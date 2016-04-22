@@ -1,6 +1,6 @@
 /*jshint es3:false */
 /*jshint maxcomplexity:15 */
-/* globals jasmine, define, spyOn, expect */
+/* globals jasmine, define, spyOn, expect, JSON */
 define(function(require) {
   var Q = require('q'),
       $ = require('jquery'),
