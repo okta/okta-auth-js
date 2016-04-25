@@ -83,9 +83,11 @@ define(function(require) {
                         '-g2iJtD3KEViJ_JKn6tJqe0xUI';
 
   var standardState = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  var standardNonce = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
   var defaultPostMessage = {
     'id_token': standardIdToken,
-    state: standardState
+    state: standardState,
+    nonce: standardNonce
   };
   var defaultResponse = {
     idToken: standardIdToken,
@@ -112,7 +114,7 @@ define(function(require) {
       });
     }
 
-    // Make sure the state is generated the same every time (standardState)
+    // Make sure the state is generated the same every time (standardState, standardNonce)
     spyOn(Math, 'random').and.callFake(function() {
       return 0;
     });
@@ -320,6 +322,7 @@ define(function(require) {
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
               'state': standardState,
+              'nonce': standardNonce,
               'scope': 'openid email',
               'prompt': 'none'
             }
@@ -348,6 +351,7 @@ define(function(require) {
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
               'state': standardState,
+              'nonce': standardNonce,
               'scope': 'openid email',
               'prompt': 'none',
               'sessionToken': 'testSessionToken'
@@ -375,6 +379,7 @@ define(function(require) {
               'response_mode': 'okta_post_message',
               'display': 'popup',
               'state': standardState,
+              'nonce': standardNonce,
               'scope': 'openid email',
               'idp': 'testIdp'
             }
@@ -401,7 +406,7 @@ define(function(require) {
       it('returns id_token using popup fragment', function (done) {
         return setupPopup({
           hrefMock: 'https://lboyette.trexcloud.com',
-          changeToHash: '#id_token=' + standardIdToken + '&state=' + standardState,
+          changeToHash: '#id_token=' + standardIdToken + '&state=' + standardState + '&nonce=' + standardNonce,
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -417,6 +422,7 @@ define(function(require) {
               'response_mode': 'fragment',
               'display': 'popup',
               'state': standardState,
+              'nonce': standardNonce,
               'scope': 'openid email',
               'idp': 'testIdp'
             }
@@ -459,6 +465,7 @@ define(function(require) {
                 'response_type': 'id_token',
                 'response_mode': 'okta_post_message',
                 'state': standardState,
+                'nonce': standardNonce,
                 'scope': 'openid email',
                 'prompt': 'none',
                 'sessionToken': 'testToken'
@@ -483,6 +490,7 @@ define(function(require) {
                 'response_type': 'id_token',
                 'response_mode': 'okta_post_message',
                 'state': standardState,
+                'nonce': standardNonce,
                 'scope': 'openid testscope',
                 'prompt': 'none',
                 'sessionToken': 'testToken'
@@ -506,6 +514,7 @@ define(function(require) {
                 'response_type': 'id_token',
                 'response_mode': 'okta_post_message',
                 'state': standardState,
+                'nonce': standardNonce,
                 'scope': 'openid email',
                 'prompt': 'none',
                 'sessionToken': 'testToken'
@@ -653,6 +662,29 @@ define(function(require) {
             errorCauses: []
           }
         );
+        itpErrorsCorrectly('throws an sdk error when nonce doesn\'t match',
+          {
+            authorizeArgs: {
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              sessionToken: 'testToken'
+            },
+            postMessageResp: {
+              'id_token': standardIdToken,
+              state: standardState,
+              nonce: 'mismatchedNonce'
+            }
+          },
+          {
+            name: 'AuthSdkError',
+            message: 'OAuth flow response nonce doesn\'t match request nonce',
+            errorCode: 'INTERNAL',
+            errorSummary: 'OAuth flow response nonce doesn\'t match request nonce',
+            errorLink: 'INTERNAL',
+            errorId: 'INTERNAL',
+            errorCauses: []
+          }
+        );
         itpErrorsCorrectly('throws an sdk error when issuer doesn\'t match',
           {
             oktaAuthArgs: {
@@ -701,7 +733,8 @@ define(function(require) {
             },
             postMessageResp: {
               'id_token': expiredBeforeIssuedToken,
-              state: standardState
+              state: standardState,
+              nonce: standardNonce
             }
           },
           {
