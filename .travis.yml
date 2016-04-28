@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - "5.8"
+install:
+  - bundle install
+  - npm install
+script:
+  - npm run package
+  - npm run lint:report
+  - npm test
+cache:
+  directories:
+    - node_modules
