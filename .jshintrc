@@ -48,14 +48,11 @@
     "waits": false,
     "spyOn": false,
     "runs": false,
-    "jasmine": false
-  },
-  "globals": {
+    "jasmine": false,
+    "escape": false,
+    "crypto": false,
+    "JSON": false,
     "module": true,
-    "it": true,
-    "xit": true,
-    "require": true,
-    "describe": true,
     "__dirname": true
   }
 }
