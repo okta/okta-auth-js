@@ -22,6 +22,9 @@ define({
         "provider": "OKTA",
         "profile": {
           "phoneNumber": "+1 XXX-XXX-6688"
+        },
+        "_embedded": {
+          "verification": null
         }
       }
     },
