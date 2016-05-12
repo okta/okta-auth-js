@@ -26,7 +26,8 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      SDK_VERSION: JSON.stringify(require('./package.json').version)
+      SDK_VERSION: JSON.stringify(require('./package.json').version),
+      STATE_TOKEN_COOKIE_NAME: JSON.stringify('oktaStateToken')
     }),
 
     new webpack.optimize.UglifyJsPlugin({
