@@ -30,7 +30,8 @@ module.exports = {
     new webpack.DefinePlugin({
       SDK_VERSION: JSON.stringify(packageJson.version),
       STATE_TOKEN_COOKIE_NAME: JSON.stringify(oktaAuthConfig.STATE_TOKEN_COOKIE_NAME),
-      DEFAULT_POLLING_DELAY: oktaAuthConfig.DEFAULT_POLLING_DELAY
+      DEFAULT_POLLING_DELAY: oktaAuthConfig.DEFAULT_POLLING_DELAY,
+      FRAME_ID: JSON.stringify(oktaAuthConfig.FRAME_ID)
     }),
 
     new webpack.optimize.UglifyJsPlugin({
