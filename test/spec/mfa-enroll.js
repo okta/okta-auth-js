@@ -1,4 +1,3 @@
-/*jshint es3:false */
 /* globals define, expect */
 define(function(require) {
   var util = require('../util/util'),

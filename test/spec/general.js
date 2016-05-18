@@ -1,4 +1,3 @@
-/*jshint es3:false, maxlen:125 */
 /* globals define, expect, xdescribe */
 define(function(require) {
   var OktaAuth = require('OktaAuth');
@@ -120,14 +119,14 @@ define(function(require) {
               {
                 request: {
                   method: 'get',
-                  uri: '/.well-known/openid-configuration',
+                  uri: '/.well-known/openid-configuration'
                 },
                 response: 'well-known'
               },
               {
                 request: {
                   method: 'get',
-                  uri: '/oauth2/v1/keys',
+                  uri: '/oauth2/v1/keys'
                 },
                 response: 'keys'
               }

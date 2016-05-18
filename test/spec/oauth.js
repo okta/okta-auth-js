@@ -1,6 +1,6 @@
-/* jshint es3:false */
-/* jshint maxcomplexity:8 */
 /* globals define, expect, spyOn */
+/* eslint-disable max-statements */
+/* eslint-disable complexity */
 define(function(require) {
   var OktaAuth = require('OktaAuth');
   var util = require('../util/util');
