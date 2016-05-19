@@ -53,6 +53,7 @@
     "webpack": "^1.13.0"
   },
   "okta-auth-js": {
-    "STATE_TOKEN_COOKIE_NAME": "oktaStateToken"
+    "STATE_TOKEN_COOKIE_NAME": "oktaStateToken",
+    "DEFAULT_POLLING_DELAY": 500
   }
 }
