@@ -7,7 +7,9 @@
 var path    = require('path');
 var webpack = require('webpack');
 var fs      = require('fs');
+var packageJson = require('./package.json');
 
+var oktaAuthConfig = packageJson['okta-auth-js'];
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 
 module.exports = {
@@ -26,7 +28,8 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      SDK_VERSION: JSON.stringify(require('./package.json').version)
+      SDK_VERSION: JSON.stringify(packageJson.version),
+      STATE_TOKEN_COOKIE_NAME: JSON.stringify(oktaAuthConfig.STATE_TOKEN_COOKIE_NAME)
     }),
 
     new webpack.optimize.UglifyJsPlugin({
