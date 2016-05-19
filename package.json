@@ -51,5 +51,8 @@
     "semver": "5.1.0",
     "sinon": "1.16.0",
     "webpack": "^1.13.0"
+  },
+  "okta-auth-js": {
+    "STATE_TOKEN_COOKIE_NAME": "oktaStateToken"
   }
 }
