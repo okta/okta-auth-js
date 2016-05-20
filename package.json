@@ -15,9 +15,9 @@
     "registry": "https://artifacts.aue1d.saasure.com/artifactory/api/npm/npm-okta"
   },
   "scripts": {
-    "lint": "eslint ./lib ./test",
-    "lint:fix": "eslint --fix ./lib ./test",
-    "lint:report": "eslint -f checkstyle -o build2/loginjs-checkstyle-result.xml ./lib ./test",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
     "test": "grunt test",
     "build": "webpack --config webpack.config.js",
     "build:AMDJqueryQ": "webpack --config webpack.AMDJqueryQ.config.js",
