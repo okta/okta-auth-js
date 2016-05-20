@@ -1,4 +1,3 @@
-/* globals define, expect */
 define(function(require) {
   var _ = require('lodash'),
       util = require('../util/util'),

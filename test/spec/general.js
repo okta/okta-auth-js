@@ -1,4 +1,3 @@
-/* globals define, expect, xdescribe */
 define(function(require) {
   var OktaAuth = require('OktaAuth');
   var Q = require('q');

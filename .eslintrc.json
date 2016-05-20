@@ -2,11 +2,9 @@
   "extends": ["eslint:recommended"],
   "env": {
     "browser": true,
-    "commonjs": true
-  },
-  "globals": {
-    "describe": true,
-    "it": true
+    "commonjs": true,
+    "jasmine": true,
+    "amd": true
   },
   "rules": {
     "camelcase": 2,
