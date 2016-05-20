@@ -7,9 +7,6 @@
   "globals": {
     "describe": true,
     "it": true
-  }, 
-  "parserOptions": {
-    "ecmaVersion": 3
   },
   "rules": {
     "camelcase": 2,
