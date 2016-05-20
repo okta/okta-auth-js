@@ -1,0 +1,37 @@
+{
+  "extends": ["eslint:recommended"],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "jasmine": true,
+    "amd": true
+  },
+  "rules": {
+    "camelcase": 2,
+    "complexity": [2, 6],
+    "curly": 2,
+    "dot-notation": 0,
+    "guard-for-in": 2,
+    "new-cap": [2, { "properties": false }],
+    "no-caller": 2,
+    "no-empty": 2,
+    "no-eval": 2,
+    "no-implied-eval": 2,
+    "no-multi-str": 0,
+    "no-new": 2,
+    "no-plusplus": 0,
+    "no-undef": 2,
+    "no-use-before-define": [2, "nofunc"],
+    "no-unused-expressions": [2, { "allowShortCircuit": true, "allowTernary": true }],
+    "no-unused-vars": [2, { "args": "none" }],
+    "max-depth": [2, 3],
+    "max-len": [2, 120],
+    "max-params": [2, 5],
+    "max-statements": [2, 18],
+    "quotes": [2, "single"],
+    "semi": 2,
+    "strict": 0,
+    "wrap-iife": [2, "any"]
+  },
+  "root": true
+}

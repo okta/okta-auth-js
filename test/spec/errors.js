@@ -1,6 +1,3 @@
-/*jshint es3:false */
-/*jshint nonew:false */
-/* globals define, expect */
 define(function(require) {
   var _ = require('lodash'),
       util = require('../util/util'),
@@ -78,7 +75,7 @@ define(function(require) {
     it('throw an error if no arguments are passed to the constructor', function () {
       var err;
       try {
-        new OktaAuth();
+        new OktaAuth(); // eslint-disable-line no-new
       } catch (e) {
         err = e;
       }
@@ -89,12 +86,13 @@ define(function(require) {
     it('throw an error if no url is passed to the constructor', function () {
       var err;
       try {
-        new OktaAuth({});
+        new OktaAuth({}); // eslint-disable-line no-new
       } catch (e) {
         err = e;
       }
       expect(err.name).toEqual('AuthSdkError');
-      expect(err.errorSummary).toEqual('No url passed to constructor. Required usage: new OktaAuth({url: "https://sample.okta.com"})');
+      expect(err.errorSummary).toEqual('No url passed to constructor. ' +
+        'Required usage: new OktaAuth({url: "https://sample.okta.com"})');
     });
 
   });

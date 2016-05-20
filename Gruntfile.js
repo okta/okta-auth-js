@@ -25,21 +25,6 @@ module.exports = function(grunt) {
       }
     },
 
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc',
-        reporter: 'checkstyle',
-        reportOutput: 'build2/loginjs-checkstyle-result.xml',
-        force: true
-      },
-      all: [
-        'Gruntfile.js',
-        'lib/index.js',
-        'test/specs/*',
-        'test/util/*'
-      ]
-    },
-
     connect: {
       server: {
         options: {
@@ -49,6 +34,9 @@ module.exports = function(grunt) {
     },
 
     shell: {
+      lint: {
+        command: 'npm run lint'
+      },
       AMDJqueryQ: {
         command: 'npm run build:AMDJqueryQ'
       },
@@ -60,12 +48,11 @@ module.exports = function(grunt) {
 
   grunt.loadTasks('buildtools/bumpprereleaseversion');
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-shell');
 
-  grunt.registerTask('test', ['jshint', 'buildAMDWithoutJqueryOrQ', 'connect:server', 'jasmine:phantom']);
+  grunt.registerTask('test', ['shell:lint', 'buildAMDWithoutJqueryOrQ', 'connect:server', 'jasmine:phantom']);
   grunt.registerTask('default', ['test', 'buildUMDWithNoDependencies']);
 
   // Builds an AMD version that requires jQuery and Q

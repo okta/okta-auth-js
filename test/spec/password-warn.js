@@ -1,4 +1,3 @@
-/* globals define */
 define(function(require) {
   var util = require('../util/util');
 
