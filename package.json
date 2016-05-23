@@ -4,6 +4,7 @@
   "version": "1.0.1",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
@@ -22,8 +23,8 @@
     "build": "webpack --config webpack.config.js",
     "build:AMDJqueryQ": "webpack --config webpack.AMDJqueryQ.config.js",
     "package": "grunt",
-    "prerelease": "grunt bump-prerelease-version",
-    "getpkg:dataload": "node buildtools/getpkginfo/getpkginfo.js -t dataload"
+    "ci-update-package": "ci-update-package",
+    "ci-pkginfo:dataload": "ci-pkginfo -t dataload"
   },
   "author": "Okta",
   "keywords": [
@@ -33,10 +34,10 @@
     "login"
   ],
   "devDependencies": {
+    "@okta/ci-pkginfo": "1.2.0",
+    "@okta/ci-update-package": "1.4.0",
     "Base64": "0.3.0",
-    "app-root-path": "1.0.0",
     "eslint": "2.10.2",
-    "git-rev-sync": "1.4.0",
     "grunt": "0.4.5",
     "grunt-cli": "1.2.0",
     "grunt-contrib-connect": "1.0.1",
@@ -44,7 +45,7 @@
     "grunt-shell": "1.3.0",
     "grunt-template-jasmine-requirejs": "0.2.3",
     "jquery": "2.1.4",
-    "lodash": "3.10.1",
+    "lodash": "4.10.0",
     "moment": "2.12.0",
     "normalize-url": "1.4.1",
     "q": "1.4.1",
