@@ -46,8 +46,6 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadTasks('buildtools/bumpprereleaseversion');
-
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-shell');
