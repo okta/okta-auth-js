@@ -76,8 +76,8 @@ function publish() {
   # If master branch, will create a beta prerelease version
   start_test_suite ${PUBLISH_TEST_SUITE_ID}
   echo "Updating the version number, and publishing"
-  if npm run prerelease -- --branch=${BRANCH} && npm publish --registry ${REGISTRY}; then
-    DATALOAD=$(npm run getpkg:dataload --silent)
+  if npm run ci-update-package -- --branch=${BRANCH} && npm publish --registry ${REGISTRY}; then
+    DATALOAD=$(npm run ci-pkginfo:dataload --silent)
     artifactory_curl -X PUT -u ${ARTIFACTORY_USER}:${ARTIFACTORY_PASSWORD} ${DATALOAD} -v -f
     echo "Publish Success"
     finish_test_suite "no-test-suite" "."
