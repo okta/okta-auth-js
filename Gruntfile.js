@@ -26,6 +26,9 @@ module.exports = function(grunt) {
       test: {
         command: 'npm run test'
       },
+      buildTests: {
+        command: 'npm run build:tests'
+      },
       // Builds an AMD version that requires jQuery and Q
       AMDJqueryQ: {
         command: 'npm run build:AMDJqueryQ'
@@ -40,6 +43,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-shell');
 
-  grunt.registerTask('test', ['shell:lint', 'shell:AMDJqueryQ', 'jasmine:phantom']);
+  grunt.registerTask('test', ['shell:lint', 'shell:AMDJqueryQ', 'shell:buildTests', 'jasmine:phantom']);
   grunt.registerTask('default', ['shell:UMDNoDependencies', 'shell:AMDJqueryQ']);
 };

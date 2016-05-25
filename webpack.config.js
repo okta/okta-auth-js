@@ -21,11 +21,6 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
-  resolve: {
-    alias: {
-      'ajaxRequest': './reqwestRequest'
-    }
-  },
   plugins: [
     new webpack.DefinePlugin({
       SDK_VERSION: JSON.stringify(packageJson.version),
