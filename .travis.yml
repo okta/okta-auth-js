@@ -7,6 +7,4 @@ script:
   - npm run package
   - npm run lint:report
   - npm test
-cache:
-  directories:
-    - node_modules
+cache: false

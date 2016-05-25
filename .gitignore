@@ -1,8 +1,8 @@
 dist
 target
-node_modules
+node_modules/*
+!node_modules/@okta
 .grunt
 build2
-buildtools
 test/SpecRunner.html
 npm-debug.log
