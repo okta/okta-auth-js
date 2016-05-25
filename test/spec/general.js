@@ -1,10 +1,9 @@
+/* globals SDK_VERSION */
 define(function(require) {
   var OktaAuth = require('OktaAuth');
   var Q = require('q');
   var util = require('../util/util');
   var _ = require('lodash');
-  var packageJson = require('text!../../package.json');
-  packageJson = packageJson && JSON.parse(packageJson);
 
   describe('General Methods', function () {
 
@@ -427,11 +426,7 @@ define(function(require) {
       });
     });
 
-    var headersDescribe = xdescribe;
-    if (packageJson) {
-      headersDescribe = describe;
-    }
-    headersDescribe('custom headers', function () {
+    describe('custom headers', function () {
       util.itMakesCorrectRequestResponse({
         title: 'adds custom headers',
         setup: {
@@ -444,7 +439,7 @@ define(function(require) {
               'X-Custom-Header': 'custom',
               'Accept': 'application/json',
               'Content-Type': 'application/json',
-              'X-Okta-SDK': 'okta-auth-js-' + packageJson.version
+              'X-Okta-SDK': 'okta-auth-js-' + SDK_VERSION
             }
           },
           response: 'session'

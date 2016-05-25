@@ -10,29 +10,27 @@ define(function(require) {
     return Q.Promise(function(resolve) {
 
       // Import the desired xhr
-      var responseSource = 'xhr/' + response;
-      require([responseSource], function(responseXHR){
+      var responseXHR = require('../xhr/' + response);
 
-        // Change the request uri to include the domain
-        if (request) {
-          request.uri = uri + request.uri;
-        }
+      // Change the request uri to include the domain
+      if (request) {
+        request.uri = uri + request.uri;
+      }
 
-        // Change the responses to use the desired uri
-        var compiledTmpl = _.template(JSON.stringify(responseXHR.response));
-        responseXHR.response = JSON.parse(compiledTmpl({uri: uri}));
+      // Change the responses to use the desired uri
+      var compiledTmpl = _.template(JSON.stringify(responseXHR.response));
+      responseXHR.response = JSON.parse(compiledTmpl({uri: uri}));
 
-        // Place response into responseText (AuthClient SDK depends on this)
-        if (!responseXHR.response) {
-          responseXHR.responseText = '';
-        } else {
-          responseXHR.responseText = JSON.stringify(responseXHR.response);
-        }
+      // Place response into responseText (AuthClient SDK depends on this)
+      if (!responseXHR.response) {
+        responseXHR.responseText = '';
+      } else {
+        responseXHR.responseText = JSON.stringify(responseXHR.response);
+      }
 
-        resolve({
-          request: request,
-          response: responseXHR
-        });
+      resolve({
+        request: request,
+        response: responseXHR
       });
     });
   }
