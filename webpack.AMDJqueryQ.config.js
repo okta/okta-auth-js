@@ -10,7 +10,7 @@ var packageJson = require('./package.json');
 var oktaAuthConfig = packageJson['okta-auth-js'];
 
 module.exports = {
-  entry: './lib/index.js',
+  entry: './jquery/index.js',
   output: {
     path: path.join(__dirname, 'dist', 'browser'),
     filename: 'OktaAuthRequireJquery.js',
@@ -20,11 +20,6 @@ module.exports = {
     'jquery',
     'q'
   ],
-  resolve: {
-    alias: {
-      'ajaxRequest': './jqueryRequest'
-    }
-  },
   plugins: [
     new webpack.DefinePlugin({
       SDK_VERSION: JSON.stringify(packageJson.version),
