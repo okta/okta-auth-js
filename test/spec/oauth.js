@@ -3,6 +3,7 @@ define(function(require) {
   var OktaAuth = require('OktaAuth');
   var util = require('../util/util');
 
+  var standardNonce = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
   var standardClaims = {
     'sub': '00u1pcla5qYIREDLWCQV',
     'name': 'Len Boyette',
@@ -14,6 +15,7 @@ define(function(require) {
     'ver': 1,
     'iss': 'https://lboyette.trexcloud.com',
     'login': 'admin@okta.com',
+    'nonce': standardNonce,
     'aud': 'NPSfOkH5eZrTy8PMDlvx',
     'iat': 1449696330,
     'exp': 1449699930,
@@ -25,24 +27,23 @@ define(function(require) {
     'jti': 'TRZT7RCiSymTs5W7Ryh3',
     'auth_time': 1449696330
   };
-  var standardIdToken = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIwMHUxcGNsYTVxWUlSRU' +
-                        'RMV0NRViIsIm5hbWUiOiJMZW4gQm95ZXR0ZSIsImdpdmVuX25hb' +
-                        'WUiOiJMZW4iLCJmYW1pbHlfbmFtZSI6IkJveWV0dGUiLCJ1cGRh' +
-                        'dGVkX2F0IjoxNDQ2MTUzNDAxLCJlbWFpbCI6Imxib3lldHRlQG9' +
-                        'rdGEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInZlciI6MS' +
-                        'wiaXNzIjoiaHR0cHM6Ly9sYm95ZXR0ZS50cmV4Y2xvdWQuY29tI' +
-                        'iwibG9naW4iOiJhZG1pbkBva3RhLmNvbSIsImF1ZCI6Ik5QU2ZP' +
-                        'a0g1ZVpyVHk4UE1EbHZ4IiwiaWF0IjoxNDQ5Njk2MzMwLCJleHA' +
-                        'iOjE0NDk2OTk5MzAsImFtciI6WyJrYmEiLCJtZmEiLCJwd2QiXS' +
-                        'wianRpIjoiVFJaVDdSQ2lTeW1UczVXN1J5aDMiLCJhdXRoX3Rpb' +
-                        'WUiOjE0NDk2OTYzMzB9.YWCNE3ZvT-8ceKnAbTkmSxYE-jIPpfh' +
-                        '2s8f_hTagUUxrfdKgyWzBb9iN3GOPaQ2K6jqOFx90RI2GBzAWec' +
-                        'pel3sAxG-wvLqiy0d8g0CUb7XTHdhXOLRrXvlpbULxdNnMbBcc6' +
-                        'uOLDalBjrumOiDMLzti-Bx6uQQ0EjUwuC-Dhv7I3wMsVxyEKejv' +
-                        'jMLbfWJ6iu4-UUx1r8_ZZUjDDXSB3OFXJQ3nPwRVFXZuRNhGScL' +
-                        'nftXz7mypRGxrapIQusym1K8hk9uy8_KYL2H2QNbyIqK9Vh9JhY' +
-                        '1rtkQNpv3ZerCUXEVGRiEXDqR_OHu4vUi1-FkONZZe2ov8dQ1mX' +
-                        'iHHdw';
+  var standardIdToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMH' +
+                        'UxcGNsYTVxWUlSRURMV0NRViIsIm5hbWUiOiJMZW4gQm95ZXR0Z' +
+                        'SIsImdpdmVuX25hbWUiOiJMZW4iLCJmYW1pbHlfbmFtZSI6IkJv' +
+                        'eWV0dGUiLCJ1cGRhdGVkX2F0IjoxNDQ2MTUzNDAxLCJlbWFpbCI' +
+                        '6Imxib3lldHRlQG9rdGEuY29tIiwiZW1haWxfdmVyaWZpZWQiOn' +
+                        'RydWUsInZlciI6MSwiaXNzIjoiaHR0cHM6Ly9sYm95ZXR0ZS50c' +
+                        'mV4Y2xvdWQuY29tIiwibG9naW4iOiJhZG1pbkBva3RhLmNvbSIs' +
+                        'Im5vbmNlIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWF' +
+                        'hYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsIm' +
+                        'F1ZCI6Ik5QU2ZPa0g1ZVpyVHk4UE1EbHZ4IiwiaWF0IjoxNDQ5N' +
+                        'jk2MzMwLCJleHAiOjE0NDk2OTk5MzAsImFtciI6WyJrYmEiLCJt' +
+                        'ZmEiLCJwd2QiXSwianRpIjoiVFJaVDdSQ2lTeW1UczVXN1J5aDM' +
+                        'iLCJhdXRoX3RpbWUiOjE0NDk2OTYzMzB9.w_JtTGqho5rIVvIkh' +
+                        'OyXun2wzOeWOw-1eNBqwy15XvEj_lrz2rVJW9-kxKZgLyQRMRcb' +
+                        '7br_I284szVX848gQQ-E5X73j9uuBmpYRtrAlb35E4TUXGKxXs9' +
+                        'kgJku2QOQeX-AHQj0MSWzDMSjK2JqJxnwifi6pgFA8RMiNfmLloc';
+
   /*
   {
     'sub': '00u1pcla5qYIREDLWCQV',
@@ -55,6 +56,7 @@ define(function(require) {
     'ver': 1,
     'iss': 'https://lboyette.trexcloud.com',
     'login': 'admin@okta.com',
+    'nonce': standardNonce,
     'aud': 'NPSfOkH5eZrTy8PMDlvx',
     'iat': 2449696330,
     'exp': 1449699930,
@@ -67,25 +69,28 @@ define(function(require) {
     'auth_time': 1449696330
   }
   */
-  var expiredBeforeIssuedToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdW' +
-                        'IiOiIwMHUxcGNsYTVxWUlSRURMV0NRViIsIm5hbWUiOiJMZW4gQm' +
-                        '95ZXR0ZSIsImdpdmVuX25hbWUiOiJMZW4iLCJmYW1pbHlfbmFtZS' +
-                        'I6IkJveWV0dGUiLCJ1cGRhdGVkX2F0IjoxNDQ2MTUzNDAxLCJlbW' +
-                        'FpbCI6Imxib3lldHRlQG9rdGEuY29tIiwiZW1haWxfdmVyaWZpZW' +
-                        'QiOnRydWUsInZlciI6MSwiaXNzIjoiaHR0cHM6Ly9sYm95ZXR0ZS' +
-                        '50cmV4Y2xvdWQuY29tIiwibG9naW4iOiJhZG1pbkBva3RhLmNvbS' +
-                        'IsImF1ZCI6Ik5QU2ZPa0g1ZVpyVHk4UE1EbHZ4IiwiaWF0IjoyND' +
-                        'Q5Njk2MzMwLCJleHAiOjE0NDk2OTk5MzAsImFtciI6WyJrYmEiLC' +
-                        'JtZmEiLCJwd2QiXSwianRpIjoiVFJaVDdSQ2lTeW1UczVXN1J5aD' +
-                        'MiLCJhdXRoX3RpbWUiOjE0NDk2OTYzMzB9.7S5SvTiQE24Jg4Eu9' +
-                        '-g2iJtD3KEViJ_JKn6tJqe0xUI';
+  var expiredBeforeIssuedToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzd' +
+                        'WIiOiIwMHUxcGNsYTVxWUlSRURMV0NRViIsIm5hbWUiOiJMZW4g' +
+                        'Qm95ZXR0ZSIsImdpdmVuX25hbWUiOiJMZW4iLCJmYW1pbHlfbmF' +
+                        'tZSI6IkJveWV0dGUiLCJ1cGRhdGVkX2F0IjoxNDQ2MTUzNDAxLC' +
+                        'JlbWFpbCI6Imxib3lldHRlQG9rdGEuY29tIiwiZW1haWxfdmVya' +
+                        'WZpZWQiOnRydWUsInZlciI6MSwiaXNzIjoiaHR0cHM6Ly9sYm95' +
+                        'ZXR0ZS50cmV4Y2xvdWQuY29tIiwibG9naW4iOiJhZG1pbkBva3R' +
+                        'hLmNvbSIsIm5vbmNlIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYW' +
+                        'FhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhY' +
+                        'WFhYSIsImF1ZCI6Ik5QU2ZPa0g1ZVpyVHk4UE1EbHZ4IiwiaWF0' +
+                        'IjoyNDQ5Njk2MzMwLCJleHAiOjE0NDk2OTk5MzAsImFtciI6WyJ' +
+                        'rYmEiLCJtZmEiLCJwd2QiXSwianRpIjoiVFJaVDdSQ2lTeW1Ucz' +
+                        'VXN1J5aDMiLCJhdXRoX3RpbWUiOjE0NDk2OTYzMzB9.u7ClfS2w' +
+                        '7O_kei5gtBfY_M01WCxLZ30A8KUhkHd2bDzkHFKmc3c4OT86PKS' +
+                        '3I-JKeRIflXTwcIe8IUqtFGv8pM9iAT_mi2nxieMqOdrFw4S8UM' +
+                        'KKgPcYLLfFCvcDs_1d0XqHHohmHKdM6YIsgP8abPk2ugwSX49Dz' +
+                        'LyJrVkCZIM';
 
   var standardState = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-  var standardNonce = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
   var defaultPostMessage = {
     'id_token': standardIdToken,
-    state: standardState,
-    nonce: standardNonce
+    state: standardState
   };
   var defaultResponse = {
     idToken: standardIdToken,
@@ -404,7 +409,7 @@ define(function(require) {
       it('returns id_token using popup fragment', function (done) {
         return setupPopup({
           hrefMock: 'https://lboyette.trexcloud.com',
-          changeToHash: '#id_token=' + standardIdToken + '&state=' + standardState + '&nonce=' + standardNonce,
+          changeToHash: '#id_token=' + standardIdToken + '&state=' + standardState,
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -665,11 +670,7 @@ define(function(require) {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
               redirectUri: 'https://lboyette.trexcloud.com/redirect',
-              sessionToken: 'testToken'
-            },
-            postMessageResp: {
-              'id_token': standardIdToken,
-              state: standardState,
+              sessionToken: 'testToken',
               nonce: 'mismatchedNonce'
             }
           },
@@ -731,8 +732,7 @@ define(function(require) {
             },
             postMessageResp: {
               'id_token': expiredBeforeIssuedToken,
-              state: standardState,
-              nonce: standardNonce
+              state: standardState
             }
           },
           {
