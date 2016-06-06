@@ -18,8 +18,7 @@ module.exports = {
     path: path.join(__dirname, 'dist', 'browser'),
     filename: 'OktaAuth.min.js',
     library: 'OktaAuth',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    libraryTarget: 'umd'
   },
   plugins: [
     new webpack.DefinePlugin({
