@@ -108,6 +108,48 @@ define(function(require) {
       });
 
       util.itMakesCorrectRequestResponse({
+        title: 'allows polling for push with rememberDevice',
+        setup: {
+          status: 'mfa-challenge-push',
+          calls: [
+            {
+              request: {
+                uri: '/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify?rememberDevice=true',
+                data: {
+                  stateToken: '00T4jcVNRzJy5dkWJ4P7c9051dY3FUYY9O2zvbU_vI'
+                }
+              },
+              response: 'mfa-challenge-push'
+            },
+            {
+              request: {
+                uri: '/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify?rememberDevice=true',
+                data: {
+                  stateToken: '00T4jcVNRzJy5dkWJ4P7c9051dY3FUYY9O2zvbU_vI'
+                }
+              },
+              response: 'mfa-challenge-push'
+            },
+            {
+              request: {
+                uri: '/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify?rememberDevice=true',
+                data: {
+                  stateToken: '00T4jcVNRzJy5dkWJ4P7c9051dY3FUYY9O2zvbU_vI'
+                }
+              },
+              response: 'success'
+            }
+          ]
+        },
+        execute: function (test) {
+          return test.trans.poll({
+            delay: 0,
+            rememberDevice: true
+          });
+        }
+      });
+
+      util.itMakesCorrectRequestResponse({
         title: 'allows polling for push after a network error',
         setup: {
           status: 'mfa-challenge-push',
