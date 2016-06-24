@@ -9,21 +9,22 @@ If you want to modify the SDK, use the following instructions.
 ## Building the SDK
 
 1. Clone the SDK repo.
-  ```bash
-  [path]$ git clone git@github.com:okta/okta-auth-js.git
-  ```
+
+    ```bash
+    [path]$ git clone git@github.com:okta/okta-auth-js.git
+    ```
 
 2. Navigate to the new `okta-auth-js` folder, and install the Okta node dependencies.
 
-  ```bash
-  [path/okta-auth-js]$ npm install
-  ```
+    ```bash
+    [path/okta-auth-js]$ npm install
+    ```
 
 3. Build the SDK. The output will be under `dist/browser/`. The standalone version is `OktaAuthReqwest.min.js`.
 
-  ```bash
-  [path/okta-auth-js]$ npm run build
-  ```
+    ```bash
+    [path/okta-auth-js]$ npm run build
+    ```
 
 ## Build and test commands
 
