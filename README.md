@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/okta/okta-auth-js.svg?branch=master)](https://travis-ci.org/okta/okta-auth-js)
+
 # Okta Auth JS
 
 Okta Auth JS is a wrapper around [Okta's authentication API](http://developer.okta.com/docs/api/resources/authn.html). It can be used to get an Okta session cookie or an ID token.
