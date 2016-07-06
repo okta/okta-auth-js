@@ -1,16 +1,13 @@
 /*
- * This config builds a minified version that can be imported
- * anywhere without any dependencies. It packages the SDK
- * with reqwest and Q. It also preserves license comments.
+ * This config builds tests against the jQuery version of the module
  */
 
 var path    = require('path');
 var webpack = require('webpack');
-var packageJson = require('./package.json');
+var _ = require('lodash');
+var commonConfig = require('./webpack.common.config');
 
-var oktaAuthConfig = packageJson['okta-auth-js'];
-
-module.exports = {
+module.exports = _.extend(commonConfig, {
   entry: './test/main.js',
   output: {
     path: path.join(__dirname, 'dist', 'test'),
@@ -20,10 +17,5 @@ module.exports = {
     alias: {
       'OktaAuth$': path.join(__dirname, 'dist', 'browser', 'OktaAuthRequireJquery.js')
     }
-  },
-  plugins: [
-    new webpack.DefinePlugin({
-      SDK_VERSION: JSON.stringify(packageJson.version)
-    })
-  ]
-};
+  }
+});
