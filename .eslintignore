@@ -7,4 +7,3 @@
 /node_modules
 Gruntfile.js
 *.config.js
-writeConfig.js

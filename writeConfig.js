@@ -1,3 +1,5 @@
+/* globals __dirname */
+/* eslint-disable no-console */
 /*
  * This builds a config file that is imported by each module
  * that needs access to a global variable like SDK_VERSION.
