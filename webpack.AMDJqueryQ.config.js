@@ -5,11 +5,10 @@
 
 var path    = require('path');
 var webpack = require('webpack');
-var packageJson = require('./package.json');
+var _ = require('lodash');
+var commonConfig = require('./webpack.common.config');
 
-var oktaAuthConfig = packageJson['okta-auth-js'];
-
-module.exports = {
+module.exports = _.extend(commonConfig, {
   entry: './jquery/index.js',
   output: {
     path: path.join(__dirname, 'dist', 'browser'),
@@ -19,13 +18,5 @@ module.exports = {
   externals: [
     'jquery',
     'q'
-  ],
-  plugins: [
-    new webpack.DefinePlugin({
-      SDK_VERSION: JSON.stringify(packageJson.version),
-      STATE_TOKEN_COOKIE_NAME: JSON.stringify(oktaAuthConfig.STATE_TOKEN_COOKIE_NAME),
-      DEFAULT_POLLING_DELAY: oktaAuthConfig.DEFAULT_POLLING_DELAY,
-      FRAME_ID: JSON.stringify(oktaAuthConfig.FRAME_ID)
-    })
   ]
-};
+});

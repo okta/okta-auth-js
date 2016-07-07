@@ -7,12 +7,12 @@
 var path    = require('path');
 var webpack = require('webpack');
 var fs      = require('fs');
-var packageJson = require('./package.json');
+var _ = require('lodash');
+var commonConfig = require('./webpack.common.config');
 
-var oktaAuthConfig = packageJson['okta-auth-js'];
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 
-module.exports = {
+module.exports = _.extend(commonConfig, {
   entry: './lib/index.js',
   output: {
     path: path.join(__dirname, 'dist', 'browser'),
@@ -21,13 +21,6 @@ module.exports = {
     libraryTarget: 'umd'
   },
   plugins: [
-    new webpack.DefinePlugin({
-      SDK_VERSION: JSON.stringify(packageJson.version),
-      STATE_TOKEN_COOKIE_NAME: JSON.stringify(oktaAuthConfig.STATE_TOKEN_COOKIE_NAME),
-      DEFAULT_POLLING_DELAY: oktaAuthConfig.DEFAULT_POLLING_DELAY,
-      FRAME_ID: JSON.stringify(oktaAuthConfig.FRAME_ID)
-    }),
-
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
@@ -44,4 +37,4 @@ module.exports = {
     // Add a single Okta license after removing others
     new webpack.BannerPlugin(license)
   ]
-};
+});

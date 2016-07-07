@@ -1,9 +1,9 @@
-/* globals SDK_VERSION */
 define(function(require) {
   var OktaAuth = require('OktaAuth');
   var Q = require('q');
   var util = require('../util/util');
   var _ = require('lodash');
+  var packageJson = require('../../package.json');
 
   describe('General Methods', function () {
 
@@ -439,7 +439,7 @@ define(function(require) {
               'X-Custom-Header': 'custom',
               'Accept': 'application/json',
               'Content-Type': 'application/json',
-              'X-Okta-SDK': 'okta-auth-js-' + SDK_VERSION
+              'X-Okta-SDK': 'okta-auth-js-' + packageJson.version
             }
           },
           response: 'session'
