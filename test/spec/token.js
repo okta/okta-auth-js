@@ -32,7 +32,7 @@ define(function(require) {
       })
       .fail(function (err) {
         expect(err.name).toEqual('AuthSdkError');
-        expect(err.errorSummary).toEqual('Malformed token');
+        expect(err.errorSummary).toBeDefined();
         done();
       });
     });
