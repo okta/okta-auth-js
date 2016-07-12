@@ -15,7 +15,8 @@ module.exports = _.extend(commonConfig, {
   },
   resolve: {
     alias: {
-      'OktaAuth$': path.join(__dirname, 'dist', 'browser', 'OktaAuthRequireJquery.js')
+      'OktaAuth$': path.join(__dirname, 'jquery', 'index.js')
     }
-  }
+  },
+  devtool: '#inline-source-map'
 });

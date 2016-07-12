@@ -1,48 +1,8 @@
 /* eslint-disable complexity, max-statements */
 define(function(require) {
-  var OktaAuth = require('OktaAuth');
   var util = require('../util/util');
-
-  var standardNonce = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-  var standardClaims = {
-    'sub': '00u1pcla5qYIREDLWCQV',
-    'name': 'Len Boyette',
-    'given_name': 'Len',
-    'family_name': 'Boyette',
-    'updated_at': 1446153401,
-    'email': 'lboyette@okta.com',
-    'email_verified': true,
-    'ver': 1,
-    'iss': 'https://lboyette.trexcloud.com',
-    'login': 'admin@okta.com',
-    'nonce': standardNonce,
-    'aud': 'NPSfOkH5eZrTy8PMDlvx',
-    'iat': 1449696330,
-    'exp': 1449699930,
-    'amr': [
-      'kba',
-      'mfa',
-      'pwd'
-    ],
-    'jti': 'TRZT7RCiSymTs5W7Ryh3',
-    'auth_time': 1449696330
-  };
-  var standardIdToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMH' +
-                        'UxcGNsYTVxWUlSRURMV0NRViIsIm5hbWUiOiJMZW4gQm95ZXR0Z' +
-                        'SIsImdpdmVuX25hbWUiOiJMZW4iLCJmYW1pbHlfbmFtZSI6IkJv' +
-                        'eWV0dGUiLCJ1cGRhdGVkX2F0IjoxNDQ2MTUzNDAxLCJlbWFpbCI' +
-                        '6Imxib3lldHRlQG9rdGEuY29tIiwiZW1haWxfdmVyaWZpZWQiOn' +
-                        'RydWUsInZlciI6MSwiaXNzIjoiaHR0cHM6Ly9sYm95ZXR0ZS50c' +
-                        'mV4Y2xvdWQuY29tIiwibG9naW4iOiJhZG1pbkBva3RhLmNvbSIs' +
-                        'Im5vbmNlIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWF' +
-                        'hYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsIm' +
-                        'F1ZCI6Ik5QU2ZPa0g1ZVpyVHk4UE1EbHZ4IiwiaWF0IjoxNDQ5N' +
-                        'jk2MzMwLCJleHAiOjE0NDk2OTk5MzAsImFtciI6WyJrYmEiLCJt' +
-                        'ZmEiLCJwd2QiXSwianRpIjoiVFJaVDdSQ2lTeW1UczVXN1J5aDM' +
-                        'iLCJhdXRoX3RpbWUiOjE0NDk2OTYzMzB9.w_JtTGqho5rIVvIkh' +
-                        'OyXun2wzOeWOw-1eNBqwy15XvEj_lrz2rVJW9-kxKZgLyQRMRcb' +
-                        '7br_I284szVX848gQQ-E5X73j9uuBmpYRtrAlb35E4TUXGKxXs9' +
-                        'kgJku2QOQeX-AHQj0MSWzDMSjK2JqJxnwifi6pgFA8RMiNfmLloc';
+  var oauthUtil = require('../util/oauthUtil');
+  var tokens = require('../util/tokens');
 
   /*
   {
@@ -87,129 +47,6 @@ define(function(require) {
                         'KKgPcYLLfFCvcDs_1d0XqHHohmHKdM6YIsgP8abPk2ugwSX49Dz' +
                         'LyJrVkCZIM';
 
-  var standardState = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-  var defaultPostMessage = {
-    'id_token': standardIdToken,
-    state: standardState
-  };
-  var defaultResponse = {
-    idToken: standardIdToken,
-    claims: standardClaims
-  };
-
-  function setup(opts) {
-
-    if (opts &&
-        (opts.authorizeArgs && opts.authorizeArgs.responseMode !== 'fragment') ||
-        (opts.refreshArgs)) {
-      // Simulate the postMessage between the window and the popup or iframe
-      spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
-        if (eventName === 'message' && !opts.closePopup) {
-          // Call postMessage on the next tick
-          setTimeout(function() {
-            fn({
-              data: opts.postMessageResp || defaultPostMessage,
-              origin: opts.oktaAuthArgs && opts.oktaAuthArgs.url ||
-                'https://lboyette.trexcloud.com'
-            });
-          });
-        }
-      });
-    }
-
-    // Make sure the state is generated the same every time (standardState, standardNonce)
-    spyOn(Math, 'random').and.callFake(function() {
-      return 0;
-    });
-
-    var authClient;
-    if (opts.oktaAuthArgs) {
-      authClient = new OktaAuth(opts.oktaAuthArgs);
-    } else {
-      authClient = new OktaAuth({
-        url: 'https://lboyette.trexcloud.com'
-      });
-    }
-
-    // Make sure our token isn't expired
-    var time;
-    if (opts.time || opts.time === 0) {
-      time = opts.time;
-    } else {
-      time = standardClaims.exp - 1;
-    }
-    util.warpToUnixTime(time);
-
-    if (opts.hrefMock) {
-      util.mockWindowLocationHref(authClient, opts.hrefMock);
-    }
-
-    var promise;
-    if (opts.refreshArgs) {
-      promise = authClient.idToken.refresh(opts.refreshArgs);
-    } else {
-      promise = authClient.idToken.authorize(opts.authorizeArgs);
-    }
-    return promise
-      .then(function(res) {
-        var expectedResp = defaultResponse;
-        expect(res.idToken).toEqual(expectedResp.idToken);
-        expect(res.claims).toEqual(expectedResp.claims);
-      })
-      .fail(function(err) {
-        if (opts.willFail) {
-          throw err;
-        } else {
-          expect(err).toBeUndefined();
-        }
-      });
-  }
-
-  function setupFrame(opts) {
-    var body = document.getElementsByTagName('body')[0];
-
-    // Capture the src of the iframe to check later
-    var src;
-    var origAppend = body.appendChild;
-    spyOn(body, 'appendChild').and.callFake(function (el) {
-      if (el.tagName === 'IFRAME') {
-        src = el.src;
-
-        // Remove the src so it doesn't actually load
-        el.src = '';
-
-        return origAppend.call(this, el);
-      }
-      return origAppend.apply(this, arguments);
-    });
-
-    var iframeId = 'okta-oauth-helper-frame';
-    function iframeWasCreated() {
-      expect(body.appendChild).toHaveBeenCalled();
-      var el = body.appendChild.calls.mostRecent().args[0];
-      expect(el.tagName).toEqual('IFRAME');
-      expect(el.id).toEqual(iframeId);
-      expect(el.style.display).toEqual('none');
-    }
-
-    function iframeWasDestroyed() {
-      var iframe = document.getElementById(iframeId);
-      expect(iframe).toBeNull();
-    }
-
-    return setup(opts)
-      .then(function() {
-        iframeWasCreated();
-        iframeWasDestroyed();
-        if (opts.postMessageSrc) {
-          var actual = util.parseUri(src);
-          var expected = opts.postMessageSrc;
-          expect(actual.baseUri).toEqual(expected.baseUri);
-          expect(actual.queryParams).toEqual(expected.queryParams);
-        }
-      });
-  }
-
   function setupPopup(opts) {
     var src;
     var fakeWindow = {
@@ -243,7 +80,7 @@ define(function(require) {
       expect(fakeWindow.close).toHaveBeenCalled();
     }
 
-    return setup(opts)
+    return oauthUtil.setup(opts)
       .then(function() {
         popupWasCreated();
         popupWasDestroyed();
@@ -276,7 +113,7 @@ define(function(require) {
     it(title, function () {
       var thrown = false;
       try {
-        setupFrame(options);
+        oauthUtil.setupFrame(options);
       } catch (e) {
         expectErrorToEqual(e, error);
         thrown = true;
@@ -293,7 +130,7 @@ define(function(require) {
           (options.authorizeArgs.responseMode === 'fragment' || options.authorizeArgs.idp)) {
         setupMethod = setupPopup;
       } else {
-        setupMethod = setupFrame;
+        setupMethod = oauthUtil.setupFrame;
       }
       setupMethod(options)
         .then(function() {
@@ -310,7 +147,7 @@ define(function(require) {
 
     describe('idToken.refresh', function () {
       it('returns new id_token using old id_token', function (done) {
-        return setupFrame({
+        return oauthUtil.setupFrame({
           oktaAuthArgs: {
             url: 'https://lboyette.trexcloud.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -324,8 +161,8 @@ define(function(require) {
               'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
-              'state': standardState,
-              'nonce': standardNonce,
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
               'scope': 'openid email',
               'prompt': 'none'
             }
@@ -340,7 +177,7 @@ define(function(require) {
     describe('idToken.authorize', function () {
 
       it('returns id_token using sessionToken', function (done) {
-        return setupFrame({
+        return oauthUtil.setupFrame({
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -353,8 +190,8 @@ define(function(require) {
               'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
-              'state': standardState,
-              'nonce': standardNonce,
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
               'scope': 'openid email',
               'prompt': 'none',
               'sessionToken': 'testSessionToken'
@@ -381,8 +218,8 @@ define(function(require) {
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
               'display': 'popup',
-              'state': standardState,
-              'nonce': standardNonce,
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
               'scope': 'openid email',
               'idp': 'testIdp'
             }
@@ -394,7 +231,7 @@ define(function(require) {
       });
 
       it('returns id_token using iframe', function (done) {
-        return setupFrame({
+        return oauthUtil.setupFrame({
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -409,7 +246,7 @@ define(function(require) {
       it('returns id_token using popup fragment', function (done) {
         return setupPopup({
           hrefMock: 'https://lboyette.trexcloud.com',
-          changeToHash: '#id_token=' + standardIdToken + '&state=' + standardState,
+          changeToHash: '#id_token=' + tokens.standardIdToken + '&state=' + oauthUtil.mockedState,
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -424,8 +261,8 @@ define(function(require) {
               'response_type': 'id_token',
               'response_mode': 'fragment',
               'display': 'popup',
-              'state': standardState,
-              'nonce': standardNonce,
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
               'scope': 'openid email',
               'idp': 'testIdp'
             }
@@ -437,7 +274,7 @@ define(function(require) {
       });
 
       it('doesn\'t throw an error when redirectUri and clientId are passed via OktaAuth', function (done) {
-        return setupFrame({
+        return oauthUtil.setupFrame({
           oktaAuthArgs: {
             url: 'https://lboyette.trexcloud.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -454,7 +291,7 @@ define(function(require) {
 
       describe('scope', function () {
         it('includes default scope in the uri', function (done) {
-          return setupFrame({
+          return oauthUtil.setupFrame({
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
               redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -467,8 +304,8 @@ define(function(require) {
                 'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
                 'response_type': 'id_token',
                 'response_mode': 'okta_post_message',
-                'state': standardState,
-                'nonce': standardNonce,
+                'state': oauthUtil.mockedState,
+                'nonce': oauthUtil.mockedNonce,
                 'scope': 'openid email',
                 'prompt': 'none',
                 'sessionToken': 'testToken'
@@ -478,7 +315,7 @@ define(function(require) {
           .fin(done);
         });
         it('includes specified scope in the uri', function (done) {
-          return setupFrame({
+          return oauthUtil.setupFrame({
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
               redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -492,8 +329,8 @@ define(function(require) {
                 'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
                 'response_type': 'id_token',
                 'response_mode': 'okta_post_message',
-                'state': standardState,
-                'nonce': standardNonce,
+                'state': oauthUtil.mockedState,
+                'nonce': oauthUtil.mockedNonce,
                 'scope': 'openid testscope',
                 'prompt': 'none',
                 'sessionToken': 'testToken'
@@ -504,7 +341,7 @@ define(function(require) {
         });
 
         it('uses the current href as the redirect_uri when it\'s not provided', function (done) {
-          return setupFrame({
+          return oauthUtil.setupFrame({
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
               sessionToken: 'testToken'
@@ -516,8 +353,8 @@ define(function(require) {
                 'redirect_uri': window.location.href,
                 'response_type': 'id_token',
                 'response_mode': 'okta_post_message',
-                'state': standardState,
-                'nonce': standardNonce,
+                'state': oauthUtil.mockedState,
+                'nonce': oauthUtil.mockedNonce,
                 'scope': 'openid email',
                 'prompt': 'none',
                 'sessionToken': 'testToken'
@@ -651,7 +488,7 @@ define(function(require) {
               sessionToken: 'testToken'
             },
             postMessageResp: {
-              'id_token': standardIdToken,
+              'id_token': tokens.standardIdToken,
               state: 'mismatchedState'
             }
           },
@@ -732,7 +569,7 @@ define(function(require) {
             },
             postMessageResp: {
               'id_token': expiredBeforeIssuedToken,
-              state: standardState
+              state: oauthUtil.mockedState
             }
           },
           {
