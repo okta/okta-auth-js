@@ -4,6 +4,7 @@ define(function(require) {
   var util = require('../util/util');
   var _ = require('lodash');
   var packageJson = require('../../package.json');
+  var tokens = require('../util/tokens');
 
   describe('General Methods', function () {
 
@@ -18,28 +19,8 @@ define(function(require) {
       it('correctly decodes an idToken', function (done) {
         return setup()
         .then(function (oa) {
-          var testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-                          'eyAibXNnX2VuIjogIkhlbGxvIiwKICAibXNnX2pwIjogIuOBk-OCk-OBq-' +
-                          'OBoeOBryIsCiAgIm1zZ19jbiI6ICLkvaDlpb0iLAogICJtc2dfa3IiOiAi' +
-                          '7JWI64WV7ZWY7IS47JqUIiwKICAibXNnX3J1IjogItCX0LTRgNCw0LLRgd' +
-                          'GC0LLRg9C50YLQtSEiLAogICJtc2dfZGUiOiAiR3LDvMOfIEdvdHQiIH0.' +
-                          'TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
-          var decodedToken = oa.idToken.decode(testToken);
-          expect(decodedToken).toDeepEqual({
-            header: {
-              'alg': 'HS256',
-              'typ': 'JWT'
-            },
-            payload: {
-              'msg_en': 'Hello',
-              'msg_jp': 'こんにちは',
-              'msg_cn': '你好',
-              'msg_kr': '안녕하세요',
-              'msg_ru': 'Здравствуйте!',
-              'msg_de': 'Grüß Gott'
-            },
-            signature: 'TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ'
-          });
+          var decodedToken = oa.idToken.decode(tokens.unicodeToken);
+          expect(decodedToken).toDeepEqual(tokens.unicodeDecoded);
           done();
         });
       });
@@ -56,7 +37,7 @@ define(function(require) {
         })
         .fail(function (err) {
           expect(err.name).toEqual('AuthSdkError');
-          expect(err.errorSummary).toEqual('Malformed idToken');
+          expect(err.errorSummary).toBeDefined();
           done();
         });
       });
