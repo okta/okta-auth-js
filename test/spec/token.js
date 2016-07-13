@@ -17,9 +17,9 @@ define(function(require) {
     it('throws an error for a malformed token', function () {
       var oa = setupSync();
       try {
-        var res = oa.token.decode('malformedToken');
+        oa.token.decode('malformedToken');
         // Should never hit this
-        expect(res).toBeNull();
+        expect(true).toBe(false);
       } catch (e) {
         expect(e.name).toEqual('AuthSdkError');
         expect(e.errorSummary).toBeDefined();
