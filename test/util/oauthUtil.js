@@ -35,6 +35,7 @@ define(function(require) {
     if (opts &&
         (opts.authorizeArgs && opts.authorizeArgs.responseMode !== 'fragment') ||
         opts.getWithoutPromptArgs ||
+        opts.getWithPopupArgs ||
         opts.refreshArgs) {
       // Simulate the postMessage between the window and the popup or iframe
       spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
@@ -80,6 +81,8 @@ define(function(require) {
       promise = authClient.idToken.refresh(opts.refreshArgs);
     } else if (opts.getWithoutPromptArgs) {
       promise = authClient.token.getWithoutPrompt(opts.getWithoutPromptArgs);
+    } else if (opts.getWithPopupArgs) {
+      promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
     } else {
       promise = authClient.idToken.authorize(opts.authorizeArgs);
     }
