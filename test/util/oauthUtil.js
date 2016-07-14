@@ -25,7 +25,9 @@ define(function(require) {
 
   var defaultResponse = {
     idToken: tokens.standardIdToken,
-    claims: tokens.standardIdTokenClaims
+    claims: tokens.standardIdTokenClaims,
+    scopes: ['openid', 'email'],
+    expiresAt: tokens.standardIdTokenClaims.exp
   };
 
   oauthUtil.setup = function(opts) {
@@ -83,9 +85,12 @@ define(function(require) {
     }
     return promise
       .then(function(res) {
-        var expectedResp = defaultResponse;
+        var expectedResp = opts.expectedResp || defaultResponse;
         expect(res.idToken).toEqual(expectedResp.idToken);
         expect(res.claims).toEqual(expectedResp.claims);
+        expect(res.accessToken).toEqual(expectedResp.accessToken);
+        expect(res.expiresAt).toEqual(expectedResp.expiresAt);
+        expect(res.tokenType).toEqual(expectedResp.tokenType);
       })
       .fail(function(err) {
         if (opts.willFail) {

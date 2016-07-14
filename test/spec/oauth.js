@@ -335,6 +335,12 @@ define(function(require) {
                 'prompt': 'none',
                 'sessionToken': 'testToken'
               }
+            },
+            expectedResp: {
+              idToken: tokens.standardIdToken,
+              claims: tokens.standardIdTokenClaims,
+              scopes: ['openid', 'testscope'],
+              expiresAt: tokens.standardIdTokenClaims.exp
             }
           })
           .fin(done);
