@@ -30,6 +30,34 @@ define(function(require) {
     scopes: ['openid', 'email']
   };
 
+  function getTime(time) {
+    if (time || time === 0) {
+      return time;
+    } else {
+      return tokens.standardIdTokenClaims.exp - 1;
+    }
+  }
+
+  function validateResponse(res, expectedResp) {
+    function expectResponsesToEqual(actual, expected) {
+      expect(actual.idToken).toEqual(expected.idToken);
+      expect(actual.claims).toEqual(expected.claims);
+      expect(actual.accessToken).toEqual(expected.accessToken);
+      expect(actual.expiresAt).toEqual(expected.expiresAt);
+      expect(actual.tokenType).toEqual(expected.tokenType);
+    }
+
+    if (Array.isArray(expectedResp)) {
+      expect(res.length).toEqual(expectedResp.length);
+      var rl = res.length;
+      while(rl--) {
+        expectResponsesToEqual(res[rl], expectedResp[rl]);
+      }
+    } else {
+      expectResponsesToEqual(res, expectedResp);
+    }
+  }
+
   oauthUtil.setup = function(opts) {
 
     if (opts &&
@@ -63,17 +91,10 @@ define(function(require) {
       });
     }
 
-    // Make sure our token isn't expired
-    var time;
-    if (opts.time || opts.time === 0) {
-      time = opts.time;
-    } else {
-      time = tokens.standardIdTokenClaims.exp - 1;
-    }
-    util.warpToUnixTime(time);
+    util.warpToUnixTime(getTime(opts.time));
 
     if (opts.hrefMock) {
-      util.mockWindowLocationHref(authClient, opts.hrefMock);
+      util.mockGetWindowLocation(authClient, opts.hrefMock);
     }
 
     var promise;
@@ -89,24 +110,7 @@ define(function(require) {
     return promise
       .then(function(res) {
         var expectedResp = opts.expectedResp || defaultResponse;
-
-        function expectResponsesToEqual(actual, expected) {
-          expect(actual.idToken).toEqual(expected.idToken);
-          expect(actual.claims).toEqual(expected.claims);
-          expect(actual.accessToken).toEqual(expected.accessToken);
-          expect(actual.expiresAt).toEqual(expected.expiresAt);
-          expect(actual.tokenType).toEqual(expected.tokenType);
-        }
-
-        if (Array.isArray(expectedResp)) {
-          expect(res.length).toEqual(expectedResp.length);
-          var rl = res.length;
-          while(rl--) {
-            expectResponsesToEqual(res[rl], expectedResp[rl]);
-          }
-        } else {
-          expectResponsesToEqual(res, expectedResp);
-        }
+        validateResponse(res, expectedResp);
       })
       .fail(function(err) {
         if (opts.willFail) {
@@ -207,6 +211,46 @@ define(function(require) {
         }
       });
   };
+  
+  oauthUtil.setupRedirect = function(opts) {
+    var client = new OktaAuth({
+      url: 'https://lboyette.trexcloud.com',
+      clientId: 'NPSfOkH5eZrTy8PMDlvx',
+      redirectUri: 'https://lboyette.trexcloud.com/redirect'
+    });
+
+    oauthUtil.mockStateAndNonce();
+    var windowLocationMock = util.mockSetWindowLocation(client);
+    var setCookieMock = util.mockSetCookie();
+
+    client.token.getWithRedirect(opts.getWithRedirectArgs);
+
+    expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
+    expect(setCookieMock).toHaveBeenCalledWith(opts.expectedCookie);
+  };
+
+  oauthUtil.setupParseUrl = function(opts) {
+    var client = new OktaAuth({
+      url: 'https://lboyette.trexcloud.com',
+      clientId: 'NPSfOkH5eZrTy8PMDlvx',
+      redirectUri: 'https://lboyette.trexcloud.com/redirect'
+    });
+
+    util.warpToUnixTime(getTime(opts.time));
+    util.mockGetLocationHash(client, opts.hashMock);
+    util.mockGetCookie(opts.oauthCookie);
+    var setCookieMock = util.mockSetCookie();
+
+    return client.token.parseFromUrl()
+      .then(function(res) {
+        var expectedResp = opts.expectedResp;
+        validateResponse(res, expectedResp);
+
+        // The cookie should be deleted
+        expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params=; ' +
+          'expires=Thu, 01 Jan 1970 00:00:00 GMT;');
+      });
+  };
 
   function expectErrorToEqual(actual, expected) {
     expect(actual.name).toEqual(expected.name);
@@ -241,7 +285,9 @@ define(function(require) {
     it(title, function (done) {
       options.willFail = true;
       var setupMethod;
-      if (options.authorizeArgs &&
+      if (options.setupMethod) {
+        setupMethod = options.setupMethod;
+      } else if (options.authorizeArgs &&
           (options.authorizeArgs.responseMode === 'fragment' || options.authorizeArgs.idp)) {
         setupMethod = oauthUtil.setupPopup;
       } else {

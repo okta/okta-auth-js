@@ -439,4 +439,252 @@ define(function(require) {
       });
     });
   });
+
+  describe('token.getWithRedirect', function() {
+    it('sets authorize url and cookie for id_token using sessionToken', function() {
+      oauthUtil.setupRedirect({
+        getWithRedirectArgs: {
+          sessionToken: 'testToken'
+        },
+        expectedCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: 'id_token',
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scope: ['openid', 'email']
+        }) + ';',
+        expectedRedirectUrl: 'https://lboyette.trexcloud.com/oauth2/v1/authorize?' +
+                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                             'redirect_uri=https%3A%2F%2Flboyette.trexcloud.com%2Fredirect&' +
+                             'response_type=id_token&' +
+                             'response_mode=fragment&' +
+                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                             'sessionToken=testToken&' +
+                             'scope=openid%20email'
+      });
+    });
+
+    it('sets authorize url for access_token using sessionToken', function() {
+      oauthUtil.setupRedirect({
+        getWithRedirectArgs: {
+          responseType: 'token',
+          sessionToken: 'testToken'
+        },
+        expectedCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: 'token',
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scope: ['openid', 'email']
+        }) + ';',
+        expectedRedirectUrl: 'https://lboyette.trexcloud.com/oauth2/v1/authorize?' +
+                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                             'redirect_uri=https%3A%2F%2Flboyette.trexcloud.com%2Fredirect&' +
+                             'response_type=token&' +
+                             'response_mode=fragment&' +
+                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                             'sessionToken=testToken&' +
+                             'scope=openid%20email'
+      });
+    });
+
+    it('sets authorize url for access_token and id_token using idp', function() {
+      oauthUtil.setupRedirect({
+        getWithRedirectArgs: {
+          responseType: ['token', 'id_token'],
+          idp: 'testIdp'
+        },
+        expectedCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: ['token', 'id_token'],
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scope: ['openid', 'email']
+        }) + ';',
+        expectedRedirectUrl: 'https://lboyette.trexcloud.com/oauth2/v1/authorize?' +
+                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                             'redirect_uri=https%3A%2F%2Flboyette.trexcloud.com%2Fredirect&' +
+                             'response_type=token%20id_token&' +
+                             'response_mode=fragment&' +
+                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                             'idp=testIdp&' +
+                             'scope=openid%20email'
+      });
+    });
+  });
+
+  describe('token.parseFromUrl', function() {
+    it('parses id_token', function(done) {
+      return oauthUtil.setupParseUrl({
+        hashMock: '#id_token=' + tokens.standardIdToken +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: 'id_token',
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scope: ['openid', 'email']
+        }) + ';',
+        expectedResp: {
+          idToken: tokens.standardIdToken,
+          claims: tokens.standardIdTokenClaims,
+          expiresAt: 1449699930,
+          scopes: ['openid', 'email']
+        }
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
+    it('parses access_token', function(done) {
+      return oauthUtil.setupParseUrl({
+        time: 1449699929,
+        hashMock: '#access_token=' + tokens.standardAccessToken +
+                  '&expires_in=3600' +
+                  '&token_type=Bearer' +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: 'token',
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scope: ['openid', 'email']
+        }) + ';',
+        expectedResp: {
+          accessToken: tokens.standardAccessToken,
+          expiresAt: 1449703529,
+          scopes: ['openid', 'email'],
+          tokenType: 'Bearer'
+        }
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
+    it('parses access_token and id_token', function(done) {
+      return oauthUtil.setupParseUrl({
+        time: 1449699929,
+        hashMock: '#access_token=' + tokens.standardAccessToken +
+                  '&id_token=' + tokens.standardIdToken +
+                  '&expires_in=3600' +
+                  '&token_type=Bearer' +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: ['id_token', 'token'],
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scope: ['openid', 'email']
+        }) + ';',
+        expectedResp: [{
+          idToken: tokens.standardIdToken,
+          claims: tokens.standardIdTokenClaims,
+          expiresAt: 1449699930,
+          scopes: ['openid', 'email']
+        }, {
+          accessToken: tokens.standardAccessToken,
+          expiresAt: 1449703529,
+          scopes: ['openid', 'email'],
+          tokenType: 'Bearer'
+        }]
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
+    oauthUtil.itpErrorsCorrectly('throws an error if nothing to parse',
+      {
+        setupMethod: oauthUtil.setupParseUrl,
+        hashMock: '',
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: ['id_token', 'token'],
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scope: ['openid', 'email']
+        }) + ';'
+      },
+      {
+        name: 'AuthSdkError',
+        message: 'Unable to parse a token from the url',
+        errorCode: 'INTERNAL',
+        errorSummary: 'Unable to parse a token from the url',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      }
+    );
+
+    oauthUtil.itpErrorsCorrectly('throws an error if no cookie set',
+      {
+        setupMethod: oauthUtil.setupParseUrl,
+        hashMock: '#access_token=' + tokens.standardAccessToken +
+                  '&id_token=' + tokens.standardIdToken +
+                  '&expires_in=3600' +
+                  '&token_type=Bearer' +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: ''
+      },
+      {
+        name: 'AuthSdkError',
+        message: 'Unable to parse a token from the url',
+        errorCode: 'INTERNAL',
+        errorSummary: 'Unable to parse a token from the url',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      }
+    );
+
+    oauthUtil.itpErrorsCorrectly('throws an error if state doesn\'t match',
+      {
+        setupMethod: oauthUtil.setupParseUrl,
+        hashMock: '#access_token=' + tokens.standardAccessToken +
+                  '&id_token=' + tokens.standardIdToken +
+                  '&expires_in=3600' +
+                  '&token_type=Bearer' +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: ['id_token', 'token'],
+          state: 'mismatchedState',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scope: ['openid', 'email']
+        }) + ';'
+      },
+      {
+        name: 'AuthSdkError',
+        message: 'OAuth flow response state doesn\'t match request state',
+        errorCode: 'INTERNAL',
+        errorSummary: 'OAuth flow response state doesn\'t match request state',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      }
+    );
+
+    oauthUtil.itpErrorsCorrectly('throws an error if nonce doesn\'t match',
+      {
+        setupMethod: oauthUtil.setupParseUrl,
+        hashMock: '#access_token=' + tokens.standardAccessToken +
+                  '&id_token=' + tokens.standardIdToken +
+                  '&expires_in=3600' +
+                  '&token_type=Bearer' +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: ['id_token', 'token'],
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'mismatchedNonce',
+          scope: ['openid', 'email']
+        }) + ';'
+      },
+      {
+        name: 'AuthSdkError',
+        message: 'OAuth flow response nonce doesn\'t match request nonce',
+        errorCode: 'INTERNAL',
+        errorSummary: 'OAuth flow response nonce doesn\'t match request nonce',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      }
+    );
+  });
 });

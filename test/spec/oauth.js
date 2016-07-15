@@ -260,9 +260,9 @@ define(function(require) {
           },
           {
             name: 'AuthSdkError',
-            message: 'A clientId must be specified in the OktaAuth constructor to get an idToken',
+            message: 'A clientId must be specified in the OktaAuth constructor to get a token',
             errorCode: 'INTERNAL',
-            errorSummary: 'A clientId must be specified in the OktaAuth constructor to get an idToken',
+            errorSummary: 'A clientId must be specified in the OktaAuth constructor to get a token',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []
