@@ -1,0 +1,10 @@
+dist
+test
+build2
+.grunt
+.eslintrc.json
+.eslintignore
+.travis.yml
+ci-scripts
+webpack*config.js
+Gruntfile.js
