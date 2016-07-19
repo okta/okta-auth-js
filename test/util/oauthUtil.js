@@ -26,8 +26,7 @@ define(function(require) {
   var defaultResponse = {
     idToken: tokens.standardIdToken,
     claims: tokens.standardIdTokenClaims,
-    scopes: ['openid', 'email'],
-    expiresAt: tokens.standardIdTokenClaims.exp
+    scopes: ['openid', 'email']
   };
 
   oauthUtil.setup = function(opts) {

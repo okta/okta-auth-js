@@ -339,8 +339,7 @@ define(function(require) {
             expectedResp: {
               idToken: tokens.standardIdToken,
               claims: tokens.standardIdTokenClaims,
-              scopes: ['openid', 'testscope'],
-              expiresAt: tokens.standardIdTokenClaims.exp
+              scopes: ['openid', 'testscope']
             }
           })
           .fin(done);
