@@ -1,147 +1,7 @@
 /* eslint-disable complexity, max-statements */
 define(function(require) {
-  var util = require('../util/util');
   var oauthUtil = require('../util/oauthUtil');
   var tokens = require('../util/tokens');
-
-  /*
-  {
-    'sub': '00u1pcla5qYIREDLWCQV',
-    'name': 'Len Boyette',
-    'given_name': 'Len',
-    'family_name': 'Boyette',
-    'updated_at': 1446153401,
-    'email': 'lboyette@okta.com',
-    'email_verified': true,
-    'ver': 1,
-    'iss': 'https://lboyette.trexcloud.com',
-    'login': 'admin@okta.com',
-    'nonce': standardNonce,
-    'aud': 'NPSfOkH5eZrTy8PMDlvx',
-    'iat': 2449696330,
-    'exp': 1449699930,
-    'amr': [
-      'kba',
-      'mfa',
-      'pwd'
-    ],
-    'jti': 'TRZT7RCiSymTs5W7Ryh3',
-    'auth_time': 1449696330
-  }
-  */
-  var expiredBeforeIssuedToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzd' +
-                        'WIiOiIwMHUxcGNsYTVxWUlSRURMV0NRViIsIm5hbWUiOiJMZW4g' +
-                        'Qm95ZXR0ZSIsImdpdmVuX25hbWUiOiJMZW4iLCJmYW1pbHlfbmF' +
-                        'tZSI6IkJveWV0dGUiLCJ1cGRhdGVkX2F0IjoxNDQ2MTUzNDAxLC' +
-                        'JlbWFpbCI6Imxib3lldHRlQG9rdGEuY29tIiwiZW1haWxfdmVya' +
-                        'WZpZWQiOnRydWUsInZlciI6MSwiaXNzIjoiaHR0cHM6Ly9sYm95' +
-                        'ZXR0ZS50cmV4Y2xvdWQuY29tIiwibG9naW4iOiJhZG1pbkBva3R' +
-                        'hLmNvbSIsIm5vbmNlIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYW' +
-                        'FhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhY' +
-                        'WFhYSIsImF1ZCI6Ik5QU2ZPa0g1ZVpyVHk4UE1EbHZ4IiwiaWF0' +
-                        'IjoyNDQ5Njk2MzMwLCJleHAiOjE0NDk2OTk5MzAsImFtciI6WyJ' +
-                        'rYmEiLCJtZmEiLCJwd2QiXSwianRpIjoiVFJaVDdSQ2lTeW1Ucz' +
-                        'VXN1J5aDMiLCJhdXRoX3RpbWUiOjE0NDk2OTYzMzB9.u7ClfS2w' +
-                        '7O_kei5gtBfY_M01WCxLZ30A8KUhkHd2bDzkHFKmc3c4OT86PKS' +
-                        '3I-JKeRIflXTwcIe8IUqtFGv8pM9iAT_mi2nxieMqOdrFw4S8UM' +
-                        'KKgPcYLLfFCvcDs_1d0XqHHohmHKdM6YIsgP8abPk2ugwSX49Dz' +
-                        'LyJrVkCZIM';
-
-  function setupPopup(opts) {
-    var src;
-    var fakeWindow = {
-      location: {
-        hash: ''
-      },
-      closed: false,
-      close: function() {
-        this.closed = true;
-      }
-    };
-    spyOn(fakeWindow, 'close').and.callThrough();
-
-    spyOn(window, 'open').and.callFake(function(s) {
-      src = s;
-      setTimeout(function() {
-        if (opts.closePopup) {
-          fakeWindow.close();
-        } else {
-          fakeWindow.location.hash = opts.changeToHash;
-        }
-      });
-      return fakeWindow;
-    });
-
-    function popupWasCreated() {
-      expect(window.open).toHaveBeenCalled();
-    }
-
-    function popupWasDestroyed() {
-      expect(fakeWindow.close).toHaveBeenCalled();
-    }
-
-    return oauthUtil.setup(opts)
-      .then(function() {
-        popupWasCreated();
-        popupWasDestroyed();
-        if (opts.postMessageSrc) {
-          var actual = util.parseUri(src);
-          var expected = opts.postMessageSrc;
-          expect(actual.baseUri).toEqual(expected.baseUri);
-          expect(actual.queryParams).toEqual(expected.queryParams);
-        }
-      });
-  }
-
-  function expectErrorToEqual(actual, expected) {
-    expect(actual.name).toEqual(expected.name);
-    expect(actual.message).toEqual(expected.message);
-    expect(actual.errorCode).toEqual(expected.errorCode);
-    expect(actual.errorSummary).toEqual(expected.errorSummary);
-    if (expected.errorLink) {
-      expect(actual.errorLink).toEqual(expected.errorLink);
-      expect(actual.errorId).toEqual(expected.errorId);
-      expect(actual.errorCauses).toEqual(expected.errorCauses);
-    } else {
-      expect(actual.errorLink).toBeUndefined();
-      expect(actual.errorId).toBeUndefined();
-      expect(actual.errorCauses).toBeUndefined();
-    }
-  }
-
-  function itErrorsCorrectly(title, options, error) {
-    it(title, function () {
-      var thrown = false;
-      try {
-        oauthUtil.setupFrame(options);
-      } catch (e) {
-        expectErrorToEqual(e, error);
-        thrown = true;
-      }
-      expect(thrown).toEqual(true);
-    });
-  }
-
-  function itpErrorsCorrectly(title, options, error) {
-    it(title, function (done) {
-      options.willFail = true;
-      var setupMethod;
-      if (options.authorizeArgs &&
-          (options.authorizeArgs.responseMode === 'fragment' || options.authorizeArgs.idp)) {
-        setupMethod = setupPopup;
-      } else {
-        setupMethod = oauthUtil.setupFrame;
-      }
-      setupMethod(options)
-        .then(function() {
-          expect('not to be hit').toEqual(true);
-        })
-        .fail(function(e) {
-          expectErrorToEqual(e, error);
-        })
-        .fin(done);
-    });
-  }
 
   describe('OAuth Methods', function () {
 
@@ -204,7 +64,7 @@ define(function(require) {
       });
 
       it('returns id_token using idp', function (done) {
-        return setupPopup({
+        return oauthUtil.setupPopup({
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -244,7 +104,7 @@ define(function(require) {
       });
 
       it('returns id_token using popup fragment', function (done) {
-        return setupPopup({
+        return oauthUtil.setupPopup({
           hrefMock: 'https://lboyette.trexcloud.com',
           changeToHash: '#id_token=' + tokens.standardIdToken + '&state=' + oauthUtil.mockedState,
           authorizeArgs: {
@@ -335,6 +195,12 @@ define(function(require) {
                 'prompt': 'none',
                 'sessionToken': 'testToken'
               }
+            },
+            expectedResp: {
+              idToken: tokens.standardIdToken,
+              claims: tokens.standardIdTokenClaims,
+              expiresAt: 1449699930,
+              scopes: ['openid', 'testscope']
             }
           })
           .fin(done);
@@ -366,7 +232,7 @@ define(function(require) {
       });
 
       describe('errors', function() {
-        itErrorsCorrectly('throws an error when openid scope isn\'t specified',
+        oauthUtil.itErrorsCorrectly('throws an error when openid scope isn\'t specified',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -385,7 +251,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itErrorsCorrectly('throws an error when clientId isn\'t specified',
+        oauthUtil.itErrorsCorrectly('throws an error when clientId isn\'t specified',
           {
             authorizeArgs: {
               redirectUri: 'https://lboyette.trexcloud.com/redirect',
@@ -402,7 +268,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an oauth error on issue',
+        oauthUtil.itpErrorsCorrectly('throws an oauth error on issue',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -421,7 +287,7 @@ define(function(require) {
             errorSummary: 'something went wrong'
           }
         );
-        itpErrorsCorrectly('throws an oauth error on issue with a fragment response',
+        oauthUtil.itpErrorsCorrectly('throws an oauth error on issue with a fragment response',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -440,7 +306,7 @@ define(function(require) {
             errorSummary: 'The requested scope is invalid, unknown, or malformed.'
           }
         );
-        itpErrorsCorrectly('throws an error when window is closed manually with a fragment',
+        oauthUtil.itpErrorsCorrectly('throws an error when window is closed manually with a fragment',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -461,7 +327,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an error when window is closed manually with a postMessage',
+        oauthUtil.itpErrorsCorrectly('throws an error when window is closed manually with a postMessage',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -480,7 +346,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an sdk error when state doesn\'t match',
+        oauthUtil.itpErrorsCorrectly('throws an sdk error when state doesn\'t match',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -502,7 +368,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an sdk error when nonce doesn\'t match',
+        oauthUtil.itpErrorsCorrectly('throws an sdk error when nonce doesn\'t match',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -521,7 +387,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an sdk error when issuer doesn\'t match',
+        oauthUtil.itpErrorsCorrectly('throws an sdk error when issuer doesn\'t match',
           {
             oktaAuthArgs: {
               url: 'https://different.issuer.com',
@@ -542,7 +408,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an sdk error when audience doesn\'t match',
+        oauthUtil.itpErrorsCorrectly('throws an sdk error when audience doesn\'t match',
           {
             authorizeArgs: {
               clientId: 'differentAudience',
@@ -560,7 +426,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an sdk error when token expired before it was issued',
+        oauthUtil.itpErrorsCorrectly('throws an sdk error when token expired before it was issued',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -568,7 +434,7 @@ define(function(require) {
               sessionToken: 'testToken'
             },
             postMessageResp: {
-              'id_token': expiredBeforeIssuedToken,
+              'id_token': tokens.expiredBeforeIssuedToken,
               state: oauthUtil.mockedState
             }
           },
@@ -582,7 +448,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an sdk error when token is expired',
+        oauthUtil.itpErrorsCorrectly('throws an sdk error when token is expired',
           {
             time: 9999999999,
             authorizeArgs: {
@@ -601,7 +467,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        itpErrorsCorrectly('throws an sdk error when token is issued in the future',
+        oauthUtil.itpErrorsCorrectly('throws an sdk error when token is issued in the future',
           {
             time: 0,
             authorizeArgs: {

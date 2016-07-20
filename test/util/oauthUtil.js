@@ -25,7 +25,9 @@ define(function(require) {
 
   var defaultResponse = {
     idToken: tokens.standardIdToken,
-    claims: tokens.standardIdTokenClaims
+    claims: tokens.standardIdTokenClaims,
+    expiresAt: 1449699930,
+    scopes: ['openid', 'email']
   };
 
   oauthUtil.setup = function(opts) {
@@ -83,9 +85,25 @@ define(function(require) {
     }
     return promise
       .then(function(res) {
-        var expectedResp = defaultResponse;
-        expect(res.idToken).toEqual(expectedResp.idToken);
-        expect(res.claims).toEqual(expectedResp.claims);
+        var expectedResp = opts.expectedResp || defaultResponse;
+
+        function expectResponsesToEqual(actual, expected) {
+          expect(actual.idToken).toEqual(expected.idToken);
+          expect(actual.claims).toEqual(expected.claims);
+          expect(actual.accessToken).toEqual(expected.accessToken);
+          expect(actual.expiresAt).toEqual(expected.expiresAt);
+          expect(actual.tokenType).toEqual(expected.tokenType);
+        }
+
+        if (Array.isArray(expectedResp)) {
+          expect(res.length).toEqual(expectedResp.length);
+          var rl = res.length;
+          while(rl--) {
+            expectResponsesToEqual(res[rl], expectedResp[rl]);
+          }
+        } else {
+          expectResponsesToEqual(res, expectedResp);
+        }
       })
       .fail(function(err) {
         if (opts.willFail) {
@@ -140,6 +158,103 @@ define(function(require) {
         }
       });
   };
+
+  oauthUtil.setupPopup = function(opts) {
+    var src;
+    var fakeWindow = {
+      location: {
+        hash: ''
+      },
+      closed: false,
+      close: function() {
+        this.closed = true;
+      }
+    };
+    spyOn(fakeWindow, 'close').and.callThrough();
+
+    spyOn(window, 'open').and.callFake(function(s) {
+      src = s;
+      setTimeout(function() {
+        if (opts.closePopup) {
+          fakeWindow.close();
+        } else {
+          fakeWindow.location.hash = opts.changeToHash;
+        }
+      });
+      return fakeWindow;
+    });
+
+    function popupWasCreated() {
+      expect(window.open).toHaveBeenCalled();
+    }
+
+    function popupWasDestroyed() {
+      expect(fakeWindow.close).toHaveBeenCalled();
+    }
+
+    return oauthUtil.setup(opts)
+      .then(function() {
+        popupWasCreated();
+        popupWasDestroyed();
+        if (opts.postMessageSrc) {
+          var actual = util.parseUri(src);
+          var expected = opts.postMessageSrc;
+          expect(actual.baseUri).toEqual(expected.baseUri);
+          expect(actual.queryParams).toEqual(expected.queryParams);
+        }
+      });
+  };
+
+  function expectErrorToEqual(actual, expected) {
+    expect(actual.name).toEqual(expected.name);
+    expect(actual.message).toEqual(expected.message);
+    expect(actual.errorCode).toEqual(expected.errorCode);
+    expect(actual.errorSummary).toEqual(expected.errorSummary);
+    if (expected.errorLink) {
+      expect(actual.errorLink).toEqual(expected.errorLink);
+      expect(actual.errorId).toEqual(expected.errorId);
+      expect(actual.errorCauses).toEqual(expected.errorCauses);
+    } else {
+      expect(actual.errorLink).toBeUndefined();
+      expect(actual.errorId).toBeUndefined();
+      expect(actual.errorCauses).toBeUndefined();
+    }
+  }
+
+  oauthUtil.itErrorsCorrectly = function(title, options, error) {
+    it(title, function () {
+      var thrown = false;
+      try {
+        oauthUtil.setupFrame(options);
+      } catch (e) {
+        expectErrorToEqual(e, error);
+        thrown = true;
+      }
+      expect(thrown).toEqual(true);
+    });
+  };
+
+  oauthUtil.itpErrorsCorrectly = function(title, options, error) {
+    it(title, function (done) {
+      options.willFail = true;
+      var setupMethod;
+      if (options.authorizeArgs &&
+          (options.authorizeArgs.responseMode === 'fragment' || options.authorizeArgs.idp)) {
+        setupMethod = oauthUtil.setupPopup;
+      } else {
+        setupMethod = oauthUtil.setupFrame;
+      }
+      setupMethod(options)
+        .then(function() {
+          expect('not to be hit').toEqual(true);
+        })
+        .fail(function(e) {
+          expectErrorToEqual(e, error);
+        })
+        .fin(done);
+    });
+  };
+  
 
   return oauthUtil;
 });
