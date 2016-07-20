@@ -80,5 +80,48 @@ define(function() {
                                'JOEhR6vs11qVmIgbwZ4--MqUIRU3WoFEsr0muLl039QrUa1' +
                                'EQ9-Ua9rPOMaO0pFC6h2lfB_HfzGifXATKsN-wLdxk6cgA';
 
+  /*
+  {
+    'sub': '00u1pcla5qYIREDLWCQV',
+    'name': 'Len Boyette',
+    'given_name': 'Len',
+    'family_name': 'Boyette',
+    'updated_at': 1446153401,
+    'email': 'lboyette@okta.com',
+    'email_verified': true,
+    'ver': 1,
+    'iss': 'https://lboyette.trexcloud.com',
+    'login': 'admin@okta.com',
+    'nonce': standardNonce,
+    'aud': 'NPSfOkH5eZrTy8PMDlvx',
+    'iat': 2449696330,
+    'exp': 1449699930,
+    'amr': [
+      'kba',
+      'mfa',
+      'pwd'
+    ],
+    'jti': 'TRZT7RCiSymTs5W7Ryh3',
+    'auth_time': 1449696330
+  }
+  */
+  tokens.expiredBeforeIssuedToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzd' +
+                           'WIiOiIwMHUxcGNsYTVxWUlSRURMV0NRViIsIm5hbWUiOiJMZW4g' +
+                           'Qm95ZXR0ZSIsImdpdmVuX25hbWUiOiJMZW4iLCJmYW1pbHlfbmF' +
+                           'tZSI6IkJveWV0dGUiLCJ1cGRhdGVkX2F0IjoxNDQ2MTUzNDAxLC' +
+                           'JlbWFpbCI6Imxib3lldHRlQG9rdGEuY29tIiwiZW1haWxfdmVya' +
+                           'WZpZWQiOnRydWUsInZlciI6MSwiaXNzIjoiaHR0cHM6Ly9sYm95' +
+                           'ZXR0ZS50cmV4Y2xvdWQuY29tIiwibG9naW4iOiJhZG1pbkBva3R' +
+                           'hLmNvbSIsIm5vbmNlIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYW' +
+                           'FhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhY' +
+                           'WFhYSIsImF1ZCI6Ik5QU2ZPa0g1ZVpyVHk4UE1EbHZ4IiwiaWF0' +
+                           'IjoyNDQ5Njk2MzMwLCJleHAiOjE0NDk2OTk5MzAsImFtciI6WyJ' +
+                           'rYmEiLCJtZmEiLCJwd2QiXSwianRpIjoiVFJaVDdSQ2lTeW1Ucz' +
+                           'VXN1J5aDMiLCJhdXRoX3RpbWUiOjE0NDk2OTYzMzB9.u7ClfS2w' +
+                           '7O_kei5gtBfY_M01WCxLZ30A8KUhkHd2bDzkHFKmc3c4OT86PKS' +
+                           '3I-JKeRIflXTwcIe8IUqtFGv8pM9iAT_mi2nxieMqOdrFw4S8UM' +
+                           'KKgPcYLLfFCvcDs_1d0XqHHohmHKdM6YIsgP8abPk2ugwSX49Dz' +
+                           'LyJrVkCZIM';
+
   return tokens;
 });

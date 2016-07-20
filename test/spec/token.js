@@ -103,7 +103,7 @@ define(function(require) {
       });
     });
 
-    it('returns access_token and id_token using sessionToken', function (done) {
+    it('returns access_token and id_token using an array of responseTypes and a sessionToken', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
           url: 'https://lboyette.trexcloud.com',
@@ -111,7 +111,7 @@ define(function(require) {
           redirectUri: 'https://lboyette.trexcloud.com/redirect'
         },
         getWithoutPromptArgs: {
-          responseType: 'id_token token',
+          responseType: ['id_token', 'token'],
           sessionToken: 'testSessionToken'
         },
         postMessageSrc: {
@@ -136,18 +136,81 @@ define(function(require) {
           'expires_in': 3600,
           'state': oauthUtil.mockedState
         },
-        expectedResp: {
+        expectedResp: [{
           idToken: tokens.standardIdToken,
           claims: tokens.standardIdTokenClaims,
+          expiresAt: 1449699930,
+          scopes: ['openid', 'email']
+        }, {
           accessToken: tokens.standardAccessToken,
           expiresAt: 1449703529,
           scopes: ['openid', 'email'],
           tokenType: 'Bearer'
-        }
+        }]
       })
       .fin(function() {
         done();
       });
     });
+
+    it('returns a single token using an array with a single responseType', function (done) {
+      return oauthUtil.setupFrame({
+        oktaAuthArgs: {
+          url: 'https://lboyette.trexcloud.com',
+          clientId: 'NPSfOkH5eZrTy8PMDlvx',
+          redirectUri: 'https://lboyette.trexcloud.com/redirect'
+        },
+        getWithoutPromptArgs: {
+          responseType: ['id_token'],
+          sessionToken: 'testSessionToken'
+        },
+        postMessageSrc: {
+          baseUri: 'https://lboyette.trexcloud.com/oauth2/v1/authorize',
+          queryParams: {
+            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+            'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
+            'response_type': 'id_token',
+            'response_mode': 'okta_post_message',
+            'state': oauthUtil.mockedState,
+            'nonce': oauthUtil.mockedNonce,
+            'scope': 'openid email',
+            'prompt': 'none',
+            'sessionToken': 'testSessionToken'
+          }
+        },
+        expectedResp: [{
+          idToken: tokens.standardIdToken,
+          claims: tokens.standardIdTokenClaims,
+          expiresAt: 1449699930,
+          scopes: ['openid', 'email']
+        }]
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
+    oauthUtil.itErrorsCorrectly('throws an error if multiple responseTypes are sent as a string',
+      {
+        oktaAuthArgs: {
+          url: 'https://lboyette.trexcloud.com',
+          clientId: 'NPSfOkH5eZrTy8PMDlvx',
+          redirectUri: 'https://lboyette.trexcloud.com/redirect'
+        },
+        getWithoutPromptArgs: {
+          responseType: 'id_token token',
+          sessionToken: 'testSessionToken'
+        }
+      },
+      {
+        name: 'AuthSdkError',
+        message: 'Multiple OAuth responseTypes must be defined as an array',
+        errorCode: 'INTERNAL',
+        errorSummary: 'Multiple OAuth responseTypes must be defined as an array',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      }
+    );
   });
 });
