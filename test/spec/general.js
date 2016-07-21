@@ -46,50 +46,6 @@ define(function(require) {
     // Run if browser supports crypto
     var describeType = OktaAuth.prototype.features.isTokenVerifySupported() ? describe : xdescribe;
     describeType('idToken.verify', function () {
-
-      /*
-      {
-        "sub": "00u1pcla5qYIREDLWCQV",
-        "name": "Len Boyette",
-        "given_name": "Len",
-        "family_name": "Boyette",
-        "updated_at": 1446153401,
-        "email": "lboyette@okta.com",
-        "email_verified": true,
-        "ver": 1,
-        "iss": "https://lboyette.trexcloud.com",
-        "login": "admin@okta.com",
-        "aud": "NPSfOkH5eZrTy8PMDlvx",
-        "iat": 1449696330,
-        "exp": 1449699930,
-        "amr": [
-          "kba",
-          "mfa",
-          "pwd"
-        ],
-        "jti": "TRZT7RCiSymTs5W7Ryh3",
-        "auth_time": 1449696330
-      }
-      */
-      var standardIdToken = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIwMHUxcGNsYTVxWUlSRU' +
-                            'RMV0NRViIsIm5hbWUiOiJMZW4gQm95ZXR0ZSIsImdpdmVuX25hb' +
-                            'WUiOiJMZW4iLCJmYW1pbHlfbmFtZSI6IkJveWV0dGUiLCJ1cGRh' +
-                            'dGVkX2F0IjoxNDQ2MTUzNDAxLCJlbWFpbCI6Imxib3lldHRlQG9' +
-                            'rdGEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInZlciI6MS' +
-                            'wiaXNzIjoiaHR0cHM6Ly9sYm95ZXR0ZS50cmV4Y2xvdWQuY29tI' +
-                            'iwibG9naW4iOiJhZG1pbkBva3RhLmNvbSIsImF1ZCI6Ik5QU2ZP' +
-                            'a0g1ZVpyVHk4UE1EbHZ4IiwiaWF0IjoxNDQ5Njk2MzMwLCJleHA' +
-                            'iOjE0NDk2OTk5MzAsImFtciI6WyJrYmEiLCJtZmEiLCJwd2QiXS' +
-                            'wianRpIjoiVFJaVDdSQ2lTeW1UczVXN1J5aDMiLCJhdXRoX3Rpb' +
-                            'WUiOjE0NDk2OTYzMzB9.YWCNE3ZvT-8ceKnAbTkmSxYE-jIPpfh' +
-                            '2s8f_hTagUUxrfdKgyWzBb9iN3GOPaQ2K6jqOFx90RI2GBzAWec' +
-                            'pel3sAxG-wvLqiy0d8g0CUb7XTHdhXOLRrXvlpbULxdNnMbBcc6' +
-                            'uOLDalBjrumOiDMLzti-Bx6uQQ0EjUwuC-Dhv7I3wMsVxyEKejv' +
-                            'jMLbfWJ6iu4-UUx1r8_ZZUjDDXSB3OFXJQ3nPwRVFXZuRNhGScL' +
-                            'nftXz7mypRGxrapIQusym1K8hk9uy8_KYL2H2QNbyIqK9Vh9JhY' +
-                            '1rtkQNpv3ZerCUXEVGRiEXDqR_OHu4vUi1-FkONZZe2ov8dQ1mX' +
-                            'iHHdw';
-
       function setupVerifyIdTokenTest(opts) {
         util.itMakesCorrectRequestResponse({
           title: opts.title,
@@ -131,7 +87,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         expectations: function (test, res) {
           expect(res).toEqual(true);
         }
@@ -164,7 +120,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'rejects an invalid idToken due to expiration',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         execute: function(test, opts) {
           util.warpToDistantPast();
           return test.oa.idToken.verify(opts.idToken, opts.verifyOpts)
@@ -181,7 +137,7 @@ define(function(require) {
       setupVerifyIdTokenTest({
         title: 'verifies an idToken that would be invalid, except ' +
                 'we\'re using the expirationTime option',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         verifyOpts: {
           expirationTime: 9999999999
         },
@@ -200,7 +156,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken using single audience option',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         verifyOpts: {
           audience: 'NPSfOkH5eZrTy8PMDlvx'
         },
@@ -211,7 +167,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'rejects an invalid idToken using single audience option',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         verifyOpts: {
           audience: 'invalid'
         },
@@ -222,7 +178,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken using multiple audience option (all valid)',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         verifyOpts: {
           audience: ['NPSfOkH5eZrTy8PMDlvx', 'NPSfOkH5eZrTy8PMDlvx']
         },
@@ -233,7 +189,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken using multiple audience option (valid and invalid)',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         verifyOpts: {
           audience: ['NPSfOkH5eZrTy8PMDlvx', 'invalid2']
         },
@@ -244,7 +200,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'rejects an invalid idToken using multiple audience option (all invalid)',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         verifyOpts: {
           audience: ['invalid1', 'invalid2']
         },
@@ -255,9 +211,9 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken using issuer option',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         verifyOpts: {
-          issuer: 'https://lboyette.trexcloud.com'
+          issuer: 'https://auth-js-test.okta.com'
         },
         expectations: function (test, res) {
           expect(res).toEqual(true);
@@ -266,7 +222,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'rejects an invalid idToken using issuer option',
-        idToken: standardIdToken,
+        idToken: tokens.standardIdToken,
         verifyOpts: {
           issuer: 'invalid'
         },

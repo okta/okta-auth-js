@@ -73,7 +73,7 @@ define(function(require) {
             fn({
               data: opts.postMessageResp || defaultPostMessage,
               origin: opts.oktaAuthArgs && opts.oktaAuthArgs.url ||
-                'https://lboyette.trexcloud.com'
+                'https://auth-js-test.okta.com'
             });
           });
         }
@@ -87,7 +87,7 @@ define(function(require) {
       authClient = new OktaAuth(opts.oktaAuthArgs);
     } else {
       authClient = new OktaAuth({
-        url: 'https://lboyette.trexcloud.com'
+        url: 'https://auth-js-test.okta.com'
       });
     }
 
@@ -214,9 +214,9 @@ define(function(require) {
   
   oauthUtil.setupRedirect = function(opts) {
     var client = new OktaAuth({
-      url: 'https://lboyette.trexcloud.com',
+      url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://lboyette.trexcloud.com/redirect'
+      redirectUri: 'https://auth-js-test.okta.com/redirect'
     });
 
     oauthUtil.mockStateAndNonce();
@@ -231,9 +231,9 @@ define(function(require) {
 
   oauthUtil.setupParseUrl = function(opts) {
     var client = new OktaAuth({
-      url: 'https://lboyette.trexcloud.com',
+      url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://lboyette.trexcloud.com/redirect'
+      redirectUri: 'https://auth-js-test.okta.com/redirect'
     });
 
     util.warpToUnixTime(getTime(opts.time));
