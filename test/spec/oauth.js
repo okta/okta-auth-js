@@ -243,9 +243,9 @@ define(function(require) {
           },
           {
             name: 'AuthSdkError',
-            message: 'openid scope must be specified in the scope argument',
+            message: 'openid scope must be specified in the scope argument when requesting an id_token',
             errorCode: 'INTERNAL',
-            errorSummary: 'openid scope must be specified in the scope argument',
+            errorSummary: 'openid scope must be specified in the scope argument when requesting an id_token',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []

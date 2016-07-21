@@ -464,17 +464,18 @@ define(function(require) {
       });
     });
 
-    it('sets authorize url for access_token using sessionToken', function() {
+    it('sets authorize url for access_token and don\'t throw an error if openid isn\'t included in scope', function() {
       oauthUtil.setupRedirect({
         getWithRedirectArgs: {
           responseType: 'token',
+          scope: ['email'],
           sessionToken: 'testToken'
         },
         expectedCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
           responseType: 'token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['openid', 'email']
+          scope: ['email']
         }) + ';',
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -484,7 +485,7 @@ define(function(require) {
                              'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                              'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                              'sessionToken=testToken&' +
-                             'scope=openid%20email'
+                             'scope=email'
       });
     });
 
