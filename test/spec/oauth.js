@@ -9,16 +9,16 @@ define(function(require) {
       it('returns new id_token using old id_token', function (done) {
         return oauthUtil.setupFrame({
           oktaAuthArgs: {
-            url: 'https://lboyette.trexcloud.com',
+            url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://lboyette.trexcloud.com/redirect'
+            redirectUri: 'https://auth-js-test.okta.com/redirect'
           },
           refreshArgs: {},
           postMessageSrc: {
-            baseUri: 'https://lboyette.trexcloud.com/oauth2/v1/authorize',
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
               'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-              'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
+              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
               'state': oauthUtil.mockedState,
@@ -40,14 +40,14 @@ define(function(require) {
         return oauthUtil.setupFrame({
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://lboyette.trexcloud.com/redirect',
+            redirectUri: 'https://auth-js-test.okta.com/redirect',
             sessionToken: 'testSessionToken'
           },
           postMessageSrc: {
-            baseUri: 'https://lboyette.trexcloud.com/oauth2/v1/authorize',
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
               'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-              'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
+              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
               'state': oauthUtil.mockedState,
@@ -67,14 +67,14 @@ define(function(require) {
         return oauthUtil.setupPopup({
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://lboyette.trexcloud.com/redirect',
+            redirectUri: 'https://auth-js-test.okta.com/redirect',
             idp: 'testIdp'
           },
           postMessageSrc: {
-            baseUri: 'https://lboyette.trexcloud.com/oauth2/v1/authorize',
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
               'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-              'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
+              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
               'display': 'popup',
@@ -94,7 +94,7 @@ define(function(require) {
         return oauthUtil.setupFrame({
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://lboyette.trexcloud.com/redirect',
+            redirectUri: 'https://auth-js-test.okta.com/redirect',
             sessionToken: 'testToken'
           }
         })
@@ -105,19 +105,19 @@ define(function(require) {
 
       it('returns id_token using popup fragment', function (done) {
         return oauthUtil.setupPopup({
-          hrefMock: 'https://lboyette.trexcloud.com',
+          hrefMock: 'https://auth-js-test.okta.com',
           changeToHash: '#id_token=' + tokens.standardIdToken + '&state=' + oauthUtil.mockedState,
           authorizeArgs: {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://lboyette.trexcloud.com/redirect',
+            redirectUri: 'https://auth-js-test.okta.com/redirect',
             idp: 'testIdp',
             responseMode: 'fragment'
           },
           postMessageSrc: {
-            baseUri: 'https://lboyette.trexcloud.com/oauth2/v1/authorize',
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
               'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-              'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
+              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
               'response_type': 'id_token',
               'response_mode': 'fragment',
               'display': 'popup',
@@ -136,9 +136,9 @@ define(function(require) {
       it('doesn\'t throw an error when redirectUri and clientId are passed via OktaAuth', function (done) {
         return oauthUtil.setupFrame({
           oktaAuthArgs: {
-            url: 'https://lboyette.trexcloud.com',
+            url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://lboyette.trexcloud.com/redirect'
+            redirectUri: 'https://auth-js-test.okta.com/redirect'
           },
           authorizeArgs: {
             sessionToken: 'testToken'
@@ -154,14 +154,14 @@ define(function(require) {
           return oauthUtil.setupFrame({
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken'
             },
             postMessageSrc: {
-              baseUri: 'https://lboyette.trexcloud.com/oauth2/v1/authorize',
+              baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               queryParams: {
                 'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-                'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
+                'redirect_uri': 'https://auth-js-test.okta.com/redirect',
                 'response_type': 'id_token',
                 'response_mode': 'okta_post_message',
                 'state': oauthUtil.mockedState,
@@ -178,15 +178,15 @@ define(function(require) {
           return oauthUtil.setupFrame({
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               scope: ['openid', 'testscope'],
               sessionToken: 'testToken'
             },
             postMessageSrc: {
-              baseUri: 'https://lboyette.trexcloud.com/oauth2/v1/authorize',
+              baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               queryParams: {
                 'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-                'redirect_uri': 'https://lboyette.trexcloud.com/redirect',
+                'redirect_uri': 'https://auth-js-test.okta.com/redirect',
                 'response_type': 'id_token',
                 'response_mode': 'okta_post_message',
                 'state': oauthUtil.mockedState,
@@ -213,7 +213,7 @@ define(function(require) {
               sessionToken: 'testToken'
             },
             postMessageSrc: {
-              baseUri: 'https://lboyette.trexcloud.com/oauth2/v1/authorize',
+              baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               queryParams: {
                 'client_id': 'NPSfOkH5eZrTy8PMDlvx',
                 'redirect_uri': window.location.href,
@@ -236,16 +236,16 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               scope: ['notopenid'],
               sessionToken: 'testToken'
             }
           },
           {
             name: 'AuthSdkError',
-            message: 'openid scope must be specified in the scope argument',
+            message: 'openid scope must be specified in the scope argument when requesting an id_token',
             errorCode: 'INTERNAL',
-            errorSummary: 'openid scope must be specified in the scope argument',
+            errorSummary: 'openid scope must be specified in the scope argument when requesting an id_token',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []
@@ -254,15 +254,15 @@ define(function(require) {
         oauthUtil.itErrorsCorrectly('throws an error when clientId isn\'t specified',
           {
             authorizeArgs: {
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken'
             }
           },
           {
             name: 'AuthSdkError',
-            message: 'A clientId must be specified in the OktaAuth constructor to get an idToken',
+            message: 'A clientId must be specified in the OktaAuth constructor to get a token',
             errorCode: 'INTERNAL',
-            errorSummary: 'A clientId must be specified in the OktaAuth constructor to get an idToken',
+            errorSummary: 'A clientId must be specified in the OktaAuth constructor to get a token',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []
@@ -272,7 +272,7 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken'
             },
             postMessageResp: {
@@ -291,11 +291,11 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               idp: 'testIdp',
               responseMode: 'fragment'
             },
-            hrefMock: 'https://lboyette.trexcloud.com',
+            hrefMock: 'https://auth-js-test.okta.com',
             changeToHash: '#error=invalid_scope&error_description=' +
               'The+requested+scope+is+invalid%2C+unknown%2C+or+malformed.'
           },
@@ -310,11 +310,11 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               idp: 'testIdp',
               responseMode: 'fragment'
             },
-            hrefMock: 'https://lboyette.trexcloud.com',
+            hrefMock: 'https://auth-js-test.okta.com',
             closePopup: true
           },
           {
@@ -331,7 +331,7 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               idp: 'testIdp'
             },
             closePopup: true
@@ -350,7 +350,7 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken'
             },
             postMessageResp: {
@@ -372,7 +372,7 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken',
               nonce: 'mismatchedNonce'
             }
@@ -392,7 +392,7 @@ define(function(require) {
             oktaAuthArgs: {
               url: 'https://different.issuer.com',
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect'
+              redirectUri: 'https://auth-js-test.okta.com/redirect'
             },
             authorizeArgs: {
               sessionToken: 'testToken'
@@ -400,9 +400,9 @@ define(function(require) {
           },
           {
             name: 'AuthSdkError',
-            message: 'The issuer [https://lboyette.trexcloud.com] does not match [https://different.issuer.com]',
+            message: 'The issuer [https://auth-js-test.okta.com] does not match [https://different.issuer.com]',
             errorCode: 'INTERNAL',
-            errorSummary: 'The issuer [https://lboyette.trexcloud.com] does not match [https://different.issuer.com]',
+            errorSummary: 'The issuer [https://auth-js-test.okta.com] does not match [https://different.issuer.com]',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []
@@ -412,7 +412,7 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'differentAudience',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken'
             }
           },
@@ -430,7 +430,7 @@ define(function(require) {
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken'
             },
             postMessageResp: {
@@ -453,7 +453,7 @@ define(function(require) {
             time: 9999999999,
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken'
             }
           },
@@ -472,7 +472,7 @@ define(function(require) {
             time: 0,
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
-              redirectUri: 'https://lboyette.trexcloud.com/redirect',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
               sessionToken: 'testToken'
             }
           },

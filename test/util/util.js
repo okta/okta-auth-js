@@ -4,7 +4,8 @@ define(function(require) {
   var Q = require('q'),
       $ = require('jquery'),
       _ = require('lodash'),
-      OktaAuth = require('OktaAuth');
+      OktaAuth = require('OktaAuth'),
+      cookies = require('../../lib/cookies');
 
   function generateXHRPair(request, response, uri) {
     return Q.Promise(function(resolve) {
@@ -314,8 +315,24 @@ define(function(require) {
     });
   };
 
-  util.mockWindowLocationHref = function (client, href) {
+  util.mockGetWindowLocation = function (client, href) {
     spyOn(client.idToken.authorize, '_getLocationHref').and.returnValue(href);
+  };
+
+  util.mockSetWindowLocation = function (client) {
+    return spyOn(client.token.getWithRedirect, '_setLocation');
+  };
+
+  util.mockSetCookie = function () {
+    return spyOn(cookies.setCookie, '_setDocumentCookie');
+  };
+
+  util.mockGetCookie = function (text) {
+    spyOn(cookies.getCookie, '_getDocumentCookie').and.returnValue(text || '');
+  };
+
+  util.mockGetLocationHash = function (client, hash) {
+    spyOn(client.token.parseFromUrl, '_getLocationHash').and.returnValue(hash);
   };
 
   return util;
