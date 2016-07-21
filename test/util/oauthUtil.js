@@ -253,29 +253,13 @@ define(function(require) {
       });
   };
 
-  function expectErrorToEqual(actual, expected) {
-    expect(actual.name).toEqual(expected.name);
-    expect(actual.message).toEqual(expected.message);
-    expect(actual.errorCode).toEqual(expected.errorCode);
-    expect(actual.errorSummary).toEqual(expected.errorSummary);
-    if (expected.errorLink) {
-      expect(actual.errorLink).toEqual(expected.errorLink);
-      expect(actual.errorId).toEqual(expected.errorId);
-      expect(actual.errorCauses).toEqual(expected.errorCauses);
-    } else {
-      expect(actual.errorLink).toBeUndefined();
-      expect(actual.errorId).toBeUndefined();
-      expect(actual.errorCauses).toBeUndefined();
-    }
-  }
-
   oauthUtil.itErrorsCorrectly = function(title, options, error) {
     it(title, function () {
       var thrown = false;
       try {
         oauthUtil.setupFrame(options);
       } catch (e) {
-        expectErrorToEqual(e, error);
+        util.expectErrorToEqual(e, error);
         thrown = true;
       }
       expect(thrown).toEqual(true);
@@ -299,7 +283,7 @@ define(function(require) {
           expect('not to be hit').toEqual(true);
         })
         .fail(function(e) {
-          expectErrorToEqual(e, error);
+          util.expectErrorToEqual(e, error);
         })
         .fin(done);
     });
