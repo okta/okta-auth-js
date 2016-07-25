@@ -67,6 +67,52 @@ define(function() {
     'auth_time': 1449696330
   };
 
+  tokens.standardIdTokenParsed = {
+    idToken: tokens.standardIdToken,
+    claims: tokens.standardIdTokenClaims,
+    expiresAt: 1449699930,
+    scopes: ['openid', 'email']
+  };
+
+  tokens.modifiedIdToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMHUx' +
+                            'cGNsYTVxWUlSRURMV0NRViIsIm5hbWUiOiJTYW1sIEphY2tzb24iL' +
+                            'CJnaXZlbl9uYW1lIjoiU2FtbCIsImZhbWlseV9uYW1lIjoiSmFja3' +
+                            'NvbiIsInVwZGF0ZWRfYXQiOjE0NDYxNTM0MDEsImVtYWlsIjoic2F' +
+                            'tbGphY2tzb25Ab2t0YS5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1' +
+                            'ZSwidmVyIjoxLCJpc3MiOiJodHRwczovL2F1dGgtanMtdGVzdC5va' +
+                            '3RhLmNvbSIsImxvZ2luIjoiYWRtaW5Ab2t0YS5jb20iLCJub25jZS' +
+                            'I6ImNjY2NjYyIsImF1ZCI6InNvbWVJZCIsImlhdCI6MTQ0OTY5NjM' +
+                            'zMCwiZXhwIjoxNDQ5Njk5OTMwLCJhbXIiOlsia2JhIiwibWZhIiwi' +
+                            'cHdkIl0sImp0aSI6IlRSWlQ3UkNpU3ltVHM1VzdSeWgzIiwiYXV0a' +
+                            'F90aW1lIjoxNDQ5Njk2MzMwfQ.kXzTzaOYLxsVKhlv0DnOOEZEyUw' +
+                            'Y2MYFVvt3g7ebIZPrvSFfUPfhIxGAlmNWobGo8e7FpFL9Hpip2bVx' +
+                            'ZZNT4eITptbFv5QA5TzaIudVsMhpngCnqzCwNXen9yEUtne61I6AS' +
+                            'uXFM_z14ll2Pb0h4mROkionwdApAVARe5I5fVc';
+                            
+  tokens.modifiedIdTokenClaims = {
+    'sub': '00u1pcla5qYIREDLWCQV',
+    'name': 'Saml Jackson',
+    'given_name': 'Saml',
+    'family_name': 'Jackson',
+    'updated_at': 1446153401,
+    'email': 'samljackson@okta.com',
+    'email_verified': true,
+    'ver': 1,
+    'iss': 'https://auth-js-test.okta.com',
+    'login': 'admin@okta.com',
+    'nonce': 'cccccc',
+    'aud': 'someId',
+    'iat': 1449696330,
+    'exp': 1449699930,
+    'amr': [
+      'kba',
+      'mfa',
+      'pwd'
+    ],
+    'jti': 'TRZT7RCiSymTs5W7Ryh3',
+    'auth_time': 1449696330
+  };
+
   tokens.standardAccessToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOj' +
                                'EsImp0aSI6IkFULnJ2Ym5TNGlXdTJhRE5jYTNid1RmMEg5Z' +
                                'VdjV2xsS1FlaU5ZX1ZlSW1NWkEiLCJpc3MiOiJodHRwczov' +

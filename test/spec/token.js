@@ -59,6 +59,56 @@ define(function(require) {
       });
     });
 
+    it('returns id_token overriding all possible oauth params', function (done) {
+      return oauthUtil.setupFrame({
+        oktaAuthArgs: {
+          url: 'https://auth-js-test.okta.com',
+          clientId: 'NPSfOkH5eZrTy8PMDlvx',
+          redirectUri: 'https://auth-js-test.okta.com/redirect'
+        },
+        getWithoutPromptArgs: {
+          sessionToken: 'testSessionToken',
+          clientId: 'someId',
+          redirectUri: 'https://some.com/redirect',
+          responseType: 'id_token',
+          responseMode: 'okta_post_message',
+          state: 'bbbbbb',
+          nonce: 'cccccc',
+          scope: ['openid', 'custom'],
+          maxAge: 1469481630,
+          display: 'page' // will be forced to undefined
+        },
+        postMessageSrc: {
+          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          queryParams: {
+            'client_id': 'someId',
+            'redirect_uri': 'https://some.com/redirect',
+            'response_type': 'id_token',
+            'response_mode': 'okta_post_message',
+            'state': 'bbbbbb',
+            'nonce': 'cccccc',
+            'scope': 'openid custom',
+            'prompt': 'none',
+            'sessionToken': 'testSessionToken',
+            'max_age': '1469481630'
+          }
+        },
+        postMessageResp: {
+          'id_token': tokens.modifiedIdToken,
+          'state': 'bbbbbb'
+        },
+        expectedResp: {
+          idToken: tokens.modifiedIdToken,
+          claims: tokens.modifiedIdTokenClaims,
+          expiresAt: 1449699930,
+          scopes: ['openid', 'custom']
+        }
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
     it('returns access_token using sessionToken', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
