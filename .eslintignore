@@ -4,6 +4,7 @@
 /.grunt
 /buildtools
 /dist
+/target
 /node_modules
 Gruntfile.js
 *.config.js

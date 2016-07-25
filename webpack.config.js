@@ -15,7 +15,7 @@ var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 module.exports = _.extend(commonConfig, {
   entry: './lib/index.js',
   output: {
-    path: path.join(__dirname, 'dist', 'browser'),
+    path: path.join(__dirname, 'dist'),
     filename: 'OktaAuth.min.js',
     library: 'OktaAuth',
     libraryTarget: 'umd'

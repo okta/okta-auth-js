@@ -7,7 +7,7 @@ module.exports = function(grunt) {
       phantom: {
         options: {
           specs: [
-            'dist/test/tests.js'
+            'target/test/tests.js'
           ],
           outfile: 'test/SpecRunner.html',
           junit: {
@@ -29,10 +29,6 @@ module.exports = function(grunt) {
       buildTests: {
         command: 'npm run build:tests'
       },
-      // Builds an AMD version that requires jQuery and Q
-      AMDJqueryQ: {
-        command: 'npm run build:AMDJqueryQ'
-      },
       // Builds a UMD version that has no dependencies
       UMDNoDependencies: {
         command: 'npm run build'
@@ -43,6 +39,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-shell');
 
-  grunt.registerTask('test', ['shell:lint', 'shell:AMDJqueryQ', 'shell:buildTests', 'jasmine:phantom']);
-  grunt.registerTask('default', ['shell:UMDNoDependencies', 'shell:AMDJqueryQ']);
+  grunt.registerTask('test', ['shell:lint', 'shell:buildTests', 'jasmine:phantom']);
+  grunt.registerTask('default', ['shell:UMDNoDependencies']);
 };
