@@ -376,7 +376,7 @@ define(function(require) {
               'X-Custom-Header': 'custom',
               'Accept': 'application/json',
               'Content-Type': 'application/json',
-              'X-Okta-SDK': 'okta-auth-js-' + packageJson.version
+              'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version
             }
           },
           response: 'session'
@@ -393,14 +393,14 @@ define(function(require) {
         title: 'override headers',
         setup: {
           headers: {
-            'X-Okta-SDK': 'another-sdk-version'
+            'X-Okta-User-Agent-Extended': 'another-sdk-version'
           },
           request: {
             uri: '/api/v1/sessions/me',
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json',
-              'X-Okta-SDK': 'another-sdk-version'
+              'X-Okta-User-Agent-Extended': 'another-sdk-version'
             }
           },
           response: 'session'
