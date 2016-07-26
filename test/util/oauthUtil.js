@@ -116,7 +116,8 @@ define(function(require) {
         if (opts.willFail) {
           throw err;
         } else {
-          expect(err).toBeUndefined();
+          // Should never hit this
+          expect(true).toBe(false);
         }
       });
   };

@@ -346,6 +346,9 @@ define(function(require) {
             errorCauses: []
           }
         );
+      });
+
+      describe('validation', function() {
         oauthUtil.itpErrorsCorrectly('throws an sdk error when state doesn\'t match',
           {
             authorizeArgs: {
@@ -467,6 +470,21 @@ define(function(require) {
             errorCauses: []
           }
         );
+        it('doesn\'t throw an error when expired if within acceptable clock skew', function(done) {
+          return oauthUtil.setupFrame({
+            time: tokens.standardIdTokenClaims.exp + 499,
+            oktaAuthArgs: {
+              url: 'https://auth-js-test.okta.com',
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
+              maxClockSkew: 500
+            },
+            authorizeArgs: {
+              sessionToken: 'testToken'
+            }
+          })
+          .fin(done);
+        });
         oauthUtil.itpErrorsCorrectly('throws an sdk error when token is issued in the future',
           {
             time: 0,
@@ -481,6 +499,58 @@ define(function(require) {
             message: 'The JWT was issued in the future',
             errorCode: 'INTERNAL',
             errorSummary: 'The JWT was issued in the future',
+            errorLink: 'INTERNAL',
+            errorId: 'INTERNAL',
+            errorCauses: []
+          }
+        );
+        it('doesn\'t throw an error when issued in future if within acceptable clock skew', function(done) {
+          return oauthUtil.setupFrame({
+            time: tokens.standardIdTokenClaims.iat - 499,
+            oktaAuthArgs: {
+              url: 'https://auth-js-test.okta.com',
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
+              maxClockSkew: 500
+            },
+            authorizeArgs: {
+              sessionToken: 'testToken'
+            }
+          })
+          .fin(done);
+        });
+        it('uses a default clock skew', function(done) {
+          return oauthUtil.setupFrame({
+            time: tokens.standardIdTokenClaims.exp + 299,
+            oktaAuthArgs: {
+              url: 'https://auth-js-test.okta.com',
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              redirectUri: 'https://auth-js-test.okta.com/redirect'
+            },
+            authorizeArgs: {
+              sessionToken: 'testToken'
+            }
+          })
+          .fin(done);
+        });
+        oauthUtil.itpErrorsCorrectly('accepts 0 as a clock skew',
+          {
+            time: tokens.standardIdTokenClaims.exp + 1,
+            oktaAuthArgs: {
+              url: 'https://auth-js-test.okta.com',
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              redirectUri: 'https://auth-js-test.okta.com/redirect',
+              maxClockSkew: 0
+            },
+            authorizeArgs: {
+              sessionToken: 'testToken'
+            }
+          },
+          {
+            name: 'AuthSdkError',
+            message: 'The JWT expired and is no longer valid',
+            errorCode: 'INTERNAL',
+            errorSummary: 'The JWT expired and is no longer valid',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []
