@@ -62,6 +62,7 @@
     "DEFAULT_POLLING_DELAY": 500,
     "DEFAULT_MAX_CLOCK_SKEW": 300,
     "FRAME_ID": "okta-oauth-helper-frame",
-    "REDIRECT_OAUTH_PARAMS_COOKIE_NAME": "okta-oauth-redirect-params"
+    "REDIRECT_OAUTH_PARAMS_COOKIE_NAME": "okta-oauth-redirect-params",
+    "TOKEN_STORAGE_NAME": "okta-token-storage"
   }
 }

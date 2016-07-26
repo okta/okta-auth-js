@@ -335,5 +335,21 @@ define(function(require) {
     spyOn(client.token.parseFromUrl, '_getLocationHash').and.returnValue(hash);
   };
 
+  util.expectErrorToEqual = function (actual, expected) {
+    expect(actual.name).toEqual(expected.name);
+    expect(actual.message).toEqual(expected.message);
+    expect(actual.errorCode).toEqual(expected.errorCode);
+    expect(actual.errorSummary).toEqual(expected.errorSummary);
+    if (expected.errorLink) {
+      expect(actual.errorLink).toEqual(expected.errorLink);
+      expect(actual.errorId).toEqual(expected.errorId);
+      expect(actual.errorCauses).toEqual(expected.errorCauses);
+    } else {
+      expect(actual.errorLink).toBeUndefined();
+      expect(actual.errorId).toBeUndefined();
+      expect(actual.errorCauses).toBeUndefined();
+    }
+  };
+
   return util;
 });
