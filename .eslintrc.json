@@ -27,7 +27,7 @@
     "max-depth": [2, 3],
     "max-len": [2, 120],
     "max-params": [2, 5],
-    "max-statements": [2, 18],
+    "max-statements": [2, 19],
     "quotes": [2, "single"],
     "semi": 2,
     "strict": 0,
