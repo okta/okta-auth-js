@@ -10,7 +10,7 @@ var commonConfig = require('./webpack.common.config');
 module.exports = _.extend(commonConfig, {
   entry: './test/main.js',
   output: {
-    path: path.join(__dirname, 'dist', 'test'),
+    path: path.join(__dirname, 'target', 'test'),
     filename: 'tests.js',
   },
   resolve: {

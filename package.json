@@ -21,7 +21,6 @@
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
     "test": "grunt test",
     "build": "webpack --config webpack.config.js",
-    "build:AMDJqueryQ": "webpack --config webpack.AMDJqueryQ.config.js",
     "build:tests": "webpack --config webpack.test.config.js",
     "package": "grunt",
     "ci-update-package": "./node_modules/@okta/ci-update-package/bin/ci-update-package.js",
