@@ -13,7 +13,7 @@ var fs = require('fs');
 var oktaAuthConfig = packageJson['okta-auth-js'];
 oktaAuthConfig.SDK_VERSION = packageJson.version;
 
-var configDest = __dirname + '/lib/config.json';
+var configDest = __dirname + '/lib/config.js';
 
 console.log('Writing config to', configDest);
-fs.writeFileSync(configDest, JSON.stringify(oktaAuthConfig, null, 2));
+fs.writeFileSync(configDest, 'module.exports = ' + JSON.stringify(oktaAuthConfig, null, 2) + ';');
