@@ -132,13 +132,6 @@ define(function() {
     'auth_time': 1449696330
   };
 
-  tokens.standardIdTokenParsed = {
-    idToken: tokens.standardIdToken,
-    claims: tokens.standardIdTokenClaims,
-    expiresAt: 1449699930,
-    scopes: ['openid', 'email']
-  };
-
   tokens.standardAccessToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOj' +
                                'EsImp0aSI6IkFULnJ2Ym5TNGlXdTJhRE5jYTNid1RmMEg5Z' +
                                'VdjV2xsS1FlaU5ZX1ZlSW1NWkEiLCJpc3MiOiJodHRwczov' +

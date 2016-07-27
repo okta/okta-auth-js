@@ -274,6 +274,68 @@ define(function(require) {
       });
     });
 
+    describe('autoRefresh', function() {
+      beforeEach(function() {
+        jasmine.clock().install();
+      });
+
+      afterEach(function() {
+        jasmine.clock().uninstall();
+      });
+
+      xit('automatically refreshes a token', function(done) {
+        return oauthUtil.setupFrame({
+          autoRefresh: true,
+          oktaAuthArgs: {
+            url: 'https://auth-js-test.okta.com',
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            redirectUri: 'https://auth-js-test.okta.com/redirect',
+            tokenManager: {
+              autoRefresh: true
+            }
+          },
+          tokenManagerAddKeys: {
+            'test-idToken': tokens.standardIdTokenParsed
+          },
+          fastForwardToTime: tokens.standardIdTokenParsed.expiresAt + 1,
+          postMessageResp: {
+            error: 'sampleErrorCode',
+            'error_description': 'something went wrong'
+          }
+        })
+        .then(function() {
+          oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        })
+        .fin(done);
+      });
+
+      xit('removes a token on OAuth failure', function(done) {
+        return oauthUtil.setupFrame({
+          autoRefresh: true,
+          oktaAuthArgs: {
+            url: 'https://auth-js-test.okta.com',
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            redirectUri: 'https://auth-js-test.okta.com/redirect',
+            tokenManager: {
+              autoRefresh: true
+            }
+          },
+          tokenManagerAddKeys: {
+            'test-idToken': tokens.standardIdTokenParsed
+          },
+          fastForwardToTime: tokens.standardIdTokenParsed.expiresAt + 1,
+          postMessageResp: {
+            error: 'sampleErrorCode',
+            'error_description': 'something went wrong'
+          }
+        })
+        .then(function() {
+          oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        })
+        .fin(done);
+      });
+    });
+
     describe('localStorage', function() {
 
       function localStorageSetup() {
