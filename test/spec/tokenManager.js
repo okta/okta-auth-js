@@ -69,7 +69,7 @@ define(function(require) {
             'test-idToken': {
               idToken: 'testInitialToken',
               claims: {'fake': 'claims'},
-              expiresAt: 1449699930,
+              expiresAt: 0,
               scopes: ['openid', 'email']
             }
           },
@@ -240,6 +240,38 @@ define(function(require) {
           errorCauses: []
         }
       );
+
+      it('removes token if an OAuthError is thrown while refreshing', function(done) {
+        return oauthUtil.setupFrame({
+          willFail: true,
+          oktaAuthArgs: {
+            url: 'https://auth-js-test.okta.com',
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            redirectUri: 'https://auth-js-test.okta.com/redirect'
+          },
+          tokenManagerAddKeys: {
+            'test-accessToken': tokens.standardAccessTokenParsed,
+            'test-idToken': tokens.standardIdTokenParsed
+          },
+          tokenManagerRefreshArgs: ['test-accessToken'],
+          postMessageResp: {
+            error: 'sampleErrorCode',
+            'error_description': 'something went wrong'
+          }
+        })
+        .fail(function(e) {
+          util.expectErrorToEqual(e, {
+            name: 'OAuthError',
+            message: 'something went wrong',
+            errorCode: 'sampleErrorCode',
+            errorSummary: 'something went wrong'
+          });
+          oauthUtil.expectTokenStorageToEqual(localStorage, {
+            'test-idToken': tokens.standardIdTokenParsed
+          });
+        })
+        .fin(done);
+      });
     });
 
     describe('localStorage', function() {

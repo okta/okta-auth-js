@@ -74,7 +74,7 @@ define(function(require) {
           responseMode: 'okta_post_message',
           state: 'bbbbbb',
           nonce: 'cccccc',
-          scope: ['openid', 'custom'],
+          scopes: ['openid', 'custom'],
           maxAge: 1469481630,
           display: 'page' // will be forced to undefined
         },
@@ -500,7 +500,7 @@ define(function(require) {
           responseType: 'id_token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['openid', 'email']
+          scopes: ['openid', 'email']
         }) + ';',
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -518,14 +518,14 @@ define(function(require) {
       oauthUtil.setupRedirect({
         getWithRedirectArgs: {
           responseType: 'token',
-          scope: ['email'],
+          scopes: ['email'],
           sessionToken: 'testToken'
         },
         expectedCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
           responseType: 'token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['email']
+          scopes: ['email']
         }) + ';',
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -549,7 +549,7 @@ define(function(require) {
           responseType: ['token', 'id_token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['openid', 'email']
+          scopes: ['openid', 'email']
         }) + ';',
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -573,7 +573,7 @@ define(function(require) {
           responseType: 'id_token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['openid', 'email']
+          scopes: ['openid', 'email']
         }) + ';',
         expectedResp: {
           idToken: tokens.standardIdToken,
@@ -598,7 +598,7 @@ define(function(require) {
           responseType: 'token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['openid', 'email']
+          scopes: ['openid', 'email']
         }) + ';',
         expectedResp: {
           accessToken: tokens.standardAccessToken,
@@ -624,7 +624,7 @@ define(function(require) {
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['openid', 'email']
+          scopes: ['openid', 'email']
         }) + ';',
         expectedResp: [{
           idToken: tokens.standardIdToken,
@@ -651,7 +651,7 @@ define(function(require) {
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['openid', 'email']
+          scopes: ['openid', 'email']
         }) + ';'
       },
       {
@@ -698,7 +698,7 @@ define(function(require) {
           responseType: ['id_token', 'token'],
           state: 'mismatchedState',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          scope: ['openid', 'email']
+          scopes: ['openid', 'email']
         }) + ';'
       },
       {
@@ -724,7 +724,7 @@ define(function(require) {
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'mismatchedNonce',
-          scope: ['openid', 'email']
+          scopes: ['openid', 'email']
         }) + ';'
       },
       {
