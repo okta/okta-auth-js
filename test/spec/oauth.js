@@ -179,7 +179,7 @@ define(function(require) {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
               redirectUri: 'https://auth-js-test.okta.com/redirect',
-              scope: ['openid', 'testscope'],
+              scopes: ['openid', 'testscope'],
               sessionToken: 'testToken'
             },
             postMessageSrc: {
@@ -237,15 +237,15 @@ define(function(require) {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
               redirectUri: 'https://auth-js-test.okta.com/redirect',
-              scope: ['notopenid'],
+              scopes: ['notopenid'],
               sessionToken: 'testToken'
             }
           },
           {
             name: 'AuthSdkError',
-            message: 'openid scope must be specified in the scope argument when requesting an id_token',
+            message: 'openid scope must be specified in the scopes argument when requesting an id_token',
             errorCode: 'INTERNAL',
-            errorSummary: 'openid scope must be specified in the scope argument when requesting an id_token',
+            errorSummary: 'openid scope must be specified in the scopes argument when requesting an id_token',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []

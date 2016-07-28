@@ -87,7 +87,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         expectations: function (test, res) {
           expect(res).toEqual(true);
         }
@@ -120,7 +120,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'rejects an invalid idToken due to expiration',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         execute: function(test, opts) {
           util.warpToDistantPast();
           return test.oa.idToken.verify(opts.idToken, opts.verifyOpts)
@@ -137,7 +137,7 @@ define(function(require) {
       setupVerifyIdTokenTest({
         title: 'verifies an idToken that would be invalid, except ' +
                 'we\'re using the expirationTime option',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         verifyOpts: {
           expirationTime: 9999999999
         },
@@ -156,7 +156,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken using single audience option',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         verifyOpts: {
           audience: 'NPSfOkH5eZrTy8PMDlvx'
         },
@@ -167,7 +167,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'rejects an invalid idToken using single audience option',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         verifyOpts: {
           audience: 'invalid'
         },
@@ -178,7 +178,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken using multiple audience option (all valid)',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         verifyOpts: {
           audience: ['NPSfOkH5eZrTy8PMDlvx', 'NPSfOkH5eZrTy8PMDlvx']
         },
@@ -189,7 +189,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken using multiple audience option (valid and invalid)',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         verifyOpts: {
           audience: ['NPSfOkH5eZrTy8PMDlvx', 'invalid2']
         },
@@ -200,7 +200,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'rejects an invalid idToken using multiple audience option (all invalid)',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         verifyOpts: {
           audience: ['invalid1', 'invalid2']
         },
@@ -211,9 +211,9 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'verifies a valid idToken using issuer option',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         verifyOpts: {
-          issuer: 'https://auth-js-test.okta.com'
+          issuer: 'https://lboyette.trexcloud.com'
         },
         expectations: function (test, res) {
           expect(res).toEqual(true);
@@ -222,7 +222,7 @@ define(function(require) {
 
       setupVerifyIdTokenTest({
         title: 'rejects an invalid idToken using issuer option',
-        idToken: tokens.standardIdToken,
+        idToken: tokens.verifiableIdToken,
         verifyOpts: {
           issuer: 'invalid'
         },

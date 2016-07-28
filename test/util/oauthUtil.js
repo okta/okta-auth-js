@@ -64,6 +64,7 @@ define(function(require) {
         (opts.authorizeArgs && opts.authorizeArgs.responseMode !== 'fragment') ||
         opts.getWithoutPromptArgs ||
         opts.getWithPopupArgs ||
+        opts.tokenManagerRefreshArgs ||
         opts.refreshArgs) {
       // Simulate the postMessage between the window and the popup or iframe
       spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
@@ -97,6 +98,16 @@ define(function(require) {
       util.mockGetWindowLocation(authClient, opts.hrefMock);
     }
 
+    if (opts.tokenManagerAddKeys) {
+      for (var key in opts.tokenManagerAddKeys) {
+        if (!opts.tokenManagerAddKeys.hasOwnProperty(key)) {
+          continue;
+        }
+        var token = opts.tokenManagerAddKeys[key];
+        authClient.tokenManager.add(key, token);
+      }
+    }
+
     var promise;
     if (opts.refreshArgs) {
       promise = authClient.idToken.refresh(opts.refreshArgs);
@@ -104,6 +115,8 @@ define(function(require) {
       promise = authClient.token.getWithoutPrompt(opts.getWithoutPromptArgs);
     } else if (opts.getWithPopupArgs) {
       promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
+    } else if (opts.tokenManagerRefreshArgs) {
+      promise = authClient.tokenManager.refresh.apply(this, opts.tokenManagerRefreshArgs);
     } else {
       promise = authClient.idToken.authorize(opts.authorizeArgs);
     }
@@ -289,6 +302,10 @@ define(function(require) {
     });
   };
   
+  oauthUtil.expectTokenStorageToEqual = function(storage, obj) {
+    var parsed = JSON.parse(storage.getItem('okta-token-storage'));
+    expect(parsed).toEqual(obj);
+  };
 
   return oauthUtil;
 });
