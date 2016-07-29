@@ -133,8 +133,7 @@ define(function(require) {
     }
 
     if (opts.fastForwardToTime) {
-      var ticks = (opts.fastForwardToTime * 1000) - Date.now();
-      jasmine.clock().tick(ticks);
+      util.warpByTicksToUnixTime(opts.fastForwardToTime);
     }
 
     return promise

@@ -281,6 +281,11 @@ define(function(require) {
     jasmine.clock().mockDate(new Date());
   };
 
+  util.warpByTicksToUnixTime = function (unixTime) {
+    var ticks = (unixTime * 1000) - Date.now();
+    jasmine.clock().tick(ticks);
+  };
+
   util.parseUri = function (uri) {
     var split = uri.split('?');
     return {
