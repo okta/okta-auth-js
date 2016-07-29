@@ -11,7 +11,8 @@ define(function(require) {
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://auth-js-test.okta.com/redirect',
       tokenManager: {
-        storage: options.type
+        storage: options.type,
+        autoRefresh: options.autoRefresh
       }
     });
   }
@@ -348,6 +349,33 @@ define(function(require) {
           oauthUtil.expectTokenStorageToEqual(localStorage, {});
         })
         .fin(done);
+      });
+
+      it('emits "expired" on existing tokens even when autoRefresh is disabled', function(done) {
+        util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+        localStorage.setItem('okta-token-storage', JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed
+        }));
+        var client = setupSync({ autoRefresh: false });
+        client.tokenManager.on('expired', function(key, token) {
+          expect(key).toEqual('test-idToken');
+          expect(token).toEqual(tokens.standardIdTokenParsed);
+          expect(client.tokenManager.get('test-idToken')).toBeUndefined();
+          done();
+        });
+        util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      });
+
+      it('emits "expired" on new tokens even when autoRefresh is disabled', function(done) {
+        util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+        var client = setupSync({ autoRefresh: false });
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        client.tokenManager.on('expired', function(key, token) {
+          expect(key).toEqual('test-idToken');
+          expect(token).toEqual(tokens.standardIdTokenParsed);
+          done();
+        });
+        util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
       });
     });
 
