@@ -4,6 +4,7 @@ define(function(require) {
   var OktaAuth = require('OktaAuth');
   var tokens = require('./tokens');
   var packageJson = require('../../package.json');
+  var Q = require('q');
 
   var oauthUtil = {};
 
@@ -65,7 +66,8 @@ define(function(require) {
         opts.getWithoutPromptArgs ||
         opts.getWithPopupArgs ||
         opts.tokenManagerRefreshArgs ||
-        opts.refreshArgs) {
+        opts.refreshArgs ||
+        opts.autoRefresh) {
       // Simulate the postMessage between the window and the popup or iframe
       spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
         if (eventName === 'message' && !opts.closePopup) {
@@ -117,11 +119,30 @@ define(function(require) {
       promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
     } else if (opts.tokenManagerRefreshArgs) {
       promise = authClient.tokenManager.refresh.apply(this, opts.tokenManagerRefreshArgs);
+    } else if (opts.autoRefresh) {
+      var refreshDeferred = Q.defer();
+      authClient.tokenManager.on('refreshed', function() {
+        refreshDeferred.resolve();
+      });
+      authClient.tokenManager.on('expired', function() {
+        refreshDeferred.resolve();
+      });
+      promise = refreshDeferred.promise;
     } else {
       promise = authClient.idToken.authorize(opts.authorizeArgs);
     }
+
+    if (opts.fastForwardToTime) {
+      var ticks = (opts.fastForwardToTime * 1000) - Date.now();
+      jasmine.clock().tick(ticks);
+    }
+
     return promise
       .then(function(res) {
+        if (opts.autoRefresh) {
+          return;
+        }
+
         var expectedResp = opts.expectedResp || defaultResponse;
         validateResponse(res, expectedResp);
       })
