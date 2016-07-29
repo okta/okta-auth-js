@@ -283,47 +283,62 @@ define(function(require) {
         jasmine.clock().uninstall();
       });
 
-      xit('automatically refreshes a token', function(done) {
+      it('automatically refreshes a token by default', function(done) {
+        var expiresAt = tokens.standardIdTokenParsed.expiresAt;
         return oauthUtil.setupFrame({
+          fastForwardToTime: expiresAt + 1,
           autoRefresh: true,
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect',
-            tokenManager: {
-              autoRefresh: true
-            }
+            redirectUri: 'https://auth-js-test.okta.com/redirect'
           },
           tokenManagerAddKeys: {
-            'test-idToken': tokens.standardIdTokenParsed
+            'test-idToken': {
+              idToken: 'testInitialToken',
+              claims: {'fake': 'claims'},
+              expiresAt: expiresAt,
+              scopes: ['openid', 'email']
+            }
           },
-          fastForwardToTime: tokens.standardIdTokenParsed.expiresAt + 1,
+          postMessageSrc: {
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            queryParams: {
+              'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+              'response_type': 'id_token',
+              'response_mode': 'okta_post_message',
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
+              'scope': 'openid email',
+              'prompt': 'none'
+            }
+          },
           postMessageResp: {
-            error: 'sampleErrorCode',
-            'error_description': 'something went wrong'
+            'id_token': tokens.standardIdToken,
+            state: oauthUtil.mockedState
           }
         })
         .then(function() {
-          oauthUtil.expectTokenStorageToEqual(localStorage, {});
+          oauthUtil.expectTokenStorageToEqual(localStorage, {
+            'test-idToken': tokens.standardIdTokenParsed
+          });
         })
         .fin(done);
       });
 
-      xit('removes a token on OAuth failure', function(done) {
+      it('removes a token on OAuth failure', function(done) {
         return oauthUtil.setupFrame({
+          fastForwardToTime: tokens.standardIdTokenParsed.expiresAt + 1,
           autoRefresh: true,
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect',
-            tokenManager: {
-              autoRefresh: true
-            }
+            redirectUri: 'https://auth-js-test.okta.com/redirect'
           },
           tokenManagerAddKeys: {
             'test-idToken': tokens.standardIdTokenParsed
           },
-          fastForwardToTime: tokens.standardIdTokenParsed.expiresAt + 1,
           postMessageResp: {
             error: 'sampleErrorCode',
             'error_description': 'something went wrong'
@@ -378,6 +393,18 @@ define(function(require) {
           });
         });
       });
+
+      describe('clear', function() {
+        it('clears all tokens', function() {
+          var client = localStorageSetup();
+          localStorage.setItem('okta-token-storage', JSON.stringify({
+            'test-idToken': tokens.standardIdTokenParsed,
+            anotherKey: tokens.standardIdTokenParsed
+          }));
+          client.tokenManager.clear();
+          oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        });
+      });
     });
 
     describe('sessionStorage', function() {
@@ -420,6 +447,18 @@ define(function(require) {
           oauthUtil.expectTokenStorageToEqual(sessionStorage, {
             anotherKey: tokens.standardIdTokenParsed
           });
+        });
+      });
+      
+      describe('clear', function() {
+        it('clears all tokens', function() {
+          var client = sessionStorageSetup();
+          sessionStorage.setItem('okta-token-storage', JSON.stringify({
+            'test-idToken': tokens.standardIdTokenParsed,
+            anotherKey: tokens.standardIdTokenParsed
+          }));
+          client.tokenManager.clear();
+          oauthUtil.expectTokenStorageToEqual(sessionStorage, {});
         });
       });
     });
@@ -468,6 +507,19 @@ define(function(require) {
           expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage=' + JSON.stringify({
             anotherKey: tokens.standardIdTokenParsed
           }) + '; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+        });
+      });
+
+      describe('clear', function() {
+        it('clears all tokens', function() {
+          var client = cookieStorageSetup();
+          util.mockGetCookie('okta-token-storage=' + JSON.stringify({
+            'test-idToken': tokens.standardIdTokenParsed,
+            anotherKey: tokens.standardIdTokenParsed
+          }) + ';');
+          var setCookieMock = util.mockSetCookie();
+          client.tokenManager.clear();
+          expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage={}; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
         });
       });
     });

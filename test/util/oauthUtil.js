@@ -121,8 +121,11 @@ define(function(require) {
       promise = authClient.tokenManager.refresh.apply(this, opts.tokenManagerRefreshArgs);
     } else if (opts.autoRefresh) {
       var refreshDeferred = Q.defer();
-      authClient.tokenManager.on('refresh', function(token) {
-        refreshDeferred.resolve(token);
+      authClient.tokenManager.on('refreshed', function() {
+        refreshDeferred.resolve();
+      });
+      authClient.tokenManager.on('expired', function() {
+        refreshDeferred.resolve();
       });
       promise = refreshDeferred.promise;
     } else {
