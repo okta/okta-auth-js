@@ -360,6 +360,7 @@ define(function(require) {
         client.tokenManager.on('expired', function(key, token) {
           expect(key).toEqual('test-idToken');
           expect(token).toEqual(tokens.standardIdTokenParsed);
+          expect(client.tokenManager.get('test-idToken')).toBeUndefined();
           done();
         });
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
