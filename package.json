@@ -22,10 +22,9 @@
     "test": "grunt test",
     "build": "webpack --config webpack.config.js",
     "build:tests": "webpack --config webpack.test.config.js",
-    "package": "grunt",
     "ci-update-package": "./node_modules/@okta/ci-update-package/bin/ci-update-package.js",
     "ci-pkginfo:dataload": "./node_modules/@okta/ci-pkginfo/bin/ci-pkginfo.js -t dataload",
-    "prepublish": "node ./writeConfig.js"
+    "prepublish": "node ./writeConfig.js && grunt shell:UMDNoDependencies"
   },
   "author": "Okta",
   "keywords": [

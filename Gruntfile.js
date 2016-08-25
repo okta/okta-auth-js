@@ -40,5 +40,4 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-shell');
 
   grunt.registerTask('test', ['shell:lint', 'shell:buildTests', 'jasmine:phantom']);
-  grunt.registerTask('default', ['shell:UMDNoDependencies']);
 };
