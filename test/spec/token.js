@@ -738,4 +738,80 @@ define(function(require) {
       }
     );
   });
+
+  describe('token.refresh', function () {
+    it('returns id_token', function (done) {
+      return oauthUtil.setupFrame({
+        oktaAuthArgs: {
+          url: 'https://auth-js-test.okta.com',
+          clientId: 'NPSfOkH5eZrTy8PMDlvx',
+          redirectUri: 'https://auth-js-test.okta.com/redirect'
+        },
+        tokenRefreshArgs: [tokens.standardIdTokenParsed],
+        postMessageSrc: {
+          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          queryParams: {
+            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+            'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+            'response_type': 'id_token',
+            'response_mode': 'okta_post_message',
+            'state': oauthUtil.mockedState,
+            'nonce': oauthUtil.mockedNonce,
+            'scope': 'openid email',
+            'prompt': 'none'
+          }
+        }
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
+    it('returns access_token', function (done) {
+      return oauthUtil.setupFrame({
+        oktaAuthArgs: {
+          url: 'https://auth-js-test.okta.com',
+          clientId: 'NPSfOkH5eZrTy8PMDlvx',
+          redirectUri: 'https://auth-js-test.okta.com/redirect'
+        },
+        tokenRefreshArgs: [tokens.standardAccessTokenParsed],
+        postMessageSrc: {
+          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          queryParams: {
+            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+            'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+            'response_type': 'token',
+            'response_mode': 'okta_post_message',
+            'state': oauthUtil.mockedState,
+            'nonce': oauthUtil.mockedNonce,
+            'scope': 'openid email',
+            'prompt': 'none'
+          }
+        }
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
+    oauthUtil.itpErrorsCorrectly('throws an error if a non-token is passed',
+      {
+        oktaAuthArgs: {
+          url: 'https://auth-js-test.okta.com',
+          clientId: 'NPSfOkH5eZrTy8PMDlvx',
+          redirectUri: 'https://auth-js-test.okta.com/redirect'
+        },
+        tokenRefreshArgs: [{non:'token'}]
+      },
+      {
+        name: 'AuthSdkError',
+        message: 'Refresh must be passed a token with an array of scopes and an accessToken or idToken',
+        errorCode: 'INTERNAL',
+        errorSummary: 'Refresh must be passed a token with an array of scopes and an accessToken or idToken',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      }
+    );
+  });
 });

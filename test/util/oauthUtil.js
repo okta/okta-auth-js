@@ -67,6 +67,7 @@ define(function(require) {
         opts.getWithPopupArgs ||
         opts.tokenManagerRefreshArgs ||
         opts.refreshArgs ||
+        opts.tokenRefreshArgs ||
         opts.autoRefresh) {
       // Simulate the postMessage between the window and the popup or iframe
       spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
@@ -119,6 +120,8 @@ define(function(require) {
       promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
     } else if (opts.tokenManagerRefreshArgs) {
       promise = authClient.tokenManager.refresh.apply(this, opts.tokenManagerRefreshArgs);
+    } else if (opts.tokenRefreshArgs) {
+      promise = authClient.token.refresh.apply(this, opts.tokenRefreshArgs);
     } else if (opts.autoRefresh) {
       var refreshDeferred = Q.defer();
       authClient.tokenManager.on('refreshed', function() {
