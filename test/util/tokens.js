@@ -197,5 +197,7 @@ define(function() {
                            'KZsa4srVE0uXiqdiyiljZ692gdXbwBXgWNIA2PWMrIagxWiqYCn' +
                            'fAJcS7TCE611eg-c';
 
+  tokens.standardAuthorizationCode = '35cFyfgCU2u0a1EzAqbO';
+
   return tokens;
 });
