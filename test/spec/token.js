@@ -1,13 +1,16 @@
 define(function(require) {
   var OktaAuth = require('OktaAuth');
   var tokens = require('../util/tokens');
+  var util = require('../util/util');
   var oauthUtil = require('../util/oauthUtil');
+  var packageJson = require('../../package.json');
+  var Q = require('q');
+
+  function setupSync() {
+    return new OktaAuth({ url: 'http://example.okta.com' });
+  }
 
   describe('token.decode', function () {
-
-    function setupSync() {
-      return new OktaAuth({ url: 'http://example.okta.com' });
-    }
 
     it('correctly decodes a token', function () {
       var oa = setupSync();
@@ -946,5 +949,67 @@ define(function(require) {
         errorCauses: []
       }
     );
+  });
+
+  describe('token.getUserInfo', function() {
+    util.itMakesCorrectRequestResponse({
+      title: 'allows retrieving UserInfo',
+      setup: {
+        request: {
+          uri: '/oauth2/v1/userinfo',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'Authorization': 'Bearer ' + tokens.standardAccessToken
+          }
+        },
+        response: 'userinfo'
+      },
+      execute: function (test) {
+        return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed);
+      },
+      expectations: function (test, res) {
+        expect(res).toEqual({
+          'sub': '00u15ozp26ACQTGHJEBH',
+          'email': 'samljackson@example.com',
+          'email_verified': true
+        });
+      }
+    });
+
+    it('throws an error if no arguments are passed instead', function(done) {
+      return Q.resolve(setupSync())
+      .then(function (oa) {
+        return oa.token.getUserInfo();
+      })
+      .then(function () {
+        expect('not to be hit').toBe(true);
+      })
+      .fail(function (err) {
+        expect(err.name).toEqual('AuthSdkError');
+        expect(err.errorSummary).toBe('getUserInfo requires an access token object');
+      })
+      .fin(function () {
+        done();
+      });
+    });
+
+    it('throws an error if a string is passed instead of an accessToken object', function(done) {
+      return Q.resolve(setupSync())
+      .then(function (oa) {
+        return oa.token.getUserInfo('just a string');
+      })
+      .then(function () {
+        expect('not to be hit').toBe(true);
+      })
+      .fail(function (err) {
+        expect(err.name).toEqual('AuthSdkError');
+        expect(err.errorSummary).toBe('getUserInfo requires an access token object');
+      })
+      .fin(function () {
+        done();
+      });
+    });
   });
 });
