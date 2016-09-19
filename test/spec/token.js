@@ -1011,5 +1011,57 @@ define(function(require) {
         done();
       });
     });
+
+    util.itErrorsCorrectly({
+      title: 'returns correct error for 403',
+      setup: {
+        request: {
+          uri: '/oauth2/v1/userinfo',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'Authorization': 'Bearer ' + tokens.standardAccessToken
+          }
+        },
+        response: 'error-userinfo-insufficient-scope'
+      },
+      execute: function (test) {
+        return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed);
+      },
+      expectations: function (test, err) {
+        expect(err.name).toEqual('OAuthError');
+        expect(err.message).toEqual('The access token must provide access to at least one' +
+          ' of these scopes - profile, email, address or phone');
+        expect(err.errorCode).toEqual('insufficient_scope');
+        expect(err.errorSummary).toEqual('The access token must provide access to at least one' +
+          ' of these scopes - profile, email, address or phone');
+      }
+    });
+
+    util.itErrorsCorrectly({
+      title: 'returns correct error for 401',
+      setup: {
+        request: {
+          uri: '/oauth2/v1/userinfo',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'Authorization': 'Bearer ' + tokens.standardAccessToken
+          }
+        },
+        response: 'error-userinfo-invalid-token'
+      },
+      execute: function (test) {
+        return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed);
+      },
+      expectations: function (test, err) {
+        expect(err.name).toEqual('OAuthError');
+        expect(err.message).toEqual('The access token is invalid.');
+        expect(err.errorCode).toEqual('invalid_token');
+        expect(err.errorSummary).toEqual('The access token is invalid.');
+      }
+    });
   });
 });

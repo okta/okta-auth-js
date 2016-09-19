@@ -82,6 +82,11 @@ define(function(require) {
 
       var deferred = $.Deferred();
       var xhr = pair.response;
+
+      xhr.getResponseHeader = function(name) {
+        return xhr.headers && xhr.headers[name];
+      };
+      
       if (xhr.status > 0 && xhr.status < 300) {
         // $.ajax send (data, textStatus, jqXHR) on success
         _.defer(function () { deferred.resolve(xhr.response, null, xhr); });
