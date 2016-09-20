@@ -293,7 +293,7 @@ define(function(require) {
       });
     });
 
-    oauthUtil.itErrorsCorrectly('throws an error if multiple responseTypes are sent as a string',
+    oauthUtil.itpErrorsCorrectly('throws an error if multiple responseTypes are sent as a string',
       {
         oktaAuthArgs: {
           url: 'https://auth-js-test.okta.com',
