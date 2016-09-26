@@ -3,7 +3,6 @@ define(function(require) {
   var util = require('../util/util');
   var OktaAuth = require('OktaAuth');
   var tokens = require('./tokens');
-  var packageJson = require('../../package.json');
   var Q = require('q');
 
   var oauthUtil = {};
@@ -176,18 +175,24 @@ define(function(require) {
       return origAppend.apply(this, arguments);
     });
 
-    var iframeId = packageJson['okta-auth-js'].FRAME_ID;
     function iframeWasCreated() {
       expect(body.appendChild).toHaveBeenCalled();
       var el = body.appendChild.calls.mostRecent().args[0];
       expect(el.tagName).toEqual('IFRAME');
-      expect(el.id).toEqual(iframeId);
       expect(el.style.display).toEqual('none');
     }
 
     function iframeWasDestroyed() {
-      var iframe = document.getElementById(iframeId);
-      expect(iframe).toBeNull();
+      // All iframes should be created and destroyed in the same test
+      var iframes = document.getElementsByTagName('IFRAME');
+      expect(iframes.length).toBe(0);
+      
+      // Remove any frames that exist, so we don't taint our other tests
+      var il = iframes.length;
+      while(il--) {
+        var iframe = iframes[il];
+        iframe.parentElement.removeChild(iframe);
+      }
     }
 
     return oauthUtil.setup(opts)
@@ -200,6 +205,10 @@ define(function(require) {
           expect(actual.baseUri).toEqual(expected.baseUri);
           expect(actual.queryParams).toEqual(expected.queryParams);
         }
+      })
+      .catch(function(err) {
+        iframeWasDestroyed();
+        throw err;
       });
   };
 

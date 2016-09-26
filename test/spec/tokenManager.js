@@ -203,14 +203,9 @@ define(function(require) {
             redirectUri: 'https://auth-js-test.okta.com/redirect'
           },
           tokenManagerAddKeys: {
-            'test-accessToken': {
-              accessToken: 'testInitialToken',
-              expiresAt: 1449703529,
-              scopes: ['openid', 'email'],
-              tokenType: 'Bearer'
-            }
+            'test-idToken': tokens.standardIdTokenParsed
           },
-          tokenManagerRefreshArgs: ['test-accessToken'],
+          tokenManagerRefreshArgs: ['test-idToken'],
           postMessageSrc: {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
@@ -225,17 +220,15 @@ define(function(require) {
             }
           },
           postMessageResp: {
-            'access_token': tokens.standardAccessToken,
-            'token_type': 'Bearer',
-            'expires_in': 3600,
-            'state': 'fakeState'
+            'id_token': tokens.modifiedIdToken,
+            state: oauthUtil.mockedState
           }
         },
         {
           name: 'AuthSdkError',
-          message: 'OAuth flow response state doesn\'t match request state',
+          message: 'OAuth flow response nonce doesn\'t match request nonce',
           errorCode: 'INTERNAL',
-          errorSummary: 'OAuth flow response state doesn\'t match request state',
+          errorSummary: 'OAuth flow response nonce doesn\'t match request nonce',
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: []
@@ -257,7 +250,8 @@ define(function(require) {
           tokenManagerRefreshArgs: ['test-accessToken'],
           postMessageResp: {
             error: 'sampleErrorCode',
-            'error_description': 'something went wrong'
+            'error_description': 'something went wrong',
+            state: oauthUtil.mockedState
           }
         })
         .fail(function(e) {
@@ -342,7 +336,8 @@ define(function(require) {
           },
           postMessageResp: {
             error: 'sampleErrorCode',
-            'error_description': 'something went wrong'
+            'error_description': 'something went wrong',
+            state: oauthUtil.mockedState
           }
         })
         .then(function() {
