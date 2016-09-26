@@ -232,7 +232,7 @@ define(function(require) {
       });
 
       describe('errors', function() {
-        oauthUtil.itErrorsCorrectly('throws an error when openid scope isn\'t specified',
+        oauthUtil.itpErrorsCorrectly('throws an error when openid scope isn\'t specified',
           {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -251,7 +251,7 @@ define(function(require) {
             errorCauses: []
           }
         );
-        oauthUtil.itErrorsCorrectly('throws an error when clientId isn\'t specified',
+        oauthUtil.itpErrorsCorrectly('throws an error when clientId isn\'t specified',
           {
             authorizeArgs: {
               redirectUri: 'https://auth-js-test.okta.com/redirect',

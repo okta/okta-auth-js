@@ -289,19 +289,6 @@ define(function(require) {
       });
   };
 
-  oauthUtil.itErrorsCorrectly = function(title, options, error) {
-    it(title, function () {
-      var thrown = false;
-      try {
-        oauthUtil.setupFrame(options);
-      } catch (e) {
-        util.expectErrorToEqual(e, error);
-        thrown = true;
-      }
-      expect(thrown).toEqual(true);
-    });
-  };
-
   oauthUtil.itpErrorsCorrectly = function(title, options, error) {
     it(title, function (done) {
       options.willFail = true;
