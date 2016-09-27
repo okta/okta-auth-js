@@ -153,7 +153,10 @@ define(function(require) {
         context.emitter.emit('trigger', oauthUtil.mockedState2);
 
         return Q.all([firstPrompt, secondPrompt])
-        .then(function() {
+        .spread(function(firstToken, secondToken) {
+          expect(firstToken).toEqual(tokens.standardIdTokenParsed);
+          expect(secondToken).toEqual(tokens.standardIdToken2Parsed);
+
           // make sure both iframes were destroyed
           expect(iframes.length).toBe(0);
 
@@ -450,7 +453,10 @@ define(function(require) {
         context.emitter.emit('trigger', oauthUtil.mockedState2);
 
         return Q.all([firstPopup, secondPopup])
-        .then(function() {
+        .spread(function(firstToken, secondToken) {
+          expect(firstToken).toEqual(tokens.standardIdTokenParsed);
+          expect(secondToken).toEqual(tokens.standardIdToken2Parsed);
+
           // make sure both popups were closed
           expect(getOpenPopups().length).toBe(0);
         });

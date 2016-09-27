@@ -113,6 +113,37 @@ define(function() {
                             'pYcGEgLFRDRhfVTsnocExDcSbQ8XFt7PBrDJVtzMxgAX75O' +
                             '4MDMenm2VBKVmMWRcUKTJfyc';
 
+  tokens.standardIdToken2Claims = {
+    'sub': '00u1pcla5qYIREDLWCQV',
+    'name': 'Saml Jackson',
+    'given_name': 'Saml',
+    'family_name': 'Jackson',
+    'updated_at': 1446153401,
+    'email': 'samljackson@okta.com',
+    'email_verified': true,
+    'ver': 1,
+    'iss': 'https://auth-js-test.okta.com',
+    'login': 'admin@okta.com',
+    'nonce': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+    'aud': 'NPSfOkH5eZrTy8PMDlvx',
+    'iat': 1449696330,
+    'exp': 1449699930,
+    'amr': [
+      'kba',
+      'mfa',
+      'pwd'
+    ],
+    'jti': 'TRZT7RCiSymTs5W7Ryh3',
+    'auth_time': 1449696330
+  };
+  
+  tokens.standardIdToken2Parsed = {
+    idToken: tokens.standardIdToken2,
+    claims: tokens.standardIdToken2Claims,
+    expiresAt: 1449699930,
+    scopes: ['openid', 'email']
+  };
+
   tokens.modifiedIdToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMHUx' +
                             'cGNsYTVxWUlSRURMV0NRViIsIm5hbWUiOiJTYW1sIEphY2tzb24iL' +
                             'CJnaXZlbl9uYW1lIjoiU2FtbCIsImZhbWlseV9uYW1lIjoiSmFja3' +
