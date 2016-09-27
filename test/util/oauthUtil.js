@@ -4,12 +4,16 @@ define(function(require) {
   var OktaAuth = require('OktaAuth');
   var tokens = require('./tokens');
   var Q = require('q');
+  var EventEmitter = require('tiny-emitter');
 
   var oauthUtil = {};
 
   // These are the result of the state and nonce after mocking
   oauthUtil.mockedState = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
   oauthUtil.mockedNonce = oauthUtil.mockedState;
+
+  oauthUtil.mockedState2 = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+  oauthUtil.mockedNonce2 = oauthUtil.mockedState2;
 
   oauthUtil.mockStateAndNonce = function() {
     // Make sure the state is generated the same every time (standardState, standardNonce)
@@ -157,8 +161,20 @@ define(function(require) {
       });
   };
 
+  oauthUtil.removeAllFrames = function() {
+    var iframes = document.getElementsByTagName('IFRAME');
+    var il = iframes.length;
+    while(il--) {
+      var iframe = iframes[il];
+      iframe.parentElement.removeChild(iframe);
+    }
+  };
+
   oauthUtil.setupFrame = function(opts) {
     var body = document.getElementsByTagName('body')[0];
+
+    // Make sure no frames carried over from previous tests
+    oauthUtil.removeAllFrames();
 
     // Capture the src of the iframe to check later
     var src;
@@ -188,11 +204,7 @@ define(function(require) {
       expect(iframes.length).toBe(0);
       
       // Remove any frames that exist, so we don't taint our other tests
-      var il = iframes.length;
-      while(il--) {
-        var iframe = iframes[il];
-        iframe.parentElement.removeChild(iframe);
-      }
+      oauthUtil.removeAllFrames();
     }
 
     return oauthUtil.setup(opts)
@@ -296,6 +308,50 @@ define(function(require) {
         expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params=; ' +
           'expires=Thu, 01 Jan 1970 00:00:00 GMT;');
       });
+  };
+
+  oauthUtil.setupSimultaneousPostMessage = function() {
+    // Create client
+    var client =  new OktaAuth({
+      url: 'https://auth-js-test.okta.com',
+      clientId: 'NPSfOkH5eZrTy8PMDlvx',
+      redirectUri: 'https://auth-js-test.okta.com/redirect'
+    });
+
+    var emitter = new EventEmitter();
+    spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
+      if (eventName === 'message') {
+        emitter.on('trigger', function(state) {
+          // get the data with the correct state
+          var data;
+          if (state === oauthUtil.mockedState) {
+            data = {
+              'id_token': tokens.standardIdToken,
+              state: oauthUtil.mockedState
+            };
+          } else if (state === oauthUtil.mockedState2) {
+            data = {
+              'id_token': tokens.standardIdToken2,
+              state: oauthUtil.mockedState2
+            };
+          } else {
+            throw 'Unrecognized state: ' + state;
+          }
+          fn({
+            data: data,
+            origin: 'https://auth-js-test.okta.com'
+          });
+        });
+      }
+    });
+
+    // warp to time to ensure tokens aren't expired
+    util.warpToUnixTime(tokens.standardIdTokenClaims.exp - 1);
+
+    return new Q({
+      client: client,
+      emitter: emitter
+    });
   };
 
   oauthUtil.itpErrorsCorrectly = function(title, options, error) {
