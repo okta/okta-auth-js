@@ -1,6 +1,54 @@
 define(function(require) {
   var OktaAuth = require('OktaAuth');
   var oauthUtil = require('../../lib/oauthUtil');
+  var util = require('../util/util');
+  var wellKnown = require('../xhr/well-known');
+
+  describe('getWellKnown', function() {
+    util.itMakesCorrectRequestResponse({
+      title: 'caches response',
+      setup: {
+        calls: [
+          {
+            request: {
+              method: 'get',
+              uri: '/.well-known/openid-configuration'
+            },
+            response: 'well-known'
+          }
+        ],
+        time: 1449699929
+      },
+      execute: function(test) {
+        localStorage.clear();
+        return oauthUtil.getWellKnown(test.oa);
+      },
+      expectations: function() {
+        var cache = localStorage.getItem('okta-cache-storage');
+        expect(cache).toEqual(JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          }
+        }));
+      }
+    });
+    util.itMakesCorrectRequestResponse({
+      title: 'uses cached response',
+      setup: {
+        time: 1449699929
+      },
+      execute: function(test) {
+        localStorage.setItem('okta-cache-storage', JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          }
+        }));
+        return oauthUtil.getWellKnown(test.oa);
+      }
+    });
+  });
 
   describe('getOAuthUrls', function() {
     function setupOAuthUrls(options) {

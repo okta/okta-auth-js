@@ -7,6 +7,30 @@ define(function(require) {
       OktaAuth = require('OktaAuth'),
       cookies = require('../../lib/cookies');
 
+  
+  var util = {};
+
+  util.warpToDistantFuture = function () {
+    jasmine.clock().mockDate(new Date(9999999999999));
+  };
+
+  util.warpToDistantPast = function () {
+    jasmine.clock().mockDate(new Date(0));
+  };
+
+  util.warpToUnixTime = function (unixTime) {
+    jasmine.clock().mockDate(new Date(unixTime * 1000));
+  };
+
+  util.returnToPresent = function () {
+    jasmine.clock().mockDate(new Date());
+  };
+
+  util.warpByTicksToUnixTime = function (unixTime) {
+    var ticks = (unixTime * 1000) - Date.now();
+    jasmine.clock().tick(ticks);
+  };
+
   function generateXHRPair(request, response, uri) {
     return Q.Promise(function(resolve) {
 
@@ -114,6 +138,10 @@ define(function(require) {
     return new Q()
       .then(function() {
 
+        if (options.time) {
+          util.warpToUnixTime(options.time);
+        }
+
         // 1. Setup ajax mock
         if (options.calls) {
           
@@ -187,8 +215,6 @@ define(function(require) {
       });
   }
 
-  var util = {};
-
   util.itMakesCorrectRequestResponse = function (options) {
     var fn = options.only ? it.only : it,
         title = options.title || 'makes correct request and returns response';
@@ -203,11 +229,10 @@ define(function(require) {
           }
           if (options.expectations) {
             options.expectations(test, res);
-            test.ajaxMock.done();
-          } else {
+          } else if (test.trans) {
             expect(test.trans.data).toEqual(test.responseBody);
-            test.ajaxMock.done();
           }
+          test.ajaxMock.done();
           done();
         });
       });
@@ -268,27 +293,6 @@ define(function(require) {
         });
       });
     });
-  };
-
-  util.warpToDistantFuture = function () {
-    jasmine.clock().mockDate(new Date(9999999999999));
-  };
-
-  util.warpToDistantPast = function () {
-    jasmine.clock().mockDate(new Date(0));
-  };
-
-  util.warpToUnixTime = function (unixTime) {
-    jasmine.clock().mockDate(new Date(unixTime * 1000));
-  };
-
-  util.returnToPresent = function () {
-    jasmine.clock().mockDate(new Date());
-  };
-
-  util.warpByTicksToUnixTime = function (unixTime) {
-    var ticks = (unixTime * 1000) - Date.now();
-    jasmine.clock().tick(ticks);
   };
 
   util.parseUri = function (uri) {

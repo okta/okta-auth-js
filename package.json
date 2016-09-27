@@ -61,7 +61,10 @@
     "STATE_TOKEN_COOKIE_NAME": "oktaStateToken",
     "DEFAULT_POLLING_DELAY": 500,
     "DEFAULT_MAX_CLOCK_SKEW": 300,
+    "DEFAULT_CACHE_DURATION": 86400,
+    "FRAME_ID": "okta-oauth-helper-frame",
     "REDIRECT_OAUTH_PARAMS_COOKIE_NAME": "okta-oauth-redirect-params",
-    "TOKEN_STORAGE_NAME": "okta-token-storage"
+    "TOKEN_STORAGE_NAME": "okta-token-storage",
+    "CACHE_STORAGE_NAME": "okta-cache-storage"
   }
 }
