@@ -112,6 +112,66 @@ define(function(require) {
       });
     });
 
+    it('allows multiple iframes simultaneously', function (done) {
+      return oauthUtil.setupSimultaneousPostMessage()
+      .then(function(context) {
+        // mock frame creation
+        var body = document.getElementsByTagName('body')[0];
+        var origAppend = body.appendChild;
+        spyOn(body, 'appendChild').and.callFake(function (el) {
+          if (el.tagName === 'IFRAME') {
+            // Remove the src so it doesn't actually load
+            el.src = '';
+            return origAppend.call(this, el);
+          }
+          return origAppend.apply(this, arguments);
+        });
+
+        // ensure that no iframes are open
+        var iframes = document.getElementsByTagName('IFRAME');
+        expect(iframes.length).toBe(0);
+
+        // getWithoutPrompt, but don't resolve
+        var firstPrompt = context.client.token.getWithoutPrompt({
+          sessionToken: 'testSessionToken',
+          state: oauthUtil.mockedState,
+          nonce: oauthUtil.mockedNonce
+        });
+
+        // getWithoutPrompt, but don't resolve
+        var secondPrompt = context.client.token.getWithoutPrompt({
+          sessionToken: 'testSessionToken2',
+          state: oauthUtil.mockedState2,
+          nonce: oauthUtil.mockedNonce2
+        });
+
+        // assert that two iframes are open
+        expect(iframes.length).toBe(2);
+
+        // resolve both prompts
+        context.emitter.emit('trigger', oauthUtil.mockedState);
+        context.emitter.emit('trigger', oauthUtil.mockedState2);
+
+        return Q.all([firstPrompt, secondPrompt])
+        .spread(function(firstToken, secondToken) {
+          expect(firstToken).toEqual(tokens.standardIdTokenParsed);
+          expect(secondToken).toEqual(tokens.standardIdToken2Parsed);
+
+          // make sure both iframes were destroyed
+          expect(iframes.length).toBe(0);
+
+          // Remove any iframes that exist, so we don't taint our other tests
+          oauthUtil.removeAllFrames();
+        });
+      })
+      .fail(function(err) {
+        expect('not to be hit').toBe(true);
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
     it('returns access_token using sessionToken', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
@@ -346,6 +406,67 @@ define(function(require) {
         .fin(function() {
           done();
         });
+    });
+
+    it('allows multiple popups simultaneously', function (done) {
+      return oauthUtil.setupSimultaneousPostMessage()
+      .then(function(context) {
+        // mock popup creation
+        var popups = [];
+        function getOpenPopups() {
+          return popups.filter(function(popup) {
+            return !popup.closed;
+          });
+        }
+        function FakePopup() {
+          var popup = this;
+          popup.closed = false;
+          popup.close = function() {
+            popup.closed = true;
+          };
+        }
+        spyOn(window, 'open').and.callFake(function(s) {
+          var popup = new FakePopup();
+          popups.push(popup);
+          return popup;
+        });
+
+        // getWithPopup, but don't resolve
+        var firstPopup = context.client.token.getWithPopup({
+          idp: 'testIdp',
+          state: oauthUtil.mockedState,
+          nonce: oauthUtil.mockedNonce
+        });
+
+        // getWithPopup, but don't resolve
+        var secondPopup = context.client.token.getWithPopup({
+          idp: 'testIdp2',
+          state: oauthUtil.mockedState2,
+          nonce: oauthUtil.mockedNonce2
+        });
+
+        // assert that two popups are open
+        expect(getOpenPopups().length).toBe(2);
+
+        // resolve the popups
+        context.emitter.emit('trigger', oauthUtil.mockedState);
+        context.emitter.emit('trigger', oauthUtil.mockedState2);
+
+        return Q.all([firstPopup, secondPopup])
+        .spread(function(firstToken, secondToken) {
+          expect(firstToken).toEqual(tokens.standardIdTokenParsed);
+          expect(secondToken).toEqual(tokens.standardIdToken2Parsed);
+
+          // make sure both popups were closed
+          expect(getOpenPopups().length).toBe(0);
+        });
+      })
+      .fail(function(err) {
+        expect('not to be hit').toBe(true);
+      })
+      .fin(function() {
+        done();
+      });
     });
 
     it('returns access_token using sessionToken', function (done) {

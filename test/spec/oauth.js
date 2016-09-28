@@ -277,7 +277,8 @@ define(function(require) {
             },
             postMessageResp: {
               error: 'sampleErrorCode',
-              'error_description': 'something went wrong'
+              'error_description': 'something went wrong',
+              state: oauthUtil.mockedState
             }
           },
           {
@@ -354,12 +355,11 @@ define(function(require) {
             authorizeArgs: {
               clientId: 'NPSfOkH5eZrTy8PMDlvx',
               redirectUri: 'https://auth-js-test.okta.com/redirect',
-              sessionToken: 'testToken'
+              idp: 'testIdp',
+              responseMode: 'fragment'
             },
-            postMessageResp: {
-              'id_token': tokens.standardIdToken,
-              state: 'mismatchedState'
-            }
+            hrefMock: 'https://auth-js-test.okta.com',
+            changeToHash: '#id_token=' + tokens.standardIdToken + '&state=mismatchedState'
           },
           {
             name: 'AuthSdkError',
