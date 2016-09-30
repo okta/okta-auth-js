@@ -42,14 +42,14 @@ define(function(require) {
             tokens.standardIdTokenParsed
           ]);
 
-          // Should never hit this
-          expect(true).toEqual(false);
+          expect('not to be hit').toEqual(true);
         } catch (e) {
           util.expectErrorToEqual(e, {
             name: 'AuthSdkError',
-            message: 'Token must be an Object with scopes, expiresAt, and an idToken or accessToken properties',
+            message: 'Token must be an Object with scopes, idToken or accessToken, expiresAt, and issuer properties',
             errorCode: 'INTERNAL',
-            errorSummary: 'Token must be an Object with scopes, expiresAt, and an idToken or accessToken properties',
+            errorSummary: 'Token must be an Object with scopes, idToken or accessToken, expiresAt, ' +
+              'and issuer properties',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []
@@ -71,7 +71,8 @@ define(function(require) {
               idToken: 'testInitialToken',
               claims: {'fake': 'claims'},
               expiresAt: 0,
-              scopes: ['openid', 'email']
+              scopes: ['openid', 'email'],
+              issuer: 'https://auth-js-test.okta.com'
             }
           },
           tokenManagerRefreshArgs: ['test-idToken'],
@@ -102,7 +103,51 @@ define(function(require) {
         .fin(done);
       });
 
-      it('allows refreshing an accessToken', function(done) {
+      it('allows refreshing an idToken with an authorization server', function(done) {
+        return oauthUtil.setupFrame({
+          oktaAuthArgs: {
+            url: 'https://auth-js-test.okta.com',
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            redirectUri: 'https://auth-js-test.okta.com/redirect'
+          },
+          tokenManagerAddKeys: {
+            'test-idToken': {
+              idToken: 'testInitialToken',
+              claims: {'fake': 'claims'},
+              expiresAt: 0,
+              scopes: ['openid', 'email'],
+              issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+            }
+          },
+          tokenManagerRefreshArgs: ['test-idToken'],
+          postMessageSrc: {
+            baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+            queryParams: {
+              'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+              'response_type': 'id_token',
+              'response_mode': 'okta_post_message',
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
+              'scope': 'openid email',
+              'prompt': 'none'
+            }
+          },
+          postMessageResp: {
+            'id_token': tokens.authServerIdToken,
+            state: oauthUtil.mockedState
+          },
+          expectedResp: tokens.authServerIdTokenParsed
+        })
+        .then(function() {
+          oauthUtil.expectTokenStorageToEqual(localStorage, {
+            'test-idToken': tokens.authServerIdTokenParsed
+          });
+        })
+        .fin(done);
+      });
+
+      it('allows refreshing an access_token', function(done) {
         return oauthUtil.setupFrame({
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
@@ -114,7 +159,8 @@ define(function(require) {
               accessToken: 'testInitialToken',
               expiresAt: 1449703529,
               scopes: ['openid', 'email'],
-              tokenType: 'Bearer'
+              tokenType: 'Bearer',
+              issuer: 'https://auth-js-test.okta.com'
             }
           },
           tokenManagerRefreshArgs: ['test-accessToken'],
@@ -142,6 +188,46 @@ define(function(require) {
         .then(function() {
           oauthUtil.expectTokenStorageToEqual(localStorage, {
             'test-accessToken': tokens.standardAccessTokenParsed
+          });
+        })
+        .fin(done);
+      });
+
+      it('allows refreshing an access_token with an authorization server', function(done) {
+        return oauthUtil.setupFrame({
+          oktaAuthArgs: {
+            url: 'https://auth-js-test.okta.com',
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            redirectUri: 'https://auth-js-test.okta.com/redirect'
+          },
+          tokenManagerAddKeys: {
+            'test-accessToken': tokens.authServerAccessTokenParsed
+          },
+          tokenManagerRefreshArgs: ['test-accessToken'],
+          postMessageSrc: {
+            baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+            queryParams: {
+              'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+              'response_type': 'token',
+              'response_mode': 'okta_post_message',
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
+              'scope': 'openid email',
+              'prompt': 'none'
+            }
+          },
+          postMessageResp: {
+            'access_token': tokens.authServerAccessToken,
+            'token_type': 'Bearer',
+            'expires_in': 3600,
+            'state': oauthUtil.mockedState
+          },
+          expectedResp: tokens.authServerAccessTokenParsed
+        })
+        .then(function() {
+          oauthUtil.expectTokenStorageToEqual(localStorage, {
+            'test-accessToken': tokens.authServerAccessTokenParsed
           });
         })
         .fin(done);
@@ -293,7 +379,8 @@ define(function(require) {
               idToken: 'testInitialToken',
               claims: {'fake': 'claims'},
               expiresAt: expiresAt,
-              scopes: ['openid', 'email']
+              scopes: ['openid', 'email'],
+              issuer: 'https://auth-js-test.okta.com'
             }
           },
           postMessageSrc: {
