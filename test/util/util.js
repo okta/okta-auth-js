@@ -106,7 +106,7 @@ define(function(require) {
 
   function setup(options) {
     if (!options.uri) {
-      options.uri = 'http://foo.com';
+      options.uri = 'https://auth-js-test.okta.com';
     }
 
     var ajaxMock, resReply, oa, trans;
