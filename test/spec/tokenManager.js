@@ -9,7 +9,7 @@ define(function(require) {
     return new OktaAuth({
       url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://auth-js-test.okta.com/redirect',
+      redirectUri: 'https://example.com/redirect',
       tokenManager: {
         storage: options.type,
         autoRefresh: options.autoRefresh
@@ -64,7 +64,7 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect'
+            redirectUri: 'https://example.com/redirect'
           },
           tokenManagerAddKeys: {
             'test-idToken': {
@@ -79,7 +79,7 @@ define(function(require) {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
               'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+              'redirect_uri': 'https://example.com/redirect',
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
               'state': oauthUtil.mockedState,
@@ -107,7 +107,7 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect'
+            redirectUri: 'https://example.com/redirect'
           },
           tokenManagerAddKeys: {
             'test-accessToken': {
@@ -122,7 +122,7 @@ define(function(require) {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
               'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+              'redirect_uri': 'https://example.com/redirect',
               'response_type': 'token',
               'response_mode': 'okta_post_message',
               'state': oauthUtil.mockedState,
@@ -152,7 +152,7 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect'
+            redirectUri: 'https://example.com/redirect'
           },
           tokenManagerRefreshArgs: ['test-accessToken']
         },
@@ -174,7 +174,7 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect'
+            redirectUri: 'https://example.com/redirect'
           },
           tokenManagerRefreshArgs: ['test-accessToken']
         })
@@ -200,7 +200,7 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect'
+            redirectUri: 'https://example.com/redirect'
           },
           tokenManagerAddKeys: {
             'test-idToken': tokens.standardIdTokenParsed
@@ -210,7 +210,7 @@ define(function(require) {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
               'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+              'redirect_uri': 'https://example.com/redirect',
               'response_type': 'token',
               'response_mode': 'okta_post_message',
               'state': oauthUtil.mockedState,
@@ -241,7 +241,7 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect'
+            redirectUri: 'https://example.com/redirect'
           },
           tokenManagerAddKeys: {
             'test-accessToken': tokens.standardAccessTokenParsed,
@@ -286,7 +286,7 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect'
+            redirectUri: 'https://example.com/redirect'
           },
           tokenManagerAddKeys: {
             'test-idToken': {
@@ -300,7 +300,7 @@ define(function(require) {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
               'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-              'redirect_uri': 'https://auth-js-test.okta.com/redirect',
+              'redirect_uri': 'https://example.com/redirect',
               'response_type': 'id_token',
               'response_mode': 'okta_post_message',
               'state': oauthUtil.mockedState,
@@ -329,7 +329,7 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://auth-js-test.okta.com/redirect'
+            redirectUri: 'https://example.com/redirect'
           },
           tokenManagerAddKeys: {
             'test-idToken': tokens.standardIdTokenParsed

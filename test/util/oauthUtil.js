@@ -282,7 +282,7 @@ define(function(require) {
     var client = new OktaAuth(opts.oktaAuthArgs || {
       url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://auth-js-test.okta.com/redirect'
+      redirectUri: 'https://example.com/redirect'
     });
 
     oauthUtil.mockStateAndNonce();
@@ -303,7 +303,7 @@ define(function(require) {
     var client = new OktaAuth({
       url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://auth-js-test.okta.com/redirect'
+      redirectUri: 'https://example.com/redirect'
     });
 
     util.warpToUnixTime(getTime(opts.time));
@@ -327,7 +327,7 @@ define(function(require) {
     var client =  new OktaAuth({
       url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://auth-js-test.okta.com/redirect'
+      redirectUri: 'https://example.com/redirect'
     });
 
     var emitter = new EventEmitter();
