@@ -134,7 +134,7 @@ define(function(require) {
       });
     });
 
-    it('allows passing alternate issuer', function (done) {
+    it('allows passing issuer through getWithoutPrompt, which takes precedence', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
           url: 'https://auth-js-test.okta.com',
@@ -172,7 +172,7 @@ define(function(require) {
       });
     });
 
-    it('allows passing alternate issuer as id', function (done) {
+    it('allows passing issuer as an id through getWithoutPrompt, which takes precedence', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
           url: 'https://auth-js-test.okta.com',
@@ -643,7 +643,7 @@ define(function(require) {
         });
     });
 
-    it('allows passing alternate authorization server', function (done) {
+    it('allows passing issuer through getWithPopup, which takes precedence', function (done) {
         return oauthUtil.setupPopup({
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
@@ -1006,7 +1006,7 @@ define(function(require) {
       });
     });
 
-    it('allows passing alternate authorization server', function() {
+    it('allows passing issuer through getWithRedirect, which takes precedence', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
           url: 'https://auth-js-test.okta.com',
