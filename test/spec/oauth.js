@@ -437,7 +437,7 @@ define(function(require) {
               sessionToken: 'testToken'
             },
             postMessageResp: {
-              'id_token': tokens.expiredBeforeIssuedToken,
+              'id_token': tokens.expiredBeforeIssuedIdToken,
               state: oauthUtil.mockedState
             }
           },

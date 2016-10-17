@@ -6,6 +6,9 @@ define(function(require) {
   var Q = require('q');
   var EventEmitter = require('tiny-emitter');
   var _ = require('lodash');
+  var wellKnown = require('../xhr/well-known');
+  var wellKnownSharedResource = require('../xhr/well-known-shared-resource');
+  var keys = require('../xhr/keys');
 
   var oauthUtil = {};
 
@@ -21,6 +24,29 @@ define(function(require) {
     spyOn(Math, 'random').and.callFake(function() {
       return 0;
     });  
+  };
+
+  oauthUtil.loadWellKnownAndKeysCache = function() {
+    // add /.well-known/openid-configuration and /oauth2/v1/keys to cache
+    // so we don't make unnecessary requests
+    localStorage.setItem('okta-cache-storage', JSON.stringify({
+      'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+        expiresAt: 1449786329,
+        response: wellKnown.response
+      },
+      'https://auth-js-test.okta.com/oauth2/v1/keys': {
+        expiresAt: 1449786329,
+        response: keys.response
+      },
+      'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/.well-known/openid-configuration': {
+        expiresAt: 1449786329,
+        response: wellKnownSharedResource.response
+      },
+      'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/keys': {
+        expiresAt: 1449786329,
+        response: keys.response
+      }
+    }));
   };
 
   var defaultPostMessage = {
@@ -100,6 +126,7 @@ define(function(require) {
     }
 
     util.warpToUnixTime(getTime(opts.time));
+    oauthUtil.loadWellKnownAndKeysCache();
 
     if (opts.hrefMock) {
       util.mockGetWindowLocation(authClient, opts.hrefMock);
@@ -311,6 +338,7 @@ define(function(require) {
     });
 
     util.warpToUnixTime(getTime(opts.time));
+    oauthUtil.loadWellKnownAndKeysCache();
     util.mockGetLocationHash(client, opts.hashMock);
     util.mockGetCookie(opts.oauthCookie);
     var setCookieMock = util.mockSetCookie();
@@ -363,6 +391,7 @@ define(function(require) {
 
     // warp to time to ensure tokens aren't expired
     util.warpToUnixTime(tokens.standardIdTokenClaims.exp - 1);
+    oauthUtil.loadWellKnownAndKeysCache();
 
     return new Q({
       client: client,
