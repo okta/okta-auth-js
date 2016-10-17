@@ -1,3 +1,4 @@
+/* eslint max-statements:[2,22] */
 define(function() {
   var tokens = {};
 
@@ -90,7 +91,9 @@ define(function() {
     idToken: tokens.standardIdToken,
     claims: tokens.standardIdTokenClaims,
     expiresAt: 1449699930,
-    scopes: ['openid', 'email']
+    scopes: ['openid', 'email'],
+    authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+    issuer: 'https://auth-js-test.okta.com'
   };
 
   // Uses modified nonce for testing simultaneous iframes
@@ -141,7 +144,54 @@ define(function() {
     idToken: tokens.standardIdToken2,
     claims: tokens.standardIdToken2Claims,
     expiresAt: 1449699930,
-    scopes: ['openid', 'email']
+    scopes: ['openid', 'email'],
+    authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+    issuer: 'https://auth-js-test.okta.com'
+  };
+
+  tokens.authServerIdToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiO' +
+                             'iIwMHVrb2VFcUlvZ2lGSHBEZTBnMyIsImVtYWlsIjoic2F' +
+                             'tbGphY2tzb25Ab2t0YS5jb20iLCJ2ZXIiOjEsImlzcyI6I' +
+                             'mh0dHBzOi8vYXV0aC1qcy10ZXN0Lm9rdGEuY29tL29hdXR' +
+                             'oMi9hdXM4YXVzNzZxOGlwaHVwRDBoNyIsImF1ZCI6Ik5QU' +
+                             '2ZPa0g1ZVpyVHk4UE1EbHZ4IiwiaWF0IjoxNDQ5Njk2MzM' +
+                             'wLCJleHAiOjE0NDk2OTk5MzAsImp0aSI6IklELlNpOUtxR' +
+                             '3RTV2hLQnJzRGh2bEV0QVItR3lkc2V1Y1VHOXhXdVdLMUp' +
+                             'oNTgiLCJhbXIiOlsicHdkIl0sImlkcCI6IjAwb2tucjFDS' +
+                             'GxXYUF3d2dvMGczIiwibm9uY2UiOiJhYWFhYWFhYWFhYWF' +
+                             'hYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhY' +
+                             'WFhYWFhYWFhYWFhYWFhYWFhIiwiZW1haWxfdmVyaWZpZWQ' +
+                             'iOnRydWUsImF1dGhfdGltZSI6MTQ0OTY5NjMzMH0.ekTCW' +
+                             'khumsT0lXnY-JfzQqfiVkgJzcQoLkvMbtRWb2FG0PYvgTb' +
+                             'p2MH-lb_Oo6qc2_ZWNieGD7RAhr-dRBXJh8BtDOWR3Zrvp' +
+                             'Ib_l6Vuv0hDx03tD1WvsbXmwMNsDqFKzR6RGFB-g-Y0Ijc' +
+                             'qAdJH1xFyb0dPVgj86jb0niRX584';
+
+  tokens.authServerIdTokenClaims = {
+    'sub': '00ukoeEqIogiFHpDe0g3',
+    'email': 'samljackson@okta.com',
+    'ver': 1,
+    'iss': 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+    'aud': 'NPSfOkH5eZrTy8PMDlvx',
+    'iat': 1449696330,
+    'exp': 1449699930,
+    'jti': 'ID.Si9KqGtSWhKBrsDhvlEtAR-GydseucUG9xWuWK1Jh58',
+    'amr': [
+      'pwd'
+    ],
+    'idp': '00oknr1CHlWaAwwgo0g3',
+    'nonce': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    'email_verified': true,
+    'auth_time': 1449696330
+  };
+
+  tokens.authServerIdTokenParsed = {
+    idToken: tokens.authServerIdToken,
+    claims: tokens.authServerIdTokenClaims,
+    expiresAt: 1449699930,
+    scopes: ['openid', 'email'],
+    authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+    issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
   };
 
   tokens.modifiedIdToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMHUx' +
@@ -202,7 +252,31 @@ define(function() {
     accessToken: tokens.standardAccessToken,
     expiresAt: 1449703529, // assuming time = 1449699929
     scopes: ['openid', 'email'],
-    tokenType: 'Bearer'
+    tokenType: 'Bearer',
+    authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+    userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+  };
+
+  tokens.authServerAccessToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjEsImp' +
+                                 '0aSI6IkFULl8wWTNCYkV5X2Y0MlNjUzJWT3drc1RwOEI4UW9qWVM' +
+                                 'zYk10WENERnJ4aDgiLCJpc3MiOiJodHRwczovL2F1dGgtanMtdGV' +
+                                 'zdC5va3RhLmNvbS9vYXV0aDIvYXVzOGF1czc2cThpcGh1cEQwaDc' +
+                                 'iLCJhdWQiOiJodHRwOi8vZXhhbXBsZS5jb20iLCJzdWIiOiJzYW1' +
+                                 'samFja3NvbkBva3RhLmNvbSIsImlhdCI6MTQ0OTY5OTkyOSwiZXh' +
+                                 'wIjoxNDQ5NzAzNTI5LCJjaWQiOiJnTHpGMERoalFJR0NUNHFPMFN' +
+                                 'NQiIsInVpZCI6IjAwdWtvZUVxSW9naUZIcERlMGczIiwic2NwIjp' +
+                                 'bIm9wZW5pZCIsImVtYWlsIl19.sD7CmiX1JCrngJFbYid5za78-c' +
+                                 'vOdVEFONqx7m5Ar8OK3MWPuui9wbzBvyiBR70rCuKzb0gSZb96N0' +
+                                 'EE8wXbgYjzGH5T6dazwgGfGmVf2PTa1pKfPew7f_XKE_t1O_tJ9C' +
+                                 'h9gY9Z3xd92ac407ZIOHkabLvZ0-45ANM3Gm0LC0c';
+
+  tokens.authServerAccessTokenParsed = {
+    accessToken: tokens.authServerAccessToken,
+    expiresAt: 1449703529, // assuming time = 1449699929
+    scopes: ['openid', 'email'],
+    tokenType: 'Bearer',
+    authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+    userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
   };
 
   /*

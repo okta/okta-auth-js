@@ -118,9 +118,17 @@ define(function(require) {
     if (opts.refreshArgs) {
       promise = authClient.idToken.refresh(opts.refreshArgs);
     } else if (opts.getWithoutPromptArgs) {
-      promise = authClient.token.getWithoutPrompt(opts.getWithoutPromptArgs);
+      if (Array.isArray(opts.getWithoutPromptArgs)) {
+        promise = authClient.token.getWithoutPrompt.apply(null, opts.getWithoutPromptArgs);
+      } else {
+        promise = authClient.token.getWithoutPrompt(opts.getWithoutPromptArgs);
+      }
     } else if (opts.getWithPopupArgs) {
-      promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
+      if (Array.isArray(opts.getWithPopupArgs)) {
+        promise = authClient.token.getWithPopup.apply(null, opts.getWithPopupArgs);
+      } else {
+        promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
+      }
     } else if (opts.tokenManagerRefreshArgs) {
       promise = authClient.tokenManager.refresh.apply(this, opts.tokenManagerRefreshArgs);
     } else if (opts.tokenRefreshArgs) {
@@ -155,8 +163,8 @@ define(function(require) {
         if (opts.willFail) {
           throw err;
         } else {
-          // Should never hit this
-          expect(true).toBe(false);
+          expect('not to be hit').toBe(true);
+          console.log(err); // eslint-disable-line
         }
       });
   };
@@ -271,17 +279,21 @@ define(function(require) {
   };
   
   oauthUtil.setupRedirect = function(opts) {
-    var client = new OktaAuth({
+    var client = new OktaAuth(opts.oktaAuthArgs || {
       url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://auth-js-test.okta.com/redirect'
+      redirectUri: 'https://example.com/redirect'
     });
 
     oauthUtil.mockStateAndNonce();
     var windowLocationMock = util.mockSetWindowLocation(client);
     var setCookieMock = util.mockSetCookie();
 
-    client.token.getWithRedirect(opts.getWithRedirectArgs);
+    if (Array.isArray(opts.getWithRedirectArgs)) {
+      client.token.getWithRedirect.apply(null, opts.getWithRedirectArgs);
+    } else {
+      client.token.getWithRedirect(opts.getWithRedirectArgs);
+    }
 
     expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
     expect(setCookieMock).toHaveBeenCalledWith(opts.expectedCookie);
@@ -291,7 +303,7 @@ define(function(require) {
     var client = new OktaAuth({
       url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://auth-js-test.okta.com/redirect'
+      redirectUri: 'https://example.com/redirect'
     });
 
     util.warpToUnixTime(getTime(opts.time));
@@ -315,7 +327,7 @@ define(function(require) {
     var client =  new OktaAuth({
       url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      redirectUri: 'https://auth-js-test.okta.com/redirect'
+      redirectUri: 'https://example.com/redirect'
     });
 
     var emitter = new EventEmitter();
