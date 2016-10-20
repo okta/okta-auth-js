@@ -184,9 +184,9 @@ define(function(require) {
         .fail(function(err) {
           util.expectErrorToEqual(err, {
             name: 'AuthSdkError',
-            message: 'Unable to parse token storage string',
+            message: 'Unable to parse storage string: okta-token-storage',
             errorCode: 'INTERNAL',
-            errorSummary: 'Unable to parse token storage string',
+            errorSummary: 'Unable to parse storage string: okta-token-storage',
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: []
