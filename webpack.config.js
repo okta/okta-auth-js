@@ -16,7 +16,7 @@ module.exports = _.extend(commonConfig, {
   entry: './lib/index.js',
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'OktaAuth.min.js',
+    filename: 'okta-auth-js.min.js',
     library: 'OktaAuth',
     libraryTarget: 'umd'
   },
