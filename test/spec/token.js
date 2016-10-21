@@ -1999,7 +1999,9 @@ define(function(require) {
   describe('token.verify', function() {
     it('verifies a valid idToken with nonce', function(done) {
       var client = setupSync();
-      client.token.verify(tokens.standardIdTokenParsed, tokens.mockedNonce)
+      util.warpToUnixTime(1449699929);
+      oauthUtil.loadWellKnownAndKeysCache();
+      client.token.verify(tokens.standardIdTokenParsed, oauthUtil.mockedNonce)
       .then(function(res) {
         expect(res).toEqual(tokens.standardIdTokenParsed);
       })
@@ -2010,6 +2012,8 @@ define(function(require) {
     });
     it('verifies a valid idToken without nonce', function(done) {
       var client = setupSync();
+      util.warpToUnixTime(1449699929);
+      oauthUtil.loadWellKnownAndKeysCache();
       client.token.verify(tokens.standardIdTokenParsed)
       .then(function(res) {
         expect(res).toEqual(tokens.standardIdTokenParsed);

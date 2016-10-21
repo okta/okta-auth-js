@@ -23,7 +23,16 @@ define(function(require) {
     // Make sure the state is generated the same every time (standardState, standardNonce)
     spyOn(Math, 'random').and.callFake(function() {
       return 0;
-    });  
+    });
+  };
+
+  oauthUtil.loadWellKnownCache = function() {
+    localStorage.setItem('okta-cache-storage', JSON.stringify({
+      'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+        expiresAt: 1449786329,
+        response: wellKnown.response
+      }
+    }));
   };
 
   oauthUtil.loadWellKnownAndKeysCache = function() {
