@@ -6,6 +6,8 @@ Okta Auth JS is a wrapper around [Okta's authentication API](http://developer.ok
 
 If you want to use the SDK, see the instructions on [the Okta Auth SDK developer page](http://developer.okta.com/docs/guides/okta_auth_sdk.html).
 
+If you wish to contribute to okta-auth-js, please read the following [contributing guidelines](./CONTRIBUTING.md)
+
 If you want to modify the SDK, use the following instructions.
 
 ## Building the SDK
