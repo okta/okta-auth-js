@@ -503,7 +503,7 @@ define(function(require) {
           client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
           expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage=' + JSON.stringify({
             'test-idToken': tokens.standardIdTokenParsed
-          }) + '; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+          }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
         });
       });
 
@@ -529,7 +529,7 @@ define(function(require) {
           client.tokenManager.remove('test-idToken');
           expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage=' + JSON.stringify({
             anotherKey: tokens.standardIdTokenParsed
-          }) + '; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+          }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
         });
       });
 
@@ -542,7 +542,8 @@ define(function(require) {
           }) + ';');
           var setCookieMock = util.mockSetCookie();
           client.tokenManager.clear();
-          expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage={}; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+          expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage={}; path=/; ' +
+            'expires=Tue, 19 Jan 2038 03:14:07 GMT;');
         });
       });
     });

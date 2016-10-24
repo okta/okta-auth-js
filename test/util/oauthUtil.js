@@ -5,6 +5,7 @@ define(function(require) {
   var tokens = require('./tokens');
   var Q = require('q');
   var EventEmitter = require('tiny-emitter');
+  var _ = require('lodash');
 
   var oauthUtil = {};
 
@@ -296,7 +297,10 @@ define(function(require) {
     }
 
     expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
-    expect(setCookieMock).toHaveBeenCalledWith(opts.expectedCookie);
+
+    _.each(opts.expectedCookies, function(cookie) {
+      expect(setCookieMock).toHaveBeenCalledWith(cookie);
+    });
   };
 
   oauthUtil.setupParseUrl = function(opts) {
@@ -317,7 +321,7 @@ define(function(require) {
         validateResponse(res, expectedResp);
 
         // The cookie should be deleted
-        expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params=; ' +
+        expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params=; path=/; ' +
           'expires=Thu, 01 Jan 1970 00:00:00 GMT;');
       });
   };
