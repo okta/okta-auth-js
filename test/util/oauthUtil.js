@@ -135,7 +135,6 @@ define(function(require) {
     }
 
     util.warpToUnixTime(getTime(opts.time));
-    oauthUtil.loadWellKnownAndKeysCache();
 
     if (opts.hrefMock) {
       util.mockGetWindowLocation(authClient, opts.hrefMock);
@@ -347,7 +346,6 @@ define(function(require) {
     });
 
     util.warpToUnixTime(getTime(opts.time));
-    oauthUtil.loadWellKnownAndKeysCache();
     util.mockGetLocationHash(client, opts.hashMock);
     util.mockGetCookie(opts.oauthCookie);
     var setCookieMock = util.mockSetCookie();
@@ -400,7 +398,6 @@ define(function(require) {
 
     // warp to time to ensure tokens aren't expired
     util.warpToUnixTime(tokens.standardIdTokenClaims.exp - 1);
-    oauthUtil.loadWellKnownAndKeysCache();
 
     return new Q({
       client: client,
