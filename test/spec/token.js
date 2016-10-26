@@ -1786,6 +1786,20 @@ define(function(require) {
             'scope': 'openid email',
             'prompt': 'none'
           }
+        },
+        time: 1449699929,
+        postMessageResp: {
+          'access_token': tokens.standardAccessToken,
+          'token_type': 'Bearer',
+          'expires_in': 3600,
+          'state': oauthUtil.mockedState
+        },
+        expectedResp: {
+          accessToken: tokens.standardAccessToken,
+          expiresAt: 1449703529,
+          scopes: ['openid', 'email'],
+          tokenType: 'Bearer',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
         }
       })
       .fin(function() {
