@@ -80,6 +80,10 @@ define(function(require) {
 
   function validateResponse(res, expectedResp) {
     function expectResponsesToEqual(actual, expected) {
+      if (!actual || !expected) {
+        expect(actual, expected);
+        return;
+      }
       expect(actual.idToken).toEqual(expected.idToken);
       expect(actual.claims).toEqual(expected.claims);
       expect(actual.accessToken).toEqual(expected.accessToken);

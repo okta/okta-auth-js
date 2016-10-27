@@ -1559,6 +1559,32 @@ define(function(require) {
       });
     });
 
+    it('parses access_token, code, and id_token, but one isn\'t returned', function(done) {
+      return oauthUtil.setupParseUrl({
+        time: 1449699929,
+        hashMock: '#access_token=' + tokens.standardAccessToken +
+                  '&id_token=' + tokens.standardIdToken +
+                  '&expires_in=3600' +
+                  '&token_type=Bearer' +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: ['id_token', 'code', 'token'],
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scopes: ['openid', 'email'],
+          urls: {
+            issuer: 'https://auth-js-test.okta.com',
+            authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+          }
+        }) + '; path=/;',
+        expectedResp: [tokens.standardIdTokenParsed, undefined, tokens.standardAccessTokenParsed]
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
     it('parses access_token, id_token, and code with authorization server issuer', function(done) {
       return oauthUtil.setupParseUrl({
         time: 1449699929,

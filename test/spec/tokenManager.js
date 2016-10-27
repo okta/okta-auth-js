@@ -12,7 +12,7 @@ define(function(require) {
       redirectUri: 'https://example.com/redirect',
       tokenManager: {
         storage: options.type,
-        autoRefresh: options.autoRefresh
+        autoRefresh: options.autoRefresh || false
       }
     });
   }
@@ -64,7 +64,10 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect'
+            redirectUri: 'https://example.com/redirect',
+            tokenManager: {
+              autoRefresh: false
+            }
           },
           tokenManagerAddKeys: {
             'test-idToken': {
@@ -107,7 +110,10 @@ define(function(require) {
           oktaAuthArgs: {
             url: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect'
+            redirectUri: 'https://example.com/redirect',
+            tokenManager: {
+              autoRefresh: false
+            }
           },
           tokenManagerAddKeys: {
             'test-accessToken': {
