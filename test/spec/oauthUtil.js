@@ -1,8 +1,11 @@
 define(function(require) {
   var OktaAuth = require('OktaAuth');
   var oauthUtil = require('../../lib/oauthUtil');
+  var oauthUtilHelpers = require('../util/oauthUtil');
   var util = require('../util/util');
   var wellKnown = require('../xhr/well-known');
+  var keys = require('../xhr/keys');
+  var tokens = require('../util/tokens');
 
   describe('getWellKnown', function() {
     util.itMakesCorrectRequestResponse({
@@ -89,6 +92,154 @@ define(function(require) {
           'https://auth-js-test.okta.com/.well-known/openid-configuration': {
             expiresAt: 1450086400,
             response: wellKnown.response
+          }
+        }));
+      }
+    });
+  });
+
+  describe('getKey', function() {
+    util.itMakesCorrectRequestResponse({
+      title: 'uses existing jwks on valid kid',
+      setup: {
+        time: 1449699929
+      },
+      execute: function(test) {
+        oauthUtilHelpers.loadWellKnownAndKeysCache();
+        return oauthUtil.getKey(test.oa, test.oa.options.url, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      },
+      expectations: function(test, key) {
+        expect(key).toEqual(tokens.standardKey);
+      }
+    });
+    util.itMakesCorrectRequestResponse({
+      title: 'pulls new jwks on valid kid',
+      setup: {
+        calls: [
+          {
+            request: {
+              method: 'get',
+              uri: '/oauth2/v1/keys'
+            },
+            response: 'keys'
+          }
+        ],
+        time: 1449699929
+      },
+      execute: function(test) {
+        oauthUtilHelpers.loadWellKnownCache();
+        return oauthUtil.getKey(test.oa, test.oa.options.url, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      },
+      expectations: function(test, key) {
+        expect(key).toEqual(tokens.standardKey);
+        var cache = localStorage.getItem('okta-cache-storage');
+        expect(cache).toEqual(JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          },
+          'https://auth-js-test.okta.com/oauth2/v1/keys': {
+            expiresAt: 1449786329,
+            response: keys.response
+          }
+        }));
+      }
+    });
+
+    util.itMakesCorrectRequestResponse({
+      title: 'checks existing jwks then pulls new jwks on valid kid',
+      setup: {
+        calls: [
+          {
+            request: {
+              method: 'get',
+              uri: '/oauth2/v1/keys'
+            },
+            response: 'keys'
+          }
+        ],
+        time: 1449699929
+      },
+      execute: function(test) {
+        // Put a modified kid in the cache
+        localStorage.setItem('okta-cache-storage', JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          },
+          'https://auth-js-test.okta.com/oauth2/v1/keys': {
+            expiresAt: 1449786329,
+            response: {
+              'keys': [{
+                alg: 'RS256',
+                kty: 'RSA',
+                n: 'fake',
+                e: 'AQAB',
+                use: 'sig',
+                kid: 'modifiedKeyId'
+              }]
+            }
+          }
+        }));
+
+        return oauthUtil.getKey(test.oa, test.oa.options.url, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      },
+      expectations: function(test, key) {
+        expect(key).toEqual(tokens.standardKey);
+        var cache = localStorage.getItem('okta-cache-storage');
+        expect(cache).toEqual(JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          },
+          'https://auth-js-test.okta.com/oauth2/v1/keys': {
+            expiresAt: 1449786329,
+            response: keys.response
+          }
+        }));
+      }
+    });
+
+    util.itErrorsCorrectly({
+      title: 'checks existing jwks then pulls new jwks on invalid kid',
+      setup: {
+        calls: [
+          {
+            request: {
+              method: 'get',
+              uri: '/oauth2/v1/keys'
+            },
+            response: 'keys'
+          }
+        ],
+        time: 1449699929
+      },
+      execute: function(test) {
+        // Put a modified kid in the cache
+        localStorage.setItem('okta-cache-storage', JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          },
+          'https://auth-js-test.okta.com/oauth2/v1/keys': {
+            expiresAt: 1449786329,
+            response: keys.response
+          }
+        }));
+
+        return oauthUtil.getKey(test.oa, test.oa.options.url, 'invalidKid');
+      },
+      expectations: function(test, err) {
+        util.assertAuthSdkError(err, 'The key id, invalidKid, was not found in the server\'s keys');
+        var cache = localStorage.getItem('okta-cache-storage');
+        expect(cache).toEqual(JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          },
+          'https://auth-js-test.okta.com/oauth2/v1/keys': {
+            expiresAt: 1449786329,
+            response: keys.response
           }
         }));
       }

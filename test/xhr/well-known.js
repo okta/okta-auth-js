@@ -2,10 +2,10 @@ define({
   "status": 200,
   "responseType": "json",
   "response": {
-    "issuer": "<%= uri %>",
-    "authorization_endpoint": "<%= uri %>/oauth2/v1/authorize",
-    "userinfo_endpoint": "<%= uri %>/oauth2/v1/userinfo",
-    "jwks_uri": "<%= uri %>/oauth2/v1/keys",
+    "issuer": "https://auth-js-test.okta.com",
+    "authorization_endpoint": "https://auth-js-test.okta.com/oauth2/v1/authorize",
+    "userinfo_endpoint": "https://auth-js-test.okta.com/oauth2/v1/userinfo",
+    "jwks_uri": "https://auth-js-test.okta.com/oauth2/v1/keys",
     "response_types_supported": [
       "id_token",
       "id_token token"

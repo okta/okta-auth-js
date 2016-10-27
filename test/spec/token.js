@@ -4,6 +4,7 @@ define(function(require) {
   var util = require('../util/util');
   var oauthUtil = require('../util/oauthUtil');
   var packageJson = require('../../package.json');
+  var _ = require('lodash');
   var Q = require('q');
 
   function setupSync() {
@@ -1558,6 +1559,32 @@ define(function(require) {
       });
     });
 
+    it('parses access_token, code, and id_token, but one isn\'t returned', function(done) {
+      return oauthUtil.setupParseUrl({
+        time: 1449699929,
+        hashMock: '#access_token=' + tokens.standardAccessToken +
+                  '&id_token=' + tokens.standardIdToken +
+                  '&expires_in=3600' +
+                  '&token_type=Bearer' +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: ['id_token', 'code', 'token'],
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scopes: ['openid', 'email'],
+          urls: {
+            issuer: 'https://auth-js-test.okta.com',
+            authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+          }
+        }) + '; path=/;',
+        expectedResp: [tokens.standardIdTokenParsed, undefined, tokens.standardAccessTokenParsed]
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
     it('parses access_token, id_token, and code with authorization server issuer', function(done) {
       return oauthUtil.setupParseUrl({
         time: 1449699929,
@@ -1785,6 +1812,20 @@ define(function(require) {
             'scope': 'openid email',
             'prompt': 'none'
           }
+        },
+        time: 1449699929,
+        postMessageResp: {
+          'access_token': tokens.standardAccessToken,
+          'token_type': 'Bearer',
+          'expires_in': 3600,
+          'state': oauthUtil.mockedState
+        },
+        expectedResp: {
+          accessToken: tokens.standardAccessToken,
+          expiresAt: 1449703529,
+          scopes: ['openid', 'email'],
+          tokenType: 'Bearer',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
         }
       })
       .fin(function() {
@@ -1992,6 +2033,91 @@ define(function(require) {
         expect(err.errorCode).toEqual('invalid_token');
         expect(err.errorSummary).toEqual('The access token is invalid.');
       }
+    });
+  });
+
+  describe('token.verify', function() {
+    it('verifies a valid idToken with nonce', function(done) {
+      var client = setupSync();
+      util.warpToUnixTime(1449699929);
+      oauthUtil.loadWellKnownAndKeysCache();
+      client.token.verify(tokens.standardIdTokenParsed, oauthUtil.mockedNonce)
+      .then(function(res) {
+        expect(res).toEqual(tokens.standardIdTokenParsed);
+      })
+      .fail(function() {
+        expect('not to be hit').toEqual(true);
+      })
+      .fin(done);
+    });
+    it('verifies a valid idToken without nonce', function(done) {
+      var client = setupSync();
+      util.warpToUnixTime(1449699929);
+      oauthUtil.loadWellKnownAndKeysCache();
+      client.token.verify(tokens.standardIdTokenParsed)
+      .then(function(res) {
+        expect(res).toEqual(tokens.standardIdTokenParsed);
+      })
+      .fail(function() {
+        expect('not to be hit').toEqual(true);
+      })
+      .fin(done);
+    });
+
+    describe('rejects a token', function() {
+      function expectError(verifyArgs, message, done) {
+        var client = setupSync();
+        return client.token.verify.apply(null, verifyArgs)
+        .then(function(res) {
+          expect('not to be hit').toEqual(true);
+        })
+        .fail(function(err) {
+          util.assertAuthSdkError(err, message);
+        })
+        .fin(done);
+      }
+
+      it('isn\'t an idToken', function(done) {
+        expectError([tokens.standardAccessTokenParsed],
+          'Only idTokens may be verified')
+        .fin(done);
+      });
+      it('issued in the future', function(done) {
+        util.warpToDistantPast();
+        expectError([tokens.standardIdTokenParsed],
+          'The JWT was issued in the future')
+        .fin(done);
+      });
+      it('expired', function(done) {
+        util.warpToDistantFuture();
+        expectError([tokens.standardIdTokenParsed],
+          'The JWT expired and is no longer valid')
+        .fin(done);
+      });
+      it('invalid nonce', function(done) {
+        expectError([tokens.standardIdTokenParsed, 'invalidNonce'],
+          'OAuth flow response nonce doesn\'t match request nonce')
+        .fin(done);
+      });
+      it('invalid audience', function(done) {
+        var idToken = _.clone(tokens.standardIdTokenParsed);
+        idToken.clientId = 'invalidAudience';
+        expectError([idToken],
+          'The audience [NPSfOkH5eZrTy8PMDlvx] does not match [invalidAudience]')
+        .fin(done);
+      });
+      it('invalid issuer', function(done) {
+        var idToken = _.clone(tokens.standardIdTokenParsed);
+        idToken.issuer = 'http://invalidissuer.example.com';
+        expectError([idToken],
+          'The issuer [https://auth-js-test.okta.com] does not match [http://invalidissuer.example.com]')
+        .fin(done);
+      });
+      it('expired before issued', function(done) {
+        expectError([tokens.expiredBeforeIssuedIdTokenParsed],
+          'The JWT expired before it was issued')
+        .fin(done);
+      });
     });
   });
 });

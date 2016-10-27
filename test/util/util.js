@@ -280,14 +280,7 @@ define(function(require) {
       return setup(options.setup).then(function (test) {
         return options.execute(test)
         .fail(function (err) {
-
-          expect(err.message).toEqual(options.errorMsg);
-          expect(err.errorCode).toEqual('INTERNAL');
-          expect(err.errorSummary).toEqual(options.errorMsg);
-          expect(err.errorLink).toEqual('INTERNAL');
-          expect(err.errorId).toEqual('INTERNAL');
-          expect(err.errorCauses).toEqual([]);
-
+          util.assertAuthSdkError(err, options.errorMsg);
           test.ajaxMock.done();
           done();
         });
@@ -363,6 +356,16 @@ define(function(require) {
       expect(actual.errorId).toBeUndefined();
       expect(actual.errorCauses).toBeUndefined();
     }
+  };
+
+  util.assertAuthSdkError = function (err, message) {
+    expect(err.name).toEqual('AuthSdkError');
+    expect(err.message).toEqual(message);
+    expect(err.errorCode).toEqual('INTERNAL');
+    expect(err.errorSummary).toEqual(message);
+    expect(err.errorLink).toEqual('INTERNAL');
+    expect(err.errorId).toEqual('INTERNAL');
+    expect(err.errorCauses).toEqual([]);
   };
 
   return util;

@@ -6,6 +6,9 @@ define(function(require) {
   var Q = require('q');
   var EventEmitter = require('tiny-emitter');
   var _ = require('lodash');
+  var wellKnown = require('../xhr/well-known');
+  var wellKnownSharedResource = require('../xhr/well-known-shared-resource');
+  var keys = require('../xhr/keys');
 
   var oauthUtil = {};
 
@@ -20,7 +23,39 @@ define(function(require) {
     // Make sure the state is generated the same every time (standardState, standardNonce)
     spyOn(Math, 'random').and.callFake(function() {
       return 0;
-    });  
+    });
+  };
+
+  oauthUtil.loadWellKnownCache = function() {
+    localStorage.setItem('okta-cache-storage', JSON.stringify({
+      'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+        expiresAt: 1449786329,
+        response: wellKnown.response
+      }
+    }));
+  };
+
+  oauthUtil.loadWellKnownAndKeysCache = function() {
+    // add /.well-known/openid-configuration and /oauth2/v1/keys to cache
+    // so we don't make unnecessary requests
+    localStorage.setItem('okta-cache-storage', JSON.stringify({
+      'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+        expiresAt: 1449786329,
+        response: wellKnown.response
+      },
+      'https://auth-js-test.okta.com/oauth2/v1/keys': {
+        expiresAt: 1449786329,
+        response: keys.response
+      },
+      'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/.well-known/openid-configuration': {
+        expiresAt: 1449786329,
+        response: wellKnownSharedResource.response
+      },
+      'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/keys': {
+        expiresAt: 1449786329,
+        response: keys.response
+      }
+    }));
   };
 
   var defaultPostMessage = {
@@ -45,6 +80,10 @@ define(function(require) {
 
   function validateResponse(res, expectedResp) {
     function expectResponsesToEqual(actual, expected) {
+      if (!actual || !expected) {
+        expect(actual, expected);
+        return;
+      }
       expect(actual.idToken).toEqual(expected.idToken);
       expect(actual.claims).toEqual(expected.claims);
       expect(actual.accessToken).toEqual(expected.accessToken);
