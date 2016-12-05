@@ -170,6 +170,9 @@ define(function(require) {
         }
       })
       .then(function() {
+        if (options.beforeClient) {
+          options.beforeClient();
+        }
 
         // 2. Setup OktaAuth
         oa = new OktaAuth({
