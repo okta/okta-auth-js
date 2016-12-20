@@ -115,10 +115,7 @@ define(function(require) {
       },
       execute: function(test) {
         sessionStorage.clear();
-        return oauthUtil.getWellKnown(test.oa)
-        .then(function() {
-          return oauthUtil.getWellKnown(test.oa);
-        });
+        return oauthUtil.getWellKnown(test.oa);
       },
       expectations: function() {
         var cache = sessionStorage.getItem('okta-cache-storage');
@@ -131,7 +128,7 @@ define(function(require) {
       }
     });
     util.itMakesCorrectRequestResponse({
-      title: 'caches response in cookie if neither localStorage nor sessionStorage is available',
+      title: 'caches response in cookie if localStorage and sessionStorage are not available',
       setup: {
         beforeClient: function() {
           oauthUtilHelpers.mockLocalStorageError();

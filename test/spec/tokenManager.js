@@ -39,7 +39,7 @@ define(function(require) {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
-      it('defaults to cookieStorage if localStorage nor sessionStorage is available', function() {
+      it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
         oauthUtil.mockLocalStorageError();
         oauthUtil.mockSessionStorageError();
         var client = setupSync();
