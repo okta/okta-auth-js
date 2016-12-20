@@ -31,6 +31,24 @@ define(function(require) {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
+      it('defaults to sessionStorage if localStorage isn\'t available', function() {
+        oauthUtil.mockLocalStorageError();
+        var client = setupSync();
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        oauthUtil.expectTokenStorageToEqual(sessionStorage, {
+          'test-idToken': tokens.standardIdTokenParsed
+        });
+      });
+      it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
+        oauthUtil.mockLocalStorageError();
+        oauthUtil.mockSessionStorageError();
+        var client = setupSync();
+        var setCookieMock = util.mockSetCookie();
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage=' + JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed
+        }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+      });
     });
 
     describe('add', function() {

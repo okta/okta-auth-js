@@ -9,6 +9,7 @@ define(function(require) {
   var wellKnown = require('../xhr/well-known');
   var wellKnownSharedResource = require('../xhr/well-known-shared-resource');
   var keys = require('../xhr/keys');
+  var storageUtil = require('../../lib/storageUtil');
 
   var oauthUtil = {};
 
@@ -23,6 +24,18 @@ define(function(require) {
     // Make sure the state is generated the same every time (standardState, standardNonce)
     spyOn(Math, 'random').and.callFake(function() {
       return 0;
+    });
+  };
+
+  oauthUtil.mockLocalStorageError = function() {
+    spyOn(storageUtil, 'getLocalStorage').and.callFake(function() {
+      throw 'This function is not supported on this system.';
+    });
+  };
+
+  oauthUtil.mockSessionStorageError = function() {
+    spyOn(storageUtil, 'getSessionStorage').and.callFake(function() {
+      throw 'This function is not supported on this system.';
     });
   };
 

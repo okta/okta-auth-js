@@ -96,6 +96,68 @@ define(function(require) {
         }));
       }
     });
+    util.itMakesCorrectRequestResponse({
+      title: 'caches response in sessionStorage if localStorage isn\'t available',
+      setup: {
+        beforeClient: function() {
+          oauthUtilHelpers.mockLocalStorageError();
+        },
+        calls: [
+          {
+            request: {
+              method: 'get',
+              uri: '/.well-known/openid-configuration'
+            },
+            response: 'well-known'
+          }
+        ],
+        time: 1449699929
+      },
+      execute: function(test) {
+        sessionStorage.clear();
+        return oauthUtil.getWellKnown(test.oa);
+      },
+      expectations: function() {
+        var cache = sessionStorage.getItem('okta-cache-storage');
+        expect(cache).toEqual(JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          }
+        }));
+      }
+    });
+    util.itMakesCorrectRequestResponse({
+      title: 'caches response in cookie if localStorage and sessionStorage are not available',
+      setup: {
+        beforeClient: function() {
+          oauthUtilHelpers.mockLocalStorageError();
+          oauthUtilHelpers.mockSessionStorageError();
+        },
+        calls: [
+          {
+            request: {
+              method: 'get',
+              uri: '/.well-known/openid-configuration'
+            },
+            response: 'well-known'
+          }
+        ],
+        time: 1449699929
+      },
+      execute: function(test) {
+        test.setCookieMock = util.mockSetCookie();
+        return oauthUtil.getWellKnown(test.oa);
+      },
+      expectations: function(test) {
+        expect(test.setCookieMock).toHaveBeenCalledWith('okta-cache-storage=' + JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          }
+        }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+      }
+    });
   });
 
   describe('getKey', function() {
