@@ -5,9 +5,9 @@ Okta Auth JS
 
 Okta Auth JS is a wrapper around [Okta's authentication API](http://developer.okta.com/docs/api/resources/authn.html). It can be used to get an Okta session cookie or an ID token.
 
-For a high level overview of the client's features and authentication flows, check out [our developer docs](http://developer.okta.com/docs/guides/okta_auth_sdk.html).
+For an overview of the client's features and authentication flows, check out [our developer docs](http://developer.okta.com/docs/guides/okta_auth_sdk.html).
 
-Contributors should read our [contributing guidelines](./CONTRIBUTING.md) if they wish to contribute.
+Read our [contributing guidelines](./CONTRIBUTING.md) if you wish to contribute.
 
 # Table of Contents
 
@@ -40,7 +40,6 @@ Contributors should read our [contributing guidelines](./CONTRIBUTING.md) if the
   * [session.exists](#sessionexists)
   * [session.get](#sessionget)
   * [session.refresh](#sessionrefresh)
-  * [session.close](#sessionclose)
   * [token.getWithoutPrompt](#tokengetwithoutpromptoauthoptions)
   * [token.getWithPopup](#tokengetwithpopupoauthoptions)
   * [token.getWithRedirect](#tokengetwithredirectoptions)
@@ -79,7 +78,7 @@ To use the CDN, include links to the JS and CSS files in your HTML:
   type="text/javascript"></script>
 ```
 
-The `okta-auth-js.min.js` file will expose a global `OktaAuth` object which can be used to bootstrap the client:
+The `okta-auth-js.min.js` file will expose a global `OktaAuth` object. Use it to bootstrap the client:
 
 ```javascript
 var authClient = new OktaAuth({/* configOptions */});
@@ -88,8 +87,8 @@ var authClient = new OktaAuth({/* configOptions */});
 ## Using the npm module
 
 Using our npm module is a good choice if:
-- You have a build system in place where you manage dependencies with npm
-- You do not want to load scripts directly from third party sites
+- You have a build system in place where you manage dependencies with npm.
+- You do not want to load scripts directly from third party sites.
 
 To install [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js):
 
@@ -121,7 +120,7 @@ var authClient = new OktaAuth({url: 'https://acme.okta.com'});
 
 ## signIn(options)
 
-The goal of an authentication flow is to set an Okta session cookie on the user's browser. The flow is started using `signIn`.
+The goal of an authentication flow is to set an Okta session cookie on the user's browser or exchange for an `id_token` or `access_token`. The flow is started using `signIn`.
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
   - `password` - The password of the user
@@ -145,7 +144,7 @@ authClient.signIn({
 
 ## signOut()
 
-This is an alias for `session.close`, which ends the current session.
+Signs the user out of their current Okta session.
 
 ```javascript
 authClient.signOut()
@@ -162,13 +161,13 @@ authClient.signOut()
 Starts a new password recovery transaction for a given user and issues a recovery token that can be used to reset a user’s password.
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-  - `factorType` - Recovery factor to use for primary authentication
+  - `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
   - `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
 
 ```javascript
 authClient.forgotPassword({
   username: 'dade.murphy@example.com',
-  factorType: 'SMS', // 'EMAIL' or 'CALL'
+  factorType: 'SMS',
 })
 .then(function(transaction) {
   return transaction.verify({
@@ -192,20 +191,15 @@ authClient.forgotPassword({
 Starts a new unlock recovery transaction for a given user and issues a recovery token that can be used to unlock a user’s account.
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-  - `factorType` - Recovery factor to use for primary authentication. May be omitted if a trusted application is whitelisted.
+  - `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
   - `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
 
 ```javascript
 authClient.unlockAccount({
   username: 'dade.murphy@example.com',
-  factorType: 'SMS', // 'EMAIL' or undefined for trusted applications
+  factorType: 'SMS',
 })
 .then(function(transaction) {
-  // if factorType is undefined
-  // return transaction.recovery({
-  //   recoveryToken: '00xdqXOE5qDZX8-PBR1bYv8AESqIFinDy3yul01tyh'
-  // });
-
   return transaction.verify({
     passCode: '123456' // The passCode from the SMS
   });
@@ -226,7 +220,7 @@ authClient.unlockAccount({
 
 Validates a recovery token that was distributed to the end-user to continue the recovery transaction.
 
-- `recoveryToken` - Recovery token that was distributed to end-user via out-of-band mechanism such as email
+- `recoveryToken` - Recovery token that was distributed to end-user via an out-of-band mechanism such as email
 
 ```javascript
 authClient.verifyRecoveryToken({
@@ -269,24 +263,34 @@ authClient.tx.exists()
 Check for a transaction to be resumed. This is synchronous and returns `true` or `false`.
 
 ```javascript
-authClient.tx.exists()
-.then(function(exists) {
-  if (exists) {
-    console.log('a session exists');
-  } else {
-    console.log('a session does not exist');
-  }
-})
-.fail(function(err) {
-  console.error(err);
-});
+var exists = authClient.tx.exists()
+if (exists) {
+  console.log('a session exists');
+} else {
+  console.log('a session does not exist');
+}
 ```
 
 ## transaction.status
 
-When Auth Client methods resolve, they return an object that encapsulates the new state in the authentication flow, a **transaction** object. This object contains metadata about the current state, and methods that can be used to progress to the next state.
+When Auth Client methods resolve, they return a **transaction** object that encapsulates [the new state in the authentication flow](http://developer.okta.com/docs/api/resources/authn.html#transaction-model). This **transaction** contains metadata about the current state, and methods that can be used to progress to the next state.
 
-Below are sample transaction objects and usage of their methods:
+![State Model Diagram](http://developer.okta.com/assets/img/auth-state-model.png "State Model Diagram")
+
+Sample transactions and their methods:
+
+### Common methods
+
+#### cancel()
+
+Terminates the current auth flow.
+
+```javascript
+transaction.cancel()
+.then(function() {
+  // transaction canceled. You can now start another with authClient.signIn
+});
+```
 
 ### LOCKED_OUT
 
@@ -304,7 +308,7 @@ The user account is locked; self-service unlock or admin unlock is required.
 #### unlock(options)
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-  - `factorType` - Recovery factor to use for primary authentication (`EMAIL` or `SMS`)
+  - `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
   - `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
 
 ```javascript
@@ -313,6 +317,8 @@ transaction.unlock({
   factorType: 'EMAIL'
 });
 ```
+
+#### [cancel()](#cancel)
 
 ### PASSWORD_EXPIRED
 
@@ -350,6 +356,8 @@ transaction.changePassword({
 });
 ```
 
+#### [cancel()](#cancel)
+
 ### PASSWORD_RESET
 
 The user successfully answered their recovery question and can set a new password.
@@ -383,6 +391,8 @@ transaction.resetPassword({
   newPassword: 'N3wP4ssw0rd'
 });
 ```
+
+#### [cancel()](#cancel)
 
 ### PASSWORD_WARN
 
@@ -446,6 +456,8 @@ Ignore the warning and continue.
 transaction.skip();
 ```
 
+#### [cancel()](#cancel)
+
 ### RECOVERY
 
 The user has requested a recovery token to reset their password or unlock their account.
@@ -495,6 +507,8 @@ transaction.recovery({
 });
 ```
 
+#### [cancel()](#cancel)
+
 ### RECOVERY_CHALLENGE
 
 The user must verify the factor-specific recovery challenge.
@@ -539,6 +553,8 @@ Resend the recovery email or text.
 ```javascript
 transaction.resend();
 ```
+
+#### [cancel()](#cancel)
 
 ### MFA_ENROLL
 
@@ -600,6 +616,8 @@ When MFA is required, but a user isn’t enrolled in MFA, they must enroll in at
   data: { /* the parsed json response */ }
 }
 ```
+
+#### [cancel()](#cancel)
 
 #### Enroll Factor
 
@@ -831,6 +849,8 @@ End current factor enrollment and return to `MFA_ENROLL`.
 transaction.prev();
 ```
 
+#### [cancel()](#cancel)
+
 ### MFA_REQUIRED
 
 The user must provide additional verification with a previously enrolled factor.
@@ -909,6 +929,8 @@ The user must provide additional verification with a previously enrolled factor.
   data: { /* the parsed json response */ }
 }
 ```
+
+#### [cancel()](#cancel)
 
 #### Verify Factor
 
@@ -1001,9 +1023,11 @@ End current factor verification and return to `MFA_REQUIRED`.
 transaction.prev();
 ```
 
+#### [cancel()](#cancel)
+
 ### SUCCESS
 
-The end of the authentication flow! This transaction contains a sessionToken you can exchange for an Okta cookie.
+The end of the authentication flow! This transaction contains a sessionToken you can exchange for an Okta cookie, an `id_token`, or `access_token`.
 
 ```javascript
 {
@@ -1036,7 +1060,7 @@ authClient.session.setCookieAndRedirect(transaction.sessionToken);
 
 ## session.exists()
 
-Returns a promise that resolves with `true` or `false`.
+Returns a promise that resolves with `true` if there is an existing Okta session, or `false` if not.
 
 ```javascript
 authClient.session.exists()
@@ -1074,20 +1098,6 @@ authClient.session.get()
 })
 .catch(function(err) {
   // there was a problem refreshing (the user may not have an existing session)
-});
-```
-
-## session.close()
-
-Signs the user out of their current Okta session.
-
-```javascript
-signIn.session.close()
-.then(function() {
-  // the user has been logged out
-})
-.catch(function(err) {
-  // the user has not been logged out, perform some error handling here.
 });
 ```
 
@@ -1154,7 +1164,7 @@ authClient.token.parseFromUrl()
 
 Decode a raw ID Token
 
-  - `idTokenString` - an id_token jwt
+  - `idTokenString` - an id_token JWT
 
 ```javascript
 authClient.token.decode('YOUR_ID_TOKEN_JWT');
@@ -1164,7 +1174,7 @@ authClient.token.decode('YOUR_ID_TOKEN_JWT');
 
 Returns a new token if the Okta session is still valid.
 
-  - `tokenToRefresh` - an access token or ID token previously provided by Okta. note: this is not the raw jwt
+  - `tokenToRefresh` - an access token or ID token previously provided by Okta. note: this is not the raw JWT
 
 ```javascript
 // this token is provided by Okta via getWithoutPrompt, getWithPopup, and parseFromUrl
@@ -1204,7 +1214,7 @@ authClient.token.getUserInfo(accessTokenObject)
 
 Verify the validity of an ID token's claims and check the signature on browsers that support web cryptography.
 
-  - `idTokenObject` - an ID token returned by this library. note: this is not the raw ID token jwt
+  - `idTokenObject` - an ID token returned by this library. note: this is not the raw ID token JWT
 
 ```javascript
 authClient.token.verify(idTokenObject)
@@ -1316,103 +1326,6 @@ authClient.tokenManager.off('refreshed');
 authClient.tokenManager.off('refreshed', myRefreshedCallback);
 ```
 
-# OpenId Connect Options
-
-Options for the [OpenId Connect](http://developer.okta.com/docs/api/resources/oidc.html) authentication flow. This flow is required for social authentication, and requires OAuth client registration with Okta. For instructions, see [Social Authentication](http://developer.okta.com/docs/api/resources/social_authentication.html).
-
-## Can be in Client Configuration
-
-These configuration options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`) or in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect`. If included in both, the value passed in the method takes priority.
-
-- **clientId:** Client Id pre-registered with Okta for the OIDC authentication flow.
-
-    ```javascript
-    clientId: 'GHtf9iJdr60A9IYrR0jw'
-    ```
-
-- **redirectUri:** The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin.
-
-    ```javascript
-    redirectUri: 'https://acme.com/oauth2/callback/home'
-    ```
-
-- **issuer:** Specify a custom issuer to perform the OIDC flow. Defaults to the baseUrl.
-
-    ```javascript
-    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7'
-    ```
-
-- **authorizeUrl:** Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize".
-
-    ```javascript
-    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
-    authorizeUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize'
-    ```
-
-- **userinfoUrl:** Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/userinfo".
-
-    ```javascript
-    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
-    userinfoUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-    ```
-
-## Cannot be in Client Configuration
-
-- **sessionToken** Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow.
-
-    ```javascript
-    sessionToken: '00p8RhRDCh_8NxIin-wtF5M6ofFtRhfKWGBAbd2WmE'
-    ```
-
-- **responseMode:** Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`.
-
-    - `okta_post_message` - Used when using `token.getWithPopup` and `token.getWithoutPrompt`. Uses [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) to send the response from the popup or iframe to the origin window.
-
-    - `fragment` - Default value when using `token.getWithRedirect` and `responseType != 'code'`. Returns the authorization response in the hash fragment of the URL after the authorization redirect.
-
-    - `query` - Default value when using `token.getWithRedirect` and `responseType = 'code'`. Returns the authorization response in the query string of the URL after the authorization redirect.
-
-    - `form_post` - Returns the authorization response as a form POST after the authorization redirect. Use this when using `token.getWithRedirect` and you do not want the response returned in the URL.
-
-    ```javascript
-    // Use form_post instead of query in the Authorization Code flow
-    responseType: 'code',
-    responseMode: 'form_post'
-    ```
-
-- **responseType:** Specify the response type for OIDC authentication. Defaults to `id_token`.
-
-    Valid response types are `id_token`, `access_token`, and `code`. Note that `code` goes through the Authorization Code flow, which requires the server to exchange the Authorization Code for tokens.
-
-    ```javascript
-    // Specifying a single responseType
-    responseType: 'token'
-
-    // Use an array if specifying multiple response types - in this case,
-    // the response will contain both an ID Token and an Access Token.
-    responseType: ['id_token', 'token']
-    ```
-
-- **scopes:** Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`.
-
-    Valid OIDC scopes: `openid`, `email`, `profile`, `address`, `phone`
-
-    ```javascript
-    scopes: ['openid', 'email', 'profile', 'address', 'phone']
-    ```
-
-- **state:** Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string.
-
-    ```javascript
-    state: '8rFzn3MH5q'
-    ```
-
-- **nonce:** Specify a nonce that will be validated in an `id_token`. This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an `id_token`. Defaults to a random string.
-
-    ```javascript
-    nonce: '51GePTswrm'
-    ```
-
 # Client Configuration
 
 The only required configuration option is `url`. All others are optional.
@@ -1469,6 +1382,103 @@ var authClient = new OktaAuth(config);
 
     // jquery
     var OktaAuth = require('@okta/okta-auth-js/jquery');
+    ```
+
+# OpenId Connect Options
+
+Options for the [OpenId Connect](http://developer.okta.com/docs/api/resources/oidc.html) authentication flow. This flow is required for social authentication, and requires OAuth client registration with Okta. For instructions, see [Social Authentication](http://developer.okta.com/docs/api/resources/social_authentication.html).
+
+## Can be in Client Configuration
+
+These configuration options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`) or in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect`. If included in both, the value passed in the method takes priority.
+
+- **clientId:** Client Id pre-registered with Okta for the OIDC authentication flow.
+
+    ```javascript
+    clientId: 'GHtf9iJdr60A9IYrR0jw'
+    ```
+
+- **redirectUri:** The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin.
+
+    ```javascript
+    redirectUri: 'https://acme.com/oauth2/callback/home'
+    ```
+
+- **issuer:** Specify a custom issuer to perform the OIDC flow. Defaults to the baseUrl.
+
+    ```javascript
+    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7'
+    ```
+
+- **authorizeUrl:** Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize".
+
+    ```javascript
+    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
+    authorizeUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize'
+    ```
+
+- **userinfoUrl:** Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/userinfo".
+
+    ```javascript
+    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
+    userinfoUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+    ```
+
+## Cannot be in Client Configuration
+
+- **sessionToken** Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow.
+
+    ```javascript
+    sessionToken: '00p8RhRDCh_8NxIin-wtF5M6ofFtRhfKWGBAbd2WmE'
+    ```
+
+- **responseMode:** Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`.
+
+    - `okta_post_message` - Used with `token.getWithPopup` and `token.getWithoutPrompt`. Uses [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) to send the response from the popup or iframe to the origin window.
+
+    - `fragment` - Default value when using `token.getWithRedirect` and `responseType != 'code'`. Returns the authorization response in the hash fragment of the URL after the authorization redirect.
+
+    - `query` - Default value when using `token.getWithRedirect` and `responseType = 'code'`. Returns the authorization response in the query string of the URL after the authorization redirect.
+
+    - `form_post` - Returns the authorization response as a form POST after the authorization redirect. Use this when using `token.getWithRedirect` and you do not want the response returned in the URL.
+
+    ```javascript
+    // Use form_post instead of query in the Authorization Code flow
+    responseType: 'code',
+    responseMode: 'form_post'
+    ```
+
+- **responseType:** Specify the response type for OIDC authentication. Defaults to `id_token`.
+
+    Valid response types are `id_token`, `access_token`, and `code`. Note that `code` goes through the Authorization Code flow, which requires the server to exchange the Authorization Code for tokens.
+
+    ```javascript
+    // Specifying a single responseType
+    responseType: 'token'
+
+    // Use an array if specifying multiple response types - in this case,
+    // the response will contain both an ID Token and an Access Token.
+    responseType: ['id_token', 'token']
+    ```
+
+- **scopes:** Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`.
+
+    Valid OIDC scopes: `openid`, `email`, `profile`, `address`, `phone`
+
+    ```javascript
+    scopes: ['openid', 'email', 'profile', 'address', 'phone']
+    ```
+
+- **state:** Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string.
+
+    ```javascript
+    state: '8rFzn3MH5q'
+    ```
+
+- **nonce:** Specify a nonce that will be validated in an `id_token`. This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an `id_token`. Defaults to a random string.
+
+    ```javascript
+    nonce: '51GePTswrm'
     ```
 
 # Developing the Okta Auth Client
