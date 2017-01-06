@@ -120,7 +120,7 @@ var authClient = new OktaAuth({url: 'https://acme.okta.com'});
 
 ## signIn(options)
 
-The goal of an authentication flow is to set an Okta session cookie on the user's browser or exchange for an `id_token` or `access_token`. The flow is started using `signIn`.
+The goal of an authentication flow is to [set an Okta session cookie on the user's browser](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [exchange for an `id_token` or `access_token`](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
   - `password` - The password of the user
@@ -144,7 +144,7 @@ authClient.signIn({
 
 ## signOut()
 
-Signs the user out of their current Okta session.
+Signs the user out of their current Okta [session](http://developer.okta.com/docs/api/resources/sessions.html#example).
 
 ```javascript
 authClient.signOut()
@@ -156,7 +156,7 @@ authClient.signOut()
 });
 ```
 
-## forgotPassword(options)
+## [forgotPassword(options)](http://developer.okta.com/docs/api/resources/authn.html#forgot-password)
 
 Starts a new password recovery transaction for a given user and issues a recovery token that can be used to reset a user’s password.
 
@@ -186,7 +186,7 @@ authClient.forgotPassword({
 });
 ```
 
-## unlockAccount(options)
+## [unlockAccount(options)](http://developer.okta.com/docs/api/resources/authn.html#unlock-account)
 
 Starts a new unlock recovery transaction for a given user and issues a recovery token that can be used to unlock a user’s account.
 
@@ -216,7 +216,7 @@ authClient.unlockAccount({
 });
 ```
 
-## verifyRecoveryToken(options)
+## [verifyRecoveryToken(options)](http://developer.okta.com/docs/api/resources/authn.html#verify-recovery-token)
 
 Validates a recovery token that was distributed to the end-user to continue the recovery transaction.
 
@@ -240,7 +240,7 @@ authClient.verifyRecoveryToken({
 
 ## tx.resume()
 
-Resumes an in-progress transaction. This is useful if a user navigates away from the login page before authentication is complete.
+Resumes an in-progress **transaction**. This is useful if a user navigates away from the login page before authentication is complete.
 
 ```javascript
 authClient.tx.exists()
@@ -260,7 +260,7 @@ authClient.tx.exists()
 
 ## tx.exists()
 
-Check for a transaction to be resumed. This is synchronous and returns `true` or `false`.
+Check for a **transaction** to be resumed. This is synchronous and returns `true` or `false`.
 
 ```javascript
 var exists = authClient.tx.exists()
@@ -292,7 +292,7 @@ transaction.cancel()
 });
 ```
 
-### LOCKED_OUT
+### [LOCKED_OUT](http://developer.okta.com/docs/api/resources/authn.html#show-lockout-failures)
 
 The user account is locked; self-service unlock or admin unlock is required.
 
@@ -305,7 +305,7 @@ The user account is locked; self-service unlock or admin unlock is required.
 }
 ```
 
-#### unlock(options)
+#### [unlock(options)](http://developer.okta.com/docs/api/resources/authn.html#unlock-account)
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
   - `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
@@ -320,7 +320,7 @@ transaction.unlock({
 
 #### [cancel()](#cancel)
 
-### PASSWORD_EXPIRED
+### [PASSWORD_EXPIRED](http://developer.okta.com/docs/api/resources/authn.html#response-example-expired-password)
 
 The user’s password was successfully validated but is expired.
 
@@ -344,7 +344,7 @@ The user’s password was successfully validated but is expired.
 }
 ```
 
-#### changePassword(options)
+#### [changePassword(options)](http://developer.okta.com/docs/api/resources/authn.html#reset-password)
 
   - `oldPassword` - User’s current password that is expired
   - `newPassword` - New password for user
@@ -382,7 +382,7 @@ The user successfully answered their recovery question and can set a new passwor
 }
 ```
 
-#### resetPassword(options)
+#### [resetPassword(options)](http://developer.okta.com/docs/api/resources/authn.html#reset-password)
 
   - `newPassword` - New password for user
 
@@ -436,7 +436,7 @@ The user’s password was successfully validated but is about to expire and shou
 }
 ```
 
-#### changePassword(options)
+#### [changePassword(options)](http://developer.okta.com/docs/api/resources/authn.html#change-password)
 
   - `oldPassword` - User’s current password that is about to expire
   - `newPassword` - New password for user
@@ -487,7 +487,7 @@ The user has requested a recovery token to reset their password or unlock their 
 }
 ```
 
-#### answer(options)
+#### [answer(options)](http://developer.okta.com/docs/api/resources/authn.html#answer-recovery-question)
 
   - `answer` - Answer to user’s recovery question
 
@@ -497,7 +497,7 @@ transaction.answer({
 });
 ```
 
-#### recovery(options)
+#### [recovery(options)](http://developer.okta.com/docs/api/resources/authn.html#verify-recovery-token)
 
   - `recoveryToken` - Recovery token that was distributed to end-user via out-of-band mechanism such as email
 
@@ -536,7 +536,7 @@ The user must verify the factor-specific recovery challenge.
 }
 ```
 
-#### verify(options)
+#### [verify(options)](http://developer.okta.com/docs/api/resources/authn.html#verify-sms-recovery-factor)
 
   - `passCode` - OTP sent to device
 
@@ -546,7 +546,7 @@ transaction.verify({
 });
 ```
 
-#### resend()
+#### [resend()](http://developer.okta.com/docs/api/resources/authn.html#resend-sms-recovery-challenge)
 
 Resend the recovery email or text.
 
@@ -627,7 +627,7 @@ To enroll in a factor, select one from the factors array, then use the following
 var factor = transaction.factors[/* index of the desired factor */];
 ```
 
-##### questions()
+##### [questions()](http://developer.okta.com/docs/api/resources/factors.html#list-security-questions)
 
 List the available questions for the question factorType.
 
@@ -646,7 +646,7 @@ questionFactor.questions()
 
 The enroll options depend on the desired factor.
 
-###### OKTA question
+###### [OKTA question](http://developer.okta.com/docs/api/resources/factors.html#enroll-okta-security-question-factor)
 
 ```javascript
 var questionFactor = transaction.factors.find(function(factor) {
@@ -661,7 +661,7 @@ questionFactor.enroll({
 });
 ```
 
-###### OKTA sms
+###### [OKTA sms](http://developer.okta.com/docs/api/resources/factors.html#enroll-okta-sms-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -678,7 +678,7 @@ factor.enroll({
 // The passCode sent to the phone is verified in MFA_ENROLL_ACTIVATE
 ```
 
-###### OKTA call
+###### [OKTA call](http://developer.okta.com/docs/api/resources/factors.html#enroll-okta-call-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -695,7 +695,7 @@ factor.enroll({
 // The passCode from the call is verified in MFA_ENROLL_ACTIVATE
 ```
 
-###### OKTA push
+###### [OKTA push](http://developer.okta.com/docs/api/resources/factors.html#enroll-okta-verify-push-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -707,7 +707,7 @@ factor.enroll();
 // The phone will need to scan a QR Code in MFA_ENROLL_ACTIVATE
 ```
 
-###### OKTA token:software:totp
+###### [OKTA token:software:totp](http://developer.okta.com/docs/api/resources/factors.html#enroll-okta-verify-totp-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -719,7 +719,7 @@ factor.enroll();
 // The phone will need to scan a QR Code in MFA_ENROLL_ACTIVATE
 ```
 
-###### GOOGLE token:software:totp
+###### [GOOGLE token:software:totp](http://developer.okta.com/docs/api/resources/factors.html#enroll-google-authenticator-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -731,7 +731,7 @@ factor.enroll();
 // The phone will need to scan a QR Code in MFA_ENROLL_ACTIVATE
 ```
 
-###### YUBICO token:hardware
+###### [YUBICO token:hardware](http://developer.okta.com/docs/api/resources/factors.html#enroll-yubikey-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -743,7 +743,7 @@ factor.enroll({
 });
 ```
 
-###### RSA token
+###### [RSA token](http://developer.okta.com/docs/api/resources/factors.html#enroll-rsa-securid-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -758,7 +758,7 @@ factor.enroll({
 });
 ```
 
-###### SYMANTEC token
+###### [SYMANTEC token](http://developer.okta.com/docs/api/resources/factors.html#enroll-symantec-vip-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -823,7 +823,7 @@ Send another OTP if user doesn’t receive the original activation SMS OTP.
 transaction.resend();
 ```
 
-#### activate(options)
+#### [activate(options)](http://developer.okta.com/docs/api/resources/authn.html#activate-sms-factor)
 
   - `passCode` - OTP sent to device
 
@@ -833,7 +833,7 @@ transaction.activate({
 });
 ```
 
-#### poll()
+#### [poll()](http://developer.okta.com/docs/api/resources/authn.html#activate-push-factor)
 
 Poll until factorResult is not WAITING. Throws AuthPollStopError if prev, resend, or cancel is called.
 
@@ -841,7 +841,7 @@ Poll until factorResult is not WAITING. Throws AuthPollStopError if prev, resend
 transaction.poll();
 ```
 
-#### prev()
+#### [prev()](http://developer.okta.com/docs/api/resources/authn.html#previous-transaction-state)
 
 End current factor enrollment and return to `MFA_ENROLL`.
 
@@ -932,7 +932,7 @@ The user must provide additional verification with a previously enrolled factor.
 
 #### [cancel()](#cancel)
 
-#### Verify Factor
+#### [Verify Factor](http://developer.okta.com/docs/api/resources/authn.html#verify-factor)
 
 To verify a factor, select one from the factors array, then use the following methods.
 
@@ -940,7 +940,7 @@ To verify a factor, select one from the factors array, then use the following me
 var factor = transaction.factors[/* index of the desired factor */];
 ```
 
-###### OKTA question
+###### [OKTA question](http://developer.okta.com/docs/api/resources/authn.html#verify-security-question-factor)
 
 ```javascript
 var questionFactor = transaction.factors.find(function(factor) {
@@ -952,7 +952,7 @@ questionFactor.verify({
 });
 ```
 
-###### All other factors
+###### [All other factors](http://developer.okta.com/docs/api/resources/authn.html#verify-factor)
 
 ```javascript
 var factor = transaction.factors.find(function(factor) {
@@ -997,7 +997,7 @@ The user must verify the factor-specific challenge.
 }
 ```
 
-#### verify(options)
+#### [verify(options)](http://developer.okta.com/docs/api/resources/authn.html#verify-factor)
 
   - `passCode` - OTP sent to device
 
@@ -1007,7 +1007,7 @@ transaction.verify({
 });
 ```
 
-#### poll()
+#### [poll()](http://developer.okta.com/docs/api/resources/authn.html#activate-push-factor)
 
 Poll until factorResult is not WAITING. Throws AuthPollStopError if prev or cancel is called.
 
@@ -1015,7 +1015,7 @@ Poll until factorResult is not WAITING. Throws AuthPollStopError if prev or canc
 transaction.poll();
 ```
 
-#### prev()
+#### [prev()](http://developer.okta.com/docs/api/resources/authn.html#previous-transaction-state)
 
 End current factor verification and return to `MFA_REQUIRED`.
 
@@ -1060,7 +1060,7 @@ authClient.session.setCookieAndRedirect(transaction.sessionToken);
 
 ## session.exists()
 
-Returns a promise that resolves with `true` if there is an existing Okta session, or `false` if not.
+Returns a promise that resolves with `true` if there is an existing Okta [session](http://developer.okta.com/docs/api/resources/sessions.html#example), or `false` if not.
 
 ```javascript
 authClient.session.exists()
@@ -1172,7 +1172,7 @@ authClient.token.decode('YOUR_ID_TOKEN_JWT');
 
 ## token.refresh(tokenToRefresh)
 
-Returns a new token if the Okta session is still valid.
+Returns a new token if the Okta [session](http://developer.okta.com/docs/api/resources/sessions.html#example) is still valid.
 
   - `tokenToRefresh` - an access token or ID token previously provided by Okta. note: this is not the raw JWT
 
