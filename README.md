@@ -120,7 +120,7 @@ var authClient = new OktaAuth({url: 'https://acme.okta.com'});
 
 ## signIn(options)
 
-The goal of an authentication flow is to [set an Okta session cookie on the user's browser](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [exchange for an `id_token` or `access_token`](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
+The goal of an authentication flow is to [set an Okta session cookie on the user's browser](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
   - `password` - The password of the user
