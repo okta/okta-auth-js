@@ -1105,7 +1105,7 @@ authClient.session.get()
 
 When you've obtained a sessionToken from the authorization flows, or a session already exists, you can obtain a token or tokens without prompting the user to log in.
 
-  - `oauthOptions` - See [OIDC Configuration](http://localhost:6419/#openid-connect-options)
+  - `oauthOptions` - See [OIDC Configuration](#openid-connect-options)
 
 ```javascript
 authClient.token.getWithoutPrompt({
@@ -1124,7 +1124,7 @@ authClient.token.getWithoutPrompt({
 
 Create token with a popup.
 
-  - `oauthOptions` - See [OIDC Configuration](http://localhost:6419/#openid-connect-options)
+  - `oauthOptions` - See [OIDC Configuration](#openid-connect-options)
 
 ```javascript
 authClient.token.getWithPopup(oauthOptions)
@@ -1140,7 +1140,7 @@ authClient.token.getWithPopup(oauthOptions)
 
 Create token using a redirect.
 
-  - `oauthOptions` - See [OIDC Configuration](http://localhost:6419/#openid-connect-options)
+  - `oauthOptions` - See [OIDC Configuration](#openid-connect-options)
 
 ```javascript
 authClient.token.getWithRedirect(oauthOptions);
