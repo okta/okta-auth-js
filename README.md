@@ -1,10 +1,13 @@
+<!-- START GITHUB ONLY -->
 [![Build Status](https://travis-ci.org/okta/okta-auth-js.svg?branch=master)](https://travis-ci.org/okta/okta-auth-js)
+<!-- END GITHUB ONLY -->
 
-Okta Auth JS
+Introduction
 ============
 
-Okta Auth JS is a wrapper around [Okta's authentication API](http://developer.okta.com/docs/api/resources/authn.html). It can be used to get an Okta session cookie or an ID token.
+The Okta Auth SDK builds on top of our [Authentication API](http://developer.okta.com/docs/api/resources/authn.html) and [OAuth 2.0 API](http://developer.okta.com/docs/api/resources/oidc.html) to enable you to create a fully branded sign-in experience using JavaScript.
 
+<!-- START GITHUB ONLY -->
 For an overview of the client's features and authentication flows, check out [our developer docs](http://developer.okta.com/docs/guides/okta_auth_sdk.html).
 
 Read our [contributing guidelines](./CONTRIBUTING.md) if you wish to contribute.
@@ -60,6 +63,7 @@ Read our [contributing guidelines](./CONTRIBUTING.md) if you wish to contribute.
 * [Developing the Okta Auth Client](#developing-the-okta-auth-client)
   * [Building the Client](#building-the-client)
   * [Build and Test Commands](#build-and-test-commands)
+<!-- END GITHUB ONLY -->
 
 # Install
 
@@ -87,7 +91,9 @@ var authClient = new OktaAuth({/* configOptions */});
 ## Using the npm module
 
 Using our npm module is a good choice if:
+
 - You have a build system in place where you manage dependencies with npm.
+
 - You do not want to load scripts directly from third party sites.
 
 To install [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js):
@@ -1342,47 +1348,47 @@ var authClient = new OktaAuth(config);
 
 - **url:** The URL for your Okta organization
 
-    ```javascript
-    // Production org with subdomain "acme"
-    url: 'https://acme.okta.com'
+  ```javascript
+  // Production org with subdomain "acme"
+  url: 'https://acme.okta.com'
 
-    // Can also target oktapreview and okta-emea, i.e.
-    url: 'https://acme.oktapreview.com'
-    ```
+  // Can also target oktapreview and okta-emea, i.e.
+  url: 'https://acme.oktapreview.com'
+  ```
 
 - **ajaxRequest** The ajax request implementation. By default, this is implemented using [reqwest](https://github.com/ded/reqwest). To provide your own request library, implement the following interface:
 
-    1) Must accept:
-      - method (http method)
-      - url (target url)
-      - args (object containing headers and data)
+  1. Must accept:
+    - method (http method)
+    - url (target url)
+    - args (object containing headers and data)
 
-    2) Must return a Promise that resolves with a raw XMLHttpRequest response
+  2. Must return a Promise that resolves with a raw XMLHttpRequest response
 
-    ```javascript
-    ajaxRequest: function(method, url, args) {
-      /*
-      args is in the form:
-      {
-        headers: {
-          headerName: headerValue
-        },
-        data: postBodyData
-      }
-      */
-      return Promise.resolve(/* a raw XMLHttpRequest response */);
+  ```javascript
+  ajaxRequest: function(method, url, args) {
+    /*
+    args is in the form:
+    {
+      headers: {
+        headerName: headerValue
+      },
+      data: postBodyData
     }
-    ```
+    */
+    return Promise.resolve(/* a raw XMLHttpRequest response */);
+  }
+  ```
 
-    If you're using a bundler like webpack or browserify, we have implementations for jquery and reqwest included. To use them, import the SDK like this:
-    
-    ```javascript
-    // reqwest
-    var OktaAuth = require('@okta/okta-auth-js/reqwest');
+  If you're using a bundler like webpack or browserify, we have implementations for jquery and reqwest included. To use them, import the SDK like this:
 
-    // jquery
-    var OktaAuth = require('@okta/okta-auth-js/jquery');
-    ```
+  ```javascript
+  // reqwest
+  var OktaAuth = require('@okta/okta-auth-js/reqwest');
+
+  // jquery
+  var OktaAuth = require('@okta/okta-auth-js/jquery');
+  ```
 
 # OpenId Connect Options
 
@@ -1394,92 +1400,92 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
 
 - **clientId:** Client Id pre-registered with Okta for the OIDC authentication flow.
 
-    ```javascript
-    clientId: 'GHtf9iJdr60A9IYrR0jw'
-    ```
+  ```javascript
+  clientId: 'GHtf9iJdr60A9IYrR0jw'
+  ```
 
 - **redirectUri:** The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin.
 
-    ```javascript
-    redirectUri: 'https://acme.com/oauth2/callback/home'
-    ```
+  ```javascript
+  redirectUri: 'https://acme.com/oauth2/callback/home'
+  ```
 
 - **issuer:** Specify a custom issuer to perform the OIDC flow. Defaults to the baseUrl.
 
-    ```javascript
-    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7'
-    ```
+  ```javascript
+  issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7'
+  ```
 
 - **authorizeUrl:** Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize".
 
-    ```javascript
-    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
-    authorizeUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize'
-    ```
+  ```javascript
+  issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
+  authorizeUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize'
+  ```
 
 - **userinfoUrl:** Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/userinfo".
 
-    ```javascript
-    issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
-    userinfoUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-    ```
+  ```javascript
+  issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
+  userinfoUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+  ```
 
 ## Cannot be in Client Configuration
 
 - **sessionToken** Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow.
 
-    ```javascript
-    sessionToken: '00p8RhRDCh_8NxIin-wtF5M6ofFtRhfKWGBAbd2WmE'
-    ```
+  ```javascript
+  sessionToken: '00p8RhRDCh_8NxIin-wtF5M6ofFtRhfKWGBAbd2WmE'
+  ```
 
 - **responseMode:** Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`.
 
-    - `okta_post_message` - Used with `token.getWithPopup` and `token.getWithoutPrompt`. Uses [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) to send the response from the popup or iframe to the origin window.
+  - `okta_post_message` - Used with `token.getWithPopup` and `token.getWithoutPrompt`. Uses [postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) to send the response from the popup or iframe to the origin window.
 
-    - `fragment` - Default value when using `token.getWithRedirect` and `responseType != 'code'`. Returns the authorization response in the hash fragment of the URL after the authorization redirect.
+  - `fragment` - Default value when using `token.getWithRedirect` and `responseType != 'code'`. Returns the authorization response in the hash fragment of the URL after the authorization redirect.
 
-    - `query` - Default value when using `token.getWithRedirect` and `responseType = 'code'`. Returns the authorization response in the query string of the URL after the authorization redirect.
+  - `query` - Default value when using `token.getWithRedirect` and `responseType = 'code'`. Returns the authorization response in the query string of the URL after the authorization redirect.
 
-    - `form_post` - Returns the authorization response as a form POST after the authorization redirect. Use this when using `token.getWithRedirect` and you do not want the response returned in the URL.
+  - `form_post` - Returns the authorization response as a form POST after the authorization redirect. Use this when using `token.getWithRedirect` and you do not want the response returned in the URL.
 
-    ```javascript
-    // Use form_post instead of query in the Authorization Code flow
-    responseType: 'code',
-    responseMode: 'form_post'
-    ```
+  ```javascript
+  // Use form_post instead of query in the Authorization Code flow
+  responseType: 'code',
+  responseMode: 'form_post'
+  ```
 
 - **responseType:** Specify the response type for OIDC authentication. Defaults to `id_token`.
 
-    Valid response types are `id_token`, `access_token`, and `code`. Note that `code` goes through the Authorization Code flow, which requires the server to exchange the Authorization Code for tokens.
+  Valid response types are `id_token`, `access_token`, and `code`. Note that `code` goes through the Authorization Code flow, which requires the server to exchange the Authorization Code for tokens.
 
-    ```javascript
-    // Specifying a single responseType
-    responseType: 'token'
+  ```javascript
+  // Specifying a single responseType
+  responseType: 'token'
 
-    // Use an array if specifying multiple response types - in this case,
-    // the response will contain both an ID Token and an Access Token.
-    responseType: ['id_token', 'token']
-    ```
+  // Use an array if specifying multiple response types - in this case,
+  // the response will contain both an ID Token and an Access Token.
+  responseType: ['id_token', 'token']
+  ```
 
 - **scopes:** Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`.
 
-    Valid OIDC scopes: `openid`, `email`, `profile`, `address`, `phone`
+  Valid OIDC scopes: `openid`, `email`, `profile`, `address`, `phone`
 
-    ```javascript
-    scopes: ['openid', 'email', 'profile', 'address', 'phone']
-    ```
+  ```javascript
+  scopes: ['openid', 'email', 'profile', 'address', 'phone']
+  ```
 
 - **state:** Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string.
 
-    ```javascript
-    state: '8rFzn3MH5q'
-    ```
+  ```javascript
+  state: '8rFzn3MH5q'
+  ```
 
 - **nonce:** Specify a nonce that will be validated in an `id_token`. This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an `id_token`. Defaults to a random string.
 
-    ```javascript
-    nonce: '51GePTswrm'
-    ```
+  ```javascript
+  nonce: '51GePTswrm'
+  ```
 
 # Developing the Okta Auth Client
 
@@ -1487,21 +1493,21 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
 
 1. Clone the repo.
 
-    ```bash
-    [path]$ git clone git@github.com:okta/okta-auth-js.git
-    ```
+   ```bash
+   [path]$ git clone git@github.com:okta/okta-auth-js.git
+   ```
 
 2. Navigate to the new `okta-auth-js` folder, and install the Okta node dependencies.
 
-    ```bash
-    [path/okta-auth-js]$ npm install
-    ```
+   ```bash
+   [path/okta-auth-js]$ npm install
+   ```
 
 3. Build the SDK. The output will be under `dist/browser/`. The standalone version is `okta-auth-js.min.js`.
 
-    ```bash
-    [path/okta-auth-js]$ npm run build
-    ```
+   ```bash
+   [path/okta-auth-js]$ npm run build
+   ```
 
 ## Build and Test Commands
 
