@@ -341,6 +341,10 @@ define(function(require) {
     spyOn(cookies.getCookie, '_getDocumentCookie').and.returnValue(text || '');
   };
 
+  util.mockSetLocationHash = function (client, hash) {
+    return spyOn(client.token.parseFromUrl, '_setLocationHash');
+  };
+
   util.mockGetLocationHash = function (client, hash) {
     spyOn(client.token.parseFromUrl, '_getLocationHash').and.returnValue(hash);
   };

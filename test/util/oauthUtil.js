@@ -363,11 +363,12 @@ define(function(require) {
     });
 
     util.warpToUnixTime(getTime(opts.time));
-    util.mockGetLocationHash(client, opts.hashMock);
+    util.mockGetLocationHash(client, opts.hashMock || '');
+    var setLocationHashMock = util.mockSetLocationHash(client);
     util.mockGetCookie(opts.oauthCookie);
     var setCookieMock = util.mockSetCookie();
 
-    return client.token.parseFromUrl()
+    return client.token.parseFromUrl(opts.directUrl)
       .then(function(res) {
         var expectedResp = opts.expectedResp;
         validateResponse(res, expectedResp);
@@ -375,6 +376,13 @@ define(function(require) {
         // The cookie should be deleted
         expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params=; path=/; ' +
           'expires=Thu, 01 Jan 1970 00:00:00 GMT;');
+
+        if (opts.directUrl) {
+          expect(setLocationHashMock).not.toHaveBeenCalled();
+        } else {
+          // The hash should be removed
+          expect(setLocationHashMock).toHaveBeenCalledWith('');
+        }
       });
   };
 
