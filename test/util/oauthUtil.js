@@ -365,6 +365,14 @@ define(function(require) {
     util.warpToUnixTime(getTime(opts.time));
     util.mockGetLocationHash(client, opts.hashMock || '');
     var setLocationHashMock = util.mockSetLocationHash(client);
+    var replaceStateSpy = jasmine.createSpy('replaceState');
+    if (opts.noHistory) {
+      util.mockGetHistory(client);
+    } else {
+      util.mockGetHistory(client, {
+        replaceState: replaceStateSpy
+      });
+    }
     util.mockGetCookie(opts.oauthCookie);
     var setCookieMock = util.mockSetCookie();
 
@@ -379,9 +387,11 @@ define(function(require) {
 
         if (opts.directUrl) {
           expect(setLocationHashMock).not.toHaveBeenCalled();
-        } else {
-          // The hash should be removed
+          expect(replaceStateSpy).not.toHaveBeenCalled();
+        } else if (opts.noHistory) {
           expect(setLocationHashMock).toHaveBeenCalledWith('');
+        } else {
+          expect(replaceStateSpy).toHaveBeenCalled();
         }
       });
   };

@@ -1406,6 +1406,34 @@ define(function(require) {
       });
     });
 
+    it('uses location.hash to remove token if history.replaceState does not exist', function(done) {
+      return oauthUtil.setupParseUrl({
+        noHistory: true,
+        hashMock: '#id_token=' + tokens.standardIdToken +
+                  '&state=' + oauthUtil.mockedState,
+        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+          responseType: 'id_token',
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scopes: ['openid', 'email'],
+          urls: {
+            issuer: 'https://auth-js-test.okta.com',
+            authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+          }
+        }) + '; path=/;',
+        expectedResp: {
+          idToken: tokens.standardIdToken,
+          claims: tokens.standardIdTokenClaims,
+          expiresAt: 1449699930,
+          scopes: ['openid', 'email']
+        }
+      })
+      .fin(function() {
+        done();
+      });
+    });
+
     it('parses id_token', function(done) {
       return oauthUtil.setupParseUrl({
         hashMock: '#id_token=' + tokens.standardIdToken +
