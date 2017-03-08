@@ -363,8 +363,34 @@ define(function(require) {
     });
 
     util.warpToUnixTime(getTime(opts.time));
-    util.mockGetLocationHash(client, opts.hashMock || '');
-    var setLocationHashMock = util.mockSetLocationHash(client);
+
+    // Mock location
+    var mockLocation = {};
+    var setLocationHashSpy = jasmine.createSpy();
+    Object.defineProperty(mockLocation, 'hash', {
+      get: function() {
+        return opts.hashMock || '';
+      },
+      set: setLocationHashSpy
+    });
+    Object.defineProperty(mockLocation, 'pathname', {
+      get: function() {
+        return '/test/path';
+      }
+    });
+    Object.defineProperty(mockLocation, 'search', {
+      get: function() {
+        return '?test=true';
+      }
+    });
+    util.mockGetLocation(client, mockLocation);
+
+    // Mock document
+    util.mockGetDocument(client, {
+      title: 'Test'
+    });
+
+    // Mock history
     var replaceStateSpy = jasmine.createSpy('replaceState');
     if (opts.noHistory) {
       util.mockGetHistory(client);
@@ -373,6 +399,7 @@ define(function(require) {
         replaceState: replaceStateSpy
       });
     }
+
     util.mockGetCookie(opts.oauthCookie);
     var setCookieMock = util.mockSetCookie();
 
@@ -386,12 +413,12 @@ define(function(require) {
           'expires=Thu, 01 Jan 1970 00:00:00 GMT;');
 
         if (opts.directUrl) {
-          expect(setLocationHashMock).not.toHaveBeenCalled();
+          expect(setLocationHashSpy).not.toHaveBeenCalled();
           expect(replaceStateSpy).not.toHaveBeenCalled();
         } else if (opts.noHistory) {
-          expect(setLocationHashMock).toHaveBeenCalledWith('');
+          expect(setLocationHashSpy).toHaveBeenCalledWith('');
         } else {
-          expect(replaceStateSpy).toHaveBeenCalled();
+          expect(replaceStateSpy).toHaveBeenCalledWith(null, 'Test', '/test/path?test=true');
         }
       });
   };
