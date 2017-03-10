@@ -341,8 +341,16 @@ define(function(require) {
     spyOn(cookies.getCookie, '_getDocumentCookie').and.returnValue(text || '');
   };
 
-  util.mockGetLocationHash = function (client, hash) {
-    spyOn(client.token.parseFromUrl, '_getLocationHash').and.returnValue(hash);
+  util.mockGetHistory = function (client, mockHistory) {
+    spyOn(client.token.parseFromUrl, '_getHistory').and.returnValue(mockHistory);
+  };
+
+  util.mockGetDocument = function (client, mockDocument) {
+    spyOn(client.token.parseFromUrl, '_getDocument').and.returnValue(mockDocument);
+  };
+
+  util.mockGetLocation = function (client, mockLocation) {
+    spyOn(client.token.parseFromUrl, '_getLocation').and.returnValue(mockLocation);
   };
 
   util.expectErrorToEqual = function (actual, expected) {

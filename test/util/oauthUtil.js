@@ -363,11 +363,47 @@ define(function(require) {
     });
 
     util.warpToUnixTime(getTime(opts.time));
-    util.mockGetLocationHash(client, opts.hashMock);
+
+    // Mock location
+    var mockLocation = {};
+    var setLocationHashSpy = jasmine.createSpy();
+    Object.defineProperty(mockLocation, 'hash', {
+      get: function() {
+        return opts.hashMock || '';
+      },
+      set: setLocationHashSpy
+    });
+    Object.defineProperty(mockLocation, 'pathname', {
+      get: function() {
+        return '/test/path';
+      }
+    });
+    Object.defineProperty(mockLocation, 'search', {
+      get: function() {
+        return '?test=true';
+      }
+    });
+    util.mockGetLocation(client, mockLocation);
+
+    // Mock document
+    util.mockGetDocument(client, {
+      title: 'Test'
+    });
+
+    // Mock history
+    var replaceStateSpy = jasmine.createSpy('replaceState');
+    if (opts.noHistory) {
+      util.mockGetHistory(client);
+    } else {
+      util.mockGetHistory(client, {
+        replaceState: replaceStateSpy
+      });
+    }
+
     util.mockGetCookie(opts.oauthCookie);
     var setCookieMock = util.mockSetCookie();
 
-    return client.token.parseFromUrl()
+    return client.token.parseFromUrl(opts.directUrl)
       .then(function(res) {
         var expectedResp = opts.expectedResp;
         validateResponse(res, expectedResp);
@@ -375,6 +411,15 @@ define(function(require) {
         // The cookie should be deleted
         expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params=; path=/; ' +
           'expires=Thu, 01 Jan 1970 00:00:00 GMT;');
+
+        if (opts.directUrl) {
+          expect(setLocationHashSpy).not.toHaveBeenCalled();
+          expect(replaceStateSpy).not.toHaveBeenCalled();
+        } else if (opts.noHistory) {
+          expect(setLocationHashSpy).toHaveBeenCalledWith('');
+        } else {
+          expect(replaceStateSpy).toHaveBeenCalledWith(null, 'Test', '/test/path?test=true');
+        }
       });
   };
 
