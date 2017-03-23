@@ -126,7 +126,7 @@ var authClient = new OktaAuth({url: 'https://acme.okta.com'});
 
 ## signIn(options)
 
-The goal of an authentication flow is to [set an Okta session cookie on the user's browser](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
+The goal of an authentication flow is to [retrieve an `id_token` or `access_token`](http://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
   - `password` - The password of the user
@@ -138,7 +138,10 @@ authClient.signIn({
 })
 .then(function(transaction) {
   if (transaction.status === 'SUCCESS') {
-    authClient.session.setCookieAndRedirect(transaction.sessionToken); // Sets a cookie on redirect
+    authClient.token.getWithRedirect({
+      sessionToken: transaction.sessionToken,
+      redirectUri: 'http://localhost:8080/secure'
+    }) // Sets a cookie on redirect
   } else {
     throw 'We cannot handle the ' + transaction.status + ' status';
   }
@@ -147,6 +150,8 @@ authClient.signIn({
   console.error(err);
 });
 ```
+
+NOTE: you'll need to have a `clientId ` specified in your `authClient` configuration in order to use signIn in this way.
 
 ## signOut()
 
