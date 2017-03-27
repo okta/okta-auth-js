@@ -1469,10 +1469,10 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
 
 - **scopes:** Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`.
 
-  Valid OIDC scopes: `openid`, `email`, `profile`, `address`, `phone`
+  Valid OIDC scopes: `openid`, `email`, `profile`, `address`, `phone`, `groups`, `offline_access`
 
   ```javascript
-  scopes: ['openid', 'email', 'profile', 'address', 'phone']
+  scopes: ['openid', 'email', 'profile', 'address', 'phone', 'groups', 'offline_access']
   ```
 
 - **state:** Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string.
