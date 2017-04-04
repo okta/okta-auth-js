@@ -26,6 +26,20 @@
     "ci-pkginfo:dataload": "./node_modules/@okta/ci-pkginfo/bin/ci-pkginfo.js -t dataload",
     "prepublish": "node ./writeConfig.js && grunt shell:UMDNoDependencies"
   },
+  "okta": {
+    "doc": [
+      {
+        "source": "README.md",
+        "target": "_source/_code/javascript/okta_auth_sdk.md",
+        "frontmatter": {
+          "layout": "docs_page",
+          "title": "Okta Auth SDK",
+          "weight": "10",
+          "excerpt": "A Javascript wrapper for Okta's Authentication APIs. Build your own branded UI and power sign-in with Okta."
+        }
+      }
+    ]
+  },
   "author": "Okta",
   "keywords": [
     "Okta",
