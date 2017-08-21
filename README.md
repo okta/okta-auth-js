@@ -116,7 +116,7 @@ var authClient = new OktaAuth(/* configOptions */);
 
 ## new OktaAuth(config)
 
-Creates a new instance of the Okta Auth Client with the provided options. The client has many [config options](#configuration). The only required option to get started is `url`, the base url for your Okta domain.
+Creates a new instance of the Okta Auth Client with the provided options. The client has many [config options](#client-configuration). The only required option to get started is `url`, the base url for your Okta domain.
 
   - `config` - Options that are used to configure the client
 
