@@ -249,19 +249,16 @@ authClient.verifyRecoveryToken({
 Resumes an in-progress **transaction**. This is useful if a user navigates away from the login page before authentication is complete.
 
 ```javascript
-authClient.tx.exists()
-.then(function(exists) {
-  if (exists) {
-    return authClient.tx.resume();
-  }
-  throw new Error('a session does not exist');
-})
-.then(function(transaction) {
-  console.log('current status:', transaction.status);
-})
-.fail(function(err) {
-  console.error(err);
-});
+var exists = authClient.tx.exists();
+if (exists) {
+  authClient.tx.resume()
+  .then(function(transaction) {
+    console.log('current status:', transaction.status);
+  })
+  .fail(function(err) {
+    console.error(err);
+  });
+}
 ```
 
 ## tx.exists()
