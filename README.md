@@ -24,6 +24,7 @@ Read our [contributing guidelines](./CONTRIBUTING.md) if you wish to contribute.
   * [forgotPassword](#forgotpasswordoptions)
   * [unlockAccount](#unlockaccountoptions)
   * [verifyRecoveryToken](#verifyrecoverytokenoptions)
+  * [webfinger](#webfingeroptions)
   * [tx.resume](#txresume)
   * [tx.exists](#txexists)
   * [transaction.status](#transactionstatus)
@@ -238,6 +239,28 @@ authClient.verifyRecoveryToken({
   } else {
     throw 'We cannot handle the ' + transaction.status + ' status';
   }
+})
+.fail(function(err) {
+  console.error(err);
+});
+```
+
+## [webfinger(options)](https://tools.ietf.org/html/rfc7033)
+
+Calls the Webfinger API and gets a response.
+
+- `resource` - URI that identifies the entity whose information is sought, currently only acct scheme is supported (e.g acct:dade.murphy@example.com)
+- `rel` - Optional parameter to request only a subset of the information that would otherwise be returned without the "rel" parameter
+- `requestContext` - Optional parameter that provides Webfinger the context of that which the user is trying to access, such as the path of an app
+
+```javascript
+authClient.webfinger({
+  resource: 'acct:john.joe@example.com',
+  rel: 'okta:idp',
+  requestContext: '/home/dropbox/0oa16630PzpWKeWrH0g4/121'
+})
+.then(function(res) {
+  // use the webfinger response to select an idp
 })
 .fail(function(err) {
   console.error(err);
