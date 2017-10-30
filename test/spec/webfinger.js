@@ -11,7 +11,8 @@ define(function(require) {
             {
               request: {
                 method: 'get',
-                uri: '/.well-known/webfinger'
+                uri: '/.well-known/webfinger?resource=acct%3Ajohn.joe%40example.com' +
+                '&requestContext=%2Furl%2Fto%2Fredirect%2Fto'
               },
               response: 'webfinger'
             }
