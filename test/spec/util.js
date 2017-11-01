@@ -29,5 +29,38 @@ define(function(require) {
         expect(_.isNative(util.getConsole().log)).toBe(false);
       });
     });
+
+    describe('extend', function() {
+      it('handles one argument', function() {
+        var obj1 = {
+          'prop1': 'test prop1',
+          'prop2': 'test prop2'
+        };
+        util.extend(obj1);
+        expect(obj1).toEqual(jasmine.objectContaining({
+          'prop1': 'test prop1',
+          'prop2': 'test prop2'
+        }));
+      });
+
+      it('handles more than one argument', function() {
+        var obj1 = {
+          'prop1': 'test prop1',
+          'prop2': 'test prop2'
+        };
+        var obj2 = {
+          'prop3': 'test prop3'
+        };
+        var obj3 = {
+          'prop1': 'test prop4'
+        };
+        util.extend(obj1, obj2, obj3);
+        expect(obj1).toEqual(jasmine.objectContaining({
+          'prop1': 'test prop4',
+          'prop2': 'test prop2',
+          'prop3': 'test prop3'
+        }));
+      });
+    });
   });
 });
