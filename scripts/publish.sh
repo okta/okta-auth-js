@@ -2,7 +2,7 @@
 
 source $OKTA_HOME/$REPO/scripts/setup.sh
 
-REGISTRY="https://artifacts.aue1d.saasure.com/artifactory/api/npm/npm-okta"
+REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-okta"
 
 export TEST_SUITE_TYPE="build"
 
@@ -15,7 +15,7 @@ else
   TARGET_BRANCH=$BRANCH
 fi
 
-if ! npm run ci-update-package -- --branch ${TARGET_BRANCH}; then
+if ! ci-update-package --branch ${TARGET_BRANCH}; then
   echo "ci-update-package failed! Exiting..."
   exit $FAILED_SETUP
 fi
@@ -25,7 +25,7 @@ if ! npm publish --registry ${REGISTRY}; then
   exit $PUBLISH_ARTIFACTORY_FAILURE
 fi
 
-DATALOAD=$(npm run ci-pkginfo:dataload --silent)
+DATALOAD=$(ci-pkginfo -t dataload)
 if ! artifactory_curl -X PUT -u ${ARTIFACTORY_CREDS} ${DATALOAD} -v -f; then
   echo "artifactory_curl failed! Exiting..."
   exit $PUBLISH_ARTIFACTORY_FAILURE
