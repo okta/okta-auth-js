@@ -1,7 +1,9 @@
 #!/bin/bash
 
+echo "URLX: ${ARTIFACTORY_URL}"
 source $OKTA_HOME/$REPO/scripts/setup.sh
 
+echo "URLY: ${ARTIFACTORY_URL}"
 REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-okta"
 
 export TEST_SUITE_TYPE="build"
@@ -20,7 +22,7 @@ if ! ci-update-package --branch ${TARGET_BRANCH}; then
   exit $FAILED_SETUP
 fi
 
-if ! npm publish --registry ${REGISTRY}; then
+if ! npm Xpublish --registry ${REGISTRY}; then
   echo "npm publish failed! Exiting..."
   exit $PUBLISH_ARTIFACTORY_FAILURE
 fi
