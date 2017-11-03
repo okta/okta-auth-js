@@ -4,6 +4,7 @@ echo "URLX: ${ARTIFACTORY_URL}"
 source $OKTA_HOME/$REPO/scripts/setup.sh
 
 echo "URLY: ${ARTIFACTORY_URL}"
+
 REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-okta"
 
 export TEST_SUITE_TYPE="build"
