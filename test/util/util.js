@@ -353,6 +353,10 @@ define(function(require) {
     spyOn(client.token.parseFromUrl, '_getLocation').and.returnValue(mockLocation);
   };
 
+  util.mockUserAgent = function (client, mockUserAgent) {
+    spyOn(client.fingerprint, '_getUserAgent').and.returnValue(mockUserAgent);
+  };
+
   util.expectErrorToEqual = function (actual, expected) {
     expect(actual.name).toEqual(expected.name);
     expect(actual.message).toEqual(expected.message);
