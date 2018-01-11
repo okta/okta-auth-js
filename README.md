@@ -25,6 +25,7 @@ Read our [contributing guidelines](./CONTRIBUTING.md) if you wish to contribute.
   * [unlockAccount](#unlockaccountoptions)
   * [verifyRecoveryToken](#verifyrecoverytokenoptions)
   * [webfinger](#webfingeroptions)
+  * [fingerprint] (#fingerprintoptions)
   * [tx.resume](#txresume)
   * [tx.exists](#txexists)
   * [transaction.status](#transactionstatus)
@@ -265,6 +266,22 @@ authClient.webfinger({
 .fail(function(err) {
   console.error(err);
 });
+```
+
+## [fingerprint(options)]
+
+Creates a browser fingerprint.
+
+- `timeout` - Time in ms until the operation times out. Defaults to 15000.
+
+```javascript
+authClient.fingerprint()
+.then(function(fingerprint) {
+  // Do something with the fingerprint
+})
+.fail(function(err) {
+  console.log(err);
+})
 ```
 
 ## tx.resume()
