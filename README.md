@@ -132,7 +132,7 @@ The goal of an authentication flow is to [set an Okta session cookie on the user
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
   - `password` - The password of the user
-  - `sendFingerprint` -  Enabling this will send a `X-Device-Fingerprint` header. Defaults to `false`
+  - `sendFingerprint` - Enabling this will send a `X-Device-Fingerprint` header. Defaults to `false`
 
 ```javascript
 authClient.signIn({

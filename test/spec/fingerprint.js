@@ -148,7 +148,7 @@ define(function(require) {
     });
 
     util.itMakesCorrectRequestResponse({
-      title: 'attaches fingerprint to signIn requests if addFingerprint is true',
+      title: 'attaches fingerprint to signIn requests if sendFingerprint is true',
       setup: {
         uri: 'http://example.okta.com',
         calls: [
@@ -173,6 +173,35 @@ define(function(require) {
           username: 'not',
           password: 'real',
           sendFingerprint: true
+        });
+      }
+    });
+
+    util.itMakesCorrectRequestResponse({
+      title: 'does not attach fingerprint to signIn requests if sendFingerprint is false',
+      setup: {
+        uri: 'http://example.okta.com',
+        calls: [
+          {
+            request: {
+              method: 'post',
+              uri: '/api/v1/authn',
+              data: { username: 'not', password: 'real' },
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version
+              }
+            },
+            response: 'success'
+          }
+        ]
+      },
+      execute: function (test) {
+        return test.oa.signIn({
+          username: 'not',
+          password: 'real',
+          sendFingerprint: false
         });
       }
     });
