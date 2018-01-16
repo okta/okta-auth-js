@@ -25,6 +25,7 @@ Read our [contributing guidelines](./CONTRIBUTING.md) if you wish to contribute.
   * [unlockAccount](#unlockaccountoptions)
   * [verifyRecoveryToken](#verifyrecoverytokenoptions)
   * [webfinger](#webfingeroptions)
+  * [fingerprint] (#fingerprintoptions)
   * [tx.resume](#txresume)
   * [tx.exists](#txexists)
   * [transaction.status](#transactionstatus)
@@ -77,9 +78,9 @@ Loading our assets directly from the CDN is a good choice if you want an easy wa
 To use the CDN, include links to the JS and CSS files in your HTML:
 
 ```html
-<!-- Latest CDN production Javascript: 1.6.0 -->
+<!-- Latest CDN production Javascript: 1.11.0 -->
 <script
-  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.6.0/okta-auth-js.min.js"
+  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.11.0/okta-auth-js.min.js"
   type="text/javascript"></script>
 ```
 
@@ -265,6 +266,22 @@ authClient.webfinger({
 .fail(function(err) {
   console.error(err);
 });
+```
+
+## [fingerprint(options)]
+
+Creates a browser fingerprint.
+
+- `timeout` - Time in ms until the operation times out. Defaults to 15000.
+
+```javascript
+authClient.fingerprint()
+.then(function(fingerprint) {
+  // Do something with the fingerprint
+})
+.fail(function(err) {
+  console.log(err);
+})
 ```
 
 ## tx.resume()
