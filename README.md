@@ -1461,7 +1461,7 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
   authorizeUrl: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize'
   ```
 
-- **userinfoUrl:** Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/userinfo".
+- **userinfoUrl:** Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo".
 
   ```javascript
   issuer: 'https://your-org.okta.com/oauth2/aus8aus76q8iphupD0h7',
