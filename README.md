@@ -25,7 +25,7 @@ Read our [contributing guidelines](./CONTRIBUTING.md) if you wish to contribute.
   * [unlockAccount](#unlockaccountoptions)
   * [verifyRecoveryToken](#verifyrecoverytokenoptions)
   * [webfinger](#webfingeroptions)
-  * [fingerprint] (#fingerprintoptions)
+  * [fingerprint](#fingerprintoptions)
   * [tx.resume](#txresume)
   * [tx.exists](#txexists)
   * [transaction.status](#transactionstatus)
@@ -132,6 +132,7 @@ The goal of an authentication flow is to [set an Okta session cookie on the user
 
   - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
   - `password` - The password of the user
+  - `sendFingerprint` - Enabling this will send a `X-Device-Fingerprint` header. Defaults to `false`
 
 ```javascript
 authClient.signIn({
