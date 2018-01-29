@@ -103,7 +103,7 @@ define(function(require) {
         err = e;
       }
       expect(err.name).toEqual('AuthSdkError');
-      expect(err.errorSummary).toEqual('URL passed to constructor contains illegal "-admin". ' +
+      expect(err.errorSummary).toEqual('URL passed to constructor contains "-admin" in subdomain. ' +
         'Required usage: new OktaAuth({url: "https://dev-12345.okta.com})');
     });
   });
