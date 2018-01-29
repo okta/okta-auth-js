@@ -95,5 +95,16 @@ define(function(require) {
         'Required usage: new OktaAuth({url: "https://sample.okta.com"})');
     });
 
+    it('throw an error if url contains "-admin" when passed to the constructor', function () {
+      var err;
+      try {
+        new OktaAuth({url: 'https://dev-12345-admin.oktapreview.com'}); // eslint-disable-line no-new
+      } catch (e) {
+        err = e;
+      }
+      expect(err.name).toEqual('AuthSdkError');
+      expect(err.errorSummary).toEqual('URL passed to constructor contains "-admin" in subdomain. ' +
+        'Required usage: new OktaAuth({url: "https://dev-12345.okta.com})');
+    });
   });
 });
