@@ -996,6 +996,20 @@ questionFactor.verify({
 });
 ```
 
+###### [OKTA push](https://developer.okta.com/docs/api/resources/authn.html#verify-push-factor)
+
+  - `autoPush` - Optional parameter to send a push notification immediately the next time `verify` is called on a push factor
+
+```javascript
+var pushFactor = transaction.factors.find(function(factor) {
+  return factor.provider === 'OKTA' && factor.factorType === 'push';
+});
+
+pushFactor.verify({
+  autoPush: true
+});
+```
+
 ###### [All other factors](http://developer.okta.com/docs/api/resources/authn.html#verify-factor)
 
 ```javascript
@@ -1044,19 +1058,25 @@ The user must verify the factor-specific challenge.
 #### [verify(options)](http://developer.okta.com/docs/api/resources/authn.html#verify-factor)
 
   - `passCode` - OTP sent to device
+  - `autoPush` - Optional parameter to send a push notification immediately the next time `verify` is called on a push factor
 
 ```javascript
 transaction.verify({
-  passCode: '615243'
+  passCode: '615243',
+  autoPush: true
 });
 ```
 
-#### [poll()](http://developer.okta.com/docs/api/resources/authn.html#activate-push-factor)
+#### [poll(options)](http://developer.okta.com/docs/api/resources/authn.html#activate-push-factor)
 
-Poll until factorResult is not WAITING. Throws AuthPollStopError if prev or cancel is called.
+  - `autoPush` - Optional parameter to send a push notification immediately the next time `verify` is called on a push factor
+
+Poll until factorResult is not WAITING. Throws AuthPollStopError if prev, resend, or cancel is called.
 
 ```javascript
-transaction.poll();
+transaction.poll({
+  autoPush: true
+});
 ```
 
 #### [prev()](http://developer.okta.com/docs/api/resources/authn.html#previous-transaction-state)
