@@ -1,4 +1,5 @@
 .DS_Store
+.idea
 dist
 target
 node_modules/*
