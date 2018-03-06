@@ -1156,7 +1156,7 @@ authClient.session.get()
 Refresh the current session by extending its lifetime. This can be used as a keep-alive operation.
 
 ```javascript
-authClient.session.get()
+authClient.session.refresh()
 .then(function(session) {
   // existing session is now refreshed
 })
