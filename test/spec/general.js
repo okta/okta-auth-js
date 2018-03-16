@@ -363,6 +363,30 @@ define(function(require) {
       });
     });
 
+    describe('modified user agent', function () {
+      util.itMakesCorrectRequestResponse({
+        title: 'should be added to requests headers',
+        setup: {
+          request: {
+            uri: '/api/v1/sessions/me',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'X-Okta-User-Agent-Extended': 'custom okta-auth-js-' + packageJson.version
+            }
+          },
+          response: 'session'
+        },
+        execute: function (test) {
+          test.oa.userAgent = 'custom ' + test.oa.userAgent;
+          return test.oa.session.get();
+        },
+        expectations: function (test, res) {
+          // We validate the headers for each request in our ajaxMock
+        }
+      });
+    });
+
     describe('custom headers', function () {
       util.itMakesCorrectRequestResponse({
         title: 'adds custom headers',
