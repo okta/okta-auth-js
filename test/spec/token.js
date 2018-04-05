@@ -313,7 +313,7 @@ define(function(require) {
           oauthUtil.removeAllFrames();
         });
       })
-      .fail(function(err) {
+      .fail(function() {
         expect('not to be hit').toBe(true);
       })
       .fin(function() {
@@ -699,7 +699,7 @@ define(function(require) {
             popup.closed = true;
           };
         }
-        spyOn(window, 'open').and.callFake(function(s) {
+        spyOn(window, 'open').and.callFake(function() {
           var popup = new FakePopup();
           popups.push(popup);
           return popup;
@@ -735,7 +735,7 @@ define(function(require) {
           expect(getOpenPopups().length).toBe(0);
         });
       })
-      .fail(function(err) {
+      .fail(function() {
         expect('not to be hit').toBe(true);
       })
       .fin(function() {
@@ -2123,7 +2123,7 @@ define(function(require) {
       function expectError(verifyArgs, message, done) {
         var client = setupSync();
         return client.token.verify.apply(null, verifyArgs)
-        .then(function(res) {
+        .then(function() {
           expect('not to be hit').toEqual(true);
         })
         .fail(function(err) {

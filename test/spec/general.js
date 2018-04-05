@@ -381,7 +381,7 @@ define(function(require) {
           test.oa.userAgent = 'custom ' + test.oa.userAgent;
           return test.oa.session.get();
         },
-        expectations: function (test, res) {
+        expectations: function () {
           // We validate the headers for each request in our ajaxMock
         }
       });
