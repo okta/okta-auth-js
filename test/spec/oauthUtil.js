@@ -1,6 +1,7 @@
 define(function(require) {
   var OktaAuth = require('OktaAuth');
   var oauthUtil = require('../../lib/oauthUtil');
+  var libUtil = require('../../lib/util');
   var oauthUtilHelpers = require('../util/oauthUtil');
   var util = require('../util/util');
   var wellKnown = require('../xhr/well-known');
@@ -493,4 +494,65 @@ define(function(require) {
       });
     });
   });
+
+  describe('loadPopup', function() {
+    it('popups window with full src url directly when none-IE', function () {
+      var mockElem = {};
+      spyOn(libUtil, 'isIE11OrLess').and.returnValue(false);
+      spyOn(window, 'open').and.returnValue(mockElem);
+
+      var winEl = oauthUtil.loadPopup('/path/to/foo', {
+        popupTitle: 'Hello Okta'
+      });
+
+      expect(winEl).toBe(mockElem);
+      expect(window.open.calls.count()).toBe(1);
+      expect(window.open).toHaveBeenCalledWith(
+        '/path/to/foo',
+        'Hello Okta',
+        'toolbar=no, scrollbars=yes, resizable=yes, top=100, left=500, width=600, height=600'
+      );
+    });
+
+    it('popups window with full src url directly and default title', function () {
+      var mockElem = {};
+      spyOn(libUtil, 'isIE11OrLess').and.returnValue(false);
+      spyOn(window, 'open').and.returnValue(mockElem);
+
+      var winEl = oauthUtil.loadPopup('/path/to/foo', {});
+
+      expect(winEl).toBe(mockElem);
+      expect(window.open.calls.count()).toBe(1);
+      expect(window.open).toHaveBeenCalledWith(
+        '/path/to/foo',
+        'External Identity Provider User Authentication',
+        'toolbar=no, scrollbars=yes, resizable=yes, top=100, left=500, width=600, height=600'
+      );
+    });
+
+    it('popups window with full src url directly when IE mode', function () {
+      var mockElem = {
+        location: {
+
+        }
+      };
+      spyOn(libUtil, 'isIE11OrLess').and.returnValue(true);
+      spyOn(window, 'open').and.returnValue(mockElem);
+
+      var winEl = oauthUtil.loadPopup('/path/to/foo', {
+        popupTitle: 'Hello Okta'
+      });
+
+      expect(winEl).toBe(mockElem);
+      expect(window.open.calls.count()).toBe(1);
+      expect(window.open).toHaveBeenCalledWith(
+        '/',
+        'Hello Okta',
+        'toolbar=no, scrollbars=yes, resizable=yes, top=100, left=500, width=600, height=600'
+      );
+      expect(winEl.location.href).toBe('/path/to/foo');
+    });
+
+  });
+
 });

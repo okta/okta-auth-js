@@ -62,5 +62,33 @@ define(function(require) {
         }));
       });
     });
+
+    describe('isIE11OrLess', function() {
+      it('returns false when document doesnot have documentMode', function() {
+        expect(document.documentMode).toBeUndefined();
+        expect(util.isIE11OrLess()).toBe(false);
+      });
+
+      it('returns true documentMode is 11', function() {
+        document.documentMode = 11;
+        expect(util.isIE11OrLess()).toBe(true);
+      });
+
+      it('returns true documentMode is 10', function() {
+        document.documentMode = 10;
+        expect(util.isIE11OrLess()).toBe(true);
+      });
+
+      it('returns true documentMode is 9', function() {
+        document.documentMode = 9;
+        expect(util.isIE11OrLess()).toBe(true);
+      });
+
+      it('returns true documentMode is 8', function() {
+        document.documentMode = 8;
+        expect(util.isIE11OrLess()).toBe(true);
+      });
+    });
+
   });
 });
