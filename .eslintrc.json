@@ -23,7 +23,7 @@
     "no-undef": 2,
     "no-use-before-define": [2, "nofunc"],
     "no-unused-expressions": [2, { "allowShortCircuit": true, "allowTernary": true }],
-    "no-unused-vars": [2, { "args": "none" }],
+    "no-unused-vars": 2,
     "max-depth": [2, 3],
     "max-len": [2, 120],
     "max-params": [2, 5],
