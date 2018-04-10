@@ -25,9 +25,6 @@ define(function(require) {
 
       test.iframe = {
         style: {},
-        contentWindow: {
-          postMessage: postMessageSpy
-        },
         parentElement: {
           removeChild: jasmine.createSpy('removeChild')
         }
@@ -55,7 +52,10 @@ define(function(require) {
             data: options.firstMessage || JSON.stringify({
               type: 'FingerprintServiceReady'
             }),
-            origin: 'http://example.okta.com'
+            origin: 'http://example.okta.com',
+            source: {
+              postMessage: postMessageSpy
+            }
           });
         });
       });
@@ -80,6 +80,7 @@ define(function(require) {
         expect(test.iframe.style.display).toEqual('none');
         expect(test.iframe.src).toEqual('http://example.okta.com/auth/services/devicefingerprint');
         expect(document.body.appendChild).toHaveBeenCalledWith(test.iframe);
+        expect(test.e.source.postMessage).toHaveBeenCalled();
         expect(test.iframe.parentElement.removeChild).toHaveBeenCalled();
         expect(fingerprint).toEqual('ABCD');
       })
