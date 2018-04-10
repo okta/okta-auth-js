@@ -1,5 +1,6 @@
 <!-- START GITHUB ONLY -->
 [![Build Status](https://travis-ci.org/okta/okta-auth-js.svg?branch=master)](https://travis-ci.org/okta/okta-auth-js)
+[![npm version](https://img.shields.io/npm/v/@okta/okta-auth-js.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-auth-js)
 <!-- END GITHUB ONLY -->
 
 Introduction
