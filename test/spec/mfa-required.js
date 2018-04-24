@@ -87,11 +87,11 @@ define(function(require) {
         }
       });
       util.itMakesCorrectRequestResponse({
-        title: 'doesn\'t pass rememberDevice as a query param if falsy',
+        title: 'passes rememberDevice as a query param if falsy',
         setup: {
           status: 'mfa-required',
           request: {
-            uri: '/api/v1/authn/factors/uftigiEmYTPOmvqTS0g3/verify',
+            uri: '/api/v1/authn/factors/uftigiEmYTPOmvqTS0g3/verify?rememberDevice=false',
             data: {
               stateToken: '004KscPNUS2LswGp26qiu4Hetqt_zcgz-PcQhPseVP',
               passCode: '123456'
@@ -306,7 +306,7 @@ define(function(require) {
         setup: {
           status: 'mfa-required',
           request: {
-            uri: '/api/v1/authn/factors/uftigiEmYTPOmvqTS0g3/verify?autoPush=true',
+            uri: '/api/v1/authn/factors/uftigiEmYTPOmvqTS0g3/verify?autoPush=true&rememberDevice=false',
             data: {
               stateToken: '004KscPNUS2LswGp26qiu4Hetqt_zcgz-PcQhPseVP',
               passCode: '123456'
@@ -321,6 +321,94 @@ define(function(require) {
             autoPush: true,
             rememberDevice: false
           });
+        }
+      });
+      util.itMakesCorrectRequestResponse({
+        title: 'passes rememberDevice as a query param if function returns true',
+        setup: {
+          status: 'mfa-required',
+          request: {
+            uri: '/api/v1/authn/factors/uftigiEmYTPOmvqTS0g3/verify?rememberDevice=true',
+            data: {
+              stateToken: '004KscPNUS2LswGp26qiu4Hetqt_zcgz-PcQhPseVP',
+              passCode: '123456'
+            }
+          },
+          response: 'success'
+        },
+        execute: function (test) {
+          var factor = _.find(test.trans.factors, {id: 'uftigiEmYTPOmvqTS0g3'});
+          return factor.verify({
+            passCode: '123456',
+            rememberDevice: function() {
+              return true;
+            }
+          });
+        }
+      });
+      util.itMakesCorrectRequestResponse({
+        title: 'passes rememberDevice as a boolean query param if function returns a truthy value',
+        setup: {
+          status: 'mfa-required',
+          request: {
+            uri: '/api/v1/authn/factors/uftigiEmYTPOmvqTS0g3/verify?rememberDevice=true',
+            data: {
+              stateToken: '004KscPNUS2LswGp26qiu4Hetqt_zcgz-PcQhPseVP',
+              passCode: '123456'
+            }
+          },
+          response: 'success'
+        },
+        execute: function (test) {
+          var factor = _.find(test.trans.factors, {id: 'uftigiEmYTPOmvqTS0g3'});
+          return factor.verify({
+            passCode: '123456',
+            rememberDevice: function() {
+              return 'test';
+            }
+          });
+        }
+      });
+      util.itMakesCorrectRequestResponse({
+        title: 'passes rememberDevice as a boolean query param if function returns a falsy value',
+        setup: {
+          status: 'mfa-required',
+          request: {
+            uri: '/api/v1/authn/factors/uftigiEmYTPOmvqTS0g3/verify?rememberDevice=false',
+            data: {
+              stateToken: '004KscPNUS2LswGp26qiu4Hetqt_zcgz-PcQhPseVP',
+              passCode: '123456'
+            }
+          },
+          response: 'success'
+        },
+        execute: function (test) {
+          var factor = _.find(test.trans.factors, {id: 'uftigiEmYTPOmvqTS0g3'});
+          return factor.verify({
+            passCode: '123456',
+            rememberDevice: function() {
+              return '';
+            }
+          });
+        }
+      });
+      util.itErrorsCorrectly({
+        title: 'throws an error when rememberDevice function throws an error',
+        setup: {
+          status: 'mfa-required'
+        },
+        execute: function (test) {
+          var factor = _.find(test.trans.factors, {id: 'uftigiEmYTPOmvqTS0g3'});
+          return factor.verify({
+            passCode: '123456',
+            rememberDevice: function () {
+              throw new Error('test');
+            }
+          });
+        },
+        expectations: function (test, err) {
+          expect(err.name).toEqual('AuthSdkError');
+          expect(err.errorSummary).toEqual('RememberDevice resulted in an error.');
         }
       });
       util.itMakesCorrectRequestResponse({
