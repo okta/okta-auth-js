@@ -79,9 +79,9 @@ Loading our assets directly from the CDN is a good choice if you want an easy wa
 To use the CDN, include links to the JS and CSS files in your HTML:
 
 ```html
-<!-- Latest CDN production Javascript: 1.11.0 -->
+<!-- Latest CDN production Javascript: 1.16.0 -->
 <script
-  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.11.0/okta-auth-js.min.js"
+  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.16.0/okta-auth-js.min.js"
   type="text/javascript"></script>
 ```
 
@@ -103,7 +103,7 @@ To install [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js
 
 ```bash
 # Run this command in your project root folder.
-[project-root-folder]$ npm install @okta/okta-auth-js --save
+npm install @okta/okta-auth-js --save
 ```
 
 After running `npm install`:
@@ -270,7 +270,7 @@ authClient.webfinger({
 });
 ```
 
-## [fingerprint(options)]
+## fingerprint(options)
 
 Creates a browser fingerprint.
 
@@ -1455,6 +1455,28 @@ Options for the [OpenId Connect](http://developer.okta.com/docs/api/resources/oi
 
 ## Can be in Client Configuration
 
+The following configuration options can be included **only** when instantiating Okta Auth JS (`new OktaAuth(config)`).
+
+- **tokenManager:** Specify the type of storage for tokens. Defaults to [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and will fall back to [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), and/or [cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) if not the previous type is not available.
+
+  ```javascript
+  tokenManager: {
+    {
+      storage: 'sessionStorage'
+    }
+  }
+  ```
+
+  The `tokenManager` will **automatically refresh tokens** for you when they expire. To disable this feature, set `autoRefresh` to false.
+
+  ```javascript
+  tokenManager: {
+    {
+      autoRefresh: false
+    }
+  }
+  ```
+
 These configuration options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`) or in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect`. If included in both, the value passed in the method takes priority.
 
 - **clientId:** Client Id pre-registered with Okta for the OIDC authentication flow.
@@ -1553,19 +1575,19 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
 1. Clone the repo.
 
    ```bash
-   [path]$ git clone git@github.com:okta/okta-auth-js.git
+   git clone git@github.com:okta/okta-auth-js.git
    ```
 
 2. Navigate to the new `okta-auth-js` folder, and install the Okta node dependencies.
 
    ```bash
-   [path/okta-auth-js]$ npm install
+   npm install
    ```
 
 3. Build the SDK. The output will be under `dist/browser/`. The standalone version is `okta-auth-js.min.js`.
 
    ```bash
-   [path/okta-auth-js]$ npm run build
+   npm run build
    ```
 
 ## Build and Test Commands
