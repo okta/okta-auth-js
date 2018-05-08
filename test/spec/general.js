@@ -8,7 +8,7 @@ define(function(require) {
 
   describe('General Methods', function () {
 
-    describe('idToken.decode', function () {
+    describe('token.decode', function () {
 
       function setup() {
         return Q.resolve(new OktaAuth({
@@ -19,7 +19,7 @@ define(function(require) {
       it('correctly decodes an idToken', function (done) {
         return setup()
         .then(function (oa) {
-          var decodedToken = oa.idToken.decode(tokens.unicodeToken);
+          var decodedToken = oa.token.decode(tokens.unicodeToken);
           expect(decodedToken).toDeepEqual(tokens.unicodeDecoded);
           done();
         });
@@ -28,7 +28,7 @@ define(function(require) {
       it('throws an error for a malformed idToken', function (done) {
         return setup()
         .then(function (oa) {
-          return oa.idToken.decode('malformedIdToken');
+          return oa.token.decode('malformedIdToken');
         })
         .then(function (res) {
           // Should never hit this
@@ -45,7 +45,7 @@ define(function(require) {
 
     // Run if browser supports crypto
     var describeType = OktaAuth.prototype.features.isTokenVerifySupported() ? describe : xdescribe;
-    describeType('idToken.verify', function () {
+    describeType('token.verify', function () {
       function setupVerifyIdTokenTest(opts) {
         util.itMakesCorrectRequestResponse({
           title: opts.title,
@@ -75,7 +75,7 @@ define(function(require) {
             // By default, we want to be in the future because the tokens
             // would be expired otherwise
             util.warpToDistantFuture();
-            return test.oa.idToken.verify(opts.idToken, opts.verifyOpts)
+            return test.oa.token.verify(opts.idToken, opts.verifyOpts)
               .then(function(res) {
                 util.returnToPresent();
                 return res;
@@ -123,7 +123,7 @@ define(function(require) {
         idToken: tokens.standardIdToken,
         execute: function(test, opts) {
           util.warpToDistantPast();
-          return test.oa.idToken.verify(opts.idToken, opts.verifyOpts)
+          return test.oa.token.verify(opts.idToken, opts.verifyOpts)
             .then(function(res) {
               util.returnToPresent();
               return res;
@@ -143,7 +143,7 @@ define(function(require) {
         },
         execute: function(test, opts) {
           util.warpToDistantPast();
-          return test.oa.idToken.verify(opts.idToken, opts.verifyOpts)
+          return test.oa.token.verify(opts.idToken, opts.verifyOpts)
             .then(function(res) {
               util.returnToPresent();
               return res;

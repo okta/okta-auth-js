@@ -153,10 +153,6 @@ define(function(require) {
 
     util.warpToUnixTime(getTime(opts.time));
 
-    if (opts.hrefMock) {
-      util.mockGetWindowLocation(authClient, opts.hrefMock);
-    }
-
     if (opts.tokenManagerAddKeys) {
       for (var key in opts.tokenManagerAddKeys) {
         if (!opts.tokenManagerAddKeys.hasOwnProperty(key)) {
@@ -169,7 +165,7 @@ define(function(require) {
 
     var promise;
     if (opts.refreshArgs) {
-      promise = authClient.idToken.refresh(opts.refreshArgs);
+      promise = authClient.token.refresh(opts.refreshArgs);
     } else if (opts.getWithoutPromptArgs) {
       if (Array.isArray(opts.getWithoutPromptArgs)) {
         promise = authClient.token.getWithoutPrompt.apply(null, opts.getWithoutPromptArgs);
@@ -195,8 +191,6 @@ define(function(require) {
         refreshDeferred.resolve();
       });
       promise = refreshDeferred.promise;
-    } else {
-      promise = authClient.idToken.authorize(opts.authorizeArgs);
     }
 
     if (opts.fastForwardToTime) {
@@ -263,7 +257,7 @@ define(function(require) {
       // All iframes should be created and destroyed in the same test
       var iframes = document.getElementsByTagName('IFRAME');
       expect(iframes.length).toBe(0);
-      
+
       // Remove any frames that exist, so we don't taint our other tests
       oauthUtil.removeAllFrames();
     }
@@ -330,7 +324,7 @@ define(function(require) {
         }
       });
   };
-  
+
   oauthUtil.setupRedirect = function(opts) {
     var client = new OktaAuth(opts.oktaAuthArgs || {
       url: 'https://auth-js-test.okta.com',
@@ -489,7 +483,7 @@ define(function(require) {
         .fin(done);
     });
   };
-  
+
   oauthUtil.expectTokenStorageToEqual = function(storage, obj) {
     var parsed = JSON.parse(storage.getItem('okta-token-storage'));
     expect(parsed).toEqual(obj);
