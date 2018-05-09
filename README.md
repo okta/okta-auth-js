@@ -1461,9 +1461,7 @@ The following configuration options can be included **only** when instantiating 
 
   ```javascript
   tokenManager: {
-    {
-      storage: 'sessionStorage'
-    }
+    storage: 'sessionStorage'
   }
   ```
 
@@ -1471,9 +1469,7 @@ The following configuration options can be included **only** when instantiating 
 
   ```javascript
   tokenManager: {
-    {
-      autoRefresh: false
-    }
+    autoRefresh: false
   }
   ```
 
