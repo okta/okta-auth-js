@@ -308,7 +308,7 @@ if (exists) {
 Check for a **transaction** to be resumed. This is synchronous and returns `true` or `false`.
 
 ```javascript
-var exists = authClient.tx.exists()
+var exists = authClient.tx.exists();
 if (exists) {
   console.log('a session exists');
 } else {
