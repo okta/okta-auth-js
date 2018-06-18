@@ -152,6 +152,9 @@ define(function(require) {
 
     util.warpToUnixTime(getTime(opts.time));
 
+    // Mock the well-known and keys request
+    oauthUtil.loadWellKnownAndKeysCache();
+
     if (opts.tokenManagerAddKeys) {
       for (var key in opts.tokenManagerAddKeys) {
         if (!opts.tokenManagerAddKeys.hasOwnProperty(key)) {
@@ -331,6 +334,9 @@ define(function(require) {
       redirectUri: 'https://example.com/redirect'
     });
 
+    // Mock the well-known and keys request
+    oauthUtil.loadWellKnownAndKeysCache();
+
     oauthUtil.mockStateAndNonce();
     var windowLocationMock = util.mockSetWindowLocation(client);
     var setCookieMock = util.mockSetCookie();
@@ -352,6 +358,9 @@ define(function(require) {
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect'
     });
+
+    // Mock the well-known and keys request
+    oauthUtil.loadWellKnownAndKeysCache();
 
     util.warpToUnixTime(getTime(opts.time));
 
@@ -420,6 +429,9 @@ define(function(require) {
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect'
     });
+
+    // Mock the well-known and keys request
+    oauthUtil.loadWellKnownAndKeysCache();
 
     var emitter = new EventEmitter();
     spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
