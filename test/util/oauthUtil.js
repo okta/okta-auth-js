@@ -144,6 +144,8 @@ define(function(require) {
     var authClient;
     if (opts.oktaAuthArgs) {
       authClient = new OktaAuth(opts.oktaAuthArgs);
+    } else if (opts.authClient) {
+      authClient = opts.authClient;
     } else {
       authClient = new OktaAuth({
         url: 'https://auth-js-test.okta.com'
@@ -193,7 +195,11 @@ define(function(require) {
     }
 
     if (opts.fastForwardToTime) {
-      util.warpByTicksToUnixTime(opts.fastForwardToTime);
+      // Since the token is "expired", we're going to attempt to
+      // retrieve it and kick-off the autoRefresh and let the event listeners
+      // above pick up the 'refreshed' and 'error' events.
+      promise = authClient.tokenManager.get(opts.autoRefreshTokenKey);
+      util.warpByTicksToUnixTime(opts.time);
     }
 
     return promise
@@ -201,7 +207,6 @@ define(function(require) {
         if (opts.autoRefresh) {
           return;
         }
-
         var expectedResp = opts.expectedResp || defaultResponse;
         validateResponse(res, expectedResp);
       })
