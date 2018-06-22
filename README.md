@@ -320,7 +320,7 @@ if (exists) {
 
 When Auth Client methods resolve, they return a **transaction** object that encapsulates [the new state in the authentication flow](http://developer.okta.com/docs/api/resources/authn.html#transaction-model). This **transaction** contains metadata about the current state, and methods that can be used to progress to the next state.
 
-![State Model Diagram](http://developer.okta.com/assets/img/auth-state-model.png "State Model Diagram")
+![State Model Diagram](https://raw.githubusercontent.com/okta/okta.github.io/source/_source/_assets/img/auth-state-model.png "State Model Diagram")
 
 Sample transactions and their methods:
 
