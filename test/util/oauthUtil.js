@@ -188,7 +188,7 @@ define(function(require) {
       authClient.tokenManager.on('refreshed', function() {
         refreshDeferred.resolve();
       });
-      authClient.tokenManager.on('expired', function() {
+      authClient.tokenManager.on('error', function() {
         refreshDeferred.resolve();
       });
       promise = refreshDeferred.promise;
