@@ -1571,12 +1571,13 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
 1. Clone the repo.
 
    ```bash
-   git clone git@github.com:okta/okta-auth-js.git
+   git clone https://github.com/okta/okta-auth-js.git
    ```
 
 2. Navigate to the new `okta-auth-js` folder, and install the Okta node dependencies.
 
    ```bash
+   cd okta-auth-js
    npm install
    ```
 
