@@ -7,7 +7,7 @@ define(function(require) {
       OktaAuth = require('OktaAuth'),
       cookies = require('../../lib/cookies');
 
-  
+
   var util = {};
 
   util.warpToDistantFuture = function () {
@@ -110,7 +110,7 @@ define(function(require) {
       xhr.getResponseHeader = function(name) {
         return xhr.headers && xhr.headers[name];
       };
-      
+
       if (xhr.status > 0 && xhr.status < 300) {
         // $.ajax send (data, textStatus, jqXHR) on success
         _.defer(function () { deferred.resolve(xhr.response, null, xhr); });
@@ -144,7 +144,7 @@ define(function(require) {
 
         // 1. Setup ajax mock
         if (options.calls) {
-          
+
           // Get all the pairs and load the mock
           var xhrGenPromises = [];
           _.each(options.calls, function(call) {
@@ -323,10 +323,6 @@ define(function(require) {
     spyOn(Q, 'delay').and.callFake(function() {
       return original.call(this, 0);
     });
-  };
-
-  util.mockGetWindowLocation = function (client, href) {
-    spyOn(client.idToken.authorize, '_getLocationHref').and.returnValue(href);
   };
 
   util.mockSetWindowLocation = function (client) {
