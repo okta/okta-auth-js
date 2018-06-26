@@ -31,6 +31,12 @@ define(function(require) {
     jasmine.clock().tick(ticks);
   };
 
+  util.calculateDaysUntilCookieExperation = function () {
+    var future = new Date('2038-01-19T03:14:07.000Z').getTime();
+    var now = new Date().getTime();
+    return Math.floor((future - now)/(86400000));
+  };
+
   function generateXHRPair(request, response, uri) {
     return Q.Promise(function(resolve) {
 
@@ -330,11 +336,15 @@ define(function(require) {
   };
 
   util.mockSetCookie = function () {
-    return spyOn(cookies.setCookie, '_setDocumentCookie');
+    return spyOn(cookies, 'setCookie');
+  };
+
+  util.mockDeleteCookie = function () {
+    return spyOn(cookies, 'deleteCookie');
   };
 
   util.mockGetCookie = function (text) {
-    spyOn(cookies.getCookie, '_getDocumentCookie').and.returnValue(text || '');
+    spyOn(cookies, 'getCookie').and.returnValue(text || '');
   };
 
   util.mockGetHistory = function (client, mockHistory) {
