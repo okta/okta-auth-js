@@ -90,5 +90,37 @@ define(function(require) {
       });
     });
 
+    describe('removeTrailingSlash', function() {
+      it('returns a url with a trailing slash without the trailing slash', function() {
+        var url = 'https://domain.com/';
+        expect(util.removeTrailingSlash(url)).toEqual('https://domain.com');
+      });
+
+      it('returns a url without a trailing slash as is', function() {
+        var url = 'https://domain.com';
+        expect(util.removeTrailingSlash(url)).toEqual('https://domain.com');
+      });
+
+      it('returns a url with a trailing slash and appended whitespace correctly', function() {
+        var url = 'https://domain.com/    ';
+        expect(util.removeTrailingSlash(url)).toEqual('https://domain.com');
+      });
+
+      it('returns a url with a trailing slash and prepended whitespace correctly', function() {
+        var url = '   https://domain.com/';
+        expect(util.removeTrailingSlash(url)).toEqual('https://domain.com');
+      });
+
+      it('returns a url without a trailing slash and appended whitespace correctly', function() {
+        var url = 'https://domain.com    ';
+        expect(util.removeTrailingSlash(url)).toEqual('https://domain.com');
+      });
+
+      it('returns a url without a trailing slash and prepended whitespace correctly', function() {
+        var url = '   https://domain.com';
+        expect(util.removeTrailingSlash(url)).toEqual('https://domain.com');
+      });
+    });
+
   });
 });
