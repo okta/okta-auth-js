@@ -31,12 +31,6 @@ define(function(require) {
     jasmine.clock().tick(ticks);
   };
 
-  util.calculateDaysUntilCookieExperation = function () {
-    var future = new Date('2038-01-19T03:14:07.000Z').getTime();
-    var now = new Date().getTime();
-    return Math.floor((future - now)/(86400000));
-  };
-
   function generateXHRPair(request, response, uri) {
     return Q.Promise(function(resolve) {
 
