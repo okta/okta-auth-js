@@ -8,7 +8,7 @@ define(function(require) {
   var Q = require('q');
 
   function setupSync() {
-    return new OktaAuth({ url: 'http://example.okta.com' });
+    return new OktaAuth({ issuer: 'http://example.okta.com' });
   }
 
   describe('token.decode', function () {
@@ -36,7 +36,7 @@ define(function(require) {
     it('returns id_token using sessionToken', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -66,10 +66,9 @@ define(function(require) {
     it('returns id_token using sessionToken with issuer', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: {
           sessionToken: 'testSessionToken'
@@ -138,10 +137,9 @@ define(function(require) {
     it('allows passing issuer through getWithoutPrompt, which takes precedence', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: [{
           sessionToken: 'testSessionToken'
@@ -176,10 +174,9 @@ define(function(require) {
     it('allows passing issuer as an id through getWithoutPrompt, which takes precedence', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: [{
           sessionToken: 'testSessionToken'
@@ -214,7 +211,7 @@ define(function(require) {
     it('returns id_token overriding all possible oauth params', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -324,7 +321,7 @@ define(function(require) {
     it('returns access_token using sessionToken', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -363,10 +360,9 @@ define(function(require) {
     it('returns access_token using sessionToken with authorization server', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: {
           responseType: 'token',
@@ -403,10 +399,9 @@ define(function(require) {
     it('returns access_token and id_token with an authorization server', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: {
           responseType: ['id_token', 'token'],
@@ -444,7 +439,7 @@ define(function(require) {
     it('returns id_token and access_token (in that order) using an array of responseTypes', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -484,7 +479,7 @@ define(function(require) {
     it('returns access_token and id_token (in that order) using an array of responseTypes', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -524,7 +519,7 @@ define(function(require) {
     it('returns a single token using an array with a single responseType', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -556,7 +551,7 @@ define(function(require) {
     oauthUtil.itpErrorsCorrectly('throws an error if multiple responseTypes are sent as a string',
       {
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -581,7 +576,7 @@ define(function(require) {
     it('returns id_token using idp', function (done) {
         return oauthUtil.setupPopup({
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect'
           },
@@ -611,10 +606,9 @@ define(function(require) {
     it('returns id_token using idp with authorization server', function (done) {
         return oauthUtil.setupPopup({
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect',
-            issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+            redirectUri: 'https://example.com/redirect'
           },
           getWithPopupArgs: {
             idp: 'testIdp'
@@ -647,10 +641,9 @@ define(function(require) {
     it('allows passing issuer through getWithPopup, which takes precedence', function (done) {
         return oauthUtil.setupPopup({
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect',
-            issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID'
+            redirectUri: 'https://example.com/redirect'
           },
           getWithPopupArgs: [{
             idp: 'testIdp'
@@ -746,7 +739,7 @@ define(function(require) {
     it('returns access_token using sessionToken', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -785,10 +778,9 @@ define(function(require) {
     it('returns access_token using idp with authorization server', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithPopupArgs: {
           responseType: 'token',
@@ -825,10 +817,9 @@ define(function(require) {
     it('returns access_token and id_token using idp with authorization server', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithPopupArgs: {
           responseType: ['token', 'id_token'],
@@ -866,7 +857,7 @@ define(function(require) {
     it('returns access_token and id_token (in that order) using idp', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -896,7 +887,7 @@ define(function(require) {
           'expires_in': 3600,
           'state': oauthUtil.mockedState
         },
-        expectedResp: [tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed] 
+        expectedResp: [tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed]
       })
       .fin(function() {
         done();
@@ -906,7 +897,7 @@ define(function(require) {
     it('returns id_token and access_token (in that order) using idp', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -980,10 +971,9 @@ define(function(require) {
     it('sets authorize url and cookie for id_token using sessionToken and authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: {
           sessionToken: 'testToken'
@@ -1018,10 +1008,9 @@ define(function(require) {
     it('allows passing issuer through getWithRedirect, which takes precedence', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: [{
           responseType: 'token',
@@ -1094,10 +1083,9 @@ define(function(require) {
     it('sets authorize url and cookie for access_token using sessionToken and authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: {
           responseType: 'token',
@@ -1167,10 +1155,9 @@ define(function(require) {
     it('sets authorize url for access_token and id_token using idp and authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: {
           responseType: ['token', 'id_token'],
@@ -1239,10 +1226,9 @@ define(function(require) {
     it('sets authorize url for authorization code requests with an authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: {
           sessionToken: 'testToken',
@@ -1784,7 +1770,7 @@ define(function(require) {
     it('returns id_token', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+         issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -1811,7 +1797,7 @@ define(function(require) {
     it('returns id_token with authorization server', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -1850,7 +1836,7 @@ define(function(require) {
     it('returns access_token', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -1891,10 +1877,9 @@ define(function(require) {
     it('returns access_token with authorization server', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/wontusethisone',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/wontusethisone'
+          redirectUri: 'https://example.com/redirect'
         },
         tokenRefreshArgs: [tokens.authServerAccessTokenParsed],
         postMessageSrc: {
@@ -1933,7 +1918,7 @@ define(function(require) {
     oauthUtil.itpErrorsCorrectly('throws an error if a non-token is passed',
       {
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
