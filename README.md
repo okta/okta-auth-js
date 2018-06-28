@@ -112,6 +112,16 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
+Alternatively, the `url` can be omitted if the `issuer` param is present, and passed as an absolute URL.
+
+```javascript
+var config = {
+  issuer: 'https://{yourOktaDomain}/oauth2/default'
+};
+
+var authClient = new OktaAuth(config);
+```
+
 ### [OpenID Connect](https://developer.okta.com/docs/api/resources/oidc) options
 
 These configuration options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`) or in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect` (unless noted otherwise). If included in both, the value passed in the method takes priority.

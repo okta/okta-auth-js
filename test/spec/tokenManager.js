@@ -7,7 +7,7 @@ define(function(require) {
   function setupSync(options) {
     options = options || {};
     return new OktaAuth({
-      url: 'https://auth-js-test.okta.com',
+      issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect',
       tokenManager: {
@@ -80,7 +80,7 @@ define(function(require) {
       it('allows refreshing an idToken', function(done) {
         return oauthUtil.setupFrame({
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect',
             tokenManager: {
@@ -126,7 +126,7 @@ define(function(require) {
       it('allows refreshing an accessToken', function(done) {
         return oauthUtil.setupFrame({
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect',
             tokenManager: {
@@ -174,7 +174,7 @@ define(function(require) {
       oauthUtil.itpErrorsCorrectly('throws an errors when a token doesn\'t exist',
         {
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect'
           },
@@ -196,7 +196,7 @@ define(function(require) {
         return oauthUtil.setupFrame({
           willFail: true,
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect'
           },
@@ -222,7 +222,7 @@ define(function(require) {
       oauthUtil.itpErrorsCorrectly('throws an error if there\'s an issue refreshing',
         {
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect'
           },
@@ -263,7 +263,7 @@ define(function(require) {
         return oauthUtil.setupFrame({
           willFail: true,
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect'
           },
@@ -308,7 +308,7 @@ define(function(require) {
           fastForwardToTime: expiresAt + 1,
           autoRefresh: true,
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect'
           },
@@ -351,7 +351,7 @@ define(function(require) {
           fastForwardToTime: tokens.standardIdTokenParsed.expiresAt + 1,
           autoRefresh: true,
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect'
           },
@@ -496,7 +496,7 @@ define(function(require) {
           });
         });
       });
-      
+
       describe('clear', function() {
         it('clears all tokens', function() {
           var client = sessionStorageSetup();
