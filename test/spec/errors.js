@@ -83,7 +83,7 @@ define(function(require) {
       expect(err.errorSummary).toEqual('No arguments passed to constructor. Required usage: new OktaAuth(args)');
     });
 
-    it('throw an error if no url and issuer are passed to the constructor', function () {
+    it('throw an error if no url and no issuer are passed to the constructor', function () {
       var err;
       try {
         new OktaAuth({}); // eslint-disable-line no-new
