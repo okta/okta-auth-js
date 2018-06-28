@@ -92,7 +92,12 @@ var OktaAuth = require('@okta/okta-auth-js/jquery');
 
 ## Usage guide
 
-For an overview of the client's features and authentication flows, check out [our developer docs](https://developer.okta.com/docs/guides/okta_auth_sdk). You can also browse the full [API reference documentation](#api-reference).
+For an overview of the client's features and authentication flows, check out [our developer docs](https://developer.okta.com/docs/guides/okta_auth_sdk). There, you will learn how to use the Auth SDK on a simple static page to:
+
+* Retrieve and store an OpenID Connect (OIDC) token
+* Get an Okta session
+
+You can also browse the full [API reference documentation](#api-reference).
 
 ## Configuration reference
 
