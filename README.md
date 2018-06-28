@@ -52,9 +52,9 @@ You'll also need:
 Loading our assets directly from the CDN is a good choice if you want an easy way to get started with okta-auth-js, and don't already have an existing build process that leverages [npm](https://www.npmjs.com/) for external dependencies.
 
 ```html
-<!-- Latest CDN production Javascript: 1.16.0 -->
+<!-- Latest CDN production Javascript: 1.17.0 -->
 <script
-  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.16.0/okta-auth-js.min.js"
+  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.17.0/okta-auth-js.min.js"
   type="text/javascript">
 </script>
 ```
