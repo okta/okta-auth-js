@@ -47,7 +47,8 @@ define(function(require) {
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
-          JSON.stringify({'test-idToken': tokens.standardIdTokenParsed})
+          JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
+          '2038-01-19T03:14:07.000Z'
         );
       });
     });
@@ -527,7 +528,8 @@ define(function(require) {
           client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
           expect(setCookieMock).toHaveBeenCalledWith(
             'okta-token-storage',
-            JSON.stringify({'test-idToken': tokens.standardIdTokenParsed})
+            JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
+            '2038-01-19T03:14:07.000Z'
           );
         });
       });
@@ -550,7 +552,8 @@ define(function(require) {
           client.tokenManager.remove('test-idToken');
           expect(setCookieMock).toHaveBeenCalledWith(
             'okta-token-storage',
-            JSON.stringify({anotherKey: tokens.standardIdTokenParsed})
+            JSON.stringify({anotherKey: tokens.standardIdTokenParsed}),
+            '2038-01-19T03:14:07.000Z'
           );
         });
       });
@@ -564,7 +567,8 @@ define(function(require) {
           client.tokenManager.clear();
           expect(setCookieMock).toHaveBeenCalledWith(
             'okta-token-storage',
-            '{}'
+            '{}',
+            '2038-01-19T03:14:07.000Z'
           );
         });
       });

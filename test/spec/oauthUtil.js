@@ -158,7 +158,8 @@ define(function(require) {
               expiresAt: 1449786329,
               response: wellKnown.response
             }
-          })
+          }),
+          '2038-01-19T03:14:07.000Z'
         );
       }
     });

@@ -1816,9 +1816,9 @@ define(function(require) {
       },
       {
         name: 'AuthSdkError',
-        message: 'Unable to parse OAuth redirect params cookie',
+        message: 'Unable to retrieve OAuth redirect params cookie',
         errorCode: 'INTERNAL',
-        errorSummary: 'Unable to parse OAuth redirect params cookie',
+        errorSummary: 'Unable to retrieve OAuth redirect params cookie',
         errorLink: 'INTERNAL',
         errorId: 'INTERNAL',
         errorCauses: []

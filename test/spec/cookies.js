@@ -12,7 +12,21 @@ describe('cookie', function () {
     it('proxies JsCookie.set',  function ()  {
       Cookies.setCookie('foo', 'bar');
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
-        expires: new Date('2038-01-19T03:14:07.000Z'),
+        path: '/'
+      });
+    });
+
+    it('proxies JsCookie.set with an expiry time',  function ()  {
+      Cookies.setCookie('foo', 'bar', '2038-01-19T03:14:07.000Z');
+      expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
+        path: '/',
+        expires: new Date('2038-01-19T03:14:07.000Z')
+      });
+    });
+
+    it('proxies JsCookie.set with an invalid expiry time',  function ()  {
+      Cookies.setCookie('foo', 'bar', 'not a valid date');
+      expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/'
       });
     });
@@ -27,8 +41,8 @@ describe('cookie', function () {
 
   describe('deleteCookie',  function ()  {
     it('proxies JsCookie.remove',  function ()  {
-      Cookies.deleteCookie('foo', { bar: 'baz' });
-      expect(JsCookie.remove).toHaveBeenCalledWith('foo', { bar: 'baz' });
+      Cookies.deleteCookie('foo');
+      expect(JsCookie.remove).toHaveBeenCalledWith('foo', { path: '/' });
     });
   });
 });
