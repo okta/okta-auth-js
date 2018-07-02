@@ -1519,6 +1519,10 @@ authClient.tokenManager.get('idToken')
   } else {
     // Token has expired
   }
+})
+.catch(function(err) {
+  // OAuth Error
+  console.error(err);
 });
 ```
 
