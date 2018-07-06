@@ -330,11 +330,15 @@ define(function(require) {
   };
 
   util.mockSetCookie = function () {
-    return spyOn(cookies.setCookie, '_setDocumentCookie');
+    return spyOn(cookies, 'setCookie');
+  };
+
+  util.mockDeleteCookie = function () {
+    return spyOn(cookies, 'deleteCookie');
   };
 
   util.mockGetCookie = function (text) {
-    spyOn(cookies.getCookie, '_getDocumentCookie').and.returnValue(text || '');
+    spyOn(cookies, 'getCookie').and.returnValue(text || '');
   };
 
   util.mockGetHistory = function (client, mockHistory) {
