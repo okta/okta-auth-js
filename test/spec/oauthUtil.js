@@ -151,12 +151,16 @@ define(function(require) {
         return oauthUtil.getWellKnown(test.oa);
       },
       expectations: function(test) {
-        expect(test.setCookieMock).toHaveBeenCalledWith('okta-cache-storage=' + JSON.stringify({
-          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
-            expiresAt: 1449786329,
-            response: wellKnown.response
-          }
-        }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+        expect(test.setCookieMock).toHaveBeenCalledWith(
+          'okta-cache-storage',
+          JSON.stringify({
+            'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+              expiresAt: 1449786329,
+              response: wellKnown.response
+            }
+          }),
+          '2038-01-19T03:14:07.000Z'
+        );
       }
     });
   });
@@ -340,7 +344,7 @@ define(function(require) {
         expect(error.errorCauses).toEqual([]);
       }
     }
-    
+
     it('defaults all urls using global defaults', function() {
       setupOAuthUrls({
         expectedResult: {

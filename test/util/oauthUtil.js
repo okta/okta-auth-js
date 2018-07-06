@@ -5,7 +5,6 @@ define(function(require) {
   var tokens = require('./tokens');
   var Q = require('q');
   var EventEmitter = require('tiny-emitter');
-  var _ = require('lodash');
   var wellKnown = require('../xhr/well-known');
   var wellKnownSharedResource = require('../xhr/well-known-shared-resource');
   var keys = require('../xhr/keys');
@@ -344,9 +343,7 @@ define(function(require) {
 
     expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
 
-    _.each(opts.expectedCookies, function(cookie) {
-      expect(setCookieMock).toHaveBeenCalledWith(cookie);
-    });
+    expect(setCookieMock.calls.allArgs()).toEqual(opts.expectedCookies);
   };
 
   oauthUtil.setupParseUrl = function(opts) {
@@ -395,7 +392,7 @@ define(function(require) {
     }
 
     util.mockGetCookie(opts.oauthCookie);
-    var setCookieMock = util.mockSetCookie();
+    var deleteCookieMock = util.mockDeleteCookie();
 
     return client.token.parseFromUrl(opts.directUrl)
       .then(function(res) {
@@ -403,8 +400,7 @@ define(function(require) {
         validateResponse(res, expectedResp);
 
         // The cookie should be deleted
-        expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params=; path=/; ' +
-          'expires=Thu, 01 Jan 1970 00:00:00 GMT;');
+        expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
 
         if (opts.directUrl) {
           expect(setLocationHashSpy).not.toHaveBeenCalled();
