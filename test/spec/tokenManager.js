@@ -5,14 +5,15 @@ define(function(require) {
   var oauthUtil = require('../util/oauthUtil');
 
   function setupSync(options) {
-    options = options || {};
+    options = options || { tokenManager: {} };
     return new OktaAuth({
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect',
+      maxClockSkew: options.maxClockSkew || 1, // set default to 1 second
       tokenManager: {
-        storage: options.type,
-        autoRefresh: options.autoRefresh || false
+        storage: options.tokenManager.type,
+        autoRefresh: options.tokenManager.autoRefresh || false
       }
     });
   }
@@ -288,7 +289,9 @@ define(function(require) {
         var expiresAt = tokens.standardIdTokenParsed.expiresAt;
         return oauthUtil.setupFrame({
           authClient: setupSync({
-            autoRefresh: true
+            tokenManager: {
+              autoRefresh: true
+            }
           }),
           autoRefresh: true,
           fastForwardToTime: true,
@@ -331,7 +334,9 @@ define(function(require) {
       it('removes a token on OAuth failure', function(done) {
         return oauthUtil.setupFrame({
           authClient: setupSync({
-            autoRefresh: true
+            tokenManager: {
+              autoRefresh: true
+            }
           }),
           autoRefresh: true,
           willFail: true,
@@ -364,7 +369,7 @@ define(function(require) {
         localStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
-        var client = setupSync({ autoRefresh: false });
+        var client = setupSync({ tokenManager: { autoRefresh: false } });
         client.tokenManager.on('expired', function(key, token) {
           expect(key).toEqual('test-idToken');
           expect(token).toEqual(tokens.standardIdTokenParsed);
@@ -379,7 +384,7 @@ define(function(require) {
 
       it('emits "expired" on new tokens even when autoRefresh is disabled', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-        var client = setupSync({ autoRefresh: false });
+        var client = setupSync({ tokenManager: { autoRefresh: false } });
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         client.tokenManager.on('expired', function(key, token) {
           expect(key).toEqual('test-idToken');
@@ -399,11 +404,31 @@ define(function(require) {
         localStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
-        var client = setupSync({ autoRefresh: false });
+        var client = setupSync({ tokenManager: { autoRefresh: false } });
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
         client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toBeUndefined();
+          done();
+        });
+      });
+
+      it('returns a token that has expired when autoRefresh is disabled and clock skew is met', function(done) {
+        util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+        localStorage.setItem('okta-token-storage', JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed
+        }));
+        var client = setupSync({
+          // Account for 10 min of clock skew
+          maxClockSkew: 600,
+          tokenManager: {
+            autoRefresh: false
+          }
+        });
+        util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+        client.tokenManager.get('test-idToken')
+        .then(function(token) {
+          expect(token).toEqual(tokens.standardIdTokenParsed);
           done();
         });
       });
@@ -413,7 +438,9 @@ define(function(require) {
 
       function localStorageSetup() {
         return setupSync({
-          type: 'localStorage'
+          tokenManager: {
+            type: 'localStorage'
+          }
         });
       }
 
@@ -487,7 +514,9 @@ define(function(require) {
 
       function sessionStorageSetup() {
         return setupSync({
-          type: 'sessionStorage'
+          tokenManager: {
+            type: 'sessionStorage'
+          }
         });
       }
 
@@ -562,7 +591,9 @@ define(function(require) {
 
       function cookieStorageSetup() {
         return setupSync({
-          type: 'cookie'
+          tokenManager: {
+            type: 'cookie'
+          }
         });
       }
 
