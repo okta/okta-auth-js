@@ -375,11 +375,6 @@ define(function(require) {
           });
         });
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
-        client.tokenManager.get('test-idToken')
-        .then(function(token) {
-          expect(token).toBeUndefined();
-          done();
-        });
       });
 
       it('emits "expired" on new tokens even when autoRefresh is disabled', function(done) {
@@ -391,6 +386,20 @@ define(function(require) {
           expect(token).toEqual(tokens.standardIdTokenParsed);
           done();
         });
+        util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+        client.tokenManager.get('test-idToken')
+        .then(function(token) {
+          expect(token).toBeUndefined();
+          done();
+        });
+      });
+
+      it('returns undefined for a token that has expired when autoRefresh is disabled', function(done) {
+        util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+        localStorage.setItem('okta-token-storage', JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed
+        }));
+        var client = setupSync({ autoRefresh: false });
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
         client.tokenManager.get('test-idToken')
         .then(function(token) {
