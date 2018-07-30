@@ -331,6 +331,102 @@ define(function(require) {
         .fin(done);
       });
 
+      it('automatically refreshes a token early when clock skew is considered', function(done) {
+        var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+        return oauthUtil.setupFrame({
+          authClient: setupSync({
+            // Account for 10 min of clock skew
+            maxClockSkew: 600,
+            tokenManager: {
+              autoRefresh: true
+            }
+          }),
+          autoRefresh: true,
+          fastForwardToTime: true,
+          autoRefreshTokenKey: 'test-idToken',
+          time: expiresAt - 10,
+          tokenManagerAddKeys: {
+            'test-idToken': {
+              idToken: 'testInitialToken',
+              claims: {'fake': 'claims'},
+              expiresAt: expiresAt,
+              scopes: ['openid', 'email']
+            }
+          },
+          postMessageSrc: {
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            queryParams: {
+              'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+              'redirect_uri': 'https://example.com/redirect',
+              'response_type': 'id_token',
+              'response_mode': 'okta_post_message',
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
+              'scope': 'openid email',
+              'prompt': 'none'
+            }
+          },
+          postMessageResp: {
+            'id_token': tokens.standardIdToken,
+            state: oauthUtil.mockedState
+          }
+        })
+        .then(function() {
+          oauthUtil.expectTokenStorageToEqual(localStorage, {
+            'test-idToken': tokens.standardIdTokenParsed
+          });
+        })
+        .fin(done);
+      });
+
+      it('does not return the token after tokens were cleared before refresh promise was resolved', function(done) {
+        var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+        return oauthUtil.setupFrame({
+          authClient: setupSync({
+            tokenManager: {
+              autoRefresh: true
+            }
+          }),
+          autoRefresh: true,
+          fastForwardToTime: true,
+          autoRefreshTokenKey: 'test-idToken',
+          time: expiresAt + 1,
+          tokenManagerAddKeys: {
+            'test-idToken': {
+              idToken: 'testInitialToken',
+              claims: {'fake': 'claims'},
+              expiresAt: expiresAt,
+              scopes: ['openid', 'email']
+            }
+          },
+          postMessageSrc: {
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            queryParams: {
+              'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+              'redirect_uri': 'https://example.com/redirect',
+              'response_type': 'id_token',
+              'response_mode': 'okta_post_message',
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
+              'scope': 'openid email',
+              'prompt': 'none'
+            }
+          },
+          postMessageResp: {
+            'id_token': tokens.standardIdToken,
+            state: oauthUtil.mockedState
+          },
+          beforeCompletion: function(authClient) {
+            // Simulate tokens being cleared while the refresh request is performed
+            authClient.tokenManager.clear();
+          }
+        })
+        .then(function() {
+          oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        })
+        .fin(done);
+      });
+
       it('removes a token on OAuth failure', function(done) {
         return oauthUtil.setupFrame({
           authClient: setupSync({
@@ -413,7 +509,8 @@ define(function(require) {
         });
       });
 
-      it('returns a token that has expired when autoRefresh is disabled and clock skew is met', function(done) {
+      it('returns undefined for an active token when autoRefresh is disabled, accounting' +
+         'for clock skew', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
         localStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
@@ -425,10 +522,10 @@ define(function(require) {
             autoRefresh: false
           }
         });
-        util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+        util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt - 5);
         client.tokenManager.get('test-idToken')
         .then(function(token) {
-          expect(token).toEqual(tokens.standardIdTokenParsed);
+          expect(token).toBeUndefined();
           done();
         });
       });

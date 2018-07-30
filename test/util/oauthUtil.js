@@ -204,6 +204,9 @@ define(function(require) {
 
     return promise
       .then(function(res) {
+        if(opts.beforeCompletion) {
+          opts.beforeCompletion(authClient);
+        }
         if (opts.autoRefresh) {
           return;
         }
