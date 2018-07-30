@@ -27,8 +27,8 @@ This library uses semantic versioning and follows Okta's [library version policy
 
 | Version   | Status                    |
 | -------   | ------------------------- |
-| `0.x`     | :x: Retired               |
 | `1.x`     | :heavy_check_mark: Stable |
+| `0.x`     | :x: Retired               |
 
 The latest release can always be found on the [releases page][github-releases].
 
@@ -1332,6 +1332,8 @@ The following configuration options can **only** be included in `token.getWithou
 | `state` | Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string. |
 | `nonce` | Specify a nonce that will be validated in an `id_token`. This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an `id_token`. Defaults to a random string. |
 
+For a list of all available parameters that can be passed to the `/authorize` endpoint, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
+
 ##### Example
 
 ```javascript
@@ -1343,7 +1345,9 @@ authClient.token.getWithoutPrompt({
     'profile'
   ],
   state: '8rFzn3MH5q',
-  nonce: '51GePTswrm'
+  nonce: '51GePTswrm',
+  // Use a custom IdP for social authentication
+  idp: '0oa62b57p7c8PaGpU0h7'
  })
 .then(function(tokenOrTokens) {
   // manage token or tokens
