@@ -89,8 +89,8 @@ define(function(require) {
       });
     });
 
-    describe('refresh', function() {
-      it('allows refreshing an idToken', function(done) {
+    describe('renew', function() {
+      it('allows renewing an idToken', function(done) {
         return oauthUtil.setupFrame({
           authClient: setupSync(),
           tokenManagerAddKeys: {
@@ -101,7 +101,7 @@ define(function(require) {
               scopes: ['openid', 'email']
             }
           },
-          tokenManagerRefreshArgs: ['test-idToken'],
+          tokenManagerRenewArgs: ['test-idToken'],
           postMessageSrc: {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
@@ -129,7 +129,7 @@ define(function(require) {
         .fin(done);
       });
 
-      it('allows refreshing an accessToken', function(done) {
+      it('allows renewing an accessToken', function(done) {
         return oauthUtil.setupFrame({
           authClient: setupSync(),
           tokenManagerAddKeys: {
@@ -140,7 +140,7 @@ define(function(require) {
               tokenType: 'Bearer'
             }
           },
-          tokenManagerRefreshArgs: ['test-accessToken'],
+          tokenManagerRenewArgs: ['test-accessToken'],
           postMessageSrc: {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
@@ -173,7 +173,7 @@ define(function(require) {
       oauthUtil.itpErrorsCorrectly('throws an errors when a token doesn\'t exist',
         {
           authClient: setupSync(),
-          tokenManagerRefreshArgs: ['test-accessToken']
+          tokenManagerRenewArgs: ['test-accessToken']
         },
         {
           name: 'AuthSdkError',
@@ -191,7 +191,7 @@ define(function(require) {
         return oauthUtil.setupFrame({
           authClient: setupSync(),
           willFail: true,
-          tokenManagerRefreshArgs: ['test-accessToken']
+          tokenManagerRenewArgs: ['test-accessToken']
         })
         .then(function() {
           expect(true).toEqual(false);
@@ -210,13 +210,13 @@ define(function(require) {
         .fin(done);
       });
 
-      oauthUtil.itpErrorsCorrectly('throws an error if there\'s an issue refreshing',
+      oauthUtil.itpErrorsCorrectly('throws an error if there\'s an issue renewing',
         {
           authClient: setupSync(),
           tokenManagerAddKeys: {
             'test-idToken': tokens.standardIdTokenParsed
           },
-          tokenManagerRefreshArgs: ['test-idToken'],
+          tokenManagerRenewArgs: ['test-idToken'],
           postMessageSrc: {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
@@ -246,7 +246,7 @@ define(function(require) {
         }
       );
 
-      it('removes token if an OAuthError is thrown while refreshing', function(done) {
+      it('removes token if an OAuthError is thrown while renewing', function(done) {
         return oauthUtil.setupFrame({
           authClient: setupSync(),
           willFail: true,
@@ -254,7 +254,7 @@ define(function(require) {
             'test-accessToken': tokens.standardAccessTokenParsed,
             'test-idToken': tokens.standardIdTokenParsed
           },
-          tokenManagerRefreshArgs: ['test-accessToken'],
+          tokenManagerRenewArgs: ['test-accessToken'],
           postMessageResp: {
             error: 'sampleErrorCode',
             'error_description': 'something went wrong',
@@ -285,7 +285,7 @@ define(function(require) {
         jasmine.clock().uninstall();
       });
 
-      it('automatically refreshes a token by default', function(done) {
+      it('automatically renewes a token by default', function(done) {
         var expiresAt = tokens.standardIdTokenParsed.expiresAt;
         return oauthUtil.setupFrame({
           authClient: setupSync({
@@ -295,7 +295,7 @@ define(function(require) {
           }),
           autoRenew: true,
           fastForwardToTime: true,
-          autoRefreshTokenKey: 'test-idToken',
+          autoRenewTokenKey: 'test-idToken',
           time: expiresAt + 1,
           tokenManagerAddKeys: {
             'test-idToken': {
@@ -331,7 +331,7 @@ define(function(require) {
         .fin(done);
       });
 
-      it('automatically refreshes a token early when clock skew is considered', function(done) {
+      it('automatically renewes a token early when clock skew is considered', function(done) {
         var expiresAt = tokens.standardIdTokenParsed.expiresAt;
         return oauthUtil.setupFrame({
           authClient: setupSync({
@@ -343,7 +343,7 @@ define(function(require) {
           }),
           autoRenew: true,
           fastForwardToTime: true,
-          autoRefreshTokenKey: 'test-idToken',
+          autoRenewTokenKey: 'test-idToken',
           time: expiresAt - 10,
           tokenManagerAddKeys: {
             'test-idToken': {
@@ -379,7 +379,7 @@ define(function(require) {
         .fin(done);
       });
 
-      it('does not return the token after tokens were cleared before refresh promise was resolved', function(done) {
+      it('does not return the token after tokens were cleared before renew promise was resolved', function(done) {
         var expiresAt = tokens.standardIdTokenParsed.expiresAt;
         return oauthUtil.setupFrame({
           authClient: setupSync({
@@ -389,7 +389,7 @@ define(function(require) {
           }),
           autoRenew: true,
           fastForwardToTime: true,
-          autoRefreshTokenKey: 'test-idToken',
+          autoRenewTokenKey: 'test-idToken',
           time: expiresAt + 1,
           tokenManagerAddKeys: {
             'test-idToken': {
@@ -417,7 +417,7 @@ define(function(require) {
             state: oauthUtil.mockedState
           },
           beforeCompletion: function(authClient) {
-            // Simulate tokens being cleared while the refresh request is performed
+            // Simulate tokens being cleared while the renew request is performed
             authClient.tokenManager.clear();
           }
         })
@@ -437,7 +437,7 @@ define(function(require) {
           autoRenew: true,
           willFail: true,
           fastForwardToTime: true,
-          autoRefreshTokenKey: 'test-idToken',
+          autoRenewTokenKey: 'test-idToken',
           time: tokens.standardIdTokenParsed.expiresAt + 1,
           tokenManagerAddKeys: {
             'test-idToken': tokens.standardIdTokenParsed

@@ -120,7 +120,7 @@ define(function(require) {
         (opts.authorizeArgs && opts.authorizeArgs.responseMode !== 'fragment') ||
         opts.getWithoutPromptArgs ||
         opts.getWithPopupArgs ||
-        opts.tokenManagerRefreshArgs ||
+        opts.tokenManagerRenewArgs ||
         opts.refreshArgs ||
         opts.tokenRefreshArgs ||
         opts.autoRenew) {
@@ -179,13 +179,13 @@ define(function(require) {
       } else {
         promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
       }
-    } else if (opts.tokenManagerRefreshArgs) {
-      promise = authClient.tokenManager.refresh.apply(this, opts.tokenManagerRefreshArgs);
+    } else if (opts.tokenManagerRenewArgs) {
+      promise = authClient.tokenManager.renew.apply(this, opts.tokenManagerRenewArgs);
     } else if (opts.tokenRefreshArgs) {
       promise = authClient.token.refresh.apply(this, opts.tokenRefreshArgs);
     } else if (opts.autoRenew) {
       var refreshDeferred = Q.defer();
-      authClient.tokenManager.on('refreshed', function() {
+      authClient.tokenManager.on('renewed', function() {
         refreshDeferred.resolve();
       });
       authClient.tokenManager.on('error', function() {
@@ -198,7 +198,7 @@ define(function(require) {
       // Since the token is "expired", we're going to attempt to
       // retrieve it and kick-off the autoRenew and let the event listeners
       // above pick up the 'refreshed' and 'error' events.
-      promise = authClient.tokenManager.get(opts.autoRefreshTokenKey);
+      promise = authClient.tokenManager.get(opts.autoRenewTokenKey);
       util.warpByTicksToUnixTime(opts.time);
     }
 
