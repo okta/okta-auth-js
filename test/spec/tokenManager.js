@@ -13,7 +13,7 @@ define(function(require) {
       maxClockSkew: options.maxClockSkew || 1, // set default to 1 second
       tokenManager: {
         storage: options.tokenManager.type,
-        autoRefresh: options.tokenManager.autoRefresh || false
+        autoRenew: options.tokenManager.autoRenew || false
       }
     });
   }
@@ -276,7 +276,7 @@ define(function(require) {
       });
     });
 
-    describe('autoRefresh', function() {
+    describe('autoRenew', function() {
       beforeEach(function() {
         jasmine.clock().install();
       });
@@ -290,10 +290,10 @@ define(function(require) {
         return oauthUtil.setupFrame({
           authClient: setupSync({
             tokenManager: {
-              autoRefresh: true
+              autoRenew: true
             }
           }),
-          autoRefresh: true,
+          autoRenew: true,
           fastForwardToTime: true,
           autoRefreshTokenKey: 'test-idToken',
           time: expiresAt + 1,
@@ -338,10 +338,10 @@ define(function(require) {
             // Account for 10 min of clock skew
             maxClockSkew: 600,
             tokenManager: {
-              autoRefresh: true
+              autoRenew: true
             }
           }),
-          autoRefresh: true,
+          autoRenew: true,
           fastForwardToTime: true,
           autoRefreshTokenKey: 'test-idToken',
           time: expiresAt - 10,
@@ -384,10 +384,10 @@ define(function(require) {
         return oauthUtil.setupFrame({
           authClient: setupSync({
             tokenManager: {
-              autoRefresh: true
+              autoRenew: true
             }
           }),
-          autoRefresh: true,
+          autoRenew: true,
           fastForwardToTime: true,
           autoRefreshTokenKey: 'test-idToken',
           time: expiresAt + 1,
@@ -431,10 +431,10 @@ define(function(require) {
         return oauthUtil.setupFrame({
           authClient: setupSync({
             tokenManager: {
-              autoRefresh: true
+              autoRenew: true
             }
           }),
-          autoRefresh: true,
+          autoRenew: true,
           willFail: true,
           fastForwardToTime: true,
           autoRefreshTokenKey: 'test-idToken',
@@ -460,12 +460,12 @@ define(function(require) {
         .fin(done);
       });
 
-      it('emits "expired" on existing tokens even when autoRefresh is disabled', function(done) {
+      it('emits "expired" on existing tokens even when autoRenew is disabled', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
         localStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
-        var client = setupSync({ tokenManager: { autoRefresh: false } });
+        var client = setupSync({ tokenManager: { autoRenew: false } });
         client.tokenManager.on('expired', function(key, token) {
           expect(key).toEqual('test-idToken');
           expect(token).toEqual(tokens.standardIdTokenParsed);
@@ -478,9 +478,9 @@ define(function(require) {
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
       });
 
-      it('emits "expired" on new tokens even when autoRefresh is disabled', function(done) {
+      it('emits "expired" on new tokens even when autoRenew is disabled', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-        var client = setupSync({ tokenManager: { autoRefresh: false } });
+        var client = setupSync({ tokenManager: { autoRenew: false } });
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         client.tokenManager.on('expired', function(key, token) {
           expect(key).toEqual('test-idToken');
@@ -495,12 +495,12 @@ define(function(require) {
         });
       });
 
-      it('returns undefined for a token that has expired when autoRefresh is disabled', function(done) {
+      it('returns undefined for a token that has expired when autoRenew is disabled', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
         localStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
-        var client = setupSync({ tokenManager: { autoRefresh: false } });
+        var client = setupSync({ tokenManager: { autoRenew: false } });
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
         client.tokenManager.get('test-idToken')
         .then(function(token) {
@@ -509,7 +509,7 @@ define(function(require) {
         });
       });
 
-      it('returns undefined for an active token when autoRefresh is disabled, accounting' +
+      it('returns undefined for an active token when autoRenew is disabled, accounting' +
          'for clock skew', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
         localStorage.setItem('okta-token-storage', JSON.stringify({
@@ -519,7 +519,7 @@ define(function(require) {
           // Account for 10 min of clock skew
           maxClockSkew: 600,
           tokenManager: {
-            autoRefresh: false
+            autoRenew: false
           }
         });
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt - 5);

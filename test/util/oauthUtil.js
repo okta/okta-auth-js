@@ -123,7 +123,7 @@ define(function(require) {
         opts.tokenManagerRefreshArgs ||
         opts.refreshArgs ||
         opts.tokenRefreshArgs ||
-        opts.autoRefresh) {
+        opts.autoRenew) {
       // Simulate the postMessage between the window and the popup or iframe
       spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
         if (eventName === 'message' && !opts.closePopup) {
@@ -183,7 +183,7 @@ define(function(require) {
       promise = authClient.tokenManager.refresh.apply(this, opts.tokenManagerRefreshArgs);
     } else if (opts.tokenRefreshArgs) {
       promise = authClient.token.refresh.apply(this, opts.tokenRefreshArgs);
-    } else if (opts.autoRefresh) {
+    } else if (opts.autoRenew) {
       var refreshDeferred = Q.defer();
       authClient.tokenManager.on('refreshed', function() {
         refreshDeferred.resolve();
@@ -196,7 +196,7 @@ define(function(require) {
 
     if (opts.fastForwardToTime) {
       // Since the token is "expired", we're going to attempt to
-      // retrieve it and kick-off the autoRefresh and let the event listeners
+      // retrieve it and kick-off the autoRenew and let the event listeners
       // above pick up the 'refreshed' and 'error' events.
       promise = authClient.tokenManager.get(opts.autoRefreshTokenKey);
       util.warpByTicksToUnixTime(opts.time);
@@ -207,7 +207,7 @@ define(function(require) {
         if(opts.beforeCompletion) {
           opts.beforeCompletion(authClient);
         }
-        if (opts.autoRefresh) {
+        if (opts.autoRenew) {
           return;
         }
         var expectedResp = opts.expectedResp || defaultResponse;
