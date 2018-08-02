@@ -144,11 +144,11 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-The `tokenManager` will **automatically refresh tokens** for you when they expire. To disable this feature, set `autoRefresh` to false.
+The `tokenManager` will **automatically renew tokens** for you when they expire. To disable this feature, set `autoRenew` to false.
 
 ```javascript
 tokenManager: {
-  autoRefresh: false
+  autoRenew: false
 }
 ```
 
@@ -248,7 +248,7 @@ var config = {
   * [token.getWithRedirect](#tokengetwithredirectoptions)
   * [token.parseFromUrl](#tokenparsefromurloptions)
   * [token.decode](#tokendecodeidtokenstring)
-  * [token.refresh](#tokenrefreshtokentorefresh)
+  * [token.renew](#tokenrenewtokentorenew)
   * [token.getUserInfo](#tokengetuserinfoaccesstokenobject)
   * [token.verify](#tokenverifyidtokenobject)
 * [tokenManager](#tokenManager)
@@ -256,7 +256,7 @@ var config = {
   * [tokenManager.get](#tokenmanagergetkey)
   * [tokenManager.remove](#tokenmanagerremovekey)
   * [tokenManager.clear](#tokenmanagerclear)
-  * [tokenManager.refresh](#tokenmanagerrefreshkey)
+  * [tokenManager.renew](#tokenmanagerrenewkey)
   * [tokenManager.on](#tokenmanagerontokenevent-callback-context)
   * [tokenManager.off](#tokenmanageroffevent-callback)
 
@@ -1432,15 +1432,15 @@ Decode a raw ID Token
 authClient.token.decode('YOUR_ID_TOKEN_JWT');
 ```
 
-#### `token.refresh(tokenToRefresh)`
+#### `token.renew(tokenToRenew)`
 
 Returns a new token if the Okta [session](https://developer.okta.com/docs/api/resources/sessions#example) is still valid.
 
-* `tokenToRefresh` - an access token or ID token previously provided by Okta. note: this is not the raw JWT
+* `tokenToRenew` - an access token or ID token previously provided by Okta. note: this is not the raw JWT
 
 ```javascript
 // this token is provided by Okta via getWithoutPrompt, getWithPopup, and parseFromUrl
-var tokenToRefresh = {
+var tokenToRenew = {
   idToken: 'YOUR_ID_TOKEN_JWT',
   claims: { /* token claims */ },
   expiresAt: 1449699930,
@@ -1450,7 +1450,7 @@ var tokenToRefresh = {
   clientId: 'NPSfOkH5eZrTy8PMDlvx'
 };
 
-authClient.token.refresh(tokenToRefresh)
+authClient.token.renew(tokenToRenew)
 .then(function(freshToken) {
   // manage freshToken
 })
@@ -1492,9 +1492,9 @@ authClient.token.verify(idTokenObject)
 
 #### `tokenManager.add(key, token)`
 
-After receiving an `access_token` or `id_token`, add it to the `tokenManager` to manage token expiration and refresh operations. When a token is added to the `tokenManager`, it is automatically refreshed when it expires.
+After receiving an `access_token` or `id_token`, add it to the `tokenManager` to manage token expiration and renew operations. When a token is added to the `tokenManager`, it is automatically renewed when it expires.
 
-* `key` - Unique key to store the token in the `tokenManager`. This is used later when you want to get, delete, or refresh the token.
+* `key` - Unique key to store the token in the `tokenManager`. This is used later when you want to get, delete, or renew the token.
 * `token` - Token object that will be added
 
 ```javascript
@@ -1544,32 +1544,32 @@ Remove all tokens from the `tokenManager`.
 authClient.tokenManager.clear();
 ```
 
-#### `tokenManager.refresh(key)`
+#### `tokenManager.renew(key)`
 
-Manually refresh a token before it expires.
+Manually renew a token before it expires.
 
-* `key` - Key for the token you want to refresh
+* `key` - Key for the token you want to renew
 
 ```javascript
-// Because the refresh() method is async, you can wait for it to complete
+// Because the renew() method is async, you can wait for it to complete
 // by using the returned Promise:
-authClient.tokenManager.refresh('idToken')
+authClient.tokenManager.renew('idToken')
 .then(function (newToken) {
   console.log(newToken);
 });
 
-// Alternatively, you can subscribe to the 'refreshed' event:
-authClient.tokenManager.on('refreshed', function (key, newToken, oldToken) {
+// Alternatively, you can subscribe to the 'renewed' event:
+authClient.tokenManager.on('renewed', function (key, newToken, oldToken) {
   console.log(newToken);
 });
-authClient.tokenManager.refresh('idToken');
+authClient.tokenManager.renew('idToken');
 ```
 
 #### `tokenManager.on(event, callback[, context])`
 
 Subscribe to an event published by the `tokenManager`.
 
-* `event` - Event to subscribe to. Possible events are `expired`, `error`, and `refreshed`.
+* `event` - Event to subscribe to. Possible events are `expired`, `error`, and `renewed`.
 * `callback` - Function to call when the event is triggered
 * `context` - Optional context to bind the callback to
 
@@ -1580,8 +1580,8 @@ authClient.tokenManager.on('expired', function (key, expiredToken) {
   console.log(expiredToken);
 });
 
-authClient.tokenManager.on('refreshed', function (key, newToken, oldToken) {
-  console.log('Token with key', key, 'has been refreshed');
+authClient.tokenManager.on('renewed', function (key, newToken, oldToken) {
+  console.log('Token with key', key, 'has been renewed');
   console.log('Old token:', oldToken);
   console.log('New token:', newToken);
 });
@@ -1604,8 +1604,8 @@ Unsubscribe from `tokenManager` events. If no callback is provided, unsubscribes
 * `callback` - Optional callback that was used to subscribe to the event
 
 ```javascript
-authClient.tokenManager.off('refreshed');
-authClient.tokenManager.off('refreshed', myRefreshedCallback);
+authClient.tokenManager.off('renewed');
+authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
 
 ## Building the SDK
