@@ -121,8 +121,8 @@ define(function(require) {
         opts.getWithoutPromptArgs ||
         opts.getWithPopupArgs ||
         opts.tokenManagerRenewArgs ||
-        opts.refreshArgs ||
-        opts.tokenRefreshArgs ||
+        opts.renewArgs ||
+        opts.tokenRenewArgs ||
         opts.autoRenew) {
       // Simulate the postMessage between the window and the popup or iframe
       spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
@@ -165,8 +165,8 @@ define(function(require) {
     }
 
     var promise;
-    if (opts.refreshArgs) {
-      promise = authClient.token.refresh(opts.refreshArgs);
+    if (opts.renewArgs) {
+      promise = authClient.token.renew(opts.renewArgs);
     } else if (opts.getWithoutPromptArgs) {
       if (Array.isArray(opts.getWithoutPromptArgs)) {
         promise = authClient.token.getWithoutPrompt.apply(null, opts.getWithoutPromptArgs);
@@ -181,23 +181,23 @@ define(function(require) {
       }
     } else if (opts.tokenManagerRenewArgs) {
       promise = authClient.tokenManager.renew.apply(this, opts.tokenManagerRenewArgs);
-    } else if (opts.tokenRefreshArgs) {
-      promise = authClient.token.refresh.apply(this, opts.tokenRefreshArgs);
+    } else if (opts.tokenRenewArgs) {
+      promise = authClient.token.renew.apply(this, opts.tokenRenewArgs);
     } else if (opts.autoRenew) {
-      var refreshDeferred = Q.defer();
+      var renewDeferred = Q.defer();
       authClient.tokenManager.on('renewed', function() {
-        refreshDeferred.resolve();
+        renewDeferred.resolve();
       });
       authClient.tokenManager.on('error', function() {
-        refreshDeferred.resolve();
+        renewDeferred.resolve();
       });
-      promise = refreshDeferred.promise;
+      promise = renewDeferred.promise;
     }
 
     if (opts.fastForwardToTime) {
       // Since the token is "expired", we're going to attempt to
       // retrieve it and kick-off the autoRenew and let the event listeners
-      // above pick up the 'refreshed' and 'error' events.
+      // above pick up the 'renewed' and 'error' events.
       promise = authClient.tokenManager.get(opts.autoRenewTokenKey);
       util.warpByTicksToUnixTime(opts.time);
     }

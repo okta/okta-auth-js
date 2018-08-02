@@ -1874,7 +1874,7 @@ define(function(require) {
     );
   });
 
-  describe('token.refresh', function () {
+  describe('token.renew', function () {
     it('returns id_token', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
@@ -1882,7 +1882,7 @@ define(function(require) {
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [tokens.standardIdTokenParsed],
+        tokenRenewArgs: [tokens.standardIdTokenParsed],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           queryParams: {
@@ -1909,7 +1909,7 @@ define(function(require) {
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [tokens.authServerIdTokenParsed],
+        tokenRenewArgs: [tokens.authServerIdTokenParsed],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           queryParams: {
@@ -1948,7 +1948,7 @@ define(function(require) {
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [tokens.standardAccessTokenParsed],
+        tokenRenewArgs: [tokens.standardAccessTokenParsed],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           queryParams: {
@@ -1989,7 +1989,7 @@ define(function(require) {
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [tokens.authServerAccessTokenParsed],
+        tokenRenewArgs: [tokens.authServerAccessTokenParsed],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           queryParams: {
@@ -2030,13 +2030,13 @@ define(function(require) {
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [{non:'token'}]
+        tokenRenewArgs: [{non:'token'}]
       },
       {
         name: 'AuthSdkError',
-        message: 'Refresh must be passed a token with an array of scopes and an accessToken or idToken',
+        message: 'Renew must be passed a token with an array of scopes and an accessToken or idToken',
         errorCode: 'INTERNAL',
-        errorSummary: 'Refresh must be passed a token with an array of scopes and an accessToken or idToken',
+        errorSummary: 'Renew must be passed a token with an array of scopes and an accessToken or idToken',
         errorLink: 'INTERNAL',
         errorId: 'INTERNAL',
         errorCauses: []
