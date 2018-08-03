@@ -1506,12 +1506,24 @@ authClient.token.getWithPopup()
 
 #### `tokenManager.get(key)`
 
-Get a token that you have previously added to the `tokenManager` with the given `key`.
+Get a token that you have previously added to the `tokenManager` with the given `key`. The token object will be returned if it has not expired.
 
 * `key` - Key for the token you want to get
 
 ```javascript
-var token = authClient.tokenManager.get('idToken');
+authClient.tokenManager.get('idToken')
+.then(function(token) {
+  if (token) {
+    // Token is valid
+    console.log(token);
+  } else {
+    // Token has expired
+  }
+})
+.catch(function(err) {
+  // OAuth Error
+  console.error(err);
+});
 ```
 
 #### `tokenManager.remove(key)`
@@ -1543,12 +1555,12 @@ Manually refresh a token before it expires.
 // by using the returned Promise:
 authClient.tokenManager.refresh('idToken')
 .then(function (newToken) {
-  // doSomethingWith(newToken);
+  console.log(newToken);
 });
 
 // Alternatively, you can subscribe to the 'refreshed' event:
 authClient.tokenManager.on('refreshed', function (key, newToken, oldToken) {
-  // doSomethingWith(newToken);
+  console.log(newToken);
 });
 authClient.tokenManager.refresh('idToken');
 ```
@@ -1562,19 +1574,25 @@ Subscribe to an event published by the `tokenManager`.
 * `context` - Optional context to bind the callback to
 
 ```javascript
+// Triggered when the token has expired
 authClient.tokenManager.on('expired', function (key, expiredToken) {
   console.log('Token with key', key, ' has expired:');
   console.log(expiredToken);
-});
-
-authClient.tokenManager.on('error', function (err) {
-  console.log('TokenManager error:', err);
 });
 
 authClient.tokenManager.on('refreshed', function (key, newToken, oldToken) {
   console.log('Token with key', key, 'has been refreshed');
   console.log('Old token:', oldToken);
   console.log('New token:', newToken);
+});
+
+// Triggered when an OAuthError is returned via the API
+authClient.tokenManager.on('error', function (err) {
+  console.log('TokenManager error:', err.message);
+  // err.name
+  // err.message
+  // err.errorCode
+  // err.errorSummary
 });
 ```
 
