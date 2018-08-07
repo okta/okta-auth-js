@@ -161,6 +161,8 @@ tokenManager: {
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
+| `ignoreSignature` | Disable ID token signature validation. Defaults to `false`.  |
+| | **Important:** For the Implicit flow, the token signature MUST be validated per [ID token Validation](http://openid.net/specs/openid-connect-core-1_0.html#ImplicitIDTValidation). This option should be used only for browser support and testing purposes. |
 
 ##### Example Client
 
@@ -251,7 +253,7 @@ var config = {
   * [token.refresh](#tokenrefreshtokentorefresh)
   * [token.getUserInfo](#tokengetuserinfoaccesstokenobject)
   * [token.verify](#tokenverifyidtokenobject)
-* [tokenManager](#tokenManager)
+* [tokenManager](#tokenmanager)
   * [tokenManager.add](#tokenmanageraddkey-token)
   * [tokenManager.get](#tokenmanagergetkey)
   * [tokenManager.remove](#tokenmanagerremovekey)
@@ -1477,9 +1479,14 @@ authClient.token.getUserInfo(accessTokenObject)
 Verify the validity of an ID token's claims and check the signature on browsers that support web cryptography.
 
 * `idTokenObject` - an ID token returned by this library. note: this is not the raw ID token JWT
+* `validationOptions` - Optional object to assert ID token claim values. Defaults to the configuration passed in during client instantiation.
 
 ```javascript
-authClient.token.verify(idTokenObject)
+var validationOptions = {
+  issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}'
+}
+
+authClient.token.verify(idTokenObject, validationOptions)
 .then(function() {
   // the idToken is valid
 })

@@ -559,35 +559,6 @@ define(function(require) {
 
   });
 
-  describe('getDefaultValidationParams', function () {
-    var contains = jasmine.objectContaining;
-    var sdk = new OktaAuth({
-      url: 'https://auth-js-test.okta.com',
-      clientId: 'foo',
-      ignoreSignature: false
-    });
-
-    it('returns params passed in during AuthJS construction', function () {
-      expect(oauthUtil.getDefaultValidationParams(sdk)).toEqual(contains({
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo',
-        ignoreSignature: false
-      }));
-    });
-
-    it('returns passed in options over the params used during AuthJS construction', function () {
-      var defaultParams = oauthUtil.getDefaultValidationParams(sdk, {
-        issuer: 'https://auth-js-test.okta.com/oauth2/default',
-        clientId: 'bar'
-      });
-      expect(defaultParams).toEqual(contains({
-        issuer: 'https://auth-js-test.okta.com/oauth2/default',
-        clientId: 'bar',
-        ignoreSignature: false
-      }));
-    });
-  });
-
   describe('validateClaims', function () {
     var sdk = new OktaAuth({
       url: 'https://auth-js-test.okta.com',
