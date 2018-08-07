@@ -949,6 +949,7 @@ define(function(require) {
               state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -995,6 +996,7 @@ define(function(require) {
               state: oauthUtil.mockedState,
               nonce: oauthUtil.mockedNonce,
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
@@ -1045,6 +1047,7 @@ define(function(require) {
               state: oauthUtil.mockedState,
               nonce: oauthUtil.mockedNonce,
               scopes: ['email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
@@ -1088,6 +1091,7 @@ define(function(require) {
               state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               scopes: ['email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -1136,6 +1140,7 @@ define(function(require) {
               state: oauthUtil.mockedState,
               nonce: oauthUtil.mockedNonce,
               scopes: ['email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
@@ -1178,6 +1183,7 @@ define(function(require) {
               state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -1225,6 +1231,7 @@ define(function(require) {
               state: oauthUtil.mockedState,
               nonce: oauthUtil.mockedNonce,
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
@@ -1267,6 +1274,7 @@ define(function(require) {
               state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -1294,8 +1302,7 @@ define(function(require) {
                              'scope=openid%20email'
       });
     });
-
-    it('sets authorize url for authorization code requests with an authorization server', function() {
+     it('sets authorize url for authorization code requests with an authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -1314,6 +1321,7 @@ define(function(require) {
               state: oauthUtil.mockedState,
               nonce: oauthUtil.mockedNonce,
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
@@ -1341,8 +1349,7 @@ define(function(require) {
                              'scope=openid%20email'
       });
     });
-
-    it('sets authorize url for authorization code (as an array) requests, ' +
+     it('sets authorize url for authorization code (as an array) requests, ' +
       'defaulting responseMode to query', function() {
       oauthUtil.setupRedirect({
         getWithRedirectArgs: {
@@ -1357,6 +1364,7 @@ define(function(require) {
               state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -1400,6 +1408,7 @@ define(function(require) {
               state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -1443,6 +1452,7 @@ define(function(require) {
               state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
               urls: {
                 issuer: 'https://auth-js-test.okta.com',
                 authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -2185,11 +2195,18 @@ define(function(require) {
   });
 
   describe('token.verify', function() {
+    var validationParams = {
+      clientId: tokens.standardIdTokenParsed.clientId,
+      issuer: tokens.standardIdTokenParsed.issuer
+    };
+
     it('verifies a valid idToken with nonce', function(done) {
       var client = setupSync();
       util.warpToUnixTime(1449699929);
       oauthUtil.loadWellKnownAndKeysCache();
-      client.token.verify(tokens.standardIdTokenParsed, oauthUtil.mockedNonce)
+      var alteredParams = _.clone(validationParams);
+      alteredParams.nonce = tokens.standardIdTokenParsed.nonce;
+      client.token.verify(tokens.standardIdTokenParsed, validationParams)
       .then(function(res) {
         expect(res).toEqual(tokens.standardIdTokenParsed);
       })
@@ -2202,7 +2219,7 @@ define(function(require) {
       var client = setupSync();
       util.warpToUnixTime(1449699929);
       oauthUtil.loadWellKnownAndKeysCache();
-      client.token.verify(tokens.standardIdTokenParsed)
+      client.token.verify(tokens.standardIdTokenParsed, validationParams)
       .then(function(res) {
         expect(res).toEqual(tokens.standardIdTokenParsed);
       })
@@ -2232,37 +2249,39 @@ define(function(require) {
       });
       it('issued in the future', function(done) {
         util.warpToDistantPast();
-        expectError([tokens.standardIdTokenParsed],
+        expectError([tokens.standardIdTokenParsed, validationParams],
           'The JWT was issued in the future')
         .fin(done);
       });
       it('expired', function(done) {
         util.warpToDistantFuture();
-        expectError([tokens.standardIdTokenParsed],
+        expectError([tokens.standardIdTokenParsed, validationParams],
           'The JWT expired and is no longer valid')
         .fin(done);
       });
       it('invalid nonce', function(done) {
-        expectError([tokens.standardIdTokenParsed, 'invalidNonce'],
+        var alteredParams = _.clone(validationParams);
+        alteredParams.nonce = 'invalidNonce';
+        expectError([tokens.standardIdToken2Parsed, alteredParams],
           'OAuth flow response nonce doesn\'t match request nonce')
         .fin(done);
       });
       it('invalid audience', function(done) {
-        var idToken = _.clone(tokens.standardIdTokenParsed);
-        idToken.clientId = 'invalidAudience';
-        expectError([idToken],
+        var alteredParams = _.clone(validationParams);
+        alteredParams.clientId = 'invalidAudience';
+        expectError([tokens.standardIdTokenParsed, alteredParams],
           'The audience [NPSfOkH5eZrTy8PMDlvx] does not match [invalidAudience]')
         .fin(done);
       });
       it('invalid issuer', function(done) {
-        var idToken = _.clone(tokens.standardIdTokenParsed);
-        idToken.issuer = 'http://invalidissuer.example.com';
-        expectError([idToken],
+        var alteredParams = _.clone(validationParams);
+        alteredParams.issuer = 'http://invalidissuer.example.com';
+        expectError([tokens.standardIdTokenParsed, alteredParams],
           'The issuer [https://auth-js-test.okta.com] does not match [http://invalidissuer.example.com]')
         .fin(done);
       });
       it('expired before issued', function(done) {
-        expectError([tokens.expiredBeforeIssuedIdTokenParsed],
+        expectError([tokens.expiredBeforeIssuedIdTokenParsed, validationParams],
           'The JWT expired before it was issued')
         .fin(done);
       });

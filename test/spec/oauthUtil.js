@@ -559,4 +559,40 @@ define(function(require) {
 
   });
 
+  describe('validateClaims', function () {
+    var sdk = new OktaAuth({
+      url: 'https://auth-js-test.okta.com',
+      clientId: 'foo',
+      ignoreSignature: false
+    });
+
+    var validationOptions = {
+      clientId: 'foo',
+      issuer: 'https://auth-js-test.okta.com'
+    };
+
+    it('throws an AuthSdkError when no jwt is provided', function () {
+      var fn = function () { oauthUtil.validateClaims(sdk, undefined, validationOptions); };
+      expect(fn).toThrowError('The jwt, iss, and aud arguments are all required');
+    });
+
+    it('throws an AuthSdkError when no clientId is provided', function () {
+      var fn = function () {
+        oauthUtil.validateClaims(sdk, undefined, {
+          issuer: 'https://auth-js-test.okta.com'
+        });
+      };
+      expect(fn).toThrowError('The jwt, iss, and aud arguments are all required');
+    });
+
+    it('throws an AuthSdkError when no issuer is provided', function () {
+      var fn = function () {
+        oauthUtil.validateClaims(sdk, undefined, {
+          clientId: 'foo'
+        });
+      };
+      expect(fn).toThrowError('The jwt, iss, and aud arguments are all required');
+    });
+  });
+
 });
