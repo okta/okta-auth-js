@@ -285,7 +285,7 @@ define(function(require) {
         jasmine.clock().uninstall();
       });
 
-      it('automatically renewes a token by default', function(done) {
+      it('automatically renews a token by default', function(done) {
         var expiresAt = tokens.standardIdTokenParsed.expiresAt;
         return oauthUtil.setupFrame({
           authClient: setupSync({
@@ -331,7 +331,7 @@ define(function(require) {
         .fin(done);
       });
 
-      it('automatically renewes a token early when clock skew is considered', function(done) {
+      it('automatically renews a token early when clock skew is considered', function(done) {
         var expiresAt = tokens.standardIdTokenParsed.expiresAt;
         return oauthUtil.setupFrame({
           authClient: setupSync({

@@ -144,7 +144,7 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-The `tokenManager` will **automatically renew tokens** for you when they expire. To disable this feature, set `autoRenew` to false.
+By default, the `tokenManager` will attempt to renew expired tokens. When an expired token is requested by the `tokenManager.get()` method, a renewal request is executed to update the token. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to  [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
 ```javascript
 tokenManager: {
@@ -257,7 +257,7 @@ var config = {
   * [tokenManager.remove](#tokenmanagerremovekey)
   * [tokenManager.clear](#tokenmanagerclear)
   * [tokenManager.renew](#tokenmanagerrenewkey)
-  * [tokenManager.on](#tokenmanagerontokenevent-callback-context)
+  * [tokenManager.on](#tokenmanageronevent-callback-context)
   * [tokenManager.off](#tokenmanageroffevent-callback)
 
 ------
