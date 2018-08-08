@@ -101,22 +101,22 @@ You can also browse the full [API reference documentation](#api-reference).
 
 ## Configuration reference
 
-The only required configuration option is `url`. All others are optional.
+If you are using this library to implement an OIDC flow, the only required configuration option is `issuer`:
 
 ```javascript
 var config = {
-  // The URL for your Okta organization
-  url: 'https://{yourOktaDomain}'
+  issuer: 'https://{yourOktaDomain}/oauth2/default'
 };
 
 var authClient = new OktaAuth(config);
 ```
 
-Alternatively, the `url` can be omitted if the `issuer` param is present, and passed as an absolute URL.
+If you’re using this library only for communicating with the [Authenticatin API][], you instead need to set the `url` for your Okta Domain:
 
 ```javascript
 var config = {
-  issuer: 'https://{yourOktaDomain}/oauth2/default'
+  // The URL for your Okta organization
+  url: 'https://{yourOktaDomain}'
 };
 
 var authClient = new OktaAuth(config);
@@ -161,8 +161,8 @@ tokenManager: {
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
-| `ignoreSignature` | Disable ID token signature validation. Defaults to `false`.  |
-| | **Important:** For the Implicit flow, the token signature MUST be validated per [ID token Validation](http://openid.net/specs/openid-connect-core-1_0.html#ImplicitIDTValidation). This option should be used only for browser support and testing purposes. |
+| `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
+| | This option should be used only for browser support and testing purposes. |
 
 ##### Example Client
 
