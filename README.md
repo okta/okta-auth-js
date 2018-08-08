@@ -41,23 +41,11 @@ If you run into problems using the SDK, you can:
 
 ## Getting started
 
-Installing the Okta JavaScript SDK in your project is simple. You can include Okta Auth JS in your project either directly from the Okta CDN, or by packaging it with your app via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
+Installing the Okta JavaScript SDK in your project is simple. You can include Okta Auth JS in your project by packaging it with your app via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
 
 You'll also need:
 
 * An Okta account, called an _organization_ (sign up for a free [developer organization](https://developer.okta.com/signup) if you need one)
-
-### Using the Okta CDN
-
-Loading our assets directly from the CDN is a good choice if you want an easy way to get started with okta-auth-js, and don't already have an existing build process that leverages [npm](https://www.npmjs.com/) for external dependencies.
-
-```html
-<!-- Latest CDN production Javascript: 1.17.0 -->
-<script
-  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.17.0/okta-auth-js.min.js"
-  type="text/javascript">
-</script>
-```
 
 ### Using the npm module
 
@@ -101,7 +89,7 @@ You can also browse the full [API reference documentation](#api-reference).
 
 ## Configuration reference
 
-If you are using this library to implement an OIDC flow, the only required configuration option is `issuer`:
+If you are using this SDK to implement an OIDC flow, the only required configuration option is `issuer`:
 
 ```javascript
 var config = {
@@ -111,7 +99,7 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-If you’re using this library only for communicating with the [Authenticatin API][], you instead need to set the `url` for your Okta Domain:
+If you’re using this library only for communicating with the [Authenticatin API](https://developer.okta.com/docs/api/resources/authn), you instead need to set the `url` for your Okta Domain:
 
 ```javascript
 var config = {
