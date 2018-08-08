@@ -2,8 +2,8 @@
 
 cd ${OKTA_HOME}/${REPO}
 
-# Use newer, faster npm
-npm install -g npm@4.0.2
+# Add yarn to the $PATH so cli commands do not fail
+export PATH="${PATH}:$(yarn global bin)"
 
 # Install required dependencies
 npm install -g @okta/ci-update-package
