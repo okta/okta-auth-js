@@ -23,12 +23,13 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
-:heavy_check_mark: The current stable major version series is: `1.x`
+:heavy_check_mark: The current stable major version series is: `2.x`
 
-| Version   | Status                    |
-| -------   | ------------------------- |
-| `1.x`     | :heavy_check_mark: Stable |
-| `0.x`     | :x: Retired               |
+| Version   | Status                           |
+| -------   | -------------------------------- |
+| `2.x`     | :heavy_check_mark: Stable        |
+| `1.x`     | :warning: Retiring on 2019-05-31 |
+| `0.x`     | :x: Retired                      |
 
 The latest release can always be found on the [releases page][github-releases].
 
@@ -99,7 +100,7 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-If you’re using this library only for communicating with the [Authenticatin API](https://developer.okta.com/docs/api/resources/authn), you instead need to set the `url` for your Okta Domain:
+If you’re using this SDK only for communicating with the [Authenticatin API](https://developer.okta.com/docs/api/resources/authn), you instead need to set the `url` for your Okta Domain:
 
 ```javascript
 var config = {
@@ -295,9 +296,9 @@ authClient.signOut()
 
 Starts a [new password recovery transaction](https://developer.okta.com/docs/api/resources/authn#forgot-password) for a given user and issues a recovery token that can be used to reset a user’s password.
 
-  - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-  - `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
-  - `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
+* `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
+* `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
+* `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
 
 ```javascript
 authClient.forgotPassword({
@@ -1637,5 +1638,5 @@ We're happy to accept contributions and PRs! Please see the [contribution guide]
 
 [devforum]: https://devforum.okta.com/
 [lang-landing]: https://developer.okta.com/code/javascript
-[github-issues]: /issues
-[github-releases]: /releases
+[github-issues]: https://github.com/okta/okta-auth-js/issues
+[github-releases]: https://github.com/okta/okta-auth-js/releases
