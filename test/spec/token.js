@@ -8,7 +8,7 @@ define(function(require) {
   var Q = require('q');
 
   function setupSync() {
-    return new OktaAuth({ url: 'http://example.okta.com' });
+    return new OktaAuth({ issuer: 'http://example.okta.com' });
   }
 
   describe('token.decode', function () {
@@ -36,7 +36,7 @@ define(function(require) {
     it('returns id_token using sessionToken', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -66,10 +66,9 @@ define(function(require) {
     it('returns id_token using sessionToken with issuer', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: {
           sessionToken: 'testSessionToken'
@@ -138,10 +137,9 @@ define(function(require) {
     it('allows passing issuer through getWithoutPrompt, which takes precedence', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: [{
           sessionToken: 'testSessionToken'
@@ -176,10 +174,9 @@ define(function(require) {
     it('allows passing issuer as an id through getWithoutPrompt, which takes precedence', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: [{
           sessionToken: 'testSessionToken'
@@ -214,7 +211,7 @@ define(function(require) {
     it('returns id_token overriding all possible oauth params', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -324,7 +321,7 @@ define(function(require) {
     it('returns access_token using sessionToken', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -363,10 +360,9 @@ define(function(require) {
     it('returns access_token using sessionToken with authorization server', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: {
           responseType: 'token',
@@ -403,10 +399,9 @@ define(function(require) {
     it('returns access_token and id_token with an authorization server', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithoutPromptArgs: {
           responseType: ['id_token', 'token'],
@@ -444,7 +439,7 @@ define(function(require) {
     it('returns id_token and access_token (in that order) using an array of responseTypes', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -484,7 +479,7 @@ define(function(require) {
     it('returns access_token and id_token (in that order) using an array of responseTypes', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -524,7 +519,7 @@ define(function(require) {
     it('returns a single token using an array with a single responseType', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -556,7 +551,7 @@ define(function(require) {
     oauthUtil.itpErrorsCorrectly('throws an error if multiple responseTypes are sent as a string',
       {
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -581,7 +576,7 @@ define(function(require) {
     it('returns id_token using idp', function (done) {
         return oauthUtil.setupPopup({
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             redirectUri: 'https://example.com/redirect'
           },
@@ -611,10 +606,9 @@ define(function(require) {
     it('returns id_token using idp with authorization server', function (done) {
         return oauthUtil.setupPopup({
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect',
-            issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+            redirectUri: 'https://example.com/redirect'
           },
           getWithPopupArgs: {
             idp: 'testIdp'
@@ -647,10 +641,9 @@ define(function(require) {
     it('allows passing issuer through getWithPopup, which takes precedence', function (done) {
         return oauthUtil.setupPopup({
           oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
+            issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect',
-            issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID'
+            redirectUri: 'https://example.com/redirect'
           },
           getWithPopupArgs: [{
             idp: 'testIdp'
@@ -746,7 +739,7 @@ define(function(require) {
     it('returns access_token using sessionToken', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -785,10 +778,9 @@ define(function(require) {
     it('returns access_token using idp with authorization server', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithPopupArgs: {
           responseType: 'token',
@@ -825,10 +817,9 @@ define(function(require) {
     it('returns access_token and id_token using idp with authorization server', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithPopupArgs: {
           responseType: ['token', 'id_token'],
@@ -866,7 +857,7 @@ define(function(require) {
     it('returns access_token and id_token (in that order) using idp', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -896,7 +887,7 @@ define(function(require) {
           'expires_in': 3600,
           'state': oauthUtil.mockedState
         },
-        expectedResp: [tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed] 
+        expectedResp: [tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed]
       })
       .fin(function() {
         done();
@@ -906,7 +897,7 @@ define(function(require) {
     it('returns id_token and access_token (in that order) using idp', function (done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
@@ -951,19 +942,29 @@ define(function(require) {
           sessionToken: 'testToken'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: 'id_token',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: 'id_token',
+              state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -980,28 +981,37 @@ define(function(require) {
     it('sets authorize url and cookie for id_token using sessionToken and authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: {
           sessionToken: 'testToken'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: 'id_token',
-            state: oauthUtil.mockedState,
-            nonce: oauthUtil.mockedNonce,
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: 'id_token',
+              state: oauthUtil.mockedState,
+              nonce: oauthUtil.mockedNonce,
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1018,10 +1028,9 @@ define(function(require) {
     it('allows passing issuer through getWithRedirect, which takes precedence', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: [{
           responseType: 'token',
@@ -1031,19 +1040,29 @@ define(function(require) {
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
         }],
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: 'token',
-            state: oauthUtil.mockedState,
-            nonce: oauthUtil.mockedNonce,
-            scopes: ['email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: 'token',
+              state: oauthUtil.mockedState,
+              nonce: oauthUtil.mockedNonce,
+              scopes: ['email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1065,19 +1084,29 @@ define(function(require) {
           sessionToken: 'testToken'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: 'token',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: 'token',
+              state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              scopes: ['email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1094,10 +1123,9 @@ define(function(require) {
     it('sets authorize url and cookie for access_token using sessionToken and authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: {
           responseType: 'token',
@@ -1105,19 +1133,29 @@ define(function(require) {
           sessionToken: 'testToken'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: 'token',
-            state: oauthUtil.mockedState,
-            nonce: oauthUtil.mockedNonce,
-            scopes: ['email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: 'token',
+              state: oauthUtil.mockedState,
+              nonce: oauthUtil.mockedNonce,
+              scopes: ['email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1138,19 +1176,29 @@ define(function(require) {
           idp: 'testIdp'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: ['token', 'id_token'],
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: ['token', 'id_token'],
+              state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1167,29 +1215,38 @@ define(function(require) {
     it('sets authorize url for access_token and id_token using idp and authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: {
           responseType: ['token', 'id_token'],
           idp: 'testIdp'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: ['token', 'id_token'],
-            state: oauthUtil.mockedState,
-            nonce: oauthUtil.mockedNonce,
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: ['token', 'id_token'],
+              state: oauthUtil.mockedState,
+              nonce: oauthUtil.mockedNonce,
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1210,19 +1267,29 @@ define(function(require) {
           responseType: 'code'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: 'code',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: 'code',
+              state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1235,33 +1302,41 @@ define(function(require) {
                              'scope=openid%20email'
       });
     });
-
-    it('sets authorize url for authorization code requests with an authorization server', function() {
+     it('sets authorize url for authorization code requests with an authorization server', function() {
       oauthUtil.setupRedirect({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
+          redirectUri: 'https://example.com/redirect'
         },
         getWithRedirectArgs: {
           sessionToken: 'testToken',
           responseType: 'code'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: 'code',
-            state: oauthUtil.mockedState,
-            nonce: oauthUtil.mockedNonce,
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: 'code',
+              state: oauthUtil.mockedState,
+              nonce: oauthUtil.mockedNonce,
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1274,8 +1349,7 @@ define(function(require) {
                              'scope=openid%20email'
       });
     });
-
-    it('sets authorize url for authorization code (as an array) requests, ' +
+     it('sets authorize url for authorization code (as an array) requests, ' +
       'defaulting responseMode to query', function() {
       oauthUtil.setupRedirect({
         getWithRedirectArgs: {
@@ -1283,19 +1357,29 @@ define(function(require) {
           responseType: ['code']
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: ['code'],
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: ['code'],
+              state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1317,19 +1401,29 @@ define(function(require) {
           responseType: ['code', 'id_token']
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: ['code', 'id_token'],
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: ['code', 'id_token'],
+              state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1351,19 +1445,29 @@ define(function(require) {
           responseMode: 'form_post'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
-            responseType: 'code',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['openid', 'email'],
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
-          }) + '; path=/;',
-          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
-          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+          [
+            'okta-oauth-redirect-params',
+            JSON.stringify({
+              responseType: 'code',
+              state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              scopes: ['openid', 'email'],
+              clientId: 'NPSfOkH5eZrTy8PMDlvx',
+              urls: {
+                issuer: 'https://auth-js-test.okta.com',
+                authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+                userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              }
+            })
+          ],
+          [
+            'okta-oauth-nonce',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ],
+          [
+            'okta-oauth-state',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          ]
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
@@ -1383,7 +1487,7 @@ define(function(require) {
       return oauthUtil.setupParseUrl({
         directUrl: 'http://example.com#id_token=' + tokens.standardIdToken +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: 'id_token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1393,7 +1497,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: {
           idToken: tokens.standardIdToken,
           claims: tokens.standardIdTokenClaims,
@@ -1411,7 +1515,7 @@ define(function(require) {
         noHistory: true,
         hashMock: '#id_token=' + tokens.standardIdToken +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: 'id_token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1421,7 +1525,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: {
           idToken: tokens.standardIdToken,
           claims: tokens.standardIdTokenClaims,
@@ -1438,7 +1542,7 @@ define(function(require) {
       return oauthUtil.setupParseUrl({
         hashMock: '#id_token=' + tokens.standardIdToken +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: 'id_token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1448,7 +1552,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: {
           idToken: tokens.standardIdToken,
           claims: tokens.standardIdTokenClaims,
@@ -1465,7 +1569,7 @@ define(function(require) {
       return oauthUtil.setupParseUrl({
         hashMock: '#id_token=' + tokens.authServerIdToken +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: 'id_token',
           state: oauthUtil.mockedState,
           nonce: oauthUtil.mockedNonce,
@@ -1475,7 +1579,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: tokens.authServerIdTokenParsed
       })
       .fin(function() {
@@ -1490,7 +1594,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: 'token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1500,7 +1604,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: tokens.standardAccessTokenParsed
       })
       .fin(function() {
@@ -1515,7 +1619,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: 'token',
           state: oauthUtil.mockedState,
           nonce: oauthUtil.mockedNonce,
@@ -1525,7 +1629,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: tokens.authServerAccessTokenParsed
       })
       .fin(function() {
@@ -1541,7 +1645,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1551,7 +1655,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: [tokens.standardIdTokenParsed, tokens.standardAccessTokenParsed]
       })
       .fin(function() {
@@ -1567,7 +1671,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: ['id_token', 'token'],
           state: oauthUtil.mockedState,
           nonce: oauthUtil.mockedNonce,
@@ -1577,7 +1681,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: [tokens.authServerIdTokenParsed, tokens.authServerTokenParsed]
       })
       .fin(function() {
@@ -1594,7 +1698,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: ['id_token', 'token', 'code'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1604,7 +1708,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: [tokens.standardIdTokenParsed, tokens.standardAccessTokenParsed, {
           authorizationCode: tokens.standardAuthorizationCode
         }]
@@ -1622,7 +1726,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: ['id_token', 'code', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1632,7 +1736,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: [tokens.standardIdTokenParsed, undefined, tokens.standardAccessTokenParsed]
       })
       .fin(function() {
@@ -1649,7 +1753,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: ['id_token', 'token', 'code'],
           state: oauthUtil.mockedState,
           nonce: oauthUtil.mockedNonce,
@@ -1659,7 +1763,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
           }
-        }) + '; path=/;',
+        }),
         expectedResp: [tokens.authServerIdTokenParsed, tokens.authServerAccessTokenParsed, {
           authorizationCode: tokens.standardAuthorizationCode
         }]
@@ -1673,7 +1777,7 @@ define(function(require) {
       {
         setupMethod: oauthUtil.setupParseUrl,
         hashMock: '',
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1683,7 +1787,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;'
+        })
       },
       {
         name: 'AuthSdkError',
@@ -1708,9 +1812,9 @@ define(function(require) {
       },
       {
         name: 'AuthSdkError',
-        message: 'Unable to parse a token from the url',
+        message: 'Unable to retrieve OAuth redirect params cookie',
         errorCode: 'INTERNAL',
-        errorSummary: 'Unable to parse a token from the url',
+        errorSummary: 'Unable to retrieve OAuth redirect params cookie',
         errorLink: 'INTERNAL',
         errorId: 'INTERNAL',
         errorCauses: []
@@ -1725,7 +1829,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: ['id_token', 'token'],
           state: 'mismatchedState',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1735,7 +1839,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;'
+        })
       },
       {
         name: 'AuthSdkError',
@@ -1756,7 +1860,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: JSON.stringify({
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'mismatchedNonce',
@@ -1766,7 +1870,7 @@ define(function(require) {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        }) + '; path=/;'
+        })
       },
       {
         name: 'AuthSdkError',
@@ -1780,15 +1884,15 @@ define(function(require) {
     );
   });
 
-  describe('token.refresh', function () {
+  describe('token.renew', function () {
     it('returns id_token', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+         issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [tokens.standardIdTokenParsed],
+        tokenRenewArgs: [tokens.standardIdTokenParsed],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           queryParams: {
@@ -1811,11 +1915,11 @@ define(function(require) {
     it('returns id_token with authorization server', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [tokens.authServerIdTokenParsed],
+        tokenRenewArgs: [tokens.authServerIdTokenParsed],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           queryParams: {
@@ -1850,11 +1954,11 @@ define(function(require) {
     it('returns access_token', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [tokens.standardAccessTokenParsed],
+        tokenRenewArgs: [tokens.standardAccessTokenParsed],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           queryParams: {
@@ -1891,12 +1995,11 @@ define(function(require) {
     it('returns access_token with authorization server', function (done) {
       return oauthUtil.setupFrame({
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com/oauth2/wontusethisone',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
-          redirectUri: 'https://example.com/redirect',
-          issuer: 'https://auth-js-test.okta.com/oauth2/wontusethisone'
+          redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [tokens.authServerAccessTokenParsed],
+        tokenRenewArgs: [tokens.authServerAccessTokenParsed],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           queryParams: {
@@ -1933,17 +2036,17 @@ define(function(require) {
     oauthUtil.itpErrorsCorrectly('throws an error if a non-token is passed',
       {
         oktaAuthArgs: {
-          url: 'https://auth-js-test.okta.com',
+          issuer: 'https://auth-js-test.okta.com',
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           redirectUri: 'https://example.com/redirect'
         },
-        tokenRefreshArgs: [{non:'token'}]
+        tokenRenewArgs: [{non:'token'}]
       },
       {
         name: 'AuthSdkError',
-        message: 'Refresh must be passed a token with an array of scopes and an accessToken or idToken',
+        message: 'Renew must be passed a token with an array of scopes and an accessToken or idToken',
         errorCode: 'INTERNAL',
-        errorSummary: 'Refresh must be passed a token with an array of scopes and an accessToken or idToken',
+        errorSummary: 'Renew must be passed a token with an array of scopes and an accessToken or idToken',
         errorLink: 'INTERNAL',
         errorId: 'INTERNAL',
         errorCauses: []
@@ -2092,11 +2195,18 @@ define(function(require) {
   });
 
   describe('token.verify', function() {
+    var validationParams = {
+      clientId: tokens.standardIdTokenParsed.clientId,
+      issuer: tokens.standardIdTokenParsed.issuer
+    };
+
     it('verifies a valid idToken with nonce', function(done) {
       var client = setupSync();
       util.warpToUnixTime(1449699929);
       oauthUtil.loadWellKnownAndKeysCache();
-      client.token.verify(tokens.standardIdTokenParsed, oauthUtil.mockedNonce)
+      var alteredParams = _.clone(validationParams);
+      alteredParams.nonce = tokens.standardIdTokenParsed.nonce;
+      client.token.verify(tokens.standardIdTokenParsed, validationParams)
       .then(function(res) {
         expect(res).toEqual(tokens.standardIdTokenParsed);
       })
@@ -2109,7 +2219,7 @@ define(function(require) {
       var client = setupSync();
       util.warpToUnixTime(1449699929);
       oauthUtil.loadWellKnownAndKeysCache();
-      client.token.verify(tokens.standardIdTokenParsed)
+      client.token.verify(tokens.standardIdTokenParsed, validationParams)
       .then(function(res) {
         expect(res).toEqual(tokens.standardIdTokenParsed);
       })
@@ -2139,37 +2249,39 @@ define(function(require) {
       });
       it('issued in the future', function(done) {
         util.warpToDistantPast();
-        expectError([tokens.standardIdTokenParsed],
+        expectError([tokens.standardIdTokenParsed, validationParams],
           'The JWT was issued in the future')
         .fin(done);
       });
       it('expired', function(done) {
         util.warpToDistantFuture();
-        expectError([tokens.standardIdTokenParsed],
+        expectError([tokens.standardIdTokenParsed, validationParams],
           'The JWT expired and is no longer valid')
         .fin(done);
       });
       it('invalid nonce', function(done) {
-        expectError([tokens.standardIdTokenParsed, 'invalidNonce'],
+        var alteredParams = _.clone(validationParams);
+        alteredParams.nonce = 'invalidNonce';
+        expectError([tokens.standardIdToken2Parsed, alteredParams],
           'OAuth flow response nonce doesn\'t match request nonce')
         .fin(done);
       });
       it('invalid audience', function(done) {
-        var idToken = _.clone(tokens.standardIdTokenParsed);
-        idToken.clientId = 'invalidAudience';
-        expectError([idToken],
+        var alteredParams = _.clone(validationParams);
+        alteredParams.clientId = 'invalidAudience';
+        expectError([tokens.standardIdTokenParsed, alteredParams],
           'The audience [NPSfOkH5eZrTy8PMDlvx] does not match [invalidAudience]')
         .fin(done);
       });
       it('invalid issuer', function(done) {
-        var idToken = _.clone(tokens.standardIdTokenParsed);
-        idToken.issuer = 'http://invalidissuer.example.com';
-        expectError([idToken],
+        var alteredParams = _.clone(validationParams);
+        alteredParams.issuer = 'http://invalidissuer.example.com';
+        expectError([tokens.standardIdTokenParsed, alteredParams],
           'The issuer [https://auth-js-test.okta.com] does not match [http://invalidissuer.example.com]')
         .fin(done);
       });
       it('expired before issued', function(done) {
-        expectError([tokens.expiredBeforeIssuedIdTokenParsed],
+        expectError([tokens.expiredBeforeIssuedIdTokenParsed, validationParams],
           'The JWT expired before it was issued')
         .fin(done);
       });

@@ -151,12 +151,16 @@ define(function(require) {
         return oauthUtil.getWellKnown(test.oa);
       },
       expectations: function(test) {
-        expect(test.setCookieMock).toHaveBeenCalledWith('okta-cache-storage=' + JSON.stringify({
-          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
-            expiresAt: 1449786329,
-            response: wellKnown.response
-          }
-        }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+        expect(test.setCookieMock).toHaveBeenCalledWith(
+          'okta-cache-storage',
+          JSON.stringify({
+            'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+              expiresAt: 1449786329,
+              response: wellKnown.response
+            }
+          }),
+          '2038-01-19T03:14:07.000Z'
+        );
       }
     });
   });
@@ -340,7 +344,7 @@ define(function(require) {
         expect(error.errorCauses).toEqual([]);
       }
     }
-    
+
     it('defaults all urls using global defaults', function() {
       setupOAuthUrls({
         expectedResult: {
@@ -553,6 +557,42 @@ define(function(require) {
       expect(winEl.location.href).toBe('/path/to/foo');
     });
 
+  });
+
+  describe('validateClaims', function () {
+    var sdk = new OktaAuth({
+      url: 'https://auth-js-test.okta.com',
+      clientId: 'foo',
+      ignoreSignature: false
+    });
+
+    var validationOptions = {
+      clientId: 'foo',
+      issuer: 'https://auth-js-test.okta.com'
+    };
+
+    it('throws an AuthSdkError when no jwt is provided', function () {
+      var fn = function () { oauthUtil.validateClaims(sdk, undefined, validationOptions); };
+      expect(fn).toThrowError('The jwt, iss, and aud arguments are all required');
+    });
+
+    it('throws an AuthSdkError when no clientId is provided', function () {
+      var fn = function () {
+        oauthUtil.validateClaims(sdk, undefined, {
+          issuer: 'https://auth-js-test.okta.com'
+        });
+      };
+      expect(fn).toThrowError('The jwt, iss, and aud arguments are all required');
+    });
+
+    it('throws an AuthSdkError when no issuer is provided', function () {
+      var fn = function () {
+        oauthUtil.validateClaims(sdk, undefined, {
+          clientId: 'foo'
+        });
+      };
+      expect(fn).toThrowError('The jwt, iss, and aud arguments are all required');
+    });
   });
 
 });

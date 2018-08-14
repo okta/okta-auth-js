@@ -5,14 +5,15 @@ define(function(require) {
   var oauthUtil = require('../util/oauthUtil');
 
   function setupSync(options) {
-    options = options || {};
+    options = options || { tokenManager: {} };
     return new OktaAuth({
-      url: 'https://auth-js-test.okta.com',
+      issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect',
+      maxClockSkew: options.maxClockSkew || 1, // set default to 1 second
       tokenManager: {
-        storage: options.type,
-        autoRefresh: options.autoRefresh || false
+        storage: options.tokenManager.type,
+        autoRenew: options.tokenManager.autoRenew || false
       }
     });
   }
@@ -32,22 +33,34 @@ define(function(require) {
         });
       });
       it('defaults to sessionStorage if localStorage isn\'t available', function() {
+        spyOn(window.console, 'log');
         oauthUtil.mockLocalStorageError();
         var client = setupSync();
+        expect(window.console.log).toHaveBeenCalledWith(
+          '[okta-auth-sdk] WARN: This browser doesn\'t ' +
+          'support localStorage. Switching to sessionStorage.'
+        );
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         oauthUtil.expectTokenStorageToEqual(sessionStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
       it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
+        spyOn(window.console, 'log');
         oauthUtil.mockLocalStorageError();
         oauthUtil.mockSessionStorageError();
         var client = setupSync();
+        expect(window.console.log).toHaveBeenCalledWith(
+          '[okta-auth-sdk] WARN: This browser doesn\'t ' +
+          'support sessionStorage. Switching to cookie-based storage.'
+        );
         var setCookieMock = util.mockSetCookie();
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-        expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage=' + JSON.stringify({
-          'test-idToken': tokens.standardIdTokenParsed
-        }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+        expect(setCookieMock).toHaveBeenCalledWith(
+          'okta-token-storage',
+          JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
+          '2038-01-19T03:14:07.000Z'
+        );
       });
     });
 
@@ -76,17 +89,10 @@ define(function(require) {
       });
     });
 
-    describe('refresh', function() {
-      it('allows refreshing an idToken', function(done) {
+    describe('renew', function() {
+      it('allows renewing an idToken', function(done) {
         return oauthUtil.setupFrame({
-          oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect',
-            tokenManager: {
-              autoRefresh: false
-            }
-          },
+          authClient: setupSync(),
           tokenManagerAddKeys: {
             'test-idToken': {
               idToken: 'testInitialToken',
@@ -95,7 +101,7 @@ define(function(require) {
               scopes: ['openid', 'email']
             }
           },
-          tokenManagerRefreshArgs: ['test-idToken'],
+          tokenManagerRenewArgs: ['test-idToken'],
           postMessageSrc: {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
@@ -123,16 +129,9 @@ define(function(require) {
         .fin(done);
       });
 
-      it('allows refreshing an accessToken', function(done) {
+      it('allows renewing an accessToken', function(done) {
         return oauthUtil.setupFrame({
-          oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect',
-            tokenManager: {
-              autoRefresh: false
-            }
-          },
+          authClient: setupSync(),
           tokenManagerAddKeys: {
             'test-accessToken': {
               accessToken: 'testInitialToken',
@@ -141,7 +140,7 @@ define(function(require) {
               tokenType: 'Bearer'
             }
           },
-          tokenManagerRefreshArgs: ['test-accessToken'],
+          tokenManagerRenewArgs: ['test-accessToken'],
           postMessageSrc: {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
@@ -173,12 +172,8 @@ define(function(require) {
 
       oauthUtil.itpErrorsCorrectly('throws an errors when a token doesn\'t exist',
         {
-          oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect'
-          },
-          tokenManagerRefreshArgs: ['test-accessToken']
+          authClient: setupSync(),
+          tokenManagerRenewArgs: ['test-accessToken']
         },
         {
           name: 'AuthSdkError',
@@ -194,13 +189,9 @@ define(function(require) {
       it('throws an errors when the token is mangled', function(done) {
         localStorage.setItem('okta-token-storage', '#unparseableJson#');
         return oauthUtil.setupFrame({
+          authClient: setupSync(),
           willFail: true,
-          oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect'
-          },
-          tokenManagerRefreshArgs: ['test-accessToken']
+          tokenManagerRenewArgs: ['test-accessToken']
         })
         .then(function() {
           expect(true).toEqual(false);
@@ -219,17 +210,13 @@ define(function(require) {
         .fin(done);
       });
 
-      oauthUtil.itpErrorsCorrectly('throws an error if there\'s an issue refreshing',
+      oauthUtil.itpErrorsCorrectly('throws an error if there\'s an issue renewing',
         {
-          oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect'
-          },
+          authClient: setupSync(),
           tokenManagerAddKeys: {
             'test-idToken': tokens.standardIdTokenParsed
           },
-          tokenManagerRefreshArgs: ['test-idToken'],
+          tokenManagerRenewArgs: ['test-idToken'],
           postMessageSrc: {
             baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             queryParams: {
@@ -259,19 +246,15 @@ define(function(require) {
         }
       );
 
-      it('removes token if an OAuthError is thrown while refreshing', function(done) {
+      it('removes token if an OAuthError is thrown while renewing', function(done) {
         return oauthUtil.setupFrame({
+          authClient: setupSync(),
           willFail: true,
-          oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect'
-          },
           tokenManagerAddKeys: {
             'test-accessToken': tokens.standardAccessTokenParsed,
             'test-idToken': tokens.standardIdTokenParsed
           },
-          tokenManagerRefreshArgs: ['test-accessToken'],
+          tokenManagerRenewArgs: ['test-accessToken'],
           postMessageResp: {
             error: 'sampleErrorCode',
             'error_description': 'something went wrong',
@@ -293,7 +276,7 @@ define(function(require) {
       });
     });
 
-    describe('autoRefresh', function() {
+    describe('autoRenew', function() {
       beforeEach(function() {
         jasmine.clock().install();
       });
@@ -302,16 +285,18 @@ define(function(require) {
         jasmine.clock().uninstall();
       });
 
-      it('automatically refreshes a token by default', function(done) {
+      it('automatically renews a token by default', function(done) {
         var expiresAt = tokens.standardIdTokenParsed.expiresAt;
         return oauthUtil.setupFrame({
-          fastForwardToTime: expiresAt + 1,
-          autoRefresh: true,
-          oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect'
-          },
+          authClient: setupSync({
+            tokenManager: {
+              autoRenew: true
+            }
+          }),
+          autoRenew: true,
+          fastForwardToTime: true,
+          autoRenewTokenKey: 'test-idToken',
+          time: expiresAt + 1,
           tokenManagerAddKeys: {
             'test-idToken': {
               idToken: 'testInitialToken',
@@ -346,15 +331,114 @@ define(function(require) {
         .fin(done);
       });
 
+      it('automatically renews a token early when clock skew is considered', function(done) {
+        var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+        return oauthUtil.setupFrame({
+          authClient: setupSync({
+            // Account for 10 min of clock skew
+            maxClockSkew: 600,
+            tokenManager: {
+              autoRenew: true
+            }
+          }),
+          autoRenew: true,
+          fastForwardToTime: true,
+          autoRenewTokenKey: 'test-idToken',
+          time: expiresAt - 10,
+          tokenManagerAddKeys: {
+            'test-idToken': {
+              idToken: 'testInitialToken',
+              claims: {'fake': 'claims'},
+              expiresAt: expiresAt,
+              scopes: ['openid', 'email']
+            }
+          },
+          postMessageSrc: {
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            queryParams: {
+              'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+              'redirect_uri': 'https://example.com/redirect',
+              'response_type': 'id_token',
+              'response_mode': 'okta_post_message',
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
+              'scope': 'openid email',
+              'prompt': 'none'
+            }
+          },
+          postMessageResp: {
+            'id_token': tokens.standardIdToken,
+            state: oauthUtil.mockedState
+          }
+        })
+        .then(function() {
+          oauthUtil.expectTokenStorageToEqual(localStorage, {
+            'test-idToken': tokens.standardIdTokenParsed
+          });
+        })
+        .fin(done);
+      });
+
+      it('does not return the token after tokens were cleared before renew promise was resolved', function(done) {
+        var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+        return oauthUtil.setupFrame({
+          authClient: setupSync({
+            tokenManager: {
+              autoRenew: true
+            }
+          }),
+          autoRenew: true,
+          fastForwardToTime: true,
+          autoRenewTokenKey: 'test-idToken',
+          time: expiresAt + 1,
+          tokenManagerAddKeys: {
+            'test-idToken': {
+              idToken: 'testInitialToken',
+              claims: {'fake': 'claims'},
+              expiresAt: expiresAt,
+              scopes: ['openid', 'email']
+            }
+          },
+          postMessageSrc: {
+            baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            queryParams: {
+              'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+              'redirect_uri': 'https://example.com/redirect',
+              'response_type': 'id_token',
+              'response_mode': 'okta_post_message',
+              'state': oauthUtil.mockedState,
+              'nonce': oauthUtil.mockedNonce,
+              'scope': 'openid email',
+              'prompt': 'none'
+            }
+          },
+          postMessageResp: {
+            'id_token': tokens.standardIdToken,
+            state: oauthUtil.mockedState
+          },
+          beforeCompletion: function(authClient) {
+            // Simulate tokens being cleared while the renew request is performed
+            authClient.tokenManager.clear();
+          }
+        })
+        .then(function() {
+          oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        })
+        .fin(done);
+      });
+
       it('removes a token on OAuth failure', function(done) {
         return oauthUtil.setupFrame({
-          fastForwardToTime: tokens.standardIdTokenParsed.expiresAt + 1,
-          autoRefresh: true,
-          oktaAuthArgs: {
-            url: 'https://auth-js-test.okta.com',
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            redirectUri: 'https://example.com/redirect'
-          },
+          authClient: setupSync({
+            tokenManager: {
+              autoRenew: true
+            }
+          }),
+          autoRenew: true,
+          willFail: true,
+          fastForwardToTime: true,
+          autoRenewTokenKey: 'test-idToken',
+          time: tokens.standardIdTokenParsed.expiresAt + 1,
           tokenManagerAddKeys: {
             'test-idToken': tokens.standardIdTokenParsed
           },
@@ -364,30 +448,39 @@ define(function(require) {
             state: oauthUtil.mockedState
           }
         })
-        .then(function() {
+        .fail(function(err) {
+          util.expectErrorToEqual(err, {
+            name: 'OAuthError',
+            message: 'something went wrong',
+            errorCode: 'sampleErrorCode',
+            errorSummary: 'something went wrong'
+          });
           oauthUtil.expectTokenStorageToEqual(localStorage, {});
         })
         .fin(done);
       });
 
-      it('emits "expired" on existing tokens even when autoRefresh is disabled', function(done) {
+      it('emits "expired" on existing tokens even when autoRenew is disabled', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
         localStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
-        var client = setupSync({ autoRefresh: false });
+        var client = setupSync({ tokenManager: { autoRenew: false } });
         client.tokenManager.on('expired', function(key, token) {
           expect(key).toEqual('test-idToken');
           expect(token).toEqual(tokens.standardIdTokenParsed);
-          expect(client.tokenManager.get('test-idToken')).toBeUndefined();
-          done();
+          client.tokenManager.get('test-idToken')
+          .then(function(token) {
+            expect(token).toBeUndefined();
+            done();
+          });
         });
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
       });
 
-      it('emits "expired" on new tokens even when autoRefresh is disabled', function(done) {
+      it('emits "expired" on new tokens even when autoRenew is disabled', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-        var client = setupSync({ autoRefresh: false });
+        var client = setupSync({ tokenManager: { autoRenew: false } });
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         client.tokenManager.on('expired', function(key, token) {
           expect(key).toEqual('test-idToken');
@@ -395,6 +488,46 @@ define(function(require) {
           done();
         });
         util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+        client.tokenManager.get('test-idToken')
+        .then(function(token) {
+          expect(token).toBeUndefined();
+          done();
+        });
+      });
+
+      it('returns undefined for a token that has expired when autoRenew is disabled', function(done) {
+        util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+        localStorage.setItem('okta-token-storage', JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed
+        }));
+        var client = setupSync({ tokenManager: { autoRenew: false } });
+        util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+        client.tokenManager.get('test-idToken')
+        .then(function(token) {
+          expect(token).toBeUndefined();
+          done();
+        });
+      });
+
+      it('returns undefined for an active token when autoRenew is disabled, accounting' +
+         'for clock skew', function(done) {
+        util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+        localStorage.setItem('okta-token-storage', JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed
+        }));
+        var client = setupSync({
+          // Account for 10 min of clock skew
+          maxClockSkew: 600,
+          tokenManager: {
+            autoRenew: false
+          }
+        });
+        util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt - 5);
+        client.tokenManager.get('test-idToken')
+        .then(function(token) {
+          expect(token).toBeUndefined();
+          done();
+        });
       });
     });
 
@@ -402,7 +535,9 @@ define(function(require) {
 
       function localStorageSetup() {
         return setupSync({
-          type: 'localStorage'
+          tokenManager: {
+            type: 'localStorage'
+          }
         });
       }
 
@@ -417,13 +552,31 @@ define(function(require) {
       });
 
       describe('get', function() {
-        it('gets a token', function() {
+        it('returns a token', function(done) {
           var client = localStorageSetup();
           localStorage.setItem('okta-token-storage', JSON.stringify({
             'test-idToken': tokens.standardIdTokenParsed
           }));
-          var result = client.tokenManager.get('test-idToken');
-          expect(result).toEqual(tokens.standardIdTokenParsed);
+          util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+          client.tokenManager.get('test-idToken')
+          .then(function(token) {
+            expect(token).toEqual(tokens.standardIdTokenParsed);
+            done();
+          });
+          // Warp back to current time
+          util.warpToUnixTime(Date.now());
+        });
+
+        it('returns undefined for an expired token', function(done) {
+          var client = localStorageSetup();
+          localStorage.setItem('okta-token-storage', JSON.stringify({
+            'test-idToken': tokens.standardIdTokenParsed
+          }));
+          client.tokenManager.get('test-idToken')
+          .then(function(token) {
+            expect(token).toBeUndefined();
+            done();
+          });
         });
       });
 
@@ -458,7 +611,9 @@ define(function(require) {
 
       function sessionStorageSetup() {
         return setupSync({
-          type: 'sessionStorage'
+          tokenManager: {
+            type: 'sessionStorage'
+          }
         });
       }
 
@@ -473,13 +628,31 @@ define(function(require) {
       });
 
       describe('get', function() {
-        it('gets a token', function() {
+        it('returns a token', function(done) {
           var client = sessionStorageSetup();
           sessionStorage.setItem('okta-token-storage', JSON.stringify({
             'test-idToken': tokens.standardIdTokenParsed
           }));
-          var result = client.tokenManager.get('test-idToken');
-          expect(result).toEqual(tokens.standardIdTokenParsed);
+          util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+          client.tokenManager.get('test-idToken')
+          .then(function(token) {
+            expect(token).toEqual(tokens.standardIdTokenParsed);
+            done();
+          });
+          // Warp back to current time
+          util.warpToUnixTime(Date.now());
+        });
+
+        it('returns undefined for an expired token', function(done) {
+          var client = sessionStorageSetup();
+          sessionStorage.setItem('okta-token-storage', JSON.stringify({
+            'test-idToken': tokens.standardIdTokenParsed
+          }));
+          client.tokenManager.get('test-idToken')
+          .then(function(token) {
+            expect(token).toBeUndefined();
+            done();
+          });
         });
       });
 
@@ -496,7 +669,7 @@ define(function(require) {
           });
         });
       });
-      
+
       describe('clear', function() {
         it('clears all tokens', function() {
           var client = sessionStorageSetup();
@@ -515,59 +688,77 @@ define(function(require) {
 
       function cookieStorageSetup() {
         return setupSync({
-          type: 'cookie'
+          tokenManager: {
+            type: 'cookie'
+          }
         });
       }
 
       describe('add', function() {
         it('adds a token', function() {
           var client = cookieStorageSetup();
-          util.mockGetCookie('');
           var setCookieMock = util.mockSetCookie();
           client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-          expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage=' + JSON.stringify({
-            'test-idToken': tokens.standardIdTokenParsed
-          }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+          expect(setCookieMock).toHaveBeenCalledWith(
+            'okta-token-storage',
+            JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
+            '2038-01-19T03:14:07.000Z'
+          );
         });
       });
 
       describe('get', function() {
-        it('gets a token', function() {
+        it('returns a token', function(done) {
           var client = cookieStorageSetup();
-          util.mockGetCookie('okta-token-storage=' + JSON.stringify({
-            'test-idToken': tokens.standardIdTokenParsed
-          }) + ';');
-          var result = client.tokenManager.get('test-idToken');
-          expect(result).toEqual(tokens.standardIdTokenParsed);
+          client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+          util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+          client.tokenManager.get('test-idToken')
+          .then(function(token) {
+            expect(token).toEqual(tokens.standardIdTokenParsed);
+            done();
+          });
+          // Warp back to current time
+          util.warpToUnixTime(Date.now());
+        });
+
+        it('returns undefined for an expired token', function(done) {
+          var client = cookieStorageSetup();
+          client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+          client.tokenManager.get('test-idToken')
+          .then(function(token) {
+            expect(token).toBeUndefined();
+            done();
+          });
         });
       });
 
       describe('remove', function() {
         it('removes a token', function() {
           var client = cookieStorageSetup();
-          util.mockGetCookie('okta-token-storage=' + JSON.stringify({
-            'test-idToken': tokens.standardIdTokenParsed,
-            anotherKey: tokens.standardIdTokenParsed
-          }) + ';');
+          client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+          client.tokenManager.add('anotherKey', tokens.standardIdTokenParsed);
           var setCookieMock = util.mockSetCookie();
           client.tokenManager.remove('test-idToken');
-          expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage=' + JSON.stringify({
-            anotherKey: tokens.standardIdTokenParsed
-          }) + '; path=/; expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+          expect(setCookieMock).toHaveBeenCalledWith(
+            'okta-token-storage',
+            JSON.stringify({anotherKey: tokens.standardIdTokenParsed}),
+            '2038-01-19T03:14:07.000Z'
+          );
         });
       });
 
       describe('clear', function() {
         it('clears all tokens', function() {
           var client = cookieStorageSetup();
-          util.mockGetCookie('okta-token-storage=' + JSON.stringify({
-            'test-idToken': tokens.standardIdTokenParsed,
-            anotherKey: tokens.standardIdTokenParsed
-          }) + ';');
+          client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+          client.tokenManager.add('anotherKey', tokens.standardIdTokenParsed);
           var setCookieMock = util.mockSetCookie();
           client.tokenManager.clear();
-          expect(setCookieMock).toHaveBeenCalledWith('okta-token-storage={}; path=/; ' +
-            'expires=Tue, 19 Jan 2038 03:14:07 GMT;');
+          expect(setCookieMock).toHaveBeenCalledWith(
+            'okta-token-storage',
+            '{}',
+            '2038-01-19T03:14:07.000Z'
+          );
         });
       });
     });

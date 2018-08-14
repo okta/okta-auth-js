@@ -5,7 +5,6 @@ define(function(require) {
   var tokens = require('./tokens');
   var Q = require('q');
   var EventEmitter = require('tiny-emitter');
-  var _ = require('lodash');
   var wellKnown = require('../xhr/well-known');
   var wellKnownSharedResource = require('../xhr/well-known-shared-resource');
   var keys = require('../xhr/keys');
@@ -121,10 +120,10 @@ define(function(require) {
         (opts.authorizeArgs && opts.authorizeArgs.responseMode !== 'fragment') ||
         opts.getWithoutPromptArgs ||
         opts.getWithPopupArgs ||
-        opts.tokenManagerRefreshArgs ||
-        opts.refreshArgs ||
-        opts.tokenRefreshArgs ||
-        opts.autoRefresh) {
+        opts.tokenManagerRenewArgs ||
+        opts.renewArgs ||
+        opts.tokenRenewArgs ||
+        opts.autoRenew) {
       // Simulate the postMessage between the window and the popup or iframe
       spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
         if (eventName === 'message' && !opts.closePopup) {
@@ -145,6 +144,8 @@ define(function(require) {
     var authClient;
     if (opts.oktaAuthArgs) {
       authClient = new OktaAuth(opts.oktaAuthArgs);
+    } else if (opts.authClient) {
+      authClient = opts.authClient;
     } else {
       authClient = new OktaAuth({
         url: 'https://auth-js-test.okta.com'
@@ -153,9 +154,8 @@ define(function(require) {
 
     util.warpToUnixTime(getTime(opts.time));
 
-    if (opts.hrefMock) {
-      util.mockGetWindowLocation(authClient, opts.hrefMock);
-    }
+    // Mock the well-known and keys request
+    oauthUtil.loadWellKnownAndKeysCache();
 
     if (opts.tokenManagerAddKeys) {
       for (var key in opts.tokenManagerAddKeys) {
@@ -168,8 +168,8 @@ define(function(require) {
     }
 
     var promise;
-    if (opts.refreshArgs) {
-      promise = authClient.idToken.refresh(opts.refreshArgs);
+    if (opts.renewArgs) {
+      promise = authClient.token.renew(opts.renewArgs);
     } else if (opts.getWithoutPromptArgs) {
       if (Array.isArray(opts.getWithoutPromptArgs)) {
         promise = authClient.token.getWithoutPrompt.apply(null, opts.getWithoutPromptArgs);
@@ -182,33 +182,37 @@ define(function(require) {
       } else {
         promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
       }
-    } else if (opts.tokenManagerRefreshArgs) {
-      promise = authClient.tokenManager.refresh.apply(this, opts.tokenManagerRefreshArgs);
-    } else if (opts.tokenRefreshArgs) {
-      promise = authClient.token.refresh.apply(this, opts.tokenRefreshArgs);
-    } else if (opts.autoRefresh) {
-      var refreshDeferred = Q.defer();
-      authClient.tokenManager.on('refreshed', function() {
-        refreshDeferred.resolve();
+    } else if (opts.tokenManagerRenewArgs) {
+      promise = authClient.tokenManager.renew.apply(this, opts.tokenManagerRenewArgs);
+    } else if (opts.tokenRenewArgs) {
+      promise = authClient.token.renew.apply(this, opts.tokenRenewArgs);
+    } else if (opts.autoRenew) {
+      var renewDeferred = Q.defer();
+      authClient.tokenManager.on('renewed', function() {
+        renewDeferred.resolve();
       });
-      authClient.tokenManager.on('expired', function() {
-        refreshDeferred.resolve();
+      authClient.tokenManager.on('error', function() {
+        renewDeferred.resolve();
       });
-      promise = refreshDeferred.promise;
-    } else {
-      promise = authClient.idToken.authorize(opts.authorizeArgs);
+      promise = renewDeferred.promise;
     }
 
     if (opts.fastForwardToTime) {
-      util.warpByTicksToUnixTime(opts.fastForwardToTime);
+      // Since the token is "expired", we're going to attempt to
+      // retrieve it and kick-off the autoRenew and let the event listeners
+      // above pick up the 'renewed' and 'error' events.
+      promise = authClient.tokenManager.get(opts.autoRenewTokenKey);
+      util.warpByTicksToUnixTime(opts.time);
     }
 
     return promise
       .then(function(res) {
-        if (opts.autoRefresh) {
+        if(opts.beforeCompletion) {
+          opts.beforeCompletion(authClient);
+        }
+        if (opts.autoRenew) {
           return;
         }
-
         var expectedResp = opts.expectedResp || defaultResponse;
         validateResponse(res, expectedResp);
       })
@@ -263,7 +267,7 @@ define(function(require) {
       // All iframes should be created and destroyed in the same test
       var iframes = document.getElementsByTagName('IFRAME');
       expect(iframes.length).toBe(0);
-      
+
       // Remove any frames that exist, so we don't taint our other tests
       oauthUtil.removeAllFrames();
     }
@@ -330,13 +334,16 @@ define(function(require) {
         }
       });
   };
-  
+
   oauthUtil.setupRedirect = function(opts) {
     var client = new OktaAuth(opts.oktaAuthArgs || {
       url: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect'
     });
+
+    // Mock the well-known and keys request
+    oauthUtil.loadWellKnownAndKeysCache();
 
     oauthUtil.mockStateAndNonce();
     var windowLocationMock = util.mockSetWindowLocation(client);
@@ -350,9 +357,7 @@ define(function(require) {
 
     expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
 
-    _.each(opts.expectedCookies, function(cookie) {
-      expect(setCookieMock).toHaveBeenCalledWith(cookie);
-    });
+    expect(setCookieMock.calls.allArgs()).toEqual(opts.expectedCookies);
   };
 
   oauthUtil.setupParseUrl = function(opts) {
@@ -361,6 +366,9 @@ define(function(require) {
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect'
     });
+
+    // Mock the well-known and keys request
+    oauthUtil.loadWellKnownAndKeysCache();
 
     util.warpToUnixTime(getTime(opts.time));
 
@@ -401,7 +409,7 @@ define(function(require) {
     }
 
     util.mockGetCookie(opts.oauthCookie);
-    var setCookieMock = util.mockSetCookie();
+    var deleteCookieMock = util.mockDeleteCookie();
 
     return client.token.parseFromUrl(opts.directUrl)
       .then(function(res) {
@@ -409,8 +417,7 @@ define(function(require) {
         validateResponse(res, expectedResp);
 
         // The cookie should be deleted
-        expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params=; path=/; ' +
-          'expires=Thu, 01 Jan 1970 00:00:00 GMT;');
+        expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
 
         if (opts.directUrl) {
           expect(setLocationHashSpy).not.toHaveBeenCalled();
@@ -430,6 +437,9 @@ define(function(require) {
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect'
     });
+
+    // Mock the well-known and keys request
+    oauthUtil.loadWellKnownAndKeysCache();
 
     var emitter = new EventEmitter();
     spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
@@ -489,7 +499,7 @@ define(function(require) {
         .fin(done);
     });
   };
-  
+
   oauthUtil.expectTokenStorageToEqual = function(storage, obj) {
     var parsed = JSON.parse(storage.getItem('okta-token-storage'));
     expect(parsed).toEqual(obj);

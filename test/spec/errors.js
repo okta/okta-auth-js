@@ -34,8 +34,8 @@ define(function(require) {
       expectations: function (test, err) {
         var expected = _.cloneDeep(test.responseBody);
         expected.errorSummary = 'Unknown error';
-        
-        // We explicitly defined the fields to compare, 
+
+        // We explicitly defined the fields to compare,
         // because we don't want to compare all the xhr fields
         expect(err.xhr.status).toEqual(test.resReply.status);
 
@@ -83,10 +83,22 @@ define(function(require) {
       expect(err.errorSummary).toEqual('No arguments passed to constructor. Required usage: new OktaAuth(args)');
     });
 
-    it('throw an error if no url is passed to the constructor', function () {
+    it('throw an error if no url and no issuer are passed to the constructor', function () {
       var err;
       try {
         new OktaAuth({}); // eslint-disable-line no-new
+      } catch (e) {
+        err = e;
+      }
+      expect(err.name).toEqual('AuthSdkError');
+      expect(err.errorSummary).toEqual('No url passed to constructor. ' +
+        'Required usage: new OktaAuth({url: "https://sample.okta.com"})');
+    });
+
+    it('throw an error if issuer is not a url and url is omitted when passed to the constructor', function () {
+      var err;
+      try {
+        new OktaAuth({issuer: 'default'}); // eslint-disable-line no-new
       } catch (e) {
         err = e;
       }

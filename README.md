@@ -23,12 +23,13 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
-:heavy_check_mark: The current stable major version series is: `1.x`
+:heavy_check_mark: The current stable major version series is: `2.x`
 
-| Version   | Status                    |
-| -------   | ------------------------- |
-| `1.x`     | :heavy_check_mark: Stable |
-| `0.x`     | :x: Retired               |
+| Version   | Status                           |
+| -------   | -------------------------------- |
+| `2.x`     | :heavy_check_mark: Stable        |
+| `1.x`     | :warning: Retiring on 2019-05-31 |
+| `0.x`     | :x: Retired                      |
 
 The latest release can always be found on the [releases page][github-releases].
 
@@ -41,23 +42,11 @@ If you run into problems using the SDK, you can:
 
 ## Getting started
 
-Installing the Okta JavaScript SDK in your project is simple. You can include Okta Auth JS in your project either directly from the Okta CDN, or by packaging it with your app via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
+Installing the Authentication SDK is simple. You can include it in your project via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
 
 You'll also need:
 
 * An Okta account, called an _organization_ (sign up for a free [developer organization](https://developer.okta.com/signup) if you need one)
-
-### Using the Okta CDN
-
-Loading our assets directly from the CDN is a good choice if you want an easy way to get started with okta-auth-js, and don't already have an existing build process that leverages [npm](https://www.npmjs.com/) for external dependencies.
-
-```html
-<!-- Latest CDN production Javascript: 1.17.0 -->
-<script
-  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.17.0/okta-auth-js.min.js"
-  type="text/javascript">
-</script>
-```
 
 ### Using the npm module
 
@@ -101,7 +90,17 @@ You can also browse the full [API reference documentation](#api-reference).
 
 ## Configuration reference
 
-The only required configuration option is `url`. All others are optional.
+If you are using this SDK to implement an OIDC flow, the only required configuration option is `issuer`:
+
+```javascript
+var config = {
+  issuer: 'https://{yourOktaDomain}/oauth2/default'
+};
+
+var authClient = new OktaAuth(config);
+```
+
+If you’re using this SDK only for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), you instead need to set the `url` for your Okta Domain:
 
 ```javascript
 var config = {
@@ -134,11 +133,11 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-The `tokenManager` will **automatically refresh tokens** for you when they expire. To disable this feature, set `autoRefresh` to false.
+By default, the `tokenManager` will attempt to renew expired tokens. When an expired token is requested by the `tokenManager.get()` method, a renewal request is executed to update the token. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to  [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
 ```javascript
 tokenManager: {
-  autoRefresh: false
+  autoRenew: false
 }
 ```
 
@@ -151,6 +150,8 @@ tokenManager: {
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
+| `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
+| | This option should be used only for browser support and testing purposes. |
 
 ##### Example Client
 
@@ -238,16 +239,16 @@ var config = {
   * [token.getWithRedirect](#tokengetwithredirectoptions)
   * [token.parseFromUrl](#tokenparsefromurloptions)
   * [token.decode](#tokendecodeidtokenstring)
-  * [token.refresh](#tokenrefreshtokentorefresh)
+  * [token.renew](#tokenrenewtokentorenew)
   * [token.getUserInfo](#tokengetuserinfoaccesstokenobject)
   * [token.verify](#tokenverifyidtokenobject)
-* [tokenManager](#tokenManager)
+* [tokenManager](#tokenmanager)
   * [tokenManager.add](#tokenmanageraddkey-token)
   * [tokenManager.get](#tokenmanagergetkey)
   * [tokenManager.remove](#tokenmanagerremovekey)
   * [tokenManager.clear](#tokenmanagerclear)
-  * [tokenManager.refresh](#tokenmanagerrefreshkey)
-  * [tokenManager.on](#tokenmanagerontokenevent-callback-context)
+  * [tokenManager.renew](#tokenmanagerrenewkey)
+  * [tokenManager.on](#tokenmanageronevent-callback-context)
   * [tokenManager.off](#tokenmanageroffevent-callback)
 
 ------
@@ -295,9 +296,9 @@ authClient.signOut()
 
 Starts a [new password recovery transaction](https://developer.okta.com/docs/api/resources/authn#forgot-password) for a given user and issues a recovery token that can be used to reset a user’s password.
 
-  - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-  - `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
-  - `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
+* `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
+* `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
+* `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
 
 ```javascript
 authClient.forgotPassword({
@@ -1426,15 +1427,15 @@ Decode a raw ID Token
 authClient.token.decode('YOUR_ID_TOKEN_JWT');
 ```
 
-#### `token.refresh(tokenToRefresh)`
+#### `token.renew(tokenToRenew)`
 
 Returns a new token if the Okta [session](https://developer.okta.com/docs/api/resources/sessions#example) is still valid.
 
-* `tokenToRefresh` - an access token or ID token previously provided by Okta. note: this is not the raw JWT
+* `tokenToRenew` - an access token or ID token previously provided by Okta. note: this is not the raw JWT
 
 ```javascript
 // this token is provided by Okta via getWithoutPrompt, getWithPopup, and parseFromUrl
-var tokenToRefresh = {
+var tokenToRenew = {
   idToken: 'YOUR_ID_TOKEN_JWT',
   claims: { /* token claims */ },
   expiresAt: 1449699930,
@@ -1444,7 +1445,7 @@ var tokenToRefresh = {
   clientId: 'NPSfOkH5eZrTy8PMDlvx'
 };
 
-authClient.token.refresh(tokenToRefresh)
+authClient.token.renew(tokenToRenew)
 .then(function(freshToken) {
   // manage freshToken
 })
@@ -1471,9 +1472,14 @@ authClient.token.getUserInfo(accessTokenObject)
 Verify the validity of an ID token's claims and check the signature on browsers that support web cryptography.
 
 * `idTokenObject` - an ID token returned by this library. note: this is not the raw ID token JWT
+* `validationOptions` - Optional object to assert ID token claim values. Defaults to the configuration passed in during client instantiation.
 
 ```javascript
-authClient.token.verify(idTokenObject)
+var validationOptions = {
+  issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}'
+}
+
+authClient.token.verify(idTokenObject, validationOptions)
 .then(function() {
   // the idToken is valid
 })
@@ -1486,9 +1492,9 @@ authClient.token.verify(idTokenObject)
 
 #### `tokenManager.add(key, token)`
 
-After receiving an `access_token` or `id_token`, add it to the `tokenManager` to manage token expiration and refresh operations. When a token is added to the `tokenManager`, it is automatically refreshed when it expires.
+After receiving an `access_token` or `id_token`, add it to the `tokenManager` to manage token expiration and renew operations. When a token is added to the `tokenManager`, it is automatically renewed when it expires.
 
-* `key` - Unique key to store the token in the `tokenManager`. This is used later when you want to get, delete, or refresh the token.
+* `key` - Unique key to store the token in the `tokenManager`. This is used later when you want to get, delete, or renew the token.
 * `token` - Token object that will be added
 
 ```javascript
@@ -1500,12 +1506,24 @@ authClient.token.getWithPopup()
 
 #### `tokenManager.get(key)`
 
-Get a token that you have previously added to the `tokenManager` with the given `key`.
+Get a token that you have previously added to the `tokenManager` with the given `key`. The token object will be returned if it has not expired.
 
 * `key` - Key for the token you want to get
 
 ```javascript
-var token = authClient.tokenManager.get('idToken');
+authClient.tokenManager.get('idToken')
+.then(function(token) {
+  if (token) {
+    // Token is valid
+    console.log(token);
+  } else {
+    // Token has expired
+  }
+})
+.catch(function(err) {
+  // OAuth Error
+  console.error(err);
+});
 ```
 
 #### `tokenManager.remove(key)`
@@ -1526,49 +1544,55 @@ Remove all tokens from the `tokenManager`.
 authClient.tokenManager.clear();
 ```
 
-#### `tokenManager.refresh(key)`
+#### `tokenManager.renew(key)`
 
-Manually refresh a token before it expires.
+Manually renew a token before it expires.
 
-* `key` - Key for the token you want to refresh
+* `key` - Key for the token you want to renew
 
 ```javascript
-// Because the refresh() method is async, you can wait for it to complete
+// Because the renew() method is async, you can wait for it to complete
 // by using the returned Promise:
-authClient.tokenManager.refresh('idToken')
+authClient.tokenManager.renew('idToken')
 .then(function (newToken) {
-  // doSomethingWith(newToken);
+  console.log(newToken);
 });
 
-// Alternatively, you can subscribe to the 'refreshed' event:
-authClient.tokenManager.on('refreshed', function (key, newToken, oldToken) {
-  // doSomethingWith(newToken);
+// Alternatively, you can subscribe to the 'renewed' event:
+authClient.tokenManager.on('renewed', function (key, newToken, oldToken) {
+  console.log(newToken);
 });
-authClient.tokenManager.refresh('idToken');
+authClient.tokenManager.renew('idToken');
 ```
 
 #### `tokenManager.on(event, callback[, context])`
 
 Subscribe to an event published by the `tokenManager`.
 
-* `event` - Event to subscribe to. Possible events are `expired`, `error`, and `refreshed`.
+* `event` - Event to subscribe to. Possible events are `expired`, `error`, and `renewed`.
 * `callback` - Function to call when the event is triggered
 * `context` - Optional context to bind the callback to
 
 ```javascript
+// Triggered when the token has expired
 authClient.tokenManager.on('expired', function (key, expiredToken) {
   console.log('Token with key', key, ' has expired:');
   console.log(expiredToken);
 });
 
-authClient.tokenManager.on('error', function (err) {
-  console.log('TokenManager error:', err);
-});
-
-authClient.tokenManager.on('refreshed', function (key, newToken, oldToken) {
-  console.log('Token with key', key, 'has been refreshed');
+authClient.tokenManager.on('renewed', function (key, newToken, oldToken) {
+  console.log('Token with key', key, 'has been renewed');
   console.log('Old token:', oldToken);
   console.log('New token:', newToken);
+});
+
+// Triggered when an OAuthError is returned via the API
+authClient.tokenManager.on('error', function (err) {
+  console.log('TokenManager error:', err.message);
+  // err.name
+  // err.message
+  // err.errorCode
+  // err.errorSummary
 });
 ```
 
@@ -1580,8 +1604,8 @@ Unsubscribe from `tokenManager` events. If no callback is provided, unsubscribes
 * `callback` - Optional callback that was used to subscribe to the event
 
 ```javascript
-authClient.tokenManager.off('refreshed');
-authClient.tokenManager.off('refreshed', myRefreshedCallback);
+authClient.tokenManager.off('renewed');
+authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
 
 ## Building the SDK
@@ -1614,5 +1638,5 @@ We're happy to accept contributions and PRs! Please see the [contribution guide]
 
 [devforum]: https://devforum.okta.com/
 [lang-landing]: https://developer.okta.com/code/javascript
-[github-issues]: /issues
-[github-releases]: /releases
+[github-issues]: https://github.com/okta/okta-auth-js/issues
+[github-releases]: https://github.com/okta/okta-auth-js/releases
