@@ -42,7 +42,7 @@ If you run into problems using the SDK, you can:
 
 ## Getting started
 
-Installing the Okta JavaScript SDK in your project is simple. You can include Okta Auth JS in your project by packaging it with your app via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
+Installing the Authentication SDK is simple. You can include it in your project via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
 
 You'll also need:
 
@@ -100,7 +100,7 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-If you’re using this SDK only for communicating with the [Authenticatin API](https://developer.okta.com/docs/api/resources/authn), you instead need to set the `url` for your Okta Domain:
+If you’re using this SDK only for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), you instead need to set the `url` for your Okta Domain:
 
 ```javascript
 var config = {
