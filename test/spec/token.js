@@ -11,6 +11,10 @@ define(function(require) {
     return new OktaAuth({ url: 'http://example.okta.com' });
   }
 
+  function encodeOauthRedirectParams(params) {
+    return btoa(JSON.stringify(params));
+  }
+
   describe('token.decode', function () {
 
     it('correctly decodes a token', function () {
@@ -896,7 +900,7 @@ define(function(require) {
           'expires_in': 3600,
           'state': oauthUtil.mockedState
         },
-        expectedResp: [tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed] 
+        expectedResp: [tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed]
       })
       .fin(function() {
         done();
@@ -951,7 +955,7 @@ define(function(require) {
           sessionToken: 'testToken'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: 'id_token',
             state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
             nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -989,7 +993,7 @@ define(function(require) {
           sessionToken: 'testToken'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: 'id_token',
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
@@ -1031,7 +1035,7 @@ define(function(require) {
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
         }],
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: 'token',
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
@@ -1065,7 +1069,7 @@ define(function(require) {
           sessionToken: 'testToken'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: 'token',
             state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
             nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1105,7 +1109,7 @@ define(function(require) {
           sessionToken: 'testToken'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: 'token',
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
@@ -1138,7 +1142,7 @@ define(function(require) {
           idp: 'testIdp'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: ['token', 'id_token'],
             state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
             nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1177,7 +1181,7 @@ define(function(require) {
           idp: 'testIdp'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: ['token', 'id_token'],
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
@@ -1210,7 +1214,7 @@ define(function(require) {
           responseType: 'code'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: 'code',
             state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
             nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1249,7 +1253,7 @@ define(function(require) {
           responseType: 'code'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: 'code',
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
@@ -1283,7 +1287,7 @@ define(function(require) {
           responseType: ['code']
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: ['code'],
             state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
             nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1317,7 +1321,7 @@ define(function(require) {
           responseType: ['code', 'id_token']
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: ['code', 'id_token'],
             state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
             nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1351,7 +1355,7 @@ define(function(require) {
           responseMode: 'form_post'
         },
         expectedCookies: [
-          'okta-oauth-redirect-params=' + JSON.stringify({
+          'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
             responseType: 'code',
             state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
             nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1383,7 +1387,7 @@ define(function(require) {
       return oauthUtil.setupParseUrl({
         directUrl: 'http://example.com#id_token=' + tokens.standardIdToken +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: 'id_token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1411,7 +1415,7 @@ define(function(require) {
         noHistory: true,
         hashMock: '#id_token=' + tokens.standardIdToken +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: 'id_token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1438,7 +1442,7 @@ define(function(require) {
       return oauthUtil.setupParseUrl({
         hashMock: '#id_token=' + tokens.standardIdToken +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: 'id_token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1465,7 +1469,7 @@ define(function(require) {
       return oauthUtil.setupParseUrl({
         hashMock: '#id_token=' + tokens.authServerIdToken +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: 'id_token',
           state: oauthUtil.mockedState,
           nonce: oauthUtil.mockedNonce,
@@ -1490,7 +1494,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: 'token',
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1515,7 +1519,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: 'token',
           state: oauthUtil.mockedState,
           nonce: oauthUtil.mockedNonce,
@@ -1541,7 +1545,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1567,7 +1571,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: ['id_token', 'token'],
           state: oauthUtil.mockedState,
           nonce: oauthUtil.mockedNonce,
@@ -1594,7 +1598,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: ['id_token', 'token', 'code'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1622,7 +1626,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: ['id_token', 'code', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1649,7 +1653,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: ['id_token', 'token', 'code'],
           state: oauthUtil.mockedState,
           nonce: oauthUtil.mockedNonce,
@@ -1673,7 +1677,7 @@ define(function(require) {
       {
         setupMethod: oauthUtil.setupParseUrl,
         hashMock: '',
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1725,7 +1729,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: ['id_token', 'token'],
           state: 'mismatchedState',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -1756,7 +1760,7 @@ define(function(require) {
                   '&expires_in=3600' +
                   '&token_type=Bearer' +
                   '&state=' + oauthUtil.mockedState,
-        oauthCookie: 'okta-oauth-redirect-params=' + JSON.stringify({
+        oauthCookie: 'okta-oauth-redirect-params=' + encodeOauthRedirectParams({
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'mismatchedNonce',
