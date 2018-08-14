@@ -23,12 +23,13 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
-:heavy_check_mark: The current stable major version series is: `1.x`
+:heavy_check_mark: The current stable major version series is: `2.x`
 
-| Version   | Status                    |
-| -------   | ------------------------- |
-| `1.x`     | :heavy_check_mark: Stable |
-| `0.x`     | :x: Retired               |
+| Version   | Status                           |
+| -------   | -------------------------------- |
+| `2.x`     | :heavy_check_mark: Stable        |
+| `1.x`     | :warning: Retiring on 2019-05-31 |
+| `0.x`     | :x: Retired                      |
 
 The latest release can always be found on the [releases page][github-releases].
 
@@ -41,23 +42,11 @@ If you run into problems using the SDK, you can:
 
 ## Getting started
 
-Installing the Okta JavaScript SDK in your project is simple. You can include Okta Auth JS in your project either directly from the Okta CDN, or by packaging it with your app via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
+Installing the Authentication SDK is simple. You can include it in your project via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
 
 You'll also need:
 
 * An Okta account, called an _organization_ (sign up for a free [developer organization](https://developer.okta.com/signup) if you need one)
-
-### Using the Okta CDN
-
-Loading our assets directly from the CDN is a good choice if you want an easy way to get started with okta-auth-js, and don't already have an existing build process that leverages [npm](https://www.npmjs.com/) for external dependencies.
-
-```html
-<!-- Latest CDN production Javascript: 1.17.0 -->
-<script
-  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.17.0/okta-auth-js.min.js"
-  type="text/javascript">
-</script>
-```
 
 ### Using the npm module
 
@@ -101,7 +90,7 @@ You can also browse the full [API reference documentation](#api-reference).
 
 ## Configuration reference
 
-If you are using this library to implement an OIDC flow, the only required configuration option is `issuer`:
+If you are using this SDK to implement an OIDC flow, the only required configuration option is `issuer`:
 
 ```javascript
 var config = {
@@ -111,7 +100,7 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-If you’re using this library only for communicating with the [Authenticatin API][], you instead need to set the `url` for your Okta Domain:
+If you’re using this SDK only for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), you instead need to set the `url` for your Okta Domain:
 
 ```javascript
 var config = {
@@ -307,9 +296,9 @@ authClient.signOut()
 
 Starts a [new password recovery transaction](https://developer.okta.com/docs/api/resources/authn#forgot-password) for a given user and issues a recovery token that can be used to reset a user’s password.
 
-  - `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-  - `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
-  - `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
+* `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
+* `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
+* `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
 
 ```javascript
 authClient.forgotPassword({
@@ -1649,5 +1638,5 @@ We're happy to accept contributions and PRs! Please see the [contribution guide]
 
 [devforum]: https://devforum.okta.com/
 [lang-landing]: https://developer.okta.com/code/javascript
-[github-issues]: /issues
-[github-releases]: /releases
+[github-issues]: https://github.com/okta/okta-auth-js/issues
+[github-releases]: https://github.com/okta/okta-auth-js/releases
