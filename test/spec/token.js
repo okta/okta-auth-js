@@ -960,7 +960,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -998,7 +999,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1040,13 +1042,55 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
         ],
         expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                              'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                             'response_type=token&' +
+                             'response_mode=fragment&' +
+                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                             'sessionToken=testToken&' +
+                             'scope=email'
+      });
+    });
+
+    it('allows passing clientId through getWithRedirect, which takes precedence over the authArgs', function() {
+      oauthUtil.setupRedirect({
+        oktaAuthArgs: {
+          url: 'https://auth-js-test.okta.com',
+          redirectUri: 'https://example.com/redirect',
+          clientId: 'NPSfOkH5eZrTy8PMDlvx'
+        },
+        getWithRedirectArgs: {
+          responseType: 'token',
+          scopes: ['email'],
+          sessionToken: 'testToken',
+          clientId: 'testClientId'
+        },
+        expectedCookies: [
+          'okta-oauth-redirect-params=' + JSON.stringify({
+            responseType: 'token',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
+            scopes: ['email'],
+            urls: {
+              issuer: 'https://auth-js-test.okta.com',
+              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+            },
+            clientId: 'testClientId'
+          }) + '; path=/;',
+          'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
+          'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
+        ],
+        expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                             'client_id=testClientId&' +
                              'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                              'response_type=token&' +
                              'response_mode=fragment&' +
@@ -1074,7 +1118,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1114,7 +1159,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1147,7 +1193,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1186,7 +1233,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1219,7 +1267,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1258,7 +1307,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1292,7 +1342,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1326,7 +1377,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
@@ -1360,7 +1412,8 @@ define(function(require) {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
               userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            }
+            },
+            clientId: 'NPSfOkH5eZrTy8PMDlvx'
           }) + '; path=/;',
           'okta-oauth-nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;',
           'okta-oauth-state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; path=/;'
