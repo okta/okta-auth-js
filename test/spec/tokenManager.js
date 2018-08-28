@@ -460,6 +460,33 @@ define(function(require) {
         .fin(done);
       });
 
+      it('does not renew the token if the token has not expired', function() {
+        var CLOCK_SKEW = 600;
+        var CURRENT_TIME = 0;
+        var EXPIRATION_TIME = CURRENT_TIME + CLOCK_SKEW + 10;
+        util.warpToUnixTime(CURRENT_TIME);
+        var TokenManager = require('../../lib/TokenManager');
+        var sdk = {
+          token: jasmine.createSpyObj(['renew']),
+          options: {
+            maxClockSkew: CLOCK_SKEW
+          }
+        };
+        var tokenManager = new TokenManager(sdk);
+        var expiresAt = EXPIRATION_TIME;
+        var token = {
+          accessToken: 'fakeToken',
+          expiresAt: expiresAt,
+          scopes: []
+        };
+        tokenManager.add('accessToken', token);
+        tokenManager.get('accessToken');
+        expect(sdk.token.renew).not.toHaveBeenCalled();
+        util.warpToUnixTime(EXPIRATION_TIME + 10);
+        tokenManager.get('accessToken');
+        expect(sdk.token.renew).toHaveBeenCalled();
+      });
+
       it('emits "expired" on existing tokens even when autoRenew is disabled', function(done) {
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
         localStorage.setItem('okta-token-storage', JSON.stringify({
