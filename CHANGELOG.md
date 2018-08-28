@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+
+Bug Fixes
+
+* Fixed an problem, introduced in 2.0.0, that was causing tokens to be refreshed every time `authClient.tokenManager.get('accessToken')` was called.
+
 ## 2.0.0
 
 ### Breaking Changes
