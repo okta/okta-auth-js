@@ -14,12 +14,12 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
-    "test": "grunt test",
+    "test": "npm run test:unit",
+    "test:unit": "npm run build:tests && grunt jasmine",
     "build": "webpack --config webpack.config.js",
     "build:tests": "webpack --config webpack.test.config.js",
-    "prepublish": "node ./writeConfig.js && grunt shell:UMDNoDependencies"
+    "prepublish": "node ./writeConfig.js && npm run build"
   },
   "author": "Okta",
   "keywords": [
@@ -37,18 +37,12 @@
     "xhr2": "0.1.3"
   },
   "devDependencies": {
-    "eslint": "2.10.2",
-    "grunt": "0.4.5",
-    "grunt-cli": "1.2.0",
+    "eslint": "5.6.1",
+    "grunt": "1.0.3",
     "grunt-contrib-jasmine": "1.1.0",
-    "grunt-shell": "1.3.0",
-    "jquery": "2.1.4",
+    "jquery": "3.3.1",
     "json-loader": "0.5.4",
-    "lodash": "4.10.0",
-    "moment": "2.12.0",
-    "normalize-url": "1.4.1",
-    "semver": "5.1.0",
-    "sinon": "1.16.0",
+    "lodash": "4.17.11",
     "webpack": "1.13.0"
   },
   "okta-auth-js": {
