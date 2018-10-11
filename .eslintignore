@@ -1,11 +1,9 @@
 /lib/vendor
 /test/vendor
 /test/xhr
-/.grunt
 /buildtools
 /dist
 /target
 /node_modules
-Gruntfile.js
 *.config.js
 /lib/config.js

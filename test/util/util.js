@@ -1,4 +1,4 @@
-/* globals jasmine, define, spyOn, expect, JSON */
+/* globals jasmine, spyOn, expect, JSON */
 /* eslint-disable max-statements, complexity */
 var Q = require('q'),
     $ = require('jquery'),
