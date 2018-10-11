@@ -4,7 +4,7 @@ var _ = require('lodash');
 describe('util', function() {
   describe('warn', function() {
     it('writes warning to console', function() {
-      spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'log').mockImplementation(() => {});
       util.warn('sample warning');
       expect(window.console.log).toHaveBeenCalledWith('[okta-auth-sdk] WARN: sample warning');
     });
@@ -12,7 +12,7 @@ describe('util', function() {
 
   describe('deprecate', function() {
     it('writes deprecation to console', function() {
-      spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'log').mockImplementation(() => {});
       util.deprecate('sample deprecation');
       expect(window.console.log).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: sample deprecation');
     });
@@ -24,7 +24,7 @@ describe('util', function() {
     });
 
     it('returns fake console if native console does not exist', function() {
-      spyOn(util, 'getNativeConsole').and.returnValue(undefined);
+      jest.spyOn(util, 'getNativeConsole').mockReturnValue(undefined);
       expect(_.isNative(util.getConsole().log)).toBe(false);
     });
   });

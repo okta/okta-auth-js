@@ -32,7 +32,7 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to sessionStorage if localStorage isn\'t available', function() {
-      spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'log').mockImplementation(() => {});
       oauthUtil.mockLocalStorageError();
       var client = setupSync();
       expect(window.console.log).toHaveBeenCalledWith(
@@ -45,7 +45,7 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
-      spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'log').mockImplementation(() => {});
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockSessionStorageError();
       var client = setupSync();

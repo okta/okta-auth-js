@@ -80,7 +80,7 @@ function mockAjax(pairs) {
     setNextPair(pairs);
   }
 
-  spyOn($, 'ajax').and.callFake(function(args) {
+  jest.spyOn($, 'ajax').mockImplementation(function(args) {
 
     var pair = allPairs.shift();
     if (!pair) {
@@ -318,41 +318,41 @@ util.parseQueryParams = function (query) {
 
 util.mockQDelay = function () {
   var original = Q.delay;
-  spyOn(Q, 'delay').and.callFake(function() {
+  jest.spyOn(Q, 'delay').mockImplementation(function() {
     return original.call(this, 0);
   });
 };
 
 util.mockSetWindowLocation = function (client) {
-  return spyOn(client.token.getWithRedirect, '_setLocation');
+  return jest.spyOn(client.token.getWithRedirect, '_setLocation');
 };
 
 util.mockSetCookie = function () {
-  return spyOn(cookies, 'setCookie');
+  return jest.spyOn(cookies, 'setCookie');
 };
 
 util.mockDeleteCookie = function () {
-  return spyOn(cookies, 'deleteCookie');
+  return jest.spyOn(cookies, 'deleteCookie');
 };
 
 util.mockGetCookie = function (text) {
-  spyOn(cookies, 'getCookie').and.returnValue(text || '');
+  jest.spyOn(cookies, 'getCookie').mockReturnValue(text || '');
 };
 
 util.mockGetHistory = function (client, mockHistory) {
-  spyOn(client.token.parseFromUrl, '_getHistory').and.returnValue(mockHistory);
+  jest.spyOn(client.token.parseFromUrl, '_getHistory').mockReturnValue(mockHistory);
 };
 
 util.mockGetDocument = function (client, mockDocument) {
-  spyOn(client.token.parseFromUrl, '_getDocument').and.returnValue(mockDocument);
+  jest.spyOn(client.token.parseFromUrl, '_getDocument').mockReturnValue(mockDocument);
 };
 
 util.mockGetLocation = function (client, mockLocation) {
-  spyOn(client.token.parseFromUrl, '_getLocation').and.returnValue(mockLocation);
+  jest.spyOn(client.token.parseFromUrl, '_getLocation').mockReturnValue(mockLocation);
 };
 
 util.mockUserAgent = function (client, mockUserAgent) {
-  spyOn(client.fingerprint, '_getUserAgent').and.returnValue(mockUserAgent);
+  jest.spyOn(client.fingerprint, '_getUserAgent').mockReturnValue(mockUserAgent);
 };
 
 util.expectErrorToEqual = function (actual, expected) {

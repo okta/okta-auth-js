@@ -20,19 +20,19 @@ oauthUtil.mockedNonce2 = oauthUtil.mockedState2;
 
 oauthUtil.mockStateAndNonce = function() {
   // Make sure the state is generated the same every time (standardState, standardNonce)
-  spyOn(Math, 'random').and.callFake(function() {
+  jest.spyOn(Math, 'random').mockImplementation(function() {
     return 0;
   });
 };
 
 oauthUtil.mockLocalStorageError = function() {
-  spyOn(storageUtil, 'getLocalStorage').and.callFake(function() {
+  jest.spyOn(storageUtil, 'getLocalStorage').mockImplementation(function() {
     throw 'This function is not supported on this system.';
   });
 };
 
 oauthUtil.mockSessionStorageError = function() {
-  spyOn(storageUtil, 'getSessionStorage').and.callFake(function() {
+  jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(function() {
     throw 'This function is not supported on this system.';
   });
 };
@@ -124,7 +124,7 @@ oauthUtil.setup = function(opts) {
       opts.tokenRenewArgs ||
       opts.autoRenew) {
     // Simulate the postMessage between the window and the popup or iframe
-    spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
+    jest.spyOn(window, 'addEventListener').mockImplementation(function(eventName, fn) {
       if (eventName === 'message' && !opts.closePopup) {
         // Call postMessage on the next tick
         setTimeout(function() {
@@ -243,7 +243,7 @@ oauthUtil.setupFrame = function(opts) {
   // Capture the src of the iframe to check later
   var src;
   var origAppend = body.appendChild;
-  spyOn(body, 'appendChild').and.callFake(function (el) {
+  jest.spyOn(body, 'appendChild').mockImplementation(function (el) {
     if (el.tagName === 'IFRAME') {
       src = el.src;
 
@@ -257,7 +257,7 @@ oauthUtil.setupFrame = function(opts) {
 
   function iframeWasCreated() {
     expect(body.appendChild).toHaveBeenCalled();
-    var el = body.appendChild.calls.mostRecent().args[0];
+    var el = body.appendChild.calls.mostRecent()[0];
     expect(el.tagName).toEqual('IFRAME');
     expect(el.style.display).toEqual('none');
   }
@@ -299,9 +299,9 @@ oauthUtil.setupPopup = function(opts) {
       this.closed = true;
     }
   };
-  spyOn(fakeWindow, 'close').and.callThrough();
+  jest.spyOn(fakeWindow, 'close');
 
-  spyOn(window, 'open').and.callFake(function(s) {
+  jest.spyOn(window, 'open').mockImplementation(function(s) {
     src = s;
     setTimeout(function() {
       if (opts.closePopup) {
@@ -373,7 +373,7 @@ oauthUtil.setupParseUrl = function(opts) {
 
   // Mock location
   var mockLocation = {};
-  var setLocationHashSpy = jasmine.createSpy();
+  var setLocationHashSpy = jest.fn();
   Object.defineProperty(mockLocation, 'hash', {
     get: function() {
       return opts.hashMock || '';
@@ -398,7 +398,7 @@ oauthUtil.setupParseUrl = function(opts) {
   });
 
   // Mock history
-  var replaceStateSpy = jasmine.createSpy('replaceState');
+  var replaceStateSpy = jest.fn();
   if (opts.noHistory) {
     util.mockGetHistory(client);
   } else {
@@ -441,7 +441,7 @@ oauthUtil.setupSimultaneousPostMessage = function() {
   oauthUtil.loadWellKnownAndKeysCache();
 
   var emitter = new EventEmitter();
-  spyOn(window, 'addEventListener').and.callFake(function(eventName, fn) {
+  jest.spyOn(window, 'addEventListener').mockImplementation(function(eventName, fn) {
     if (eventName === 'message') {
       emitter.on('trigger', function(state) {
         // get the data with the correct state

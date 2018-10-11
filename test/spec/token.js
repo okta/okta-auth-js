@@ -263,7 +263,7 @@ describe('token.getWithoutPrompt', function () {
       // mock frame creation
       var body = document.getElementsByTagName('body')[0];
       var origAppend = body.appendChild;
-      spyOn(body, 'appendChild').and.callFake(function (el) {
+      jest.spyOn(body, 'appendChild').mockImplementation(function (el) {
         if (el.tagName === 'IFRAME') {
           // Remove the src so it doesn't actually load
           el.src = '';
@@ -691,7 +691,7 @@ describe('token.getWithPopup', function () {
           popup.closed = true;
         };
       }
-      spyOn(window, 'open').and.callFake(function() {
+      jest.spyOn(window, 'open').mockImplementation(function() {
         var popup = new FakePopup();
         popups.push(popup);
         return popup;

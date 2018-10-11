@@ -57,6 +57,7 @@
   },
   "jest": {
     "moduleNameMapper": {
+      "restoreMocks": true,
       "^OktaAuth(.*)$": "<rootDir>/jquery/$1"
     }
   }

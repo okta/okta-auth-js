@@ -3,9 +3,9 @@ var JsCookie = require('js-cookie');
 
 describe('cookie', function () {
   beforeEach(function () {
-    spyOn(JsCookie, 'get');
-    spyOn(JsCookie, 'set');
-    spyOn(JsCookie, 'remove');
+    jest.spyOn(JsCookie, 'get').mockImplementation(() => {});
+    jest.spyOn(JsCookie, 'set').mockImplementation(() => {});
+    jest.spyOn(JsCookie, 'remove').mockImplementation(() => {});
   });
 
   describe('setCookie',  function ()  {

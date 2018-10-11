@@ -7,7 +7,7 @@ describe('fingerprint', function() {
     options = options || {};
     var test = this;
     var listener;
-    var postMessageSpy = jasmine.createSpy('postMessage').and.callFake(function(msg, url) {
+    var postMessageSpy = jest.fn().and.callFake(function(msg, url) {
       // "receive" the message in the iframe
       expect(url).toEqual('http://example.okta.com');
       expect(msg).toEqual(jasmine.any(String));
@@ -25,17 +25,17 @@ describe('fingerprint', function() {
     test.iframe = {
       style: {},
       parentElement: {
-        removeChild: jasmine.createSpy('removeChild')
+        removeChild: jest.fn()
       }
     };
 
-    spyOn(window, 'addEventListener').and.callFake(function(name, fn) {
+    jest.spyOn(window, 'addEventListener').mockImplementation(function(name, fn) {
       expect(name).toEqual('message');
       listener = fn;
     });
-    spyOn(document, 'createElement').and.returnValue(test.iframe);
-    spyOn(document.body, 'contains').and.returnValue(true);
-    spyOn(document.body, 'appendChild').and.callFake(function() {
+    jest.spyOn(document, 'createElement').mockReturnValue(test.iframe);
+    jest.spyOn(document.body, 'contains').mockReturnValue(true);
+    jest.spyOn(document.body, 'appendChild').mockImplementation(function() {
       if (options.timeout) { return; }
       // mimic async page load with setTimeouts
       if (options.sendOtherMessage) {

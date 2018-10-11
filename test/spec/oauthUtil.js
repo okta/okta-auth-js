@@ -501,15 +501,15 @@ describe('getOAuthUrls', function() {
 describe('loadPopup', function() {
   it('popups window with full src url directly when none-IE', function () {
     var mockElem = {};
-    spyOn(libUtil, 'isIE11OrLess').and.returnValue(false);
-    spyOn(window, 'open').and.returnValue(mockElem);
+    jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(false);
+    jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
     var winEl = oauthUtil.loadPopup('/path/to/foo', {
       popupTitle: 'Hello Okta'
     });
 
     expect(winEl).toBe(mockElem);
-    expect(window.open.calls.count()).toBe(1);
+    expect(window.open.mock.calls.length).toBe(1);
     expect(window.open).toHaveBeenCalledWith(
       '/path/to/foo',
       'Hello Okta',
@@ -519,13 +519,13 @@ describe('loadPopup', function() {
 
   it('popups window with full src url directly and default title', function () {
     var mockElem = {};
-    spyOn(libUtil, 'isIE11OrLess').and.returnValue(false);
-    spyOn(window, 'open').and.returnValue(mockElem);
+    jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(false);
+    jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
     var winEl = oauthUtil.loadPopup('/path/to/foo', {});
 
     expect(winEl).toBe(mockElem);
-    expect(window.open.calls.count()).toBe(1);
+    expect(window.open.mock.calls.length).toBe(1);
     expect(window.open).toHaveBeenCalledWith(
       '/path/to/foo',
       'External Identity Provider User Authentication',
@@ -539,15 +539,15 @@ describe('loadPopup', function() {
 
       }
     };
-    spyOn(libUtil, 'isIE11OrLess').and.returnValue(true);
-    spyOn(window, 'open').and.returnValue(mockElem);
+    jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(true);
+    jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
     var winEl = oauthUtil.loadPopup('/path/to/foo', {
       popupTitle: 'Hello Okta'
     });
 
     expect(winEl).toBe(mockElem);
-    expect(window.open.calls.count()).toBe(1);
+    expect(window.open.mock.calls.length).toBe(1);
     expect(window.open).toHaveBeenCalledWith(
       '/',
       'Hello Okta',
