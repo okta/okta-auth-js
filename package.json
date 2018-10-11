@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
     "test": "npm run test:unit",
-    "test:unit": "jest test/*.spec.js --silent",
+    "test:unit": "jest test/spec/ --silent",
     "build": "webpack --config webpack.config.js",
     "prepublish": "node ./writeConfig.js && npm run build"
   },
@@ -56,9 +56,12 @@
     "CACHE_STORAGE_NAME": "okta-cache-storage"
   },
   "jest": {
+    "restoreMocks": true,
     "moduleNameMapper": {
-      "restoreMocks": true,
       "^OktaAuth(.*)$": "<rootDir>/jquery/$1"
-    }
+    },
+    "testMatch": [
+      "**/*.js"
+    ]
   }
 }

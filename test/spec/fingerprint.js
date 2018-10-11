@@ -7,12 +7,12 @@ describe('fingerprint', function() {
     options = options || {};
     var test = this;
     var listener;
-    var postMessageSpy = jest.fn().and.callFake(function(msg, url) {
+    var postMessageSpy = jest.spyOn(window, 'postMessage').mockImplementation(function(msg, url) {
       // "receive" the message in the iframe
       expect(url).toEqual('http://example.okta.com');
-      expect(msg).toEqual(jasmine.any(String));
+      expect(msg).toEqual(expect.any(String));
       expect(JSON.parse(msg).type).toEqual('GetFingerprint');
-      expect(listener).toEqual(jasmine.any(Function));
+      expect(listener).toEqual(expect.any(Function));
       listener({
         data: JSON.stringify({
           type: 'FingerprintAvailable',

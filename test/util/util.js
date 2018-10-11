@@ -1,4 +1,4 @@
-/* globals jasmine, spyOn, expect, JSON */
+/* globals expect, JSON */
 /* eslint-disable max-statements, complexity */
 var Q = require('q'),
     $ = require('jquery'),
@@ -8,25 +8,25 @@ var Q = require('q'),
 
 var util = {};
 
+function warpByTicksToUnixTime(unixTime) {
+  var ticks = (unixTime * 1000) - Date.now();
+  jest.advanceTimersByTime(ticks);
+}
+
 util.warpToDistantFuture = function () {
-  jasmine.clock().mockDate(new Date(9999999999999));
+  warpByTicksToUnixTime(9999999999999);
 };
 
 util.warpToDistantPast = function () {
-  jasmine.clock().mockDate(new Date(0));
+  warpByTicksToUnixTime(0);
 };
 
 util.warpToUnixTime = function (unixTime) {
-  jasmine.clock().mockDate(new Date(unixTime * 1000));
-};
-
-util.returnToPresent = function () {
-  jasmine.clock().mockDate(new Date());
+  jest.spyOn(Date, 'now').mockReturnValue(new Date(unixTime * 1000));
 };
 
 util.warpByTicksToUnixTime = function (unixTime) {
-  var ticks = (unixTime * 1000) - Date.now();
-  jasmine.clock().tick(ticks);
+  warpByTicksToUnixTime(unixTime);
 };
 
 function generateXHRPair(request, response, uri) {

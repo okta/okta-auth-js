@@ -20,9 +20,7 @@ oauthUtil.mockedNonce2 = oauthUtil.mockedState2;
 
 oauthUtil.mockStateAndNonce = function() {
   // Make sure the state is generated the same every time (standardState, standardNonce)
-  jest.spyOn(Math, 'random').mockImplementation(function() {
-    return 0;
-  });
+  jest.spyOn(Math, 'random').mockReturnValue(0);
 };
 
 oauthUtil.mockLocalStorageError = function() {
@@ -356,7 +354,7 @@ oauthUtil.setupRedirect = function(opts) {
 
   expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
 
-  expect(setCookieMock.calls.allArgs()).toEqual(opts.expectedCookies);
+  expect(setCookieMock.mock.calls).toEqual(opts.expectedCookies);
 };
 
 oauthUtil.setupParseUrl = function(opts) {

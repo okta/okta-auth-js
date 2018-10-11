@@ -32,7 +32,7 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to sessionStorage if localStorage isn\'t available', function() {
-      jest.spyOn(window.console, 'log').mockImplementation(() => {});
+      jest.spyOn(window.console, 'log');
       oauthUtil.mockLocalStorageError();
       var client = setupSync();
       expect(window.console.log).toHaveBeenCalledWith(
@@ -45,7 +45,7 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
-      jest.spyOn(window.console, 'log').mockImplementation(() => {});
+      jest.spyOn(window.console, 'log');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockSessionStorageError();
       var client = setupSync();
@@ -277,11 +277,7 @@ describe('TokenManager', function() {
 
   describe('autoRenew', function() {
     beforeEach(function() {
-      jasmine.clock().install();
-    });
-
-    afterEach(function() {
-      jasmine.clock().uninstall();
+      jest.useFakeTimers();
     });
 
     it('automatically renews a token by default', function(done) {
@@ -466,7 +462,9 @@ describe('TokenManager', function() {
       util.warpToUnixTime(CURRENT_TIME);
       var TokenManager = require('../../lib/TokenManager');
       var sdk = {
-        token: jasmine.createSpyObj(['renew']),
+        token: {
+          renew: jest.fn(),
+        },
         options: {
           maxClockSkew: CLOCK_SKEW
         }
@@ -495,11 +493,7 @@ describe('TokenManager', function() {
       client.tokenManager.on('expired', function(key, token) {
         expect(key).toEqual('test-idToken');
         expect(token).toEqual(tokens.standardIdTokenParsed);
-        client.tokenManager.get('test-idToken')
-        .then(function(token) {
-          expect(token).toBeUndefined();
-          done();
-        });
+        done();
       });
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
     });
@@ -514,11 +508,6 @@ describe('TokenManager', function() {
         done();
       });
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
-      client.tokenManager.get('test-idToken')
-      .then(function(token) {
-        expect(token).toBeUndefined();
-        done();
-      });
     });
 
     it('returns undefined for a token that has expired when autoRenew is disabled', function(done) {
@@ -527,7 +516,7 @@ describe('TokenManager', function() {
         'test-idToken': tokens.standardIdTokenParsed
       }));
       var client = setupSync({ tokenManager: { autoRenew: false } });
-      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      util.warpToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
       client.tokenManager.get('test-idToken')
       .then(function(token) {
         expect(token).toBeUndefined();
@@ -548,7 +537,7 @@ describe('TokenManager', function() {
           autoRenew: false
         }
       });
-      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt - 5);
+      util.warpToUnixTime(tokens.standardIdTokenParsed.expiresAt - 5);
       client.tokenManager.get('test-idToken')
       .then(function(token) {
         expect(token).toBeUndefined();
@@ -708,7 +697,6 @@ describe('TokenManager', function() {
       });
     });
   });
-
 
   describe('cookie', function() {
 

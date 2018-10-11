@@ -15,7 +15,7 @@ describe('token.decode', function () {
   it('correctly decodes a token', function () {
     var oa = setupSync();
     var decodedToken = oa.token.decode(tokens.unicodeToken);
-    expect(decodedToken).toDeepEqual(tokens.unicodeDecoded);
+    expect(decodedToken).toEqual(tokens.unicodeDecoded);
   });
 
   it('throws an error for a malformed token', function () {

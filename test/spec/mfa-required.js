@@ -589,7 +589,7 @@ describe('MFA_REQUIRED', function () {
     });
 
     // Add this test when we have this functionality
-    xit('deletes stateToken cookie when cancel is called');
+    xit('deletes stateToken cookie when cancel is called', function() {});
   });
 
 });

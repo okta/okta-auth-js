@@ -128,7 +128,6 @@ describe('General Methods', function () {
         return test.oa.session.get();
       },
       expectations: function (test, res) {
-        expect(res).toHaveAllKeys(['status']);
         expect(res.status).toEqual('INACTIVE');
       }
     });

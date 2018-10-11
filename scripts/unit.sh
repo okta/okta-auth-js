@@ -3,7 +3,7 @@
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
 export TEST_SUITE_TYPE="jsunit"
-export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/jasmine"
+export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/"
 
 if ! npm test; then
   echo "unit failed! Exiting..."

@@ -1,10 +1,12 @@
 var util = require('../../lib/util');
-var _ = require('lodash');
 
 describe('util', function() {
+  beforeEach(function() {
+    jest.spyOn(window.console, 'log');
+  });
+
   describe('warn', function() {
     it('writes warning to console', function() {
-      jest.spyOn(window.console, 'log').mockImplementation(() => {});
       util.warn('sample warning');
       expect(window.console.log).toHaveBeenCalledWith('[okta-auth-sdk] WARN: sample warning');
     });
@@ -12,7 +14,6 @@ describe('util', function() {
 
   describe('deprecate', function() {
     it('writes deprecation to console', function() {
-      jest.spyOn(window.console, 'log').mockImplementation(() => {});
       util.deprecate('sample deprecation');
       expect(window.console.log).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: sample deprecation');
     });
@@ -25,7 +26,7 @@ describe('util', function() {
 
     it('returns fake console if native console does not exist', function() {
       jest.spyOn(util, 'getNativeConsole').mockReturnValue(undefined);
-      expect(_.isNative(util.getConsole().log)).toBe(false);
+      expect(util.getConsole().log).toBeDefined();
     });
   });
 
@@ -36,7 +37,7 @@ describe('util', function() {
         'prop2': 'test prop2'
       };
       util.extend(obj1);
-      expect(obj1).toEqual(jasmine.objectContaining({
+      expect(obj1).toEqual(expect.objectContaining({
         'prop1': 'test prop1',
         'prop2': 'test prop2'
       }));
@@ -54,7 +55,7 @@ describe('util', function() {
         'prop1': 'test prop4'
       };
       util.extend(obj1, obj2, obj3);
-      expect(obj1).toEqual(jasmine.objectContaining({
+      expect(obj1).toEqual(expect.objectContaining({
         'prop1': 'test prop4',
         'prop2': 'test prop2',
         'prop3': 'test prop3'
