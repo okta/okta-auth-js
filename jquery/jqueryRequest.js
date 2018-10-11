@@ -28,6 +28,7 @@ function jqueryRequest(method, url, args) {
     deferred.resolve(jqXHR);
   }, function(jqXHR) {
     delete jqXHR.then;
+    // Emit "error.api" event
     deferred.reject(jqXHR);
   });
   return deferred;
