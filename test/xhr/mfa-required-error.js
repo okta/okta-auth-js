@@ -1,4 +1,4 @@
-define({
+module.exports = {
   "status": 403,
   "responseType": "json",
   "response": {
@@ -10,4 +10,4 @@ define({
       "errorSummary": "Your passcode doesn't match our records. Please try again."
     }]
   }
-});
+};

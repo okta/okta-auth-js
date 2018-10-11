@@ -1,4 +1,4 @@
-define({
+module.exports = {
   "status": 403,
   "responseType": "json",
   "response": {
@@ -8,4 +8,4 @@ define({
     "errorId": "oaeGEiIPFfeR3a_XxpezUH9ug",
     "errorCauses": []
   }
-});
+};
