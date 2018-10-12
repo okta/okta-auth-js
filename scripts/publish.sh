@@ -6,6 +6,11 @@ REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-okta"
 
 export TEST_SUITE_TYPE="build"
 
+# Install required dependencies
+export PATH="${PATH}:$(yarn global bin)"
+yarn global add @okta/ci-update-package
+yarn global add @okta/ci-pkginfo
+
 if [ -n "${action_branch}" ];
 then
   echo "Publishing from bacon task using branch ${action_branch}"
@@ -20,6 +25,9 @@ if ! ci-update-package --branch ${TARGET_BRANCH}; then
   exit ${FAILED_SETUP}
 fi
 
+### looks like ci-update-package is not compatible with `yarn publish`
+### which expects new-version is passed via command line parameter.
+### keep using npm for now
 if ! npm publish --registry ${REGISTRY}; then
   echo "npm publish failed! Exiting..."
   exit ${PUBLISH_ARTIFACTORY_FAILURE}
