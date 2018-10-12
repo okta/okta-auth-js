@@ -59,10 +59,14 @@ To install [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js
 
 ```bash
 # Run this command in your project root folder.
-npm install @okta/okta-auth-js --save
+# yarn
+yarn add --save @okta/okta-auth-js
+
+# npm
+npm install --save @okta/okta-auth-js
 ```
 
-After running `npm install`, the minified auth client will be installed to `node_modules/@okta/okta-auth-js/dist`. You can copy the `dist` contents to a publicly hosted directory. However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module using CommonJS.
+After installing `@okta/okta-auth-js`, the minified auth client will be installed to `node_modules/@okta/okta-auth-js/dist`. You can copy the `dist` contents to a publicly hosted directory. However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module using CommonJS.
 
 ```javascript
 var OktaAuth = require('@okta/okta-auth-js');
@@ -1616,21 +1620,20 @@ In most cases, you won't need to build the SDK from source. If you want to build
 # Clone the repo
 git clone https://github.com/okta/okta-auth-js.git
 
-# Navigate into the new `okta-auth-js` filder, and install Okta node dependencies
+# Navigate into the new `okta-auth-js` filder
 cd okta-auth-js
-npm install
 
-# Build the SDK. The output will be under `dist`
-npm run build
+# Install Okta node dependencies and SDK will be built under `dist`
+yarn install
 ```
 
 ### Build and Test Commands
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
-| `npm run build`       | Build the SDK with a sourcemap |
-| `npm test`            | Run unit tests using PhantomJS |
-| `npm run lint:report` | Run eslint linting tests       |
+| `yarn build`          | Build the SDK with a sourcemap |
+| `yarn test`           | Run unit tests using Jest      |
+| `yarn lint`           | Run eslint linting             |
 
 ## Contributing
 
