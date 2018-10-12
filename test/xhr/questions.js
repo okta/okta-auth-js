@@ -1,4 +1,4 @@
-define({
+module.exports = {
   "status": 200,
   "responseType": "json",
   "response": [{
@@ -62,4 +62,4 @@ define({
     "question": "favorite_sports_player",
     "questionText": "Who is your favorite sports player?"
   }]
-});
+};

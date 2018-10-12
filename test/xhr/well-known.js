@@ -1,4 +1,4 @@
-define({
+module.exports = {
   "status": 200,
   "responseType": "json",
   "response": {
@@ -57,4 +57,4 @@ define({
       "updated_at"
     ]
   }
-});
+};

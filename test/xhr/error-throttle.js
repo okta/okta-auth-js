@@ -1,4 +1,4 @@
-define({
+module.exports = {
   "status": 429,
   "responseType": "json",
   "response": {
@@ -9,4 +9,4 @@ define({
     "errorCauses": [
     ]
   }
-});
+};

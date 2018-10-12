@@ -15,10 +15,9 @@
   "scripts": {
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
-    "test": "npm run test:unit",
-    "test:unit": "npm run build:tests && grunt jasmine",
+    "test": "jest test/spec/ --silent",
+    "test:report" : "npm test -- --ci || true",
     "build": "webpack --config webpack.config.js",
-    "build:tests": "webpack --config webpack.test.config.js",
     "prepublish": "node ./writeConfig.js && npm run build"
   },
   "author": "Okta",
@@ -38,8 +37,8 @@
   },
   "devDependencies": {
     "eslint": "5.6.1",
-    "grunt": "1.0.3",
-    "grunt-contrib-jasmine": "1.1.0",
+    "jest": "^23.6.0",
+    "jest-junit": "^5.0.0",
     "jquery": "3.3.1",
     "json-loader": "0.5.4",
     "lodash": "4.17.11",
@@ -56,5 +55,21 @@
     "REDIRECT_NONCE_COOKIE_NAME": "okta-oauth-nonce",
     "TOKEN_STORAGE_NAME": "okta-token-storage",
     "CACHE_STORAGE_NAME": "okta-cache-storage"
+  },
+  "jest": {
+    "restoreMocks": true,
+    "moduleNameMapper": {
+      "^OktaAuth(.*)$": "<rootDir>/jquery/$1"
+    },
+    "testMatch": [
+      "**/*.js"
+    ],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ]
+  },
+  "jest-junit": {
+    "output": "./build2/reports/unit/junit-result.xml"
   }
 }
