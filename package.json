@@ -16,9 +16,9 @@
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
     "test": "jest test/spec/ --silent",
-    "test:report" : "npm test -- --ci || true",
-    "build": "webpack --config webpack.config.js",
-    "prepublish": "node ./writeConfig.js && npm run build"
+    "test:report" : "yarn test --ci || true",
+    "build": "node ./writeConfig.js && webpack --config webpack.config.js",
+    "prepublish": "yarn build"
   },
   "author": "Okta",
   "keywords": [

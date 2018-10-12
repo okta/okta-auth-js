@@ -2,8 +2,9 @@ language: node_js
 node_js:
   - '8'
 install:
-  - npm install
+  - yarn install
+  - TMPDIR=/tmp yarn install
 script:
-  - npm run lint:report
-  - npm test
+  - yarn lint
+  - yarn test
 cache: false
