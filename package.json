@@ -15,8 +15,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
-    "test": "jest test/spec/ --silent",
-    "test:report" : "yarn test --ci || true",
+    "test": "jest",
+    "test:report" : "yarn test --ci --silent || true",
     "build": "node ./writeConfig.js && webpack --config webpack.config.js",
     "prepublish": "yarn build"
   },
@@ -57,12 +57,13 @@
     "CACHE_STORAGE_NAME": "okta-cache-storage"
   },
   "jest": {
+    "coverageDirectory": "./build2/reports/coverage",
     "restoreMocks": true,
     "moduleNameMapper": {
       "^OktaAuth(.*)$": "<rootDir>/jquery/$1"
     },
     "testMatch": [
-      "**/*.js"
+      "**/test/spec/*.js"
     ],
     "reporters": [
       "default",
