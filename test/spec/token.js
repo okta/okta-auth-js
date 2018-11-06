@@ -32,7 +32,8 @@ describe('token.decode', function () {
 });
 
 describe('token.getWithoutPrompt', function () {
-  it('uses defaults if undefined/null values are provided for requesting an id_token using a sessionToken', function(done) {
+  it('uses default authorization parameters if undefined/null values are provided \
+    when requesting an id_token using a sessionToken', function(done) {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -604,7 +605,8 @@ describe('token.getWithoutPrompt', function () {
 });
 
 describe('token.getWithPopup', function () {
-  it('uses defaults if undefined/null values are provided for requesting an id_token using idp', function (done) {
+  it('uses default authorization parameters if undefined/null values are provided \
+    when requesting an id_token using idp', function (done) {
     return oauthUtil.setupPopup({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -999,7 +1001,8 @@ describe('token.getWithPopup', function () {
 });
 
 describe('token.getWithRedirect', function() {
-  it('uses defaults if undefined/null values are provided for minting an id_token using sessionToken', function() {
+  it('uses default authorization parameters if undefined/null values are provided \
+    when minting an id_token using sessionToken', function() {
     oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken',
