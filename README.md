@@ -1409,7 +1409,7 @@ authClient.token.getWithRedirect(oauthOptions);
 
 #### `token.parseFromUrl(options)`
 
-Parses the access or ID Tokens from the url after a successful authentication redirect.
+Parses the access or ID Tokens from the url after a successful authentication redirect. If an ID token is present, it will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
 
 ```javascript
 authClient.token.parseFromUrl()
@@ -1473,7 +1473,9 @@ authClient.token.getUserInfo(accessTokenObject)
 
 #### `token.verify(idTokenObject)`
 
-Verify the validity of an ID token's claims and check the signature on browsers that support web cryptography.
+Manually verify the validity of an ID token's claims and check the signature on browsers that support web cryptography.
+
+> **Note:** Token validation occurs [automatically](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) when tokens are returned via `getWithoutPrompt`, `getWithPopup`, and `getWithRedirect`.
 
 * `idTokenObject` - an ID token returned by this library. note: this is not the raw ID token JWT
 * `validationOptions` - Optional object to assert ID token claim values. Defaults to the configuration passed in during client instantiation.
