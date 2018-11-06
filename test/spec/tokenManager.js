@@ -44,11 +44,45 @@ describe('TokenManager', function() {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
+    it('defaults to sessionStorage if localStorage cannot be written to', function() {
+      jest.spyOn(window.console, 'log');
+      oauthUtil.mockStorageSetItemError();
+      var client = setupSync();
+      expect(window.console.log).toHaveBeenCalledWith(
+        '[okta-auth-sdk] WARN: This browser doesn\'t ' +
+        'support localStorage. Switching to sessionStorage.'
+      );
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      oauthUtil.expectTokenStorageToEqual(sessionStorage, {
+        'test-idToken': tokens.standardIdTokenParsed
+      });
+    });
     it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
       jest.spyOn(window.console, 'log');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockSessionStorageError();
       var client = setupSync();
+      expect(window.console.log).toHaveBeenCalledWith(
+        '[okta-auth-sdk] WARN: This browser doesn\'t ' +
+        'support sessionStorage. Switching to cookie-based storage.'
+      );
+      var setCookieMock = util.mockSetCookie();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      expect(setCookieMock).toHaveBeenCalledWith(
+        'okta-token-storage',
+        JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
+        '2038-01-19T03:14:07.000Z'
+      );
+    });
+    it('defaults to cookie-based storage if sessionStorage cannot be written to', function() {
+      jest.spyOn(window.console, 'log');
+      oauthUtil.mockLocalStorageError();
+      oauthUtil.mockStorageSetItemError();
+      var client = setupSync({
+        tokenManager: {
+          storage: 'sessionStorage'
+        }
+      });
       expect(window.console.log).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support sessionStorage. Switching to cookie-based storage.'
