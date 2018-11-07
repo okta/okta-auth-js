@@ -29,6 +29,12 @@ oauthUtil.mockLocalStorageError = function() {
   });
 };
 
+oauthUtil.mockStorageSetItemError = function() {
+  jest.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(function() {
+    throw 'This function is not supported on this system.';
+  });
+};
+
 oauthUtil.mockSessionStorageError = function() {
   jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(function() {
     throw 'This function is not supported on this system.';
