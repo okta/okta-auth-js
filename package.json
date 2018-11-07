@@ -1,7 +1,7 @@
 {
   "name": "@okta/okta-auth-js",
   "description": "The Okta Auth SDK",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "lib/index.js",
@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
     "test": "jest",
-    "test:report" : "yarn test --ci --silent || true",
+    "test:report": "yarn test --ci --silent || true",
     "build": "node ./writeConfig.js && webpack --config webpack.config.js",
     "prepublish": "yarn build"
   },
