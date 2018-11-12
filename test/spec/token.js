@@ -32,39 +32,6 @@ describe('token.decode', function() {
 });
 
 describe('token.getWithoutPrompt', function() {
-  it('uses default authorization parameters if undefined/null values are provided \
-    when requesting an id_token using a sessionToken', function(done) {
-    return oauthUtil.setupFrame({
-      oktaAuthArgs: {
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect',
-        scopes: null,
-        responseType: undefined
-      },
-      getWithoutPromptArgs: {
-        sessionToken: 'testSessionToken'
-      },
-      postMessageSrc: {
-        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        queryParams: {
-          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-          'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'id_token',
-          'response_mode': 'okta_post_message',
-          'state': oauthUtil.mockedState,
-          'nonce': oauthUtil.mockedNonce,
-          'scope': 'openid email',
-          'prompt': 'none',
-          'sessionToken': 'testSessionToken'
-        }
-      }
-    })
-    .fin(function() {
-      done();
-    });
-  });
-
   it('returns id_token using sessionToken', function(done) {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
@@ -605,39 +572,6 @@ describe('token.getWithoutPrompt', function() {
 });
 
 describe('token.getWithPopup', function() {
-  it('uses default authorization parameters if undefined/null values are provided \
-    when requesting an id_token using idp', function(done) {
-    return oauthUtil.setupPopup({
-      oktaAuthArgs: {
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect',
-        scopes: null,
-        responseType: undefined
-      },
-      getWithPopupArgs: {
-        idp: 'testIdp'
-      },
-      postMessageSrc: {
-        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        queryParams: {
-          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-          'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'id_token',
-          'response_mode': 'okta_post_message',
-          'display': 'popup',
-          'state': oauthUtil.mockedState,
-          'nonce': oauthUtil.mockedNonce,
-          'scope': 'openid email',
-          'idp': 'testIdp'
-        }
-      }
-    })
-    .fin(function() {
-      done();
-    });
-  });
-
   it('returns id_token using idp', function(done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
@@ -1001,51 +935,6 @@ describe('token.getWithPopup', function() {
 });
 
 describe('token.getWithRedirect', function() {
-  it('uses default authorization parameters if undefined/null values are provided \
-    when minting an id_token using sessionToken', function() {
-    oauthUtil.setupRedirect({
-      getWithRedirectArgs: {
-        sessionToken: 'testToken',
-        scopes: null,
-        responseType: undefined
-      },
-      expectedCookies: [
-        [
-          'okta-oauth-redirect-params',
-          JSON.stringify({
-            responseType: 'id_token',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['openid', 'email'],
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-            },
-            ignoreSignature: false
-          })
-        ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
-      ],
-      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
-                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=id_token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'sessionToken=testToken&' +
-                            'scope=openid%20email'
-    });
-  });
   it('sets authorize url and cookie for id_token using sessionToken', function() {
     oauthUtil.setupRedirect({
       getWithRedirectArgs: {
