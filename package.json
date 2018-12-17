@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "Base64": "0.3.0",
-    "js-cookie": "2.2.0",
+    "hardtack": "2.1.0",
     "q": "1.4.1",
     "reqwest": "2.0.5",
     "tiny-emitter": "1.1.0",
