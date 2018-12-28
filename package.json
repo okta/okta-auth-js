@@ -4,7 +4,12 @@
   "version": "2.3.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
+  "main": "lib/serverIndex.js",
+  "browser": {
+    "./lib/serverIndex.js": "./lib/browserIndex.js",
+    "./lib/serverStorage.js": "./lib/cookies.js",
+    "./lib/serverStorageUtil.js": "./lib/browserStorageUtil.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
@@ -29,7 +34,10 @@
   ],
   "dependencies": {
     "Base64": "0.3.0",
+    "es6-promise": "^4.2.5",
+    "isomorphic-fetch": "^2.2.1",
     "js-cookie": "2.2.0",
+    "node-cache": "^4.2.0",
     "q": "1.4.1",
     "reqwest": "2.0.5",
     "tiny-emitter": "1.1.0",
@@ -45,7 +53,7 @@
     "webpack": "1.13.0"
   },
   "okta-auth-js": {
-    "STATE_TOKEN_COOKIE_NAME": "oktaStateToken",
+    "STATE_TOKEN_KEY_NAME": "oktaStateToken",
     "DEFAULT_POLLING_DELAY": 500,
     "DEFAULT_MAX_CLOCK_SKEW": 300,
     "DEFAULT_CACHE_DURATION": 86400,
@@ -57,6 +65,7 @@
     "CACHE_STORAGE_NAME": "okta-cache-storage"
   },
   "jest": {
+    "browser": true,
     "coverageDirectory": "./build2/reports/coverage",
     "restoreMocks": true,
     "moduleNameMapper": {
