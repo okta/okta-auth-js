@@ -11,4 +11,4 @@
  *
  */
 
-module.exports = require('../lib/browserBuilder')();
+module.exports = require('../lib/browser')();

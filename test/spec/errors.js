@@ -90,7 +90,7 @@ describe('General Errors', function () {
     }
     expect(err.name).toEqual('AuthSdkError');
     expect(err.errorSummary).toEqual('No url passed to constructor. ' +
-      'Required usage: new OktaAuth({url: "https://sample.okta.com"})');
+      'Required usage: new OktaAuth({url: "https://{yourOktaDomain}.com"})');
   });
 
   it('throw an error if issuer is not a url and url is omitted when passed to the constructor', function () {
@@ -102,7 +102,7 @@ describe('General Errors', function () {
     }
     expect(err.name).toEqual('AuthSdkError');
     expect(err.errorSummary).toEqual('No url passed to constructor. ' +
-      'Required usage: new OktaAuth({url: "https://sample.okta.com"})');
+      'Required usage: new OktaAuth({url: "https://{yourOktaDomain}.com"})');
   });
 
   it('throw an error if url contains "-admin" when passed to the constructor', function () {
@@ -114,6 +114,6 @@ describe('General Errors', function () {
     }
     expect(err.name).toEqual('AuthSdkError');
     expect(err.errorSummary).toEqual('URL passed to constructor contains "-admin" in subdomain. ' +
-      'Required usage: new OktaAuth({url: "https://dev-12345.okta.com})');
+      'Required usage: new OktaAuth({url: "https://{yourOktaDomain}.com})');
   });
 });

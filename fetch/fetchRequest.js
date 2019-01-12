@@ -10,20 +10,32 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-require('es6-promise').polyfill();
-require('isomorphic-fetch');
+var fetch = require('cross-fetch');
 
 function fetchRequest(method, url, args) {
-  var f = fetch(url, {
+  var error;
+  var fetchPromise = fetch(url, {
     method: method,
     headers: args.headers,
     body: JSON.stringify(args.data),
     credentials: 'include'
   })
   .then(function(response) {
-    return response.json();
+    error = !response.ok;
+    if (response.headers.get('Accept') &&
+        response.headers.get('Accept').toLowerCase().indexOf('application/json') >= 0) {
+      return response.json();
+    } else {
+      return response.text();
+    }
+  })
+  .then(function(response) {
+    if (error) {
+      throw response;
+    }
+    return response;
   });
-  return f;
+  return fetchPromise;
 }
 
 module.exports = fetchRequest;

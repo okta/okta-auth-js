@@ -1,0 +1,18 @@
+{
+  "browser": true,
+  "coverageDirectory": "./build2/reports/coverage",
+  "restoreMocks": true,
+  "moduleNameMapper": {
+    "^OktaAuth(.*)$": "<rootDir>/jquery/$1"
+  },
+  "testMatch": [
+    "**/test/spec/*.js"
+  ],
+  "testPathIgnorePatterns": [
+    "./test/spec/serverStorage.js"
+  ],
+  "reporters": [
+    "default",
+    "jest-junit"
+  ]
+}
