@@ -42,10 +42,7 @@ describe('cookie', function () {
   describe('deleteCookie',  function ()  {
     it('proxies JsCookie.remove',  function ()  {
       Cookies.deleteCookie('foo');
-      expect(hardtack.remove).toHaveBeenCalledWith('foo', {
-        expires: "Thu, 01 Jan 1970 00:00:01 GMT",
-        path: '/'
-      });
+      expect(hardtack.remove).toHaveBeenCalledWith('foo', { path: '/' });
     });
   });
 });
