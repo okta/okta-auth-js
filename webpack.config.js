@@ -13,7 +13,7 @@ var commonConfig = require('./webpack.common.config');
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 
 module.exports = _.extend(commonConfig, {
-  entry: './lib/serverIndex.js',
+  entry: './lib/server/serverIndex.js',
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'okta-auth-js.min.js',

@@ -4,11 +4,11 @@
   "version": "2.3.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
-  "main": "lib/serverIndex.js",
+  "main": "lib/server/serverIndex.js",
   "browser": {
-    "./lib/serverIndex.js": "./lib/browserIndex.js",
-    "./lib/serverStorage.js": "./lib/cookies.js",
-    "./lib/serverStorageUtil.js": "./lib/browserStorageUtil.js"
+    "./lib/server/serverIndex.js": "./lib/browser/browserIndex.js",
+    "./lib/server/serverStorage.js": "./lib/browser/cookies.js",
+    "./lib/server/serverStorageUtil.js": "./lib/browser/browserStorageUtil.js"
   },
   "repository": {
     "type": "git",

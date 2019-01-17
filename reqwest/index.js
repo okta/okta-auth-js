@@ -12,4 +12,4 @@
  */
 
 var reqwestRequest = require('./reqwestRequest');
-module.exports = require('../lib/browser')(reqwestRequest);
+module.exports = require('../lib/browser/browser')(reqwestRequest);

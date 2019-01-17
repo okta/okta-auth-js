@@ -12,4 +12,4 @@
  */
 
 var jqueryRequest = require('./jqueryRequest');
-module.exports = require('../lib/browser')(jqueryRequest);
+module.exports = require('../lib/browser/browser')(jqueryRequest);

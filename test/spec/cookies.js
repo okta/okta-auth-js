@@ -1,4 +1,4 @@
-var Cookies  = require('../../lib/cookies');
+var Cookies  = require('../../lib/browser/cookies');
 var JsCookie = require('js-cookie');
 
 describe('cookie', function () {
@@ -17,10 +17,10 @@ describe('cookie', function () {
     });
 
     it('proxies JsCookie.set with an expiry time',  function ()  {
-      Cookies.set('foo', 'bar', '2038-01-19T03:14:07.000Z');
+      Cookies.set('foo', 'bar', '2200-01-01T00:00:00.000Z');
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/',
-        expires: new Date('2038-01-19T03:14:07.000Z')
+        expires: new Date('2200-01-01T00:00:00.000Z')
       });
     });
 

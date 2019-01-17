@@ -12,4 +12,4 @@
  */
 
 var fetchRequest = require('./fetchRequest');
-module.exports = require('../lib/server')(fetchRequest);
+module.exports = require('../lib/server/server')(fetchRequest);
