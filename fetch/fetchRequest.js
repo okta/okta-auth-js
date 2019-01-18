@@ -13,8 +13,6 @@
 var fetch = require('cross-fetch');
 
 function fetchRequest(method, url, args) {
-  var error;
-  var status;
   var fetchPromise = fetch(url, {
     method: method,
     headers: args.headers,
@@ -22,25 +20,25 @@ function fetchRequest(method, url, args) {
     credentials: 'include'
   })
   .then(function(response) {
-    error = !response.ok;
-    status = response.status;
+    var error = !response.ok;
+    var status = response.status;
+    var respHandler = function(resp) {
+      var result = {
+        responseText: resp,
+        status: status
+      };
+      if (error) {
+        // Throwing response object since error handling is done in http.js
+        throw result;
+      }
+      return result;
+    };
     if (response.headers.get('Accept') &&
         response.headers.get('Accept').toLowerCase().indexOf('application/json') >= 0) {
-      return response.json();
+      return response.json().then(respHandler);
     } else {
-      return response.text();
+      return response.text().then(respHandler);
     }
-  })
-  .then(function(response) {
-    var resp = {
-      responseText: response,
-      status: status
-    };
-    if (error) {
-      // Throwing response object since error handling is done in http.js
-      throw resp;
-    }
-    return resp;
   });
   return fetchPromise;
 }

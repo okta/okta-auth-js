@@ -12,4 +12,5 @@
  */
 
 var jqueryRequest = require('./jqueryRequest');
-module.exports = require('../lib/browser/browser')(jqueryRequest);
+var storageUtil = require('../lib/browser/browserStorageUtil');
+module.exports = require('../lib/browser/browser')(storageUtil, jqueryRequest);

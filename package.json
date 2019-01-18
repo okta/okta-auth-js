@@ -5,11 +5,7 @@
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "lib/server/serverIndex.js",
-  "browser": {
-    "./lib/server/serverIndex.js": "./lib/browser/browserIndex.js",
-    "./lib/server/serverStorage.js": "./lib/browser/cookies.js",
-    "./lib/server/serverStorageUtil.js": "./lib/browser/browserStorageUtil.js"
-  },
+  "browser": "lib/browser/browserIndex.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"

@@ -12,4 +12,5 @@
  */
 
 var reqwestRequest = require('./reqwestRequest');
-module.exports = require('../lib/browser/browser')(reqwestRequest);
+var storageUtil = require('../lib/browser/browserStorageUtil');
+module.exports = require('../lib/browser/browser')(storageUtil, reqwestRequest);

@@ -1,4 +1,4 @@
-var serverStorage  = require('../../lib/server/serverStorage');
+var serverStorage  = require('../../lib/server/serverStorageUtil').storage;
 
 describe('serverStorage', function () {
     describe('get', function () {

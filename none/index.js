@@ -10,5 +10,5 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
-module.exports = require('../lib/browser/browser')();
+var storageUtil = require('../lib/browser/browserStorageUtil');
+module.exports = require('../lib/browser/browser')(storageUtil);
