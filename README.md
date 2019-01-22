@@ -13,7 +13,7 @@
 * [Configuration reference](#configuration-reference)
 * [API Reference](#api-reference)
 * [Building the SDK](#building-the-sdk)
-* [Using the library in Node as an Authentication SDK](#using-the-library-in-node-as-an-authentication-sdk)
+* [Node JS Usage](#node-js-usage)
 * [Contributing](#contributing)
 
 The Okta Auth JavaScript SDK builds on top of our [Authentication API](https://developer.okta.com/docs/api/resources/authn) and [OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
@@ -1615,9 +1615,7 @@ authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
 
-## Using the library in Node as an Authentication SDK
-
-> :warning: Beta alert! This library is in beta.
+## Node JS Usage
 
 You can use this library on server side in your Node application as an Authentication SDK. It can only be used in this way for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), **not** to implement an OIDC flow.
 
@@ -1638,14 +1636,14 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-### API Reference
+### Supported APIs
 
 Since the Node library can be used only for the Authentication flow, it implements only by a subset of okta-auth-js APIs:
 
-* [signIn](#signinoptions-in-node)
-* [forgotPassword](#forgotpasswordoptions-in-node)
-* [unlockAccount](#unlockaccountoptions-in-node)
-* [verifyRecoveryToken](#verifyrecoverytokenoptions-in-node)
+* [signIn](#signinoptions)
+* [forgotPassword](#forgotpasswordoptions)
+* [unlockAccount](#unlockaccountoptions)
+* [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -1661,115 +1659,9 @@ Since the Node library can be used only for the Authentication flow, it implemen
   * [MFA_CHALLENGE](#mfa_challenge)
   * [SUCCESS](#success)
 
-### `signIn(options) in Node`
+The main difference is that the Node library does **not** have a `session.setCookieAndRedirect` function, so you will have to redirect by yourself (for example using `res.redirect('https://www.yoursuccesspage.com')`).
 
-The goal of an authentication flow is to authenticate a User. The flow is started using `signIn`.
-
-* `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-* `password` - The password of the user
-
-```javascript
-authClient.signIn({
-  username: 'some-username',
-  password: 'some-password'
-})
-.then(function(transaction) {
-  if (transaction.status === 'SUCCESS') {
-    // Redirect to your success page
-    res.redirect('https://www.yoursuccesspage.com');
-  } else {
-    throw 'We cannot handle the ' + transaction.status + ' status';
-  }
-})
-.fail(function(err) {
-  console.error(err);
-});
-```
-
-### `forgotPassword(options) in Node`
-
-Starts a [new password recovery transaction](https://developer.okta.com/docs/api/resources/authn#forgot-password) for a given user and issues a recovery token that can be used to reset a user’s password.
-
-* `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-* `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
-* `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
-
-```javascript
-authClient.forgotPassword({
-  username: 'dade.murphy@example.com',
-  factorType: 'SMS',
-})
-.then(function(transaction) {
-  return transaction.verify({
-    passCode: '123456' // The passCode from the SMS or CALL
-  });
-})
-.then(function(transaction) {
-  if (transaction.status === 'SUCCESS') {
-    // Redirect to your success page
-    res.redirect('https://www.yoursuccesspage.com');
-  } else {
-    throw 'We cannot handle the ' + transaction.status + ' status';
-  }
-})
-.fail(function(err) {
-  console.error(err);
-});
-```
-
-### `unlockAccount(options) in Node`
-
-Starts a [new unlock recovery transaction](https://developer.okta.com/docs/api/resources/authn#unlock-account) for a given user and issues a recovery token that can be used to unlock a user’s account.
-
-* `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
-* `factorType` - Recovery factor to use for primary authentication. Supported options are `SMS`, `EMAIL`, or `CALL`
-* `relayState` - Optional state value that is persisted for the lifetime of the recovery transaction
-
-```javascript
-authClient.unlockAccount({
-  username: 'dade.murphy@example.com',
-  factorType: 'SMS',
-})
-.then(function(transaction) {
-  return transaction.verify({
-    passCode: '123456' // The passCode from the SMS
-  });
-})
-.then(function(transaction) {
-  if (transaction.status === 'SUCCESS') {
-    // Redirect to your success page
-    res.redirect('https://www.yoursuccesspage.com');
-  } else {
-    throw 'We cannot handle the ' + transaction.status + ' status';
-  }
-})
-.fail(function(err) {
-  console.error(err);
-});
-```
-
-### `verifyRecoveryToken(options) in Node`
-
-Validates a recovery token that was distributed to the end-user to continue the [recovery transaction](https://developer.okta.com/docs/api/resources/authn#verify-recovery-token).
-
-* `recoveryToken` - Recovery token that was distributed to end-user via an out-of-band mechanism such as email
-
-```javascript
-authClient.verifyRecoveryToken({
-  recoveryToken: '00xdqXOE5qDZX8-PBR1bYv8AESqIFinDy3yul01tyh'
-})
-.then(function(transaction) {
-  if (transaction.status === 'SUCCESS') {
-    // Redirect to your success page
-    res.redirect('https://www.yoursuccesspage.com');
-  } else {
-    throw 'We cannot handle the ' + transaction.status + ' status';
-  }
-})
-.fail(function(err) {
-  console.error(err);
-});
-```
+The `SUCCESS` transaction will still include a `sessionToken` which you can use with the session APIs: https://github.com/okta/okta-sdk-nodejs#sessions.
 
 ## Building the SDK
 
