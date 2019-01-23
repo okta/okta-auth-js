@@ -158,7 +158,7 @@ describe('getWellKnown', function() {
             response: wellKnown.response
           }
         }),
-        '2038-01-19T03:14:07.000Z'
+        '2200-01-01T00:00:00.000Z'
       );
     }
   });

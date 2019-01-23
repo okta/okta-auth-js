@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+
+### Features
+
+- [#184](https://github.com/okta/okta-auth-js/pull/184) - Adds support for calling the AuthN API from Node
+
 ## 2.2.0
 
 ### Bug Fixes
@@ -47,11 +53,11 @@
   * `idToken.refresh`
   * `idToken.decode`
 
-## Features
+### Features
 
 * Clears whitespace around URLs when instantiating the client.
 * Infer the `url` from the `issuer` to simplify client setup.
 
-## Other
+### Other
 
 * Renames all `refresh` methods on the `token` and `tokenManager` objects to `renew`.

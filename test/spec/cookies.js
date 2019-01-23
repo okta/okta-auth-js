@@ -1,4 +1,4 @@
-var Cookies  = require('../../lib/cookies');
+var Cookies  = require('../../lib/browser/browserStorage').storage;
 var JsCookie = require('js-cookie');
 
 describe('cookie', function () {
@@ -8,40 +8,40 @@ describe('cookie', function () {
     jest.spyOn(JsCookie, 'remove');
   });
 
-  describe('setCookie',  function ()  {
+  describe('set',  function ()  {
     it('proxies JsCookie.set',  function ()  {
-      Cookies.setCookie('foo', 'bar');
+      Cookies.set('foo', 'bar');
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/'
       });
     });
 
     it('proxies JsCookie.set with an expiry time',  function ()  {
-      Cookies.setCookie('foo', 'bar', '2038-01-19T03:14:07.000Z');
+      Cookies.set('foo', 'bar', '2200-01-01T00:00:00.000Z');
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/',
-        expires: new Date('2038-01-19T03:14:07.000Z')
+        expires: new Date('2200-01-01T00:00:00.000Z')
       });
     });
 
     it('proxies JsCookie.set with an invalid expiry time',  function ()  {
-      Cookies.setCookie('foo', 'bar', 'not a valid date');
+      Cookies.set('foo', 'bar', 'not a valid date');
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/'
       });
     });
   });
 
-  describe('getCookie',  function ()  {
-    it('proxies Cookie.getCookie',  function ()  {
-      Cookies.getCookie('foo');
+  describe('get',  function ()  {
+    it('proxies JsCookie.get',  function ()  {
+      Cookies.get('foo');
       expect(JsCookie.get).toHaveBeenCalledWith('foo');
     });
   });
 
-  describe('deleteCookie',  function ()  {
+  describe('delete',  function ()  {
     it('proxies JsCookie.remove',  function ()  {
-      Cookies.deleteCookie('foo');
+      Cookies.delete('foo');
       expect(JsCookie.remove).toHaveBeenCalledWith('foo', { path: '/' });
     });
   });

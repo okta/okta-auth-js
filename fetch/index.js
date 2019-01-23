@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
  *
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
@@ -11,5 +11,7 @@
  *
  */
 
-// This exists to use reqwest for http requests by default
-module.exports = require('../reqwest');
+var fetchRequest = require('./fetchRequest');
+var storageUtil = require('../lib/server/serverStorage');
+
+module.exports = require('../lib/server/server')(storageUtil, fetchRequest);

@@ -13,6 +13,7 @@
 * [Configuration reference](#configuration-reference)
 * [API Reference](#api-reference)
 * [Building the SDK](#building-the-sdk)
+* [Node JS Usage](#node-js-usage)
 * [Contributing](#contributing)
 
 The Okta Auth JavaScript SDK builds on top of our [Authentication API](https://developer.okta.com/docs/api/resources/authn) and [OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
@@ -1613,6 +1614,54 @@ Unsubscribe from `tokenManager` events. If no callback is provided, unsubscribes
 authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
+
+## Node JS Usage
+
+You can use this library on server side in your Node application as an Authentication SDK. It can only be used in this way for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), **not** to implement an OIDC flow.
+
+To include this library in your project, you can follow the instructions in the [Getting started](#getting-started) section.
+
+### Configuration
+
+You only need to set the `url` for your Okta Domain:
+
+```javascript
+var OktaAuth = require('@okta/okta-auth-js');
+
+var config = {
+  // The URL for your Okta organization
+  url: 'https://{yourOktaDomain}'
+};
+
+var authClient = new OktaAuth(config);
+```
+
+### Supported APIs
+
+Since the Node library can be used only for the Authentication flow, it implements only a subset of okta-auth-js APIs:
+
+* [signIn](#signinoptions)
+* [forgotPassword](#forgotpasswordoptions)
+* [unlockAccount](#unlockaccountoptions)
+* [verifyRecoveryToken](#verifyrecoverytokenoptions)
+* [tx.resume](#txresume)
+* [tx.exists](#txexists)
+* [transaction.status](#transactionstatus)
+  * [LOCKED_OUT](#locked_out)
+  * [PASSWORD_EXPIRED](#password_expired)
+  * [PASSWORD_RESET](#password_reset)
+  * [PASSWORD_WARN](#password_warn)
+  * [RECOVERY](#recovery)
+  * [RECOVERY_CHALLENGE](#recovery_challenge)
+  * [MFA_ENROLL](#mfa_enroll)
+  * [MFA_ENROLL_ACTIVATE](#mfa_enroll_activate)
+  * [MFA_REQUIRED](#mfa_required)
+  * [MFA_CHALLENGE](#mfa_challenge)
+  * [SUCCESS](#success)
+
+The main difference is that the Node library does **not** have a `session.setCookieAndRedirect` function, so you will have to redirect by yourself (for example using `res.redirect('https://www.yoursuccesspage.com')`).
+
+The `SUCCESS` transaction will still include a `sessionToken` which you can use with the session APIs: https://github.com/okta/okta-sdk-nodejs#sessions.
 
 ## Building the SDK
 

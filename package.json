@@ -4,7 +4,8 @@
   "version": "2.3.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
+  "main": "lib/server/serverIndex.js",
+  "browser": "lib/browser/browserIndex.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
@@ -15,7 +16,9 @@
   "scripts": {
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
-    "test": "jest",
+    "test": "yarn test:browser && yarn test:server",
+    "test:browser": "jest --config ./jest.browser.json",
+    "test:server": "jest --config ./jest.server.json",
     "test:report": "yarn test --ci --silent || true",
     "build": "node ./writeConfig.js && webpack --config webpack.config.js",
     "prepublish": "yarn build"
@@ -29,7 +32,9 @@
   ],
   "dependencies": {
     "Base64": "0.3.0",
+    "cross-fetch": "^3.0.0",
     "js-cookie": "2.2.0",
+    "node-cache": "^4.2.0",
     "q": "1.4.1",
     "reqwest": "2.0.5",
     "tiny-emitter": "1.1.0",
@@ -45,7 +50,7 @@
     "webpack": "1.13.0"
   },
   "okta-auth-js": {
-    "STATE_TOKEN_COOKIE_NAME": "oktaStateToken",
+    "STATE_TOKEN_KEY_NAME": "oktaStateToken",
     "DEFAULT_POLLING_DELAY": 500,
     "DEFAULT_MAX_CLOCK_SKEW": 300,
     "DEFAULT_CACHE_DURATION": 86400,
@@ -55,20 +60,6 @@
     "REDIRECT_NONCE_COOKIE_NAME": "okta-oauth-nonce",
     "TOKEN_STORAGE_NAME": "okta-token-storage",
     "CACHE_STORAGE_NAME": "okta-cache-storage"
-  },
-  "jest": {
-    "coverageDirectory": "./build2/reports/coverage",
-    "restoreMocks": true,
-    "moduleNameMapper": {
-      "^OktaAuth(.*)$": "<rootDir>/jquery/$1"
-    },
-    "testMatch": [
-      "**/test/spec/*.js"
-    ],
-    "reporters": [
-      "default",
-      "jest-junit"
-    ]
   },
   "jest-junit": {
     "output": "./build2/reports/unit/junit-result.xml"

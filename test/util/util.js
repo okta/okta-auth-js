@@ -4,7 +4,7 @@ var Q = require('q'),
     $ = require('jquery'),
     _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
-    cookies = require('../../lib/cookies');
+    cookies = require('../../lib/browser/browserStorage').storage;
 
 var util = {};
 
@@ -328,15 +328,15 @@ util.mockSetWindowLocation = function (client) {
 };
 
 util.mockSetCookie = function () {
-  return jest.spyOn(cookies, 'setCookie');
+  return jest.spyOn(cookies, 'set');
 };
 
 util.mockDeleteCookie = function () {
-  return jest.spyOn(cookies, 'deleteCookie');
+  return jest.spyOn(cookies, 'delete');
 };
 
 util.mockGetCookie = function (text) {
-  jest.spyOn(cookies, 'getCookie').mockReturnValue(text || '');
+  jest.spyOn(cookies, 'get').mockReturnValue(text || '');
 };
 
 util.mockGetHistory = function (client, mockHistory) {
