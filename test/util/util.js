@@ -4,7 +4,7 @@ var Q = require('q'),
     $ = require('jquery'),
     _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
-    cookies = require('../../lib/browser/browserStorageUtil').storage;
+    cookies = require('../../lib/browser/browserStorage').storage;
 
 var util = {};
 

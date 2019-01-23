@@ -12,5 +12,6 @@
  */
 
 var fetchRequest = require('./fetchRequest');
-var storageUtil = require('../lib/server/serverStorageUtil');
+var storageUtil = require('../lib/server/serverStorage');
+
 module.exports = require('../lib/server/server')(storageUtil, fetchRequest);

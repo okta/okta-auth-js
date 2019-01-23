@@ -1,4 +1,4 @@
-var Cookies  = require('../../lib/browser/browserStorageUtil').storage;
+var Cookies  = require('../../lib/browser/browserStorage').storage;
 var JsCookie = require('js-cookie');
 
 describe('cookie', function () {

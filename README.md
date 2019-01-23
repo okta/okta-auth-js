@@ -1619,7 +1619,7 @@ authClient.tokenManager.off('renewed', myRenewedCallback);
 
 You can use this library on server side in your Node application as an Authentication SDK. It can only be used in this way for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), **not** to implement an OIDC flow.
 
-To include this library in your project, you can follow the instruction in the [Getting started](#getting-started) section.
+To include this library in your project, you can follow the instructions in the [Getting started](#getting-started) section.
 
 ### Configuration
 
@@ -1638,7 +1638,7 @@ var authClient = new OktaAuth(config);
 
 ### Supported APIs
 
-Since the Node library can be used only for the Authentication flow, it implements only by a subset of okta-auth-js APIs:
+Since the Node library can be used only for the Authentication flow, it implements only a subset of okta-auth-js APIs:
 
 * [signIn](#signinoptions)
 * [forgotPassword](#forgotpasswordoptions)
