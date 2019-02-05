@@ -184,7 +184,35 @@ var authClient = new OktaAuth(config);
 
 ### Optional configuration options
 
+### `httpRequestClient`
+
+The http request implementation. By default, this is implemented using [reqwest](https://github.com/ded/reqwest) for browser and [cross-fetch](https://github.com/lquixada/cross-fetch) for server. To provide your own request library, implement the following interface:
+
+  1. Must accept:
+      * method (http method)
+      * url (target url)
+      * args (object containing headers and data)
+  2. Must return a Promise that resolves with a raw XMLHttpRequest response
+
+```javascript
+var config = {
+  url: 'https://{yourOktaDomain}',
+  httpRequestClient: function(method, url, args) {
+    // args is in the form:
+    // {
+    //   headers: {
+    //     headerName: headerValue
+    //   },
+    //   data: postBodyData
+    // }
+    return Promise.resolve(/* a raw XMLHttpRequest response */);
+  }
+}
+```
+
 #### `ajaxRequest`
+
+:warning: This parameter has been *deprecated*, please use [**httpRequestClient**](#httpRequestClient) instead.
 
 The ajax request implementation. By default, this is implemented using [reqwest](https://github.com/ded/reqwest). To provide your own request library, implement the following interface:
 
