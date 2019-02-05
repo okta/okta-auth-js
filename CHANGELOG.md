@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.1
+
+### Bug Fixes
+
+- [#187](https://github.com/okta/okta-auth-js/pull/187) - When deprecated `ajaxRequest` was passed to config, the logger for the deprecate message was still using window.console. This fix makes the logger isomorphic.
+
 ## 2.3.0
 
 ### Features
