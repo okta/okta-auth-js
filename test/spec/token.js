@@ -1270,7 +1270,9 @@ describe('token.getWithRedirect', function() {
     oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken',
-        responseType: 'code'
+        responseType: 'code',
+        codeChallenge: 'ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM',
+        codeChallengeMethod: 'S256'
       },
       expectedCookies: [
         [
@@ -1299,6 +1301,8 @@ describe('token.getWithRedirect', function() {
         ]
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'code_challenge=ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM&' +
+                            'code_challenge_method=S256&' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
@@ -1319,7 +1323,9 @@ describe('token.getWithRedirect', function() {
       },
       getWithRedirectArgs: {
         sessionToken: 'testToken',
-        responseType: 'code'
+        responseType: 'code',
+        codeChallenge: 'ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM',
+        codeChallengeMethod: 'S256'
       },
       expectedCookies: [
         [
@@ -1348,6 +1354,8 @@ describe('token.getWithRedirect', function() {
         ]
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
+                            'code_challenge=ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM&' +
+                            'code_challenge_method=S256&' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
@@ -1364,7 +1372,9 @@ describe('token.getWithRedirect', function() {
     oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken',
-        responseType: ['code']
+        responseType: ['code'],
+        codeChallenge: 'ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM',
+        codeChallengeMethod: 'S256'
       },
       expectedCookies: [
         [
@@ -1393,6 +1403,8 @@ describe('token.getWithRedirect', function() {
         ]
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'code_challenge=ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM&' +
+                            'code_challenge_method=S256&' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
@@ -1409,7 +1421,9 @@ describe('token.getWithRedirect', function() {
     oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken',
-        responseType: ['code', 'id_token']
+        responseType: ['code', 'id_token'],
+        codeChallenge: 'ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM',
+        codeChallengeMethod: 'S256'
       },
       expectedCookies: [
         [
@@ -1438,6 +1452,8 @@ describe('token.getWithRedirect', function() {
         ]
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'code_challenge=ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM&' +
+                            'code_challenge_method=S256&' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code%20id_token&' +
@@ -1454,7 +1470,9 @@ describe('token.getWithRedirect', function() {
       getWithRedirectArgs: {
         sessionToken: 'testToken',
         responseType: 'code',
-        responseMode: 'form_post'
+        responseMode: 'form_post',
+        codeChallenge: 'ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM',
+        codeChallengeMethod: 'S256'
       },
       expectedCookies: [
         [
@@ -1483,6 +1501,8 @@ describe('token.getWithRedirect', function() {
         ]
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'code_challenge=ytDGlZj95o1C9Z4c0b_dO5VaeVTxb7eEjP0lio1hvYM&' +
+                            'code_challenge_method=S256&' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
