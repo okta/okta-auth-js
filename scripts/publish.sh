@@ -5,6 +5,8 @@ source $OKTA_HOME/$REPO/scripts/setup.sh
 REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-okta"
 
 export TEST_SUITE_TYPE="build"
+yarn global add @okta/ci-update-package
+yarn global add @okta/ci-pkginfo
 
 if [ -n "$action_branch" ];
 then
