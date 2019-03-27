@@ -33,8 +33,8 @@ function fetchRequest(method, url, args) {
       }
       return result;
     };
-    if (response.headers.get('Accept') &&
-        response.headers.get('Accept').toLowerCase().indexOf('application/json') >= 0) {
+    if (response.headers.get('Content-Type') &&
+        response.headers.get('Content-Type').toLowerCase().indexOf('application/json') >= 0) {
       return response.json().then(respHandler);
     } else {
       return response.text().then(respHandler);
