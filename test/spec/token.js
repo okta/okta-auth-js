@@ -6,6 +6,8 @@ var packageJson = require('../../package.json');
 var _ = require('lodash');
 var Q = require('q');
 
+jest.mock('cross-fetch');
+
 function setupSync() {
   return new OktaAuth({ issuer: 'http://example.okta.com' });
 }
