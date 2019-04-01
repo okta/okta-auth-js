@@ -2,7 +2,7 @@
 /* eslint-disable max-statements, complexity */
 var Q = require('q'),
     _ = require('lodash'),
-    OktaAuth = require('OktaAuth'),
+    OktaAuth = require('../../lib/server/serverIndex'),
     cookies = require('../../lib/browser/browserStorage').storage,
     fetch = require('cross-fetch');
 
@@ -114,10 +114,6 @@ function mockAjax(pairs) {
         resolve(xhr.responseText);
       });
     }
-
-    xhr.getResponseHeader = function(name) {
-      return xhr.headers && xhr.headers[name];
-    };
 
     if (xhr.status > 0 && xhr.status < 300) {
       _.defer(function () { deferred.resolve(xhr); });

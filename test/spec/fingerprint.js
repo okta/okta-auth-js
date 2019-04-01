@@ -1,4 +1,4 @@
-var OktaAuth = require('OktaAuth');
+var OktaAuth = require('../../lib/server/serverIndex');
 var util = require('../util/util');
 var packageJson = require('../../package.json');
 

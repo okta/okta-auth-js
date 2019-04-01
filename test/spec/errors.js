@@ -1,6 +1,6 @@
 var _ = require('lodash'),
     util = require('../util/util'),
-    OktaAuth = require('OktaAuth');
+    OktaAuth = require('../../lib/server/serverIndex');
 
 describe('General Errors', function () {
   util.itErrorsCorrectly({

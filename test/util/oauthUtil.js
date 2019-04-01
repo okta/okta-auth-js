@@ -1,6 +1,6 @@
 /* eslint-disable complexity, max-statements */
 var util = require('../util/util');
-var OktaAuth = require('OktaAuth');
+var OktaAuth = require('../../lib/server/serverIndex');
 var tokens = require('./tokens');
 var Q = require('q');
 var EventEmitter = require('tiny-emitter');
