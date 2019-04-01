@@ -17,8 +17,8 @@
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
     "test": "yarn test:browser && yarn test:server",
-    "test:browser": "jest --config ./jest.browser.json",
-    "test:server": "jest --config ./jest.server.json",
+    "test:browser": "jest --config ./jest.browser.js",
+    "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
     "build": "node ./writeConfig.js && webpack --config webpack.config.js",
     "prepublish": "yarn build"

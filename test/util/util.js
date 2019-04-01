@@ -2,7 +2,7 @@
 /* eslint-disable max-statements, complexity */
 var Q = require('q'),
     _ = require('lodash'),
-    OktaAuth = require('../../lib/server/serverIndex'),
+    OktaAuth = require('OktaAuth'),
     cookies = require('../../lib/browser/browserStorage').storage,
     fetch = require('cross-fetch');
 
