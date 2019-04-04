@@ -122,4 +122,25 @@ describe('util', function() {
     });
   });
 
+  describe('isFunction', function() {
+    it('returns false if argument is undefined', function() {
+      var fn;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is null', function() {
+      var fn = null;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is not a function', function() {
+      var fn = "I am not a function!";
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns true if argument is a function', function() {
+      var fn = function() { return "I am a function!"; };
+      expect(util.isFunction(fn)).toBe(true);
+    });
+  });
 });
