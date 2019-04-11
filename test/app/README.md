@@ -1,5 +1,7 @@
 # test-app
 
+Install dependencies
+
 `npm i`
 
 Set or pass environment variables.
