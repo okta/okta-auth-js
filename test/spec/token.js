@@ -952,7 +952,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
             },
             ignoreSignature: false
           })
@@ -1000,7 +1001,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token'
             },
             ignoreSignature: false
           })
@@ -1052,7 +1054,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token'
             },
             ignoreSignature: false
           })
@@ -1097,7 +1100,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
             },
             ignoreSignature: false
           })
@@ -1147,7 +1151,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token'
             },
             ignoreSignature: false
           })
@@ -1191,7 +1196,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
             },
             ignoreSignature: false
           })
@@ -1240,7 +1246,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token'
             },
             ignoreSignature: false
           })
@@ -1284,7 +1291,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
             },
             ignoreSignature: false
           })
@@ -1333,7 +1341,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token'
             },
             ignoreSignature: false
           })
@@ -1378,7 +1387,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
             },
             ignoreSignature: false
           })
@@ -1423,7 +1433,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
             },
             ignoreSignature: false
           })
@@ -1468,7 +1479,8 @@ describe('token.getWithRedirect', function() {
             urls: {
               issuer: 'https://auth-js-test.okta.com',
               authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
             },
             ignoreSignature: false
           })
@@ -1507,6 +1519,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1535,6 +1548,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1562,6 +1576,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1589,6 +1604,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
         }
@@ -1614,6 +1630,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1639,6 +1656,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
         }
@@ -1665,6 +1683,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1691,6 +1710,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
         }
@@ -1718,6 +1738,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1746,6 +1767,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1773,6 +1795,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
         }
@@ -1797,6 +1820,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1849,6 +1873,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
@@ -1880,6 +1905,7 @@ describe('token.parseFromUrl', function() {
         scopes: ['openid', 'email'],
         urls: {
           issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }

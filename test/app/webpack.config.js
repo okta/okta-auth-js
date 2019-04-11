@@ -1,3 +1,4 @@
+/* global process, __dirname */
 require('dotenv').config();
 
 var webpack = require('webpack');
