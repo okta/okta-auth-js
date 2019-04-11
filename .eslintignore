@@ -7,3 +7,4 @@
 /node_modules
 *.config.js
 /lib/config.js
+/test/app/node_modules

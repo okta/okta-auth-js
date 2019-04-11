@@ -61,7 +61,6 @@ async function handleAuthentication() {
     code: authorizationCode,
     codeVerifier: codeVerifier,
   });
-  console.log('tokens', tokens);
   tokens = Array.isArray(tokens) ? tokens : [tokens];
   tokens.forEach((token) => {
     if (token.idToken) {
@@ -133,6 +132,7 @@ function renderCallback(tokens) {
   rootEl.innerHTML = `<div>${content}</div>`;
 }
 
+/* eslint-disable no-console */
 async function start() {
   const { pathname } = window.location;
   if (pathname.startsWith('/implicit/callback')) {

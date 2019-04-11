@@ -1,10 +1,6 @@
 {
-  "extends": "airbnb",
-  "root": true,
-  "rules": {
-    "strict": "off",
-    "max-len": ["error", 200],
-    "react/prop-types": "off",
-    "react/prefer-stateless-function": [0]
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2017
   }
 }
