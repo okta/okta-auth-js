@@ -11,7 +11,7 @@
  */
 
 /* global process, window, document */
-
+/* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
 
 /* eslint-disable prefer-destructuring */
@@ -30,16 +30,25 @@ const oktaAuth = new OktaAuth({
   redirectUri: REDIRECT_URI,
 });
 
-const code = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
-const codeVerifier = oktaAuth.pkce.generateVerifier(code);
+function saveCodeVerifier(val) {
+  sessionStorage.setItem('okta-code-verifier', val);
+}
+
+function loadCodeVerifier() {
+  return sessionStorage.getItem('okta-code-verifier');
+}
 
 window.login = async function login(event) {
   event.preventDefault(); // Necessary to prevent default navigation for redirect below
 
   const scopes = ['openid', 'email', 'profile'];
+  const codeVerifier = oktaAuth.pkce.generateVerifier();
   const codeChallenge = await oktaAuth.pkce.computeChallenge(codeVerifier);
   const responseType = 'code';
   const responseMode = 'fragment';
+
+  // We must save the code verifier somewhere that will survive the redirect
+  saveCodeVerifier(codeVerifier);
 
   oktaAuth.token.getWithRedirect({
     scopes,
@@ -56,7 +65,10 @@ window.logout = async function logout() {
 };
 
 async function handleAuthentication() {
+  // The authorization code is in the URL fragment
   let { authorizationCode } = await oktaAuth.token.parseFromUrl();
+  // The code verifier we have stored locally
+  const codeVerifier = loadCodeVerifier();
   let tokens = await oktaAuth.pkce.exchangeForToken({
     code: authorizationCode,
     codeVerifier: codeVerifier,
@@ -90,8 +102,12 @@ async function getUser() {
 function renderApp(props) {
   const { user } = props;
   const content = (user ?
-    `<h2>Welcome back, ${user.name}</h2><hr/><a href="/" onclick="logout()">Logout</a>` :
-    '<a href="/" onclick="login(event)">Login</a>'
+    `<h2>Welcome back, ${user.name}</h2>
+    <hr/>
+    <a href="/" onclick="logout()">Logout</a>` :
+    `<h2>Greetings, user!</h2>
+    <hr/>
+    <a href="/" onclick="login(event)">Login (using PKCE)</a>`
   );
   const rootEl = document.getElementById('root');
   rootEl.innerHTML = `<div>${content}</div>`;
@@ -126,13 +142,13 @@ function tokensHTML(tokens) {
 function renderCallback(tokens) {
   const rootEl = document.getElementById('root');
   const content = `
-    ${tokensHTML(tokens)}
     <a href="/">Return Home</a>
+    <hr/>
+    ${tokensHTML(tokens)}
   `;
   rootEl.innerHTML = `<div>${content}</div>`;
 }
 
-/* eslint-disable no-console */
 async function start() {
   const { pathname } = window.location;
   if (pathname.startsWith('/implicit/callback')) {
