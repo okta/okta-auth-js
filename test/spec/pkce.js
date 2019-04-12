@@ -2,6 +2,7 @@ require('../util/webcrypto').polyFill();
 
 var OktaAuth = require('OktaAuth');
 var util = require('../util/util');
+var packageJson = require('../../package.json');
 
 describe('pkce', function() {
   var authClient;
@@ -65,38 +66,52 @@ describe('pkce', function() {
   });
 
   describe('exchangeForToken', function() {
+    var ISSUER = 'http://example.okta.com';
+    var REDIRECT_URI = 'http://fake.local';
+    var CLIENT_ID = 'fake';
 
-    // TODO
-    xit('makes requests', function() {
-      util.itMakesCorrectRequestResponse({
-        title: 'attaches fingerprint to signIn requests if sendFingerprint is true',
-        setup: {
-          uri: 'http://example.okta.com',
-          calls: [
-            {
-              request: {
-                method: 'post',
-                uri: '/api/v1/authn',
-                data: { username: 'not', password: 'real' },
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                  'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
-                  'X-Device-Fingerprint': 'ABCD'
-                }
+    util.itMakesCorrectRequestResponse({
+      title: 'requests a token',
+      setup: {
+        uri: ISSUER,
+        bypassCrypto: true,
+        calls: [
+          {
+            request: {
+              method: 'post',
+              uri: '/oauth2/v1/token',
+              data: {
+                client_id: CLIENT_ID,
+                grant_type: 'authorization_code',
+                redirect_uri: REDIRECT_URI
               },
-              response: 'success'
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': null,
+                'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version
+              }
+            },
+            response: 'pkce-token-success',
+            responseVars: {
+              scope: 'also fake',
+              accessToken: 'fake access token',
+              idToken: util.generateIDToken({
+                issuer: ISSUER,
+                clientId: CLIENT_ID
+              })
             }
-          ]
-        },
-        execute: function (test) {
-          return setup({ authClient: test.oa }).signIn({
-            username: 'not',
-            password: 'real',
-            sendFingerprint: true
-          });
-        }
+          }
+        ]
+      },
+      execute: function (test) {
+        return test.oa.pkce.exchangeForToken({
+          clientId: CLIENT_ID,
+          redirectUri: REDIRECT_URI
+        }, {
+          issuer: ISSUER
+        });
+      }
     })
   });
-});
+
 });
