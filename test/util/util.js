@@ -4,9 +4,28 @@ var Q = require('q'),
     $ = require('jquery'),
     _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
-    cookies = require('../../lib/browser/browserStorage').storage;
+    cookies = require('../../lib/browser/browserStorage').storage,
+    sdkUtil = require('../../lib/util');
 
 var util = {};
+
+util.generateIDToken = function(options) {
+  var header = {};
+  var signature = {};
+  var payload = {}
+
+  options = options || {};
+  payload.iss = options.issuer;
+  payload.aud = options.clientId;
+  payload.iat = Date.now() / 1000;
+  payload.exp = payload.iat + (1000 * 30);
+
+  return [
+    sdkUtil.stringToBase64Url(JSON.stringify(header)),
+    sdkUtil.stringToBase64Url(JSON.stringify(payload)),
+    sdkUtil.stringToBase64Url(JSON.stringify(signature))
+  ].join('.');
+}
 
 function warpByTicksToUnixTime(unixTime) {
   var ticks = (unixTime * 1000) - Date.now();
@@ -29,8 +48,10 @@ util.warpByTicksToUnixTime = function (unixTime) {
   warpByTicksToUnixTime(unixTime);
 };
 
-function generateXHRPair(request, response, uri) {
+function generateXHRPair(request, response, uri, responseVars) {
   return Q.Promise(function(resolve) {
+    responseVars = responseVars || {};
+    responseVars.uri = responseVars.uri || uri;
 
     // Import the desired xhr
     var responseXHR = require('../xhr/' + response);
@@ -42,7 +63,7 @@ function generateXHRPair(request, response, uri) {
 
     // Change the responses to use the desired uri
     var compiledTmpl = _.template(JSON.stringify(responseXHR.response));
-    responseXHR.response = JSON.parse(compiledTmpl({uri: uri}));
+    responseXHR.response = JSON.parse(compiledTmpl(responseVars));
 
     // Place response into responseText (AuthClient SDK depends on this)
     if (!responseXHR.response) {
@@ -146,7 +167,7 @@ function setup(options) {
         // Get all the pairs and load the mock
         var xhrGenPromises = [];
         _.each(options.calls, function(call) {
-          var xhrGenPromise = generateXHRPair(call.request, call.response, options.uri);
+          var xhrGenPromise = generateXHRPair(call.request, call.response, options.uri, call.responseVars);
           xhrGenPromises.push(xhrGenPromise);
         });
 
@@ -157,7 +178,7 @@ function setup(options) {
           });
 
       } else if (options.response) {
-        return generateXHRPair(options.request, options.response, options.uri)
+        return generateXHRPair(options.request, options.response, options.uri, options.responseVars)
           .then(function(pair) {
             // Load the single response as a pair
             ajaxMock = mockAjax(pair);
@@ -176,7 +197,8 @@ function setup(options) {
       oa = new OktaAuth({
         url: options.uri,
         transformErrorXHR: options.transformErrorXHR,
-        headers: options.headers
+        headers: options.headers,
+        ignoreSignature: options.bypassCrypto === true
       });
 
       // 3. Initialize status if passed in
@@ -237,7 +259,7 @@ util.itMakesCorrectRequestResponse = function (options) {
         done();
       });
     });
-  });
+  }, options.timeout);
 };
 
 util.itErrorsCorrectly = function (options) {
