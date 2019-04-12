@@ -3,7 +3,7 @@
  * anywhere without any dependencies. It packages the SDK
  * with reqwest and Q. It also preserves license comments.
  */
-
+/* global __dirname */
 var path    = require('path');
 var webpack = require('webpack');
 var fs      = require('fs');
