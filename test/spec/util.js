@@ -122,4 +122,50 @@ describe('util', function() {
     });
   });
 
+  describe('isFunction', function() {
+    it('returns false if argument is undefined', function() {
+      var fn;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is null', function() {
+      var fn = null;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is a boolean', function() {
+      var fn = true;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is a number', function() {
+      var fn = 3;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument a string', function() {
+      var fn = 'I am not a function!';
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is an Object', function() {
+      var fn = { name: 'Not a function!' };
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is a Date', function() {
+      var fn = new Date('December 17, 1995 03:24:00');
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is a RegExp', function() {
+      var fn = new RegExp('\\w+');
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns true if argument is a function', function() {
+      var fn = function() { return 'I am a function!'; };
+      expect(util.isFunction(fn)).toBe(true);
+    });
+  });
 });
