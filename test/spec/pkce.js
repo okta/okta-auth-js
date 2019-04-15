@@ -1,7 +1,9 @@
 require('../util/webcrypto').polyFill();
 
-var OktaAuth = require('OktaAuth');
+// Must be required before any code that uses 'cross-fetch'
 var util = require('../util/util');
+
+var OktaAuth = require('../../lib/browser/browserIndex');
 var packageJson = require('../../package.json');
 
 describe('pkce', function() {
