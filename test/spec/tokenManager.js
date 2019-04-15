@@ -12,7 +12,8 @@ function setupSync(options) {
     maxClockSkew: options.maxClockSkew || 1, // set default to 1 second
     tokenManager: {
       storage: options.tokenManager.type,
-      autoRenew: options.tokenManager.autoRenew || false
+      autoRenew: options.tokenManager.autoRenew || false,
+      secure: options.tokenManager.secure // used by cookie storage
     }
   });
 }
@@ -71,7 +72,8 @@ describe('TokenManager', function() {
       expect(setCookieMock).toHaveBeenCalledWith(
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-        '2200-01-01T00:00:00.000Z'
+        '2200-01-01T00:00:00.000Z',
+        undefined // secure
       );
     });
     it('defaults to cookie-based storage if sessionStorage cannot be written to', function() {
@@ -92,7 +94,8 @@ describe('TokenManager', function() {
       expect(setCookieMock).toHaveBeenCalledWith(
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-        '2200-01-01T00:00:00.000Z'
+        '2200-01-01T00:00:00.000Z',
+        undefined // secure
       );
     });
   });
@@ -734,10 +737,12 @@ describe('TokenManager', function() {
 
   describe('cookie', function() {
 
-    function cookieStorageSetup() {
+    function cookieStorageSetup(options) {
+      options = options || {};
       return setupSync({
         tokenManager: {
-          type: 'cookie'
+          type: 'cookie',
+          secure: options.secure
         }
       });
     }
@@ -750,9 +755,23 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z'
+          '2200-01-01T00:00:00.000Z',
+          undefined // secure
         );
       });
+
+      it('respects the "secure" option', function() {
+        var client = cookieStorageSetup({ secure: true });
+        var setCookieMock = util.mockSetCookie();
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        expect(setCookieMock).toHaveBeenCalledWith(
+          'okta-token-storage',
+          JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
+          '2200-01-01T00:00:00.000Z',
+          true // secure
+        );
+      });
+
     });
 
     describe('get', function() {
@@ -790,7 +809,8 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           JSON.stringify({anotherKey: tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z'
+          '2200-01-01T00:00:00.000Z',
+          undefined // secure
         );
       });
     });
@@ -805,7 +825,8 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           '{}',
-          '2200-01-01T00:00:00.000Z'
+          '2200-01-01T00:00:00.000Z',
+          undefined // secure
         );
       });
     });

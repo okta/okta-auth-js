@@ -124,7 +124,7 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
 
 **Important:** This configuration option can be included **only** when instantiating Okta Auth JS.
 
-Specify the type of storage for tokens. Defaults to [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and will fall back to [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), and/or [cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) if not the previous type is not available.
+Specify the type of storage for tokens. Defaults to [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and will fall back to [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), and/or [cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) if the previous type is not available.
 
 ```javascript
 
@@ -137,6 +137,15 @@ var config = {
 
 var authClient = new OktaAuth(config);
 ```
+
+Even if you have specified `localStorage` or `sessionStorage` in your config, the `TokenManager` may fall back to using `cookie` storage on some clients. If your site will always be served over a HTTPS connection, you may want to enable "secure" cookies. This option will prevent cookies from being stored on an HTTP connection.
+
+```javascript
+tokenManager: {
+  secure: true
+}
+```
+
 
 By default, the `tokenManager` will attempt to renew expired tokens. When an expired token is requested by the `tokenManager.get()` method, a renewal request is executed to update the token. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to  [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
