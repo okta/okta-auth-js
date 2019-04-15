@@ -7,6 +7,8 @@ var wellKnown = require('../xhr/well-known');
 var keys = require('../xhr/keys');
 var tokens = require('../util/tokens');
 
+jest.mock('cross-fetch');
+
 describe('getWellKnown', function() {
   util.itMakesCorrectRequestResponse({
     title: 'caches response and uses cache on subsequent requests',

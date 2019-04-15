@@ -1,10 +1,12 @@
 /* globals expect, JSON */
 /* eslint-disable max-statements, complexity */
 var Q = require('q'),
-    $ = require('jquery'),
     _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
-    cookies = require('../../lib/browser/browserStorage').storage;
+    cookies = require('../../lib/browser/browserStorage').storage,
+    fetch = require('cross-fetch');
+
+jest.mock('cross-fetch');
 
 var util = {};
 
@@ -80,44 +82,46 @@ function mockAjax(pairs) {
     setNextPair(pairs);
   }
 
-  jest.spyOn($, 'ajax').mockImplementation(function(args) {
-
+  fetch.mockImplementation(function (url, args) {
     var pair = allPairs.shift();
     if (!pair) {
       throw new Error('We are making a request that we have not anticipated.');
     }
 
     // Make sure every request is attaching cookies
-    expect(args.xhrFields).toEqual({
-      withCredentials: true
-    });
+    expect(args.credentials).toEqual('include');
 
     if (pair.request) {
-      expect(pair.request.uri).toEqual(args.url);
-      if (pair.request.data || args.data) {
-        expect(pair.request.data).toEqual(JSON.parse(args.data));
+      expect(pair.request.uri).toEqual(url);
+      if (pair.request.data || args.body) {
+        expect(pair.request.data).toEqual(JSON.parse(args.body));
       }
       if (pair.request.headers) {
         expect(pair.request.headers).toEqual(args.headers);
       }
     }
 
-    var deferred = $.Deferred();
+    var deferred = Q.defer();
     var xhr = pair.response;
-
-    xhr.getResponseHeader = function(name) {
-      return xhr.headers && xhr.headers[name];
-    };
+    xhr.headers = xhr.headers || {};
+    xhr.headers['Content-Type'] = 'application/json';
+    xhr.headers.get = function(attr) {
+      return xhr.headers[attr];
+    }
+    xhr.ok = xhr.status >= 200 && xhr.status < 300;
+    xhr.json = function() {
+      return Q.Promise(function(resolve) {
+        resolve(xhr.responseText);
+      });
+    }
 
     if (xhr.status > 0 && xhr.status < 300) {
-      // $.ajax send (data, textStatus, jqXHR) on success
-      _.defer(function () { deferred.resolve(xhr.response, null, xhr); });
+      _.defer(function () { deferred.resolve(xhr); });
     } else {
-      // $.ajax send (jqXHR, textStatus, errorThrown) on failure
       xhr.responseJSON = xhr.response;
-      deferred.reject(xhr, null, xhr.response);
+      deferred.reject(xhr);
     }
-    return deferred;
+    return deferred.promise;
   });
 
   return {
