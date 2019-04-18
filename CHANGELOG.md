@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.5.0
+
+### Features
+- [d736cc9](https://github.com/okta/okta-auth-js/commit/d736cc9ad5377f4fecac2644390a9f856d5d8238) - New TokenManager option to support HTTPS-only "secure" cookies.
+
+### Other
+- [fddec0a](https://github.com/okta/okta-auth-js/commit/fddec0a21a060d3ed81246b2ca79faf8364f638f) - Use `fetch` as the default request agent (instead of `reqwest`).
+
+
 ## 2.3.1
 
 ### Bug Fixes
