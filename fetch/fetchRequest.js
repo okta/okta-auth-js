@@ -13,11 +13,18 @@
 var fetch = require('cross-fetch');
 
 function fetchRequest(method, url, args) {
+  var body = args.data;
+
+  // JSON encode body (if appropriate)
+  if (body && args.headers['Content-Type'] === 'application/json' && typeof body !== 'string') {
+    body = JSON.stringify(body);
+  }
+
   var fetchPromise = fetch(url, {
     method: method,
     headers: args.headers,
-    body: JSON.stringify(args.data),
-    credentials: 'include'
+    body: body,
+    credentials: !args.withCredentials ? 'omit' : 'include'
   })
   .then(function(response) {
     var error = !response.ok;
