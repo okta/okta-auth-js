@@ -17,8 +17,7 @@ function reqwestRequest(method, url, args) {
     url: url,
     method: method,
     headers: args.headers,
-    data: args.data, //method === 'POST' ? args.data : JSON.stringify(args.data),
-    withCredentials: args.withCredentials === false ? false : true
+    data: JSON.stringify(args.data)
   })
   .then(function() {
     return r.request;

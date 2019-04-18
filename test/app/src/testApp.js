@@ -24,7 +24,6 @@ const HOST = window.location.host;
 const REDIRECT_URI = `http://${HOST}/implicit/callback`;
 
 const oktaAuth = new OktaAuth({
-  // maxClockSkew: Number.MAX_SAFE_INTEGER, // FORCES TOKEN RENEW
   issuer: ISSUER,
   clientId: CLIENT_ID,
   redirectUri: REDIRECT_URI,
@@ -66,7 +65,7 @@ window.logout = async function logout() {
 
 async function handleAuthentication() {
   // The authorization code is in the URL fragment
-  let { authorizationCode } = await oktaAuth.token.parseFromUrl();
+  const { authorizationCode } = await oktaAuth.token.parseFromUrl();
   // The code verifier we have stored locally
   const codeVerifier = loadCodeVerifier();
   let tokens = await oktaAuth.pkce.exchangeForToken({
