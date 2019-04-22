@@ -109,14 +109,19 @@ function mockAjax(pairs) {
       throw new Error('We are making a request that we have not anticipated.');
     }
 
-    // Make sure every request is attaching cookies
-    expect(args.credentials).toEqual('include');
+    if (pair.request.withCredentials !== false) {
+      // Make sure every request is attaching cookies
+      expect(args.credentials).toEqual('include');
+    }
 
     if (pair.request) {
       expect(pair.request.uri).toEqual(url);
-      if (pair.request.data || args.body) {
-        expect(pair.request.data).toEqual(JSON.parse(args.body));
-      }
+
+      // TODO: this is testing fetchRequest. move this to a unit test
+      // if (pair.request.data || args.body) {
+      //   expect(pair.request.data).toEqual(JSON.parse(args.body));
+      // }
+  
       if (pair.request.headers) {
         expect(pair.request.headers).toEqual(args.headers);
       }

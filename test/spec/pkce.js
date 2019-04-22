@@ -82,6 +82,7 @@ describe('pkce', function() {
             request: {
               method: 'post',
               uri: '/oauth2/v1/token',
+              withCredentials: false,
               data: {
                 client_id: CLIENT_ID,
                 grant_type: 'authorization_code',
@@ -89,7 +90,7 @@ describe('pkce', function() {
               },
               headers: {
                 'Accept': 'application/json',
-                'Content-Type': null,
+                'Content-Type': 'application/x-www-form-urlencoded',
                 'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version
               }
             },

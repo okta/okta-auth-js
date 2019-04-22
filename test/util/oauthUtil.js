@@ -352,15 +352,18 @@ oauthUtil.setupRedirect = function(opts) {
   var windowLocationMock = util.mockSetWindowLocation(client);
   var setCookieMock = util.mockSetCookie();
 
+  var promise;
   if (Array.isArray(opts.getWithRedirectArgs)) {
-    client.token.getWithRedirect.apply(null, opts.getWithRedirectArgs);
+    promise = client.token.getWithRedirect.apply(null, opts.getWithRedirectArgs);
   } else {
-    client.token.getWithRedirect(opts.getWithRedirectArgs);
+    promise = client.token.getWithRedirect(opts.getWithRedirectArgs);
   }
 
-  expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
-
-  expect(setCookieMock.mock.calls).toEqual(opts.expectedCookies);
+  return promise
+    .then(function() {
+      expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
+      expect(setCookieMock.mock.calls).toEqual(opts.expectedCookies);
+    });
 };
 
 oauthUtil.setupParseUrl = function(opts) {
