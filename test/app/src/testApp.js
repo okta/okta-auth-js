@@ -29,31 +29,11 @@ const oktaAuth = new OktaAuth({
   redirectUri: REDIRECT_URI,
 });
 
-function saveCodeVerifier(val) {
-  sessionStorage.setItem('okta-code-verifier', val);
-}
-
-function loadCodeVerifier() {
-  return sessionStorage.getItem('okta-code-verifier');
-}
-
 window.login = async function login(event) {
   event.preventDefault(); // Necessary to prevent default navigation for redirect below
 
-  const scopes = ['openid', 'email', 'profile'];
-  const codeVerifier = oktaAuth.pkce.generateVerifier();
-  const codeChallenge = await oktaAuth.pkce.computeChallenge(codeVerifier);
-  const responseType = 'code';
-  const responseMode = 'fragment';
-
-  // We must save the code verifier somewhere that will survive the redirect
-  saveCodeVerifier(codeVerifier);
-
   oktaAuth.token.getWithRedirect({
-    scopes,
-    codeChallenge,
-    responseType,
-    responseMode
+    grantType: 'code'
   });
 };
 
@@ -66,11 +46,9 @@ window.logout = async function logout() {
 async function handleAuthentication() {
   // The authorization code is in the URL fragment
   const { authorizationCode } = await oktaAuth.token.parseFromUrl();
-  // The code verifier we have stored locally
-  const codeVerifier = loadCodeVerifier();
+
   let tokens = await oktaAuth.pkce.exchangeForToken({
-    code: authorizationCode,
-    codeVerifier: codeVerifier,
+    code: authorizationCode
   });
   tokens = Array.isArray(tokens) ? tokens : [tokens];
   tokens.forEach((token) => {
@@ -101,7 +79,7 @@ async function getUser() {
 function renderApp(props) {
   const { user } = props;
   const content = (user ?
-    `<h2>Welcome back, ${user.name}</h2>
+    `<h2>Welcome back, ${user.email}</h2>
     <hr/>
     <a href="/" onclick="logout()">Logout</a>` :
     `<h2>Greetings, user!</h2>
