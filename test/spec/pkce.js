@@ -67,10 +67,14 @@ describe('pkce', function() {
     })
   });
 
-  describe('exchangeForToken', function() {
+  describe('getToken', function() {
     var ISSUER = 'http://example.okta.com';
     var REDIRECT_URI = 'http://fake.local';
     var CLIENT_ID = 'fake';
+    var endpoint = '/oauth2/v1/token';
+    var codeVerifier = 'superfake';
+    var authorizationCode = 'notreal';
+    var grantType = 'authorization_code';
 
     util.itMakesCorrectRequestResponse({
       title: 'requests a token',
@@ -81,11 +85,11 @@ describe('pkce', function() {
           {
             request: {
               method: 'post',
-              uri: '/oauth2/v1/token',
+              uri: endpoint,
               withCredentials: false,
               data: {
                 client_id: CLIENT_ID,
-                grant_type: 'authorization_code',
+                grant_type: grantType,
                 redirect_uri: REDIRECT_URI
               },
               headers: {
@@ -107,11 +111,14 @@ describe('pkce', function() {
         ]
       },
       execute: function (test) {
-        return test.oa.pkce.exchangeForToken({
+        return test.oa.pkce.getToken({
           clientId: CLIENT_ID,
-          redirectUri: REDIRECT_URI
+          redirectUri: REDIRECT_URI,
+          authorizationCode: authorizationCode,
+          codeVerifier: codeVerifier,
+          grantType: grantType,
         }, {
-          issuer: ISSUER
+          tokenUrl: ISSUER + endpoint
         });
       }
     })

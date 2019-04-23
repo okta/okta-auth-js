@@ -29,27 +29,28 @@ const oktaAuth = new OktaAuth({
   redirectUri: REDIRECT_URI,
 });
 
-window.login = async function login(event) {
+async function login(implicit, event) {
   event.preventDefault(); // Necessary to prevent default navigation for redirect below
 
   oktaAuth.token.getWithRedirect({
-    grantType: 'code'
+    grantType: implicit ? 'implicit' : 'authorization_code',
+    responseType: ['id_token', 'token']
   });
-};
+}
 
-window.logout = async function logout() {
+async function logout() {
   oktaAuth.tokenManager.clear();
   await oktaAuth.signOut();
   window.location.reload();
-};
+}
+
+window.loginPKCE = login.bind(null, false);
+window.loginImplicit = login.bind(null, true);
+window.logout = logout.bind(null);
 
 async function handleAuthentication() {
-  // The authorization code is in the URL fragment
-  const { authorizationCode } = await oktaAuth.token.parseFromUrl();
-
-  let tokens = await oktaAuth.pkce.exchangeForToken({
-    code: authorizationCode
-  });
+  // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
+  let tokens = await oktaAuth.token.parseFromUrl();
   tokens = Array.isArray(tokens) ? tokens : [tokens];
   tokens.forEach((token) => {
     if (token.idToken) {
@@ -84,7 +85,9 @@ function renderApp(props) {
     <a href="/" onclick="logout()">Logout</a>` :
     `<h2>Greetings, user!</h2>
     <hr/>
-    <a href="/" onclick="login(event)">Login (using PKCE)</a>`
+    <a href="/" onclick="loginPKCE(event)">Login (using PKCE)</a>
+    <br/>
+    <a href="/" onclick="loginImplicit(event)">Login (using Implicit Flow)</a>`
   );
   const rootEl = document.getElementById('root');
   rootEl.innerHTML = `<div>${content}</div>`;
