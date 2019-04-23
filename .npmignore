@@ -5,3 +5,4 @@ build2
 .travis.yml
 ci-scripts
 webpack*config.js
+scripts
