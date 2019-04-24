@@ -1,3 +1,5 @@
+jest.mock('cross-fetch');
+
 var OktaAuth = require('OktaAuth');
 var oauthUtil = require('../../lib/oauthUtil');
 var libUtil = require('../../lib/util');
@@ -6,8 +8,6 @@ var util = require('../util/util');
 var wellKnown = require('../xhr/well-known');
 var keys = require('../xhr/keys');
 var tokens = require('../util/tokens');
-
-jest.mock('cross-fetch');
 
 describe('getWellKnown', function() {
   util.itMakesCorrectRequestResponse({

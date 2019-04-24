@@ -1,8 +1,8 @@
+jest.mock('cross-fetch');
+
 var OktaAuth = require('OktaAuth');
 var util = require('../util/util');
 var packageJson = require('../../package.json');
-
-jest.mock('cross-fetch');
 
 describe('fingerprint', function() {
   function setup(options) {

@@ -1,13 +1,12 @@
 /* globals expect, JSON */
 /* eslint-disable max-statements, complexity */
+
 var Q = require('q'),
     _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
     cookies = require('../../lib/browser/browserStorage').storage,
     sdkUtil = require('../../lib/util'),
     fetch = require('cross-fetch');
-
-jest.mock('cross-fetch');
 
 var util = {};
 
@@ -109,14 +108,14 @@ function mockAjax(pairs) {
       throw new Error('We are making a request that we have not anticipated.');
     }
 
-    // Make sure every request is attaching cookies
-    expect(args.credentials).toEqual('include');
+    if (pair.request.withCredentials !== false) {
+      // Make sure every request is attaching cookies
+      expect(args.credentials).toEqual('include');
+    }
 
     if (pair.request) {
       expect(pair.request.uri).toEqual(url);
-      if (pair.request.data || args.body) {
-        expect(pair.request.data).toEqual(JSON.parse(args.body));
-      }
+
       if (pair.request.headers) {
         expect(pair.request.headers).toEqual(args.headers);
       }

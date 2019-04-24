@@ -1,3 +1,5 @@
+jest.mock('cross-fetch');
+
 var util = require('../util/util');
 
 describe('LOCKED_OUT', function () {
