@@ -4,6 +4,10 @@ require('../util/webcrypto').polyFill();
 var util = require('../util/util');
 var OktaAuth = require('../../lib/browser/browserIndex');
 var packageJson = require('../../package.json');
+var sdkUtil = require('../../lib/util');
+
+var MIN_VERIFIER_LENGTH = 43;
+var MAX_VERIFIER_LENGTH = 128;
 
 describe('pkce', function() {
   var authClient;
@@ -18,7 +22,8 @@ describe('pkce', function() {
   // Code challenge: Base64 URL-encoded SHA-256 hash of the code verifier.
 
   function validateVerifier(code) {
-    expect(code.length).toBeGreaterThan(42);
+    expect(code.length).toBeGreaterThan(MIN_VERIFIER_LENGTH - 1);
+    expect(code.length).toBeLessThan(MAX_VERIFIER_LENGTH + 1);
     expect(encodeURIComponent(code)).toBe(code);
   }
 
@@ -27,6 +32,14 @@ describe('pkce', function() {
     it('produces a valid code', function() {
       var code = authClient.pkce.generateVerifier();
       validateVerifier(code);
+    });
+
+    it('trims code to maximum length', function() {
+      var prefix = sdkUtil.genRandomString(MAX_VERIFIER_LENGTH * 2);
+      expect(prefix.length).toBeGreaterThan(MAX_VERIFIER_LENGTH);
+      var code = authClient.pkce.generateVerifier(prefix);
+      validateVerifier(code);
+      expect(code.length).toBe(MAX_VERIFIER_LENGTH);
     });
 
     it('accepts a prefix', function() {
