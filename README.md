@@ -164,6 +164,7 @@ tokenManager: {
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
+| `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
 | `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
 | | This option should be used only for browser support and testing purposes. |
 
@@ -1365,6 +1366,7 @@ The following configuration options can **only** be included in `token.getWithou
 
 | Options | Description |
 | :-------: | ----------|
+| `grantType`  | Specify grantType for this Application. Supported types are "implicit" and "authorization_code". Defaults to "implicit" |
 | `sessionToken` | Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow. |
 | `responseMode` | Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`. See [Parameter Details](https://developer.okta.com/docs/api/resources/oidc#parameter-details) for a list of available modes. |
 | `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. Defaults to `id_token`. |
@@ -1440,12 +1442,20 @@ Create token using a redirect.
 * `oauthOptions` - See [Extended OpenID Connect options](#extended-openid-connect-options)
 
 ```javascript
-authClient.token.getWithRedirect(oauthOptions);
+authClient.token.getWithRedirect({
+  grantType: 'authorization_code',
+  responseType: ['id_token', 'token'])
+})
 ```
 
 #### `token.parseFromUrl(options)`
 
-Parses the access or ID Tokens from the url after a successful authentication redirect. If an ID token is present, it will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
+Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. 
+
+If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint. 
+
+The ID token will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
+
 
 ```javascript
 authClient.token.parseFromUrl()
