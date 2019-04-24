@@ -16,7 +16,7 @@ function fetchRequest(method, url, args) {
   var body = args.data;
 
   // JSON encode body (if appropriate)
-  if (body && args.headers['Content-Type'] === 'application/json' && typeof body !== 'string') {
+  if (body && args.headers && args.headers['Content-Type'] === 'application/json' && typeof body !== 'string') {
     body = JSON.stringify(body);
   }
 
@@ -24,7 +24,7 @@ function fetchRequest(method, url, args) {
     method: method,
     headers: args.headers,
     body: body,
-    credentials: !args.withCredentials ? 'omit' : 'include'
+    credentials: args.withCredentials === false ? 'omit' : 'include'
   })
   .then(function(response) {
     var error = !response.ok;

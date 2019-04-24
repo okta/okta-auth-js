@@ -1,3 +1,5 @@
+jest.mock('cross-fetch');
+
 var OktaAuth = require('OktaAuth');
 var tokens = require('../util/tokens');
 var util = require('../util/util');
@@ -5,8 +7,6 @@ var oauthUtil = require('../util/oauthUtil');
 var packageJson = require('../../package.json');
 var _ = require('lodash');
 var Q = require('q');
-
-jest.mock('cross-fetch');
 
 function setupSync() {
   return new OktaAuth({ issuer: 'http://example.okta.com' });

@@ -1,13 +1,12 @@
 /* globals expect, JSON */
 /* eslint-disable max-statements, complexity */
+
 var Q = require('q'),
     _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
     cookies = require('../../lib/browser/browserStorage').storage,
     sdkUtil = require('../../lib/util'),
     fetch = require('cross-fetch');
-
-jest.mock('cross-fetch');
 
 var util = {};
 

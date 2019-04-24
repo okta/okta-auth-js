@@ -1,8 +1,7 @@
+jest.mock('cross-fetch');
 require('../util/webcrypto').polyFill();
 
-// Must be required before any code that uses 'cross-fetch'
 var util = require('../util/util');
-
 var OktaAuth = require('../../lib/browser/browserIndex');
 var packageJson = require('../../package.json');
 
