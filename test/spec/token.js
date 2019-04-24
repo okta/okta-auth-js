@@ -1275,7 +1275,7 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  xit('sets authorize url for authorization code requests, defaulting responseMode to query', function() {
+  it('sets authorize url for authorization code requests', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken',
@@ -1312,7 +1312,7 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
-                            'response_mode=query&' +
+                            'response_mode=fragment&' +
                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'sessionToken=testToken&' +
@@ -1320,7 +1320,7 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  xit('sets authorize url for authorization code requests with an authorization server', function() {
+  it('sets authorize url for authorization code requests with an authorization server', function() {
     return oauthUtil.setupRedirect({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -1362,7 +1362,7 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
-                            'response_mode=query&' +
+                            'response_mode=fragment&' +
                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'sessionToken=testToken&' +
@@ -1370,7 +1370,7 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  xit('sets authorize url for authorization code (as an array) requests, ' +
+  it('sets authorize url for authorization code (as an array) requests, ' +
     'defaulting responseMode to query', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
@@ -1408,7 +1408,7 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
-                            'response_mode=query&' +
+                            'response_mode=fragment&' +
                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'sessionToken=testToken&' +

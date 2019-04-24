@@ -116,11 +116,6 @@ function mockAjax(pairs) {
     if (pair.request) {
       expect(pair.request.uri).toEqual(url);
 
-      // TODO: this is testing fetchRequest. move this to a unit test
-      // if (pair.request.data || args.body) {
-      //   expect(pair.request.data).toEqual(JSON.parse(args.body));
-      // }
-  
       if (pair.request.headers) {
         expect(pair.request.headers).toEqual(args.headers);
       }
