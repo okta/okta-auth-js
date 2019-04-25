@@ -5,28 +5,10 @@ var Q = require('q'),
     _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
     cookies = require('../../lib/browser/browserStorage').storage,
-    sdkUtil = require('../../lib/util'),
     fetch = require('cross-fetch');
 
 var util = {};
 
-util.generateIDToken = function(options) {
-  var header = {};
-  var signature = {};
-  var payload = {}
-
-  options = options || {};
-  payload.iss = options.issuer;
-  payload.aud = options.clientId;
-  payload.iat = Date.now() / 1000;
-  payload.exp = payload.iat + (1000 * 30);
-
-  return [
-    sdkUtil.stringToBase64Url(JSON.stringify(header)),
-    sdkUtil.stringToBase64Url(JSON.stringify(payload)),
-    sdkUtil.stringToBase64Url(JSON.stringify(signature))
-  ].join('.');
-}
 
 function warpByTicksToUnixTime(unixTime) {
   var ticks = (unixTime * 1000) - Date.now();
