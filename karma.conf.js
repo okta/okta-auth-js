@@ -18,6 +18,7 @@ var path = require('path');
 var REPORTS_DIR = path.join(__dirname, 'build2', 'reports', 'karma');
 
 var webpackConf = {
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -35,18 +36,20 @@ var webpackConf = {
 module.exports = function (config) {
   config.set({
     basePath: '',
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'jquery-3.3.1'],
     plugins: [
-      require('karma-jasmine'),
-      require('karma-chrome-launcher'),
-      require('karma-coverage-istanbul-reporter'),
-      require('karma-webpack'),
+      'karma-jasmine',
+      'karma-chrome-launcher',
+      'karma-coverage-istanbul-reporter',
+      'karma-webpack',
+      'karma-jquery',
+      'karma-sourcemap-loader'
     ],
     files: [
       { pattern: './test/karma/main.js', watched: false }
     ],
     preprocessors: {
-      'test/karma/main.js': ['webpack']
+      'test/karma/main.js': ['webpack', 'sourcemap']
     },
     webpack: webpackConf,
     webpackMiddleware: {

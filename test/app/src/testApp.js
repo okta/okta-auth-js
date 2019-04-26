@@ -10,146 +10,137 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global process, window, document */
+/* global console */
 /* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
 
-/* eslint-disable prefer-destructuring */
-const DOMAIN = process.env.DOMAIN;
-const CLIENT_ID = process.env.CLIENT_ID;
-/* eslint-enable prefer-destructuring */
+export default function(window, document) {
 
-const ISSUER = `https://${DOMAIN}/oauth2/default`;
-const HOST = window.location.host;
-const REDIRECT_URI = `http://${HOST}/implicit/callback`;
+  function TestApp(config) {
+    this.oktaAuth = new OktaAuth(config);
 
-const oktaAuth = new OktaAuth({
-  issuer: ISSUER,
-  clientId: CLIENT_ID,
-  redirectUri: REDIRECT_URI,
-});
+    window.loginPKCE = this.login.bind(null, {
+      grantType: 'authorization_code'
+    });
+    window.loginImplicit = this.login.bind(null, {
+      grantType: 'implicit'
+    });
+    window.logout = this.logout.bind(null);
+  }
 
-async function login(implicit, event) {
-  event.preventDefault(); // Necessary to prevent default navigation for redirect below
+  Object.assign(TestApp.prototype, {
+    bootstrap: async function(pathname) {
+      pathname = pathname || '';
+      const isCallback = pathname.startsWith('/implicit/callback');
+      if (isCallback) {
+        let tokens = [];
+        try {
+          tokens = await this.handleAuthentication();
+        } catch(e) {
+          console.error(e);
+        }
+        return this.renderCallback(tokens);
+      }
+      // Default home page
+      let user;
+      try {
+        user = await this.getUser();
+      } catch (e) {
+        console.error(e);
+      }
 
-  oktaAuth.token.getWithRedirect({
-    grantType: implicit ? 'implicit' : 'authorization_code',
-    responseType: ['id_token', 'token']
-  });
-}
+      return this.renderApp({
+        user,
+      });
+    },
+    login: async function(options, event) {
+      event && event.preventDefault(); // Necessary to prevent default navigation for redirect below
+      options = Object.assign({}, {
+        responseType: ['id_token', 'token']
+      }, options);
+      this.oktaAuth.token.getWithRedirect(options);
+    },
+    logout: async function() {
+      this.oktaAuth.tokenManager.clear();
+      await this.oktaAuth.signOut();
+      // window.location.reload();
+    },
+    handleAuthentication: async function() {
+      // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
+      let tokens = await this.oktaAuth.token.parseFromUrl();
+      tokens = Array.isArray(tokens) ? tokens : [tokens];
+      tokens.forEach((token) => {
+        if (token.idToken) {
+          this.oktaAuth.tokenManager.add('idToken', token);
+        } else if (token.accessToken) {
+          this.oktaAuth.tokenManager.add('accessToken', token);
+        }
+      });
+      return tokens;
+    },
+    getUser: async function() {
+      const accessToken = await this.oktaAuth.tokenManager.get('accessToken');
+      const idToken = await this.oktaAuth.tokenManager.get('idToken');
+      if (accessToken && idToken) {
+        const userinfo = await this.oktaAuth.token.getUserInfo(accessToken);
+        if (userinfo.sub === idToken.claims.sub) {
+          // Only return the userinfo response if subjects match to
+          // mitigate token substitution attacks
+          return userinfo;
+        }
+      }
+      return idToken ? idToken.claims : undefined;
+    },
+    renderApp: function(props) {
+      const { user } = props;
+      const content = (user ?
+        `<h2>Welcome back, ${user.email}</h2>
+        <hr/>
+        <a href="/" onclick="logout()">Logout</a>` :
+        `<h2>Greetings, user!</h2>
+        <hr/>
+        <a id="login-pkce" href="/" onclick="loginPKCE(event)">Login (using PKCE)</a>
+        <br/>
+        <a id="login-implicit" href="/" onclick="loginImplicit(event)">Login (using Implicit Flow)</a>`
+      );
+      const rootEl = document.getElementById('root');
+      rootEl.innerHTML = `<div>${content}</div>`;
+    },
+    tokensHTML: function(tokens) {
+      if (tokens.length < 2) {
+        return '<b>Tokens not returned. Check error console for details</b><br/>';
+      }
 
-async function logout() {
-  oktaAuth.tokenManager.clear();
-  await oktaAuth.signOut();
-  window.location.reload();
-}
-
-window.loginPKCE = login.bind(null, false);
-window.loginImplicit = login.bind(null, true);
-window.logout = logout.bind(null);
-
-async function handleAuthentication() {
-  // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
-  let tokens = await oktaAuth.token.parseFromUrl();
-  tokens = Array.isArray(tokens) ? tokens : [tokens];
-  tokens.forEach((token) => {
-    if (token.idToken) {
-      oktaAuth.tokenManager.add('idToken', token);
-    } else if (token.accessToken) {
-      oktaAuth.tokenManager.add('accessToken', token);
+      const idToken = tokens[0];
+      const claims = idToken.claims;
+      const html = `
+      <table id="claims">
+        <thead>
+          <tr>
+            <th>Claim</th><th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+        ${
+          Object.keys(claims).map((key) => {
+            return `<tr><td>${key}</td><td>${claims[key]}</td></tr>`;
+          }).join('\n')
+        }
+        </tbody>
+      </table>
+      `;
+      return html;
+    },
+    renderCallback: function(tokens) {
+      const rootEl = document.getElementById('root');
+      const content = `
+        <a href="/">Return Home</a>
+        <hr/>
+        ${this.tokensHTML(tokens)}
+      `;
+      rootEl.innerHTML = `<div>${content}</div>`;
     }
   });
-  return tokens;
+
+  return TestApp;
 }
-
-async function getUser() {
-  const accessToken = await oktaAuth.tokenManager.get('accessToken');
-  const idToken = await oktaAuth.tokenManager.get('idToken');
-  if (accessToken && idToken) {
-    const userinfo = await oktaAuth.token.getUserInfo(accessToken);
-    if (userinfo.sub === idToken.claims.sub) {
-      // Only return the userinfo response if subjects match to
-      // mitigate token substitution attacks
-      return userinfo;
-    }
-  }
-  return idToken ? idToken.claims : undefined;
-}
-
-
-function renderApp(props) {
-  const { user } = props;
-  const content = (user ?
-    `<h2>Welcome back, ${user.email}</h2>
-    <hr/>
-    <a href="/" onclick="logout()">Logout</a>` :
-    `<h2>Greetings, user!</h2>
-    <hr/>
-    <a href="/" onclick="loginPKCE(event)">Login (using PKCE)</a>
-    <br/>
-    <a href="/" onclick="loginImplicit(event)">Login (using Implicit Flow)</a>`
-  );
-  const rootEl = document.getElementById('root');
-  rootEl.innerHTML = `<div>${content}</div>`;
-}
-
-function tokensHTML(tokens) {
-  if (tokens.length < 2) {
-    return '<b>Tokens not returned. Check error console for details</b><br/>';
-  }
-
-  const idToken = tokens[0];
-  const claims = idToken.claims;
-  const html = `
-  <table>
-    <thead>
-      <tr>
-        <th>Claim</th><th>Value</th>
-      </tr>
-    </thead>
-    <tbody>
-    ${
-      Object.keys(claims).map((key) => {
-        return `<tr><td>${key}</td><td>${claims[key]}</td></tr>`;
-      }).join('\n')
-    }
-    </tbody>
-  </table>
-  `;
-  return html;
-}
-
-function renderCallback(tokens) {
-  const rootEl = document.getElementById('root');
-  const content = `
-    <a href="/">Return Home</a>
-    <hr/>
-    ${tokensHTML(tokens)}
-  `;
-  rootEl.innerHTML = `<div>${content}</div>`;
-}
-
-async function start() {
-  const { pathname } = window.location;
-  if (pathname.startsWith('/implicit/callback')) {
-    let tokens = [];
-    try {
-      tokens = await handleAuthentication();
-    } catch(e) {
-      console.error(e);
-    }
-    return renderCallback(tokens);
-  }
-  let user;
-  try {
-    user = await getUser();
-  } catch (e) {
-    console.error(e);
-  }
-
-  return renderApp({
-    user,
-  });
-}
-
-export default start;

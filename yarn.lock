@@ -2535,6 +2535,10 @@ istanbul-reports@^2.2.3:
   dependencies:
     handlebars "^4.1.0"
 
+jasmine-ajax@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/jasmine-ajax/-/jasmine-ajax-4.0.0.tgz#7d8ba7e47e3f7e780e155fe9aa563faafa7e1a26"
+
 jasmine-core@^3.3:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.4.0.tgz#2a74618e966026530c3518f03e9f845d26473ce3"
@@ -2977,6 +2981,16 @@ karma-jasmine@^2.0.1:
   resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-2.0.1.tgz#26e3e31f2faf272dd80ebb0e1898914cc3a19763"
   dependencies:
     jasmine-core "^3.3"
+
+karma-jquery@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/karma-jquery/-/karma-jquery-0.2.3.tgz#e67107934d0b4047c206baa520e43c78d7e8411f"
+
+karma-sourcemap-loader@^0.3.7:
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/karma-sourcemap-loader/-/karma-sourcemap-loader-0.3.7.tgz#91322c77f8f13d46fed062b042e1009d4c4505d8"
+  dependencies:
+    graceful-fs "^4.1.2"
 
 karma-webpack@^3.0.5:
   version "3.0.5"
