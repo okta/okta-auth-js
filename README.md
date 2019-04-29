@@ -1366,7 +1366,7 @@ The following configuration options can **only** be included in `token.getWithou
 
 | Options | Description |
 | :-------: | ----------|
-| `grantType`  | Specify grantType for this Application. Supported types are "implicit" and "authorization_code". Defaults to "implicit" |
+| `grantType`  | Specify grantType for this Application. Supported types are `implicit` and `authorization_code`. Defaults to `implicit` |
 | `sessionToken` | Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow. |
 | `responseMode` | Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`. See [Parameter Details](https://developer.okta.com/docs/api/resources/oidc#parameter-details) for a list of available modes. |
 | `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. Defaults to `id_token`. |
@@ -1442,10 +1442,7 @@ Create token using a redirect.
 * `oauthOptions` - See [Extended OpenID Connect options](#extended-openid-connect-options)
 
 ```javascript
-authClient.token.getWithRedirect({
-  grantType: 'authorization_code',
-  responseType: ['id_token', 'token'])
-})
+authClient.token.getWithRedirect(oauthOptions);
 ```
 
 #### `token.parseFromUrl(options)`
