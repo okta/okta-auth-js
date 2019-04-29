@@ -19,6 +19,11 @@ var REPORTS_DIR = path.join(__dirname, 'build2', 'reports', 'karma');
 
 var webpackConf = {
   devtool: 'inline-source-map',
+  resolve: {
+    alias: {
+      '@okta/okta-auth-js': path.join(__dirname, 'lib/browser/browserIndex.js')
+    }
+  },
   module: {
     rules: [
       {
