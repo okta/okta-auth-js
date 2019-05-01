@@ -1,6 +1,7 @@
 /* global process, window, document */
 
-const TestApp = require('./testApp')(window, document);
+const buildTestApp = require('./testApp').default;
+const TestApp = buildTestApp(window, document);
 
 /* eslint-disable prefer-destructuring */
 const DOMAIN = process.env.DOMAIN;

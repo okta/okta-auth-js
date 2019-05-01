@@ -19,13 +19,13 @@ export default function(window, document) {
   function TestApp(config) {
     this.oktaAuth = new OktaAuth(config);
 
-    window.loginPKCE = this.login.bind(null, {
+    window.loginPKCE = this.login.bind(this, {
       grantType: 'authorization_code'
     });
-    window.loginImplicit = this.login.bind(null, {
+    window.loginImplicit = this.login.bind(this, {
       grantType: 'implicit'
     });
-    window.logout = this.logout.bind(null);
+    window.logout = this.logout.bind(this);
   }
 
   Object.assign(TestApp.prototype, {
