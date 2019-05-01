@@ -23,8 +23,8 @@
     "test:report": "yarn test --ci --silent || true",
     "build": "node ./writeConfig.js && webpack --config webpack.config.js",
     "prepare": "yarn build",
-    "prestart": "npm install -C test/app",
-    "start": "npm start -C test/app"
+    "prestart": "npm install --prefix test/app",
+    "start": "npm start --prefix test/app"
   },
   "author": "Okta",
   "keywords": [
