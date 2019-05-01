@@ -6,6 +6,7 @@ var packageJson = require('../../package.json');
 var AuthSdkError  = require('../../lib/errors/AuthSdkError');
 var OktaAuth = require('../../lib/browser/browserIndex');
 var http = require('../../lib/http');
+var pkce = require('../../lib/pkce');
 
 describe('pkce', function() {
 
@@ -53,7 +54,7 @@ describe('pkce', function() {
         ]
       },
       execute: function (test) {
-        return test.oa.pkce.getToken({
+        return pkce.getToken(test.oa, {
           clientId: CLIENT_ID,
           redirectUri: REDIRECT_URI,
           authorizationCode: authorizationCode,
@@ -88,14 +89,14 @@ describe('pkce', function() {
         var urls = {
           tokenUrl: 'http://superfake'
         };
-        authClient.pkce.getToken(oauthOptions, urls);
+        pkce.getToken(authClient, oauthOptions, urls);
         expect(httpRequst).toHaveBeenCalled();
       });
   
       it('Throws if no clientId', function() {
         oauthOptions.clientId = undefined;
         try {
-          authClient.pkce.getToken(oauthOptions);
+          pkce.getToken(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('A clientId must be specified in the OktaAuth constructor to get a token');
@@ -105,7 +106,7 @@ describe('pkce', function() {
       it('Throws if no redirectUri', function() {
         oauthOptions.redirectUri = undefined;
         try {
-          authClient.pkce.getToken(oauthOptions);
+          pkce.getToken(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('The redirectUri passed to /authorize must also be passed to /token');
@@ -115,7 +116,7 @@ describe('pkce', function() {
       it('Throws if no authorizationCode', function() {
         oauthOptions.authorizationCode = undefined;
         try {
-          authClient.pkce.getToken(oauthOptions);
+          pkce.getToken(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('An authorization code (returned from /authorize) must be passed to /token');
@@ -125,7 +126,7 @@ describe('pkce', function() {
       it('Throws if no codeVerifier', function() {
         oauthOptions.codeVerifier = undefined;
         try {
-          authClient.pkce.getToken(oauthOptions);
+          pkce.getToken(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('The "codeVerifier" (generated and saved by your app) must be passed to /token');
@@ -135,7 +136,7 @@ describe('pkce', function() {
       it('Throws if grantType is not "authorization_code', function() {
         oauthOptions.grantType = 'implicit';
         try {
-          authClient.pkce.getToken(oauthOptions);
+          pkce.getToken(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('Expecting "grantType" to equal "authorization_code"');
