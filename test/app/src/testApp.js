@@ -58,7 +58,7 @@ export default function(window, document) {
       options = Object.assign({}, {
         responseType: ['id_token', 'token']
       }, options);
-      this.oktaAuth.token.getWithRedirect(options);
+      return this.oktaAuth.token.getWithRedirect(options);
     },
     logout: async function() {
       this.oktaAuth.tokenManager.clear();

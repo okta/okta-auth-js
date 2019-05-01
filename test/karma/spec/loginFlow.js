@@ -3,6 +3,7 @@ require('jasmine-ajax');
 
 var tokens = require('../../util/tokens');
 const TestApp = require('../../app/src/testApp').default(window, document);
+const AuthSdkError = require('../../../lib/errors/AuthSdkError');
 
 import waitFor from '../../util/waitFor';
 
@@ -86,7 +87,8 @@ describe('Complete login flow', function() {
     sdk.options.storageUtil.getHttpCache().clearStorage();
 
     var wellKnown = {
-      'jwks_uri': JWKS_URI
+      'jwks_uri': JWKS_URI,
+      code_challenge_methods_supported: ['S256']
     };
     var keys = [
       tokens.standardKey
@@ -113,10 +115,12 @@ describe('Complete login flow', function() {
     // First hit /authorize
     return bootstrap({})
     .then(function(app) {
-      app.login({
+      return app.login({
         grantType: 'implicit',
         nonce: NONCE
       });
+    })
+    .then(function() {
       return waitFor(function() {
         return setLocation.calls.any();
       });
@@ -161,11 +165,13 @@ describe('Complete login flow', function() {
     // First hit /authorize
     return bootstrap()
     .then(function(app) {
-      app.login({
+      mockWellKnown();
+      return app.login({
         grantType: 'authorization_code',
         nonce: NONCE,
         codeVerifier: CODE_VERIFIER
       });
+    }).then(function() {
       return waitFor(function() {
         return setLocation.calls.any();
       });
@@ -186,8 +192,9 @@ describe('Complete login flow', function() {
       return url;
     })
     .then(function(url) {
+      jasmine.Ajax.requests.reset();
+
       // Now we handle the redirect & hit /token
-      mockWellKnown();
       const state = url.searchParams.get('state');
       const pathname = `${CALLBACK_PATH}#code=${AUTHORIZATION_CODE}&state=${state}`;
       const tokenResponse = {
@@ -239,5 +246,21 @@ describe('Complete login flow', function() {
     });
   });
 
+  it('throws for invalid code_challenge_method', function() {
+    // First hit /authorize
+    return bootstrap()
+    .then(function(app) {
+      mockWellKnown();
+      return app.login({
+        grantType: 'authorization_code',
+        nonce: NONCE,
+        codeVerifier: CODE_VERIFIER,
+        codeChallengeMethod: 'invalid'
+      });
+    }).catch(function(e) {
+      expect(e instanceof AuthSdkError).toBe(true);
+      expect(e.message).toBe('Invalid code_challenge_method');
+    });
+  });
 
 });
