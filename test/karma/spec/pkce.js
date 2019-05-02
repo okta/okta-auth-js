@@ -1,4 +1,3 @@
-var OktaAuth = require('../../../lib/browser/browserIndex');
 var sdkUtil = require('../../../lib/util');
 var pkce = require('../../../lib/pkce');
 

@@ -2,9 +2,9 @@
 require('jasmine-ajax');
 
 var tokens = require('../../util/tokens');
-const TestApp = require('../../app/src/testApp').default(window, document);
 const AuthSdkError = require('../../../lib/errors/AuthSdkError');
 
+import TestApp from '../../app/src/testApp';
 import waitFor from '../../util/waitFor';
 
 describe('Complete login flow', function() {
@@ -76,11 +76,8 @@ describe('Complete login flow', function() {
     getHistory = spyOn(sdk.token.parseFromUrl, '_getHistory').and.returnValue(_history);
     getDocument = spyOn(sdk.token.parseFromUrl, '_getDocument').and.returnValue(_document);
   
-    return app.bootstrap(pathname)
-      .then(function() {
-        $app = $('#root');
-        return app;
-      });
+    $app = $('#root');
+    return app.mount(window, $app[0], pathname);
   }
 
   function mockWellKnown() {
@@ -115,7 +112,7 @@ describe('Complete login flow', function() {
     // First hit /authorize
     return bootstrap({})
     .then(function(app) {
-      return app.login({
+      return app.loginRedirect({
         grantType: 'implicit',
         nonce: NONCE
       });
@@ -166,7 +163,7 @@ describe('Complete login flow', function() {
     return bootstrap()
     .then(function(app) {
       mockWellKnown();
-      return app.login({
+      return app.loginRedirect({
         grantType: 'authorization_code',
         nonce: NONCE,
         codeVerifier: CODE_VERIFIER
@@ -251,7 +248,7 @@ describe('Complete login flow', function() {
     return bootstrap()
     .then(function(app) {
       mockWellKnown();
-      return app.login({
+      return app.loginRedirect({
         grantType: 'authorization_code',
         nonce: NONCE,
         codeVerifier: CODE_VERIFIER,
