@@ -1,7 +1,5 @@
 /* global process, window, document */
-
-const buildTestApp = require('./testApp').default;
-const TestApp = buildTestApp(window, document);
+import TestApp from './testApp';
 
 /* eslint-disable prefer-destructuring */
 const DOMAIN = process.env.DOMAIN;
@@ -20,9 +18,11 @@ const config = {
 
 // Create the app as a function of config
 const app = new TestApp(config);
+
+// Expose for console fiddling
 window._testApp = app;
 
 // Bootstrap as a function of the URL path
 const { pathname } = window.location;
-app.bootstrap(pathname);
+app.mount(window, document.getElementById('root'), pathname);
 
