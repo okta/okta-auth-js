@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Okta, Inc. and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
  *
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global console, Promise */
+/* global console */
 /* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
 
@@ -28,6 +28,15 @@ function bindFunctions(testApp, window) {
     grantType: 'authorization_code'
   });
   window.loginPopupImplicit = testApp.loginPopup.bind(testApp, {
+    grantType: 'implicit'
+  });
+
+  // getWithoutPrompt
+  window.getTokenPKCE = testApp.getToken.bind(testApp, {
+    grantType: 'authorization_code'
+  });
+
+  window.getTokenImplicit = testApp.getToken.bind(testApp, {
     grantType: 'implicit'
   });
 
@@ -54,14 +63,8 @@ Object.assign(TestApp.prototype, {
   render: async function(pathname, elem) {
     pathname = pathname || '';
     elem = elem || this.rootElem;
-    return Promise.resolve()
-    .then(() => {
-      const isCallback = pathname.startsWith('/implicit/callback');
-      if (isCallback) {
-        return this.renderCallback();
-      }
-      return this.renderHome();
-    })
+    const isCallback = pathname.startsWith('/implicit/callback');
+    return (isCallback ? this.renderCallback() : this.renderHome())
     .then(content => {
       if (elem) {
         elem.innerHTML = `<div>${content}</div>`;
@@ -70,36 +73,33 @@ Object.assign(TestApp.prototype, {
     });
   },
   renderCallback: async function() {
-    let tokens = [];
-    try {
-      tokens = await this.handleAuthentication();
-    } catch(e) {
-      console.error(e);
-    }
-    return this.callbackHTML(tokens)
-
+    return this.handleAuthentication()
+      .catch(e => {
+        console.error(e);
+      })
+      .then(tokens => {
+        return this.callbackHTML(tokens)
+      });
   },
   renderHome: async function() {
     // Default home page
-    let user;
-    try {
-      user = await this.getUser();
-    } catch (e) {
+    return this.getUserData()
+    .catch((e) => {
       console.error(e);
-    }
-    return this.appHTML({
-      user,
+    })
+    .then(data => {
+      return this.appHTML(data);
     });
   },
   loginRedirect: async function(options, event) {
-    event && event.preventDefault(); // Necessary to prevent default navigation for redirect below
+    event && event.preventDefault(); // prevent navigation / page reload
     options = Object.assign({}, {
       responseType: ['id_token', 'token']
     }, options);
     return this.oktaAuth.token.getWithRedirect(options);
   },
   loginPopup: async function(options, event) {
-    event && event.preventDefault(); // Necessary to prevent default navigation for redirect below
+    event && event.preventDefault(); // prevent navigation / page reload
     options = Object.assign({}, {
       responseType: ['id_token', 'token']
     }, options);
@@ -109,9 +109,20 @@ Object.assign(TestApp.prototype, {
       this.render();
     })
   },
+  getToken: async function(options, event) {
+    event && event.preventDefault(); // prevent navigation / page reload
+    options = Object.assign({}, {
+      responseType: ['id_token', 'token']
+    }, options);
+    return this.oktaAuth.token.getWithoutPrompt(options)
+    .then((tokens) => {
+      this.saveTokens(tokens);
+      this.render();
+    })
+  },
   logout: async function() {
     this.oktaAuth.tokenManager.clear();
-    await this.oktaAuth.signOut();
+    return this.oktaAuth.signOut();
     // window.location.reload();
   },
   handleAuthentication: async function() {
@@ -130,40 +141,62 @@ Object.assign(TestApp.prototype, {
       }
     });
   },
-  getUser: async function() {
+  getUserData: async function() {
     const accessToken = await this.oktaAuth.tokenManager.get('accessToken');
     const idToken = await this.oktaAuth.tokenManager.get('idToken');
     if (accessToken && idToken) {
-      const userinfo = await this.oktaAuth.token.getUserInfo(accessToken);
-      if (userinfo.sub === idToken.claims.sub) {
+      const user = await this.oktaAuth.token.getUserInfo(accessToken);
+      if (user.sub === idToken.claims.sub) {
         // Only return the userinfo response if subjects match to
         // mitigate token substitution attacks
-        return userinfo;
+        return { user, accessToken, idToken };
       }
     }
-    return idToken ? idToken.claims : undefined;
   },
   appHTML: function(props) {
-    const { user } = props;
-    const content = (user ?
-      `<h2>Welcome back, ${user.email}</h2>
+    const { user, idToken, accessToken } = props || {};
+    if (user) {
+      // Authenticated user home page
+      return `
+      <h2>Welcome back, ${user.email}</h2>
       <hr/>
-      <a href="/" onclick="logout()">Logout</a>` :
-      `<h2>Greetings, user!</h2>
+      <a href="/" onclick="logout()">Logout</a>
       <hr/>
-      <h2>PKCE flow</h2>
-      <a id="login-redirect-pkce" href="/" onclick="loginRedirectPKCE(event)">Login (using REDIRECT)</a>
-      <a id="login-popup-pkce" href="/" onclick="loginPopupPKCE(event)">Login (using POPUP)</a>
-      <br/>
-      <h2>Implicit flow</h2>
-      <a id="login-redirect-implicit" href="/" onclick="loginRedirectImplicit(event)">Login (using REDIRECT)</a>
-      <a id="login-popup-implicit" href="/" onclick="loginPopupImplicit(event)">Login (using POPUP)</a>`
-    );
-    return content;
+      <ul>
+        <li><b>Get Token</b>
+          <ul>
+            <li><a id="gettoken-pkce" href="/" onclick="getTokenPKCE(event)">Get Token using PKCE flow</a></li>
+            <li><a id="gettoken-implicit" href="/" onclick="getTokenImplicit(event)">Get Token using Implicit flow</a></li>
+          </ul>
+        </li>
+      </ul>
+      <hr/>
+      ${ this.tokensHTML([idToken, accessToken])}`;
+    }
+    
+    // Unauthenticated user, Login page
+    return `
+      <h2>Greetings, user!</h2>
+      <hr/>
+      <ul>
+        <li><b>Login using REDIRECT</b>
+          <ul>
+          <li><a id="login-redirect-pkce" href="/" onclick="loginRedirectPKCE(event)">login using PKCE Flow</a></li>
+          <li><a id="login-redirect-implicit" href="/" onclick="loginRedirectImplicit(event)">login using Implicit Flow</a></li>
+          </ul>
+        </li>
+        <li><b>Login using POPUP</b>
+          <ul>
+            <li><a id="login-popup-pkce" href="/" onclick="loginPopupPKCE(event)">login using PKCE flow</a></li>
+            <li><a id="login-popup-implicit" href="/" onclick="loginPopupImplicit(event)">login using Implicit Flow</a></li>
+        </li>
+      </ul>
+      <br/>`;
+
   },
   tokensHTML: function(tokens) {
-    if (tokens.length < 2) {
-      return '<b>Tokens not returned. Check error console for details</b><br/>';
+    if (!tokens || tokens.length < 2) {
+      return '<b></b><br/>';
     }
 
     const idToken = tokens[0];
@@ -187,10 +220,14 @@ Object.assign(TestApp.prototype, {
     return html;
   },
   callbackHTML: function(tokens) {
+    const success = tokens && tokens.length === 2;
+    const message = success ? 'Successfully received tokens on the callback page!' : 'Tokens not returned. Check error console for details';
     const content = `
+      <b>${message}</b>
+      <br/>
       <a href="/">Return Home</a>
       <hr/>
-      ${this.tokensHTML(tokens)}
+      ${ success ? this.tokensHTML(tokens): '' }
     `;
     return content;
   }

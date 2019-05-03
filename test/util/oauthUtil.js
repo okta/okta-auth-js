@@ -89,7 +89,7 @@ function getTime(time) {
   if (time || time === 0) {
     return time;
   } else {
-    return tokens.standardIdTokenClaims.exp - 1;
+    return tokens.standardIdTokenClaims['auth_time'];
   }
 }
 
@@ -138,6 +138,9 @@ oauthUtil.setup = function(opts) {
               'https://auth-js-test.okta.com'
           });
         });
+        if (opts.fastForwardToTime) {
+          jest.runAllTimers();
+        }
       }
     });
   }
