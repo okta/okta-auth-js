@@ -22,6 +22,14 @@ describe('pkce', function() {
       validateVerifier(code);
     });
 
+    it('produces a different code each time it is called', function() {
+      var code = pkce.generateVerifier();
+      validateVerifier(code);
+      var code2 = pkce.generateVerifier();
+      validateVerifier(code2);
+      expect(code).not.toBe(code2);
+    });
+
     it('trims code to maximum length', function() {
       var prefix = sdkUtil.genRandomString(MAX_VERIFIER_LENGTH * 2);
       expect(prefix.length).toBeGreaterThan(MAX_VERIFIER_LENGTH);
