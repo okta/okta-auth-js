@@ -1725,7 +1725,7 @@ yarn install
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
 | `yarn build`          | Build the SDK with a sourcemap |
-| `yarn test`           | Run unit tests using Jest      |
+| `yarn test`           | Run unit tests     |
 | `yarn lint`           | Run eslint linting             |
 
 ## Contributing

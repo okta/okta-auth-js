@@ -15,6 +15,7 @@
 import OktaAuth from '@okta/okta-auth-js';
 
 function bindFunctions(testApp, window) {
+
   // getWithRedirect
   window.loginRedirectPKCE = testApp.loginRedirect.bind(testApp, {
     grantType: 'authorization_code'
@@ -41,9 +42,12 @@ function bindFunctions(testApp, window) {
   });
 
   window.logout = testApp.logout.bind(testApp);
+
+  window.renewToken = testApp.renewToken.bind(testApp);
 }
 
 function TestApp(config) {
+  this.config = config;
   this.oktaAuth = new OktaAuth(config);
 }
 
@@ -120,6 +124,11 @@ Object.assign(TestApp.prototype, {
       this.render();
     })
   },
+  // grantType must be already set before calling this method
+  renewToken: async function(event) {
+    event && event.preventDefault(); // prevent navigation / page reload
+    return this.oktaAuth.tokenManager.renew('accessToken');
+  },
   logout: async function() {
     this.oktaAuth.tokenManager.clear();
     return this.oktaAuth.signOut();
@@ -155,6 +164,7 @@ Object.assign(TestApp.prototype, {
   },
   appHTML: function(props) {
     const { user, idToken, accessToken } = props || {};
+    const config = JSON.stringify(this.config, null, 2).replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;');
     if (user) {
       // Authenticated user home page
       return `
@@ -163,6 +173,17 @@ Object.assign(TestApp.prototype, {
       <a href="/" onclick="logout()">Logout</a>
       <hr/>
       <ul>
+        <li>
+          <a id="renewtoken" href="/" onclick="renewToken(event)"><b>Renew Token</b></a>
+          <p>(must set grantType via constructor)
+          <div>
+            <b>grantType:</b>
+            <a href="/?grantType=authorization_code">authorization_code</a>
+              &nbsp;|&nbsp;
+            <a href="/?grantType=implicit">implicit</a>
+          </div>
+          </p>
+        </li>
         <li><b>Get Token</b>
           <ul>
             <li><a id="gettoken-pkce" href="/" onclick="getTokenPKCE(event)">Get Token using PKCE flow</a></li>
@@ -171,7 +192,11 @@ Object.assign(TestApp.prototype, {
         </li>
       </ul>
       <hr/>
-      ${ this.tokensHTML([idToken, accessToken])}`;
+      ${ this.tokensHTML([idToken, accessToken])}
+      <hr/>
+      <h2>Config</h2>
+      ${ config }
+      `;
     }
     
     // Unauthenticated user, Login page
@@ -191,7 +216,10 @@ Object.assign(TestApp.prototype, {
             <li><a id="login-popup-implicit" href="/" onclick="loginPopupImplicit(event)">login using Implicit Flow</a></li>
         </li>
       </ul>
-      <br/>`;
+      <hr/>
+      <h2>Config</h2>
+      ${ config }
+      `;
 
   },
   tokensHTML: function(tokens) {

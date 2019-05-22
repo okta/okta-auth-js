@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@okta/okta-auth-js": "file:../../",
     "dotenv": "^7.0.0",
     "webpack": "^4.29.6"
   },

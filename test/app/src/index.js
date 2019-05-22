@@ -1,5 +1,6 @@
-/* global process, window, document */
+/* global process, window, document, URL*/
 import TestApp from './testApp';
+
 
 /* eslint-disable prefer-destructuring */
 const DOMAIN = process.env.DOMAIN;
@@ -15,6 +16,11 @@ const config = {
   clientId: CLIENT_ID,
   redirectUri: REDIRECT_URI,
 };
+
+// Allow setting some values by URL params
+const url = new URL(window.location.href);
+
+config.grantType = url.searchParams.get('grantType');
 
 // Create the app as a function of config
 const app = new TestApp(config);
