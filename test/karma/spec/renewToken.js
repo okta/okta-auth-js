@@ -1,11 +1,12 @@
-/* global jasmine, $, window, document, URL, Event */
+/* global jasmine, window, document, URL, Event, Promise */
 require('jasmine-ajax');
 
 var tokens = require('../../util/tokens');
 
-import TestApp from '../../app/src/testApp';
+import OktaAuth from '@okta/okta-auth-js';
 import oauthUtil from '../../../lib/oauthUtil';
 import pkce from '../../../lib/pkce';
+import OauthError from '../../../lib/errors/OAuthError';
 
 describe('Renew token', function() {
 
@@ -26,9 +27,8 @@ describe('Renew token', function() {
   const AUTHORIZATION_CODE = 'FAKEY';
   const JWKS_URI = 'http://myfake.jwks.local';
 
-  var app;
   var sdk;
-  var $app;
+
 
   beforeEach(function() {
     document.body.insertAdjacentHTML('beforeend', '<div id="root"></div>');
@@ -44,15 +44,11 @@ describe('Renew token', function() {
     jasmine.Ajax.uninstall();
   });
 
-  function bootstrap(config, pathname) {
-    pathname = pathname || '';
+  function bootstrap(config) {
     config = Object.assign({}, DEFAULT_CONFIG, config);
-    app = new TestApp(config);
-
-    sdk = app.oktaAuth;
+    sdk = new OktaAuth(config);
     sdk.tokenManager.clear();
-    $app = $('#root');
-    return app.mount(window, $app[0], pathname);
+    return Promise.resolve();
   }
 
   function mockWellKnown() {
@@ -82,11 +78,49 @@ describe('Renew token', function() {
     })
   }
 
+  it('receives/throws error from iframe', function() {
+    // This is the error if requesting scope='offline_access'
+    const error = 'access_denied';
+    const error_description = 'Policy evaluation succeeded but all the requested scopes were rejected.';
+
+    return bootstrap()
+    .then(() => {
+      sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
+
+      // We are not loading a real iframe
+      spyOn(oauthUtil, 'loadFrame').and.callFake(urlStr => {
+        const url = new URL(urlStr);
+        const state = url.searchParams.get('state');
+
+
+        var response = {
+          state,
+          error,
+          error_description,
+          name: 'OAuthError'    
+        };
+
+        // Simulate window.postMessage() from iframe
+        var event = new Event('message');
+        event.data = response;
+        event.origin = ISSUER;
+        window.dispatchEvent(event);
+
+      });
+      return sdk.tokenManager.renew('accessToken');
+    })
+    .catch(e => {
+      expect(oauthUtil.loadFrame).toHaveBeenCalled();
+      expect(e instanceof OauthError).toBe(true);
+      expect(e.message).toBe(error_description);
+    });
+  });
+
   it('grantType: implicit', function() {
     return bootstrap({
       grantType: 'implicit'
     })
-    .then(function(app) {
+    .then(() => {
       sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
 
       // We are not loading a real iframe
@@ -122,7 +156,7 @@ describe('Renew token', function() {
         window.dispatchEvent(event);
 
       });
-      return app.renewToken();
+      return sdk.tokenManager.renew('accessToken');
     })
     .then(function(res) {
       expect(oauthUtil.loadFrame).toHaveBeenCalled();
@@ -136,7 +170,7 @@ describe('Renew token', function() {
     return bootstrap({
       grantType: 'authorization_code'
     })
-    .then(function(app) {
+    .then(() => {
       sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
 
       mockWellKnown();
@@ -189,9 +223,9 @@ describe('Renew token', function() {
         window.dispatchEvent(event);
 
       });
-      return app.renewToken();
+      return sdk.tokenManager.renew('accessToken');
     })
-    .then(function(res) {
+    .then(res => {
       expect(oauthUtil.loadFrame).toHaveBeenCalled();
       expect(res.accessToken).toBe(ACCESS_TOKEN_STR);
 
