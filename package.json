@@ -73,7 +73,8 @@
     "REDIRECT_STATE_COOKIE_NAME": "okta-oauth-state",
     "REDIRECT_NONCE_COOKIE_NAME": "okta-oauth-nonce",
     "TOKEN_STORAGE_NAME": "okta-token-storage",
-    "CACHE_STORAGE_NAME": "okta-cache-storage"
+    "CACHE_STORAGE_NAME": "okta-cache-storage",
+    "PKCE_STORAGE_NAME": "okta-pkce-storage"
   },
   "jest-junit": {
     "output": "./build2/reports/unit/junit-result.xml"
