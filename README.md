@@ -162,6 +162,7 @@ tokenManager: {
 | `issuer`       | Specify a custom issuer to perform the OIDC flow. Defaults to the base url parameter if not provided. |
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
+| `grantType`  | Specify grantType for this Application. Supported types are `implicit` and `authorization_code`. Defaults to `implicit` |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
 | `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
@@ -191,6 +192,26 @@ var config = {
 
 var authClient = new OktaAuth(config);
 ```
+
+##### PKCE Oauth flow
+
+By default the `implicit` Oauth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser. For strongest security with the widest browser support, it is recommended to test for and use PKCE if supported or fall back to `implicit` if not.
+
+To use PKCE flow, set `grantType` to `authorization_code` in your config.
+
+```javascript
+
+var config = {
+  // use PKCE or implicit flow based on browser support
+  grantType: OktaAuth.features.isPKCESupported() ? 'authorization_code' : 'implicit',
+
+  // other config
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+};
+
+var authClient = new OktaAuth(config);
+```
+
 
 ### Optional configuration options
 
@@ -1366,7 +1387,6 @@ The following configuration options can **only** be included in `token.getWithou
 
 | Options | Description |
 | :-------: | ----------|
-| `grantType`  | Specify grantType for this Application. Supported types are `implicit` and `authorization_code`. Defaults to `implicit` |
 | `sessionToken` | Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow. |
 | `responseMode` | Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`. See [Parameter Details](https://developer.okta.com/docs/api/resources/oidc#parameter-details) for a list of available modes. |
 | `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. Defaults to `id_token`. |
