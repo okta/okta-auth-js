@@ -234,7 +234,8 @@ var config = {
     //   headers: {
     //     headerName: headerValue
     //   },
-    //   data: postBodyData
+    //   data: postBodyData,
+    //   withCredentials: true|false,
     // }
     return Promise.resolve(/* a raw XMLHttpRequest response */);
   }
