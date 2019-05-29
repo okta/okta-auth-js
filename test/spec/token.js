@@ -5,6 +5,7 @@ var tokens = require('../util/tokens');
 var util = require('../util/util');
 var oauthUtil = require('../util/oauthUtil');
 var packageJson = require('../../package.json');
+var token = require('../../lib/token');
 var _ = require('lodash');
 var Q = require('q');
 
@@ -30,6 +31,24 @@ describe('token.decode', function() {
       expect(e.name).toEqual('AuthSdkError');
       expect(e.errorSummary).toBeDefined();
     }
+  });
+});
+
+describe('token.getToken', function() {
+  it('throws an error if grantType is "authorization_code" and PKCE is not supported', function() {
+    spyOn(OktaAuth.prototype.features, 'isPKCESupported').and.returnValue(false);
+    var oa = setupSync();
+    return token.getToken(oa, {
+      grantType: 'authorization_code'
+    })
+    .then(function() {
+      // Should never hit this
+      expect(true).toBe(false);
+    })
+    .catch(function (e) {
+      expect(e.name).toEqual('AuthSdkError');
+      expect(e.errorSummary).toEqual('This browser doesn\'t support PKCE');
+    });
   });
 });
 
