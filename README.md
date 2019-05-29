@@ -195,15 +195,14 @@ var authClient = new OktaAuth(config);
 
 ##### PKCE Oauth flow
 
-By default the `implicit` Oauth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser. For strongest security with the widest browser support, it is recommended to test for and use PKCE if supported or fall back to `implicit` if not.
+By default the `implicit` Oauth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser.
 
 To use PKCE flow, set `grantType` to `authorization_code` in your config.
 
 ```javascript
 
 var config = {
-  // use PKCE or implicit flow based on browser support
-  grantType: OktaAuth.features.isPKCESupported() ? 'authorization_code' : 'implicit',
+  grantType:  'authorization_code',
 
   // other config
   issuer: 'https://{yourOktaDomain}/oauth2/default',
@@ -212,6 +211,9 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
+If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
+
+`OktaAuth.features.isPKCESupported()`
 
 ### Optional configuration options
 
