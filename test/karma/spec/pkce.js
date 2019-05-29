@@ -64,7 +64,7 @@ describe('pkce', function() {
         .then(function(computed) {
           expect(computed).toBe(SAMPLE_CODE_CHALLENGE);
         });
-    })
+    });
 
     it('is URL safe', function() {
       var codeVerifier = pkce.generateVerifier();
@@ -72,7 +72,7 @@ describe('pkce', function() {
       .then(function(computed) {
         expect(encodeURIComponent(computed)).toBe(computed);
       });  
-    })
+    });
   });
 
 

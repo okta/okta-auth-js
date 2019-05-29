@@ -1,7 +1,6 @@
 /* global process, window, document, URL*/
 import TestApp from './testApp';
 
-
 /* eslint-disable prefer-destructuring */
 const DOMAIN = process.env.DOMAIN;
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -31,4 +30,3 @@ window._testApp = app;
 // Bootstrap as a function of the URL path
 const { pathname } = window.location;
 app.mount(window, document.getElementById('root'), pathname);
-

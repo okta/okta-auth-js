@@ -22,7 +22,7 @@ describe('crypto', function() {
       var idToken = factory.buildIDToken({
         issuer: ISSUER,
         clientId: CLIENT_ID
-      })
+      });
       var key = tokens.standardKey;
       return sdkCrypto.verifyToken(idToken, key)
         .then(function(res) {

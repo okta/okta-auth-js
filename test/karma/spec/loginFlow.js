@@ -11,7 +11,7 @@ describe('Complete login flow', function() {
 
   const ASSUMED_TIME = 1449699929;
   const ISSUER = tokens.standardIdTokenParsed.issuer;
-  const CALLBACK_PATH = '/implicit/callback'
+  const CALLBACK_PATH = '/implicit/callback';
   const REDIRECT_URI = `${ISSUER}${CALLBACK_PATH}`;
   const CLIENT_ID = tokens.standardIdTokenParsed.clientId;
   const DEFAULT_CONFIG = {
@@ -104,9 +104,8 @@ describe('Complete login flow', function() {
       responseText: JSON.stringify({
         keys: keys
       })
-    })
+    });
   }
-
 
   it('grantType: implicit', function() {
     // First hit /authorize
@@ -225,7 +224,7 @@ describe('Complete login flow', function() {
         expect(request.withCredentials).toBe(false);
 
         // Decode request params
-        var params = {}
+        var params = {};
         request.params.split('&').forEach(function(str) {
           var pair = str.split('=');
           params[pair[0]] = decodeURIComponent(pair[1]);

@@ -12,7 +12,7 @@ describe('Renew token', function() {
 
   const ASSUMED_TIME = 1449699929;
   const ISSUER = tokens.standardIdTokenParsed.issuer;
-  const CALLBACK_PATH = '/implicit/callback'
+  const CALLBACK_PATH = '/implicit/callback';
   const REDIRECT_URI = `${ISSUER}${CALLBACK_PATH}`;
   const CLIENT_ID = tokens.standardIdTokenParsed.clientId;
   const DEFAULT_CONFIG = {
@@ -75,7 +75,7 @@ describe('Renew token', function() {
       responseText: JSON.stringify({
         keys: keys
       })
-    })
+    });
   }
 
   it('receives/throws error from iframe', function() {
@@ -91,8 +91,6 @@ describe('Renew token', function() {
       spyOn(oauthUtil, 'loadFrame').and.callFake(urlStr => {
         const url = new URL(urlStr);
         const state = url.searchParams.get('state');
-
-
         var response = {
           state,
           error,
@@ -237,7 +235,7 @@ describe('Renew token', function() {
       expect(request.withCredentials).toBe(false);
 
       // Decode request params
-      var params = {}
+      var params = {};
       request.params.split('&').forEach(function(str) {
         var pair = str.split('=');
         params[pair[0]] = decodeURIComponent(pair[1]);

@@ -82,7 +82,7 @@ Object.assign(TestApp.prototype, {
         console.error(e);
       })
       .then(tokens => {
-        return this.callbackHTML(tokens)
+        return this.callbackHTML(tokens);
       });
   },
   renderHome: async function() {
@@ -98,20 +98,20 @@ Object.assign(TestApp.prototype, {
   loginRedirect: async function(options, event) {
     event && event.preventDefault(); // prevent navigation / page reload
     options = Object.assign({}, {
-      responseType: ['id_token', 'token']
+      responseType: ['id_token', 'token'],
     }, options);
     return this.oktaAuth.token.getWithRedirect(options);
   },
   loginPopup: async function(options, event) {
     event && event.preventDefault(); // prevent navigation / page reload
     options = Object.assign({}, {
-      responseType: ['id_token', 'token']
+      responseType: ['id_token', 'token'],
     }, options);
     return this.oktaAuth.token.getWithPopup(options)
     .then((tokens) => {
       this.saveTokens(tokens);
       this.render();
-    })
+    });
   },
   getToken: async function(options, event) {
     event && event.preventDefault(); // prevent navigation / page reload
@@ -122,7 +122,7 @@ Object.assign(TestApp.prototype, {
     .then((tokens) => {
       this.saveTokens(tokens);
       this.render();
-    })
+    });
   },
   // grantType must be already set before calling this method
   renewToken: async function(event) {
@@ -132,7 +132,6 @@ Object.assign(TestApp.prototype, {
   logout: async function() {
     this.oktaAuth.tokenManager.clear();
     return this.oktaAuth.signOut();
-    // window.location.reload();
   },
   handleAuthentication: async function() {
     // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
@@ -260,5 +259,3 @@ Object.assign(TestApp.prototype, {
     return content;
   }
 });
-
-
