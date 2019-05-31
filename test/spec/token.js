@@ -12,6 +12,7 @@ function setupSync() {
   return new OktaAuth({ issuer: 'http://example.okta.com' });
 }
 
+
 describe('token.decode', function() {
 
   it('correctly decodes a token', function() {
@@ -34,6 +35,19 @@ describe('token.decode', function() {
 });
 
 describe('token.getWithoutPrompt', function() {
+
+  it('throws error if responseType includes "code"', function() {
+    var oa = setupSync();
+    try {
+      oa.token.getWithoutPrompt({
+        responseType: ['token', 'code']
+      });
+    } catch(e) {
+      expect(e.name).toBe('AuthSdkError');
+      expect(e.message).toBe('To use PKCE flow, set grantType: "authorization_code"');
+    }
+  });
+
   it('returns id_token using sessionToken', function(done) {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
@@ -574,6 +588,18 @@ describe('token.getWithoutPrompt', function() {
 });
 
 describe('token.getWithPopup', function() {
+  it('throws error if responseType includes "code"', function() {
+    var oa = setupSync();
+    try {
+      oa.token.getWithPopup({
+        responseType: ['token', 'code']
+      });
+    } catch(e) {
+      expect(e.name).toBe('AuthSdkError');
+      expect(e.message).toBe('To use PKCE flow, set grantType: "authorization_code"');
+    }
+  });
+
   it('returns id_token using idp', function(done) {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
@@ -937,6 +963,18 @@ describe('token.getWithPopup', function() {
 });
 
 describe('token.getWithRedirect', function() {
+  it('throws error if responseType includes "code"', function() {
+    var oa = setupSync();
+    try {
+      oa.token.getWithRedirect({
+        responseType: ['token', 'code']
+      });
+    } catch(e) {
+      expect(e.name).toBe('AuthSdkError');
+      expect(e.message).toBe('To use PKCE flow, set grantType: "authorization_code"');
+    }
+  });
+
   it('sets authorize url and cookie for id_token using sessionToken', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
@@ -1275,7 +1313,8 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('sets authorize url for authorization code requests', function() {
+  // TODO: What is the future of this test? "code" responseType is explicitly disallowed.
+  xit('sets authorize url for authorization code requests', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken',
@@ -1320,7 +1359,8 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('sets authorize url for authorization code requests with an authorization server', function() {
+  // TODO: What is the future of this test? "code" responseType is explicitly disallowed.
+  xit('sets authorize url for authorization code requests with an authorization server', function() {
     return oauthUtil.setupRedirect({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -1370,7 +1410,8 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('sets authorize url for authorization code (as an array) requests, ' +
+  // TODO: What is the future of this test? "code" responseType is explicitly disallowed.
+  xit('sets authorize url for authorization code (as an array) requests, ' +
     'defaulting responseMode to query', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
@@ -1416,7 +1457,8 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('sets authorize url for authorization code and id_token requests,' +
+  // TODO: What is the future of this test? "code" responseType is explicitly disallowed.
+  xit('sets authorize url for authorization code and id_token requests,' +
     ' defaulting responseMode to fragment', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
@@ -1462,7 +1504,8 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('sets authorize url for authorization code requests, allowing form_post responseMode', function() {
+  // TODO: What is the future of this test? "code" responseType is explicitly disallowed.
+  xit('sets authorize url for authorization code requests, allowing form_post responseMode', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken',
