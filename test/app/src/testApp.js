@@ -98,14 +98,16 @@ Object.assign(TestApp.prototype, {
   loginRedirect: async function(options, event) {
     event && event.preventDefault(); // prevent navigation / page reload
     options = Object.assign({}, {
-      responseType: ['id_token', 'token'],
+      responseType: this.config.responseType,
+      scopes: this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithRedirect(options);
   },
   loginPopup: async function(options, event) {
     event && event.preventDefault(); // prevent navigation / page reload
     options = Object.assign({}, {
-      responseType: ['id_token', 'token'],
+      responseType: this.config.responseType,
+      scopes: this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithPopup(options)
     .then((tokens) => {
@@ -116,7 +118,8 @@ Object.assign(TestApp.prototype, {
   getToken: async function(options, event) {
     event && event.preventDefault(); // prevent navigation / page reload
     options = Object.assign({}, {
-      responseType: ['id_token', 'token']
+      responseType: this.config.responseType,
+      scopes: this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithoutPrompt(options)
     .then((tokens) => {
@@ -142,10 +145,15 @@ Object.assign(TestApp.prototype, {
   saveTokens: function(tokens) {
     tokens = Array.isArray(tokens) ? tokens : [tokens];
     tokens.forEach((token) => {
-      if (token.idToken) {
+      if (!token) {
+        console.error('BAD/EMPTY token returned');
+        return;
+      } else if (token.idToken) {
         this.oktaAuth.tokenManager.add('idToken', token);
       } else if (token.accessToken) {
         this.oktaAuth.tokenManager.add('accessToken', token);
+      } else {
+        console.error('Unknown token returned: ', token);
       }
     });
   },
