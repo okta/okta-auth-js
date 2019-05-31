@@ -1754,14 +1754,7 @@ yarn install
 
 #### Test App
 
-Implements a simple SPA application to demonstrate functionality. The following parameters are accepted in the URL:
-
-* `grantType` - set the default grantType (needed for PKCE token renew)
-* `scopes` - set the scopes passed during OAuth flow. Comma delimited.
-* `responseType` - set the responseType passed during OAuth flow. Comma delimited.
-
-All params can be used together:
-`http://localhost:8080/?scopes=openid,email&responseType=id_token,token&grantType=authorization_code`
+Implements a simple SPA application to demonstrate functionality and provide for manual testing. [See here for more information](test/app/README.md).
 
 ## Contributing
 

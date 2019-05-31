@@ -1,12 +1,15 @@
 # test-app
 
-Install dependencies
+The following enironment variables are **required**. You can use a [.env file](https://github.com/motdotla/dotenv#usage) in this directory.
 
-`npm i`
+* `CLIENT_ID` - abc12
+* `DOMAIN` - x.okta.com
 
-Set or pass environment variables.
-Can be set locally using a [.env file](https://github.com/motdotla/dotenv#usage)
+The following parameters are accepted in the URL:
 
-`CLIENT_ID=XXX
-DOMAIN=xxx.okta.com
-npm start`
+* `grantType` - set the default grantType (needed for PKCE token renew)
+* `scopes` - set the scopes passed during OAuth flow. Comma delimited.
+* `responseType` - set the responseType passed during OAuth flow. Comma delimited.
+
+All params can be used together:
+`http://localhost:8080/?scopes=openid,email&responseType=id_token,token&grantType=authorization_code`
