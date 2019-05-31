@@ -18,6 +18,8 @@ describe('Complete login flow', function() {
     issuer: ISSUER,
     clientId: CLIENT_ID,
     redirectUri: REDIRECT_URI,
+    scopes: ['openid', 'email'],
+    responseType: ['id_token', 'token']
   };
 
   const ACCESS_TOKEN = tokens.standardAccessToken;
