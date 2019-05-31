@@ -234,7 +234,9 @@ Object.assign(TestApp.prototype, {
       return '<b></b><br/>';
     }
 
-    const idToken = tokens[0];
+    const idToken = tokens.filter(token => {
+      return token.idToken;
+    })[0];
     const claims = idToken.claims;
     const html = `
     <table id="claims">
