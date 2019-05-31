@@ -60,7 +60,7 @@ module.exports = function (config) {
     webpackMiddleware: {
       stats: 'normal',
     },
-    client:{
+    client: {
       // Passing specific test to run
       // but this works only with `karma start`, not `karma run`.
       test: config.test,

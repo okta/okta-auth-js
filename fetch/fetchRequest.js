@@ -12,11 +12,14 @@
 
 var fetch = require('cross-fetch');
 
+/* eslint-disable complexity */
 function fetchRequest(method, url, args) {
   var body = args.data;
+  var headers = args.headers || {};
+  var contentType = (headers['Content-Type'] || headers['content-type'] || '').toLowerCase();
 
   // JSON encode body (if appropriate)
-  if (body && args.headers && args.headers['Content-Type'] === 'application/json' && typeof body !== 'string') {
+  if (contentType === 'application/json' && body && typeof body !== 'string') {
     body = JSON.stringify(body);
   }
 

@@ -132,9 +132,6 @@ describe('Renew token', function() {
         expect(url.searchParams.get('response_mode')).toBe('okta_post_message');
         expect(url.searchParams.get('scope')).toBe('openid email');
         expect(url.searchParams.get('state')).toBeTruthy();
-        
-        // nonce will be a random string when renewing access token. Is this expected?
-        // expect(url.searchParams.get('nonce')).toBe(NONCE);
 
         // Response back to caller
         const state = url.searchParams.get('state');
@@ -185,9 +182,6 @@ describe('Renew token', function() {
         expect(url.searchParams.get('scope')).toBe('openid email');
         expect(url.searchParams.get('state')).toBeTruthy();
         
-        // nonce will be a random string when renewing access token. Is this expected?
-        // expect(url.searchParams.get('nonce')).toBe(NONCE);
-
         const state = url.searchParams.get('state');
         codeChallenge = url.searchParams.get('code_challenge');
         expect(codeChallenge).toBeTruthy();

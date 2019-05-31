@@ -13,6 +13,7 @@
 var $ = require('jquery');
 
 function jqueryRequest(method, url, args) {
+  // TODO: support content-type
   var deferred = $.Deferred();
   $.ajax({
     type: method,
