@@ -19,7 +19,7 @@ const config = {
 // Allow setting some values by URL params
 const url = new URL(window.location.href);
 const grantType = url.searchParams.get('grantType');
-const scopes = (url.searchParams.get('scopes') || 'openid').split(',');
+const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
 const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
 Object.assign(config, {
   grantType,

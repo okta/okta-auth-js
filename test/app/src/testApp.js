@@ -18,7 +18,8 @@ function bindFunctions(testApp, window) {
 
   // getWithRedirect
   window.loginRedirectPKCE = testApp.loginRedirect.bind(testApp, {
-    grantType: 'authorization_code'
+    grantType: 'authorization_code',
+    responseType: 'code'
   });
   window.loginRedirectImplicit = testApp.loginRedirect.bind(testApp, {
     grantType: 'implicit'
@@ -26,7 +27,8 @@ function bindFunctions(testApp, window) {
 
   // getWithPopup
   window.loginPopupPKCE = testApp.loginPopup.bind(testApp, {
-    grantType: 'authorization_code'
+    grantType: 'authorization_code',
+    responseType: 'code'
   });
   window.loginPopupImplicit = testApp.loginPopup.bind(testApp, {
     grantType: 'implicit'
@@ -34,7 +36,8 @@ function bindFunctions(testApp, window) {
 
   // getWithoutPrompt
   window.getTokenPKCE = testApp.getToken.bind(testApp, {
-    grantType: 'authorization_code'
+    grantType: 'authorization_code',
+    responseType: 'code'
   });
 
   window.getTokenImplicit = testApp.getToken.bind(testApp, {
@@ -130,7 +133,10 @@ Object.assign(TestApp.prototype, {
   // grantType must be already set before calling this method
   renewToken: async function(event) {
     event && event.preventDefault(); // prevent navigation / page reload
-    return this.oktaAuth.tokenManager.renew('accessToken');
+    return this.oktaAuth.tokenManager.renew('idToken')
+      .then(() => {
+        this.render();
+      });
   },
   logout: async function() {
     this.oktaAuth.tokenManager.clear();

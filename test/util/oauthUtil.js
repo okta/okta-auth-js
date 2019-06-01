@@ -342,11 +342,11 @@ oauthUtil.setupPopup = function(opts) {
 };
 
 oauthUtil.setupRedirect = function(opts) {
-  var client = new OktaAuth(opts.oktaAuthArgs || {
+  var client = new OktaAuth(Object.assign({
     url: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
-  });
+  }, opts.oktaAuthArgs));
 
   // Mock the well-known and keys request
   oauthUtil.loadWellKnownAndKeysCache();

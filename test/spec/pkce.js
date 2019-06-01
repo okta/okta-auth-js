@@ -1,5 +1,7 @@
 jest.mock('cross-fetch');
 
+var Q = require('q');
+
 var util = require('../util/util');
 var factory = require('../util/factory');
 var packageJson = require('../../package.json');
@@ -7,8 +9,83 @@ var AuthSdkError  = require('../../lib/errors/AuthSdkError');
 var OktaAuth = require('../../lib/browser/browserIndex');
 var http = require('../../lib/http');
 var pkce = require('../../lib/pkce');
+var token = require('../../lib/token');
+var oauthUtil = require('../../lib/oauthUtil');
 
 describe('pkce', function() {
+
+  describe('prepare oauth params', function() {
+
+    describe('responseType', function() {
+      it('Must be "code" if grantType is "authorization_code"', function() {
+        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+        var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'authorization_code' });
+        return token.prepareOauthParams(sdk, {
+          responseType: 'token'
+        })
+        .then(function() {
+          expect(false).toBe(true); // should not reach this line
+        })
+        .catch(function(e) {
+          expect(e.name).toBe('AuthSdkError');
+          expect(e.errorSummary).toBe('When grantType is "authorization_code", responseType should be "code"');
+        });
+  
+      });
+  
+      it('Must not contain "code" if grantType is not "authorization_code"', function() {
+        var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'implicit' });
+        return token.prepareOauthParams(sdk, {
+          responseType: ['token', 'code']
+        })
+        .then(function() {
+          expect(false).toBe(true); // should not reach this line
+        })
+        .catch(function(e) {
+          expect(e.name).toBe('AuthSdkError');
+          expect(e.errorSummary).toBe('When responseType is "code", grantType should be "authorization_code"');
+        });
+      })
+    });
+  
+    it('Checks codeChallengeMethod against well-known', function() {
+      spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+      var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'authorization_code' });
+      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Q.resolve({
+        'code_challenge_methods_supported': []
+      }))
+      return token.prepareOauthParams(sdk, {})
+      .then(function() {
+        expect(false).toBe(true); // should not reach this line
+      })
+      .catch(function(e) {
+        expect(e.name).toBe('AuthSdkError');
+        expect(e.errorSummary).toBe('Invalid code_challenge_method');
+      });
+    });
+
+    it('Computes and returns a code challenge', function() {
+      var codeChallengeMethod = 'fake';
+      var codeVerifier = 'alsofake';
+      var codeChallenge = 'ohsofake';
+
+      spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+      var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'authorization_code' });
+      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Q.resolve({
+        'code_challenge_methods_supported': [codeChallengeMethod]
+      }));
+      spyOn(pkce, 'generateVerifier').and.returnValue(codeVerifier);
+      spyOn(pkce, 'saveMeta');
+      spyOn(pkce, 'computeChallenge').and.returnValue(Q.resolve(codeChallenge));
+      return token.prepareOauthParams(sdk, {
+        codeChallengeMethod: codeChallengeMethod
+      })
+      .then(function(oauthParams) {
+        expect(oauthParams.codeChallenge).toBe(codeChallenge);
+      })
+    });
+    
+  });
 
   describe('getToken', function() {
     var ISSUER = 'http://example.okta.com';

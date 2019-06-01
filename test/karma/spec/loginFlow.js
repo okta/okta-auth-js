@@ -166,6 +166,7 @@ describe('Complete login flow', function() {
       mockWellKnown();
       return app.loginRedirect({
         grantType: 'authorization_code',
+        responseType: 'code',
         nonce: NONCE,
         codeVerifier: CODE_VERIFIER
       });
@@ -251,6 +252,7 @@ describe('Complete login flow', function() {
       mockWellKnown();
       return app.loginRedirect({
         grantType: 'authorization_code',
+        responseType: 'code',
         nonce: NONCE,
         codeVerifier: CODE_VERIFIER,
         codeChallengeMethod: 'invalid'

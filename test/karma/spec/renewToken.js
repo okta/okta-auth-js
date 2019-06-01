@@ -22,6 +22,7 @@ describe('Renew token', function() {
   };
 
   const ACCESS_TOKEN_STR = 'fakeytoken'; // will not be verified in this flow
+  const ID_TOKEN_STR = tokens.standardIdToken;
   const ACCCESS_TOKEN_PARSED = tokens.standardAccessTokenParsed;
   const NONCE = tokens.standardIdTokenClaims.nonce;
   const AUTHORIZATION_CODE = 'FAKEY';
@@ -163,13 +164,15 @@ describe('Renew token', function() {
     var codeChallenge, codeVerifier;
 
     return bootstrap({
-      grantType: 'authorization_code'
+      grantType: 'authorization_code',
     })
     .then(() => {
       sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
 
       mockWellKnown();
   
+      spyOn(oauthUtil, 'generateNonce').and.returnValue(NONCE);
+
       // We are not loading a real iframe
       spyOn(oauthUtil, 'loadFrame').and.callFake(urlStr => {
         const url = new URL(urlStr);
@@ -196,7 +199,8 @@ describe('Renew token', function() {
         const tokenResponse = {
           'access_token': ACCESS_TOKEN_STR,
           'nonce': NONCE,
-          'expires_in': 1000
+          'expires_in': 1000,
+          'id_token': ID_TOKEN_STR
         };
 
         jasmine.Ajax.requests.reset();
