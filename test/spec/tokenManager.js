@@ -840,16 +840,87 @@ describe('TokenManager', function() {
         tokenManager: {
           type: {
             customStorage: options.customStorage,
-            getItem: function (key) {
+            getItem: options.getItem || function (key) {
               return options.customStorage[key];
             },
-            setItem: function (key, val) {
+            setItem: options.setItem || function (key, val) {
               options.customStorage[key] = val;
             }
           }
         }
       });
     }
+
+    describe('throws errors if not set up correctly', function() {
+      it('has an invalid setItem function', function() {
+        var customStorage = {};
+        try {
+          customStorageSetup( {
+            customStorage: customStorage,
+            setItem: "not a function"
+          });
+
+          // Should never hit this since setItem should fail if not a function
+          expect(true).toEqual(false);
+        } catch (e) {
+          util.expectErrorToEqual(e, {
+            name: 'AuthSdkError',
+            message: 'Custom storage not implemented correctly. Unable to write to storage.',
+            errorCode: 'INTERNAL',
+            errorSummary: 'Custom storage not implemented correctly. Unable to write to storage.',
+            errorLink: 'INTERNAL',
+            errorId: 'INTERNAL',
+            errorCauses: []
+          });
+        }
+      });
+      it('has an invalid getItem function', function() {
+        var customStorage = {};
+        try {
+          customStorageSetup( {
+            customStorage: customStorage,
+            getItem: "not a function"
+          });
+
+          // Should never hit this since setItem should fail if not a function
+          expect(true).toEqual(false);
+        } catch (e) {
+          util.expectErrorToEqual(e, {
+            name: 'AuthSdkError',
+            message: 'Custom storage not implemented correctly. Unable to read from storage.',
+            errorCode: 'INTERNAL',
+            errorSummary: 'Custom storage not implemented correctly. Unable to read from storage.',
+            errorLink: 'INTERNAL',
+            errorId: 'INTERNAL',
+            errorCauses: []
+          });
+        }
+      });
+      it('getItem does not return value set by setItem', function() {
+        var customStorage = {};
+        try {
+          customStorageSetup( {
+            customStorage: customStorage,
+            getItem: function (key) {
+              return customStorage[key] + "random addition to string";
+            }
+          });
+
+          // Should never hit this since setItem should fail if not a function
+          expect(true).toEqual(false);
+        } catch (e) {
+          util.expectErrorToEqual(e, {
+            name: 'AuthSdkError',
+            message: 'Custom storage not implemented correctly. Read value does not equal written value.',
+            errorCode: 'INTERNAL',
+            errorSummary: 'Custom storage not implemented correctly. Read value does not equal written value.',
+            errorLink: 'INTERNAL',
+            errorId: 'INTERNAL',
+            errorCauses: []
+          });
+        }
+      });
+    });
 
     describe('add', function() {
       it('adds a token', function() {
