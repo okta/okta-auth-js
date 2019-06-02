@@ -831,4 +831,86 @@ describe('TokenManager', function() {
       });
     });
   });
+
+  describe('customStorage', function() {
+
+    function customStorageSetup(options) {
+      options = options || {};
+      return setupSync({
+        tokenManager: {
+          type: {
+            customStorage: options.customStorage,
+            getItem: function (key) {
+              return options.customStorage[key];
+            },
+            setItem: function (key, val) {
+              options.customStorage[key] = val;
+            }
+          }
+        }
+      });
+    }
+
+    describe('add', function() {
+      it('adds a token', function() {
+        var customStorage = {};
+        var client = customStorageSetup({ customStorage: customStorage });
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        expect(customStorage['okta-token-storage']).toEqual(
+          JSON.stringify({ 'test-idToken': tokens.standardIdTokenParsed })
+        );
+      });
+    });
+
+    describe('get', function() {
+      it('returns a token', function(done) {
+        var customStorage = {};
+        var client = customStorageSetup({ customStorage: customStorage });
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+        client.tokenManager.get('test-idToken')
+        .then(function(token) {
+          expect(token).toEqual(tokens.standardIdTokenParsed);
+          done();
+        });
+        // Warp back to current time
+        util.warpToUnixTime(Date.now());
+      });
+
+      it('returns undefined for an expired token', function(done) {
+        var customStorage = {};
+        var client = customStorageSetup({ customStorage: customStorage });
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        client.tokenManager.get('test-idToken')
+        .then(function(token) {
+          expect(token).toBeUndefined();
+          done();
+        });
+      });
+    });
+
+    describe('remove', function() {
+      it('removes a token', function() {
+        var customStorage = {};
+        var client = customStorageSetup({ customStorage: customStorage });
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        client.tokenManager.add('anotherKey', tokens.standardIdTokenParsed);
+        client.tokenManager.remove('test-idToken');
+        expect(customStorage['okta-token-storage']).toEqual(
+          JSON.stringify({ anotherKey: tokens.standardIdTokenParsed })
+        );
+      });
+    });
+
+    describe('clear', function() {
+      it('clears all tokens', function() {
+        var customStorage = {};
+        var client = customStorageSetup({ customStorage: customStorage });
+        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+        client.tokenManager.add('anotherKey', tokens.standardIdTokenParsed);
+        client.tokenManager.clear();
+        expect(customStorage['okta-token-storage']).toEqual(JSON.stringify({}));
+      });
+    });
+  });
 });
