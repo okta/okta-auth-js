@@ -162,8 +162,10 @@ tokenManager: {
 | `issuer`       | Specify a custom issuer to perform the OIDC flow. Defaults to the base url parameter if not provided. |
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
+| `grantType`  | Specify `grantType` for this Application. Supported types are `implicit` and `authorization_code`. Defaults to `implicit` |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
+| `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
 | `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
 | | This option should be used only for browser support and testing purposes. |
 
@@ -191,6 +193,28 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
+##### PKCE OAuth 2.0 flow
+
+By default the `implicit` OAuth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser.
+
+To use PKCE flow, set `grantType` to `authorization_code` in your config.
+
+```javascript
+
+var config = {
+  grantType:  'authorization_code',
+
+  // other config
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+};
+
+var authClient = new OktaAuth(config);
+```
+
+If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
+
+`OktaAuth.features.isPKCESupported()`
+
 ### Optional configuration options
 
 ### `httpRequestClient`
@@ -212,7 +236,8 @@ var config = {
     //   headers: {
     //     headerName: headerValue
     //   },
-    //   data: postBodyData
+    //   data: postBodyData,
+    //   withCredentials: true|false,
     // }
     return Promise.resolve(/* a raw XMLHttpRequest response */);
   }
@@ -1367,13 +1392,14 @@ The following configuration options can **only** be included in `token.getWithou
 | :-------: | ----------|
 | `sessionToken` | Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow. |
 | `responseMode` | Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`. See [Parameter Details](https://developer.okta.com/docs/api/resources/oidc#parameter-details) for a list of available modes. |
-| `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. Defaults to `id_token`. |
+| `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. The default value is based on the configured `grantType`. If `grantType` is `implicit` (the default setting), `responseType` will have a default value of `id_token`. If `grantType` is `authorization_code`, the default value will be `code`. |
 | | Use an array if specifying multiple response types - in this case, the response will contain both an ID Token and an Access Token. `responseType: ['id_token', 'token']` |
 | `scopes` | Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`. For a list of available scopes, see [Scopes and Claims](https://developer.okta.com/docs/api/resources/oidc#access-token-scopes-and-claims). |
 | `state` | Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string. |
 | `nonce` | Specify a nonce that will be validated in an `id_token`. This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an `id_token`. Defaults to a random string. |
 
 For a list of all available parameters that can be passed to the `/authorize` endpoint, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
+
 
 ##### Example
 
@@ -1445,7 +1471,12 @@ authClient.token.getWithRedirect(oauthOptions);
 
 #### `token.parseFromUrl(options)`
 
-Parses the access or ID Tokens from the url after a successful authentication redirect. If an ID token is present, it will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
+Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. 
+
+If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint. 
+
+The ID token will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
+
 
 ```javascript
 authClient.token.parseFromUrl()
@@ -1718,8 +1749,13 @@ yarn install
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
 | `yarn build`          | Build the SDK with a sourcemap |
-| `yarn test`           | Run unit tests using Jest      |
+| `yarn test`           | Run unit tests     |
 | `yarn lint`           | Run eslint linting             |
+| `yarn start`          | Start internal test app        |
+
+#### Test App
+
+Implements a simple SPA application to demonstrate functionality and provide for manual testing. [See here for more information](test/app/README.md).
 
 ## Contributing
 

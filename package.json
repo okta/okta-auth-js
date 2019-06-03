@@ -16,12 +16,17 @@
   "scripts": {
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
-    "test": "yarn test:browser && yarn test:server",
+    "test": "yarn test:karma && yarn test:browser && yarn test:server",
+    "test:karma": "karma start --single-run",
     "test:browser": "jest --config ./jest.browser.js",
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
     "build": "node ./writeConfig.js && webpack --config webpack.config.js",
-    "prepublish": "yarn build"
+    "prepare": "yarn build",
+    "install:app": "yarn --cwd test/app install",
+    "start:app": "yarn --cwd test/app start",
+    "prestart": "yarn install:app",
+    "start": "yarn start:app"
   },
   "author": "Okta",
   "keywords": [
@@ -42,12 +47,21 @@
   },
   "devDependencies": {
     "eslint": "5.6.1",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "jasmine-ajax": "^4.0.0",
     "jest": "^23.6.0",
     "jest-junit": "^5.0.0",
     "jquery": "3.3.1",
     "json-loader": "0.5.4",
+    "karma": "^4.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage-istanbul-reporter": "^2.0.5",
+    "karma-jasmine": "^2.0.1",
+    "karma-jquery": "^0.2.3",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^3.0.5",
     "lodash": "4.17.11",
-    "webpack": "1.13.0"
+    "webpack": "^3.0.0"
   },
   "okta-auth-js": {
     "STATE_TOKEN_KEY_NAME": "oktaStateToken",
@@ -59,7 +73,8 @@
     "REDIRECT_STATE_COOKIE_NAME": "okta-oauth-state",
     "REDIRECT_NONCE_COOKIE_NAME": "okta-oauth-nonce",
     "TOKEN_STORAGE_NAME": "okta-token-storage",
-    "CACHE_STORAGE_NAME": "okta-cache-storage"
+    "CACHE_STORAGE_NAME": "okta-cache-storage",
+    "PKCE_STORAGE_NAME": "okta-pkce-storage"
   },
   "jest-junit": {
     "output": "./build2/reports/unit/junit-result.xml"

@@ -1,0 +1,17 @@
+{
+  "extends": ["eslint:recommended"],
+  "env": {
+    "browser": false
+  },
+  "globals": {
+    "spyOn": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2017
+  },
+  "rules": {
+    "semi": 2,
+    "eol-last": 2
+  }
+}

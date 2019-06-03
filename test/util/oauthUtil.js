@@ -89,7 +89,7 @@ function getTime(time) {
   if (time || time === 0) {
     return time;
   } else {
-    return tokens.standardIdTokenClaims.exp - 1;
+    return tokens.standardIdTokenClaims['auth_time'];
   }
 }
 
@@ -138,6 +138,9 @@ oauthUtil.setup = function(opts) {
               'https://auth-js-test.okta.com'
           });
         });
+        if (opts.fastForwardToTime) {
+          jest.runAllTimers();
+        }
       }
     });
   }
@@ -339,11 +342,11 @@ oauthUtil.setupPopup = function(opts) {
 };
 
 oauthUtil.setupRedirect = function(opts) {
-  var client = new OktaAuth(opts.oktaAuthArgs || {
+  var client = new OktaAuth(Object.assign({
     url: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
-  });
+  }, opts.oktaAuthArgs));
 
   // Mock the well-known and keys request
   oauthUtil.loadWellKnownAndKeysCache();
@@ -352,15 +355,18 @@ oauthUtil.setupRedirect = function(opts) {
   var windowLocationMock = util.mockSetWindowLocation(client);
   var setCookieMock = util.mockSetCookie();
 
+  var promise;
   if (Array.isArray(opts.getWithRedirectArgs)) {
-    client.token.getWithRedirect.apply(null, opts.getWithRedirectArgs);
+    promise = client.token.getWithRedirect.apply(null, opts.getWithRedirectArgs);
   } else {
-    client.token.getWithRedirect(opts.getWithRedirectArgs);
+    promise = client.token.getWithRedirect(opts.getWithRedirectArgs);
   }
 
-  expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
-
-  expect(setCookieMock.mock.calls).toEqual(opts.expectedCookies);
+  return promise
+    .then(function() {
+      expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
+      expect(setCookieMock.mock.calls).toEqual(opts.expectedCookies);
+    });
 };
 
 oauthUtil.setupParseUrl = function(opts) {

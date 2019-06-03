@@ -12,12 +12,22 @@
 
 var fetch = require('cross-fetch');
 
+/* eslint-disable complexity */
 function fetchRequest(method, url, args) {
+  var body = args.data;
+  var headers = args.headers || {};
+  var contentType = (headers['Content-Type'] || headers['content-type'] || '');
+
+  // JSON encode body (if appropriate)
+  if (contentType === 'application/json' && body && typeof body !== 'string') {
+    body = JSON.stringify(body);
+  }
+
   var fetchPromise = fetch(url, {
     method: method,
     headers: args.headers,
-    body: JSON.stringify(args.data),
-    credentials: 'include'
+    body: body,
+    credentials: args.withCredentials === false ? 'omit' : 'include'
   })
   .then(function(response) {
     var error = !response.ok;

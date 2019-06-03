@@ -13,6 +13,7 @@
 var $ = require('jquery');
 
 function jqueryRequest(method, url, args) {
+  // TODO: support content-type
   var deferred = $.Deferred();
   $.ajax({
     type: method,
@@ -20,7 +21,7 @@ function jqueryRequest(method, url, args) {
     headers: args.headers,
     data: JSON.stringify(args.data),
     xhrFields: {
-      withCredentials: true
+      withCredentials: args.withCredentials
     }
   })
   .then(function(data, textStatus, jqXHR) {

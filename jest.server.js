@@ -16,7 +16,9 @@ module.exports = {
     './test/spec/oauthUtil.js',
     './test/spec/token.js',
     './test/spec/tokenManager.js',
-    './test/spec/webfinger.js'
+    './test/spec/webfinger.js',
+    './test/spec/pkce.js',
+    './test/spec/features.js'
   ],
   'reporters': [
     'default',

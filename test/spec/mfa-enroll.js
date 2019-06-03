@@ -1,3 +1,5 @@
+jest.mock('cross-fetch');
+
 var util = require('../util/util'),
     _ = require('lodash');
 
