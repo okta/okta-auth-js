@@ -16,6 +16,23 @@ describe('pkce', function() {
 
   describe('prepare oauth params', function() {
 
+    it('throws an error if grantType is "authorization_code" and PKCE is not supported', function() {
+      spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
+      var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'implicit' });
+      return token.prepareOauthParams(sdk, {
+        grantType: 'authorization_code',
+        responseType: 'code'
+      })
+      .then(function() {
+        // Should never hit this
+        expect(true).toBe(false);
+      })
+      .catch(function (e) {
+        expect(e.name).toEqual('AuthSdkError');
+        expect(e.errorSummary).toEqual('This browser doesn\'t support PKCE');
+      });
+    });
+    
     describe('responseType', function() {
       it('Must be "code" if grantType is "authorization_code"', function() {
         spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
