@@ -162,7 +162,7 @@ tokenManager: {
 | `issuer`       | Specify a custom issuer to perform the OIDC flow. Defaults to the base url parameter if not provided. |
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
-| `grantType`  | Specify grantType for this Application. Supported types are `implicit` and `authorization_code`. Defaults to `implicit` |
+| `grantType`  | Specify `grantType` for this Application. Supported types are `implicit` and `authorization_code`. Defaults to `implicit` |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
 | `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
@@ -193,7 +193,7 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-##### PKCE OAuth flow
+##### PKCE OAuth 2.0 flow
 
 By default the `implicit` OAuth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser.
 

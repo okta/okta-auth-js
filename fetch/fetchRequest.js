@@ -16,7 +16,7 @@ var fetch = require('cross-fetch');
 function fetchRequest(method, url, args) {
   var body = args.data;
   var headers = args.headers || {};
-  var contentType = (headers['Content-Type'] || headers['content-type'] || '').toLowerCase();
+  var contentType = (headers['Content-Type'] || headers['content-type'] || '');
 
   // JSON encode body (if appropriate)
   if (contentType === 'application/json' && body && typeof body !== 'string') {
