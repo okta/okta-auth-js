@@ -1,5 +1,7 @@
 #!/bin/bash
 
+setup_service google-chrome-stable 66.0.3359.139-1
+
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
 export TEST_SUITE_TYPE="jsunit"
