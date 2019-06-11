@@ -1,6 +1,6 @@
 var OktaAuth = require('OktaAuth');
 
-fdescribe('features', function() {
+describe('features', function() {
 
   describe('functions exist', function() {
     var funcs = [

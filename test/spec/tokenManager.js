@@ -4,12 +4,13 @@ var util = require('../util/util');
 var oauthUtil = require('../util/oauthUtil');
 
 function setupSync(options) {
-  options = options || { tokenManager: {} };
+  options = options || {};
+  options.tokenManager = options.tokenManager || {};
   return new OktaAuth({
     issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect',
-    clockSkew: options.clockSkew || 0, // by default there is no skew
+    localClockOffset: options.localClockOffset || 0,
     tokenManager: {
       storage: options.tokenManager.type,
       autoRenew: options.tokenManager.autoRenew || false,
@@ -130,14 +131,14 @@ describe('TokenManager', function() {
       return oauthUtil.setupFrame({
         authClient: setupSync(),
         tokenManagerAddKeys: {
-          'idToken': {
+          'test-idToken': {
             idToken: 'testInitialToken',
             claims: {'fake': 'claims'},
             expiresAt: 0,
             scopes: ['openid', 'email']
           }
         },
-        tokenManagerRenewArgs: ['idToken'],
+        tokenManagerRenewArgs: ['test-idToken'],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           queryParams: {
@@ -159,7 +160,7 @@ describe('TokenManager', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed
         });
       });
     });
@@ -327,10 +328,10 @@ describe('TokenManager', function() {
         }),
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'idToken',
+        autoRenewTokenKey: 'test-idToken',
         time: expiresAt + 1,
         tokenManagerAddKeys: {
-          'idToken': {
+          'test-idToken': {
             idToken: 'testInitialToken',
             claims: {'fake': 'claims'},
             expiresAt: expiresAt,
@@ -357,27 +358,27 @@ describe('TokenManager', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed
         });
       });
     });
 
-    it('automatically renews a token early when clock skew is considered', function() {
+    it('automatically renews a token early when local clock offset is considered', function() {
       var expiresAt = tokens.standardIdTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: setupSync({
-          // skew the clock by 10 seconds
-          clockSkew: 10000,
+          // local clock offset: 10 seconds behind the server
+          localClockOffset: 10000,
           tokenManager: {
             autoRenew: true
           }
         }),
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'idToken',
-        time: expiresAt - 10, // 10 seconds until expiration
+        autoRenewTokenKey: 'test-idToken',
+        time: expiresAt - 10, // set local time to 10 seconds until expiration
         tokenManagerAddKeys: {
-          'idToken': {
+          'test-idToken': {
             idToken: 'testInitialToken',
             claims: {'fake': 'claims'},
             expiresAt: expiresAt,
@@ -404,7 +405,7 @@ describe('TokenManager', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed
         });
       });
     });
@@ -493,14 +494,8 @@ describe('TokenManager', function() {
       var EXPIRATION_TIME = CURRENT_TIME + 10;
       util.warpToUnixTime(CURRENT_TIME);
       var TokenManager = require('../../lib/TokenManager');
-      var sdk = {
-        token: {
-          renew: jest.fn(),
-        },
-        options: {
-          clockSkew: 0
-        }
-      };
+      var sdk = setupSync();
+      jest.spyOn(sdk.token, 'renew');
       var tokenManager = new TokenManager(sdk);
       var expiresAt = EXPIRATION_TIME;
       var token = {
@@ -511,7 +506,32 @@ describe('TokenManager', function() {
       tokenManager.add('accessToken', token);
       tokenManager.get('accessToken');
       expect(sdk.token.renew).not.toHaveBeenCalled();
-      util.warpToUnixTime(EXPIRATION_TIME + 10);
+      util.warpToUnixTime(EXPIRATION_TIME);
+      tokenManager.get('accessToken');
+      expect(sdk.token.renew).toHaveBeenCalled();
+    });
+
+    it('does not renew the token if the token has not expired, accounting for local clock offset', function() {
+      var CURRENT_TIME = 10;
+      var EXPIRATION_TIME = CURRENT_TIME - 1;
+      util.warpToUnixTime(CURRENT_TIME);
+      var TokenManager = require('../../lib/TokenManager');
+      var sdk = setupSync({
+        // negative offset means the local time is ahead of the server time
+        localClockOffset: -2000
+      });
+      jest.spyOn(sdk.token, 'renew');
+      var tokenManager = new TokenManager(sdk);
+      var expiresAt = EXPIRATION_TIME;
+      var token = {
+        accessToken: 'fakeToken',
+        expiresAt: expiresAt,
+        scopes: []
+      };
+      tokenManager.add('accessToken', token);
+      tokenManager.get('accessToken');
+      expect(sdk.token.renew).not.toHaveBeenCalled();
+      util.warpToUnixTime(EXPIRATION_TIME + 2);
       tokenManager.get('accessToken');
       expect(sdk.token.renew).toHaveBeenCalled();
     });
@@ -542,6 +562,22 @@ describe('TokenManager', function() {
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
     });
 
+    it('accounts for local clock offset when emittting "expired"', function() {
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      var client = setupSync({
+        // local client is 2 seconds fast
+        localClockOffset: -2000
+      });
+      var callback = jest.fn();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      client.tokenManager.on('expired', callback);
+      expect(callback).not.toHaveBeenCalled();
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(callback).not.toHaveBeenCalled();
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt);
+      expect(callback).toHaveBeenCalled();
+    });
+  
     it('returns undefined for a token that has expired when autoRenew is disabled', function() {
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       localStorage.setItem('okta-token-storage', JSON.stringify({
@@ -556,13 +592,13 @@ describe('TokenManager', function() {
     });
 
     it('returns undefined for an active token when autoRenew is disabled, accounting' +
-        'for clock skew', function() {
+        'for local clock offset', function() {
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       localStorage.setItem('okta-token-storage', JSON.stringify({
         'test-idToken': tokens.standardIdTokenParsed
       }));
       var client = setupSync({
-        clockSkew: 5000, // local clock is 5 seconds behind server
+        localClockOffset: 5000, // local clock is 5 seconds behind server
         tokenManager: {
           autoRenew: false
         }
