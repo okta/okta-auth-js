@@ -24,7 +24,7 @@ util.warpToDistantPast = function () {
 };
 
 util.warpToUnixTime = function (unixTime) {
-  jest.spyOn(Date, 'now').mockReturnValue(new Date(unixTime * 1000));
+  jest.spyOn(Date, 'now').mockReturnValue(unixTime * 1000);
 };
 
 util.warpByTicksToUnixTime = function (unixTime) {

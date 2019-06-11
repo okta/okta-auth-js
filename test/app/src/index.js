@@ -21,10 +21,12 @@ const url = new URL(window.location.href);
 const grantType = url.searchParams.get('grantType');
 const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
 const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
+const maxClockSkew = parseInt(url.searchParams.get('maxClockSkew') || 300);
 Object.assign(config, {
   grantType,
   scopes,
   responseType,
+  maxClockSkew,
 });
 
 // Create the app as a function of config

@@ -264,7 +264,7 @@ oauthUtil.setupFrame = function(opts) {
 
   function iframeWasCreated() {
     expect(body.appendChild).toHaveBeenCalled();
-    var el = body.appendChild.calls.mostRecent()[0];
+    var el = body.appendChild.mock.calls[0][0];
     expect(el.tagName).toEqual('IFRAME');
     expect(el.style.display).toEqual('none');
   }
