@@ -574,16 +574,21 @@ describe('loadPopup', function() {
 });
 
 describe('validateClaims', function () {
-  var sdk = new OktaAuth({
-    url: 'https://auth-js-test.okta.com',
-    clientId: 'foo',
-    ignoreSignature: false
-  });
+  var sdk;
+  var validationOptions;
 
-  var validationOptions = {
-    clientId: 'foo',
-    issuer: 'https://auth-js-test.okta.com'
-  };
+  beforeEach(function() {
+    sdk = new OktaAuth({
+      url: 'https://auth-js-test.okta.com',
+      clientId: 'foo',
+      ignoreSignature: false
+    });
+
+    validationOptions = {
+      clientId: 'foo',
+      issuer: 'https://auth-js-test.okta.com'
+    };
+  });
 
   it('throws an AuthSdkError when no jwt is provided', function () {
     var fn = function () { oauthUtil.validateClaims(sdk, undefined, validationOptions); };
@@ -592,7 +597,7 @@ describe('validateClaims', function () {
 
   it('throws an AuthSdkError when no clientId is provided', function () {
     var fn = function () {
-      oauthUtil.validateClaims(sdk, undefined, {
+      oauthUtil.validateClaims(sdk, {}, {
         issuer: 'https://auth-js-test.okta.com'
       });
     };
@@ -601,10 +606,139 @@ describe('validateClaims', function () {
 
   it('throws an AuthSdkError when no issuer is provided', function () {
     var fn = function () {
-      oauthUtil.validateClaims(sdk, undefined, {
+      oauthUtil.validateClaims(sdk, {}, {
         clientId: 'foo'
       });
     };
     expect(fn).toThrowError('The jwt, iss, and aud arguments are all required');
+  });
+
+  it('validates nonce, if provided', function() {
+    validationOptions.nonce = 'bar';
+    var claims = { nonce: 'foo' };
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).toThrowError('OAuth flow response nonce doesn\'t match request nonce');  
+  });
+
+  it('validates issuer', function() {
+    var claims = { iss: 'foo' };
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).toThrowError('The issuer [' + claims.iss + '] ' +
+    'does not match [' + validationOptions.issuer + ']'); 
+  });
+
+  it('validates audience', function() {
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: 'nobody'
+    };
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).toThrowError('The audience [' + claims.aud + '] ' +
+      'does not match [' + validationOptions.clientId + ']'); 
+  });
+
+  it('validates exp > iat', function() {
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+      exp: 1,
+      iat: 2
+    };
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).toThrowError('The JWT expired before it was issued'); 
+  });
+
+  it('throws if expired', function() {
+    var now = 10;
+    util.warpToUnixTime(now);
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+      exp: now - 1,
+      iat: now - 2
+    };
+    sdk.options.maxClockSkew = 0;
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).toThrowError('The JWT expired and is no longer valid'); 
+  });
+
+  it('maxClockSkew extends expiration window', function() {
+    var now = 10;
+    var skew = 2;
+    util.warpToUnixTime(now);
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+      exp: now - 1,
+      iat: now - 2
+    };
+    sdk.options.maxClockSkew = skew;
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).not.toThrowError();
+    util.warpToUnixTime(now + skew);
+    expect(fn).toThrowError('The JWT expired and is no longer valid'); 
+  });
+
+  it('throws if issued in the future', function() {
+    var now = 10;
+    util.warpToUnixTime(now);
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+      exp: now + 2,
+      iat: now + 1
+    };
+    sdk.options.maxClockSkew = 0;
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).toThrowError('The JWT was issued in the future'); 
+  });
+
+  it('maxClockSkew extends iat validation into the future', function() {
+    var now = 10;
+    var skew = 2;
+    util.warpToUnixTime(now);
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+      exp: now + 2,
+      iat: now + 1
+    };
+    sdk.options.maxClockSkew = skew;
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).not.toThrowError();
+    util.warpToUnixTime(now - skew);
+    expect(fn).toThrowError('The JWT was issued in the future'); 
+  });
+
+  it('can validate all claims without error', function() {
+    var now = 10;
+    util.warpToUnixTime(now);
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+      exp: now + 2,
+      iat: now - 1
+    };
+    sdk.options.maxClockSkew = 0;
+    var fn = function () {
+      oauthUtil.validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).not.toThrowError();
   });
 });

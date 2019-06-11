@@ -562,7 +562,7 @@ describe('TokenManager', function() {
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
     });
 
-    it('accounts for local clock offset when emittting "expired"', function() {
+    it('accounts for local clock offset when emitting "expired"', function() {
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       var client = setupSync({
         // local client is 2 seconds fast
