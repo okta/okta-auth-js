@@ -4,12 +4,13 @@ var util = require('../util/util');
 var oauthUtil = require('../util/oauthUtil');
 
 function setupSync(options) {
-  options = options || { tokenManager: {} };
+  options = options || {};
+  options.tokenManager = options.tokenManager || {};
   return new OktaAuth({
     issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect',
-    maxClockSkew: options.maxClockSkew || 1, // set default to 1 second
+    localClockOffset: options.localClockOffset || 0,
     tokenManager: {
       storage: options.tokenManager.type,
       autoRenew: options.tokenManager.autoRenew || false,
@@ -126,7 +127,7 @@ describe('TokenManager', function() {
   });
 
   describe('renew', function() {
-    it('allows renewing an idToken', function(done) {
+    it('allows renewing an idToken', function() {
       return oauthUtil.setupFrame({
         authClient: setupSync(),
         tokenManagerAddKeys: {
@@ -161,22 +162,25 @@ describe('TokenManager', function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
-      })
-      .fin(done);
+      });
     });
 
-    it('allows renewing an accessToken', function(done) {
+    it('allows renewing an accessToken', function() {
+      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
+      var mockTime = expiresAt - 3600;
+
       return oauthUtil.setupFrame({
         authClient: setupSync(),
         tokenManagerAddKeys: {
-          'test-accessToken': {
+          'accessToken': {
             accessToken: 'testInitialToken',
-            expiresAt: 1449703529,
+            expiresAt: mockTime + 100,
             scopes: ['openid', 'email'],
             tokenType: 'Bearer'
           }
         },
-        tokenManagerRenewArgs: ['test-accessToken'],
+        time: mockTime,
+        tokenManagerRenewArgs: ['accessToken'],
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           queryParams: {
@@ -200,10 +204,9 @@ describe('TokenManager', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-accessToken': tokens.standardAccessTokenParsed
+          'accessToken': tokens.standardAccessTokenParsed
         });
-      })
-      .fin(done);
+      });
     });
 
     oauthUtil.itpErrorsCorrectly('throws an errors when a token doesn\'t exist',
@@ -222,7 +225,7 @@ describe('TokenManager', function() {
       }
     );
 
-    it('throws an errors when the token is mangled', function(done) {
+    it('throws an errors when the token is mangled', function() {
       localStorage.setItem('okta-token-storage', '#unparseableJson#');
       return oauthUtil.setupFrame({
         authClient: setupSync(),
@@ -242,8 +245,7 @@ describe('TokenManager', function() {
           errorId: 'INTERNAL',
           errorCauses: []
         });
-      })
-      .fin(done);
+      });
     });
 
     oauthUtil.itpErrorsCorrectly('throws an error if there\'s an issue renewing',
@@ -282,7 +284,7 @@ describe('TokenManager', function() {
       }
     );
 
-    it('removes token if an OAuthError is thrown while renewing', function(done) {
+    it('removes token if an OAuthError is thrown while renewing', function() {
       return oauthUtil.setupFrame({
         authClient: setupSync(),
         willFail: true,
@@ -307,8 +309,7 @@ describe('TokenManager', function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
-      })
-      .fin(done);
+      });
     });
   });
 
@@ -317,7 +318,7 @@ describe('TokenManager', function() {
       jest.useFakeTimers();
     });
 
-    it('automatically renews a token by default', function(done) {
+    it('automatically renews a token by default', function() {
       var expiresAt = tokens.standardIdTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: setupSync({
@@ -359,16 +360,15 @@ describe('TokenManager', function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
-      })
-      .fin(done);
+      });
     });
 
-    it('automatically renews a token early when clock skew is considered', function(done) {
+    it('automatically renews a token early when local clock offset is considered', function() {
       var expiresAt = tokens.standardIdTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: setupSync({
-          // Account for 10 min of clock skew
-          maxClockSkew: 600,
+          // local clock offset: 10 seconds behind the server
+          localClockOffset: 10000,
           tokenManager: {
             autoRenew: true
           }
@@ -376,7 +376,7 @@ describe('TokenManager', function() {
         autoRenew: true,
         fastForwardToTime: true,
         autoRenewTokenKey: 'test-idToken',
-        time: expiresAt - 10,
+        time: expiresAt - 10, // set local time to 10 seconds until expiration
         tokenManagerAddKeys: {
           'test-idToken': {
             idToken: 'testInitialToken',
@@ -407,11 +407,10 @@ describe('TokenManager', function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
-      })
-      .fin(done);
+      });
     });
 
-    it('does not return the token after tokens were cleared before renew promise was resolved', function(done) {
+    it('does not return the token after tokens were cleared before renew promise was resolved', function() {
       var expiresAt = tokens.standardIdTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: setupSync({
@@ -455,11 +454,10 @@ describe('TokenManager', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
-      })
-      .fin(done);
+      });
     });
 
-    it('removes a token on OAuth failure', function(done) {
+    it('removes a token on OAuth failure', function() {
       return oauthUtil.setupFrame({
         authClient: setupSync({
           tokenManager: {
@@ -488,24 +486,16 @@ describe('TokenManager', function() {
           errorSummary: 'something went wrong'
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
-      })
-      .fin(done);
+      });
     });
 
     it('does not renew the token if the token has not expired', function() {
-      var CLOCK_SKEW = 600;
       var CURRENT_TIME = 0;
-      var EXPIRATION_TIME = CURRENT_TIME + CLOCK_SKEW + 10;
+      var EXPIRATION_TIME = CURRENT_TIME + 10;
       util.warpToUnixTime(CURRENT_TIME);
       var TokenManager = require('../../lib/TokenManager');
-      var sdk = {
-        token: {
-          renew: jest.fn(),
-        },
-        options: {
-          maxClockSkew: CLOCK_SKEW
-        }
-      };
+      var sdk = setupSync();
+      jest.spyOn(sdk.token, 'renew');
       var tokenManager = new TokenManager(sdk);
       var expiresAt = EXPIRATION_TIME;
       var token = {
@@ -516,7 +506,32 @@ describe('TokenManager', function() {
       tokenManager.add('accessToken', token);
       tokenManager.get('accessToken');
       expect(sdk.token.renew).not.toHaveBeenCalled();
-      util.warpToUnixTime(EXPIRATION_TIME + 10);
+      util.warpToUnixTime(EXPIRATION_TIME);
+      tokenManager.get('accessToken');
+      expect(sdk.token.renew).toHaveBeenCalled();
+    });
+
+    it('does not renew the token if the token has not expired, accounting for local clock offset', function() {
+      var CURRENT_TIME = 10;
+      var EXPIRATION_TIME = CURRENT_TIME - 1;
+      util.warpToUnixTime(CURRENT_TIME);
+      var TokenManager = require('../../lib/TokenManager');
+      var sdk = setupSync({
+        // negative offset means the local time is ahead of the server time
+        localClockOffset: -2000
+      });
+      jest.spyOn(sdk.token, 'renew');
+      var tokenManager = new TokenManager(sdk);
+      var expiresAt = EXPIRATION_TIME;
+      var token = {
+        accessToken: 'fakeToken',
+        expiresAt: expiresAt,
+        scopes: []
+      };
+      tokenManager.add('accessToken', token);
+      tokenManager.get('accessToken');
+      expect(sdk.token.renew).not.toHaveBeenCalled();
+      util.warpToUnixTime(EXPIRATION_TIME + 2);
       tokenManager.get('accessToken');
       expect(sdk.token.renew).toHaveBeenCalled();
     });
@@ -547,38 +562,52 @@ describe('TokenManager', function() {
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
     });
 
-    it('returns undefined for a token that has expired when autoRenew is disabled', function(done) {
+    it('accounts for local clock offset when emitting "expired"', function() {
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      var client = setupSync({
+        // local client is 2 seconds fast
+        localClockOffset: -2000
+      });
+      var callback = jest.fn();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      client.tokenManager.on('expired', callback);
+      expect(callback).not.toHaveBeenCalled();
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(callback).not.toHaveBeenCalled();
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt);
+      expect(callback).toHaveBeenCalled();
+    });
+  
+    it('returns undefined for a token that has expired when autoRenew is disabled', function() {
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       localStorage.setItem('okta-token-storage', JSON.stringify({
         'test-idToken': tokens.standardIdTokenParsed
       }));
       var client = setupSync({ tokenManager: { autoRenew: false } });
       util.warpToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
-      client.tokenManager.get('test-idToken')
+      return client.tokenManager.get('test-idToken')
       .then(function(token) {
         expect(token).toBeUndefined();
-        done();
       });
     });
 
     it('returns undefined for an active token when autoRenew is disabled, accounting' +
-        'for clock skew', function(done) {
+        'for local clock offset', function() {
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       localStorage.setItem('okta-token-storage', JSON.stringify({
         'test-idToken': tokens.standardIdTokenParsed
       }));
       var client = setupSync({
-        // Account for 10 min of clock skew
-        maxClockSkew: 600,
+        localClockOffset: 5000, // local clock is 5 seconds behind server
         tokenManager: {
           autoRenew: false
         }
       });
+      // Set local time to server expiration minus 5 seconds
       util.warpToUnixTime(tokens.standardIdTokenParsed.expiresAt - 5);
-      client.tokenManager.get('test-idToken')
+      return client.tokenManager.get('test-idToken')
       .then(function(token) {
         expect(token).toBeUndefined();
-        done();
       });
     });
   });
@@ -604,30 +633,26 @@ describe('TokenManager', function() {
     });
 
     describe('get', function() {
-      it('returns a token', function(done) {
+      it('returns a token', function() {
         var client = localStorageSetup();
         localStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-        client.tokenManager.get('test-idToken')
+        return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toEqual(tokens.standardIdTokenParsed);
-          done();
         });
-        // Warp back to current time
-        util.warpToUnixTime(Date.now());
       });
 
-      it('returns undefined for an expired token', function(done) {
+      it('returns undefined for an expired token', function() {
         var client = localStorageSetup();
         localStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
-        client.tokenManager.get('test-idToken')
+        return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toBeUndefined();
-          done();
         });
       });
     });
@@ -680,30 +705,26 @@ describe('TokenManager', function() {
     });
 
     describe('get', function() {
-      it('returns a token', function(done) {
+      it('returns a token', function() {
         var client = sessionStorageSetup();
         sessionStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-        client.tokenManager.get('test-idToken')
+        return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toEqual(tokens.standardIdTokenParsed);
-          done();
         });
-        // Warp back to current time
-        util.warpToUnixTime(Date.now());
       });
 
-      it('returns undefined for an expired token', function(done) {
+      it('returns undefined for an expired token', function() {
         var client = sessionStorageSetup();
         sessionStorage.setItem('okta-token-storage', JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
-        client.tokenManager.get('test-idToken')
+        return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toBeUndefined();
-          done();
         });
       });
     });
@@ -775,26 +796,22 @@ describe('TokenManager', function() {
     });
 
     describe('get', function() {
-      it('returns a token', function(done) {
+      it('returns a token', function() {
         var client = cookieStorageSetup();
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-        client.tokenManager.get('test-idToken')
+        return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toEqual(tokens.standardIdTokenParsed);
-          done();
         });
-        // Warp back to current time
-        util.warpToUnixTime(Date.now());
       });
 
-      it('returns undefined for an expired token', function(done) {
+      it('returns undefined for an expired token', function() {
         var client = cookieStorageSetup();
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-        client.tokenManager.get('test-idToken')
+        return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toBeUndefined();
-          done();
         });
       });
     });
