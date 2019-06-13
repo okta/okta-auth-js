@@ -168,6 +168,7 @@ tokenManager: {
 | `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
 | `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
 | | This option should be used only for browser support and testing purposes. |
+| `maxClockSkew` | Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
 
 ##### Example Client
 

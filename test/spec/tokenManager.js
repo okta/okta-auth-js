@@ -563,18 +563,16 @@ describe('TokenManager', function() {
     });
 
     it('accounts for local clock offset when emitting "expired"', function() {
-      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      util.warpToUnixTime(tokens.standardIdTokenClaims.expiresAt);
+      var localClockOffset = -2000; // local client is 2 seconds fast
       var client = setupSync({
-        // local client is 2 seconds fast
-        localClockOffset: -2000
+        localClockOffset: localClockOffset
       });
       var callback = jest.fn();
-      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
       client.tokenManager.on('expired', callback);
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
       expect(callback).not.toHaveBeenCalled();
-      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
-      expect(callback).not.toHaveBeenCalled();
-      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt);
+      jest.advanceTimersByTime(-localClockOffset);
       expect(callback).toHaveBeenCalled();
     });
   
