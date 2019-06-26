@@ -2,15 +2,16 @@ var OktaAuth = require('OktaAuth');
 var tokens = require('../util/tokens');
 var util = require('../util/util');
 var oauthUtil = require('../util/oauthUtil');
+var SdkClock = require('../../lib/clock');
 
 function setupSync(options) {
   options = options || {};
   options.tokenManager = options.tokenManager || {};
+  jest.spyOn(SdkClock, 'create').mockReturnValue(new SdkClock(options.localClockOffset));
   return new OktaAuth({
     issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect',
-    localClockOffset: options.localClockOffset || 0,
     tokenManager: {
       storage: options.tokenManager.type,
       autoRenew: options.tokenManager.autoRenew || false,
