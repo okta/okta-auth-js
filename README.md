@@ -146,12 +146,20 @@ tokenManager: {
 }
 ```
 
-
 By default, the `tokenManager` will attempt to renew expired tokens. When an expired token is requested by the `tokenManager.get()` method, a renewal request is executed to update the token. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to  [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
 ```javascript
 tokenManager: {
   autoRenew: false
+}
+```
+
+By default, the `expired` event will fire 30 seconds before actual expiration time. You can customize this by setting the `expireEarly` option. If `autoRenew` is set to true, tokens will also be automatically renewed early by this amount.
+
+```javascript
+// Renew tokens 2 minutes before expiration
+tokenManager: {
+  expireEarly: 120
 }
 ```
 

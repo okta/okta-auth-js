@@ -13,6 +13,7 @@ function setupSync(options) {
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect',
     tokenManager: {
+      expireEarly: options.tokenManager.expireEarly || 0,
       storage: options.tokenManager.type,
       autoRenew: options.tokenManager.autoRenew || false,
       secure: options.tokenManager.secure // used by cookie storage
@@ -411,6 +412,53 @@ describe('TokenManager', function() {
       });
     });
 
+    it('renews a token early when "expireEarly" option is considered', function() {
+      var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+      return oauthUtil.setupFrame({
+        authClient: setupSync({
+          tokenManager: {
+            autoRenew: true,
+            expireEarly: 10
+          }
+        }),
+        autoRenew: true,
+        fastForwardToTime: true,
+        autoRenewTokenKey: 'test-idToken',
+        time: expiresAt - 10, // set local time to 10 seconds until expiration
+        tokenManagerAddKeys: {
+          'test-idToken': {
+            idToken: 'testInitialToken',
+            claims: {'fake': 'claims'},
+            expiresAt: expiresAt,
+            scopes: ['openid', 'email']
+          }
+        },
+        postMessageSrc: {
+          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          queryParams: {
+            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+            'redirect_uri': 'https://example.com/redirect',
+            'response_type': 'id_token',
+            'response_mode': 'okta_post_message',
+            'state': oauthUtil.mockedState,
+            'nonce': oauthUtil.mockedNonce,
+            'scope': 'openid email',
+            'prompt': 'none'
+          }
+        },
+        postMessageResp: {
+          'id_token': tokens.standardIdToken,
+          state: oauthUtil.mockedState
+        }
+      })
+      .then(function() {
+        oauthUtil.expectTokenStorageToEqual(localStorage, {
+          'test-idToken': tokens.standardIdTokenParsed
+        });
+      });
+    });
+
+
     it('does not return the token after tokens were cleared before renew promise was resolved', function() {
       var expiresAt = tokens.standardIdTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
@@ -497,7 +545,9 @@ describe('TokenManager', function() {
       var TokenManager = require('../../lib/TokenManager');
       var sdk = setupSync();
       jest.spyOn(sdk.token, 'renew');
-      var tokenManager = new TokenManager(sdk);
+      var tokenManager = new TokenManager(sdk, {
+        expireEarly: 0
+      });
       var expiresAt = EXPIRATION_TIME;
       var token = {
         accessToken: 'fakeToken',
@@ -522,7 +572,9 @@ describe('TokenManager', function() {
         localClockOffset: -2000
       });
       jest.spyOn(sdk.token, 'renew');
-      var tokenManager = new TokenManager(sdk);
+      var tokenManager = new TokenManager(sdk, {
+        expireEarly: 0
+      });
       var expiresAt = EXPIRATION_TIME;
       var token = {
         accessToken: 'fakeToken',
@@ -564,7 +616,7 @@ describe('TokenManager', function() {
     });
 
     it('accounts for local clock offset when emitting "expired"', function() {
-      util.warpToUnixTime(tokens.standardIdTokenClaims.expiresAt);
+      util.warpToUnixTime(tokens.standardIdTokenClaims.exp);
       var localClockOffset = -2000; // local client is 2 seconds fast
       var client = setupSync({
         localClockOffset: localClockOffset
@@ -572,11 +624,29 @@ describe('TokenManager', function() {
       var callback = jest.fn();
       client.tokenManager.on('expired', callback);
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      jest.advanceTimersByTime(0);
       expect(callback).not.toHaveBeenCalled();
       jest.advanceTimersByTime(-localClockOffset);
       expect(callback).toHaveBeenCalled();
     });
   
+    it('accounts for "expireEarly" option when emitting "expired"', function() {
+      var expireEarly = 10;
+      util.warpToUnixTime(tokens.standardIdTokenClaims.exp - (expireEarly + 1));
+      var client = setupSync({
+        tokenManager: {
+          expireEarly: expireEarly
+        }
+      });
+      var callback = jest.fn();
+      client.tokenManager.on('expired', callback);
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      jest.advanceTimersByTime(0);
+      expect(callback).not.toHaveBeenCalled();
+      jest.advanceTimersByTime(1000);
+      expect(callback).toHaveBeenCalled();
+    });
+
     it('returns undefined for a token that has expired when autoRenew is disabled', function() {
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       localStorage.setItem('okta-token-storage', JSON.stringify({
