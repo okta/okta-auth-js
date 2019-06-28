@@ -154,13 +154,13 @@ tokenManager: {
 }
 ```
 
-Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration. You can customize this value by setting the `expireEarly` option. The value should be large enough to account for network latency between the client and Okta's servers.
+Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration, if accessed with `tokenManager.get()`. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency between the client and Okta's servers.
 
 ```javascript
 // Emit expired event 2 minutes before expiration
-// Tokens auto-renew within 2 minutes of expiration
+// Tokens accessed with tokenManager.get() will auto-renew within 2 minutes of expiration
 tokenManager: {
-  expireEarly: 120
+  expireEarlySeconds: 120
 }
 ```
 

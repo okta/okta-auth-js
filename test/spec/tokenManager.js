@@ -13,7 +13,7 @@ function setupSync(options) {
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect',
     tokenManager: {
-      expireEarly: options.tokenManager.expireEarly || 0,
+      expireEarlySeconds: options.tokenManager.expireEarlySeconds || 0,
       storage: options.tokenManager.type,
       autoRenew: options.tokenManager.autoRenew || false,
       secure: options.tokenManager.secure // used by cookie storage
@@ -412,13 +412,13 @@ describe('TokenManager', function() {
       });
     });
 
-    it('renews a token early when "expireEarly" option is considered', function() {
+    it('renews a token early when "expireEarlySeconds" option is considered', function() {
       var expiresAt = tokens.standardIdTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: setupSync({
           tokenManager: {
             autoRenew: true,
-            expireEarly: 10
+            expireEarlySeconds: 10
           }
         }),
         autoRenew: true,
@@ -546,7 +546,7 @@ describe('TokenManager', function() {
       var sdk = setupSync();
       jest.spyOn(sdk.token, 'renew');
       var tokenManager = new TokenManager(sdk, {
-        expireEarly: 0
+        expireEarlySeconds: 0
       });
       var expiresAt = EXPIRATION_TIME;
       var token = {
@@ -573,7 +573,7 @@ describe('TokenManager', function() {
       });
       jest.spyOn(sdk.token, 'renew');
       var tokenManager = new TokenManager(sdk, {
-        expireEarly: 0
+        expireEarlySeconds: 0
       });
       var expiresAt = EXPIRATION_TIME;
       var token = {
@@ -630,12 +630,12 @@ describe('TokenManager', function() {
       expect(callback).toHaveBeenCalled();
     });
   
-    it('accounts for "expireEarly" option when emitting "expired"', function() {
-      var expireEarly = 10;
-      util.warpToUnixTime(tokens.standardIdTokenClaims.exp - (expireEarly + 1));
+    it('accounts for "expireEarlySeconds" option when emitting "expired"', function() {
+      var expireEarlySeconds = 10;
+      util.warpToUnixTime(tokens.standardIdTokenClaims.exp - (expireEarlySeconds + 1));
       var client = setupSync({
         tokenManager: {
-          expireEarly: expireEarly
+          expireEarlySeconds: expireEarlySeconds
         }
       });
       var callback = jest.fn();
