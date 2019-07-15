@@ -87,7 +87,7 @@ describe('util', function() {
         'prop2': 'test prop2'
       };
       var obj2 = {
-        'prop3': undefined
+        'prop2': undefined
       };
       util.extend(obj1, obj2);
       expect(obj1).toEqual(expect.objectContaining({
