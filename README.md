@@ -146,12 +146,21 @@ tokenManager: {
 }
 ```
 
-
 By default, the `tokenManager` will attempt to renew expired tokens. When an expired token is requested by the `tokenManager.get()` method, a renewal request is executed to update the token. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to  [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
 ```javascript
 tokenManager: {
   autoRenew: false
+}
+```
+
+Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration, if accessed with `tokenManager.get()`. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency between the client and Okta's servers.
+
+```javascript
+// Emit expired event 2 minutes before expiration
+// Tokens accessed with tokenManager.get() will auto-renew within 2 minutes of expiration
+tokenManager: {
+  expireEarlySeconds: 120
 }
 ```
 
@@ -168,6 +177,7 @@ tokenManager: {
 | `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
 | `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
 | | This option should be used only for browser support and testing purposes. |
+| `maxClockSkew` | Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
 
 ##### Example Client
 

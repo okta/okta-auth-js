@@ -61,6 +61,40 @@ describe('util', function() {
         'prop3': 'test prop3'
       }));
     });
+
+    it('returns the first argument as the modified object', function() {
+      var obj1 = {
+        // empty
+      };
+      var obj2 = {
+        'prop1': 'test prop1'
+      };
+      var obj3 = {
+        'prop2': 'test prop2'
+      };
+      util.extend(obj1, obj2, obj3);
+      var res = util.extend(obj1);
+      expect(res).toBe(obj1);
+      expect(obj1).toEqual(expect.objectContaining({
+        'prop1': 'test prop1',
+        'prop2': 'test prop2'
+      }));
+    });
+
+    it('does not copy properties with undefined values', function() {
+      var obj1 = {
+        'prop1': 'test prop1',
+        'prop2': 'test prop2'
+      };
+      var obj2 = {
+        'prop2': undefined
+      };
+      util.extend(obj1, obj2);
+      expect(obj1).toEqual(expect.objectContaining({
+        'prop1': 'test prop1',
+        'prop2': 'test prop2'
+      }));
+    });
   });
 
   describe('isIE11OrLess', function() {
