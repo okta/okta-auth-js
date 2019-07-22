@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.6.1
+
+### Features
+- [d8d2fee](https://github.com/okta/okta-auth-js/commit/d8d2feee6832fde7c297fd63f58e738c478d338b) TokenManager: new option `expireEarlySeconds`
+
+### Bug Fixes
+- TokenManager: Re-enables use of custom storage keys
+
+### Other
+- TokenManager: Document the `maxClockSkew` option
+
+## 2.6.0
+
+### Features
+- [0a8a4e1](https://github.com/okta/okta-auth-js/commit/0a8a4e16d75028900280ab93e561d9e4368a484f) PKCE support
+
+### Bug Fixes
+- TokenManager: tokens were being expired 5 minutes early
+
 ## 2.5.0
 
 ### Features
