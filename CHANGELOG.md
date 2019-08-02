@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.6.2
+
+### Bug Fixes
+- [747216b](https://github.com/okta/okta-auth-js/commit/747216ba2d186d17a08b0f0482da7e3e94977e98) create /dist/okta-auth-js.min.js for browsers
+
 ## 2.6.1
 
 ### Features
