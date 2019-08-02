@@ -18,30 +18,27 @@ function bindFunctions(testApp, window) {
 
   // getWithRedirect
   window.loginRedirectPKCE = testApp.loginRedirect.bind(testApp, {
-    grantType: 'authorization_code',
-    responseType: 'code'
+    pkce: true,
   });
   window.loginRedirectImplicit = testApp.loginRedirect.bind(testApp, {
-    grantType: 'implicit'
+
   });
 
   // getWithPopup
   window.loginPopupPKCE = testApp.loginPopup.bind(testApp, {
-    grantType: 'authorization_code',
-    responseType: 'code'
+    pkce: true,
   });
   window.loginPopupImplicit = testApp.loginPopup.bind(testApp, {
-    grantType: 'implicit'
+
   });
 
   // getWithoutPrompt
   window.getTokenPKCE = testApp.getToken.bind(testApp, {
-    grantType: 'authorization_code',
-    responseType: 'code'
+    pkce: true,
   });
 
   window.getTokenImplicit = testApp.getToken.bind(testApp, {
-    grantType: 'implicit'
+
   });
 
   window.logout = testApp.logout.bind(testApp);
@@ -130,7 +127,7 @@ Object.assign(TestApp.prototype, {
       this.render();
     });
   },
-  // grantType must be already set before calling this method
+  // pkce must be already set before calling this method
   renewToken: async function(event) {
     event && event.preventDefault(); // prevent navigation / page reload
     return this.oktaAuth.tokenManager.renew('idToken')
@@ -188,12 +185,12 @@ Object.assign(TestApp.prototype, {
       <ul>
         <li>
           <a id="renewtoken" href="/" onclick="renewToken(event)"><b>Renew Token</b></a>
-          <p>(must set grantType via constructor)
+          <p>(must set pkce via constructor)
           <div>
-            <b>grantType:</b>
-            <a href="/?grantType=authorization_code">authorization_code</a>
+            <b>pkce:</b>
+            <a href="/?pkce=1">pkce flow</a>
               &nbsp;|&nbsp;
-            <a href="/?grantType=implicit">implicit</a>
+            <a href="/">implicit flow</a>
           </div>
           </p>
         </li>

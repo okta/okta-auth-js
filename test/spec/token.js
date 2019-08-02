@@ -38,18 +38,6 @@ describe('token.decode', function() {
 
 describe('token.getWithoutPrompt', function() {
 
-  it('throws error if responseType includes "code"', function() {
-    var oa = setupSync();
-    try {
-      oa.token.getWithoutPrompt({
-        responseType: ['token', 'code']
-      });
-    } catch(e) {
-      expect(e.name).toBe('AuthSdkError');
-      expect(e.message).toBe('To use PKCE flow, set grantType: "authorization_code"');
-    }
-  });
-
   it('returns id_token using sessionToken', function(done) {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
@@ -590,17 +578,6 @@ describe('token.getWithoutPrompt', function() {
 });
 
 describe('token.getWithPopup', function() {
-  it('throws error if responseType includes "code"', function() {
-    var oa = setupSync();
-    try {
-      oa.token.getWithPopup({
-        responseType: ['token', 'code']
-      });
-    } catch(e) {
-      expect(e.name).toBe('AuthSdkError');
-      expect(e.message).toBe('To use PKCE flow, set grantType: "authorization_code"');
-    }
-  });
 
   it('returns id_token using idp', function(done) {
       return oauthUtil.setupPopup({
@@ -1316,11 +1293,56 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('sets authorize url for authorization code requests', function() {
+  it('sets authorize url for authorization code requests, defaulting responseMode to query', function() {
+    return oauthUtil.setupRedirect({
+      getWithRedirectArgs: {
+        sessionToken: 'testToken',
+        responseType: 'code'
+      },
+      expectedCookies: [
+        [
+          'okta-oauth-redirect-params',
+          JSON.stringify({
+            responseType: 'code',
+            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            scopes: ['openid', 'email'],
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            urls: {
+              issuer: 'https://auth-js-test.okta.com',
+              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
+            },
+            ignoreSignature: false
+          })
+        ],
+        [
+          'okta-oauth-nonce',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ],
+        [
+          'okta-oauth-state',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ]
+      ],
+      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_type=code&' +
+                            'response_mode=query&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'sessionToken=testToken&' +
+                            'scope=openid%20email'
+    });
+  });
+
+  it('PKCE: sets authorize url for authorization code requests, defaulting responseMode to fragment', function() {
     mockPKCE();
     return oauthUtil.setupRedirect({
       oktaAuthArgs: {
-        grantType: 'authorization_code'
+        pkce: true,
       },
       getWithRedirectArgs: {
         sessionToken: 'testToken',
@@ -1373,8 +1395,7 @@ describe('token.getWithRedirect', function() {
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
         clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect',
-        grantType: 'authorization_code'
+        redirectUri: 'https://example.com/redirect'
       },
       getWithRedirectArgs: {
         sessionToken: 'testToken',
@@ -1411,23 +1432,17 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
-                            'response_mode=fragment&' +
+                            'response_mode=query&' +
                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'sessionToken=testToken&' +
-                            'code_challenge=' + codeChallenge + '&' +
-                            'code_challenge_method=' + codeChallengeMethod + '&' +
                             'scope=openid%20email'
     });
   });
 
   it('sets authorize url for authorization code (as an array) requests, ' +
     'defaulting responseMode to query', function() {
-    mockPKCE();
     return oauthUtil.setupRedirect({
-      oktaAuthArgs: {
-        grantType: 'authorization_code'
-      },
       getWithRedirectArgs: {
         sessionToken: 'testToken',
         responseType: ['code']
@@ -1463,15 +1478,65 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_type=code&' +
-                            'response_mode=fragment&' +
+                            'response_mode=query&' +
                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'sessionToken=testToken&' +
-                            'code_challenge=' + codeChallenge + '&' +
-                            'code_challenge_method=' + codeChallengeMethod + '&' +
                             'scope=openid%20email'
     });
   });
+
+  it('PKCE: sets authorize url for authorization code (as an array) requests, ' +
+  'defaulting responseMode to fragment', function() {
+  mockPKCE();
+  return oauthUtil.setupRedirect({
+    oktaAuthArgs: {
+      pkce: true,
+    },
+    getWithRedirectArgs: {
+      sessionToken: 'testToken',
+      responseType: ['code']
+    },
+    expectedCookies: [
+      [
+        'okta-oauth-redirect-params',
+        JSON.stringify({
+          responseType: 'code',
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scopes: ['openid', 'email'],
+          clientId: 'NPSfOkH5eZrTy8PMDlvx',
+          urls: {
+            issuer: 'https://auth-js-test.okta.com',
+            authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+            tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
+          },
+          ignoreSignature: false
+        })
+      ],
+      [
+        'okta-oauth-nonce',
+        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      ],
+      [
+        'okta-oauth-state',
+        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      ]
+    ],
+    expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                          'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                          'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                          'response_type=code&' +
+                          'response_mode=fragment&' +
+                          'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                          'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                          'sessionToken=testToken&' +
+                          'code_challenge=' + codeChallenge + '&' +
+                          'code_challenge_method=' + codeChallengeMethod + '&' +
+                          'scope=openid%20email'
+  });
+});
 
   // TODO: "hybrid" flows are explicitly disallowed. is any part of this test needed? 
   xit('sets authorize url for authorization code and id_token requests,' +
@@ -1479,7 +1544,7 @@ describe('token.getWithRedirect', function() {
     mockPKCE();
     return oauthUtil.setupRedirect({
       oktaAuthArgs: {
-        grantType: 'authorization_code'
+        pkce: true,
       },
       getWithRedirectArgs: {
         sessionToken: 'testToken',
@@ -1527,11 +1592,7 @@ describe('token.getWithRedirect', function() {
   });
 
   it('sets authorize url for authorization code requests, allowing form_post responseMode', function() {
-    mockPKCE();
     return oauthUtil.setupRedirect({
-      oktaAuthArgs: {
-        grantType: 'authorization_code'
-      },
       getWithRedirectArgs: {
         sessionToken: 'testToken',
         responseType: 'code',
@@ -1572,8 +1633,6 @@ describe('token.getWithRedirect', function() {
                             'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'sessionToken=testToken&' +
-                            'code_challenge=' + codeChallenge + '&' +
-                            'code_challenge_method=' + codeChallengeMethod + '&' +
                             'scope=openid%20email'
     });
   });

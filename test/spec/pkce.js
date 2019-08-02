@@ -1,3 +1,4 @@
+/* global Promise */
 jest.mock('cross-fetch');
 
 var Q = require('q');
@@ -16,12 +17,11 @@ describe('pkce', function() {
 
   describe('prepare oauth params', function() {
 
-    it('throws an error if grantType is "authorization_code" and PKCE is not supported', function() {
+    it('throws an error if pkce is true and PKCE is not supported', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-      var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'implicit' });
+      var sdk = new OktaAuth({ issuer: 'https://foo.com',  });
       return token.prepareOauthParams(sdk, {
-        grantType: 'authorization_code',
-        responseType: 'code'
+        pkce: true,
       })
       .then(function() {
         // Should never hit this
@@ -34,40 +34,30 @@ describe('pkce', function() {
     });
     
     describe('responseType', function() {
-      it('Must be "code" if grantType is "authorization_code"', function() {
+      it('Is set to "code" if pkce is true', function() {
         spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-        var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'authorization_code' });
+        spyOn(oauthUtil, 'getWellKnown').and.returnValue(Promise.resolve({
+          code_challenge_methods_supported: ['S256']
+        }));
+
+        spyOn(pkce, 'generateVerifier').and.returnValue(Promise.resolve());
+        spyOn(pkce, 'saveMeta').and.returnValue(Promise.resolve());        
+        spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve());
+        
+        var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
         return token.prepareOauthParams(sdk, {
           responseType: 'token'
         })
-        .then(function() {
-          expect(false).toBe(true); // should not reach this line
-        })
-        .catch(function(e) {
-          expect(e.name).toBe('AuthSdkError');
-          expect(e.errorSummary).toBe('When grantType is "authorization_code", responseType should be "code"');
+        .then(function(params) {
+          expect(params.responseType).toBe('code');
         });
   
       });
-  
-      it('Must not contain "code" if grantType is not "authorization_code"', function() {
-        var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'implicit' });
-        return token.prepareOauthParams(sdk, {
-          responseType: ['token', 'code']
-        })
-        .then(function() {
-          expect(false).toBe(true); // should not reach this line
-        })
-        .catch(function(e) {
-          expect(e.name).toBe('AuthSdkError');
-          expect(e.errorSummary).toBe('When responseType is "code", grantType should be "authorization_code"');
-        });
-      })
     });
   
     it('Checks codeChallengeMethod against well-known', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-      var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'authorization_code' });
+      var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
       spyOn(oauthUtil, 'getWellKnown').and.returnValue(Q.resolve({
         'code_challenge_methods_supported': []
       }))
@@ -87,7 +77,7 @@ describe('pkce', function() {
       var codeChallenge = 'ohsofake';
 
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-      var sdk = new OktaAuth({ issuer: 'https://foo.com', grantType: 'authorization_code' });
+      var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
       spyOn(oauthUtil, 'getWellKnown').and.returnValue(Q.resolve({
         'code_challenge_methods_supported': [codeChallengeMethod]
       }));
@@ -111,7 +101,6 @@ describe('pkce', function() {
     var endpoint = '/oauth2/v1/token';
     var codeVerifier = 'superfake';
     var authorizationCode = 'notreal';
-    var grantType = 'authorization_code';
 
     util.itMakesCorrectRequestResponse({
       title: 'requests a token',
@@ -126,7 +115,7 @@ describe('pkce', function() {
               withCredentials: false,
               data: {
                 client_id: CLIENT_ID,
-                grant_type: grantType,
+                grant_type: 'authorization_code',
                 redirect_uri: REDIRECT_URI
               },
               headers: {
@@ -153,7 +142,6 @@ describe('pkce', function() {
           redirectUri: REDIRECT_URI,
           authorizationCode: authorizationCode,
           codeVerifier: codeVerifier,
-          grantType: grantType,
         }, {
           tokenUrl: ISSUER + endpoint
         });
@@ -174,7 +162,6 @@ describe('pkce', function() {
           redirectUri: REDIRECT_URI,
           authorizationCode: authorizationCode,
           codeVerifier: codeVerifier,
-          grantType: grantType,
         };
       });
 
@@ -227,15 +214,6 @@ describe('pkce', function() {
         }
       });
 
-      it('Throws if grantType is not "authorization_code', function() {
-        oauthOptions.grantType = 'implicit';
-        try {
-          pkce.getToken(authClient, oauthOptions);
-        } catch(e) {
-          expect(e instanceof AuthSdkError).toBe(true);
-          expect(e.message).toBe('Expecting "grantType" to equal "authorization_code"');
-        }
-      });
     });
   });
 

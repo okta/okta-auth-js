@@ -88,13 +88,13 @@ describe('features', function() {
     });
 
 
-    it('throw an error during construction if grantType is "authorization_code" and PKCE is not supported', function () {
+    it('throw an error during construction if pkce is true and PKCE is not supported', function () {
       var err;
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
       try {
         new OktaAuth({
           url: 'https://dev-12345.oktapreview.com',
-          grantType: 'authorization_code',
+          pkce: true,
         });
       } catch (e) {
         err = e;

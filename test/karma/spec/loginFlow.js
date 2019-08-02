@@ -109,12 +109,11 @@ describe('Complete login flow', function() {
     });
   }
 
-  it('grantType: implicit', function() {
+  it('implicit login flow', function() {
     // First hit /authorize
     return bootstrap({})
     .then(function(app) {
       return app.loginRedirect({
-        grantType: 'implicit',
         nonce: NONCE
       });
     })
@@ -159,14 +158,13 @@ describe('Complete login flow', function() {
     });
   });
 
-  it('grantType: authorization_code', function() {
+  it('PKCE login flow', function() {
     // First hit /authorize
     return bootstrap()
     .then(function(app) {
       mockWellKnown();
       return app.loginRedirect({
-        grantType: 'authorization_code',
-        responseType: 'code',
+        pkce: true,
         nonce: NONCE,
         codeVerifier: CODE_VERIFIER
       });
@@ -245,14 +243,13 @@ describe('Complete login flow', function() {
     });
   });
 
-  it('throws for invalid code_challenge_method', function() {
+  it('PKCE: throws for invalid code_challenge_method', function() {
     // First hit /authorize
     return bootstrap()
     .then(function(app) {
       mockWellKnown();
       return app.loginRedirect({
-        grantType: 'authorization_code',
-        responseType: 'code',
+        pkce: true,
         nonce: NONCE,
         codeVerifier: CODE_VERIFIER,
         codeChallengeMethod: 'invalid'
