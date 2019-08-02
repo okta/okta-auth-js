@@ -4,6 +4,6 @@
 /buildtools
 /dist
 /target
-/node_modules
+node_modules
 *.config.js
 /lib/config.js

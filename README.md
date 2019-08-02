@@ -124,7 +124,7 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
 
 **Important:** This configuration option can be included **only** when instantiating Okta Auth JS.
 
-Specify the type of storage for tokens. Defaults to [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and will fall back to [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), and/or [cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) if not the previous type is not available.
+Specify the type of storage for tokens. Defaults to [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and will fall back to [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), and/or [cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) if the previous type is not available.
 
 ```javascript
 
@@ -138,11 +138,29 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
+Even if you have specified `localStorage` or `sessionStorage` in your config, the `TokenManager` may fall back to using `cookie` storage on some clients. If your site will always be served over a HTTPS connection, you may want to enable "secure" cookies. This option will prevent cookies from being stored on an HTTP connection.
+
+```javascript
+tokenManager: {
+  secure: true
+}
+```
+
 By default, the `tokenManager` will attempt to renew expired tokens. When an expired token is requested by the `tokenManager.get()` method, a renewal request is executed to update the token. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to  [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
 ```javascript
 tokenManager: {
   autoRenew: false
+}
+```
+
+Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration, if accessed with `tokenManager.get()`. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency between the client and Okta's servers.
+
+```javascript
+// Emit expired event 2 minutes before expiration
+// Tokens accessed with tokenManager.get() will auto-renew within 2 minutes of expiration
+tokenManager: {
+  expireEarlySeconds: 120
 }
 ```
 
@@ -153,10 +171,13 @@ tokenManager: {
 | `issuer`       | Specify a custom issuer to perform the OIDC flow. Defaults to the base url parameter if not provided. |
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
+| `grantType`  | Specify `grantType` for this Application. Supported types are `implicit` and `authorization_code`. Defaults to `implicit` |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
+| `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
 | `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
 | | This option should be used only for browser support and testing purposes. |
+| `maxClockSkew` | Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
 
 ##### Example Client
 
@@ -182,6 +203,28 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
+##### PKCE OAuth 2.0 flow
+
+By default the `implicit` OAuth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser.
+
+To use PKCE flow, set `grantType` to `authorization_code` in your config.
+
+```javascript
+
+var config = {
+  grantType:  'authorization_code',
+
+  // other config
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+};
+
+var authClient = new OktaAuth(config);
+```
+
+If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
+
+`OktaAuth.features.isPKCESupported()`
+
 ### Optional configuration options
 
 ### `httpRequestClient`
@@ -203,7 +246,8 @@ var config = {
     //   headers: {
     //     headerName: headerValue
     //   },
-    //   data: postBodyData
+    //   data: postBodyData,
+    //   withCredentials: true|false,
     // }
     return Promise.resolve(/* a raw XMLHttpRequest response */);
   }
@@ -413,13 +457,11 @@ Calls the [Webfinger](https://tools.ietf.org/html/rfc7033) API and gets a respon
 
 * `resource` - URI that identifies the entity whose information is sought, currently only acct scheme is supported (e.g acct:dade.murphy@example.com)
 * `rel` - Optional parameter to request only a subset of the information that would otherwise be returned without the "rel" parameter
-* `requestContext` - Optional parameter that provides Webfinger the context of that which the user is trying to access, such as the path of an app
 
 ```javascript
 authClient.webfinger({
   resource: 'acct:john.joe@example.com',
-  rel: 'okta:idp',
-  requestContext: '/home/dropbox/0oa16630PzpWKeWrH0g4/121'
+  rel: 'okta:idp'
 })
 .then(function(res) {
   // use the webfinger response to select an idp
@@ -479,7 +521,7 @@ if (exists) {
 
 When Auth Client methods resolve, they return a **transaction** object that encapsulates [the new state in the authentication flow](https://developer.okta.com/docs/api/resources/authn#transaction-model). This **transaction** contains metadata about the current state, and methods that can be used to progress to the next state.
 
-![State Model Diagram](https://raw.githubusercontent.com/okta/okta.github.io/source/_source/_assets/img/auth-state-model.png "State Model Diagram")
+![State Model Diagram](https://developer.okta.com/img/auth-state-model.png "State Model Diagram")
 
 #### Common methods
 
@@ -1360,13 +1402,14 @@ The following configuration options can **only** be included in `token.getWithou
 | :-------: | ----------|
 | `sessionToken` | Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow. |
 | `responseMode` | Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`. See [Parameter Details](https://developer.okta.com/docs/api/resources/oidc#parameter-details) for a list of available modes. |
-| `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. Defaults to `id_token`. |
+| `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. The default value is based on the configured `grantType`. If `grantType` is `implicit` (the default setting), `responseType` will have a default value of `id_token`. If `grantType` is `authorization_code`, the default value will be `code`. |
 | | Use an array if specifying multiple response types - in this case, the response will contain both an ID Token and an Access Token. `responseType: ['id_token', 'token']` |
 | `scopes` | Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`. For a list of available scopes, see [Scopes and Claims](https://developer.okta.com/docs/api/resources/oidc#access-token-scopes-and-claims). |
 | `state` | Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string. |
 | `nonce` | Specify a nonce that will be validated in an `id_token`. This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an `id_token`. Defaults to a random string. |
 
 For a list of all available parameters that can be passed to the `/authorize` endpoint, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
+
 
 ##### Example
 
@@ -1438,7 +1481,12 @@ authClient.token.getWithRedirect(oauthOptions);
 
 #### `token.parseFromUrl(options)`
 
-Parses the access or ID Tokens from the url after a successful authentication redirect. If an ID token is present, it will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
+Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. 
+
+If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint. 
+
+The ID token will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
+
 
 ```javascript
 authClient.token.parseFromUrl()
@@ -1711,8 +1759,13 @@ yarn install
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
 | `yarn build`          | Build the SDK with a sourcemap |
-| `yarn test`           | Run unit tests using Jest      |
+| `yarn test`           | Run unit tests     |
 | `yarn lint`           | Run eslint linting             |
+| `yarn start`          | Start internal test app        |
+
+#### Test App
+
+Implements a simple SPA application to demonstrate functionality and provide for manual testing. [See here for more information](test/app/README.md).
 
 ## Contributing
 

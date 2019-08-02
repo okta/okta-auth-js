@@ -1,3 +1,5 @@
+jest.mock('cross-fetch');
+
 var _ = require('lodash'),
     util = require('../util/util'),
     OktaAuth = require('OktaAuth');

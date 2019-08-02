@@ -13,12 +13,13 @@
 var reqwest = require('reqwest');
 
 function reqwestRequest(method, url, args) {
+  // TODO: support content-type and withCredentials
   var r = reqwest({
     url: url,
     method: method,
     headers: args.headers,
     data: JSON.stringify(args.data),
-    withCredentials: true
+    withCredentials: args.withCredentials
   })
   .then(function() {
     return r.request;

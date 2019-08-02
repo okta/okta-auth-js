@@ -61,6 +61,40 @@ describe('util', function() {
         'prop3': 'test prop3'
       }));
     });
+
+    it('returns the first argument as the modified object', function() {
+      var obj1 = {
+        // empty
+      };
+      var obj2 = {
+        'prop1': 'test prop1'
+      };
+      var obj3 = {
+        'prop2': 'test prop2'
+      };
+      util.extend(obj1, obj2, obj3);
+      var res = util.extend(obj1);
+      expect(res).toBe(obj1);
+      expect(obj1).toEqual(expect.objectContaining({
+        'prop1': 'test prop1',
+        'prop2': 'test prop2'
+      }));
+    });
+
+    it('does not copy properties with undefined values', function() {
+      var obj1 = {
+        'prop1': 'test prop1',
+        'prop2': 'test prop2'
+      };
+      var obj2 = {
+        'prop2': undefined
+      };
+      util.extend(obj1, obj2);
+      expect(obj1).toEqual(expect.objectContaining({
+        'prop1': 'test prop1',
+        'prop2': 'test prop2'
+      }));
+    });
   });
 
   describe('isIE11OrLess', function() {
@@ -122,4 +156,50 @@ describe('util', function() {
     });
   });
 
+  describe('isFunction', function() {
+    it('returns false if argument is undefined', function() {
+      var fn;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is null', function() {
+      var fn = null;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is a boolean', function() {
+      var fn = true;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is a number', function() {
+      var fn = 3;
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument a string', function() {
+      var fn = 'I am not a function!';
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is an Object', function() {
+      var fn = { name: 'Not a function!' };
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is a Date', function() {
+      var fn = new Date('December 17, 1995 03:24:00');
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns false if argument is a RegExp', function() {
+      var fn = new RegExp('\\w+');
+      expect(util.isFunction(fn)).toBe(false);
+    });
+
+    it('returns true if argument is a function', function() {
+      var fn = function() { return 'I am a function!'; };
+      expect(util.isFunction(fn)).toBe(true);
+    });
+  });
 });

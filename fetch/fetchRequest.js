@@ -12,12 +12,22 @@
 
 var fetch = require('cross-fetch');
 
+/* eslint-disable complexity */
 function fetchRequest(method, url, args) {
+  var body = args.data;
+  var headers = args.headers || {};
+  var contentType = (headers['Content-Type'] || headers['content-type'] || '');
+
+  // JSON encode body (if appropriate)
+  if (contentType === 'application/json' && body && typeof body !== 'string') {
+    body = JSON.stringify(body);
+  }
+
   var fetchPromise = fetch(url, {
     method: method,
     headers: args.headers,
-    body: JSON.stringify(args.data),
-    credentials: 'include'
+    body: body,
+    credentials: args.withCredentials === false ? 'omit' : 'include'
   })
   .then(function(response) {
     var error = !response.ok;
@@ -33,8 +43,8 @@ function fetchRequest(method, url, args) {
       }
       return result;
     };
-    if (response.headers.get('Accept') &&
-        response.headers.get('Accept').toLowerCase().indexOf('application/json') >= 0) {
+    if (response.headers.get('Content-Type') &&
+        response.headers.get('Content-Type').toLowerCase().indexOf('application/json') >= 0) {
       return response.json().then(respHandler);
     } else {
       return response.text().then(respHandler);
