@@ -67,7 +67,9 @@ yarn add --save @okta/okta-auth-js
 npm install --save @okta/okta-auth-js
 ```
 
-After installing `@okta/okta-auth-js`, the minified auth client will be installed to `node_modules/@okta/okta-auth-js/dist`. You can copy the `dist` contents to a publicly hosted directory. However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module using CommonJS.
+If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.min.js` file in a `<script>` tag.  
+
+However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module using CommonJS.
 
 ```javascript
 var OktaAuth = require('@okta/okta-auth-js');
