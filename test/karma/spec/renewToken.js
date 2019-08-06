@@ -115,9 +115,9 @@ describe('Renew token', function() {
     });
   });
 
-  it('grantType: implicit', function() {
+  it('implicit flow', function() {
     return bootstrap({
-      grantType: 'implicit'
+
     })
     .then(() => {
       sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
@@ -160,11 +160,11 @@ describe('Renew token', function() {
     });
   });
 
-  it('grantType: authorization_code', function() {
+  it('PKCE flow', function() {
     var codeChallenge, codeVerifier;
 
     return bootstrap({
-      grantType: 'authorization_code',
+      pkce: true,
     })
     .then(() => {
       sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);

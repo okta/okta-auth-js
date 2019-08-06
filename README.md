@@ -173,7 +173,7 @@ tokenManager: {
 | `issuer`       | Specify a custom issuer to perform the OIDC flow. Defaults to the base url parameter if not provided. |
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
-| `grantType`  | Specify `grantType` for this Application. Supported types are `implicit` and `authorization_code`. Defaults to `implicit` |
+| `pkce`  | If set to true, the authorization flow will automatically use PKCE.  The authorize request will use `response_type=code`, and `grant_type=authorization_code` will be used on the token request.  All these details are handled for you, including the creation and verification of code verifiers. |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
 | `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
@@ -209,12 +209,12 @@ var authClient = new OktaAuth(config);
 
 By default the `implicit` OAuth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser.
 
-To use PKCE flow, set `grantType` to `authorization_code` in your config.
+To use PKCE flow, set `pkce` to `true` in your config.
 
 ```javascript
 
 var config = {
-  grantType:  'authorization_code',
+  pkce:  true,
 
   // other config
   issuer: 'https://{yourOktaDomain}/oauth2/default',
@@ -1404,7 +1404,7 @@ The following configuration options can **only** be included in `token.getWithou
 | :-------: | ----------|
 | `sessionToken` | Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow. |
 | `responseMode` | Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`. See [Parameter Details](https://developer.okta.com/docs/api/resources/oidc#parameter-details) for a list of available modes. |
-| `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. The default value is based on the configured `grantType`. If `grantType` is `implicit` (the default setting), `responseType` will have a default value of `id_token`. If `grantType` is `authorization_code`, the default value will be `code`. |
+| `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. The default value is `id_token`. If `pkce` is `true`, this option will be ingored. |
 | | Use an array if specifying multiple response types - in this case, the response will contain both an ID Token and an Access Token. `responseType: ['id_token', 'token']` |
 | `scopes` | Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`. For a list of available scopes, see [Scopes and Claims](https://developer.okta.com/docs/api/resources/oidc#access-token-scopes-and-claims). |
 | `state` | Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string. |
