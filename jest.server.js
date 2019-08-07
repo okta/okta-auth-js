@@ -11,6 +11,7 @@ module.exports = {
     '**/test/spec/*.js'
   ],
   'testPathIgnorePatterns': [
+    './test/spec/browser.js',
     './test/spec/fingerprint.js',
     './test/spec/general.js',
     './test/spec/oauthUtil.js',
