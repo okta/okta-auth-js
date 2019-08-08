@@ -1,8 +1,18 @@
 # Changelog
 
+## 2.6.3
+
+### Other
+- [(#235)](https://github.com/okta/okta-auth-js/pull/235) - Option `grantType` has been deprecated and will be removed in 3.0
+
 ## 2.6.2
 
+### Features
+- [(#233)](https://github.com/okta/okta-auth-js/pull/235) - New option `pkce` 
+
 ### Bug Fixes
+- [(#233)](https://github.com/okta/okta-auth-js/pull/233)  The default `responseMode` was incorrectly set to `fragment` instead of `query` when the `responseType` was `code`. This regression was introduced in version `2.6.0`.
+
 - [747216b](https://github.com/okta/okta-auth-js/commit/747216ba2d186d17a08b0f0482da7e3e94977e98) fix build process, so that /dist/okta-auth-js.min.js is for browsers (since version 2.2.0, dist/ output was being built for node.js applications, which was not intended)
 
 ## 2.6.1
