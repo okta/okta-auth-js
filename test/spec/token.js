@@ -1389,6 +1389,57 @@ describe('token.getWithRedirect', function() {
     });
   });
 
+  it('PKCE: can use grantType="authorization_code" as an alias for pkce: true', function() {
+    mockPKCE();
+    return oauthUtil.setupRedirect({
+      oktaAuthArgs: {
+        grantType: "authorization_code", // alias for pkce: true
+      },
+      getWithRedirectArgs: {
+        sessionToken: 'testToken',
+        responseType: 'code'
+      },
+      expectedCookies: [
+        [
+          'okta-oauth-redirect-params',
+          JSON.stringify({
+            responseType: 'code',
+            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            scopes: ['openid', 'email'],
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            urls: {
+              issuer: 'https://auth-js-test.okta.com',
+              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
+            },
+            ignoreSignature: false
+          })
+        ],
+        [
+          'okta-oauth-nonce',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ],
+        [
+          'okta-oauth-state',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ]
+      ],
+      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_type=code&' +
+                            'response_mode=fragment&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'sessionToken=testToken&' +
+                            'code_challenge=' + codeChallenge + '&' +
+                            'code_challenge_method=' + codeChallengeMethod + '&' +
+                            'scope=openid%20email'
+    });
+  });
+
   it('sets authorize url for authorization code requests with an authorization server', function() {
     mockPKCE();
     return oauthUtil.setupRedirect({
