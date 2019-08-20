@@ -989,12 +989,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=id_token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=id_token&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1038,12 +1038,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=id_token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=id_token&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1091,12 +1091,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=token&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=email'
     });
   });
@@ -1137,12 +1137,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=token&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=email'
     });
   });
@@ -1188,12 +1188,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=token&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=email'
     });
   });
@@ -1233,12 +1233,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=token%20id_token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'idp=testIdp&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=token%20id_token&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1283,12 +1283,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=token%20id_token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'idp=testIdp&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=token%20id_token&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1328,12 +1328,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=code&' +
-                            'response_mode=query&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=query&' +
+                            'response_type=code&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1377,14 +1377,14 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=code&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'sessionToken=testToken&' +
                             'code_challenge=' + codeChallenge + '&' +
                             'code_challenge_method=' + codeChallengeMethod + '&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=code&' +
+                            'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1428,14 +1428,14 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=code&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'sessionToken=testToken&' +
                             'code_challenge=' + codeChallenge + '&' +
                             'code_challenge_method=' + codeChallengeMethod + '&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=code&' +
+                            'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1481,12 +1481,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=code&' +
-                            'response_mode=query&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=query&' +
+                            'response_type=code&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1527,12 +1527,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=code&' +
-                            'response_mode=query&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=query&' +
+                            'response_type=code&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
@@ -1577,14 +1577,14 @@ describe('token.getWithRedirect', function() {
     ],
     expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                           'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                          'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                          'response_type=code&' +
-                          'response_mode=fragment&' +
-                          'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                          'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                          'sessionToken=testToken&' +
                           'code_challenge=' + codeChallenge + '&' +
                           'code_challenge_method=' + codeChallengeMethod + '&' +
+                          'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                          'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                          'response_mode=fragment&' +
+                          'response_type=code&' +
+                          'sessionToken=testToken&' +
+                          'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                           'scope=openid%20email'
   });
 });
@@ -1630,14 +1630,14 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=code%20id_token&' +
-                            'response_mode=fragment&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'sessionToken=testToken&' +
                             'code_challenge=' + codeChallenge + '&' +
                             'code_challenge_method=' + codeChallengeMethod + '&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=code%20id_token&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'sessionToken=testToken&' +
                             'scope=openid%20email'
     });
   });
@@ -1678,15 +1678,148 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_type=code&' +
-                            'response_mode=form_post&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=form_post&' +
+                            'response_type=code&' +
                             'sessionToken=testToken&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
                             'scope=openid%20email'
     });
   });
+
+  it('passes optional login_hint query param through', function() {
+    return oauthUtil.setupRedirect({
+      getWithRedirectArgs: {
+        loginHint: 'JoeUser',
+      },
+      expectedCookies: [
+        [
+          'okta-oauth-redirect-params',
+          JSON.stringify({
+            responseType: 'id_token',
+            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            scopes: ['openid', 'email'],
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            urls: {
+              issuer: 'https://auth-js-test.okta.com',
+              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
+            },
+            ignoreSignature: false
+          })
+        ],
+        [
+          'okta-oauth-nonce',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ],
+        [
+          'okta-oauth-state',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ]
+      ],
+      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'login_hint=JoeUser&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=id_token&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'scope=openid%20email'
+    });
+  });
+
+  it('passes optional idp_scope query param through when given a string', function() {
+    return oauthUtil.setupRedirect({
+      getWithRedirectArgs: {
+        idpScope: 'scope1 scope2',
+      },
+      expectedCookies: [
+        [
+          'okta-oauth-redirect-params',
+          JSON.stringify({
+            responseType: 'id_token',
+            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            scopes: ['openid', 'email'],
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            urls: {
+              issuer: 'https://auth-js-test.okta.com',
+              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
+            },
+            ignoreSignature: false
+          })
+        ],
+        [
+          'okta-oauth-nonce',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ],
+        [
+          'okta-oauth-state',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ]
+      ],
+      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'idp_scope=scope1%20scope2&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=id_token&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'scope=openid%20email'
+    });
+  });
+
+  it('passes optional idp_scope query param through when given an array of strings', function() {
+    return oauthUtil.setupRedirect({
+      getWithRedirectArgs: {
+        idpScope: ['scope1', 'scope2'],
+      },
+      expectedCookies: [
+        [
+          'okta-oauth-redirect-params',
+          JSON.stringify({
+            responseType: 'id_token',
+            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            scopes: ['openid', 'email'],
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            urls: {
+              issuer: 'https://auth-js-test.okta.com',
+              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
+              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
+            },
+            ignoreSignature: false
+          })
+        ],
+        [
+          'okta-oauth-nonce',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ],
+        [
+          'okta-oauth-state',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        ]
+      ],
+      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'idp_scope=scope1%20scope2&' +
+                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=id_token&' +
+                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'scope=openid%20email'
+    });
+  });
+
 });
 
 describe('token.parseFromUrl', function() {
