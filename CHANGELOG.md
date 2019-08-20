@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0
+### Features
+- [(#238)](https://github.com/okta/okta-auth-js/pull/238) - Adds pass-thru of optional 'loginHint' and 'idpScopes' params (resolves [issue #214](https://github.com/okta/okta-auth-js/issues/214))
+
 ## 2.6.3
 
 ### Other
