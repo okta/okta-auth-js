@@ -227,7 +227,7 @@ function setup(options) {
 util.itMakesCorrectRequestResponse = function (options) {
   var fn = options.only ? it.only : it,
       title = options.title || 'makes correct request and returns response';
-  fn(title, function (done) {
+  fn(title, function () {
     return setup(options.setup).then(function (test) {
       return options.execute(test)
       // Add a tick for the setTimeout successFn
@@ -242,7 +242,6 @@ util.itMakesCorrectRequestResponse = function (options) {
           expect(test.trans.data).toEqual(test.responseBody);
         }
         test.ajaxMock.done();
-        done();
       });
     });
   }, options.timeout);
