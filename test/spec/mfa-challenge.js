@@ -415,7 +415,7 @@ describe('MFA_CHALLENGE', function () {
     });
   });
 
-  describe('trans.poll', function () {
+  describe('trans.poll', function () { 
     util.itMakesCorrectRequestResponse({
       title: 'allows polling for push',
       setup: {
@@ -1289,6 +1289,53 @@ describe('MFA_CHALLENGE', function () {
         util.mockQDelay();
         return test.trans.poll(0);
       }
+    });
+
+    util.itMakesCorrectRequestResponse({
+      title: 'allows polling for push with transactionCallBack',
+      setup: {
+        status: 'mfa-challenge-push',
+        calls: [
+          {
+            request: {
+              uri: '/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify',
+              data: {
+                stateToken: '00T4jcVNRzJy5dkWJ4P7c9051dY3FUYY9O2zvbU_vI'
+              }
+            },
+            response: 'mfa-challenge-push'
+          },
+          {
+            request: {
+              uri: '/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify',
+              data: {
+                stateToken: '00T4jcVNRzJy5dkWJ4P7c9051dY3FUYY9O2zvbU_vI'
+              }
+            },
+            response: 'mfa-challenge-push'
+          },
+          {
+            request: {
+              uri: '/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify',
+              data: {
+                stateToken: '00T4jcVNRzJy5dkWJ4P7c9051dY3FUYY9O2zvbU_vI'
+              }
+            },
+            response: 'success'
+          }
+        ]
+      },
+      execute: function (test) {
+        test.transactionCallbackFn = jasmine.createSpy('spy');
+        return test.trans.poll({
+          delay: 0, 
+          transactionCallBack: test.transactionCallbackFn
+        });
+      },
+      expectations: function (test) {
+        expect(test.transactionCallbackFn.calls.count()).toBe(2);
+        expect(test.transactionCallbackFn.calls.argsFor(0)[0]).toMatchSnapshot();
+      },
     });
 
     util.itErrorsCorrectly({
