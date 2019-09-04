@@ -1,0 +1,82 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MFA_CHALLENGE trans.poll allows polling for push with transactionCallBack 1`] = `
+Object {
+  "_embedded": Object {
+    "factor": Object {
+      "factorType": "push",
+      "id": "opf492vmb3s1blLTs0h7",
+      "profile": Object {
+        "credentialId": "exampleUser@example.com",
+        "deviceType": "SmartPhone_IPhone",
+        "keys": Array [
+          Object {
+            "kid": "default",
+            "kty": "PKIX",
+            "use": "sig",
+            "x5c": Array [
+              "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwd3kkRHieZUwY2wRaufKLuKWBHzy6oj8JjuXVyQJHzHJHyAjAo1jhey21v8WtxWMkb8soR1cg7iSf9kM/MjRxQJFKWNNhZDSgrMs/nc8RIO3xX1dWOVhNf51z/82S/+Wgo0ZRzrfM9iOFUwKDt5PoGe3d8rPsY3F5sJaw8lwAw9HqgI95RmRovta99S5zgh9DD3D57ckECKdCbe8HxFd+lkRLz1nl85FxEKLMaPa0vh8/AN8j14GSjoVogyLnF1468LEff7i2VL81HbUpO2PRQ7LEqTQWzmfcB0BULd499WydFIuwpV68c91VcGXWPUKHyXxZVB5SXSHgAgR45p8nQIDAQAB",
+            ],
+          },
+        ],
+        "name": "Example’s iPhone",
+        "platform": "IOS",
+        "version": "8.3",
+      },
+      "provider": "OKTA",
+    },
+    "user": Object {
+      "id": "00u492uyb0VqYtZiI0h7",
+      "profile": Object {
+        "firstName": "Test",
+        "lastName": "User",
+        "locale": "en_US",
+        "login": "exampleUser@example.com",
+        "timeZone": "America/Los_Angeles",
+      },
+    },
+  },
+  "_links": Object {
+    "cancel": Object {
+      "hints": Object {
+        "allow": Array [
+          "POST",
+        ],
+      },
+      "href": "https://auth-js-test.okta.com/api/v1/authn/cancel",
+    },
+    "next": Object {
+      "hints": Object {
+        "allow": Array [
+          "POST",
+        ],
+      },
+      "href": "https://auth-js-test.okta.com/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify",
+      "name": "poll",
+    },
+    "prev": Object {
+      "hints": Object {
+        "allow": Array [
+          "POST",
+        ],
+      },
+      "href": "https://auth-js-test.okta.com/api/v1/authn/previous",
+    },
+    "resend": Array [
+      Object {
+        "hints": Object {
+          "allow": Array [
+            "POST",
+          ],
+        },
+        "href": "https://auth-js-test.okta.com/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify/resend",
+        "name": "push",
+      },
+    ],
+  },
+  "expiresAt": "2015-06-10T22:42:40.224Z",
+  "factorResult": "WAITING",
+  "stateToken": "00T4jcVNRzJy5dkWJ4P7c9051dY3FUYY9O2zvbU_vI",
+  "status": "MFA_CHALLENGE",
+}
+`;
