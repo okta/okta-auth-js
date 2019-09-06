@@ -141,7 +141,7 @@ describe('token.getWithoutPrompt', function() {
             errorId: 'INTERNAL',
             errorCauses: []
           });
-        })
+        });
       });
     });
   });

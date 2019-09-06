@@ -1,3 +1,9 @@
+var allSettled = require('promise.allsettled');
+allSettled.shim(); // will be a no-op if not needed
+
+var promiseFinally = require('promise.prototype.finally');
+promiseFinally.shim(); // will be a no-op if not needed
+
 var OktaAuth = require('OktaAuth');
 var tokens = require('../util/tokens');
 var util = require('../util/util');
@@ -129,6 +135,79 @@ describe('TokenManager', function() {
   });
 
   describe('renew', function() {
+
+    it('multiple overlapping calls will produce a single request and promise', function() {
+      var client = setupSync();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+        return Promise.resolve(tokens.standardIdTokenParsed);
+      });
+      var p1 = client.tokenManager.renew('test-idToken');
+      var p2 = client.tokenManager.renew('test-idToken');
+      expect(p1).toBe(p2);
+      return Promise.all([p1, p2]);
+    });
+
+    it('multiple overlapping calls will produce a single request and promise (failure case)', function() {
+      var client = setupSync();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+        return Promise.reject(new Error('expected'));
+      });
+      var p1 = client.tokenManager.renew('test-idToken');
+      var p2 = client.tokenManager.renew('test-idToken');
+      expect(p1).toBe(p2);
+      return Promise.allSettled([p1, p2]).then(function(results) {
+        expect(results).toHaveLength(2);
+        results.forEach(function(result) {
+          expect(result.status).toBe('rejected');
+          util.expectErrorToEqual(result.reason, {
+            name: 'Error',
+            message: 'expected',
+          });
+        });
+      });
+    });
+
+    it('sequential calls will produce a unique request and promise', function() {
+      var client = setupSync();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+        return Promise.resolve(tokens.standardIdTokenParsed);
+      });
+      var p1 = client.tokenManager.renew('test-idToken').then(function() {
+        var p2 = client.tokenManager.renew('test-idToken');
+        expect(p1).not.toBe(p2);
+        return p2;
+      });
+    });
+
+    it('sequential calls will produce a unique request and promise (failure case)', function() {
+      var client = setupSync();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+        return Promise.reject(new Error('expected'));
+      });
+      var p1 = client.tokenManager.renew('test-idToken').then(function() {
+        expect(false).toBe(true);
+      }).catch(function(err) {
+        util.expectErrorToEqual(err, {
+          name: 'Error',
+          message: 'expected',
+        });
+        var p2 = client.tokenManager.renew('test-idToken');
+        expect(p1).not.toBe(p2);
+        return p2;
+      }).then(function() {
+        expect(false).toBe(true);
+      }).catch(function(err) {
+        util.expectErrorToEqual(err, {
+          name: 'Error',
+          message: 'expected',
+        });
+      });
+    });
+
     it('allows renewing an idToken', function() {
       return oauthUtil.setupFrame({
         authClient: setupSync(),
