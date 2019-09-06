@@ -7,11 +7,26 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest Current File",
+      "name": "Jest Current File (browser)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
         "--no-cache",
+        "--config=jest.browser.js",
+        "${relativeFile}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Current File (server)",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": [
+        "--runInBand",
+        "--no-cache",
+        "--config=jest.server.js",
         "${relativeFile}"
       ],
       "console": "integratedTerminal",

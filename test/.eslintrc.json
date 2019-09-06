@@ -3,5 +3,8 @@
   "env": {
     "jest": true,
     "jasmine": true
+  },
+  "globals": {
+    "Promise": "readonly"
   }
 }
