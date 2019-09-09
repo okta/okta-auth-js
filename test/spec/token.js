@@ -1,4 +1,6 @@
 jest.mock('cross-fetch');
+var allSettled = require('promise.allsettled');
+allSettled.shim(); // will be a no-op if not needed
 
 var OktaAuth = require('OktaAuth');
 var tokens = require('../util/tokens');
@@ -9,6 +11,7 @@ var _ = require('lodash');
 var Q = require('q');
 var sdkUtil = require('../../lib/oauthUtil');
 var pkce = require('../../lib/pkce');
+var waitFor = require('../util/waitFor');
 
 function setupSync() {
   return new OktaAuth({ issuer: 'http://example.okta.com' });
@@ -37,6 +40,144 @@ describe('token.decode', function() {
 });
 
 describe('token.getWithoutPrompt', function() {
+  
+  describe('concurrent requests', function() {
+    var authClient;
+    var states;
+    var messageCallbacks;
+
+    function fireCallback(index, origin) {
+      var fn = messageCallbacks[index];
+      fn({
+        data: {
+          'id_token': tokens.standardIdToken,
+          state: states[index],
+        },
+        origin: origin || 'https://auth-js-test.okta.com'
+      });
+    }
+
+    beforeEach(function() {
+      var oktaAuthArgs = {
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      };
+      authClient = new OktaAuth(oktaAuthArgs);
+      states = [];
+      messageCallbacks = [];
+
+      // Mock the well-known and keys request
+      oauthUtil.loadWellKnownAndKeysCache();
+      oauthUtil.mockStateAndNonce();
+      util.warpToUnixTime(oauthUtil.getTime());
+  
+      // Unique state per request
+      var stateCounter = 0;
+      jest.spyOn(sdkUtil, 'generateState').mockImplementation(function() {
+        stateCounter++;
+        states.push(stateCounter);
+        return states[states.length - 1];
+      });
+  
+      // Simulate the postMessage between the window and the popup or iframe
+      jest.spyOn(window, 'addEventListener').mockImplementation(function(eventName, fn) {
+        if (eventName === 'message') {
+          messageCallbacks.push(fn);
+        }
+      });
+
+      // Capture the iframe
+      var body = document.getElementsByTagName('body')[0];
+      var origAppend = body.appendChild;
+      jest.spyOn(body, 'appendChild').mockImplementation(function (el) {
+        if (el.tagName === 'IFRAME') {
+          // Remove the src so it doesn't actually load
+          el.src = '';
+          return origAppend.call(this, el);
+        }
+        return origAppend.apply(this, arguments);
+      });
+
+    });
+
+    it('multiple valid will resolve', function() {
+      var p1 = authClient.token.getWithoutPrompt();
+      var p2 = authClient.token.getWithoutPrompt();
+      var p3 = authClient.token.getWithoutPrompt();
+      return waitFor(function() {
+        return messageCallbacks.length === 3;
+      }).then(function() {
+        // manually fire callbacks in mixed order. All promises should resolve
+        fireCallback(1);
+        fireCallback(2);
+        fireCallback(0);
+        return Promise.all([p1, p2, p3]);
+      });
+    });
+
+    it('multiple invalid will fail (authorizeUrl mismatch)', function() {
+      var p1 = authClient.token.getWithoutPrompt();
+      var p2 = authClient.token.getWithoutPrompt();
+      var p3 = authClient.token.getWithoutPrompt();
+      return waitFor(function() {
+        return messageCallbacks.length === 3;
+      }).then(function() {
+        // manually fire callbacks in mixed order. All promises should reject
+        fireCallback(1, 'bogus');
+        fireCallback(2, 'bogus');
+        fireCallback(0, 'bogus');
+        return Promise.allSettled([p1, p2, p3]);
+      }).then(function(results) {
+        expect(results).toHaveLength(3);
+        results.forEach(function(result) {
+          expect(result.status).toBe('rejected');
+          util.expectErrorToEqual(result.reason, {
+            name: 'AuthSdkError',
+            message: 'The request does not match client configuration',
+            errorCode: 'INTERNAL',
+            errorSummary: 'The request does not match client configuration',
+            errorLink: 'INTERNAL',
+            errorId: 'INTERNAL',
+            errorCauses: []
+          });
+        });
+      });
+    });
+  });
+
+  it('If authorizeUrl does not match configured issuer, promise will reject', function() {
+    return oauthUtil.setupFrame({
+      willFail: true,
+      oktaAuthArgs: {
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      },
+      getWithoutPromptArgs: [{
+        sessionToken: 'testSessionToken'
+      }, {
+        authorizeUrl: 'https://bogus',
+      }],
+      postMessageSrc: {
+        baseUri: 'https://bogus'
+      }
+    })
+    .then(function() {
+      expect(true).toEqual(false);
+    })
+    .fail(function(err) {
+      util.expectErrorToEqual(err, {
+        name: 'AuthSdkError',
+        message: 'The request does not match client configuration',
+        errorCode: 'INTERNAL',
+        errorSummary: 'The request does not match client configuration',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      });
+    });
+  });
 
   it('returns id_token using sessionToken', function(done) {
     return oauthUtil.setupFrame({

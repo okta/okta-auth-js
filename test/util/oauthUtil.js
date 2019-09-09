@@ -1,4 +1,5 @@
 /* eslint-disable complexity, max-statements */
+var URL = require('url').URL;
 var util = require('../util/util');
 var OktaAuth = require('OktaAuth');
 var tokens = require('./tokens');
@@ -73,7 +74,7 @@ oauthUtil.loadWellKnownAndKeysCache = function() {
   }));
 };
 
-var defaultPostMessage = {
+var defaultPostMessage = oauthUtil.defaultPostMessage = {
   'id_token': tokens.standardIdToken,
   state: oauthUtil.mockedState
 };
@@ -85,7 +86,7 @@ var defaultResponse = {
   scopes: ['openid', 'email']
 };
 
-function getTime(time) {
+var getTime = oauthUtil.getTime = function getTime(time) {
   if (time || time === 0) {
     return time;
   } else {
@@ -130,12 +131,17 @@ oauthUtil.setup = function(opts) {
     // Simulate the postMessage between the window and the popup or iframe
     jest.spyOn(window, 'addEventListener').mockImplementation(function(eventName, fn) {
       if (eventName === 'message' && !opts.closePopup) {
+        var origin = 'https://auth-js-test.okta.com';
+        if (opts.postMessageSrc) {
+          origin = new URL(opts.postMessageSrc.baseUri).origin;
+        } else if (opts.oktaAuthArgs && opts.oktaAuthArgs.url) {
+          origin = opts.oktaAuthArgs.url;
+        }
         // Call postMessage on the next tick
         setTimeout(function() {
           fn({
             data: opts.postMessageResp || defaultPostMessage,
-            origin: opts.oktaAuthArgs && opts.oktaAuthArgs.url ||
-              'https://auth-js-test.okta.com'
+            origin: origin,
           });
         });
         if (opts.fastForwardToTime) {
@@ -227,7 +233,7 @@ oauthUtil.setup = function(opts) {
         throw err;
       } else {
         expect('not to be hit').toBe(true);
-        console.log(err); // eslint-disable-line
+        console.error(err); // eslint-disable-line
       }
     });
 };
