@@ -49,6 +49,12 @@ function bindFunctions(testApp, window) {
 function TestApp(config) {
   this.config = config;
   this.oktaAuth = new OktaAuth(config);
+  this.oktaAuth.tokenManager.on('error', e => {
+    console.error('Token manager error:', e);
+    if (e.errorCode === 'login_required') {
+      this.render();
+    }
+  });
 }
 
 export default TestApp;

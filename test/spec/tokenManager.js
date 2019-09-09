@@ -585,6 +585,51 @@ describe('TokenManager', function() {
       });
     });
 
+    it('Emits an "error" event on OAuth failure', function() {
+      var authClient = setupSync({
+        tokenManager: {
+          autoRenew: true
+        }
+      });
+      var errorEventCallback = jest.fn().mockImplementation(function(err) {
+        util.expectErrorToEqual(err, {
+          name: 'OAuthError',
+          message: 'something went wrong',
+          errorCode: 'sampleErrorCode',
+          errorSummary: 'something went wrong'
+        });
+      })
+      authClient.tokenManager.on('error', errorEventCallback);
+
+      return oauthUtil.setupFrame({
+        authClient: authClient,
+        autoRenew: true,
+        willFail: true,
+        fastForwardToTime: true,
+        autoRenewTokenKey: 'test-idToken',
+        time: tokens.standardIdTokenParsed.expiresAt + 1,
+        tokenManagerAddKeys: {
+          'test-idToken': tokens.standardIdTokenParsed
+        },
+        postMessageResp: {
+          error: 'sampleErrorCode',
+          'error_description': 'something went wrong',
+          state: oauthUtil.mockedState
+        }
+      })
+      .fail(function(err) {
+        util.expectErrorToEqual(err, {
+          name: 'OAuthError',
+          message: 'something went wrong',
+          errorCode: 'sampleErrorCode',
+          errorSummary: 'something went wrong'
+        });
+        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+
+        expect(errorEventCallback).toHaveBeenCalled();
+      });
+    });
+
     it('removes a token on OAuth failure', function() {
       return oauthUtil.setupFrame({
         authClient: setupSync({
