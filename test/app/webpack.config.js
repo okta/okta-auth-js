@@ -4,10 +4,14 @@ const fs = require('fs');
 const path = require('path');
 
 // Read environment variables from "testenv". Override environment vars if they are already set.
-const envConfig = dotenv.parse(fs.readFileSync(path.resolve(__dirname, '../..', 'testenv')));
-Object.keys(envConfig).forEach((k) => {
-  process.env[k] = envConfig[k];
-});
+const TESTENV = path.resolve(__dirname, '../..', 'testenv');
+
+if (fs.existsSync(TESTENV)) {
+  const envConfig = dotenv.parse(fs.readFileSync(TESTENV));
+  Object.keys(envConfig).forEach((k) => {
+    process.env[k] = envConfig[k];
+  });  
+}
 
 var webpack = require('webpack');
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
