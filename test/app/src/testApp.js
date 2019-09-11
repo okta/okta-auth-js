@@ -178,6 +178,15 @@ Object.assign(TestApp.prototype, {
     if (user) {
       // Authenticated user home page
       return `
+      <style>
+      #app {
+        font-family: 'Avenir', Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: #2c3e50;
+      }
+      </style>
+      <div id="app">
       <h2>Welcome back, ${user.email}</h2>
       <hr/>
       <a href="/" onclick="logout()">Logout</a>
@@ -206,13 +215,22 @@ Object.assign(TestApp.prototype, {
       <hr/>
       <h2>Config</h2>
       ${ config }
+      </div>
       `;
     }
-    
+
     // Unauthenticated user, Login page
     return `
+    <style>
+    #app {
+      font-family: 'Avenir', Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      color: #2c3e50;
+    }
+    </style>
+      <div id="app">
       <h2>Greetings, user!</h2>
-      <hr/>
       <ul>
         <li><b>Login using REDIRECT</b>
           <ul>
@@ -226,9 +244,9 @@ Object.assign(TestApp.prototype, {
             <li><a id="login-popup-implicit" href="/" onclick="loginPopupImplicit(event)">login using Implicit Flow</a></li>
         </li>
       </ul>
-      <hr/>
       <h2>Config</h2>
       ${ config }
+      </div>
       `;
 
   },
@@ -242,6 +260,25 @@ Object.assign(TestApp.prototype, {
     })[0];
     const claims = idToken.claims;
     const html = `
+    <head>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+    </style>
+    </head>
     <table id="claims">
       <thead>
         <tr>
