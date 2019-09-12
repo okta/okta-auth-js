@@ -22,11 +22,11 @@ waitOn({
   ].concat(opts), { stdio: 'inherit' });
 
   runner.on('exit', function (code) {
-    server.kill()
-    process.exit(code)
+    server.kill();
+    process.exit(code);
   });
   runner.on('error', function (err) {
-    server.kill()
-    throw err
+    server.kill();
+    throw err;
   });
 });

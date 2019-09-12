@@ -28,10 +28,12 @@ fi
 ### looks like ci-update-package is not compatible with `yarn publish`
 ### which expects new-version is passed via command line parameter.
 ### keep using npm for now
+pushd ./packages/okta-auth-js
 if ! npm publish --registry ${REGISTRY}; then
   echo "npm publish failed! Exiting..."
   exit ${PUBLISH_ARTIFACTORY_FAILURE}
 fi
+popd
 
 DATALOAD=$(ci-pkginfo -t dataload)
 if ! artifactory_curl -X PUT -u ${ARTIFACTORY_CREDS} ${DATALOAD} -v -f; then

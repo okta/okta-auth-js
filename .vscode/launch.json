@@ -7,12 +7,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest Current File (browser)",
+      "name": "okta-auth-js (browser)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
         "--no-cache",
-        "--config=jest.browser.js",
+        "--config=packages/okta-auth-js/jest.browser.js",
         "${relativeFile}"
       ],
       "console": "integratedTerminal",
@@ -21,12 +21,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest Current File (server)",
+      "name": "okta-auth-js (server)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
         "--no-cache",
-        "--config=jest.server.js",
+        "--config=packages/okta-auth-js/jest.browser.js",
         "${relativeFile}"
       ],
       "console": "integratedTerminal",
@@ -40,7 +40,7 @@
       "args": ["wdio.conf.js", "--spec", "${file}"],
       "cwd": "${workspaceFolder}/test/e2e",
       "autoAttachChildProcesses": true,
-      "program": "${workspaceRoot}/test/e2e/node_modules/@wdio/cli/bin/wdio.js",
+      "program": "${workspaceRoot}/node_modules/@wdio/cli/bin/wdio.js",
       "console": "integratedTerminal"
   }
   ]

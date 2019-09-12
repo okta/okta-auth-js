@@ -8,5 +8,13 @@
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 2017
+  },
+  "plugins": ["jasmine"],
+  "env": {
+    "jasmine": true
+  },
+  "rules": {
+    "jasmine/no-focused-tests": 0,
+    "jasmine/no-suite-dupes": [2, "branch"]
   }
 }

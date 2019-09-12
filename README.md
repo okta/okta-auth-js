@@ -1764,6 +1764,8 @@ yarn install
 
 | Command               | Description                     |
 | --------------------- | ------------------------------- |
+| `yarn clean`          | Removes installed dependencies and build outputs |
+| `yarn install`        | Install dependencies            |
 | `yarn build`          | Build the SDK with a sourcemap  |
 | `yarn start`          | Start internal test app         |
 | `yarn lint`           | Run eslint linting              |

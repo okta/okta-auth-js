@@ -19,7 +19,7 @@ const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
 const chromeOptions = {
     args: []
-}
+};
 
 if (CI) {
     chromeOptions.args = chromeOptions.args.concat([
