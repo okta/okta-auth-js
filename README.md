@@ -1673,11 +1673,15 @@ authClient.tokenManager.on('renewed', function (key, newToken, oldToken) {
 
 // Triggered when an OAuthError is returned via the API
 authClient.tokenManager.on('error', function (err) {
-  console.log('TokenManager error:', err.message);
+  console.log('TokenManager error:', err);
   // err.name
   // err.message
   // err.errorCode
   // err.errorSummary
+
+  if (err.errorCode === 'login_required') {
+    // Return to unauthenticated state
+  }
 });
 ```
 

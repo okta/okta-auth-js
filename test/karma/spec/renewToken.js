@@ -6,7 +6,8 @@ var tokens = require('../../util/tokens');
 import OktaAuth from '@okta/okta-auth-js';
 import oauthUtil from '../../../lib/oauthUtil';
 import pkce from '../../../lib/pkce';
-import OauthError from '../../../lib/errors/OAuthError';
+import OAuthError from '../../../lib/errors/OAuthError';
+import AuthSdkError from '../../../lib/errors/AuthSdkError';
 
 describe('Renew token', function() {
 
@@ -79,6 +80,51 @@ describe('Renew token', function() {
     });
   }
 
+  it('TokenManager::renew throws an exception if token does not exist', function() {
+    const expectedMessage = 'The tokenManager has no token for the key: accessToken';
+    return bootstrap()
+    .then(() => {
+      return sdk.tokenManager.renew('accessToken');
+    })
+    .catch(e => {
+      expect(e instanceof AuthSdkError).toBe(true);
+      expect(e.message).toBe(expectedMessage);
+    });
+  });
+
+  it('TokenManager::renew emits an error if token::renew returns an OAuthError', function() {
+    const errorCode = 'login_required';
+    const errorMessage = 'The client specified not to prompt, but the user is not logged in.';
+    const errorCallback = jasmine.createSpy();
+    return bootstrap()
+    .then(() => {
+      sdk.tokenManager.on('error', errorCallback);
+      sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
+      spyOn(oauthUtil, 'loadFrame').and.callFake(urlStr => {
+        const url = new URL(urlStr);
+        const state = url.searchParams.get('state');
+        var response = {
+          state,
+          error: errorCode,
+          error_description: errorMessage,
+          name: 'OAuthError'    
+        };
+
+        // Simulate window.postMessage() from iframe
+        var event = new Event('message');
+        event.data = response;
+        event.origin = ISSUER;
+        window.dispatchEvent(event);
+      });
+      return sdk.tokenManager.renew('accessToken');
+    })
+    .catch(e => {
+      expect(e instanceof OAuthError).toBe(true);
+      expect(e.message).toBe(errorMessage);
+      expect(errorCallback).toHaveBeenCalledWith(e);
+    });
+  });
+
   it('receives/throws error from iframe', function() {
     // This is the error if requesting scope='offline_access'
     const error = 'access_denied';
@@ -110,7 +156,7 @@ describe('Renew token', function() {
     })
     .catch(e => {
       expect(oauthUtil.loadFrame).toHaveBeenCalled();
-      expect(e instanceof OauthError).toBe(true);
+      expect(e instanceof OAuthError).toBe(true);
       expect(e.message).toBe(error_description);
     });
   });

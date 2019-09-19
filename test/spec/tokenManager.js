@@ -392,6 +392,38 @@ describe('TokenManager', function() {
         });
       });
     });
+
+    it('removes token if an AuthSdkError is thrown while renewing', function() {
+      return oauthUtil.setupFrame({
+        authClient: setupSync(),
+        willFail: true,
+        tokenManagerAddKeys: {
+          'test-accessToken': tokens.standardAccessTokenParsed,
+          'test-idToken': tokens.standardIdTokenParsed
+        },
+        tokenManagerRenewArgs: ['test-accessToken'],
+        postMessageSrc: {
+          baseUri: 'http://obviously.fake.foo',
+        },
+        postMessageResp: {
+          state: oauthUtil.mockedState
+        }
+      })
+      .fail(function(e) {
+        util.expectErrorToEqual(e, {
+          name: 'AuthSdkError',
+          message: 'The request does not match client configuration',
+          errorCode: 'INTERNAL',
+          errorSummary: 'The request does not match client configuration',
+          errorLink: 'INTERNAL',
+          errorId: 'INTERNAL',
+          errorCauses: [],
+        });
+        oauthUtil.expectTokenStorageToEqual(localStorage, {
+          'test-idToken': tokens.standardIdTokenParsed
+        });
+      });
+    });
   });
 
   describe('autoRenew', function() {
@@ -585,6 +617,103 @@ describe('TokenManager', function() {
       });
     });
 
+    it('Emits an "error" event on OAuth failure', function() {
+      var authClient = setupSync({
+        tokenManager: {
+          autoRenew: true
+        }
+      });
+      var errorEventCallback = jest.fn().mockImplementation(function(err) {
+        util.expectErrorToEqual(err, {
+          name: 'OAuthError',
+          message: 'something went wrong',
+          errorCode: 'sampleErrorCode',
+          errorSummary: 'something went wrong'
+        });
+      })
+      authClient.tokenManager.on('error', errorEventCallback);
+
+      return oauthUtil.setupFrame({
+        authClient: authClient,
+        autoRenew: true,
+        willFail: true,
+        fastForwardToTime: true,
+        autoRenewTokenKey: 'test-idToken',
+        time: tokens.standardIdTokenParsed.expiresAt + 1,
+        tokenManagerAddKeys: {
+          'test-idToken': tokens.standardIdTokenParsed
+        },
+        postMessageResp: {
+          error: 'sampleErrorCode',
+          'error_description': 'something went wrong',
+          state: oauthUtil.mockedState
+        }
+      })
+      .fail(function(err) {
+        util.expectErrorToEqual(err, {
+          name: 'OAuthError',
+          message: 'something went wrong',
+          errorCode: 'sampleErrorCode',
+          errorSummary: 'something went wrong'
+        });
+        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+
+        expect(errorEventCallback).toHaveBeenCalled();
+      });
+    });
+
+    it('Emits an "error" event on AuthSdkError', function() {
+      var authClient = setupSync({
+        tokenManager: {
+          autoRenew: true
+        }
+      });
+      var errorEventCallback = jest.fn().mockImplementation(function(err) {
+        util.expectErrorToEqual(err, {
+          name: 'AuthSdkError',
+          message: 'The request does not match client configuration',
+          errorCode: 'INTERNAL',
+          errorSummary: 'The request does not match client configuration',
+          errorLink: 'INTERNAL',
+          errorId: 'INTERNAL',
+          errorCauses: [],
+        });
+      })
+      authClient.tokenManager.on('error', errorEventCallback);
+
+      return oauthUtil.setupFrame({
+        authClient: authClient,
+        autoRenew: true,
+        willFail: true,
+        fastForwardToTime: true,
+        autoRenewTokenKey: 'test-idToken',
+        time: tokens.standardIdTokenParsed.expiresAt + 1,
+        tokenManagerAddKeys: {
+          'test-idToken': tokens.standardIdTokenParsed
+        },
+        postMessageSrc: {
+          baseUri: 'http://obviously.fake.foo',
+        },
+        postMessageResp: {
+          state: oauthUtil.mockedState
+        }
+      })
+      .fail(function(err) {
+        util.expectErrorToEqual(err, {
+          name: 'AuthSdkError',
+          message: 'The request does not match client configuration',
+          errorCode: 'INTERNAL',
+          errorSummary: 'The request does not match client configuration',
+          errorLink: 'INTERNAL',
+          errorId: 'INTERNAL',
+          errorCauses: [],
+        });
+        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+
+        expect(errorEventCallback).toHaveBeenCalled();
+      });
+    });
+
     it('removes a token on OAuth failure', function() {
       return oauthUtil.setupFrame({
         authClient: setupSync({
@@ -612,6 +741,42 @@ describe('TokenManager', function() {
           message: 'something went wrong',
           errorCode: 'sampleErrorCode',
           errorSummary: 'something went wrong'
+        });
+        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+      });
+    });
+
+    it('removes a token on AuthSdkError', function() {
+      return oauthUtil.setupFrame({
+        authClient: setupSync({
+          tokenManager: {
+            autoRenew: true
+          }
+        }),
+        autoRenew: true,
+        willFail: true,
+        fastForwardToTime: true,
+        autoRenewTokenKey: 'test-idToken',
+        time: tokens.standardIdTokenParsed.expiresAt + 1,
+        tokenManagerAddKeys: {
+          'test-idToken': tokens.standardIdTokenParsed
+        },
+        postMessageSrc: {
+          baseUri: 'http://obviously.fake.foo',
+        },
+        postMessageResp: {
+          state: oauthUtil.mockedState
+        }
+      })
+      .fail(function(e) {
+        util.expectErrorToEqual(e, {
+          name: 'AuthSdkError',
+          message: 'The request does not match client configuration',
+          errorCode: 'INTERNAL',
+          errorSummary: 'The request does not match client configuration',
+          errorLink: 'INTERNAL',
+          errorId: 'INTERNAL',
+          errorCauses: [],
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
       });
