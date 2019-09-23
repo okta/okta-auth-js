@@ -34,6 +34,9 @@ const app = new TestApp(config);
 // Expose for console fiddling
 window._testApp = app;
 
-// Bootstrap as a function of the URL path
-const { pathname } = window.location;
-app.mount(window, document.getElementById('root'), pathname);
+document.addEventListener('DOMContentLoaded', () => {
+  // Bootstrap as a function of the URL path
+  const { pathname } = window.location;
+  app.mount(window, document.getElementById('root'), pathname);
+});
+

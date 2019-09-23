@@ -182,26 +182,30 @@ Object.assign(TestApp.prototype, {
   pollSessionExists(event) {
     event && event.preventDefault(); // prevent navigation / page reload
     const authClient = this.oktaAuth;
+    let running = false;
+
     function poll() {
-      console.log('starting cycle');
-       authClient.session.exists()
+      if (running) {
+        console.error('PREVIOUS CYCLE has not completed yet');
+      }
+      running = true;
+       return authClient.session.exists()
        .then(function(exists) {
            if (exists) {
-               // logged in
-               document.write('You are logged in!');
-               console.log("logged in");
+               console.info("logged in");
            } else {
-               // not logged in
-               console.log(exists);
-               document.write('You are not logged in.');
-               console.log("not logged in");
+               console.info("NOT logged in");
            }
        })
-       .fail( () => { console.log('fail successful - brain broken') });
+       .fail( () => { console.log('fail successful - brain broken'); })
+       .finally(() => {
+         running = false;
+       });
    }
-   
+
    poll();
    setTimeout(poll, 3000);
+    // setInterval(poll, 3000);
   },
   appHTML: function(props) {
     const { user, idToken, accessToken } = props || {};
