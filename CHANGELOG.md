@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.9.0
+
+### Features
+- [add5369](https://github.com/okta/okta-auth-js/pull/252/commits/add536984b07538a7830b2f3e50c64abf2cd2ccf) Add support to pass callback to poll function
+
+### Bug Fixes
+- [541683](https://github.com/okta/okta-auth-js/pull/246/commits/541683227d3e10865da0bcb543e16f5202879ad0) Origin mismatch will now cause promise rejection (token renew)
+- [d9900a](https://github.com/okta/okta-auth-js/pull/246/commits/d9900a7bf9da5c6d8d97e1bcce6647ed0e418fbb) TokenManager: return existing promise for concurrent requests
+- [77ece4](https://github.com/okta/okta-auth-js/pull/247/commits/77ece4c05657bf3e695c25c1ab568e82da48fbca) Clear token on 'AuthSdkError'
+
 ## 2.7.0
 ### Features
 - [(#238)](https://github.com/okta/okta-auth-js/pull/238) - Adds pass-thru of optional 'loginHint' and 'idpScopes' params (resolves [issue #214](https://github.com/okta/okta-auth-js/issues/214))
