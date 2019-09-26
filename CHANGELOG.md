@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.0-alpha+001 (REPLACE FOR ACTUAL 3.0.0 RELEASE)
+
+### Bug Fixes
+ - Updates http.js to return native (not q) promises to resolve issue with session.exists() sometimes eturning a promise that neither resolves nor rejects.  Users should change any .fail() calls on the returned promise to use .catch() instead (async/await try/catch blocks require no change).
+
 ## 2.9.0
 
 ### Features
