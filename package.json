@@ -16,17 +16,16 @@
   "scripts": {
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
-    "test": "yarn test:karma && yarn test:browser && yarn test:server",
+    "test": "yarn test:unit && yarn test:e2e",
+    "test:e2e": "yarn --cwd test/e2e start",
+    "test:unit": "yarn test:karma && yarn test:browser && yarn test:server",
     "test:karma": "karma start --single-run",
     "test:browser": "jest --config ./jest.browser.js",
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
     "build": "node ./writeConfig.js && webpack --config webpack.config.js",
     "prepare": "yarn build",
-    "install:app": "yarn --cwd test/app install",
-    "start:app": "yarn --cwd test/app start",
-    "prestart": "yarn install:app",
-    "start": "yarn start:app"
+    "start": "yarn --cwd test/app start --open"
   },
   "author": "Okta",
   "keywords": [

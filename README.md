@@ -1762,16 +1762,22 @@ yarn install
 
 ### Build and Test Commands
 
-| Command               | Description                    |
-| --------------------- | ------------------------------ |
-| `yarn build`          | Build the SDK with a sourcemap |
-| `yarn test`           | Run unit tests     |
-| `yarn lint`           | Run eslint linting             |
-| `yarn start`          | Start internal test app        |
+| Command               | Description                     |
+| --------------------- | ------------------------------- |
+| `yarn build`          | Build the SDK with a sourcemap  |
+| `yarn start`          | Start internal test app         |
+| `yarn lint`           | Run eslint linting              |
+| `yarn test:unit`      | Run only unit tests             |
+| `yarn test:e2e`       | Run only E2E (end-to-end) tests |
+| `yarn test`           | Run all tests                   |
+
+#### Test Environment
+
+Before running the E2E tests, you will need to setup a test environment. See [test/e2e/README](test/e2e/README.md) for more information.
 
 #### Test App
 
-Implements a simple SPA application to demonstrate functionality and provide for manual testing. [See here for more information](test/app/README.md).
+The internal test app can be run manually using `yarn start`. This is useful for troubleshooting and manual testing. See [test/app/README](test/app/README.md) for more information on the test app.
 
 ## Contributing
 

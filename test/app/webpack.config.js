@@ -22,6 +22,10 @@ var PORT = process.env.PORT || 8080;
 
 module.exports = {
   mode: 'development',
+  output: {
+    path: path.join(__dirname, 'public'),
+    filename: 'oidc-app.js'
+  },
   resolve: {
     alias: {
       '@okta/okta-auth-js': MAIN_ENTRY

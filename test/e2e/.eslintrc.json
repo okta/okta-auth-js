@@ -1,0 +1,12 @@
+{
+  "globals": {
+    "$": "readonly",
+    "browser": "readonly",
+    "process": "readonly",
+    "__dirname": "readonly"
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2017
+  }
+}

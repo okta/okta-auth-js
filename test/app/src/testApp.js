@@ -10,104 +10,150 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global console */
+/* global document, window, Promise */
 /* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
+import { saveConfigToStorage } from './config';
+import { MOUNT_PATH } from './constants';
+import { htmlString, toQueryParams } from './util';
+import { Form, updateForm } from './form';
+import { tokensHTML } from './tokens';
+
+function homeLink(app) {
+  return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
+}
+
+function logoutLink(app) {
+  return `<a id="logout" href="${app.originalUrl}" onclick="logoutAndReload(event)">Logout</a>`;
+}
+
+const Footer = `
+`;
+
+const Layout = `
+  <div id="layout">
+    <div id="page-content"></div>
+    <div id="config-area" class="flex-row">
+      <div id="form-content" class="box">${Form}</div>
+      <div id="config-dump" class="box"></div>
+    </div>
+    ${Footer}
+  </div>
+`;
 
 function bindFunctions(testApp, window) {
-
-  // getWithRedirect
-  window.loginRedirectPKCE = testApp.loginRedirect.bind(testApp, {
-    pkce: true,
-  });
-  window.loginRedirectImplicit = testApp.loginRedirect.bind(testApp, {
-
-  });
-
-  // getWithPopup
-  window.loginPopupPKCE = testApp.loginPopup.bind(testApp, {
-    pkce: true,
-  });
-  window.loginPopupImplicit = testApp.loginPopup.bind(testApp, {
-
-  });
-
-  // getWithoutPrompt
-  window.getTokenPKCE = testApp.getToken.bind(testApp, {
-    pkce: true,
-  });
-
-  window.getTokenImplicit = testApp.getToken.bind(testApp, {
-
-  });
-
+  window.loginRedirect = testApp.loginRedirect.bind(testApp, {});
+  window.loginPopup = testApp.loginPopup.bind(testApp, {});
+  window.loginDirect = testApp.loginDirect.bind(testApp);
+  window.getToken = testApp.getToken.bind(testApp, {});
   window.logout = testApp.logout.bind(testApp);
-
+  window.logoutAndReload = testApp.logoutAndReload.bind(testApp);
   window.renewToken = testApp.renewToken.bind(testApp);
+  window.handleCallback = testApp.handleCallback.bind(testApp);
+  window.getUserInfo = testApp.getUserInfo.bind(testApp);
 }
 
 function TestApp(config) {
   this.config = config;
-  this.oktaAuth = new OktaAuth(config);
-  this.oktaAuth.tokenManager.on('error', e => {
-    console.error('Token manager error:', e);
-    if (e.errorCode === 'login_required') {
-      this.render();
-    }
-  });
 }
 
 export default TestApp;
 
 Object.assign(TestApp.prototype, {
   // Mount into the DOM
-  mount: async function(window, rootElem, pathname) {
+  mount: function(window, rootElem) {
+    this.originalUrl = MOUNT_PATH + toQueryParams(this.config);
     this.rootElem = rootElem;
+    this.rootElem.innerHTML = Layout;
+    updateForm(this.config);
+    document.getElementById("config-dump").innerHTML = this.configHTML();
+    this.contentElem = document.getElementById("page-content");
     bindFunctions(this, window);
-    return this.render(pathname, this.rootElem)
-    .then(() => {
-      return this;
-    });
   },
-  // Load and render the app
-  render: async function(pathname, elem) {
-    pathname = pathname || '';
-    elem = elem || this.rootElem;
-    const isCallback = pathname.startsWith('/implicit/callback');
-    return (isCallback ? this.renderCallback() : this.renderHome())
-    .then(content => {
-      if (elem) {
-        elem.innerHTML = `<div>${content}</div>`;
-      }
-      return content;
-    });
-  },
-  renderCallback: async function() {
-    return this.handleAuthentication()
-      .catch(e => {
-        console.error(e);
-      })
-      .then(tokens => {
-        return this.callbackHTML(tokens);
+  getSDKInstance() {
+    return Promise.resolve()
+      .then(() => {
+        this.oktaAuth = this.oktaAuth || new OktaAuth(this.config); // can throw
       });
   },
-  renderHome: async function() {
+  _setContent: function(content) {
+    this.contentElem.innerHTML = `
+      <div>${content}</div>
+    `;
+  },
+
+  bootstrapCallback: async function() {
+    const content = `
+      <a id="handle-callback" href="/" onclick="handleCallback(event)">Handle callback (Continue Login)</a>
+      <hr/>
+      ${homeLink(this)}
+    `;
+    return this.getSDKInstance()
+      .then(() => this._setContent(content));
+  },
+  bootstrapHome: async function() {
     // Default home page
-    return this.getUserData()
+    return this.getSDKInstance()
+      .then(() => this.render());
+  },
+  render: function() {
+    this.getTokens()
     .catch((e) => {
-      console.error(e);
+      this.renderError(e);
     })
-    .then(data => {
-      return this.appHTML(data);
+    .then(data => this.appHTML(data))
+    .then(content => this._setContent(content))
+    .then(() => {
+      // Add a special highlight on links when they are clicked
+      let links = Array.prototype.slice.call(document.getElementsByTagName('a'));
+      links.forEach(link => {
+        link.addEventListener('click', function() {
+          this.classList.add('clicked');
+        });
+      });
+    });
+  },
+  renderError: function(e) {
+    const xhrError = e && e.xhr ? e.xhr.message : '';
+    this._setContent(`
+      <div id="error" style="color: red">${e.toString()}</div>
+      <div id="xhr-error" style="color: red">${xhrError}</div>
+      <hr/>
+      ${homeLink(this)}
+      ${logoutLink(this)}
+    `);
+  },
+  loginDirect: async function(e) {
+    e && e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    return this.oktaAuth.signIn({username, password})
+    .then(res => {
+      if (res.status === 'SUCCESS') {
+        saveConfigToStorage(this.config);
+        return this.oktaAuth.token.getWithRedirect({
+          sessionToken: res.sessionToken,
+          responseType: this.config.responseType
+        });
+      }
+    })
+    .catch(e => {
+      this.renderError(e);
+      throw e;
     });
   },
   loginRedirect: async function(options, event) {
     event && event.preventDefault(); // prevent navigation / page reload
+    saveConfigToStorage(this.config);
     options = Object.assign({}, {
       responseType: this.config.responseType,
       scopes: this.config.scopes,
     }, options);
-    return this.oktaAuth.token.getWithRedirect(options);
+    return this.oktaAuth.token.getWithRedirect(options)
+      .catch(e => {
+        this.renderError(e);
+        throw e;
+      });
   },
   loginPopup: async function(options, event) {
     event && event.preventDefault(); // prevent navigation / page reload
@@ -133,7 +179,6 @@ Object.assign(TestApp.prototype, {
       this.render();
     });
   },
-  // pkce must be already set before calling this method
   renewToken: async function(event) {
     event && event.preventDefault(); // prevent navigation / page reload
     return this.oktaAuth.tokenManager.renew('idToken')
@@ -145,7 +190,24 @@ Object.assign(TestApp.prototype, {
     this.oktaAuth.tokenManager.clear();
     return this.oktaAuth.signOut();
   },
-  handleAuthentication: async function() {
+  logoutAndReload: function(event) {
+    event && event.preventDefault();
+    this.logout().then(() => {
+      window.location.reload();
+    });
+  },
+  handleCallback: async function(e) {
+    e && e.preventDefault();
+
+    return this.getTokensFromUrl()
+      .catch(e => {
+        this.renderError(e);
+        throw e;
+      })
+      .then(tokens => this.callbackHTML(tokens))
+      .then(content => this._setContent(content));
+  },
+  getTokensFromUrl: async function() {
     // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
     let tokens = await this.oktaAuth.token.parseFromUrl();
     this.saveTokens(tokens);
@@ -155,125 +217,102 @@ Object.assign(TestApp.prototype, {
     tokens = Array.isArray(tokens) ? tokens : [tokens];
     tokens.forEach((token) => {
       if (!token) {
-        console.error('BAD/EMPTY token returned');
-        return;
+        throw new Error('BAD/EMPTY token returned');
       } else if (token.idToken) {
         this.oktaAuth.tokenManager.add('idToken', token);
       } else if (token.accessToken) {
         this.oktaAuth.tokenManager.add('accessToken', token);
       } else {
-        console.error('Unknown token returned: ', token);
+        throw new Error('Unknown token returned: ' + JSON.stringify(token));
       }
     });
   },
-  getUserData: async function() {
+  getTokens: async function() {
     const accessToken = await this.oktaAuth.tokenManager.get('accessToken');
     const idToken = await this.oktaAuth.tokenManager.get('idToken');
+    return { accessToken, idToken };
+  },
+  getUserInfo: async function(event) {
+    event && event.preventDefault(); // prevent navigation / page reload
+    const { accessToken, idToken } = await this.getTokens();
     if (accessToken && idToken) {
-      const user = await this.oktaAuth.token.getUserInfo(accessToken);
-      if (user.sub === idToken.claims.sub) {
-        // Only return the userinfo response if subjects match to
-        // mitigate token substitution attacks
-        return { user, accessToken, idToken };
-      }
+      return this.oktaAuth.token.getUserInfo(accessToken)
+        .catch(error => {
+          this.renderError(error);
+          throw error;
+        })
+        .then(user => {
+          document.getElementById('user-info').innerHTML = htmlString(user);
+        });
+    } else {
+      this.renderError(new Error('Missing tokens'));
     }
   },
-  appHTML: function(props) {
-    const { user, idToken, accessToken } = props || {};
-    const config = JSON.stringify(this.config, null, 2).replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;');
-    if (user) {
-      // Authenticated user home page
-      return `
-      <h2>Welcome back, ${user.email}</h2>
-      <hr/>
-      <a href="/" onclick="logout()">Logout</a>
-      <hr/>
-      <ul>
-        <li>
-          <a id="renewtoken" href="/" onclick="renewToken(event)"><b>Renew Token</b></a>
-          <p>(must set pkce via constructor)
-          <div>
-            <b>pkce:</b>
-            <a href="/?pkce=1">pkce flow</a>
-              &nbsp;|&nbsp;
-            <a href="/">implicit flow</a>
-          </div>
-          </p>
-        </li>
-        <li><b>Get Token</b>
-          <ul>
-            <li><a id="gettoken-pkce" href="/" onclick="getTokenPKCE(event)">Get Token using PKCE flow</a></li>
-            <li><a id="gettoken-implicit" href="/" onclick="getTokenImplicit(event)">Get Token using Implicit flow</a></li>
-          </ul>
-        </li>
-      </ul>
-      <hr/>
-      ${ this.tokensHTML([idToken, accessToken])}
-      <hr/>
+  configHTML() {
+    const config = htmlString(this.config);
+    return `
       <h2>Config</h2>
       ${ config }
+    `;
+  },
+  appHTML: function(props) {
+    const { idToken, accessToken } = props || {};
+    if (idToken || accessToken) {
+      // Authenticated user home page
+      return `
+        <h2>Welcome back</h2>
+        <hr/>
+        ${logoutLink(this)}
+        <hr/>
+        <ul>
+          <li>
+            <a id="get-userinfo" href="/" onclick="getUserInfo(event)">Get User Info</a>
+          </li>
+          <li>
+            <a id="renew-token" href="/" onclick="renewToken(event)">Renew Token</a>
+          </li>
+          <li>
+            <a id="get-token" href="/" onclick="getToken(event)">Get Token (without prompt)</a>
+          </li>
+        </ul>
+        <div id="user-info"></div>
+        <hr/>
+        ${ tokensHTML([idToken, accessToken])}
       `;
     }
     
     // Unauthenticated user, Login page
     return `
-      <h2>Greetings, user!</h2>
+      <h2>Greetings, unknown user!</h2>
       <hr/>
       <ul>
-        <li><b>Login using REDIRECT</b>
-          <ul>
-          <li><a id="login-redirect-pkce" href="/" onclick="loginRedirectPKCE(event)">login using PKCE Flow</a></li>
-          <li><a id="login-redirect-implicit" href="/" onclick="loginRedirectImplicit(event)">login using Implicit Flow</a></li>
-          </ul>
+        <li>
+          <a id="login-redirect" href="/" onclick="loginRedirect(event)">Login using REDIRECT</a>
         </li>
-        <li><b>Login using POPUP</b>
-          <ul>
-            <li><a id="login-popup-pkce" href="/" onclick="loginPopupPKCE(event)">login using PKCE flow</a></li>
-            <li><a id="login-popup-implicit" href="/" onclick="loginPopupImplicit(event)">login using Implicit Flow</a></li>
+        <li>
+          <a id="login-popup" href="/" onclick="loginPopup(event)">Login using POPUP</a>
         </li>
       </ul>
-      <hr/>
-      <h2>Config</h2>
-      ${ config }
+      <h4/>
+      <input name="username" id="username" placeholder="username" type="email"/>
+      <input name="password" id="password" placeholder="password" type="password"/>
+      <a href="/" id="login-direct" onclick="loginDirect(event)">Login DIRECT</a>
       `;
-
   },
-  tokensHTML: function(tokens) {
-    if (!tokens || tokens.length < 2) {
-      return '<b></b><br/>';
-    }
 
-    const idToken = tokens.filter(token => {
-      return token.idToken;
-    })[0];
-    const claims = idToken.claims;
-    const html = `
-    <table id="claims">
-      <thead>
-        <tr>
-          <th>Claim</th><th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-      ${
-        Object.keys(claims).map((key) => {
-          return `<tr><td>${key}</td><td>${claims[key]}</td></tr>`;
-        }).join('\n')
-      }
-      </tbody>
-    </table>
-    `;
-    return html;
-  },
   callbackHTML: function(tokens) {
     const success = tokens && tokens.length === 2;
-    const message = success ? 'Successfully received tokens on the callback page!' : 'Tokens not returned. Check error console for details';
+    const errorMessage = success ? '' :  'Tokens not returned. Check error console for more details';
+    const successMessage = success ? 'Successfully received tokens on the callback page!' : '';
     const content = `
-      <b>${message}</b>
-      <br/>
-      <a href="/">Return Home</a>
+      <div id="callback-result">
+        <strong><div id="success">${successMessage}</div></strong>
+        <div id="error">${errorMessage}</div>
+        <div id="xhr-error"></div>
+      </div>
       <hr/>
-      ${ success ? this.tokensHTML(tokens): '' }
+      ${homeLink(this)}
+      ${ success ? tokensHTML(tokens): '' }
     `;
     return content;
   }
