@@ -1,8 +1,8 @@
 
 export default function toQueryParams(obj) {
-  var str = [];
+  const str = [];
   if (obj !== null) {
-    for (var key in obj) {
+    for (let key in obj) {
       if (obj.hasOwnProperty(key) &&
           obj[key] !== undefined &&
           obj[key] !== null) {

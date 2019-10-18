@@ -1777,7 +1777,9 @@ Before running the E2E tests, you will need to setup a test environment. See [te
 
 #### Test App
 
-The internal test app can be run manually using `yarn start`. This is useful for troubleshooting and manual testing. See [test/app/README](test/app/README.md) for more information on the test app.
+We have implemented a small SPA app, located at `./test/app/` which is used internally as a test harness for the E2E tests. The app can be run manually using `yarn start`. This will start a webpack dev server and open a new browser window at `http://localhost:8080`. The app provides a high level of feedback and configurability which make it useful as a tool for troubleshooting and manual testing scenarios. See [test/app/README](test/app/README.md) for more information on the test app.
+
+Because this test app is set up to dynamically change configuration and leak internal information, users should not use this test app as the basis for their own applications. Instead, use the example usage outlined elsewhere in this README.
 
 ## Contributing
 
