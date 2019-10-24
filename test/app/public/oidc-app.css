@@ -1,0 +1,29 @@
+.flex-row {
+  flex-direction: row;
+  display: flex;
+}
+
+.box {
+  border: 1px solid darkgray;
+  padding: 10px;
+  margin: 10px;
+  max-width: 700px;
+  overflow-wrap: break-word;
+}
+
+input {
+  font-size: larger;
+  width: 600px;
+}
+
+a {
+  padding: 4px;
+  margin: 4px;
+  display: inline-block;
+  background-color: #eeeeee;
+  border: 1px #333 solid;
+}
+a:active, a.clicked {
+  background-color: green;
+  color: white;
+}

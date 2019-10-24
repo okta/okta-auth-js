@@ -1,7 +1,13 @@
 <html>
-  <body>
-    <h1>CALLBACK from OKTA</h1>
-    <div id="root"></div>
-    <script src="/main.js"></script>
-  </body>
+<head>
+  <link rel="stylesheet" href="/oidc-app.css"/>
+</head>
+<body class="oidc-app callback">
+  <h1>OIDC CALLBACK</h1>
+  <div id="root"></div>
+  <script src="/oidc-app.js"></script>
+  <script type="text/javascript">
+    bootstrapCallback();
+  </script>
+</body>
 </html>

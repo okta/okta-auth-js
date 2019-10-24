@@ -65,12 +65,12 @@ describe('Complete login flow', function() {
     jasmine.Ajax.uninstall();
   });
 
-  function bootstrap(config, pathname) {
+  async function bootstrap(config, pathname) {
     pathname = pathname || '';
     _location = new URL(`${ISSUER}${pathname}`);
     config = Object.assign({}, DEFAULT_CONFIG, config);
     app = new TestApp(config);
-
+    await app.getSDKInstance();
     sdk = app.oktaAuth;
     sdk.tokenManager.clear();
     setLocation = spyOn(sdk.token.getWithRedirect, '_setLocation');
@@ -79,7 +79,16 @@ describe('Complete login flow', function() {
     getDocument = spyOn(sdk.token.parseFromUrl, '_getDocument').and.returnValue(_document);
   
     $app = $('#root');
-    return app.mount(window, $app[0], pathname);
+    await app.mount(window, $app[0]);
+
+    const isCallback = pathname.startsWith('/implicit/callback');
+    if (isCallback) {
+      await app.bootstrapCallback();
+      await app.handleCallback();
+    } else {
+      await app.bootstrapHome();
+    }
+    return app;
   }
 
   function mockWellKnown() {

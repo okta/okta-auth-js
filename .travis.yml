@@ -2,9 +2,12 @@ language: node_js
 node_js:
   - '8'
 install:
-  - yarn install
-  - TMPDIR=/tmp yarn install
+  - yarn install --frozen-lockfile
+  - yarn --cwd test/app install --frozen-lockfile
+  - yarn --cwd test/e2e install --frozen-lockfile
 script:
   - yarn lint
   - yarn test
 cache: false
+addons:
+  chrome: stable
