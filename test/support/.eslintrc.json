@@ -1,7 +1,0 @@
-{
-  "globals": {
-    "it": "readonly",
-    "jest": "readonly",
-    "expect": "readonly"
-  }
-}

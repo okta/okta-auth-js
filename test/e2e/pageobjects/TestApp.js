@@ -2,45 +2,40 @@ import assert from 'assert';
 import toQueryParams from '../util/toQueryParams';
 
 class TestApp {
-  get rootSelector() { return $('#root'); }
-  get readySelector() { return $('#root.rendered.loaded'); }
-  get landingSelector() { return $('body.oidc-app.landing'); }
+  get landingSelector() { return $('body.oidc-app.landing') }
 
   // Authenticated landing
-  get logoutBtn() { return $('#logout'); }
-  get renewTokenBtn() { return $('#renew-token'); }
-  get getTokenBtn() { return $('#get-token'); }
-  get getUserInfoBtn() { return $('#get-userinfo'); }
-  get userInfo() { return $('#user-info'); }
+  get logoutBtn() { return $('#logout') }
+  get renewTokenBtn() { return $('#renew-token') }
+  get getTokenBtn() { return $('#get-token') }
+  get getUserInfoBtn() { return $('#get-userinfo') }
+  get userInfo() { return $('#user-info') }
 
   // Unauthenticated landing
-  get loginRedirectBtn() { return $('#login-redirect'); }
-  get loginPopupBtn() { return $('#login-popup'); }
-  get loginDirectBtn() { return $('#login-direct'); }
-  get username() { return $('#username'); }
-  get password() { return $('#password'); }
+  get loginRedirectBtn() { return $('#login-redirect') }
+  get loginPopupBtn() { return $('#login-popup') }
+  get loginDirectBtn() { return $('#login-direct') }
+  get username() { return $('#username') }
+  get password() { return $('#password') }
 
   // Form
-  get pkceOption() { return $('#pkce'); }
-  get clientId() { return $('#clientId'); }
-  get issuer() { return $('#issuer'); }
+  get pkceOption() { return $("#pkce") }
+  get clientId() { return $("#clientId") }
+  get issuer() { return $("#issuer") }
 
   // Callback
-  get callbackSelector() { return $('#root.callback'); }
-  get callbackHandledSelector() { return $('#root.callback-handled'); }
-
-  get handleCallbackBtn() { return $('#handle-callback'); }
-  get callbackResult() { return $('#callback-result'); }
-  get returnHomeBtn() { return $('#return-home'); }
-  get accessToken() { return $('#access-token'); }
-  get idToken() { return $('#id-token'); }
-  get success() { return $('#success'); }
-  get error() { return $('#error'); }
-  get xhrError() { return $('#xhr-error'); }
+  get callbackSelector() { return $('body.oidc-app.callback') }
+  get handleCallbackBtn() { return $('#handle-callback') }
+  get callbackResult() { return $('#callback-result') }
+  get returnHomeBtn() { return $('#return-home') }
+  get accessToken() { return $("#access-token") }
+  get idToken() { return $("#id-token") }
+  get success() { return $("#success") }
+  get error() { return $("#error") }
+  get xhrError() { return $("#xhr-error") }
 
   open(queryObj) {
     browser.url(toQueryParams(queryObj));
-    browser.waitUntil(() => this.readySelector.isExisting());
   }
 
   loginRedirect() {
@@ -50,7 +45,6 @@ class TestApp {
 
   handleCallback() {
     this.waitForCallback();
-    browser.waitUntil(() => this.handleCallbackBtn.isClickable());
     this.handleCallbackBtn.click();
   }
 
@@ -73,12 +67,10 @@ class TestApp {
   }
 
   getUserInfo() {
-    browser.waitUntil(() => this.getUserInfoBtn.isClickable());
     this.getUserInfoBtn.click();
   }
 
   returnHome() {
-    browser.waitUntil(() => this.returnHomeBtn.isClickable());
     this.returnHomeBtn.click();
     if(!this.landingSelector.isDisplayed()){
       this.landingSelector.waitForDisplayed(5000);
@@ -86,6 +78,7 @@ class TestApp {
   }
 
   logout() {
+    this.waitForLogoutBtn();
     this.logoutBtn.click();
     this.waitForLoginBtn();
   }
@@ -103,11 +96,17 @@ class TestApp {
   }
 
   waitForCallback() {
-    browser.waitUntil(() => this.callbackSelector.isExisting());
+    // parsed the url
+    if(!this.callbackSelector.isExisting()){
+      this.callbackSelector.waitForExist(10000);
+    }
   }
 
   waitForCallbackResult() {
-    browser.waitUntil(() => this.callbackHandledSelector.isExisting());
+    // parsed the url
+    if(!this.callbackResult.isExisting()){
+      this.callbackResult.waitForExist(10000);
+    }
   }
 
   waitForUserInfo() {
@@ -136,4 +135,4 @@ class TestApp {
   }
 }
 
-export default new TestApp();
+export default new TestApp()

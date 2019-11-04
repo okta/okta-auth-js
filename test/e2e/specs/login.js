@@ -4,6 +4,8 @@ import { loginRedirect, loginPopup, loginDirect } from '../util/loginUtils';
 
 describe('E2E login', () => {
   afterEach(() => {
+    TestApp.getUserInfo();
+    TestApp.assertUserInfo();
     TestApp.logout();
   });
 
@@ -15,20 +17,14 @@ describe('E2E login', () => {
 
       it('can login using redirect', () => {
         loginRedirect(flow);
-        TestApp.getUserInfo();
-        TestApp.assertUserInfo();
       });
 
       it('can login using a popup window', () => {
         loginPopup(flow);
-        TestApp.getUserInfo();
-        TestApp.assertUserInfo();
       });
 
       it('can login directly, calling signin() with username and password', () => {
         loginDirect(flow);
-        TestApp.getUserInfo();
-        TestApp.assertUserInfo();
       });
     });
   });
