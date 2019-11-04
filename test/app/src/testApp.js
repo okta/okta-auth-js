@@ -81,7 +81,12 @@ Object.assign(TestApp.prototype, {
       <div>${content}</div>
     `;
   },
-
+  _afterRender: function(extraClass) {
+    this.rootElem.classList.add('rendered');
+    if (extraClass) {
+      this.rootElem.classList.add(extraClass);
+    }
+  },
   bootstrapCallback: async function() {
     const content = `
       <a id="handle-callback" href="/" onclick="handleCallback(event)">Handle callback (Continue Login)</a>
@@ -89,7 +94,8 @@ Object.assign(TestApp.prototype, {
       ${homeLink(this)}
     `;
     return this.getSDKInstance()
-      .then(() => this._setContent(content));
+      .then(() => this._setContent(content))
+      .then(() => this._afterRender('callback'));
   },
   bootstrapHome: async function() {
     // Default home page
@@ -100,6 +106,7 @@ Object.assign(TestApp.prototype, {
     this.getTokens()
     .catch((e) => {
       this.renderError(e);
+      throw e;
     })
     .then(data => this.appHTML(data))
     .then(content => this._setContent(content))
@@ -111,6 +118,7 @@ Object.assign(TestApp.prototype, {
           this.classList.add('clicked');
         });
       });
+      this._afterRender();
     });
   },
   renderError: function(e) {
@@ -122,6 +130,7 @@ Object.assign(TestApp.prototype, {
       ${homeLink(this)}
       ${logoutLink(this)}
     `);
+    this._afterRender('with-error');
   },
   loginDirect: async function(e) {
     e && e.preventDefault();
@@ -205,7 +214,8 @@ Object.assign(TestApp.prototype, {
         throw e;
       })
       .then(tokens => this.callbackHTML(tokens))
-      .then(content => this._setContent(content));
+      .then(content => this._setContent(content))
+      .then(() => this._afterRender('callback-handled'));
   },
   getTokensFromUrl: async function() {
     // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens

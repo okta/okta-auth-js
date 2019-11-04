@@ -1,9 +1,10 @@
 {
-  "name": "test-app",
+  "name": "@okta/test.app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
+    "lint": "eslint .",
     "watch": "webpack --watch",
     "prestart": "yarn install",
     "start": "webpack-dev-server",
@@ -12,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "dependencies": {
     "dotenv": "^7.0.0",
     "webpack": "^4.29.6"

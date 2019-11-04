@@ -2,9 +2,10 @@
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
 
 // Read environment variables from "testenv". Override environment vars if they are already set.
-const TESTENV = path.resolve(__dirname, '../..', 'testenv');
+const TESTENV = path.resolve(ROOT_DIR, 'testenv');
 
 if (fs.existsSync(TESTENV)) {
   const envConfig = dotenv.parse(fs.readFileSync(TESTENV));
@@ -14,22 +15,14 @@ if (fs.existsSync(TESTENV)) {
 }
 
 var webpack = require('webpack');
-const ROOT_DIR = path.resolve(__dirname, '..', '..');
-const PACKAGE_JSON = require(path.join(ROOT_DIR, 'package.json'));
-const MAIN_ENTRY = path.resolve(ROOT_DIR, PACKAGE_JSON.browser);
-
 var PORT = process.env.PORT || 8080;
 
 module.exports = {
   mode: 'development',
+  entry: './src/webpackEntry.js',
   output: {
     path: path.join(__dirname, 'public'),
     filename: 'oidc-app.js'
-  },
-  resolve: {
-    alias: {
-      '@okta/okta-auth-js': MAIN_ENTRY
-    }
   },
   plugins: [
     new webpack.EnvironmentPlugin(['CLIENT_ID', 'ISSUER']),

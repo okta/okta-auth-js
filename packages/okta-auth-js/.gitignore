@@ -1,0 +1,5 @@
+node_modules
+
+lib/config.js
+dist
+build2

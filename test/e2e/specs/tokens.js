@@ -28,7 +28,7 @@ describe('E2E token flows', () => {
         const prev = {
           idToken: TestApp.idToken.getText(),
           accessToken: TestApp.accessToken.getText(),
-        }
+        };
         TestApp.getToken();
         browser.waitUntil(() => {
           return (

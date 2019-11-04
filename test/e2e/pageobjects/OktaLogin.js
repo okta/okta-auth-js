@@ -1,8 +1,8 @@
 class OktaLogin {
-  get signinForm() { return $('form[data-se="o-form"]')}
-  get signinUsername() { return $('#okta-signin-username') }
-  get signinPassword() { return $('#okta-signin-password') }
-  get signinSubmitBtn() { return $('#okta-signin-submit') }
+  get signinForm() { return $('form[data-se="o-form"]');}
+  get signinUsername() { return $('#okta-signin-username'); }
+  get signinPassword() { return $('#okta-signin-password'); }
+  get signinSubmitBtn() { return $('#okta-signin-submit'); }
 
   signin(username, password) {
     this.waitForLoad();
@@ -18,4 +18,4 @@ class OktaLogin {
   }
 }
 
-export default new OktaLogin()
+export default new OktaLogin();
