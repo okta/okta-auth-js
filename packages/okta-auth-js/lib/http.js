@@ -15,7 +15,7 @@
 var util = require('./util');
 var Q = require('q');
 var AuthApiError = require('./errors/AuthApiError');
-var config = require('./config');
+var constants = require('./constants');
 
 function httpRequest(sdk, options) {
   options = options || {};
@@ -64,17 +64,17 @@ function httpRequest(sdk, options) {
 
       if (saveAuthnState) {
         if (!res.stateToken) {
-          storage.delete(config.STATE_TOKEN_KEY_NAME);
+          storage.delete(constants.STATE_TOKEN_KEY_NAME);
         }
       }
 
       if (res && res.stateToken && res.expiresAt) {
-        storage.set(config.STATE_TOKEN_KEY_NAME, res.stateToken, res.expiresAt);
+        storage.set(constants.STATE_TOKEN_KEY_NAME, res.stateToken, res.expiresAt);
       }
 
       if (res && options.cacheResponse) {
         httpCache.updateStorage(url, {
-          expiresAt: Math.floor(Date.now()/1000) + config.DEFAULT_CACHE_DURATION,
+          expiresAt: Math.floor(Date.now()/1000) + constants.DEFAULT_CACHE_DURATION,
           response: res
         });
       }
@@ -104,7 +104,7 @@ function httpRequest(sdk, options) {
       err = new AuthApiError(serverErr, resp);
 
       if (err.errorCode === 'E0000011') {
-        storage.delete(config.STATE_TOKEN_KEY_NAME);
+        storage.delete(constants.STATE_TOKEN_KEY_NAME);
       }
 
       throw err;

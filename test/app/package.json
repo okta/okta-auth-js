@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@webpack-cli/serve": "^0.1.5",
+    "source-map-loader": "^0.2.4",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1"
   }

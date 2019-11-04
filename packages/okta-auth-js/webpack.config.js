@@ -12,15 +12,15 @@ var commonConfig = require('./webpack.common.config');
 
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 
-module.exports = _.extend(commonConfig, {
-  entry: '.',
+module.exports = _.extend({}, _.cloneDeep(commonConfig), {
+  entry: './lib/browser/browserIndex.js',
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'okta-auth-js.min.js',
     library: 'OktaAuth',
     libraryTarget: 'umd'
   },
-  plugins: [
+  plugins: commonConfig.plugins.concat([
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
@@ -36,6 +36,6 @@ module.exports = _.extend(commonConfig, {
 
     // Add a single Okta license after removing others
     new webpack.BannerPlugin(license)
-  ],
+  ]),
   devtool: 'source-map'
 });

@@ -1,5 +1,15 @@
-var sdkUtil = require('@okta/okta-auth-js/lib/util');
 var factory = {};
+
+// converts a standard base64-encoded string to a "url/filename safe" variant
+var base64ToBase64Url = function(b64) {
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
+// converts a string to base64 (url/filename safe variant)
+var stringToBase64Url = function(str) {
+  var b64 = btoa(str);
+  return base64ToBase64Url(b64);
+};
 
 factory.buildIDToken = function(options) {
   var header = {};
@@ -13,9 +23,9 @@ factory.buildIDToken = function(options) {
   payload.exp = payload.iat + (1000 * 30);
 
   return [
-    sdkUtil.stringToBase64Url(JSON.stringify(header)),
-    sdkUtil.stringToBase64Url(JSON.stringify(payload)),
-    sdkUtil.stringToBase64Url(JSON.stringify(signature))
+    stringToBase64Url(JSON.stringify(header)),
+    stringToBase64Url(JSON.stringify(payload)),
+    stringToBase64Url(JSON.stringify(signature))
   ].join('.');
 };
 

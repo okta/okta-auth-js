@@ -13,7 +13,7 @@
 
 var Cookies = require('js-cookie');
 var storageBuilder = require('../storageBuilder');
-var config = require('../config');
+var constants = require('../constants');
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil = {};
@@ -40,21 +40,21 @@ storageUtil.browserHasSessionStorage = function() {
 
 storageUtil.getPKCEStorage = function() {
   if (storageUtil.browserHasLocalStorage()) {
-    return storageBuilder(storageUtil.getLocalStorage(), config.PKCE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getLocalStorage(), constants.PKCE_STORAGE_NAME);
   } else if (storageUtil.browserHasSessionStorage()) {
-    return storageBuilder(storageUtil.getSessionStorage(), config.PKCE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getSessionStorage(), constants.PKCE_STORAGE_NAME);
   } else {
-    return storageBuilder(storageUtil.getCookieStorage(), config.PKCE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getCookieStorage(), constants.PKCE_STORAGE_NAME);
   }
 };
 
 storageUtil.getHttpCache = function() {
   if (storageUtil.browserHasLocalStorage()) {
-    return storageBuilder(storageUtil.getLocalStorage(), config.CACHE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getLocalStorage(), constants.CACHE_STORAGE_NAME);
   } else if (storageUtil.browserHasSessionStorage()) {
-    return storageBuilder(storageUtil.getSessionStorage(), config.CACHE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getSessionStorage(), constants.CACHE_STORAGE_NAME);
   } else {
-    return storageBuilder(storageUtil.getCookieStorage(), config.CACHE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getCookieStorage(), constants.CACHE_STORAGE_NAME);
   }
 };
 
