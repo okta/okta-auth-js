@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 cd ${OKTA_HOME}/${REPO}
 
@@ -17,7 +17,8 @@ OKTA_REGISTRY=${ARTIFACTORY_URL}/api/npm/npm-okta-master
 # Replace yarn artifactory with Okta's
 sed -i "s#${YARN_REGISTRY}#${OKTA_REGISTRY}#g" yarn.lock
 
-if ! yarn install; then
+echo "Doing the install now"
+if ! yarn install --frozen-lockfile; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
