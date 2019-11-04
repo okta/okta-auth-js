@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 cd ${OKTA_HOME}/${REPO}
 
@@ -17,10 +17,14 @@ OKTA_REGISTRY=${ARTIFACTORY_URL}/api/npm/npm-okta-master
 # Replace yarn artifactory with Okta's
 sed -i "s#${YARN_REGISTRY}#${OKTA_REGISTRY}#g" yarn.lock
 
-if ! yarn install; then
+# Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
+if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
+
+# Build config
+yarn workspace @okta/okta-auth-js prepare
 
 # Revert the origional change
 # sed -i "s#${OKTA_REGISTRY}#${YARN_REGISTRY}#" yarn.lock

@@ -15,7 +15,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "lint:report": "eslint -f checkstyle -o build2/reports/lint/eslint-checkstyle-result.xml .",
+    "lint:report": "eslint -f checkstyle -o ../../build2/reports/lint/eslint-checkstyle-result.xml .",
     "test": "yarn test:karma && yarn test:browser && yarn test:server",
     "test:karma": "karma start --single-run",
     "test:browser": "jest --config ./jest.browser.js",
@@ -76,6 +76,7 @@
     "PKCE_STORAGE_NAME": "okta-pkce-storage"
   },
   "jest-junit": {
-    "output": "./build2/reports/unit/junit-result.xml"
+    "outputDirectory": "../../build2/reports/unit/",
+    "outputName": "junit-result.xml"
   }
 }

@@ -17,7 +17,7 @@
     "@wdio/mocha-framework": "^5.15.1",
     "@wdio/spec-reporter": "^5.15.1",
     "@wdio/sync": "^5.15.1",
-    "chromedriver": "^77.0.0",
+    "chromedriver": "^78.0.0",
     "dotenv": "^8.2.0",
     "eslint": "5.6.1",
     "eslint-plugin-jasmine": "^2.10.1",

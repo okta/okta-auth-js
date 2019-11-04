@@ -22,7 +22,7 @@
     "test": "yarn test:unit && yarn test:e2e",
     "test:e2e": "yarn --cwd test/e2e start",
     "test:unit": "yarn workspace @okta/okta-auth-js test",
-    "test:report": "yarn test --ci --silent || true",
+    "test:report": "yarn test:unit --ci --silent || true",
     "prepare": "yarn build",
     "start": "yarn --cwd test/app start --open"
   },
