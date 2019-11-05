@@ -1,42 +1,67 @@
+import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
+import OktaHome from '../pageobjects/OktaHome';
 import { flows, openImplicit, openPKCE } from '../util/appUtils';
 import { loginPopup } from '../util/loginUtils';
+import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 
 describe('E2E token flows', () => {
-  afterEach(() => {
-    TestApp.logout();
-  });
 
   flows.forEach(flow => {
     describe(flow + ' flow', () => {
-      beforeEach(() => {
-        (flow === 'pkce') ? openPKCE() : openImplicit();
+      beforeEach(async () => {
+        (flow === 'pkce') ? await openPKCE() : await openImplicit();
       });
 
-      it('can renew the id token', () => {
-        loginPopup(flow);
-        const prevToken = TestApp.idToken.getText();
-        TestApp.renewToken();
-        browser.waitUntil(() => {
-          return TestApp.idToken.getText() !== prevToken;
+      it('can renew the id token', async () => {
+        await loginPopup(flow);
+        const prevToken = await TestApp.idToken.then(el => el.getText());
+        await TestApp.renewToken();
+        await browser.waitUntil(async () => {
+          const txt = await TestApp.idToken.then(el => el.getText());
+          return txt !== prevToken;
         }, 10000);
-        TestApp.assertLoggedIn();
+        await TestApp.assertLoggedIn();
+        await TestApp.logout();
       });
 
-      it('can refresh all tokens', () => {
-        loginPopup(flow);
+      it('can refresh all tokens', async () => {
+        await loginPopup(flow);
         const prev = {
-          idToken: TestApp.idToken.getText(),
-          accessToken: TestApp.accessToken.getText(),
+          idToken: await TestApp.idToken.then(el => el.getText()),
+          accessToken: await TestApp.accessToken.then(el => el.getText())
         };
-        TestApp.getToken();
-        browser.waitUntil(() => {
+        await TestApp.getToken();
+        await browser.waitUntil(async () => {
+          const idToken = await TestApp.idToken.then(el => el.getText());
+          const accessToken = await TestApp.accessToken.then(el => el.getText());
           return (
-            TestApp.idToken.getText() !== prev.idToken &&
-            TestApp.accessToken.getText() !== prev.accessToken
+            idToken !== prev.idToken &&
+            accessToken !== prev.accessToken
           );
         }, 10000);
-        TestApp.assertLoggedIn();
+        await TestApp.assertLoggedIn();
+        await TestApp.logout();
+      });
+
+      it('Can receive an error on token renew if user has signed out from Okta page', async () => {
+        await loginPopup(flow);
+        let tokenError = await TestApp.tokenError.then(el => el.getText());
+        assert(tokenError.trim() === '');
+        await openOktaHome();
+        await OktaHome.signOut();
+        await browser.closeWindow();
+        await switchToMainWindow();
+        await TestApp.renewToken();
+        await browser.waitUntil(async () => {
+          const txt = await TestApp.tokenError.then(el => el.getText());
+          return txt !== tokenError;
+        }, 10000, 'wait for token error');
+        await TestApp.tokenError.then(el => el.getText()).then(msg => {
+          assert(msg.trim() === 'OAuthError: The client specified not to prompt, but the user is not logged in.');
+        });
+        await browser.refresh();
+        await TestApp.waitForLoginBtn(); // assert we are logged out
       });
     });
   });

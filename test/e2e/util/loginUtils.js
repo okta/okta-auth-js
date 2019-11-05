@@ -16,34 +16,34 @@ function assertImplicit(url) {
   assert(hash.indexOf('id_token' > 0));
 }
 
-function handleCallback(flow) {
-  TestApp.waitForCallback();
-  const url = browser.getUrl();
+async function handleCallback(flow) {
+  await TestApp.waitForCallback();
+  const url = await browser.getUrl();
   (flow === 'pkce') ? assertPKCE(url) : assertImplicit(url);
-  TestApp.handleCallback();
-  TestApp.assertCallbackSuccess();
-  TestApp.returnHome();
+  await TestApp.handleCallback();
+  await TestApp.assertCallbackSuccess();
+  await TestApp.returnHome();
   return url;
 }
 
-function loginPopup() {
-  TestApp.loginPopup();
-  switchToPopupWindow();
-  OktaLogin.signin(USERNAME, PASSWORD);
-  switchToMainWindow();
-  TestApp.assertLoggedIn();
+async function loginPopup() {
+  await TestApp.loginPopup();
+  await switchToPopupWindow();
+  await OktaLogin.signin(USERNAME, PASSWORD);
+  await switchToMainWindow();
+  await TestApp.assertLoggedIn();
 }
 
-function loginRedirect(flow) {
-  TestApp.loginRedirect();
-  OktaLogin.signin(USERNAME, PASSWORD);
+async function loginRedirect(flow) {
+  await TestApp.loginRedirect();
+  await OktaLogin.signin(USERNAME, PASSWORD);
   return handleCallback(flow);
 }
 
-function loginDirect(flow) {
-  TestApp.username.setValue(USERNAME);
-  TestApp.password.setValue(PASSWORD);
-  TestApp.loginDirect();
+async function loginDirect(flow) {
+  await TestApp.username.then(el => el.setValue(USERNAME));
+  await TestApp.password.then(el => el.setValue(PASSWORD));
+  await TestApp.loginDirect();
   return handleCallback(flow);
 }
 export { loginDirect, loginPopup, loginRedirect };

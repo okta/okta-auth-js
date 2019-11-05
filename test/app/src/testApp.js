@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global document, window, Promise */
+/* global document, window, Promise, console */
 /* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
 import { saveConfigToStorage } from './config';
@@ -32,6 +32,7 @@ const Footer = `
 
 const Layout = `
   <div id="layout">
+    <div id="token-error" style="color: red"></div>
     <div id="page-content"></div>
     <div id="config-area" class="flex-row">
       <div id="form-content" class="box">${Form}</div>
@@ -74,6 +75,7 @@ Object.assign(TestApp.prototype, {
     return Promise.resolve()
       .then(() => {
         this.oktaAuth = this.oktaAuth || new OktaAuth(this.config); // can throw
+        this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
       });
   },
   _setContent: function(content) {
@@ -86,6 +88,9 @@ Object.assign(TestApp.prototype, {
     if (extraClass) {
       this.rootElem.classList.add(extraClass);
     }
+  },
+  _onTokenError: function(error) {
+    document.getElementById('token-error').innerText = error;
   },
   bootstrapCallback: async function() {
     const content = `
@@ -201,9 +206,13 @@ Object.assign(TestApp.prototype, {
   },
   logoutAndReload: function(event) {
     event && event.preventDefault();
-    this.logout().then(() => {
-      window.location.reload();
-    });
+    this.logout()
+      .catch(e => {
+        console.error('Error during signout: ', e);
+      })
+      .then(() => {
+        window.location.reload();
+      });
   },
   handleCallback: async function(e) {
     e && e.preventDefault();
@@ -267,10 +276,10 @@ Object.assign(TestApp.prototype, {
   },
   appHTML: function(props) {
     const { idToken, accessToken } = props || {};
-    if (idToken || accessToken) {
+    if (idToken && accessToken) {
       // Authenticated user home page
       return `
-        <h2>Welcome back</h2>
+        <strong>Welcome back</strong>
         <hr/>
         ${logoutLink(this)}
         <hr/>
@@ -287,13 +296,13 @@ Object.assign(TestApp.prototype, {
         </ul>
         <div id="user-info"></div>
         <hr/>
-        ${ tokensHTML([idToken, accessToken])}
+        ${ tokensHTML({idToken, accessToken})}
       `;
     }
     
     // Unauthenticated user, Login page
     return `
-      <h2>Greetings, unknown user!</h2>
+      <strong>Greetings, unknown user!</strong>
       <hr/>
       <ul>
         <li>
