@@ -17,7 +17,7 @@ import { saveConfigToStorage } from './config';
 import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryParams } from './util';
 import { Form, updateForm } from './form';
-import { tokensHTML } from './tokens';
+import { tokensArrayToObject, tokensHTML } from './tokens';
 
 function homeLink(app) {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
@@ -234,17 +234,14 @@ Object.assign(TestApp.prototype, {
   },
   saveTokens: function(tokens) {
     tokens = Array.isArray(tokens) ? tokens : [tokens];
-    tokens.forEach((token) => {
-      if (!token) {
-        throw new Error('BAD/EMPTY token returned');
-      } else if (token.idToken) {
-        this.oktaAuth.tokenManager.add('idToken', token);
-      } else if (token.accessToken) {
-        this.oktaAuth.tokenManager.add('accessToken', token);
-      } else {
-        throw new Error('Unknown token returned: ' + JSON.stringify(token));
-      }
-    });
+    tokens = tokensArrayToObject(tokens);
+    const { idToken, accessToken } = tokens;
+    if (idToken) {
+      this.oktaAuth.tokenManager.add('idToken', idToken);
+    }
+    if (accessToken) {
+      this.oktaAuth.tokenManager.add('accessToken', accessToken);
+    }
   },
   getTokens: async function() {
     const accessToken = await this.oktaAuth.tokenManager.get('accessToken');
@@ -331,7 +328,7 @@ Object.assign(TestApp.prototype, {
       </div>
       <hr/>
       ${homeLink(this)}
-      ${ success ? tokensHTML(tokens): '' }
+      ${ success ? tokensHTML(tokensArrayToObject(tokens)): '' }
     `;
     return content;
   }

@@ -1,25 +1,23 @@
 import { htmlString } from './util';
 
-function tokensHTML(tokens) {
-  let accessToken;
-  let idToken;
-  if (!tokens) {
-    return '';
-  } else if (Array.isArray(tokens)) {
-    if (tokens.length < 2) {
-      return '';
-    }
-    accessToken = tokens.filter(token => {
-      return token.accessToken;
-    })[0];
-    idToken = tokens.filter(token => {
-      return token.idToken;
-    })[0];
-  } else {
-    accessToken = tokens.accessToken;
-    idToken = tokens.idToken;
-  }
+function tokensArrayToObject(tokens) {
+  let accessToken = tokens.filter(token => {
+    return token.accessToken;
+  });
+  accessToken = accessToken.length ? accessToken[0] : null;
 
+  let idToken = tokens.filter(token => {
+    return token.idToken;
+  });
+  idToken = idToken.length ? idToken[0] : null;
+  return {
+    accessToken,
+    idToken
+  };
+}
+
+function tokensHTML(tokens) {
+  const { idToken, accessToken } = tokens;
   const claims = idToken.claims;
   const html = `
   <table id="claims">
@@ -51,4 +49,4 @@ function tokensHTML(tokens) {
   return html;
 }
 
-export { tokensHTML };
+export { tokensArrayToObject, tokensHTML };

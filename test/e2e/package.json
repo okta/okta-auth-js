@@ -7,7 +7,6 @@
     "lint": "eslint .",
     "start:runner": "wdio run wdio.conf.js",
     "start:app": "yarn --cwd ../app start --open",
-    "prestart": "yarn install",
     "start": "node ./runner"
   },
   "dependencies": {

@@ -6,7 +6,6 @@
   "scripts": {
     "lint": "eslint .",
     "watch": "webpack --watch",
-    "prestart": "yarn install",
     "start": "webpack-dev-server",
     "start:dev": "yarn start --open",
     "build": "webpack",
