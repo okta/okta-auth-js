@@ -1,4 +1,5 @@
 require('@babel/register'); // Allows use of import module syntax
+require('regenerator-runtime'); // Allows use of async/await
 
 const dotenv = require('dotenv');
 const fs = require('fs');
@@ -29,7 +30,8 @@ if (CI) {
 
 exports.config = {
     jasmineNodeOpts: {
-        defaultTimeoutInterval
+        defaultTimeoutInterval,
+        stopSpecOnExpectationFailure: true
     },
 
     //
