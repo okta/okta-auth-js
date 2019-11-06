@@ -1,6 +1,7 @@
 import assert from 'assert';
 import toQueryParams from '../util/toQueryParams';
 
+/* eslint-disable max-len */
 class TestApp {
   get rootSelector() { return $('#root'); }
   get readySelector() { return $('#root.rendered.loaded'); }
@@ -12,6 +13,7 @@ class TestApp {
   get getTokenBtn() { return $('#get-token'); }
   get getUserInfoBtn() { return $('#get-userinfo'); }
   get userInfo() { return $('#user-info'); }
+  get tokenError() { return $('#token-error'); }
 
   // Unauthenticated landing
   get loginRedirectBtn() { return $('#login-redirect'); }
@@ -38,101 +40,112 @@ class TestApp {
   get error() { return $('#error'); }
   get xhrError() { return $('#xhr-error'); }
 
-  open(queryObj) {
-    browser.url(toQueryParams(queryObj));
-    browser.waitUntil(() => this.readySelector.isExisting());
+  async open(queryObj) {
+    await browser.url(toQueryParams(queryObj));
+    await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
   }
 
-  loginRedirect() {
-    this.waitForLoginBtn();
-    this.loginRedirectBtn.click();
+  async loginRedirect() {
+    await this.waitForLoginBtn();
+    await this.loginRedirectBtn.then(el => el.click());
   }
 
-  handleCallback() {
-    this.waitForCallback();
-    browser.waitUntil(() => this.handleCallbackBtn.isClickable());
-    this.handleCallbackBtn.click();
+  async handleCallback() {
+    await this.waitForCallback();
+    await browser.waitUntil(async () => this.handleCallbackBtn.then(el => el.isDisplayed()), 5000, 'wait for handle callback btn');
+    await this.handleCallbackBtn.then(el => el.click());
   }
 
-  loginPopup() {
-    this.waitForLoginBtn();
-    this.loginPopupBtn.click();
+  async loginPopup() {
+    await this.waitForLoginBtn();
+    var btn = await this.loginPopupBtn;
+    await btn.click();
   }
 
-  loginDirect() {
-    this.waitForLoginBtn();
-    this.loginDirectBtn.click();
+  async loginDirect() {
+    await this.waitForLoginBtn();
+    await this.loginDirectBtn.then(el => el.click());
   }
 
-  renewToken() {
-    this.renewTokenBtn.click();
+  async renewToken() {
+    const btn = await this.renewTokenBtn;
+    await btn.click();
   }
 
-  getToken() {
-    this.getTokenBtn.click();
+  async getToken() {
+    return this.getTokenBtn.then(el => el.click());
   }
 
-  getUserInfo() {
-    browser.waitUntil(() => this.getUserInfoBtn.isClickable());
-    this.getUserInfoBtn.click();
+  async getUserInfo() {
+    await browser.waitUntil(async () => this.getUserInfoBtn.then(el => el.isDisplayed()));
+    await this.getUserInfoBtn.then(el => el.click());
   }
 
-  returnHome() {
-    browser.waitUntil(() => this.returnHomeBtn.isClickable());
-    this.returnHomeBtn.click();
-    if(!this.landingSelector.isDisplayed()){
-      this.landingSelector.waitForDisplayed(5000);
-    }
+  async returnHome() {
+    await browser.waitUntil(async () => this.returnHomeBtn.then(el => el.isDisplayed()));
+    await this.returnHomeBtn.then(el => el.click());
+    await browser.waitUntil(async () => this.landingSelector.then(el => el.isDisplayed()));
   }
 
-  logout() {
-    this.logoutBtn.click();
-    this.waitForLoginBtn();
+  async logout() {
+    await this.logoutBtn.then(el => el.click());
+    await this.waitForLoginBtn();
   }
 
-  waitForLoginBtn() {
-    if(!this.loginRedirectBtn.isDisplayed()){
-      this.loginRedirectBtn.waitForDisplayed(5000);
-    }
+  async waitForLoginBtn() {
+    return browser.waitUntil(async () => this.loginRedirectBtn.then(el => el.isDisplayed()), 5000, 'wait for login button');
   }
 
-  waitForLogoutBtn() {
-    if(!this.logoutBtn.isDisplayed()){
-      this.logoutBtn.waitForDisplayed(5000);
-    }
+  async waitForLogoutBtn() {
+    return browser.waitUntil(async () => this.logoutBtn.then(el => el.isDisplayed()), 5000, 'wait for logout button');
   }
 
-  waitForCallback() {
-    browser.waitUntil(() => this.callbackSelector.isExisting());
+  async waitForCallback() {
+    return browser.waitUntil(async () => this.callbackSelector.then(el => el.isExisting()), 5000, 'wait for callback');
   }
 
-  waitForCallbackResult() {
-    browser.waitUntil(() => this.callbackHandledSelector.isExisting());
+  async waitForCallbackResult() {
+    return browser.waitUntil(async () => this.callbackHandledSelector.then(el => el.isExisting()), 5000, 'wait for callback result');
   }
 
-  waitForUserInfo() {
-    if(!this.userInfo.isDisplayed()){
-      this.userInfo.waitForDisplayed(10000);
-    }
-  }
-  assertCallbackSuccess() {
-    this.waitForCallbackResult();
-    assert(this.success.getText() !== '');
-    assert(this.error.getText() === '');
-    assert(this.xhrError.getText() === '');
-    assert(this.accessToken.getText().indexOf('expiresAt') > 0);
-    assert(this.idToken.getText().indexOf('claims') > 0);
+  async waitForUserInfo() {
+    return browser.waitUntil(async () => this.userInfo.then(el => el.isDisplayed()), 5000, 'wait for user info');
   }
 
-  assertLoggedIn() {
-    this.waitForLogoutBtn();
-    assert(this.accessToken.getText().indexOf('expiresAt') > 0);
-    assert(this.idToken.getText().indexOf('claims') > 0);
+  async assertCallbackSuccess() {
+    await this.waitForCallbackResult();
+    await this.success.then(el => el.getText()).then(txt => {
+      assert(txt !== '');
+    });
+    await this.error.then(el => el.getText()).then(txt => {
+      assert(txt === '');
+    });
+    await this.xhrError.then(el => el.getText()).then(txt => {
+      assert(txt === '');
+    });
+    await this.accessToken.then(el => el.getText()).then(txt => {
+      assert(txt.indexOf('expiresAt') > 0);
+    });
+    await this.idToken.then(el => el.getText()).then(txt => {
+      assert(txt.indexOf('claims') > 0);
+    });
   }
 
-  assertUserInfo() {
-    this.waitForUserInfo();
-    assert(this.userInfo.getText().indexOf('email') > 0);
+  async assertLoggedIn() {
+    await this.waitForLogoutBtn();
+    await this.accessToken.then(btn => btn.getText()).then(txt => {
+      assert(txt.indexOf('expiresAt') > 0);
+    });
+    await this.idToken.then(btn => btn.getText()).then(txt => {
+      assert(txt.indexOf('claims') > 0);
+    });
+  }
+
+  async assertUserInfo() {
+    await this.waitForUserInfo();
+    await this.userInfo.then(el => el.getText()).then(txt => {
+      assert(txt.indexOf('email') > 0);
+    });
   }
 }
 

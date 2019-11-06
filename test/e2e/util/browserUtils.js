@@ -1,11 +1,26 @@
-function switchToPopupWindow() {
-  browser.waitUntil(() => browser.getWindowHandles().length > 1);
-  browser.switchToWindow(browser.getWindowHandles()[1]);
+
+const URL = require('url');
+const ISSUER = process.env.ISSUER;
+const issuer = URL.parse(ISSUER);
+const BASE_URL = issuer.protocol + issuer.host;
+
+async function openOktaHome() {
+  return browser.newWindow(BASE_URL, 'Okta signin page');
 }
 
-function switchToMainWindow() {
-  browser.switchToWindow(browser.getWindowHandles()[0]);
+async function switchToPopupWindow() {
+  await browser.waitUntil(async () => {
+    const handles = await browser.getWindowHandles();
+    return handles.length > 1;
+  });
+  const handles = await browser.getWindowHandles();
+  return browser.switchToWindow(handles[handles.length - 1]);
 }
 
-export { switchToMainWindow, switchToPopupWindow };
+async function switchToMainWindow() {
+  const handles = await browser.getWindowHandles();
+  return browser.switchToWindow(handles[0]);
+}
+
+export { openOktaHome, switchToMainWindow, switchToPopupWindow };
   
