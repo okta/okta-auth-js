@@ -719,6 +719,97 @@ describe('token.getWithoutPrompt', function() {
 });
 
 describe('token.getWithPopup', function() {
+  afterEach(function() {
+    jest.useRealTimers();
+  });
+
+  it('promise will reject if fails due to timeout', function() {
+    var timeoutMs = 120000;
+    var mockWindow = {
+      closed: false,
+      close: jest.fn()
+    };
+    jest.spyOn(window, 'open').mockImplementation(function () {
+      return mockWindow; // valid window is returned
+    });
+    jest.spyOn(Q.makePromise.prototype, 'timeout');
+    jest.useFakeTimers();
+    var promise = oauthUtil.setup({
+      closePopup: true, // prevent any message being passed
+      willFail: true,
+      oktaAuthArgs: {
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      },
+      getWithPopupArgs: {
+        responseType: 'token'
+      }
+    })
+    .then(function() {
+      expect(true).toEqual(false);
+    })
+    .fail(function(err) {
+      expect(mockWindow.close).toHaveBeenCalled();
+      util.expectErrorToEqual(err, {
+        name: 'AuthSdkError',
+        message: 'OAuth flow timed out',
+        errorCode: 'INTERNAL',
+        errorSummary: 'OAuth flow timed out',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      });
+    });
+    return Promise.resolve()
+      .then(function() {
+        jest.runAllTicks(); // resolve pending promises
+        expect(Q.makePromise.prototype.timeout).toHaveBeenCalled();
+        jest.advanceTimersByTime(timeoutMs); // should trigger timeout
+        return promise;
+      });
+  });
+  it('promise will reject if popup is blocked', function() {
+    jest.spyOn(window, 'open').mockImplementation(function () {
+      return null; // null window is returned
+    });
+    jest.spyOn(Q.makePromise.prototype, 'timeout').mockImplementation(function() {
+      return this; // return for chaining promise methods
+    });
+    jest.useFakeTimers();
+
+    var promise = oauthUtil.setup({
+      closePopup: true,
+      willFail: true,
+      oktaAuthArgs: {
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      },
+      getWithPopupArgs: {
+        responseType: 'token'
+      }
+    })
+    .then(function() {
+      expect(true).toEqual(false);
+    })
+    .fail(function(err) {
+      util.expectErrorToEqual(err, {
+        name: 'AuthSdkError',
+        message: 'Unable to parse OAuth flow response',
+        errorCode: 'INTERNAL',
+        errorSummary: 'Unable to parse OAuth flow response',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      });
+    });
+    return Promise.resolve()
+      .then(function () {
+        jest.runAllTimers();
+        return promise;
+      });
+  });
 
   it('returns id_token using idp', function(done) {
       return oauthUtil.setupPopup({
@@ -2728,7 +2819,9 @@ describe('token.verify', function() {
     beforeEach(function() {
       jest.useFakeTimers();
     });
-
+    afterEach(function() {
+      jest.useRealTimers();
+    });
     function expectError(verifyArgs, message, done) {
       var client = setupSync();
       return client.token.verify.apply(null, verifyArgs)
