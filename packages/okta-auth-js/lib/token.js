@@ -467,12 +467,15 @@ function getToken(sdk, oauthOptions, options) {
         var popupDeferred = Q.defer();
         /* eslint-disable-next-line no-case-declarations, no-inner-declarations */
         function hasClosed(win) {
-          if (win.closed) {
+          if (!win || win.closed) {
             popupDeferred.reject(new AuthSdkError('Unable to parse OAuth flow response'));
+            return true;
           }
         }
         var closePoller = setInterval(function() {
-          hasClosed(windowEl);
+          if (hasClosed(windowEl)) {
+            clearInterval(closePoller);
+          }
         }, 500);
 
         // Proxy the promise results into the deferred
@@ -489,8 +492,8 @@ function getToken(sdk, oauthOptions, options) {
             return handleOAuthResponse(sdk, oauthParams, res, urls);
           })
           .fin(function() {
-            if (!windowEl.closed) {
-              clearInterval(closePoller);
+            clearInterval(closePoller);
+            if (windowEl && !windowEl.closed) {
               windowEl.close();
             }
           });

@@ -430,7 +430,9 @@ describe('TokenManager', function() {
     beforeEach(function() {
       jest.useFakeTimers();
     });
-
+    afterEach(function() {
+      jest.useRealTimers();
+    });
     it('automatically renews a token by default', function() {
       var expiresAt = tokens.standardIdTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
