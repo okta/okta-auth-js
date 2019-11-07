@@ -214,21 +214,30 @@ function TokenManager(sdk, options) {
     options.storage = 'cookie';
   }
 
-  var storage;
-  switch(options.storage) {
-    case 'localStorage':
-      storage = storageBuilder(localStorage, config.TOKEN_STORAGE_NAME);
-      break;
-    case 'sessionStorage':
-      storage = storageBuilder(sessionStorage, config.TOKEN_STORAGE_NAME);
-      break;
-    case 'cookie':
-      storage = storageBuilder(storageUtil.getCookieStorage(options), config.TOKEN_STORAGE_NAME);
-      break;
-    default:
-      throw new AuthSdkError('Unrecognized storage option');
+  var storageProvider;
+  if (typeof options.storage === 'object') {
+    // A custom storage provider must implement getItem(key) and setItem(key, val)
+    storageProvider = options.storage;
+  } else {
+    switch(options.storage) {
+      case 'localStorage':
+        storageProvider = localStorage;
+        break;
+      case 'sessionStorage':
+        storageProvider = sessionStorage;
+        break;
+      case 'cookie':
+        storageProvider = storageUtil.getCookieStorage(options);
+        break;
+      case 'memory':
+        storageProvider = storageUtil.getInMemoryStorage();
+        break;
+      default:
+        throw new AuthSdkError('Unrecognized storage option');
+    }
   }
-
+  var storageKey = options.storageKey || config.TOKEN_STORAGE_NAME;
+  var storage = storageBuilder(storageProvider, storageKey);
   var clock = SdkClock.create(sdk, options);
   var tokenMgmtRef = {
     clock: clock,

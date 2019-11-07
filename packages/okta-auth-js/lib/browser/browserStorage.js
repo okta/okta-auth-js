@@ -78,6 +78,19 @@ storageUtil.getCookieStorage = function(options) {
   };
 };
 
+// Provides an in-memory solution
+storageUtil.getInMemoryStorage = function() {
+  var store = {};
+  return {
+    getItem: function(key) {
+      return store[key];
+    },
+    setItem: function(key, value) {
+      store[key] = value;
+    }
+  };
+};
+
 storageUtil.testStorage = function(storage) {
   var key = 'okta-test-storage';
   try {
