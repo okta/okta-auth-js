@@ -1,6 +1,3 @@
-/* SDK_VERSION is defined in webpack config */ 
-/* global SDK_VERSION */
-
 module.exports = {
   'STATE_TOKEN_KEY_NAME': 'oktaStateToken',
   'DEFAULT_POLLING_DELAY': 500,
@@ -11,6 +8,5 @@ module.exports = {
   'REDIRECT_NONCE_COOKIE_NAME': 'okta-oauth-nonce',
   'TOKEN_STORAGE_NAME': 'okta-token-storage',
   'CACHE_STORAGE_NAME': 'okta-cache-storage',
-  'PKCE_STORAGE_NAME': 'okta-pkce-storage',
-  'SDK_VERSION': SDK_VERSION
+  'PKCE_STORAGE_NAME': 'okta-pkce-storage'
 };

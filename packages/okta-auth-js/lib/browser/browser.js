@@ -11,6 +11,8 @@
  */
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
+/* SDK_VERSION is defined in webpack config */ 
+/* global SDK_VERSION */
 
 require('../vendor/polyfills');
 
@@ -52,7 +54,7 @@ function OktaAuthBuilder(args) {
     throw new AuthSdkError('This browser doesn\'t support PKCE');
   }
 
-  this.userAgent = 'okta-auth-js-' + constants.SDK_VERSION;
+  this.userAgent = 'okta-auth-js-' + SDK_VERSION;
 
   // Digital clocks will drift over time, so the server
   // can misalign with the time reported by the browser.
