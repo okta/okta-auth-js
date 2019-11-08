@@ -12,7 +12,7 @@
  */
 
 var storageBuilder = require('../storageBuilder');
-var config = require('../config');
+var constants = require('../constants');
 var NodeCache = require('node-cache');
 var storage = new NodeCache();
 
@@ -20,7 +20,7 @@ var storage = new NodeCache();
 var storageUtil = {};
 
 storageUtil.getHttpCache = function() {
-  return storageBuilder(storageUtil.getStorage(), config.CACHE_STORAGE_NAME);
+  return storageBuilder(storageUtil.getStorage(), constants.CACHE_STORAGE_NAME);
 };
 
 storageUtil.getStorage = function() {

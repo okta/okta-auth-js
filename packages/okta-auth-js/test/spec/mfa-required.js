@@ -591,6 +591,7 @@ describe('MFA_REQUIRED', function () {
     });
 
     // Add this test when we have this functionality
+    // eslint-disable-next-line jasmine/no-disabled-tests
     xit('deletes stateToken cookie when cancel is called', function() {});
   });
 

@@ -493,7 +493,7 @@ oauthUtil.setupSimultaneousPostMessage = function() {
 };
 
 oauthUtil.itpErrorsCorrectly = function(title, options, error) {
-  it(title, function (done) {
+  it(title, function () {
     options.willFail = true;
     var setupMethod;
     if (options.setupMethod) {
@@ -504,14 +504,13 @@ oauthUtil.itpErrorsCorrectly = function(title, options, error) {
     } else {
       setupMethod = oauthUtil.setupFrame;
     }
-    setupMethod(options)
+    return setupMethod(options)
       .then(function() {
         expect('not to be hit').toEqual(true);
       })
       .fail(function(e) {
         util.expectErrorToEqual(e, error);
-      })
-      .fin(done);
+      });
   });
 };
 

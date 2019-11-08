@@ -15,9 +15,13 @@
 
 /* global __dirname */
 var path = require('path');
+
 var ROOT_DIR = path.resolve(__dirname, '..', '..');
 var REPORTS_DIR = path.join(ROOT_DIR, 'build2', 'reports', 'karma');
-var webpackConf = {
+var _ = require('lodash');
+var commonConfig = require('./webpack.common.config');
+
+var webpackConf =  _.extend({}, _.cloneDeep(commonConfig), {
   devtool: 'inline-source-map',
   module: {
     rules: [
@@ -30,8 +34,13 @@ var webpackConf = {
         ]
       }
     ]
+  },
+  resolve: {
+    alias: {
+      '@okta/okta-auth-js': path.join(__dirname, '/lib/browser/browserIndex.js')
+    }
   }
-};
+});
 
 module.exports = function (config) {
   config.set({

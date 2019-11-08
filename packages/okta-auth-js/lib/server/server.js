@@ -15,7 +15,7 @@
 require('../vendor/polyfills');
 
 var builderUtil       = require('../builderUtil');
-var config            = require('../config');
+var constants         = require('../constants');
 var storage           = require('./serverStorage').storage;
 var tx                = require('../tx');
 var util              = require('../util');
@@ -31,7 +31,7 @@ function OktaAuthBuilder(args) {
     headers: args.headers
   };
 
-  this.userAgent = 'okta-auth-js-server' + config.SDK_VERSION;
+  this.userAgent = 'okta-auth-js-server' + constants.SDK_VERSION;
 
   sdk.tx = {
     status: util.bind(tx.transactionStatus, null, sdk),

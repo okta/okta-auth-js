@@ -17,7 +17,7 @@ var util              = require('./util');
 var Q                 = require('q');
 var AuthSdkError      = require('./errors/AuthSdkError');
 var AuthPollStopError = require('./errors/AuthPollStopError');
-var config            = require('./config');
+var constants         = require('./constants');
 
 function addStateToken(res, options) {
   var builtArgs = {};
@@ -42,7 +42,7 @@ function transactionStatus(sdk, args) {
 
 function resumeTransaction(sdk, args) {
   if (!args || !args.stateToken) {
-    var stateToken = sdk.tx.exists._get(config.STATE_TOKEN_KEY_NAME);
+    var stateToken = sdk.tx.exists._get(constants.STATE_TOKEN_KEY_NAME);
     if (stateToken) {
       args = {
         stateToken: stateToken
@@ -59,7 +59,7 @@ function resumeTransaction(sdk, args) {
 
 function introspect (sdk, args) {
   if (!args || !args.stateToken) {
-    var stateToken = sdk.tx.exists._get(config.STATE_TOKEN_KEY_NAME);
+    var stateToken = sdk.tx.exists._get(constants.STATE_TOKEN_KEY_NAME);
     if (stateToken) {
       args = {
         stateToken: stateToken
@@ -81,7 +81,7 @@ function transactionStep(sdk, args) {
 
 function transactionExists(sdk) {
   // We have a cookie state token
-  return !!sdk.tx.exists._get(config.STATE_TOKEN_KEY_NAME);
+  return !!sdk.tx.exists._get(constants.STATE_TOKEN_KEY_NAME);
 }
 
 function postToTransaction(sdk, url, args, options) {
@@ -108,7 +108,7 @@ function getPollFn(sdk, res, ref) {
     }
 
     if (!delay && delay !== 0) {
-      delay = config.DEFAULT_POLLING_DELAY;
+      delay = constants.DEFAULT_POLLING_DELAY;
     }
 
     // Get the poll function

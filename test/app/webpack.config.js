@@ -31,4 +31,14 @@ module.exports = {
     contentBase: path.join(__dirname, 'public'),
     port: PORT,
   },
+  devtool: 'source-map',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: ['source-map-loader'],
+        enforce: 'pre'
+      }
+    ]
+  }
 };

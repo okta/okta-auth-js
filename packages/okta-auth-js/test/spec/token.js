@@ -40,7 +40,9 @@ describe('token.decode', function() {
 });
 
 describe('token.getWithoutPrompt', function() {
-  
+  afterEach(function() {
+    jest.useRealTimers();
+  });
   describe('concurrent requests', function() {
     var authClient;
     var states;
@@ -179,7 +181,7 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
-  it('returns id_token using sessionToken', function(done) {
+  it('returns id_token using sessionToken', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -203,13 +205,10 @@ describe('token.getWithoutPrompt', function() {
           'sessionToken': 'testSessionToken'
         }
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns id_token using sessionToken with issuer', function(done) {
+  it('returns id_token using sessionToken with issuer', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -238,13 +237,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: tokens.authServerIdTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns id_token using sessionToken with issuer as id', function(done) {
+  it('returns id_token using sessionToken with issuer as id', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         url: 'https://auth-js-test.okta.com',
@@ -274,13 +270,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: tokens.authServerIdTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('allows passing issuer through getWithoutPrompt, which takes precedence', function(done) {
+  it('allows passing issuer through getWithoutPrompt, which takes precedence', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
@@ -311,13 +304,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: tokens.authServerIdTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('allows passing issuer as an id through getWithoutPrompt, which takes precedence', function(done) {
+  it('allows passing issuer as an id through getWithoutPrompt, which takes precedence', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
@@ -348,13 +338,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: tokens.authServerIdTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns id_token overriding all possible oauth params', function(done) {
+  it('returns id_token overriding all possible oauth params', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -398,13 +385,11 @@ describe('token.getWithoutPrompt', function() {
         expiresAt: 1449699930,
         scopes: ['openid', 'custom']
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('allows multiple iframes simultaneously', function(done) {
+  it('allows multiple iframes simultaneously', function() {
+    jest.useFakeTimers();
     return oauthUtil.setupSimultaneousPostMessage()
     .then(function(context) {
       // mock frame creation
@@ -437,6 +422,8 @@ describe('token.getWithoutPrompt', function() {
         nonce: oauthUtil.mockedNonce2
       });
 
+      jest.runAllTicks(); // resolve promises
+
       // assert that two iframes are open
       expect(iframes.length).toBe(2);
 
@@ -455,16 +442,10 @@ describe('token.getWithoutPrompt', function() {
         // Remove any iframes that exist, so we don't taint our other tests
         oauthUtil.removeAllFrames();
       });
-    })
-    .fail(function() {
-      expect('not to be hit').toBe(true);
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token using sessionToken', function(done) {
+  it('returns access_token using sessionToken', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -497,13 +478,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: tokens.standardAccessTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token using sessionToken with authorization server', function(done) {
+  it('returns access_token using sessionToken with authorization server', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -536,13 +514,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: tokens.authServerAccessTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token and id_token with an authorization server', function(done) {
+  it('returns access_token and id_token with an authorization server', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -576,13 +551,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: [tokens.authServerIdTokenParsed, tokens.authServerAccessTokenParsed]
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns id_token and access_token (in that order) using an array of responseTypes', function(done) {
+  it('returns id_token and access_token (in that order) using an array of responseTypes', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -616,13 +588,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: [tokens.standardIdTokenParsed, tokens.standardAccessTokenParsed]
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token and id_token (in that order) using an array of responseTypes', function(done) {
+  it('returns access_token and id_token (in that order) using an array of responseTypes', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -656,13 +625,10 @@ describe('token.getWithoutPrompt', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: [tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed]
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns a single token using an array with a single responseType', function(done) {
+  it('returns a single token using an array with a single responseType', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -688,9 +654,6 @@ describe('token.getWithoutPrompt', function() {
         }
       },
       expectedResp: [tokens.standardIdTokenParsed]
-    })
-    .fin(function() {
-      done();
     });
   });
 
@@ -811,7 +774,7 @@ describe('token.getWithPopup', function() {
       });
   });
 
-  it('returns id_token using idp', function(done) {
+  it('returns id_token using idp', function() {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
           issuer: 'https://auth-js-test.okta.com',
@@ -835,13 +798,10 @@ describe('token.getWithPopup', function() {
             'idp': 'testIdp'
           }
         }
-      })
-      .fin(function() {
-        done();
       });
   });
 
-  it('returns id_token using idp with authorization server', function(done) {
+  it('returns id_token using idp with authorization server', function() {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -870,13 +830,10 @@ describe('token.getWithPopup', function() {
           'state': oauthUtil.mockedState
         },
         expectedResp: tokens.authServerIdTokenParsed
-      })
-      .fin(function() {
-        done();
       });
   });
 
-  it('allows passing issuer through getWithPopup, which takes precedence', function(done) {
+  it('allows passing issuer through getWithPopup, which takes precedence', function() {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
           issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
@@ -907,13 +864,11 @@ describe('token.getWithPopup', function() {
           'state': oauthUtil.mockedState
         },
         expectedResp: tokens.authServerIdTokenParsed
-      })
-      .fin(function() {
-        done();
       });
   });
 
-  it('allows multiple popups simultaneously', function(done) {
+  it('allows multiple popups simultaneously', function() {
+    jest.useFakeTimers();
     return oauthUtil.setupSimultaneousPostMessage()
     .then(function(context) {
       // mock popup creation
@@ -950,6 +905,8 @@ describe('token.getWithPopup', function() {
         nonce: oauthUtil.mockedNonce2
       });
 
+      jest.runAllTicks(); // resolve promises
+
       // assert that two popups are open
       expect(getOpenPopups().length).toBe(2);
 
@@ -965,16 +922,10 @@ describe('token.getWithPopup', function() {
         // make sure both popups were closed
         expect(getOpenPopups().length).toBe(0);
       });
-    })
-    .fail(function() {
-      expect('not to be hit').toBe(true);
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token using sessionToken', function(done) {
+  it('returns access_token using sessionToken', function() {
     return oauthUtil.setupPopup({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -1007,13 +958,10 @@ describe('token.getWithPopup', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: tokens.standardAccessTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token using idp with authorization server', function(done) {
+  it('returns access_token using idp with authorization server', function() {
     return oauthUtil.setupPopup({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -1046,13 +994,10 @@ describe('token.getWithPopup', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: tokens.authServerAccessTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token and id_token using idp with authorization server', function(done) {
+  it('returns access_token and id_token using idp with authorization server', function() {
     return oauthUtil.setupPopup({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -1086,13 +1031,10 @@ describe('token.getWithPopup', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: [tokens.authServerAccessTokenParsed, tokens.authServerIdTokenParsed]
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token and id_token (in that order) using idp', function(done) {
+  it('returns access_token and id_token (in that order) using idp', function() {
     return oauthUtil.setupPopup({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -1126,13 +1068,10 @@ describe('token.getWithPopup', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: [tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed]
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns id_token and access_token (in that order) using idp', function(done) {
+  it('returns id_token and access_token (in that order) using idp', function() {
     return oauthUtil.setupPopup({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -1166,9 +1105,6 @@ describe('token.getWithPopup', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: [tokens.standardIdTokenParsed, tokens.standardAccessTokenParsed]
-    })
-    .fin(function() {
-      done();
     });
   });
 });
@@ -1821,59 +1757,6 @@ describe('token.getWithRedirect', function() {
   });
 });
 
-  // TODO: "hybrid" flows are explicitly disallowed. is any part of this test needed? 
-  xit('sets authorize url for authorization code and id_token requests,' +
-    ' defaulting responseMode to fragment', function() {
-    mockPKCE();
-    return oauthUtil.setupRedirect({
-      oktaAuthArgs: {
-        pkce: true,
-      },
-      getWithRedirectArgs: {
-        sessionToken: 'testToken',
-        responseType: ['code', 'id_token']
-      },
-      expectedCookies: [
-        [
-          'okta-oauth-redirect-params',
-          JSON.stringify({
-            responseType: ['code', 'id_token'],
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            scopes: ['openid', 'email'],
-            clientId: 'NPSfOkH5eZrTy8PMDlvx',
-            urls: {
-              issuer: 'https://auth-js-test.okta.com',
-              authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-              userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
-              tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token'
-            },
-            ignoreSignature: false
-          })
-        ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
-      ],
-      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
-                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'code_challenge=' + codeChallenge + '&' +
-                            'code_challenge_method=' + codeChallengeMethod + '&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
-                            'response_type=code%20id_token&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
-                            'sessionToken=testToken&' +
-                            'scope=openid%20email'
-    });
-  });
-
   it('sets authorize url for authorization code requests, allowing form_post responseMode', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
@@ -2055,7 +1938,7 @@ describe('token.getWithRedirect', function() {
 });
 
 describe('token.parseFromUrl', function() {
-  it('does not change the hash if a url is passed directly', function(done) {
+  it('does not change the hash if a url is passed directly', function() {
     return oauthUtil.setupParseUrl({
       directUrl: 'http://example.com#id_token=' + tokens.standardIdToken +
                 '&state=' + oauthUtil.mockedState,
@@ -2077,13 +1960,10 @@ describe('token.parseFromUrl', function() {
         expiresAt: 1449699930,
         scopes: ['openid', 'email']
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('uses location.hash to remove token if history.replaceState does not exist', function(done) {
+  it('uses location.hash to remove token if history.replaceState does not exist', function() {
     return oauthUtil.setupParseUrl({
       noHistory: true,
       hashMock: '#id_token=' + tokens.standardIdToken +
@@ -2106,13 +1986,10 @@ describe('token.parseFromUrl', function() {
         expiresAt: 1449699930,
         scopes: ['openid', 'email']
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('parses id_token', function(done) {
+  it('parses id_token', function() {
     return oauthUtil.setupParseUrl({
       hashMock: '#id_token=' + tokens.standardIdToken +
                 '&state=' + oauthUtil.mockedState,
@@ -2134,13 +2011,10 @@ describe('token.parseFromUrl', function() {
         expiresAt: 1449699930,
         scopes: ['openid', 'email']
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('parses id_token with authorization server issuer', function(done) {
+  it('parses id_token with authorization server issuer', function() {
     return oauthUtil.setupParseUrl({
       hashMock: '#id_token=' + tokens.authServerIdToken +
                 '&state=' + oauthUtil.mockedState,
@@ -2157,13 +2031,10 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: tokens.authServerIdTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('parses access_token', function(done) {
+  it('parses access_token', function() {
     return oauthUtil.setupParseUrl({
       time: 1449699929,
       hashMock: '#access_token=' + tokens.standardAccessToken +
@@ -2183,13 +2054,10 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: tokens.standardAccessTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('parses access_token with authorization server issuer', function(done) {
+  it('parses access_token with authorization server issuer', function() {
     return oauthUtil.setupParseUrl({
       time: 1449699929,
       hashMock: '#access_token=' + tokens.authServerAccessToken +
@@ -2209,13 +2077,10 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: tokens.authServerAccessTokenParsed
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('parses access_token and id_token', function(done) {
+  it('parses access_token and id_token', function() {
     return oauthUtil.setupParseUrl({
       time: 1449699929,
       hashMock: '#access_token=' + tokens.standardAccessToken +
@@ -2236,13 +2101,10 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: [tokens.standardIdTokenParsed, tokens.standardAccessTokenParsed]
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('parses access_token and id_token with authorization server issuer', function(done) {
+  it('parses access_token and id_token with authorization server issuer', function() {
     return oauthUtil.setupParseUrl({
       time: 1449699929,
       hashMock: '#access_token=' + tokens.authServerAccessToken +
@@ -2262,97 +2124,7 @@ describe('token.parseFromUrl', function() {
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
         }
       }),
-      expectedResp: [tokens.authServerIdTokenParsed, tokens.authServerTokenParsed]
-    })
-    .fin(function() {
-      done();
-    });
-  });
-
-  it('parses access_token, id_token, and code', function(done) {
-    return oauthUtil.setupParseUrl({
-      time: 1449699929,
-      hashMock: '#access_token=' + tokens.standardAccessToken +
-                '&id_token=' + tokens.standardIdToken +
-                '&code=' + tokens.standardAuthorizationCode +
-                '&expires_in=3600' +
-                '&token_type=Bearer' +
-                '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
-        responseType: ['id_token', 'token', 'code'],
-        state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-        nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-        scopes: ['openid', 'email'],
-        urls: {
-          issuer: 'https://auth-js-test.okta.com',
-          tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
-          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-        }
-      }),
-      expectedResp: [tokens.standardIdTokenParsed, tokens.standardAccessTokenParsed, {
-        authorizationCode: tokens.standardAuthorizationCode
-      }]
-    })
-    .fin(function() {
-      done();
-    });
-  });
-
-  it('parses access_token, code, and id_token, but one isn\'t returned', function(done) {
-    return oauthUtil.setupParseUrl({
-      time: 1449699929,
-      hashMock: '#access_token=' + tokens.standardAccessToken +
-                '&id_token=' + tokens.standardIdToken +
-                '&expires_in=3600' +
-                '&token_type=Bearer' +
-                '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
-        responseType: ['id_token', 'code', 'token'],
-        state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-        nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-        scopes: ['openid', 'email'],
-        urls: {
-          issuer: 'https://auth-js-test.okta.com',
-          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
-          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-        }
-      }),
-      expectedResp: [tokens.standardIdTokenParsed, undefined, tokens.standardAccessTokenParsed]
-    })
-    .fin(function() {
-      done();
-    });
-  });
-
-  it('parses access_token, id_token, and code with authorization server issuer', function(done) {
-    return oauthUtil.setupParseUrl({
-      time: 1449699929,
-      hashMock: '#access_token=' + tokens.authServerAccessToken +
-                '&id_token=' + tokens.authServerIdToken +
-                '&code=' + tokens.standardAuthorizationCode +
-                '&expires_in=3600' +
-                '&token_type=Bearer' +
-                '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
-        responseType: ['id_token', 'token', 'code'],
-        state: oauthUtil.mockedState,
-        nonce: oauthUtil.mockedNonce,
-        scopes: ['openid', 'email'],
-        urls: {
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-          tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
-          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-        }
-      }),
-      expectedResp: [tokens.authServerIdTokenParsed, tokens.authServerAccessTokenParsed, {
-        authorizationCode: tokens.standardAuthorizationCode
-      }]
-    })
-    .fin(function() {
-      done();
+      expectedResp: [tokens.authServerIdTokenParsed, tokens.authServerAccessTokenParsed]
     });
   });
 
@@ -2471,7 +2243,7 @@ describe('token.parseFromUrl', function() {
 });
 
 describe('token.renew', function() {
-  it('returns id_token', function(done) {
+  it('returns id_token', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -2492,13 +2264,10 @@ describe('token.renew', function() {
           'prompt': 'none'
         }
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns id_token with authorization server', function(done) {
+  it('returns id_token with authorization server', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -2531,13 +2300,10 @@ describe('token.renew', function() {
         scopes: ['openid', 'custom'],
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token', function(done) {
+  it('returns access_token', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com',
@@ -2572,13 +2338,10 @@ describe('token.renew', function() {
         tokenType: 'Bearer',
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('returns access_token with authorization server', function(done) {
+  it('returns access_token with authorization server', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/wontusethisone',
@@ -2613,9 +2376,6 @@ describe('token.renew', function() {
         tokenType: 'Bearer',
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
       }
-    })
-    .fin(function() {
-      done();
     });
   });
 
@@ -2693,7 +2453,7 @@ describe('token.getUserInfo', function() {
     }
   });
 
-  it('throws an error if no arguments are passed instead', function(done) {
+  it('throws an error if no arguments are passed instead', function() {
     return Q.resolve(setupSync())
     .then(function(oa) {
       return oa.token.getUserInfo();
@@ -2704,13 +2464,10 @@ describe('token.getUserInfo', function() {
     .fail(function(err) {
       expect(err.name).toEqual('AuthSdkError');
       expect(err.errorSummary).toBe('getUserInfo requires an access token object');
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('throws an error if a string is passed instead of an accessToken object', function(done) {
+  it('throws an error if a string is passed instead of an accessToken object', function() {
     return Q.resolve(setupSync())
     .then(function(oa) {
       return oa.token.getUserInfo('just a string');
@@ -2721,9 +2478,6 @@ describe('token.getUserInfo', function() {
     .fail(function(err) {
       expect(err.name).toEqual('AuthSdkError');
       expect(err.errorSummary).toBe('getUserInfo requires an access token object');
-    })
-    .fin(function() {
-      done();
     });
   });
 
@@ -2786,33 +2540,31 @@ describe('token.verify', function() {
     issuer: tokens.standardIdTokenParsed.issuer
   };
 
-  it('verifies a valid idToken with nonce', function(done) {
+  it('verifies a valid idToken with nonce', function() {
     var client = setupSync();
     util.warpToUnixTime(1449699929);
     oauthUtil.loadWellKnownAndKeysCache();
     var alteredParams = _.clone(validationParams);
     alteredParams.nonce = tokens.standardIdTokenParsed.nonce;
-    client.token.verify(tokens.standardIdTokenParsed, validationParams)
+    return client.token.verify(tokens.standardIdTokenParsed, validationParams)
     .then(function(res) {
       expect(res).toEqual(tokens.standardIdTokenParsed);
     })
     .fail(function() {
       expect('not to be hit').toEqual(true);
     })
-    .fin(done);
   });
-  it('verifies a valid idToken without nonce', function(done) {
+  it('verifies a valid idToken without nonce', function() {
     var client = setupSync();
     util.warpToUnixTime(1449699929);
     oauthUtil.loadWellKnownAndKeysCache();
-    client.token.verify(tokens.standardIdTokenParsed, validationParams)
+    return client.token.verify(tokens.standardIdTokenParsed, validationParams)
     .then(function(res) {
       expect(res).toEqual(tokens.standardIdTokenParsed);
     })
     .fail(function() {
       expect('not to be hit').toEqual(true);
-    })
-    .fin(done);
+    });
   });
 
   describe('rejects a token', function() {
@@ -2822,7 +2574,7 @@ describe('token.verify', function() {
     afterEach(function() {
       jest.useRealTimers();
     });
-    function expectError(verifyArgs, message, done) {
+    function expectError(verifyArgs, message) {
       var client = setupSync();
       return client.token.verify.apply(null, verifyArgs)
       .then(function() {
@@ -2830,52 +2582,44 @@ describe('token.verify', function() {
       })
       .fail(function(err) {
         util.assertAuthSdkError(err, message);
-      })
-      .fin(done);
+      });
     }
 
-    it('isn\'t an idToken', function(done) {
-      expectError([tokens.standardAccessTokenParsed],
-        'Only idTokens may be verified')
-      .fin(done);
+    it('isn\'t an idToken', function() {
+      return expectError([tokens.standardAccessTokenParsed],
+        'Only idTokens may be verified');
     });
-    it('issued in the future', function(done) {
+    it('issued in the future', function() {
       util.warpToDistantPast();
-      expectError([tokens.standardIdTokenParsed, validationParams],
-        'The JWT was issued in the future')
-      .fin(done);
+      return expectError([tokens.standardIdTokenParsed, validationParams],
+        'The JWT was issued in the future');
     });
-    it('expired', function(done) {
+    it('expired', function() {
       util.warpToDistantFuture();
-      expectError([tokens.standardIdTokenParsed, validationParams],
-        'The JWT expired and is no longer valid')
-      .fin(done);
+      return expectError([tokens.standardIdTokenParsed, validationParams],
+        'The JWT expired and is no longer valid');
     });
-    it('invalid nonce', function(done) {
+    it('invalid nonce', function() {
       var alteredParams = _.clone(validationParams);
       alteredParams.nonce = 'invalidNonce';
-      expectError([tokens.standardIdToken2Parsed, alteredParams],
-        'OAuth flow response nonce doesn\'t match request nonce')
-      .fin(done);
+      return expectError([tokens.standardIdToken2Parsed, alteredParams],
+        'OAuth flow response nonce doesn\'t match request nonce');
     });
-    it('invalid audience', function(done) {
+    it('invalid audience', function() {
       var alteredParams = _.clone(validationParams);
       alteredParams.clientId = 'invalidAudience';
-      expectError([tokens.standardIdTokenParsed, alteredParams],
-        'The audience [NPSfOkH5eZrTy8PMDlvx] does not match [invalidAudience]')
-      .fin(done);
+      return expectError([tokens.standardIdTokenParsed, alteredParams],
+        'The audience [NPSfOkH5eZrTy8PMDlvx] does not match [invalidAudience]');
     });
-    it('invalid issuer', function(done) {
+    it('invalid issuer', function() {
       var alteredParams = _.clone(validationParams);
       alteredParams.issuer = 'http://invalidissuer.example.com';
-      expectError([tokens.standardIdTokenParsed, alteredParams],
-        'The issuer [https://auth-js-test.okta.com] does not match [http://invalidissuer.example.com]')
-      .fin(done);
+      return expectError([tokens.standardIdTokenParsed, alteredParams],
+        'The issuer [https://auth-js-test.okta.com] does not match [http://invalidissuer.example.com]');
     });
-    it('expired before issued', function(done) {
-      expectError([tokens.expiredBeforeIssuedIdTokenParsed, validationParams],
-        'The JWT expired before it was issued')
-      .fin(done);
+    it('expired before issued', function() {
+      return expectError([tokens.expiredBeforeIssuedIdTokenParsed, validationParams],
+        'The JWT expired before it was issued');
     });
   });
 });
