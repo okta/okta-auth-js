@@ -15,7 +15,8 @@
 
 /* global __dirname */
 var path = require('path');
-var REPORTS_DIR = path.join(__dirname, 'build2', 'reports', 'karma');
+var ROOT_DIR = path.resolve(__dirname, '..', '..');
+var REPORTS_DIR = path.join(ROOT_DIR, 'build2', 'reports', 'karma');
 var webpackConf = {
   devtool: 'inline-source-map',
   module: {

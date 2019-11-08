@@ -2,7 +2,7 @@ var packageJson = require('./package.json');
 var OktaAuth = '<rootDir>/' + packageJson.main;
 
 module.exports = {
-  'coverageDirectory': './build2/reports/coverage',
+  'coverageDirectory': '<rootDir>/build2/reports/coverage',
   'restoreMocks': true,
   'moduleNameMapper': {
     '^OktaAuth(.*)$': OktaAuth

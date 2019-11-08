@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
 export TEST_SUITE_TYPE="checkstyle"
 export TEST_RESULT_FILE_DIR="${REPO}/build2"
 
-if ! yarn lint:report; then
+if ! yarn workspace @okta/okta-auth-js lint:report; then
   echo "lint failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
