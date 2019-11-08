@@ -20,7 +20,8 @@ function setupSync(options) {
     redirectUri: 'https://example.com/redirect',
     tokenManager: {
       expireEarlySeconds: options.tokenManager.expireEarlySeconds || 0,
-      storage: options.tokenManager.type,
+      storage: options.tokenManager.storage,
+      storageKey: options.tokenManager.storageKey,
       autoRenew: options.tokenManager.autoRenew || false,
       secure: options.tokenManager.secure // used by cookie storage
     }
@@ -34,6 +35,73 @@ describe('TokenManager', function() {
   });
   afterEach(function() {
     jest.useRealTimers();
+  });
+  
+  describe('storageKey', function() {
+    it('Uses "okta-token-storage" by default', function() {
+      var client = setupSync();
+      expect(localStorage.getItem('okta-token-storage')).toBeFalsy();
+      client.tokenManager.add('foo', tokens.standardIdTokenParsed);
+      expect(localStorage.getItem('okta-token-storage')).toBeTruthy();
+    });
+    it('Can use a custom value', function() {
+      var client = setupSync({
+        tokenManager: {
+          storageKey: 'custom1'
+        }
+      });
+      expect(localStorage.getItem('custom1')).toBeFalsy();
+      client.tokenManager.add('foo', tokens.standardIdTokenParsed);
+      expect(localStorage.getItem('custom1')).toBeTruthy();
+      expect(localStorage.getItem('okta-token-storage')).toBeFalsy();
+    })
+  });
+  describe('storage', function() {
+    it('throws if storage option is unrecognized', function() {
+      var fn = setupSync.bind(null, {
+        tokenManager: {
+          storage: 'unheardof'
+        }
+      });
+      expect(fn).toThrowError('Unrecognized storage option');
+    });
+    it('has an in memory option', function() {
+      // warp to time to ensure tokens aren't expired
+      util.warpToUnixTime(tokens.standardIdTokenClaims.exp - 1);
+
+      var client = setupSync({
+        tokenManager: {
+          storage: 'memory'
+        }
+      });
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      return client.tokenManager.get('test-idToken')
+        .then(function (value) {
+          expect(value).toEqual(tokens.standardIdTokenParsed);
+        });
+    });
+    it('accepts a custom provider', function() {
+      var store = {};
+      var provider = {
+        getItem: jest.fn().mockImplementation(function(key) { 
+          return store[key];
+        }),
+        setItem: jest.fn().mockImplementation(function(key, val) {
+          store[key] = val;
+        })
+      };
+      var client = setupSync({
+        tokenManager: {
+          storage: provider
+        }
+      });
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      oauthUtil.expectTokenStorageToEqual(provider, {
+        'test-idToken': tokens.standardIdTokenParsed
+      });
+      expect(provider.setItem).toHaveBeenCalled();
+      expect(provider.getItem).toHaveBeenCalled();
+    });
   });
 
   describe('general', function() {
@@ -937,7 +1005,7 @@ describe('TokenManager', function() {
     function localStorageSetup() {
       return setupSync({
         tokenManager: {
-          type: 'localStorage'
+          storage: 'localStorage'
         }
       });
     }
@@ -1009,7 +1077,7 @@ describe('TokenManager', function() {
     function sessionStorageSetup() {
       return setupSync({
         tokenManager: {
-          type: 'sessionStorage'
+          storage: 'sessionStorage'
         }
       });
     }
@@ -1082,7 +1150,7 @@ describe('TokenManager', function() {
       options = options || {};
       return setupSync({
         tokenManager: {
-          type: 'cookie',
+          storage: 'cookie',
           secure: options.secure
         }
       });

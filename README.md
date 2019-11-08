@@ -166,6 +166,28 @@ tokenManager: {
 }
 ```
 
+##### Storage
+
+You may provide a custom storage provider. It should implement two functions:
+
+* `getItem(key)`
+* `setItem(key, value)`
+
+The storage provider will receive the users's raw tokens, as a string. Any custom storage provider should take care to save this string in a secure location which is not accessible by other users.
+
+```javascript
+tokenManager: {
+  storage: {
+    getItem: function(key) {
+      // custom get
+    },
+    setItem: function(key, val) {
+      // custom set
+    }
+  }
+}
+```
+
 #### Additional Options
 
 | Option | Description |
@@ -180,6 +202,21 @@ tokenManager: {
 | `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
 | | This option should be used only for browser support and testing purposes. |
 | `maxClockSkew` | Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
+| `tokenManager` | *(optional)*: An object containing additional properties used to configure the internal token manager. |
+
+* `autoRenew`:
+  By default, the library will attempt to renew expired tokens. When an expired token is requested by the library, a renewal request is executed to update the token. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
+
+* `secure`: If `true` then only "secure" https cookies will be stored. This option will prevent cookies from being stored on an HTTP connection. This option is only relevant if `storage` is set to `cookie`, or if the client browser does not support `localStorage` or `sessionStorage`, in which case `cookie` storage will be used.
+
+* `storage`:
+  You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types:
+  * [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) (default)
+  * [`sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
+  * [`cookie`](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)
+  * `memory`: a simple in-memory storage provider
+
+* `storageKey`: By default all tokens will be stored under the key `okta-token-storage`. You may want to change this if you have multiple apps running on a single domain which share the same storage type. Giving each app a unique storage key will prevent them from reading or writing each other's token values.
 
 ##### Example Client
 
