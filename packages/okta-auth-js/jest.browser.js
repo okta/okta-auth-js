@@ -2,7 +2,7 @@ var OktaAuth = '<rootDir>/lib/browser/browserIndex.js';
 var SDK_VERSION = require('./package.json').version;
 
 module.exports = {
-  'coverageDirectory': './build2/reports/coverage',
+  'coverageDirectory': '<rootDir>/build2/reports/coverage',
   'globals': {
     SDK_VERSION: SDK_VERSION
   },
