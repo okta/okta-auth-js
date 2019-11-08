@@ -5,9 +5,16 @@ var util = require('@okta/test.support/util');
 var packageJson = require('../../package.json');
 
 describe('fingerprint', function() {
+  var test;
+  beforeEach(function() {
+    test = {};
+  });
+  afterEach(function() {
+    jest.useRealTimers();
+  });
+
   function setup(options) {
     options = options || {};
-    var test = this;
     var listener;
     var postMessageSpy = jest.spyOn(window, 'postMessage').mockImplementation(function(msg, url) {
       // "receive" the message in the iframe
@@ -70,82 +77,75 @@ describe('fingerprint', function() {
     return authClient;
   }
 
-  it('iframe is created with the right src and it is hidden', function (done) {
-    return setup().fingerprint()
-    .catch(function(err) {
-      expect(err).toBeUndefined();
-    })
-    .then(function(fingerprint) {
-      var test = this;
-      expect(document.createElement).toHaveBeenCalled();
-      expect(test.iframe.style.display).toEqual('none');
-      expect(test.iframe.src).toEqual('http://example.okta.com/auth/services/devicefingerprint');
-      expect(document.body.appendChild).toHaveBeenCalledWith(test.iframe);
-      expect(test.e.source.postMessage).toHaveBeenCalled();
-      expect(test.iframe.parentElement.removeChild).toHaveBeenCalled();
-      expect(fingerprint).toEqual('ABCD');
-    })
-    .fin(function() {
-      done();
-    });
+  it('iframe is created with the right src and it is hidden', function () {
+    jest.useFakeTimers();
+    var promise =  setup().fingerprint();
+    return Promise.resolve()
+      .then(function() {
+        jest.runAllTicks(); // resolves outstanding promises
+        jest.advanceTimersByTime(1); // allow listener to be called
+        return promise;
+      })
+      .then(function(fingerprint) {
+        expect(document.createElement).toHaveBeenCalled();
+        expect(test.iframe.style.display).toEqual('none');
+        expect(test.iframe.src).toEqual('http://example.okta.com/auth/services/devicefingerprint');
+        expect(document.body.appendChild).toHaveBeenCalledWith(test.iframe);
+        expect(window.postMessage).toHaveBeenCalled();
+        expect(test.iframe.parentElement.removeChild).toHaveBeenCalled();
+        expect(fingerprint).toEqual('ABCD');
+      });
   });
 
-  it('allows non-Okta postMessages', function (done) {
+  it('allows non-Okta postMessages', function () {
     return setup({ sendOtherMessage: true }).fingerprint()
     .catch(function(err) {
       expect(err).toBeUndefined();
     })
     .then(function(fingerprint) {
       expect(fingerprint).toEqual('ABCD');
-    })
-    .fin(function() {
-      done();
     });
   });
 
-  it('fails if the iframe sends invalid message content', function (done) {
+  it('fails if the iframe sends invalid message content', function () {
     return setup({ firstMessage: 'invalidMessageContent' }).fingerprint()
     .then(function() {
-      done.fail('Fingerprint promise should have been rejected');
+      throw new Error('Fingerprint promise should have been rejected');
     })
     .catch(function(err) {
       util.assertAuthSdkError(err, 'Unable to parse iframe response');
-      done();
     });
   });
 
-  it('fails if user agent is not defined', function (done) {
+  it('fails if user agent is not defined', function () {
     return setup({ userAgent: '' }).fingerprint()
     .then(function() {
-      done.fail('Fingerprint promise should have been rejected');
+      throw new Error('Fingerprint promise should have been rejected');
     })
     .catch(function(err) {
       util.assertAuthSdkError(err, 'Fingerprinting is not supported on this device');
-      done();
     });
   });
 
-  it('fails if it is called from a Windows phone', function (done) {
+  it('fails if it is called from a Windows phone', function () {
     return setup({
       userAgent: 'Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0;)'
     }).fingerprint()
     .then(function() {
-      done.fail('Fingerprint promise should have been rejected');
+      throw new Error('Fingerprint promise should have been rejected');
     })
     .catch(function(err) {
       util.assertAuthSdkError(err, 'Fingerprinting is not supported on this device');
-      done();
     });
   });
 
-  it('fails after a timeout period', function (done) {
+  it('fails after a timeout period', function () {
     return setup({ timeout: true }).fingerprint({ timeout: 5 })
     .then(function() {
-      done.fail('Fingerprint promise should have been rejected');
+      throw new Error('Fingerprint promise should have been rejected');
     })
     .catch(function(err) {
       util.assertAuthSdkError(err, 'Fingerprinting timed out');
-      done();
     });
   });
 
@@ -208,7 +208,7 @@ describe('fingerprint', function() {
     }
   });
 
-  it('fails signIn request if fingerprinting fails', function(done) {
+  it('fails signIn request if fingerprinting fails', function() {
     return setup({ firstMessage: 'invalidMessageContent' })
     .signIn({
       username: 'not',
@@ -216,11 +216,10 @@ describe('fingerprint', function() {
       sendFingerprint: true
     })
     .then(function() {
-      done.fail('signIn promise should have been rejected');
+      throw new Error('signIn promise should have been rejected');
     })
     .catch(function(err) {
       util.assertAuthSdkError(err, 'Unable to parse iframe response');
-      done();
     });
   });
 });

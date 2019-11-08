@@ -11,6 +11,7 @@ var util = {};
 
 
 function warpByTicksToUnixTime(unixTime) {
+  util.warpToUnixTime(unixTime);
   var ticks = (unixTime * 1000) - Date.now();
   jest.advanceTimersByTime(ticks);
 }
