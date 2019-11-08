@@ -19,7 +19,7 @@ var Q             = require('q');
 var sdkCrypto     = require('./crypto');
 var AuthSdkError  = require('./errors/AuthSdkError');
 var OAuthError    = require('./errors/OAuthError');
-var config        = require('./config');
+var constants     = require('./constants');
 var cookies       = require('./browser/browserStorage').storage;
 var PKCE          = require('./pkce');
 
@@ -606,7 +606,7 @@ function getWithRedirect(sdk, oauthOptions, options) {
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(oauthParams);
 
       // Set session cookie to store the oauthParams
-      cookies.set(config.REDIRECT_OAUTH_PARAMS_COOKIE_NAME, JSON.stringify({
+      cookies.set(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME, JSON.stringify({
         responseType: oauthParams.responseType,
         state: oauthParams.state,
         nonce: oauthParams.nonce,
@@ -617,10 +617,10 @@ function getWithRedirect(sdk, oauthOptions, options) {
       }));
 
       // Set nonce cookie for servers to validate nonce in id_token
-      cookies.set(config.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce);
+      cookies.set(constants.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce);
 
       // Set state cookie for servers to validate state
-      cookies.set(config.REDIRECT_STATE_COOKIE_NAME, oauthParams.state);
+      cookies.set(constants.REDIRECT_STATE_COOKIE_NAME, oauthParams.state);
 
       sdk.token.getWithRedirect._setLocation(requestUrl);
     });
@@ -673,7 +673,7 @@ function parseFromUrl(sdk, url) {
     return Q.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
-  var oauthParamsCookie = cookies.get(config.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
+  var oauthParamsCookie = cookies.get(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
   if (!oauthParamsCookie) {
     return Q.reject(new AuthSdkError('Unable to retrieve OAuth redirect params cookie'));
   }
@@ -682,10 +682,10 @@ function parseFromUrl(sdk, url) {
     var oauthParams = JSON.parse(oauthParamsCookie);
     var urls = oauthParams.urls;
     delete oauthParams.urls;
-    cookies.delete(config.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
+    cookies.delete(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
   } catch(e) {
     return Q.reject(new AuthSdkError('Unable to parse the ' +
-      config.REDIRECT_OAUTH_PARAMS_COOKIE_NAME + ' cookie: ' + e.message));
+    constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME + ' cookie: ' + e.message));
   }
 
   return Q.resolve(oauthUtil.hashToObject(hash))

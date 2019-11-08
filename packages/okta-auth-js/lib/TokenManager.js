@@ -17,7 +17,7 @@ var AuthSdkError = require('./errors/AuthSdkError');
 var storageUtil = require('./browser/browserStorage');
 var Q = require('q');
 var Emitter = require('tiny-emitter');
-var config = require('./config');
+var constants = require('./constants');
 var storageBuilder = require('./storageBuilder');
 var SdkClock = require('./clock');
 
@@ -217,13 +217,13 @@ function TokenManager(sdk, options) {
   var storage;
   switch(options.storage) {
     case 'localStorage':
-      storage = storageBuilder(localStorage, config.TOKEN_STORAGE_NAME);
+      storage = storageBuilder(localStorage, constants.TOKEN_STORAGE_NAME);
       break;
     case 'sessionStorage':
-      storage = storageBuilder(sessionStorage, config.TOKEN_STORAGE_NAME);
+      storage = storageBuilder(sessionStorage, constants.TOKEN_STORAGE_NAME);
       break;
     case 'cookie':
-      storage = storageBuilder(storageUtil.getCookieStorage(options), config.TOKEN_STORAGE_NAME);
+      storage = storageBuilder(storageUtil.getCookieStorage(options), constants.TOKEN_STORAGE_NAME);
       break;
     default:
       throw new AuthSdkError('Unrecognized storage option');

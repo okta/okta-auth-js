@@ -5,7 +5,7 @@
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "lib/server/serverIndex.js",
-  "browser": "lib/browser/browserIndex.js",
+  "browser": "dist/okta-auth-js.min.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
@@ -21,7 +21,7 @@
     "test:browser": "jest --config ./jest.browser.js",
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
-    "build": "node ./writeConfig.js && webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js",
     "prepare": "yarn build"
   },
   "author": "Okta",
@@ -62,19 +62,6 @@
     "promise.allsettled": "^1.0.1",
     "promise.prototype.finally": "^3.1.1",
     "webpack": "^3.0.0"
-  },
-  "okta-auth-js": {
-    "STATE_TOKEN_KEY_NAME": "oktaStateToken",
-    "DEFAULT_POLLING_DELAY": 500,
-    "DEFAULT_MAX_CLOCK_SKEW": 300,
-    "DEFAULT_CACHE_DURATION": 86400,
-    "FRAME_ID": "okta-oauth-helper-frame",
-    "REDIRECT_OAUTH_PARAMS_COOKIE_NAME": "okta-oauth-redirect-params",
-    "REDIRECT_STATE_COOKIE_NAME": "okta-oauth-state",
-    "REDIRECT_NONCE_COOKIE_NAME": "okta-oauth-nonce",
-    "TOKEN_STORAGE_NAME": "okta-token-storage",
-    "CACHE_STORAGE_NAME": "okta-cache-storage",
-    "PKCE_STORAGE_NAME": "okta-pkce-storage"
   },
   "jest-junit": {
     "outputDirectory": "../../build2/reports/unit/",

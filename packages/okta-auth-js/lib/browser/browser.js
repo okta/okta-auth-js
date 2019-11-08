@@ -16,7 +16,7 @@ require('../vendor/polyfills');
 
 var AuthSdkError      = require('../errors/AuthSdkError');
 var builderUtil       = require('../builderUtil');
-var config            = require('../config');
+var constants         = require('../constants');
 var cookies           = require('./browserStorage').storage;
 var http              = require('../http');
 var oauthUtil         = require('../oauthUtil');
@@ -52,7 +52,7 @@ function OktaAuthBuilder(args) {
     throw new AuthSdkError('This browser doesn\'t support PKCE');
   }
 
-  this.userAgent = 'okta-auth-js-' + config.SDK_VERSION;
+  this.userAgent = 'okta-auth-js-' + constants.SDK_VERSION;
 
   // Digital clocks will drift over time, so the server
   // can misalign with the time reported by the browser.
@@ -62,7 +62,7 @@ function OktaAuthBuilder(args) {
   // default maximum tolerance allowed by Kerberos.
   // (https://technet.microsoft.com/en-us/library/cc976357.aspx)
   if (!args.maxClockSkew && args.maxClockSkew !== 0) {
-    this.options.maxClockSkew = config.DEFAULT_MAX_CLOCK_SKEW;
+    this.options.maxClockSkew = constants.DEFAULT_MAX_CLOCK_SKEW;
   } else {
     this.options.maxClockSkew = args.maxClockSkew;
   }
