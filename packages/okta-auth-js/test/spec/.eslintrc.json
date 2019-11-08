@@ -7,22 +7,18 @@
     "jasmine"
   ],
   "env": {
-    "browser": false,
+    "jest": true,
     "jasmine": true
   },
   "globals": {
-    "spyOn": true
-  },
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaVersion": 2017
+    "Promise": "readonly"
   },
   "rules": {
-    "semi": 2,
-    "eol-last": 2,
     "jasmine/no-unsafe-spy": 0,
     "jasmine/new-line-before-expect": 0,
     "jasmine/prefer-toHaveBeenCalledWith": 0,
-    "jasmine/new-line-between-declarations": 0
+    "jasmine/new-line-between-declarations": 0,
+    "jasmine/no-spec-dupes": [1, "branch"],
+    "jasmine/no-suite-dupes": [1, "branch"]
   }
 }

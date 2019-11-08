@@ -27,12 +27,15 @@ function setupSync(options) {
   });
 }
 
-beforeEach(function() {
-  localStorage.clear();
-  sessionStorage.clear();
-});
-
 describe('TokenManager', function() {
+  beforeEach(function() {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+  afterEach(function() {
+    jest.useRealTimers();
+  });
+
   describe('general', function() {
     it('defaults to localStorage', function() {
       var client = setupSync();
@@ -836,11 +839,12 @@ describe('TokenManager', function() {
     });
 
     it('emits "expired" on existing tokens even when autoRenew is disabled', function(done) {
-      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      jest.useFakeTimers();
       localStorage.setItem('okta-token-storage', JSON.stringify({
         'test-idToken': tokens.standardIdTokenParsed
       }));
       var client = setupSync({ tokenManager: { autoRenew: false } });
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       client.tokenManager.on('expired', function(key, token) {
         expect(key).toEqual('test-idToken');
         expect(token).toEqual(tokens.standardIdTokenParsed);
@@ -850,9 +854,10 @@ describe('TokenManager', function() {
     });
 
     it('emits "expired" on new tokens even when autoRenew is disabled', function(done) {
-      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      jest.useFakeTimers();
       var client = setupSync({ tokenManager: { autoRenew: false } });
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       client.tokenManager.on('expired', function(key, token) {
         expect(key).toEqual('test-idToken');
         expect(token).toEqual(tokens.standardIdTokenParsed);
