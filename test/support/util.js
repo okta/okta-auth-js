@@ -370,6 +370,17 @@ util.expectErrorToEqual = function (actual, expected) {
     expect(actual.errorId).toBeUndefined();
     expect(actual.errorCauses).toBeUndefined();
   }
+  if (expected.tokenKey) {
+    expect(actual.tokenKey).toEqual(expected.tokenKey);
+  } else {
+    expect(actual.tokenKey).toBeUndefined();
+  }
+
+  if (typeof expected.accessToken !== 'undefined') {
+    expect(actual.accessToken).toEqual(expected.accessToken);
+  } else {
+    expect(actual.accessToken).toBeUndefined();
+  }
 };
 
 util.assertAuthSdkError = function (err, message) {

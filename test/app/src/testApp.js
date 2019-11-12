@@ -36,6 +36,7 @@ const Footer = `
 
 const Layout = `
   <div id="layout">
+    <div id="session-expired" style="color: orange"></div>
     <div id="token-error" style="color: red"></div>
     <div id="token-msg" style="color: green"></div>
     <div id="page-content"></div>
@@ -78,6 +79,9 @@ function bindFunctions(testApp, window) {
 
 function TestApp(config) {
   this.config = config;
+  Object.assign(this.config, {
+    onSessionExpired: this._onSessionExpired.bind(this)
+  });
 }
 
 export default TestApp;
@@ -113,6 +117,9 @@ Object.assign(TestApp.prototype, {
   },
   _onTokenError: function(error) {
     document.getElementById('token-error').innerText = error;
+  },
+  _onSessionExpired: function() {
+    document.getElementById('session-expired').innerText = 'SESSION EXPIRED';
   },
   bootstrapCallback: async function() {
     const content = `
@@ -222,7 +229,7 @@ Object.assign(TestApp.prototype, {
     });
   },
   renewToken: async function() {
-    return this.oktaAuth.tokenManager.renew('idToken')
+    return this.oktaAuth.tokenManager.renew('accessToken')
       .then(() => {
         this.render();
       });

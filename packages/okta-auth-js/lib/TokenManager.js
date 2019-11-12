@@ -16,7 +16,6 @@ var util = require('./util');
 var AuthSdkError = require('./errors/AuthSdkError');
 var storageUtil = require('./browser/browserStorage');
 var Q = require('q');
-var Emitter = require('tiny-emitter');
 var constants = require('./constants');
 var storageBuilder = require('./storageBuilder');
 var SdkClock = require('./clock');
@@ -184,6 +183,8 @@ function renew(sdk, tokenMgmtRef, storage, key) {
     .catch(function(err) {
       if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
         remove(tokenMgmtRef, storage, key);
+        err.tokenKey = key;
+        err.accessToken = !!token.accessToken;
         emitError(tokenMgmtRef, err);
       }
       throw err;
@@ -242,7 +243,7 @@ function TokenManager(sdk, options) {
   var tokenMgmtRef = {
     clock: clock,
     options: options,
-    emitter: new Emitter(),
+    emitter: sdk.emitter,
     expireTimeouts: {},
     renewPromise: {}
   };
