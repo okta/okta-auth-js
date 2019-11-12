@@ -33,6 +33,7 @@ const Footer = `
 const Layout = `
   <div id="layout">
     <div id="token-error" style="color: red"></div>
+    <div id="login-required" style="color: green"></div>
     <div id="page-content"></div>
     <div id="config-area" class="flex-row">
       <div id="form-content" class="box">${Form}</div>
@@ -56,6 +57,9 @@ function bindFunctions(testApp, window) {
 
 function TestApp(config) {
   this.config = config;
+  Object.assign(this.config, {
+    onLoginRequired: this._onLoginRequired.bind(this)
+  });
 }
 
 export default TestApp;
@@ -91,6 +95,9 @@ Object.assign(TestApp.prototype, {
   },
   _onTokenError: function(error) {
     document.getElementById('token-error').innerText = error;
+  },
+  _onLoginRequired: function() {
+    document.getElementById('login-required').innerText = 'YES';
   },
   bootstrapCallback: async function() {
     const content = `

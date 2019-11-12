@@ -14,7 +14,8 @@ class TestApp {
   get getUserInfoBtn() { return $('#get-userinfo'); }
   get userInfo() { return $('#user-info'); }
   get tokenError() { return $('#token-error'); }
-
+  get loginRequired() { return $('#login-required'); }
+  
   // Unauthenticated landing
   get loginRedirectBtn() { return $('#login-redirect'); }
   get loginPopupBtn() { return $('#login-popup'); }

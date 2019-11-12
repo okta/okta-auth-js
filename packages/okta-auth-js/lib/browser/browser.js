@@ -45,7 +45,8 @@ function OktaAuthBuilder(args) {
     httpRequestClient: args.httpRequestClient,
     storageUtil: args.storageUtil,
     transformErrorXHR: args.transformErrorXHR,
-    headers: args.headers
+    headers: args.headers,
+    onLoginRequired: args.onLoginRequired,
   };
 
   if (this.options.pkce && !sdk.features.isPKCESupported()) {
@@ -142,9 +143,15 @@ function OktaAuthBuilder(args) {
   };
 
   sdk.tokenManager = new TokenManager(sdk, args.tokenManager);
+  sdk.tokenManager.on('error', this._onTokenManagerError.bind(this));
 }
 
 var proto = OktaAuthBuilder.prototype;
+proto._onTokenManagerError = function(error) {
+  if (error.errorCode === 'login_required') {
+    this.options.onLoginRequired && this.options.onLoginRequired();
+  }
+};
 
 proto.features = {};
 
