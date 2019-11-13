@@ -28,6 +28,7 @@ var token             = require('../token');
 var TokenManager      = require('../TokenManager');
 var tx                = require('../tx');
 var util              = require('../util');
+var storageUtil       = require('./browserStorage');
 
 function OktaAuthBuilder(args) {
   var sdk = this;
@@ -48,7 +49,7 @@ function OktaAuthBuilder(args) {
     storageUtil: args.storageUtil,
     transformErrorXHR: args.transformErrorXHR,
     headers: args.headers,
-    onLoginRequired: args.onLoginRequired,
+    onLoginRequired: args.onLoginRequired
   };
 
   if (this.options.pkce && !sdk.features.isPKCESupported()) {
@@ -150,9 +151,36 @@ function OktaAuthBuilder(args) {
 
 var proto = OktaAuthBuilder.prototype;
 proto._onTokenManagerError = function(error) {
-  if (error.errorCode === 'login_required') {
-    this.options.onLoginRequired && this.options.onLoginRequired();
+  var code = error.errorCode;
+  if (code === 'login_required') {
+    if (this.options.onSessionEnd) {
+      this.options.onSessionEnd(this);
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Session has ended.');
+    }
   }
+};
+
+proto.loginRedirect = function() {
+  this.saveUrlBeforeRedirect();
+  if (this.options.onAuthRequired) {
+    return this.options.onAuthRequired(this);
+  }
+  return this.token.getWithRedirect();
+};
+
+proto.saveUrlBeforeRedirect = function(urlObject) {
+  urlObject = urlObject || new URL(window.location.href);
+  var storage = storageUtil.getRedirectStorage();
+  storage.setStorage(urlObject);
+};
+
+proto.getUrlAfterRedirect = function() {
+  var storage = storageUtil.getRedirectStorage();
+  var urlObject = storage.getStorage();
+  storage.clearStorage();
+  return urlObject;
 };
 
 proto.features = {};

@@ -8,5 +8,6 @@ module.exports = {
   'REDIRECT_NONCE_COOKIE_NAME': 'okta-oauth-nonce',
   'TOKEN_STORAGE_NAME': 'okta-token-storage',
   'CACHE_STORAGE_NAME': 'okta-cache-storage',
-  'PKCE_STORAGE_NAME': 'okta-pkce-storage'
+  'PKCE_STORAGE_NAME': 'okta-pkce-storage',
+  'REDIRECT_STORAGE_NAME': 'secureRouterReferrerPath' // maintain for okta-react compatibility
 };

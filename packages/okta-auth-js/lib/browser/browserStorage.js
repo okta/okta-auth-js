@@ -14,6 +14,8 @@
 var Cookies = require('js-cookie');
 var storageBuilder = require('../storageBuilder');
 var constants = require('../constants');
+var AuthSdkError      = require('../errors/AuthSdkError');
+var util              = require('../util');
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil = {};
@@ -56,6 +58,13 @@ storageUtil.getHttpCache = function() {
   } else {
     return storageBuilder(storageUtil.getCookieStorage(), constants.CACHE_STORAGE_NAME);
   }
+};
+
+storageUtil.getRedirectStorage = function(options) {
+  options = options || { storage: 'localStorage', secure: true };
+  var storageProvider = storageUtil.getStorageProvider(options);
+  var storageKey = options.storageKey || constants.REDIRECT_STORAGE_NAME;
+  return storageBuilder(storageProvider, storageKey);
 };
 
 storageUtil.getLocalStorage = function() {
@@ -129,6 +138,45 @@ storageUtil.storage = {
   delete: function(name) {
     return Cookies.remove(name, { path: '/' });
   }
+};
+
+// eslint-disable-next-line complexity
+storageUtil.getStorageProvider = function (options) {
+  var option = options.storage;
+  if (option === 'localStorage' && !storageUtil.browserHasLocalStorage()) {
+    util.warn('This browser doesn\'t support localStorage. Switching to sessionStorage.');
+    option = 'sessionStorage';
+  }
+
+  if (options.storage === 'sessionStorage' && !storageUtil.browserHasSessionStorage()) {
+    util.warn('This browser doesn\'t support sessionStorage. Switching to cookie-based storage.');
+    option = 'cookie';
+  }
+
+  if (typeof option === 'object') {
+    // A custom storage provider must implement getItem(key) and setItem(key, val)
+    return option;
+  } 
+
+  var storageProvider;
+  switch(option) {
+    case 'localStorage':
+      storageProvider = localStorage;
+      break;
+    case 'sessionStorage':
+      storageProvider = sessionStorage;
+      break;
+    case 'cookie':
+      storageProvider = storageUtil.getCookieStorage(options);
+      break;
+    case 'memory':
+      storageProvider = storageUtil.getInMemoryStorage();
+      break;
+    default:
+      throw new AuthSdkError('Unrecognized storage option');
+  }
+  
+  return storageProvider;
 };
 
 module.exports = storageUtil;

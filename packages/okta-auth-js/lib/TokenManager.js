@@ -204,38 +204,7 @@ function clear(tokenMgmtRef, storage) {
 function TokenManager(sdk, options) {
   options = util.extend({}, DEFAULT_OPTIONS, util.removeNils(options));
 
-  if (options.storage === 'localStorage' && !storageUtil.browserHasLocalStorage()) {
-    util.warn('This browser doesn\'t support localStorage. Switching to sessionStorage.');
-    options.storage = 'sessionStorage';
-  }
-
-  if (options.storage === 'sessionStorage' && !storageUtil.browserHasSessionStorage()) {
-    util.warn('This browser doesn\'t support sessionStorage. Switching to cookie-based storage.');
-    options.storage = 'cookie';
-  }
-
-  var storageProvider;
-  if (typeof options.storage === 'object') {
-    // A custom storage provider must implement getItem(key) and setItem(key, val)
-    storageProvider = options.storage;
-  } else {
-    switch(options.storage) {
-      case 'localStorage':
-        storageProvider = localStorage;
-        break;
-      case 'sessionStorage':
-        storageProvider = sessionStorage;
-        break;
-      case 'cookie':
-        storageProvider = storageUtil.getCookieStorage(options);
-        break;
-      case 'memory':
-        storageProvider = storageUtil.getInMemoryStorage();
-        break;
-      default:
-        throw new AuthSdkError('Unrecognized storage option');
-    }
-  }
+  var storageProvider = storageUtil.getStorageProvider(options);
   var storageKey = options.storageKey || constants.TOKEN_STORAGE_NAME;
   var storage = storageBuilder(storageProvider, storageKey);
   var clock = SdkClock.create(sdk, options);

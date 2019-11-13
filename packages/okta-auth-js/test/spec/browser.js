@@ -20,7 +20,7 @@ describe('Browser', function() {
       expect(OktaAuth.prototype._onTokenManagerError).toHaveBeenCalledWith(error);
     });
   
-    it('errorCode "login_required": Will call option "onLoginRequired" function', function() {
+    it('errorCode "login_required": Will call config option "onLoginRequired"', function() {
       var onLoginRequired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
       new OktaAuth({ url: 'http://localhost/fake', onLoginRequired: onLoginRequired });
@@ -30,6 +30,19 @@ describe('Browser', function() {
       emitter.emit('error', error);
       expect(onLoginRequired).toHaveBeenCalled();
     });
+
+    it('errorCode "login_required": Will call dynamic handler passed to "onLoginRequired"', function() {
+      var onLoginRequired = jest.fn();
+      jest.spyOn(Emitter.prototype, 'on');
+      var auth = new OktaAuth({ url: 'http://localhost/fake' });
+      auth.onLoginRequired(onLoginRequired);
+      var emitter = Emitter.prototype.on.mock.instances[0];
+      expect(onLoginRequired).not.toHaveBeenCalled();
+      var error = { errorCode: 'login_required'};
+      emitter.emit('error', error);
+      expect(onLoginRequired).toHaveBeenCalled();
+    });
+
 
     it('unknown errorCode is ignored', function() {
       var onLoginRequired = jest.fn();
