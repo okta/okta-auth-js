@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.10.0
+
+### Features
+- [#266](https://github.com/okta/okta-auth-js/pull/266) - New storage options for TokenManager
+
+### Bug Fixes
+- [#265](https://github.com/okta/okta-auth-js/pull/265) - Fix for popup blockers
+
+### Other
+
+- [#256](https://github.com/okta/okta-auth-js/pull/256) - Adds E2E tests, updates test app
+- [#249](https://github.com/okta/okta-auth-js/pull/249) - Convert to yarn workspace
+- [#264](https://github.com/okta/okta-auth-js/pull/264) - Removed lib/config.js, replaced with lib/constants.js and webpack define
+
 ## 2.9.0
 
 ### Features
