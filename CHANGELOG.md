@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.10.1
+
+### Other
+
+- Fixes incorrect npm publish of previous version
+
 ## 2.10.0
 
 ### Features
