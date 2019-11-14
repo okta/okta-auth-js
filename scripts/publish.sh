@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
@@ -20,6 +20,8 @@ else
   TARGET_BRANCH=${BRANCH}
 fi
 
+pushd ./packages/okta-auth-js
+
 if ! ci-update-package --branch ${TARGET_BRANCH}; then
   echo "ci-update-package failed! Exiting..."
   exit ${FAILED_SETUP}
@@ -28,17 +30,18 @@ fi
 ### looks like ci-update-package is not compatible with `yarn publish`
 ### which expects new-version is passed via command line parameter.
 ### keep using npm for now
-pushd ./packages/okta-auth-js
 if ! npm publish --registry ${REGISTRY}; then
   echo "npm publish failed! Exiting..."
   exit ${PUBLISH_ARTIFACTORY_FAILURE}
 fi
-popd
+
 
 DATALOAD=$(ci-pkginfo -t dataload)
 if ! artifactory_curl -X PUT -u ${ARTIFACTORY_CREDS} ${DATALOAD} -v -f; then
   echo "artifactory_curl failed! Exiting..."
   exit ${PUBLISH_ARTIFACTORY_FAILURE}
 fi
+
+popd
 
 exit ${SUCCESS}
