@@ -5,4 +5,5 @@ build2
 .travis.yml
 ci-scripts
 webpack*config.js
+karma*conf.js
 scripts
