@@ -7,5 +7,6 @@ test/SpecRunner.html
 npm-debug.log
 testenv
 junit.xml
+.idea
 lerna-debug.*
 yarn-error.*
