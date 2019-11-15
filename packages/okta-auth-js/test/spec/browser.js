@@ -38,7 +38,11 @@ describe('Browser', function() {
         function fn() {
           auth = new OktaAuth({ pkce: true, url: 'http://localhost/fake' });
         }
-        expect(fn).toThrowError('This browser doesn\'t support PKCE');
+        expect(fn).toThrowError(
+          'PKCE requires a modern browser with encryption support running in a secure context.\n' +
+          'The current page is not being served with HTTPS protocol. Try using HTTPS.\n' +
+          '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
+        );
       });
     })
   });

@@ -51,7 +51,14 @@ function OktaAuthBuilder(args) {
   };
 
   if (this.options.pkce && !sdk.features.isPKCESupported()) {
-    throw new AuthSdkError('This browser doesn\'t support PKCE');
+    var errorMessage = 'PKCE requires a modern browser with encryption support running in a secure context.';
+    if (!sdk.features.isHTTPS()) {
+      errorMessage += '\nThe current page is not being served with HTTPS protocol. Try using HTTPS.';
+    }
+    if (!sdk.features.hasTextEncoder()) {
+      errorMessage += '\n"TextEncoder" is not defined. You may need a polyfill/shim for this browser.';
+    }
+    throw new AuthSdkError(errorMessage);
   }
 
   this.userAgent = 'okta-auth-js-' + SDK_VERSION;
@@ -162,8 +169,16 @@ proto.features.isTokenVerifySupported = function() {
   return typeof crypto !== 'undefined' && crypto.subtle && typeof Uint8Array !== 'undefined';
 };
 
+proto.features.hasTextEncoder = function() {
+  return typeof TextEncoder !== 'undefined';
+};
+
 proto.features.isPKCESupported = function() {
-  return proto.features.isTokenVerifySupported();
+  return proto.features.isTokenVerifySupported() && proto.features.hasTextEncoder();
+};
+
+proto.features.isHTTPS = function() {
+  return window.location.protocol === 'https:';
 };
 
 // { username, password, (relayState), (context) }
