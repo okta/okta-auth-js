@@ -232,8 +232,8 @@ oauthUtil.setup = function(opts) {
       if (opts.willFail) {
         throw err;
       } else {
-        expect('not to be hit').toBe(true);
         console.error(err); // eslint-disable-line
+        expect('not to be hit').toBe(true);
       }
     });
 };

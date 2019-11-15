@@ -9,11 +9,16 @@ class TestApp {
 
   // Authenticated landing
   get logoutBtn() { return $('#logout'); }
+  get logoutRedirectBtn() { return $('#logout-redirect'); }
+  get logoutLocalBtn() { return $('#logout-local'); }
   get renewTokenBtn() { return $('#renew-token'); }
+  get revokeTokenBtn() { return $('#revoke-token'); }
   get getTokenBtn() { return $('#get-token'); }
+  get clearTokensBtn() { return $('#clear-tokens'); }
   get getUserInfoBtn() { return $('#get-userinfo'); }
   get userInfo() { return $('#user-info'); }
   get tokenError() { return $('#token-error'); }
+  get tokenMsg() { return $('#token-msg'); }
 
   // Unauthenticated landing
   get loginRedirectBtn() { return $('#login-redirect'); }
@@ -76,6 +81,14 @@ class TestApp {
     return this.getTokenBtn.then(el => el.click());
   }
 
+  async clearTokens() {
+    return this.clearTokensBtn.then(el => el.click());
+  }
+
+  async revokeToken() {
+    return this.revokeTokenBtn.then(el => el.click());
+  }
+
   async getUserInfo() {
     await browser.waitUntil(async () => this.getUserInfoBtn.then(el => el.isDisplayed()));
     await this.getUserInfoBtn.then(el => el.click());
@@ -92,12 +105,22 @@ class TestApp {
     await this.waitForLoginBtn();
   }
 
+  async logoutLocal() {
+    await this.logoutLocalBtn.then(el => el.click());
+    await this.waitForLoginBtn();
+  }
+
+  async logoutRedirect() {
+    await this.logoutRedirectBtn.then(el => el.click());
+    await this.waitForLoginBtn();
+  }
+
   async waitForLoginBtn() {
     return browser.waitUntil(async () => this.loginRedirectBtn.then(el => el.isDisplayed()), 5000, 'wait for login button');
   }
 
   async waitForLogoutBtn() {
-    return browser.waitUntil(async () => this.logoutBtn.then(el => el.isDisplayed()), 5000, 'wait for logout button');
+    return browser.waitUntil(async () => this.logoutBtn.then(el => el.isDisplayed()), 15000, 'wait for logout button');
   }
 
   async waitForCallback() {
@@ -147,6 +170,13 @@ class TestApp {
       assert(txt.indexOf('email') > 0);
     });
   }
+
+  async assertIdToken() {
+    await this.idToken.then(el => el.getText()).then(txt => {
+      assert(txt.indexOf('claims') > 0);
+    });
+  }
+
 }
 
 export default new TestApp();
