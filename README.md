@@ -244,7 +244,7 @@ var authClient = new OktaAuth(config);
 
 ##### PKCE OAuth 2.0 flow
 
-By default the `implicit` OAuth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser.
+By default the `implicit` OAuth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser. Specifically, the browser must implement `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is available on all major platforms except IE Edge. In this case, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
 
 To use PKCE flow, set `pkce` to `true` in your config.
 
