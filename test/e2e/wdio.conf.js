@@ -11,7 +11,7 @@ if (fs.existsSync(TESTENV)) {
   const envConfig = dotenv.parse(fs.readFileSync(TESTENV));
   Object.keys(envConfig).forEach((k) => {
     process.env[k] = envConfig[k];
-  });  
+  });
 }
 
 const DEBUG = process.env.DEBUG;
@@ -24,7 +24,7 @@ const chromeOptions = {
 
 if (CI) {
     chromeOptions.args = chromeOptions.args.concat([
-        '--headless', '--disable-gpu', '--window-size=1600x1200', '--no-sandbox'
+        '--headless', '--disable-gpu', '--window-size=1600x1200', '--no-sandbox', '--whitelisted-ips', '--disable-extensions'
     ]);
 }
 
@@ -33,6 +33,7 @@ exports.config = {
         defaultTimeoutInterval,
         stopSpecOnExpectationFailure: true
     },
+
 
     //
     // ====================
@@ -144,7 +145,6 @@ exports.config = {
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
     services: ['chromedriver'],
-    
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks.html
@@ -160,7 +160,7 @@ exports.config = {
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter.html
     reporters: ['spec'],
- 
+
     //
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
