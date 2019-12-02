@@ -195,6 +195,7 @@ tokenManager: {
 | `issuer`       | Specify a custom issuer to perform the OIDC flow. Defaults to the base url parameter if not provided. |
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
+| `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [signOut](#signout). This url must be added to the list of `Logout redirect URIs` on the application's `General Settings` tab.
 | `pkce`  | If set to true, the authorization flow will automatically use PKCE.  The authorize request will use `response_type=code`, and `grant_type=authorization_code` will be used on the token request.  All these details are handled for you, including the creation and verification of code verifiers. |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
@@ -396,15 +397,78 @@ authClient.signIn({
 
 ### `signOut()`
 
-Signs the user out of their current Okta [session](https://developer.okta.com/docs/api/resources/sessions#example).
+Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. The Okta session can be closed using either an `XHR` method or a `redirect` method. By default, the `XHR` method is used. Here are some points to consider when deciding which method is most appropriate for your application:
+
+XHR:
+
+* Executes in the background. The user will see not any change to `window.location`.
+* Will fail if 3rd-party cookies are blocked by the browser.
+* If the session is already closed, the method will fail and reject the returned Promise. This error can be caught by the app and handled seamlessly.
+* It is recommended (but not required) for the app to call `window.location.reload()` after the `XHR` method completes to ensure your app is properly re-initialized in an unauthenticated state.
+* For more information, see [Close Current Session](https://developer.okta.com/docs/reference/api/sessions/#close-current-session) in the Session API documentation.
+
+Redirect:
+
+* Will change the `window.location` to an Okta-hosted page before redirecting to a URI of your choice.
+* No issue with 3rd-party cookies.
+* Requires a `postLogoutRedirectUri` to be specified. This URI must be whitelisted in the Okta application's settings. If the `postLogoutRedirectUri` is unknown or invalid the redirect will end on a 400 error page from Okta. This error will be visible to the user and cannot be handled by the app.
+* Requires a valid ID token. If an ID token is not available, `signOut` will fallback to using the `XHR` method and then redirect to the `postLogoutRedirectUri`.
+* For more information, see [Logout](https://developer.okta.com/docs/reference/api/oidc/#logout) in the OIDC API documentation.
+
+`signOut` takes the following options:
+
+* `postLogoutRedirectUri` - Setting a value will enable the logout redirect method. **The URI must be whitelisted** as a `Logout Redirect Uri` in your application's general settings. It is common to use your application's origin URI as the `postLogoutRedirectUri` so that users are sent to the application "home page" after signout.
+* `state` - An optional value, used along with `postLogoutRedirectUri`. If set, this value will be returned as a query parameter during the redirect to the `postLogoutRedirectUri`
+* `idToken` - Specifies the ID token object. This is only relevant when a `postLogoutRedirectUri` has been specified. By default, `signOut` will look for a token object named `idToken` within the `TokenManager`. If you have stored the id token object in a different location, you should retrieve it first and then pass it here.
+* `revokeAccessToken` - If `true`, the access token will be revoked before the session is closed.
+* `accessToken` - Specifies the access token object. This is only relevant when the `revokeAccessToken` option is `true`. By default, `signOut` will look for a token object named `token` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here.
 
 ```javascript
+// Sign out using the XHR method
 authClient.signOut()
 .then(function() {
   console.log('successfully logged out');
 })
-.fail(function(err) {
+.catch(function(err) {
   console.error(err);
+})
+.then(function() {
+  // Reload app in unauthenticated state
+  window.location.reload();
+});
+```
+
+```javascript
+// Sign out using the redirect method, specifying the current window origin as the post logout URI
+authClient.signOut({
+  postLogoutRedirectUri: window.location.origin
+});
+```
+
+```javascript
+// In this case, the ID token is stored under the 'myIdToken' key
+var idToken = await authClient.tokenManager.get('myIdToken');
+authClient.signOut({
+  idToken: idToken,
+  postLogoutRedirectUri: window.location.origin
+});
+```
+
+```javascript
+// Revoke the access token and sign out using the redirect method
+authClient.signOut({
+  revokeAccessToken: true,
+  postLogoutRedirectUri: window.location.origin
+});
+```
+
+```javascript
+// In this case, the access token is stored under the 'myAccessToken' key
+var accessToken = await authClient.tokenManager.get('myAccessToken');
+authClient.signOut({
+  accessToken: accessToken,
+  revokeAccessToken: true,
+  postLogoutRedirectUri: window.location.origin
 });
 ```
 

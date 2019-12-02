@@ -24,7 +24,11 @@ function homeLink(app) {
 }
 
 function logoutLink(app) {
-  return `<a id="logout" href="${app.originalUrl}" onclick="logoutAndReload(event)">Logout</a>`;
+  return `
+  <a id="logout" href="${app.originalUrl}" onclick="logoutAndReload(event)">Logout (and reload)</a><br/>
+  <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutAndRedirect(event)">Logout (and redirect here)</a><br/>
+  <a id="logout-local" href="${app.originalUrl}" onclick="logoutLocal(event)">Logout (local only)</a><br/>
+  `;
 }
 
 const Footer = `
@@ -33,6 +37,7 @@ const Footer = `
 const Layout = `
   <div id="layout">
     <div id="token-error" style="color: red"></div>
+    <div id="token-msg" style="color: green"></div>
     <div id="page-content"></div>
     <div id="config-area" class="flex-row">
       <div id="form-content" class="box">${Form}</div>
@@ -42,16 +47,33 @@ const Layout = `
   </div>
 `;
 
+function makeClickHandler(fn) {
+  return function(event) {
+    event && event.preventDefault(); // prevent navigation / page reload
+    return fn();
+  };
+}
+
 function bindFunctions(testApp, window) {
-  window.loginRedirect = testApp.loginRedirect.bind(testApp, {});
-  window.loginPopup = testApp.loginPopup.bind(testApp, {});
-  window.loginDirect = testApp.loginDirect.bind(testApp);
-  window.getToken = testApp.getToken.bind(testApp, {});
-  window.logout = testApp.logout.bind(testApp);
-  window.logoutAndReload = testApp.logoutAndReload.bind(testApp);
-  window.renewToken = testApp.renewToken.bind(testApp);
-  window.handleCallback = testApp.handleCallback.bind(testApp);
-  window.getUserInfo = testApp.getUserInfo.bind(testApp);
+  var boundFunctions = {
+    loginRedirect: testApp.loginRedirect.bind(testApp, {}),
+    loginPopup: testApp.loginPopup.bind(testApp, {}),
+    loginDirect: testApp.loginDirect.bind(testApp),
+    getToken: testApp.getToken.bind(testApp, {}),
+    clearTokens: testApp.clearTokens.bind(testApp),
+    logout: testApp.logout.bind(testApp),
+    logoutAndReload: testApp.logoutAndReload.bind(testApp),
+    logoutAndRedirect: testApp.logoutAndRedirect.bind(testApp),
+    logoutLocal: testApp.logoutLocal.bind(testApp),
+    refreshSession: testApp.refreshSession.bind(testApp),
+    renewToken: testApp.renewToken.bind(testApp),
+    revokeToken: testApp.revokeToken.bind(testApp),
+    handleCallback: testApp.handleCallback.bind(testApp),
+    getUserInfo: testApp.getUserInfo.bind(testApp),
+  };
+  Object.keys(boundFunctions).forEach(functionName => {
+    window[functionName] = makeClickHandler(boundFunctions[functionName]);
+  });
 }
 
 function TestApp(config) {
@@ -137,8 +159,7 @@ Object.assign(TestApp.prototype, {
     `);
     this._afterRender('with-error');
   },
-  loginDirect: async function(e) {
-    e && e.preventDefault();
+  loginDirect: async function() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     return this.oktaAuth.signIn({username, password})
@@ -156,8 +177,7 @@ Object.assign(TestApp.prototype, {
       throw e;
     });
   },
-  loginRedirect: async function(options, event) {
-    event && event.preventDefault(); // prevent navigation / page reload
+  loginRedirect: async function(options) {
     saveConfigToStorage(this.config);
     options = Object.assign({}, {
       responseType: this.config.responseType,
@@ -169,8 +189,7 @@ Object.assign(TestApp.prototype, {
         throw e;
       });
   },
-  loginPopup: async function(options, event) {
-    event && event.preventDefault(); // prevent navigation / page reload
+  loginPopup: async function(options) {
     options = Object.assign({}, {
       responseType: this.config.responseType,
       scopes: this.config.scopes,
@@ -181,8 +200,7 @@ Object.assign(TestApp.prototype, {
       this.render();
     });
   },
-  getToken: async function(options, event) {
-    event && event.preventDefault(); // prevent navigation / page reload
+  getToken: async function(options) {
     options = Object.assign({}, {
       responseType: this.config.responseType,
       scopes: this.config.scopes,
@@ -193,19 +211,26 @@ Object.assign(TestApp.prototype, {
       this.render();
     });
   },
-  renewToken: async function(event) {
-    event && event.preventDefault(); // prevent navigation / page reload
+  refreshSession: async function() {
+    return this.oktaAuth.session.refresh();
+  },
+  revokeToken: async function() {
+    const accessToken = await this.oktaAuth.tokenManager.get('accessToken');
+    return this.oktaAuth.token.revoke(accessToken)
+    .then(() => {
+      document.getElementById('token-msg').innerHTML = 'access token revoked';
+    });
+  },
+  renewToken: async function() {
     return this.oktaAuth.tokenManager.renew('idToken')
       .then(() => {
         this.render();
       });
   },
   logout: async function() {
-    this.oktaAuth.tokenManager.clear();
     return this.oktaAuth.signOut();
   },
-  logoutAndReload: function(event) {
-    event && event.preventDefault();
+  logoutAndReload: function() {
     this.logout()
       .catch(e => {
         console.error('Error during signout: ', e);
@@ -214,15 +239,29 @@ Object.assign(TestApp.prototype, {
         window.location.reload();
       });
   },
-  handleCallback: async function(e) {
-    e && e.preventDefault();
-
+  logoutAndRedirect: function() {
+    var options = {
+      postLogoutRedirectUri: window.location.origin
+    };
+    this.oktaAuth.signOut(options)
+      .catch(e => {
+        console.error('Error during signout & redirect: ', e);
+      });
+  },
+  logoutLocal: function() {
+    this.clearTokens();
+    window.location.reload();
+  },
+  handleCallback: async function() {
     return this.getTokensFromUrl()
       .catch(e => {
         this.renderError(e);
         throw e;
       })
-      .then(tokens => this.callbackHTML(tokens))
+      .then(tokens => {
+        this.saveTokens(tokens);
+        return this.callbackHTML(tokens);
+      })
       .then(content => this._setContent(content))
       .then(() => this._afterRender('callback-handled'));
   },
@@ -248,8 +287,10 @@ Object.assign(TestApp.prototype, {
     const idToken = await this.oktaAuth.tokenManager.get('idToken');
     return { accessToken, idToken };
   },
-  getUserInfo: async function(event) {
-    event && event.preventDefault(); // prevent navigation / page reload
+  clearTokens: function() {
+    this.oktaAuth.tokenManager.clear();
+  },
+  getUserInfo: async function() {
     const { accessToken, idToken } = await this.getTokens();
     if (accessToken && idToken) {
       return this.oktaAuth.token.getUserInfo(accessToken)
@@ -289,6 +330,15 @@ Object.assign(TestApp.prototype, {
           </li>
           <li>
             <a id="get-token" href="/" onclick="getToken(event)">Get Token (without prompt)</a>
+          </li>
+          <li>
+            <a id="clear-tokens" href="/" onclick="clearTokens(event)">Clear Tokens</a>
+          </li>
+          <li>
+            <a id="revoke-token" href="/" onclick="revokeToken(event)">Revoke Access Token</a>
+          </li>
+          <li>
+            <a id="refresh-session" href="/" onclick="refreshSession(event)">Refresh Session</a>
           </li>
         </ul>
         <div id="user-info"></div>

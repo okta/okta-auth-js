@@ -5,6 +5,36 @@ import { flows, openImplicit, openPKCE } from '../util/appUtils';
 import { loginPopup } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 
+describe('token revoke', () => {
+  it('can revoke the access token', async () => {
+    await openPKCE();
+    await loginPopup();
+    
+    // We should be able to request and display user info with no errors
+    await TestApp.getUserInfo();
+    await TestApp.assertUserInfo();
+
+    // Revoke the token
+    await TestApp.revokeToken();
+    await browser.waitUntil(async () => {
+      const txt = await TestApp.tokenMsg.then(el => el.getText());
+      return txt !== '';
+    }, 10000, 'wait for token message');
+    const txt = await TestApp.tokenMsg.then(el => el.getText());
+    assert(txt === 'access token revoked');
+
+    // Now if we try to get user info, we should receive an error
+    await TestApp.getUserInfo();
+    await TestApp.error.then(el => el.waitForExist(15000, false, 'wait for error'));
+    const error = await TestApp.error.then(el => el.getText());
+    assert(error === 'AuthApiError');
+    const xhrError = await TestApp.xhrError.then(el => el.getText());
+    assert(xhrError === 'Network request failed');
+
+    await TestApp.logout();
+  });
+});
+
 describe('E2E token flows', () => {
 
   flows.forEach(flow => {

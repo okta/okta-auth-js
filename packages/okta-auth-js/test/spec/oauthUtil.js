@@ -351,6 +351,8 @@ describe('getOAuthUrls', function() {
     setupOAuthUrls({
       expectedResult: {
         issuer: 'https://auth-js-test.okta.com',
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout',
+        revokeUrl: 'https://auth-js-test.okta.com/oauth2/v1/revoke',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
@@ -362,12 +364,15 @@ describe('getOAuthUrls', function() {
       oktaAuthArgs: {
         url: 'https://auth-js-test.okta.com',
         issuer: 'https://auth-js-test.okta.com/',
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout/',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token/',
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize/',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo/'
       },
       expectedResult: {
         issuer: 'https://auth-js-test.okta.com',
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout',
+        revokeUrl: 'https://auth-js-test.okta.com/oauth2/v1/revoke',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
@@ -379,21 +384,27 @@ describe('getOAuthUrls', function() {
       oktaAuthArgs: {
         url: 'https://auth-js-test.okta.com',
         issuer: 'https://bad.okta.com',
+        logoutUrl: 'https://bad.okta.com/oauth2/v1/logout',
+        revokeUrl: 'https://bad.okta.com/oauth2/v1/revoke',
         tokenUrl: 'https://bad.okta.com/oauth2/v1/token',
         authorizeUrl: 'https://bad.okta.com/oauth2/v1/authorize',
         userinfoUrl: 'https://bad.okta.com/oauth2/v1/userinfo'
       },
       options: {
         issuer: 'https://auth-js-test.okta.com',
-        tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
-        authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        logoutUrl: 'https://overrid-js-test.okta.com/oauth2/v1/logout',
+        revokeUrl: 'https://override-js-test.okta.com/oauth2/v1/revoke',
+        tokenUrl: 'https://override-js-test.okta.com/oauth2/v1/token',
+        authorizeUrl: 'https://override-js-test.okta.com/oauth2/v1/authorize',
+        userinfoUrl: 'https://override-js-test.okta.com/oauth2/v1/userinfo'
       },
       expectedResult: {
         issuer: 'https://auth-js-test.okta.com',
-        tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
-        authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        logoutUrl: 'https://overrid-js-test.okta.com/oauth2/v1/logout',
+        revokeUrl: 'https://override-js-test.okta.com/oauth2/v1/revoke',
+        tokenUrl: 'https://override-js-test.okta.com/oauth2/v1/token',
+        authorizeUrl: 'https://override-js-test.okta.com/oauth2/v1/authorize',
+        userinfoUrl: 'https://override-js-test.okta.com/oauth2/v1/userinfo'
       }
     });
   });
@@ -401,12 +412,16 @@ describe('getOAuthUrls', function() {
     setupOAuthUrls({
       options: {
         issuer: 'https://auth-js-test.okta.com/',
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout/',
+        revokeUrl: 'https://auth-js-test.okta.com/oauth2/v1/revoke/',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token/',
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize/',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo/'
       },
       expectedResult: {
         issuer: 'https://auth-js-test.okta.com',
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout',
+        revokeUrl: 'https://auth-js-test.okta.com/oauth2/v1/revoke',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
@@ -420,6 +435,8 @@ describe('getOAuthUrls', function() {
       },
       expectedResult: {
         issuer: 'https://auth-js-test.okta.com',
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout',
+        revokeUrl: 'https://auth-js-test.okta.com/oauth2/v1/revoke',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
@@ -433,6 +450,8 @@ describe('getOAuthUrls', function() {
       },
       expectedResult: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/logout',
+        revokeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/revoke',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
@@ -446,6 +465,8 @@ describe('getOAuthUrls', function() {
       },
       expectedResult: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/logout',
+        revokeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/revoke',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
@@ -463,6 +484,8 @@ describe('getOAuthUrls', function() {
       },
       expectedResult: {
         issuer: 'https://auth-js-test.okta.com', // We don't validate the issuer of access tokens, so this is ignored
+        logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout',
+        revokeUrl: 'https://auth-js-test.okta.com/oauth2/v1/revoke',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token', // we are not using this url for responseType 'token'
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
