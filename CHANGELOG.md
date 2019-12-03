@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.11.0
+
+### Features
+
+- [#288](https://github.com/okta/okta-auth-js/pull/288) - New options for `signOut`:
+  - Can provide a post-logout redirect URI.
+  - Can revoke access token
+
+### Bug Fixes
+
+- [#288](https://github.com/okta/okta-auth-js/pull/288) - calling `signOut` will clear the TokenManager.
+- [#284](https://github.com/okta/okta-auth-js/pull/284) - `isPKCESupported` will return false if `TextEncoder` is not available (IE Edge).
+
+### Other
+
+- [#284](https://github.com/okta/okta-auth-js/pull/284) - better error messages when attempting to use PKCE in an unsupported browser configuration.
+
 ## 2.10.1
 
 ### Other

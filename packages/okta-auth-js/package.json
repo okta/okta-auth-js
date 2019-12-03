@@ -1,7 +1,7 @@
 {
   "name": "@okta/okta-auth-js",
   "description": "The Okta Auth SDK",
-  "version": "2.10.1",
+  "version": "2.11.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "lib/server/serverIndex.js",
