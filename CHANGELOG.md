@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.11.1
+
+### Other
+
+- [#293](https://github.com/okta/okta-auth-js/pull/293) - Copy markdown files to package directory during publish
+
 ## 2.11.0
 
 ### Features
