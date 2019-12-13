@@ -4,15 +4,22 @@ if (!process.env.ARTIFACTORY_URL) {
   throw new Error('ARTIFACTORY_URL environment variable must be set');
 }
 
+if (!process.env.BRANCH) {
+  throw new Error('BRANCH environment variable must be set');
+}
+
+if (!process.env.SHA) {
+  throw new Error('SHA environment variable must be set');
+}
+
 const path = require('path');
 const execSync = require('child_process').execSync;
-const branch = execSync(`git branch --show-current`).toString().trim();
-const CI = process.env.BRANCH && branch === process.env.BRANCH;
+const branch = process.env.BRANCH;
+const sha = process.env.SHA;
 const isTopicBranch = branch !== 'master';
 
 let versionSuffix = '';
 if (isTopicBranch) {
-  const sha = execSync(`git log ${branch} | head -1`).toString().trim().split(' ')[1];
   versionSuffix = '-beta.' + sha.substring(sha.length - 8);
   console.log(`Using version suffix "${versionSuffix}"`);
 }
@@ -33,9 +40,11 @@ Object.keys(workspaces).forEach(name => {
   }
 
   let pkgVersion = pkg.version + versionSuffix;
-  if (versionSuffix && CI) {
+  if (versionSuffix) {
     // Update package.json with the beta version
-    execSync(`npm version ${pkgVersion}`);
+    execSync(`npm version ${pkgVersion} --no-git-tag-version`,  {
+      cwd: moduleDir
+    });
   }
 
   const moduleWithVersion = `${pkg.name}@${pkgVersion}`;
@@ -52,14 +61,12 @@ Object.keys(workspaces).forEach(name => {
 
   if (isInPublicNpm) {
     console.log(`${moduleWithVersion} exists`);
-  } else if (CI) {
+  } else {
     console.log(`Publishing ${moduleWithVersion}`);
     execSync(`npm publish --registry ${registry}`, {
       cwd: moduleDir
     });
     hasPublishedAPackage = true;
-  } else {
-    console.log(`Not publishing ${moduleWithVersion} because not running in a CI environment`);
   }
 });
 
