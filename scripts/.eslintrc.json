@@ -1,0 +1,19 @@
+{
+  "extends": ["eslint:recommended"],
+  "env": {
+    "browser": false,
+    "node": true
+  },
+  "globals": {
+    "console": "readonly"
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2017
+  },
+  "rules": {
+    "semi": 2,
+    "eol-last": 2,
+    "no-console": 0
+  }
+}

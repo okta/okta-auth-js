@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "@okta/test.e2e",
   "version": "1.0.0",
   "main": "index.js",
