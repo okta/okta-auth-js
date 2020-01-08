@@ -259,9 +259,9 @@ util.removeTrailingSlash = function(path) {
   }
   // Remove any whitespace before or after string
   var trimmed = path.replace(/^\s+|\s+$/gm,'');
-  if (trimmed.slice(-1) === '/') {
-    return trimmed.slice(0, -1);
-  }
+  // Remove trailing slash(es)
+  trimmed = trimmed.replace(/\/+$/, '');
+
   return trimmed;
 };
 

@@ -21,6 +21,8 @@
     "publish": "lerna publish --skip-npm",
     "test": "yarn test:unit && yarn test:e2e",
     "test:e2e": "yarn --cwd test/e2e start",
+    "test:browser": "yarn workspace @okta/okta-auth-js test:browser",
+    "test:server": "yarn workspace @okta/okta-auth-js test:server",
     "test:unit": "yarn workspace @okta/okta-auth-js test",
     "test:report": "yarn test:unit --ci --silent || true",
     "prepare": "yarn build",

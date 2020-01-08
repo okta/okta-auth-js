@@ -2,10 +2,10 @@
 const URL = require('url');
 const ISSUER = process.env.ISSUER;
 const issuer = URL.parse(ISSUER);
-const BASE_URL = issuer.protocol + issuer.host;
+const BASE_URL = issuer.protocol + '//' + issuer.host;
 
 async function openOktaHome() {
-  return browser.newWindow(BASE_URL, 'Okta signin page');
+  return browser.newWindow(BASE_URL, 'Okta-hosted page');
 }
 
 async function switchToPopupWindow() {

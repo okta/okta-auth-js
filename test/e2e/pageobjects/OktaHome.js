@@ -11,6 +11,10 @@ class OktaLogin {
     await this.signOutBtn.then(el => el.click());
     await browser.waitUntil(async () => browser.getUrl().then(cur => (cur !== url)), 5000, 'wait for url change');
   }
+
+  async waitForLoad() {
+    await browser.waitUntil(async () => this.userMenu.then(el => el.isDisplayed()), 5000, 'wait for user menu');
+  }
 }
 
 export default new OktaLogin();

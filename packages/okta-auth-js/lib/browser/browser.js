@@ -42,8 +42,11 @@ function OktaAuthBuilder(args) {
     authorizeUrl: util.removeTrailingSlash(args.authorizeUrl),
     userinfoUrl: util.removeTrailingSlash(args.userinfoUrl),
     tokenUrl: util.removeTrailingSlash(args.tokenUrl),
+    revokeUrl: util.removeTrailingSlash(args.revokeUrl),
+    logoutUrl: util.removeTrailingSlash(args.logoutUrl),
     pkce: usePKCE,
     redirectUri: args.redirectUri,
+    postLogoutRedirectUri: args.postLogoutRedirectUri,
     httpRequestClient: args.httpRequestClient,
     storageUtil: args.storageUtil,
     transformErrorXHR: args.transformErrorXHR,
@@ -51,7 +54,14 @@ function OktaAuthBuilder(args) {
   };
 
   if (this.options.pkce && !sdk.features.isPKCESupported()) {
-    throw new AuthSdkError('This browser doesn\'t support PKCE');
+    var errorMessage = 'PKCE requires a modern browser with encryption support running in a secure context.';
+    if (!sdk.features.isHTTPS()) {
+      errorMessage += '\nThe current page is not being served with HTTPS protocol. Try using HTTPS.';
+    }
+    if (!sdk.features.hasTextEncoder()) {
+      errorMessage += '\n"TextEncoder" is not defined. You may need a polyfill/shim for this browser.';
+    }
+    throw new AuthSdkError(errorMessage);
   }
 
   this.userAgent = 'okta-auth-js-' + SDK_VERSION;
@@ -108,6 +118,7 @@ function OktaAuthBuilder(args) {
     getWithRedirect: util.bind(token.getWithRedirect, null, sdk),
     parseFromUrl: util.bind(token.parseFromUrl, null, sdk),
     decode: token.decodeToken,
+    revoke: util.bind(token.revokeToken, null, sdk),
     renew: util.bind(token.renewToken, null, sdk),
     getUserInfo: util.bind(token.getUserInfo, null, sdk),
     verify: util.bind(token.verifyToken, null, sdk)
@@ -162,8 +173,16 @@ proto.features.isTokenVerifySupported = function() {
   return typeof crypto !== 'undefined' && crypto.subtle && typeof Uint8Array !== 'undefined';
 };
 
+proto.features.hasTextEncoder = function() {
+  return typeof TextEncoder !== 'undefined';
+};
+
 proto.features.isPKCESupported = function() {
-  return proto.features.isTokenVerifySupported();
+  return proto.features.isTokenVerifySupported() && proto.features.hasTextEncoder();
+};
+
+proto.features.isHTTPS = function() {
+  return window.location.protocol === 'https:';
 };
 
 // { username, password, (relayState), (context) }
@@ -187,8 +206,105 @@ proto.signIn = function (opts) {
   });
 };
 
-proto.signOut = function () {
-  return this.session.close();
+// Ends the current application session, clearing all local tokens
+// Optionally revokes the access token
+// Ends the user's Okta session using the API or redirect method
+proto.signOut = function (options) {
+  options = util.extend({}, options);
+
+  // postLogoutRedirectUri must be whitelisted in Okta Admin UI
+  var postLogoutRedirectUri = options.postLogoutRedirectUri || this.options.postLogoutRedirectUri;
+
+  var accessToken = options.accessToken;
+  var revokeAccessToken = options.revokeAccessToken;
+  var idToken = options.idToken;
+
+  var sdk = this;
+  var logoutUrl = oauthUtil.getOAuthUrls(sdk).logoutUrl;
+
+  function getAccessToken() {
+    return new Q()
+    .then(function() {
+      if (revokeAccessToken && typeof accessToken === 'undefined') {
+        return sdk.tokenManager.get('token');
+      }
+      return accessToken;
+    });
+  }
+
+  function getIdToken() {
+    return new Q()
+    .then(function() {
+      if (postLogoutRedirectUri && typeof idToken === 'undefined') {
+        return sdk.tokenManager.get('idToken');
+      }
+      return idToken;
+    });
+  }
+
+  function closeSession() {
+    return sdk.session.close() // DELETE /api/v1/sessions/me
+    .catch(function(e) {
+      if (e.name === 'AuthApiError') {
+        // Most likely cause is session does not exist or has already been closed
+        // Could also be a network error. Nothing we can do here.
+        return;
+      }
+      throw e;
+    });
+  }
+
+  return Q.allSettled([getAccessToken(), getIdToken()])
+    .then(function(tokens) {
+      accessToken = tokens[0].value;
+      idToken = tokens[1].value;
+
+      // Clear all local tokens
+      sdk.tokenManager.clear();
+
+      if (revokeAccessToken && accessToken) {
+        return sdk.token.revoke(accessToken)
+        .catch(function(e) {
+          if (e.name === 'AuthApiError') {
+            // Capture and ignore network errors
+            return;
+          }
+          throw e;
+        });
+      }
+    })
+    .then(function() {
+      // XHR signOut method
+      if (!postLogoutRedirectUri) {
+        return closeSession();
+      }
+
+      // No idToken? This can happen if the storage was cleared.
+      // Fallback to XHR signOut, then redirect to the post logout uri
+      if (!idToken) {
+        return closeSession()
+        .catch(function(err) {
+          // eslint-disable-next-line no-console
+          console.log('Unhandled exception while closing session', err);
+        })
+        .then(function() {
+          window.location.assign(postLogoutRedirectUri);
+        });
+      }
+
+      // logout redirect using the idToken.
+      var state = options.state;
+      var idTokenHint = idToken.idToken; // a string
+      var logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint) +
+        '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
+    
+      // State allows option parameters to be passed to logout redirect uri
+      if (state) {
+        logoutUri += '&state=' + encodeURIComponent(state);
+      }
+      
+      window.location.assign(logoutUri);
+    });
 };
 
 builderUtil.addSharedPrototypes(proto);

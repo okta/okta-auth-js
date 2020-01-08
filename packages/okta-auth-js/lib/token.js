@@ -23,6 +23,34 @@ var constants     = require('./constants');
 var cookies       = require('./browser/browserStorage').storage;
 var PKCE          = require('./pkce');
 
+// Only the access token can be revoked in SPA applications
+function revokeToken(sdk, token) {
+  return new Q()
+  .then(function() {
+    if (!token || !token.accessToken) {
+      throw new AuthSdkError('A valid access token object is required');
+    }
+    var clientId = sdk.options.clientId;
+    if (!clientId) {
+      throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to revoke a token');
+    }
+    var revokeUrl = oauthUtil.getOAuthUrls(sdk).revokeUrl;
+    var accessToken = token.accessToken;
+    var args = util.toQueryParams({
+      // eslint-disable-next-line camelcase
+      token_type_hint: 'access_token',
+      token: accessToken
+    }).slice(1);
+    var creds = btoa(clientId);
+    return http.post(sdk, revokeUrl, args, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + creds
+      }
+    });
+  });
+}
+
 function decodeToken(token) {
   var jwt = token.split('.');
   var decodedToken;
@@ -40,6 +68,7 @@ function decodeToken(token) {
   return decodedToken;
 }
 
+// Verify the id token
 function verifyToken(sdk, token, validationParams) {
   return new Q()
   .then(function() {
@@ -731,6 +760,7 @@ function getUserInfo(sdk, accessTokenObject) {
 }
 
 module.exports = {
+  revokeToken: revokeToken,
   getToken: getToken,
   getWithoutPrompt: getWithoutPrompt,
   getWithPopup: getWithPopup,

@@ -168,6 +168,8 @@ function getOAuthUrls(sdk, oauthParams, options) {
   var issuer = util.removeTrailingSlash(options.issuer) || sdk.options.issuer;
   var userinfoUrl = util.removeTrailingSlash(options.userinfoUrl) || sdk.options.userinfoUrl;
   var tokenUrl = util.removeTrailingSlash(options.tokenUrl) || sdk.options.tokenUrl;
+  var logoutUrl = util.removeTrailingSlash(options.logoutUrl) || sdk.options.logoutUrl;
+  var revokeUrl = util.removeTrailingSlash(options.revokeUrl) || sdk.options.revokeUrl;
 
   // If an issuer exists but it's not a url, assume it's an authServerId
   if (issuer && !(/^https?:/.test(issuer))) {
@@ -183,7 +185,7 @@ function getOAuthUrls(sdk, oauthParams, options) {
   }
 
   // If a token is requested without an issuer
-  if (!issuer && oauthParams.responseType.indexOf('token') !== -1) {
+  if (!issuer && oauthParams && oauthParams.responseType.indexOf('token') !== -1) {
     // If an authorizeUrl is supplied without a userinfoUrl
     if (authorizeUrl && !userinfoUrl) {
       // The userinfoUrl is ambiguous, so we won't be able to call getUserInfo
@@ -197,42 +199,39 @@ function getOAuthUrls(sdk, oauthParams, options) {
     }
   }
 
-  var sharedResourceServerRegex = new RegExp('^https?://.*?/oauth2/.+');
-
   // Default the issuer to our baseUrl
   issuer = issuer || sdk.options.url;
 
-  // A shared resource server issuer looks like:
+  // Trim trailing slashes
+  issuer = util.removeTrailingSlash(issuer);
+
+  var baseUrl = issuer;
+  // A custom auth server issuer looks like:
   // https://example.okta.com/oauth2/aus8aus76q8iphupD0h7
-  if (sharedResourceServerRegex.test(issuer)) {
-    // A shared resource server authorizeUrl looks like:
-    // https://example.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize
-    authorizeUrl = authorizeUrl || issuer + '/v1/authorize';
-    // Shared resource server userinfoUrls look like:
-    // https://example.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo
-    userinfoUrl = userinfoUrl || issuer + '/v1/userinfo';
-    // Shared resource server tokenUrls look like:
-    // https://example.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token
-    tokenUrl = tokenUrl || issuer + '/v1/token';
-  // Normally looks like:
-  // https://example.okta.com
-  } else {
-    // Normal authorizeUrls look like:
-    // https://example.okta.com/oauth2/v1/authorize
-    authorizeUrl = authorizeUrl || issuer + '/oauth2/v1/authorize';
-    // Normal userinfoUrls look like:
-    // https://example.okta.com/oauth2/v1/userinfo
-    userinfoUrl = userinfoUrl || issuer + '/oauth2/v1/userinfo';
-    // Normal tokenUrls look like:
-    // https://example.okta.com/oauth2/v1/token
-    tokenUrl = tokenUrl || issuer + '/oauth2/v1/token';
+  // 
+  // Most orgs have a "default" custom authorization server:
+  // https://example.okta.com/oauth2/default
+  var customAuthServerRegex = new RegExp('^https?://.*?/oauth2/.+');
+  if (!customAuthServerRegex.test(baseUrl)) {
+    // Append '/oauth2' if necessary
+    if (!baseUrl.endsWith('/oauth2')) {
+      baseUrl += '/oauth2';
+    }
   }
+
+  authorizeUrl = authorizeUrl || baseUrl + '/v1/authorize';
+  userinfoUrl = userinfoUrl || baseUrl + '/v1/userinfo';
+  tokenUrl = tokenUrl || baseUrl + '/v1/token';
+  revokeUrl = revokeUrl || baseUrl + '/v1/revoke';
+  logoutUrl = logoutUrl || baseUrl + '/v1/logout';
 
   return {
     issuer: issuer,
     authorizeUrl: authorizeUrl,
     userinfoUrl: userinfoUrl,
-    tokenUrl: tokenUrl
+    tokenUrl: tokenUrl,
+    revokeUrl: revokeUrl,
+    logoutUrl: logoutUrl
   };
 }
 
