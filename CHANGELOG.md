@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.11.2
+
+### Features
+
+- [#271](https://github.com/okta/okta-auth-js/pull/271) - New option `onSessionExpired`
+
 ## 2.11.1
 
 ### Other
