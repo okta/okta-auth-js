@@ -11,11 +11,19 @@
   overflow-wrap: break-word;
 }
 
-input {
-  font-size: larger;
+input[type=text] {
   width: 600px;
 }
 
+label,
+input,
+select {
+  font-size: larger;
+}
+
+label {
+  margin-right: 10px;
+}
 a {
   padding: 4px;
   margin: 4px;

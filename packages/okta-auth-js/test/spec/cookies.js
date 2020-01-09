@@ -30,6 +30,26 @@ describe('cookie', function () {
         path: '/'
       });
     });
+
+    it('proxies JsCookie.set with "secure" setting',  function ()  {
+      Cookies.set('foo', 'bar', null, {
+        secure: true
+      });
+      expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
+        path: '/',
+        secure: true
+      });
+    });
+
+    it('proxies JsCookie.set with "sameSite" setting',  function ()  {
+      Cookies.set('foo', 'bar', null, {
+        sameSite: 'lax'
+      });
+      expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
+        path: '/',
+        sameSite: 'lax'
+      });
+    });
   });
 
   describe('get',  function ()  {

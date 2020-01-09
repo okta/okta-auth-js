@@ -69,11 +69,16 @@ storageUtil.getSessionStorage = function() {
 // Provides webStorage-like interface for cookies
 storageUtil.getCookieStorage = function(options) {
   options = options || {};
+  var secure = options.secure; // currently opt-in
+  var sameSite = options.sameSite || 'strict'; // token storage should only be accessed by javascript
   return {
     getItem: storageUtil.storage.get,
     setItem: function(key, value) {
       // Cookie shouldn't expire
-      storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', options.secure);
+      storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
+        secure: secure, 
+        sameSite: sameSite
+      });
     }
   };
 };
@@ -103,10 +108,12 @@ storageUtil.testStorage = function(storage) {
 };
 
 storageUtil.storage = {
-  set: function(name, value, expiresAt, secure) {
+  set: function(name, value, expiresAt, options) {
+    options = options || {};
     var cookieOptions = {
-      path: '/',
-      secure: secure
+      path: options.path || '/',
+      secure: options.secure,
+      sameSite: options.sameSite
     };
 
     // eslint-disable-next-line no-extra-boolean-cast

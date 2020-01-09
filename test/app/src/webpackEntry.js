@@ -1,5 +1,6 @@
 /* entry point for SPA application */
 /* global window, document */
+import Cookies from 'js-cookie';
 import TestApp from './testApp';
 import { getDefaultConfig, getConfigFromUrl, getConfigFromStorage, clearStorage } from './config';
 
@@ -10,7 +11,11 @@ const rootElem = document.getElementById('root');
 function mount() {
   // Create the app as a function of config
   app = new TestApp(config);
-  window._testApp = app; // Expose for console fiddling
+
+  // Expose for console fiddling
+  window._testApp = app;
+  window._cookies = Cookies;
+
   app.mount(window, rootElem);
   return app;
 }

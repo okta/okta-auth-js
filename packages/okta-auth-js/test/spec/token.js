@@ -1171,6 +1171,9 @@ describe('token.getWithRedirect', function() {
   var codeChallenge = 'fake';
   var defaultUrls;
   var customUrls;
+  var nonceCookie;
+  var stateCookie;
+
   beforeEach(function() {
     defaultUrls = {
       issuer: 'https://auth-js-test.okta.com',
@@ -1188,6 +1191,23 @@ describe('token.getWithRedirect', function() {
       revokeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/revoke',
       logoutUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/logout',
     }
+    nonceCookie = [
+      'okta-oauth-nonce',
+      oauthUtil.mockedNonce,
+      null, // expiresAt
+      {
+        sameSite: 'lax'
+      }
+    ];
+
+    stateCookie =  [
+      'okta-oauth-state',
+      oauthUtil.mockedState,
+      null, // expiresAt
+      {
+        sameSite: 'lax'
+      }
+    ];
   });
   function mockPKCE() {
     spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
@@ -1209,31 +1229,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'id_token',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=id_token&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1259,25 +1276,22 @@ describe('token.getWithRedirect', function() {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: customUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=id_token&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1307,25 +1321,22 @@ describe('token.getWithRedirect', function() {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: customUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=token&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=email'
     });
   });
@@ -1342,31 +1353,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'token',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=token&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=email'
     });
   });
@@ -1394,25 +1402,22 @@ describe('token.getWithRedirect', function() {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: customUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=token&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=email'
     });
   });
@@ -1428,31 +1433,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: ['token', 'id_token'],
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'idp=testIdp&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1479,25 +1481,22 @@ describe('token.getWithRedirect', function() {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: customUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'idp=testIdp&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1513,31 +1512,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'code',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=query&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1557,33 +1553,30 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'code',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'code_challenge=' + codeChallenge + '&' +
                             'code_challenge_method=' + codeChallengeMethod + '&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1603,33 +1596,30 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'code',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'code_challenge=' + codeChallenge + '&' +
                             'code_challenge_method=' + codeChallengeMethod + '&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1657,25 +1647,22 @@ describe('token.getWithRedirect', function() {
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: customUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=query&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1692,31 +1679,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: ['code'],
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=query&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1737,33 +1721,30 @@ describe('token.getWithRedirect', function() {
         'okta-oauth-redirect-params',
         JSON.stringify({
           responseType: 'code',
-          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          state: oauthUtil.mockedState,
+          nonce: oauthUtil.mockedNonce,
           scopes: ['openid', 'email'],
           clientId: 'NPSfOkH5eZrTy8PMDlvx',
           urls: defaultUrls,
           ignoreSignature: false
-        })
+        }),
+        null, {
+          sameSite: 'strict'
+        }
       ],
-      [
-        'okta-oauth-nonce',
-        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-      ],
-      [
-        'okta-oauth-state',
-        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-      ]
+      nonceCookie,
+      stateCookie
     ],
     expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                           'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                           'code_challenge=' + codeChallenge + '&' +
                           'code_challenge_method=' + codeChallengeMethod + '&' +
-                          'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                          'nonce=' + oauthUtil.mockedNonce + '&' +
                           'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                           'response_mode=fragment&' +
                           'response_type=code&' +
                           'sessionToken=testToken&' +
-                          'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                          'state=' + oauthUtil.mockedState + '&' +
                           'scope=openid%20email'
   });
 });
@@ -1780,31 +1761,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'code',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=form_post&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1819,31 +1797,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'id_token',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'login_hint=JoeUser&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=id_token&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1858,31 +1833,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'id_token',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+          null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'idp_scope=scope1%20scope2&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=id_token&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
@@ -1897,31 +1869,28 @@ describe('token.getWithRedirect', function() {
           'okta-oauth-redirect-params',
           JSON.stringify({
             responseType: 'id_token',
-            state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
             clientId: 'NPSfOkH5eZrTy8PMDlvx',
             urls: defaultUrls,
             ignoreSignature: false
-          })
+          }),
+null, {
+            sameSite: 'strict'
+          }
         ],
-        [
-          'okta-oauth-nonce',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ],
-        [
-          'okta-oauth-state',
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        ]
+        nonceCookie,
+        stateCookie
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'idp_scope=scope1%20scope2&' +
-                            'nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
                             'response_type=id_token&' +
-                            'state=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&' +
+                            'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
