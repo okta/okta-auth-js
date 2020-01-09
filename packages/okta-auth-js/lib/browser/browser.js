@@ -16,6 +16,7 @@
 
 require('../vendor/polyfills');
 
+var Emitter           = require('tiny-emitter');
 var AuthSdkError      = require('../errors/AuthSdkError');
 var builderUtil       = require('../builderUtil');
 var constants         = require('../constants');
@@ -50,7 +51,8 @@ function OktaAuthBuilder(args) {
     httpRequestClient: args.httpRequestClient,
     storageUtil: args.storageUtil,
     transformErrorXHR: args.transformErrorXHR,
-    headers: args.headers
+    headers: args.headers,
+    onSessionExpired: args.onSessionExpired,
   };
 
   if (this.options.pkce && !sdk.features.isPKCESupported()) {
@@ -154,10 +156,23 @@ function OktaAuthBuilder(args) {
     return agent && !isWindowsPhone.test(agent);
   };
 
+  sdk.emitter = new Emitter();
   sdk.tokenManager = new TokenManager(sdk, args.tokenManager);
+  sdk.tokenManager.on('error', this._onTokenManagerError, this);
 }
 
 var proto = OktaAuthBuilder.prototype;
+proto._onTokenManagerError = function(error) {
+  var code = error.errorCode;
+  if (code === 'login_required' && error.accessToken) {
+    if (this.options.onSessionExpired) {
+      this.options.onSessionExpired();
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Session has expired or was closed outside the application.');
+    }
+  }
+};
 
 proto.features = {};
 
