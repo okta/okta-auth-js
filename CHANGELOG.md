@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0
+
+### Breaking Changes
+
+### Other
+
 ## 2.11.2
 
 ### Features
