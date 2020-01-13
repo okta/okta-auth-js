@@ -1,26 +1,25 @@
 describe('fetchRequest', function () {
-  var Q = require('q');
   var mockFetchResult;
   var mockFetchObj = {
     fetch: function mockFetchFunc() {
-      return Q.resolve(mockFetchResult);
+      return Promise.resolve(mockFetchResult);
     }
   }
   jest.setMock('cross-fetch', function() {
     return mockFetchObj.fetch.apply(null, arguments);
   });
 
-  var fetchRequest = require('../../fetch/fetchRequest');
+  var fetchRequest = require('../../lib/fetch/fetchRequest');
 
   beforeEach(function() {
     /* global Map */
     mockFetchResult = {
       headers: new Map(),
       json: function() {
-        return Q.resolve();
+        return Promise.resolve();
       },
       text: function() {
-        return Q.resolve();
+        return Promise.resolve();
       }
     }
   });

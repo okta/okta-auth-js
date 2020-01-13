@@ -1,5 +1,33 @@
 # Changelog
 
+## 3.0.0
+
+### Breaking Changes
+
+- [#308](https://github.com/okta/okta-auth-js/pull/308) - Removed `jquery` and `reqwest` httpRequesters
+
+- [#309](https://github.com/okta/okta-auth-js/pull/309) - Removed `Q` library, now using standard Promise. IE11 will require a polyfill for the `Promise` object. Use of `Promise.prototype.finally` requires Node > 10.3 for server-side use.
+
+- [#310](https://github.com/okta/okta-auth-js/pull/310)
+  - `postLogoutRedirectUri` will default to `window.location.origin`
+  - `signOut` will revoke access token and perform redirect by default. Fallback to XHR (`closeSession`) if no idToken.
+  - New method `closeSession` for XHR signout without redirect or reload.
+  - New method `revokeAccessToken`
+
+- [#311](https://github.com/okta/okta-auth-js/pull/311) - `parseFromUrl` now returns tokens in an object hash (instead of array). The `state` parameter (passed to authorize request) is also returned.
+
+- [#313](https://github.com/okta/okta-auth-js/pull/313) - New option `secureCookies`, which is `true` by default. An HTTPS origin will be enforced unless `secureCookies` is set to `false`.
+
+- [#316](https://github.com/okta/okta-auth-js/pull/316) - Option `issuer` is required. Option `url` has been deprecated and is no longer used.
+
+- [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` option is now `true` by default. `grantType` option is removed.
+
+- [#321](https://github.com/okta/okta-auth-js/pull/321)
+  - Default responseType when using implicit flow is now ['token', 'id_token'].
+  - When both access token and id token are returned, the id token's at_hash claim will be validated against the access token
+
+### Other
+
 ## 2.13.0
 
 ### Features

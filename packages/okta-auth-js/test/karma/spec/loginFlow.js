@@ -92,7 +92,10 @@ describe('Complete login flow', function() {
   }
 
   function mockWellKnown() {
-    sdk.options.storageUtil.getHttpCache().clearStorage();
+    sdk.options.storageUtil.getHttpCache({
+      secure: sdk.options.secureCookies,
+      sameSite: 'lax'
+    }).clearStorage();
 
     var wellKnown = {
       'jwks_uri': JWKS_URI,
@@ -123,6 +126,7 @@ describe('Complete login flow', function() {
     return bootstrap({})
     .then(function(app) {
       return app.loginRedirect({
+        pkce: false,
         nonce: NONCE
       });
     })
