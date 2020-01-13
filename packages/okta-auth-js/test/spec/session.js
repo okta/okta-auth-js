@@ -1,3 +1,4 @@
+/* global window */
 var session = require('../../lib/session');
 var http = require('../../lib/http');
 var Q = require('q');

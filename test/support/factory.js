@@ -1,3 +1,4 @@
+/* global btoa */
 var factory = {};
 
 // converts a standard base64-encoded string to a "url/filename safe" variant

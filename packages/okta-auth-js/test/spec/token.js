@@ -1,3 +1,4 @@
+/* global window, document, btoa */
 jest.mock('cross-fetch');
 var allSettled = require('promise.allsettled');
 allSettled.shim(); // will be a no-op if not needed

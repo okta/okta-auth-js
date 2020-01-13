@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global window, document, btoa */
 /* eslint-disable complexity, max-statements */
 var http          = require('./http');
 var util          = require('./util');

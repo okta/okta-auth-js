@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global localStorage, sessionStorage */
 /* eslint complexity:[0,8] max-statements:[0,21] */
 var util = require('./util');
 var AuthSdkError = require('./errors/AuthSdkError');
