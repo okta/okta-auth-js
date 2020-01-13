@@ -1,8 +1,6 @@
 /* global Promise */
 jest.mock('cross-fetch');
 
-var Q = require('q');
-
 var util = require('@okta/test.support/util');
 var factory = require('@okta/test.support/factory');
 var packageJson = require('../../package.json');
@@ -19,7 +17,7 @@ describe('pkce', function() {
 
     it('throws an error if pkce is true and PKCE is not supported', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-      var sdk = new OktaAuth({ issuer: 'https://foo.com',  });
+      var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: false });
       return token.prepareOauthParams(sdk, {
         pkce: true,
       })
@@ -58,7 +56,7 @@ describe('pkce', function() {
     it('Checks codeChallengeMethod against well-known', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
       var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
-      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Q.resolve({
+      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Promise.resolve({
         'code_challenge_methods_supported': []
       }))
       return token.prepareOauthParams(sdk, {})
@@ -78,12 +76,12 @@ describe('pkce', function() {
 
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
       var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
-      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Q.resolve({
+      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Promise.resolve({
         'code_challenge_methods_supported': [codeChallengeMethod]
       }));
       spyOn(pkce, 'generateVerifier').and.returnValue(codeVerifier);
       spyOn(pkce, 'saveMeta');
-      spyOn(pkce, 'computeChallenge').and.returnValue(Q.resolve(codeChallenge));
+      spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
       return token.prepareOauthParams(sdk, {
         codeChallengeMethod: codeChallengeMethod
       })
@@ -105,7 +103,7 @@ describe('pkce', function() {
     util.itMakesCorrectRequestResponse({
       title: 'requests a token',
       setup: {
-        uri: ISSUER,
+        issuer: ISSUER,
         bypassCrypto: true,
         calls: [
           {
@@ -153,8 +151,9 @@ describe('pkce', function() {
       var oauthOptions;
 
       beforeEach(function() {
+        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
         authClient = new OktaAuth({
-          url: 'https://auth-js-test.okta.com'
+          issuer: 'https://auth-js-test.okta.com'
         });
 
         oauthOptions = {

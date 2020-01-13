@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global crypto */
  /* eslint-disable complexity, max-statements */
 var AuthSdkError  = require('./errors/AuthSdkError');
 var http          = require('./http');
@@ -41,19 +41,23 @@ function generateVerifier(prefix) {
   return encodeURIComponent(verifier).slice(0, MAX_VERIFIER_LENGTH);
 }
 
+function getStorage(sdk) {
+  return sdk.options.storageUtil.getPKCEStorage(sdk.options.cookies);
+}
+
 function saveMeta(sdk, meta) {
-  var storage = sdk.options.storageUtil.getPKCEStorage();
+  var storage = getStorage(sdk);
   storage.setStorage(meta);
 }
 
 function loadMeta(sdk) {
-  var storage = sdk.options.storageUtil.getPKCEStorage();
+  var storage = getStorage(sdk);
   var obj = storage.getStorage();
   return obj;
 }
 
 function clearMeta(sdk) {
-  var storage = sdk.options.storageUtil.getPKCEStorage();
+  var storage = getStorage(sdk);
   storage.clearStorage();
 }
 

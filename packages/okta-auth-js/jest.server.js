@@ -1,5 +1,4 @@
-var packageJson = require('./package.json');
-var OktaAuth = '<rootDir>/' + packageJson.main;
+var OktaAuth = '<rootDir>/lib/server/serverIndex.js';
 
 module.exports = {
   'coverageDirectory': '<rootDir>/build2/reports/coverage',
@@ -13,6 +12,7 @@ module.exports = {
   'testPathIgnorePatterns': [
     './test/spec/browser.js',
     './test/spec/browserStorage.js',
+    './test/spec/cookies.js',
     './test/spec/fingerprint.js',
     './test/spec/general.js',
     './test/spec/oauthUtil.js',

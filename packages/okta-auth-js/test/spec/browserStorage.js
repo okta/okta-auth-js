@@ -91,112 +91,96 @@ describe('browserStorage', () => {
   describe('getPKCEStorage', () => {
     it('Uses localStorage by default', () => {
       browserStorage.getPKCEStorage();
-      expect(storageBuilder).toHaveBeenCalledWith(window.localStorage, 'okta-pkce-storage');
+      expect(storageBuilder).toHaveBeenCalledWith(global.window.localStorage, 'okta-pkce-storage');
     });
     it('Uses sessionStorage if localStorage is not available', () => {
-      delete window.localStorage;
+      delete global.window.localStorage;
       browserStorage.getPKCEStorage();
-      expect(storageBuilder).toHaveBeenCalledWith(window.sessionStorage, 'okta-pkce-storage');
+      expect(storageBuilder).toHaveBeenCalledWith(global.window.sessionStorage, 'okta-pkce-storage');
     });
     it('Uses cookie storage if localStorage and sessionStorage are not available', () => {
-      delete window.localStorage;
-      delete window.sessionStorage;
+      delete global.window.localStorage;
+      delete global.window.sessionStorage;
       const fakeStorage = { fakeStorage: true };
       jest.spyOn(browserStorage, 'getCookieStorage').mockReturnValue(fakeStorage);
-      browserStorage.getPKCEStorage();
+      const opts = { fakeOptions: true };
+      browserStorage.getPKCEStorage(opts);
       expect(storageBuilder).toHaveBeenCalledWith(fakeStorage, 'okta-pkce-storage');
-      expect(browserStorage.getCookieStorage).toHaveBeenCalledWith({
-        secure: false
-      });
-    });
-    it('Uses secure cookie storage if localStorage and sessionStorage are not available on HTTPS', () => {
-      delete window.localStorage;
-      delete window.sessionStorage;
-      delete window.location;
-      window.location = {
-        protocol: 'https:'
-      }
-      const fakeStorage = { fakeStorage: true };
-      jest.spyOn(browserStorage, 'getCookieStorage').mockReturnValue(fakeStorage);
-      browserStorage.getPKCEStorage();
-      expect(storageBuilder).toHaveBeenCalledWith(fakeStorage, 'okta-pkce-storage');
-      expect(browserStorage.getCookieStorage).toHaveBeenCalledWith({
-        secure: true
-      });
+      expect(browserStorage.getCookieStorage).toHaveBeenCalledWith(opts);
     });
   });
 
   describe('getHttpCache', () => {
     it('Uses localStorage by default', () => {
       browserStorage.getHttpCache();
-      expect(storageBuilder).toHaveBeenCalledWith(window.localStorage, 'okta-cache-storage');
+      expect(storageBuilder).toHaveBeenCalledWith(global.window.localStorage, 'okta-cache-storage');
     });
     it('Uses sessionStorage if localStorage is not available', () => {
-      delete window.localStorage;
+      delete global.window.localStorage;
       browserStorage.getHttpCache();
-      expect(storageBuilder).toHaveBeenCalledWith(window.sessionStorage, 'okta-cache-storage');
+      expect(storageBuilder).toHaveBeenCalledWith(global.window.sessionStorage, 'okta-cache-storage');
     });
     it('Uses cookie storage if localStorage and sessionStorage are not available', () => {
-      delete window.localStorage;
-      delete window.sessionStorage;
+      delete global.window.localStorage;
+      delete global.window.sessionStorage;
       const fakeStorage = { fakeStorage: true };
       jest.spyOn(browserStorage, 'getCookieStorage').mockReturnValue(fakeStorage);
-      browserStorage.getHttpCache();
+      const opts = { fakeOptions: true };
+      browserStorage.getHttpCache(opts);
       expect(storageBuilder).toHaveBeenCalledWith(fakeStorage, 'okta-cache-storage');
-      expect(browserStorage.getCookieStorage).toHaveBeenCalledWith({
-        secure: false
-      });
-    });
-    it('Uses secure cookie storage if localStorage and sessionStorage are not available on HTTPS', () => {
-      delete window.localStorage;
-      delete window.sessionStorage;
-      delete window.location;
-      window.location = {
-        protocol: 'https:'
-      }
-      const fakeStorage = { fakeStorage: true };
-      jest.spyOn(browserStorage, 'getCookieStorage').mockReturnValue(fakeStorage);
-      browserStorage.getHttpCache();
-      expect(storageBuilder).toHaveBeenCalledWith(fakeStorage, 'okta-cache-storage');
-      expect(browserStorage.getCookieStorage).toHaveBeenCalledWith({
-        secure: true
-      });
+      expect(browserStorage.getCookieStorage).toHaveBeenCalledWith(opts);
     });
   });
 
   describe('getCookieStorage', () => {
-    it('Default: sets "secure" to false, sameSite to "lax"', () => {
-      jest.spyOn(browserStorage.storage, 'set').mockReturnValue(null);
-      const storage = browserStorage.getCookieStorage();
-      const key = 'fake-key';
-      const val = { fakeValue: true };
-      storage.setItem(key, val);
-      expect(browserStorage.storage.set).toHaveBeenCalledWith(key, val, '2200-01-01T00:00:00.000Z', {
-        secure: false,
-        sameSite: 'lax'
-      });
+    it('requires an options object', () => {
+      const fn = function() {
+        browserStorage.getCookieStorage();
+      };
+      expect(fn).toThrowError('Cannot read property \'secure\' of undefined');
     });
 
-    it('Can pass true for "secure", sets sameSite to "none"', () => {
-      jest.spyOn(browserStorage.storage, 'set').mockReturnValue(null);
-      const storage = browserStorage.getCookieStorage({ secure: true });
-      const key = 'fake-key';
-      const val = { fakeValue: true };
-      storage.setItem(key, val);
-      expect(browserStorage.storage.set).toHaveBeenCalledWith(key, val, '2200-01-01T00:00:00.000Z', {
-        secure: true,
-        sameSite: 'none'
-      });
+    it('requires a "secure" option', () => {
+      const fn = function() {
+        browserStorage.getCookieStorage({});
+      };
+      expect(fn).toThrowError('getCookieStorage: "secure" and "sameSite" options must be provided');
+    });
+
+    it('requires a "sameSite" option', () => {
+      const fn = function() {
+        browserStorage.getCookieStorage({ secure: true });
+      };
+      expect(fn).toThrowError('getCookieStorage: "secure" and "sameSite" options must be provided');
+    });
+
+    it('Can pass false for "secure" and "sameSite"', () => {
+      const fn = function() {
+        browserStorage.getCookieStorage({ secure: false, sameSite: false });
+      };
+      expect(fn).not.toThrow();
     });
 
     it('getItem: will call storage.get', () => {
       const retVal = { fakeCookie: true };
       jest.spyOn(browserStorage.storage, 'get').mockReturnValue(retVal);
-      const storage = browserStorage.getCookieStorage();
+      const storage = browserStorage.getCookieStorage({ secure: true, sameSite: 'strict' });
       const key = 'fake-key';
       expect(storage.getItem(key)).toBe(retVal);
       expect(browserStorage.storage.get).toHaveBeenCalledWith(key);
     });
+
+    it('setItem: will call storage.set, passing secure and sameSite options', () => {
+      jest.spyOn(browserStorage.storage, 'set').mockReturnValue(null);
+      const storage = browserStorage.getCookieStorage({ secure: 'fakey', sameSite: 'strictly fakey' });
+      const key = 'fake-key';
+      const val = { fakeValue: true };
+      storage.setItem(key, val);
+      expect(browserStorage.storage.set).toHaveBeenCalledWith(key, val, '2200-01-01T00:00:00.000Z', {
+        secure: 'fakey',
+        sameSite: 'strictly fakey'
+      });
+    })
   });
 
   describe('getInMemoryStorage', () => {

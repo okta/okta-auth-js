@@ -13,7 +13,6 @@
 
 /* eslint-disable complexity */
 var util = require('./util');
-var Q = require('q');
 var AuthApiError = require('./errors/AuthApiError');
 var constants = require('./constants');
 
@@ -27,13 +26,13 @@ function httpRequest(sdk, options) {
       withCredentials = options.withCredentials !== false, // default value is true
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil.storage,
-      httpCache = storageUtil.getHttpCache();
+      httpCache = storageUtil.getHttpCache(sdk.options.cookies);
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
     var cachedResponse = cacheContents[url];
     if (cachedResponse && Date.now()/1000 < cachedResponse.expiresAt) {
-      return Q.resolve(cachedResponse.response);
+      return Promise.resolve(cachedResponse.response);
     }
   }
 
@@ -55,7 +54,7 @@ function httpRequest(sdk, options) {
   };
 
   var err, res;
-  return new Q(sdk.options.httpRequestClient(method, url, ajaxOptions))
+  return sdk.options.httpRequestClient(method, url, ajaxOptions)
     .then(function(resp) {
       res = resp.responseText;
       if (res && util.isString(res)) {
@@ -69,7 +68,7 @@ function httpRequest(sdk, options) {
       }
 
       if (res && res.stateToken && res.expiresAt) {
-        storage.set(constants.STATE_TOKEN_KEY_NAME, res.stateToken, res.expiresAt);
+        storage.set(constants.STATE_TOKEN_KEY_NAME, res.stateToken, res.expiresAt, sdk.options.cookies);
       }
 
       if (res && options.cacheResponse) {
@@ -81,7 +80,7 @@ function httpRequest(sdk, options) {
 
       return res;
     })
-    .fail(function(resp) {
+    .catch(function(resp) {
       var serverErr = resp.responseText || {};
       if (util.isString(serverErr)) {
         try {
@@ -112,7 +111,7 @@ function httpRequest(sdk, options) {
 }
 
 function get(sdk, url, options) {
-  url = util.isAbsoluteUrl(url) ? url : sdk.options.url + url;
+  url = util.isAbsoluteUrl(url) ? url : sdk.getIssuerOrigin() + url;
   var getOptions = {
     url: url,
     method: 'GET'
@@ -122,7 +121,7 @@ function get(sdk, url, options) {
 }
 
 function post(sdk, url, args, options) {
-  url = util.isAbsoluteUrl(url) ? url : sdk.options.url + url;
+  url = util.isAbsoluteUrl(url) ? url : sdk.getIssuerOrigin() + url;
   var postOptions = {
     url: url,
     method: 'POST',

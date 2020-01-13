@@ -55,7 +55,7 @@ describe('Renew token', function() {
   }
 
   function mockWellKnown() {
-    sdk.options.storageUtil.getHttpCache().clearStorage();
+    sdk.options.storageUtil.getHttpCache(sdk.options.cookies).clearStorage();
 
     var wellKnown = {
       'jwks_uri': JWKS_URI,
@@ -164,7 +164,7 @@ describe('Renew token', function() {
 
   it('implicit flow', function() {
     return bootstrap({
-
+      pkce: false
     })
     .then(() => {
       sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
