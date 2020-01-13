@@ -4,6 +4,8 @@
 
 ### Breaking Changes
 
+- [#308](https://github.com/okta/okta-auth-js/pull/308) - Removed `jquery` and `reqwest` httpRequesters
+
 - [#309](https://github.com/okta/okta-auth-js/pull/309) - Removed `Q` library, now using standard Promise. IE11 will require a polyfill for the `Promise` object. Use of `Promise.prototype.finally` requires Node > 10.3 for server-side use.
 
 - [#310](https://github.com/okta/okta-auth-js/pull/310)
@@ -11,6 +13,7 @@
   - `signOut` will revoke access token and perform redirect by default. Fallback to XHR (`closeSession`) if no idToken.
   - New method `closeSession` for XHR signout without redirect or reload.
   - New method `revokeAccessToken`
+
 
 ### Other
 

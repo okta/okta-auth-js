@@ -99,16 +99,6 @@ var OktaAuth = require('@okta/okta-auth-js');
 var authClient = new OktaAuth(/* configOptions */);
 ```
 
-If you're using a bundler like webpack or browserify, we have implementations for jquery and reqwest included. To use them, import the SDK like this:
-
-```javascript
-// reqwest
-var OktaAuth = require('@okta/okta-auth-js/reqwest');
-
-// jquery
-var OktaAuth = require('@okta/okta-auth-js/jquery');
-```
-
 ## Usage guide
 
 For an overview of the client's features and authentication flows, check out [our developer docs](https://developer.okta.com/code/javascript/okta_auth_sdk). There, you will learn how to use the Auth SDK on a simple static page to:
@@ -297,7 +287,7 @@ If the user's browser does not support PKCE, an exception will be thrown. You ca
 
 ### `httpRequestClient`
 
-The http request implementation. By default, this is implemented using [reqwest](https://github.com/ded/reqwest) for browser and [cross-fetch](https://github.com/lquixada/cross-fetch) for server. To provide your own request library, implement the following interface:
+The http request implementation. By default, this is implemented using [cross-fetch](https://github.com/lquixada/cross-fetch). To provide your own request library, implement the following interface:
 
   1. Must accept:
       * method (http method)
@@ -316,34 +306,6 @@ var config = {
     //   },
     //   data: postBodyData,
     //   withCredentials: true|false,
-    // }
-    return Promise.resolve(/* a raw XMLHttpRequest response */);
-  }
-}
-```
-
-#### `ajaxRequest`
-
-:warning: This parameter has been *deprecated*, please use [**httpRequestClient**](#httpRequestClient) instead.
-
-The ajax request implementation. By default, this is implemented using [reqwest](https://github.com/ded/reqwest). To provide your own request library, implement the following interface:
-
-  1. Must accept:
-      * method (http method)
-      * url (target url)
-      * args (object containing headers and data)
-  2. Must return a Promise that resolves with a raw XMLHttpRequest response
-
-```javascript
-var config = {
-  url: 'https://{yourOktaDomain}',
-  ajaxRequest: function(method, url, args) {
-    // args is in the form:
-    // {
-    //   headers: {
-    //     headerName: headerValue
-    //   },
-    //   data: postBodyData
     // }
     return Promise.resolve(/* a raw XMLHttpRequest response */);
   }
