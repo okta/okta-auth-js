@@ -1,8 +1,16 @@
 {
   "extends": ["eslint:recommended"],
   "env": {
-    "browser": true,
+    "browser": false,
     "commonjs": true
+  },
+  "globals": {
+    "Promise": true,
+    "console": true,
+    "setTimeout": true,
+    "clearTimeout": true,
+    "setInterval": true,
+    "clearInterval": true
   },
   "rules": {
     "camelcase": 2,

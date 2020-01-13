@@ -1,5 +1,43 @@
 # Changelog
 
+## 3.0.0
+
+### Breaking Changes
+
+- [#308](https://github.com/okta/okta-auth-js/pull/308) - Removed `jquery` and `reqwest` httpRequesters
+
+- [#309](https://github.com/okta/okta-auth-js/pull/309) - Removed `Q` library, now using standard Promise. IE11 will require a polyfill for the `Promise` object. Use of `Promise.prototype.finally` requires Node > 10.3 for server-side use.
+
+- [#310](https://github.com/okta/okta-auth-js/pull/310) - New behavior for [signOut()](README.md#signout)
+  - `postLogoutRedirectUri` will default to `window.location.origin`
+  - [signOut()](README.md#signout) will revoke access token and perform redirect by default. Fallback to XHR [closeSession()](README.md#closesession) if no idToken.
+  - New method [closeSession()](README.md#closesession) for XHR signout without redirect or reload.
+  - New method [revokeAccessToken()](README.md#revokeaccesstokenaccesstoken)
+
+- [#311](https://github.com/okta/okta-auth-js/pull/311) - [parseFromUrl()](README.md#tokenparsefromurloptions) now returns tokens in an object hash (instead of array). The `state` parameter (passed to authorize request) is also returned.
+
+- [#313](https://github.com/okta/okta-auth-js/pull/313) - New [option](README.md#additional-options) `secureCookies`, which is `true` by default. An HTTPS origin will be enforced unless `secureCookies` is set to `false`.
+
+- [#316](https://github.com/okta/okta-auth-js/pull/316) - Option `issuer` is [required](README.md#configuration-reference). Option `url` has been deprecated and is no longer used.
+
+- [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` [option](README.md#additional-options)  is now `true` by default. `grantType` option is removed.
+
+- [#320](https://github.com/okta/okta-auth-js/pull/320) - `getWithRedirect`, `getWithPopup`, and `getWithoutPrompt` previously took 2 sets of option objects as parameters, a set of "oauthOptions" and additional options. These methods now take a single options object which can hold all [available options](README.md#authorize-options). Passing a second options object will cause an exception to be thrown.
+
+- [#321](https://github.com/okta/okta-auth-js/pull/321)
+  - Default responseType when using [implicit flow](README.md#implicit-oauth-20-flow) is now `['token', 'id_token']`.
+  - When both access token and id token are returned, the id token's `at_hash` claim will be validated against the access token
+
+- [#325](https://github.com/okta/okta-auth-js/pull/325) - Previously, the default `responseMode` for [PKCE](README.md#pkce-oauth-20-flow) was `"fragment"`. It is now `"query"`. Unless explicitly specified using the `responseMode` option, the `response_mode` parameter is no longer passed by `token.getWithRedirect` to the `/authorize` endpoint. The `response_mode` will be set by the backend according to the [OpenID specification](https://openid.net/specs/openid-connect-core-1_0.html#Authentication). [Implicit flow](README.md#implicit-oauth-20-flow) will use `"fragment"` and [PKCE](README.md#pkce-oauth-20-flow) will use `"query"`. If previous behavior is desired, [PKCE](README.md#pkce-oauth-20-flow) can set the `responseMode` option to `"fragment"`.
+
+- [#329](https://github.com/okta/okta-auth-js/pull/329) - Fix internal fetch implementation. `responseText` will always be a string, regardless of headers or response type. If a JSON object was returned, the object will be returned as `responseJSON` and `responseType` will be set to "json". Invalid/malformed JSON server response will no longer throw a raw TypeError but will return a well structured error response which includes the `status` code returned from the server.
+
+### Other
+
+- [#306](https://github.com/okta/okta-auth-js/pull/306) - Now using babel for ES5 compatibility. [All polyfills have been removed](README.md#browser-compatibility).
+
+- [#312](https://github.com/okta/okta-auth-js/pull/312) - Added an E2E test for server-side authentication (node module, not webpack).
+
 ## 2.13.1
 
 ### Bug Fixes

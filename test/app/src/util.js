@@ -20,4 +20,7 @@ function toQueryParams(obj) {
   }
 }
 
-export { htmlString, toQueryParams };
+module.exports = {
+  htmlString,
+  toQueryParams 
+};

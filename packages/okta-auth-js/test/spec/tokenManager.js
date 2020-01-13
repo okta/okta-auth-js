@@ -1,8 +1,8 @@
+/* global window, localStorage, sessionStorage */
+
+// Promise.allSettled is added in Node 12.10
 var allSettled = require('promise.allsettled');
 allSettled.shim(); // will be a no-op if not needed
-
-var promiseFinally = require('promise.prototype.finally');
-promiseFinally.shim(); // will be a no-op if not needed
 
 var Emitter = require('tiny-emitter');
 var OktaAuth = require('OktaAuth');
@@ -16,6 +16,7 @@ function setupSync(options) {
   options.tokenManager = options.tokenManager || {};
   jest.spyOn(SdkClock, 'create').mockReturnValue(new SdkClock(options.localClockOffset));
   return new OktaAuth({
+    pkce: false,
     issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect',
@@ -30,11 +31,21 @@ function setupSync(options) {
 }
 
 describe('TokenManager', function() {
+  let originalLocation;
   beforeEach(function() {
     localStorage.clear();
     sessionStorage.clear();
+
+    // Mock window.location so we appear to be on an HTTPS origin
+    originalLocation = global.window.location;
+    delete global.window.location;
+    global.window.location = {
+      protocol: 'https:',
+      hostname: 'somesite.local'
+    };
   });
   afterEach(function() {
+    global.window.location = originalLocation;
     jest.useRealTimers();
   });
 
@@ -198,7 +209,8 @@ describe('TokenManager', function() {
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
         '2200-01-01T00:00:00.000Z', {
-          sameSite: 'none'
+          sameSite: 'none',
+          secure: true
         }
       );
     });
@@ -221,6 +233,7 @@ describe('TokenManager', function() {
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
         '2200-01-01T00:00:00.000Z', {
+          secure: true,
           sameSite: 'none'
         }
       );
@@ -450,7 +463,7 @@ describe('TokenManager', function() {
       .then(function() {
         expect(true).toEqual(false);
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.expectErrorToEqual(err, {
           name: 'AuthSdkError',
           message: 'Unable to parse storage string: okta-token-storage',
@@ -516,7 +529,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(e) {
+      .catch(function(e) {
         util.expectErrorToEqual(e, {
           name: 'OAuthError',
           message: 'something went wrong',
@@ -547,7 +560,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(e) {
+      .catch(function(e) {
         util.expectErrorToEqual(e, {
           name: 'AuthSdkError',
           message: 'The request does not match client configuration',
@@ -793,7 +806,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.expectErrorToEqual(err, {
           name: 'OAuthError',
           message: 'something went wrong',
@@ -846,7 +859,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.expectErrorToEqual(err, {
           name: 'AuthSdkError',
           message: 'The request does not match client configuration',
@@ -885,7 +898,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.expectErrorToEqual(err, {
           name: 'OAuthError',
           message: 'something went wrong',
@@ -920,7 +933,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(e) {
+      .catch(function(e) {
         util.expectErrorToEqual(e, {
           name: 'AuthSdkError',
           message: 'The request does not match client configuration',
@@ -1223,12 +1236,10 @@ describe('TokenManager', function() {
 
   describe('cookie', function() {
 
-    function cookieStorageSetup(options) {
-      options = options || {};
+    function cookieStorageSetup() {
       return setupSync({
         tokenManager: {
-          storage: 'cookie',
-          secure: options.secure
+          storage: 'cookie'
         }
       });
     }
@@ -1236,19 +1247,6 @@ describe('TokenManager', function() {
     describe('add', function() {
       it('adds a token', function() {
         var client = cookieStorageSetup();
-        var setCookieMock = util.mockSetCookie();
-        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-        expect(setCookieMock).toHaveBeenCalledWith(
-          'okta-token-storage',
-          JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z', {
-            sameSite: 'none'
-          }
-        );
-      });
-
-      it('respects the "secure" option', function() {
-        var client = cookieStorageSetup({ secure: true });
         var setCookieMock = util.mockSetCookie();
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         expect(setCookieMock).toHaveBeenCalledWith(
@@ -1265,27 +1263,50 @@ describe('TokenManager', function() {
 
     describe('get', function() {
       it('returns a token', function() {
-        var client = cookieStorageSetup();
-        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-        util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+        const setCookieMock = util.mockSetCookie();
+        const getCookieMock = util.mockGetCookie(JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed
+        }));
+        const client = cookieStorageSetup();
+        util.warpToUnixTime(tokens.standardIdTokenClaims.iat); // token should not be expired
         return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toEqual(tokens.standardIdTokenParsed);
+          expect(getCookieMock).toHaveBeenCalledWith('okta-token-storage');
+          expect(setCookieMock).not.toHaveBeenCalled();
         });
       });
 
       it('returns undefined for an expired token', function() {
-        var client = cookieStorageSetup();
+        const setCookieMock = util.mockSetCookie();
+        const getCookieMock = util.mockGetCookie(JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed
+        }));
+        const client = cookieStorageSetup();
+        util.warpToUnixTime(tokens.standardIdTokenClaims.exp + 1); // token should be expired
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toBeUndefined();
+          expect(getCookieMock).toHaveBeenCalledWith('okta-token-storage');
+          expect(setCookieMock).toHaveBeenCalledWith(
+            'okta-token-storage',
+            '{}',
+            '2200-01-01T00:00:00.000Z', {
+              secure: true,
+              sameSite: 'none'
+            }
+          );
         });
       });
     });
 
     describe('remove', function() {
       it('removes a token', function() {
+        util.mockGetCookie(JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed,
+          'anotherKey': tokens.standardIdTokenParsed
+        }));
         var client = cookieStorageSetup();
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         client.tokenManager.add('anotherKey', tokens.standardIdTokenParsed);
@@ -1295,6 +1316,7 @@ describe('TokenManager', function() {
           'okta-token-storage',
           JSON.stringify({anotherKey: tokens.standardIdTokenParsed}),
           '2200-01-01T00:00:00.000Z', {
+            secure: true,
             sameSite: 'none'
           }
         );
@@ -1303,6 +1325,10 @@ describe('TokenManager', function() {
 
     describe('clear', function() {
       it('clears all tokens', function() {
+        util.mockGetCookie(JSON.stringify({
+          'test-idToken': tokens.standardIdTokenParsed,
+          'anotherKey': tokens.standardIdTokenParsed
+        }));
         var client = cookieStorageSetup();
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         client.tokenManager.add('anotherKey', tokens.standardIdTokenParsed);
@@ -1312,6 +1338,7 @@ describe('TokenManager', function() {
           'okta-token-storage',
           '{}',
           '2200-01-01T00:00:00.000Z', {
+            secure: true,
             sameSite: 'none'
           }
         );
