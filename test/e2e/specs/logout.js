@@ -11,41 +11,63 @@ describe('E2E logout', () => {
       await loginPopup();
     });
 
-    it('can logout locally, keeping remote user session open', async () => {
-      await TestApp.logoutLocal();
-
-      // We should still be logged into Okta
-      await openOktaHome();
-      await OktaHome.waitForLoad();
-
-      // Now sign the user out
-      await OktaHome.closeInitialPopUp();
-      await OktaHome.signOut();
-      await browser.closeWindow();
-      await switchToMainWindow();
-
+    describe('logoutApp', () => {
+      it('can clear app session, keeping remote SSO session open', async () => {
+        await TestApp.logoutApp();
+  
+        // We should still be logged into Okta
+        await openOktaHome();
+        await OktaHome.waitForLoad();
+  
+        // Now sign the user out
+        await OktaHome.closeInitialPopUp();
+        await OktaHome.signOut();
+        await browser.closeWindow();
+        await switchToMainWindow();
+      });
+  
     });
 
-    it('can logout from okta, ending remote user session', async() => {
-      await TestApp.logout();
+    describe('logoutRedirect', () => {
+      it('can logout from okta, ending remote user session', async() => {
+        await TestApp.assertIdToken();
+        await TestApp.logoutRedirect();
+  
+        // We should not be logged into Okta
+        await openOktaHome();
+        await OktaLogin.waitForLoad();
+  
+        // cleanup
+        await browser.closeWindow();
+        await switchToMainWindow();
+      });
+  
+      it('no idToken: can logout from okta (using XHR fallback) and end back to the application', async () => {
+        await TestApp.clearTokens();
+        await TestApp.logoutRedirect();
 
-      // We should not be logged into Okta
-      await openOktaHome();
-      await OktaLogin.waitForLoad();
-
-      // cleanup
-      await browser.closeWindow();
-      await switchToMainWindow();
+        // We should not be logged into Okta
+        await openOktaHome();
+        await OktaLogin.waitForLoad();
+  
+        // cleanup
+        await browser.closeWindow();
+        await switchToMainWindow();
+      });
     });
 
-    it('can logout from okta and redirect back to the application', async () => {
-      await TestApp.assertIdToken();
-      await TestApp.logoutRedirect();
-    });
-
-    it('no idToken: can logout from okta and redirect back to the application', async () => {
-      await TestApp.clearTokens();
-      await TestApp.logoutRedirect();
+    describe('logoutXHR', () => {
+      it('can logout from okta using XHR, ending remote user session', async() => {
+        await TestApp.logoutXHR();
+  
+        // We should not be logged into Okta
+        await openOktaHome();
+        await OktaLogin.waitForLoad();
+  
+        // cleanup
+        await browser.closeWindow();
+        await switchToMainWindow();
+      });
     });
 
 });

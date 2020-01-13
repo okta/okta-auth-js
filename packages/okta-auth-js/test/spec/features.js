@@ -1,3 +1,4 @@
+/* global window, document */
 var OktaAuth = require('OktaAuth');
 
 describe('features', function() {

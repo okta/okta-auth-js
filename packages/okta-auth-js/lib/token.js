@@ -10,12 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global window, document, btoa */
 /* eslint-disable complexity, max-statements */
 var http          = require('./http');
 var util          = require('./util');
 var oauthUtil     = require('./oauthUtil');
-var Q             = require('q');
 var sdkCrypto     = require('./crypto');
 var AuthSdkError  = require('./errors/AuthSdkError');
 var OAuthError    = require('./errors/OAuthError');
@@ -25,7 +24,7 @@ var PKCE          = require('./pkce');
 
 // Only the access token can be revoked in SPA applications
 function revokeToken(sdk, token) {
-  return new Q()
+  return Promise.resolve()
   .then(function() {
     if (!token || !token.accessToken) {
       throw new AuthSdkError('A valid access token object is required');
@@ -70,7 +69,7 @@ function decodeToken(token) {
 
 // Verify the id token
 function verifyToken(sdk, token, validationParams) {
-  return new Q()
+  return Promise.resolve()
   .then(function() {
     if (!token || !token.idToken) {
       throw new AuthSdkError('Only idTokens may be verified');
@@ -109,60 +108,75 @@ function verifyToken(sdk, token, validationParams) {
 }
 
 function addPostMessageListener(sdk, timeout, state) {
-  var deferred = Q.defer();
+  var responseHandler;
+  var timeoutId;
+  var msgReceivedOrTimeout = new Promise(function(resolve, reject) {
 
-  function responseHandler(e) {
-    if (!e.data || e.data.state !== state) {
-      // A message not meant for us
-      return;
-    }
+    responseHandler = function responseHandler(e) {
+      if (!e.data || e.data.state !== state) {
+        // A message not meant for us
+        return;
+      }
 
-    // Configuration mismatch between saved token and current app instance
-    // This may happen if apps with different issuers are running on the same host url
-    // If they share the same storage key, they may read and write tokens in the same location.
-    // Common when developing against http://localhost
-    if (e.origin !== sdk.options.url) {
-      return deferred.reject(new AuthSdkError('The request does not match client configuration'));
-    }
+      // Configuration mismatch between saved token and current app instance
+      // This may happen if apps with different issuers are running on the same host url
+      // If they share the same storage key, they may read and write tokens in the same location.
+      // Common when developing against http://localhost
+      if (e.origin !== sdk.options.url) {
+        return reject(new AuthSdkError('The request does not match client configuration'));
+      }
 
-    deferred.resolve(e.data);
-  }
+      resolve(e.data);
+    };
 
-  oauthUtil.addListener(window, 'message', responseHandler);
+    oauthUtil.addListener(window, 'message', responseHandler);
 
-  return deferred.promise.timeout(timeout || 120000, new AuthSdkError('OAuth flow timed out'))
-    .fin(function() {
+    timeoutId = setTimeout(function() {
+      reject(new AuthSdkError('OAuth flow timed out'));
+    }, timeout || 120000);
+  });
+
+  return msgReceivedOrTimeout
+    .finally(function() {
+      clearTimeout(timeoutId);
       oauthUtil.removeListener(window, 'message', responseHandler);
     });
 }
 
 function addFragmentListener(sdk, windowEl, timeout) {
-  var deferred = Q.defer();
-
-  function hashChangeHandler() {
-    /*
-      We are only able to access window.location.hash on a window
-      that has the same domain. A try/catch is necessary because
-      there's no other way to determine that the popup is in
-      another domain. When we try to access a window on another
-      domain, an error is thrown.
-    */
-    try {
-      if (windowEl &&
-          windowEl.location &&
-          windowEl.location.hash) {
-        deferred.resolve(oauthUtil.hashToObject(windowEl.location.hash));
-      } else if (windowEl && !windowEl.closed) {
+  var timeoutId;
+  var promise = new Promise(function(resolve, reject) {
+    function hashChangeHandler() {
+      /*
+        We are only able to access window.location.hash on a window
+        that has the same domain. A try/catch is necessary because
+        there's no other way to determine that the popup is in
+        another domain. When we try to access a window on another
+        domain, an error is thrown.
+      */
+      try {
+        if (windowEl &&
+            windowEl.location &&
+            windowEl.location.hash) {
+          resolve(oauthUtil.hashToObject(windowEl.location.hash));
+        } else if (windowEl && !windowEl.closed) {
+          setTimeout(hashChangeHandler, 500);
+        }
+      } catch (err) {
         setTimeout(hashChangeHandler, 500);
       }
-    } catch (err) {
-      setTimeout(hashChangeHandler, 500);
     }
-  }
+  
+    hashChangeHandler();
 
-  hashChangeHandler();
+    timeoutId = setTimeout(function() {
+      reject(new AuthSdkError('OAuth flow timed out'));
+    }, timeout || 120000);
+  });
 
-  return deferred.promise.timeout(timeout || 120000, new AuthSdkError('OAuth flow timed out'));
+  return promise.finally(function() {
+    clearTimeout(timeoutId);
+  });
 }
 
 function exchangeCodeForToken(sdk, oauthParams, authorizationCode, urls) {
@@ -180,7 +194,7 @@ function exchangeCodeForToken(sdk, oauthParams, authorizationCode, urls) {
     validateResponse(res, getTokenParams);
     return res;
   })
-  .fin(function() {
+  .finally(function() {
     PKCE.clearMeta(sdk);
   });
 }
@@ -202,7 +216,7 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
   var scopes = util.clone(oauthParams.scopes);
   var clientId = oauthParams.clientId || sdk.options.clientId;
 
-  return new Q()
+  return Promise.resolve()
   .then(function() {
     validateResponse(res, oauthParams);
 
@@ -423,14 +437,11 @@ function getToken(sdk, oauthOptions, options) {
     var requestUrl,
         endpoint,
         urls;
-    try {
-      // Get authorizeUrl and issuer
-      urls = oauthUtil.getOAuthUrls(sdk, oauthParams, options);
-      endpoint = oauthOptions.codeVerifier ? urls.tokenUrl : urls.authorizeUrl;
-      requestUrl = endpoint + buildAuthorizeParams(oauthParams);
-    } catch (e) {
-      return Q.reject(e);
-    }
+
+    // Get authorizeUrl and issuer
+    urls = oauthUtil.getOAuthUrls(sdk, oauthParams, options);
+    endpoint = oauthOptions.codeVerifier ? urls.tokenUrl : urls.authorizeUrl;
+    requestUrl = endpoint + buildAuthorizeParams(oauthParams);
 
     // Determine the flow type
     var flowType;
@@ -457,22 +468,22 @@ function getToken(sdk, oauthOptions, options) {
           .then(function(res) {
             return handleOAuthResponse(sdk, oauthParams, res, urls);
           })
-          .fin(function() {
+          .finally(function() {
             if (document.body.contains(iframeEl)) {
               iframeEl.parentElement.removeChild(iframeEl);
             }
           });
 
-      case 'POPUP': // eslint-disable-line no-case-declarations
-        var popupPromise;
+      case 'POPUP':
+        var oauthPromise; // resolves with OAuth response
 
         // Add listener on postMessage before window creation, so
         // postMessage isn't triggered before we're listening
         if (oauthParams.responseMode === 'okta_post_message') {
           if (!sdk.features.isPopupPostMessageSupported()) {
-            return Q.reject(new AuthSdkError('This browser doesn\'t have full postMessage support'));
+            throw new AuthSdkError('This browser doesn\'t have full postMessage support');
           }
-          popupPromise = addPostMessageListener(sdk, options.timeout, oauthParams.state);
+          oauthPromise = addPostMessageListener(sdk, options.timeout, oauthParams.state);
         }
 
         // Create the window
@@ -486,49 +497,45 @@ function getToken(sdk, oauthOptions, options) {
           var windowOrigin = getOrigin(sdk.idToken.authorize._getLocationHref());
           var redirectUriOrigin = getOrigin(oauthParams.redirectUri);
           if (windowOrigin !== redirectUriOrigin) {
-            return Q.reject(new AuthSdkError('Using fragment, the redirectUri origin (' + redirectUriOrigin +
-              ') must match the origin of this page (' + windowOrigin + ')'));
+            throw new AuthSdkError('Using fragment, the redirectUri origin (' + redirectUriOrigin +
+              ') must match the origin of this page (' + windowOrigin + ')');
           }
-          popupPromise = addFragmentListener(sdk, windowEl, options.timeout);
+          oauthPromise = addFragmentListener(sdk, windowEl, options.timeout);
         }
 
-        // Both postMessage and fragment require a poll to see if the popup closed
-        var popupDeferred = Q.defer();
-        /* eslint-disable-next-line no-case-declarations, no-inner-declarations */
-        function hasClosed(win) {
-          if (!win || win.closed) {
-            popupDeferred.reject(new AuthSdkError('Unable to parse OAuth flow response'));
-            return true;
-          }
-        }
-        var closePoller = setInterval(function() {
-          if (hasClosed(windowEl)) {
+        // The popup may be closed without receiving an OAuth response. Setup a poller to monitor the window.
+        var popupPromise = new Promise(function(resolve, reject) {
+          var closePoller = setInterval(function() {
+            if (!windowEl || windowEl.closed) {
+              clearInterval(closePoller);
+              reject(new AuthSdkError('Unable to parse OAuth flow response'));
+            }
+          }, 100);
+
+          // Proxy the OAuth promise results
+          oauthPromise
+          .then(function(res) {
             clearInterval(closePoller);
-          }
-        }, 500);
-
-        // Proxy the promise results into the deferred
-        popupPromise
-        .then(function(res) {
-          popupDeferred.resolve(res);
-        })
-        .fail(function(err) {
-          popupDeferred.reject(err);
+            resolve(res);
+          })
+          .catch(function(err) {
+            clearInterval(closePoller);
+            reject(err);
+          });
         });
 
-        return popupDeferred.promise
+        return popupPromise
           .then(function(res) {
             return handleOAuthResponse(sdk, oauthParams, res, urls);
           })
-          .fin(function() {
-            clearInterval(closePoller);
+          .finally(function() {
             if (windowEl && !windowEl.closed) {
               windowEl.close();
             }
           });
 
       default:
-        return Q.reject(new AuthSdkError('The full page redirect flow is not supported'));
+        throw new AuthSdkError('The full page redirect flow is not supported');
     }
   });
 }
@@ -566,12 +573,12 @@ function prepareOauthParams(sdk, oauthOptions) {
   util.extend(oauthParams, oauthOptions);
 
   if (oauthParams.pkce !== true) {
-    return Q.resolve(oauthParams);
+    return Promise.resolve(oauthParams);
   }
 
   // PKCE flow
   if (!sdk.features.isPKCESupported()) {
-    return Q.reject(new AuthSdkError('This browser doesn\'t support PKCE'));
+    return Promise.reject(new AuthSdkError('This browser doesn\'t support PKCE'));
   }
 
   // set default code challenge method, if none provided
@@ -663,7 +670,7 @@ function getWithRedirect(sdk, oauthOptions, options) {
 
 function renewToken(sdk, token) {
   if (!oauthUtil.isToken(token)) {
-    return Q.reject(new AuthSdkError('Renew must be passed a token with ' +
+    return Promise.reject(new AuthSdkError('Renew must be passed a token with ' +
       'an array of scopes and an accessToken or idToken'));
   }
 
@@ -705,12 +712,12 @@ function parseFromUrl(sdk, url) {
   }
 
   if (!hash) {
-    return Q.reject(new AuthSdkError('Unable to parse a token from the url'));
+    return Promise.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
   var oauthParamsCookie = cookies.get(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
   if (!oauthParamsCookie) {
-    return Q.reject(new AuthSdkError('Unable to retrieve OAuth redirect params cookie'));
+    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params cookie'));
   }
 
   try {
@@ -719,11 +726,11 @@ function parseFromUrl(sdk, url) {
     delete oauthParams.urls;
     cookies.delete(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
   } catch(e) {
-    return Q.reject(new AuthSdkError('Unable to parse the ' +
+    return Promise.reject(new AuthSdkError('Unable to parse the ' +
     constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME + ' cookie: ' + e.message));
   }
 
-  return Q.resolve(oauthUtil.hashToObject(hash))
+  return Promise.resolve(oauthUtil.hashToObject(hash))
     .then(function(res) {
       if (!url) {
         // Remove the hash from the url
@@ -736,14 +743,14 @@ function parseFromUrl(sdk, url) {
 function getUserInfo(sdk, accessTokenObject) {
   if (!accessTokenObject ||
       (!oauthUtil.isToken(accessTokenObject) && !accessTokenObject.accessToken && !accessTokenObject.userinfoUrl)) {
-    return Q.reject(new AuthSdkError('getUserInfo requires an access token object'));
+    return Promise.reject(new AuthSdkError('getUserInfo requires an access token object'));
   }
   return http.httpRequest(sdk, {
     url: accessTokenObject.userinfoUrl,
     method: 'GET',
     accessToken: accessTokenObject.accessToken
   })
-  .fail(function(err) {
+  .catch(function(err) {
     if (err.xhr && (err.xhr.status === 401 || err.xhr.status === 403)) {
       var authenticateHeader;
       if (err.xhr.headers && util.isFunction(err.xhr.headers.get) && err.xhr.headers.get('WWW-Authenticate')) {

@@ -10,12 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global localStorage, sessionStorage */
 /* eslint complexity:[0,8] max-statements:[0,21] */
 var util = require('./util');
 var AuthSdkError = require('./errors/AuthSdkError');
 var storageUtil = require('./browser/browserStorage');
-var Q = require('q');
 var constants = require('./constants');
 var storageBuilder = require('./storageBuilder');
 var SdkClock = require('./clock');
@@ -115,7 +114,7 @@ function get(storage, key) {
 }
 
 function getAsync(sdk, tokenMgmtRef, storage, key) {
-  return Q.Promise(function(resolve) {
+  return new Promise(function(resolve) {
     var token = get(storage, key);
     if (!token || !hasExpired(tokenMgmtRef, token)) {
       return resolve(token);
@@ -152,7 +151,7 @@ function renew(sdk, tokenMgmtRef, storage, key) {
       throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
     }
   } catch (e) {
-    return Q.reject(e);
+    return Promise.reject(e);
   }
 
   // Remove existing autoRenew timeout for this key

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global window */
 var util = require('./util');
 var http = require('./http');
 
@@ -22,7 +22,7 @@ function sessionExists(sdk) {
       }
       return false;
     })
-    .fail(function() {
+    .catch(function() {
       return false;
     });
 }
@@ -42,7 +42,7 @@ function getSession(sdk) {
 
     return res;
   })
-  .fail(function() {
+  .catch(function() {
     // Return INACTIVE status on failure
     return {status: 'INACTIVE'};
   });

@@ -1,16 +1,21 @@
 jest.mock('cross-fetch');
 
 var util = require('@okta/test.support/util');
+var sdkUtil = require('../../lib/util');
 
-var Q = require('q');
-function mockQDelay() {
-  var original = Q.delay;
-  jest.spyOn(Q, 'delay').mockImplementation(function() {
-    return original.call(this, 0);
+function mockDelay() {
+  jest.spyOn(sdkUtil, 'delay').mockImplementation(function() {
+    return Promise.resolve();
   });
 }
 
+
+
 describe('MFA_CHALLENGE', function () {
+  beforeEach(() => {
+    mockDelay();
+  });
+
   describe('trans.verify', function () {
     util.itMakesCorrectRequestResponse({
       title: 'allows verification with passCode',
@@ -1254,7 +1259,6 @@ describe('MFA_CHALLENGE', function () {
         ]
       },
       execute: function (test) {
-        mockQDelay();
         return test.trans.poll(0);
       }
     });
@@ -1294,7 +1298,6 @@ describe('MFA_CHALLENGE', function () {
         ]
       },
       execute: function (test) {
-        mockQDelay();
         return test.trans.poll(0);
       }
     });
@@ -1426,7 +1429,6 @@ describe('MFA_CHALLENGE', function () {
         ]
       },
       execute: function (test) {
-        mockQDelay();
         return test.trans.poll(0);
       },
       expectations: function (test, err) {
@@ -1503,7 +1505,6 @@ describe('MFA_CHALLENGE', function () {
         ]
       },
       execute: function (test) {
-        mockQDelay();
         return test.trans.poll(0);
       },
       expectations: function (test, err) {

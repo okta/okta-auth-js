@@ -1,9 +1,8 @@
 describe('fetchRequest', function () {
-  var Q = require('q');
   var mockFetchResult;
   var mockFetchObj = {
     fetch: function mockFetchFunc() {
-      return Q.resolve(mockFetchResult);
+      return Promise.resolve(mockFetchResult);
     }
   }
   jest.setMock('cross-fetch', function() {
@@ -17,10 +16,10 @@ describe('fetchRequest', function () {
     mockFetchResult = {
       headers: new Map(),
       json: function() {
-        return Q.resolve();
+        return Promise.resolve();
       },
       text: function() {
-        return Q.resolve();
+        return Promise.resolve();
       }
     }
   });
