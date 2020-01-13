@@ -11,8 +11,7 @@ describe('webfinger', function () {
           {
             request: {
               method: 'get',
-              uri: '/.well-known/webfinger?resource=acct%3Ajohn.joe%40example.com' +
-              '&requestContext=%2Furl%2Fto%2Fredirect%2Fto'
+              uri: '/.well-known/webfinger?resource=acct%3Ajohn.joe%40example.com'
             },
             response: 'webfinger'
           }
@@ -20,8 +19,7 @@ describe('webfinger', function () {
       },
       execute: function (test) {
         return test.oa.webfinger({
-          resource: 'acct:john.joe@example.com',
-          requestContext: '/url/to/redirect/to'
+          resource: 'acct:john.joe@example.com'
         });
       }
     });
