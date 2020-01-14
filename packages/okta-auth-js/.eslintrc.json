@@ -1,0 +1,13 @@
+{
+  "extends": ["plugin:compat/recommended"],
+  "settings": {
+    "polyfills": [
+      "Array.from",
+      "TextEncoder"
+    ]
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2017
+  }
+}

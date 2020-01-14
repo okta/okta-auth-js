@@ -12,8 +12,6 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
 
-require('../vendor/polyfills');
-
 var builderUtil       = require('../builderUtil');
 var SDK_VERSION       = require('../../package.json').version;
 var storage           = require('./serverStorage').storage;

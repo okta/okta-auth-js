@@ -1,3 +1,4 @@
+/* global window, document */
 jest.mock('cross-fetch');
 
 var OktaAuth = require('OktaAuth');

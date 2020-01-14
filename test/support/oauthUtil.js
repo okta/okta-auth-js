@@ -1,3 +1,4 @@
+/* global window, document, Storage, localStorage */
 /* eslint-disable complexity, max-statements */
 var URL = require('url').URL;
 var util = require('./util');

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global localStorage, sessionStorage */
 var Cookies = require('js-cookie');
 var storageBuilder = require('../storageBuilder');
 var constants = require('../constants');

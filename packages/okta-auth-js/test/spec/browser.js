@@ -1,3 +1,4 @@
+/* global window */
 jest.mock('cross-fetch');
 
 var Emitter = require('tiny-emitter');
