@@ -8,9 +8,9 @@ class TestApp {
   get landingSelector() { return $('body.oidc-app.landing'); }
 
   // Authenticated landing
-  get logoutBtn() { return $('#logout'); }
   get logoutRedirectBtn() { return $('#logout-redirect'); }
-  get logoutLocalBtn() { return $('#logout-local'); }
+  get logoutXHRBtn() { return $('#logout-xhr'); }
+  get logoutAppBtn() { return $('#logout-app'); }
   get renewTokenBtn() { return $('#renew-token'); }
   get revokeTokenBtn() { return $('#revoke-token'); }
   get getTokenBtn() { return $('#get-token'); }
@@ -102,18 +102,18 @@ class TestApp {
     await browser.waitUntil(async () => this.landingSelector.then(el => el.isDisplayed()));
   }
 
-  async logout() {
-    await this.logoutBtn.then(el => el.click());
-    await this.waitForLoginBtn();
-  }
-
-  async logoutLocal() {
-    await this.logoutLocalBtn.then(el => el.click());
-    await this.waitForLoginBtn();
-  }
-
   async logoutRedirect() {
     await this.logoutRedirectBtn.then(el => el.click());
+    await this.waitForLoginBtn();
+  }
+
+  async logoutXHR() {
+    await this.logoutXHRBtn.then(el => el.click());
+    await this.waitForLoginBtn();
+  }
+
+  async logoutApp() {
+    await this.logoutAppBtn.then(el => el.click());
     await this.waitForLoginBtn();
   }
 
@@ -122,7 +122,7 @@ class TestApp {
   }
 
   async waitForLogoutBtn() {
-    return browser.waitUntil(async () => this.logoutBtn.then(el => el.isDisplayed()), 15000, 'wait for logout button');
+    return browser.waitUntil(async () => this.logoutRedirectBtn.then(el => el.isDisplayed()), 15000, 'wait for logout button');
   }
 
   async waitForCallback() {

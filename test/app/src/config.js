@@ -2,6 +2,7 @@
 import { CALLBACK_PATH, STORAGE_KEY } from './constants';
 const HOST = window.location.host;
 const REDIRECT_URI = `http://${HOST}${CALLBACK_PATH}`;
+const POST_LOGOUT_REDIRECT_URI = `http://${HOST}`;
 
 function getDefaultConfig() {
   const ISSUER = process.env.ISSUER;
@@ -9,6 +10,7 @@ function getDefaultConfig() {
   
   return {
     redirectUri: REDIRECT_URI,
+    postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
     issuer: ISSUER,
     clientId: CLIENT_ID,
     pkce: true,
@@ -18,6 +20,8 @@ function getDefaultConfig() {
 function getConfigFromUrl() {
   const url = new URL(window.location.href);
   const issuer = url.searchParams.get('issuer');
+  const redirectUri = url.searchParams.get('redirectUri') || REDIRECT_URI;
+  const postLogoutRedirectUri = url.searchParams.get('postLogoutRedirectUri') || POST_LOGOUT_REDIRECT_URI;
   const clientId = url.searchParams.get('clientId');
   const pkce = url.searchParams.get('pkce') && url.searchParams.get('pkce') !== 'false';
   const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
@@ -25,7 +29,8 @@ function getConfigFromUrl() {
   const storage = url.searchParams.get('storage') || undefined;
   const secure = url.searchParams.get('secure') === 'on'; // currently opt-in.
   return {
-    redirectUri: REDIRECT_URI,
+    redirectUri,
+    postLogoutRedirectUri,
     issuer,
     clientId,
     pkce,
@@ -39,7 +44,13 @@ function getConfigFromUrl() {
 }
 
 function saveConfigToStorage(config) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+  const configCopy = {};
+  Object.keys(config).forEach(key => {
+    if (typeof config[key] !== 'function') {
+      configCopy[key] = config[key];
+    }
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(configCopy));
 }
 
 function getConfigFromStorage() {

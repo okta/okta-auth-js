@@ -26,7 +26,6 @@ var token             = require('../token');
 var TokenManager      = require('../TokenManager');
 var tx                = require('../tx');
 var util              = require('../util');
-var allSettled        = require('promise.allsettled');
 
 function OktaAuthBuilder(args) {
   var sdk = this;
@@ -219,105 +218,93 @@ proto.signIn = function (opts) {
   });
 };
 
-// Ends the current application session, clearing all local tokens
-// Optionally revokes the access token
-// Ends the user's Okta session using the API or redirect method
-proto.signOut = function (options) {
+// Ends the current Okta SSO session without redirecting to Okta.
+proto.closeSession = function closeSession() {
+  var sdk = this;
+  
+  // Clear all local tokens
+  sdk.tokenManager.clear();
+
+  return sdk.session.close() // DELETE /api/v1/sessions/me
+  .catch(function(e) {
+    if (e.name === 'AuthApiError' && e.errorCode === 'E0000007') {
+      // Session does not exist or has already been closed
+      return;
+    }
+    throw e;
+  });
+};
+
+// Revokes the access token for the application session
+proto.revokeAccessToken = async function revokeAccessToken(accessToken) {
+  var sdk = this;
+  if (!accessToken) {
+    accessToken = await sdk.tokenManager.get('accessToken');
+  }
+  // Access token may have been removed. In this case, we will silently succeed.
+  if (!accessToken) {
+    return Promise.resolve();
+  }
+  return sdk.token.revoke(accessToken);
+};
+
+// Revokes accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
+proto.signOut = async function (options) {
   options = util.extend({}, options);
 
   // postLogoutRedirectUri must be whitelisted in Okta Admin UI
-  var postLogoutRedirectUri = options.postLogoutRedirectUri || this.options.postLogoutRedirectUri;
+  var defaultUri = window.location.origin;
+  var postLogoutRedirectUri = options.postLogoutRedirectUri
+    || this.options.postLogoutRedirectUri
+    || defaultUri;
 
   var accessToken = options.accessToken;
-  var revokeAccessToken = options.revokeAccessToken;
+  var revokeAccessToken = options.revokeAccessToken !== false;
   var idToken = options.idToken;
 
   var sdk = this;
   var logoutUrl = oauthUtil.getOAuthUrls(sdk).logoutUrl;
 
-  function getAccessToken() {
-    return Promise.resolve()
+  if (typeof idToken === 'undefined') {
+    idToken = await sdk.tokenManager.get('idToken');
+  }
+
+  if (revokeAccessToken && typeof accessToken === 'undefined') {
+    accessToken = await sdk.tokenManager.get('token');
+  }
+
+  // Clear all local tokens
+  sdk.tokenManager.clear();
+
+  if (revokeAccessToken && accessToken) {
+    await sdk.revokeAccessToken(accessToken);
+  }
+
+  // No idToken? This can happen if the storage was cleared.
+  // Fallback to XHR signOut, then redirect to the post logout uri
+  if (!idToken) {
+    return sdk.closeSession() // can throw if the user cannot be signed out
     .then(function() {
-      if (revokeAccessToken && typeof accessToken === 'undefined') {
-        return sdk.tokenManager.get('token');
+      if (postLogoutRedirectUri === defaultUri) {
+        window.location.reload();
+      } else {
+        window.location.assign(postLogoutRedirectUri);
       }
-      return accessToken;
     });
   }
 
-  function getIdToken() {
-    return Promise.resolve()
-    .then(function() {
-      if (postLogoutRedirectUri && typeof idToken === 'undefined') {
-        return sdk.tokenManager.get('idToken');
-      }
-      return idToken;
-    });
+  // logout redirect using the idToken.
+  var state = options.state;
+  var idTokenHint = idToken.idToken; // a string
+  var logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint) +
+    '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
+
+  // State allows option parameters to be passed to logout redirect uri
+  if (state) {
+    logoutUri += '&state=' + encodeURIComponent(state);
   }
-
-  function closeSession() {
-    return sdk.session.close() // DELETE /api/v1/sessions/me
-    .catch(function(e) {
-      if (e.name === 'AuthApiError') {
-        // Most likely cause is session does not exist or has already been closed
-        // Could also be a network error. Nothing we can do here.
-        return;
-      }
-      throw e;
-    });
-  }
-
-  return allSettled([getAccessToken(), getIdToken()])
-    .then(function(tokens) {
-      accessToken = tokens[0].value;
-      idToken = tokens[1].value;
-
-      // Clear all local tokens
-      sdk.tokenManager.clear();
-
-      if (revokeAccessToken && accessToken) {
-        return sdk.token.revoke(accessToken)
-        .catch(function(e) {
-          if (e.name === 'AuthApiError') {
-            // Capture and ignore network errors
-            return;
-          }
-          throw e;
-        });
-      }
-    })
-    .then(function() {
-      // XHR signOut method
-      if (!postLogoutRedirectUri) {
-        return closeSession();
-      }
-
-      // No idToken? This can happen if the storage was cleared.
-      // Fallback to XHR signOut, then redirect to the post logout uri
-      if (!idToken) {
-        return closeSession()
-        .catch(function(err) {
-          // eslint-disable-next-line no-console
-          console.log('Unhandled exception while closing session', err);
-        })
-        .then(function() {
-          window.location.assign(postLogoutRedirectUri);
-        });
-      }
-
-      // logout redirect using the idToken.
-      var state = options.state;
-      var idTokenHint = idToken.idToken; // a string
-      var logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint) +
-        '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
-    
-      // State allows option parameters to be passed to logout redirect uri
-      if (state) {
-        logoutUri += '&state=' + encodeURIComponent(state);
-      }
-      
-      window.location.assign(logoutUri);
-    });
+  
+  window.location.assign(logoutUri);
 };
 
 builderUtil.addSharedPrototypes(proto);

@@ -5,6 +5,8 @@ const Form = `
   <form target="/oidc" method="GET">
   <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
   <label for="clientId">Client ID</label><input id="clientId" name="clientId" type="text" /><br/>
+  <label for="redirectUri">Redirect URI</label><input id="redirectUri" name="redirectUri" type="text" /><br/>
+  <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" /><br/>
   <label for="pkce">PKCE</label><input id="pkce" name="pkce" type="checkbox"/><br/>
   <label for="storage">Storage</label>
   <select id="storage" name="storage">
@@ -23,6 +25,8 @@ const Form = `
 function updateForm(config) {
   config = flattenConfig(config);
   document.getElementById('issuer').value = config.issuer;
+  document.getElementById('redirectUri').value = config.redirectUri;
+  document.getElementById('postLogoutRedirectUri').value = config.postLogoutRedirectUri;
   document.getElementById('clientId').value = config.clientId;
   document.getElementById('pkce').checked = !!config.pkce;
   document.querySelector(`#storage [value="${config.storage || ''}"]`).selected = true;

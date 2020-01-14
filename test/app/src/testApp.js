@@ -25,9 +25,9 @@ function homeLink(app) {
 
 function logoutLink(app) {
   return `
-  <a id="logout" href="${app.originalUrl}" onclick="logoutAndReload(event)">Logout (and reload)</a><br/>
-  <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutAndRedirect(event)">Logout (and redirect here)</a><br/>
-  <a id="logout-local" href="${app.originalUrl}" onclick="logoutLocal(event)">Logout (local only)</a><br/>
+  <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)">Logout (and redirect here)</a><br/>
+  <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)">Logout (XHR + reload)</a><br/>
+  <a id="logout-app" href="${app.originalUrl}" onclick="logoutApp(event)">Logout (app only)</a><br/>
   `;
 }
 
@@ -62,10 +62,9 @@ function bindFunctions(testApp, window) {
     loginDirect: testApp.loginDirect.bind(testApp),
     getToken: testApp.getToken.bind(testApp, {}),
     clearTokens: testApp.clearTokens.bind(testApp),
-    logout: testApp.logout.bind(testApp),
-    logoutAndReload: testApp.logoutAndReload.bind(testApp),
-    logoutAndRedirect: testApp.logoutAndRedirect.bind(testApp),
-    logoutLocal: testApp.logoutLocal.bind(testApp),
+    logoutRedirect: testApp.logoutRedirect.bind(testApp),
+    logoutXHR: testApp.logoutXHR.bind(testApp),
+    logoutApp: testApp.logoutApp.bind(testApp),
     refreshSession: testApp.refreshSession.bind(testApp),
     renewToken: testApp.renewToken.bind(testApp),
     revokeToken: testApp.revokeToken.bind(testApp),
@@ -222,8 +221,7 @@ Object.assign(TestApp.prototype, {
     return this.oktaAuth.session.refresh();
   },
   revokeToken: async function() {
-    const accessToken = await this.oktaAuth.tokenManager.get('accessToken');
-    return this.oktaAuth.token.revoke(accessToken)
+    return this.oktaAuth.revokeAccessToken()
     .then(() => {
       document.getElementById('token-msg').innerHTML = 'access token revoked';
     });
@@ -234,29 +232,25 @@ Object.assign(TestApp.prototype, {
         this.render();
       });
   },
-  logout: async function() {
-    return this.oktaAuth.signOut();
-  },
-  logoutAndReload: function() {
-    this.logout()
+  logoutRedirect: function() {
+    this.oktaAuth.signOut()
       .catch(e => {
-        console.error('Error during signout: ', e);
+        console.error('Error during signout & redirect: ', e);
+      });
+  },
+  logoutXHR: async function() {
+    await this.oktaAuth.revokeAccessToken();
+    this.oktaAuth.closeSession()
+      .catch(e => {
+        console.error('Error during signout & redirect: ', e);
       })
       .then(() => {
         window.location.reload();
       });
   },
-  logoutAndRedirect: function() {
-    var options = {
-      postLogoutRedirectUri: window.location.origin
-    };
-    this.oktaAuth.signOut(options)
-      .catch(e => {
-        console.error('Error during signout & redirect: ', e);
-      });
-  },
-  logoutLocal: function() {
-    this.clearTokens();
+  logoutApp: async function() {
+    await this.oktaAuth.revokeAccessToken();
+    this.oktaAuth.tokenManager.clear();
     window.location.reload();
   },
   handleCallback: async function() {

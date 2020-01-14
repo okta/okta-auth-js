@@ -14,21 +14,21 @@ describe('E2E login', () => {
         await loginRedirect(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
-        await TestApp.logout();
+        await TestApp.logoutRedirect();
       });
 
       it('can login using a popup window', async() => {
         await loginPopup(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
-        await TestApp.logout();
+        await TestApp.logoutRedirect();
       });
 
       it('can login directly, calling signin() with username and password', async () => {
         await loginDirect(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
-        await TestApp.logout();
+        await TestApp.logoutRedirect();
       });
     });
   });
