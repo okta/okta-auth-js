@@ -269,3 +269,9 @@ util.isIE11OrLess = function() {
 util.isFunction = function(fn) {
   return !!fn && {}.toString.call(fn) === '[object Function]';
 };
+
+util.delay = function(ms) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, ms);
+  });
+};

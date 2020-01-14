@@ -1,9 +1,8 @@
 /* global window, localStorage, sessionStorage */
+
+// Promise.allSettled is added in Node 12.10
 var allSettled = require('promise.allsettled');
 allSettled.shim(); // will be a no-op if not needed
-
-var promiseFinally = require('promise.prototype.finally');
-promiseFinally.shim(); // will be a no-op if not needed
 
 var Emitter = require('tiny-emitter');
 var OktaAuth = require('OktaAuth');
@@ -451,7 +450,7 @@ describe('TokenManager', function() {
       .then(function() {
         expect(true).toEqual(false);
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.expectErrorToEqual(err, {
           name: 'AuthSdkError',
           message: 'Unable to parse storage string: okta-token-storage',
@@ -517,7 +516,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(e) {
+      .catch(function(e) {
         util.expectErrorToEqual(e, {
           name: 'OAuthError',
           message: 'something went wrong',
@@ -548,7 +547,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(e) {
+      .catch(function(e) {
         util.expectErrorToEqual(e, {
           name: 'AuthSdkError',
           message: 'The request does not match client configuration',
@@ -794,7 +793,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.expectErrorToEqual(err, {
           name: 'OAuthError',
           message: 'something went wrong',
@@ -847,7 +846,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.expectErrorToEqual(err, {
           name: 'AuthSdkError',
           message: 'The request does not match client configuration',
@@ -886,7 +885,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.expectErrorToEqual(err, {
           name: 'OAuthError',
           message: 'something went wrong',
@@ -921,7 +920,7 @@ describe('TokenManager', function() {
           state: oauthUtil.mockedState
         }
       })
-      .fail(function(e) {
+      .catch(function(e) {
         util.expectErrorToEqual(e, {
           name: 'AuthSdkError',
           message: 'The request does not match client configuration',

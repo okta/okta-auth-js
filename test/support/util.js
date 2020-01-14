@@ -1,8 +1,7 @@
 /* globals expect, JSON */
 /* eslint-disable max-statements, complexity */
 
-var Q = require('q'),
-    _ = require('lodash'),
+var _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
     cookies = require('@okta/okta-auth-js/lib/browser/browserStorage').storage,
     fetch = require('cross-fetch');
@@ -34,7 +33,7 @@ util.warpByTicksToUnixTime = function (unixTime) {
 };
 
 function generateXHRPair(request, response, uri, responseVars) {
-  return Q.Promise(function(resolve) {
+  return new Promise(function(resolve) {
     responseVars = responseVars || {};
     responseVars.uri = responseVars.uri || uri;
 
@@ -105,27 +104,25 @@ function mockAjax(pairs) {
       }
     }
 
-    var deferred = Q.defer();
-    var xhr = pair.response;
-    xhr.headers = xhr.headers || {};
-    xhr.headers['Content-Type'] = 'application/json';
-    xhr.headers.get = function(attr) {
-      return xhr.headers[attr];
-    };
-    xhr.ok = xhr.status >= 200 && xhr.status < 300;
-    xhr.json = function() {
-      return Q.Promise(function(resolve) {
-        resolve(xhr.responseText);
-      });
-    };
+    return new Promise(function(resolve, reject) {
+      var xhr = pair.response;
+      xhr.headers = xhr.headers || {};
+      xhr.headers['Content-Type'] = 'application/json';
+      xhr.headers.get = function(attr) {
+        return xhr.headers[attr];
+      };
+      xhr.ok = xhr.status >= 200 && xhr.status < 300;
+      xhr.json = function() {
+        return Promise.resolve(xhr.responseText);
+      };
 
-    if (xhr.status > 0 && xhr.status < 300) {
-      _.defer(function () { deferred.resolve(xhr); });
-    } else {
-      xhr.responseJSON = xhr.response;
-      deferred.reject(xhr);
-    }
-    return deferred.promise;
+      if (xhr.status > 0 && xhr.status < 300) {
+        _.defer(function () { resolve(xhr); });
+      } else {
+        xhr.responseJSON = xhr.response;
+        reject(xhr);
+      }
+    });
   });
 
   return {
@@ -141,7 +138,7 @@ function setup(options) {
 
   var ajaxMock, resReply, oa, trans;
 
-  return new Q()
+  return Promise.resolve()
     .then(function() {
 
       if (options.time) {
@@ -158,7 +155,7 @@ function setup(options) {
           xhrGenPromises.push(xhrGenPromise);
         });
 
-        return Q.all(xhrGenPromises)
+        return Promise.all(xhrGenPromises)
           .then(function (pairs) {
             ajaxMock = mockAjax(pairs);
             resReply = _.last(pairs).response;
@@ -231,8 +228,6 @@ util.itMakesCorrectRequestResponse = function (options) {
   fn(title, function () {
     return setup(options.setup).then(function (test) {
       return options.execute(test)
-      // Add a tick for the setTimeout successFn
-      .delay(0)
       .then(function (res) {
         if (res.data) {
           test.trans = res;
@@ -253,12 +248,7 @@ util.itErrorsCorrectly = function (options) {
   fn(options.title, function (done) {
     return setup(options.setup).then(function (test) {
       return options.execute(test)
-      // Add a tick for the setTimeout successFn
-      .then(null, function(err) {
-        return Q.delay(0)
-        .thenReject(err);
-      })
-      .fail(function (err) {
+      .catch(function (err) {
         if (options.expectations) {
           options.expectations(test, err);
           test.ajaxMock.done();
@@ -288,7 +278,7 @@ util.itErrorChecksInput = function (options) {
   fn(options.title, function (done) {
     return setup(options.setup).then(function (test) {
       return options.execute(test)
-      .fail(function (err) {
+      .catch(function (err) {
         util.assertAuthSdkError(err, options.errorMsg);
         test.ajaxMock.done();
         done();

@@ -1,8 +1,6 @@
 /* global Promise */
 jest.mock('cross-fetch');
 
-var Q = require('q');
-
 var util = require('@okta/test.support/util');
 var factory = require('@okta/test.support/factory');
 var packageJson = require('../../package.json');
@@ -58,7 +56,7 @@ describe('pkce', function() {
     it('Checks codeChallengeMethod against well-known', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
       var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
-      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Q.resolve({
+      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Promise.resolve({
         'code_challenge_methods_supported': []
       }))
       return token.prepareOauthParams(sdk, {})
@@ -78,12 +76,12 @@ describe('pkce', function() {
 
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
       var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
-      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Q.resolve({
+      spyOn(oauthUtil, 'getWellKnown').and.returnValue(Promise.resolve({
         'code_challenge_methods_supported': [codeChallengeMethod]
       }));
       spyOn(pkce, 'generateVerifier').and.returnValue(codeVerifier);
       spyOn(pkce, 'saveMeta');
-      spyOn(pkce, 'computeChallenge').and.returnValue(Q.resolve(codeChallenge));
+      spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
       return token.prepareOauthParams(sdk, {
         codeChallengeMethod: codeChallengeMethod
       })
