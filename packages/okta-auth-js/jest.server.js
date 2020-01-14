@@ -1,5 +1,4 @@
-var packageJson = require('./package.json');
-var OktaAuth = '<rootDir>/' + packageJson.main;
+var OktaAuth = '<rootDir>/lib/server/serverIndex.js';
 
 module.exports = {
   'coverageDirectory': '<rootDir>/build2/reports/coverage',

@@ -6,6 +6,9 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.json$/, loader: 'json' }
+    ],
+    rules: [
+      { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
     ]
   },
   plugins: [

@@ -13,9 +13,7 @@
 /* eslint-disable max-statements */
 /* SDK_VERSION is defined in webpack config */ 
 /* global SDK_VERSION */
-
-require('../vendor/polyfills');
-
+/* global window, navigator, document, crypto */
 var Emitter           = require('tiny-emitter');
 var AuthSdkError      = require('../errors/AuthSdkError');
 var builderUtil       = require('../builderUtil');
