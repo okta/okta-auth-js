@@ -19,6 +19,7 @@ describe('E2E logout', () => {
       await OktaHome.waitForLoad();
 
       // Now sign the user out
+      await OktaHome.closeInitialPopUp();
       await OktaHome.signOut();
       await browser.closeWindow();
       await switchToMainWindow();

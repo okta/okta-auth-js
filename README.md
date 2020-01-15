@@ -203,6 +203,7 @@ tokenManager: {
 | `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
 | | This option should be used only for browser support and testing purposes. |
 | `maxClockSkew` | Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
+| `onSessionExpired` | A function to be called when the Okta SSO session has expired or was ended outside of the application. A typical handler would initiate a login flow.
 | `tokenManager` | *(optional)*: An object containing additional properties used to configure the internal token manager. |
 
 * `autoRenew`:
@@ -237,6 +238,10 @@ var config = {
   // TokenManager config
   tokenManager: {
     storage: 'sessionStorage'
+  },
+
+  onSessionExpired: function() {
+    console.log('re-authorization is required');
   }
 };
 
@@ -1513,7 +1518,6 @@ The following configuration options can **only** be included in `token.getWithou
 
 For a list of all available parameters that can be passed to the `/authorize` endpoint, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
 
-
 ##### Example
 
 ```javascript
@@ -1584,12 +1588,11 @@ authClient.token.getWithRedirect(oauthOptions);
 
 #### `token.parseFromUrl(options)`
 
-Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. 
+Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect.
 
-If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint. 
+If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint.
 
 The ID token will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
-
 
 ```javascript
 authClient.token.parseFromUrl()
@@ -1732,7 +1735,7 @@ authClient.tokenManager.clear();
 
 #### `tokenManager.renew(key)`
 
-Manually renew a token before it expires.
+Manually renew a token before it expires and update the stored value.
 
 * `key` - Key for the token you want to renew
 
@@ -1760,28 +1763,30 @@ Subscribe to an event published by the `tokenManager`.
 * `context` - Optional context to bind the callback to
 
 ```javascript
-// Triggered when the token has expired
+// Triggered when a token has expired
 authClient.tokenManager.on('expired', function (key, expiredToken) {
   console.log('Token with key', key, ' has expired:');
   console.log(expiredToken);
 });
-
+// Triggered when a token has been renewed
 authClient.tokenManager.on('renewed', function (key, newToken, oldToken) {
   console.log('Token with key', key, 'has been renewed');
   console.log('Old token:', oldToken);
   console.log('New token:', newToken);
 });
-
-// Triggered when an OAuthError is returned via the API
+// Triggered when an OAuthError is returned via the API (typically during auto-renew)
 authClient.tokenManager.on('error', function (err) {
   console.log('TokenManager error:', err);
   // err.name
   // err.message
   // err.errorCode
   // err.errorSummary
-
-  if (err.errorCode === 'login_required') {
-    // Return to unauthenticated state
+  // err.tokenKey
+  // err.accessToken
+  if (err.errorCode === 'login_required' && err.accessToken) {
+    // The Okta session has expired or was closed outside the application
+    // The application should return to an unauthenticated state
+    // This error can also be handled using the 'onSessionExpired' option
   }
 });
 ```
@@ -1790,10 +1795,10 @@ authClient.tokenManager.on('error', function (err) {
 
 Unsubscribe from `tokenManager` events. If no callback is provided, unsubscribes all listeners from the event.
 
-* `event` - Event to unsubscribe from
+* `event` - Event to unsubscribe from 
 * `callback` - Optional callback that was used to subscribe to the event
 
-```javascript
+```javascript 
 authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
@@ -1844,7 +1849,7 @@ Since the Node library can be used only for the Authentication flow, it implemen
 
 The main difference is that the Node library does **not** have a `session.setCookieAndRedirect` function, so you will have to redirect by yourself (for example using `res.redirect('https://www.yoursuccesspage.com')`).
 
-The `SUCCESS` transaction will still include a `sessionToken` which you can use with the session APIs: https://github.com/okta/okta-sdk-nodejs#sessions.
+The `SUCCESS` transaction will still include a `sessionToken` which you can use with the session APIs: <https://github.com/okta/okta-sdk-nodejs#sessions.>
 
 ## Building the SDK
 

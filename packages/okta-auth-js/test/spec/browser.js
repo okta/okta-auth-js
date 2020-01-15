@@ -1,3 +1,6 @@
+jest.mock('cross-fetch');
+
+var Emitter = require('tiny-emitter');
 var OktaAuth = require('../../lib/browser/browserIndex');
 var AuthApiError = require('../../lib/errors/AuthApiError');
 
@@ -9,6 +12,52 @@ describe('Browser', function() {
 
   it('is a valid constructor', function() {
     expect(auth instanceof OktaAuth).toBe(true);
+  });
+
+  describe('Error handling', function() {
+    it('Listens to error events from TokenManager', function() {
+      jest.spyOn(Emitter.prototype, 'on');
+      jest.spyOn(OktaAuth.prototype, '_onTokenManagerError');
+      var auth = new OktaAuth({ url: 'http://localhost/fake' });
+      expect(Emitter.prototype.on).toHaveBeenCalledWith('error', auth._onTokenManagerError, auth);
+      var emitter = Emitter.prototype.on.mock.instances[0];
+      var error = { errorCode: 'anything'};
+      emitter.emit('error', error);
+      expect(OktaAuth.prototype._onTokenManagerError).toHaveBeenCalledWith(error);
+    });
+  
+    it('error with errorCode "login_required" and accessToken: true will call option "onSessionExpired" function', function() {
+      var onSessionExpired = jest.fn();
+      jest.spyOn(Emitter.prototype, 'on');
+      new OktaAuth({ url: 'http://localhost/fake', onSessionExpired: onSessionExpired });
+      var emitter = Emitter.prototype.on.mock.instances[0];
+      expect(onSessionExpired).not.toHaveBeenCalled();
+      var error = { errorCode: 'login_required', accessToken: true };
+      emitter.emit('error', error);
+      expect(onSessionExpired).toHaveBeenCalled();
+    });
+
+    it('error with errorCode "login_required" (not accessToken) does not call option "onSessionExpired" function', function() {
+      var onSessionExpired = jest.fn();
+      jest.spyOn(Emitter.prototype, 'on');
+      new OktaAuth({ url: 'http://localhost/fake', onSessionExpired: onSessionExpired });
+      var emitter = Emitter.prototype.on.mock.instances[0];
+      expect(onSessionExpired).not.toHaveBeenCalled();
+      var error = { errorCode: 'login_required' };
+      emitter.emit('error', error);
+      expect(onSessionExpired).not.toHaveBeenCalled();
+    });
+    
+    it('error with unknown errorCode does not call option "onSessionExpired" function', function() {
+      var onSessionExpired = jest.fn();
+      jest.spyOn(Emitter.prototype, 'on');
+      new OktaAuth({ url: 'http://localhost/fake', onSessionExpired: onSessionExpired });
+      var emitter = Emitter.prototype.on.mock.instances[0];
+      expect(onSessionExpired).not.toHaveBeenCalled();
+      var error = { errorCode: 'unknown', accessToken: true };
+      emitter.emit('error', error);
+      expect(onSessionExpired).not.toHaveBeenCalled();
+    });
   });
 
   describe('options', function() {
