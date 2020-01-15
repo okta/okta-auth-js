@@ -13,7 +13,7 @@
 /* global document, window, Promise, console */
 /* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
-import { saveConfigToStorage } from './config';
+import { saveConfigToStorage, flattenConfig } from './config';
 import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryParams } from './util';
 import { Form, updateForm } from './form';
@@ -36,6 +36,7 @@ const Footer = `
 
 const Layout = `
   <div id="layout">
+    <div id="session-expired" style="color: orange"></div>
     <div id="token-error" style="color: red"></div>
     <div id="token-msg" style="color: green"></div>
     <div id="page-content"></div>
@@ -78,6 +79,9 @@ function bindFunctions(testApp, window) {
 
 function TestApp(config) {
   this.config = config;
+  Object.assign(this.config, {
+    onSessionExpired: this._onSessionExpired.bind(this)
+  });
 }
 
 export default TestApp;
@@ -85,7 +89,7 @@ export default TestApp;
 Object.assign(TestApp.prototype, {
   // Mount into the DOM
   mount: function(window, rootElem) {
-    this.originalUrl = MOUNT_PATH + toQueryParams(this.config);
+    this.originalUrl = MOUNT_PATH + toQueryParams(flattenConfig(this.config));
     this.rootElem = rootElem;
     this.rootElem.innerHTML = Layout;
     updateForm(this.config);
@@ -96,7 +100,7 @@ Object.assign(TestApp.prototype, {
   getSDKInstance() {
     return Promise.resolve()
       .then(() => {
-        this.oktaAuth = this.oktaAuth || new OktaAuth(this.config); // can throw
+        this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config)); // can throw
         this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
       });
   },
@@ -113,6 +117,9 @@ Object.assign(TestApp.prototype, {
   },
   _onTokenError: function(error) {
     document.getElementById('token-error').innerText = error;
+  },
+  _onSessionExpired: function() {
+    document.getElementById('session-expired').innerText = 'SESSION EXPIRED';
   },
   bootstrapCallback: async function() {
     const content = `
@@ -222,7 +229,7 @@ Object.assign(TestApp.prototype, {
     });
   },
   renewToken: async function() {
-    return this.oktaAuth.tokenManager.renew('idToken')
+    return this.oktaAuth.tokenManager.renew('accessToken')
       .then(() => {
         this.render();
       });

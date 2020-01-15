@@ -22,6 +22,8 @@ function getConfigFromUrl() {
   const pkce = url.searchParams.get('pkce') && url.searchParams.get('pkce') !== 'false';
   const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
+  const storage = url.searchParams.get('storage') || undefined;
+  const secure = url.searchParams.get('secure') === 'on'; // currently opt-in.
   return {
     redirectUri: REDIRECT_URI,
     issuer,
@@ -29,6 +31,10 @@ function getConfigFromUrl() {
     pkce,
     scopes,
     responseType,
+    tokenManager: {
+      storage,
+      secure,
+    },
   };
 }
 
@@ -45,4 +51,15 @@ function clearStorage() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-export { getDefaultConfig, getConfigFromUrl, saveConfigToStorage, getConfigFromStorage, clearStorage };
+function flattenConfig(config) {
+  let flat = {};
+  Object.assign(flat, config.tokenManager);
+  Object.keys(config).forEach(key => {
+    if (key !== 'tokenManager') {
+      flat[key] = config[key];
+    }
+  });
+  return flat;
+}
+
+export { getDefaultConfig, getConfigFromUrl, saveConfigToStorage, getConfigFromStorage, clearStorage, flattenConfig };

@@ -4,6 +4,7 @@ allSettled.shim(); // will be a no-op if not needed
 var promiseFinally = require('promise.prototype.finally');
 promiseFinally.shim(); // will be a no-op if not needed
 
+var Emitter = require('tiny-emitter');
 var OktaAuth = require('OktaAuth');
 var tokens = require('@okta/test.support/tokens');
 var util = require('@okta/test.support/util');
@@ -36,7 +37,51 @@ describe('TokenManager', function() {
   afterEach(function() {
     jest.useRealTimers();
   });
-  
+
+  describe('Event emitter', function() {
+    it('uses emitter from the SDK client', function() {
+      jest.spyOn(Emitter.prototype, 'on');
+      var client = setupSync();
+      var handlerFn = jest.fn();
+      client.tokenManager.on('fake', handlerFn);
+      var emitter = Emitter.prototype.on.mock.instances[0];
+      expect(emitter).toBe(client.emitter);
+      emitter.emit('fake');
+      expect(handlerFn).toHaveBeenCalled();
+    });
+
+    it('Can add event callbacks using on()', function() {
+      var client = setupSync();
+      var handler = jest.fn();
+      client.tokenManager.on('fake', handler);
+      var payload = { foo: 'bar' };
+      client.emitter.emit('fake', payload);
+      expect(handler).toHaveBeenCalledWith(payload);
+    });
+
+    it('Event callbacks can have an optional context', function() {
+      var client = setupSync();
+      var context = jest.fn();
+      var handler = jest.fn().mockImplementation(function() {
+        expect(this).toBe(context);
+      });
+      client.tokenManager.on('fake', handler, context);
+      var payload = { foo: 'bar' };
+      client.emitter.emit('fake', payload);
+      expect(handler).toHaveBeenCalledWith(payload);
+    });
+
+    it('Can remove event callbacks using off()', function() {
+      var client = setupSync();
+      var handler = jest.fn();
+      client.tokenManager.on('fake', handler);
+      client.tokenManager.off('fake', handler);
+      var payload = { foo: 'bar' };
+      client.emitter.emit('fake', payload);
+      expect(handler).not.toHaveBeenCalled();
+    });
+  });
+
   describe('storageKey', function() {
     it('Uses "okta-token-storage" by default', function() {
       var client = setupSync();
@@ -152,8 +197,9 @@ describe('TokenManager', function() {
       expect(setCookieMock).toHaveBeenCalledWith(
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-        '2200-01-01T00:00:00.000Z',
-        undefined // secure
+        '2200-01-01T00:00:00.000Z', {
+          sameSite: 'strict'
+        }
       );
     });
     it('defaults to cookie-based storage if sessionStorage cannot be written to', function() {
@@ -174,8 +220,9 @@ describe('TokenManager', function() {
       expect(setCookieMock).toHaveBeenCalledWith(
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-        '2200-01-01T00:00:00.000Z',
-        undefined // secure
+        '2200-01-01T00:00:00.000Z', {
+          sameSite: 'strict'
+        }
       );
     });
   });
@@ -206,6 +253,22 @@ describe('TokenManager', function() {
   });
 
   describe('renew', function() {
+    it('on success, emits a "renewed" event with the new token', function() {
+      var client = setupSync();
+      var key = 'test-idToken';
+      var origToken = tokens.standardIdTokenParsed;
+      var renewedToken = Object.assign({}, origToken);
+      client.tokenManager.add(key, origToken);
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+        return Promise.resolve(renewedToken);
+      });
+      var callback = jest.fn();
+      client.tokenManager.on('renewed', callback);
+      return client.tokenManager.renew('test-idToken')
+        .then(function() {
+          expect(callback).toHaveBeenCalledWith(key, renewedToken, origToken);
+        });
+    });
 
     it('multiple overlapping calls will produce a single request and promise', function() {
       var client = setupSync();
@@ -432,7 +495,9 @@ describe('TokenManager', function() {
         errorSummary: 'OAuth flow response nonce doesn\'t match request nonce',
         errorLink: 'INTERNAL',
         errorId: 'INTERNAL',
-        errorCauses: []
+        errorCauses: [],
+        tokenKey: 'test-idToken',
+        accessToken: false
       }
     );
 
@@ -456,7 +521,9 @@ describe('TokenManager', function() {
           name: 'OAuthError',
           message: 'something went wrong',
           errorCode: 'sampleErrorCode',
-          errorSummary: 'something went wrong'
+          errorSummary: 'something went wrong',
+          tokenKey: 'test-accessToken',
+          accessToken: true
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-idToken': tokens.standardIdTokenParsed
@@ -489,6 +556,8 @@ describe('TokenManager', function() {
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: [],
+          tokenKey: 'test-accessToken',
+          accessToken: true
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-idToken': tokens.standardIdTokenParsed
@@ -701,7 +770,9 @@ describe('TokenManager', function() {
           name: 'OAuthError',
           message: 'something went wrong',
           errorCode: 'sampleErrorCode',
-          errorSummary: 'something went wrong'
+          errorSummary: 'something went wrong',
+          tokenKey: 'test-idToken',
+          accessToken: false
         });
       })
       authClient.tokenManager.on('error', errorEventCallback);
@@ -727,7 +798,9 @@ describe('TokenManager', function() {
           name: 'OAuthError',
           message: 'something went wrong',
           errorCode: 'sampleErrorCode',
-          errorSummary: 'something went wrong'
+          errorSummary: 'something went wrong',
+          tokenKey: 'test-idToken',
+          accessToken: false
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
 
@@ -750,6 +823,8 @@ describe('TokenManager', function() {
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: [],
+          tokenKey: 'test-idToken',
+          accessToken: false
         });
       })
       authClient.tokenManager.on('error', errorEventCallback);
@@ -780,6 +855,8 @@ describe('TokenManager', function() {
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: [],
+          tokenKey: 'test-idToken',
+          accessToken: false
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
 
@@ -813,7 +890,9 @@ describe('TokenManager', function() {
           name: 'OAuthError',
           message: 'something went wrong',
           errorCode: 'sampleErrorCode',
-          errorSummary: 'something went wrong'
+          errorSummary: 'something went wrong',
+          tokenKey: 'test-idToken',
+          accessToken: false
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
       });
@@ -850,6 +929,8 @@ describe('TokenManager', function() {
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: [],
+          tokenKey: 'test-idToken',
+          accessToken: false
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
       });
@@ -906,32 +987,28 @@ describe('TokenManager', function() {
       expect(sdk.token.renew).toHaveBeenCalled();
     });
 
-    it('emits "expired" on existing tokens even when autoRenew is disabled', function(done) {
+    it('emits "expired" on existing tokens even when autoRenew is disabled', function() {
       jest.useFakeTimers();
       localStorage.setItem('okta-token-storage', JSON.stringify({
         'test-idToken': tokens.standardIdTokenParsed
       }));
       var client = setupSync({ tokenManager: { autoRenew: false } });
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-      client.tokenManager.on('expired', function(key, token) {
-        expect(key).toEqual('test-idToken');
-        expect(token).toEqual(tokens.standardIdTokenParsed);
-        done();
-      });
+      var callback = jest.fn();
+      client.tokenManager.on('expired', callback);
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(callback).toHaveBeenCalledWith('test-idToken', tokens.standardIdTokenParsed);
     });
 
-    it('emits "expired" on new tokens even when autoRenew is disabled', function(done) {
+    it('emits "expired" on new tokens even when autoRenew is disabled', function() {
       jest.useFakeTimers();
       var client = setupSync({ tokenManager: { autoRenew: false } });
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-      client.tokenManager.on('expired', function(key, token) {
-        expect(key).toEqual('test-idToken');
-        expect(token).toEqual(tokens.standardIdTokenParsed);
-        done();
-      });
+      var callback = jest.fn();
+      client.tokenManager.on('expired', callback);
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(callback).toHaveBeenCalledWith('test-idToken', tokens.standardIdTokenParsed);
     });
 
     it('accounts for local clock offset when emitting "expired"', function() {
@@ -946,7 +1023,7 @@ describe('TokenManager', function() {
       jest.advanceTimersByTime(0);
       expect(callback).not.toHaveBeenCalled();
       jest.advanceTimersByTime(-localClockOffset);
-      expect(callback).toHaveBeenCalled();
+      expect(callback).toHaveBeenCalledWith('test-idToken', tokens.standardIdTokenParsed);
     });
   
     it('accounts for "expireEarlySeconds" option when emitting "expired"', function() {
@@ -963,7 +1040,7 @@ describe('TokenManager', function() {
       jest.advanceTimersByTime(0);
       expect(callback).not.toHaveBeenCalled();
       jest.advanceTimersByTime(1000);
-      expect(callback).toHaveBeenCalled();
+      expect(callback).toHaveBeenCalledWith('test-idToken', tokens.standardIdTokenParsed);
     });
 
     it('returns undefined for a token that has expired when autoRenew is disabled', function() {
@@ -1164,8 +1241,9 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z',
-          undefined // secure
+          '2200-01-01T00:00:00.000Z', {
+            sameSite: 'strict'
+          }
         );
       });
 
@@ -1176,8 +1254,10 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z',
-          true // secure
+          '2200-01-01T00:00:00.000Z', {
+            secure: true,
+            sameSite: 'strict'
+          }
         );
       });
 
@@ -1214,8 +1294,9 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           JSON.stringify({anotherKey: tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z',
-          undefined // secure
+          '2200-01-01T00:00:00.000Z', {
+            sameSite: 'strict'
+          }
         );
       });
     });
@@ -1230,8 +1311,9 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           '{}',
-          '2200-01-01T00:00:00.000Z',
-          undefined // secure
+          '2200-01-01T00:00:00.000Z', {
+            sameSite: 'strict'
+          }
         );
       });
     });

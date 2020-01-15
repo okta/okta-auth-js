@@ -43,12 +43,12 @@ describe('E2E token flows', () => {
         (flow === 'pkce') ? await openPKCE() : await openImplicit();
       });
 
-      it('can renew the id token', async () => {
+      it('can renew the access token', async () => {
         await loginPopup(flow);
-        const prevToken = await TestApp.idToken.then(el => el.getText());
+        const prevToken = await TestApp.accessToken.then(el => el.getText());
         await TestApp.renewToken();
         await browser.waitUntil(async () => {
-          const txt = await TestApp.idToken.then(el => el.getText());
+          const txt = await TestApp.accessToken.then(el => el.getText());
           return txt !== prevToken;
         }, 10000);
         await TestApp.assertLoggedIn();
@@ -89,6 +89,9 @@ describe('E2E token flows', () => {
         }, 10000, 'wait for token error');
         await TestApp.tokenError.then(el => el.getText()).then(msg => {
           assert(msg.trim() === 'OAuthError: The client specified not to prompt, but the user is not logged in.');
+        });
+        await TestApp.sessionExpired.then(el => el.getText()).then(txt => {
+          assert(txt === 'SESSION EXPIRED');
         });
         await browser.refresh();
         await TestApp.waitForLoginBtn(); // assert we are logged out
