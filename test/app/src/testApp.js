@@ -13,7 +13,7 @@
 /* global document, window, Promise, console */
 /* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
-import { saveConfigToStorage } from './config';
+import { saveConfigToStorage, flattenConfig } from './config';
 import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryParams } from './util';
 import { Form, updateForm } from './form';
@@ -89,7 +89,7 @@ export default TestApp;
 Object.assign(TestApp.prototype, {
   // Mount into the DOM
   mount: function(window, rootElem) {
-    this.originalUrl = MOUNT_PATH + toQueryParams(this.config);
+    this.originalUrl = MOUNT_PATH + toQueryParams(flattenConfig(this.config));
     this.rootElem = rootElem;
     this.rootElem.innerHTML = Layout;
     updateForm(this.config);
@@ -100,7 +100,7 @@ Object.assign(TestApp.prototype, {
   getSDKInstance() {
     return Promise.resolve()
       .then(() => {
-        this.oktaAuth = this.oktaAuth || new OktaAuth(this.config); // can throw
+        this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config)); // can throw
         this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
       });
   },
