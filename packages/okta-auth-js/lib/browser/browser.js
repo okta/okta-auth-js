@@ -21,12 +21,12 @@ var constants         = require('../constants');
 var cookies           = require('./browserStorage').storage;
 var http              = require('../http');
 var oauthUtil         = require('../oauthUtil');
-var Q                 = require('q');
 var session           = require('../session');
 var token             = require('../token');
 var TokenManager      = require('../TokenManager');
 var tx                = require('../tx');
 var util              = require('../util');
+var allSettled        = require('promise.allsettled');
 
 function OktaAuthBuilder(args) {
   var sdk = this;
@@ -236,7 +236,7 @@ proto.signOut = function (options) {
   var logoutUrl = oauthUtil.getOAuthUrls(sdk).logoutUrl;
 
   function getAccessToken() {
-    return new Q()
+    return Promise.resolve()
     .then(function() {
       if (revokeAccessToken && typeof accessToken === 'undefined') {
         return sdk.tokenManager.get('token');
@@ -246,7 +246,7 @@ proto.signOut = function (options) {
   }
 
   function getIdToken() {
-    return new Q()
+    return Promise.resolve()
     .then(function() {
       if (postLogoutRedirectUri && typeof idToken === 'undefined') {
         return sdk.tokenManager.get('idToken');
@@ -267,7 +267,7 @@ proto.signOut = function (options) {
     });
   }
 
-  return Q.allSettled([getAccessToken(), getIdToken()])
+  return allSettled([getAccessToken(), getIdToken()])
     .then(function(tokens) {
       accessToken = tokens[0].value;
       idToken = tokens[1].value;
@@ -337,45 +337,48 @@ proto.fingerprint = function(options) {
   options = options || {};
   var sdk = this;
   if (!sdk.features.isFingerprintSupported()) {
-    return Q.reject(new AuthSdkError('Fingerprinting is not supported on this device'));
+    return Promise.reject(new AuthSdkError('Fingerprinting is not supported on this device'));
   }
 
-  var deferred = Q.defer();
+  var timeout;
+  var iframe;
+  var listener;
+  var promise = new Promise(function (resolve, reject) {
+    iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
 
-  var iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
+    listener = function listener(e) {
+      if (!e || !e.data || e.origin !== sdk.options.url) {
+        return;
+      }
 
-  function listener(e) {
-    if (!e || !e.data || e.origin !== sdk.options.url) {
-      return;
-    }
+      try {
+        var msg = JSON.parse(e.data);
+      } catch (err) {
+        return reject(new AuthSdkError('Unable to parse iframe response'));
+      }
 
-    try {
-      var msg = JSON.parse(e.data);
-    } catch (err) {
-      return deferred.reject(new AuthSdkError('Unable to parse iframe response'));
-    }
+      if (!msg) { return; }
+      if (msg.type === 'FingerprintAvailable') {
+        return resolve(msg.fingerprint);
+      }
+      if (msg.type === 'FingerprintServiceReady') {
+        e.source.postMessage(JSON.stringify({
+          type: 'GetFingerprint'
+        }), e.origin);
+      }
+    };
+    oauthUtil.addListener(window, 'message', listener);
 
-    if (!msg) { return; }
-    if (msg.type === 'FingerprintAvailable') {
-      return deferred.resolve(msg.fingerprint);
-    }
-    if (msg.type === 'FingerprintServiceReady') {
-      e.source.postMessage(JSON.stringify({
-        type: 'GetFingerprint'
-      }), e.origin);
-    }
-  }
-  oauthUtil.addListener(window, 'message', listener);
+    iframe.src = sdk.options.url + '/auth/services/devicefingerprint';
+    document.body.appendChild(iframe);
 
-  iframe.src = sdk.options.url + '/auth/services/devicefingerprint';
-  document.body.appendChild(iframe);
+    timeout = setTimeout(function() {
+      reject(new AuthSdkError('Fingerprinting timed out'));
+    }, options.timeout || 15000);
+  });
 
-  var timeout = setTimeout(function() {
-    deferred.reject(new AuthSdkError('Fingerprinting timed out'));
-  }, options.timeout || 15000);
-
-  return deferred.promise.fin(function() {
+  return promise.finally(function() {
     clearTimeout(timeout);
     oauthUtil.removeListener(window, 'message', listener);
     if (document.body.contains(iframe)) {

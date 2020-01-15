@@ -4,7 +4,6 @@ var allSettled = require('promise.allsettled');
 allSettled.shim(); // will be a no-op if not needed
 
 var _ = require('lodash');
-var Q = require('q');
 var OktaAuth = require('OktaAuth');
 var tokens = require('@okta/test.support/tokens');
 var util = require('@okta/test.support/util');
@@ -226,7 +225,7 @@ describe('token.getWithoutPrompt', function() {
     .then(function() {
       expect(true).toEqual(false);
     })
-    .fail(function(err) {
+    .catch(function(err) {
       util.expectErrorToEqual(err, {
         name: 'AuthSdkError',
         message: 'The request does not match client configuration',
@@ -447,7 +446,9 @@ describe('token.getWithoutPrompt', function() {
   });
 
   it('allows multiple iframes simultaneously', function() {
-    jest.useFakeTimers();
+    var iframes;
+    var firstPrompt;
+    var secondPrompt;
     return oauthUtil.setupSimultaneousPostMessage()
     .then(function(context) {
       // mock frame creation
@@ -463,25 +464,27 @@ describe('token.getWithoutPrompt', function() {
       });
 
       // ensure that no iframes are open
-      var iframes = document.getElementsByTagName('IFRAME');
+      iframes = document.getElementsByTagName('IFRAME');
       expect(iframes.length).toBe(0);
 
       // getWithoutPrompt, but don't resolve
-      var firstPrompt = context.client.token.getWithoutPrompt({
+      firstPrompt = context.client.token.getWithoutPrompt({
         sessionToken: 'testSessionToken',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce
       });
 
       // getWithoutPrompt, but don't resolve
-      var secondPrompt = context.client.token.getWithoutPrompt({
+      secondPrompt = context.client.token.getWithoutPrompt({
         sessionToken: 'testSessionToken2',
         state: oauthUtil.mockedState2,
         nonce: oauthUtil.mockedNonce2
       });
-
-      jest.runAllTicks(); // resolve promises
-
+      return waitFor(function() {
+        return iframes.length === 2 ? context : false;
+      });
+    })
+    .then(function(context) {
       // assert that two iframes are open
       expect(iframes.length).toBe(2);
 
@@ -489,10 +492,10 @@ describe('token.getWithoutPrompt', function() {
       context.emitter.emit('trigger', oauthUtil.mockedState);
       context.emitter.emit('trigger', oauthUtil.mockedState2);
 
-      return Q.all([firstPrompt, secondPrompt])
-      .spread(function(firstToken, secondToken) {
-        expect(firstToken).toEqual(tokens.standardIdTokenParsed);
-        expect(secondToken).toEqual(tokens.standardIdToken2Parsed);
+      return Promise.all([firstPrompt, secondPrompt])
+      .then(function(values) {
+        expect(values[0]).toEqual(tokens.standardIdTokenParsed);
+        expect(values[1]).toEqual(tokens.standardIdToken2Parsed);
 
         // make sure both iframes were destroyed
         expect(iframes.length).toBe(0);
@@ -753,7 +756,6 @@ describe('token.getWithPopup', function() {
     jest.spyOn(window, 'open').mockImplementation(function () {
       return mockWindow; // valid window is returned
     });
-    jest.spyOn(Q.makePromise.prototype, 'timeout');
     jest.useFakeTimers();
     var promise = oauthUtil.setup({
       closePopup: true, // prevent any message being passed
@@ -770,7 +772,7 @@ describe('token.getWithPopup', function() {
     .then(function() {
       expect(true).toEqual(false);
     })
-    .fail(function(err) {
+    .catch(function(err) {
       expect(mockWindow.close).toHaveBeenCalled();
       util.expectErrorToEqual(err, {
         name: 'AuthSdkError',
@@ -785,7 +787,6 @@ describe('token.getWithPopup', function() {
     return Promise.resolve()
       .then(function() {
         jest.runAllTicks(); // resolve pending promises
-        expect(Q.makePromise.prototype.timeout).toHaveBeenCalled();
         jest.advanceTimersByTime(timeoutMs); // should trigger timeout
         return promise;
       });
@@ -793,9 +794,6 @@ describe('token.getWithPopup', function() {
   it('promise will reject if popup is blocked', function() {
     jest.spyOn(window, 'open').mockImplementation(function () {
       return null; // null window is returned
-    });
-    jest.spyOn(Q.makePromise.prototype, 'timeout').mockImplementation(function() {
-      return this; // return for chaining promise methods
     });
     jest.useFakeTimers();
 
@@ -814,7 +812,7 @@ describe('token.getWithPopup', function() {
     .then(function() {
       expect(true).toEqual(false);
     })
-    .fail(function(err) {
+    .catch(function(err) {
       util.expectErrorToEqual(err, {
         name: 'AuthSdkError',
         message: 'Unable to parse OAuth flow response',
@@ -926,16 +924,20 @@ describe('token.getWithPopup', function() {
   });
 
   it('allows multiple popups simultaneously', function() {
-    jest.useFakeTimers();
+    var firstPopup;
+    var secondPopup;
+
+    // mock popup creation
+    var popups = [];
+    function getOpenPopups() {
+      return popups.filter(function(popup) {
+        return !popup.closed;
+      });
+    }
+
     return oauthUtil.setupSimultaneousPostMessage()
     .then(function(context) {
-      // mock popup creation
-      var popups = [];
-      function getOpenPopups() {
-        return popups.filter(function(popup) {
-          return !popup.closed;
-        });
-      }
+
       function FakePopup() {
         var popup = this;
         popup.closed = false;
@@ -950,20 +952,22 @@ describe('token.getWithPopup', function() {
       });
 
       // getWithPopup, but don't resolve
-      var firstPopup = context.client.token.getWithPopup({
+      firstPopup = context.client.token.getWithPopup({
         idp: 'testIdp',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce
       });
 
       // getWithPopup, but don't resolve
-      var secondPopup = context.client.token.getWithPopup({
+      secondPopup = context.client.token.getWithPopup({
         idp: 'testIdp2',
         state: oauthUtil.mockedState2,
         nonce: oauthUtil.mockedNonce2
       });
-
-      jest.runAllTicks(); // resolve promises
+      return waitFor(() => {
+        return popups.length === 2 ? context : false;
+      })
+    }).then(context => {
 
       // assert that two popups are open
       expect(getOpenPopups().length).toBe(2);
@@ -972,10 +976,10 @@ describe('token.getWithPopup', function() {
       context.emitter.emit('trigger', oauthUtil.mockedState);
       context.emitter.emit('trigger', oauthUtil.mockedState2);
 
-      return Q.all([firstPopup, secondPopup])
-      .spread(function(firstToken, secondToken) {
-        expect(firstToken).toEqual(tokens.standardIdTokenParsed);
-        expect(secondToken).toEqual(tokens.standardIdToken2Parsed);
+      return Promise.all([firstPopup, secondPopup])
+      .then(function(values) {
+        expect(values[0]).toEqual(tokens.standardIdTokenParsed);
+        expect(values[1]).toEqual(tokens.standardIdToken2Parsed);
 
         // make sure both popups were closed
         expect(getOpenPopups().length).toBe(0);
@@ -1212,12 +1216,12 @@ describe('token.getWithRedirect', function() {
   });
   function mockPKCE() {
     spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-    spyOn(sdkUtil, 'getWellKnown').and.returnValue(Q.resolve({
+    spyOn(sdkUtil, 'getWellKnown').and.returnValue(Promise.resolve({
       'code_challenge_methods_supported': [codeChallengeMethod]
     }));
     spyOn(pkce, 'generateVerifier');
     spyOn(pkce, 'saveMeta');
-    spyOn(pkce, 'computeChallenge').and.returnValue(Q.resolve(codeChallenge));
+    spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
   }
 
   it('sets authorize url and cookie for id_token using sessionToken', function() {
@@ -2415,28 +2419,28 @@ describe('token.getUserInfo', function() {
   });
 
   it('throws an error if no arguments are passed instead', function() {
-    return Q.resolve(setupSync())
+    return Promise.resolve(setupSync())
     .then(function(oa) {
       return oa.token.getUserInfo();
     })
     .then(function() {
       expect('not to be hit').toBe(true);
     })
-    .fail(function(err) {
+    .catch(function(err) {
       expect(err.name).toEqual('AuthSdkError');
       expect(err.errorSummary).toBe('getUserInfo requires an access token object');
     });
   });
 
   it('throws an error if a string is passed instead of an accessToken object', function() {
-    return Q.resolve(setupSync())
+    return Promise.resolve(setupSync())
     .then(function(oa) {
       return oa.token.getUserInfo('just a string');
     })
     .then(function() {
       expect('not to be hit').toBe(true);
     })
-    .fail(function(err) {
+    .catch(function(err) {
       expect(err.name).toEqual('AuthSdkError');
       expect(err.errorSummary).toBe('getUserInfo requires an access token object');
     });
@@ -2511,7 +2515,7 @@ describe('token.verify', function() {
     .then(function(res) {
       expect(res).toEqual(tokens.standardIdTokenParsed);
     })
-    .fail(function() {
+    .catch(function() {
       expect('not to be hit').toEqual(true);
     })
   });
@@ -2523,7 +2527,7 @@ describe('token.verify', function() {
     .then(function(res) {
       expect(res).toEqual(tokens.standardIdTokenParsed);
     })
-    .fail(function() {
+    .catch(function() {
       expect('not to be hit').toEqual(true);
     });
   });
@@ -2541,7 +2545,7 @@ describe('token.verify', function() {
       .then(function() {
         expect('not to be hit').toEqual(true);
       })
-      .fail(function(err) {
+      .catch(function(err) {
         util.assertAuthSdkError(err, message);
       });
     }

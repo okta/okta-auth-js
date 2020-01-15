@@ -13,7 +13,6 @@
 
 /* eslint-disable complexity */
 var util = require('./util');
-var Q = require('q');
 var AuthApiError = require('./errors/AuthApiError');
 var constants = require('./constants');
 
@@ -33,7 +32,7 @@ function httpRequest(sdk, options) {
     var cacheContents = httpCache.getStorage();
     var cachedResponse = cacheContents[url];
     if (cachedResponse && Date.now()/1000 < cachedResponse.expiresAt) {
-      return Q.resolve(cachedResponse.response);
+      return Promise.resolve(cachedResponse.response);
     }
   }
 
@@ -55,7 +54,7 @@ function httpRequest(sdk, options) {
   };
 
   var err, res;
-  return new Q(sdk.options.httpRequestClient(method, url, ajaxOptions))
+  return sdk.options.httpRequestClient(method, url, ajaxOptions)
     .then(function(resp) {
       res = resp.responseText;
       if (res && util.isString(res)) {
@@ -81,7 +80,7 @@ function httpRequest(sdk, options) {
 
       return res;
     })
-    .fail(function(resp) {
+    .catch(function(resp) {
       var serverErr = resp.responseText || {};
       if (util.isString(serverErr)) {
         try {

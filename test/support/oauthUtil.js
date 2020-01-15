@@ -4,7 +4,6 @@ var URL = require('url').URL;
 var util = require('./util');
 var OktaAuth = require('OktaAuth');
 var tokens = require('./tokens');
-var Q = require('q');
 var EventEmitter = require('tiny-emitter');
 var wellKnown = require('./xhr/well-known');
 var wellKnownSharedResource = require('./xhr/well-known-shared-resource');
@@ -200,14 +199,15 @@ oauthUtil.setup = function(opts) {
   } else if (opts.tokenRenewArgs) {
     promise = authClient.token.renew.apply(this, opts.tokenRenewArgs);
   } else if (opts.autoRenew) {
-    var renewDeferred = Q.defer();
-    authClient.tokenManager.on('renewed', function() {
-      renewDeferred.resolve();
+    promise = new Promise(function(resolve) {
+      // TODO: do we need to remove handlers?
+      authClient.tokenManager.on('renewed', function() {
+        resolve();
+      });
+      authClient.tokenManager.on('error', function() {
+        resolve();
+      });
     });
-    authClient.tokenManager.on('error', function() {
-      renewDeferred.resolve();
-    });
-    promise = renewDeferred.promise;
   }
 
   if (opts.fastForwardToTime) {
@@ -229,7 +229,7 @@ oauthUtil.setup = function(opts) {
       var expectedResp = opts.expectedResp || defaultResponse;
       validateResponse(res, expectedResp);
     })
-    .fail(function(err) {
+    .catch(function(err) {
       if (opts.willFail) {
         throw err;
       } else {
@@ -487,7 +487,7 @@ oauthUtil.setupSimultaneousPostMessage = function() {
   // warp to time to ensure tokens aren't expired
   util.warpToUnixTime(tokens.standardIdTokenClaims.exp - 1);
 
-  return new Q({
+  return Promise.resolve({
     client: client,
     emitter: emitter
   });
@@ -509,7 +509,7 @@ oauthUtil.itpErrorsCorrectly = function(title, options, error) {
       .then(function() {
         expect('not to be hit').toEqual(true);
       })
-      .fail(function(e) {
+      .catch(function(e) {
         util.expectErrorToEqual(e, error);
       });
   });

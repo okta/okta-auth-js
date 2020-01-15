@@ -1,7 +1,6 @@
 /* global window */
 var session = require('../../lib/session');
 var http = require('../../lib/http');
-var Q = require('q');
 
 describe('session', function() {
   var sdk;
@@ -12,9 +11,7 @@ describe('session', function() {
     sdk = {
       session: {
         get: jest.fn().mockImplementation(function() {
-          var deferred = Q.defer();
-          deferred.resolve(sessionObj);
-          return deferred.promise;
+          return Promise.resolve(sessionObj);
         })
       }
     };
@@ -36,9 +33,7 @@ describe('session', function() {
 
     it('resolves to false if session.get throws', function() {
       sdk.session.get.mockImplementation(function() {
-        var deferred = Q.defer();
-        deferred.reject(new Error('test error'));
-        return deferred.promise;
+        return Promise.reject(new Error('test error'));
       });
       return session.sessionExists(sdk)
         .then(function(res) {
@@ -59,7 +54,7 @@ describe('session', function() {
 
   describe('getSession', function() {
     it('Hits endpoint: /api/v1/sessions/me', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Q());
+      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
       return session.getSession(sdk)
         .then(function() {
           expect(http.get).toHaveBeenCalledWith(sdk, '/api/v1/sessions/me');
@@ -68,9 +63,7 @@ describe('session', function() {
 
     it('XHR error: returns an INACTIVE session object', function() {
       jest.spyOn(http, 'get').mockImplementation(function() {
-        var deferred = Q.defer();
-        deferred.reject(new Error('test error'));
-        return deferred.promise;
+        return Promise.reject(new Error('test error'));
       });
       return session.getSession(sdk)
         .then(function(res) {
@@ -81,7 +74,7 @@ describe('session', function() {
     });
 
     it('Adds a "refresh" method on the session object', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Q());
+      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
       return session.getSession(sdk)
         .then(function(res) {
           expect(typeof res.refresh).toBe('function');
@@ -89,7 +82,7 @@ describe('session', function() {
     });
 
     it('Adds a "user" method on the session object', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Q());
+      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
       return session.getSession(sdk)
         .then(function(res) {
           expect(typeof res.user).toBe('function');
@@ -104,9 +97,7 @@ describe('session', function() {
         }
       };
       jest.spyOn(http, 'get').mockImplementation(function() {
-        var deferred = Q.defer();
-        deferred.resolve(sessionObj);
-        return deferred.promise;
+        return Promise.resolve(sessionObj);
       });
       return session.getSession(sdk)
         .then(function(res) {
@@ -129,9 +120,7 @@ describe('session', function() {
       };
       jest.spyOn(http, 'post').mockReturnValue(null);
       jest.spyOn(http, 'get').mockImplementation(function() {
-        var deferred = Q.defer();
-        deferred.resolve(sessionObj);
-        return deferred.promise;
+        return Promise.resolve(sessionObj);
       });
       return session.getSession(sdk)
         .then(function(res) {
@@ -150,9 +139,7 @@ describe('session', function() {
         }
       };
       jest.spyOn(http, 'get').mockImplementation(function() {
-        var deferred = Q.defer();
-        deferred.resolve(sessionObj);
-        return deferred.promise;
+        return Promise.resolve(sessionObj);
       });
       return session.getSession(sdk)
         .then(function(res) {

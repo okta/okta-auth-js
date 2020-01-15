@@ -395,7 +395,7 @@ authClient.signIn({
     throw 'We cannot handle the ' + transaction.status + ' status';
   }
 })
-.fail(function(err) {
+.catch(function(err) {
   console.error(err);
 });
 ```
@@ -502,7 +502,7 @@ authClient.forgotPassword({
     throw 'We cannot handle the ' + transaction.status + ' status';
   }
 })
-.fail(function(err) {
+.catch(function(err) {
   console.error(err);
 });
 ```
@@ -532,7 +532,7 @@ authClient.unlockAccount({
     throw 'We cannot handle the ' + transaction.status + ' status';
   }
 })
-.fail(function(err) {
+.catch(function(err) {
   console.error(err);
 });
 ```
@@ -554,7 +554,7 @@ authClient.verifyRecoveryToken({
     throw 'We cannot handle the ' + transaction.status + ' status';
   }
 })
-.fail(function(err) {
+.catch(function(err) {
   console.error(err);
 });
 ```
@@ -574,7 +574,7 @@ authClient.webfinger({
 .then(function(res) {
   // use the webfinger response to select an idp
 })
-.fail(function(err) {
+.catch(function(err) {
   console.error(err);
 });
 ```
@@ -590,7 +590,7 @@ authClient.fingerprint()
 .then(function(fingerprint) {
   // Do something with the fingerprint
 })
-.fail(function(err) {
+.catch(function(err) {
   console.log(err);
 })
 ```
@@ -606,7 +606,7 @@ if (exists) {
   .then(function(transaction) {
     console.log('current status:', transaction.status);
   })
-  .fail(function(err) {
+  .catch(function(err) {
     console.error(err);
   });
 }

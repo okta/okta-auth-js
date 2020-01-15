@@ -5,6 +5,7 @@
     "commonjs": true
   },
   "globals": {
+    "Promise": true,
     "console": true,
     "setTimeout": true,
     "clearTimeout": true,
