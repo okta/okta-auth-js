@@ -92,7 +92,10 @@ describe('Complete login flow', function() {
   }
 
   function mockWellKnown() {
-    sdk.options.storageUtil.getHttpCache().clearStorage();
+    sdk.options.storageUtil.getHttpCache({
+      secure: sdk.options.secureCookies,
+      sameSite: 'strict' // http cache storage should only be accessed by javascript
+    }).clearStorage();
 
     var wellKnown = {
       'jwks_uri': JWKS_URI,

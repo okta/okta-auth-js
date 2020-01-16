@@ -219,7 +219,10 @@ function TokenManager(sdk, options) {
         storageProvider = sessionStorage;
         break;
       case 'cookie':
-        storageProvider = storageUtil.getCookieStorage(options);
+        storageProvider = storageUtil.getCookieStorage({
+          secure: sdk.options.secureCookies,
+          sameSite: 'strict' // Use strictest setting. We do not expect token storage to be accessed server-side.
+        });
         break;
       case 'memory':
         storageProvider = storageUtil.getInMemoryStorage();

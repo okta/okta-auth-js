@@ -224,6 +224,7 @@ tokenManager: {
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be listed in your Okta application's [Login redirect URIs](#login-redirect-uris). If no `redirectUri` is provided, defaults to the current origin (`window.location.origin`). |
 | `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [signOut](#signout). This url must be listed in your Okta application's [Logout redirect URIs](#logout-redirect-uris). If not specified, your application's origin (`window.location.origin`) will be used.
 | `pkce`  | If set to true, the authorization flow will automatically use PKCE.  The authorize request will use `response_type=code`, and `grant_type=authorization_code` will be used on the token request.  All these details are handled for you, including the creation and verification of code verifiers. |
+| `secureCookies` | Defaults to `true`. Will set the "secure" option on all cookies. With this option on, an exception will be thrown if the application origin is not using the HTTPS protocol. Automatically disabled for `http://localhost`.
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
 | `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
@@ -469,9 +470,9 @@ authClient.closeSession()
   })
 ```
 
-### `revokeAccessToken(accessToken?)`
+### `revokeAccessToken(accessToken)`
 
-Revokes the access token for this application so it can no longer be used to authenticate API requests. By default, `revokeAccessToken` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
+Revokes the access token for this application so it can no longer be used to authenticate API requests. The `accessToken` parameter is optional. By default, `revokeAccessToken` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
 
 ### `forgotPassword(options)`
 

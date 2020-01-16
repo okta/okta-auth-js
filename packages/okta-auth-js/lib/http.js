@@ -26,7 +26,10 @@ function httpRequest(sdk, options) {
       withCredentials = options.withCredentials !== false, // default value is true
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil.storage,
-      httpCache = storageUtil.getHttpCache();
+      httpCache = storageUtil.getHttpCache({
+        secure: sdk.options.secureCookies,
+        sameSite: 'strict' // http cache storage should only be accessed by javascript
+      });
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
@@ -68,7 +71,10 @@ function httpRequest(sdk, options) {
       }
 
       if (res && res.stateToken && res.expiresAt) {
-        storage.set(constants.STATE_TOKEN_KEY_NAME, res.stateToken, res.expiresAt);
+        storage.set(constants.STATE_TOKEN_KEY_NAME, res.stateToken, res.expiresAt, {
+          secure: sdk.options.secureCookies,
+          sameSite: 'lax' // state token may be accessed by server
+        });
       }
 
       if (res && options.cacheResponse) {

@@ -15,6 +15,7 @@ function getDefaultConfig() {
     issuer: ISSUER,
     clientId: CLIENT_ID,
     pkce: true,
+    secureCookies: true
   };
 }
 
@@ -28,7 +29,7 @@ function getConfigFromUrl() {
   const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
   const storage = url.searchParams.get('storage') || undefined;
-  const secure = url.searchParams.get('secure') === 'on'; // currently opt-in.
+  const secureCookies = url.searchParams.get('secureCookies') !== 'off'; // On by default
   return {
     redirectUri,
     postLogoutRedirectUri,
@@ -37,9 +38,9 @@ function getConfigFromUrl() {
     pkce,
     scopes,
     responseType,
+    secureCookies,
     tokenManager: {
       storage,
-      secure,
     },
   };
 }

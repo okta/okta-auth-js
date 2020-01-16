@@ -17,8 +17,6 @@ var util = require('./util');
 var storageUtil = require('./browser/browserStorage');
 var AuthSdkError = require('./errors/AuthSdkError');
 
-var httpCache = storageUtil.getHttpCache();
-
 function generateState() {
   return util.genRandomString(64);
 }
@@ -85,6 +83,11 @@ function getWellKnown(sdk, issuer) {
 }
 
 function getKey(sdk, issuer, kid) {
+  var httpCache = storageUtil.getHttpCache({
+    secure: sdk.options.secureCookies,
+    sameSite: 'strict' // http cache storage should only be accessed by javascript
+  });
+
   return getWellKnown(sdk, issuer)
   .then(function(wellKnown) {
     var jwksUri = wellKnown['jwks_uri'];
