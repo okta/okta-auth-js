@@ -17,7 +17,7 @@ import { saveConfigToStorage, flattenConfig } from './config';
 import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryParams } from './util';
 import { Form, updateForm } from './form';
-import { tokensArrayToObject, tokensHTML } from './tokens';
+import { tokensHTML } from './tokens';
 
 function homeLink(app) {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
@@ -201,8 +201,8 @@ Object.assign(TestApp.prototype, {
       scopes: this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithPopup(options)
-    .then((tokens) => {
-      this.saveTokens(tokens);
+    .then(res => {
+      this.saveTokens(res.tokens);
       this.render();
     });
   },
@@ -212,8 +212,8 @@ Object.assign(TestApp.prototype, {
       scopes: this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithoutPrompt(options)
-    .then((tokens) => {
-      this.saveTokens(tokens);
+    .then(res => {
+      this.saveTokens(res.tokens);
       this.render();
     });
   },
@@ -259,22 +259,19 @@ Object.assign(TestApp.prototype, {
         this.renderError(e);
         throw e;
       })
-      .then(tokens => {
-        this.saveTokens(tokens);
-        return this.callbackHTML(tokens);
+      .then(res => {
+        return this.callbackHTML(res);
       })
       .then(content => this._setContent(content))
       .then(() => this._afterRender('callback-handled'));
   },
   getTokensFromUrl: async function() {
     // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
-    let tokens = await this.oktaAuth.token.parseFromUrl();
-    this.saveTokens(tokens);
-    return tokens;
+    const res = await this.oktaAuth.token.parseFromUrl();
+    this.saveTokens(res.tokens);
+    return res;
   },
   saveTokens: function(tokens) {
-    tokens = Array.isArray(tokens) ? tokens : [tokens];
-    tokens = tokensArrayToObject(tokens);
     const { idToken, accessToken } = tokens;
     if (idToken) {
       this.oktaAuth.tokenManager.add('idToken', idToken);
@@ -367,8 +364,8 @@ Object.assign(TestApp.prototype, {
       `;
   },
 
-  callbackHTML: function(tokens) {
-    const success = tokens && tokens.length === 2;
+  callbackHTML: function(res) {
+    const success = res.tokens && res.tokens.accessToken && res.tokens.idToken;
     const errorMessage = success ? '' :  'Tokens not returned. Check error console for more details';
     const successMessage = success ? 'Successfully received tokens on the callback page!' : '';
     const content = `
@@ -376,10 +373,11 @@ Object.assign(TestApp.prototype, {
         <strong><div id="success">${successMessage}</div></strong>
         <div id="error">${errorMessage}</div>
         <div id="xhr-error"></div>
+        <div id="res-state">State: <strong>${res.state}</strong></div>
       </div>
       <hr/>
       ${homeLink(this)}
-      ${ success ? tokensHTML(tokensArrayToObject(tokens)): '' }
+      ${ success ? tokensHTML(res.tokens): '' }
     `;
     return content;
   }
