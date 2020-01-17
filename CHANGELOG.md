@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.12.0
+
+### Features
+
+- [#304](https://github.com/okta/okta-auth-js/pull/304) - Will set a 'SameSite' value on all cookies set by this SDK
+  - Cookies intended for server-side use will be set to 'Lax', cookies intended for client-side use will be set to 'Strict'
+
 ## 2.11.2
 
 ### Features
