@@ -11,6 +11,96 @@ var tokens = require('@okta/test.support/tokens');
 
 describe('getWellKnown', function() {
   util.itMakesCorrectRequestResponse({
+    title: 'can getWellKnown response using ORG auth server',
+    setup: {
+      calls: [
+        {
+          request: {
+            method: 'get',
+            uri: '/.well-known/openid-configuration'
+          },
+          response: 'well-known'
+        }
+      ],
+      time: 1449699929
+    },
+    execute: function(test) {
+      return oauthUtil.getWellKnown(test.oa);
+    },
+    expectations: function (test, res) {
+      expect(test.resReply.status).toEqual(200);
+      expect(test.responseBody).toEqual(res);
+    }
+  });
+  util.itMakesCorrectRequestResponse({
+    title: 'can getWellKnown response using default auth server',
+    setup: {
+      issuer: 'https://auth-js-test.okta.com/oauth2/default',
+      calls: [
+        {
+          request: {
+            method: 'get',
+            uri: '/oauth2/default/.well-known/openid-configuration'
+          },
+          response: 'well-known'
+        }
+      ],
+      time: 1449699929
+    },
+    execute: function(test) {
+      return oauthUtil.getWellKnown(test.oa);
+    },
+    expectations: function (test, res) {
+      expect(test.resReply.status).toEqual(200);
+      expect(test.responseBody).toEqual(res);
+    }
+  });
+  util.itMakesCorrectRequestResponse({
+    title: 'can getWellKnown response using custom auth server',
+    setup: {
+      issuer: 'https://auth-js-test.okta.com/oauth2/custom',
+      calls: [
+        {
+          request: {
+            method: 'get',
+            uri: '/oauth2/custom/.well-known/openid-configuration'
+          },
+          response: 'well-known'
+        }
+      ],
+      time: 1449699929
+    },
+    execute: function(test) {
+      return oauthUtil.getWellKnown(test.oa);
+    },
+    expectations: function (test, res) {
+      expect(test.resReply.status).toEqual(200);
+      expect(test.responseBody).toEqual(res);
+    }
+  });
+  util.itMakesCorrectRequestResponse({
+    title: 'can pass an issuer',
+    setup: {
+      calls: [
+        {
+          request: {
+            method: 'get',
+            uri: '/oauth2/custom2/.well-known/openid-configuration'
+          },
+          response: 'well-known'
+        }
+      ],
+      time: 1449699929
+    },
+    execute: function(test) {
+      return oauthUtil.getWellKnown(test.oa, 'https://auth-js-test.okta.com/oauth2/custom2');
+    },
+    expectations: function (test, res) {
+      expect(test.resReply.status).toEqual(200);
+      expect(test.responseBody).toEqual(res);
+    }
+  });
+  util.itMakesCorrectRequestResponse({
     title: 'caches response and uses cache on subsequent requests',
     setup: {
       calls: [

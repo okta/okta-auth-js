@@ -78,7 +78,8 @@ function loadPopup(src, options) {
 }
 
 function getWellKnown(sdk, issuer) {
-  return http.get(sdk, (issuer || sdk.options.url) + '/.well-known/openid-configuration', {
+  var authServerUri = (issuer || sdk.options.issuer || sdk.options.url);
+  return http.get(sdk, authServerUri + '/.well-known/openid-configuration', {
     cacheResponse: true
   });
 }
