@@ -183,6 +183,7 @@ function setup(options) {
       // 2. Setup OktaAuth
       oa = new OktaAuth({
         url: options.uri,
+        issuer: options.issuer,
         transformErrorXHR: options.transformErrorXHR,
         headers: options.headers,
         ignoreSignature: options.bypassCrypto === true
