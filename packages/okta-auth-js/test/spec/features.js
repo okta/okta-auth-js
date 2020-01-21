@@ -110,7 +110,7 @@ describe('features', function() {
       spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(true);
       try {
         new OktaAuth({
-          url: 'https://dev-12345.oktapreview.com',
+          issuer: 'https://dev-12345.oktapreview.com',
           pkce: true,
         });
       } catch (e) {
@@ -127,7 +127,7 @@ describe('features', function() {
       spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(false);
       try {
         new OktaAuth({
-          url: 'https://dev-12345.oktapreview.com',
+          issuer: 'https://dev-12345.oktapreview.com',
           pkce: true,
         });
       } catch (e) {
@@ -147,7 +147,7 @@ describe('features', function() {
       window.TextEncoder = undefined;
       try {
         new OktaAuth({
-          url: 'https://dev-12345.oktapreview.com',
+          issuer: 'https://dev-12345.oktapreview.com',
           pkce: true,
         });
       } catch (e) {
@@ -167,7 +167,7 @@ describe('features', function() {
       window.TextEncoder = undefined;
       try {
         new OktaAuth({
-          url: 'https://dev-12345.oktapreview.com',
+          issuer: 'https://dev-12345.oktapreview.com',
           pkce: true,
         });
       } catch (e) {

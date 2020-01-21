@@ -103,7 +103,7 @@ describe('pkce', function() {
     util.itMakesCorrectRequestResponse({
       title: 'requests a token',
       setup: {
-        uri: ISSUER,
+        issuer: ISSUER,
         bypassCrypto: true,
         calls: [
           {
@@ -152,7 +152,7 @@ describe('pkce', function() {
 
       beforeEach(function() {
         authClient = new OktaAuth({
-          url: 'https://auth-js-test.okta.com'
+          issuer: 'https://auth-js-test.okta.com'
         });
 
         oauthOptions = {
