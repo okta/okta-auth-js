@@ -198,7 +198,7 @@ describe('TokenManager', function() {
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
         '2200-01-01T00:00:00.000Z', {
-          sameSite: 'strict'
+          sameSite: 'lax'
         }
       );
     });
@@ -221,7 +221,7 @@ describe('TokenManager', function() {
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
         '2200-01-01T00:00:00.000Z', {
-          sameSite: 'strict'
+          sameSite: 'lax'
         }
       );
     });
@@ -1242,7 +1242,7 @@ describe('TokenManager', function() {
           'okta-token-storage',
           JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
           '2200-01-01T00:00:00.000Z', {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         );
       });
@@ -1256,7 +1256,7 @@ describe('TokenManager', function() {
           JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
           '2200-01-01T00:00:00.000Z', {
             secure: true,
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         );
       });
@@ -1295,7 +1295,7 @@ describe('TokenManager', function() {
           'okta-token-storage',
           JSON.stringify({anotherKey: tokens.standardIdTokenParsed}),
           '2200-01-01T00:00:00.000Z', {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         );
       });
@@ -1312,7 +1312,7 @@ describe('TokenManager', function() {
           'okta-token-storage',
           '{}',
           '2200-01-01T00:00:00.000Z', {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         );
       });

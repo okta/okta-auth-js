@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.12.1
+
+### Bug Fixes
+
+- [#319](https://github.com/okta/okta-auth-js/pull/319) - Setting 'SameSite=lax' for all cookies (Fix for Firefox/Safari)
+
 ## 2.12.0
 
 ### Features
