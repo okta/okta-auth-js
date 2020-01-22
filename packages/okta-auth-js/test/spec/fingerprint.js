@@ -70,7 +70,7 @@ describe('fingerprint', function() {
     });
 
     var authClient = options.authClient || new OktaAuth({
-      url: 'http://example.okta.com'
+      issuer: 'http://example.okta.com'
     });
     if (typeof options.userAgent !== 'undefined') {
       util.mockUserAgent(authClient, options.userAgent);
@@ -153,7 +153,7 @@ describe('fingerprint', function() {
   util.itMakesCorrectRequestResponse({
     title: 'attaches fingerprint to signIn requests if sendFingerprint is true',
     setup: {
-      uri: 'http://example.okta.com',
+      issuer: 'http://example.okta.com',
       calls: [
         {
           request: {
@@ -183,7 +183,7 @@ describe('fingerprint', function() {
   util.itMakesCorrectRequestResponse({
     title: 'does not attach fingerprint to signIn requests if sendFingerprint is false',
     setup: {
-      uri: 'http://example.okta.com',
+      issuer: 'http://example.okta.com',
       calls: [
         {
           request: {

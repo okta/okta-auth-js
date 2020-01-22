@@ -12,6 +12,8 @@
   - New method `closeSession` for XHR signout without redirect or reload.
   - New method `revokeAccessToken`
 
+-[#316](https://github.com/okta/okta-auth-js/pull/316) - Option `issuer` is required. Option `url` has been deprecated and is no longer used.
+
 ### Other
 
 ## 2.12.0

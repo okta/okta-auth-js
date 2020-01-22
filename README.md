@@ -120,7 +120,21 @@ You can also browse the full [API reference documentation](#api-reference).
 
 ## Configuration reference
 
-If you are using this SDK to implement an OIDC flow, the only required configuration option is `issuer`:
+Whether you are using this SDK to implement an OIDC flow or for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), the only required configuration option is `issuer`, which is the URL to an Okta [Authorization Server](https://developer.okta.com/docs/guides/customize-authz-server/overview/)
+
+### About the Issuer
+
+You may use the URL for your Okta organization as the issuer. This will apply a default authorization policy and issue tokens scoped at the organization level.
+
+```javascript
+var config = {
+  issuer: 'https://{yourOktaDomain}'
+};
+
+var authClient = new OktaAuth(config);
+```
+
+Okta allows you to create multiple custom OAuth 2.0 authorization servers that you can use to protect your own resource servers. Within each authorization server you can define your own OAuth 2.0 scopes, claims, and access policies. Many organizations have a "default" authorization server.
 
 ```javascript
 var config = {
@@ -130,12 +144,12 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-If you’re using this SDK only for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), you instead need to set the `url` for your Okta Domain:
+You may also create and customize additional authorization servers.
 
 ```javascript
+
 var config = {
-  // The URL for your Okta organization
-  url: 'https://{yourOktaDomain}'
+  issuer: 'https://{yourOktaDomain}/oauth2/custom-auth-server-id'
 };
 
 var authClient = new OktaAuth(config);

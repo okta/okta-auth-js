@@ -5,10 +5,17 @@ var http = require('../../lib/http');
 describe('session', function() {
   var sdk;
   var sessionObj;
+  var baseUrl;
 
   beforeEach(function() {
     sessionObj = {};
+    baseUrl = 'http://fakey';
+    
     sdk = {
+      getIssuerOrigin: jest.fn().mockReturnValue(baseUrl),
+      options: {
+        issuer: baseUrl
+      },
       session: {
         get: jest.fn().mockImplementation(function() {
           return Promise.resolve(sessionObj);
@@ -154,10 +161,6 @@ describe('session', function() {
   describe('closeSession', function() {
     it('makes a DELETE request to /api/v1/sessions/me', function() {
       jest.spyOn(http, 'httpRequest').mockReturnValue(Promise.resolve());
-      var baseUrl = 'http://fakey';
-      sdk.options = {
-        url: baseUrl
-      };
       return session.closeSession(sdk)
         .then(function() {
           expect(http.httpRequest).toHaveBeenCalledWith(sdk, {
@@ -170,9 +173,6 @@ describe('session', function() {
     it('will throw if http request rejects', function() {
       var testError = new Error('test error');
       jest.spyOn(http, 'httpRequest').mockReturnValue(Promise.reject(testError));
-      sdk.options = {
-        url: 'http://fakey'
-      };
       return session.closeSession(sdk) // should throw
         .catch(function(e) {
           expect(e).toBe(testError);
@@ -199,7 +199,6 @@ describe('session', function() {
   });
 
   describe('setCookieAndRedirect', function() {
-    var baseUrl;
     var currentUrl;
     beforeEach(function() {
       currentUrl = 'http://i-am-here';
@@ -207,10 +206,6 @@ describe('session', function() {
       window.location = {
         href: currentUrl
       };
-      baseUrl = 'http://fakey';
-      sdk.options = {
-        url: baseUrl
-      }
     });
     it('redirects to /login/sessionCookieRedirect', function() {
       session.setCookieAndRedirect(sdk);

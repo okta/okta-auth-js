@@ -132,10 +132,10 @@ function mockAjax(pairs) {
 }
 
 function setup(options) {
-  if (!options.uri) {
-    options.uri = 'https://auth-js-test.okta.com';
+  if (!options.issuer) {
+    options.issuer = 'https://auth-js-test.okta.com';
   }
-
+  var baseUri = options.issuer.indexOf('/oauth2') > 0 ? options.issuer.split('/oauth2')[0] : options.issuer;
   var ajaxMock, resReply, oa, trans;
 
   return Promise.resolve()
@@ -151,7 +151,7 @@ function setup(options) {
         // Get all the pairs and load the mock
         var xhrGenPromises = [];
         _.each(options.calls, function(call) {
-          var xhrGenPromise = generateXHRPair(call.request, call.response, options.uri, call.responseVars);
+          var xhrGenPromise = generateXHRPair(call.request, call.response, baseUri, call.responseVars);
           xhrGenPromises.push(xhrGenPromise);
         });
 
@@ -162,7 +162,7 @@ function setup(options) {
           });
 
       } else if (options.response) {
-        return generateXHRPair(options.request, options.response, options.uri, options.responseVars)
+        return generateXHRPair(options.request, options.response, baseUri, options.responseVars)
           .then(function(pair) {
             // Load the single response as a pair
             ajaxMock = mockAjax(pair);
@@ -179,7 +179,6 @@ function setup(options) {
 
       // 2. Setup OktaAuth
       oa = new OktaAuth({
-        url: options.uri,
         issuer: options.issuer,
         transformErrorXHR: options.transformErrorXHR,
         headers: options.headers,
@@ -194,7 +193,7 @@ function setup(options) {
             stateToken: 'dummy'
           }
         };
-        return generateXHRPair(request, options.status, options.uri)
+        return generateXHRPair(request, options.status, baseUri)
           .then(function(pair) {
             ajaxMock.setNextPair({
               request: pair.request,
