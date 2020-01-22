@@ -1,21 +1,5 @@
 import { htmlString } from './util';
 
-function tokensArrayToObject(tokens) {
-  let accessToken = tokens.filter(token => {
-    return token.accessToken;
-  });
-  accessToken = accessToken.length ? accessToken[0] : null;
-
-  let idToken = tokens.filter(token => {
-    return token.idToken;
-  });
-  idToken = idToken.length ? idToken[0] : null;
-  return {
-    accessToken,
-    idToken
-  };
-}
-
 function tokensHTML(tokens) {
   const { idToken, accessToken } = tokens;
   const claims = idToken.claims;
@@ -49,4 +33,4 @@ function tokensHTML(tokens) {
   return html;
 }
 
-export { tokensArrayToObject, tokensHTML };
+export { tokensHTML };

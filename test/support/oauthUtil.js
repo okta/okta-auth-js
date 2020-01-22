@@ -80,10 +80,16 @@ var defaultPostMessage = oauthUtil.defaultPostMessage = {
 };
 
 var defaultResponse = {
-  idToken: tokens.standardIdToken,
-  claims: tokens.standardIdTokenClaims,
-  expiresAt: 1449699930,
-  scopes: ['openid', 'email']
+  state: oauthUtil.mockedState,
+  tokens: {
+    idToken: {
+      value: tokens.standardIdToken,
+      idToken: tokens.standardIdToken,
+      claims: tokens.standardIdTokenClaims,
+      expiresAt: 1449699930,
+      scopes: ['openid', 'email']
+    }
+  }
 };
 
 var getTime = oauthUtil.getTime = function getTime(time) {
@@ -100,6 +106,7 @@ function validateResponse(res, expectedResp) {
       expect(actual, expected);
       return;
     }
+    expect(actual.value).toEqual(expected.value);
     expect(actual.idToken).toEqual(expected.idToken);
     expect(actual.claims).toEqual(expected.claims);
     expect(actual.accessToken).toEqual(expected.accessToken);

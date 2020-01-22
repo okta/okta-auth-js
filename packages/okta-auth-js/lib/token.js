@@ -213,6 +213,10 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
   urls = urls || {};
 
   var responseType = oauthParams.responseType;
+  if (!Array.isArray(responseType)) {
+    responseType = [responseType];
+  }
+
   var scopes = util.clone(oauthParams.scopes);
   var clientId = oauthParams.clientId || sdk.options.clientId;
 
@@ -231,7 +235,8 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
     var tokenDict = {};
 
     if (res['access_token']) {
-      tokenDict['token'] = {
+      tokenDict['accessToken'] = {
+        value: res['access_token'],
         accessToken: res['access_token'],
         expiresAt: Number(res['expires_in']) + Math.floor(Date.now()/1000),
         tokenType: res['token_type'],
@@ -245,6 +250,7 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
       var jwt = sdk.token.decode(res['id_token']);
 
       var idToken = {
+        value: res['id_token'],
         idToken: res['id_token'],
         claims: jwt.payload,
         expiresAt: jwt.payload.exp,
@@ -266,7 +272,7 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
 
       return verifyToken(sdk, idToken, validationParams)
       .then(function() {
-        tokenDict['id_token'] = idToken;
+        tokenDict['idToken'] = idToken;
         return tokenDict;
       });
     }
@@ -274,24 +280,20 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
     return tokenDict;
   })
   .then(function(tokenDict) {
-    if (!Array.isArray(responseType)) {
-      return tokenDict[responseType];
+    // Validate received tokens against requested response types 
+    if (responseType.indexOf('token') !== -1 && !tokenDict['accessToken']) {
+      // eslint-disable-next-line max-len
+      throw new AuthSdkError('Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.');
+    }
+    if (responseType.indexOf('id_token') !== -1 && !tokenDict['idToken']) {
+      // eslint-disable-next-line max-len
+      throw new AuthSdkError('Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.');
     }
 
-    // Validate response against tokenTypes
-    var validateTokenTypes =  ['token', 'id_token'];
-    validateTokenTypes.filter(function(key) {
-      return (responseType.indexOf(key) !== -1);
-    }).forEach(function(key) {
-      if (!tokenDict[key]) {
-        throw new AuthSdkError('Unable to parse OAuth flow response: ' + key + ' was not returned.');
-      }     
-    });
-
-    // Create token array in the order of the responseType array
-    return responseType.map(function(item) {
-      return tokenDict[item];
-    });
+    return {
+      tokens: tokenDict,
+      state: res['state']
+    };
   });
 }
 
@@ -690,6 +692,11 @@ function renewToken(sdk, token) {
     authorizeUrl: token.authorizeUrl,
     userinfoUrl: token.userinfoUrl,
     issuer: token.issuer
+  })
+  .then(function(res) {
+    // Multiple tokens may have come back. Return only the token which was requested.
+    var tokens = res.tokens;
+    return token.idToken ? tokens.idToken : tokens.accessToken;
   });
 }
 

@@ -159,15 +159,7 @@ function renew(sdk, tokenMgmtRef, storage, key) {
 
   // Store the renew promise state, to avoid renewing again
   tokenMgmtRef.renewPromise[key] = sdk.token.renew(token)
-    .then(function(freshTokens) {
-      var freshToken = freshTokens;
-      // With PKCE flow we will receive multiple tokens. Find the one we are looking for
-      if (freshTokens instanceof Array) {
-        freshToken = freshTokens.find(function(freshToken) {
-          return (freshToken.idToken && token.idToken) || (freshToken.accessToken && token.accessToken);
-        });
-      }
-
+    .then(function(freshToken) {
       var oldToken = get(storage, key);
       if (!oldToken) {
         // It is possible to enter a state where the tokens have been cleared

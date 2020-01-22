@@ -1529,8 +1529,11 @@ authClient.token.getWithoutPrompt({
   // Use a custom IdP for social authentication
   idp: '0oa62b57p7c8PaGpU0h7'
  })
-.then(function(tokenOrTokens) {
-  // manage token or tokens
+.then(function(res) {
+  var tokens = res.tokens;
+
+  // Do something with tokens, such as
+  authClient.tokenManager.add('idToken', tokens.idToken);
 })
 .catch(function(err) {
   // handle OAuthError
@@ -1548,8 +1551,11 @@ authClient.token.getWithoutPrompt({
   responseType: 'id_token', // or array of types
   sessionToken: 'testSessionToken' // optional if the user has an existing Okta session
 })
-.then(function(tokenOrTokens) {
-  // manage token or tokens
+.then(function(res) {
+  var tokens = res.tokens;
+
+  // Do something with tokens, such as
+  authClient.tokenManager.add('idToken', tokens.idToken);
 })
 .catch(function(err) {
   // handle OAuthError
@@ -1564,8 +1570,11 @@ Create token with a popup.
 
 ```javascript
 authClient.token.getWithPopup(oauthOptions)
-.then(function(tokenOrTokens) {
-  // manage token or tokens
+.then(function(res) {
+  var tokens = res.tokens;
+
+  // Do something with tokens, such as
+  authClient.tokenManager.add('idToken', tokens.idToken);
 })
 .catch(function(err) {
   // handle OAuthError
@@ -1579,7 +1588,10 @@ Create token using a redirect.
 * `oauthOptions` - See [Extended OpenID Connect options](#extended-openid-connect-options)
 
 ```javascript
-authClient.token.getWithRedirect(oauthOptions);
+authClient.token.getWithRedirect({
+  responseType: ['token', 'id_token'],
+  state: 'any-string-you-want-to-pass-to-callback' // will be URI encoded
+});
 ```
 
 #### `token.parseFromUrl(options)`
@@ -1592,8 +1604,15 @@ The ID token will be [verified and validated](https://github.com/okta/okta-auth-
 
 ```javascript
 authClient.token.parseFromUrl()
-.then(function(tokenOrTokens) {
+.then(function(res) {
+  var state = res.state; // passed to getWithRedirect(), can be any string
+
   // manage token or tokens
+  var tokens = res.tokens;
+
+  // Do something with tokens, such as
+  authClient.tokenManager.add('idToken', tokens.idToken);
+  authClient.tokenManager.add('accessToken', tokens.accesstoken);
 })
 .catch(function(err) {
   // handle OAuthError
@@ -1684,8 +1703,8 @@ After receiving an `access_token` or `id_token`, add it to the `tokenManager` to
 
 ```javascript
 authClient.token.getWithPopup()
-.then(function(idToken) {
-  authClient.tokenManager.add('idToken', idToken);
+.then(function(res) {
+  authClient.tokenManager.add('idToken', res.tokens.idToken);
 });
 ```
 
