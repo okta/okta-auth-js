@@ -9,7 +9,7 @@ describe('fetchRequest', function () {
     return mockFetchObj.fetch.apply(null, arguments);
   });
 
-  var fetchRequest = require('../../fetch/fetchRequest');
+  var fetchRequest = require('../../lib/fetch/fetchRequest');
 
   beforeEach(function() {
     /* global Map */
