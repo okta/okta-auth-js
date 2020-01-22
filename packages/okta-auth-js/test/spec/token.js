@@ -1237,7 +1237,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1278,7 +1278,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1323,7 +1323,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1361,7 +1361,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1404,7 +1404,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1441,7 +1441,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1483,7 +1483,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1520,7 +1520,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1561,7 +1561,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1604,7 +1604,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
 null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1649,7 +1649,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1687,7 +1687,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1729,7 +1729,7 @@ null, {
           ignoreSignature: false
         }),
         null, {
-          sameSite: 'strict'
+          sameSite: 'lax'
         }
       ],
       nonceCookie,
@@ -1769,7 +1769,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1805,7 +1805,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1841,7 +1841,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,
@@ -1877,7 +1877,7 @@ null, {
             ignoreSignature: false
           }),
 null, {
-            sameSite: 'strict'
+            sameSite: 'lax'
           }
         ],
         nonceCookie,

@@ -70,7 +70,7 @@ storageUtil.getSessionStorage = function() {
 storageUtil.getCookieStorage = function(options) {
   options = options || {};
   var secure = options.secure; // currently opt-in
-  var sameSite = options.sameSite || 'strict'; // token storage should only be accessed by javascript
+  var sameSite = options.sameSite || 'lax';
   return {
     getItem: storageUtil.storage.get,
     setItem: function(key, value) {
