@@ -36,7 +36,7 @@ function getStateToken(res) {
 
 function transactionStatus(sdk, args) {
   args = addStateToken(sdk, args);
-  return http.post(sdk, sdk.options.url + '/api/v1/authn', args);
+  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn', args);
 }
 
 function resumeTransaction(sdk, args) {
@@ -75,7 +75,7 @@ function introspect (sdk, args) {
 
 function transactionStep(sdk, args) {
   args = addStateToken(sdk, args);
-  return http.post(sdk, sdk.options.url + '/idp/idx/introspect', args);
+  return http.post(sdk, sdk.getIssuerOrigin() + '/idp/idx/introspect', args);
 }
 
 function transactionExists(sdk) {

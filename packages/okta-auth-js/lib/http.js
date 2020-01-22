@@ -111,7 +111,7 @@ function httpRequest(sdk, options) {
 }
 
 function get(sdk, url, options) {
-  url = util.isAbsoluteUrl(url) ? url : sdk.options.url + url;
+  url = util.isAbsoluteUrl(url) ? url : sdk.getIssuerOrigin() + url;
   var getOptions = {
     url: url,
     method: 'GET'
@@ -121,7 +121,7 @@ function get(sdk, url, options) {
 }
 
 function post(sdk, url, args, options) {
-  url = util.isAbsoluteUrl(url) ? url : sdk.options.url + url;
+  url = util.isAbsoluteUrl(url) ? url : sdk.getIssuerOrigin() + url;
   var postOptions = {
     url: url,
     method: 'POST',

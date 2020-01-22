@@ -160,7 +160,7 @@ oauthUtil.setup = function(opts) {
     authClient = opts.authClient;
   } else {
     authClient = new OktaAuth({
-      url: 'https://auth-js-test.okta.com'
+      issuer: 'https://auth-js-test.okta.com'
     });
   }
 
@@ -350,7 +350,7 @@ oauthUtil.setupPopup = function(opts) {
 
 oauthUtil.setupRedirect = function(opts) {
   var client = new OktaAuth(Object.assign({
-    url: 'https://auth-js-test.okta.com',
+    issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
   }, opts.oktaAuthArgs));
@@ -378,7 +378,7 @@ oauthUtil.setupRedirect = function(opts) {
 
 oauthUtil.setupParseUrl = function(opts) {
   var client = new OktaAuth({
-    url: 'https://auth-js-test.okta.com',
+    issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
   });
@@ -449,7 +449,7 @@ oauthUtil.setupParseUrl = function(opts) {
 oauthUtil.setupSimultaneousPostMessage = function() {
   // Create client
   var client =  new OktaAuth({
-    url: 'https://auth-js-test.okta.com',
+    issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
   });

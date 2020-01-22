@@ -30,11 +30,10 @@ var util              = require('../util');
 function OktaAuthBuilder(args) {
   var sdk = this;
 
-  var url = builderUtil.getValidUrl(args);
+  builderUtil.assertValidConfig(args);
   // OKTA-242989: support for grantType will be removed in 3.0 
   var usePKCE = args.pkce || args.grantType === 'authorization_code';
   this.options = {
-    url: util.removeTrailingSlash(url),
     clientId: args.clientId,
     issuer: util.removeTrailingSlash(args.issuer),
     authorizeUrl: util.removeTrailingSlash(args.authorizeUrl),
@@ -335,7 +334,7 @@ proto.fingerprint = function(options) {
     iframe.style.display = 'none';
 
     listener = function listener(e) {
-      if (!e || !e.data || e.origin !== sdk.options.url) {
+      if (!e || !e.data || e.origin !== sdk.getIssuerOrigin()) {
         return;
       }
 
@@ -357,7 +356,7 @@ proto.fingerprint = function(options) {
     };
     oauthUtil.addListener(window, 'message', listener);
 
-    iframe.src = sdk.options.url + '/auth/services/devicefingerprint';
+    iframe.src = sdk.getIssuerOrigin() + '/auth/services/devicefingerprint';
     document.body.appendChild(iframe);
 
     timeout = setTimeout(function() {

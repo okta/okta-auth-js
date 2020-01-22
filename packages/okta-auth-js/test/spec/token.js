@@ -300,10 +300,9 @@ describe('token.getWithoutPrompt', function() {
   it('returns id_token using sessionToken with issuer as id', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
-        url: 'https://auth-js-test.okta.com',
+        issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
         clientId: 'NPSfOkH5eZrTy8PMDlvx',
         redirectUri: 'https://example.com/redirect',
-        issuer: 'aus8aus76q8iphupD0h7'
       },
       getWithoutPromptArgs: {
         sessionToken: 'testSessionToken'
@@ -341,40 +340,6 @@ describe('token.getWithoutPrompt', function() {
         sessionToken: 'testSessionToken'
       }, {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
-      }],
-      postMessageSrc: {
-        baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-        queryParams: {
-          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-          'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'id_token',
-          'response_mode': 'okta_post_message',
-          'state': oauthUtil.mockedState,
-          'nonce': oauthUtil.mockedNonce,
-          'scope': 'openid email',
-          'prompt': 'none',
-          'sessionToken': 'testSessionToken'
-        }
-      },
-      postMessageResp: {
-        'id_token': tokens.authServerIdToken,
-        'state': oauthUtil.mockedState
-      },
-      expectedResp: tokens.authServerIdTokenParsed
-    });
-  });
-
-  it('allows passing issuer as an id through getWithoutPrompt, which takes precedence', function() {
-    return oauthUtil.setupFrame({
-      oktaAuthArgs: {
-        issuer: 'https://auth-js-test.okta.com/oauth2/ORIGINAL_AUTH_SERVER_ID',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect'
-      },
-      getWithoutPromptArgs: [{
-        sessionToken: 'testSessionToken'
-      }, {
-        issuer: 'aus8aus76q8iphupD0h7'
       }],
       postMessageSrc: {
         baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',

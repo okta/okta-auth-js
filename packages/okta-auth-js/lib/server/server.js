@@ -21,9 +21,9 @@ var util              = require('../util');
 function OktaAuthBuilder(args) {
   var sdk = this;
 
-  var url = builderUtil.getValidUrl(args);
+  builderUtil.assertValidConfig(args);
   this.options = {
-    url: util.removeTrailingSlash(url),
+    issuer: util.removeTrailingSlash(args.issuer),
     httpRequestClient: args.httpRequestClient,
     storageUtil: args.storageUtil,
     headers: args.headers

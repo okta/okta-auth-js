@@ -79,7 +79,7 @@ function verifyToken(sdk, token, validationParams) {
 
     var validationOptions = {
       clientId: sdk.options.clientId,
-      issuer: sdk.options.issuer || sdk.options.url,
+      issuer: sdk.options.issuer,
       ignoreSignature: sdk.options.ignoreSignature
     };
 
@@ -122,7 +122,7 @@ function addPostMessageListener(sdk, timeout, state) {
       // This may happen if apps with different issuers are running on the same host url
       // If they share the same storage key, they may read and write tokens in the same location.
       // Common when developing against http://localhost
-      if (e.origin !== sdk.options.url) {
+      if (e.origin !== sdk.getIssuerOrigin()) {
         return reject(new AuthSdkError('The request does not match client configuration'));
       }
 
