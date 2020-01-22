@@ -4,6 +4,9 @@
 
 ### Breaking Changes
 
+
+- [#307](https://github.com/okta/okta-auth-js/pull/307) - Deprecated `requestContext` option was removed from `webfinger`
+
 - [#309](https://github.com/okta/okta-auth-js/pull/309) - Removed `Q` library, now using standard Promise. IE11 will require a polyfill for the `Promise` object. Use of `Promise.prototype.finally` requires Node > 10.3 for server-side use.
 
 - [#310](https://github.com/okta/okta-auth-js/pull/310)
