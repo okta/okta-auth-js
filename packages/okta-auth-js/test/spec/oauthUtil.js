@@ -253,7 +253,8 @@ describe('getWellKnown', function() {
         }),
         '2200-01-01T00:00:00.000Z',
         {
-          sameSite: 'strict'
+          sameSite: 'strict',
+          secure: false // due to localhost exemption
         }
       );
     }

@@ -16,7 +16,7 @@ const Form = `
     <option value="cookie">Cookie</option>
     <option value="memory">Memory</option>
   </select><br/>
-  <label for="secure">Secure Cookies</label><input id="secure" name="secure" type="checkbox"/><br/>
+  <label for="secure">Secure Cookies</label><input id="secureCookies" name="secureCookies" type="checkbox"/><br/>
   <hr/>
   <input id="login-submit" type="submit" value="Update Config"/>
   </form>
@@ -30,7 +30,7 @@ function updateForm(config) {
   document.getElementById('clientId').value = config.clientId;
   document.getElementById('pkce').checked = !!config.pkce;
   document.querySelector(`#storage [value="${config.storage || ''}"]`).selected = true;
-  document.getElementById('secure').checked = !!config.secure;
+  document.getElementById('secureCookies').checked = !!config.secureCookies;
 }
 
 export { Form, updateForm };

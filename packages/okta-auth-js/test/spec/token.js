@@ -1191,8 +1191,21 @@ describe('token.getWithRedirect', function() {
   var customUrls;
   var nonceCookie;
   var stateCookie;
+  var originalLocation;
+
+  afterEach(() => {
+    global.window.location = originalLocation;
+  });
 
   beforeEach(function() {
+    // mock window.location so we appear to be on an HTTPS origin
+    originalLocation = global.window.location;
+    delete global.window.location;
+    global.window.location = {
+      protocol: 'https:',
+      hostname: 'somesite.local'
+    };
+
     defaultUrls = {
       issuer: 'https://auth-js-test.okta.com',
       authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -1214,6 +1227,7 @@ describe('token.getWithRedirect', function() {
       oauthUtil.mockedNonce,
       null, // expiresAt
       {
+        secure: true,
         sameSite: 'lax'
       }
     ];
@@ -1223,6 +1237,7 @@ describe('token.getWithRedirect', function() {
       oauthUtil.mockedState,
       null, // expiresAt
       {
+        secure: true,
         sameSite: 'lax'
       }
     ];
@@ -1255,6 +1270,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1296,6 +1312,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1341,6 +1358,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1379,6 +1397,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1422,6 +1441,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1459,6 +1479,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1501,6 +1522,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1538,6 +1560,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1579,6 +1602,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1622,6 +1646,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1667,6 +1692,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1705,6 +1731,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1747,6 +1774,7 @@ describe('token.getWithRedirect', function() {
           ignoreSignature: false
         }),
         null, {
+          secure: true,
           sameSite: 'strict'
         }
       ],
@@ -1787,6 +1815,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1823,6 +1852,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1859,6 +1889,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],
@@ -1894,7 +1925,8 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-null, {
+          null, {
+            secure: true,
             sameSite: 'strict'
           }
         ],

@@ -6,9 +6,22 @@ var OktaAuth = require('../../lib/browser/browserIndex');
 var AuthApiError = require('../../lib/errors/AuthApiError');
 
 describe('Browser', function() {
-  var auth;
-  var issuer;
+  let auth;
+  let issuer;
+  let originalLocation;
+
+  afterEach(() => {
+    global.window.location = originalLocation;
+  });
+
   beforeEach(function() {
+    originalLocation = global.window.location;
+    delete global.window.location;
+    global.window.location = {
+      protocol: 'https:',
+      hostname: 'somesite.local'
+    };
+
     issuer =  'http://my-okta-domain';
     auth = new OktaAuth({ issuer });
   });
@@ -64,7 +77,34 @@ describe('Browser', function() {
   });
 
   describe('options', function() {
+    describe('secureCookies', () => {
 
+      it('is true by default', () => {
+        expect(auth.options.secureCookies).toBe(true);
+      });
+
+      it('throws if running on HTTP', () => {
+        global.window.location.protocol = 'http:';
+        function fn() {
+          auth = new OktaAuth({ issuer: 'http://my-okta-domain' });
+        }
+        expect(fn).toThrowError(
+          'The current page is not being served with the HTTPS protocol.\n' +
+          'For security reasons, we strongly recommend using HTTPS.\n' +
+          'If you cannot use HTTPS, set the "secureCookies" option to false.'
+        );
+      });
+
+      it('does not throw if running on HTTP and secureCookies = false', () => {
+        global.window.location.protocol = 'http:';
+        function fn() {
+          auth = new OktaAuth({ secureCookies: false, issuer: 'http://my-okta-domain', pkce: false });
+        }
+        expect(fn).not.toThrow();
+      });
+
+    });
+  
     describe('PKCE', function() {
 
       it('is false by default', function() {
@@ -83,15 +123,39 @@ describe('Browser', function() {
         expect(auth.options.pkce).toBe(true);
       });
 
-      it('throws if PKCE is not supported', function() {
+      it('throws if PKCE is not supported (HTTP)', function() {
         spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
+        global.window.location.protocol = 'http:';
         function fn() {
-          auth = new OktaAuth({ pkce: true, issuer: 'http://my-okta-domain' });
+          auth = new OktaAuth({ pkce: true, secureCookies: false, issuer: 'http://my-okta-domain' });
         }
         expect(fn).toThrowError(
           'PKCE requires a modern browser with encryption support running in a secure context.\n' +
           'The current page is not being served with HTTPS protocol. Try using HTTPS.\n' +
           '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
+        );
+      });
+
+      it('throws if PKCE is not supported (HTTPS, no TextEncoder)', function() {
+        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
+        expect(global.window.TextEncoder).toBe(undefined);
+        function fn() {
+          auth = new OktaAuth({ pkce: true, issuer: 'http://my-okta-domain' });
+        }
+        expect(fn).toThrowError(
+          'PKCE requires a modern browser with encryption support running in a secure context.\n' +
+          '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
+        );
+      });
+
+      it('throws if PKCE is not supported (HTTPS, with TextEncoder)', function() {
+        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
+        global.window.TextEncoder = {};
+        function fn() {
+          auth = new OktaAuth({ pkce: true, issuer: 'http://my-okta-domain' });
+        }
+        expect(fn).toThrowError(
+          'PKCE requires a modern browser with encryption support running in a secure context.'
         );
       });
     })
@@ -176,16 +240,17 @@ describe('Browser', function() {
   describe('signOut', function() {
     let origin;
     let encodedOrigin;
+  
     beforeEach(function() {
-      delete global.window.location;
-      origin = 'http://localhost:3000';
+      origin = 'https://somesite.local';
       encodedOrigin = encodeURIComponent(origin);
-      global.window.location = {
+      Object.assign(global.window.location, {
         origin,
         assign: jest.fn(),
         reload: jest.fn()
-      };
+      });
     });
+
     describe('with idToken and accessToken', () => {
       let idToken;
       let accessToken;

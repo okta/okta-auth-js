@@ -327,7 +327,7 @@ util.mockDeleteCookie = function () {
 };
 
 util.mockGetCookie = function (text) {
-  jest.spyOn(cookies, 'get').mockReturnValue(text || '');
+  return jest.spyOn(cookies, 'get').mockReturnValue(text || '');
 };
 
 util.mockGetHistory = function (client, mockHistory) {

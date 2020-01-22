@@ -33,6 +33,19 @@ function OktaAuthBuilder(args) {
   builderUtil.assertValidConfig(args);
   // OKTA-242989: support for grantType will be removed in 3.0 
   var usePKCE = args.pkce || args.grantType === 'authorization_code';
+
+  var secureCookies = true;
+  if (args.secureCookies === false || (sdk.features.isLocalhost() && !sdk.features.isHTTPS())) {
+    secureCookies = false;
+  }
+  if (secureCookies && !sdk.features.isHTTPS()) {
+    throw new AuthSdkError(
+      'The current page is not being served with the HTTPS protocol.\n' +
+      'For security reasons, we strongly recommend using HTTPS.\n' +
+      'If you cannot use HTTPS, set the "secureCookies" option to false.'
+    );
+  }
+
   this.options = {
     clientId: args.clientId,
     issuer: util.removeTrailingSlash(args.issuer),
@@ -49,6 +62,7 @@ function OktaAuthBuilder(args) {
     transformErrorXHR: args.transformErrorXHR,
     headers: args.headers,
     onSessionExpired: args.onSessionExpired,
+    secureCookies
   };
 
   if (this.options.pkce && !sdk.features.isPKCESupported()) {
@@ -196,6 +210,9 @@ proto.features.isHTTPS = function() {
   return window.location.protocol === 'https:';
 };
 
+proto.features.isLocalhost = function() {
+  return window.location.hostname === 'localhost';
+};
 // { username, password, (relayState), (context) }
 proto.signIn = function (opts) {
   var sdk = this;

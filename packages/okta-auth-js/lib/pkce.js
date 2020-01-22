@@ -41,19 +41,26 @@ function generateVerifier(prefix) {
   return encodeURIComponent(verifier).slice(0, MAX_VERIFIER_LENGTH);
 }
 
+function getStorage(sdk) {
+  return sdk.options.storageUtil.getPKCEStorage({
+    secure: sdk.options.secureCookies,
+    sameSite: 'strict' // PKCE storage should only be accessed by javascript
+  });
+}
+
 function saveMeta(sdk, meta) {
-  var storage = sdk.options.storageUtil.getPKCEStorage();
+  var storage = getStorage(sdk);
   storage.setStorage(meta);
 }
 
 function loadMeta(sdk) {
-  var storage = sdk.options.storageUtil.getPKCEStorage();
+  var storage = getStorage(sdk);
   var obj = storage.getStorage();
   return obj;
 }
 
 function clearMeta(sdk) {
-  var storage = sdk.options.storageUtil.getPKCEStorage();
+  var storage = getStorage(sdk);
   storage.clearStorage();
 }
 

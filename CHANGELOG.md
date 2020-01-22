@@ -16,6 +16,8 @@
 
 - [#311](https://github.com/okta/okta-auth-js/pull/311) - `parseFromUrl` now returns tokens in an object hash (instead of array). The `state` parameter (passed to authorize request) is also returned.
 
+- [#313](https://github.com/okta/okta-auth-js/pull/313) - New option `secureCookies`, which is `true` by default. An HTTPS origin will be enforced unless `secureCookies` is set to `false`.
+
 - [#316](https://github.com/okta/okta-auth-js/pull/316) - Option `issuer` is required. Option `url` has been deprecated and is no longer used.
 
 ### Other
