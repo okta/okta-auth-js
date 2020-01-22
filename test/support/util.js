@@ -136,6 +136,11 @@ function setup(options) {
     options.issuer = 'https://auth-js-test.okta.com';
   }
   var baseUri = options.issuer.indexOf('/oauth2') > 0 ? options.issuer.split('/oauth2')[0] : options.issuer;
+
+  if (typeof options.pkce === 'undefined') {
+    options.pkce = false;
+  }
+
   var ajaxMock, resReply, oa, trans;
 
   return Promise.resolve()
@@ -179,6 +184,7 @@ function setup(options) {
 
       // 2. Setup OktaAuth
       oa = new OktaAuth({
+        pkce: options.pkce,
         issuer: options.issuer,
         transformErrorXHR: options.transformErrorXHR,
         headers: options.headers,

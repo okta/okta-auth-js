@@ -12,6 +12,7 @@ describe('features', function() {
 
     it('on prototype', function() {
       var auth = new OktaAuth({
+        pkce: false,
         issuer: 'https://fakeo'
       });
 

@@ -23,7 +23,7 @@ describe('Browser', function() {
     };
 
     issuer =  'http://my-okta-domain';
-    auth = new OktaAuth({ issuer });
+    auth = new OktaAuth({ issuer, pkce: false });
   });
 
   it('is a valid constructor', function() {
@@ -34,7 +34,7 @@ describe('Browser', function() {
     it('Listens to error events from TokenManager', function() {
       jest.spyOn(Emitter.prototype, 'on');
       jest.spyOn(OktaAuth.prototype, '_onTokenManagerError');
-      var auth = new OktaAuth({ issuer: 'http://localhost/fake' });
+      var auth = new OktaAuth({ issuer: 'http://localhost/fake', pkce: false });
       expect(Emitter.prototype.on).toHaveBeenCalledWith('error', auth._onTokenManagerError, auth);
       var emitter = Emitter.prototype.on.mock.instances[0];
       var error = { errorCode: 'anything'};
@@ -45,7 +45,7 @@ describe('Browser', function() {
     it('error with errorCode "login_required" and accessToken: true will call option "onSessionExpired" function', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
-      new OktaAuth({ issuer: 'http://localhost/fake', onSessionExpired: onSessionExpired });
+      new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
       var emitter = Emitter.prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'login_required', accessToken: true };
@@ -56,7 +56,7 @@ describe('Browser', function() {
     it('error with errorCode "login_required" (not accessToken) does not call option "onSessionExpired" function', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
-      new OktaAuth({ issuer: 'http://localhost/fake', onSessionExpired: onSessionExpired });
+      new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
       var emitter = Emitter.prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'login_required' };
@@ -67,7 +67,7 @@ describe('Browser', function() {
     it('error with unknown errorCode does not call option "onSessionExpired" function', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
-      new OktaAuth({ issuer: 'http://localhost/fake', onSessionExpired: onSessionExpired });
+      new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
       var emitter = Emitter.prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'unknown', accessToken: true };
@@ -107,20 +107,15 @@ describe('Browser', function() {
   
     describe('PKCE', function() {
 
-      it('is false by default', function() {
+      it('is true by default', function() {
+        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+        auth = new OktaAuth({ issuer });
+        expect(auth.options.pkce).toBe(true);
+      });
+
+      it('can be set to "false" by arg', function() {
+        auth = new OktaAuth({ pkce: false, issuer: 'http://my-okta-domain' });
         expect(auth.options.pkce).toBe(false);
-      });
-
-      it('can be set by arg', function() {
-        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-        auth = new OktaAuth({ pkce: true, issuer: 'http://my-okta-domain' });
-        expect(auth.options.pkce).toBe(true);
-      });
-
-      it('accepts alias "grantType"', function() {
-        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-        auth = new OktaAuth({ grantType: "authorization_code", issuer: 'http://my-okta-domain' });
-        expect(auth.options.pkce).toBe(true);
       });
 
       it('throws if PKCE is not supported (HTTP)', function() {
@@ -291,6 +286,7 @@ describe('Browser', function() {
       it('supports custom authorization server', function() {
         issuer = 'http://my-okta-domain/oauth2/custom-as';
         auth = new OktaAuth({
+          pkce: false,
           issuer
         });
         initSpies();
@@ -325,6 +321,7 @@ describe('Browser', function() {
           const postLogoutRedirectUri = 'http://someother';
           const encodedUri = encodeURIComponent(postLogoutRedirectUri);
           auth = new OktaAuth({
+            pkce: false,
             issuer,
             postLogoutRedirectUri
           });

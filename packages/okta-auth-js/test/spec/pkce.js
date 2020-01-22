@@ -17,7 +17,7 @@ describe('pkce', function() {
 
     it('throws an error if pkce is true and PKCE is not supported', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-      var sdk = new OktaAuth({ issuer: 'https://foo.com',  });
+      var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: false });
       return token.prepareOauthParams(sdk, {
         pkce: true,
       })
@@ -151,6 +151,7 @@ describe('pkce', function() {
       var oauthOptions;
 
       beforeEach(function() {
+        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
         authClient = new OktaAuth({
           issuer: 'https://auth-js-test.okta.com'
         });

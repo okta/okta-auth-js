@@ -31,8 +31,6 @@ function OktaAuthBuilder(args) {
   var sdk = this;
 
   builderUtil.assertValidConfig(args);
-  // OKTA-242989: support for grantType will be removed in 3.0 
-  var usePKCE = args.pkce || args.grantType === 'authorization_code';
 
   var secureCookies = true;
   if (args.secureCookies === false || (sdk.features.isLocalhost() && !sdk.features.isHTTPS())) {
@@ -54,7 +52,7 @@ function OktaAuthBuilder(args) {
     tokenUrl: util.removeTrailingSlash(args.tokenUrl),
     revokeUrl: util.removeTrailingSlash(args.revokeUrl),
     logoutUrl: util.removeTrailingSlash(args.logoutUrl),
-    pkce: usePKCE,
+    pkce: args.pkce === false ? false : true,
     redirectUri: args.redirectUri,
     postLogoutRedirectUri: args.postLogoutRedirectUri,
     httpRequestClient: args.httpRequestClient,

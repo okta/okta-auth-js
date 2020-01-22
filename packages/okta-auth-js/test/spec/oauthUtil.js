@@ -412,6 +412,7 @@ describe('getKey', function() {
 describe('getOAuthUrls', function() {
   function setupOAuthUrls(options) {
     var sdk = new OktaAuth(options.oktaAuthArgs || {
+      pkce: false,
       issuer: 'https://auth-js-test.okta.com'
     });
 
@@ -456,6 +457,7 @@ describe('getOAuthUrls', function() {
   it('sanitizes forward slashes', function() {
     setupOAuthUrls({
       oktaAuthArgs: {
+        pkce: false,
         issuer: 'https://auth-js-test.okta.com/',
         logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout/',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token/',
@@ -475,6 +477,7 @@ describe('getOAuthUrls', function() {
   it('overrides defaults with options', function() {
     setupOAuthUrls({
       oktaAuthArgs: {
+        pkce: false,
         issuer: 'https://bad.okta.com',
         logoutUrl: 'https://bad.okta.com/oauth2/v1/logout',
         revokeUrl: 'https://bad.okta.com/oauth2/v1/revoke',
@@ -637,6 +640,7 @@ describe('validateClaims', function () {
 
   beforeEach(function() {
     sdk = new OktaAuth({
+      pkce: false,
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'foo',
       ignoreSignature: false

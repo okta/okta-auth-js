@@ -166,7 +166,7 @@ describe('Renew token', function() {
 
   it('implicit flow', function() {
     return bootstrap({
-
+      pkce: false
     })
     .then(() => {
       sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
