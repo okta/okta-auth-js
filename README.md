@@ -16,11 +16,9 @@
 * [Node JS Usage](#node-js-usage)
 * [Contributing](#contributing)
 
-The Okta Auth JavaScript SDK builds on top of our [Authentication API](https://developer.okta.com/docs/api/resources/authn) and [OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
+The Okta Auth JavaScript SDK builds on top of our [Authentication API](https://developer.okta.com/docs/api/resources/authn) and [OpenID Connect & OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
 
 You can learn more on the [Okta + JavaScript][lang-landing] page in our documentation.
-
-## Release status
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
@@ -155,7 +153,7 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-### [OpenID Connect](https://developer.okta.com/docs/api/resources/oidc) options
+### Configuration options
 
 These configuration options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`) or in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect` (unless noted otherwise). If included in both, the value passed in the method takes priority.
 
@@ -377,8 +375,8 @@ var config = {
   * [session.get](#sessionget)
   * [session.refresh](#sessionrefresh)
 * [token](#token)
-  * [token.getWithoutPrompt](#tokengetwithoutpromptoauthoptions)
-  * [token.getWithPopup](#tokengetwithpopupoauthoptions)
+  * [token.getWithoutPrompt](#tokengetwithoutpromptoptions)
+  * [token.getWithPopup](#tokengetwithpopupoptions)
   * [token.getWithRedirect](#tokengetwithredirectoptions)
   * [token.parseFromUrl](#tokenparsefromurloptions)
   * [token.decode](#tokendecodeidtokenstring)
@@ -1518,7 +1516,7 @@ authClient.session.refresh()
 
 ### `token`
 
-#### Extended OpenID Connect options
+#### Authorize options
 
 The following configuration options can **only** be included in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect`.
 
@@ -1530,8 +1528,14 @@ The following configuration options can **only** be included in `token.getWithou
 | `scopes` | Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`. For a list of available scopes, see [Scopes and Claims](https://developer.okta.com/docs/api/resources/oidc#access-token-scopes-and-claims). |
 | `state` | A string that will be passed to `/authorize` endpoint and returned in the OAuth response. The value is used to validate the OAuth response and prevent cross-site request forgery (CSRF). The `state` value passed to [getWithRedirect](#tokengetwithredirectoptions) will be returned along with any requested tokens from [parseFromUrl](#tokenparsefromurloptions). Your app can use this string to perform additional validation and/or pass information from the login page. Defaults to a random string. |
 | `nonce` | Specify a nonce that will be validated in an `id_token`. This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an `id_token`. Defaults to a random string. |
+| `idp` | Identity provider to use if there is no Okta Session. |
+| `idpScope` | A space delimited list of scopes to be provided to the Social Identity Provider when performing [Social Login](social-login) These scopes are used in addition to the scopes already configured on the Identity Provider. |
+| `display` | The display parameter to be passed to the Social Identity Provider when performing [Social Login](social-login). |
+| `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information. |
+| `maxAge` | Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta. |
+| `loginHint` | A username to prepopulate if prompting for authentication. |
 
-For a list of all available parameters that can be passed to the `/authorize` endpoint, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
+For more details, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
 
 ##### Example
 
@@ -1559,11 +1563,11 @@ authClient.token.getWithoutPrompt({
 });
 ```
 
-#### `token.getWithoutPrompt(oauthOptions)`
+#### `token.getWithoutPrompt(options)`
 
 When you've obtained a sessionToken from the authorization flows, or a session already exists, you can obtain a token or tokens without prompting the user to log in.
 
-* `oauthOptions` - See [Extended OpenID Connect options](#extended-openid-connect-options)
+* `options` - See [Authorize options](#authorize-options)
 
 ```javascript
 authClient.token.getWithoutPrompt({
@@ -1581,14 +1585,14 @@ authClient.token.getWithoutPrompt({
 });
 ```
 
-#### `token.getWithPopup(oauthOptions)`
+#### `token.getWithPopup(options)`
 
 Create token with a popup.
 
-* `oauthOptions` - See [Extended OpenID Connect options](#extended-openid-connect-options)
+* `options` - See [Authorize options](#authorize-options)
 
 ```javascript
-authClient.token.getWithPopup(oauthOptions)
+authClient.token.getWithPopup(options)
 .then(function(res) {
   var tokens = res.tokens;
 
@@ -1604,7 +1608,7 @@ authClient.token.getWithPopup(oauthOptions)
 
 Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#additional-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. By default, values will be in the hash fragment of the URL (for SPA applications) or in the search query (for Web applications). SPA Applications using the PKCE flow can opt to receive the authorization code in the search query by setting the [responseMode](#additional-options) option to "query".
 
-* `oauthOptions` - See [Extended OpenID Connect options](#extended-openid-connect-options)
+* `options` - See [Authorize options](#authorize-options)
 
 ```javascript
 authClient.token.getWithRedirect({
@@ -1964,3 +1968,4 @@ We're happy to accept contributions and PRs! Please see the [contribution guide]
 [lang-landing]: https://developer.okta.com/code/javascript
 [github-issues]: https://github.com/okta/okta-auth-js/issues
 [github-releases]: https://github.com/okta/okta-auth-js/releases
+[social-login]: https://developer.okta.com/docs/concepts/social-login/

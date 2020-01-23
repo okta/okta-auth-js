@@ -416,13 +416,9 @@ describe('getOAuthUrls', function() {
       issuer: 'https://auth-js-test.okta.com'
     });
 
-    var oauthParams = options.oauthParams || {
-      responseType: 'id_token'
-    };
-
     var result, error;
     try {
-      result = oauthUtil.getOAuthUrls(sdk, oauthParams, options.options);
+      result = oauthUtil.getOAuthUrls(sdk, options.options);
     } catch(e) {
       error = e;
     }
@@ -442,6 +438,18 @@ describe('getOAuthUrls', function() {
     }
   }
 
+  it('throws if an extra options object is passed', () => {
+    const sdk = new OktaAuth({
+      pkce: false,
+      issuer: 'https://auth-js-test.okta.com'
+    });
+
+    const f = function () {
+      oauthUtil.getOAuthUrls(sdk, {}, {});
+    };
+    expect(f).toThrowError('As of version 3.0, "getOAuthUrls" takes only a single set of options');
+  });
+  
   it('defaults all urls using global defaults', function() {
     setupOAuthUrls({
       expectedResult: {

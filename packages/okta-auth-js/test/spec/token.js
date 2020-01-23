@@ -209,6 +209,35 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
+  it('If extra options are passed, promise will reject', function() {
+    return oauthUtil.setupFrame({
+      willFail: true,
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com',
+      },
+      getWithoutPromptArgs: [{
+        /* expected options */
+      }, {
+        /* extra options */
+      }]
+    })
+    .then(function() {
+      expect(true).toEqual(false);
+    })
+    .catch(function(err) {
+      util.expectErrorToEqual(err, {
+        name: 'AuthSdkError',
+        message: 'As of version 3.0, "getWithoutPrompt" takes only a single set of options',
+        errorCode: 'INTERNAL',
+        errorSummary: 'As of version 3.0, "getWithoutPrompt" takes only a single set of options',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      });
+    });
+  });
+
   it('If authorizeUrl does not match configured issuer, promise will reject', function() {
     return oauthUtil.setupFrame({
       willFail: true,
@@ -219,8 +248,7 @@ describe('token.getWithoutPrompt', function() {
         redirectUri: 'https://example.com/redirect'
       },
       getWithoutPromptArgs: [{
-        sessionToken: 'testSessionToken'
-      }, {
+        sessionToken: 'testSessionToken',
         authorizeUrl: 'https://bogus',
       }],
       postMessageSrc: {
@@ -358,8 +386,7 @@ describe('token.getWithoutPrompt', function() {
         redirectUri: 'https://example.com/redirect'
       },
       getWithoutPromptArgs: [{
-        sessionToken: 'testSessionToken'
-      }, {
+        sessionToken: 'testSessionToken',
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
       }],
       postMessageSrc: {
@@ -787,6 +814,35 @@ describe('token.getWithPopup', function() {
     jest.useRealTimers();
   });
 
+  it('promise will reject if extra options object is passed', function() {
+    return oauthUtil.setup({
+      willFail: true,
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com',
+      },
+      getWithPopupArgs: [{
+        /* expected options */
+      }, {
+        /* extra options */
+      }]
+    })
+    .then(function() {
+      expect(true).toEqual(false);
+    })
+    .catch(function(err) {
+      util.expectErrorToEqual(err, {
+        name: 'AuthSdkError',
+        message: 'As of version 3.0, "getWithPopup" takes only a single set of options',
+        errorCode: 'INTERNAL',
+        errorSummary: 'As of version 3.0, "getWithPopup" takes only a single set of options',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      });
+    });
+  });
+
   it('promise will reject if fails due to timeout', function() {
     var timeoutMs = 120000;
     var mockWindow = {
@@ -948,8 +1004,7 @@ describe('token.getWithPopup', function() {
           redirectUri: 'https://example.com/redirect'
         },
         getWithPopupArgs: [{
-          idp: 'testIdp'
-        }, {
+          idp: 'testIdp',
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
         }],
         postMessageSrc: {
@@ -1287,6 +1342,35 @@ describe('token.getWithRedirect', function() {
     spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
   }
 
+  it('If extra options are passed, promise will reject', function() {
+    return oauthUtil.setupRedirect({
+      willFail: true,
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com',
+      },
+      getWithRedirectArgs: [{
+        /* expected options */
+      }, {
+        /* extra options */
+      }]
+    })
+    .then(function() {
+      expect(true).toEqual(false);
+    })
+    .catch(function(err) {
+      util.expectErrorToEqual(err, {
+        name: 'AuthSdkError',
+        message: 'As of version 3.0, "getWithRedirect" takes only a single set of options',
+        errorCode: 'INTERNAL',
+        errorSummary: 'As of version 3.0, "getWithRedirect" takes only a single set of options',
+        errorLink: 'INTERNAL',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      });
+    });
+  });
+
   it('Can pass responseMode=query', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
@@ -1454,8 +1538,7 @@ describe('token.getWithRedirect', function() {
       getWithRedirectArgs: [{
         responseType: 'token',
         scopes: ['email'],
-        sessionToken: 'testToken'
-      }, {
+        sessionToken: 'testToken',
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7'
       }],
       expectedCookies: [
