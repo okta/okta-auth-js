@@ -13,6 +13,7 @@ var packageJson = require('../../package.json');
 var sdkUtil = require('../../lib/oauthUtil');
 var pkce = require('../../lib/pkce');
 var http = require('../../lib/http');
+var sdkCrypto = require('../../lib/crypto');
 
 function setupSync(options) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);
@@ -111,6 +112,7 @@ describe('token.getWithoutPrompt', function() {
       fn({
         data: {
           'id_token': tokens.standardIdToken,
+          'access_token': tokens.standardAccessToken,
           state: states[index],
         },
         origin: origin || 'https://auth-js-test.okta.com'
@@ -241,7 +243,7 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
-  it('returns id_token using sessionToken', function() {
+  it('returns tokens using sessionToken', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         pkce: false,
@@ -257,7 +259,7 @@ describe('token.getWithoutPrompt', function() {
         queryParams: {
           'client_id': 'NPSfOkH5eZrTy8PMDlvx',
           'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'id_token',
+          'response_type': 'token id_token',
           'response_mode': 'okta_post_message',
           'state': oauthUtil.mockedState,
           'nonce': oauthUtil.mockedNonce,
@@ -269,7 +271,7 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
-  it('returns id_token using sessionToken with issuer', function() {
+  it('returns tokens using sessionToken with issuer', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         pkce: false,
@@ -285,7 +287,7 @@ describe('token.getWithoutPrompt', function() {
         queryParams: {
           'client_id': 'NPSfOkH5eZrTy8PMDlvx',
           'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'id_token',
+          'response_type': 'token id_token',
           'response_mode': 'okta_post_message',
           'state': oauthUtil.mockedState,
           'nonce': oauthUtil.mockedNonce,
@@ -295,6 +297,7 @@ describe('token.getWithoutPrompt', function() {
         }
       },
       postMessageResp: {
+        'access_token': tokens.authServerAccessToken,
         'id_token': tokens.authServerIdToken,
         'state': oauthUtil.mockedState
       },
@@ -307,7 +310,7 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
-  it('returns id_token using sessionToken with issuer as id', function() {
+  it('returns tokens using sessionToken with issuer as id', function() {
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -323,7 +326,7 @@ describe('token.getWithoutPrompt', function() {
         queryParams: {
           'client_id': 'NPSfOkH5eZrTy8PMDlvx',
           'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'id_token',
+          'response_type': 'token id_token',
           'response_mode': 'okta_post_message',
           'state': oauthUtil.mockedState,
           'nonce': oauthUtil.mockedNonce,
@@ -333,6 +336,7 @@ describe('token.getWithoutPrompt', function() {
         }
       },
       postMessageResp: {
+        'access_token': tokens.authServerAccessToken,
         'id_token': tokens.authServerIdToken,
         'state': oauthUtil.mockedState
       },
@@ -363,7 +367,7 @@ describe('token.getWithoutPrompt', function() {
         queryParams: {
           'client_id': 'NPSfOkH5eZrTy8PMDlvx',
           'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'id_token',
+          'response_type': 'token id_token',
           'response_mode': 'okta_post_message',
           'state': oauthUtil.mockedState,
           'nonce': oauthUtil.mockedNonce,
@@ -373,6 +377,7 @@ describe('token.getWithoutPrompt', function() {
         }
       },
       postMessageResp: {
+        'access_token': tokens.authServerAccessToken,
         'id_token': tokens.authServerIdToken,
         'state': oauthUtil.mockedState
       },
@@ -462,6 +467,7 @@ describe('token.getWithoutPrompt', function() {
 
       // getWithoutPrompt, but don't resolve
       firstPrompt = context.client.token.getWithoutPrompt({
+        responseType: 'id_token',
         sessionToken: 'testSessionToken',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce
@@ -469,6 +475,7 @@ describe('token.getWithoutPrompt', function() {
 
       // getWithoutPrompt, but don't resolve
       secondPrompt = context.client.token.getWithoutPrompt({
+        responseType: 'id_token',
         sessionToken: 'testSessionToken2',
         state: oauthUtil.mockedState2,
         nonce: oauthUtil.mockedNonce2
@@ -865,7 +872,7 @@ describe('token.getWithPopup', function() {
       });
   });
 
-  it('returns id_token using idp', function() {
+  it('returns tokens using idp', function() {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
           pkce: false,
@@ -881,7 +888,7 @@ describe('token.getWithPopup', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
+            'response_type': 'token id_token',
             'response_mode': 'okta_post_message',
             'display': 'popup',
             'state': oauthUtil.mockedState,
@@ -893,7 +900,7 @@ describe('token.getWithPopup', function() {
       });
   });
 
-  it('returns id_token using idp with authorization server', function() {
+  it('returns tokens using idp with authorization server', function() {
       return oauthUtil.setupPopup({
         oktaAuthArgs: {
           pkce: false,
@@ -909,7 +916,7 @@ describe('token.getWithPopup', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
+            'response_type': 'token id_token',
             'response_mode': 'okta_post_message',
             'display': 'popup',
             'state': oauthUtil.mockedState,
@@ -919,6 +926,7 @@ describe('token.getWithPopup', function() {
           }
         },
         postMessageResp: {
+          'access_token': tokens.authServerAccessToken,
           'id_token': tokens.authServerIdToken,
           'state': oauthUtil.mockedState
         },
@@ -949,7 +957,7 @@ describe('token.getWithPopup', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
+            'response_type': 'token id_token',
             'response_mode': 'okta_post_message',
             'display': 'popup',
             'state': oauthUtil.mockedState,
@@ -959,6 +967,7 @@ describe('token.getWithPopup', function() {
           }
         },
         postMessageResp: {
+          'access_token': tokens.authServerAccessToken,
           'id_token': tokens.authServerIdToken,
           'state': oauthUtil.mockedState
         },
@@ -1002,6 +1011,7 @@ describe('token.getWithPopup', function() {
       // getWithPopup, but don't resolve
       firstPopup = context.client.token.getWithPopup({
         idp: 'testIdp',
+        responseType: 'id_token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce
       });
@@ -1009,6 +1019,7 @@ describe('token.getWithPopup', function() {
       // getWithPopup, but don't resolve
       secondPopup = context.client.token.getWithPopup({
         idp: 'testIdp2',
+        responseType: 'id_token',
         state: oauthUtil.mockedState2,
         nonce: oauthUtil.mockedNonce2
       });
@@ -1276,7 +1287,7 @@ describe('token.getWithRedirect', function() {
     spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
   }
 
-  it('sets authorize url and cookie for id_token using sessionToken', function() {
+  it('sets authorize url and cookie using sessionToken', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken'
@@ -1285,7 +1296,7 @@ describe('token.getWithRedirect', function() {
         [
           'okta-oauth-redirect-params',
           JSON.stringify({
-            responseType: 'id_token',
+            responseType: ['token', 'id_token'],
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
@@ -1306,14 +1317,14 @@ describe('token.getWithRedirect', function() {
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
-                            'response_type=id_token&' +
+                            'response_type=token%20id_token&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
 
-  it('sets authorize url and cookie for id_token using sessionToken and authorization server', function() {
+  it('sets authorize url and cookie using sessionToken and authorization server', function() {
     return oauthUtil.setupRedirect({
       oktaAuthArgs: {
         pkce: false,
@@ -1328,7 +1339,7 @@ describe('token.getWithRedirect', function() {
         [
           'okta-oauth-redirect-params',
           JSON.stringify({
-            responseType: 'id_token',
+            responseType: ['token', 'id_token'],
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
@@ -1349,7 +1360,7 @@ describe('token.getWithRedirect', function() {
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
-                            'response_type=id_token&' +
+                            'response_type=token%20id_token&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
@@ -1828,7 +1839,7 @@ describe('token.getWithRedirect', function() {
         [
           'okta-oauth-redirect-params',
           JSON.stringify({
-            responseType: 'id_token',
+            responseType: ['token', 'id_token'],
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
@@ -1850,7 +1861,7 @@ describe('token.getWithRedirect', function() {
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
-                            'response_type=id_token&' +
+                            'response_type=token%20id_token&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
@@ -1865,7 +1876,7 @@ describe('token.getWithRedirect', function() {
         [
           'okta-oauth-redirect-params',
           JSON.stringify({
-            responseType: 'id_token',
+            responseType: ['token', 'id_token'],
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
@@ -1887,7 +1898,7 @@ describe('token.getWithRedirect', function() {
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
-                            'response_type=id_token&' +
+                            'response_type=token%20id_token&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
@@ -1902,7 +1913,7 @@ describe('token.getWithRedirect', function() {
         [
           'okta-oauth-redirect-params',
           JSON.stringify({
-            responseType: 'id_token',
+            responseType: ['token', 'id_token'],
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
@@ -1924,7 +1935,7 @@ describe('token.getWithRedirect', function() {
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
                             'response_mode=fragment&' +
-                            'response_type=id_token&' +
+                            'response_type=token%20id_token&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
@@ -2618,35 +2629,86 @@ describe('token.getUserInfo', function() {
 });
 
 describe('token.verify', function() {
-  var validationParams = {
-    clientId: tokens.standardIdTokenParsed.clientId,
-    issuer: tokens.standardIdTokenParsed.issuer
-  };
+  var validationParams;
+  var client;
+  beforeEach(() => {
+    validationParams = {
+      clientId: tokens.standardIdTokenParsed.clientId,
+      issuer: tokens.standardIdTokenParsed.issuer
+    };
+    client = setupSync();
+  });
+
+  describe('with access token', () => {
+    var idToken;
+    var atHash;
+
+    beforeEach(() => {
+      atHash = 'Gryuqew1_irUBmgZAncMsA'; // based on tokens.standardAccessToken
+
+      // Mock out sdk crypto
+      jest.spyOn(client.features, 'isTokenVerifySupported').mockReturnValue(true);
+      jest.spyOn(sdkCrypto, 'verifyToken').mockReturnValue(true);
+      jest.spyOn(sdkCrypto, 'getOidcHash').mockReturnValue(Promise.resolve(atHash));
+
+      // Return modified idToken
+      idToken = _.cloneDeep(tokens.standardIdTokenParsed);
+      idToken.claims.at_hash = atHash;
+    });
+
+    it('verifies idToken at_hash claim against accessToken', () => {
+      util.warpToUnixTime(1449699929);
+      oauthUtil.loadWellKnownAndKeysCache();
+      validationParams.accessToken = tokens.standardAccessToken;
+      return client.token.verify(idToken, validationParams)
+      .then(function(res) {
+        expect(res).toEqual(idToken);
+        expect(sdkCrypto.getOidcHash).toHaveBeenCalledWith(tokens.standardAccessToken);
+      });
+    });
+
+    it('throws if idToken at_hash claim does not match accessToken', () => {
+      util.warpToUnixTime(1449699929);
+      oauthUtil.loadWellKnownAndKeysCache();
+      validationParams.accessToken = tokens.standardAccessToken;
+      idToken.claims.at_hash = 'other_hash';
+      return client.token.verify(idToken, validationParams)
+      .then(function() {
+        expect('not to be hit').toEqual(true);
+      })
+      .catch(function(err) {
+        util.assertAuthSdkError(err, 'Token hash verification failed');
+      });
+    });
+
+    it('skips verification if idToken does not have at_hash claim', () => {
+      util.warpToUnixTime(1449699929);
+      oauthUtil.loadWellKnownAndKeysCache();
+      validationParams.accessToken = tokens.standardAccessToken;
+      delete idToken.claims.at_hash;
+      return client.token.verify(idToken, validationParams)
+      .then(function(res) {
+        expect(res).toEqual(idToken);
+        expect(sdkCrypto.getOidcHash).not.toHaveBeenCalled();
+      });
+    });
+  });
 
   it('verifies a valid idToken with nonce', function() {
-    var client = setupSync();
     util.warpToUnixTime(1449699929);
     oauthUtil.loadWellKnownAndKeysCache();
-    var alteredParams = _.clone(validationParams);
-    alteredParams.nonce = tokens.standardIdTokenParsed.nonce;
+    validationParams.nonce = tokens.standardIdTokenParsed.nonce;
     return client.token.verify(tokens.standardIdTokenParsed, validationParams)
     .then(function(res) {
       expect(res).toEqual(tokens.standardIdTokenParsed);
-    })
-    .catch(function() {
-      expect('not to be hit').toEqual(true);
-    })
+    });
   });
-  it('verifies a valid idToken without nonce', function() {
-    var client = setupSync();
+  it('verifies a valid idToken without nonce or accessToken', function() {
     util.warpToUnixTime(1449699929);
     oauthUtil.loadWellKnownAndKeysCache();
     return client.token.verify(tokens.standardIdTokenParsed, validationParams)
     .then(function(res) {
       expect(res).toEqual(tokens.standardIdTokenParsed);
-    })
-    .catch(function() {
-      expect('not to be hit').toEqual(true);
     });
   });
 
@@ -2658,7 +2720,6 @@ describe('token.verify', function() {
       jest.useRealTimers();
     });
     function expectError(verifyArgs, message) {
-      var client = setupSync();
       return client.token.verify.apply(null, verifyArgs)
       .then(function() {
         expect('not to be hit').toEqual(true);
@@ -2683,21 +2744,18 @@ describe('token.verify', function() {
         'The JWT expired and is no longer valid');
     });
     it('invalid nonce', function() {
-      var alteredParams = _.clone(validationParams);
-      alteredParams.nonce = 'invalidNonce';
-      return expectError([tokens.standardIdToken2Parsed, alteredParams],
+      validationParams.nonce = 'invalidNonce';
+      return expectError([tokens.standardIdToken2Parsed, validationParams],
         'OAuth flow response nonce doesn\'t match request nonce');
     });
     it('invalid audience', function() {
-      var alteredParams = _.clone(validationParams);
-      alteredParams.clientId = 'invalidAudience';
-      return expectError([tokens.standardIdTokenParsed, alteredParams],
+      validationParams.clientId = 'invalidAudience';
+      return expectError([tokens.standardIdTokenParsed, validationParams],
         'The audience [NPSfOkH5eZrTy8PMDlvx] does not match [invalidAudience]');
     });
     it('invalid issuer', function() {
-      var alteredParams = _.clone(validationParams);
-      alteredParams.issuer = 'http://invalidissuer.example.com';
-      return expectError([tokens.standardIdTokenParsed, alteredParams],
+      validationParams.issuer = 'http://invalidissuer.example.com';
+      return expectError([tokens.standardIdTokenParsed, validationParams],
         'The issuer [https://auth-js-test.okta.com] does not match [http://invalidissuer.example.com]');
     });
     it('expired before issued', function() {

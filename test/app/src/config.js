@@ -14,6 +14,7 @@ function getDefaultConfig() {
     postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
     issuer: ISSUER,
     clientId: CLIENT_ID,
+    responseType: ['token', 'id_token'],
     pkce: true,
     secureCookies: true
   };
@@ -25,11 +26,11 @@ function getConfigFromUrl() {
   const redirectUri = url.searchParams.get('redirectUri') || REDIRECT_URI;
   const postLogoutRedirectUri = url.searchParams.get('postLogoutRedirectUri') || POST_LOGOUT_REDIRECT_URI;
   const clientId = url.searchParams.get('clientId');
-  const pkce = url.searchParams.get('pkce') && url.searchParams.get('pkce') !== 'false';
+  const pkce = url.searchParams.get('pkce') !== 'false'; // On by default
   const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
   const storage = url.searchParams.get('storage') || undefined;
-  const secureCookies = url.searchParams.get('secureCookies') !== 'off'; // On by default
+  const secureCookies = url.searchParams.get('secureCookies') !== 'false'; // On by default
   return {
     redirectUri,
     postLogoutRedirectUri,

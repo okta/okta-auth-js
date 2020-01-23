@@ -29,10 +29,15 @@ app.post('/login', function(req, res) {
   let status = '';
   let sessionToken = '';
   let error = '';
+  let authClient;
 
-  const authClient = new OktaAuthJS( {
-    issuer
-  });
+  try {
+    authClient = new OktaAuthJS({
+      issuer
+    });
+  } catch(e) {
+    console.error('Caught exception in OktaAuthJS constructor: ', e);
+  }
 
   authClient.signIn({
     username,

@@ -2,7 +2,7 @@ import { htmlString } from './util';
 
 function tokensHTML(tokens) {
   const { idToken, accessToken } = tokens;
-  const claims = idToken.claims;
+  const claims = idToken ? idToken.claims : {};
   const html = `
   <table id="claims">
     <thead>
@@ -22,11 +22,11 @@ function tokensHTML(tokens) {
   <div class="flex-row">
     <div class="box">
       <strong>Access Token</strong><br/>
-      <div id="access-token">${ htmlString(accessToken) }</div>
+      <div id="access-token">${ accessToken ? htmlString(accessToken) : 'N/A' }</div>
     </div>
     <div class="box">
       <strong>ID Token</strong><br/>
-      <div id="id-token">${ htmlString(idToken) }</div>
+      <div id="id-token">${ idToken ? htmlString(idToken) : 'N/A' }</div>
     </div>
   </div>
   `;

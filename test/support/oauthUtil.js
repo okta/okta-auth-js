@@ -76,12 +76,17 @@ oauthUtil.loadWellKnownAndKeysCache = function() {
 
 var defaultPostMessage = oauthUtil.defaultPostMessage = {
   'id_token': tokens.standardIdToken,
+  'access_token': tokens.standardAccessToken,
   state: oauthUtil.mockedState
 };
 
 var defaultResponse = {
   state: oauthUtil.mockedState,
   tokens: {
+    accessToken: {
+      value: tokens.standardAccessToken,
+      accessToken: tokens.standardAccessToken
+    },
     idToken: {
       value: tokens.standardIdToken,
       idToken: tokens.standardIdToken,

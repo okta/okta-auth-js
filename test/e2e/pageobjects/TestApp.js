@@ -30,7 +30,7 @@ class TestApp {
   get password() { return $('#password'); }
 
   // Form
-  get pkceOption() { return $('#pkce'); }
+  get pkceOption() { return $('#pkce-on'); }
   get clientId() { return $('#clientId'); }
   get issuer() { return $('#issuer'); }
 

@@ -312,7 +312,7 @@ Object.assign(TestApp.prototype, {
   },
   appHTML: function(props) {
     const { idToken, accessToken } = props || {};
-    if (idToken && accessToken) {
+    if (idToken || accessToken) {
       // Authenticated user home page
       return `
         <strong>Welcome back</strong>
@@ -365,9 +365,10 @@ Object.assign(TestApp.prototype, {
   },
 
   callbackHTML: function(res) {
-    const success = res.tokens && res.tokens.accessToken && res.tokens.idToken;
+    const tokensReceived = res.tokens ? Object.keys(res.tokens): [];
+    const success = res.tokens && tokensReceived.length;
     const errorMessage = success ? '' :  'Tokens not returned. Check error console for more details';
-    const successMessage = success ? 'Successfully received tokens on the callback page!' : '';
+    const successMessage = success ? 'Successfully received tokens on the callback page: ' + tokensReceived.join(', ') : '';
     const content = `
       <div id="callback-result">
         <strong><div id="success">${successMessage}</div></strong>

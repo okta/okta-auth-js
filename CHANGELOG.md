@@ -22,6 +22,10 @@
 
 - [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` option is now `true` by default. `grantType` option is removed.
 
+- [#321](https://github.com/okta/okta-auth-js/pull/321)
+  - Default responseType when using implicit flow is now ['token', 'id_token'].
+  - When both access token and id token are returned, the id token's at_hash claim will be validated against the access token
+
 ### Other
 
 ## 2.12.0

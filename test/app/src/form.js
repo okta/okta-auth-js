@@ -5,9 +5,12 @@ const Form = `
   <form target="/oidc" method="GET">
   <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
   <label for="clientId">Client ID</label><input id="clientId" name="clientId" type="text" /><br/>
+  <label for="responseType">Response Type (comma separated)</label><input id="responseType" name="responseType" type="text" /><br/>
   <label for="redirectUri">Redirect URI</label><input id="redirectUri" name="redirectUri" type="text" /><br/>
   <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" /><br/>
-  <label for="pkce">PKCE</label><input id="pkce" name="pkce" type="checkbox"/><br/>
+  <label for="pkce">PKCE</label><br/>
+  <input id="pkce-on" name="pkce" type="radio" value="true"/>ON<br/>
+  <input id="pkce-off" name="pkce" type="radio" value="false"/>OFF<br/>
   <label for="storage">Storage</label>
   <select id="storage" name="storage">
     <option value="" selected>Auto</option>
@@ -16,7 +19,9 @@ const Form = `
     <option value="cookie">Cookie</option>
     <option value="memory">Memory</option>
   </select><br/>
-  <label for="secure">Secure Cookies</label><input id="secureCookies" name="secureCookies" type="checkbox"/><br/>
+  <label for="secure">Secure Cookies</label><br/>
+  <input id="secureCookies-on" name="secureCookies" type="radio" value="true"/>ON<br/>
+  <input id="secureCookies-off" name="secureCookies" type="radio" value="false"/>OFF<br/>
   <hr/>
   <input id="login-submit" type="submit" value="Update Config"/>
   </form>
@@ -26,11 +31,22 @@ function updateForm(config) {
   config = flattenConfig(config);
   document.getElementById('issuer').value = config.issuer;
   document.getElementById('redirectUri').value = config.redirectUri;
+  document.getElementById('responseType').value = config.responseType.join(',');
   document.getElementById('postLogoutRedirectUri').value = config.postLogoutRedirectUri;
   document.getElementById('clientId').value = config.clientId;
-  document.getElementById('pkce').checked = !!config.pkce;
   document.querySelector(`#storage [value="${config.storage || ''}"]`).selected = true;
-  document.getElementById('secureCookies').checked = !!config.secureCookies;
+
+  if (config.pkce) {
+    document.getElementById('pkce-on').checked = true;
+  } else {
+    document.getElementById('pkce-off').checked = true;
+  }
+
+  if (config.secureCookies) {
+    document.getElementById('secureCookies-on').checked = true;
+  } else {
+    document.getElementById('secureCookies-off').checked = true;
+  }
 }
 
 export { Form, updateForm };

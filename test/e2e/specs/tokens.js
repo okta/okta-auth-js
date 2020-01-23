@@ -93,6 +93,7 @@ describe('E2E token flows', () => {
         await TestApp.sessionExpired.then(el => el.getText()).then(txt => {
           assert(txt === 'SESSION EXPIRED');
         });
+        await TestApp.clearTokens();
         await browser.refresh();
         await TestApp.waitForLoginBtn(); // assert we are logged out
       });

@@ -102,6 +102,16 @@ function verifyToken(sdk, token, validationParams) {
       if (!valid) {
         throw new AuthSdkError('The token signature is not valid');
       }
+      if (validationParams.accessToken && token.claims.at_hash) {
+        return sdkCrypto.getOidcHash(validationParams.accessToken)
+          .then(hash => {
+            if (hash !== token.claims.at_hash) {
+              throw new AuthSdkError('Token hash verification failed');
+            }
+          });
+      }
+    })
+    .then(() => {
       return token;
     });
   });
@@ -233,25 +243,29 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
     return res;
   }).then(function(res) {
     var tokenDict = {};
-
-    if (res['access_token']) {
-      tokenDict['accessToken'] = {
-        value: res['access_token'],
-        accessToken: res['access_token'],
-        expiresAt: Number(res['expires_in']) + Math.floor(Date.now()/1000),
-        tokenType: res['token_type'],
+    var expiresIn = res.expires_in;
+    var tokenType = res.token_type;
+    var accessToken = res.access_token;
+    var idToken = res.id_token;
+    
+    if (accessToken) {
+      tokenDict.accessToken = {
+        value: accessToken,
+        accessToken: accessToken,
+        expiresAt: Number(expiresIn) + Math.floor(Date.now()/1000),
+        tokenType: tokenType,
         scopes: scopes,
         authorizeUrl: urls.authorizeUrl,
         userinfoUrl: urls.userinfoUrl
       };
     }
 
-    if (res['id_token']) {
-      var jwt = sdk.token.decode(res['id_token']);
+    if (idToken) {
+      var jwt = sdk.token.decode(idToken);
 
-      var idToken = {
-        value: res['id_token'],
-        idToken: res['id_token'],
+      var idTokenObj = {
+        value: idToken,
+        idToken: idToken,
         claims: jwt.payload,
         expiresAt: jwt.payload.exp,
         scopes: scopes,
@@ -263,16 +277,17 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
       var validationParams = {
         clientId: clientId,
         issuer: urls.issuer,
-        nonce: oauthParams.nonce
+        nonce: oauthParams.nonce,
+        accessToken: accessToken
       };
 
       if (oauthParams.ignoreSignature !== undefined) {
         validationParams.ignoreSignature = oauthParams.ignoreSignature;
       }
 
-      return verifyToken(sdk, idToken, validationParams)
+      return verifyToken(sdk, idTokenObj, validationParams)
       .then(function() {
-        tokenDict['idToken'] = idToken;
+        tokenDict.idToken = idTokenObj;
         return tokenDict;
       });
     }
@@ -281,18 +296,18 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
   })
   .then(function(tokenDict) {
     // Validate received tokens against requested response types 
-    if (responseType.indexOf('token') !== -1 && !tokenDict['accessToken']) {
+    if (responseType.indexOf('token') !== -1 && !tokenDict.accessToken) {
       // eslint-disable-next-line max-len
       throw new AuthSdkError('Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.');
     }
-    if (responseType.indexOf('id_token') !== -1 && !tokenDict['idToken']) {
+    if (responseType.indexOf('id_token') !== -1 && !tokenDict.idToken) {
       // eslint-disable-next-line max-len
       throw new AuthSdkError('Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.');
     }
 
     return {
       tokens: tokenDict,
-      state: res['state']
+      state: res.state
     };
   });
 }
@@ -302,7 +317,7 @@ function getDefaultOAuthParams(sdk) {
     pkce: sdk.options.pkce,
     clientId: sdk.options.clientId,
     redirectUri: sdk.options.redirectUri || window.location.href,
-    responseType: 'id_token',
+    responseType: ['token', 'id_token'],
     responseMode: 'okta_post_message',
     state: oauthUtil.generateState(),
     nonce: oauthUtil.generateNonce(),
