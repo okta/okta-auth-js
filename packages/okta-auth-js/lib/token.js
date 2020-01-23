@@ -299,7 +299,7 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
 
 function getDefaultOAuthParams(sdk) {
   return {
-    pkce: sdk.options.pkce || false,
+    pkce: sdk.options.pkce,
     clientId: sdk.options.clientId,
     redirectUri: sdk.options.redirectUri || window.location.href,
     responseType: 'id_token',
@@ -565,16 +565,11 @@ function prepareOauthParams(sdk, oauthOptions) {
   // clone and prepare options
   oauthOptions = util.clone(oauthOptions) || {};
 
-  // OKTA-242989: support for grantType will be removed in 3.0 
-  if (oauthOptions.grantType === 'authorization_code') {
-    oauthOptions.pkce = true;
-  }
-
   // build params using defaults + options
   var oauthParams = getDefaultOAuthParams(sdk);
   util.extend(oauthParams, oauthOptions);
 
-  if (oauthParams.pkce !== true) {
+  if (oauthParams.pkce === false) {
     return Promise.resolve(oauthParams);
   }
 

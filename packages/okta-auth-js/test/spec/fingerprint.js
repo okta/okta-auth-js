@@ -70,6 +70,7 @@ describe('fingerprint', function() {
     });
 
     var authClient = options.authClient || new OktaAuth({
+      pkce: false,
       issuer: 'http://example.okta.com'
     });
     if (typeof options.userAgent !== 'undefined') {

@@ -20,6 +20,8 @@
 
 - [#316](https://github.com/okta/okta-auth-js/pull/316) - Option `issuer` is required. Option `url` has been deprecated and is no longer used.
 
+- [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` option is now `true` by default. `grantType` option is removed.
+
 ### Other
 
 ## 2.12.0

@@ -41,6 +41,16 @@ If you run into problems using the SDK, you can:
 * Ask questions on the [Okta Developer Forums][devforum]
 * Post [issues][github-issues] here on GitHub (for code errors)
 
+### Browser Compatibility
+
+This SDK is known to work with current versions of Chrome, Firefox, and Safari on desktop and mobile.
+
+Compatibility with IE Edge can be accomplished by adding polyfill/shims for the following objects:
+
+* Promise
+* Array.from
+* TextEncoder
+
 ## Getting started
 
 Installing the Authentication SDK is simple. You can include it in your project via our npm package, [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js).
@@ -223,8 +233,8 @@ tokenManager: {
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be listed in your Okta application's [Login redirect URIs](#login-redirect-uris). If no `redirectUri` is provided, defaults to the current origin (`window.location.origin`). |
 | `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [signOut](#signout). This url must be listed in your Okta application's [Logout redirect URIs](#logout-redirect-uris). If not specified, your application's origin (`window.location.origin`) will be used.
-| `pkce`  | If set to true, the authorization flow will automatically use PKCE.  The authorize request will use `response_type=code`, and `grant_type=authorization_code` will be used on the token request.  All these details are handled for you, including the creation and verification of code verifiers. |
 | `secureCookies` | Defaults to `true`. Will set the "secure" option on all cookies. With this option on, an exception will be thrown if the application origin is not using the HTTPS protocol. Automatically disabled for `http://localhost`.
+| `pkce`  | Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and `grant_type=authorization_code` on the token request. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions) |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
 | `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
@@ -278,14 +288,22 @@ var authClient = new OktaAuth(config);
 
 ##### PKCE OAuth 2.0 flow
 
-By default the `implicit` OAuth flow will be used. It is widely supported by most browsers. PKCE is a newer flow which is more secure, but does require certain capabilities from the browser. Specifically, the browser must implement `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is available on all major platforms except IE Edge. In this case, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
+The PKCE OAuth flow will be used by default. It is widely supported by most modern browsers when running on an HTTPS connection. PKCE requires that the browser implements `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is available on all major browsers except IE Edge. In this case, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
 
-To use PKCE flow, set `pkce` to `true` in your config.
+If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
+
+`OktaAuth.features.isPKCESupported()`
+
+#### Implicit OAuth 2.0 flow
+
+Implicit OAuth flow is available as an option if PKCE flow cannot be supported in your deployment. It is widely supported by most browsers, and can work over an insecure HTTP connection. Note that implicit flow is less secure than PKCE flow, even over HTTPS, since raw tokens are exposed in the browser's history. For this reason, we highly recommending using the PKCE flow if possible.
+
+Implicit flow can be enabled by setting the `pkce` option to `false`
 
 ```javascript
 
 var config = {
-  pkce:  true,
+  pkce:  false,
 
   // other config
   issuer: 'https://{yourOktaDomain}/oauth2/default',
@@ -293,10 +311,6 @@ var config = {
 
 var authClient = new OktaAuth(config);
 ```
-
-If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
-
-`OktaAuth.features.isPKCESupported()`
 
 ### Optional configuration options
 
@@ -1507,7 +1521,7 @@ The following configuration options can **only** be included in `token.getWithou
 | :-------: | ----------|
 | `sessionToken` | Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow. |
 | `responseMode` | Specify how the authorization response should be returned. You will generally not need to set this unless you want to override the default values for `token.getWithRedirect`. See [Parameter Details](https://developer.okta.com/docs/api/resources/oidc#parameter-details) for a list of available modes. |
-| `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication. The default value is `id_token`. If `pkce` is `true`, this option will be ingored. |
+| `responseType` | Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication when using the [Implicit OAuth Flow](#implicit-oauth-20-flow). The default value is `id_token`. If `pkce` is `true`, this option will be ingored. |
 | | Use an array if specifying multiple response types - in this case, the response will contain both an ID Token and an Access Token. `responseType: ['id_token', 'token']` |
 | `scopes` | Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`. For a list of available scopes, see [Scopes and Claims](https://developer.okta.com/docs/api/resources/oidc#access-token-scopes-and-claims). |
 | `state` | Specify a state that will be validated in an OAuth response. This is usually only provided during redirect flows to obtain an authorization code. Defaults to a random string. |

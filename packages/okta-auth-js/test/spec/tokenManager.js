@@ -16,6 +16,7 @@ function setupSync(options) {
   options.tokenManager = options.tokenManager || {};
   jest.spyOn(SdkClock, 'create').mockReturnValue(new SdkClock(options.localClockOffset));
   return new OktaAuth({
+    pkce: false,
     issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect',

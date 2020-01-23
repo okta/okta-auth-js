@@ -126,6 +126,7 @@ describe('Complete login flow', function() {
     return bootstrap({})
     .then(function(app) {
       return app.loginRedirect({
+        pkce: false,
         nonce: NONCE
       });
     })
