@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+- [#315](https://github.com/okta/okta-auth-js/pull/315)`getWellKnown` was using base url over issuer. Method has been fixed to use issuer, if configured, and will fallback to base url
 - [#319](https://github.com/okta/okta-auth-js/pull/319) - Setting 'SameSite=lax' for all cookies (Fix for Firefox/Safari)
 
 ## 2.12.0
