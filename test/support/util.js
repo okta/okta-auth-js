@@ -38,7 +38,7 @@ function generateXHRPair(request, response, uri, responseVars) {
     responseVars.uri = responseVars.uri || uri;
 
     // Import the desired xhr
-    var responseXHR = require('./xhr/' + response);
+    var responseXHR = typeof response === 'object' ? response : require('./xhr/' + response);
 
     // Change the request uri to include the domain
     if (request) {
@@ -132,6 +132,10 @@ function mockAjax(pairs) {
 }
 
 function setup(options) {
+  if (typeof options === 'function') {
+    options = options();
+  }
+
   if (!options.issuer) {
     options.issuer = 'https://auth-js-test.okta.com';
   }

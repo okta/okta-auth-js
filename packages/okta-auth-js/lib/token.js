@@ -791,15 +791,36 @@ function parseFromUrl(sdk, options) {
     });
 }
 
-function getUserInfo(sdk, accessTokenObject) {
+async function getUserInfo(sdk, accessTokenObject, idTokenObject) {
+  // If token objects were not passed, attempt to read from the TokenManager
+  if (!accessTokenObject) {
+    accessTokenObject = await sdk.tokenManager.get('accessToken');
+  }
+  if (!idTokenObject) {
+    idTokenObject = await sdk.tokenManager.get('idToken');
+  }
+
   if (!accessTokenObject ||
       (!oauthUtil.isToken(accessTokenObject) && !accessTokenObject.accessToken && !accessTokenObject.userinfoUrl)) {
     return Promise.reject(new AuthSdkError('getUserInfo requires an access token object'));
   }
+
+  if (!idTokenObject ||
+    (!oauthUtil.isToken(idTokenObject) && !idTokenObject.idToken)) {
+    return Promise.reject(new AuthSdkError('getUserInfo requires an ID token object'));
+  }
+
   return http.httpRequest(sdk, {
     url: accessTokenObject.userinfoUrl,
     method: 'GET',
     accessToken: accessTokenObject.accessToken
+  })
+  .then(userInfo => {
+    // Only return the userinfo response if subjects match to mitigate token substitution attacks
+    if (userInfo.sub === idTokenObject.claims.sub) {
+      return userInfo;
+    }
+    return Promise.reject(new AuthSdkError('getUserInfo request was rejected due to token mismatch'));
   })
   .catch(function(err) {
     if (err.xhr && (err.xhr.status === 401 || err.xhr.status === 403)) {

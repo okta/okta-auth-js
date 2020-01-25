@@ -381,7 +381,7 @@ var config = {
   * [token.parseFromUrl](#tokenparsefromurloptions)
   * [token.decode](#tokendecodeidtokenstring)
   * [token.renew](#tokenrenewtokentorenew)
-  * [token.getUserInfo](#tokengetuserinfoaccesstokenobject)
+  * [token.getUserInfo](#tokengetuserinfoaccesstokenobject-idtokenobject)
   * [token.verify](#tokenverifyidtokenobject)
 * [tokenManager](#tokenmanager)
   * [tokenManager.add](#tokenmanageraddkey-token)
@@ -1712,14 +1712,30 @@ authClient.token.renew(tokenToRenew)
 });
 ```
 
-#### `token.getUserInfo(accessTokenObject)`
+#### `token.getUserInfo(accessTokenObject, idTokenObject)`
 
 Retrieve the [details about a user](https://developer.okta.com/docs/api/resources/oidc#response-example-success).
 
-* `accessTokenObject` - an access token returned by this library. note: this is not the raw access token
+* `accessTokenObject` - (optional) an access token returned by this library. **Note**: this is not the raw access token.
+* `idTokenObject` - (optional) an ID token returned by this library. **Note**: this is not the raw ID token.
+
+By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager. If either token has expired it will be renewed automatically by the TokenManager before the user info is requested. It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken". If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
+
 
 ```javascript
-authClient.token.getUserInfo(accessTokenObject)
+// access and ID tokens are retrieved automatically from the TokenManager
+authClient.token.getUserInfo()
+.then(function(user) {
+  // user has details about the user
+});
+```
+
+```javascript
+// In this example, the access token is stored under the key 'myAccessToken'
+const accessTokenObject = authClient.tokenManager.get('myAccessToken');
+// In this example, the ID token is stored under the key "myIdToken"
+const idTokenObject = authClient.tokenManager.get('myIdToken');
+authClient.token.getUserInfo(accessTokenObject, idTokenObject)
 .then(function(user) {
   // user has details about the user
 });

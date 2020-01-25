@@ -2747,61 +2747,93 @@ describe('token.renew', function() {
 });
 
 describe('token.getUserInfo', function() {
+  let responseXHR;
+  beforeEach(() => {
+    responseXHR = _.cloneDeep(require('@okta/test.support/xhr/userinfo'));
+    responseXHR.response.sub = tokens.standardIdTokenParsed.claims.sub;
+  });
+
   util.itMakesCorrectRequestResponse({
-    title: 'allows retrieving UserInfo',
-    setup: {
-      request: {
-        uri: '/oauth2/v1/userinfo',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
-          'Authorization': 'Bearer ' + tokens.standardAccessToken
-        }
-      },
-      response: 'userinfo'
+    title: 'allows retrieving UserInfo with accessTokenObject and idTokenObject',
+    setup: () => {
+      return {
+        request: {
+          uri: '/oauth2/v1/userinfo',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'Authorization': 'Bearer ' + tokens.standardAccessToken
+          }
+        },
+        response: responseXHR
+      }
     },
     execute: function(test) {
-      return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed);
+      return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed);
     },
     expectations: function(test, res) {
-      expect(res).toEqual({
-        'sub': '00u15ozp26ACQTGHJEBH',
-        'email': 'samljackson@example.com',
-        'email_verified': true
-      });
+      expect(res).toEqual(responseXHR.response);
+    }
+  });
+
+
+  util.itMakesCorrectRequestResponse({
+    title: 'allows retrieving UserInfo with no arguments if valid tokens exist in token manager',
+    setup: () => {
+      return {
+        request: {
+          uri: '/oauth2/v1/userinfo',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'Authorization': 'Bearer ' + tokens.standardAccessToken
+          }
+        },
+        response: responseXHR
+      }
+    },
+    execute: function(test) {
+      util.warpToUnixTime(oauthUtil.getTime());
+      test.oa.tokenManager.add('accessToken', tokens.standardAccessTokenParsed);
+      test.oa.tokenManager.add('idToken', tokens.standardIdTokenParsed);
+      return test.oa.token.getUserInfo();
+    },
+    expectations: function(test, res) {
+      expect(res).toEqual(responseXHR.response);
     }
   });
 
   util.itMakesCorrectRequestResponse({
     title: 'allows retrieving UserInfo using authorization server',
-    setup: {
-      request: {
-        uri: '/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
-          'Authorization': 'Bearer ' + tokens.authServerAccessToken
-        }
-      },
-      response: 'userinfo'
+    setup: () => {
+      responseXHR.response.sub = tokens.authServerIdTokenParsed.claims.sub;
+      return {
+        request: {
+          uri: '/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'Authorization': 'Bearer ' + tokens.authServerAccessToken
+          }
+        },
+        response: responseXHR
+      };
     },
     execute: function(test) {
-      return test.oa.token.getUserInfo(tokens.authServerAccessTokenParsed);
+      return test.oa.token.getUserInfo(tokens.authServerAccessTokenParsed, tokens.authServerIdTokenParsed);
     },
     expectations: function(test, res) {
-      expect(res).toEqual({
-        'sub': '00u15ozp26ACQTGHJEBH',
-        'email': 'samljackson@example.com',
-        'email_verified': true
-      });
+      expect(res).toEqual(responseXHR.response);
     }
   });
 
-  it('throws an error if no arguments are passed instead', function() {
+  it('throws an error if no arguments are passed', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve());
       return oa.token.getUserInfo();
     })
     .then(function() {
@@ -2816,6 +2848,7 @@ describe('token.getUserInfo', function() {
   it('throws an error if a string is passed instead of an accessToken object', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve());
       return oa.token.getUserInfo('just a string');
     })
     .then(function() {
@@ -2824,6 +2857,36 @@ describe('token.getUserInfo', function() {
     .catch(function(err) {
       expect(err.name).toEqual('AuthSdkError');
       expect(err.errorSummary).toBe('getUserInfo requires an access token object');
+    });
+  });
+
+  it('throws an error if no idTokenObject is passed', function() {
+    return Promise.resolve(setupSync())
+    .then(function(oa) {
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve());
+      return oa.token.getUserInfo(tokens.standardAccessTokenParsed);
+    })
+    .then(function() {
+      expect('not to be hit').toBe(true);
+    })
+    .catch(function(err) {
+      expect(err.name).toEqual('AuthSdkError');
+      expect(err.errorSummary).toBe('getUserInfo requires an ID token object');
+    });
+  });
+
+  it('throws an error if a string is passed instead of an idTokenObject', function() {
+    return Promise.resolve(setupSync())
+    .then(function(oa) {
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve());
+      return oa.token.getUserInfo(tokens.standardAccessTokenParsed, 'some string');
+    })
+    .then(function() {
+      expect('not to be hit').toBe(true);
+    })
+    .catch(function(err) {
+      expect(err.name).toEqual('AuthSdkError');
+      expect(err.errorSummary).toBe('getUserInfo requires an ID token object');
     });
   });
 
@@ -2842,7 +2905,7 @@ describe('token.getUserInfo', function() {
       response: 'error-userinfo-insufficient-scope'
     },
     execute: function(test) {
-      return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed);
+      return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed);
     },
     expectations: function(test, err) {
       expect(err.name).toEqual('OAuthError');
@@ -2869,7 +2932,7 @@ describe('token.getUserInfo', function() {
       response: 'error-userinfo-invalid-token'
     },
     execute: function(test) {
-      return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed);
+      return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed);
     },
     expectations: function(test, err) {
       expect(err.name).toEqual('OAuthError');
