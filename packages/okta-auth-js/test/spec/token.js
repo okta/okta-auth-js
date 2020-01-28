@@ -1219,6 +1219,80 @@ describe('token.getWithRedirect', function() {
     spyOn(pkce, 'computeChallenge').and.returnValue(Q.resolve(codeChallenge));
   }
 
+  it('Can pass responseMode=query', function() {
+    return oauthUtil.setupRedirect({
+      getWithRedirectArgs: {
+        responseMode: 'query',
+      },
+      expectedCookies: [
+        [
+          'okta-oauth-redirect-params',
+          JSON.stringify({
+            responseType: 'id_token',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
+            scopes: ['openid', 'email'],
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            urls: defaultUrls,
+            ignoreSignature: false
+          }),
+          null, {
+            sameSite: 'lax'
+          }
+        ],
+        nonceCookie,
+        stateCookie
+      ],
+      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=query&' +
+                            'response_type=id_token&' +
+                            'state=' + oauthUtil.mockedState + '&' +
+                            'scope=openid%20email'
+    });
+  });
+
+  it('Can set responseMode=query on SDK instance', function() {
+    return oauthUtil.setupRedirect({
+      oktaAuthArgs: {
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect',
+        responseMode: 'query'
+      },
+      getWithRedirectArgs: {},
+      expectedCookies: [
+        [
+          'okta-oauth-redirect-params',
+          JSON.stringify({
+            responseType: 'id_token',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
+            scopes: ['openid', 'email'],
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            urls: defaultUrls,
+            ignoreSignature: false
+          }),
+          null, {
+            sameSite: 'lax'
+          }
+        ],
+        nonceCookie,
+        stateCookie
+      ],
+      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=query&' +
+                            'response_type=id_token&' +
+                            'state=' + oauthUtil.mockedState + '&' +
+                            'scope=openid%20email'
+    });
+  });
+
   it('sets authorize url and cookie for id_token using sessionToken', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
@@ -1900,8 +1974,94 @@ null, {
 describe('token.parseFromUrl', function() {
   it('does not change the hash if a url is passed directly', function() {
     return oauthUtil.setupParseUrl({
-      directUrl: 'http://example.com#id_token=' + tokens.standardIdToken +
+      parseFromUrlArgs: 'http://example.com#id_token=' + tokens.standardIdToken +
                 '&state=' + oauthUtil.mockedState,
+      oauthCookie: JSON.stringify({
+        responseType: 'id_token',
+        state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      }),
+      expectedResp: {
+        idToken: tokens.standardIdToken,
+        claims: tokens.standardIdTokenClaims,
+        expiresAt: 1449699930,
+        scopes: ['openid', 'email']
+      }
+    });
+  });
+
+  it('does not change the hash if a url is passed as an option', function() {
+    return oauthUtil.setupParseUrl({
+      parseFromUrlArgs: {
+        url: 'http://example.com#id_token=' + tokens.standardIdToken +
+                '&state=' + oauthUtil.mockedState,
+      },
+      oauthCookie: JSON.stringify({
+        responseType: 'id_token',
+        state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      }),
+      expectedResp: {
+        idToken: tokens.standardIdToken,
+        claims: tokens.standardIdTokenClaims,
+        expiresAt: 1449699930,
+        scopes: ['openid', 'email']
+      }
+    });
+  });
+
+  it('Can pass responseMode=query in options', function() {
+    return oauthUtil.setupParseUrl({
+      parseFromUrlArgs: {
+        responseMode: 'query'
+      },
+      searchMock: '?id_token=' + tokens.standardIdToken +
+      '&state=' + oauthUtil.mockedState,
+      oauthCookie: JSON.stringify({
+        responseType: 'id_token',
+        state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      }),
+      expectedResp: {
+        idToken: tokens.standardIdToken,
+        claims: tokens.standardIdTokenClaims,
+        expiresAt: 1449699930,
+        scopes: ['openid', 'email']
+      }
+    });
+  });
+
+  it('Can set responseMode=query in SDK options', function() {
+    return oauthUtil.setupParseUrl({
+      oktaAuthArgs: {
+        url: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect',
+        responseMode: 'query'
+      },
+      searchMock: '?id_token=' + tokens.standardIdToken +
+      '&state=' + oauthUtil.mockedState,
       oauthCookie: JSON.stringify({
         responseType: 'id_token',
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',

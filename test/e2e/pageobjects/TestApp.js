@@ -31,6 +31,7 @@ class TestApp {
 
   // Form
   get pkceOption() { return $('#pkce'); }
+  get responseModeQuery() { return $('#responseMode [value="query"]'); }
   get clientId() { return $('#clientId'); }
   get issuer() { return $('#issuer'); }
 

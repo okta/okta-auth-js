@@ -236,13 +236,13 @@ function getOAuthUrls(sdk, oauthParams, options) {
   };
 }
 
-function hashToObject(hash) {
+function urlParamsToObject(hashOrSearch) {
   // Predefine regexs for parsing hash
   var plus2space = /\+/g;
   var paramSplit = /([^&=]+)=?([^&]*)/g;
 
-  // Remove the leading hash
-  var fragment = hash.substring(1);
+  // Remove the leading # or ?
+  var fragment = hashOrSearch.substring(1);
 
   var obj = {};
 
@@ -274,7 +274,7 @@ module.exports = {
   getOAuthUrls: getOAuthUrls,
   loadFrame: loadFrame,
   loadPopup: loadPopup,
-  hashToObject: hashToObject,
+  urlParamsToObject: urlParamsToObject,
   isToken: isToken,
   addListener: addListener,
   removeListener: removeListener

@@ -197,6 +197,7 @@ tokenManager: {
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be pre-registered as part of client registration. If no `redirectUri` is provided, defaults to the current origin. |
 | `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [signOut](#signout). This url must be added to the list of `Logout redirect URIs` on the application's `General Settings` tab.
 | `pkce`  | If set to true, the authorization flow will automatically use PKCE.  The authorize request will use `response_type=code`, and `grant_type=authorization_code` will be used on the token request.  All these details are handled for you, including the creation and verification of code verifiers. |
+| `responseMode` | Applicable only for SPA clients using PKCE flow. By default, when requesting tokens via redirect (Initiated with `token.getWithRedirect` and handled using `token.parseFromUrl`), the PKCE authorization code is requested and parsed from the hash fragment. Setting this value to `query` will cause the URL search query to be used instead. If your application uses or alters the hash fragment of the url, you may want to set this option to "query". |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
 | `userinfoUrl`  | Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo". |
 | `tokenUrl`  | Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token". |
@@ -1578,7 +1579,7 @@ authClient.token.getWithPopup(oauthOptions)
 
 #### `token.getWithRedirect(options)`
 
-Create token using a redirect.
+Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#additional-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. By default, values will be in the hash fragment of the URL (for SPA applications) or in the search query (for Web applications). SPA Applications using the PKCE flow can opt to receive the authorization code in the search query by setting the [responseMode](#additional-options) option to "query".
 
 * `oauthOptions` - See [Extended OpenID Connect options](#extended-openid-connect-options)
 
@@ -1588,7 +1589,7 @@ authClient.token.getWithRedirect(oauthOptions);
 
 #### `token.parseFromUrl(options)`
 
-Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect.
+Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. By default, values will be read from the hash fragment of the URL. SPA Applications using the PKCE flow can opt to receive the authorization code in the search query by setting the [responseMode](#additional-options) option to "query".
 
 If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint.
 
@@ -1601,6 +1602,39 @@ authClient.token.parseFromUrl()
 })
 .catch(function(err) {
   // handle OAuthError
+});
+```
+
+After reading values, this method will rewrite either the hash fragment or search query portion of the URL (if [responseMode](#additional-options) is "query") so that the code or tokens are no longer present or visible to the user. For this reason, it is recommended to use a dedicated route or path for the [redirectUri](#additional-options) so that this URL rewrite does not interfere with other URL parameters which may be used by your application. A complete login flow will usually save the current URL before calling `getWithRedirect` and restore the URL after saving tokens from `parseFromUrl`.
+
+```javascript
+// On any page while unauthenticated. Begin login flow
+
+// Save URL
+sessionStorage.setItem('url', window.location.href);
+
+// Redirect to Okta
+authClient.token.getWithRedirect({
+  responseType: 'token'
+});
+```
+
+```javascript
+// On callback (redirectUri) page
+authClient.token.parseFromUrl()
+.then(function(token) {
+  // Save token
+  authClient.tokenManager.add('accessToken', token);
+
+  // Read saved URL from storage
+  const url = sessionStorage.getItem('url');
+  sessionStorage.removeItem('url');
+
+  // Restore URL
+  window.location.assign(url);
+})
+.catch(function(err) {
+  // Handle OAuthError
 });
 ```
 

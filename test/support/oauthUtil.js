@@ -376,7 +376,7 @@ oauthUtil.setupRedirect = function(opts) {
 };
 
 oauthUtil.setupParseUrl = function(opts) {
-  var client = new OktaAuth({
+  var client = new OktaAuth(opts.oktaAuthArgs || {
     url: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
@@ -392,7 +392,7 @@ oauthUtil.setupParseUrl = function(opts) {
   var setLocationHashSpy = jest.fn();
   Object.defineProperty(mockLocation, 'hash', {
     get: function() {
-      return opts.hashMock || '';
+      return typeof opts.hashMock === 'undefined' ? '#test=true' : opts.hashMock;
     },
     set: setLocationHashSpy
   });
@@ -403,7 +403,7 @@ oauthUtil.setupParseUrl = function(opts) {
   });
   Object.defineProperty(mockLocation, 'search', {
     get: function() {
-      return '?test=true';
+      return opts.searchMock || '?test=true';
     }
   });
   util.mockGetLocation(client, mockLocation);
@@ -426,7 +426,7 @@ oauthUtil.setupParseUrl = function(opts) {
   util.mockGetCookie(opts.oauthCookie);
   var deleteCookieMock = util.mockDeleteCookie();
 
-  return client.token.parseFromUrl(opts.directUrl)
+  return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {
       var expectedResp = opts.expectedResp;
       validateResponse(res, expectedResp);
@@ -434,11 +434,13 @@ oauthUtil.setupParseUrl = function(opts) {
       // The cookie should be deleted
       expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
 
-      if (opts.directUrl) {
+      if (opts.parseFromUrlArgs && (typeof opts.parseFromUrlArgs === 'string' || opts.parseFromUrlArgs.url)) {
         expect(setLocationHashSpy).not.toHaveBeenCalled();
         expect(replaceStateSpy).not.toHaveBeenCalled();
       } else if (opts.noHistory) {
         expect(setLocationHashSpy).toHaveBeenCalledWith('');
+      } else if (opts.searchMock) {
+        expect(replaceStateSpy).toHaveBeenCalledWith(null, 'Test', '/test/path#test=true');
       } else {
         expect(replaceStateSpy).toHaveBeenCalledWith(null, 'Test', '/test/path?test=true');
       }

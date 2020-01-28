@@ -6,6 +6,12 @@ const Form = `
   <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
   <label for="clientId">Client ID</label><input id="clientId" name="clientId" type="text" /><br/>
   <label for="pkce">PKCE</label><input id="pkce" name="pkce" type="checkbox"/><br/>
+  <label for="responseMode">Response Mode</label>
+  <select id="responseMode" name="responseMode">
+    <option value="" selected>Auto</option>
+    <option value="fragment">Fragment</option>
+    <option value="query">Query</option>
+  </select><br/>
   <label for="storage">Storage</label>
   <select id="storage" name="storage">
     <option value="" selected>Auto</option>
@@ -25,6 +31,7 @@ function updateForm(config) {
   document.getElementById('issuer').value = config.issuer;
   document.getElementById('clientId').value = config.clientId;
   document.getElementById('pkce').checked = !!config.pkce;
+  document.querySelector(`#responseMode [value="${config.responseMode || ''}"]`).selected = true;
   document.querySelector(`#storage [value="${config.storage || ''}"]`).selected = true;
   document.getElementById('secure').checked = !!config.secure;
 }

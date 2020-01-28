@@ -626,8 +626,8 @@ function getWithRedirect(sdk, oauthOptions, options) {
           // server-side flows using authorization_code
           oauthParams.responseMode = 'query';
         } else {
-          // general case, client-side flow.
-          oauthParams.responseMode = 'fragment';
+          // Client-side flow can use fragment or query. This can be configured on the SDK instance.
+          oauthParams.responseMode = sdk.options.responseMode || 'fragment';
         }
       }
 
@@ -697,14 +697,35 @@ function removeHash(sdk) {
   }
 }
 
-function parseFromUrl(sdk, url) {
+function removeSearch(sdk) {
+  var nativeHistory = sdk.token.parseFromUrl._getHistory();
+  var nativeDoc = sdk.token.parseFromUrl._getDocument();
   var nativeLoc = sdk.token.parseFromUrl._getLocation();
-  var hash = nativeLoc.hash;
-  if (url) {
-    hash = url.substring(url.indexOf('#'));
+  if (nativeHistory && nativeHistory.replaceState) {
+    nativeHistory.replaceState(null, nativeDoc.title, nativeLoc.pathname + nativeLoc.hash);
+  } else {
+    nativeLoc.search = '';
+  }
+}
+
+function parseFromUrl(sdk, options) {
+  options = options || {};
+  if (util.isString(options)) {
+    options = { url: options };
   }
 
-  if (!hash) {
+  var url = options.url;
+  var responseMode = options.responseMode || sdk.options.responseMode || 'fragment';
+  var nativeLoc = sdk.token.parseFromUrl._getLocation();
+  var paramStr;
+
+  if (responseMode === 'query') {
+    paramStr = url ? url.substring(url.indexOf('?')) : nativeLoc.search;
+  } else {
+    paramStr = url ? url.substring(url.indexOf('#')) : nativeLoc.hash;
+  }
+
+  if (!paramStr) {
     return Q.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
@@ -723,11 +744,11 @@ function parseFromUrl(sdk, url) {
     constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME + ' cookie: ' + e.message));
   }
 
-  return Q.resolve(oauthUtil.hashToObject(hash))
+  return Q.resolve(oauthUtil.urlParamsToObject(paramStr))
     .then(function(res) {
       if (!url) {
-        // Remove the hash from the url
-        removeHash(sdk);
+        // Clean hash or search from the url
+        responseMode === 'query' ? removeSearch(sdk) : removeHash(sdk);
       }
       return handleOAuthResponse(sdk, oauthParams, res, urls);
     });
