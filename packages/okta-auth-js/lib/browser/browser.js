@@ -48,6 +48,7 @@ function OktaAuthBuilder(args) {
     pkce: usePKCE,
     redirectUri: args.redirectUri,
     postLogoutRedirectUri: args.postLogoutRedirectUri,
+    responseMode: args.responseMode,
     httpRequestClient: args.httpRequestClient,
     storageUtil: args.storageUtil,
     transformErrorXHR: args.transformErrorXHR,

@@ -23,6 +23,7 @@ function getConfigFromUrl() {
   const pkce = url.searchParams.get('pkce') && url.searchParams.get('pkce') !== 'false';
   const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
+  const responseMode = url.searchParams.get('responseMode') || undefined;
   const storage = url.searchParams.get('storage') || undefined;
   const secure = url.searchParams.get('secure') === 'on'; // currently opt-in.
   return {
@@ -32,6 +33,7 @@ function getConfigFromUrl() {
     pkce,
     scopes,
     responseType,
+    responseMode,
     tokenManager: {
       storage,
       secure,

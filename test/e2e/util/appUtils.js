@@ -6,8 +6,8 @@ const CLIENT_ID = process.env.CLIENT_ID;
 
 const flows = ['implicit', 'pkce'];
 
-async function openImplicit() {
-  await TestApp.open({ issuer: ISSUER, clientId: CLIENT_ID });
+async function openImplicit(options) {
+  await TestApp.open(Object.assign({ issuer: ISSUER, clientId: CLIENT_ID }, options));
   await TestApp.pkceOption.then(el => el.isSelected()).then(isSelected => {
     assert(isSelected === false);
   });
@@ -19,8 +19,8 @@ async function openImplicit() {
   });
 }
 
-async function openPKCE() {
-  await TestApp.open({ issuer: ISSUER, clientId: CLIENT_ID, pkce: true });
+async function openPKCE(options) {
+  await TestApp.open(Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: true }, options));
   await TestApp.pkceOption.then(el => el.isSelected()).then(isSelected => {
     assert(isSelected);
   });

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.13.0
+
+### Features
+
+- [#324](https://github.com/okta/okta-auth-js/pull/324) - Support `responseMode: "query"` option for SPA apps using PKCE flow
+
 ## 2.12.1
 
 ### Bug Fixes
