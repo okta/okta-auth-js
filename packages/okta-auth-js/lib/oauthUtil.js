@@ -164,7 +164,10 @@ function validateClaims(sdk, claims, validationParams) {
   }
 }
 
-function getOAuthUrls(sdk, oauthParams, options) {
+function getOAuthUrls(sdk, options) {
+  if (arguments.length > 2) {
+    throw new AuthSdkError('As of version 3.0, "getOAuthUrls" takes only a single set of options');
+  }
   options = options || {};
 
   // Get user-supplied arguments

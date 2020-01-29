@@ -22,6 +22,8 @@
 
 - [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` option is now `true` by default. `grantType` option is removed.
 
+- [#320](https://github.com/okta/okta-auth-js/pull/320) - `getWithRedirect`, `getWithPopup`, and `getWithoutPrompt` previously took 2 sets of option objects as parameters, a set of "oauthOptions" and additional options. These methods now take a single options object which can hold all available options. Passing a second options object will cause an exception to be thrown.
+
 - [#321](https://github.com/okta/okta-auth-js/pull/321)
   - Default responseType when using implicit flow is now ['token', 'id_token'].
   - When both access token and id token are returned, the id token's at_hash claim will be validated against the access token
