@@ -223,6 +223,16 @@ tokenManager: {
 }
 ```
 
+#### responseMode
+
+When requesting tokens using [token.getWithRedirect](#tokengetwithredirectoptions) values will be returned as parameters appended to the [redirectUri](#additional-options).
+
+In most cases you will not need to set a value for `responseMode`. Defaults are set according to the [OpenID Connect 1.0 specification](https://openid.net/specs/openid-connect-core-1_0.html#Authentication).
+
+* For [PKCE OAuth Flow](#pkce-oauth-20-flow)), the authorization code will be in search query of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#additional-options) option to "fragment".
+
+* For [Implicit OAuth Flow](#implicit-oauth-20-flow)), tokens will be in the hash fragment of the URL. This cannot be changed.
+
 #### Required Options
 
 | Option | Description |
@@ -237,7 +247,7 @@ tokenManager: {
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be listed in your Okta application's [Login redirect URIs](#login-redirect-uris). If no `redirectUri` is provided, defaults to the current origin (`window.location.origin`). [Configuring your Okta application](#configuring-your-okta-application) |
 | `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [signOut](#signout). This url must be listed in your Okta application's [Logout redirect URIs](#logout-redirect-uris). If not specified, your application's origin (`window.location.origin`) will be used.  [Configuring your Okta application](#configuring-your-okta-application) |
 | `onSessionExpired` | A function to be called when the Okta SSO session has expired or was ended outside of the application. A typical handler would initiate a login flow. |
-| `responseMode` | Applicable only for SPA clients using PKCE flow. By default, when requesting tokens via redirect (Initiated with `token.getWithRedirect` and handled using `token.parseFromUrl`), the PKCE authorization code is requested and parsed from the hash fragment. Setting this value to `query` will cause the URL search query to be used instead. If your application uses or alters the hash fragment of the url, you may want to set this option to "query". |
+| `responseMode` | Applicable only for SPA clients using [PKCE OAuth Flow](#pkce-oauth-20-flow). By default, the authorization code is requested and parsed from the search query. Setting this value to `fragment` will cause the URL hash fragment to be used instead. If your application uses or alters the search query portion of the `redirectUri`, you may want to set this option to "fragment". This option affects both [token.getWithRedirect](#tokengetwithredirectoptions) and [token.parseFromUrl](#tokenparsefromurloptions) |
 | `secureCookies` | Defaults to `true`. Will set the "secure" option on all cookies. With this option on, an exception will be thrown if the application origin is not using the HTTPS protocol. Automatically disabled for `http://localhost`. |
 | `pkce`  | Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and `grant_type=authorization_code` on the token request. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions) |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
@@ -271,8 +281,8 @@ var config = {
   clientId: 'GHtf9iJdr60A9IYrR0jw',
   redirectUri: 'https://acme.com/oauth2/callback/home',
 
-  // Pass authorization code in search query instead of hash fragment
-  responseMode: 'query',
+  // Parse authorization code from hash fragment instead of search query
+  responseMode: 'fragment',
 
   // Configure TokenManager to use sessionStorage instead of localStorage
   tokenManager: {
@@ -1606,7 +1616,7 @@ authClient.token.getWithPopup(options)
 
 #### `token.getWithRedirect(options)`
 
-Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#additional-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. By default, values will be in the hash fragment of the URL (for SPA applications) or in the search query (for Web applications). SPA Applications using the PKCE flow can opt to receive the authorization code in the search query by setting the [responseMode](#additional-options) option to "query".
+Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#additional-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. Values will be returned in either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode)
 
 * `options` - See [Authorize options](#authorize-options)
 
@@ -1619,11 +1629,13 @@ authClient.token.getWithRedirect({
 
 #### `token.parseFromUrl(options)`
 
-Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. By default, values will be read from the hash fragment of the URL. SPA Applications using the PKCE flow can opt to receive the authorization code in the search query by setting the [responseMode](#additional-options) option to "query".
+Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. Values are parsed from either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode).
 
 If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint.
 
 The ID token will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
+
+The `state` string which was passed to `getWithRedirect` will be also be available on the response.
 
 ```javascript
 authClient.token.parseFromUrl()
@@ -1642,7 +1654,7 @@ authClient.token.parseFromUrl()
 });
 ```
 
-After reading values, this method will rewrite either the hash fragment or search query portion of the URL (if [responseMode](#additional-options) is "query") so that the code or tokens are no longer present or visible to the user. For this reason, it is recommended to use a dedicated route or path for the [redirectUri](#additional-options) so that this URL rewrite does not interfere with other URL parameters which may be used by your application. A complete login flow will usually save the current URL before calling `getWithRedirect` and restore the URL after saving tokens from `parseFromUrl`.
+After reading values, this method will rewrite either the hash fragment or search query portion of the URL (depending on the [responseMode](#responsemode)) so that the code or tokens are no longer present or visible to the user. For this reason, it is recommended to use a dedicated route or path for the [redirectUri](#additional-options) so that this URL rewrite does not interfere with other URL parameters which may be used by your application. A complete login flow will usually save the current URL before calling `getWithRedirect` and restore the URL after saving tokens from `parseFromUrl`.
 
 ```javascript
 // On any page while unauthenticated. Begin login flow
@@ -1659,9 +1671,9 @@ authClient.token.getWithRedirect({
 ```javascript
 // On callback (redirectUri) page
 authClient.token.parseFromUrl()
-.then(function(token) {
+.then(function(res) {
   // Save token
-  authClient.tokenManager.add('accessToken', token);
+  authClient.tokenManager.add('accessToken', res.tokens.accessToken);
 
   // Read saved URL from storage
   const url = sessionStorage.getItem('url');

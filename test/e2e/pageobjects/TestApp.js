@@ -31,6 +31,7 @@ class TestApp {
 
   // Form
   get responseModeQuery() { return $('#responseMode [value="query"]'); }
+  get responseModeFragment() { return $('#responseMode [value="fragment"]'); }
   get pkceOption() { return $('#pkce-on'); }
   get clientId() { return $('#clientId'); }
   get issuer() { return $('#issuer'); }

@@ -7,7 +7,7 @@ const USERNAME = process.env.USERNAME;
 const PASSWORD = process.env.PASSWORD;
 
 function assertPKCE(url, responseMode) {
-  const char = responseMode === 'query' ? '?' : '#';
+  const char = responseMode === 'fragment' ? '#' : '?';
   const str = url.split(char)[1];
   assert(str.indexOf('code' > 0));
 }

@@ -318,7 +318,7 @@ function getDefaultOAuthParams(sdk) {
     clientId: sdk.options.clientId,
     redirectUri: sdk.options.redirectUri || window.location.href,
     responseType: ['token', 'id_token'],
-    responseMode: 'okta_post_message',
+    responseMode: sdk.options.responseMode,
     state: oauthUtil.generateState(),
     nonce: oauthUtil.generateNonce(),
     scopes: ['openid', 'email'],
@@ -648,19 +648,6 @@ function getWithRedirect(sdk, options) {
 
   return prepareOauthParams(sdk, options)
     .then(function(oauthParams) {
-
-      // Dynamically set the responseMode unless the user has explicitly provided one
-      // Server-side flow requires query. Client-side apps usually prefer fragment.
-      if (!options.responseMode) {
-        if (oauthParams.responseType.includes('code') && !oauthParams.pkce) {
-          // server-side flows using authorization_code
-          oauthParams.responseMode = 'query';
-        } else {
-          // Client-side flow can use fragment or query. This can be configured on the SDK instance.
-          oauthParams.responseMode = sdk.options.responseMode || 'fragment';
-        }
-      }
-
       var urls = oauthUtil.getOAuthUrls(sdk, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(oauthParams);
 
@@ -751,8 +738,11 @@ function parseFromUrl(sdk, options) {
     options = { url: options };
   }
 
+  // https://openid.net/specs/openid-connect-core-1_0.html#Authentication
+  var defaultResponseMode = sdk.options.pkce ? 'query' : 'fragment';
+
   var url = options.url;
-  var responseMode = options.responseMode || sdk.options.responseMode || 'fragment';
+  var responseMode = options.responseMode || sdk.options.responseMode || defaultResponseMode;
   var nativeLoc = sdk.token.parseFromUrl._getLocation();
   var paramStr;
 

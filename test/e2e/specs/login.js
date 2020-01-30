@@ -6,12 +6,12 @@ import { loginRedirect, loginPopup, loginDirect } from '../util/loginUtils';
 describe('E2E login', () => {
 
   // responseMode=query is not supported for implicit flow
-  it('can login using redirect (responseMode=query)', async () => {
-    await openPKCE({ responseMode: 'query' });
-    await TestApp.responseModeQuery.then(el => el.isSelected()).then(isSelected => {
+  it('PKCE: can login using redirect with responseMode=fragment', async () => {
+    await openPKCE({ responseMode: 'fragment' });
+    await TestApp.responseModeFragment.then(el => el.isSelected()).then(isSelected => {
       assert(isSelected === true);
     });
-    await loginRedirect('pkce', 'query');
+    await loginRedirect('pkce', 'fragment');
     await TestApp.getUserInfo();
     await TestApp.assertUserInfo();
     await TestApp.logoutRedirect();

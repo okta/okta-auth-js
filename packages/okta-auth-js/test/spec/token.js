@@ -1346,7 +1346,6 @@ describe('token.getWithRedirect', function() {
     return oauthUtil.setupRedirect({
       willFail: true,
       oktaAuthArgs: {
-        pkce: false,
         issuer: 'https://auth-js-test.okta.com',
       },
       getWithRedirectArgs: [{
@@ -1371,16 +1370,20 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('Can pass responseMode=query', function() {
+  it('PKCE: Can pass responseMode=fragment', function() {
+    mockPKCE();
     return oauthUtil.setupRedirect({
+      oktaAuthArgs: {
+        pkce: true
+      },
       getWithRedirectArgs: {
-        responseMode: 'query',
+        responseMode: 'fragment',
       },
       expectedCookies: [
         [
           'okta-oauth-redirect-params',
           JSON.stringify({
-            responseType: ['token', 'id_token'],
+            responseType: 'code',
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
@@ -1398,29 +1401,30 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'code_challenge=' + codeChallenge + '&' +
+                            'code_challenge_method=' + codeChallengeMethod + '&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=query&' +
-                            'response_type=token%20id_token&' +
+                            'response_mode=fragment&' +
+                            'response_type=code&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
 
-  it('Can set responseMode=query on SDK instance', function() {
+  it('PKCE: Can set responseMode=fragment on SDK instance', function() {
+    mockPKCE();
     return oauthUtil.setupRedirect({
       oktaAuthArgs: {
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect',
-        responseMode: 'query'
+        pkce: true,
+        responseMode: 'fragment'
       },
       getWithRedirectArgs: {},
       expectedCookies: [
         [
           'okta-oauth-redirect-params',
           JSON.stringify({
-            responseType: ['token', 'id_token'],
+            responseType: 'code',
             state: oauthUtil.mockedState,
             nonce: oauthUtil.mockedNonce,
             scopes: ['openid', 'email'],
@@ -1438,10 +1442,12 @@ describe('token.getWithRedirect', function() {
       ],
       expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'code_challenge=' + codeChallenge + '&' +
+                            'code_challenge_method=' + codeChallengeMethod + '&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=query&' +
-                            'response_type=token%20id_token&' +
+                            'response_mode=fragment&' +
+                            'response_type=code&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
@@ -1476,7 +1482,6 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1519,7 +1524,6 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1565,7 +1569,6 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1604,7 +1607,6 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1649,7 +1651,6 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1688,7 +1689,6 @@ describe('token.getWithRedirect', function() {
                             'idp=testIdp&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
@@ -1732,14 +1732,13 @@ describe('token.getWithRedirect', function() {
                             'idp=testIdp&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
   });
 
-  it('sets authorize url for authorization code requests, defaulting responseMode to query', function() {
+  it('sets authorize url for authorization code requests', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
         sessionToken: 'testToken',
@@ -1769,7 +1768,6 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=query&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1777,7 +1775,7 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('PKCE: sets authorize url for authorization code requests, defaulting responseMode to fragment', function() {
+  it('PKCE: sets authorize url for authorization code requests', function() {
     mockPKCE();
     return oauthUtil.setupRedirect({
       oktaAuthArgs: {
@@ -1785,7 +1783,6 @@ describe('token.getWithRedirect', function() {
       },
       getWithRedirectArgs: {
         sessionToken: 'testToken',
-        responseType: 'code'
       },
       expectedCookies: [
         [
@@ -1813,7 +1810,6 @@ describe('token.getWithRedirect', function() {
                             'code_challenge_method=' + codeChallengeMethod + '&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1822,7 +1818,6 @@ describe('token.getWithRedirect', function() {
   });
 
   it('sets authorize url for authorization code requests with an authorization server', function() {
-    mockPKCE();
     return oauthUtil.setupRedirect({
       oktaAuthArgs: {
         pkce: false,
@@ -1858,7 +1853,6 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=query&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1897,7 +1891,6 @@ describe('token.getWithRedirect', function() {
                             'client_id=NPSfOkH5eZrTy8PMDlvx&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=query&' +
                             'response_type=code&' +
                             'sessionToken=testToken&' +
                             'state=' + oauthUtil.mockedState + '&' +
@@ -1942,7 +1935,6 @@ describe('token.getWithRedirect', function() {
                           'code_challenge_method=' + codeChallengeMethod + '&' +
                           'nonce=' + oauthUtil.mockedNonce + '&' +
                           'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                          'response_mode=fragment&' +
                           'response_type=code&' +
                           'sessionToken=testToken&' +
                           'state=' + oauthUtil.mockedState + '&' +
@@ -2019,7 +2011,6 @@ describe('token.getWithRedirect', function() {
                             'login_hint=JoeUser&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
@@ -2056,7 +2047,6 @@ describe('token.getWithRedirect', function() {
                             'idp_scope=scope1%20scope2&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
@@ -2093,7 +2083,6 @@ describe('token.getWithRedirect', function() {
                             'idp_scope=scope1%20scope2&' +
                             'nonce=' + oauthUtil.mockedNonce + '&' +
                             'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
-                            'response_mode=fragment&' +
                             'response_type=token%20id_token&' +
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
@@ -2103,6 +2092,19 @@ describe('token.getWithRedirect', function() {
 });
 
 describe('token.parseFromUrl', function() {
+  function mockPKCE(response) {
+    var codeVerifier = 'fake';
+    var redirectUri = 'https://example.com/redirect';
+  
+    spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+    spyOn(pkce, 'loadMeta').and.returnValue({
+      codeVerifier,
+      redirectUri
+    });
+    spyOn(pkce, 'clearMeta');
+    spyOn(pkce, 'getToken').and.returnValue(Promise.resolve(response));
+  }
+
   it('does not change the hash if a url is passed directly', function() {
     return oauthUtil.setupParseUrl({
       parseFromUrlArgs: 'http://example.com#id_token=' + tokens.standardIdToken +
@@ -2159,14 +2161,17 @@ describe('token.parseFromUrl', function() {
     });
   });
 
-  it('Can pass responseMode=query in options', function() {
+  it('PKCE: can parse code in query', function() {
+    mockPKCE({
+      id_token: tokens.standardIdToken,
+      access_token: tokens.standardAccessToken
+    });
     return oauthUtil.setupParseUrl({
-      parseFromUrlArgs: {
-        responseMode: 'query'
+      oktaAuthArgs: {
+        pkce: true
       },
-      searchMock: '?id_token=' + tokens.standardIdToken +
-      '&access_token=' + tokens.standardAccessToken +
-      '&state=' + oauthUtil.mockedState,
+      searchMock: '?code=fake' + 
+        '&state=' + oauthUtil.mockedState,
       oauthCookie: JSON.stringify({
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2189,19 +2194,56 @@ describe('token.parseFromUrl', function() {
     });
   });
 
-  it('Can set responseMode=query in SDK options', function() {
+  it('PKCE: can pass responseMode=fragment in options', function() {
+    mockPKCE({
+      id_token: tokens.standardIdToken,
+      access_token: tokens.standardAccessToken
+    })
     return oauthUtil.setupParseUrl({
       oktaAuthArgs: {
-        pkce: false,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect',
-        responseMode: 'query'
+        pkce: true
       },
-      searchMock: '?id_token=' + tokens.standardIdToken +
+      parseFromUrlArgs: {
+        responseMode: 'fragment'
+      },
+      hashMock: '#code=fake' + 
+        '&state=' + oauthUtil.mockedState,
+      oauthCookie: JSON.stringify({
+        responseType: ['token', 'id_token'],
+        state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      }),
+      expectedResp: {
+        state: oauthUtil.mockedState,
+        tokens: {
+          accessToken: tokens.standardAccessTokenParsed,
+          idToken: tokens.standardIdTokenParsed
+        }
+      }
+    });
+  });
+
+  it('PKCE: Can set responseMode=fragment in SDK options', function() {
+    mockPKCE({
+      id_token: tokens.standardIdToken,
+      access_token: tokens.standardAccessToken
+    });
+    return oauthUtil.setupParseUrl({
+      oktaAuthArgs: {
+        pkce: true,
+        responseMode: 'fragment'
+      },
+      hashMock: '#code=fake' +
       '&state=' + oauthUtil.mockedState,
       oauthCookie: JSON.stringify({
-        responseType: 'id_token',
+        responseType: ['token', 'id_token'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
         scopes: ['openid', 'email'],
