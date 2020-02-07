@@ -4,8 +4,7 @@ node_js:
 install:
   - yarn install --frozen-lockfile
 script:
-  - yarn lint
-  - yarn test
+  - ./scripts/travis.sh
 cache: false
 addons:
   chrome: stable
