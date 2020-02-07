@@ -30,6 +30,8 @@
 
 - [#325](https://github.com/okta/okta-auth-js/pull/325) - Previously, the default `responseMode` for [PKCE](README.md#pkce-oauth-20-flow) was `"fragment"`. It is now `"query"`. Unless explicitly specified using the `responseMode` option, the `response_mode` parameter is no longer passed by `token.getWithRedirect` to the `/authorize` endpoint. The `response_mode` will be set by the backend according to the [OpenID specification](https://openid.net/specs/openid-connect-core-1_0.html#Authentication). [Implicit flow](README.md#implicit-oauth-20-flow) will use `"fragment"` and [PKCE](README.md#pkce-oauth-20-flow) will use `"query"`. If previous behavior is desired, [PKCE](README.md#pkce-oauth-20-flow) can set the `responseMode` option to `"fragment"`.
 
+- [#329](https://github.com/okta/okta-auth-js/pull/329) - Fix internal fetch implementation. `responseText` will always be a string, regardless of headers or response type. If a JSON object was returned, the object will be returned as `responseJSON` and `responseType` will be set to "json". Invalid/malformed JSON server response will no longer throw a raw TypeError but will return a well structured error response which includes the `status` code returned from the server.
+
 ### Other
 
 - [#306](https://github.com/okta/okta-auth-js/pull/306) - Now using babel for ES5 compatibility. [All polyfills have been removed](README.md#browser-compatibility).
