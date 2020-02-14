@@ -65,6 +65,10 @@ module.exports = function (config) {
       stats: 'normal',
     },
     client: {
+      jasmine: {
+        random: true, // Default: true. Tests should have no effect on other tests
+        timeoutInterval: 5000 // Default: 5000. Can increase locally when debugging
+      },
       // Passing specific test to run
       // but this works only with `karma start`, not `karma run`.
       test: config.test,
@@ -81,6 +85,7 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: ['ChromeHeadlessNoSandbox'],
+    concurrency: 1,
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',

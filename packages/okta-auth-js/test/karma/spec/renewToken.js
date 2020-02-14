@@ -50,6 +50,7 @@ describe('Renew token', function() {
     config = Object.assign({}, DEFAULT_CONFIG, config);
     sdk = new OktaAuth(config);
     sdk.tokenManager.clear();
+    mockWellKnown();
     return Promise.resolve();
   }
 
@@ -214,8 +215,6 @@ describe('Renew token', function() {
     })
     .then(() => {
       sdk.tokenManager.add('accessToken', ACCCESS_TOKEN_PARSED);
-
-      mockWellKnown();
   
       spyOn(oauthUtil, 'generateNonce').and.returnValue(NONCE);
 
