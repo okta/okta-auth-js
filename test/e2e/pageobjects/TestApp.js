@@ -18,10 +18,10 @@ class TestApp {
   get getUserInfoBtn() { return $('#get-userinfo'); }
   get userInfo() { return $('#user-info'); }
   get sessionExpired() { return $('#session-expired'); }
-  
+
   get tokenError() { return $('#token-error'); }
   get tokenMsg() { return $('#token-msg'); }
-  
+
   // Unauthenticated landing
   get loginRedirectBtn() { return $('#login-redirect'); }
   get loginPopupBtn() { return $('#login-popup'); }
@@ -56,6 +56,7 @@ class TestApp {
 
   async loginRedirect() {
     await this.waitForLoginBtn();
+    await browser.pause(5000);
     await this.loginRedirectBtn.then(el => el.click());
   }
 
