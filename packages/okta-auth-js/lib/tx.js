@@ -76,7 +76,7 @@ function introspect (sdk, args) {
 
 function transactionStep(sdk, args) {
   args = addStateToken(sdk, args);
-  return http.post(sdk, sdk.options.url + '/idp/idx/introspect', args);
+  return http.post(sdk, sdk.options.url + '/api/v1/authn/introspect', args);
 }
 
 function transactionExists(sdk) {
