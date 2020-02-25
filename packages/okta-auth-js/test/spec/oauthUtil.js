@@ -252,7 +252,7 @@ describe('getWellKnown', function() {
         }),
         '2200-01-01T00:00:00.000Z',
         {
-          sameSite: 'lax'
+          sameSite: 'none'
         }
       );
     }

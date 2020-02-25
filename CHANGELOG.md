@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.13.1
+
+### Bug Fixes
+
+- [#334](https://github.com/okta/okta-auth-js/pull/334) - Setting 'SameSite=none' for all cookies (Fix for iFrame)
+
 ## 2.13.0
 
 ### Features

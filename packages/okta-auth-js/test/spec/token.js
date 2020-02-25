@@ -1196,7 +1196,7 @@ describe('token.getWithRedirect', function() {
       oauthUtil.mockedNonce,
       null, // expiresAt
       {
-        sameSite: 'lax'
+        sameSite: 'none'
       }
     ];
 
@@ -1205,7 +1205,7 @@ describe('token.getWithRedirect', function() {
       oauthUtil.mockedState,
       null, // expiresAt
       {
-        sameSite: 'lax'
+        sameSite: 'none'
       }
     ];
   });
@@ -1237,7 +1237,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1276,7 +1276,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1311,7 +1311,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1352,7 +1352,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1397,7 +1397,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1435,7 +1435,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1478,7 +1478,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1515,7 +1515,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1557,7 +1557,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1594,7 +1594,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1635,7 +1635,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1678,7 +1678,7 @@ describe('token.getWithRedirect', function() {
             ignoreSignature: false
           }),
 null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1723,7 +1723,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1761,7 +1761,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1803,7 +1803,7 @@ null, {
           ignoreSignature: false
         }),
         null, {
-          sameSite: 'lax'
+          sameSite: 'none'
         }
       ],
       nonceCookie,
@@ -1843,7 +1843,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1879,7 +1879,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1915,7 +1915,7 @@ null, {
             ignoreSignature: false
           }),
           null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
@@ -1951,7 +1951,7 @@ null, {
             ignoreSignature: false
           }),
 null, {
-            sameSite: 'lax'
+            sameSite: 'none'
           }
         ],
         nonceCookie,
