@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Karma tests need chrome
-setup_service google-chrome-stable 66.0.3359.139-1
+# Install current version of Chrome
+setup_service google-chrome-stable 79.0.3945.88-1
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
