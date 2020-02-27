@@ -1,5 +1,10 @@
 #!/bin/bash -xe
 
+export NVM_DIR="/root/.nvm"
+
+# Install required node version
+setup_service node v12.13.0
+
 cd ${OKTA_HOME}/${REPO}
 
 # Yarn does not utilize the npmrc/yarnrc registry configuration
