@@ -5,6 +5,9 @@ export NVM_DIR="/root/.nvm"
 # Install required node version
 setup_service node v12.13.0
 
+# Install current version of Chrome
+setup_service google-chrome-stable 79.0.3945.88-
+
 cd ${OKTA_HOME}/${REPO}
 
 # Yarn does not utilize the npmrc/yarnrc registry configuration
