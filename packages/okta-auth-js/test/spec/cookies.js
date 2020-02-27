@@ -43,11 +43,11 @@ describe('cookie', function () {
 
     it('proxies JsCookie.set with "sameSite" setting',  function ()  {
       Cookies.set('foo', 'bar', null, {
-        sameSite: 'lax'
+        sameSite: 'none'
       });
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/',
-        sameSite: 'lax'
+        sameSite: 'none'
       });
     });
   });

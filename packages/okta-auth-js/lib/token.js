@@ -644,17 +644,17 @@ function getWithRedirect(sdk, oauthOptions, options) {
         urls: urls,
         ignoreSignature: oauthParams.ignoreSignature
       }), null, {
-        sameSite: 'lax'
+        sameSite: 'none'
       });
 
       // Set nonce cookie for servers to validate nonce in id_token
       cookies.set(constants.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce, null, {
-        sameSite: 'lax'
+        sameSite: 'none'
       });
 
       // Set state cookie for servers to validate state
       cookies.set(constants.REDIRECT_STATE_COOKIE_NAME, oauthParams.state, null, {
-        sameSite: 'lax'
+        sameSite: 'none'
       });
 
       sdk.token.getWithRedirect._setLocation(requestUrl);
