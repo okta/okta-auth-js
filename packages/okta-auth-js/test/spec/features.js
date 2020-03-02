@@ -1,4 +1,3 @@
-/* global window, document */
 var OktaAuth = require('OktaAuth');
 
 describe('features', function() {
@@ -12,7 +11,6 @@ describe('features', function() {
 
     it('on prototype', function() {
       var auth = new OktaAuth({
-        pkce: false,
         issuer: 'https://fakeo'
       });
 
@@ -111,7 +109,7 @@ describe('features', function() {
       spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(true);
       try {
         new OktaAuth({
-          issuer: 'https://dev-12345.oktapreview.com',
+          url: 'https://dev-12345.oktapreview.com',
           pkce: true,
         });
       } catch (e) {
@@ -128,7 +126,7 @@ describe('features', function() {
       spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(false);
       try {
         new OktaAuth({
-          issuer: 'https://dev-12345.oktapreview.com',
+          url: 'https://dev-12345.oktapreview.com',
           pkce: true,
         });
       } catch (e) {
@@ -148,7 +146,7 @@ describe('features', function() {
       window.TextEncoder = undefined;
       try {
         new OktaAuth({
-          issuer: 'https://dev-12345.oktapreview.com',
+          url: 'https://dev-12345.oktapreview.com',
           pkce: true,
         });
       } catch (e) {
@@ -168,7 +166,7 @@ describe('features', function() {
       window.TextEncoder = undefined;
       try {
         new OktaAuth({
-          issuer: 'https://dev-12345.oktapreview.com',
+          url: 'https://dev-12345.oktapreview.com',
           pkce: true,
         });
       } catch (e) {

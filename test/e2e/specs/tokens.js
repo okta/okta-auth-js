@@ -31,7 +31,7 @@ describe('token revoke', () => {
     const xhrError = await TestApp.xhrError.then(el => el.getText());
     assert(xhrError === 'Network request failed');
 
-    await TestApp.logoutRedirect();
+    await TestApp.logout();
   });
 });
 
@@ -52,7 +52,7 @@ describe('E2E token flows', () => {
           return txt !== prevToken;
         }, 10000);
         await TestApp.assertLoggedIn();
-        await TestApp.logoutRedirect();
+        await TestApp.logout();
       });
 
       it('can refresh all tokens', async () => {
@@ -71,7 +71,7 @@ describe('E2E token flows', () => {
           );
         }, 10000);
         await TestApp.assertLoggedIn();
-        await TestApp.logoutRedirect();
+        await TestApp.logout();
       });
 
       it('Can receive an error on token renew if user has signed out from Okta page', async () => {
@@ -93,7 +93,6 @@ describe('E2E token flows', () => {
         await TestApp.sessionExpired.then(el => el.getText()).then(txt => {
           assert(txt === 'SESSION EXPIRED');
         });
-        await TestApp.clearTokens();
         await browser.refresh();
         await TestApp.waitForLoginBtn(); // assert we are logged out
       });

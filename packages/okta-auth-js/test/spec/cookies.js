@@ -9,59 +9,45 @@ describe('cookie', function () {
   });
 
   describe('set',  function ()  {
-    it('Throws if "secure" option is not set', () => {
-      function testFunc() { Cookies.set('foo', 'bar', null, { sameSite: 'strict' }); }
-      expect(testFunc).toThrow('storage.set: "secure" and "sameSite" options must be provided')
-    });
     it('proxies JsCookie.set',  function ()  {
-      Cookies.set('foo', 'bar', null, { secure: true, sameSite: 'strict' });
+      Cookies.set('foo', 'bar');
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
-        path: '/',
-        secure: true,
-        sameSite: 'strict'
+        path: '/'
       });
     });
 
     it('proxies JsCookie.set with an expiry time',  function ()  {
-      Cookies.set('foo', 'bar', '2200-01-01T00:00:00.000Z', { secure: true, sameSite: 'strict' });
+      Cookies.set('foo', 'bar', '2200-01-01T00:00:00.000Z');
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/',
-        expires: new Date('2200-01-01T00:00:00.000Z'),
-        secure: true,
-        sameSite: 'strict'
+        expires: new Date('2200-01-01T00:00:00.000Z')
       });
     });
 
     it('proxies JsCookie.set with an invalid expiry time',  function ()  {
-      Cookies.set('foo', 'bar', 'not a valid date', { secure: true, sameSite: 'strict' });
+      Cookies.set('foo', 'bar', 'not a valid date');
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
-        path: '/',
-        secure: true,
-        sameSite: 'strict'
+        path: '/'
       });
     });
 
     it('proxies JsCookie.set with "secure" setting',  function ()  {
       Cookies.set('foo', 'bar', null, {
-        secure: false,
-        sameSite: 'strict'
+        secure: true
       });
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/',
-        secure: false,
-        sameSite: 'strict'
+        secure: true
       });
     });
 
     it('proxies JsCookie.set with "sameSite" setting',  function ()  {
       Cookies.set('foo', 'bar', null, {
-        secure: true,
-        sameSite: 'lax'
+        sameSite: 'none'
       });
       expect(JsCookie.set).toHaveBeenCalledWith('foo', 'bar', {
         path: '/',
-        secure: true,
-        sameSite: 'lax'
+        sameSite: 'none'
       });
     });
   });

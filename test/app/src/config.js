@@ -3,7 +3,6 @@ import { CALLBACK_PATH, STORAGE_KEY } from './constants';
 const HOST = window.location.host;
 const PROTO = window.location.protocol;
 const REDIRECT_URI = `${PROTO}//${HOST}${CALLBACK_PATH}`;
-const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}`;
 
 function getDefaultConfig() {
   const ISSUER = process.env.ISSUER;
@@ -11,51 +10,39 @@ function getDefaultConfig() {
   
   return {
     redirectUri: REDIRECT_URI,
-    postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
     issuer: ISSUER,
     clientId: CLIENT_ID,
-    responseType: ['token', 'id_token'],
     pkce: true,
-    secureCookies: true
   };
 }
 
 function getConfigFromUrl() {
   const url = new URL(window.location.href);
   const issuer = url.searchParams.get('issuer');
-  const redirectUri = url.searchParams.get('redirectUri') || REDIRECT_URI;
-  const postLogoutRedirectUri = url.searchParams.get('postLogoutRedirectUri') || POST_LOGOUT_REDIRECT_URI;
   const clientId = url.searchParams.get('clientId');
-  const pkce = url.searchParams.get('pkce') !== 'false'; // On by default
+  const pkce = url.searchParams.get('pkce') && url.searchParams.get('pkce') !== 'false';
   const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
   const responseMode = url.searchParams.get('responseMode') || undefined;
   const storage = url.searchParams.get('storage') || undefined;
-  const secureCookies = url.searchParams.get('secureCookies') !== 'false'; // On by default
+  const secure = url.searchParams.get('secure') === 'on'; // currently opt-in.
   return {
-    redirectUri,
-    postLogoutRedirectUri,
+    redirectUri: REDIRECT_URI,
     issuer,
     clientId,
     pkce,
     scopes,
     responseType,
     responseMode,
-    secureCookies,
     tokenManager: {
       storage,
+      secure,
     },
   };
 }
 
 function saveConfigToStorage(config) {
-  const configCopy = {};
-  Object.keys(config).forEach(key => {
-    if (typeof config[key] !== 'function') {
-      configCopy[key] = config[key];
-    }
-  });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(configCopy));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 }
 
 function getConfigFromStorage() {

@@ -14,6 +14,7 @@
 /* eslint-disable complexity, max-statements */
 var http              = require('./http');
 var util              = require('./util');
+var Q                 = require('q');
 var AuthSdkError      = require('./errors/AuthSdkError');
 var AuthPollStopError = require('./errors/AuthPollStopError');
 var constants         = require('./constants');
@@ -36,7 +37,7 @@ function getStateToken(res) {
 
 function transactionStatus(sdk, args) {
   args = addStateToken(sdk, args);
-  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn', args);
+  return http.post(sdk, sdk.options.url + '/api/v1/authn', args);
 }
 
 function resumeTransaction(sdk, args) {
@@ -47,7 +48,7 @@ function resumeTransaction(sdk, args) {
         stateToken: stateToken
       };
     } else {
-      return Promise.reject(new AuthSdkError('No transaction to resume'));
+      return Q.reject(new AuthSdkError('No transaction to resume'));
     }
   }
   return sdk.tx.status(args)
@@ -64,7 +65,7 @@ function introspect (sdk, args) {
         stateToken: stateToken
       };
     } else {
-      return Promise.reject(new AuthSdkError('No transaction to evaluate'));
+      return Q.reject(new AuthSdkError('No transaction to evaluate'));
     }
   }
   return transactionStep(sdk, args)
@@ -76,7 +77,7 @@ function introspect (sdk, args) {
 function transactionStep(sdk, args) {
   args = addStateToken(sdk, args);
   // v1 pipeline introspect API
-  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn/introspect', args);
+  return http.post(sdk, sdk.options.url + '/api/v1/authn/introspect', args);
 }
 
 function transactionExists(sdk) {
@@ -120,7 +121,7 @@ function getPollFn(sdk, res, ref) {
           opts.autoPush = !!autoPush();
         }
         catch (e) {
-          return Promise.reject(new AuthSdkError('AutoPush resulted in an error.'));
+          return Q.reject(new AuthSdkError('AutoPush resulted in an error.'));
         }
       }
       else if (autoPush !== undefined && autoPush !== null) {
@@ -131,7 +132,7 @@ function getPollFn(sdk, res, ref) {
           opts.rememberDevice = !!rememberDevice();
         }
         catch (e) {
-          return Promise.reject(new AuthSdkError('RememberDevice resulted in an error.'));
+          return Q.reject(new AuthSdkError('RememberDevice resulted in an error.'));
         }
       }
       else if (rememberDevice !== undefined && rememberDevice !== null) {
@@ -150,7 +151,7 @@ function getPollFn(sdk, res, ref) {
     var recursivePoll = function () {
       // If the poll was manually stopped during the delay
       if (!ref.isPolling) {
-        return Promise.reject(new AuthPollStopError());
+        return Q.reject(new AuthPollStopError());
       }
       return pollFn()
         .then(function (pollRes) {
@@ -170,7 +171,8 @@ function getPollFn(sdk, res, ref) {
             }
 
             // Continue poll
-            return util.delay(delay).then(recursivePoll);
+            return Q.delay(delay)
+              .then(recursivePoll);
 
           } else {
             // Any non-waiting result, even if polling was stopped
@@ -179,21 +181,21 @@ function getPollFn(sdk, res, ref) {
             return new AuthTransaction(sdk, pollRes);
           }
         })
-        .catch(function(err) {
+        .fail(function(err) {
           // Exponential backoff, up to 16 seconds
           if (err.xhr &&
               (err.xhr.status === 0 || err.xhr.status === 429) &&
               retryCount <= 4) {
             var delayLength = Math.pow(2, retryCount) * 1000;
             retryCount++;
-            return util.delay(delayLength)
+            return Q.delay(delayLength)
               .then(recursivePoll);
           }
           throw err;
         });
     };
     return recursivePoll()
-      .catch(function(err) {
+      .fail(function(err) {
         ref.isPolling = false;
         throw err;
       });
@@ -250,7 +252,7 @@ function link2fn(sdk, res, obj, link, ref) {
                 params.autoPush = !!autoPush();
               }
               catch (e) {
-                return Promise.reject(new AuthSdkError('AutoPush resulted in an error.'));
+                return Q.reject(new AuthSdkError('AutoPush resulted in an error.'));
               }
             }
             else if (autoPush !== null) {
@@ -266,7 +268,7 @@ function link2fn(sdk, res, obj, link, ref) {
                 params.rememberDevice = !!rememberDevice();
               }
               catch (e) {
-                return Promise.reject(new AuthSdkError('RememberDevice resulted in an error.'));
+                return Q.reject(new AuthSdkError('RememberDevice resulted in an error.'));
               }
             }
             else if (rememberDevice !== null) {
@@ -369,7 +371,7 @@ function AuthTransaction(sdk, res) {
     // when OKTA-75434 is resolved
     if (res.status === 'RECOVERY_CHALLENGE' && !res._links) {
       this.cancel = function() {
-        return Promise.resolve(new AuthTransaction(sdk));
+        return new Q(new AuthTransaction(sdk));
       };
     }
   }

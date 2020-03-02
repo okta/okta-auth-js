@@ -1,178 +1,87 @@
-/* global Map */
 describe('fetchRequest', function () {
-  let fetchSpy;
-
-  let requestHeaders;
-  let requestMethod;
-  let requestUrl;
-  let response;
-  let responseHeaders;
-  let responseJSON;
-  let responseText;
-
-  const mockFetchObj = {
+  var Q = require('q');
+  var mockFetchResult;
+  var mockFetchObj = {
     fetch: function mockFetchFunc() {
-      return Promise.resolve(response);
+      return Q.resolve(mockFetchResult);
     }
   }
   jest.setMock('cross-fetch', function() {
     return mockFetchObj.fetch.apply(null, arguments);
   });
-  const fetchRequest = require('../../lib/fetch/fetchRequest');
+
+  var fetchRequest = require('../../fetch/fetchRequest');
 
   beforeEach(function() {
-    fetchSpy = jest.spyOn(mockFetchObj, 'fetch');
-    responseHeaders = new Map();
-    responseHeaders.set('Content-Type', 'application/json');
-    responseJSON = { isFakeResponse: true };
-    responseText = JSON.stringify(responseJSON);
-    response = {
-      headers: responseHeaders,
-      status: 200,
-      ok: true,
+    /* global Map */
+    mockFetchResult = {
+      headers: new Map(),
       json: function() {
-        return Promise.resolve(responseJSON);
+        return Q.resolve();
       },
       text: function() {
-        return Promise.resolve(responseText);
+        return Q.resolve();
       }
+    }
+  });
+
+  it('JSON encodes request body if request Content-Type is application/json', function() {
+    var spy = jest.spyOn(mockFetchObj, 'fetch');
+    var method = 'GET';
+    var url = 'http://fakey.local';
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var obj = {
+      foo: 'bar'
+    };
+    var jsonObj = JSON.stringify(obj);
+
+    fetchRequest(method, url, {
+      headers: headers,
+      data: obj
+    });
+
+    expect(spy).toHaveBeenCalledWith(url, {
+      method: method,
+      headers: headers,
+      body: jsonObj,
+      credentials: 'include'
+    });
+  });
+
+  it('Leaves request body unchanged if request Content-Type is NOT application/json', function() {
+    var spy = jest.spyOn(mockFetchObj, 'fetch');
+    var method = 'GET';
+    var url = 'http://fakey.local';
+    var obj = {
+      foo: 'bar'
     };
 
-    requestHeaders = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    }
-    requestMethod = 'GET';
-    requestUrl = 'http://fakey.local';
-  });
-
-  describe('request', () => {
-    it('JSON encodes request body if request header Content-Type is application/json', function() {
-      const requestJSON = {
-        foo: 'bar'
-      };
-      return fetchRequest(requestMethod, requestUrl, {
-        headers: requestHeaders,
-        data: requestJSON
-      })
-      .then(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(requestUrl, {
-          method: requestMethod,
-          headers: requestHeaders,
-          body: JSON.stringify(requestJSON),
-          credentials: 'include'
-        });
-      });
+    fetchRequest(method, url, {
+      data: obj
     });
 
-    it('Leaves request body unchanged if request header Content-Type is NOT application/json', function() {
-      requestHeaders = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-      };
-      const requestText = 'string=1&fake=2';
-      return fetchRequest(requestMethod, requestUrl, {
-        headers: requestHeaders,
-        data: requestText
-      })
-      .then(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(requestUrl, {
-          method: requestMethod,
-          headers: requestHeaders,
-          body: requestText,
-          credentials: 'include'
-        });
-      });
-    });
-
-
-    it('Can omit credentials', function() {
-      return fetchRequest(requestMethod, requestUrl, {
-        withCredentials: false
-      })
-      .then(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(requestUrl, {
-          method: requestMethod,
-          credentials: 'omit'
-        });
-      });
+    expect(spy).toHaveBeenCalledWith(url, {
+      method: method,
+      body: obj,
+      credentials: 'include'
     });
   });
 
-  describe('response', () => {
+  it('Can omit credentials', function() {
+    var spy = jest.spyOn(mockFetchObj, 'fetch');
+    var method = 'GET';
+    var url = 'http://fakey.local';
 
-    it('Returns JSON if response header Content-Type is application/json', function() {
-      return fetchRequest(requestMethod, requestUrl, {})
-      .then(res => {
-        expect(res).toEqual({
-          status: response.status,
-          responseJSON,
-          responseText,
-          responseType: 'json'
-        });
-      });
+    fetchRequest(method, url, {
+      withCredentials: false
     });
 
-    it('Returns text if response header Content-Type is NOT application/json', function() {
-      responseHeaders.set('Content-Type', 'application/x-www-form-urlencoded');
-      return fetchRequest(requestMethod, requestUrl, {})
-      .then(res => {
-        expect(res).toEqual({
-          status: response.status,
-          responseText
-        });
-      });
-    });
-
-    it('Throws the response if response.ok is false (JSON)', () => {
-      response.status = 401;
-      response.ok = false;
-      return fetchRequest(requestMethod, requestUrl, {})
-      .catch(err => {
-        expect(err).toEqual({
-          status: response.status,
-          responseText,
-          responseType: 'json',
-          responseJSON
-        });
-      });
-    });
-
-    it('Throws the response if response.ok is false (text)', () => {
-      response.status = 401;
-      response.ok = false;
-      responseHeaders.set('Content-Type', 'application/x-www-form-urlencoded');
-      return fetchRequest(requestMethod, requestUrl, {})
-      .catch(err => {
-        expect(err).toEqual({
-          status: response.status,
-          responseText
-        });
-      });
-    });
-
-    it('Throws the response if response.ok is false (invalid JSON)', () => {
-      var error = new Error('A fake error, ignore me');
-      response.status = 401;
-      response.ok = false;
-      response.json = function() {
-        return Promise.reject(error);
-      };
-
-      var errorJSON = {
-        error: error,
-        errorSummary: 'Could not parse server response'
-      };
-
-      return fetchRequest(requestMethod, requestUrl, {})
-      .catch(err => {
-        expect(err).toEqual({
-          status: response.status,
-          responseText: JSON.stringify(errorJSON),
-          responseJSON: errorJSON,
-          responseType: 'json'
-        });
-      });
+    expect(spy).toHaveBeenCalledWith(url, {
+      method: method,
+      credentials: 'omit'
     });
   });
+
 });

@@ -1,24 +1,19 @@
-/* global window */
 var session = require('../../lib/session');
 var http = require('../../lib/http');
+var Q = require('q');
 
 describe('session', function() {
   var sdk;
   var sessionObj;
-  var baseUrl;
 
   beforeEach(function() {
     sessionObj = {};
-    baseUrl = 'http://fakey';
-    
     sdk = {
-      getIssuerOrigin: jest.fn().mockReturnValue(baseUrl),
-      options: {
-        issuer: baseUrl
-      },
       session: {
         get: jest.fn().mockImplementation(function() {
-          return Promise.resolve(sessionObj);
+          var deferred = Q.defer();
+          deferred.resolve(sessionObj);
+          return deferred.promise;
         })
       }
     };
@@ -40,7 +35,9 @@ describe('session', function() {
 
     it('resolves to false if session.get throws', function() {
       sdk.session.get.mockImplementation(function() {
-        return Promise.reject(new Error('test error'));
+        var deferred = Q.defer();
+        deferred.reject(new Error('test error'));
+        return deferred.promise;
       });
       return session.sessionExists(sdk)
         .then(function(res) {
@@ -61,7 +58,7 @@ describe('session', function() {
 
   describe('getSession', function() {
     it('Hits endpoint: /api/v1/sessions/me', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
+      jest.spyOn(http, 'get').mockReturnValue(Q());
       return session.getSession(sdk)
         .then(function() {
           expect(http.get).toHaveBeenCalledWith(sdk, '/api/v1/sessions/me');
@@ -70,7 +67,9 @@ describe('session', function() {
 
     it('XHR error: returns an INACTIVE session object', function() {
       jest.spyOn(http, 'get').mockImplementation(function() {
-        return Promise.reject(new Error('test error'));
+        var deferred = Q.defer();
+        deferred.reject(new Error('test error'));
+        return deferred.promise;
       });
       return session.getSession(sdk)
         .then(function(res) {
@@ -81,7 +80,7 @@ describe('session', function() {
     });
 
     it('Adds a "refresh" method on the session object', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
+      jest.spyOn(http, 'get').mockReturnValue(Q());
       return session.getSession(sdk)
         .then(function(res) {
           expect(typeof res.refresh).toBe('function');
@@ -89,7 +88,7 @@ describe('session', function() {
     });
 
     it('Adds a "user" method on the session object', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
+      jest.spyOn(http, 'get').mockReturnValue(Q());
       return session.getSession(sdk)
         .then(function(res) {
           expect(typeof res.user).toBe('function');
@@ -104,7 +103,9 @@ describe('session', function() {
         }
       };
       jest.spyOn(http, 'get').mockImplementation(function() {
-        return Promise.resolve(sessionObj);
+        var deferred = Q.defer();
+        deferred.resolve(sessionObj);
+        return deferred.promise;
       });
       return session.getSession(sdk)
         .then(function(res) {
@@ -127,7 +128,9 @@ describe('session', function() {
       };
       jest.spyOn(http, 'post').mockReturnValue(null);
       jest.spyOn(http, 'get').mockImplementation(function() {
-        return Promise.resolve(sessionObj);
+        var deferred = Q.defer();
+        deferred.resolve(sessionObj);
+        return deferred.promise;
       });
       return session.getSession(sdk)
         .then(function(res) {
@@ -146,7 +149,9 @@ describe('session', function() {
         }
       };
       jest.spyOn(http, 'get').mockImplementation(function() {
-        return Promise.resolve(sessionObj);
+        var deferred = Q.defer();
+        deferred.resolve(sessionObj);
+        return deferred.promise;
       });
       return session.getSession(sdk)
         .then(function(res) {
@@ -161,6 +166,10 @@ describe('session', function() {
   describe('closeSession', function() {
     it('makes a DELETE request to /api/v1/sessions/me', function() {
       jest.spyOn(http, 'httpRequest').mockReturnValue(Promise.resolve());
+      var baseUrl = 'http://fakey';
+      sdk.options = {
+        url: baseUrl
+      };
       return session.closeSession(sdk)
         .then(function() {
           expect(http.httpRequest).toHaveBeenCalledWith(sdk, {
@@ -173,6 +182,9 @@ describe('session', function() {
     it('will throw if http request rejects', function() {
       var testError = new Error('test error');
       jest.spyOn(http, 'httpRequest').mockReturnValue(Promise.reject(testError));
+      sdk.options = {
+        url: 'http://fakey'
+      };
       return session.closeSession(sdk) // should throw
         .catch(function(e) {
           expect(e).toBe(testError);
@@ -199,6 +211,7 @@ describe('session', function() {
   });
 
   describe('setCookieAndRedirect', function() {
+    var baseUrl;
     var currentUrl;
     beforeEach(function() {
       currentUrl = 'http://i-am-here';
@@ -206,6 +219,10 @@ describe('session', function() {
       window.location = {
         href: currentUrl
       };
+      baseUrl = 'http://fakey';
+      sdk.options = {
+        url: baseUrl
+      }
     });
     it('redirects to /login/sessionCookieRedirect', function() {
       session.setCookieAndRedirect(sdk);

@@ -1,18 +1,16 @@
 jest.mock('cross-fetch');
 
 var util = require('@okta/test.support/util');
-var sdkUtil = require('../../lib/util');
+var Q = require('q');
 
-function mockDelay() {
-  jest.spyOn(sdkUtil, 'delay').mockImplementation(function() {
-    return Promise.resolve();
+function mockQDelay() {
+  var original = Q.delay;
+  jest.spyOn(Q, 'delay').mockImplementation(function() {
+    return original.call(this, 0);
   });
 }
 
 describe('MFA_ENROLL_ACTIVATE', function () {
-  beforeEach(() => {
-    mockDelay();
-  });
   describe('trans.poll', function () {
     util.itMakesCorrectRequestResponse({
       title: 'allows polling for push',
@@ -106,6 +104,7 @@ describe('MFA_ENROLL_ACTIVATE', function () {
         ]
       },
       execute: function (test) {
+        mockQDelay();
         return test.trans.poll(0);
       }
     });
@@ -145,6 +144,7 @@ describe('MFA_ENROLL_ACTIVATE', function () {
         ]
       },
       execute: function (test) {
+        mockQDelay();
         return test.trans.poll(0);
       }
     });
@@ -211,6 +211,7 @@ describe('MFA_ENROLL_ACTIVATE', function () {
         ]
       },
       execute: function (test) {
+        mockQDelay();
         return test.trans.poll(0);
       },
       expectations: function (test, err) {
@@ -305,6 +306,7 @@ describe('MFA_ENROLL_ACTIVATE', function () {
         ]
       },
       execute: function (test) {
+        mockQDelay();
         return test.trans.poll(0);
       },
       expectations: function (test, err) {

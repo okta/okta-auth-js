@@ -13,7 +13,9 @@
 /* eslint-disable max-statements */
 /* SDK_VERSION is defined in webpack config */ 
 /* global SDK_VERSION */
-/* global window, navigator, document, crypto */
+
+require('../vendor/polyfills');
+
 var Emitter           = require('tiny-emitter');
 var AuthSdkError      = require('../errors/AuthSdkError');
 var builderUtil       = require('../builderUtil');
@@ -21,6 +23,7 @@ var constants         = require('../constants');
 var cookies           = require('./browserStorage').storage;
 var http              = require('../http');
 var oauthUtil         = require('../oauthUtil');
+var Q                 = require('q');
 var session           = require('../session');
 var token             = require('../token');
 var TokenManager      = require('../TokenManager');
@@ -30,21 +33,11 @@ var util              = require('../util');
 function OktaAuthBuilder(args) {
   var sdk = this;
 
-  builderUtil.assertValidConfig(args);
-
-  var secureCookies = true;
-  if (args.secureCookies === false || (sdk.features.isLocalhost() && !sdk.features.isHTTPS())) {
-    secureCookies = false;
-  }
-  if (secureCookies && !sdk.features.isHTTPS()) {
-    throw new AuthSdkError(
-      'The current page is not being served with the HTTPS protocol.\n' +
-      'For security reasons, we strongly recommend using HTTPS.\n' +
-      'If you cannot use HTTPS, set the "secureCookies" option to false.'
-    );
-  }
-
+  var url = builderUtil.getValidUrl(args);
+  // OKTA-242989: support for grantType will be removed in 3.0 
+  var usePKCE = args.pkce || args.grantType === 'authorization_code';
   this.options = {
+    url: util.removeTrailingSlash(url),
     clientId: args.clientId,
     issuer: util.removeTrailingSlash(args.issuer),
     authorizeUrl: util.removeTrailingSlash(args.authorizeUrl),
@@ -52,7 +45,7 @@ function OktaAuthBuilder(args) {
     tokenUrl: util.removeTrailingSlash(args.tokenUrl),
     revokeUrl: util.removeTrailingSlash(args.revokeUrl),
     logoutUrl: util.removeTrailingSlash(args.logoutUrl),
-    pkce: args.pkce === false ? false : true,
+    pkce: usePKCE,
     redirectUri: args.redirectUri,
     postLogoutRedirectUri: args.postLogoutRedirectUri,
     responseMode: args.responseMode,
@@ -61,7 +54,6 @@ function OktaAuthBuilder(args) {
     transformErrorXHR: args.transformErrorXHR,
     headers: args.headers,
     onSessionExpired: args.onSessionExpired,
-    secureCookies
   };
 
   if (this.options.pkce && !sdk.features.isPKCESupported()) {
@@ -209,9 +201,6 @@ proto.features.isHTTPS = function() {
   return window.location.protocol === 'https:';
 };
 
-proto.features.isLocalhost = function() {
-  return window.location.hostname === 'localhost';
-};
 // { username, password, (relayState), (context) }
 proto.signIn = function (opts) {
   var sdk = this;
@@ -233,93 +222,105 @@ proto.signIn = function (opts) {
   });
 };
 
-// Ends the current Okta SSO session without redirecting to Okta.
-proto.closeSession = function closeSession() {
-  var sdk = this;
-  
-  // Clear all local tokens
-  sdk.tokenManager.clear();
-
-  return sdk.session.close() // DELETE /api/v1/sessions/me
-  .catch(function(e) {
-    if (e.name === 'AuthApiError' && e.errorCode === 'E0000007') {
-      // Session does not exist or has already been closed
-      return;
-    }
-    throw e;
-  });
-};
-
-// Revokes the access token for the application session
-proto.revokeAccessToken = async function revokeAccessToken(accessToken) {
-  var sdk = this;
-  if (!accessToken) {
-    accessToken = await sdk.tokenManager.get('accessToken');
-  }
-  // Access token may have been removed. In this case, we will silently succeed.
-  if (!accessToken) {
-    return Promise.resolve();
-  }
-  return sdk.token.revoke(accessToken);
-};
-
-// Revokes accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
-proto.signOut = async function (options) {
+// Ends the current application session, clearing all local tokens
+// Optionally revokes the access token
+// Ends the user's Okta session using the API or redirect method
+proto.signOut = function (options) {
   options = util.extend({}, options);
 
   // postLogoutRedirectUri must be whitelisted in Okta Admin UI
-  var defaultUri = window.location.origin;
-  var postLogoutRedirectUri = options.postLogoutRedirectUri
-    || this.options.postLogoutRedirectUri
-    || defaultUri;
+  var postLogoutRedirectUri = options.postLogoutRedirectUri || this.options.postLogoutRedirectUri;
 
   var accessToken = options.accessToken;
-  var revokeAccessToken = options.revokeAccessToken !== false;
+  var revokeAccessToken = options.revokeAccessToken;
   var idToken = options.idToken;
 
   var sdk = this;
   var logoutUrl = oauthUtil.getOAuthUrls(sdk).logoutUrl;
 
-  if (typeof idToken === 'undefined') {
-    idToken = await sdk.tokenManager.get('idToken');
-  }
-
-  if (revokeAccessToken && typeof accessToken === 'undefined') {
-    accessToken = await sdk.tokenManager.get('token');
-  }
-
-  // Clear all local tokens
-  sdk.tokenManager.clear();
-
-  if (revokeAccessToken && accessToken) {
-    await sdk.revokeAccessToken(accessToken);
-  }
-
-  // No idToken? This can happen if the storage was cleared.
-  // Fallback to XHR signOut, then redirect to the post logout uri
-  if (!idToken) {
-    return sdk.closeSession() // can throw if the user cannot be signed out
+  function getAccessToken() {
+    return new Q()
     .then(function() {
-      if (postLogoutRedirectUri === defaultUri) {
-        window.location.reload();
-      } else {
-        window.location.assign(postLogoutRedirectUri);
+      if (revokeAccessToken && typeof accessToken === 'undefined') {
+        return sdk.tokenManager.get('token');
       }
+      return accessToken;
     });
   }
 
-  // logout redirect using the idToken.
-  var state = options.state;
-  var idTokenHint = idToken.idToken; // a string
-  var logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint) +
-    '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
-
-  // State allows option parameters to be passed to logout redirect uri
-  if (state) {
-    logoutUri += '&state=' + encodeURIComponent(state);
+  function getIdToken() {
+    return new Q()
+    .then(function() {
+      if (postLogoutRedirectUri && typeof idToken === 'undefined') {
+        return sdk.tokenManager.get('idToken');
+      }
+      return idToken;
+    });
   }
-  
-  window.location.assign(logoutUri);
+
+  function closeSession() {
+    return sdk.session.close() // DELETE /api/v1/sessions/me
+    .catch(function(e) {
+      if (e.name === 'AuthApiError') {
+        // Most likely cause is session does not exist or has already been closed
+        // Could also be a network error. Nothing we can do here.
+        return;
+      }
+      throw e;
+    });
+  }
+
+  return Q.allSettled([getAccessToken(), getIdToken()])
+    .then(function(tokens) {
+      accessToken = tokens[0].value;
+      idToken = tokens[1].value;
+
+      // Clear all local tokens
+      sdk.tokenManager.clear();
+
+      if (revokeAccessToken && accessToken) {
+        return sdk.token.revoke(accessToken)
+        .catch(function(e) {
+          if (e.name === 'AuthApiError') {
+            // Capture and ignore network errors
+            return;
+          }
+          throw e;
+        });
+      }
+    })
+    .then(function() {
+      // XHR signOut method
+      if (!postLogoutRedirectUri) {
+        return closeSession();
+      }
+
+      // No idToken? This can happen if the storage was cleared.
+      // Fallback to XHR signOut, then redirect to the post logout uri
+      if (!idToken) {
+        return closeSession()
+        .catch(function(err) {
+          // eslint-disable-next-line no-console
+          console.log('Unhandled exception while closing session', err);
+        })
+        .then(function() {
+          window.location.assign(postLogoutRedirectUri);
+        });
+      }
+
+      // logout redirect using the idToken.
+      var state = options.state;
+      var idTokenHint = idToken.idToken; // a string
+      var logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint) +
+        '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
+    
+      // State allows option parameters to be passed to logout redirect uri
+      if (state) {
+        logoutUri += '&state=' + encodeURIComponent(state);
+      }
+      
+      window.location.assign(logoutUri);
+    });
 };
 
 builderUtil.addSharedPrototypes(proto);
@@ -339,48 +340,45 @@ proto.fingerprint = function(options) {
   options = options || {};
   var sdk = this;
   if (!sdk.features.isFingerprintSupported()) {
-    return Promise.reject(new AuthSdkError('Fingerprinting is not supported on this device'));
+    return Q.reject(new AuthSdkError('Fingerprinting is not supported on this device'));
   }
 
-  var timeout;
-  var iframe;
-  var listener;
-  var promise = new Promise(function (resolve, reject) {
-    iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
+  var deferred = Q.defer();
 
-    listener = function listener(e) {
-      if (!e || !e.data || e.origin !== sdk.getIssuerOrigin()) {
-        return;
-      }
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
 
-      try {
-        var msg = JSON.parse(e.data);
-      } catch (err) {
-        return reject(new AuthSdkError('Unable to parse iframe response'));
-      }
+  function listener(e) {
+    if (!e || !e.data || e.origin !== sdk.options.url) {
+      return;
+    }
 
-      if (!msg) { return; }
-      if (msg.type === 'FingerprintAvailable') {
-        return resolve(msg.fingerprint);
-      }
-      if (msg.type === 'FingerprintServiceReady') {
-        e.source.postMessage(JSON.stringify({
-          type: 'GetFingerprint'
-        }), e.origin);
-      }
-    };
-    oauthUtil.addListener(window, 'message', listener);
+    try {
+      var msg = JSON.parse(e.data);
+    } catch (err) {
+      return deferred.reject(new AuthSdkError('Unable to parse iframe response'));
+    }
 
-    iframe.src = sdk.getIssuerOrigin() + '/auth/services/devicefingerprint';
-    document.body.appendChild(iframe);
+    if (!msg) { return; }
+    if (msg.type === 'FingerprintAvailable') {
+      return deferred.resolve(msg.fingerprint);
+    }
+    if (msg.type === 'FingerprintServiceReady') {
+      e.source.postMessage(JSON.stringify({
+        type: 'GetFingerprint'
+      }), e.origin);
+    }
+  }
+  oauthUtil.addListener(window, 'message', listener);
 
-    timeout = setTimeout(function() {
-      reject(new AuthSdkError('Fingerprinting timed out'));
-    }, options.timeout || 15000);
-  });
+  iframe.src = sdk.options.url + '/auth/services/devicefingerprint';
+  document.body.appendChild(iframe);
 
-  return promise.finally(function() {
+  var timeout = setTimeout(function() {
+    deferred.reject(new AuthSdkError('Fingerprinting timed out'));
+  }, options.timeout || 15000);
+
+  return deferred.promise.fin(function() {
     clearTimeout(timeout);
     oauthUtil.removeListener(window, 'message', listener);
     if (document.body.contains(iframe)) {

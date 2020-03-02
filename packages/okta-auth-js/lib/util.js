@@ -9,8 +9,7 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
-/* global window, document, btoa, atob, Uint8Array */
-
+/* eslint-env es6 */
 var util = module.exports;
 
 // converts a string to base64 (url/filename safe variant)
@@ -86,6 +85,10 @@ util.isObject = function(obj) {
 
 util.isNumber = function(obj) {
   return Object.prototype.toString.call(obj) === '[object Number]';
+};
+
+util.isArray = function(obj) {
+  return Object.prototype.toString.call(obj) === '[object Array]';
 };
 
 util.isoToUTCString = function(str) {
@@ -268,10 +271,4 @@ util.isIE11OrLess = function() {
 
 util.isFunction = function(fn) {
   return !!fn && {}.toString.call(fn) === '[object Function]';
-};
-
-util.delay = function(ms) {
-  return new Promise(function(resolve) {
-    setTimeout(resolve, ms);
-  });
 };

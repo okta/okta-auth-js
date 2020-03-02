@@ -219,6 +219,46 @@ DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
 
 0. You just DO WHAT THE FUCK YOU WANT TO.
 
+q.js
+Version (if any):		
+Brief Description:	If a function cannot return a value or throw an 
+exception without blocking, it can return a promise instead. A promise is an 
+object that represents the return value or the thrown exception that the 
+function may eventually provide. A promise can also be used as a proxy for a 
+remote object to overcome latency. On the first pass, promises can mitigate the 
+“Pyramid of Doom”: the situation where code marches to the right faster than it 
+marches forward.	
+License	MIT	
+ 
+Copyright 2009–2014 Kristopher Michael Kowal. All rights reserved. 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do 
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+SOFTWARE.
+
+
+reqwest
+Version (if any):	2.0.5	
+Brief Description:	It's AJAX All over again. Includes support for 
+xmlHttpRequest, JSONP, CORS, and CommonJS Promises A.	
+License	MIT	
+
+Copyright 2015 Dustin Diaz. All rights reserved. 
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
 the Software without restriction, including without limitation the rights to 

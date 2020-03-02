@@ -8,10 +8,30 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- *
  */
 
-var fetchRequest = require('../../fetch/fetchRequest');
-var storageUtil = require('./browserStorage');
+var $ = require('jquery');
 
-module.exports = require('./browser')(storageUtil, fetchRequest);
+function jqueryRequest(method, url, args) {
+  // TODO: support content-type
+  var deferred = $.Deferred();
+  $.ajax({
+    type: method,
+    url: url,
+    headers: args.headers,
+    data: JSON.stringify(args.data),
+    xhrFields: {
+      withCredentials: args.withCredentials
+    }
+  })
+  .then(function(data, textStatus, jqXHR) {
+    delete jqXHR.then;
+    deferred.resolve(jqXHR);
+  }, function(jqXHR) {
+    delete jqXHR.then;
+    deferred.reject(jqXHR);
+  });
+  return deferred;
+}
+
+module.exports = jqueryRequest;

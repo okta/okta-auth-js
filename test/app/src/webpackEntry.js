@@ -37,7 +37,7 @@ window.bootstrapLanding = function() {
 
 // Callback, read config from storage
 window.bootstrapCallback = function() {
-  config = getConfigFromStorage() || getDefaultConfig();
+  config = getConfigFromStorage();
   clearStorage();
   mount();
   app.bootstrapCallback();

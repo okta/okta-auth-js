@@ -509,7 +509,7 @@ describe('MFA_REQUIRED', function () {
           passCode: 'invalidanswer',
           rememberDevice: true
         })
-        .catch(function(err) {
+        .fail(function(err) {
           invalidError = err;
         })
         .then(function() {
@@ -518,7 +518,7 @@ describe('MFA_REQUIRED', function () {
             rememberDevice: true
           });
         })
-        .finally(function() {
+        .fin(function() {
           expect(invalidError).not.toBeUndefined();
         });
       }
@@ -557,7 +557,7 @@ describe('MFA_REQUIRED', function () {
           passCode: 'invalidanswer',
           autoPush: true
         })
-        .catch(function(err) {
+        .fail(function(err) {
           invalidError = err;
         })
         .then(function() {
@@ -566,7 +566,7 @@ describe('MFA_REQUIRED', function () {
             autoPush: true
           });
         })
-        .finally(function() {
+        .fin(function() {
           expect(invalidError).not.toBeUndefined();
         });
       }

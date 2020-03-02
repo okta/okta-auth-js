@@ -12,36 +12,6 @@
 
 var fetch = require('cross-fetch');
 
-
-function readData(response) {
-  if (response.headers.get('Content-Type') &&
-    response.headers.get('Content-Type').toLowerCase().indexOf('application/json') >= 0) {
-  return response.json()
-    // JSON parse can fail if response is not a valid object
-    .catch(e => {
-      return {
-        error: e,
-        errorSummary: 'Could not parse server response'
-      };
-    });
-  } else {
-    return response.text();
-  }
-}
-
-function formatResult(status, data) {
-  const isObject = typeof data === 'object'; 
-  const result = {
-    responseText: isObject ? JSON.stringify(data) : data,
-    status: status
-  };
-  if (isObject) {
-    result.responseType = 'json';
-    result.responseJSON = data;
-  }
-  return result;
-}
-
 /* eslint-disable complexity */
 function fetchRequest(method, url, args) {
   var body = args.data;
@@ -62,17 +32,23 @@ function fetchRequest(method, url, args) {
   .then(function(response) {
     var error = !response.ok;
     var status = response.status;
-    return readData(response)
-      .then(data => {
-        return formatResult(status, data);
-      })
-      .then(result => {
-        if (error) {
-          // Throwing result object since error handling is done in http.js
-          throw result;
-        }
-        return result;
-      });
+    var respHandler = function(resp) {
+      var result = {
+        responseText: resp,
+        status: status
+      };
+      if (error) {
+        // Throwing response object since error handling is done in http.js
+        throw result;
+      }
+      return result;
+    };
+    if (response.headers.get('Content-Type') &&
+        response.headers.get('Content-Type').toLowerCase().indexOf('application/json') >= 0) {
+      return response.json().then(respHandler);
+    } else {
+      return response.text().then(respHandler);
+    }
   });
   return fetchPromise;
 }
