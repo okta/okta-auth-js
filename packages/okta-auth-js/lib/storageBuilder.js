@@ -40,7 +40,7 @@ function storageBuilder(webstorage, storageName) {
 
   function clearStorage(key) {
     if (!key) {
-      setStorage({});
+      return setStorage({});
     }
     var storage = getStorage();
     delete storage[key];

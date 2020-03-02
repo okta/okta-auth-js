@@ -9,8 +9,19 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
-
+/* global crypto, Uint8Array, TextEncoder */
 var util = require('./util');
+
+function getOidcHash(str) {  
+  var buffer = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
+    var intBuffer = new Uint8Array(arrayBuffer);
+    var firstHalf = intBuffer.slice(0, 16);
+    var hash = String.fromCharCode.apply(null, firstHalf);
+    var b64u = util.stringToBase64Url(hash); // url-safe base64 variant
+    return b64u;
+  });
+}
 
 function verifyToken(idToken, key) {
   key = util.clone(key);
@@ -51,5 +62,6 @@ function verifyToken(idToken, key) {
 }
 
 module.exports = {
+  getOidcHash: getOidcHash,
   verifyToken: verifyToken
 };

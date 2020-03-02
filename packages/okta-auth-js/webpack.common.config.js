@@ -6,6 +6,18 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.json$/, loader: 'json' }
+    ],
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['@babel/env'],
+          plugins: ['@babel/plugin-transform-runtime'],
+          sourceType: 'unambiguous'
+        }
+      }
     ]
   },
   plugins: [

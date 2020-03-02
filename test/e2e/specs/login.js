@@ -6,15 +6,15 @@ import { loginRedirect, loginPopup, loginDirect } from '../util/loginUtils';
 describe('E2E login', () => {
 
   // responseMode=query is not supported for implicit flow
-  it('can login using redirect (responseMode=query)', async () => {
-    await openPKCE({ responseMode: 'query' });
-    await TestApp.responseModeQuery.then(el => el.isSelected()).then(isSelected => {
+  it('PKCE: can login using redirect with responseMode=fragment', async () => {
+    await openPKCE({ responseMode: 'fragment' });
+    await TestApp.responseModeFragment.then(el => el.isSelected()).then(isSelected => {
       assert(isSelected === true);
     });
-    await loginRedirect('pkce', 'query');
+    await loginRedirect('pkce', 'fragment');
     await TestApp.getUserInfo();
     await TestApp.assertUserInfo();
-    await TestApp.logout();
+    await TestApp.logoutRedirect();
   });
 
   flows.forEach(flow => {
@@ -27,21 +27,21 @@ describe('E2E login', () => {
         await loginRedirect(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
-        await TestApp.logout();
+        await TestApp.logoutRedirect();
       });
 
       it('can login using a popup window', async() => {
         await loginPopup(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
-        await TestApp.logout();
+        await TestApp.logoutRedirect();
       });
 
       it('can login directly, calling signin() with username and password', async () => {
         await loginDirect(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
-        await TestApp.logout();
+        await TestApp.logoutRedirect();
       });
     });
   });

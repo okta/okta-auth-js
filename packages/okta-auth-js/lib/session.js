@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global window */
 var util = require('./util');
 var http = require('./http');
 
@@ -22,7 +22,7 @@ function sessionExists(sdk) {
       }
       return false;
     })
-    .fail(function() {
+    .catch(function() {
       return false;
     });
 }
@@ -42,7 +42,7 @@ function getSession(sdk) {
 
     return res;
   })
-  .fail(function() {
+  .catch(function() {
     // Return INACTIVE status on failure
     return {status: 'INACTIVE'};
   });
@@ -50,7 +50,7 @@ function getSession(sdk) {
 
 function closeSession(sdk) {
   return http.httpRequest(sdk, {
-    url: sdk.options.url + '/api/v1/sessions/me',
+    url: sdk.getIssuerOrigin() + '/api/v1/sessions/me',
     method: 'DELETE'
   });
 }
@@ -61,7 +61,7 @@ function refreshSession(sdk) {
 
 function setCookieAndRedirect(sdk, sessionToken, redirectUrl) {
   redirectUrl = redirectUrl || window.location.href;
-  window.location = sdk.options.url + '/login/sessionCookieRedirect' +
+  window.location = sdk.getIssuerOrigin() + '/login/sessionCookieRedirect' +
     util.toQueryParams({
       checkAccountSetupComplete: true,
       token: sessionToken,
