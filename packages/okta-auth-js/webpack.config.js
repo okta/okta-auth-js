@@ -1,6 +1,7 @@
 /*
  * This config builds a minified version that can be imported
- * anywhere without any dependencies. It also preserves license comments.
+ * anywhere without any dependencies. It packages the SDK
+ * with reqwest and Q. It also preserves license comments.
  */
 /* global __dirname */
 var path    = require('path');

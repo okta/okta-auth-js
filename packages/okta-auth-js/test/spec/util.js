@@ -1,4 +1,3 @@
-/* global window, document */
 var util = require('../../lib/util');
 
 describe('util', function() {

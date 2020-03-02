@@ -8,10 +8,23 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- *
  */
 
-var fetchRequest = require('../../fetch/fetchRequest');
-var storageUtil = require('./browserStorage');
+var reqwest = require('reqwest');
 
-module.exports = require('./browser')(storageUtil, fetchRequest);
+function reqwestRequest(method, url, args) {
+  // TODO: support content-type and withCredentials
+  var r = reqwest({
+    url: url,
+    method: method,
+    headers: args.headers,
+    data: JSON.stringify(args.data),
+    withCredentials: args.withCredentials
+  })
+  .then(function() {
+    return r.request;
+  });
+  return r;
+}
+
+module.exports = reqwestRequest;

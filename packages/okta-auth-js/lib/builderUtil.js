@@ -14,37 +14,33 @@ var AuthSdkError = require('./errors/AuthSdkError');
 var tx = require('./tx');
 var util = require('./util');
 
-// TODO: use @okta/configuration-validation (move module to this monorepo?)
-function assertValidConfig(args) {
+function getValidUrl(args) {
   if (!args) {
     throw new AuthSdkError('No arguments passed to constructor. ' +
       'Required usage: new OktaAuth(args)');
   }
 
-  var issuer = args.issuer;
-  if (!issuer) {
-    throw new AuthSdkError('No issuer passed to constructor. ' + 
-      'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com/oauth2/{authServerId}"})');
+  var url = args.url;
+  if (!url) {
+    var isUrlRegex = new RegExp('^http?s?://.+');
+    if (args.issuer && isUrlRegex.test(args.issuer)) {
+      // Infer the URL from the issuer URL, omitting the /oauth2/{authServerId}
+      url = args.issuer.split('/oauth2/')[0];
+    } else {
+      throw new AuthSdkError('No url passed to constructor. ' +
+      'Required usage: new OktaAuth({url: "https://{yourOktaDomain}.com"})');
+    }
   }
 
-  var isUrlRegex = new RegExp('^http?s?://.+');
-  if (!isUrlRegex.test(args.issuer)) {
-    throw new AuthSdkError('Issuer must be a valid URL. ' + 
-      'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com/oauth2/{authServerId}"})');
+  if (url.indexOf('-admin.') !== -1) {
+    throw new AuthSdkError('URL passed to constructor contains "-admin" in subdomain. ' +
+      'Required usage: new OktaAuth({url: "https://{yourOktaDomain}.com})');
   }
 
-  if (issuer.indexOf('-admin.') !== -1) {
-    throw new AuthSdkError('Issuer URL passed to constructor contains "-admin" in subdomain. ' +
-      'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com})');
-  }
+  return url;
 }
 
 function addSharedPrototypes(proto) {
-  proto.getIssuerOrigin = function() {
-    // Infer the URL from the issuer URL, omitting the /oauth2/{authServerId}
-    return this.options.issuer.split('/oauth2/')[0];
-  };
-
   // { username, (relayState) }
   proto.forgotPassword = function (opts) {
     return tx.postToTransaction(this, '/api/v1/authn/recovery/password', opts);
@@ -94,5 +90,5 @@ function buildOktaAuth(OktaAuthBuilder) {
 module.exports = {
   addSharedPrototypes: addSharedPrototypes,
   buildOktaAuth: buildOktaAuth,
-  assertValidConfig: assertValidConfig
+  getValidUrl: getValidUrl
 };

@@ -1,4 +1,3 @@
-/* global window */
 jest.mock('cross-fetch');
 
 var Emitter = require('tiny-emitter');
@@ -6,24 +5,9 @@ var OktaAuth = require('../../lib/browser/browserIndex');
 var AuthApiError = require('../../lib/errors/AuthApiError');
 
 describe('Browser', function() {
-  let auth;
-  let issuer;
-  let originalLocation;
-
-  afterEach(() => {
-    global.window.location = originalLocation;
-  });
-
+  var auth;
   beforeEach(function() {
-    originalLocation = global.window.location;
-    delete global.window.location;
-    global.window.location = {
-      protocol: 'https:',
-      hostname: 'somesite.local'
-    };
-
-    issuer =  'http://my-okta-domain';
-    auth = new OktaAuth({ issuer, pkce: false });
+    auth = new OktaAuth({ url: 'http://my-okta-domain' });
   });
 
   it('is a valid constructor', function() {
@@ -34,7 +18,7 @@ describe('Browser', function() {
     it('Listens to error events from TokenManager', function() {
       jest.spyOn(Emitter.prototype, 'on');
       jest.spyOn(OktaAuth.prototype, '_onTokenManagerError');
-      var auth = new OktaAuth({ issuer: 'http://localhost/fake', pkce: false });
+      var auth = new OktaAuth({ url: 'http://localhost/fake' });
       expect(Emitter.prototype.on).toHaveBeenCalledWith('error', auth._onTokenManagerError, auth);
       var emitter = Emitter.prototype.on.mock.instances[0];
       var error = { errorCode: 'anything'};
@@ -45,7 +29,7 @@ describe('Browser', function() {
     it('error with errorCode "login_required" and accessToken: true will call option "onSessionExpired" function', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
-      new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
+      new OktaAuth({ url: 'http://localhost/fake', onSessionExpired: onSessionExpired });
       var emitter = Emitter.prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'login_required', accessToken: true };
@@ -56,7 +40,7 @@ describe('Browser', function() {
     it('error with errorCode "login_required" (not accessToken) does not call option "onSessionExpired" function', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
-      new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
+      new OktaAuth({ url: 'http://localhost/fake', onSessionExpired: onSessionExpired });
       var emitter = Emitter.prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'login_required' };
@@ -67,7 +51,7 @@ describe('Browser', function() {
     it('error with unknown errorCode does not call option "onSessionExpired" function', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
-      new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
+      new OktaAuth({ url: 'http://localhost/fake', onSessionExpired: onSessionExpired });
       var emitter = Emitter.prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'unknown', accessToken: true };
@@ -77,52 +61,29 @@ describe('Browser', function() {
   });
 
   describe('options', function() {
-    describe('secureCookies', () => {
 
-      it('is true by default', () => {
-        expect(auth.options.secureCookies).toBe(true);
-      });
-
-      it('throws if running on HTTP', () => {
-        global.window.location.protocol = 'http:';
-        function fn() {
-          auth = new OktaAuth({ issuer: 'http://my-okta-domain' });
-        }
-        expect(fn).toThrowError(
-          'The current page is not being served with the HTTPS protocol.\n' +
-          'For security reasons, we strongly recommend using HTTPS.\n' +
-          'If you cannot use HTTPS, set the "secureCookies" option to false.'
-        );
-      });
-
-      it('does not throw if running on HTTP and secureCookies = false', () => {
-        global.window.location.protocol = 'http:';
-        function fn() {
-          auth = new OktaAuth({ secureCookies: false, issuer: 'http://my-okta-domain', pkce: false });
-        }
-        expect(fn).not.toThrow();
-      });
-
-    });
-  
     describe('PKCE', function() {
 
-      it('is true by default', function() {
-        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-        auth = new OktaAuth({ issuer });
-        expect(auth.options.pkce).toBe(true);
-      });
-
-      it('can be set to "false" by arg', function() {
-        auth = new OktaAuth({ pkce: false, issuer: 'http://my-okta-domain' });
+      it('is false by default', function() {
         expect(auth.options.pkce).toBe(false);
       });
 
-      it('throws if PKCE is not supported (HTTP)', function() {
+      it('can be set by arg', function() {
+        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+        auth = new OktaAuth({ pkce: true, url: 'http://my-okta-domain' });
+        expect(auth.options.pkce).toBe(true);
+      });
+
+      it('accepts alias "grantType"', function() {
+        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+        auth = new OktaAuth({ grantType: "authorization_code", url: 'http://my-okta-domain' });
+        expect(auth.options.pkce).toBe(true);
+      });
+
+      it('throws if PKCE is not supported', function() {
         spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-        global.window.location.protocol = 'http:';
         function fn() {
-          auth = new OktaAuth({ pkce: true, secureCookies: false, issuer: 'http://my-okta-domain' });
+          auth = new OktaAuth({ pkce: true, url: 'http://my-okta-domain' });
         }
         expect(fn).toThrowError(
           'PKCE requires a modern browser with encryption support running in a secure context.\n' +
@@ -130,356 +91,331 @@ describe('Browser', function() {
           '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
         );
       });
-
-      it('throws if PKCE is not supported (HTTPS, no TextEncoder)', function() {
-        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-        expect(global.window.TextEncoder).toBe(undefined);
-        function fn() {
-          auth = new OktaAuth({ pkce: true, issuer: 'http://my-okta-domain' });
-        }
-        expect(fn).toThrowError(
-          'PKCE requires a modern browser with encryption support running in a secure context.\n' +
-          '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
-        );
-      });
-
-      it('throws if PKCE is not supported (HTTPS, with TextEncoder)', function() {
-        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-        global.window.TextEncoder = {};
-        function fn() {
-          auth = new OktaAuth({ pkce: true, issuer: 'http://my-okta-domain' });
-        }
-        expect(fn).toThrowError(
-          'PKCE requires a modern browser with encryption support running in a secure context.'
-        );
-      });
     })
   });
 
-  describe('revokeAccessToken', function() {
-    it('will read from TokenManager and call token.revoke', function() {
-      var accessToken = { accessToken: 'fake' };
-      spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
-      spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
-      return auth.revokeAccessToken()
-        .then(function() {
-          expect(auth.tokenManager.get).toHaveBeenCalledWith('accessToken');
-          expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
-        });
+  describe('signOut', function() {
+    beforeEach(function() {
+      global.window.location.assign = jest.fn();
     });
-    it('will throw if token.revoke rejects with unknown error', function() {
-      var accessToken = { accessToken: 'fake' };
-      spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
-      var testError = new Error('test error');
-      spyOn(auth.token, 'revoke').and.callFake(function() {
-        return Promise.reject(testError);
-      });
-      return auth.revokeAccessToken()
-        .catch(function(e) {
-          expect(e).toBe(testError);
-        });
-    });
-    it('can pass an access token object to bypass TokenManager', function() {
-      var accessToken = { accessToken: 'fake' };
-      spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
-      spyOn(auth.tokenManager, 'get');
-      return auth.revokeAccessToken(accessToken)
-        .then(function() {
-          expect(auth.tokenManager.get).not.toHaveBeenCalled();
-          expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
-        });
-    });
-    it('if accessToken cannot be located, will resolve without error', function() {
-      spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
-      spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve())
-      return auth.revokeAccessToken()
-        .then(() => {
-          expect(auth.tokenManager.get).toHaveBeenCalled();
-          expect(auth.token.revoke).not.toHaveBeenCalled();
-        });
-    });
-  });
-
-  describe('closeSession', function() {
-    it('Default options: clears TokenManager, closes session', function() {
+    it('Default options: clear TokenManager, close session, no redirect', function() {
       spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
       spyOn(auth.tokenManager, 'clear');
-      return auth.closeSession()
+      return auth.signOut()
         .then(function() {
           expect(auth.tokenManager.clear).toHaveBeenCalled();
           expect(auth.session.close).toHaveBeenCalled();
+          expect(window.location.assign).not.toHaveBeenCalled();
         });
     });
-    it('catches and absorbs "AuthApiError" errors with errorCode E0000007 (RESOURCE_NOT_FOUND_EXCEPTION)', function() {
-      var testError = new AuthApiError({ errorCode: 'E0000007' });
-      spyOn(auth.session, 'close').and.callFake(function() {
-        return Promise.reject(testError);
-      });
-      return auth.closeSession()
-      .then(function() {
-        expect(auth.session.close).toHaveBeenCalled();
-      });
-    });
-    it('will throw unknown errors', function() {
-      var testError = new Error('test error');
-      spyOn(auth.session, 'close').and.callFake(function() {
-        return Promise.reject(testError);
-      });
-      return auth.closeSession()
-      .catch(function(e) {
-        expect(e).toBe(testError);
-      });
-    });
-  });
-
-  describe('signOut', function() {
-    let origin;
-    let encodedOrigin;
-  
-    beforeEach(function() {
-      origin = 'https://somesite.local';
-      encodedOrigin = encodeURIComponent(origin);
-      Object.assign(global.window.location, {
-        origin,
-        assign: jest.fn(),
-        reload: jest.fn()
-      });
-    });
-
-    describe('with idToken and accessToken', () => {
-      let idToken;
-      let accessToken;
-
-      function initSpies() {
-        spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === 'idToken') {
-            return idToken;
-          } else if (key === 'token') {
-            return accessToken;
-          } else {
-            throw new Error(`Unknown token key: ${key}`);
-          }
-        });
+    describe('revokeAccessToken', function() {
+      it('will call token.revoke', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
         spyOn(auth.tokenManager, 'clear');
-        spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
-      }
-
-      beforeEach(() => {
-        accessToken = { accessToken: 'fake' };
-        idToken = { idToken: 'fake' };
-        initSpies();
-      });
-
-      it('Default options: will revokeAccessToken and use window.location.href for postLogoutRedirectUri', function() {
-        return auth.signOut()
+        var accessToken = { accessToken: 'fake' };
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
+        spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
+        return auth.signOut({ revokeAccessToken: true })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'idToken');
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, 'token');
-            expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
+            expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
-            expect(auth.closeSession).not.toHaveBeenCalled();
-            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+            expect(auth.session.close).toHaveBeenCalled();
+          });
+      });
+      it('will throw if token.revoke rejects with unknown error', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        var accessToken = { accessToken: 'fake' };
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
+        var testError = new Error('test error');
+        spyOn(auth.token, 'revoke').and.callFake(function() {
+          return Promise.reject(testError);
+        });
+        return auth.signOut({ revokeAccessToken: true })
+          .catch(function(e) {
+            expect(e).toBe(testError);
+          });
+      });
+      it('will not throw if token.revoke rejects with AuthApiError', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        var accessToken = { accessToken: 'fake' };
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
+        var testError = new AuthApiError({});
+        spyOn(auth.token, 'revoke').and.callFake(function() {
+          return Promise.reject(testError);
+        });
+        return auth.signOut({ revokeAccessToken: true })
+        .then(function() {
+          expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
+          expect(auth.tokenManager.clear).toHaveBeenCalled();
+          expect(auth.session.close).toHaveBeenCalled();
+        });
+      });
+      it('by default, will read access token from TokenManager using key "token"', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        var accessToken = { accessToken: 'fake' };
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
+        spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
+        return auth.signOut({ revokeAccessToken: true })
+          .then(function() {
+            expect(auth.tokenManager.get).toHaveBeenCalledWith('token');
+            expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).toHaveBeenCalled();
+          });
+      });
+      it('can pass an access token object', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        var accessToken = { accessToken: 'fake' };
+        spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'get');
+        return auth.signOut({ revokeAccessToken: true, accessToken: accessToken })
+          .then(function() {
+            expect(auth.tokenManager.get).not.toHaveBeenCalled();
+            expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).toHaveBeenCalled();
+          });
+      });
+      it('if accessToken=false, will not revoke or read from TokenManager', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'get');
+        return auth.signOut({ revokeAccessToken: true, accessToken: false })
+          .then(function() {
+            expect(auth.tokenManager.get).not.toHaveBeenCalled();
+            expect(auth.token.revoke).not.toHaveBeenCalled();
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).toHaveBeenCalled();
+          });
+      });
+      it('if accessToken cannot be located, will not attempt revoke', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve())
+        return auth.signOut({ revokeAccessToken: true })
+          .then(function() {
+            expect(auth.tokenManager.get).toHaveBeenCalled();
+            expect(auth.token.revoke).not.toHaveBeenCalled();
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).toHaveBeenCalled();
+          });
+      });
+      it('can be combined with "postLogoutRedirectUri"', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        var accessToken = { accessToken: 'fake' };
+        var idToken = { idToken: 'fake' };
+
+        spyOn(auth.tokenManager, 'get');
+        spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
+        return auth.signOut({ revokeAccessToken: true, accessToken: accessToken, postLogoutRedirectUri: 'http://someother', idToken: idToken })
+          .then(function() {
+            expect(auth.tokenManager.get).not.toHaveBeenCalled();
+            expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).not.toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://my-okta-domain/oauth2/v1/logout?id_token_hint=fake&post_logout_redirect_uri=http%3A%2F%2Fsomeother');
           });
       });
 
-      it('supports custom authorization server', function() {
-        issuer = 'http://my-okta-domain/oauth2/custom-as';
+      it('can be combined with "postLogoutRedirectUri" (no id token)', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        var accessToken = { accessToken: 'fake' };
+        var idToken = false;
+
+        spyOn(auth.tokenManager, 'get');
+        spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
+        return auth.signOut({ revokeAccessToken: true, accessToken: accessToken, postLogoutRedirectUri: 'http://someother', idToken: idToken })
+          .then(function() {
+            expect(auth.tokenManager.get).not.toHaveBeenCalled();
+            expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://someother');
+          });
+      });
+    });
+    describe('closeSession', function() {
+      it('will throw unknown errors', function() {
+        var testError = new Error('test error');
+        spyOn(auth.session, 'close').and.callFake(function() {
+          return Promise.reject(testError);
+        });
+        return auth.signOut()
+        .catch(function(e) {
+          expect(e).toBe(testError);
+        });
+      });
+      it('catches and absorbs "AuthApiError" errors', function() {
+        var testError = new AuthApiError({});
+        spyOn(auth.session, 'close').and.callFake(function() {
+          return Promise.reject(testError);
+        });
+        return auth.signOut()
+        .then(function() {
+          expect(auth.session.close).toHaveBeenCalled();
+        });
+      });
+    })
+    describe('postLogoutRedirectUri', function() {
+      it('can be set by config', function() {
         auth = new OktaAuth({
-          pkce: false,
-          issuer
+          url: 'http://my-okta-domain',
+          postLogoutRedirectUri: 'http://someother' 
         });
-        initSpies();
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
         return auth.signOut()
           .then(function() {
-            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+            expect(window.location.assign).toHaveBeenCalledWith('http://someother');
+          });
+      });
+    
+      it('supports custom authorization server', function() {
+        auth = new OktaAuth({
+          url: 'http://my-okta-domain',
+          issuer: 'http://my-okta-domain/oauth2/custom-as',
+        });
+        var idToken = { idToken: 'fake' };
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(idToken));
+        return auth.signOut({ postLogoutRedirectUri: 'http://someother' })
+          .then(function() {
+            expect(window.location.assign).toHaveBeenCalledWith('http://my-okta-domain/oauth2/custom-as/v1/logout?id_token_hint=fake&post_logout_redirect_uri=http%3A%2F%2Fsomeother');
+          });
+      });
+  
+      it('will catch exceptions from session.close and perform redirect', function() {
+        auth = new OktaAuth({
+          url: 'http://my-okta-domain',
+          postLogoutRedirectUri: 'http://someother' 
+        });
+        var testError = new Error('test error');
+        spyOn(auth.session, 'close').and.callFake(function() {
+          return Promise.reject(testError);
+        });
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(null));
+        return auth.signOut()
+          .then(function() {
+            expect(auth.session.close).toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://someother');
           });
       });
 
-      it('if idToken is passed, will skip token manager read', function() {
+      it('by default, will try to get idToken from TokenManager', function() {
+        var idToken = { idToken: 'fake' };
+  
+        spyOn(auth.tokenManager, 'clear').and.callFake(function() {
+          // Catch condition where clear() is called before the idToken is read
+          idToken = false;
+        });
+  
+        spyOn(auth.tokenManager, 'get').and.callFake(function() {
+          return idToken;
+        })
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        return auth.signOut({ postLogoutRedirectUri: 'http://someother' })
+          .then(function() {
+            expect(auth.tokenManager.get).toHaveBeenCalledWith('idToken');
+            expect(auth.session.close).not.toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://my-okta-domain/oauth2/v1/logout?id_token_hint=fake&post_logout_redirect_uri=http%3A%2F%2Fsomeother');
+          });
+      });
+  
+      it('if idToken is passed, will skip token manager read and do location redirect', function() {
+        var idToken = { idToken: 'fake' };
         var customToken = { idToken: 'fake-custom' };
-        return auth.signOut({ idToken: customToken })
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(idToken));
+        return auth.signOut({ idToken: customToken, postLogoutRedirectUri: 'http://someother' })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'token');
-            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${customToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+            expect(auth.tokenManager.get).not.toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://my-okta-domain/oauth2/v1/logout?id_token_hint=fake-custom&post_logout_redirect_uri=http%3A%2F%2Fsomeother');
           });
       });
   
-      it('if idToken=false will skip token manager read and call closeSession', function() {
-        return auth.signOut({ idToken: false })
+      it('if idToken=false will skip token manager read and use session.close before redirecting', function() {
+        var idToken = { idToken: 'fake' };
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(idToken));
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        return auth.signOut({ idToken: false, postLogoutRedirectUri: 'http://someother' })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'token');
-            expect(auth.closeSession).toHaveBeenCalled();
-            expect(window.location.reload).toHaveBeenCalled();
+            expect(auth.tokenManager.get).not.toHaveBeenCalled();
+            expect(auth.session.close).toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://someother');
           });
       });
   
-      describe('postLogoutRedirectUri', function() {
-        it('can be set by config', function() {
-          const postLogoutRedirectUri = 'http://someother';
-          const encodedUri = encodeURIComponent(postLogoutRedirectUri);
-          auth = new OktaAuth({
-            pkce: false,
-            issuer,
-            postLogoutRedirectUri
-          });
-          initSpies();
-          return auth.signOut()
-            .then(function() {
-              expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedUri}`);
-            });
-        });
-        it('can be passed as an option', function() {
-          const postLogoutRedirectUri = 'http://someother';
-          const encodedUri = encodeURIComponent(postLogoutRedirectUri);
-          return auth.signOut({ postLogoutRedirectUri })
-            .then(function() {
-              expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedUri}`);
-            });
-        });
-      });
-
-      it('Can pass a "state" option', function() {
-        const state = 'foo=bar&yo=me';
-        const encodedState = encodeURIComponent(state);
-        return auth.signOut({ state })
-          .then(function() {
-            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}&state=${encodedState}`);
-          });
-      });
-
-      it('Can pass a "revokeAccessToken=false" to skip accessToken logic', function() {
-        return auth.signOut({ revokeAccessToken: false })
-          .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'idToken');
-            expect(auth.revokeAccessToken).not.toHaveBeenCalled();
-            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
-          });
-      });
-
-      it('Can pass a "accessToken=false" to skip accessToken logic', function() {
-        return auth.signOut({ accessToken: false })
-          .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'idToken');
-            expect(auth.revokeAccessToken).not.toHaveBeenCalled();
-            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
-          });
-      });
-    });
-
-    describe('without idToken', () => {
-      let accessToken;
-
-      beforeEach(() => {
-        accessToken = { accessToken: 'fake' };
-        spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === 'idToken') {
-            return;
-          } else if (key === 'token') {
-            return accessToken;
-          } else {
-            throw new Error(`Unknown token key: ${key}`);
-          }
-        });        
+  
+      it('redirect: (no idToken) - will close session and redirect to uri', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve());
         spyOn(auth.tokenManager, 'clear');
-        spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
-      });
-
-      it('Default options: will revokeAccessToken and fallback to closeSession and window.location.reload()', function() {
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
-        return auth.signOut()
+        return auth.signOut({ postLogoutRedirectUri: 'http://someother' })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'idToken');
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, 'token');
-            expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
-            expect(auth.closeSession).toHaveBeenCalled();
-            expect(window.location.reload).toHaveBeenCalled();
+            expect(auth.session.close).toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://someother');
           });
       });
-
-      it('Default options: will throw exceptions from closeSession and not call window.location.reload', function() {
-        const testError = new Error('test error');
-        spyOn(auth, 'closeSession').and.callFake(function() {
-          return Promise.reject(testError);
-        });
-        return auth.signOut()
+  
+      it('idToken: without a redirect option, it will not use logout redirect', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        return auth.signOut({ idToken: { idToken: 'fake' } })
           .then(function() {
-            expect(false).toBe(true);
-          })
-          .catch(function(e) {
-            expect(e).toBe(testError);
-            expect(auth.closeSession).toHaveBeenCalled();
-            expect(window.location.reload).not.toHaveBeenCalled();
-          });
-      });
-
-      it('with postLogoutRedirectUri: will call window.location.assign', function() {
-        const postLogoutRedirectUri = 'http://someother';
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
-        return auth.signOut({ postLogoutRedirectUri })
-          .then(function() {
-            expect(window.location.assign).toHaveBeenCalledWith(postLogoutRedirectUri);
-          });
-      });
-
-      it('with postLogoutRedirectUri: will throw exceptions from closeSession and not call window.location.assign', function() {
-        const postLogoutRedirectUri = 'http://someother';
-        const testError = new Error('test error');
-        spyOn(auth, 'closeSession').and.callFake(function() {
-          return Promise.reject(testError);
-        });
-        return auth.signOut({ postLogoutRedirectUri })
-          .then(function() {
-            expect(false).toBe(true);
-          })
-          .catch(function(e) {
-            expect(e).toBe(testError);
-            expect(auth.closeSession).toHaveBeenCalled();
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).toHaveBeenCalled();
             expect(window.location.assign).not.toHaveBeenCalled();
           });
       });
-    });
-
-    describe('without accessToken', () => {
-      let idToken;
-      beforeEach(() => {
-        idToken = { idToken: 'fake' };
-        spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === 'idToken') {
-            return idToken;
-          } else if (key === 'token') {
-            return;
-          } else {
-            throw new Error(`Unknown token key: ${key}`);
-          }
-        });
+  
+      it('idToken + postLogoutRedirectUri: will use logout redirect with "post_logout_redirect_uri"', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
         spyOn(auth.tokenManager, 'clear');
-        spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
+        return auth.signOut({ idToken: { idToken: 'fake' }, postLogoutRedirectUri: 'http://someother' })
+          .then(function() {
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).not.toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://my-okta-domain/oauth2/v1/logout?id_token_hint=fake&post_logout_redirect_uri=http%3A%2F%2Fsomeother');
+          });
       });
-
-      it('Default options: will not revoke accessToken', () => {
-        return auth.signOut()
-        .then(function() {
-          expect(auth.revokeAccessToken).not.toHaveBeenCalled();
-          expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
-        });
-      });
-
-      it('Can pass an accessToken', () => {
-        const accessToken = { accessToken: 'custom-fake' };
-        return auth.signOut({ accessToken })
-        .then(function() {
-          expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
-          expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
-        });
+  
+      it('idToken + postLogoutRedirectUri + state: logout redirect url includes "state" and "post_logout_redirect_uri"', function() {
+        spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
+        spyOn(auth.tokenManager, 'clear');
+        return auth.signOut({ idToken: { idToken: 'fake' }, postLogoutRedirectUri: 'http://someother', state: 'foo=bar&yo=me' })
+          .then(function() {
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.session.close).not.toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith('http://my-okta-domain/oauth2/v1/logout?id_token_hint=fake&post_logout_redirect_uri=http%3A%2F%2Fsomeother&state=foo%3Dbar%26yo%3Dme');
+          });
       });
     });
 
+    describe('XHR logout', function() {
+      it('will not catch exceptions from session.close', function() {
+        auth = new OktaAuth({
+          url: 'http://my-okta-domain',
+        });
+        var testError = new Error('test error');
+        spyOn(auth.session, 'close').and.callFake(function() {
+          return Promise.reject(testError);
+        });
+        spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(null));
+        return auth.signOut()
+          .catch(function(e) {
+            expect(e).toBe(testError);
+          })
+          .then(function() {
+            expect(auth.session.close).toHaveBeenCalled();
+          });
+      });
+    });
   });
 
 });

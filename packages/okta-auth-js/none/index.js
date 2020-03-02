@@ -10,8 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+var storageUtil = require('../lib/browser/browserStorage');
 
-var fetchRequest = require('../../fetch/fetchRequest');
-var storageUtil = require('./browserStorage');
-
-module.exports = require('./browser')(storageUtil, fetchRequest);
+module.exports = require('../lib/browser/browser')(storageUtil);

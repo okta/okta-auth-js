@@ -10,11 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-/* global window, document, btoa */
+
 /* eslint-disable complexity, max-statements */
 var http          = require('./http');
 var util          = require('./util');
 var oauthUtil     = require('./oauthUtil');
+var Q             = require('q');
 var sdkCrypto     = require('./crypto');
 var AuthSdkError  = require('./errors/AuthSdkError');
 var OAuthError    = require('./errors/OAuthError');
@@ -24,7 +25,7 @@ var PKCE          = require('./pkce');
 
 // Only the access token can be revoked in SPA applications
 function revokeToken(sdk, token) {
-  return Promise.resolve()
+  return new Q()
   .then(function() {
     if (!token || !token.accessToken) {
       throw new AuthSdkError('A valid access token object is required');
@@ -69,7 +70,7 @@ function decodeToken(token) {
 
 // Verify the id token
 function verifyToken(sdk, token, validationParams) {
-  return Promise.resolve()
+  return new Q()
   .then(function() {
     if (!token || !token.idToken) {
       throw new AuthSdkError('Only idTokens may be verified');
@@ -79,7 +80,7 @@ function verifyToken(sdk, token, validationParams) {
 
     var validationOptions = {
       clientId: sdk.options.clientId,
-      issuer: sdk.options.issuer,
+      issuer: sdk.options.issuer || sdk.options.url,
       ignoreSignature: sdk.options.ignoreSignature
     };
 
@@ -102,91 +103,66 @@ function verifyToken(sdk, token, validationParams) {
       if (!valid) {
         throw new AuthSdkError('The token signature is not valid');
       }
-      if (validationParams.accessToken && token.claims.at_hash) {
-        return sdkCrypto.getOidcHash(validationParams.accessToken)
-          .then(hash => {
-            if (hash !== token.claims.at_hash) {
-              throw new AuthSdkError('Token hash verification failed');
-            }
-          });
-      }
-    })
-    .then(() => {
       return token;
     });
   });
 }
 
 function addPostMessageListener(sdk, timeout, state) {
-  var responseHandler;
-  var timeoutId;
-  var msgReceivedOrTimeout = new Promise(function(resolve, reject) {
+  var deferred = Q.defer();
 
-    responseHandler = function responseHandler(e) {
-      if (!e.data || e.data.state !== state) {
-        // A message not meant for us
-        return;
-      }
+  function responseHandler(e) {
+    if (!e.data || e.data.state !== state) {
+      // A message not meant for us
+      return;
+    }
 
-      // Configuration mismatch between saved token and current app instance
-      // This may happen if apps with different issuers are running on the same host url
-      // If they share the same storage key, they may read and write tokens in the same location.
-      // Common when developing against http://localhost
-      if (e.origin !== sdk.getIssuerOrigin()) {
-        return reject(new AuthSdkError('The request does not match client configuration'));
-      }
+    // Configuration mismatch between saved token and current app instance
+    // This may happen if apps with different issuers are running on the same host url
+    // If they share the same storage key, they may read and write tokens in the same location.
+    // Common when developing against http://localhost
+    if (e.origin !== sdk.options.url) {
+      return deferred.reject(new AuthSdkError('The request does not match client configuration'));
+    }
 
-      resolve(e.data);
-    };
+    deferred.resolve(e.data);
+  }
 
-    oauthUtil.addListener(window, 'message', responseHandler);
+  oauthUtil.addListener(window, 'message', responseHandler);
 
-    timeoutId = setTimeout(function() {
-      reject(new AuthSdkError('OAuth flow timed out'));
-    }, timeout || 120000);
-  });
-
-  return msgReceivedOrTimeout
-    .finally(function() {
-      clearTimeout(timeoutId);
+  return deferred.promise.timeout(timeout || 120000, new AuthSdkError('OAuth flow timed out'))
+    .fin(function() {
       oauthUtil.removeListener(window, 'message', responseHandler);
     });
 }
 
 function addFragmentListener(sdk, windowEl, timeout) {
-  var timeoutId;
-  var promise = new Promise(function(resolve, reject) {
-    function hashChangeHandler() {
-      /*
-        We are only able to access window.location.hash on a window
-        that has the same domain. A try/catch is necessary because
-        there's no other way to determine that the popup is in
-        another domain. When we try to access a window on another
-        domain, an error is thrown.
-      */
-      try {
-        if (windowEl &&
-            windowEl.location &&
-            windowEl.location.hash) {
-          resolve(oauthUtil.hashToObject(windowEl.location.hash));
-        } else if (windowEl && !windowEl.closed) {
-          setTimeout(hashChangeHandler, 500);
-        }
-      } catch (err) {
+  var deferred = Q.defer();
+
+  function hashChangeHandler() {
+    /*
+      We are only able to access window.location.hash on a window
+      that has the same domain. A try/catch is necessary because
+      there's no other way to determine that the popup is in
+      another domain. When we try to access a window on another
+      domain, an error is thrown.
+    */
+    try {
+      if (windowEl &&
+          windowEl.location &&
+          windowEl.location.hash) {
+        deferred.resolve(oauthUtil.hashToObject(windowEl.location.hash));
+      } else if (windowEl && !windowEl.closed) {
         setTimeout(hashChangeHandler, 500);
       }
+    } catch (err) {
+      setTimeout(hashChangeHandler, 500);
     }
-  
-    hashChangeHandler();
+  }
 
-    timeoutId = setTimeout(function() {
-      reject(new AuthSdkError('OAuth flow timed out'));
-    }, timeout || 120000);
-  });
+  hashChangeHandler();
 
-  return promise.finally(function() {
-    clearTimeout(timeoutId);
-  });
+  return deferred.promise.timeout(timeout || 120000, new AuthSdkError('OAuth flow timed out'));
 }
 
 function exchangeCodeForToken(sdk, oauthParams, authorizationCode, urls) {
@@ -204,7 +180,7 @@ function exchangeCodeForToken(sdk, oauthParams, authorizationCode, urls) {
     validateResponse(res, getTokenParams);
     return res;
   })
-  .finally(function() {
+  .fin(function() {
     PKCE.clearMeta(sdk);
   });
 }
@@ -223,14 +199,10 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
   urls = urls || {};
 
   var responseType = oauthParams.responseType;
-  if (!Array.isArray(responseType)) {
-    responseType = [responseType];
-  }
-
   var scopes = util.clone(oauthParams.scopes);
   var clientId = oauthParams.clientId || sdk.options.clientId;
 
-  return Promise.resolve()
+  return new Q()
   .then(function() {
     validateResponse(res, oauthParams);
 
@@ -243,29 +215,23 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
     return res;
   }).then(function(res) {
     var tokenDict = {};
-    var expiresIn = res.expires_in;
-    var tokenType = res.token_type;
-    var accessToken = res.access_token;
-    var idToken = res.id_token;
-    
-    if (accessToken) {
-      tokenDict.accessToken = {
-        value: accessToken,
-        accessToken: accessToken,
-        expiresAt: Number(expiresIn) + Math.floor(Date.now()/1000),
-        tokenType: tokenType,
+
+    if (res['access_token']) {
+      tokenDict['token'] = {
+        accessToken: res['access_token'],
+        expiresAt: Number(res['expires_in']) + Math.floor(Date.now()/1000),
+        tokenType: res['token_type'],
         scopes: scopes,
         authorizeUrl: urls.authorizeUrl,
         userinfoUrl: urls.userinfoUrl
       };
     }
 
-    if (idToken) {
-      var jwt = sdk.token.decode(idToken);
+    if (res['id_token']) {
+      var jwt = sdk.token.decode(res['id_token']);
 
-      var idTokenObj = {
-        value: idToken,
-        idToken: idToken,
+      var idToken = {
+        idToken: res['id_token'],
         claims: jwt.payload,
         expiresAt: jwt.payload.exp,
         scopes: scopes,
@@ -277,17 +243,16 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
       var validationParams = {
         clientId: clientId,
         issuer: urls.issuer,
-        nonce: oauthParams.nonce,
-        accessToken: accessToken
+        nonce: oauthParams.nonce
       };
 
       if (oauthParams.ignoreSignature !== undefined) {
         validationParams.ignoreSignature = oauthParams.ignoreSignature;
       }
 
-      return verifyToken(sdk, idTokenObj, validationParams)
+      return verifyToken(sdk, idToken, validationParams)
       .then(function() {
-        tokenDict.idToken = idTokenObj;
+        tokenDict['id_token'] = idToken;
         return tokenDict;
       });
     }
@@ -295,30 +260,34 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
     return tokenDict;
   })
   .then(function(tokenDict) {
-    // Validate received tokens against requested response types 
-    if (responseType.indexOf('token') !== -1 && !tokenDict.accessToken) {
-      // eslint-disable-next-line max-len
-      throw new AuthSdkError('Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.');
-    }
-    if (responseType.indexOf('id_token') !== -1 && !tokenDict.idToken) {
-      // eslint-disable-next-line max-len
-      throw new AuthSdkError('Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.');
+    if (!Array.isArray(responseType)) {
+      return tokenDict[responseType];
     }
 
-    return {
-      tokens: tokenDict,
-      state: res.state
-    };
+    // Validate response against tokenTypes
+    var validateTokenTypes =  ['token', 'id_token'];
+    validateTokenTypes.filter(function(key) {
+      return (responseType.indexOf(key) !== -1);
+    }).forEach(function(key) {
+      if (!tokenDict[key]) {
+        throw new AuthSdkError('Unable to parse OAuth flow response: ' + key + ' was not returned.');
+      }     
+    });
+
+    // Create token array in the order of the responseType array
+    return responseType.map(function(item) {
+      return tokenDict[item];
+    });
   });
 }
 
 function getDefaultOAuthParams(sdk) {
   return {
-    pkce: sdk.options.pkce,
+    pkce: sdk.options.pkce || false,
     clientId: sdk.options.clientId,
     redirectUri: sdk.options.redirectUri || window.location.href,
-    responseType: ['token', 'id_token'],
-    responseMode: sdk.options.responseMode,
+    responseType: 'id_token',
+    responseMode: 'okta_post_message',
     state: oauthUtil.generateState(),
     nonce: oauthUtil.generateNonce(),
     scopes: ['openid', 'email'],
@@ -426,13 +395,11 @@ function buildAuthorizeParams(oauthParams) {
  * @param {String} [options.popupTitle] Title dispayed in the popup.
  *                                      Defaults to 'External Identity Provider User Authentication'
  */
-function getToken(sdk, options) {
-  if (arguments.length > 2) {
-    return Promise.reject(new AuthSdkError('As of version 3.0, "getToken" takes only a single set of options'));
-  }
+function getToken(sdk, oauthOptions, options) {
+  oauthOptions = oauthOptions || {};
   options = options || {};
 
-  return prepareOauthParams(sdk, options)
+  return prepareOauthParams(sdk, oauthOptions)
   .then(function(oauthParams) {
 
     // Start overriding any options that don't make sense
@@ -446,9 +413,9 @@ function getToken(sdk, options) {
       display: 'popup'
     };
 
-    if (options.sessionToken) {
+    if (oauthOptions.sessionToken) {
       util.extend(oauthParams, sessionTokenOverrides);
-    } else if (options.idp) {
+    } else if (oauthOptions.idp) {
       util.extend(oauthParams, idpOverrides);
     }
 
@@ -456,11 +423,14 @@ function getToken(sdk, options) {
     var requestUrl,
         endpoint,
         urls;
-
-    // Get authorizeUrl and issuer
-    urls = oauthUtil.getOAuthUrls(sdk, oauthParams);
-    endpoint = options.codeVerifier ? urls.tokenUrl : urls.authorizeUrl;
-    requestUrl = endpoint + buildAuthorizeParams(oauthParams);
+    try {
+      // Get authorizeUrl and issuer
+      urls = oauthUtil.getOAuthUrls(sdk, oauthParams, options);
+      endpoint = oauthOptions.codeVerifier ? urls.tokenUrl : urls.authorizeUrl;
+      requestUrl = endpoint + buildAuthorizeParams(oauthParams);
+    } catch (e) {
+      return Q.reject(e);
+    }
 
     // Determine the flow type
     var flowType;
@@ -487,22 +457,22 @@ function getToken(sdk, options) {
           .then(function(res) {
             return handleOAuthResponse(sdk, oauthParams, res, urls);
           })
-          .finally(function() {
+          .fin(function() {
             if (document.body.contains(iframeEl)) {
               iframeEl.parentElement.removeChild(iframeEl);
             }
           });
 
-      case 'POPUP':
-        var oauthPromise; // resolves with OAuth response
+      case 'POPUP': // eslint-disable-line no-case-declarations
+        var popupPromise;
 
         // Add listener on postMessage before window creation, so
         // postMessage isn't triggered before we're listening
         if (oauthParams.responseMode === 'okta_post_message') {
           if (!sdk.features.isPopupPostMessageSupported()) {
-            throw new AuthSdkError('This browser doesn\'t have full postMessage support');
+            return Q.reject(new AuthSdkError('This browser doesn\'t have full postMessage support'));
           }
-          oauthPromise = addPostMessageListener(sdk, options.timeout, oauthParams.state);
+          popupPromise = addPostMessageListener(sdk, options.timeout, oauthParams.state);
         }
 
         // Create the window
@@ -516,89 +486,92 @@ function getToken(sdk, options) {
           var windowOrigin = getOrigin(sdk.idToken.authorize._getLocationHref());
           var redirectUriOrigin = getOrigin(oauthParams.redirectUri);
           if (windowOrigin !== redirectUriOrigin) {
-            throw new AuthSdkError('Using fragment, the redirectUri origin (' + redirectUriOrigin +
-              ') must match the origin of this page (' + windowOrigin + ')');
+            return Q.reject(new AuthSdkError('Using fragment, the redirectUri origin (' + redirectUriOrigin +
+              ') must match the origin of this page (' + windowOrigin + ')'));
           }
-          oauthPromise = addFragmentListener(sdk, windowEl, options.timeout);
+          popupPromise = addFragmentListener(sdk, windowEl, options.timeout);
         }
 
-        // The popup may be closed without receiving an OAuth response. Setup a poller to monitor the window.
-        var popupPromise = new Promise(function(resolve, reject) {
-          var closePoller = setInterval(function() {
-            if (!windowEl || windowEl.closed) {
-              clearInterval(closePoller);
-              reject(new AuthSdkError('Unable to parse OAuth flow response'));
-            }
-          }, 100);
+        // Both postMessage and fragment require a poll to see if the popup closed
+        var popupDeferred = Q.defer();
+        /* eslint-disable-next-line no-case-declarations, no-inner-declarations */
+        function hasClosed(win) {
+          if (!win || win.closed) {
+            popupDeferred.reject(new AuthSdkError('Unable to parse OAuth flow response'));
+            return true;
+          }
+        }
+        var closePoller = setInterval(function() {
+          if (hasClosed(windowEl)) {
+            clearInterval(closePoller);
+          }
+        }, 500);
 
-          // Proxy the OAuth promise results
-          oauthPromise
-          .then(function(res) {
-            clearInterval(closePoller);
-            resolve(res);
-          })
-          .catch(function(err) {
-            clearInterval(closePoller);
-            reject(err);
-          });
+        // Proxy the promise results into the deferred
+        popupPromise
+        .then(function(res) {
+          popupDeferred.resolve(res);
+        })
+        .fail(function(err) {
+          popupDeferred.reject(err);
         });
 
-        return popupPromise
+        return popupDeferred.promise
           .then(function(res) {
             return handleOAuthResponse(sdk, oauthParams, res, urls);
           })
-          .finally(function() {
+          .fin(function() {
+            clearInterval(closePoller);
             if (windowEl && !windowEl.closed) {
               windowEl.close();
             }
           });
 
       default:
-        throw new AuthSdkError('The full page redirect flow is not supported');
+        return Q.reject(new AuthSdkError('The full page redirect flow is not supported'));
     }
   });
 }
 
-function getWithoutPrompt(sdk, options) {
-  if (arguments.length > 2) {
-    return Promise.reject(new AuthSdkError('As of version 3.0, "getWithoutPrompt" takes only a single set of options'));
-  }
-  options = util.clone(options) || {};
-  util.extend(options, {
+function getWithoutPrompt(sdk, oauthOptions, options) {
+  var oauthParams = util.clone(oauthOptions) || {};
+  util.extend(oauthParams, {
     prompt: 'none',
     responseMode: 'okta_post_message',
     display: null
   });
-  return getToken(sdk, options);
+  return getToken(sdk, oauthParams, options);
 }
 
-function getWithPopup(sdk, options) {
-  if (arguments.length > 2) {
-    return Promise.reject(new AuthSdkError('As of version 3.0, "getWithPopup" takes only a single set of options'));
-  }
-  options = util.clone(options) || {};
-  util.extend(options, {
+function getWithPopup(sdk, oauthOptions, options) {
+  var oauthParams = util.clone(oauthOptions) || {};
+  util.extend(oauthParams, {
     display: 'popup',
     responseMode: 'okta_post_message'
   });
-  return getToken(sdk, options);
+  return getToken(sdk, oauthParams, options);
 }
 
-function prepareOauthParams(sdk, options) {
+function prepareOauthParams(sdk, oauthOptions) {
   // clone and prepare options
-  options = util.clone(options) || {};
+  oauthOptions = util.clone(oauthOptions) || {};
+
+  // OKTA-242989: support for grantType will be removed in 3.0 
+  if (oauthOptions.grantType === 'authorization_code') {
+    oauthOptions.pkce = true;
+  }
 
   // build params using defaults + options
   var oauthParams = getDefaultOAuthParams(sdk);
-  util.extend(oauthParams, options);
+  util.extend(oauthParams, oauthOptions);
 
-  if (oauthParams.pkce === false) {
-    return Promise.resolve(oauthParams);
+  if (oauthParams.pkce !== true) {
+    return Q.resolve(oauthParams);
   }
 
   // PKCE flow
   if (!sdk.features.isPKCESupported()) {
-    return Promise.reject(new AuthSdkError('This browser doesn\'t support PKCE'));
+    return Q.reject(new AuthSdkError('This browser doesn\'t support PKCE'));
   }
 
   // set default code challenge method, if none provided
@@ -640,15 +613,25 @@ function prepareOauthParams(sdk, options) {
     });
 }
 
-function getWithRedirect(sdk, options) {
-  if (arguments.length > 2) {
-    return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
-  }
-  options = util.clone(options) || {};
+function getWithRedirect(sdk, oauthOptions, options) {
+  oauthOptions = util.clone(oauthOptions) || {};
 
-  return prepareOauthParams(sdk, options)
+  return prepareOauthParams(sdk, oauthOptions)
     .then(function(oauthParams) {
-      var urls = oauthUtil.getOAuthUrls(sdk, options);
+
+      // Dynamically set the responseMode unless the user has provided one
+      // Server-side flow requires query. Client-side apps usually prefer fragment.
+      if (!oauthOptions.responseMode) {
+        if (oauthParams.responseType.includes('code') && !oauthParams.pkce) {
+          // server-side flows using authorization_code
+          oauthParams.responseMode = 'query';
+        } else {
+          // Client-side flow can use fragment or query. This can be configured on the SDK instance.
+          oauthParams.responseMode = sdk.options.responseMode || 'fragment';
+        }
+      }
+
+      var urls = oauthUtil.getOAuthUrls(sdk, oauthParams, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(oauthParams);
 
       // Set session cookie to store the oauthParams
@@ -661,19 +644,16 @@ function getWithRedirect(sdk, options) {
         urls: urls,
         ignoreSignature: oauthParams.ignoreSignature
       }), null, {
-        secure: sdk.options.secureCookies,
         sameSite: 'none'
       });
 
       // Set nonce cookie for servers to validate nonce in id_token
       cookies.set(constants.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce, null, {
-        secure: sdk.options.secureCookies,
         sameSite: 'none'
       });
 
       // Set state cookie for servers to validate state
       cookies.set(constants.REDIRECT_STATE_COOKIE_NAME, oauthParams.state, null, {
-        secure: sdk.options.secureCookies,
         sameSite: 'none'
       });
 
@@ -683,7 +663,7 @@ function getWithRedirect(sdk, options) {
 
 function renewToken(sdk, token) {
   if (!oauthUtil.isToken(token)) {
-    return Promise.reject(new AuthSdkError('Renew must be passed a token with ' +
+    return Q.reject(new AuthSdkError('Renew must be passed a token with ' +
       'an array of scopes and an accessToken or idToken'));
   }
 
@@ -698,15 +678,11 @@ function renewToken(sdk, token) {
 
   return sdk.token.getWithoutPrompt({
     responseType: responseType,
-    scopes: token.scopes,
+    scopes: token.scopes
+  }, {
     authorizeUrl: token.authorizeUrl,
     userinfoUrl: token.userinfoUrl,
     issuer: token.issuer
-  })
-  .then(function(res) {
-    // Multiple tokens may have come back. Return only the token which was requested.
-    var tokens = res.tokens;
-    return token.idToken ? tokens.idToken : tokens.accessToken;
   });
 }
 
@@ -738,11 +714,8 @@ function parseFromUrl(sdk, options) {
     options = { url: options };
   }
 
-  // https://openid.net/specs/openid-connect-core-1_0.html#Authentication
-  var defaultResponseMode = sdk.options.pkce ? 'query' : 'fragment';
-
   var url = options.url;
-  var responseMode = options.responseMode || sdk.options.responseMode || defaultResponseMode;
+  var responseMode = options.responseMode || sdk.options.responseMode || 'fragment';
   var nativeLoc = sdk.token.parseFromUrl._getLocation();
   var paramStr;
 
@@ -753,12 +726,12 @@ function parseFromUrl(sdk, options) {
   }
 
   if (!paramStr) {
-    return Promise.reject(new AuthSdkError('Unable to parse a token from the url'));
+    return Q.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
   var oauthParamsCookie = cookies.get(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
   if (!oauthParamsCookie) {
-    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params cookie'));
+    return Q.reject(new AuthSdkError('Unable to retrieve OAuth redirect params cookie'));
   }
 
   try {
@@ -767,11 +740,11 @@ function parseFromUrl(sdk, options) {
     delete oauthParams.urls;
     cookies.delete(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
   } catch(e) {
-    return Promise.reject(new AuthSdkError('Unable to parse the ' +
+    return Q.reject(new AuthSdkError('Unable to parse the ' +
     constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME + ' cookie: ' + e.message));
   }
 
-  return Promise.resolve(oauthUtil.urlParamsToObject(paramStr))
+  return Q.resolve(oauthUtil.urlParamsToObject(paramStr))
     .then(function(res) {
       if (!url) {
         // Clean hash or search from the url
@@ -781,38 +754,17 @@ function parseFromUrl(sdk, options) {
     });
 }
 
-async function getUserInfo(sdk, accessTokenObject, idTokenObject) {
-  // If token objects were not passed, attempt to read from the TokenManager
-  if (!accessTokenObject) {
-    accessTokenObject = await sdk.tokenManager.get('accessToken');
-  }
-  if (!idTokenObject) {
-    idTokenObject = await sdk.tokenManager.get('idToken');
-  }
-
+function getUserInfo(sdk, accessTokenObject) {
   if (!accessTokenObject ||
       (!oauthUtil.isToken(accessTokenObject) && !accessTokenObject.accessToken && !accessTokenObject.userinfoUrl)) {
-    return Promise.reject(new AuthSdkError('getUserInfo requires an access token object'));
+    return Q.reject(new AuthSdkError('getUserInfo requires an access token object'));
   }
-
-  if (!idTokenObject ||
-    (!oauthUtil.isToken(idTokenObject) && !idTokenObject.idToken)) {
-    return Promise.reject(new AuthSdkError('getUserInfo requires an ID token object'));
-  }
-
   return http.httpRequest(sdk, {
     url: accessTokenObject.userinfoUrl,
     method: 'GET',
     accessToken: accessTokenObject.accessToken
   })
-  .then(userInfo => {
-    // Only return the userinfo response if subjects match to mitigate token substitution attacks
-    if (userInfo.sub === idTokenObject.claims.sub) {
-      return userInfo;
-    }
-    return Promise.reject(new AuthSdkError('getUserInfo request was rejected due to token mismatch'));
-  })
-  .catch(function(err) {
+  .fail(function(err) {
     if (err.xhr && (err.xhr.status === 401 || err.xhr.status === 403)) {
       var authenticateHeader;
       if (err.xhr.headers && util.isFunction(err.xhr.headers.get) && err.xhr.headers.get('WWW-Authenticate')) {

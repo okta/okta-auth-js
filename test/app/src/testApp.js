@@ -17,7 +17,7 @@ import { saveConfigToStorage, flattenConfig } from './config';
 import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryParams } from './util';
 import { Form, updateForm } from './form';
-import { tokensHTML } from './tokens';
+import { tokensArrayToObject, tokensHTML } from './tokens';
 
 function homeLink(app) {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
@@ -25,9 +25,9 @@ function homeLink(app) {
 
 function logoutLink(app) {
   return `
-  <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)">Logout (and redirect here)</a><br/>
-  <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)">Logout (XHR + reload)</a><br/>
-  <a id="logout-app" href="${app.originalUrl}" onclick="logoutApp(event)">Logout (app only)</a><br/>
+  <a id="logout" href="${app.originalUrl}" onclick="logoutAndReload(event)">Logout (and reload)</a><br/>
+  <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutAndRedirect(event)">Logout (and redirect here)</a><br/>
+  <a id="logout-local" href="${app.originalUrl}" onclick="logoutLocal(event)">Logout (local only)</a><br/>
   `;
 }
 
@@ -62,9 +62,10 @@ function bindFunctions(testApp, window) {
     loginDirect: testApp.loginDirect.bind(testApp),
     getToken: testApp.getToken.bind(testApp, {}),
     clearTokens: testApp.clearTokens.bind(testApp),
-    logoutRedirect: testApp.logoutRedirect.bind(testApp),
-    logoutXHR: testApp.logoutXHR.bind(testApp),
-    logoutApp: testApp.logoutApp.bind(testApp),
+    logout: testApp.logout.bind(testApp),
+    logoutAndReload: testApp.logoutAndReload.bind(testApp),
+    logoutAndRedirect: testApp.logoutAndRedirect.bind(testApp),
+    logoutLocal: testApp.logoutLocal.bind(testApp),
     refreshSession: testApp.refreshSession.bind(testApp),
     renewToken: testApp.renewToken.bind(testApp),
     revokeToken: testApp.revokeToken.bind(testApp),
@@ -201,8 +202,8 @@ Object.assign(TestApp.prototype, {
       scopes: this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithPopup(options)
-    .then(res => {
-      this.saveTokens(res.tokens);
+    .then((tokens) => {
+      this.saveTokens(tokens);
       this.render();
     });
   },
@@ -212,8 +213,8 @@ Object.assign(TestApp.prototype, {
       scopes: this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithoutPrompt(options)
-    .then(res => {
-      this.saveTokens(res.tokens);
+    .then((tokens) => {
+      this.saveTokens(tokens);
       this.render();
     });
   },
@@ -221,7 +222,8 @@ Object.assign(TestApp.prototype, {
     return this.oktaAuth.session.refresh();
   },
   revokeToken: async function() {
-    return this.oktaAuth.revokeAccessToken()
+    const accessToken = await this.oktaAuth.tokenManager.get('accessToken');
+    return this.oktaAuth.token.revoke(accessToken)
     .then(() => {
       document.getElementById('token-msg').innerHTML = 'access token revoked';
     });
@@ -232,25 +234,29 @@ Object.assign(TestApp.prototype, {
         this.render();
       });
   },
-  logoutRedirect: function() {
-    this.oktaAuth.signOut()
-      .catch(e => {
-        console.error('Error during signout & redirect: ', e);
-      });
+  logout: async function() {
+    return this.oktaAuth.signOut();
   },
-  logoutXHR: async function() {
-    await this.oktaAuth.revokeAccessToken();
-    this.oktaAuth.closeSession()
+  logoutAndReload: function() {
+    this.logout()
       .catch(e => {
-        console.error('Error during signout & redirect: ', e);
+        console.error('Error during signout: ', e);
       })
       .then(() => {
         window.location.reload();
       });
   },
-  logoutApp: async function() {
-    await this.oktaAuth.revokeAccessToken();
-    this.oktaAuth.tokenManager.clear();
+  logoutAndRedirect: function() {
+    var options = {
+      postLogoutRedirectUri: window.location.origin
+    };
+    this.oktaAuth.signOut(options)
+      .catch(e => {
+        console.error('Error during signout & redirect: ', e);
+      });
+  },
+  logoutLocal: function() {
+    this.clearTokens();
     window.location.reload();
   },
   handleCallback: async function() {
@@ -259,19 +265,22 @@ Object.assign(TestApp.prototype, {
         this.renderError(e);
         throw e;
       })
-      .then(res => {
-        return this.callbackHTML(res);
+      .then(tokens => {
+        this.saveTokens(tokens);
+        return this.callbackHTML(tokens);
       })
       .then(content => this._setContent(content))
       .then(() => this._afterRender('callback-handled'));
   },
   getTokensFromUrl: async function() {
     // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
-    const res = await this.oktaAuth.token.parseFromUrl();
-    this.saveTokens(res.tokens);
-    return res;
+    let tokens = await this.oktaAuth.token.parseFromUrl();
+    this.saveTokens(tokens);
+    return tokens;
   },
   saveTokens: function(tokens) {
+    tokens = Array.isArray(tokens) ? tokens : [tokens];
+    tokens = tokensArrayToObject(tokens);
     const { idToken, accessToken } = tokens;
     if (idToken) {
       this.oktaAuth.tokenManager.add('idToken', idToken);
@@ -312,7 +321,7 @@ Object.assign(TestApp.prototype, {
   },
   appHTML: function(props) {
     const { idToken, accessToken } = props || {};
-    if (idToken || accessToken) {
+    if (idToken && accessToken) {
       // Authenticated user home page
       return `
         <strong>Welcome back</strong>
@@ -364,21 +373,19 @@ Object.assign(TestApp.prototype, {
       `;
   },
 
-  callbackHTML: function(res) {
-    const tokensReceived = res.tokens ? Object.keys(res.tokens): [];
-    const success = res.tokens && tokensReceived.length;
+  callbackHTML: function(tokens) {
+    const success = tokens && tokens.length === 2;
     const errorMessage = success ? '' :  'Tokens not returned. Check error console for more details';
-    const successMessage = success ? 'Successfully received tokens on the callback page: ' + tokensReceived.join(', ') : '';
+    const successMessage = success ? 'Successfully received tokens on the callback page!' : '';
     const content = `
       <div id="callback-result">
         <strong><div id="success">${successMessage}</div></strong>
         <div id="error">${errorMessage}</div>
         <div id="xhr-error"></div>
-        <div id="res-state">State: <strong>${res.state}</strong></div>
       </div>
       <hr/>
       ${homeLink(this)}
-      ${ success ? tokensHTML(res.tokens): '' }
+      ${ success ? tokensHTML(tokensArrayToObject(tokens)): '' }
     `;
     return content;
   }
