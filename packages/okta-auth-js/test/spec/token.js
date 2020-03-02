@@ -19,6 +19,18 @@ function setupSync(options) {
   return new OktaAuth(options);
 }
 
+// Expected settings when testing on HTTP protocol
+var cookieSettings = {
+  secure: false,
+  sameSite: 'lax'
+};
+
+// Expected settings when testing on HTTPS protocol
+var secureCookieSettings = {
+  secure: true,
+  sameSite: 'none'
+};
+
 describe('token.revoke', function() {
   it('throws if token is not passed', function() {
     var oa = setupSync();
@@ -947,7 +959,6 @@ describe('token.getWithPopup', function() {
         popups.push(popup);
         return popup;
       });
-
       // getWithPopup, but don't resolve
       var firstPopup = context.client.token.getWithPopup({
         idp: 'testIdp',
@@ -1173,8 +1184,10 @@ describe('token.getWithRedirect', function() {
   var customUrls;
   var nonceCookie;
   var stateCookie;
+  let originalLocation;
 
   beforeEach(function() {
+    originalLocation = window.location;
     defaultUrls = {
       issuer: 'https://auth-js-test.okta.com',
       authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -1195,20 +1208,21 @@ describe('token.getWithRedirect', function() {
       'okta-oauth-nonce',
       oauthUtil.mockedNonce,
       null, // expiresAt
-      {
-        sameSite: 'none'
-      }
+      cookieSettings
     ];
 
     stateCookie =  [
       'okta-oauth-state',
       oauthUtil.mockedState,
       null, // expiresAt
-      {
-        sameSite: 'none'
-      }
+      cookieSettings
     ];
   });
+  
+  afterEach(() => {
+    window.location = originalLocation;
+  });
+
   function mockPKCE() {
     spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
     spyOn(sdkUtil, 'getWellKnown').and.returnValue(Q.resolve({
@@ -1218,7 +1232,51 @@ describe('token.getWithRedirect', function() {
     spyOn(pkce, 'saveMeta');
     spyOn(pkce, 'computeChallenge').and.returnValue(Q.resolve(codeChallenge));
   }
-
+  it('Uses secure cookie settings if running on HTTPS domain', function() {
+    delete window.location;
+    window.location = {
+      protocol: 'https:'
+    }
+    return oauthUtil.setupRedirect({
+      getWithRedirectArgs: {},
+      expectedCookies: [
+        [
+          'okta-oauth-redirect-params',
+          JSON.stringify({
+            responseType: 'id_token',
+            state: oauthUtil.mockedState,
+            nonce: oauthUtil.mockedNonce,
+            scopes: ['openid', 'email'],
+            clientId: 'NPSfOkH5eZrTy8PMDlvx',
+            urls: defaultUrls,
+            ignoreSignature: false
+          }),
+          null, 
+          secureCookieSettings
+        ],
+        [
+          'okta-oauth-nonce',
+          oauthUtil.mockedNonce,
+          null, // expiresAt
+          secureCookieSettings
+        ],
+        [
+          'okta-oauth-state',
+          oauthUtil.mockedState,
+          null, // expiresAt
+          secureCookieSettings
+        ]
+      ],
+      expectedRedirectUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize?' +
+                            'client_id=NPSfOkH5eZrTy8PMDlvx&' +
+                            'nonce=' + oauthUtil.mockedNonce + '&' +
+                            'redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&' +
+                            'response_mode=fragment&' +
+                            'response_type=id_token&' +
+                            'state=' + oauthUtil.mockedState + '&' +
+                            'scope=openid%20email'
+    });
+  });
   it('Can pass responseMode=query', function() {
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {
@@ -1236,10 +1294,7 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1275,10 +1330,7 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1310,10 +1362,7 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1351,10 +1400,7 @@ describe('token.getWithRedirect', function() {
             urls: customUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1396,10 +1442,7 @@ describe('token.getWithRedirect', function() {
             urls: customUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1434,10 +1477,7 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1477,10 +1517,7 @@ describe('token.getWithRedirect', function() {
             urls: customUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1514,10 +1551,7 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1556,10 +1590,7 @@ describe('token.getWithRedirect', function() {
             urls: customUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1593,10 +1624,7 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1634,10 +1662,7 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1677,10 +1702,7 @@ describe('token.getWithRedirect', function() {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-null, {
-            sameSite: 'none'
-          }
-        ],
+        null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1722,10 +1744,7 @@ null, {
             urls: customUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1760,10 +1779,7 @@ null, {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1802,9 +1818,8 @@ null, {
           urls: defaultUrls,
           ignoreSignature: false
         }),
-        null, {
-          sameSite: 'none'
-        }
+        null,
+        cookieSettings
       ],
       nonceCookie,
       stateCookie
@@ -1842,10 +1857,7 @@ null, {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1878,10 +1890,7 @@ null, {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1914,10 +1923,7 @@ null, {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-          null, {
-            sameSite: 'none'
-          }
-        ],
+          null, cookieSettings],
         nonceCookie,
         stateCookie
       ],
@@ -1950,10 +1956,7 @@ null, {
             urls: defaultUrls,
             ignoreSignature: false
           }),
-null, {
-            sameSite: 'none'
-          }
-        ],
+        null, cookieSettings],
         nonceCookie,
         stateCookie
       ],

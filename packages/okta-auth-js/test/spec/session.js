@@ -5,8 +5,10 @@ var Q = require('q');
 describe('session', function() {
   var sdk;
   var sessionObj;
+  let originalLocation;
 
   beforeEach(function() {
+    originalLocation = window.location;
     sessionObj = {};
     sdk = {
       session: {
@@ -17,7 +19,12 @@ describe('session', function() {
         })
       }
     };
+  });  
+  
+  afterEach(() => {
+    window.location = originalLocation;
   });
+
   describe('sessionExists', function() {
     it('calls sdk.session.get', function() {
       return session.sessionExists(sdk)

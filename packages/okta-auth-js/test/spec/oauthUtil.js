@@ -9,7 +9,29 @@ var wellKnown = require('@okta/test.support/xhr/well-known');
 var keys = require('@okta/test.support/xhr/keys');
 var tokens = require('@okta/test.support/tokens');
 
+// Expected cookie settings. Cache will use the same settings on HTTP and HTTPS
+var cookieSettings = {
+  secure: false,
+  sameSite: 'lax'
+};
+
+// Expected settings when testing on HTTPS protocol
+var secureCookieSettings = {
+  secure: true,
+  sameSite: 'none'
+};
+
 describe('getWellKnown', function() {
+  let originalLocation;
+
+  beforeEach(() => {
+    originalLocation = window.location;
+  });
+
+  afterEach(() => {
+    window.location = originalLocation;
+  });
+
   util.itMakesCorrectRequestResponse({
     title: 'can getWellKnown response using ORG auth server',
     setup: {
@@ -238,7 +260,7 @@ describe('getWellKnown', function() {
       time: 1449699929
     },
     execute: function(test) {
-      test.setCookieMock = util.mockSetCookie();
+      test.setCookieMock = util.mockSetCookie().mockReturnValue(null);
       return oauthUtil.getWellKnown(test.oa);
     },
     expectations: function(test) {
@@ -251,9 +273,47 @@ describe('getWellKnown', function() {
           }
         }),
         '2200-01-01T00:00:00.000Z',
-        {
-          sameSite: 'none'
+        cookieSettings
+      );
+    }
+  });
+  util.itMakesCorrectRequestResponse({
+    title: 'caches response in secure cookie if localStorage and sessionStorage are not available on HTTPS protocol',
+    setup: {
+      beforeClient: function() {
+        delete window.location;
+        window.location = {
+          protocol: 'https:'
         }
+        oauthUtilHelpers.mockLocalStorageError();
+        oauthUtilHelpers.mockSessionStorageError();
+      },
+      calls: [
+        {
+          request: {
+            method: 'get',
+            uri: '/.well-known/openid-configuration'
+          },
+          response: 'well-known'
+        }
+      ],
+      time: 1449699929
+    },
+    execute: function(test) {
+      test.setCookieMock = util.mockSetCookie().mockReturnValue(null);
+      return oauthUtil.getWellKnown(test.oa);
+    },
+    expectations: function(test) {
+      expect(test.setCookieMock).toHaveBeenCalledWith(
+        'okta-cache-storage',
+        JSON.stringify({
+          'https://auth-js-test.okta.com/.well-known/openid-configuration': {
+            expiresAt: 1449786329,
+            response: wellKnown.response
+          }
+        }),
+        '2200-01-01T00:00:00.000Z',
+        secureCookieSettings
       );
     }
   });

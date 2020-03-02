@@ -12,6 +12,7 @@ module.exports = {
   ],
   'testPathIgnorePatterns': [
     './test/spec/browser.js',
+    './test/spec/browserStorage.js',
     './test/spec/fingerprint.js',
     './test/spec/general.js',
     './test/spec/oauthUtil.js',

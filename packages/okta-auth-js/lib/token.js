@@ -634,6 +634,15 @@ function getWithRedirect(sdk, oauthOptions, options) {
       var urls = oauthUtil.getOAuthUrls(sdk, oauthParams, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(oauthParams);
 
+      // Chrome >= 80 will block cookies with SameSite=None unless they are also Secure
+      // If the application is running on HTTPS, we can relax 3rd party cookie settings.
+      // This will allow embedding the app in an iframe (only if it is running on HTTPS protocol)
+      var isSecure = window.location.protocol === 'https:';
+      var cookieSettings = {
+        secure: isSecure,
+        sameSite: isSecure ? 'none' : 'lax'
+      };
+
       // Set session cookie to store the oauthParams
       cookies.set(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME, JSON.stringify({
         responseType: oauthParams.responseType,
@@ -643,19 +652,13 @@ function getWithRedirect(sdk, oauthOptions, options) {
         clientId: oauthParams.clientId,
         urls: urls,
         ignoreSignature: oauthParams.ignoreSignature
-      }), null, {
-        sameSite: 'none'
-      });
+      }), null, cookieSettings);
 
       // Set nonce cookie for servers to validate nonce in id_token
-      cookies.set(constants.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce, null, {
-        sameSite: 'none'
-      });
+      cookies.set(constants.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce, null, cookieSettings);
 
       // Set state cookie for servers to validate state
-      cookies.set(constants.REDIRECT_STATE_COOKIE_NAME, oauthParams.state, null, {
-        sameSite: 'none'
-      });
+      cookies.set(constants.REDIRECT_STATE_COOKIE_NAME, oauthParams.state, null, cookieSettings);
 
       sdk.token.getWithRedirect._setLocation(requestUrl);
     });

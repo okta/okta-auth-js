@@ -44,7 +44,9 @@ storageUtil.getPKCEStorage = function() {
   } else if (storageUtil.browserHasSessionStorage()) {
     return storageBuilder(storageUtil.getSessionStorage(), constants.PKCE_STORAGE_NAME);
   } else {
-    return storageBuilder(storageUtil.getCookieStorage(), constants.PKCE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getCookieStorage({
+      secure: window.location.protocol === 'https:'
+    }), constants.PKCE_STORAGE_NAME);
   }
 };
 
@@ -54,7 +56,9 @@ storageUtil.getHttpCache = function() {
   } else if (storageUtil.browserHasSessionStorage()) {
     return storageBuilder(storageUtil.getSessionStorage(), constants.CACHE_STORAGE_NAME);
   } else {
-    return storageBuilder(storageUtil.getCookieStorage(), constants.CACHE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getCookieStorage({
+      secure: window.location.protocol === 'https:'
+    }), constants.CACHE_STORAGE_NAME);
   }
 };
 
@@ -69,8 +73,8 @@ storageUtil.getSessionStorage = function() {
 // Provides webStorage-like interface for cookies
 storageUtil.getCookieStorage = function(options) {
   options = options || {};
-  var secure = options.secure; // currently opt-in
-  var sameSite = options.sameSite || 'none';
+  var secure = options.secure || false; // currently opt-in
+  var sameSite = options.sameSite || (secure ? 'none' : 'lax');
   return {
     getItem: storageUtil.storage.get,
     setItem: function(key, value) {

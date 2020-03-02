@@ -11,6 +11,18 @@ var util = require('@okta/test.support/util');
 var oauthUtil = require('@okta/test.support/oauthUtil');
 var SdkClock = require('../../lib/clock');
 
+// Expected settings with default options
+var cookieSettings = {
+  secure: false,
+  sameSite: 'lax'
+};
+
+// Expected settings when option secure: true
+var secureCookieSettings = {
+  secure: true,
+  sameSite: 'none'
+};
+
 function setupSync(options) {
   options = options || {};
   options.tokenManager = options.tokenManager || {};
@@ -197,9 +209,8 @@ describe('TokenManager', function() {
       expect(setCookieMock).toHaveBeenCalledWith(
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-        '2200-01-01T00:00:00.000Z', {
-          sameSite: 'none'
-        }
+        '2200-01-01T00:00:00.000Z',
+        cookieSettings
       );
     });
     it('defaults to cookie-based storage if sessionStorage cannot be written to', function() {
@@ -220,9 +231,8 @@ describe('TokenManager', function() {
       expect(setCookieMock).toHaveBeenCalledWith(
         'okta-token-storage',
         JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-        '2200-01-01T00:00:00.000Z', {
-          sameSite: 'none'
-        }
+        '2200-01-01T00:00:00.000Z',
+        cookieSettings
       );
     });
   });
@@ -1241,9 +1251,8 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z', {
-            sameSite: 'none'
-          }
+          '2200-01-01T00:00:00.000Z',
+          cookieSettings
         );
       });
 
@@ -1254,10 +1263,8 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           JSON.stringify({'test-idToken': tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z', {
-            secure: true,
-            sameSite: 'none'
-          }
+          '2200-01-01T00:00:00.000Z',
+          secureCookieSettings
         );
       });
 
@@ -1294,9 +1301,8 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           JSON.stringify({anotherKey: tokens.standardIdTokenParsed}),
-          '2200-01-01T00:00:00.000Z', {
-            sameSite: 'none'
-          }
+          '2200-01-01T00:00:00.000Z',
+          cookieSettings
         );
       });
     });
@@ -1311,9 +1317,8 @@ describe('TokenManager', function() {
         expect(setCookieMock).toHaveBeenCalledWith(
           'okta-token-storage',
           '{}',
-          '2200-01-01T00:00:00.000Z', {
-            sameSite: 'none'
-          }
+          '2200-01-01T00:00:00.000Z',
+          cookieSettings
         );
       });
     });

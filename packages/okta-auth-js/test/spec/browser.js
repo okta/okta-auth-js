@@ -96,7 +96,7 @@ describe('Browser', function() {
 
   describe('signOut', function() {
     beforeEach(function() {
-      global.window.location.assign = jest.fn();
+      window.location.assign = jest.fn();
     });
     it('Default options: clear TokenManager, close session, no redirect', function() {
       spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
