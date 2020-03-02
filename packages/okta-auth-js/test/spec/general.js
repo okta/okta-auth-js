@@ -45,7 +45,7 @@ describe('General Methods', function () {
       },
       execute: function (test) {
         return test.oa.signIn({})
-          .fail(function(err) {
+          .catch(function(err) {
             expect(err.errorCode).toEqual('E0000004');
             expect(err.errorSummary).toEqual('Authentication failed');
             expect(err.errorLink).toEqual('E0000004');

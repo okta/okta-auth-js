@@ -10,14 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global window, document */
 /* eslint-disable complexity, max-statements */
 var http = require('./http');
 var util = require('./util');
 var storageUtil = require('./browser/browserStorage');
 var AuthSdkError = require('./errors/AuthSdkError');
-
-var httpCache = storageUtil.getHttpCache();
 
 function generateState() {
   return util.genRandomString(64);
@@ -78,13 +76,18 @@ function loadPopup(src, options) {
 }
 
 function getWellKnown(sdk, issuer) {
-  var authServerUri = (issuer || sdk.options.issuer || sdk.options.url);
+  var authServerUri = (issuer || sdk.options.issuer);
   return http.get(sdk, authServerUri + '/.well-known/openid-configuration', {
     cacheResponse: true
   });
 }
 
 function getKey(sdk, issuer, kid) {
+  var httpCache = storageUtil.getHttpCache({
+    secure: sdk.options.secureCookies,
+    sameSite: 'none'
+  });
+
   return getWellKnown(sdk, issuer)
   .then(function(wellKnown) {
     var jwksUri = wellKnown['jwks_uri'];
@@ -161,7 +164,10 @@ function validateClaims(sdk, claims, validationParams) {
   }
 }
 
-function getOAuthUrls(sdk, oauthParams, options) {
+function getOAuthUrls(sdk, options) {
+  if (arguments.length > 2) {
+    throw new AuthSdkError('As of version 3.0, "getOAuthUrls" takes only a single set of options');
+  }
   options = options || {};
 
   // Get user-supplied arguments
@@ -172,53 +178,7 @@ function getOAuthUrls(sdk, oauthParams, options) {
   var logoutUrl = util.removeTrailingSlash(options.logoutUrl) || sdk.options.logoutUrl;
   var revokeUrl = util.removeTrailingSlash(options.revokeUrl) || sdk.options.revokeUrl;
 
-  // If an issuer exists but it's not a url, assume it's an authServerId
-  if (issuer && !(/^https?:/.test(issuer))) {
-    // Make it a url
-    issuer = sdk.options.url + '/oauth2/' + issuer;
-  }
-
-  // If an authorizeUrl is supplied without an issuer, and an id_token is requested
-  if (!issuer && authorizeUrl &&
-      oauthParams.responseType.indexOf('id_token') !== -1) {
-    // The issuer is ambiguous, so we won't be able to validate the id_token jwt
-    throw new AuthSdkError('Cannot request idToken with an authorizeUrl without an issuer');
-  }
-
-  // If a token is requested without an issuer
-  if (!issuer && oauthParams && oauthParams.responseType.indexOf('token') !== -1) {
-    // If an authorizeUrl is supplied without a userinfoUrl
-    if (authorizeUrl && !userinfoUrl) {
-      // The userinfoUrl is ambiguous, so we won't be able to call getUserInfo
-      throw new AuthSdkError('Cannot request accessToken with an authorizeUrl without an issuer or userinfoUrl');
-    }
-
-    // If a userinfoUrl is supplied without a authorizeUrl
-    if (userinfoUrl && !authorizeUrl) {
-      // The authorizeUrl is ambiguous, so we won't be able to call the authorize endpoint
-      throw new AuthSdkError('Cannot request token with an userinfoUrl without an issuer or authorizeUrl');
-    }
-  }
-
-  // Default the issuer to our baseUrl
-  issuer = issuer || sdk.options.url;
-
-  // Trim trailing slashes
-  issuer = util.removeTrailingSlash(issuer);
-
-  var baseUrl = issuer;
-  // A custom auth server issuer looks like:
-  // https://example.okta.com/oauth2/aus8aus76q8iphupD0h7
-  // 
-  // Most orgs have a "default" custom authorization server:
-  // https://example.okta.com/oauth2/default
-  var customAuthServerRegex = new RegExp('^https?://.*?/oauth2/.+');
-  if (!customAuthServerRegex.test(baseUrl)) {
-    // Append '/oauth2' if necessary
-    if (!baseUrl.endsWith('/oauth2')) {
-      baseUrl += '/oauth2';
-    }
-  }
+  var baseUrl = issuer.indexOf('/oauth2') > 0 ? issuer : issuer + '/oauth2';
 
   authorizeUrl = authorizeUrl || baseUrl + '/v1/authorize';
   userinfoUrl = userinfoUrl || baseUrl + '/v1/userinfo';

@@ -11,7 +11,7 @@
  *
  */
 
-var fetchRequest = require('../../fetch/fetchRequest');
+var fetchRequest = require('../fetch/fetchRequest');
 var storageUtil = require('./browserStorage');
 
 module.exports = require('./browser')(storageUtil, fetchRequest);

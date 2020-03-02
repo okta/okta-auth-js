@@ -92,7 +92,10 @@ describe('Complete login flow', function() {
   }
 
   function mockWellKnown() {
-    sdk.options.storageUtil.getHttpCache().clearStorage();
+    sdk.options.storageUtil.getHttpCache({
+      secure: sdk.options.secureCookies,
+      sameSite: 'none'
+    }).clearStorage();
 
     var wellKnown = {
       'jwks_uri': JWKS_URI,
@@ -120,7 +123,9 @@ describe('Complete login flow', function() {
 
   it('implicit login flow', function() {
     // First hit /authorize
-    return bootstrap({})
+    return bootstrap({
+      pkce: false
+    })
     .then(function(app) {
       return app.loginRedirect({
         nonce: NONCE
@@ -139,7 +144,6 @@ describe('Complete login flow', function() {
       expect(url.searchParams.get('client_id')).toBe(CLIENT_ID);
       expect(url.searchParams.get('redirect_uri')).toBe(REDIRECT_URI);
       expect(url.searchParams.get('response_type')).toBe('id_token token');
-      expect(url.searchParams.get('response_mode')).toBe('fragment');
       expect(url.searchParams.get('scope')).toBe('openid email');
       expect(url.searchParams.get('state')).toBeTruthy();
       expect(url.searchParams.get('nonce')).toBe(NONCE);
@@ -150,7 +154,7 @@ describe('Complete login flow', function() {
       mockWellKnown();
       const state = url.searchParams.get('state');
       const pathname = `${CALLBACK_PATH}#access_token=${ACCESS_TOKEN}&id_token=${ID_TOKEN}&state=${state}&nonce=${NONCE}&expires_in=1000`;
-      return bootstrap({}, pathname)
+      return bootstrap({ pkce: false }, pathname)
       .then(function() {
 
         expect(getLocation).toHaveBeenCalled();
@@ -190,7 +194,6 @@ describe('Complete login flow', function() {
       expect(url.searchParams.get('client_id')).toBe(CLIENT_ID);
       expect(url.searchParams.get('redirect_uri')).toBe(REDIRECT_URI);
       expect(url.searchParams.get('response_type')).toBe('code');
-      expect(url.searchParams.get('response_mode')).toBe('fragment');
       expect(url.searchParams.get('scope')).toBe('openid email');
       expect(url.searchParams.get('state')).toBeTruthy();
       expect(url.searchParams.get('nonce')).toBeTruthy();
@@ -202,7 +205,7 @@ describe('Complete login flow', function() {
 
       // Now we handle the redirect & hit /token
       const state = url.searchParams.get('state');
-      const pathname = `${CALLBACK_PATH}#code=${AUTHORIZATION_CODE}&state=${state}`;
+      const pathname = `${CALLBACK_PATH}?code=${AUTHORIZATION_CODE}&state=${state}`;
       const tokenResponse = {
         'access_token': ACCESS_TOKEN,
         'id_token': ID_TOKEN,
