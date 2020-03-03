@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.13.2
+
+### Bug Fixes
+
+-[#338](https://github.com/okta/okta-auth-js/pull/338) - (Fix for Chrome 80) Setting 'Secure' on cookies if running on HTTPS. Setting 'SameSite=Lax' on cookies if running on HTTP. TokenManager (if using cookie storage) will retain previous behavior, setting 'SameSite=Lax' in all cases unless `tokenManager.secure` is set to `true` via config.
+
 ## 2.13.1
 
 ### Bug Fixes
