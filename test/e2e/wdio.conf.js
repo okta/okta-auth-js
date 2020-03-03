@@ -19,7 +19,9 @@ const CI = process.env.CI;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
 const chromeOptions = {
-    args: [],
+    args: [
+        // '--headless'
+    ],
     localState: {
         'browser.enabled_labs_experiments': [ 'same-site-by-default-cookies@1', 'cookies-without-same-site-must-be-secure@1' ]
     }
@@ -59,7 +61,7 @@ exports.config = {
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
     specs: [
-        './specs/**/*.js'
+        './specs/login.js'
     ],
     // Patterns to exclude.
     exclude: [

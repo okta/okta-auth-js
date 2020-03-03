@@ -23,7 +23,7 @@ describe('E2E login', () => {
         (flow === 'pkce') ? await openPKCE() : await openImplicit();
       });
 
-      it('can login using redirect', async () => {
+      it.only('can login using redirect', async () => {
         await loginRedirect(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
