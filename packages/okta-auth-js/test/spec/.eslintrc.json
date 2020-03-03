@@ -13,6 +13,10 @@
   "globals": {
     "Promise": "readonly"
   },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2017
+  },
   "rules": {
     "jasmine/no-unsafe-spy": 0,
     "jasmine/new-line-before-expect": 0,
