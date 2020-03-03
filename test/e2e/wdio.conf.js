@@ -19,7 +19,10 @@ const CI = process.env.CI;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
 const chromeOptions = {
-    args: []
+    args: [],
+    localState: {
+        'browser.enabled_labs_experiments': [ 'same-site-by-default-cookies@1', 'cookies-without-same-site-must-be-secure@1' ]
+    }
 };
 
 if (CI) {
