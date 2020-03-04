@@ -12,8 +12,6 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
 
-require('../vendor/polyfills');
-
 var builderUtil       = require('../builderUtil');
 var SDK_VERSION       = require('../../package.json').version;
 var storage           = require('./serverStorage').storage;
@@ -23,9 +21,9 @@ var util              = require('../util');
 function OktaAuthBuilder(args) {
   var sdk = this;
 
-  var url = builderUtil.getValidUrl(args);
+  builderUtil.assertValidConfig(args);
   this.options = {
-    url: util.removeTrailingSlash(url),
+    issuer: util.removeTrailingSlash(args.issuer),
     httpRequestClient: args.httpRequestClient,
     storageUtil: args.storageUtil,
     headers: args.headers

@@ -1,9 +1,9 @@
+/* global window, document, Storage, localStorage */
 /* eslint-disable complexity, max-statements */
 var URL = require('url').URL;
 var util = require('./util');
 var OktaAuth = require('OktaAuth');
 var tokens = require('./tokens');
-var Q = require('q');
 var EventEmitter = require('tiny-emitter');
 var wellKnown = require('./xhr/well-known');
 var wellKnownSharedResource = require('./xhr/well-known-shared-resource');
@@ -76,14 +76,25 @@ oauthUtil.loadWellKnownAndKeysCache = function() {
 
 var defaultPostMessage = oauthUtil.defaultPostMessage = {
   'id_token': tokens.standardIdToken,
+  'access_token': tokens.standardAccessToken,
   state: oauthUtil.mockedState
 };
 
 var defaultResponse = {
-  idToken: tokens.standardIdToken,
-  claims: tokens.standardIdTokenClaims,
-  expiresAt: 1449699930,
-  scopes: ['openid', 'email']
+  state: oauthUtil.mockedState,
+  tokens: {
+    accessToken: {
+      value: tokens.standardAccessToken,
+      accessToken: tokens.standardAccessToken
+    },
+    idToken: {
+      value: tokens.standardIdToken,
+      idToken: tokens.standardIdToken,
+      claims: tokens.standardIdTokenClaims,
+      expiresAt: 1449699930,
+      scopes: ['openid', 'email']
+    }
+  }
 };
 
 var getTime = oauthUtil.getTime = function getTime(time) {
@@ -100,6 +111,7 @@ function validateResponse(res, expectedResp) {
       expect(actual, expected);
       return;
     }
+    expect(actual.value).toEqual(expected.value);
     expect(actual.idToken).toEqual(expected.idToken);
     expect(actual.claims).toEqual(expected.claims);
     expect(actual.accessToken).toEqual(expected.accessToken);
@@ -160,7 +172,8 @@ oauthUtil.setup = function(opts) {
     authClient = opts.authClient;
   } else {
     authClient = new OktaAuth({
-      url: 'https://auth-js-test.okta.com'
+      pkce: false,
+      issuer: 'https://auth-js-test.okta.com'
     });
   }
 
@@ -199,14 +212,15 @@ oauthUtil.setup = function(opts) {
   } else if (opts.tokenRenewArgs) {
     promise = authClient.token.renew.apply(this, opts.tokenRenewArgs);
   } else if (opts.autoRenew) {
-    var renewDeferred = Q.defer();
-    authClient.tokenManager.on('renewed', function() {
-      renewDeferred.resolve();
+    promise = new Promise(function(resolve) {
+      // TODO: do we need to remove handlers?
+      authClient.tokenManager.on('renewed', function() {
+        resolve();
+      });
+      authClient.tokenManager.on('error', function() {
+        resolve();
+      });
     });
-    authClient.tokenManager.on('error', function() {
-      renewDeferred.resolve();
-    });
-    promise = renewDeferred.promise;
   }
 
   if (opts.fastForwardToTime) {
@@ -228,7 +242,7 @@ oauthUtil.setup = function(opts) {
       var expectedResp = opts.expectedResp || defaultResponse;
       validateResponse(res, expectedResp);
     })
-    .fail(function(err) {
+    .catch(function(err) {
       if (opts.willFail) {
         throw err;
       } else {
@@ -349,7 +363,8 @@ oauthUtil.setupPopup = function(opts) {
 
 oauthUtil.setupRedirect = function(opts) {
   var client = new OktaAuth(Object.assign({
-    url: 'https://auth-js-test.okta.com',
+    pkce: false,
+    issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
   }, opts.oktaAuthArgs));
@@ -376,11 +391,12 @@ oauthUtil.setupRedirect = function(opts) {
 };
 
 oauthUtil.setupParseUrl = function(opts) {
-  var client = new OktaAuth(opts.oktaAuthArgs || {
-    url: 'https://auth-js-test.okta.com',
+  var client = new OktaAuth(Object.assign({
+    pkce: false,
+    issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
-  });
+  }, opts.oktaAuthArgs));
 
   // Mock the well-known and keys request
   oauthUtil.loadWellKnownAndKeysCache();
@@ -450,7 +466,8 @@ oauthUtil.setupParseUrl = function(opts) {
 oauthUtil.setupSimultaneousPostMessage = function() {
   // Create client
   var client =  new OktaAuth({
-    url: 'https://auth-js-test.okta.com',
+    pkce: false,
+    issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect'
   });
@@ -488,7 +505,7 @@ oauthUtil.setupSimultaneousPostMessage = function() {
   // warp to time to ensure tokens aren't expired
   util.warpToUnixTime(tokens.standardIdTokenClaims.exp - 1);
 
-  return new Q({
+  return Promise.resolve({
     client: client,
     emitter: emitter
   });
@@ -510,7 +527,7 @@ oauthUtil.itpErrorsCorrectly = function(title, options, error) {
       .then(function() {
         expect('not to be hit').toEqual(true);
       })
-      .fail(function(e) {
+      .catch(function(e) {
         util.expectErrorToEqual(e, error);
       });
   });

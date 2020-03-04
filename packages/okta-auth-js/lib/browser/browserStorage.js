@@ -10,10 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
+/* global localStorage, sessionStorage */
 var Cookies = require('js-cookie');
 var storageBuilder = require('../storageBuilder');
 var constants = require('../constants');
+var AuthSdkError = require('../errors/AuthSdkError');
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil = {};
@@ -38,27 +39,23 @@ storageUtil.browserHasSessionStorage = function() {
   }
 };
 
-storageUtil.getPKCEStorage = function() {
+storageUtil.getPKCEStorage = function(options) {
   if (storageUtil.browserHasLocalStorage()) {
     return storageBuilder(storageUtil.getLocalStorage(), constants.PKCE_STORAGE_NAME);
   } else if (storageUtil.browserHasSessionStorage()) {
     return storageBuilder(storageUtil.getSessionStorage(), constants.PKCE_STORAGE_NAME);
   } else {
-    return storageBuilder(storageUtil.getCookieStorage({
-      secure: window.location.protocol === 'https:'
-    }), constants.PKCE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getCookieStorage(options), constants.PKCE_STORAGE_NAME);
   }
 };
 
-storageUtil.getHttpCache = function() {
+storageUtil.getHttpCache = function(options) {
   if (storageUtil.browserHasLocalStorage()) {
     return storageBuilder(storageUtil.getLocalStorage(), constants.CACHE_STORAGE_NAME);
   } else if (storageUtil.browserHasSessionStorage()) {
     return storageBuilder(storageUtil.getSessionStorage(), constants.CACHE_STORAGE_NAME);
   } else {
-    return storageBuilder(storageUtil.getCookieStorage({
-      secure: window.location.protocol === 'https:'
-    }), constants.CACHE_STORAGE_NAME);
+    return storageBuilder(storageUtil.getCookieStorage(options), constants.CACHE_STORAGE_NAME);
   }
 };
 
@@ -72,9 +69,11 @@ storageUtil.getSessionStorage = function() {
 
 // Provides webStorage-like interface for cookies
 storageUtil.getCookieStorage = function(options) {
-  options = options || {};
-  var secure = options.secure || false; // currently opt-in
-  var sameSite = options.sameSite || (secure ? 'none' : 'lax');
+  const secure = options.secure;
+  const sameSite = options.sameSite;
+  if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
+    throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
+  }
   return {
     getItem: storageUtil.storage.get,
     setItem: function(key, value) {
@@ -113,11 +112,15 @@ storageUtil.testStorage = function(storage) {
 
 storageUtil.storage = {
   set: function(name, value, expiresAt, options) {
-    options = options || {};
+    const secure = options.secure;
+    const sameSite = options.sameSite;
+    if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
+      throw new AuthSdkError('storage.set: "secure" and "sameSite" options must be provided');
+    }
     var cookieOptions = {
       path: options.path || '/',
-      secure: options.secure,
-      sameSite: options.sameSite
+      secure,
+      sameSite
     };
 
     // eslint-disable-next-line no-extra-boolean-cast

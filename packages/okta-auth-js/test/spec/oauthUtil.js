@@ -1,3 +1,4 @@
+/* global window, localStorage, sessionStorage */
 jest.mock('cross-fetch');
 
 var OktaAuth = require('OktaAuth');
@@ -327,7 +328,7 @@ describe('getKey', function() {
     },
     execute: function(test) {
       oauthUtilHelpers.loadWellKnownAndKeysCache();
-      return oauthUtil.getKey(test.oa, test.oa.options.url, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return oauthUtil.getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -349,7 +350,7 @@ describe('getKey', function() {
     },
     execute: function(test) {
       oauthUtilHelpers.loadWellKnownCache();
-      return oauthUtil.getKey(test.oa, test.oa.options.url, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return oauthUtil.getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -403,7 +404,7 @@ describe('getKey', function() {
         }
       }));
 
-      return oauthUtil.getKey(test.oa, test.oa.options.url, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return oauthUtil.getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -448,7 +449,7 @@ describe('getKey', function() {
         }
       }));
 
-      return oauthUtil.getKey(test.oa, test.oa.options.url, 'invalidKid');
+      return oauthUtil.getKey(test.oa, null, 'invalidKid');
     },
     expectations: function(test, err) {
       util.assertAuthSdkError(err, 'The key id, invalidKid, was not found in the server\'s keys');
@@ -470,16 +471,13 @@ describe('getKey', function() {
 describe('getOAuthUrls', function() {
   function setupOAuthUrls(options) {
     var sdk = new OktaAuth(options.oktaAuthArgs || {
-      url: 'https://auth-js-test.okta.com'
+      pkce: false,
+      issuer: 'https://auth-js-test.okta.com'
     });
-
-    var oauthParams = options.oauthParams || {
-      responseType: 'id_token'
-    };
 
     var result, error;
     try {
-      result = oauthUtil.getOAuthUrls(sdk, oauthParams, options.options);
+      result = oauthUtil.getOAuthUrls(sdk, options.options);
     } catch(e) {
       error = e;
     }
@@ -499,6 +497,18 @@ describe('getOAuthUrls', function() {
     }
   }
 
+  it('throws if an extra options object is passed', () => {
+    const sdk = new OktaAuth({
+      pkce: false,
+      issuer: 'https://auth-js-test.okta.com'
+    });
+
+    const f = function () {
+      oauthUtil.getOAuthUrls(sdk, {}, {});
+    };
+    expect(f).toThrowError('As of version 3.0, "getOAuthUrls" takes only a single set of options');
+  });
+  
   it('defaults all urls using global defaults', function() {
     setupOAuthUrls({
       expectedResult: {
@@ -514,7 +524,7 @@ describe('getOAuthUrls', function() {
   it('sanitizes forward slashes', function() {
     setupOAuthUrls({
       oktaAuthArgs: {
-        url: 'https://auth-js-test.okta.com',
+        pkce: false,
         issuer: 'https://auth-js-test.okta.com/',
         logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout/',
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token/',
@@ -534,7 +544,7 @@ describe('getOAuthUrls', function() {
   it('overrides defaults with options', function() {
     setupOAuthUrls({
       oktaAuthArgs: {
-        url: 'https://auth-js-test.okta.com',
+        pkce: false,
         issuer: 'https://bad.okta.com',
         logoutUrl: 'https://bad.okta.com/oauth2/v1/logout',
         revokeUrl: 'https://bad.okta.com/oauth2/v1/revoke',
@@ -610,21 +620,6 @@ describe('getOAuthUrls', function() {
       }
     });
   });
-  it('uses authServer issuer as authServerId to generate authorizeUrl and userinfoUrl', function() {
-    setupOAuthUrls({
-      options: {
-        issuer: 'aus8aus76q8iphupD0h7'
-      },
-      expectedResult: {
-        issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-        logoutUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/logout',
-        revokeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/revoke',
-        tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
-        authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-        userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-      }
-    });
-  });
   it('allows token requested with only authorizeUrl and userinfoUrl', function() {
     setupOAuthUrls({
       oauthParams: {
@@ -641,48 +636,6 @@ describe('getOAuthUrls', function() {
         tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token', // we are not using this url for responseType 'token'
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-      }
-    });
-  });
-  it('fails if id_token requested without issuer, with authorizeUrl', function() {
-    setupOAuthUrls({
-      oauthParams: {
-        responseType: 'id_token'
-      },
-      options: {
-        authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize'
-      },
-      expectedError: {
-        name: 'AuthSdkError',
-        message: 'Cannot request idToken with an authorizeUrl without an issuer'
-      }
-    });
-  });
-  it('fails if token requested without issuer, without userinfoUrl, with authorizeUrl', function() {
-    setupOAuthUrls({
-      oauthParams: {
-        responseType: 'token'
-      },
-      options: {
-        authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize'
-      },
-      expectedError: {
-        name: 'AuthSdkError',
-        message: 'Cannot request accessToken with an authorizeUrl without an issuer or userinfoUrl'
-      }
-    });
-  });
-  it('fails if token requested without issuer, without authorizeUrl, with userinfoUrl', function() {
-    setupOAuthUrls({
-      oauthParams: {
-        responseType: 'id_token'
-      },
-      options: {
-        userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-      },
-      expectedError: {
-        name: 'AuthSdkError',
-        message: 'Cannot request token with an userinfoUrl without an issuer or authorizeUrl'
       }
     });
   });
@@ -754,7 +707,8 @@ describe('validateClaims', function () {
 
   beforeEach(function() {
     sdk = new OktaAuth({
-      url: 'https://auth-js-test.okta.com',
+      pkce: false,
+      issuer: 'https://auth-js-test.okta.com',
       clientId: 'foo',
       ignoreSignature: false
     });
