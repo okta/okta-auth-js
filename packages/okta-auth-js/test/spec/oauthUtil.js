@@ -341,6 +341,7 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
+            withCredentials: false,
             uri: '/oauth2/v1/keys'
           },
           response: 'keys'
@@ -375,6 +376,7 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
+            withCredentials: false,
             uri: '/oauth2/v1/keys'
           },
           response: 'keys'
@@ -429,6 +431,7 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
+            withCredentials: false,
             uri: '/oauth2/v1/keys'
           },
           response: 'keys'

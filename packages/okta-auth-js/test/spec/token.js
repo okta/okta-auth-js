@@ -2785,6 +2785,7 @@ describe('token.getUserInfo', function() {
       return {
         request: {
           uri: '/oauth2/v1/userinfo',
+          withCredentials: false,
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -2810,6 +2811,7 @@ describe('token.getUserInfo', function() {
       return {
         request: {
           uri: '/oauth2/v1/userinfo',
+          withCredentials: false,
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -2838,6 +2840,7 @@ describe('token.getUserInfo', function() {
       return {
         request: {
           uri: '/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
+          withCredentials: false,
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -2921,6 +2924,7 @@ describe('token.getUserInfo', function() {
     setup: {
       request: {
         uri: '/oauth2/v1/userinfo',
+        withCredentials: false,
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -2948,6 +2952,7 @@ describe('token.getUserInfo', function() {
     setup: {
       request: {
         uri: '/oauth2/v1/userinfo',
+        withCredentials: false,
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',

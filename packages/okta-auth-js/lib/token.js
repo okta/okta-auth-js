@@ -794,7 +794,8 @@ async function getUserInfo(sdk, accessTokenObject, idTokenObject) {
   return http.httpRequest(sdk, {
     url: accessTokenObject.userinfoUrl,
     method: 'GET',
-    accessToken: accessTokenObject.accessToken
+    accessToken: accessTokenObject.accessToken,
+    withCredentials: false
   })
   .then(userInfo => {
     // Only return the userinfo response if subjects match to mitigate token substitution attacks

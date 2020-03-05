@@ -107,7 +107,8 @@ function getKey(sdk, issuer, kid) {
 
     // Pull the latest keys if the key wasn't in the cache
     return http.get(sdk, jwksUri, {
-      cacheResponse: true
+      cacheResponse: true,
+      withCredentials: false
     })
     .then(function(res) {
       var key = util.find(res.keys, {
