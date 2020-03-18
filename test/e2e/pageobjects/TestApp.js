@@ -56,7 +56,6 @@ class TestApp {
 
   async loginRedirect() {
     await this.waitForLoginBtn();
-    await browser.pause(5000);
     await this.loginRedirectBtn.then(el => el.click());
   }
 
