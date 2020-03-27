@@ -117,6 +117,7 @@ function validateResponse(res, expectedResp) {
     expect(actual.accessToken).toEqual(expected.accessToken);
     expect(actual.expiresAt).toEqual(expected.expiresAt);
     expect(actual.tokenType).toEqual(expected.tokenType);
+    expect(actual.code).toEqual(expected.code);
   }
 
   if (Array.isArray(expectedResp)) {
