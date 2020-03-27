@@ -229,16 +229,18 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
 
   var scopes = util.clone(oauthParams.scopes);
   var clientId = oauthParams.clientId || sdk.options.clientId;
+  var pkce = sdk.options.pkce !== false;
 
   return Promise.resolve()
   .then(function() {
     validateResponse(res, oauthParams);
 
+    // PKCE flow
     // We do not support "hybrid" scenarios where the response includes both a code and a token.
     // If the response contains a code it is used immediately to obtain new tokens.
-    if (res['code']) {
+    if (res.code && pkce) {
       responseType = ['token', 'id_token']; // what we expect the code to provide us
-      return exchangeCodeForToken(sdk, oauthParams, res['code'], urls);
+      return exchangeCodeForToken(sdk, oauthParams, res.code, urls);
     }
     return res;
   }).then(function(res) {
@@ -307,7 +309,8 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
 
     return {
       tokens: tokenDict,
-      state: res.state
+      state: res.state,
+      code: res.code
     };
   });
 }
