@@ -60,7 +60,7 @@ describe('fetchRequest', function () {
           method: requestMethod,
           headers: requestHeaders,
           body: JSON.stringify(requestJSON),
-          credentials: 'include'
+          credentials: 'omit'
         });
       });
     });
@@ -80,20 +80,20 @@ describe('fetchRequest', function () {
           method: requestMethod,
           headers: requestHeaders,
           body: requestText,
-          credentials: 'include'
+          credentials: 'omit'
         });
       });
     });
 
 
-    it('Can omit credentials', function() {
+    it('Can include credentials', function() {
       return fetchRequest(requestMethod, requestUrl, {
-        withCredentials: false
+        withCredentials: true
       })
       .then(() => {
         expect(fetchSpy).toHaveBeenCalledWith(requestUrl, {
           method: requestMethod,
-          credentials: 'omit'
+          credentials: 'include'
         });
       });
     });
