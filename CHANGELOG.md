@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.1
+
+### Bug Fixes
+
+- [#354](https://github.com/okta/okta-auth-js/pull/354) - Omit cookies from API requests. Removes warning messages in latest version of Chrome.
+
+- [#355](https://github.com/okta/okta-auth-js/pull/355) - Fix for authorization_code flow for non-SPA applications (when responseType=code and pkce=false). The code can be retrieved client-side using `parseFromUrl()` without throwing an error.
+
 ## 3.0.0
 
 ### Features
