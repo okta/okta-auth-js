@@ -2089,6 +2089,35 @@ describe('token.parseFromUrl', function() {
     spyOn(pkce, 'getToken').and.returnValue(Promise.resolve(response));
   }
 
+  it('authorization_code: Will return code', function() {
+    return oauthUtil.setupParseUrl({
+      oktaAuthArgs: {
+        pkce: false,
+        responseMode: 'query',
+        responseType: ['code']
+      },
+      searchMock: '?code=fake' +
+      '&state=' + oauthUtil.mockedState,
+      oauthCookie: JSON.stringify({
+        responseType: ['code'],
+        state: oauthUtil.mockedState,
+        nonce: oauthUtil.mockedNonce,
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      }),
+      expectedResp: {
+        code: 'fake',
+        state: oauthUtil.mockedState,
+        tokens: {}
+      }
+    });
+  });
+
   it('does not change the hash if a url is passed directly', function() {
     return oauthUtil.setupParseUrl({
       parseFromUrlArgs: 'http://example.com#id_token=' + tokens.standardIdToken +
@@ -2169,6 +2198,7 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
+        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           accessToken: tokens.standardAccessTokenParsed,
@@ -2205,6 +2235,7 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
+        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           accessToken: tokens.standardAccessTokenParsed,
@@ -2239,6 +2270,7 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
+        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           idToken: {

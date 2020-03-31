@@ -22,6 +22,46 @@ var secureCookieSettings = {
   sameSite: 'none'
 };
 
+describe('urlParamsToObject', () => {
+  it('removes leading #/', () => {
+    expect(oauthUtil.urlParamsToObject('#/foo=bar')).toEqual({
+      foo: 'bar'
+    });
+  });
+  it('removes leading #', () => {
+    expect(oauthUtil.urlParamsToObject('#foo=bar')).toEqual({
+      foo: 'bar'
+    });
+  });
+  it('removes leading ?', () => {
+    expect(oauthUtil.urlParamsToObject('?foo=bar')).toEqual({
+      foo: 'bar'
+    });
+  });
+  it('does not modify string if no leading char', () => {
+    expect(oauthUtil.urlParamsToObject('foo=bar')).toEqual({
+      foo: 'bar'
+    });
+  });
+  it('decodes regular URI components', () => {
+    const val = 'b a + & r';
+    const encoded = encodeURIComponent(val);
+    expect(oauthUtil.urlParamsToObject(`?foo=${encoded}`)).toEqual({
+      foo: val
+    });
+  });
+  it('does not decode id_token, access_token, or code', () => {
+    const val = 'b a + & r';
+    const encoded = encodeURIComponent(val);
+    expect(oauthUtil.urlParamsToObject(`?foo=${encoded}&id_token=${encoded}&access_token=${encoded}&code=${encoded}`)).toEqual({
+      foo: val,
+      id_token: encoded,
+      access_token: encoded,
+      code: encoded
+    });
+  });
+});
+
 describe('getWellKnown', function() {
   let originalLocation;
 

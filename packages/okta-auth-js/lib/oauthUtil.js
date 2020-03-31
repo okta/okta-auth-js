@@ -197,9 +197,18 @@ function urlParamsToObject(hashOrSearch) {
   // Predefine regexs for parsing hash
   var plus2space = /\+/g;
   var paramSplit = /([^&=]+)=?([^&]*)/g;
+  var fragment = hashOrSearch;
+
+  // Some hash based routers will automatically add a / character after the hash
+  if (fragment.charAt(0) === '#' && fragment.charAt(1) === '/') {
+    fragment = fragment.substring(2);
+  }
 
   // Remove the leading # or ?
-  var fragment = hashOrSearch.substring(1);
+  if (fragment.charAt(0) === '#' || fragment.charAt(0) === '?') {
+    fragment = fragment.substring(1);
+  }
+
 
   var obj = {};
 

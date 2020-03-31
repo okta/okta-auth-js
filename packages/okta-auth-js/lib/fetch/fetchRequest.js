@@ -57,7 +57,7 @@ function fetchRequest(method, url, args) {
     method: method,
     headers: args.headers,
     body: body,
-    credentials: args.withCredentials === false ? 'omit' : 'include'
+    credentials: args.withCredentials ? 'include' : 'omit'
   })
   .then(function(response) {
     var error = !response.ok;
