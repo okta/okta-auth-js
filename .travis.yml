@@ -1,11 +1,15 @@
 language: node_js
+
 node_js:
   - '10'
+
 install:
   - yarn install --frozen-lockfile
+
 script:
-  - yarn lint
-  - yarn test
+  - ./scripts/travis.sh
+
 cache: false
+
 addons:
   chrome: stable

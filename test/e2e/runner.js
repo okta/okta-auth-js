@@ -13,12 +13,16 @@ waitOn({
     'http-get://localhost:8080'
   ]
 }).then(() => {
-  // 2. run webdriver
+  // 2. run webdriver based on if sauce is needed or not
+  let wdioConfig = 'wdio.conf.js';
+  if (process.env.RUN_SAUCE_TESTS) {
+    wdioConfig = 'sauce.wdio.conf.js';
+  }
 
   let opts = process.argv.slice(2); // pass extra arguments through
   const runner = spawn('./node_modules/.bin/wdio', [
     'run',
-    'wdio.conf.js'
+    wdioConfig
   ].concat(opts), { stdio: 'inherit' });
 
   runner.on('exit', function (code) {

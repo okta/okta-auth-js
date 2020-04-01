@@ -24,6 +24,7 @@
     "eslint-plugin-jasmine": "^2.10.1",
     "wait-on": "^3.3.0",
     "wdio-chromedriver-service": "^5.0.2",
-    "webpack": "^3.0.0"
+    "webpack": "^3.0.0",
+    "@wdio/sauce-service": "^5.0.0"
   }
 }
