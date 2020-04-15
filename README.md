@@ -92,7 +92,7 @@ To install [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js
 ```bash
 # Run this command in your project root folder.
 # yarn
-yarn add --save @okta/okta-auth-js
+yarn add @okta/okta-auth-js
 
 # npm
 npm install --save @okta/okta-auth-js
