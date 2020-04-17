@@ -22,12 +22,13 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
-:heavy_check_mark: The current stable major version series is: `2.x`
+:heavy_check_mark: The current stable major version series is: `3.x`
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
-| `2.x`     | :heavy_check_mark: Stable        |
-| `1.x`     | :warning: Retiring on 2019-05-31 |
+| `3.x`     | :heavy_check_mark: Stable        |
+| `2.x`     | :warning: Retiring on 2020-09-30 |
+| `1.x`     | :x: Retired                      |
 | `0.x`     | :x: Retired                      |
 
 The latest release can always be found on the [releases page][github-releases].
@@ -92,7 +93,7 @@ To install [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js
 ```bash
 # Run this command in your project root folder.
 # yarn
-yarn add --save @okta/okta-auth-js
+yarn add @okta/okta-auth-js
 
 # npm
 npm install --save @okta/okta-auth-js
