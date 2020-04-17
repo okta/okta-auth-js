@@ -29,7 +29,7 @@ function OktaAuthBuilder(args) {
     headers: args.headers
   };
 
-  this.userAgent = 'okta-auth-js-server' + SDK_VERSION;
+  this.userAgent = builderUtil.getUserAgent(args) || 'okta-auth-js-server' + SDK_VERSION;
 
   sdk.tx = {
     status: util.bind(tx.transactionStatus, null, sdk),
