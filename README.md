@@ -1906,22 +1906,22 @@ authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
 
-## Node JS Usage
+## Node JS and React Native Usage
 
-You can use this library on server side in your Node application as an Authentication SDK. It can only be used in this way for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), **not** to implement an OIDC flow.
+You can use this library on server side in your Node application or mobile client side in React Native environment as an Authentication SDK. It can only be used in this way for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), **not** to implement an OIDC flow.
 
 To include this library in your project, you can follow the instructions in the [Getting started](#getting-started) section.
 
 ### Configuration
 
-You only need to set the `url` for your Okta Domain:
+You only need to set the `issuer` for your Okta Domain:
 
 ```javascript
 var OktaAuth = require('@okta/okta-auth-js');
 
 var config = {
   // The URL for your Okta organization
-  url: 'https://{yourOktaDomain}'
+  issuer: 'https://{yourOktaDomain}'
 };
 
 var authClient = new OktaAuth(config);
