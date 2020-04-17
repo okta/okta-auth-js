@@ -1,5 +1,6 @@
-var builderUtil  = require('../../lib/builderUtil');
-var SDK_VERSION = require('../../package.json').version;
+const builderUtil  = require('../../lib/builderUtil');
+
+const SDK_VERSION = '0.0.0';
 
 describe('builderUtil', () => {
 
@@ -19,8 +20,8 @@ describe('builderUtil', () => {
           template: 'fake userAgent $OKTA_AUTH_JS' 
         } 
       };
-      const userAgent = builderUtil.getUserAgent(args);
-      expect(userAgent).toEqual(`fake userAgent okta-auth-js/${SDK_VERSION}`);
+      const userAgent = builderUtil.getUserAgent(args, SDK_VERSION);
+      expect(userAgent).toEqual(`fake userAgent okta-auth-js/0.0.0`);
     });
     it('should return undefined if neither with userAgent nor userAgentTemplate in args', () => {
       const args = {};

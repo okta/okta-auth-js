@@ -82,7 +82,7 @@ function OktaAuthBuilder(args) {
     throw new AuthSdkError(errorMessage);
   }
 
-  this.userAgent = builderUtil.getUserAgent(args) || 'okta-auth-js-' + SDK_VERSION;
+  this.userAgent = builderUtil.getUserAgent(args, SDK_VERSION) || 'okta-auth-js-' + SDK_VERSION;
 
   // Digital clocks will drift over time, so the server
   // can misalign with the time reported by the browser.

@@ -13,7 +13,6 @@
 var AuthSdkError = require('./errors/AuthSdkError');
 var tx = require('./tx');
 var util = require('./util');
-var SDK_VERSION = require('../package.json').version;
 
 // TODO: use @okta/configuration-validation (move module to this monorepo?)
 // eslint-disable-next-line complexity
@@ -101,7 +100,7 @@ function buildOktaAuth(OktaAuthBuilder) {
   };
 }
 
-function getUserAgent(args) {
+function getUserAgent(args, sdkVersion) {
   var userAgent = args.userAgent;
 
   if (!userAgent) {
@@ -113,7 +112,7 @@ function getUserAgent(args) {
   }
 
   if (userAgent.template) {
-    return userAgent.template.replace('$OKTA_AUTH_JS', `okta-auth-js/${SDK_VERSION}`);
+    return userAgent.template.replace('$OKTA_AUTH_JS', `okta-auth-js/${sdkVersion}`);
   }
 
   return '';
