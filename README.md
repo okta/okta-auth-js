@@ -13,7 +13,7 @@
 * [Configuration reference](#configuration-reference)
 * [API Reference](#api-reference)
 * [Building the SDK](#building-the-sdk)
-* [Node JS Usage](#node-js-usage)
+* [Node JS and React Native Usage](#node-js-and-react-native-usage)
 * [Contributing](#contributing)
 
 The Okta Auth JavaScript SDK builds on top of our [Authentication API](https://developer.okta.com/docs/api/resources/authn) and [OpenID Connect & OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
