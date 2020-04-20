@@ -1,11 +1,12 @@
 {
   "name": "@okta/okta-auth-js",
   "description": "The Okta Auth SDK",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "lib/server/serverIndex.js",
   "browser": "dist/okta-auth-js.min.js",
+  "react-native": "lib/server/serverIndex.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"

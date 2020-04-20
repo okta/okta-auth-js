@@ -15,6 +15,7 @@ var tx = require('./tx');
 var util = require('./util');
 
 // TODO: use @okta/configuration-validation (move module to this monorepo?)
+// eslint-disable-next-line complexity
 function assertValidConfig(args) {
   if (!args) {
     throw new AuthSdkError('No arguments passed to constructor. ' +
@@ -36,6 +37,14 @@ function assertValidConfig(args) {
   if (issuer.indexOf('-admin.') !== -1) {
     throw new AuthSdkError('Issuer URL passed to constructor contains "-admin" in subdomain. ' +
       'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com})');
+  }
+
+  var userAgent = args.userAgent;
+  var userAgentTemplateWithNoPlaceholder = 
+    userAgent && userAgent.template && userAgent.template.indexOf('$OKTA_AUTH_JS') === -1;
+  if (userAgentTemplateWithNoPlaceholder) {
+    throw new AuthSdkError('UserAgentTemplate must include "$OKTA_AUTH_JS" placeholder. ' + 
+      'Required usage: new OktaAuth({userAgentTemplate: "xxx $OKTA_AUTH_JS xxx"})');
   }
 }
 
@@ -91,8 +100,27 @@ function buildOktaAuth(OktaAuthBuilder) {
   };
 }
 
+function getUserAgent(args, sdkVersion) {
+  var userAgent = args.userAgent;
+
+  if (!userAgent) {
+    return '';
+  }
+
+  if (userAgent.value) {
+    return userAgent.value;
+  }
+
+  if (userAgent.template) {
+    return userAgent.template.replace('$OKTA_AUTH_JS', `okta-auth-js/${sdkVersion}`);
+  }
+
+  return '';
+}
+
 module.exports = {
   addSharedPrototypes: addSharedPrototypes,
   buildOktaAuth: buildOktaAuth,
-  assertValidConfig: assertValidConfig
+  assertValidConfig: assertValidConfig,
+  getUserAgent: getUserAgent
 };

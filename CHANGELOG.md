@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.0
+
+### Features
+
+- [#363](https://github.com/okta/okta-auth-js/pull/363) 
+  - Expose server bundle for React Native platform as an Authentication SDK.
+  - Handle userAgent customization with newly added userAgent field in config.
+
 ## 3.0.1
 
 ### Bug Fixes

@@ -344,7 +344,7 @@ Object.assign(TestApp.prototype, {
         ${ tokensHTML({idToken, accessToken})}
       `;
     }
-    
+
     // Unauthenticated user, Login page
     return `
       <strong>Greetings, unknown user!</strong>
