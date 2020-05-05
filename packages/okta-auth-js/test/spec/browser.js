@@ -100,13 +100,14 @@ describe('Browser', function() {
         expect(auth.options.cookies.sameSite).toBe('lax');
       });
 
-      it('throws if running on HTTP (not localhost)', () => {
+      it('console warning if running on HTTP (not localhost)', () => {
         window.location.protocol = 'http:';
         window.location.hostname = 'not-localhost';
-        function fn() {
-          auth = new OktaAuth({ issuer: 'http://my-okta-domain' });
-        }
-        expect(fn).toThrowError(
+        jest.spyOn(console, 'warn').mockReturnValue(null);
+        auth = new OktaAuth({ issuer: 'http://my-okta-domain' });
+        
+        // eslint-disable-next-line no-console
+        expect(console.warn).toHaveBeenCalledWith(
           'The current page is not being served with the HTTPS protocol.\n' +
           'For security reasons, we strongly recommend using HTTPS.\n' +
           'If you cannot use HTTPS, set "cookies.secure" option to false.'
@@ -135,42 +136,6 @@ describe('Browser', function() {
       it('can be set to "false" by arg', function() {
         auth = new OktaAuth({ pkce: false, issuer: 'http://my-okta-domain' });
         expect(auth.options.pkce).toBe(false);
-      });
-
-      it('throws if PKCE is not supported (HTTP)', function() {
-        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-        global.window.location.protocol = 'http:';
-        function fn() {
-          auth = new OktaAuth({ pkce: true, cookies: { secure: false }, issuer: 'http://my-okta-domain' });
-        }
-        expect(fn).toThrowError(
-          'PKCE requires a modern browser with encryption support running in a secure context.\n' +
-          'The current page is not being served with HTTPS protocol. Try using HTTPS.\n' +
-          '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
-        );
-      });
-
-      it('throws if PKCE is not supported (HTTPS, no TextEncoder)', function() {
-        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-        expect(global.window.TextEncoder).toBe(undefined);
-        function fn() {
-          auth = new OktaAuth({ pkce: true, issuer: 'http://my-okta-domain' });
-        }
-        expect(fn).toThrowError(
-          'PKCE requires a modern browser with encryption support running in a secure context.\n' +
-          '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
-        );
-      });
-
-      it('throws if PKCE is not supported (HTTPS, with TextEncoder)', function() {
-        spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
-        global.window.TextEncoder = {};
-        function fn() {
-          auth = new OktaAuth({ pkce: true, issuer: 'http://my-okta-domain' });
-        }
-        expect(fn).toThrowError(
-          'PKCE requires a modern browser with encryption support running in a secure context.'
-        );
       });
     })
   });

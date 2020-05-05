@@ -27,7 +27,11 @@ describe('pkce', function() {
       })
       .catch(function (e) {
         expect(e.name).toEqual('AuthSdkError');
-        expect(e.errorSummary).toEqual('This browser doesn\'t support PKCE');
+        expect(e.errorSummary).toEqual(
+          'PKCE requires a modern browser with encryption support running in a secure context.\n' +
+          'The current page is not being served with HTTPS protocol. PKCE requires secure HTTPS protocol.\n' +
+          '"TextEncoder" is not defined. To use PKCE, you may need to include a polyfill/shim for this browser.'
+        );
       });
     });
     

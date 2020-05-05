@@ -433,6 +433,7 @@ function getToken(sdk, options) {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getToken" takes only a single set of options'));
   }
+  
   options = options || {};
 
   return prepareOauthParams(sdk, options)
@@ -601,7 +602,16 @@ function prepareOauthParams(sdk, options) {
 
   // PKCE flow
   if (!sdk.features.isPKCESupported()) {
-    return Promise.reject(new AuthSdkError('This browser doesn\'t support PKCE'));
+    var errorMessage = 'PKCE requires a modern browser with encryption support running in a secure context.';
+    if (!sdk.features.isHTTPS()) {
+      // eslint-disable-next-line max-len
+      errorMessage += '\nThe current page is not being served with HTTPS protocol. PKCE requires secure HTTPS protocol.';
+    }
+    if (!sdk.features.hasTextEncoder()) {
+      // eslint-disable-next-line max-len
+      errorMessage += '\n"TextEncoder" is not defined. To use PKCE, you may need to include a polyfill/shim for this browser.';
+    }
+    return Promise.reject(new AuthSdkError(errorMessage));
   }
 
   // set default code challenge method, if none provided
