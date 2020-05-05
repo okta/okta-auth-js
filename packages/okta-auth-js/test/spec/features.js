@@ -105,60 +105,69 @@ describe('features', function() {
       expect(OktaAuth.features.isPKCESupported()).toBe(false);
     });
 
-    it('throw an error during construction if pkce is true and PKCE is not supported', function () {
+    it('rejects with an error when calling getToken if pkce is true and PKCE is not supported', function () {
       var err;
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
       spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(true);
-      try {
-        new OktaAuth({
-          issuer: 'https://dev-12345.oktapreview.com',
-          pkce: true,
+      var auth = new OktaAuth({
+        issuer: 'https://dev-12345.oktapreview.com',
+        pkce: true,
+      });
+
+      return auth.token.getWithoutPrompt()
+        .catch (e => {
+          err = e;
+        })
+        .then(() => {
+          expect(err.name).toEqual('AuthSdkError');
+          expect(err.errorSummary).toEqual('PKCE requires a modern browser with encryption support running in a secure context.');
         });
-      } catch (e) {
-        err = e;
-      }
-      expect(err.name).toEqual('AuthSdkError');
-      expect(err.errorSummary).toEqual('PKCE requires a modern browser with encryption support running in a secure context.');
     });
 
 
-    it('HTTPS: throw a more specific error', function () {
+    it('HTTPS: rejects with a more specific error', function () {
       var err;
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
       spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(false);
-      try {
-        new OktaAuth({
-          issuer: 'https://dev-12345.oktapreview.com',
-          pkce: true,
+      var auth = new OktaAuth({
+        issuer: 'https://dev-12345.oktapreview.com',
+        pkce: true,
+      });
+      
+      return auth.token.getWithoutPrompt()
+        .catch (e => {
+          err = e;
+        })
+        .then(() => {
+          expect(err.name).toEqual('AuthSdkError');
+          expect(err.errorSummary).toEqual(
+            'PKCE requires a modern browser with encryption support running in a secure context.\n' +
+            'The current page is not being served with HTTPS protocol. PKCE requires secure HTTPS protocol.'
+          );
         });
-      } catch (e) {
-        err = e;
-      }
-      expect(err.name).toEqual('AuthSdkError');
-      expect(err.errorSummary).toEqual(
-        'PKCE requires a modern browser with encryption support running in a secure context.\n' +
-        'The current page is not being served with HTTPS protocol. Try using HTTPS.'
-      );
     });
 
-    it('TextEncoder: throw a more specific error', function () {
+    it('TextEncoder: rejects with a more specific error', function () {
       var err;
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
       spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(true);
       window.TextEncoder = undefined;
-      try {
-        new OktaAuth({
-          issuer: 'https://dev-12345.oktapreview.com',
-          pkce: true,
+
+      var auth = new OktaAuth({
+        issuer: 'https://dev-12345.oktapreview.com',
+        pkce: true,
+      });
+      return auth.token.getWithoutPrompt()
+        .catch (e => {
+          err = e;
+        })
+        .then(() => {
+          expect(err.name).toEqual('AuthSdkError');
+          expect(err.errorSummary).toEqual(
+            'PKCE requires a modern browser with encryption support running in a secure context.\n' +
+            '"TextEncoder" is not defined. To use PKCE, you may need to include a polyfill/shim for this browser.'
+          );
         });
-      } catch (e) {
-        err = e;
-      }
-      expect(err.name).toEqual('AuthSdkError');
-      expect(err.errorSummary).toEqual(
-        'PKCE requires a modern browser with encryption support running in a secure context.\n' +
-        '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
-      );
     });
 
     it('TextEncoder & HTTPS: throw a more specific error', function () {
@@ -166,20 +175,23 @@ describe('features', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
       spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(false);
       window.TextEncoder = undefined;
-      try {
-        new OktaAuth({
-          issuer: 'https://dev-12345.oktapreview.com',
-          pkce: true,
+
+      var auth = new OktaAuth({
+        issuer: 'https://dev-12345.oktapreview.com',
+        pkce: true,
+      });
+      return auth.token.getWithoutPrompt()
+        .catch (e => {
+          err = e;
+        })
+        .then(() => {
+          expect(err.name).toEqual('AuthSdkError');
+          expect(err.errorSummary).toEqual(
+            'PKCE requires a modern browser with encryption support running in a secure context.\n' +
+            'The current page is not being served with HTTPS protocol. PKCE requires secure HTTPS protocol.\n' +
+            '"TextEncoder" is not defined. To use PKCE, you may need to include a polyfill/shim for this browser.'
+          );
         });
-      } catch (e) {
-        err = e;
-      }
-      expect(err.name).toEqual('AuthSdkError');
-      expect(err.errorSummary).toEqual(
-        'PKCE requires a modern browser with encryption support running in a secure context.\n' +
-        'The current page is not being served with HTTPS protocol. Try using HTTPS.\n' +
-        '"TextEncoder" is not defined. You may need a polyfill/shim for this browser.'
-      );
     });
 
   });
