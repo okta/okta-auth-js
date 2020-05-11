@@ -100,22 +100,18 @@ function buildOktaAuth(OktaAuthBuilder) {
   };
 }
 
-function getUserAgent(args, sdkVersion) {
-  var userAgent = args.userAgent;
-
-  if (!userAgent) {
-    return '';
-  }
+function getUserAgent(args, sdkValue) {
+  var userAgent = args.userAgent || {};
 
   if (userAgent.value) {
     return userAgent.value;
   }
 
   if (userAgent.template) {
-    return userAgent.template.replace('$OKTA_AUTH_JS', `okta-auth-js/${sdkVersion}`);
+    return userAgent.template.replace('$OKTA_AUTH_JS', sdkValue);
   }
 
-  return '';
+  return sdkValue;
 }
 
 module.exports = {

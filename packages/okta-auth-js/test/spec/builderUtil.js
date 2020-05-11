@@ -1,11 +1,9 @@
 const builderUtil  = require('../../lib/builderUtil');
 
-const SDK_VERSION = '0.0.0';
-
 describe('builderUtil', () => {
 
   describe('getUserAgent', () => {
-    it('should return userAgent if "userAgent" is provided in args', () => {
+    it('should return userAgent if "userAgent.value" is provided in args', () => {
       const args = { 
         userAgent: {
           value: 'fake userAgent'
@@ -14,19 +12,41 @@ describe('builderUtil', () => {
       const userAgent = builderUtil.getUserAgent(args);
       expect(userAgent).toEqual('fake userAgent');
     });
-    it('should replace "$OKTA_AUTH_JS" with current authJs version if only with userAgentTemplate in args', () => {
+    it('should replace "$OKTA_AUTH_JS" with current authJs user agent value if only with userAgentTemplate in args', () => {
       const args = { 
         userAgent: {
           template: 'fake userAgent $OKTA_AUTH_JS' 
         } 
       };
-      const userAgent = builderUtil.getUserAgent(args, SDK_VERSION);
+      const sdkUserAgentValue = 'okta-auth-js/0.0.0';
+      const userAgent = builderUtil.getUserAgent(args, sdkUserAgentValue);
       expect(userAgent).toEqual(`fake userAgent okta-auth-js/0.0.0`);
     });
-    it('should return undefined if neither with userAgent nor userAgentTemplate in args', () => {
+    it('should return undefined if no userAgent object is in args', () => {
       const args = {};
       const userAgent = builderUtil.getUserAgent(args);
-      expect(userAgent).toEqual('');
+      expect(userAgent).toEqual(undefined);
+    });
+    it('should return undefined if neither with userAgent.value nor userAgent.template in args', () => {
+      const args = {
+        userAgent: {}
+      };
+      const userAgent = builderUtil.getUserAgent(args);
+      expect(userAgent).toEqual(undefined);
+    });
+    it('should return sdk defined user agent if no userAgent object is in args', () => {
+      const args = {};
+      const sdkUserAgentValue = 'okta-auth-js-fake/0.0.0';
+      const userAgent = builderUtil.getUserAgent(args, sdkUserAgentValue);
+      expect(userAgent).toEqual('okta-auth-js-fake/0.0.0');
+    });
+    it('should return sdk defined user agent if neither with userAgent.value nor userAgent.template in args', () => {
+      const args = {
+        userAgent: {}
+      };
+      const sdkUserAgentValue = 'okta-auth-js-fake/0.0.0';
+      const userAgent = builderUtil.getUserAgent(args, sdkUserAgentValue);
+      expect(userAgent).toEqual('okta-auth-js-fake/0.0.0');
     });
   });
 
