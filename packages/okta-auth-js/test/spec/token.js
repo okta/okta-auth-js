@@ -2820,7 +2820,7 @@ describe('token.getUserInfo', function() {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
             'Authorization': 'Bearer ' + tokens.standardAccessToken
           }
         },
@@ -2845,7 +2845,7 @@ describe('token.getUserInfo', function() {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
             'Authorization': 'Bearer ' + tokens.standardAccessToken
           }
         },
@@ -2873,7 +2873,7 @@ describe('token.getUserInfo', function() {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
             'Authorization': 'Bearer ' + tokens.authServerAccessToken
           }
         },
@@ -2956,7 +2956,7 @@ describe('token.getUserInfo', function() {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+          'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
           'Authorization': 'Bearer ' + tokens.standardAccessToken
         }
       },
@@ -2983,7 +2983,7 @@ describe('token.getUserInfo', function() {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version,
+          'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
           'Authorization': 'Bearer ' + tokens.standardAccessToken
         }
       },

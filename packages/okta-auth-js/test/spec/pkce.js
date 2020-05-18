@@ -123,7 +123,7 @@ describe('pkce', function() {
               headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version
+                'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version
               }
             },
             response: 'pkce-token-success',
