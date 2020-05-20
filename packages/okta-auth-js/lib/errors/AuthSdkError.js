@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-function AuthSdkError(msg, xhr) {
+function AuthSdkError(msg, xhr = null) {
   this.name = 'AuthSdkError';
   this.message = msg;
 

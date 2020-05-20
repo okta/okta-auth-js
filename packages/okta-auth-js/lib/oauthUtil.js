@@ -10,6 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+
+/**
+ * @typedef {OktaAuth.CustomUrls} CustomUrls
+ */
+
 /* global window, document */
 /* eslint-disable complexity, max-statements */
 var http = require('./http');
@@ -75,13 +80,22 @@ function loadPopup(src, options) {
   }
 }
 
-function getWellKnown(sdk, issuer) {
+/**
+ * @param {OktaAuth} sdk
+ * @param {string=} issuer
+ */
+function getWellKnown(sdk, issuer = '') {
   var authServerUri = (issuer || sdk.options.issuer);
   return http.get(sdk, authServerUri + '/.well-known/openid-configuration', {
     cacheResponse: true
   });
 }
 
+/**
+ * @param {OktaAuth} sdk
+ * @param {string} issuer
+ * @param {string} kid
+ */
 function getKey(sdk, issuer, kid) {
   var httpCache = storageUtil.getHttpCache(sdk.options.cookies);
 
@@ -123,6 +137,11 @@ function getKey(sdk, issuer, kid) {
   });
 }
 
+/**
+ * @param {OktaAuth} sdk
+ * @param {object} claims
+ * @param {object} validationParams
+ */
 function validateClaims(sdk, claims, validationParams) {
   var aud = validationParams.clientId;
   var iss = validationParams.issuer;
@@ -161,7 +180,11 @@ function validateClaims(sdk, claims, validationParams) {
   }
 }
 
-function getOAuthUrls(sdk, options) {
+/**
+ * @param {OktaAuth} sdk
+ * @param {CustomUrls} options
+ */
+function getOAuthUrls(sdk, options = null) {
   if (arguments.length > 2) {
     throw new AuthSdkError('As of version 3.0, "getOAuthUrls" takes only a single set of options');
   }

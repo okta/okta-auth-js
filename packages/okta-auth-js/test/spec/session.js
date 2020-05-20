@@ -157,6 +157,7 @@ describe('session', function() {
       });
       return session.getSession(sdk)
         .then(function(res) {
+          // @ts-ignore
           http.get.mockReset();
           jest.spyOn(http, 'get').mockReturnValue(null);
           res.user();
@@ -210,25 +211,27 @@ describe('session', function() {
     beforeEach(function() {
       currentUrl = 'http://i-am-here';
       delete window.location;
+      // @ts-ignore
       window.location = {
-        href: currentUrl
+        href: currentUrl,
+        assign: jest.fn()
       };
     });
     it('redirects to /login/sessionCookieRedirect', function() {
       session.setCookieAndRedirect(sdk);
-      expect(window.location).toBe(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&redirectUrl=' + encodeURIComponent(currentUrl));
+      expect(window.location.assign).toHaveBeenCalledWith(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&redirectUrl=' + encodeURIComponent(currentUrl));
     });
     it('can pass a sessionToken', function() {
       var sessionToken = 'blah-blah';
       session.setCookieAndRedirect(sdk, sessionToken);
-      expect(window.location).toBe(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&token=' +
+      expect(window.location.assign).toHaveBeenCalledWith(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&token=' +
         encodeURIComponent(sessionToken) + '&redirectUrl=' + encodeURIComponent(currentUrl));
     });
     it('can pass a redirectUrl', function() {
       var sessionToken = 'blah-blah';
       var redirectUrl = 'http://go-here-now';
       session.setCookieAndRedirect(sdk, sessionToken, redirectUrl);
-      expect(window.location).toBe(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&token=' +
+      expect(window.location.assign).toHaveBeenCalledWith(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&token=' +
         encodeURIComponent(sessionToken) + '&redirectUrl=' + encodeURIComponent(redirectUrl));
     });
   });

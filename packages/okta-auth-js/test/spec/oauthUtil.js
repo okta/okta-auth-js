@@ -323,7 +323,7 @@ describe('getWellKnown', function() {
     setup: {
       beforeClient: function() {
         delete window.location;
-        window.location = {
+        /** @type {any} */(window).location = {
           protocol: 'https:'
         }
         oauthUtilHelpers.mockLocalStorageError();
@@ -683,7 +683,7 @@ describe('getOAuthUrls', function() {
 
 describe('loadPopup', function() {
   it('popups window with full src url directly when none-IE', function () {
-    var mockElem = {};
+    var mockElem = /** @type {Window} */({});
     jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(false);
     jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
@@ -692,7 +692,7 @@ describe('loadPopup', function() {
     });
 
     expect(winEl).toBe(mockElem);
-    expect(window.open.mock.calls.length).toBe(1);
+    expect(/** @type {any} */(window).open.mock.calls.length).toBe(1);
     expect(window.open).toHaveBeenCalledWith(
       '/path/to/foo',
       'Hello Okta',
@@ -701,14 +701,14 @@ describe('loadPopup', function() {
   });
 
   it('popups window with full src url directly and default title', function () {
-    var mockElem = {};
+    var mockElem = /** @type {Window} */({});
     jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(false);
     jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
     var winEl = oauthUtil.loadPopup('/path/to/foo', {});
 
     expect(winEl).toBe(mockElem);
-    expect(window.open.mock.calls.length).toBe(1);
+    expect(/** @type {any} */(window).open.mock.calls.length).toBe(1);
     expect(window.open).toHaveBeenCalledWith(
       '/path/to/foo',
       'External Identity Provider User Authentication',
@@ -717,11 +717,11 @@ describe('loadPopup', function() {
   });
 
   it('popups window with full src url directly when IE mode', function () {
-    var mockElem = {
+    var mockElem = /** @type {Window} */({
       location: {
 
       }
-    };
+    });
     jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(true);
     jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
@@ -730,7 +730,7 @@ describe('loadPopup', function() {
     });
 
     expect(winEl).toBe(mockElem);
-    expect(window.open.mock.calls.length).toBe(1);
+    expect(/** @type {any} */(window).open.mock.calls.length).toBe(1);
     expect(window.open).toHaveBeenCalledWith(
       '/',
       'Hello Okta',

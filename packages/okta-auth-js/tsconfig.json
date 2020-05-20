@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "commonjs",
+    "target": "es5",
+    "allowJs": true,
+    "checkJs": true,
+    "moduleResolution": "node",
+    "alwaysStrict": true,
+    "strictNullChecks": false,
+    "noEmit": false,
+    "declaration": true,
+    "outDir": "./build2/types",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": false,
+    "rootDir": "../../",
+    "baseUrl": "./",
+    "paths": {
+      "OktaAuth": ["./lib/browser/browserIndex"]
+    }
+  },
+  "files": [
+    "package.json"
+  ],
+  "include": [
+    "types/**/*.ts",
+    "lib/**/*.js",
+    "test/spec/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "build2"
+  ]
+}

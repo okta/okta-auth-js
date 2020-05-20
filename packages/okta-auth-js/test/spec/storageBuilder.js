@@ -4,13 +4,13 @@ describe('storageBuilder', () => {
 
   it('throws if a storagename is not provided', () => {
     const fn = function() {
-      storageBuilder();
+      storageBuilder(null, null);
     };
     expect(fn).toThrowError('"storageName" is required');
   });
 
   it('Returns an interface around a storage object', () => {
-    const storage = storageBuilder({}, 'fake');
+    const storage = storageBuilder({ getItem: jest.fn(), setItem: jest.fn() }, 'fake');
     expect(typeof storage.getStorage).toBe('function');
     expect(typeof storage.setStorage).toBe('function');
     expect(typeof storage.clearStorage).toBe('function');
@@ -20,7 +20,8 @@ describe('storageBuilder', () => {
   describe('getStorage', () => {
     it('Calls "getItem" on the inner storage', () => {
       const inner = {
-        getItem: jest.fn()
+        getItem: jest.fn(),
+        setItem: jest.fn()
       };
       const storageName = 'fake';
       const storage = storageBuilder(inner, storageName);
@@ -30,7 +31,8 @@ describe('storageBuilder', () => {
     it('JSON decodes the returned object', () => {
       const obj = { fakeObject: true };
       const inner = {
-        getItem: jest.fn().mockReturnValue(JSON.stringify(obj))
+        getItem: jest.fn().mockReturnValue(JSON.stringify(obj)),
+        setItem: jest.fn()
       };
       const storageName = 'fake';
       const storage = storageBuilder(inner, storageName);
@@ -38,7 +40,8 @@ describe('storageBuilder', () => {
     });
     it('throws if object cannot be decoded', () => {
       const inner = {
-        getItem: jest.fn().mockReturnValue('a string that wont decode')
+        getItem: jest.fn().mockReturnValue('a string that wont decode'),
+        setItem: jest.fn()
       };
       const storageName = 'fake';
       const storage = storageBuilder(inner, storageName);
@@ -52,6 +55,7 @@ describe('storageBuilder', () => {
   describe('setStorage', () => {
     it('Calls "setItem" on the inner storage', () => {
       const inner = {
+        getItem: jest.fn(),
         setItem: jest.fn()
       };
       const storageName = 'fake';
@@ -61,6 +65,7 @@ describe('storageBuilder', () => {
     });
     it('JSON stringifies the object passed to inner storage', () => {
       const inner = {
+        getItem: jest.fn(),
         setItem: jest.fn()
       };
       const storageName = 'fake';
@@ -71,6 +76,7 @@ describe('storageBuilder', () => {
     });
     it('Throws an error if setItem throws', () => {
       const inner = {
+        getItem: jest.fn(),
         setItem: jest.fn().mockImplementation(() => {
           throw new Error('this error will be caught');
         })
@@ -87,6 +93,7 @@ describe('storageBuilder', () => {
   describe('clearStorage', () => {
     it('if no key is passed, it will set storage to an empty object', () => {
       const inner = {
+        getItem: jest.fn(),
         setItem: jest.fn()
       };
       const storageName = 'fake';

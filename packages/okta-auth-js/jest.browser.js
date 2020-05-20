@@ -16,6 +16,9 @@ module.exports = {
   'testPathIgnorePatterns': [
     './test/spec/serverStorage.js'
   ],
+  'modulePathIgnorePatterns': [
+    '/build2/'
+  ],
   'reporters': [
     'default',
     'jest-junit'

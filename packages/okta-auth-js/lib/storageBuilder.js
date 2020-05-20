@@ -11,9 +11,14 @@
  *
  */
 
+ /**
+  * @typedef {OktaAuth.StorageBuilder} StorageBuilder
+  */
+
 var AuthSdkError = require('./errors/AuthSdkError');
 
 // storage must have getItem and setItem
+/** @type {StorageBuilder} */
 function storageBuilder(webstorage, storageName) {
   if (typeof storageName !== 'string' || !storageName.length) {
     throw new AuthSdkError('"storageName" is required');

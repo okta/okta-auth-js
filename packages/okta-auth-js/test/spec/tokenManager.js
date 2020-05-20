@@ -1,10 +1,11 @@
 /* global window, localStorage, sessionStorage */
-
 // Promise.allSettled is added in Node 12.10
 var allSettled = require('promise.allsettled');
 allSettled.shim(); // will be a no-op if not needed
 
 var Emitter = require('tiny-emitter');
+
+// @ts-ignore
 var OktaAuth = require('OktaAuth');
 var tokens = require('@okta/test.support/tokens');
 var util = require('@okta/test.support/util');
@@ -17,6 +18,9 @@ var secureCookieSettings = {
   sameSite: 'none'
 };
 
+/**
+ * @returns {OktaAuth}
+ */
 function setupSync(options) {
   options = options || {};
   options.tokenManager = options.tokenManager || {};
@@ -43,15 +47,16 @@ describe('TokenManager', function() {
     sessionStorage.clear();
 
     // Mock window.location so we appear to be on an HTTPS origin
-    originalLocation = global.window.location;
-    delete global.window.location;
-    global.window.location = {
+    originalLocation = window.location;
+    delete window.location;
+    // @ts-ignore
+    window.location = {
       protocol: 'https:',
       hostname: 'somesite.local'
     };
   });
   afterEach(function() {
-    global.window.location = originalLocation;
+    window.location = originalLocation;
     jest.useRealTimers();
   });
 
@@ -61,6 +66,7 @@ describe('TokenManager', function() {
       var client = setupSync();
       var handlerFn = jest.fn();
       client.tokenManager.on('fake', handlerFn);
+      // @ts-ignore
       var emitter = Emitter.prototype.on.mock.instances[0];
       expect(emitter).toBe(client.emitter);
       emitter.emit('fake');
@@ -246,6 +252,7 @@ describe('TokenManager', function() {
     it('throws an error when attempting to add a non-token', function() {
       var client = setupSync();
       try {
+        // @ts-ignore
         client.tokenManager.add('test-idToken', [
           tokens.standardIdTokenParsed,
           tokens.standardIdTokenParsed

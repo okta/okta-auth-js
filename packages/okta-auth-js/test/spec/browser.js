@@ -11,13 +11,13 @@ describe('Browser', function() {
   let originalLocation;
 
   afterEach(() => {
-    global.window.location = originalLocation;
+    window.location = originalLocation;
   });
 
   beforeEach(function() {
-    originalLocation = global.window.location;
-    delete global.window.location;
-    global.window.location = {
+    originalLocation = window.location;
+    delete window.location;
+    /** @type {any} */(window).location = {
       protocol: 'https:',
       hostname: 'somesite.local'
     };
@@ -36,7 +36,7 @@ describe('Browser', function() {
       jest.spyOn(OktaAuth.prototype, '_onTokenManagerError');
       var auth = new OktaAuth({ issuer: 'http://localhost/fake', pkce: false });
       expect(Emitter.prototype.on).toHaveBeenCalledWith('error', auth._onTokenManagerError, auth);
-      var emitter = Emitter.prototype.on.mock.instances[0];
+      var emitter = /** @type {any} */(Emitter).prototype.on.mock.instances[0];
       var error = { errorCode: 'anything'};
       emitter.emit('error', error);
       expect(OktaAuth.prototype._onTokenManagerError).toHaveBeenCalledWith(error);
@@ -46,7 +46,7 @@ describe('Browser', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
       new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
-      var emitter = Emitter.prototype.on.mock.instances[0];
+      var emitter = /** @type {any} */(Emitter).prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'login_required', accessToken: true };
       emitter.emit('error', error);
@@ -57,7 +57,7 @@ describe('Browser', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
       new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
-      var emitter = Emitter.prototype.on.mock.instances[0];
+      var emitter = /** @type {any} */(Emitter).prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'login_required' };
       emitter.emit('error', error);
@@ -68,7 +68,7 @@ describe('Browser', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
       new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
-      var emitter = Emitter.prototype.on.mock.instances[0];
+      var emitter = /** @type {any} */(Emitter).prototype.on.mock.instances[0];
       expect(onSessionExpired).not.toHaveBeenCalled();
       var error = { errorCode: 'unknown', accessToken: true };
       emitter.emit('error', error);
@@ -115,7 +115,7 @@ describe('Browser', function() {
       });
 
       it('does not throw if running on HTTP and cookies.secure = false', () => {
-        global.window.location.protocol = 'http:';
+        window.location.protocol = 'http:';
         window.location.hostname = 'not-localhost';
         function fn() {
           auth = new OktaAuth({ cookies: { secure: false }, issuer: 'http://my-okta-domain', pkce: false });
@@ -223,7 +223,7 @@ describe('Browser', function() {
     beforeEach(function() {
       origin = 'https://somesite.local';
       encodedOrigin = encodeURIComponent(origin);
-      Object.assign(global.window.location, {
+      Object.assign(window.location, {
         origin,
         assign: jest.fn(),
         reload: jest.fn()

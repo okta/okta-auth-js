@@ -11,37 +11,55 @@
  */
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
-
+/**
+ * @typedef {OktaAuth.OktaAuthOptions} OktaAuthOptions
+ */
 var builderUtil       = require('../builderUtil');
 var SDK_VERSION       = require('../../package.json').version;
 var storage           = require('./serverStorage').storage;
 var tx                = require('../tx');
 var util              = require('../util');
 
+/**
+ * @param {OktaAuthOptions} args
+ */
 function OktaAuthBuilder(args) {
+  /**
+   * @type {OktaAuth}
+   */
   var sdk = this;
 
   builderUtil.assertValidConfig(args);
-  this.options = {
+
+  /**
+   * @type {OktaAuthOptions}
+   */
+  var options = {
     issuer: util.removeTrailingSlash(args.issuer),
     httpRequestClient: args.httpRequestClient,
     storageUtil: args.storageUtil,
     headers: args.headers
   };
-
-  this.userAgent = builderUtil.getUserAgent(args, `okta-auth-js-server/${SDK_VERSION}`);
+  sdk.options = options;
+  sdk.userAgent = builderUtil.getUserAgent(args, `okta-auth-js-server/${SDK_VERSION}`);
 
   sdk.tx = {
+    introspect: util.bind(tx.introspect, null, sdk),
     status: util.bind(tx.transactionStatus, null, sdk),
     resume: util.bind(tx.resumeTransaction, null, sdk),
-    exists: util.bind(tx.transactionExists, null, sdk)
+    exists: util.extend(util.bind(tx.transactionExists, null, sdk), {
+      _get: function(name) {
+        return storage.get(name);
+      }
+    })
   };
 
-  sdk.tx.exists._get = function(name) {
-    return storage.get(name);
-  };
+
 }
 
+/**
+ * @type {OktaAuth}
+ */
 var proto = OktaAuthBuilder.prototype;
 
 // { username, password, (relayState), (context) }

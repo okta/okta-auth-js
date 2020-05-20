@@ -11,12 +11,14 @@
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
   },
+  "types": "types/index.d.ts",
   "bugs": {
     "url": "https://github.com/okta/okta-auth-js/issues"
   },
   "scripts": {
-    "lint": "eslint .",
-    "lint:report": "eslint -f checkstyle -o ../../build2/reports/lint/eslint-checkstyle-result.xml .",
+    "lint": "eslint . --ext .js --ext .ts",
+    "lint:report": "eslint -f checkstyle -o ../../build2/reports/lint/eslint-checkstyle-result.xml . --ext .js --ext .ts",
+    "validate": "yarn lint && yarn tsc",
     "test": "yarn test:karma && yarn test:browser && yarn test:server",
     "test:karma": "karma start --single-run",
     "test:browser": "jest --config ./jest.browser.js",
@@ -54,11 +56,16 @@
     "@babel/core": "^7.8.0",
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.2",
+    "@types/jest": "^25.2.3",
+    "@types/node": "^14.0.3",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
     "eslint": "5.6.1",
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-jasmine": "^2.10.1",
+    "eslint-plugin-jsdoc": "^25.4.2",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-ajax": "^4.0.0",
     "jest": "^24.9.0",
@@ -73,6 +80,7 @@
     "karma-webpack": "^3.0.5",
     "lodash": "4.17.11",
     "promise.allsettled": "^1.0.1",
+    "typescript": "^3.9.2",
     "webpack": "^3.0.0"
   },
   "jest-junit": {

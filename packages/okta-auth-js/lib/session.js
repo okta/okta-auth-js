@@ -10,10 +10,20 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+
+
+/**
+ * @typedef {OktaAuth.OAuthParams} OAuthParams
+ * @typedef {OktaAuth.SessionObject} SessionObject
+ */
+
 /* global window */
 var util = require('./util');
 var http = require('./http');
 
+/**
+ * @param {OktaAuth} sdk 
+ */
 function sessionExists(sdk) {
   return sdk.session.get()
     .then(function(res) {
@@ -27,9 +37,14 @@ function sessionExists(sdk) {
     });
 }
 
+/**
+ * @param {OktaAuth} sdk
+ * @returns {Promise<SessionObject>}
+ */
 function getSession(sdk) { 
   return http.get(sdk, '/api/v1/sessions/me')
   .then(function(session) {
+    /** @type {SessionObject} */
     var res = util.omit(session, '_links');
 
     res.refresh = function() {
@@ -44,10 +59,13 @@ function getSession(sdk) {
   })
   .catch(function() {
     // Return INACTIVE status on failure
-    return {status: 'INACTIVE'};
+    return /** @type {SessionObject} */({status: 'INACTIVE'});
   });
 }
 
+/**
+ * @param {OktaAuth} sdk
+ */
 function closeSession(sdk) {
   return http.httpRequest(sdk, {
     url: sdk.getIssuerOrigin() + '/api/v1/sessions/me',
@@ -55,18 +73,26 @@ function closeSession(sdk) {
   });
 }
 
+/**
+ * @param {OktaAuth} sdk
+ */
 function refreshSession(sdk) {
   return http.post(sdk, '/api/v1/sessions/me/lifecycle/refresh');
 }
 
-function setCookieAndRedirect(sdk, sessionToken, redirectUrl) {
+/**
+ * @param {OktaAuth} sdk
+ * @param {string=} sessionToken
+ * @param {string=} redirectUrl
+ */
+function setCookieAndRedirect(sdk, sessionToken = null, redirectUrl = null) {
   redirectUrl = redirectUrl || window.location.href;
-  window.location = sdk.getIssuerOrigin() + '/login/sessionCookieRedirect' +
+  window.location.assign(sdk.getIssuerOrigin() + '/login/sessionCookieRedirect' +
     util.toQueryParams({
       checkAccountSetupComplete: true,
       token: sessionToken,
       redirectUrl: redirectUrl
-    });
+    }));
 }
 
 module.exports = {

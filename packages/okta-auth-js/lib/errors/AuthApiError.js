@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-function AuthApiError(err, xhr) {
+function AuthApiError(err, xhr = null) {
   this.name = 'AuthApiError';
   this.message = err.errorSummary;
   this.errorSummary = err.errorSummary;

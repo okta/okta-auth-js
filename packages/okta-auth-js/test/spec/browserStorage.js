@@ -1,3 +1,6 @@
+/**
+ * @typedef {OktaAuth.SimpleStorage} SimpleStorage
+ */
 jest.mock('../../lib/storageBuilder');
 
 var browserStorage  = require('../../lib/browser/browserStorage');
@@ -59,7 +62,7 @@ describe('browserStorage', () => {
     });
 
     it('returns false if sessionStorage does not exist', () => {
-      delete window.sessionStorage;
+      delete /** @type {any} */(window).sessionStorage;
       expect(browserStorage.browserHasSessionStorage()).toBe(false);
     });
 
@@ -124,11 +127,11 @@ describe('browserStorage', () => {
     });
 
     it('Uses cookie storage if localStorage and sessionStorage are not available', () => {
-      delete global.window.localStorage;
-      delete global.window.sessionStorage;
-      const fakeStorage = { fakeStorage: true };
+      delete /** @type {any} */(window).localStorage;
+      delete /** @type {any} */(window).sessionStorage;
+      const fakeStorage = { getItem: jest.fn(), setItem: jest.fn() };
       jest.spyOn(browserStorage, 'getCookieStorage').mockReturnValue(fakeStorage);
-      const opts = { fakeOptions: true };
+      const opts = { secure: true };
       browserStorage.getPKCEStorage(opts);
       expect(storageBuilder).toHaveBeenCalledWith(fakeStorage, 'okta-pkce-storage');
       expect(browserStorage.getCookieStorage).toHaveBeenCalledWith(opts);
@@ -147,7 +150,7 @@ describe('browserStorage', () => {
     });
 
     it('Uses sessionStorage if localStorage is not available', () => {
-      delete global.window.localStorage;
+      delete /** @type {any} */(window).localStorage;
       browserStorage.getHttpCache();
       expect(storageBuilder).toHaveBeenCalledTimes(1);
       // .toHaveBeenCalledWith doesn't do a strict comparison, so an empty localStorage reads the same as an empty sessionStorage
@@ -156,11 +159,12 @@ describe('browserStorage', () => {
     });
 
     it('Uses cookie storage if localStorage and sessionStorage are not available', () => {
-      delete global.window.localStorage;
-      delete global.window.sessionStorage;
+      delete /** @type {any} */(window).localStorage;
+      delete /** @type {any} */(window).sessionStorage;
       const fakeStorage = { fakeStorage: true };
+      // @ts-ignore
       jest.spyOn(browserStorage, 'getCookieStorage').mockReturnValue(fakeStorage);
-      const opts = { fakeOptions: true };
+      const opts = { secure: true };
       browserStorage.getHttpCache(opts);
       expect(storageBuilder).toHaveBeenCalledWith(fakeStorage, 'okta-cache-storage');
       expect(browserStorage.getCookieStorage).toHaveBeenCalledWith(opts);
@@ -199,7 +203,7 @@ describe('browserStorage', () => {
     });
 
     it('getItem: will call storage.get', () => {
-      const retVal = { fakeCookie: true };
+      const retVal = JSON.stringify({ fakeCookie: true });
       jest.spyOn(browserStorage.storage, 'get').mockReturnValue(retVal);
       const storage = browserStorage.getCookieStorage({ secure: true, sameSite: 'strict' });
       const key = 'fake-key';
@@ -209,12 +213,12 @@ describe('browserStorage', () => {
 
     it('setItem: will call storage.set, passing secure and sameSite options', () => {
       jest.spyOn(browserStorage.storage, 'set').mockReturnValue(null);
-      const storage = browserStorage.getCookieStorage({ secure: 'fakey', sameSite: 'strictly fakey' });
+      const storage = browserStorage.getCookieStorage({ secure: false, sameSite: 'strictly fakey' });
       const key = 'fake-key';
       const val = { fakeValue: true };
       storage.setItem(key, val);
       expect(browserStorage.storage.set).toHaveBeenCalledWith(key, val, '2200-01-01T00:00:00.000Z', {
-        secure: 'fakey',
+        secure: false,
         sameSite: 'strictly fakey'
       });
     })

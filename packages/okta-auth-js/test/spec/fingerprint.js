@@ -45,8 +45,8 @@ describe('fingerprint', function() {
     });
     jest.spyOn(document, 'createElement').mockReturnValue(test.iframe);
     jest.spyOn(document.body, 'contains').mockReturnValue(true);
-    jest.spyOn(document.body, 'appendChild').mockImplementation(function() {
-      if (options.timeout) { return; }
+    jest.spyOn(document.body, 'appendChild').mockImplementation(function(newChild) {
+      if (options.timeout) { return newChild; }
       // mimic async page load with setTimeouts
       if (options.sendOtherMessage) {
         setTimeout(function() {
@@ -66,6 +66,7 @@ describe('fingerprint', function() {
             postMessage: postMessageSpy
           }
         });
+        return newChild;
       });
     });
 

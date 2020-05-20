@@ -14,6 +14,10 @@
 /* SDK_VERSION is defined in webpack config */ 
 /* global SDK_VERSION */
 /* global window, navigator, document, crypto */
+/**
+ * @typedef {OktaAuth.OktaAuthOptions} OktaAuthOptions
+ * @typedef {OktaAuth.CookieOptions} CookieOptions
+ */
 var Emitter           = require('tiny-emitter');
 var AuthSdkError      = require('../errors/AuthSdkError');
 var builderUtil       = require('../builderUtil');
@@ -27,11 +31,18 @@ var TokenManager      = require('../TokenManager');
 var tx                = require('../tx');
 var util              = require('../util');
 
+/**
+ * @param {OktaAuthOptions} args 
+ */
 function OktaAuthBuilder(args) {
+  /** @type {OktaAuth} */
   var sdk = this;
 
   builderUtil.assertValidConfig(args);
 
+  /**
+   * @type {CookieOptions}
+   */
   var cookieSettings = util.extend({
     secure: true
   }, args.cookies);
@@ -53,7 +64,10 @@ function OktaAuthBuilder(args) {
     cookieSettings.secure = false;
   }
 
-  this.options = {
+  /**
+   * @type {OktaAuthOptions}
+   */
+  var options = {
     clientId: args.clientId,
     issuer: util.removeTrailingSlash(args.issuer),
     authorizeUrl: util.removeTrailingSlash(args.authorizeUrl),
@@ -73,7 +87,9 @@ function OktaAuthBuilder(args) {
     cookies: cookieSettings
   };
 
-  this.userAgent = builderUtil.getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
+  // @ts-ignore
+  var sdkDefaultUserAgent = `okta-auth-js/${SDK_VERSION}`; // SDK_VERSION is defined in webpack config
+  this.userAgent = builderUtil.getUserAgent(args, sdkDefaultUserAgent);
 
   // Digital clocks will drift over time, so the server
   // can misalign with the time reported by the browser.
@@ -83,14 +99,16 @@ function OktaAuthBuilder(args) {
   // default maximum tolerance allowed by Kerberos.
   // (https://technet.microsoft.com/en-us/library/cc976357.aspx)
   if (!args.maxClockSkew && args.maxClockSkew !== 0) {
-    this.options.maxClockSkew = constants.DEFAULT_MAX_CLOCK_SKEW;
+    options.maxClockSkew = constants.DEFAULT_MAX_CLOCK_SKEW;
   } else {
-    this.options.maxClockSkew = args.maxClockSkew;
+    options.maxClockSkew = args.maxClockSkew;
   }
 
   // Give the developer the ability to disable token signature
   // validation.
-  this.options.ignoreSignature = !!args.ignoreSignature;
+  options.ignoreSignature = !!args.ignoreSignature;
+
+  sdk.options = options;
 
   sdk.session = {
     close: util.bind(session.closeSession, null, sdk),
@@ -103,13 +121,13 @@ function OktaAuthBuilder(args) {
   sdk.tx = {
     status: util.bind(tx.transactionStatus, null, sdk),
     resume: util.bind(tx.resumeTransaction, null, sdk),
-    exists: util.bind(tx.transactionExists, null, sdk),
+    exists: util.extend(util.bind(tx.transactionExists, null, sdk), {
+      // This is exposed so we can mock document.cookie in our tests
+      _get: function(name) {
+        return cookies.get(name);
+      }
+    }),
     introspect: util.bind(tx.introspect, null, sdk)
-  };
-
-  // This is exposed so we can mock document.cookie in our tests
-  sdk.tx.exists._get = function(name) {
-    return cookies.get(name);
   };
 
   // This is exposed so we can mock window.location.href in our tests
@@ -124,37 +142,33 @@ function OktaAuthBuilder(args) {
   sdk.token = {
     getWithoutPrompt: util.bind(token.getWithoutPrompt, null, sdk),
     getWithPopup: util.bind(token.getWithPopup, null, sdk),
-    getWithRedirect: util.bind(token.getWithRedirect, null, sdk),
-    parseFromUrl: util.bind(token.parseFromUrl, null, sdk),
+    getWithRedirect: util.extend(util.bind(token.getWithRedirect, null, sdk), {
+      // This is exposed so we can set window.location in our tests
+      _setLocation: function(url) {
+        window.location = url;
+      }
+    }),
+    parseFromUrl: util.extend(util.bind(token.parseFromUrl, null, sdk), {
+      // This is exposed so we can mock getting window.history in our tests
+      _getHistory: function() {
+        return window.history;
+      },
+
+      // This is exposed so we can mock getting window.location in our tests
+      _getLocation: function() {
+        return window.location;
+      },
+
+      // This is exposed so we can mock getting window.document in our tests
+      _getDocument: function() {
+        return window.document;
+      }
+    }),
     decode: token.decodeToken,
     revoke: util.bind(token.revokeToken, null, sdk),
     renew: util.bind(token.renewToken, null, sdk),
     getUserInfo: util.bind(token.getUserInfo, null, sdk),
     verify: util.bind(token.verifyToken, null, sdk)
-  };
-
-  // This is exposed so we can set window.location in our tests
-  sdk.token.getWithRedirect._setLocation = function(url) {
-    window.location = url;
-  };
-
-  // This is exposed so we can mock getting window.history in our tests
-  sdk.token.parseFromUrl._getHistory = function() {
-    return window.history;
-  };
-
-  // This is exposed so we can mock getting window.location in our tests
-  sdk.token.parseFromUrl._getLocation = function() {
-    return window.location;
-  };
-
-  // This is exposed so we can mock getting window.document in our tests
-  sdk.token.parseFromUrl._getDocument = function() {
-    return window.document;
-  };
-
-  sdk.fingerprint._getUserAgent = function() {
-    return navigator.userAgent;
   };
 
   var isWindowsPhone = /windows phone|iemobile|wpdesktop/i;
@@ -168,6 +182,9 @@ function OktaAuthBuilder(args) {
   sdk.tokenManager.on('error', this._onTokenManagerError, this);
 }
 
+/**
+ * @type {OktaAuth}
+ */
 var proto = OktaAuthBuilder.prototype;
 proto._onTokenManagerError = function(error) {
   var code = error.errorCode;
@@ -333,7 +350,7 @@ proto.webfinger = function (opts) {
   return http.get(this, url, options);
 };
 
-proto.fingerprint = function(options) {
+proto.fingerprint = util.extend(function(options) {
   options = options || {};
   var sdk = this;
   if (!sdk.features.isFingerprintSupported()) {
@@ -385,6 +402,10 @@ proto.fingerprint = function(options) {
       iframe.parentElement.removeChild(iframe);
     }
   });
-};
+}, {
+  _getUserAgent: function() {
+    return navigator.userAgent;
+  }
+});
 
 module.exports = builderUtil.buildOktaAuth(OktaAuthBuilder);

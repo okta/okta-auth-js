@@ -11,137 +11,147 @@
  *
  */
 /* global localStorage, sessionStorage */
+/**
+ * @typedef {OktaAuth.StorageUtil} StorageUtil
+ * @typedef {OktaAuth.StorageProvider} StorageProvider
+ */
+
+
 var Cookies = require('js-cookie');
 var storageBuilder = require('../storageBuilder');
 var constants = require('../constants');
 var AuthSdkError = require('../errors/AuthSdkError');
 
 // Building this as an object allows us to mock the functions in our tests
-var storageUtil = {};
+/** @type {StorageUtil} */
+var storageUtil = {
+  // We must define all properties up front. 
+  // https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files#object-literals-are-open-ended
 
-// IE11 bug that Microsoft doesn't plan to fix
-// https://connect.microsoft.com/IE/Feedback/Details/1496040
-storageUtil.browserHasLocalStorage = function() {
-  try {
-    var storage = storageUtil.getLocalStorage();
-    return storageUtil.testStorage(storage);
-  } catch (e) {
-    return false;
-  }
-};
-
-storageUtil.browserHasSessionStorage = function() {
-  try {
-    var storage = storageUtil.getSessionStorage();
-    return storageUtil.testStorage(storage);
-  } catch (e) {
-    return false;
-  }
-};
-
-storageUtil.getPKCEStorage = function(options) {
-  if (storageUtil.browserHasSessionStorage()) {
-    return storageBuilder(storageUtil.getSessionStorage(), constants.PKCE_STORAGE_NAME);
-  } else if (storageUtil.browserHasLocalStorage()) {
-    return storageBuilder(storageUtil.getLocalStorage(), constants.PKCE_STORAGE_NAME);
-  } else {
-    return storageBuilder(storageUtil.getCookieStorage(options), constants.PKCE_STORAGE_NAME);
-  }
-};
-
-storageUtil.getHttpCache = function(options) {
-  if (storageUtil.browserHasLocalStorage()) {
-    return storageBuilder(storageUtil.getLocalStorage(), constants.CACHE_STORAGE_NAME);
-  } else if (storageUtil.browserHasSessionStorage()) {
-    return storageBuilder(storageUtil.getSessionStorage(), constants.CACHE_STORAGE_NAME);
-  } else {
-    return storageBuilder(storageUtil.getCookieStorage(options), constants.CACHE_STORAGE_NAME);
-  }
-};
-
-storageUtil.getLocalStorage = function() {
-  return localStorage;
-};
-
-storageUtil.getSessionStorage = function() {
-  return sessionStorage;
-};
-
-// Provides webStorage-like interface for cookies
-storageUtil.getCookieStorage = function(options) {
-  const secure = options.secure;
-  const sameSite = options.sameSite;
-  if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
-    throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
-  }
-  return {
-    getItem: storageUtil.storage.get,
-    setItem: function(key, value) {
-      // Cookie shouldn't expire
-      storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
-        secure: secure, 
-        sameSite: sameSite
-      });
+  // IE11 bug that Microsoft doesn't plan to fix
+  // https://connect.microsoft.com/IE/Feedback/Details/1496040
+  browserHasLocalStorage: function() {
+    try {
+      var storage = storageUtil.getLocalStorage();
+      return storageUtil.testStorage(storage);
+    } catch (e) {
+      return false;
     }
-  };
-};
+  },
 
-// Provides an in-memory solution
-storageUtil.getInMemoryStorage = function() {
-  var store = {};
-  return {
-    getItem: function(key) {
-      return store[key];
-    },
-    setItem: function(key, value) {
-      store[key] = value;
+  browserHasSessionStorage: function() {
+    try {
+      var storage = storageUtil.getSessionStorage();
+      return storageUtil.testStorage(storage);
+    } catch (e) {
+      return false;
     }
-  };
-};
+  },
 
-storageUtil.testStorage = function(storage) {
-  var key = 'okta-test-storage';
-  try {
-    storage.setItem(key, key);
-    storage.removeItem(key);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+  getPKCEStorage: function(options) {
+    if (storageUtil.browserHasSessionStorage()) {
+      return storageBuilder(storageUtil.getSessionStorage(), constants.PKCE_STORAGE_NAME);
+    } else if (storageUtil.browserHasLocalStorage()) {
+      return storageBuilder(storageUtil.getLocalStorage(), constants.PKCE_STORAGE_NAME);
+    } else {
+      return storageBuilder(storageUtil.getCookieStorage(options), constants.PKCE_STORAGE_NAME);
+    }
+  },
 
-storageUtil.storage = {
-  set: function(name, value, expiresAt, options) {
+  getHttpCache: function(options) {
+    if (storageUtil.browserHasLocalStorage()) {
+      return storageBuilder(storageUtil.getLocalStorage(), constants.CACHE_STORAGE_NAME);
+    } else if (storageUtil.browserHasSessionStorage()) {
+      return storageBuilder(storageUtil.getSessionStorage(), constants.CACHE_STORAGE_NAME);
+    } else {
+      return storageBuilder(storageUtil.getCookieStorage(options), constants.CACHE_STORAGE_NAME);
+    }
+  },
+
+  getLocalStorage: function() {
+    return localStorage;
+  },
+
+  getSessionStorage: function() {
+    return sessionStorage;
+  },
+
+  // Provides webStorage-like interface for cookies
+  getCookieStorage: function(options) {
     const secure = options.secure;
     const sameSite = options.sameSite;
     if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
-      throw new AuthSdkError('storage.set: "secure" and "sameSite" options must be provided');
+      throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
     }
-    var cookieOptions = {
-      path: options.path || '/',
-      secure,
-      sameSite
+    return {
+      getItem: storageUtil.storage.get,
+      setItem: function(key, value) {
+        // Cookie shouldn't expire
+        storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
+          secure: secure, 
+          sameSite: sameSite
+        });
+      }
     };
+  },
 
-    // eslint-disable-next-line no-extra-boolean-cast
-    if (!!(Date.parse(expiresAt))) {
-      // Expires value can be converted to a Date object.
-      //
-      // If the 'expiresAt' value is not provided, or the value cannot be
-      // parsed as a Date object, the cookie will set as a session cookie.
-      cookieOptions.expires = new Date(expiresAt);
+  // Provides an in-memory solution
+  getInMemoryStorage: function() {
+    var store = {};
+    return {
+      getItem: function(key) {
+        return store[key];
+      },
+      setItem: function(key, value) {
+        store[key] = value;
+      }
+    };
+  },
+
+  testStorage: function(storage) {
+    var key = 'okta-test-storage';
+    try {
+      storage.setItem(key, key);
+      storage.removeItem(key);
+      return true;
+    } catch (e) {
+      return false;
     }
-
-    Cookies.set(name, value, cookieOptions);
-    return storageUtil.storage.get(name);
   },
 
-  get: function(name) {
-    return Cookies.get(name);
-  },
+  storage: {
+    set: function(name, value, expiresAt, options) {
+      const secure = options.secure;
+      const sameSite = options.sameSite;
+      if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
+        throw new AuthSdkError('storage.set: "secure" and "sameSite" options must be provided');
+      }
+      var cookieOptions = {
+        path: options.path || '/',
+        secure,
+        sameSite
+      };
 
-  delete: function(name) {
-    return Cookies.remove(name, { path: '/' });
+      // eslint-disable-next-line no-extra-boolean-cast
+      if (!!(Date.parse(expiresAt))) {
+        // Expires value can be converted to a Date object.
+        //
+        // If the 'expiresAt' value is not provided, or the value cannot be
+        // parsed as a Date object, the cookie will set as a session cookie.
+        cookieOptions.expires = new Date(expiresAt);
+      }
+
+      Cookies.set(name, value, cookieOptions);
+      return storageUtil.storage.get(name);
+    },
+
+    get: function(name) {
+      return Cookies.get(name);
+    },
+
+    delete: function(name) {
+      return Cookies.remove(name, { path: '/' });
+    }
   }
 };
 

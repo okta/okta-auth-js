@@ -153,26 +153,25 @@ describe('pkce', function() {
     describe('validateOptions', function() {
       var authClient;
       var oauthOptions;
-
+      var urls;
       beforeEach(function() {
         spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
         authClient = new OktaAuth({
           issuer: 'https://auth-js-test.okta.com'
         });
-
         oauthOptions = {
           clientId: CLIENT_ID,
           redirectUri: REDIRECT_URI,
           authorizationCode: authorizationCode,
           codeVerifier: codeVerifier,
         };
+        urls = {
+          tokenUrl: 'http://superfake'
+        };
       });
 
       it('Does not throw if options are valid', function() {
         var httpRequst = jest.spyOn(http, 'httpRequest').mockImplementation();
-        var urls = {
-          tokenUrl: 'http://superfake'
-        };
         pkce.getToken(authClient, oauthOptions, urls);
         expect(httpRequst).toHaveBeenCalled();
       });
@@ -180,7 +179,7 @@ describe('pkce', function() {
       it('Throws if no clientId', function() {
         oauthOptions.clientId = undefined;
         try {
-          pkce.getToken(authClient, oauthOptions);
+          pkce.getToken(authClient, oauthOptions, urls);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('A clientId must be specified in the OktaAuth constructor to get a token');
@@ -190,7 +189,7 @@ describe('pkce', function() {
       it('Throws if no redirectUri', function() {
         oauthOptions.redirectUri = undefined;
         try {
-          pkce.getToken(authClient, oauthOptions);
+          pkce.getToken(authClient, oauthOptions, urls);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('The redirectUri passed to /authorize must also be passed to /token');
@@ -200,7 +199,7 @@ describe('pkce', function() {
       it('Throws if no authorizationCode', function() {
         oauthOptions.authorizationCode = undefined;
         try {
-          pkce.getToken(authClient, oauthOptions);
+          pkce.getToken(authClient, oauthOptions, urls);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('An authorization code (returned from /authorize) must be passed to /token');
@@ -210,7 +209,7 @@ describe('pkce', function() {
       it('Throws if no codeVerifier', function() {
         oauthOptions.codeVerifier = undefined;
         try {
-          pkce.getToken(authClient, oauthOptions);
+          pkce.getToken(authClient, oauthOptions, urls);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('The "codeVerifier" (generated and saved by your app) must be passed to /token');

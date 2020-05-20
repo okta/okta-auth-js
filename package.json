@@ -19,6 +19,7 @@
     "clean-dist": "rimraf dist && lerna exec rimraf build2 && lerna exec rimraf dist",
     "clean-node-modules": "lerna exec rimraf node_modules && rimraf node_modules",
     "lint": "yarn workspaces run lint",
+    "validate": "yarn workspace @okta/okta-auth-js tsc && yarn lint",
     "publish": "lerna publish --skip-npm",
     "test": "yarn test:unit && yarn test:e2e",
     "test:e2e": "yarn --cwd test/e2e start",

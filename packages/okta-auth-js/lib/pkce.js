@@ -10,6 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+
+ /**
+  * @typedef {OktaAuth.OAuthParams} OAuthParams
+  * @typedef {OktaAuth.CustomUrls} CustomUrls
+  */
+
 /* global crypto */
  /* eslint-disable complexity, max-statements */
 var AuthSdkError  = require('./errors/AuthSdkError');
@@ -41,21 +47,33 @@ function generateVerifier(prefix) {
   return encodeURIComponent(verifier).slice(0, MAX_VERIFIER_LENGTH);
 }
 
+/**
+ * @param {OktaAuth} sdk 
+ */
 function getStorage(sdk) {
   return sdk.options.storageUtil.getPKCEStorage(sdk.options.cookies);
 }
 
+/**
+ * @param {OktaAuth} sdk 
+ */
 function saveMeta(sdk, meta) {
   var storage = getStorage(sdk);
   storage.setStorage(meta);
 }
 
+/**
+ * @param {OktaAuth} sdk 
+ */
 function loadMeta(sdk) {
   var storage = getStorage(sdk);
   var obj = storage.getStorage();
   return obj;
 }
 
+/**
+ * @param {OktaAuth} sdk 
+ */
 function clearMeta(sdk) {
   var storage = getStorage(sdk);
   storage.clearStorage();
@@ -71,7 +89,9 @@ function computeChallenge(str) {
   });
 }
 
-
+/**
+ * @param {OAuthParams} oauthOptions 
+ */
 function validateOptions(oauthOptions) {
   // Quick validation
   if (!oauthOptions.clientId) {
@@ -91,6 +111,9 @@ function validateOptions(oauthOptions) {
   }
 }
 
+/**
+ * @param {OAuthParams} options 
+ */
 function getPostData(options) {
   // Convert options to OAuth params
   var params = util.removeNils({
@@ -105,6 +128,11 @@ function getPostData(options) {
 }
 
 // exchange authorization code for an access token
+/**
+ * @param {OktaAuth} sdk 
+ * @param {OAuthParams} oauthOptions
+ * @param {CustomUrls} urls
+ */
 function getToken(sdk, oauthOptions, urls) {
   validateOptions(oauthOptions);
   var data = getPostData(oauthOptions);

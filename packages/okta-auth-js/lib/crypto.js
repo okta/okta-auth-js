@@ -39,6 +39,7 @@ function verifyToken(idToken, key) {
   // It's not necessary to properly verify the jwt's signature.
   delete key.use;
 
+  // @ts-ignore
   return crypto.subtle.importKey(
     format,
     key,

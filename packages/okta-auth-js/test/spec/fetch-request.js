@@ -1,4 +1,7 @@
 /* global Map */
+/**
+ * @typedef {OktaAuth.HttpRequestor} HttpRequestor
+ */
 describe('fetchRequest', function () {
   let fetchSpy;
 
@@ -18,7 +21,8 @@ describe('fetchRequest', function () {
   jest.setMock('cross-fetch', function() {
     return mockFetchObj.fetch.apply(null, arguments);
   });
-  const fetchRequest = require('../../lib/fetch/fetchRequest');
+
+  var fetchRequest = /** @type {HttpRequestor} */(require('../../lib/fetch/fetchRequest'));
 
   beforeEach(function() {
     fetchSpy = jest.spyOn(mockFetchObj, 'fetch');

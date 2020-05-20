@@ -9,9 +9,10 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
-
+/**
+ * @typedef {OktaAuth.HttpRequestor} HttpRequestor
+ */
 var fetch = require('cross-fetch');
-
 
 function readData(response) {
   if (response.headers.get('Content-Type') &&
@@ -43,6 +44,7 @@ function formatResult(status, data) {
 }
 
 /* eslint-disable complexity */
+/** @type {HttpRequestor} */
 function fetchRequest(method, url, args) {
   var body = args.data;
   var headers = args.headers || {};
@@ -53,6 +55,7 @@ function fetchRequest(method, url, args) {
     body = JSON.stringify(body);
   }
 
+  // @ts-ignore
   var fetchPromise = fetch(url, {
     method: method,
     headers: args.headers,

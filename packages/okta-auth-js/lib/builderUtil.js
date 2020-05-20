@@ -10,10 +10,19 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/**
+ * @typedef {OktaAuth.OktaAuthOptions} OktaAuthOptions
+ * @typedef {OktaAuth.OktaAuthBuilder} OktaAuthBuilder
+ * @typedef {OktaAuth.OktaAuthFactory} OktaAuthFactory
+ */
+
 var AuthSdkError = require('./errors/AuthSdkError');
 var tx = require('./tx');
 var util = require('./util');
 
+/**
+ * @param {OktaAuthOptions} args
+ */
 // TODO: use @okta/configuration-validation (move module to this monorepo?)
 // eslint-disable-next-line complexity
 function assertValidConfig(args) {
@@ -48,6 +57,9 @@ function assertValidConfig(args) {
   }
 }
 
+/**
+ * @param {OktaAuth} proto
+ */
 function addSharedPrototypes(proto) {
   proto.getIssuerOrigin = function() {
     // Infer the URL from the issuer URL, omitting the /oauth2/{authServerId}
@@ -70,8 +82,17 @@ function addSharedPrototypes(proto) {
   };
 }
 
+/**
+ * 
+ * @returns {OktaAuthFactory}
+ */
 function buildOktaAuth(OktaAuthBuilder) {
+
   return function(storageUtil, httpRequestClient) {
+    /**
+     * @class
+     * @param {OktaAuthOptions} args
+     */
     function OktaAuth(args) {
       if (!(this instanceof OktaAuth)) {
         return new OktaAuth(args);
@@ -100,6 +121,10 @@ function buildOktaAuth(OktaAuthBuilder) {
   };
 }
 
+/**
+ * @param {OktaAuthOptions} args
+ * @param {string} sdkValue
+ */
 function getUserAgent(args, sdkValue) {
   var userAgent = args.userAgent || {};
 

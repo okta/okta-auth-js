@@ -52,6 +52,9 @@ function resumeTransaction(sdk, args) {
   }
   return sdk.tx.status(args)
     .then(function(res) {
+      /**
+       * @type {AuthTransaction}
+       */
       return new AuthTransaction(sdk, res);
     });
 }
@@ -357,7 +360,7 @@ function flattenEmbedded(sdk, res, obj, ref) {
   return obj;
 }
 
-function AuthTransaction(sdk, res) {
+function AuthTransaction(sdk, res = null) {
   if (res) {
     this.data = res;
     util.extend(this, flattenEmbedded(sdk, res, res, {}));
@@ -369,7 +372,9 @@ function AuthTransaction(sdk, res) {
     // when OKTA-75434 is resolved
     if (res.status === 'RECOVERY_CHALLENGE' && !res._links) {
       this.cancel = function() {
-        return Promise.resolve(new AuthTransaction(sdk));
+        return Promise.resolve(
+          new AuthTransaction(sdk)
+        );
       };
     }
   }

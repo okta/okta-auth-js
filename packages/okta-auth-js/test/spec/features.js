@@ -45,10 +45,10 @@ describe('features', function() {
 
   describe('isTokenVerifySupported', function() {
     beforeEach(function() {
-      window.crypto = {
+      /** @type {any} */(window).crypto = {
         subtle: true
       };
-      window.Uint8Array = true;
+      /** @type {any} */(window).Uint8Array = true;
     });
 
     it('can succeed', function() {
@@ -56,7 +56,7 @@ describe('features', function() {
     })
 
     it('fails if no crypto', function() {
-      window.crypto = undefined;
+      /** @type {any} */(window).crypto = undefined;
       expect(OktaAuth.features.isTokenVerifySupported()).toBe(false);
     });
 
@@ -68,7 +68,7 @@ describe('features', function() {
 
   describe('hasTextEncoder', function() {
     it('returns true if TextEncoder is defined', function() {
-      window.TextEncoder = true;
+      /** @type {any} */(window).TextEncoder = true;
       expect(OktaAuth.features.hasTextEncoder()).toBe(true);
     });
     it('returns false if TextEncoder is undefined', function() {
@@ -79,11 +79,11 @@ describe('features', function() {
 
   describe('isPKCESupported', function() {
     beforeEach(function() {
-      window.crypto = {
+      /** @type {any} */(window).crypto = {
         subtle: true
       };
-      window.Uint8Array = true;
-      window.TextEncoder = true;
+      /** @type {any} */(window).Uint8Array = true;
+      /** @type {any} */(window).TextEncoder = true;
     });
 
     it('can succeed', function() {
@@ -91,7 +91,7 @@ describe('features', function() {
     })
 
     it('fails if no crypto', function() {
-      window.crypto = undefined;
+      /** @type {any} */(window).crypto = undefined;
       expect(OktaAuth.features.isPKCESupported()).toBe(false);
     });
 

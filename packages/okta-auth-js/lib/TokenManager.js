@@ -10,6 +10,15 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+
+ /**
+  * @typedef {OktaAuth.TokenManagerOptions} TokenManagerOptions
+  * @typedef {OktaAuth.TokenManagerAPI} TokenManagerAPI
+  * @typedef {OktaAuth.TokenManagerRef} TokenManagerRef
+  * @typedef {OktaAuth.Token} Token
+  * @typedef {OktaAuth.StorageProvider} StorageProvider
+  */
+
 /* global localStorage, sessionStorage */
 /* eslint complexity:[0,8] max-statements:[0,21] */
 var util = require('./util');
@@ -19,30 +28,52 @@ var constants = require('./constants');
 var storageBuilder = require('./storageBuilder');
 var SdkClock = require('./clock');
 
+/** @type {TokenManagerOptions} */
 var DEFAULT_OPTIONS = {
   autoRenew: true,
   storage: 'localStorage',
   expireEarlySeconds: 30
 };
 
+/**
+ * @param {TokenManagerRef} tokenMgmtRef 
+ * @param {Token} token 
+ */
 function getExpireTime(tokenMgmtRef, token) {
   var expireTime = token.expiresAt - tokenMgmtRef.options.expireEarlySeconds;
   return expireTime;
 }
 
+/**
+ * @param {TokenManagerRef} tokenMgmtRef 
+ * @param {Token} token 
+ */
 function hasExpired(tokenMgmtRef, token) {
   var expireTime = getExpireTime(tokenMgmtRef, token);
   return expireTime <= tokenMgmtRef.clock.now();
 }
 
+/**
+ * @param {TokenManagerRef} tokenMgmtRef 
+ * @param {string} key
+ * @param {Token} token 
+ */
 function emitExpired(tokenMgmtRef, key, token) {
   tokenMgmtRef.emitter.emit('expired', key, token);
 }
 
+/**
+ * @param {TokenManagerRef} tokenMgmtRef 
+ * @param {any} error 
+ */
 function emitError(tokenMgmtRef, error) {
   tokenMgmtRef.emitter.emit('error', error);
 }
 
+/**
+ * @param {TokenManagerRef} tokenMgmtRef
+ * @param {string} key 
+ */
 function clearExpireEventTimeout(tokenMgmtRef, key) {
   clearTimeout(tokenMgmtRef.expireTimeouts[key]);
   delete tokenMgmtRef.expireTimeouts[key];
@@ -51,6 +82,9 @@ function clearExpireEventTimeout(tokenMgmtRef, key) {
   delete tokenMgmtRef.renewPromise[key];
 }
 
+/**
+ * @param {TokenManagerRef} tokenMgmtRef
+ */
 function clearExpireEventTimeoutAll(tokenMgmtRef) {
   var expireTimeouts = tokenMgmtRef.expireTimeouts;
   for (var key in expireTimeouts) {
@@ -61,6 +95,12 @@ function clearExpireEventTimeoutAll(tokenMgmtRef) {
   }
 }
 
+/**
+ * @param {OktaAuth} sdk
+ * @param {TokenManagerRef} tokenMgmtRef
+ * @param {string} key
+ * @param {Token} token 
+ */
 function setExpireEventTimeout(sdk, tokenMgmtRef, key, token) {
   var expireTime = getExpireTime(tokenMgmtRef, token);
   var expireEventWait = Math.max(expireTime - tokenMgmtRef.clock.now(), 0) * 1000;
@@ -76,6 +116,11 @@ function setExpireEventTimeout(sdk, tokenMgmtRef, key, token) {
   tokenMgmtRef.expireTimeouts[key] = expireEventTimeout;
 }
 
+/**
+ * @param {OktaAuth} sdk
+ * @param {TokenManagerRef} tokenMgmtRef
+ * @param {StorageProvider} storage
+ */
 function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
   try {
     var tokenStorage = storage.getStorage();
@@ -90,11 +135,19 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
     if (!tokenStorage.hasOwnProperty(key)) {
       continue;
     }
+    /** @type {Token} */
     var token = tokenStorage[key];
     setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
   }
 }
 
+/**
+ * @param {OktaAuth} sdk
+ * @param {TokenManagerRef} tokenMgmtRef
+ * @param {StorageProvider} storage
+ * @param {string} key
+ * @param {any} token
+ */
 function add(sdk, tokenMgmtRef, storage, key, token) {
   var tokenStorage = storage.getStorage();
   if (!util.isObject(token) ||
@@ -108,11 +161,21 @@ function add(sdk, tokenMgmtRef, storage, key, token) {
   setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
 }
 
+/**
+ * @param {StorageProvider} storage
+ * @param {string} key
+ */
 function get(storage, key) {
   var tokenStorage = storage.getStorage();
   return tokenStorage[key];
 }
 
+/**
+ * @param {OktaAuth} sdk
+ * @param {TokenManagerRef} tokenMgmtRef
+ * @param {StorageProvider} storage
+ * @param {string} key
+ */
 function getAsync(sdk, tokenMgmtRef, storage, key) {
   return new Promise(function(resolve) {
     var token = get(storage, key);
@@ -128,6 +191,11 @@ function getAsync(sdk, tokenMgmtRef, storage, key) {
   });
 }
 
+/**
+ * @param {TokenManagerRef} tokenMgmtRef
+ * @param {StorageProvider} storage
+ * @param {string} key
+ */
 function remove(tokenMgmtRef, storage, key) {
   // Clear any listener for this token
   clearExpireEventTimeout(tokenMgmtRef, key);
@@ -188,11 +256,19 @@ function renew(sdk, tokenMgmtRef, storage, key) {
   return tokenMgmtRef.renewPromise[key];
 }
 
+/**
+ * @param {TokenManagerRef} tokenMgmtRef
+ * @param {StorageProvider} storage
+ */
 function clear(tokenMgmtRef, storage) {
   clearExpireEventTimeoutAll(tokenMgmtRef);
   storage.clearStorage();
 }
 
+/**
+ * @param {OktaAuth} sdk
+ * @param {TokenManagerOptions} options
+ */
 function TokenManager(sdk, options) {
   options = util.extend({}, DEFAULT_OPTIONS, util.removeNils(options));
 
@@ -230,7 +306,9 @@ function TokenManager(sdk, options) {
   }
   var storageKey = options.storageKey || constants.TOKEN_STORAGE_NAME;
   var storage = storageBuilder(storageProvider, storageKey);
-  var clock = SdkClock.create(sdk, options);
+  var clock = SdkClock.create();
+
+  /** @type {TokenManagerRef} */
   var tokenMgmtRef = {
     clock: clock,
     options: options,
@@ -239,13 +317,15 @@ function TokenManager(sdk, options) {
     renewPromise: {}
   };
 
-  this.add = util.bind(add, this, sdk, tokenMgmtRef, storage);
-  this.get = util.bind(getAsync, this, sdk, tokenMgmtRef, storage);
-  this.remove = util.bind(remove, this, tokenMgmtRef, storage);
-  this.clear = util.bind(clear, this, tokenMgmtRef, storage);
-  this.renew = util.bind(renew, this, sdk, tokenMgmtRef, storage);
-  this.on = util.bind(tokenMgmtRef.emitter.on, tokenMgmtRef.emitter);
-  this.off = util.bind(tokenMgmtRef.emitter.off, tokenMgmtRef.emitter);
+  /** @type {TokenManagerAPI} */
+  var api = this;
+  api.add = util.bind(add, this, sdk, tokenMgmtRef, storage);
+  api.get = util.bind(getAsync, this, sdk, tokenMgmtRef, storage);
+  api.remove = util.bind(remove, this, tokenMgmtRef, storage);
+  api.clear = util.bind(clear, this, tokenMgmtRef, storage);
+  api.renew = util.bind(renew, this, sdk, tokenMgmtRef, storage);
+  api.on = util.bind(tokenMgmtRef.emitter.on, tokenMgmtRef.emitter);
+  api.off = util.bind(tokenMgmtRef.emitter.off, tokenMgmtRef.emitter);
 
   setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
 }
