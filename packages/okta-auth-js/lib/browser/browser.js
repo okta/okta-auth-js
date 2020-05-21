@@ -44,11 +44,13 @@ function OktaAuthBuilder(args) {
     cookieSettings.sameSite = cookieSettings.secure ? 'none' : 'lax';
   }
   if (cookieSettings.secure && !sdk.features.isHTTPS()) {
-    throw new AuthSdkError(
+    // eslint-disable-next-line no-console
+    console.warn(
       'The current page is not being served with the HTTPS protocol.\n' +
       'For security reasons, we strongly recommend using HTTPS.\n' +
       'If you cannot use HTTPS, set "cookies.secure" option to false.'
     );
+    cookieSettings.secure = false;
   }
 
   this.options = {
@@ -71,18 +73,7 @@ function OktaAuthBuilder(args) {
     cookies: cookieSettings
   };
 
-  if (this.options.pkce && !sdk.features.isPKCESupported()) {
-    var errorMessage = 'PKCE requires a modern browser with encryption support running in a secure context.';
-    if (!sdk.features.isHTTPS()) {
-      errorMessage += '\nThe current page is not being served with HTTPS protocol. Try using HTTPS.';
-    }
-    if (!sdk.features.hasTextEncoder()) {
-      errorMessage += '\n"TextEncoder" is not defined. You may need a polyfill/shim for this browser.';
-    }
-    throw new AuthSdkError(errorMessage);
-  }
-
-  this.userAgent = 'okta-auth-js-' + SDK_VERSION;
+  this.userAgent = builderUtil.getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
 
   // Digital clocks will drift over time, so the server
   // can misalign with the time reported by the browser.

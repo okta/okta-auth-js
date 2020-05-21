@@ -155,7 +155,7 @@ Object.assign(TestApp.prototype, {
     });
   },
   renderError: function(e) {
-    const xhrError = e && e.xhr ? e.xhr.message : '';
+    const xhrError = e && e.xhr ? (e.xhr.message || 'Network request failed') : '';
     this._setContent(`
       <div id="error" style="color: red">${e.toString()}</div>
       <div id="xhr-error" style="color: red">${xhrError}</div>
@@ -344,7 +344,7 @@ Object.assign(TestApp.prototype, {
         ${ tokensHTML({idToken, accessToken})}
       `;
     }
-    
+
     // Unauthenticated user, Login page
     return `
       <strong>Greetings, unknown user!</strong>

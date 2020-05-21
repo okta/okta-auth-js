@@ -13,7 +13,7 @@
 * [Configuration reference](#configuration-reference)
 * [API Reference](#api-reference)
 * [Building the SDK](#building-the-sdk)
-* [Node JS Usage](#node-js-usage)
+* [Node JS and React Native Usage](#node-js-and-react-native-usage)
 * [Contributing](#contributing)
 
 The Okta Auth JavaScript SDK builds on top of our [Authentication API](https://developer.okta.com/docs/api/resources/authn) and [OpenID Connect & OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
@@ -22,12 +22,13 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
-:heavy_check_mark: The current stable major version series is: `2.x`
+:heavy_check_mark: The current stable major version series is: `3.x`
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
-| `2.x`     | :heavy_check_mark: Stable        |
-| `1.x`     | :warning: Retiring on 2019-05-31 |
+| `3.x`     | :heavy_check_mark: Stable        |
+| `2.x`     | :warning: Retiring on 2020-09-30 |
+| `1.x`     | :x: Retired                      |
 | `0.x`     | :x: Retired                      |
 
 The latest release can always be found on the [releases page][github-releases].
@@ -92,7 +93,7 @@ To install [@okta/okta-auth-js](https://www.npmjs.com/package/@okta/okta-auth-js
 ```bash
 # Run this command in your project root folder.
 # yarn
-yarn add --save @okta/okta-auth-js
+yarn add @okta/okta-auth-js
 
 # npm
 npm install --save @okta/okta-auth-js
@@ -273,6 +274,11 @@ In most cases you will not need to set a value for `responseMode`. Defaults are 
 
 * `secure`: Defaults to `true`, unless the application origin is `http://localhost`, in which case it is forced to `false`. If `true`, the SDK will set the "Secure" option on all cookies. When this option is `true`, an exception will be thrown if the application origin is not using the HTTPS protocol. Setting to `false` will allow setting cookies on an HTTP origin, but is not recommended for production applications.
 * `sameSite`: Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
+
+| `userAgent` | An object to customize SDK information in `User-Agent` or `X-Okta-User-Agent-Extended` http header. Okta's downstream SDKs of `okta-auth-js` should provide customized userAgent for analytics purpose. |
+
+* `value`: Exact value to use as customized userAgent.
+* `template`: String template with `$OKTA_AUTH_JS` placeholder. `okta-auth-js` will replace the placeholder with current module information.
 
 ##### Example Client
 
@@ -1905,22 +1911,22 @@ authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
 
-## Node JS Usage
+## Node JS and React Native Usage
 
-You can use this library on server side in your Node application as an Authentication SDK. It can only be used in this way for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), **not** to implement an OIDC flow.
+You can use this library on server side in your Node application or mobile client side in React Native environment as an Authentication SDK. It can only be used in this way for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), **not** to implement an OIDC flow.
 
 To include this library in your project, you can follow the instructions in the [Getting started](#getting-started) section.
 
 ### Configuration
 
-You only need to set the `url` for your Okta Domain:
+You only need to set the `issuer` for your Okta Domain:
 
 ```javascript
 var OktaAuth = require('@okta/okta-auth-js');
 
 var config = {
   // The URL for your Okta organization
-  url: 'https://{yourOktaDomain}'
+  issuer: 'https://{yourOktaDomain}'
 };
 
 var authClient = new OktaAuth(config);

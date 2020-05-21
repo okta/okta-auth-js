@@ -144,7 +144,7 @@ describe('General Methods', function () {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'custom okta-auth-js-' + packageJson.version
+            'X-Okta-User-Agent-Extended': 'custom okta-auth-js/' + packageJson.version
           }
         },
         response: 'session'
@@ -172,7 +172,7 @@ describe('General Methods', function () {
             'X-Custom-Header': 'custom',
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'okta-auth-js-' + packageJson.version
+            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version
           }
         },
         response: 'session'
