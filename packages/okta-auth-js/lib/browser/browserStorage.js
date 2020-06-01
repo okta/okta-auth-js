@@ -40,10 +40,10 @@ storageUtil.browserHasSessionStorage = function() {
 };
 
 storageUtil.getPKCEStorage = function(options) {
-  if (storageUtil.browserHasLocalStorage()) {
-    return storageBuilder(storageUtil.getLocalStorage(), constants.PKCE_STORAGE_NAME);
-  } else if (storageUtil.browserHasSessionStorage()) {
+  if (storageUtil.browserHasSessionStorage()) {
     return storageBuilder(storageUtil.getSessionStorage(), constants.PKCE_STORAGE_NAME);
+  } else if (storageUtil.browserHasLocalStorage()) {
+    return storageBuilder(storageUtil.getLocalStorage(), constants.PKCE_STORAGE_NAME);
   } else {
     return storageBuilder(storageUtil.getCookieStorage(options), constants.PKCE_STORAGE_NAME);
   }

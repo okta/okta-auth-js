@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1.2
+
+- Shifts browser storage for ephemeral PKCE code challenge to default to sessionStorage before localStorage or cookies
+  - This should reduce problems with multiple tabs making overlapping requests to renew tokens
+
 ## 3.1.1
 
 ### Bug Fixes
