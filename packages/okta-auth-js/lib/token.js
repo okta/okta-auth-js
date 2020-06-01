@@ -102,7 +102,7 @@ function verifyToken(sdk, token, validationParams) {
       if (!valid) {
         throw new AuthSdkError('The token signature is not valid');
       }
-      if (validationParams.accessToken && token.claims.at_hash) {
+      if (validationParams && validationParams.accessToken && token.claims.at_hash) {
         return sdkCrypto.getOidcHash(validationParams.accessToken)
           .then(hash => {
             if (hash !== token.claims.at_hash) {
