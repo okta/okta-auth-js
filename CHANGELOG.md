@@ -2,7 +2,7 @@
 
 ## 3.1.2
 
-- Shifts browser storage for ephemeral PKCE code challenge to default to sessionStorage before localStorage or cookies
+- [#384](https://github.com/okta/okta-auth-js/pull/384) Shifts browser storage for ephemeral PKCE code challenge to default to sessionStorage before localStorage or cookies
   - This should reduce problems with multiple tabs making overlapping requests to renew tokens
 
 ## 3.1.1
