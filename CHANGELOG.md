@@ -1,5 +1,9 @@
 # Changelog
 
+## PENDING
+
+- [#386](https://github.com/okta/okta-auth-js/pull/386) Fixes `token.verify`: `validationParams` should be optional.
+
 ## 3.1.1
 
 ### Bug Fixes
