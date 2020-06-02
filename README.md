@@ -54,7 +54,7 @@ Compatibility with IE Edge can be accomplished by adding polyfill/shims for the 
 
 ### Third party cookies
 
-Many browsers have started blocking cross-origin or "third party" cookies by default. Although most of the Okta API methods supported by this SDK do not rely upon cookies, there are a few methods which do. These methods will break if third party cookies are blocked:
+Many browsers have started blocking cross-origin or "third party" cookies by default. Although most of the Okta APIs supported by this SDK do not rely upon cookies, there are a few methods which do. These methods will break if third party cookies are blocked:
 
 * [session](#session) APIs require access to cookies stored on the Okta domain.
   * [session.setCookieAndRedirect](#sessionsetcookieandredirectsessiontoken-redirecturi)
@@ -62,8 +62,9 @@ Many browsers have started blocking cross-origin or "third party" cookies by def
   * [session.get](#sessionget)
   * [session.refresh](#sessionrefresh)
   * [closeSession](#closesession)
-* [token.getWithoutPrompt](#tokengetwithoutpromptoptions) must have access to cookies on the Okta domain via an iFrame running on your application's page.
-* [token.renew](#tokenrenewtokentorenew) uses [token.getWithoutPrompt](#tokengetwithoutpromptoptions) and is subject to the same limitations.
+* [token](#token)
+  * [token.getWithoutPrompt](#tokengetwithoutpromptoptions) must have access to cookies on the Okta domain via an iFrame running on your application's page.
+  * [token.renew](#tokenrenewtokentorenew) uses [token.getWithoutPrompt](#tokengetwithoutpromptoptions) and is subject to the same limitations.
 
 If your application depends on any of these methods, you should try to either rewrite your application to avoid using these methods or communicate to your users that they must enable third party cookies. Okta engineers are currently working on a better long-term solution to this problem.
 
@@ -498,10 +499,12 @@ authClient.signOut({
 
 ### `closeSession()`
 
+> :warning: This method requires access to [third party cookies](#third-party-cookies)
+
 Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. This method is an XHR-based alternative to [signOut](#signout), which will redirect to Okta before returning to your application. Here are some points to consider when using this method:
 
 * Executes in the background. The user will see not any change to `window.location`.
-* This method requires access to [third party cookies](#third-party-cookies). The method will fail to sign the user out if 3rd-party cookies are blocked by the browser.
+* The method will fail to sign the user out if 3rd-party cookies are blocked by the browser.
 * Does not revoke the access token. It is strongly recommended to call [revokeAccessToken](#revokeaccesstokenaccesstoken) before calling this method
 * It is recommended (but not required) for the app to call `window.location.reload()` after the `XHR` method completes to ensure your app is properly re-initialized in an unauthenticated state.
 * For more information, see [Close Current Session](https://developer.okta.com/docs/reference/api/sessions/#close-current-session) in the Session API documentation.
@@ -1492,9 +1495,9 @@ The end of the authentication flow! This transaction contains a sessionToken you
 
 ### `session`
 
-These methods require access to [third party cookies](#third-party-cookies).
-
 #### `session.setCookieAndRedirect(sessionToken, redirectUri)`
+
+> :warning: This method requires access to [third party cookies](#third-party-cookies)
 
 This allows you to create a session using a sessionToken.
 
@@ -1506,6 +1509,8 @@ authClient.session.setCookieAndRedirect(transaction.sessionToken);
 ```
 
 #### `session.exists()`
+
+> :warning: This method requires access to [third party cookies](#third-party-cookies)
 
 Returns a promise that resolves with `true` if there is an existing Okta [session](https://developer.okta.com/docs/api/resources/sessions#example), or `false` if not.
 
@@ -1522,6 +1527,8 @@ authClient.session.exists()
 
 #### `session.get()`
 
+> :warning: This method requires access to [third party cookies](#third-party-cookies)
+
 Gets the active [session](https://developer.okta.com/docs/api/resources/sessions#example).
 
 ```javascript
@@ -1535,6 +1542,8 @@ authClient.session.get()
 ```
 
 #### `session.refresh()`
+
+> :warning: This method requires access to [third party cookies](#third-party-cookies)
 
 Refresh the current session by extending its lifetime. This can be used as a keep-alive operation.
 
@@ -1598,9 +1607,9 @@ authClient.token.getWithoutPrompt({
 
 #### `token.getWithoutPrompt(options)`
 
-When you've obtained a sessionToken from the authorization flows, or a session already exists, you can obtain a token or tokens without prompting the user to log in.
+> :warning: This method requires access to [third party cookies](#third-party-cookies)
 
-This method requires access to [third party cookies](#third-party-cookies).
+When you've obtained a sessionToken from the authorization flows, or a session already exists, you can obtain a token or tokens without prompting the user to log in.
 
 * `options` - See [Authorize options](#authorize-options)
 
@@ -1724,9 +1733,9 @@ authClient.token.decode('YOUR_ID_TOKEN_JWT');
 
 #### `token.renew(tokenToRenew)`
 
-Returns a new token if the Okta [session](https://developer.okta.com/docs/api/resources/sessions#example) is still valid.
+> :warning: This method requires access to [third party cookies](#third-party-cookies)
 
-This method requires access to [third party cookies](#third-party-cookies).
+Returns a new token if the Okta [session](https://developer.okta.com/docs/api/resources/sessions#example) is still valid.
 
 * `tokenToRenew` - an access token or ID token previously provided by Okta. note: this is not the raw JWT
 
