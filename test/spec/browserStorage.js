@@ -1,3 +1,4 @@
+/* global window */
 jest.mock('../../lib/storageBuilder');
 
 var browserStorage  = require('../../lib/browser/browserStorage');

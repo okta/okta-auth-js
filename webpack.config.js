@@ -15,7 +15,7 @@ module.exports = _.extend({}, _.cloneDeep(commonConfig), {
   entry: './lib/browser/browserIndex.js',
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'okta-auth-js.min.js',
+    filename: 'bundles/okta-auth-js.umd.js',
     library: 'OktaAuth',
     libraryTarget: 'umd'
   },
