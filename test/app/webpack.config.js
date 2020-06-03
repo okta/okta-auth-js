@@ -29,5 +29,10 @@ module.exports = {
         enforce: 'pre'
       }
     ]
+  },
+  resolve: {
+    alias: {
+      '@okta/okta-auth-js': path.join(__dirname, '..', '..', 'dist')
+    }
   }
 };

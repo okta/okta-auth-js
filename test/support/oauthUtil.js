@@ -8,7 +8,7 @@ var EventEmitter = require('tiny-emitter');
 var wellKnown = require('./xhr/well-known');
 var wellKnownSharedResource = require('./xhr/well-known-shared-resource');
 var keys = require('./xhr/keys');
-var storageUtil = require('@okta/okta-auth-js/lib/browser/browserStorage');
+var storageUtil = require('../../lib/browser/browserStorage');
 
 var oauthUtil = {};
 

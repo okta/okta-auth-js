@@ -18,6 +18,26 @@
     "ecmaVersion": 2017
   },
   "rules": {
+    "node/no-missing-require": ["error", {
+      "allowModules": [
+        "OktaAuth"
+      ]
+    }],
+    "node/no-extraneous-require": ["error", {
+      "allowModules": [
+        "@okta/test.support"
+      ]
+    }],
+    "node/no-unsupported-features/node-builtins": ["error", {
+      "ignores": [
+        "TextEncoder"
+      ]
+    }],
+    "node/no-unsupported-features/es-builtins": ["error", {
+      "ignores": [
+        "Promise.allSettled"
+      ]
+    }],
     "jasmine/no-unsafe-spy": 0,
     "jasmine/new-line-before-expect": 0,
     "jasmine/prefer-toHaveBeenCalledWith": 0,

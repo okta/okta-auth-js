@@ -9,6 +9,9 @@ module.exports = {
   'testMatch': [
     '**/test/spec/*.js'
   ],
+  'roots': [
+    'test/spec'
+  ],
   'testPathIgnorePatterns': [
     './test/spec/browser.js',
     './test/spec/browserStorage.js',

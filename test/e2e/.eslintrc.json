@@ -18,6 +18,7 @@
     "jasmine": true
   },
   "rules": {
+    "node/no-unsupported-features/es-syntax": 0,
     "jasmine/no-suite-dupes": [1, "branch"]
   }
 }

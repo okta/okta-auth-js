@@ -13,6 +13,9 @@ module.exports = {
   'testMatch': [
     '**/test/spec/*.js'
   ],
+  'roots': [
+    'test/spec'
+  ],
   'testPathIgnorePatterns': [
     './test/spec/serverStorage.js'
   ],

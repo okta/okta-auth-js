@@ -3,7 +3,7 @@
 
 var _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
-    cookies = require('@okta/okta-auth-js/lib/browser/browserStorage').storage,
+    cookies = require('../../lib/browser/browserStorage').storage,
     fetch = require('cross-fetch');
 
 var util = {};
