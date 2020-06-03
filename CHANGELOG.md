@@ -2,8 +2,9 @@
 
 ## 3.1.2
 
-- [#384](https://github.com/okta/okta-auth-js/pull/384) Shifts browser storage for ephemeral PKCE code challenge to default to sessionStorage before localStorage or cookies
-  - This should reduce problems with multiple tabs making overlapping requests to renew tokens
+- [#384](https://github.com/okta/okta-auth-js/pull/384) Shifts browser storage for ephemeral PKCE code challenge to default to sessionStorage before localStorage or cookies.
+  - This should reduce problems with multiple tabs making overlapping requests to renew tokens.
+- [#386](https://github.com/okta/okta-auth-js/pull/386) Fixes `token.verify`: `validationParams` should be optional.
 
 ## 3.1.1
 

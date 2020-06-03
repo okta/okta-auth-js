@@ -3084,6 +3084,18 @@ describe('token.verify', function() {
       expect(res).toEqual(tokens.standardIdTokenParsed);
     });
   });
+  it('validationParams are optional', () => {
+    util.warpToUnixTime(1449699929);
+    oauthUtil.loadWellKnownAndKeysCache();
+    client = setupSync({
+      issuer: tokens.standardIdTokenParsed.issuer,
+      clientId: tokens.standardIdTokenParsed.clientId,
+    });
+    return client.token.verify(tokens.standardIdTokenParsed, undefined)
+    .then(function(res) {
+      expect(res).toEqual(tokens.standardIdTokenParsed);
+    });
+  });
 
   describe('rejects a token', function() {
     beforeEach(function() {
