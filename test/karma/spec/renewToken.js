@@ -4,7 +4,6 @@ require('jasmine-ajax');
 import tokens from '@okta/test.support/tokens';
 
 import OktaAuth from '@okta/okta-auth-js';
-import * as oauthUtil from '../../../lib/oauthUtil';
 import pkce from '../../../lib/pkce';
 import OAuthError from '../../../lib/errors/OAuthError';
 import AuthSdkError from '../../../lib/errors/AuthSdkError';
