@@ -4,11 +4,15 @@
     "polyfills": [
       "Promise",
       "Array.from",
-      "TextEncoder"
+      "TextEncoder",
+      "Object.assign"
     ]
   },
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 2017
+  },
+  "rules": {
+    "node/no-unsupported-features/es-syntax": 0
   }
 }
