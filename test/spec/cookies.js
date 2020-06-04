@@ -1,5 +1,7 @@
-var Cookies  = require('../../lib/browser/browserStorage').storage;
-var JsCookie = require('js-cookie');
+import browserStorage from '../../lib/browser/browserStorage';
+const Cookies = browserStorage.storage;
+
+import JsCookie from 'js-cookie';
 
 describe('cookie', function () {
   beforeEach(function () {

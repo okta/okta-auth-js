@@ -18,12 +18,17 @@
     "ecmaVersion": 2017
   },
   "rules": {
-    "node/no-missing-require": ["error", {
+    "node/no-extraneous-require": ["error", {
+      "allowModules": [
+        "@okta/test.support"
+      ]
+    }],
+    "node/no-missing-import": ["error", {
       "allowModules": [
         "OktaAuth"
       ]
     }],
-    "node/no-extraneous-require": ["error", {
+    "node/no-extraneous-import": ["error", {
       "allowModules": [
         "@okta/test.support"
       ]

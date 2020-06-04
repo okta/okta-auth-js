@@ -1,11 +1,14 @@
 {
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "globals": {
     "it": "readonly",
     "jest": "readonly",
     "expect": "readonly"
   },
   "rules": {
-    "node/no-missing-require": ["error", {
+    "node/no-missing-import": ["error", {
       "allowModules": [
         "OktaAuth"
       ]

@@ -1,8 +1,8 @@
 jest.mock('cross-fetch');
 
-var _ = require('lodash');
-var util = require('@okta/test.support/util');
-var OktaAuth = require('OktaAuth');
+import _ from 'lodash';
+import util from '@okta/test.support/util';
+import OktaAuth from 'OktaAuth';
 
 describe('General Errors', function () {
   util.itErrorsCorrectly({
@@ -80,7 +80,8 @@ describe('General Errors', function () {
       err = e;
     }
     expect(err.name).toEqual('AuthSdkError');
-    expect(err.errorSummary).toEqual('No arguments passed to constructor. Required usage: new OktaAuth(args)');
+    expect(err.errorSummary).toEqual('No issuer passed to constructor. ' +
+      'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com/oauth2/{authServerId}"})');
   });
 
   it('throw an error if no issuer is passed to the constructor', function () {

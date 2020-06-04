@@ -1,7 +1,7 @@
-var tokens = require('@okta/test.support/tokens');
-var factory = require('@okta/test.support/factory');
-var sdkCrypto = require('../../../lib/crypto');
-var sdkUtil = require('../../../lib/util');
+import tokens from '@okta/test.support/tokens';
+import factory from '@okta/test.support/factory';
+import * as sdkCrypto from '../../../lib/crypto';
+import sdkUtil from '../../../lib/util';
 
 describe('crypto', function() {
   describe('getOidcHash', () => {

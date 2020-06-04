@@ -1,5 +1,5 @@
-var sdkUtil = require('../../../lib/util');
-var pkce = require('../../../lib/pkce');
+import sdkUtil from '../../../lib/util';
+import pkce from '../../../lib/pkce';
 
 var MIN_VERIFIER_LENGTH = 43;
 var MAX_VERIFIER_LENGTH = 128;

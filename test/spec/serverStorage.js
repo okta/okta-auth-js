@@ -1,4 +1,6 @@
-var serverStorage = require('../../lib/server/serverStorage').storage;
+import _serverStorage from '../../lib/server/serverStorage';
+
+const serverStorage = _serverStorage.storage;
 
 describe('serverStorage', function () {
   describe('get', function () {

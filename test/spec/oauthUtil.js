@@ -1,14 +1,14 @@
 /* global window, localStorage, sessionStorage */
 jest.mock('cross-fetch');
 
-var OktaAuth = require('OktaAuth');
-var oauthUtil = require('../../lib/oauthUtil');
-var libUtil = require('../../lib/util');
-var oauthUtilHelpers = require('@okta/test.support/oauthUtil');
-var util = require('@okta/test.support/util');
-var wellKnown = require('@okta/test.support/xhr/well-known');
-var keys = require('@okta/test.support/xhr/keys');
-var tokens = require('@okta/test.support/tokens');
+import OktaAuth from 'OktaAuth';
+import * as oauthUtil from '../../lib/oauthUtil';
+import libUtil from '../../lib/util';
+import oauthUtilHelpers from '@okta/test.support/oauthUtil';
+import util from '@okta/test.support/util';
+import wellKnown from '@okta/test.support/xhr/well-known';
+import keys from '@okta/test.support/xhr/keys';
+import tokens from '@okta/test.support/tokens';
 
 // Expected cookie settings. Cache will use the same settings on HTTP and HTTPS
 var cookieSettings = {

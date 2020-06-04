@@ -18,7 +18,7 @@ describe('fetchRequest', function () {
   jest.setMock('cross-fetch', function() {
     return mockFetchObj.fetch.apply(null, arguments);
   });
-  const fetchRequest = require('../../lib/fetch/fetchRequest');
+  const fetchRequest = require('../../lib/fetch/fetchRequest').default;
 
   beforeEach(function() {
     fetchSpy = jest.spyOn(mockFetchObj, 'fetch');

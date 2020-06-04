@@ -1,9 +1,9 @@
 /* global window */
 jest.mock('cross-fetch');
 
-var Emitter = require('tiny-emitter');
-var OktaAuth = require('../../lib/browser/browserIndex');
-var AuthApiError = require('../../lib/errors/AuthApiError');
+import Emitter from 'tiny-emitter';
+import OktaAuth from '../../lib/browser/browserIndex';
+import AuthApiError from '../../lib/errors/AuthApiError';
 
 describe('Browser', function() {
   let auth;

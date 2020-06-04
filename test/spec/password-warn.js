@@ -1,6 +1,6 @@
 jest.mock('cross-fetch');
 
-var util = require('@okta/test.support/util');
+import util from '@okta/test.support/util';
 
 describe('PASSWORD_WARN', function () {
   describe('trans.changePassword', function () {

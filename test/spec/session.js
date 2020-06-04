@@ -1,6 +1,12 @@
 /* global window */
-var session = require('../../lib/session');
-var http = require('../../lib/http');
+import {
+  closeSession,
+  sessionExists,
+  getSession,
+  refreshSession,
+  setCookieAndRedirect
+} from '../../lib/session';
+import http from '../../lib/http';
 
 describe('session', function() {
   var sdk;
@@ -32,14 +38,14 @@ describe('session', function() {
 
   describe('sessionExists', function() {
     it('calls sdk.session.get', function() {
-      return session.sessionExists(sdk)
+      return sessionExists(sdk)
         .then(function() {
           expect(sdk.session.get).toHaveBeenCalled();
         });
     });
 
     it('resolves to false by default', function() {
-      return session.sessionExists(sdk)
+      return sessionExists(sdk)
         .then(function(res) {
           expect(res).toBe(false);
         });
@@ -49,7 +55,7 @@ describe('session', function() {
       sdk.session.get.mockImplementation(function() {
         return Promise.reject(new Error('test error'));
       });
-      return session.sessionExists(sdk)
+      return sessionExists(sdk)
         .then(function(res) {
           expect(res).toBe(false);
         });
@@ -59,7 +65,7 @@ describe('session', function() {
       sessionObj = {
         status: 'ACTIVE'
       };
-      return session.sessionExists(sdk)
+      return sessionExists(sdk)
         .then(function(res) {
           expect(res).toBe(true);
         });
@@ -69,7 +75,7 @@ describe('session', function() {
   describe('getSession', function() {
     it('Hits endpoint: /api/v1/sessions/me', function() {
       jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
-      return session.getSession(sdk)
+      return getSession(sdk)
         .then(function() {
           expect(http.get).toHaveBeenCalledWith(sdk, '/api/v1/sessions/me');
         });
@@ -79,7 +85,7 @@ describe('session', function() {
       jest.spyOn(http, 'get').mockImplementation(function() {
         return Promise.reject(new Error('test error'));
       });
-      return session.getSession(sdk)
+      return getSession(sdk)
         .then(function(res) {
           expect(res).toEqual({
             status: 'INACTIVE'
@@ -89,7 +95,7 @@ describe('session', function() {
 
     it('Adds a "refresh" method on the session object', function() {
       jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
-      return session.getSession(sdk)
+      return getSession(sdk)
         .then(function(res) {
           expect(typeof res.refresh).toBe('function');
         });
@@ -97,7 +103,7 @@ describe('session', function() {
 
     it('Adds a "user" method on the session object', function() {
       jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
-      return session.getSession(sdk)
+      return getSession(sdk)
         .then(function(res) {
           expect(typeof res.user).toBe('function');
         });
@@ -113,7 +119,7 @@ describe('session', function() {
       jest.spyOn(http, 'get').mockImplementation(function() {
         return Promise.resolve(sessionObj);
       });
-      return session.getSession(sdk)
+      return getSession(sdk)
         .then(function(res) {
           expect(res).toEqual({
             foo: 'bar',
@@ -136,7 +142,7 @@ describe('session', function() {
       jest.spyOn(http, 'get').mockImplementation(function() {
         return Promise.resolve(sessionObj);
       });
-      return session.getSession(sdk)
+      return getSession(sdk)
         .then(function(res) {
           res.refresh();
           expect(http.post).toHaveBeenCalledWith(sdk, href)
@@ -155,7 +161,7 @@ describe('session', function() {
       jest.spyOn(http, 'get').mockImplementation(function() {
         return Promise.resolve(sessionObj);
       });
-      return session.getSession(sdk)
+      return getSession(sdk)
         .then(function(res) {
           http.get.mockReset();
           jest.spyOn(http, 'get').mockReturnValue(null);
@@ -168,7 +174,7 @@ describe('session', function() {
   describe('closeSession', function() {
     it('makes a DELETE request to /api/v1/sessions/me', function() {
       jest.spyOn(http, 'httpRequest').mockReturnValue(Promise.resolve());
-      return session.closeSession(sdk)
+      return closeSession(sdk)
         .then(function() {
           expect(http.httpRequest).toHaveBeenCalledWith(sdk, {
             url: baseUrl + '/api/v1/sessions/me',
@@ -180,7 +186,7 @@ describe('session', function() {
     it('will throw if http request rejects', function() {
       var testError = new Error('test error');
       jest.spyOn(http, 'httpRequest').mockReturnValue(Promise.reject(testError));
-      return session.closeSession(sdk) // should throw
+      return closeSession(sdk) // should throw
         .catch(function(e) {
           expect(e).toBe(testError);
         });
@@ -190,7 +196,7 @@ describe('session', function() {
   describe('refreshSession', function() {
     it('makes a POST to /api/v1/sessions/me/lifecycle/refresh', function() {
       jest.spyOn(http, 'post').mockReturnValue(Promise.resolve());
-      return session.refreshSession(sdk)
+      return refreshSession(sdk)
         .then(function() {
           expect(http.post).toHaveBeenCalledWith(sdk,'/api/v1/sessions/me/lifecycle/refresh');
         });
@@ -198,7 +204,7 @@ describe('session', function() {
     it('can throw', function() {
       var testError = new Error('test error');
       jest.spyOn(http, 'post').mockReturnValue(Promise.reject(testError));
-      return session.refreshSession(sdk)
+      return refreshSession(sdk)
         .catch(function(e) {
           expect(e).toBe(testError);
         });
@@ -215,19 +221,19 @@ describe('session', function() {
       };
     });
     it('redirects to /login/sessionCookieRedirect', function() {
-      session.setCookieAndRedirect(sdk);
+      setCookieAndRedirect(sdk);
       expect(window.location).toBe(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&redirectUrl=' + encodeURIComponent(currentUrl));
     });
     it('can pass a sessionToken', function() {
       var sessionToken = 'blah-blah';
-      session.setCookieAndRedirect(sdk, sessionToken);
+      setCookieAndRedirect(sdk, sessionToken);
       expect(window.location).toBe(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&token=' +
         encodeURIComponent(sessionToken) + '&redirectUrl=' + encodeURIComponent(currentUrl));
     });
     it('can pass a redirectUrl', function() {
       var sessionToken = 'blah-blah';
       var redirectUrl = 'http://go-here-now';
-      session.setCookieAndRedirect(sdk, sessionToken, redirectUrl);
+      setCookieAndRedirect(sdk, sessionToken, redirectUrl);
       expect(window.location).toBe(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&token=' +
         encodeURIComponent(sessionToken) + '&redirectUrl=' + encodeURIComponent(redirectUrl));
     });

@@ -1,19 +1,19 @@
 /* global window, document, btoa */
 jest.mock('cross-fetch');
-var allSettled = require('promise.allsettled');
+import allSettled from 'promise.allsettled';
 allSettled.shim(); // will be a no-op if not needed
 
-var _ = require('lodash');
-var OktaAuth = require('OktaAuth');
-var tokens = require('@okta/test.support/tokens');
-var util = require('@okta/test.support/util');
-var oauthUtil = require('@okta/test.support/oauthUtil');
-var waitFor = require('@okta/test.support/waitFor');
-var packageJson = require('../../package.json');
-var sdkUtil = require('../../lib/oauthUtil');
-var pkce = require('../../lib/pkce');
-var http = require('../../lib/http');
-var sdkCrypto = require('../../lib/crypto');
+import _ from 'lodash';
+import OktaAuth from 'OktaAuth';
+import tokens from '@okta/test.support/tokens';
+import util from '@okta/test.support/util';
+import oauthUtil from '@okta/test.support/oauthUtil';
+import waitFor from '@okta/test.support/waitFor';
+import packageJson from '../../package.json';
+import * as sdkUtil from '../../lib/oauthUtil';
+import pkce from '../../lib/pkce';
+import http from '../../lib/http';
+import * as sdkCrypto from '../../lib/crypto';
 
 function setupSync(options) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);

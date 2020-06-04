@@ -1,4 +1,4 @@
-var SdkClock = require('../../lib/clock');
+import SdkClock from '../../lib/clock';
 
 describe('clock', function() {
   describe('create', function() {

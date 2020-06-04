@@ -1,9 +1,9 @@
 /* global window, document */
 jest.mock('cross-fetch');
 
-var OktaAuth = require('OktaAuth');
-var util = require('@okta/test.support/util');
-var packageJson = require('../../package.json');
+import OktaAuth from 'OktaAuth';
+import util from '@okta/test.support/util';
+import packageJson from '../../package.json';
 
 describe('fingerprint', function() {
   var test;

@@ -1,15 +1,15 @@
 /* global Promise */
 jest.mock('cross-fetch');
 
-var util = require('@okta/test.support/util');
-var factory = require('@okta/test.support/factory');
-var packageJson = require('../../package.json');
-var AuthSdkError  = require('../../lib/errors/AuthSdkError');
-var OktaAuth = require('../../lib/browser/browserIndex');
-var http = require('../../lib/http');
-var pkce = require('../../lib/pkce');
-var token = require('../../lib/token');
-var oauthUtil = require('../../lib/oauthUtil');
+import util from '@okta/test.support/util';
+import factory from '@okta/test.support/factory';
+import packageJson from '../../package.json';
+import AuthSdkError from '../../lib/errors/AuthSdkError';
+import OktaAuth from '../../lib/browser/browserIndex';
+import http from '../../lib/http';
+import pkce from '../../lib/pkce';
+import * as token from '../../lib/token';
+import * as oauthUtil from '../../lib/oauthUtil';
 
 describe('pkce', function() {
 

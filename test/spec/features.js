@@ -1,5 +1,5 @@
 /* global window, document */
-var OktaAuth = require('OktaAuth');
+import OktaAuth from 'OktaAuth';
 
 describe('features', function() {
 

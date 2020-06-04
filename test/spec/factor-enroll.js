@@ -1,7 +1,7 @@
 jest.mock('cross-fetch');
 
-var util = require('@okta/test.support/util');
-var _ = require('lodash');
+import util from '@okta/test.support/util';
+import _ from 'lodash';
 
 describe('FACTOR_ENROLL', function () {
   describe('factors', function () {

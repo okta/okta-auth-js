@@ -1,4 +1,4 @@
-var storageBuilder  = require('../../lib/storageBuilder');
+import storageBuilder from '../../lib/storageBuilder';
 
 describe('storageBuilder', () => {
 

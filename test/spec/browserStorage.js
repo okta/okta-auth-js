@@ -1,8 +1,8 @@
 /* global window */
 jest.mock('../../lib/storageBuilder');
 
-var browserStorage  = require('../../lib/browser/browserStorage');
-var storageBuilder  = require('../../lib/storageBuilder');
+import browserStorage from '../../lib/browser/browserStorage';
+import storageBuilder from '../../lib/storageBuilder';
 
 describe('browserStorage', () => {
   let originalLocalStorage;

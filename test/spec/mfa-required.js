@@ -1,7 +1,7 @@
 jest.mock('cross-fetch');
 
-var util = require('@okta/test.support/util');
-var _ = require('lodash');
+import util from '@okta/test.support/util';
+import _ from 'lodash';
 
 describe('MFA_REQUIRED', function () {
   describe('factor.verify', function () {

@@ -27,7 +27,23 @@ var webpackConf =  _.extend({}, _.cloneDeep(commonConfig), {
     rules: [
       {
         test: /\.js$/,
-        use: { loader: 'istanbul-instrumenter-loader' },
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+          plugins: [
+            '@babel/plugin-transform-runtime',
+            'mockable-imports'
+          ],
+          sourceType: 'unambiguous'
+        }
+      },
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'istanbul-instrumenter-loader',
+          options: { esModules: true }
+        },
         enforce: 'post',
         include: [
           path.resolve(__dirname, 'lib')

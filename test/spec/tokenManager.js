@@ -1,15 +1,16 @@
 /* global window, localStorage, sessionStorage */
 
 // Promise.allSettled is added in Node 12.10
-var allSettled = require('promise.allsettled');
+import allSettled from 'promise.allsettled';
 allSettled.shim(); // will be a no-op if not needed
 
-var Emitter = require('tiny-emitter');
-var OktaAuth = require('OktaAuth');
-var tokens = require('@okta/test.support/tokens');
-var util = require('@okta/test.support/util');
-var oauthUtil = require('@okta/test.support/oauthUtil');
-var SdkClock = require('../../lib/clock');
+import Emitter from 'tiny-emitter';
+import OktaAuth from 'OktaAuth';
+import tokens from '@okta/test.support/tokens';
+import util from '@okta/test.support/util';
+import oauthUtil from '@okta/test.support/oauthUtil';
+import SdkClock from '../../lib/clock';
+import TokenManager from '../../lib/TokenManager';
 
 // Expected settings on HTTPS
 var secureCookieSettings = {
@@ -955,7 +956,6 @@ describe('TokenManager', function() {
       var CURRENT_TIME = 0;
       var EXPIRATION_TIME = CURRENT_TIME + 10;
       util.warpToUnixTime(CURRENT_TIME);
-      var TokenManager = require('../../lib/TokenManager');
       var sdk = setupSync();
       jest.spyOn(sdk.token, 'renew');
       var tokenManager = new TokenManager(sdk, {
@@ -979,7 +979,6 @@ describe('TokenManager', function() {
       var CURRENT_TIME = 10;
       var EXPIRATION_TIME = CURRENT_TIME - 1;
       util.warpToUnixTime(CURRENT_TIME);
-      var TokenManager = require('../../lib/TokenManager');
       var sdk = setupSync({
         // negative offset means the local time is ahead of the server time
         localClockOffset: -2000

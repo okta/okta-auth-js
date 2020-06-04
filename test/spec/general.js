@@ -1,8 +1,8 @@
 jest.mock('cross-fetch');
 
-var util = require('@okta/test.support/util');
-var _ = require('lodash');
-var packageJson = require('../../package.json');
+import util from '@okta/test.support/util';
+import _ from 'lodash';
+import packageJson from '../../package.json';
 
 describe('General Methods', function () {
   describe('trans.cancel', function () {
