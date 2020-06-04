@@ -29,6 +29,8 @@
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
     "build": "node build.js",
+    "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
+    "build:server": "cross-env babel lib -d dist/lib --config-file ./babel.node.json",
     "prepare": "yarn build",
     "start": "yarn --cwd test/app start --open"
   },
@@ -60,10 +62,13 @@
   "devDependencies": {
     "@babel/cli": "^7.8.0",
     "@babel/core": "^7.8.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.10.1",
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.2",
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "babel-plugin-mockable-imports": "^1.7.1",
     "chalk": "2.4.2",
     "cross-env": "^5.1.1",
     "dotenv": "^8.1.0",

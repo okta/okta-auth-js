@@ -19,7 +19,8 @@
     {
       "files": ["dist/**/*"],
       "rules": {
-        "node/no-unpublished-require": 1
+        "node/no-unpublished-require": 1,
+        "node/no-unpublished-import": 1
       }
     },
     {
@@ -33,6 +34,7 @@
   ],
   "rules": {
     "node/no-unpublished-require": 0,
+    "node/no-unpublished-import": 0,
     "camelcase": 2,
     "complexity": [2, 7],
     "curly": 2,
