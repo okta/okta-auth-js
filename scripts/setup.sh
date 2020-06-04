@@ -28,8 +28,5 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
   exit ${FAILED_SETUP}
 fi
 
-# Build config
-yarn workspace @okta/okta-auth-js prepare
-
-# Revert the origional change
-# sed -i "s#${OKTA_REGISTRY}#${YARN_REGISTRY}#" yarn.lock
+# Revert the original change
+sed -i "s#${OKTA_REGISTRY}#${YARN_REGISTRY}#" yarn.lock
