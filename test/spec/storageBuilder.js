@@ -44,8 +44,8 @@ describe('storageBuilder', () => {
       const storage = storageBuilder(inner, storageName);
       const fn = function() {
         storage.getStorage();
-      }
-      expect(fn).toThrowError('Unable to parse storage string: fake')
+      };
+      expect(fn).toThrowError('Unable to parse storage string: fake');
     });
   });
 
@@ -79,7 +79,7 @@ describe('storageBuilder', () => {
       const storage = storageBuilder(inner, storageName);
       const fn = function() {
         storage.setStorage({});
-      }
+      };
       expect(fn).toThrowError('Unable to set storage: fake');
     });
   });

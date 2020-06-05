@@ -1,5 +1,5 @@
 import TestApp from '../pageobjects/TestApp';
-import OktaHome from '../pageobjects/OktaHome'
+import OktaHome from '../pageobjects/OktaHome';
 import { openPKCE } from '../util/appUtils';
 import { loginPopup } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';

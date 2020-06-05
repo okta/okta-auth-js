@@ -5,7 +5,8 @@
   ],
   "env": {
     "browser": false,
-    "commonjs": true
+    "commonjs": true,
+    "node": true
   },
   "globals": {
     "Promise": true,
@@ -56,7 +57,7 @@
     "max-len": [2, 120],
     "max-params": [2, 5],
     "max-statements": [2, 25],
-    "quotes": [2, "single"],
+    "quotes": [2, "single", { "allowTemplateLiterals": true }],
     "semi": 2,
     "strict": 0,
     "wrap-iife": [2, "any"]

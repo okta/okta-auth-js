@@ -185,7 +185,7 @@ oauthUtil.setup = function(opts) {
 
   if (opts.tokenManagerAddKeys) {
     for (var key in opts.tokenManagerAddKeys) {
-      if (!opts.tokenManagerAddKeys.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(opts.tokenManagerAddKeys, key)) {
         continue;
       }
       var token = opts.tokenManagerAddKeys[key];

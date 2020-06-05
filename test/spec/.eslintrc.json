@@ -15,9 +15,11 @@
   },
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2017
+    "ecmaVersion": 2020
   },
   "rules": {
+    "max-len": 0,
+    "camelcase": 0,
     "node/no-extraneous-require": ["error", {
       "allowModules": [
         "@okta/test.support"

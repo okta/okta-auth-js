@@ -1,4 +1,3 @@
-/* global Map */
 describe('fetchRequest', function () {
   let fetchSpy;
 
@@ -14,7 +13,7 @@ describe('fetchRequest', function () {
     fetch: function mockFetchFunc() {
       return Promise.resolve(response);
     }
-  }
+  };
   jest.setMock('cross-fetch', function() {
     return mockFetchObj.fetch.apply(null, arguments);
   });
@@ -41,7 +40,7 @@ describe('fetchRequest', function () {
     requestHeaders = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-    }
+    };
     requestMethod = 'GET';
     requestUrl = 'http://fakey.local';
   });

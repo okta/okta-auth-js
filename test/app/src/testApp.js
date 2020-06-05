@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global document, window, Promise, console */
 /* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig } from './config';
@@ -92,8 +91,8 @@ Object.assign(TestApp.prototype, {
     this.rootElem = rootElem;
     this.rootElem.innerHTML = Layout;
     updateForm(this.config);
-    document.getElementById("config-dump").innerHTML = this.configHTML();
-    this.contentElem = document.getElementById("page-content");
+    document.getElementById('config-dump').innerHTML = this.configHTML();
+    this.contentElem = document.getElementById('page-content');
     bindFunctions(this, window);
   },
   getSDKInstance() {
@@ -368,7 +367,8 @@ Object.assign(TestApp.prototype, {
     const tokensReceived = res.tokens ? Object.keys(res.tokens): [];
     const success = res.tokens && tokensReceived.length;
     const errorMessage = success ? '' :  'Tokens not returned. Check error console for more details';
-    const successMessage = success ? 'Successfully received tokens on the callback page: ' + tokensReceived.join(', ') : '';
+    const successMessage = success ?
+      'Successfully received tokens on the callback page: ' + tokensReceived.join(', ') : '';
     const content = `
       <div id="callback-result">
         <strong><div id="success">${successMessage}</div></strong>

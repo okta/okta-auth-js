@@ -1,8 +1,9 @@
+/* eslint-disable no-new */
 /* global window */
 jest.mock('cross-fetch');
 
 import Emitter from 'tiny-emitter';
-import OktaAuth from '../../lib/browser/browserIndex';
+import OktaAuth from '../../lib/browser';
 import AuthApiError from '../../lib/errors/AuthApiError';
 
 describe('Browser', function() {
@@ -42,7 +43,7 @@ describe('Browser', function() {
       expect(OktaAuth.prototype._onTokenManagerError).toHaveBeenCalledWith(error);
     });
   
-    it('error with errorCode "login_required" and accessToken: true will call option "onSessionExpired" function', function() {
+    it('errorCode "login_required" and accessToken: true will call option "onSessionExpired" function', function() {
       var onSessionExpired = jest.fn();
       jest.spyOn(Emitter.prototype, 'on');
       new OktaAuth({ issuer: 'http://localhost/fake', pkce: false, onSessionExpired: onSessionExpired });
@@ -137,7 +138,7 @@ describe('Browser', function() {
         auth = new OktaAuth({ pkce: false, issuer: 'http://my-okta-domain' });
         expect(auth.options.pkce).toBe(false);
       });
-    })
+    });
   });
 
   describe('revokeAccessToken', function() {
@@ -175,7 +176,7 @@ describe('Browser', function() {
     });
     it('if accessToken cannot be located, will resolve without error', function() {
       spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
-      spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve())
+      spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve());
       return auth.revokeAccessToken()
         .then(() => {
           expect(auth.tokenManager.get).toHaveBeenCalled();

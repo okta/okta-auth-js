@@ -1,5 +1,4 @@
 /* entry point for SPA application */
-/* global window, document */
 
 // polyfill TextEncoder for IE Edge
 import { TextEncoder } from 'text-encoding';

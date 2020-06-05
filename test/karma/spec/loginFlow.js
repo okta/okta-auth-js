@@ -1,4 +1,4 @@
-/* global jasmine, $, window, document, URL */
+/* global $ */
 require('jasmine-ajax');
 
 import tokens from '@okta/test.support/tokens';
@@ -7,6 +7,7 @@ import AuthSdkError from '../../../lib/errors/AuthSdkError';
 import { TestApp } from '@okta/test.app';
 import waitFor from '@okta/test.support/waitFor';
 
+// eslint-disable-next-line max-statements
 describe('Complete login flow', function() {
 
   const ASSUMED_TIME = 1449699929;
@@ -96,7 +97,7 @@ describe('Complete login flow', function() {
 
     var wellKnown = {
       'jwks_uri': JWKS_URI,
-      code_challenge_methods_supported: ['S256']
+      'code_challenge_methods_supported': ['S256']
     };
     var keys = [
       tokens.standardKey
@@ -150,6 +151,7 @@ describe('Complete login flow', function() {
       // Now we handle the redirect
       mockWellKnown();
       const state = url.searchParams.get('state');
+      // eslint-disable-next-line max-len
       const pathname = `${CALLBACK_PATH}#access_token=${ACCESS_TOKEN}&id_token=${ID_TOKEN}&state=${state}&nonce=${NONCE}&expires_in=1000`;
       return bootstrap({ pkce: false }, pathname)
       .then(function() {

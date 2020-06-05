@@ -1090,7 +1090,7 @@ describe('token.getWithPopup', function() {
       });
       return waitFor(() => {
         return popups.length === 2 ? context : false;
-      })
+      });
     }).then(context => {
 
       // assert that two popups are open
@@ -1284,6 +1284,7 @@ describe('token.getWithPopup', function() {
   });
 });
 
+// eslint-disable-next-line max-statements
 describe('token.getWithRedirect', function() {
   var codeChallengeMethod = 'S256';
   var codeChallenge = 'fake';
@@ -1321,7 +1322,7 @@ describe('token.getWithRedirect', function() {
       tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
       revokeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/revoke',
       logoutUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/logout',
-    }
+    };
     nonceCookie = [
       'okta-oauth-nonce',
       oauthUtil.mockedNonce,
@@ -1355,7 +1356,7 @@ describe('token.getWithRedirect', function() {
     window.location = {
       protocol: 'http:',
       hostname: 'localhost'
-    }
+    };
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {},
       expectedCookies: [
@@ -2212,7 +2213,7 @@ describe('token.parseFromUrl', function() {
     mockPKCE({
       id_token: tokens.standardIdToken,
       access_token: tokens.standardAccessToken
-    })
+    });
     return oauthUtil.setupParseUrl({
       oktaAuthArgs: {
         pkce: true
@@ -2825,7 +2826,7 @@ describe('token.getUserInfo', function() {
           }
         },
         response: responseXHR
-      }
+      };
     },
     execute: function(test) {
       return test.oa.token.getUserInfo(tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed);
@@ -2850,7 +2851,7 @@ describe('token.getUserInfo', function() {
           }
         },
         response: responseXHR
-      }
+      };
     },
     execute: function(test) {
       util.warpToUnixTime(oauthUtil.getTime());

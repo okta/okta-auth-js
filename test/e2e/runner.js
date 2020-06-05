@@ -27,6 +27,7 @@ waitOn({
 
   runner.on('exit', function (code) {
     server.kill();
+    // eslint-disable-next-line no-process-exit
     process.exit(code);
   });
   runner.on('error', function (err) {

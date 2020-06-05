@@ -1,4 +1,3 @@
-/* global jasmine, window, document, URL, Event, Promise */
 require('jasmine-ajax');
 
 import tokens from '@okta/test.support/tokens';

@@ -36,7 +36,7 @@ describe('clock', function() {
       it('returns a valid number even if offset is a string', function() {
         var fakeDate = 4200;
         jest.spyOn(Date, 'now').mockReturnValue(fakeDate);
-        var offset = "0";
+        var offset = '0';
         var clock = new SdkClock(offset);
         expect(clock.now()).toBe(fakeDate / 1000);
       });
@@ -52,11 +52,11 @@ describe('clock', function() {
       it('will be NaN if offset is NaN', function() {
         var fakeDate = 4200;
         jest.spyOn(Date, 'now').mockReturnValue(fakeDate);
-        var offset = "definitelyNotanumber";
+        var offset = 'definitelyNotanumber';
         var clock = new SdkClock(offset);
         expect(clock.now()).toBe(Number.NaN);
       });
 
     });
   });
-})
+});

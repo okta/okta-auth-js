@@ -1,9 +1,9 @@
-/* global atob */
 import util from '../../../lib/util';
 
 describe('util', function() {
 
-  const LONG_STRING = 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. ';
+  const LONG_STRING = 'Contrary to popular belief, Lorem Ipsum is not simply random text. ' +
+    'It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. ';
 
   describe('base64ToBase64Url', function() {
     it('Replaces "+" with "-"', function() {

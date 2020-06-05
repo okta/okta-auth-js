@@ -1,4 +1,3 @@
-/* global window, URL, localStorage, process */
 import { CALLBACK_PATH, STORAGE_KEY } from './constants';
 const HOST = window.location.host;
 const PROTO = window.location.protocol;
@@ -22,6 +21,7 @@ function getDefaultConfig() {
   };
 }
 
+// eslint-disable-next-line complexity
 function getConfigFromUrl() {
   const url = new URL(window.location.href);
   const issuer = url.searchParams.get('issuer');

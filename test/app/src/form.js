@@ -1,13 +1,14 @@
-/* global document */
 import { flattenConfig } from './config';
 
 const Form = `
   <form target="/oidc" method="GET">
   <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
   <label for="clientId">Client ID</label><input id="clientId" name="clientId" type="text" /><br/>
-  <label for="responseType">Response Type (comma separated)</label><input id="responseType" name="responseType" type="text" /><br/>
+  <label for="responseType">Response Type (comma separated)</label>
+    <input id="responseType" name="responseType" type="text" /><br/>
   <label for="redirectUri">Redirect URI</label><input id="redirectUri" name="redirectUri" type="text" /><br/>
-  <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" /><br/>
+  <label for="postLogoutRedirectUri">Post Logout Redirect URI</label>
+    <input id="postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" /><br/>
   <label for="responseMode">Response Mode</label>
   <select id="responseMode" name="responseMode">
     <option value="" selected>Auto</option>

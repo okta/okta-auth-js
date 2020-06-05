@@ -325,7 +325,7 @@ describe('getWellKnown', function() {
         delete window.location;
         window.location = {
           protocol: 'https:'
-        }
+        };
         oauthUtilHelpers.mockLocalStorageError();
         oauthUtilHelpers.mockSessionStorageError();
       },

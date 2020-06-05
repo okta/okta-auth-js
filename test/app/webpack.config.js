@@ -1,4 +1,3 @@
-/* global process, __dirname */
 require('./env'); // update environment variables from testenv file
 
 const path = require('path');

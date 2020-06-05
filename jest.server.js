@@ -1,4 +1,4 @@
-var OktaAuth = '<rootDir>/lib/server/serverIndex.js';
+var OktaAuth = '<rootDir>/lib/server';
 
 module.exports = {
   'coverageDirectory': '<rootDir>/build2/reports/coverage',

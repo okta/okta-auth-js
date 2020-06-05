@@ -1,4 +1,3 @@
-/* globals expect, JSON */
 /* eslint-disable max-statements, complexity */
 
 import _ from 'lodash';

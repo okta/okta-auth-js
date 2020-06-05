@@ -64,7 +64,7 @@ describe('browserStorage', () => {
       const fakeStorage = {
         removeItem: jest.fn(),
         setItem: jest.fn()
-      }
+      };
       expect(browserStorage.testStorage(fakeStorage)).toBe(true);
       expect(fakeStorage.setItem).toHaveBeenCalledWith('okta-test-storage', 'okta-test-storage');
       expect(fakeStorage.removeItem).toHaveBeenCalledWith('okta-test-storage');
@@ -75,7 +75,7 @@ describe('browserStorage', () => {
           throw new Error('removeItem fails');
         }),
         setItem: jest.fn()
-      }
+      };
       expect(browserStorage.testStorage(fakeStorage)).toBe(false);
     });
     it('returns false if an exception is thrown on setItem', () => {
@@ -84,7 +84,7 @@ describe('browserStorage', () => {
         setItem: jest.fn().mockImplementation(() => {
           throw new Error('setItem fails');
         }),
-      }
+      };
       expect(browserStorage.testStorage(fakeStorage)).toBe(false);
     });
   });
@@ -181,7 +181,7 @@ describe('browserStorage', () => {
         secure: 'fakey',
         sameSite: 'strictly fakey'
       });
-    })
+    });
   });
 
   describe('getInMemoryStorage', () => {
@@ -191,6 +191,6 @@ describe('browserStorage', () => {
       const val = { fakeValue: true };
       storage.setItem(key, val);
       expect(storage.getItem(key)).toBe(val);
-    })
-  })
+    });
+  });
 });

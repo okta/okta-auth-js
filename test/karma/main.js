@@ -1,4 +1,3 @@
-/* global window */
 var karma = window.__karma__;
 var testsContext = require.context('./spec', true, /.*\.js$/);
 

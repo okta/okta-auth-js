@@ -7,7 +7,7 @@
     "jasmine"
   ],
   "env": {
-    "browser": false,
+    "browser": true,
     "jasmine": true
   },
   "globals": {
@@ -15,9 +15,10 @@
   },
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2017
+    "ecmaVersion": 2020
   },
   "rules": {
+    "camelcase": 0,
     "node/no-extraneous-require": ["error", {
       "allowModules": [
         "@okta/test.support"

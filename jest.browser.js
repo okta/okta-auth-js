@@ -1,4 +1,4 @@
-var OktaAuth = '<rootDir>/lib/browser/browserIndex.js';
+var OktaAuth = '<rootDir>/lib/browser';
 var SDK_VERSION = require('./package.json').version;
 
 module.exports = {

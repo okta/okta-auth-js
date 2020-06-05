@@ -1,11 +1,12 @@
 {
   "extends": ["eslint:recommended"],
   "env": {
-    "browser": false
+    "browser": true,
+    "node": false
   },
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2017
+    "ecmaVersion": 2020
   },
   "rules": {
     "node/no-unsupported-features/es-syntax": 0,

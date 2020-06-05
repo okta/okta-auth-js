@@ -8,7 +8,7 @@ describe('features', function() {
       'isPopupPostMessageSupported',
       'isTokenVerifySupported',
       'isPKCESupported',
-    ]
+    ];
 
     it('on prototype', function() {
       var auth = new OktaAuth({
@@ -34,12 +34,12 @@ describe('features', function() {
 
     it('can succeed', function() {
       expect(OktaAuth.features.isPopupPostMessageSupported()).toBe(true);
-    })
+    });
 
     it('not supported in IE < 10', function() {
       document.documentMode = 9;
       expect(OktaAuth.features.isPopupPostMessageSupported()).toBe(false);
-    })
+    });
 
   });
 
@@ -53,7 +53,7 @@ describe('features', function() {
 
     it('can succeed', function() {
       expect(OktaAuth.features.isTokenVerifySupported()).toBe(true);
-    })
+    });
 
     it('fails if no crypto', function() {
       window.crypto = undefined;
@@ -88,7 +88,7 @@ describe('features', function() {
 
     it('can succeed', function() {
       expect(OktaAuth.features.isPKCESupported()).toBe(true);
-    })
+    });
 
     it('fails if no crypto', function() {
       window.crypto = undefined;

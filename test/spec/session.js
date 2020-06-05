@@ -145,7 +145,7 @@ describe('session', function() {
       return getSession(sdk)
         .then(function(res) {
           res.refresh();
-          expect(http.post).toHaveBeenCalledWith(sdk, href)
+          expect(http.post).toHaveBeenCalledWith(sdk, href);
         });
     });
 
@@ -166,7 +166,7 @@ describe('session', function() {
           http.get.mockReset();
           jest.spyOn(http, 'get').mockReturnValue(null);
           res.user();
-          expect(http.get).toHaveBeenCalledWith(sdk, href)
+          expect(http.get).toHaveBeenCalledWith(sdk, href);
         });
     });
   });

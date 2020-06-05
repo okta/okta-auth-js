@@ -1,11 +1,10 @@
-/* global Promise */
 jest.mock('cross-fetch');
 
 import util from '@okta/test.support/util';
 import factory from '@okta/test.support/factory';
 import packageJson from '../../package.json';
 import AuthSdkError from '../../lib/errors/AuthSdkError';
-import OktaAuth from '../../lib/browser/browserIndex';
+import OktaAuth from '../../lib/browser';
 import http from '../../lib/http';
 import pkce from '../../lib/pkce';
 import * as token from '../../lib/token';
@@ -62,7 +61,7 @@ describe('pkce', function() {
       var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
       spyOn(oauthUtil, 'getWellKnown').and.returnValue(Promise.resolve({
         'code_challenge_methods_supported': []
-      }))
+      }));
       return token.prepareOauthParams(sdk, {})
       .then(function() {
         expect(false).toBe(true); // should not reach this line
@@ -91,7 +90,7 @@ describe('pkce', function() {
       })
       .then(function(oauthParams) {
         expect(oauthParams.codeChallenge).toBe(codeChallenge);
-      })
+      });
     });
     
   });

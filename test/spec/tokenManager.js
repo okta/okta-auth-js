@@ -117,7 +117,7 @@ describe('TokenManager', function() {
       client.tokenManager.add('foo', tokens.standardIdTokenParsed);
       expect(localStorage.getItem('custom1')).toBeTruthy();
       expect(localStorage.getItem('okta-token-storage')).toBeFalsy();
-    })
+    });
   });
   describe('storage', function() {
     it('throws if storage option is unrecognized', function() {
@@ -790,7 +790,7 @@ describe('TokenManager', function() {
           tokenKey: 'test-idToken',
           accessToken: false
         });
-      })
+      });
       authClient.tokenManager.on('error', errorEventCallback);
 
       return oauthUtil.setupFrame({
@@ -842,7 +842,7 @@ describe('TokenManager', function() {
           tokenKey: 'test-idToken',
           accessToken: false
         });
-      })
+      });
       authClient.tokenManager.on('error', errorEventCallback);
 
       return oauthUtil.setupFrame({

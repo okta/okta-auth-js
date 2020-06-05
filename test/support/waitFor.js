@@ -1,6 +1,5 @@
 var POLL_INTERVAL = 10; // ms
 
-/* global Promise */
 function waitFor(conditionFn) {
   return new Promise(function(resolve, reject) {
 

@@ -12,7 +12,7 @@ describe('builderUtil', () => {
       const userAgent = builderUtil.getUserAgent(args);
       expect(userAgent).toEqual('fake userAgent');
     });
-    it('should replace "$OKTA_AUTH_JS" with current authJs user agent value if only with userAgentTemplate in args', () => {
+    it('replaces "$OKTA_AUTH_JS" with current authJs user agent if userAgentTemplate in args', () => {
       const args = { 
         userAgent: {
           template: 'fake userAgent $OKTA_AUTH_JS' 

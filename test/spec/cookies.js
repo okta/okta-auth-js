@@ -13,7 +13,7 @@ describe('cookie', function () {
   describe('set',  function ()  {
     it('Throws if "secure" option is not set', () => {
       function testFunc() { Cookies.set('foo', 'bar', null, { sameSite: 'strict' }); }
-      expect(testFunc).toThrow('storage.set: "secure" and "sameSite" options must be provided')
+      expect(testFunc).toThrow('storage.set: "secure" and "sameSite" options must be provided');
     });
     it('proxies JsCookie.set',  function ()  {
       Cookies.set('foo', 'bar', null, { secure: true, sameSite: 'strict' });
