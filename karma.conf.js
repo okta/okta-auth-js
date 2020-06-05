@@ -13,7 +13,6 @@
 // Karma configuration file, see link for more information
 // http://karma-runner.github.io/3.0/config/configuration-file.html
 
-/* global __dirname */
 var path = require('path');
 
 var ROOT_DIR = path.resolve(__dirname, '..', '..');
@@ -53,7 +52,7 @@ var webpackConf =  _.extend({}, _.cloneDeep(commonConfig), {
   },
   resolve: {
     alias: {
-      '@okta/okta-auth-js': path.join(__dirname, '/lib/browser/browserIndex.js')
+      '@okta/okta-auth-js': path.join(__dirname, '/lib/browser')
     }
   }
 });

@@ -5,9 +5,9 @@
   "version": "4.0.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
-  "main": "lib/server/serverIndex.js",
+  "main": "lib/server/index.js",
   "browser": "bundles/okta-auth-js.umd.js",
-  "react-native": "lib/server/serverIndex.js",
+  "react-native": "lib/server/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
@@ -72,7 +72,7 @@
     "chalk": "2.4.2",
     "cross-env": "^5.1.1",
     "dotenv": "^8.1.0",
-    "eslint": "5.6.1",
+    "eslint": "^7.1.0",
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-jasmine": "^2.10.1",
     "eslint-plugin-node": "^11.1.0",

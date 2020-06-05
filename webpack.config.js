@@ -2,7 +2,6 @@
  * This config builds a minified version that can be imported
  * anywhere without any dependencies. It also preserves license comments.
  */
-/* global __dirname */
 var path    = require('path');
 var webpack = require('webpack');
 var fs      = require('fs');
@@ -12,7 +11,7 @@ var commonConfig = require('./webpack.common.config');
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 
 module.exports = _.extend({}, _.cloneDeep(commonConfig), {
-  entry: './lib/browser/browserIndex.js',
+  entry: './lib/browser/index.js',
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundles/okta-auth-js.umd.js',
