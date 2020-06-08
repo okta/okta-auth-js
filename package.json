@@ -1,38 +1,115 @@
 {
   "private": true,
-  "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "@babel/preset-env": "^7.6.3",
-    "@babel/register": "^7.6.2",
-    "dotenv": "^8.1.0",
-    "eslint-plugin-compat": "^3.3.0",
-    "eslint-plugin-jasmine": "^2.10.1",
-    "globby": "^6.1.0",
-    "lerna": "^2.11.0"
+  "name": "@okta/okta-auth-js",
+  "description": "The Okta Auth SDK",
+  "version": "4.0.0",
+  "homepage": "https://github.com/okta/okta-auth-js",
+  "license": "Apache-2.0",
+  "main": "lib/server/index.js",
+  "browser": "bundles/okta-auth-js.umd.js",
+  "react-native": "lib/server/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/okta/okta-auth-js.git"
   },
-  "engines": {
-    "yarn": "^1.7.0"
+  "bugs": {
+    "url": "https://github.com/okta/okta-auth-js/issues"
   },
   "scripts": {
-    "build": "yarn workspace @okta/okta-auth-js build",
-    "clean": "yarn clean-node-modules",
-    "clean-dist": "rimraf dist && lerna exec rimraf build2 && lerna exec rimraf dist",
-    "clean-node-modules": "lerna exec rimraf node_modules && rimraf node_modules",
-    "lint": "yarn workspaces run lint",
-    "publish": "lerna publish --skip-npm",
+    "clean": "yarn clean:dist clean:modules",
+    "clean:dist": "rimraf dist && rimraf build2 && rimraf dist",
+    "clean:modules": "lerna exec rimraf node_modules && rimraf node_modules",
+    "dev": "webpack --config webpack.dev.config.js",
+    "lint": "eslint .",
+    "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",
     "test": "yarn test:unit && yarn test:e2e && yarn test:e2e:saucelabs",
-    "test:e2e": "lsof -nti:8080 | xargs kill -9 && yarn --cwd test/e2e start",
+    "test:unit": "yarn test:karma && yarn test:browser && yarn test:server",
+    "test:e2e": "yarn --cwd test/e2e start",
     "test:e2e:saucelabs": "export RUN_SAUCE_TESTS=true && yarn test:e2e",
-    "test:browser": "yarn workspace @okta/okta-auth-js test:browser",
-    "test:server": "yarn workspace @okta/okta-auth-js test:server",
-    "test:karma": "yarn workspace @okta/okta-auth-js test:karma",
-    "test:unit": "yarn workspace @okta/okta-auth-js test",
-    "test:report": "yarn test:unit --ci --silent || true",
+    "test:karma": "karma start --single-run",
+    "test:browser": "jest --config ./jest.browser.js",
+    "test:server": "jest --config ./jest.server.js",
+    "test:report": "yarn test --ci --silent || true",
+    "build": "node build.js",
+    "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
+    "build:server": "cross-env babel lib -d dist/lib --config-file ./babel.node.json",
+    "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
     "prepare": "yarn build",
     "start": "yarn --cwd test/app start --open"
   },
+  "author": "Okta",
+  "keywords": [
+    "Okta",
+    "authentication",
+    "auth",
+    "login"
+  ],
+  "browserslist": [
+    "> 0.1%",
+    "not opera < 69",
+    "not firefox < 53",
+    "not safari < 7.1",
+    "not ie < 11",
+    "not IE_Mob 11"
+  ],
+  "engines": {
+    "node": ">=10.3",
+    "yarn": "^1.7.0"
+  },
+  "dependencies": {
+    "Base64": "0.3.0",
+    "core-js": "^3.6.5",
+    "cross-fetch": "^3.0.0",
+    "js-cookie": "2.2.0",
+    "node-cache": "^4.2.0",
+    "text-encoding": "^0.7.0",
+    "tiny-emitter": "1.1.0",
+    "webcrypto-shim": "^0.1.5",
+    "xhr2": "0.1.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.0",
+    "@babel/core": "^7.8.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.10.1",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.2",
+    "babel-jest": "^24.9.0",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "babel-plugin-mockable-imports": "^1.7.1",
+    "chalk": "2.4.2",
+    "cross-env": "^5.1.1",
+    "dotenv": "^8.1.0",
+    "eslint": "^7.1.0",
+    "eslint-plugin-compat": "^3.3.0",
+    "eslint-plugin-jasmine": "^2.10.1",
+    "eslint-plugin-node": "^11.1.0",
+    "globby": "^6.1.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "jasmine-ajax": "^4.0.0",
+    "jest": "^24.9.0",
+    "jest-junit": "^9.0.0",
+    "json-loader": "0.5.4",
+    "karma": "^4.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage-istanbul-reporter": "^2.0.5",
+    "karma-jasmine": "^2.0.1",
+    "karma-jquery": "^0.2.3",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^3.0.5",
+    "lerna": "^2.11.0",
+    "lodash": "4.17.11",
+    "promise.allsettled": "^1.0.1",
+    "shelljs": "0.8.3",
+    "webpack": "^3.0.0"
+  },
+  "jest-junit": {
+    "outputDirectory": "./build2/reports/unit/",
+    "outputName": "junit-result.xml"
+  },
   "workspaces": [
-    "packages/*",
-    "test/*"
+    "test/app",
+    "test/e2e",
+    "test/support"
   ]
 }

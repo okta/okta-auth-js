@@ -1,4 +1,3 @@
-/* global process, __dirname */
 require('./env'); // update environment variables from testenv file
 
 const path = require('path');
@@ -39,5 +38,10 @@ module.exports = {
         }
       }
     ]
+  },
+  resolve: {
+    alias: {
+      '@okta/okta-auth-js': path.join(__dirname, '..', '..', 'dist')
+    }
   }
 };

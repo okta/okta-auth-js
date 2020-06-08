@@ -1,7 +1,17 @@
 {
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "globals": {
     "it": "readonly",
     "jest": "readonly",
     "expect": "readonly"
+  },
+  "rules": {
+    "node/no-missing-import": ["error", {
+      "allowModules": [
+        "OktaAuth"
+      ]
+    }]
   }
 }

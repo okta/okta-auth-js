@@ -1,4 +1,4 @@
-/* global document */
+/* eslint-disable max-len */
 import { flattenConfig } from './config';
 
 const Form = `
