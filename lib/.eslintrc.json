@@ -1,0 +1,22 @@
+{
+  "extends": ["plugin:compat/recommended"],
+  "env": {
+    "browser": false,
+    "node": false
+  },
+  "settings": {
+    "polyfills": [
+      "Promise",
+      "Array.from",
+      "TextEncoder",
+      "Object.assign"
+    ]
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2020
+  },
+  "rules": {
+    "node/no-unsupported-features/es-syntax": 0
+  }
+}

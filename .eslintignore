@@ -1,1 +1,4 @@
+/test/support/xhr
 node_modules
+/dist/bundles
+/dist/lib

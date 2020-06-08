@@ -1,14 +1,14 @@
 /* global window, document, Storage, localStorage */
 /* eslint-disable complexity, max-statements */
 var URL = require('url').URL;
-var util = require('./util');
-var OktaAuth = require('OktaAuth');
-var tokens = require('./tokens');
-var EventEmitter = require('tiny-emitter');
+import util from './util';
+import OktaAuth from 'OktaAuth';
+import tokens from './tokens';
+import EventEmitter from 'tiny-emitter';
 var wellKnown = require('./xhr/well-known');
 var wellKnownSharedResource = require('./xhr/well-known-shared-resource');
 var keys = require('./xhr/keys');
-var storageUtil = require('@okta/okta-auth-js/lib/browser/browserStorage');
+import storageUtil from '../../lib/browser/browserStorage';
 
 var oauthUtil = {};
 
@@ -185,7 +185,7 @@ oauthUtil.setup = function(opts) {
 
   if (opts.tokenManagerAddKeys) {
     for (var key in opts.tokenManagerAddKeys) {
-      if (!opts.tokenManagerAddKeys.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(opts.tokenManagerAddKeys, key)) {
         continue;
       }
       var token = opts.tokenManagerAddKeys[key];
@@ -539,4 +539,4 @@ oauthUtil.expectTokenStorageToEqual = function(storage, obj) {
   expect(parsed).toEqual(obj);
 };
 
-module.exports = oauthUtil;
+export default oauthUtil;

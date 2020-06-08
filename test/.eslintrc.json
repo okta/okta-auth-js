@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "node/no-unsupported-features/es-syntax": 0,
+    "compat/compat": 0
+  }
+}

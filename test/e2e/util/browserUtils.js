@@ -1,6 +1,7 @@
 
 const URL = require('url');
 const ISSUER = process.env.ISSUER;
+// eslint-disable-next-line node/no-deprecated-api
 const issuer = URL.parse(ISSUER);
 const BASE_URL = issuer.protocol + '//' + issuer.host;
 

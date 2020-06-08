@@ -1,0 +1,55 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:jasmine/recommended"
+  ],
+  "plugins": [
+    "jasmine"
+  ],
+  "env": {
+    "jest": true,
+    "jasmine": true
+  },
+  "globals": {
+    "Promise": "readonly"
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2020
+  },
+  "rules": {
+    "max-len": 0,
+    "camelcase": 0,
+    "node/no-extraneous-require": ["error", {
+      "allowModules": [
+        "@okta/test.support"
+      ]
+    }],
+    "node/no-missing-import": ["error", {
+      "allowModules": [
+        "OktaAuth"
+      ]
+    }],
+    "node/no-extraneous-import": ["error", {
+      "allowModules": [
+        "@okta/test.support"
+      ]
+    }],
+    "node/no-unsupported-features/node-builtins": ["error", {
+      "ignores": [
+        "TextEncoder"
+      ]
+    }],
+    "node/no-unsupported-features/es-builtins": ["error", {
+      "ignores": [
+        "Promise.allSettled"
+      ]
+    }],
+    "jasmine/no-unsafe-spy": 0,
+    "jasmine/new-line-before-expect": 0,
+    "jasmine/prefer-toHaveBeenCalledWith": 0,
+    "jasmine/new-line-between-declarations": 0,
+    "jasmine/no-spec-dupes": [1, "branch"],
+    "jasmine/no-suite-dupes": [1, "branch"]
+  }
+}
