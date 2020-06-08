@@ -1,9 +1,0 @@
-/lib/vendor
-/test/vendor
-/test/xhr
-/buildtools
-/dist
-/target
-node_modules
-*.config.js
-/lib/config.js

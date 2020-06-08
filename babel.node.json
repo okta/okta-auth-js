@@ -1,0 +1,18 @@
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": {
+        "node": true
+      },
+      "modules": false
+    }
+  ]],
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    ["@babel/plugin-transform-modules-commonjs", {
+      "strict": true,
+      "noInterop": false
+    }],
+    "add-module-exports"
+  ]
+}

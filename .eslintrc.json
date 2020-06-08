@@ -1,8 +1,12 @@
 {
-  "extends": ["eslint:recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:node/recommended"
+  ],
   "env": {
     "browser": false,
-    "commonjs": true
+    "commonjs": true,
+    "node": true
   },
   "globals": {
     "Promise": true,
@@ -12,7 +16,37 @@
     "setInterval": true,
     "clearInterval": true
   },
+  "overrides": [
+    {
+      "files": ["polyfill/**/*", "dist/polyfill/**/*"],
+      "env": {
+        "browser": true
+      },
+      "rules": {
+        "node/no-unsupported-features/node-builtins": ["error", {
+          "ignores": ["TextEncoder", "TextDecoder"]
+        }]
+      }
+    },
+    {
+      "files": ["dist/**/*"],
+      "rules": {
+        "node/no-unpublished-require": 1,
+        "node/no-unpublished-import": 1
+      }
+    },
+    {
+      "files": ["{lib,dist/lib}/{browser/*,crypto,pkce}.js"],
+      "rules": {
+        "node/no-unsupported-features/node-builtins": ["error", {
+          "ignores": ["TextEncoder"]
+        }]
+      }
+    }
+  ],
   "rules": {
+    "node/no-unpublished-require": 0,
+    "node/no-unpublished-import": 0,
     "camelcase": 2,
     "complexity": [2, 7],
     "curly": 2,
@@ -34,7 +68,7 @@
     "max-len": [2, 120],
     "max-params": [2, 5],
     "max-statements": [2, 25],
-    "quotes": [2, "single"],
+    "quotes": [2, "single", { "allowTemplateLiterals": true }],
     "semi": 2,
     "strict": 0,
     "wrap-iife": [2, "any"]

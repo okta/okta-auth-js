@@ -4,5 +4,10 @@
   "license": "Apache-2.0",
   "scripts": {
     "lint": "eslint ."
+  },
+  "dependencies": {
+    "cross-fetch": "^3.0.0",
+    "lodash": "4.17.11",
+    "tiny-emitter": "1.1.0"
   }
 }
