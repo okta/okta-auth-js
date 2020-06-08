@@ -11,13 +11,14 @@
   },
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2017
+    "ecmaVersion": 2020
   },
   "plugins": ["jasmine"],
   "env": {
     "jasmine": true
   },
   "rules": {
+    "node/no-unsupported-features/es-syntax": 0,
     "jasmine/no-suite-dupes": [1, "branch"]
   }
 }

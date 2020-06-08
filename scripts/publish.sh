@@ -19,10 +19,8 @@ else
   TARGET_BRANCH=${BRANCH}
 fi
 
-# Copy README, CHANGELOG, and CONTRIBUTING to the package directory so they will be published with the the package on npm
-cp ./*.md ./packages/okta-auth-js/
 
-pushd ./packages/okta-auth-js
+pushd ./dist
 
 if ! ci-append-sha; then
   echo "ci-append-sha failed! Exiting..."

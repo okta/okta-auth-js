@@ -2,7 +2,7 @@
 
 require('./env'); // update environment variables from testenv file
 
-const OktaAuthJS = require('@okta/okta-auth-js');
+const OktaAuthJS = require('../../dist/lib/server');
 
 const util = require('./src/util');
 const express = require('express');

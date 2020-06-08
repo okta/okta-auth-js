@@ -1,5 +1,4 @@
 /* entry point for SPA application */
-/* global window, document */
 
 import '@okta/okta-auth-js/polyfill';
 
