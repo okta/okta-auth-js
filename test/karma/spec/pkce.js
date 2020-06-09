@@ -1,4 +1,4 @@
-import sdkUtil from '../../../lib/util';
+import * as sdkUtil from '../../../lib/util';
 import pkce from '../../../lib/pkce';
 
 var MIN_VERIFIER_LENGTH = 43;

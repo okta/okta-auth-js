@@ -2,10 +2,8 @@ require('jasmine-ajax');
 
 import tokens from '@okta/test.support/tokens';
 
-import OktaAuth from '@okta/okta-auth-js';
+import { OktaAuth, OAuthError, AuthSdkError } from '@okta/okta-auth-js';
 import pkce from '../../../lib/pkce';
-import OAuthError from '../../../lib/errors/OAuthError';
-import AuthSdkError from '../../../lib/errors/AuthSdkError';
 import * as token from '../../../lib/token';
 
 describe('Renew token', function() {

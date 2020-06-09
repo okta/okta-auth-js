@@ -1,7 +1,7 @@
 /* global window, document */
 jest.mock('cross-fetch');
 
-import OktaAuth from 'OktaAuth';
+import { OktaAuth } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 import packageJson from '../../package.json';
 

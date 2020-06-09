@@ -1,7 +1,7 @@
 import tokens from '@okta/test.support/tokens';
 import factory from '@okta/test.support/factory';
 import * as sdkCrypto from '../../../lib/crypto';
-import sdkUtil from '../../../lib/util';
+import * as sdkUtil from '../../../lib/util';
 
 describe('crypto', function() {
   describe('getOidcHash', () => {

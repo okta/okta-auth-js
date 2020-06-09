@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "outDir": "./public/dist",
+    "noImplicitAny": true,
+    "noEmit": false,
+    "module": "es6",
+    "target": "es5",
+    "allowJs": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "@okta/okta-auth-js": ["../../dist"],
+      "@okta/okta-auth-js/polyfill": ["../../dist/polyfill"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js"
+  ]
+}

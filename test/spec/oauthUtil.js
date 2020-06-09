@@ -1,9 +1,9 @@
 /* global window, localStorage, sessionStorage */
 jest.mock('cross-fetch');
 
-import OktaAuth from 'OktaAuth';
+import { OktaAuth } from '@okta/okta-auth-js';
 import * as oauthUtil from '../../lib/oauthUtil';
-import libUtil from '../../lib/util';
+import * as libUtil from '../../lib/util';
 import oauthUtilHelpers from '@okta/test.support/oauthUtil';
 import util from '@okta/test.support/util';
 import wellKnown from '@okta/test.support/xhr/well-known';

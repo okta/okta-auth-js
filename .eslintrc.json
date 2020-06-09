@@ -1,7 +1,10 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:node/recommended"
+    "plugin:node/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsdoc/recommended"
   ],
   "env": {
     "browser": false,
@@ -15,6 +18,14 @@
     "clearTimeout": true,
     "setInterval": true,
     "clearInterval": true
+  },
+  "settings": {
+    "jsdoc": {
+      "mode": "typescript",
+      "definedTags": [
+        "type"
+      ]
+    }
   },
   "overrides": [
     {
@@ -36,15 +47,41 @@
       }
     },
     {
-      "files": ["{lib,dist/lib}/{browser/*,crypto,pkce}.js"],
+      "files": ["{lib,dist/lib}/{browser/*,crypto,pkce}.{js,ts}"],
       "rules": {
         "node/no-unsupported-features/node-builtins": ["error", {
           "ignores": ["TextEncoder"]
         }]
       }
+    },
+    {
+      "files": [
+        "lib/**/*"
+      ],
+      "plugins": [
+        "@typescript-eslint",
+        "jsdoc"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.json",
+        "tsconfigRootDir": "./"
+      },
+      "rules": {
+        "node/no-missing-import": ["error", {
+          "allowModules": [
+            "@okta/okta-auth-js"
+          ],
+          "tryExtensions": [".js", ".ts"]
+        }]
+      }
     }
   ],
   "rules": {
+    "no-var": 0,
+    "prefer-rest-params": 0,
+    "prefer-spread": 0,
+    "prefer-const": 0,
     "node/no-unpublished-require": 0,
     "node/no-unpublished-import": 0,
     "camelcase": 2,
@@ -71,7 +108,24 @@
     "quotes": [2, "single", { "allowTemplateLiterals": true }],
     "semi": 2,
     "strict": 0,
-    "wrap-iife": [2, "any"]
+    "wrap-iife": [2, "any"],
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/camelcase": 0,
+    "@typescript-eslint/no-this-alias": 0,
+    "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    "@typescript-eslint/ban-ts-ignore": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/interface-name-prefix": 0,
+    "@typescript-eslint/triple-slash-reference": 0,
+    "jsdoc/require-jsdoc": 0,
+    "jsdoc/require-param": 0,
+    "jsdoc/require-returns-description": 0,
+    "jsdoc/require-param-description": 0,
+    "jsdoc/require-returns": 0,
+    "jsdoc/no-undefined-types": 0
+
   },
   "root": true
 }

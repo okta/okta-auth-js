@@ -1,5 +1,17 @@
 {
   "rules": {
+    "node/no-missing-import": ["error", {
+      "allowModules": [
+        "@okta/okta-auth-js"
+      ],
+      "tryExtensions": [".js", ".ts"]
+    }],
+    "node/no-missing-require": ["error", {
+      "allowModules": [
+        "@okta/okta-auth-js"
+      ],
+      "tryExtensions": [".js", ".ts"]
+    }],
     "node/no-unsupported-features/es-syntax": 0,
     "compat/compat": 0
   }

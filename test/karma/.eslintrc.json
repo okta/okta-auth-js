@@ -30,11 +30,6 @@
         "@okta/test.support"
       ]
     }],
-    "node/no-missing-import": ["error", {
-      "allowModules": [
-        "@okta/okta-auth-js"
-      ]
-    }],
     "node/no-unsupported-features/es-syntax": 0,
     "semi": 2,
     "eol-last": 2,

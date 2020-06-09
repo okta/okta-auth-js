@@ -19,26 +19,47 @@ var ROOT_DIR = path.resolve(__dirname, '..', '..');
 var REPORTS_DIR = path.join(ROOT_DIR, 'build2', 'reports', 'karma');
 var _ = require('lodash');
 var commonConfig = require('./webpack.common.config');
+var babelOptions = {
+  presets: [
+    '@babel/preset-env'
+  ],
+  plugins: [
+    '@babel/plugin-proposal-class-properties',
+    '@babel/plugin-transform-runtime',
+    'mockable-imports'
+  ],
+  sourceType: 'unambiguous'
+};
 
 var webpackConf =  _.extend({}, _.cloneDeep(commonConfig), {
   devtool: 'inline-source-map',
+  mode: 'development',
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-          plugins: [
-            '@babel/plugin-transform-runtime',
-            'mockable-imports'
-          ],
-          sourceType: 'unambiguous'
-        }
+        options: babelOptions
       },
       {
-        test: /\.js$/,
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: babelOptions
+          },
+          {
+            loader: 'ts-loader',
+            options: {
+              configFile: require.resolve('./tsconfig.json')
+            }
+          }
+        ]
+      },
+      {
+        test: /\.{js,ts}$/,
         use: {
           loader: 'istanbul-instrumenter-loader',
           options: { esModules: true }
@@ -51,7 +72,9 @@ var webpackConf =  _.extend({}, _.cloneDeep(commonConfig), {
     ]
   },
   resolve: {
+    extensions: ['.js', '.ts'],
     alias: {
+      '@okta/test.app': path.join(__dirname, 'test/app'),
       '@okta/okta-auth-js': path.join(__dirname, '/lib/browser')
     }
   }

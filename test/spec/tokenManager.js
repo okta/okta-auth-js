@@ -5,13 +5,11 @@ import allSettled from 'promise.allsettled';
 allSettled.shim(); // will be a no-op if not needed
 
 import Emitter from 'tiny-emitter';
-import OktaAuth from 'OktaAuth';
+import { OktaAuth, TokenManager, AuthSdkError } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../lib/clock';
-import TokenManager from '../../lib/TokenManager';
-import AuthSdkError from '../../lib/errors/AuthSdkError';
 
 // Expected settings on HTTPS
 var secureCookieSettings = {
