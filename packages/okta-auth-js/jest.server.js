@@ -10,6 +10,7 @@ module.exports = {
     '**/test/spec/*.js'
   ],
   'testPathIgnorePatterns': [
+    './test/spec/asyncMethodQueue.js',
     './test/spec/browser.js',
     './test/spec/browserStorage.js',
     './test/spec/cookies.js',

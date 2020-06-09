@@ -26,6 +26,7 @@ var token             = require('../token');
 var TokenManager      = require('../TokenManager');
 var tx                = require('../tx');
 var util              = require('../util');
+var AsyncMethodQueue       = require('../AsyncMethodQueue');
 
 function OktaAuthBuilder(args) {
   var sdk = this;
@@ -121,6 +122,7 @@ function OktaAuthBuilder(args) {
     }
   };
 
+  sdk._tokenQueue = new AsyncMethodQueue();
   sdk.token = {
     getWithoutPrompt: util.bind(token.getWithoutPrompt, null, sdk),
     getWithPopup: util.bind(token.getWithPopup, null, sdk),
@@ -132,7 +134,14 @@ function OktaAuthBuilder(args) {
     getUserInfo: util.bind(token.getUserInfo, null, sdk),
     verify: util.bind(token.verifyToken, null, sdk)
   };
-
+  // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
+  Object.keys(sdk.token).forEach(key => {
+    if (key === 'decode') { // sync methods should not be wrapped
+      return;
+    }
+    var method = sdk.token[key];
+    sdk.token[key] = util.bind(AsyncMethodQueue.prototype.push, sdk._tokenQueue, method, null);
+  });
   // This is exposed so we can set window.location in our tests
   sdk.token.getWithRedirect._setLocation = function(url) {
     window.location = url;

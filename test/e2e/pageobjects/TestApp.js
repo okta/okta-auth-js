@@ -18,7 +18,8 @@ class TestApp {
   get getUserInfoBtn() { return $('#get-userinfo'); }
   get userInfo() { return $('#user-info'); }
   get sessionExpired() { return $('#session-expired'); }
-  
+  get testConcurrentGetTokenBtn() { return $('#test-concurrent-get-token'); }
+
   get tokenError() { return $('#token-error'); }
   get tokenMsg() { return $('#token-msg'); }
   
@@ -28,6 +29,7 @@ class TestApp {
   get loginDirectBtn() { return $('#login-direct'); }
   get username() { return $('#username'); }
   get password() { return $('#password'); }
+  get testConcurrentLoginBtn() { return $('#test-concurrent-login'); }
 
   // Form
   get responseModeQuery() { return $('#responseMode [value="query"]'); }
@@ -119,6 +121,14 @@ class TestApp {
     await this.waitForLoginBtn();
   }
 
+  async testConcurrentLogin() {
+    await this.testConcurrentLoginBtn.then(el => el.click());
+  }
+
+  async testConcurrentGetToken() {
+    await this.testConcurrentGetTokenBtn.then(el => el.click());
+  }
+
   async waitForLoginBtn() {
     return browser.waitUntil(async () => this.loginRedirectBtn.then(el => el.isDisplayed()), 5000, 'wait for login button');
   }
@@ -179,6 +189,15 @@ class TestApp {
     await this.idToken.then(el => el.getText()).then(txt => {
       assert(txt.indexOf('claims') > 0);
     });
+  }
+
+  async assertTokenMessage(msg) {
+    await browser.waitUntil(async () => {
+      const txt = await this.tokenMsg.then(el => el.getText());
+      return txt !== '';
+    }, 10000, 'wait for token message');
+    const txt = await this.tokenMsg.then(el => el.getText());
+    assert(txt === msg);
   }
 
 }

@@ -275,3 +275,7 @@ util.delay = function(ms) {
     setTimeout(resolve, ms);
   });
 };
+
+util.isPromise = function(obj) {
+  return obj && obj.finally && (typeof obj.finally === 'function');
+};

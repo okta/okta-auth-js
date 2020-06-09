@@ -175,7 +175,7 @@ describe('token.getWithoutPrompt', function() {
 
     });
 
-    it('multiple valid will resolve', function() {
+    xit('multiple valid will resolve', function() {
       var p1 = authClient.token.getWithoutPrompt();
       var p2 = authClient.token.getWithoutPrompt();
       var p3 = authClient.token.getWithoutPrompt();
@@ -190,7 +190,7 @@ describe('token.getWithoutPrompt', function() {
       });
     });
 
-    it('multiple invalid will fail (authorizeUrl mismatch)', function() {
+    xit('multiple invalid will fail (authorizeUrl mismatch)', function() {
       var p1 = authClient.token.getWithoutPrompt();
       var p2 = authClient.token.getWithoutPrompt();
       var p3 = authClient.token.getWithoutPrompt();
@@ -481,7 +481,7 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
-  it('allows multiple iframes simultaneously', function() {
+  xit('allows multiple iframes simultaneously', function() {
     var iframes;
     var firstPrompt;
     var secondPrompt;
@@ -1046,7 +1046,7 @@ describe('token.getWithPopup', function() {
       });
   });
 
-  it('allows multiple popups simultaneously', function() {
+  xit('allows multiple popups simultaneously', function() {
     var firstPopup;
     var secondPopup;
 

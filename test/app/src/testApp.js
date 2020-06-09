@@ -70,6 +70,8 @@ function bindFunctions(testApp, window) {
     revokeToken: testApp.revokeToken.bind(testApp),
     handleCallback: testApp.handleCallback.bind(testApp),
     getUserInfo: testApp.getUserInfo.bind(testApp),
+    testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
+    testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp)
   };
   Object.keys(boundFunctions).forEach(functionName => {
     window[functionName] = makeClickHandler(boundFunctions[functionName]);
@@ -303,6 +305,42 @@ Object.assign(TestApp.prototype, {
       this.renderError(new Error('Missing tokens'));
     }
   },
+  testConcurrentGetToken: async function() {
+    // Call getToken() but do not await the result
+    var p1 = this.getToken().catch(error => {
+      console.error('Saw error on the first request', error);
+      this.renderError(error);
+      throw error;
+    });
+    // Call getToken() again. If there is a concurrency issue, it will cause the first call to fail
+    var p2 = this.getToken().catch(error => {
+      console.error('Saw error on the second request', error);
+      this.renderError(error);
+      throw error;
+    });
+    return Promise.all([p1, p2])
+      .then(() => {
+        document.getElementById('token-msg').innerHTML = 'concurrent test passed';
+      });
+  },
+  testConcurrentLogin: async function() {
+    // Call login but do not await the result
+    var p1 = this.loginPopup().catch(error => {
+      console.error('Saw error on the first request', error);
+      this.renderError(error);
+      throw error;
+    });
+    // Call login again. If there is a concurrency issue, it will cause the first call to fail
+    var p2 = this.loginPopup().catch(error => {
+      console.error('Saw error on the second request', error);
+      this.renderError(error);
+      throw error;
+    });
+    return Promise.all([p1, p2])
+      .then(() => {
+        document.getElementById('token-msg').innerHTML = 'concurrent test passed';
+      });
+  },
   configHTML() {
     const config = htmlString(this.config);
     return `
@@ -338,6 +376,9 @@ Object.assign(TestApp.prototype, {
           <li>
             <a id="refresh-session" href="/" onclick="refreshSession(event)">Refresh Session</a>
           </li>
+          <li>
+            <a id="test-concurrent-get-token" href="/" onclick="testConcurrentGetToken(event)">Test Concurrent getToken</a>
+          </li>
         </ul>
         <div id="user-info"></div>
         <hr/>
@@ -355,6 +396,12 @@ Object.assign(TestApp.prototype, {
         </li>
         <li>
           <a id="login-popup" href="/" onclick="loginPopup(event)">Login using POPUP</a>
+        </li>
+        <li>
+         <a id="get-token" href="/" onclick="getToken(event)">Get Token (without prompt)</a>
+        </li>
+        <li>
+          <a id="test-concurrent-login" href="/" onclick="testConcurrentLogin(event)">Test Concurrent Login</a>
         </li>
       </ul>
       <h4/>
