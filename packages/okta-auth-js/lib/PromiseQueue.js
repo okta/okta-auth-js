@@ -1,11 +1,17 @@
 var util = require('./util');
 
-function AsyncMethodQueue() {
+// Implements a queue for synchronous or asynchronous methods
+// Methods will be wrapped in a promise and execute sequentially
+// This can be used to prevent concurrent calls to a single method or a set of methods
+function PromiseQueue() {
   this.queue = [];
   this.running = false;
 }
 
-util.extend(AsyncMethodQueue.prototype, {
+util.extend(PromiseQueue.prototype, {
+  // Returns a promise
+  // If the method is synchronous, it will resolve when the method completes
+  // If the method returns a promise, it will resolve (or reject) with the value from the method's promise
   push: function(/* method, thisObject, args... */) {
     var args = Array.prototype.slice.call(arguments);
     var method = args[0];
@@ -45,4 +51,4 @@ util.extend(AsyncMethodQueue.prototype, {
   }
 });
 
-module.exports = AsyncMethodQueue;
+module.exports = PromiseQueue;

@@ -1,59 +1,59 @@
-var AsyncMethodQueue = require('../../lib/AsyncMethodQueue');
+var PromiseQueue = require('../../lib/PromiseQueue');
 
-describe('AsyncMethodQueue', () => {
-  var asyncQueue;
+describe('PromiseQueue', () => {
+  var promiseQueue;
   beforeEach(() => {
-    asyncQueue = new AsyncMethodQueue();
+    promiseQueue = new PromiseQueue();
   });
 
   it('initial state, empty queue, running = false', () => {
-    expect(asyncQueue.queue.length).toBe(0);
-    expect(asyncQueue.running).toBe(false);
+    expect(promiseQueue.queue.length).toBe(0);
+    expect(promiseQueue.running).toBe(false);
   });
 
   it('adds an item to the queue, calls run', (done) => {
     var fn = jest.fn();
-    jest.spyOn(asyncQueue, 'run').mockImplementation(() => {
-      expect(asyncQueue.queue.length).toBe(1);
+    jest.spyOn(promiseQueue, 'run').mockImplementation(() => {
+      expect(promiseQueue.queue.length).toBe(1);
       done();
     })
-    asyncQueue.push(fn);
+    promiseQueue.push(fn);
   });
 
   it('after sync method is called, calls run again', (done) => {
     var fn = jest.fn();
     var callCount = 0;
-    var originalRun = AsyncMethodQueue.prototype.run;
-    jest.spyOn(asyncQueue, 'run').mockImplementation(() => {
+    var originalRun = PromiseQueue.prototype.run;
+    jest.spyOn(promiseQueue, 'run').mockImplementation(() => {
       callCount++;
       if (callCount === 1) {
         // call original method
-        originalRun.call(asyncQueue);
+        originalRun.call(promiseQueue);
         return;
       }
       expect(callCount).toBe(2);
-      expect(asyncQueue.queue.length).toBe(0);
+      expect(promiseQueue.queue.length).toBe(0);
       done();
     })
-    asyncQueue.push(fn);
+    promiseQueue.push(fn);
   });
 
   it('after async method is called, calls run again', (done) => {
     var fn = jest.fn().mockReturnValue(Promise.resolve('foo'));
     var callCount = 0;
-    var originalRun = AsyncMethodQueue.prototype.run;
-    jest.spyOn(asyncQueue, 'run').mockImplementation(() => {
+    var originalRun = PromiseQueue.prototype.run;
+    jest.spyOn(promiseQueue, 'run').mockImplementation(() => {
       callCount++;
       if (callCount === 1) {
         // call original method
-        originalRun.call(asyncQueue);
+        originalRun.call(promiseQueue);
         return;
       }
       expect(callCount).toBe(2);
-      expect(asyncQueue.queue.length).toBe(0);
+      expect(promiseQueue.queue.length).toBe(0);
       done();
     })
-    asyncQueue.push(fn)
+    promiseQueue.push(fn)
       .then(res => {
         expect(res).toBe('foo');
       })
@@ -64,7 +64,7 @@ describe('AsyncMethodQueue', () => {
 
   it('returns a promise which resolves after method is called', () => {
     var fn = jest.fn();
-    return asyncQueue.push(fn)
+    return promiseQueue.push(fn)
       .then(() => {
         expect(fn).toHaveBeenCalled();
       });
@@ -75,7 +75,7 @@ describe('AsyncMethodQueue', () => {
     var fn = jest.fn().mockImplementation(function () {
       expect(this).toBe(context);
     });
-    return asyncQueue.push(fn, context)
+    return promiseQueue.push(fn, context)
       .then(() => {
         expect(fn).toHaveBeenCalled();
       });
@@ -83,7 +83,7 @@ describe('AsyncMethodQueue', () => {
 
   it('passes arguments to the function', () => {
     var fn = jest.fn();
-    return asyncQueue.push(fn, null, 'foo', 'bar')
+    return promiseQueue.push(fn, null, 'foo', 'bar')
       .then(() => {
         expect(fn).toHaveBeenCalledWith('foo', 'bar');
       });
@@ -96,7 +96,7 @@ describe('AsyncMethodQueue', () => {
         resolvePromise = resolve;
       });
     })
-    var promise = asyncQueue.push(fn);
+    var promise = promiseQueue.push(fn);
     resolvePromise('foo');
 
     return promise
@@ -112,7 +112,7 @@ describe('AsyncMethodQueue', () => {
         rejectPromise = resolve;
       });
     })
-    var promise = asyncQueue.push(fn);
+    var promise = promiseQueue.push(fn);
     rejectPromise(new Error('foo'));
 
     return promise
@@ -139,9 +139,9 @@ describe('AsyncMethodQueue', () => {
       resolve2();
       return Promise.resolve('bar');
     });
-    var p1 = asyncQueue.push(fn1);
+    var p1 = promiseQueue.push(fn1);
     expect(fn1).toHaveBeenCalled();
-    var p2 = asyncQueue.push(fn2);
+    var p2 = promiseQueue.push(fn2);
     expect(fn2).not.toHaveBeenCalled();
     resolve1('foo'); // resolve fn1
     return p1
