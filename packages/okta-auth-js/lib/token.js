@@ -135,7 +135,6 @@ function addPostMessageListener(sdk, timeout, state) {
       if (e.origin !== sdk.getIssuerOrigin()) {
         return reject(new AuthSdkError('The request does not match client configuration'));
       }
-
       resolve(e.data);
     };
 
@@ -700,7 +699,7 @@ function renewToken(sdk, token) {
     responseType = 'id_token';
   }
 
-  return sdk.token.getWithoutPrompt({
+  return getWithoutPrompt(sdk, {
     responseType: responseType,
     scopes: token.scopes,
     authorizeUrl: token.authorizeUrl,

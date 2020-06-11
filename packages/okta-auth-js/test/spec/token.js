@@ -117,6 +117,7 @@ describe('token.getWithoutPrompt', function() {
     var authClient;
     var states;
     var messageCallbacks;
+    var body;
 
     function fireCallback(index, origin) {
       var fn = messageCallbacks[index];
@@ -162,7 +163,7 @@ describe('token.getWithoutPrompt', function() {
       });
 
       // Capture the iframe
-      var body = document.getElementsByTagName('body')[0];
+      body = document.getElementsByTagName('body')[0];
       var origAppend = body.appendChild;
       jest.spyOn(body, 'appendChild').mockImplementation(function (el) {
         if (el.tagName === 'IFRAME') {
@@ -173,49 +174,84 @@ describe('token.getWithoutPrompt', function() {
         return origAppend.apply(this, arguments);
       });
 
+      jest.spyOn(body, 'removeChild');
     });
 
-    it('multiple valid will resolve', function() {
+    // asserts that multiple iframes are not opened simultaneously
+    it('multiple valid concurrent calls will resolve sequentially', function() {
       var p1 = authClient.token.getWithoutPrompt();
       var p2 = authClient.token.getWithoutPrompt();
-      var p3 = authClient.token.getWithoutPrompt();
-      return waitFor(function() {
-        return messageCallbacks.length === 3;
-      }).then(function() {
-        // manually fire callbacks in mixed order. All promises should resolve
-        fireCallback(1);
-        fireCallback(2);
-        fireCallback(0);
-        return Promise.all([p1, p2, p3]);
+      expect(body.appendChild).not.toHaveBeenCalled(); // prepareOauthParams is async
+      return waitFor(() => {
+        return body.appendChild.mock.calls.length > 0;
+      }).then(() => {
+        expect(body.appendChild).toHaveBeenCalledTimes(1);
+        body.appendChild.mockClear();
+        fireCallback(0); // will resolve the first call
+        return p1;
+      }).then(() => {
+        // expect that the iframe from the first call has been removed
+        expect(body.removeChild).toHaveBeenCalledTimes(1);
+        body.removeChild.mockClear();
+        // wait for the 2nd call to open an iframe
+        return waitFor(function() {
+          return body.appendChild.mock.calls.length > 0;
+        });
+      }).then(() => {
+        expect(body.appendChild).toHaveBeenCalledTimes(1);
+        fireCallback(1); // resolve 2nd call
+        return p2;
+      })
+      .then(() => {
+        // expect that the iframe from the second call has been removed
+        expect(body.removeChild).toHaveBeenCalledTimes(1);
       });
     });
 
-    it('multiple invalid will fail (authorizeUrl mismatch)', function() {
+    it('multiple invalid (authorizeUrl mismatch) concurrent will fail sequentially', function() {
       var p1 = authClient.token.getWithoutPrompt();
       var p2 = authClient.token.getWithoutPrompt();
-      var p3 = authClient.token.getWithoutPrompt();
-      return waitFor(function() {
-        return messageCallbacks.length === 3;
-      }).then(function() {
-        // manually fire callbacks in mixed order. All promises should reject
-        fireCallback(1, 'bogus');
-        fireCallback(2, 'bogus');
-        fireCallback(0, 'bogus');
-        return Promise.allSettled([p1, p2, p3]);
-      }).then(function(results) {
-        expect(results).toHaveLength(3);
-        results.forEach(function(result) {
-          expect(result.status).toBe('rejected');
-          util.expectErrorToEqual(result.reason, {
-            name: 'AuthSdkError',
-            message: 'The request does not match client configuration',
-            errorCode: 'INTERNAL',
-            errorSummary: 'The request does not match client configuration',
-            errorLink: 'INTERNAL',
-            errorId: 'INTERNAL',
-            errorCauses: []
-          });
+      expect(body.appendChild).not.toHaveBeenCalled(); // prepareOauthParams is async
+      return waitFor(() => {
+        return body.appendChild.mock.calls.length > 0;
+      }).then(() => {
+        expect(body.appendChild).toHaveBeenCalledTimes(1);
+        body.appendChild.mockClear();
+        fireCallback(0, 'bogus'); // will resolve (with failure) the first call
+        return p1;
+      }).catch(err => {
+        util.expectErrorToEqual(err, {
+          name: 'AuthSdkError',
+          message: 'The request does not match client configuration',
+          errorCode: 'INTERNAL',
+          errorSummary: 'The request does not match client configuration',
+          errorLink: 'INTERNAL',
+          errorId: 'INTERNAL',
+          errorCauses: []
         });
+        // expect that the iframe from the first call has been removed
+        expect(body.removeChild).toHaveBeenCalledTimes(1);
+        body.removeChild.mockClear();
+        // wait for the 2nd call to open an iframe
+        return waitFor(function() {
+          return body.appendChild.mock.calls.length > 0;
+        });
+      }).then(() => {
+        expect(body.appendChild).toHaveBeenCalledTimes(1);
+        fireCallback(1, 'bogus'); // resolve 2nd call
+        return p2;
+      }).catch(err => {
+        util.expectErrorToEqual(err, {
+          name: 'AuthSdkError',
+          message: 'The request does not match client configuration',
+          errorCode: 'INTERNAL',
+          errorSummary: 'The request does not match client configuration',
+          errorLink: 'INTERNAL',
+          errorId: 'INTERNAL',
+          errorCauses: []
+        });
+        // expect that the iframe from the second call has been removed
+        expect(body.removeChild).toHaveBeenCalledTimes(1);
       });
     });
   });
@@ -481,14 +517,15 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
-  it('allows multiple iframes simultaneously', function() {
+  it('prevents multiple iframes from opening simultaneously', function() {
     var iframes;
     var firstPrompt;
     var secondPrompt;
+    var body;
     return oauthUtil.setupSimultaneousPostMessage()
     .then(function(context) {
       // mock frame creation
-      var body = document.getElementsByTagName('body')[0];
+      body = document.getElementsByTagName('body')[0];
       var origAppend = body.appendChild;
       jest.spyOn(body, 'appendChild').mockImplementation(function(el) {
         if (el.tagName === 'IFRAME') {
@@ -498,7 +535,7 @@ describe('token.getWithoutPrompt', function() {
         }
         return origAppend.apply(this, arguments);
       });
-
+      jest.spyOn(body, 'removeChild');
       // ensure that no iframes are open
       iframes = document.getElementsByTagName('IFRAME');
       expect(iframes.length).toBe(0);
@@ -519,28 +556,38 @@ describe('token.getWithoutPrompt', function() {
         nonce: oauthUtil.mockedNonce2
       });
       return waitFor(function() {
-        return iframes.length === 2 ? context : false;
+        return iframes.length > 0 ? context : false;
       });
     })
     .then(function(context) {
-      // assert that two iframes are open
-      expect(iframes.length).toBe(2);
+      // assert that only one iframe is open
+      expect(iframes.length).toBe(1);
 
-      // resolve both prompts
+      // resolve first prompt
       context.emitter.emit('trigger', oauthUtil.mockedState);
+      return firstPrompt.then(val => {
+        expect(val.tokens.idToken).toEqual(tokens.standardIdTokenParsed);
+        return context;
+      });
+    }).then(context => {
+      expect(body.removeChild).toHaveBeenCalled(); // expect first frame to be closed
+      body.removeChild.mockClear();
+      return waitFor(function() {
+        return iframes.length > 0 ? context : false;
+      });
+    }).then(context => {
+      // assert that only one iframe is open
+      expect(iframes.length).toBe(1);
       context.emitter.emit('trigger', oauthUtil.mockedState2);
-
-      return Promise.all([firstPrompt, secondPrompt])
-      .then(function(values) {
-        expect(values[0].tokens.idToken).toEqual(tokens.standardIdTokenParsed);
-        expect(values[1].tokens.idToken).toEqual(tokens.standardIdToken2Parsed);
-
-        // make sure both iframes were destroyed
-        expect(iframes.length).toBe(0);
-
+      return secondPrompt.then(val => {
+        expect(val.tokens.idToken).toEqual(tokens.standardIdToken2Parsed);
+        return context;
+      });
+    }).then(() => {
+        expect(body.removeChild).toHaveBeenCalled(); // expect 2nd frame to be closed
+        expect(iframes.length).toBe(0); 
         // Remove any iframes that exist, so we don't taint our other tests
         oauthUtil.removeAllFrames();
-      });
     });
   });
 
@@ -1046,7 +1093,7 @@ describe('token.getWithPopup', function() {
       });
   });
 
-  it('allows multiple popups simultaneously', function() {
+  it('does not allow multiple popups simultaneously', function() {
     var firstPopup;
     var secondPopup;
 
@@ -1089,24 +1136,35 @@ describe('token.getWithPopup', function() {
         nonce: oauthUtil.mockedNonce2
       });
       return waitFor(() => {
-        return popups.length === 2 ? context : false;
+        return popups.length > 0 ? context : false;
       })
     }).then(context => {
 
-      // assert that two popups are open
-      expect(getOpenPopups().length).toBe(2);
+      // assert that only one popup is open
+      expect(getOpenPopups().length).toBe(1);
 
-      // resolve the popups
+      // resolve the first popup
       context.emitter.emit('trigger', oauthUtil.mockedState);
+      return firstPopup.then(val => {
+        expect(val.tokens.idToken).toEqual(tokens.standardIdTokenParsed);
+        expect(popups[0].closed).toBe(true); // first popup should be closed
+        expect(popups.length).toBe(1); // 2nd popup is not open yet
+        return waitFor(() => {
+          return getOpenPopups().length > 0 ? context : false;
+        })
+      });
+    }).then(context => {
+      // assert that only one popup is open
+      expect(getOpenPopups().length).toBe(1);
+
+      // resolve the 2nd popup
       context.emitter.emit('trigger', oauthUtil.mockedState2);
 
-      return Promise.all([firstPopup, secondPopup])
-      .then(function(values) {
-        expect(values[0].tokens.idToken).toEqual(tokens.standardIdTokenParsed);
-        expect(values[1].tokens.idToken).toEqual(tokens.standardIdToken2Parsed);
-
-        // make sure both popups were closed
-        expect(getOpenPopups().length).toBe(0);
+      return secondPopup
+      .then(function(val) {
+        expect(val.tokens.idToken).toEqual(tokens.standardIdToken2Parsed);
+        expect(popups[1].closed).toBe(true); // 2nd popup should be closed
+        expect(popups.length).toBe(2); // no other popups were created
       });
     });
   });

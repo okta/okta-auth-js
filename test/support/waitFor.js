@@ -20,6 +20,7 @@ function waitFor(conditionFn) {
 
       if (res) {
         resolve(res);
+        return;
       }
 
       // result was false, poll and try again
