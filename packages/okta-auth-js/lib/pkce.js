@@ -41,8 +41,9 @@ function generateVerifier(prefix) {
   return encodeURIComponent(verifier).slice(0, MAX_VERIFIER_LENGTH);
 }
 
-function getStorage(sdk) {
-  return sdk.options.storageUtil.getPKCEStorage(sdk.options.cookies);
+function getStorage(sdk, options) {
+  options = util.extend({}, sdk.options.cookies, options);
+  return sdk.options.storageUtil.getPKCEStorage(options);
 }
 
 function saveMeta(sdk, meta) {
@@ -53,6 +54,18 @@ function saveMeta(sdk, meta) {
 function loadMeta(sdk) {
   var storage = getStorage(sdk);
   var obj = storage.getStorage();
+  // Verify the Meta
+  if (!obj.codeVerifier) {
+    // If meta is not valid, try reading from localStorage.
+    // This is for compatibility with older versions of the signin widget.
+    storage = getStorage(sdk, { preferLocalStorage: true });
+    obj = storage.getStorage();
+    if (!obj.codeVerifier) {
+      // If meta is not valid, throw an exception to avoid misleading server-side error
+      // The most likely cause of this error is trying to handle a callback twice
+      throw new AuthSdkError('Could not load PKCE codeVerifier from storage');
+    }
+  }
   return obj;
 }
 

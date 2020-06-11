@@ -12,6 +12,52 @@ var token = require('../../lib/token');
 var oauthUtil = require('../../lib/oauthUtil');
 
 describe('pkce', function() {
+  afterEach(() => {
+    window.sessionStorage.clear();
+    window.localStorage.clear();
+  });
+  describe('clearMeta', () => {
+    it('clears meta from sessionStorage', () => {
+      const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
+      window.sessionStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
+      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
+      pkce.clearMeta(sdk);
+      const res = JSON.parse(window.sessionStorage.getItem('okta-pkce-storage'));
+      expect(res).toEqual({});
+    });
+  });
+  describe('saveMeta', () => {
+    it('saves meta in sessionStorage', () => {
+      const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
+      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
+      pkce.saveMeta(sdk, meta);
+      const res = JSON.parse(window.sessionStorage.getItem('okta-pkce-storage'));
+      expect(res).toEqual(meta);
+    });
+  });
+  describe('loadMeta', () => {
+    it('can return the meta from sessionStorage', () => {
+      const meta = { codeVerifier: 'fake' };
+      window.sessionStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
+      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
+      const res = pkce.loadMeta(sdk);
+      expect(res.codeVerifier).toBe(meta.codeVerifier);
+    });
+    it('can return the meta from localStorage', () => {
+      const meta = { codeVerifier: 'fake' };
+      window.localStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
+      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
+      const res = pkce.loadMeta(sdk);
+      expect(res.codeVerifier).toBe(meta.codeVerifier);
+    });
+    it('throws an error if meta cannot be found', () => {
+      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
+      const fn = () => {
+        pkce.loadMeta(sdk);
+      };
+      expect(fn).toThrowError('Could not load PKCE codeVerifier from storage');
+    });
+  });
 
   describe('prepare oauth params', function() {
 

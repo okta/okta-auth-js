@@ -40,7 +40,8 @@ storageUtil.browserHasSessionStorage = function() {
 };
 
 storageUtil.getPKCEStorage = function(options) {
-  if (storageUtil.browserHasSessionStorage()) {
+  options = options || {};
+  if (!options.preferLocalStorage && storageUtil.browserHasSessionStorage()) {
     return storageBuilder(storageUtil.getSessionStorage(), constants.PKCE_STORAGE_NAME);
   } else if (storageUtil.browserHasLocalStorage()) {
     return storageBuilder(storageUtil.getLocalStorage(), constants.PKCE_STORAGE_NAME);
