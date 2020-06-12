@@ -15,6 +15,8 @@ function getDefaultConfig() {
     issuer: ISSUER,
     clientId: CLIENT_ID,
     responseType: ['token', 'id_token'],
+    scopes: ['openid', 'email'],
+    _defaultScopes: false,
     pkce: true,
     cookies: {
       secure: true
@@ -29,6 +31,7 @@ function getConfigFromUrl() {
   const postLogoutRedirectUri = url.searchParams.get('postLogoutRedirectUri') || POST_LOGOUT_REDIRECT_URI;
   const clientId = url.searchParams.get('clientId');
   const pkce = url.searchParams.get('pkce') !== 'false'; // On by default
+  const _defaultScopes = url.searchParams.get('_defaultScopes') === 'true';
   const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
   const responseMode = url.searchParams.get('responseMode') || undefined;
@@ -42,6 +45,7 @@ function getConfigFromUrl() {
     issuer,
     clientId,
     pkce,
+    _defaultScopes,
     scopes,
     responseType,
     responseMode,

@@ -6,6 +6,10 @@ const Form = `
   <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
   <label for="clientId">Client ID</label><input id="clientId" name="clientId" type="text" /><br/>
   <label for="responseType">Response Type (comma separated)</label><input id="responseType" name="responseType" type="text" /><br/>
+  <label for="_defaultScopes">Use DEFAULT scopes (defined by authorization server)</label><br/>
+  <input id="default-scopes-yes" name="_defaultScopes" type="radio" value="true"/>YES<br/>
+  <input id="default-scopes-no" name="_defaultScopes" type="radio" value="false"/>NO (list scopes below)<br/>
+  <label for="scopes">Scopes (comma separated)</label><input id="scopes" name="scopes" type="text" /><br/>
   <label for="redirectUri">Redirect URI</label><input id="redirectUri" name="redirectUri" type="text" /><br/>
   <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" /><br/>
   <label for="responseMode">Response Mode</label>
@@ -44,6 +48,7 @@ function updateForm(config) {
   document.getElementById('issuer').value = config.issuer;
   document.getElementById('redirectUri').value = config.redirectUri;
   document.getElementById('responseType').value = config.responseType.join(',');
+  document.getElementById('scopes').value = config.scopes.join(',');
   document.getElementById('postLogoutRedirectUri').value = config.postLogoutRedirectUri;
   document.getElementById('clientId').value = config.clientId;
   document.querySelector(`#responseMode [value="${config.responseMode || ''}"]`).selected = true;
@@ -60,6 +65,14 @@ function updateForm(config) {
     document.getElementById('secureCookies-on').checked = true;
   } else {
     document.getElementById('secureCookies-off').checked = true;
+  }
+
+  if (config._defaultScopes) {
+    document.getElementById('default-scopes-yes').checked = true;
+    document.getElementById('scopes').disabled = true;
+  } else {
+    document.getElementById('default-scopes-no').checked = true;
+    document.getElementById('scopes').disabled = false;
   }
 }
 

@@ -101,7 +101,10 @@ Object.assign(TestApp.prototype, {
   getSDKInstance() {
     return Promise.resolve()
       .then(() => {
-        this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config)); // can throw
+        // can throw
+        this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config, {
+          scopes: this.config._defaultScopes ? [] : this.config.scopes
+        }));
         this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
       });
   },
@@ -189,7 +192,7 @@ Object.assign(TestApp.prototype, {
     saveConfigToStorage(this.config);
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config.scopes,
+      scopes: this.config._defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithRedirect(options)
       .catch(e => {
@@ -200,7 +203,7 @@ Object.assign(TestApp.prototype, {
   loginPopup: async function(options) {
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config.scopes,
+      scopes: this.config._defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithPopup(options)
     .then(res => {
@@ -211,7 +214,7 @@ Object.assign(TestApp.prototype, {
   getToken: async function(options) {
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config.scopes,
+      scopes: this.config._defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithoutPrompt(options)
     .then(res => {
