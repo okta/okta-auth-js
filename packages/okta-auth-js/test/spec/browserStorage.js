@@ -134,6 +134,13 @@ describe('browserStorage', () => {
       expect(browserStorage.getCookieStorage).toHaveBeenCalledWith(opts);
     });
 
+    it('Uses localStorage instead of sessionStorage if options.preferLocalStorage is set', () => {
+      browserStorage.getPKCEStorage({ preferLocalStorage: true });
+      expect(storageBuilder).toHaveBeenCalledTimes(1);
+      // .toHaveBeenCalledWith doesn't do a strict comparison, so an empty localStorage reads the same as an empty sessionStorage
+      expect(storageBuilder.mock.calls[0][0]).toBe(global.window.localStorage);
+      expect(storageBuilder.mock.calls[0][1]).toBe('okta-pkce-storage');
+    });
   });
 
   describe('getHttpCache', () => {
