@@ -6,6 +6,8 @@
 
 - [#395](https://github.com/okta/okta-auth-js/pull/395) Prevents concurrent use of token API methods such as `getWithoutPrompt`, `getWithRedirect` or `getWithPopup` within a single running instance. These methods will be executed within a queue to ensure that they complete sequentially. This fix only affects a single instance. If there are several instances running (for example, in multiple tabs) it is still possible for token API methods to be executing concurrently.
 
+- [#399](https://github.com/okta/okta-auth-js/pull/399) Fixes an error involving PKCE flow and the signin widget.
+
 ## 3.1.2
 
 - [#384](https://github.com/okta/okta-auth-js/pull/384) Shifts browser storage for ephemeral PKCE code challenge to default to sessionStorage before localStorage or cookies.
