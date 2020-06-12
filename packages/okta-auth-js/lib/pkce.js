@@ -57,7 +57,7 @@ function loadMeta(sdk) {
   // Verify the Meta
   if (!obj.codeVerifier) {
     // If meta is not valid, try reading from localStorage.
-    // This is for compatibility with older versions of the signin widget.
+    // This is for compatibility with older versions of the signin widget. OKTA-304806
     storage = getStorage(sdk, { preferLocalStorage: true });
     obj = storage.getStorage();
     if (!obj.codeVerifier) {
