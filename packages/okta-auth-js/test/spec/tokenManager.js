@@ -1303,6 +1303,13 @@ describe('TokenManager', function() {
 
     describe('remove', function() {
       it('removes a token', function() {
+        util.mockGetCookie({
+          'okta-token-storage_test-idToken': JSON.stringify(tokens.standardIdTokenParsed),
+          'okta-token-storage_anotherKey': JSON.stringify(tokens.standardIdTokenParsed)
+        });
+        util.mockSetCookie({
+          'okta-token-storage_anotherKey': JSON.stringify(tokens.standardIdTokenParsed)
+        });
         const client = cookieStorageSetup();
         const deleteCookieMock = util.mockDeleteCookie();
         client.tokenManager.remove('test-idToken');
@@ -1312,21 +1319,14 @@ describe('TokenManager', function() {
 
     describe('clear', function() {
       it('clears all tokens', function() {
-        util.mockGetCookie(JSON.stringify({
-          'test-idToken': tokens.standardIdTokenParsed,
-          'anotherKey': tokens.standardIdTokenParsed
-        }));
+        util.mockGetCookie({
+          'okta-token-storage_test-idToken': JSON.stringify(tokens.standardIdTokenParsed),
+          'okta-token-storage_anotherKey': JSON.stringify(tokens.standardIdTokenParsed)
+        });
         var client = cookieStorageSetup();
-        client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-        client.tokenManager.add('anotherKey', tokens.standardIdTokenParsed);
-        var setCookieMock = util.mockSetCookie();
+        const deleteCookieMock = util.mockDeleteCookie();
         client.tokenManager.clear();
-        expect(setCookieMock).toHaveBeenCalledWith(
-          'okta-token-storage',
-          '{}',
-          '2200-01-01T00:00:00.000Z',
-          secureCookieSettings
-        );
+        expect(deleteCookieMock).toHaveBeenCalledTimes(2)
       });
     });
   });

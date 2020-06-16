@@ -76,40 +76,13 @@ storageUtil.getCookieStorage = function(options) {
     throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
   }
   return {
-    _getKey: function(key, subKey) {
-      return subKey ? `${key}_${subKey}` : key;
-    },
-    getItem: function(key, useAsPrefix /* optional */) {
-      // Get all data under key scope (prefixed with key)
-      if (useAsPrefix) {
-        var data = storageUtil.storage.get();
-        var value = {};
-        Object.keys(data).forEach(k => {
-          if (k.indexOf(key) === 0) {
-            value[k.replace(`${key}_`, '')] = JSON.parse(data[k]);
-          }
-        });
-        return JSON.stringify(value);
-      }
-
-      return storageUtil.storage.get(key);
-    },
-    setItem: function(key, value, subKey /* optional */) {
-      // Store data in separated cookie if subKey is provided
-      if (subKey) {
-        key = this._getKey(key, subKey);
-        value = JSON.parse(value);
-        value = JSON.stringify(value[subKey]);
-      }
-      if (value) {
-        // Cookie shouldn't expire
-        storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
-          secure: secure, 
-          sameSite: sameSite
-        });
-      } else {
-        storageUtil.storage.delete(key);
-      }
+    getItem: storageUtil.storage.get,
+    setItem: function(key, value) {
+      // Cookie shouldn't expire
+      storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
+        secure: secure, 
+        sameSite: sameSite
+      });
     }
   };
 };

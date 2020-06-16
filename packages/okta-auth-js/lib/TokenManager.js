@@ -78,7 +78,7 @@ function setExpireEventTimeout(sdk, tokenMgmtRef, key, token) {
 
 function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
   try {
-    var tokenStorage = storage.getStorage(true /* useAsPrefix */);
+    var tokenStorage = storage.getStorage();
   } catch(e) {
     // Any errors thrown on instantiation will not be caught,
     // because there are no listeners yet
@@ -96,7 +96,7 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
 }
 
 function add(sdk, tokenMgmtRef, storage, key, token) {
-  var tokenStorage = storage.getStorage(true /* useAsPrefix */);
+  var tokenStorage = storage.getStorage();
   if (!util.isObject(token) ||
       !token.scopes ||
       (!token.expiresAt && token.expiresAt !== 0) ||
@@ -104,12 +104,12 @@ function add(sdk, tokenMgmtRef, storage, key, token) {
     throw new AuthSdkError('Token must be an Object with scopes, expiresAt, and an idToken or accessToken properties');
   }
   tokenStorage[key] = token;
-  storage.setStorage(tokenStorage, key);
+  storage.setStorage(tokenStorage);
   setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
 }
 
 function get(storage, key) {
-  var tokenStorage = storage.getStorage(true /* useAsPrefix */);
+  var tokenStorage = storage.getStorage();
   return tokenStorage[key];
 }
 
@@ -133,9 +133,9 @@ function remove(tokenMgmtRef, storage, key) {
   clearExpireEventTimeout(tokenMgmtRef, key);
 
   // Remove it from storage
-  var tokenStorage = storage.getStorage(true /* useAsPrefix */);
+  var tokenStorage = storage.getStorage();
   delete tokenStorage[key];
-  storage.setStorage(tokenStorage, key);
+  storage.setStorage(tokenStorage);
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {
@@ -219,7 +219,39 @@ function TokenManager(sdk, options) {
         storageProvider = sessionStorage;
         break;
       case 'cookie':
-        storageProvider = storageUtil.getCookieStorage(sdk.options.cookies);
+        // Implement customized cookie storage to make sure each token is stored separatedly in cookie
+        storageProvider = (function(options) {
+          var storage = storageUtil.getCookieStorage(options);
+          return {
+            getItem: function(key) {
+              var data = storage.getItem();
+              var value = {};
+              Object.keys(data).forEach(k => {
+                if (k.indexOf(key) === 0) {
+                  value[k.replace(`${key}_`, '')] = JSON.parse(data[k]);
+                }
+              });
+              return JSON.stringify(value);
+            },
+            setItem: function(key, value) {
+              // console.log(key, value);
+              const existingValues = JSON.parse(this.getItem(key));
+              // console.log(existingValues);
+              value = JSON.parse(value);
+              // Set key-value pairs from input to cookies
+              Object.keys(value).forEach(k => {
+                var storageKey = key + '_' + k;
+                var valueToStore = JSON.stringify(value[k]);
+                storage.setItem(storageKey, valueToStore);
+                delete existingValues[k];
+              });
+              // Delete unmatched keys from existing cookies
+              Object.keys(existingValues).forEach(k => {
+                storageUtil.storage.delete(key + '_' + k);
+              });
+            }
+          };
+        }(sdk.options.cookies));
         break;
       case 'memory':
         storageProvider = storageUtil.getInMemoryStorage();
