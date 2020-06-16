@@ -1,5 +1,11 @@
 # Changelog
 
+## PENDING
+
+### Bug Fixes
+
+-[#400](https://github.com/okta/okta-auth-js/pull/400) Allows an accessToken to be retrieved without an idToken. Also allows retrieving "default" scopes as defined by the custom authorization server.
+
 ## 3.1.3
 
 ### Bug Fixes
