@@ -83,12 +83,12 @@ storageUtil.getCookieStorage = function(options) {
       // Get all data under key scope (prefixed with key)
       if (useAsPrefix) {
         var data = storageUtil.storage.get();
-        var value = Object.keys(data).reduce((acc, curr) => {
-          if (curr.indexOf(key) === 0) {
-            acc[curr.replace(`${key}_`, '')] = JSON.parse(data[curr]);
+        var value = {};
+        Object.keys(data).forEach(k => {
+          if (k.indexOf(key) === 0) {
+            value[k.replace(`${key}_`, '')] = JSON.parse(data[k]);
           }
-          return acc;
-        }, {});
+        });
         return JSON.stringify(value);
       }
 
