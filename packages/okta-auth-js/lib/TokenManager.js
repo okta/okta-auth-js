@@ -96,7 +96,7 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
 }
 
 function add(sdk, tokenMgmtRef, storage, key, token) {
-  var tokenStorage = storage.getStorage();
+  var tokenStorage = storage.getStorage(true /* scope */);
   if (!util.isObject(token) ||
       !token.scopes ||
       (!token.expiresAt && token.expiresAt !== 0) ||
@@ -104,12 +104,12 @@ function add(sdk, tokenMgmtRef, storage, key, token) {
     throw new AuthSdkError('Token must be an Object with scopes, expiresAt, and an idToken or accessToken properties');
   }
   tokenStorage[key] = token;
-  storage.setStorage(tokenStorage);
+  storage.setStorage(tokenStorage, key);
   setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
 }
 
 function get(storage, key) {
-  var tokenStorage = storage.getStorage();
+  var tokenStorage = storage.getStorage(true /* scope */);
   return tokenStorage[key];
 }
 

@@ -23,7 +23,8 @@
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
     "build": "webpack --config webpack.config.js",
-    "prepare": "yarn build"
+    "prepare": "yarn build",
+    "dev": "webpack --config webpack.dev.config.js"
   },
   "author": "Okta",
   "keywords": [

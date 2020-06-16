@@ -76,8 +76,31 @@ storageUtil.getCookieStorage = function(options) {
     throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
   }
   return {
-    getItem: storageUtil.storage.get,
-    setItem: function(key, value) {
+    _getKey: function(key, subKey) {
+      return subKey ? `${key}_${subKey}` : key;
+    },
+    getItem: function(key, scope /* optional */) {
+      // Get all data under key scope (prefixed with key)
+      if (scope) {
+        var data = storageUtil.storage.get();
+        var value = Object.keys(data).reduce((acc, curr) => {
+          if (curr.indexOf(key) === 0) {
+            acc[curr.replace(`${key}_`, '')] = JSON.parse(data[curr]);
+          }
+          return acc;
+        }, {});
+        return JSON.stringify(value);
+      }
+
+      return storageUtil.storage.get(key);
+    },
+    setItem: function(key, value, subKey /* optional */) {
+      // Store data in separated cookie if subKey is provided
+      if (subKey) {
+        key = this._getKey(key, subKey);
+        value = JSON.parse(value);
+        value = JSON.stringify(value[subKey]);
+      }
       // Cookie shouldn't expire
       storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
         secure: secure, 
@@ -144,6 +167,10 @@ storageUtil.storage = {
   delete: function(name) {
     return Cookies.remove(name, { path: '/' });
   }
+};
+
+storageUtil.getTokenStorageKey = function(options) {
+  return options.storageKey || constants.TOKEN_STORAGE_NAME;
 };
 
 module.exports = storageUtil;

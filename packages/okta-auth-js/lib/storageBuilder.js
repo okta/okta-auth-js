@@ -19,8 +19,8 @@ function storageBuilder(webstorage, storageName) {
     throw new AuthSdkError('"storageName" is required');
   }
 
-  function getStorage() {
-    var storageString = webstorage.getItem(storageName);
+  function getStorage(scope /* optional */) {
+    var storageString = webstorage.getItem(storageName, scope /* optional */);
     storageString = storageString || '{}';
     try {
       return JSON.parse(storageString);
@@ -29,10 +29,10 @@ function storageBuilder(webstorage, storageName) {
     }
   }
 
-  function setStorage(storage) {
+  function setStorage(storage, cookieSubKey /* optional */) {
     try {
       var storageString = JSON.stringify(storage);
-      webstorage.setItem(storageName, storageString);
+      webstorage.setItem(storageName, storageString, cookieSubKey /* optional */);
     } catch(e) {
       throw new AuthSdkError('Unable to set storage: ' + storageName);
     }
