@@ -238,7 +238,12 @@ function handleOAuthResponse(sdk, oauthParams, res, urls) {
     // We do not support "hybrid" scenarios where the response includes both a code and a token.
     // If the response contains a code it is used immediately to obtain new tokens.
     if (res.code && pkce) {
-      responseType = ['token', 'id_token']; // what we expect the code to provide us
+      // responseType is not sent to the token endpoint.
+      // We populate this array to validate the response below
+      responseType = ['token']; // an accessToken will always be returned
+      if (scopes.indexOf('openid') !== -1) {
+        responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
+      }
       return exchangeCodeForToken(sdk, oauthParams, res.code, urls);
     }
     return res;
