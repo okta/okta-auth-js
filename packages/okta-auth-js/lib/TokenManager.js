@@ -78,7 +78,7 @@ function setExpireEventTimeout(sdk, tokenMgmtRef, key, token) {
 
 function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
   try {
-    var tokenStorage = storage.getStorage();
+    var tokenStorage = storage.getStorage(true /* useAsPrefix */);
   } catch(e) {
     // Any errors thrown on instantiation will not be caught,
     // because there are no listeners yet
@@ -96,7 +96,7 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
 }
 
 function add(sdk, tokenMgmtRef, storage, key, token) {
-  var tokenStorage = storage.getStorage(true /* scope */);
+  var tokenStorage = storage.getStorage(true /* useAsPrefix */);
   if (!util.isObject(token) ||
       !token.scopes ||
       (!token.expiresAt && token.expiresAt !== 0) ||
@@ -109,7 +109,7 @@ function add(sdk, tokenMgmtRef, storage, key, token) {
 }
 
 function get(storage, key) {
-  var tokenStorage = storage.getStorage(true /* scope */);
+  var tokenStorage = storage.getStorage(true /* useAsPrefix */);
   return tokenStorage[key];
 }
 
@@ -133,9 +133,9 @@ function remove(tokenMgmtRef, storage, key) {
   clearExpireEventTimeout(tokenMgmtRef, key);
 
   // Remove it from storage
-  var tokenStorage = storage.getStorage();
+  var tokenStorage = storage.getStorage(true /* useAsPrefix */);
   delete tokenStorage[key];
-  storage.setStorage(tokenStorage);
+  storage.setStorage(tokenStorage, key);
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {

@@ -25,7 +25,7 @@ describe('storageBuilder', () => {
       const storageName = 'fake';
       const storage = storageBuilder(inner, storageName);
       storage.getStorage();
-      expect(inner.getItem).toHaveBeenCalledWith(storageName);
+      expect(inner.getItem).toHaveBeenCalledWith(storageName, undefined);
     });
     it('JSON decodes the returned object', () => {
       const obj = { fakeObject: true };
@@ -57,7 +57,7 @@ describe('storageBuilder', () => {
       const storageName = 'fake';
       const storage = storageBuilder(inner, storageName);
       storage.setStorage({});
-      expect(inner.setItem).toHaveBeenCalledWith(storageName, '{}');
+      expect(inner.setItem).toHaveBeenCalledWith(storageName, '{}', undefined);
     });
     it('JSON stringifies the object passed to inner storage', () => {
       const inner = {
@@ -67,7 +67,7 @@ describe('storageBuilder', () => {
       const storage = storageBuilder(inner, storageName);
       const obj = { fakeObject: true, anArray: [1, 2, 3] };
       storage.setStorage(obj);
-      expect(inner.setItem).toHaveBeenCalledWith(storageName, JSON.stringify(obj));
+      expect(inner.setItem).toHaveBeenCalledWith(storageName, JSON.stringify(obj), undefined);
     });
     it('Throws an error if setItem throws', () => {
       const inner = {
@@ -92,7 +92,7 @@ describe('storageBuilder', () => {
       const storageName = 'fake';
       const storage = storageBuilder(inner, storageName);
       storage.clearStorage();
-      expect(inner.setItem).toHaveBeenCalledWith(storageName, '{}');
+      expect(inner.setItem).toHaveBeenCalledWith(storageName, '{}', undefined);
     });
     it('will remove the property with the given key', () => {
       const obj = {
@@ -106,8 +106,8 @@ describe('storageBuilder', () => {
       const storageName = 'fake';
       const storage = storageBuilder(inner, storageName);
       storage.clearStorage('key1');
-      expect(inner.getItem).toHaveBeenCalledWith(storageName);
-      expect(inner.setItem).toHaveBeenCalledWith(storageName, '{"key2":"b"}');
+      expect(inner.getItem).toHaveBeenCalledWith(storageName, undefined);
+      expect(inner.setItem).toHaveBeenCalledWith(storageName, '{"key2":"b"}', undefined);
     });
   });
 
@@ -127,8 +127,8 @@ describe('storageBuilder', () => {
       const storageName = 'fake';
       const storage = storageBuilder(inner, storageName);
       storage.updateStorage('key2', 'b');
-      expect(inner.getItem).toHaveBeenCalledWith(storageName);
-      expect(inner.setItem).toHaveBeenCalledWith(storageName, JSON.stringify(finalObj));
+      expect(inner.getItem).toHaveBeenCalledWith(storageName, undefined);
+      expect(inner.setItem).toHaveBeenCalledWith(storageName, JSON.stringify(finalObj), undefined);
     });
   });
 });

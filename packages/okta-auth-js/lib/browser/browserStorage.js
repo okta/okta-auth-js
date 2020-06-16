@@ -79,9 +79,9 @@ storageUtil.getCookieStorage = function(options) {
     _getKey: function(key, subKey) {
       return subKey ? `${key}_${subKey}` : key;
     },
-    getItem: function(key, scope /* optional */) {
+    getItem: function(key, useAsPrefix /* optional */) {
       // Get all data under key scope (prefixed with key)
-      if (scope) {
+      if (useAsPrefix) {
         var data = storageUtil.storage.get();
         var value = Object.keys(data).reduce((acc, curr) => {
           if (curr.indexOf(key) === 0) {
@@ -101,11 +101,15 @@ storageUtil.getCookieStorage = function(options) {
         value = JSON.parse(value);
         value = JSON.stringify(value[subKey]);
       }
-      // Cookie shouldn't expire
-      storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
-        secure: secure, 
-        sameSite: sameSite
-      });
+      if (value) {
+        // Cookie shouldn't expire
+        storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
+          secure: secure, 
+          sameSite: sameSite
+        });
+      } else {
+        storageUtil.storage.delete(key);
+      }
     }
   };
 };
@@ -167,10 +171,6 @@ storageUtil.storage = {
   delete: function(name) {
     return Cookies.remove(name, { path: '/' });
   }
-};
-
-storageUtil.getTokenStorageKey = function(options) {
-  return options.storageKey || constants.TOKEN_STORAGE_NAME;
 };
 
 module.exports = storageUtil;

@@ -19,8 +19,8 @@ function storageBuilder(webstorage, storageName) {
     throw new AuthSdkError('"storageName" is required');
   }
 
-  function getStorage(scope /* optional */) {
-    var storageString = webstorage.getItem(storageName, scope /* optional */);
+  function getStorage(useAsPrefix /* optional */) {
+    var storageString = webstorage.getItem(storageName, useAsPrefix /* optional */);
     storageString = storageString || '{}';
     try {
       return JSON.parse(storageString);
