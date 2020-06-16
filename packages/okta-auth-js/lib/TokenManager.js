@@ -234,9 +234,7 @@ function TokenManager(sdk, options) {
               return JSON.stringify(value);
             },
             setItem: function(key, value) {
-              // console.log(key, value);
-              const existingValues = JSON.parse(this.getItem(key));
-              // console.log(existingValues);
+              var existingValues = JSON.parse(this.getItem(key));
               value = JSON.parse(value);
               // Set key-value pairs from input to cookies
               Object.keys(value).forEach(k => {
