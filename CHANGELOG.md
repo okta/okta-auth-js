@@ -1,10 +1,12 @@
 # Changelog
 
-## PENDING
+## 3.1.4
 
 ### Bug Fixes
 
--[#400](https://github.com/okta/okta-auth-js/pull/400) Allows an accessToken to be retrieved without an idToken. Also allows retrieving "default" scopes as defined by the custom authorization server.
+- [#400](https://github.com/okta/okta-auth-js/pull/400) Allows an accessToken to be retrieved without an idToken. Also allows retrieving "default" scopes as defined by the custom authorization server.
+
+- [#402](https://github.com/okta/okta-auth-js/pull/402) Fixes tokenManager cookie storage size limitation issue by store tokens in separated cookies.
 
 ## 3.1.3
 
