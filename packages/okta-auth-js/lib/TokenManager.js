@@ -219,7 +219,37 @@ function TokenManager(sdk, options) {
         storageProvider = sessionStorage;
         break;
       case 'cookie':
-        storageProvider = storageUtil.getCookieStorage(sdk.options.cookies);
+        // Implement customized cookie storage to make sure each token is stored separatedly in cookie
+        storageProvider = (function(options) {
+          var storage = storageUtil.getCookieStorage(options);
+          return {
+            getItem: function(key) {
+              var data = storage.getItem();
+              var value = {};
+              Object.keys(data).forEach(k => {
+                if (k.indexOf(key) === 0) {
+                  value[k.replace(`${key}_`, '')] = JSON.parse(data[k]);
+                }
+              });
+              return JSON.stringify(value);
+            },
+            setItem: function(key, value) {
+              var existingValues = JSON.parse(this.getItem(key));
+              value = JSON.parse(value);
+              // Set key-value pairs from input to cookies
+              Object.keys(value).forEach(k => {
+                var storageKey = key + '_' + k;
+                var valueToStore = JSON.stringify(value[k]);
+                storage.setItem(storageKey, valueToStore);
+                delete existingValues[k];
+              });
+              // Delete unmatched keys from existing cookies
+              Object.keys(existingValues).forEach(k => {
+                storageUtil.storage.delete(key + '_' + k);
+              });
+            }
+          };
+        }(sdk.options.cookies));
         break;
       case 'memory':
         storageProvider = storageUtil.getInMemoryStorage();
