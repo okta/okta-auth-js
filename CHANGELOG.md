@@ -1,5 +1,11 @@
 # Changelog
 
+## PENDING
+
+### Features
+
+-[#408](https://github.com/okta/okta-auth-js/pull/408) Provides a polyfill for IE 11+
+
 ## 3.1.4
 
 ### Bug Fixes

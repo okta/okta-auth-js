@@ -1,11 +1,7 @@
 /* entry point for SPA application */
 /* global window, document */
 
-// polyfill TextEncoder for IE Edge
-import { TextEncoder } from 'text-encoding';
-if (typeof window.TextEncoder === 'undefined') {
-  window.TextEncoder = TextEncoder;
-}
+import '@okta/okta-auth-js/polyfill';
 
 import Cookies from 'js-cookie';
 
