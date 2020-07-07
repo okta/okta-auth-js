@@ -27,6 +27,16 @@ module.exports = {
         test: /\.js$/,
         use: ['source-map-loader'],
         enforce: 'pre'
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['@babel/env'],
+          plugins: ['@babel/plugin-transform-runtime'],
+          sourceType: 'unambiguous'
+        }
       }
     ]
   }

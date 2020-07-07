@@ -8,7 +8,7 @@
 
 * [Release status](#release-status)
 * [Need help?](#need-help)
-  * [Browser compatibility](#browser-compatibility)
+  * [Browser compatibility / polyfill](#browser-compatibility--polyfill)
   * [Third party cookies](#third-party-cookies)
 * [Getting started](#getting-started)
 * [Usage guide](#usage-guide)
@@ -42,15 +42,34 @@ If you run into problems using the SDK, you can:
 * Ask questions on the [Okta Developer Forums][devforum]
 * Post [issues][github-issues] here on GitHub (for code errors)
 
-### Browser Compatibility
+### Browser compatibility / polyfill
 
 This SDK is known to work with current versions of Chrome, Firefox, and Safari on desktop and mobile.
 
-Compatibility with IE Edge can be accomplished by adding polyfill/shims for the following objects:
+Compatibility with IE 11 / Edge can be accomplished by adding polyfill/shims for the following objects:
 
-* ES6 Promise
+* ES Promise
 * Array.from
 * TextEncoder
+* Object.assign
+* UInt8 typed array
+* webcrypto (crypto.subtle)
+
+This module provides an entrypoint that implements all required polyfills.
+
+If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.polyfill.js` file in a `<script>` tag. It should be loaded before any other scripts which depend on the polyfill.  
+
+If you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import import or require `@okta/okta-auth-js/polyfill` at or near the beginning of your application's code:
+
+```javascript
+import '@okta/okta-auth-js/polyfill';
+```
+
+or
+
+```javascript
+require('@okta/okta-auth-js/polyfill');
+```
 
 ### Third party cookies
 

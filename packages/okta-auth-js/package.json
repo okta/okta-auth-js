@@ -22,7 +22,9 @@
     "test:browser": "jest --config ./jest.browser.js",
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
-    "build": "webpack --config webpack.config.js",
+    "build": "yarn build:lib && yarn build:polyfill",
+    "build:lib": "webpack --config webpack.config.js",
+    "build:polyfill": "webpack --config webpack.polyfill.config.js",
     "prepare": "yarn build",
     "dev": "webpack --config webpack.dev.config.js"
   },
@@ -57,6 +59,7 @@
     "@babel/preset-env": "^7.8.2",
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
+    "core-js": "^3.6.5",
     "eslint": "5.6.1",
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-jasmine": "^2.10.1",
@@ -74,6 +77,8 @@
     "karma-webpack": "^3.0.5",
     "lodash": "4.17.11",
     "promise.allsettled": "^1.0.1",
+    "text-encoding": "^0.7.0",
+    "webcrypto-shim": "^0.1.5",
     "webpack": "^3.0.0"
   },
   "jest-junit": {
