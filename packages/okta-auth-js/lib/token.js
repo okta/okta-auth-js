@@ -437,6 +437,13 @@ function getToken(sdk, options) {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getToken" takes only a single set of options'));
   }
+
+  if (oauthUtil.isAuthCallback(sdk)) {
+    return Promise.reject(new AuthSdkError(
+      'The app should not attempt to call getToken on callback. ' +
+      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
+    ));
+  }
   
   options = options || {};
 
@@ -854,5 +861,5 @@ module.exports = {
   getUserInfo: getUserInfo,
   verifyToken: verifyToken,
   handleOAuthResponse: handleOAuthResponse,
-  prepareOauthParams: prepareOauthParams
+  _prepareOauthParams: prepareOauthParams
 };

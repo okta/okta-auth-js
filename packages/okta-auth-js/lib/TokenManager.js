@@ -18,6 +18,7 @@ var storageUtil = require('./browser/browserStorage');
 var constants = require('./constants');
 var storageBuilder = require('./storageBuilder');
 var SdkClock = require('./clock');
+var oauthUtil = require('./oauthUtil');
 
 var DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -114,7 +115,14 @@ function get(storage, key) {
 }
 
 function getAsync(sdk, tokenMgmtRef, storage, key) {
-  return new Promise(function(resolve) {
+  return new Promise(function(resolve, reject) {
+    if (sdk.options.autoRenew && oauthUtil.isAuthCallback(sdk)) {
+      return reject(new AuthSdkError(
+        'App should not attempt to call authorize API on callback. ' + 
+        'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
+      ));
+    }
+
     var token = get(storage, key);
     if (!token || !hasExpired(tokenMgmtRef, token)) {
       return resolve(token);
