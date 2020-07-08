@@ -1258,7 +1258,7 @@ The user must activate the factor to complete enrollment.
 Send another OTP if user doesn’t receive the original activation SMS OTP.
 
 ```javascript
-transaction.resend();
+transaction.resend('sms');
 ```
 
 ##### `activate(options)`
