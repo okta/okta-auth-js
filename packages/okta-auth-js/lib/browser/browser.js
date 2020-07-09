@@ -175,6 +175,10 @@ function OktaAuthBuilder(args) {
   sdk.emitter = new Emitter();
   sdk.tokenManager = new TokenManager(sdk, args.tokenManager);
   sdk.tokenManager.on('error', this._onTokenManagerError, this);
+
+  sdk.oauthUtil = {
+    isOAuthCallback: util.bind(oauthUtil.isOAuthCallback, null, sdk)
+  };
 }
 
 var proto = OktaAuthBuilder.prototype;

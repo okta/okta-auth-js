@@ -443,6 +443,8 @@ var config = {
   * [tokenManager.renew](#tokenmanagerrenewkey)
   * [tokenManager.on](#tokenmanageronevent-callback-context)
   * [tokenManager.off](#tokenmanageroffevent-callback)
+* [oauthUtil](#oauthutil)
+  * [oauthutil.isOAuthCallback](#oauthutilisoauthcallback)
 
 ------
 
@@ -1967,6 +1969,16 @@ Unsubscribe from `tokenManager` events. If no callback is provided, unsubscribes
 ```javascript 
 authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
+```
+
+### `oauthUtil`
+
+#### `oauthUtil.isOAuthCallback`
+
+Check `window.location` to verify if the app is in OAuth callback state or not. This function is synchronous and returns `true` or `false`.
+
+```javascript
+authClient.oauthUtil.isOAuthCallback();
 ```
 
 ## Node JS and React Native Usage
