@@ -10,6 +10,7 @@ var tokens = require('@okta/test.support/tokens');
 var util = require('@okta/test.support/util');
 var oauthUtil = require('@okta/test.support/oauthUtil');
 var SdkClock = require('../../lib/clock');
+var AuthSdkError = require('../../lib/errors/AuthSdkError');
 
 // Expected settings on HTTPS
 var secureCookieSettings = {
@@ -1330,4 +1331,29 @@ describe('TokenManager', function() {
       });
     });
   });
+
+  describe('get', function() {
+    it('should throw AuthSdkError if autoRenew is turned on and app is in oauth callback state', async () => {
+      delete global.window.location;
+      global.window.location = {
+        protocol: 'https:',
+        hostname: 'somesite.local',
+        search: '?code=fakecode'
+      };
+      const client = new OktaAuth({
+        pkce: true,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'foo'
+      });
+  
+      try {
+        await client.tokenManager.get();
+      } catch (err) {
+        expect(err).toBeInstanceOf(AuthSdkError);
+        expect(err.message).toBe('The app should not attempt to call authorize API on callback. Authorize flow is already in process. Use parseFromUrl() to receive tokens.');
+      }
+    });
+  });
 });
+
+

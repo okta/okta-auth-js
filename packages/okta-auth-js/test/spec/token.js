@@ -14,6 +14,7 @@ var sdkUtil = require('../../lib/oauthUtil');
 var pkce = require('../../lib/pkce');
 var http = require('../../lib/http');
 var sdkCrypto = require('../../lib/crypto');
+var AuthSdkError = require('../../lib/errors/AuthSdkError');
 
 function setupSync(options) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);
@@ -865,6 +866,27 @@ describe('token.getWithoutPrompt', function() {
       errorCauses: []
     }
   );
+
+  it('should throw AuthSdkError when in callback state', async () => {
+    delete global.window.location;
+    global.window.location = {
+      protocol: 'https:',
+      hostname: 'somesite.local',
+      search: '?code=fakecode'
+    };
+    const client = new OktaAuth({
+      pkce: true,
+      issuer: 'https://auth-js-test.okta.com',
+      clientId: 'foo'
+    });
+
+    try {
+      await client.token.getWithoutPrompt();
+    } catch (err) {
+      expect(err).toBeInstanceOf(AuthSdkError);
+      expect(err.message).toBe('The app should not attempt to call getToken on callback. Authorize flow is already in process. Use parseFromUrl() to receive tokens.');
+    }
+  });
 });
 
 describe('token.getWithPopup', function() {
@@ -1340,6 +1362,28 @@ describe('token.getWithPopup', function() {
       }
     });
   });
+
+  it('should throw AuthSdkError when in callback state', async () => {
+    delete global.window.location;
+    global.window.location = {
+      protocol: 'https:',
+      hostname: 'somesite.local',
+      search: '?code=fakecode'
+    };
+    const client = new OktaAuth({
+      pkce: true,
+      issuer: 'https://auth-js-test.okta.com',
+      clientId: 'foo'
+    });
+
+    try {
+      await client.token.getWithPopup();
+    } catch (err) {
+      expect(err).toBeInstanceOf(AuthSdkError);
+      expect(err.message).toBe('The app should not attempt to call getToken on callback. Authorize flow is already in process. Use parseFromUrl() to receive tokens.');
+    }
+  });
+
 });
 
 describe('token.getWithRedirect', function() {
@@ -2129,6 +2173,27 @@ describe('token.getWithRedirect', function() {
                             'state=' + oauthUtil.mockedState + '&' +
                             'scope=openid%20email'
     });
+  });
+
+  it('should throw AuthSdkError when in callback state', async () => {
+    delete global.window.location;
+    global.window.location = {
+      protocol: 'https:',
+      hostname: 'somesite.local',
+      search: '?code=fakecode'
+    };
+    const client = new OktaAuth({
+      pkce: true,
+      issuer: 'https://auth-js-test.okta.com',
+      clientId: 'foo'
+    });
+
+    try {
+      await client.token.getWithRedirect();
+    } catch (err) {
+      expect(err).toBeInstanceOf(AuthSdkError);
+      expect(err.message).toBe('The app should not attempt to call getToken on callback. Authorize flow is already in process. Use parseFromUrl() to receive tokens.');
+    }
   });
 
 });

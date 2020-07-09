@@ -132,7 +132,8 @@ function OktaAuthBuilder(args) {
     revoke: util.bind(token.revokeToken, null, sdk),
     renew: util.bind(token.renewToken, null, sdk),
     getUserInfo: util.bind(token.getUserInfo, null, sdk),
-    verify: util.bind(token.verifyToken, null, sdk)
+    verify: util.bind(token.verifyToken, null, sdk),
+    isLoginRedirect: util.bind(oauthUtil.isLoginRedirect, null, sdk)
   };
   // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
   Object.keys(sdk.token).forEach(key => {

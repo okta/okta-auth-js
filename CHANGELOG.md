@@ -5,6 +5,7 @@
 ### Features
 
 -[#408](https://github.com/okta/okta-auth-js/pull/408) Provides a polyfill for IE 11+
+-[#410](https://github.com/okta/okta-auth-js/pull/410) Add `token.isLoginRedirect` function to prevent app from starting new Oauth flow while already in OAuth callback state.
 
 ## 3.1.4
 

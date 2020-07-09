@@ -593,6 +593,13 @@ function getWithPopup(sdk, options) {
 }
 
 function prepareOauthParams(sdk, options) {
+  if (oauthUtil.isLoginRedirect(sdk)) {
+    return Promise.reject(new AuthSdkError(
+      'The app should not attempt to call getToken on callback. ' +
+      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
+    ));
+  }
+
   // clone and prepare options
   options = util.clone(options) || {};
 
