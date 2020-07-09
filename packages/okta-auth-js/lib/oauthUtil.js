@@ -243,7 +243,7 @@ function hasCodeInUrl(hashOrSearch) {
  * Check if tokens or a code have been passed back into the url, which happens in
  * the social auth IDP redirect flow.
  */
-function isAuthCallback (sdk) {
+function isOAuthCallback (sdk) {
   var authParams = sdk.options;
   if (authParams.pkce || authParams.responseType === 'code' || authParams.responseMode === 'query') {
     // Look for code
@@ -268,5 +268,5 @@ module.exports = {
   isToken: isToken,
   addListener: addListener,
   removeListener: removeListener,
-  isAuthCallback: isAuthCallback
+  isOAuthCallback: isOAuthCallback
 };

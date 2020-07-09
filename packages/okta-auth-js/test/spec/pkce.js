@@ -64,7 +64,7 @@ describe('pkce', function() {
     it('throws an error if pkce is true and PKCE is not supported', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
       var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: false });
-      return token._prepareOauthParams(sdk, {
+      return token.prepareOauthParams(sdk, {
         pkce: true,
       })
       .then(function() {
@@ -93,7 +93,7 @@ describe('pkce', function() {
         spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve());
         
         var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
-        return token._prepareOauthParams(sdk, {
+        return token.prepareOauthParams(sdk, {
           responseType: 'token'
         })
         .then(function(params) {
@@ -109,7 +109,7 @@ describe('pkce', function() {
       spyOn(oauthUtil, 'getWellKnown').and.returnValue(Promise.resolve({
         'code_challenge_methods_supported': []
       }))
-      return token._prepareOauthParams(sdk, {})
+      return token.prepareOauthParams(sdk, {})
       .then(function() {
         expect(false).toBe(true); // should not reach this line
       })
@@ -132,7 +132,7 @@ describe('pkce', function() {
       spyOn(pkce, 'generateVerifier').and.returnValue(codeVerifier);
       spyOn(pkce, 'saveMeta');
       spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
-      return token._prepareOauthParams(sdk, {
+      return token.prepareOauthParams(sdk, {
         codeChallengeMethod: codeChallengeMethod
       })
       .then(function(oauthParams) {

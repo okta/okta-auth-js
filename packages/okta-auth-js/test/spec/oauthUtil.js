@@ -911,3 +911,97 @@ describe('validateClaims', function () {
     expect(fn).not.toThrowError();
   });
 });
+
+describe('isOAuthCallback', function() {
+  let sdk;
+  let originalLocation;
+  beforeEach(() => {
+    originalLocation = window.location;
+  });
+  afterEach(() => {
+    window.location = originalLocation;
+  });
+
+  describe('Implicit OIDC flow', () => {
+    beforeEach(() => {
+      sdk = new OktaAuth({
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'foo'
+      });
+    });
+
+    it('should return true if there is id_token in hash', () => {
+      delete window.location;
+      window.location = {
+        hash: '#id_token=fakeidtoken'
+      }
+      const result = oauthUtil.isOAuthCallback(sdk);
+      expect(result).toBe(true);
+    });
+
+    it('should return true if there is access_token in hash', () => {
+      delete window.location;
+      window.location = {
+        hash: '#access_token=fakeaccesstoken'
+      }
+      const result = oauthUtil.isOAuthCallback(sdk);
+      expect(result).toBe(true);
+    });
+
+    it('should return false if there is no id or access token in hash', () => {
+      delete window.location;
+      window.location = {
+        hash: '#random_token=fakerandomtoken'
+      }
+      const result = oauthUtil.isOAuthCallback(sdk);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('PKCE', () => {
+    it('there should be code in hash when responseMode is fragment', () => {
+      delete window.location;
+      window.location = {
+        hash: '#code=fakecode'
+      }
+      sdk = new OktaAuth({
+        pkce: true,
+        responseMode: 'fragment',
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'foo'
+      });
+      const result = oauthUtil.isOAuthCallback(sdk);
+      expect(result).toBe(true);
+    });
+
+    it('there should be code in query when use default responseMode', () => {
+      delete window.location;
+      window.location = {
+        search: '?code=fakecode'
+      }
+      sdk = new OktaAuth({
+        pkce: true,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'foo'
+      });
+      const result = oauthUtil.isOAuthCallback(sdk);
+      expect(result).toBe(true);
+    });
+
+    it('there should be code in query when responseMode is query', () => {
+      delete window.location;
+      window.location = {
+        search: '?code=fakecode'
+      }
+      sdk = new OktaAuth({
+        pkce: true,
+        responseMode: 'query',
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'foo'
+      });
+      const result = oauthUtil.isOAuthCallback(sdk);
+      expect(result).toBe(true);
+    });
+  });
+});
