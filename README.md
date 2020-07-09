@@ -1620,7 +1620,7 @@ authClient.token.getWithoutPrompt({
   authClient.tokenManager.add('idToken', tokens.idToken);
 })
 .catch(function(err) {
-  // handle OAuthError
+  // handle OAuthError or AuthSdkError
 });
 ```
 
@@ -1644,7 +1644,7 @@ authClient.token.getWithoutPrompt({
   authClient.tokenManager.add('idToken', tokens.idToken);
 })
 .catch(function(err) {
-  // handle OAuthError
+  // handle OAuthError or AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
 });
 ```
 
@@ -1663,7 +1663,7 @@ authClient.token.getWithPopup(options)
   authClient.tokenManager.add('idToken', tokens.idToken);
 })
 .catch(function(err) {
-  // handle OAuthError
+  // handle OAuthError or AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
 });
 ```
 
@@ -1677,6 +1677,9 @@ Create token using a redirect. After a successful authentication, the browser wi
 authClient.token.getWithRedirect({
   responseType: ['token', 'id_token'],
   state: 'any-string-you-want-to-pass-to-callback' // will be URI encoded
+})
+.catch(function(err) {
+  // handle AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
 });
 ```
 
@@ -1794,17 +1797,26 @@ By default, if no parameters are passed, both the access token and ID token obje
 authClient.token.getUserInfo()
 .then(function(user) {
   // user has details about the user
+})
+.catch(function(err) {
+  // handle OAuthError or AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
 });
 ```
 
 ```javascript
-// In this example, the access token is stored under the key 'myAccessToken'
-const accessTokenObject = authClient.tokenManager.get('myAccessToken');
-// In this example, the ID token is stored under the key "myIdToken"
-const idTokenObject = authClient.tokenManager.get('myIdToken');
-authClient.token.getUserInfo(accessTokenObject, idTokenObject)
+// In this example, the access token is stored under the key 'myAccessToken', the ID token is stored under the key "myIdToken"
+Promise.all([
+  authClient.tokenManager.get('myAccessToken'),
+  authClient.tokenManager.get('myAccessToken')
+])
+.then(([accessTokenObject, idTokenObject]) => {
+  return authClient.token.getUserInfo(accessTokenObject, idTokenObject);
+})
 .then(function(user) {
   // user has details about the user
+})
+.catch((err) => {
+  // handle AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
 });
 ```
 
@@ -1864,7 +1876,7 @@ authClient.tokenManager.get('idToken')
   }
 })
 .catch(function(err) {
-  // OAuth Error
+  // handle OAuthError or AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
   console.error(err);
 });
 ```
