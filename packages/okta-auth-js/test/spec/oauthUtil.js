@@ -912,7 +912,7 @@ describe('validateClaims', function () {
   });
 });
 
-describe('isOAuthCallback', function() {
+describe('isLoginRedirect', function() {
   let sdk;
   let originalLocation;
   beforeEach(() => {
@@ -936,7 +936,7 @@ describe('isOAuthCallback', function() {
       window.location = {
         hash: '#id_token=fakeidtoken'
       }
-      const result = oauthUtil.isOAuthCallback(sdk);
+      const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
@@ -945,7 +945,7 @@ describe('isOAuthCallback', function() {
       window.location = {
         hash: '#access_token=fakeaccesstoken'
       }
-      const result = oauthUtil.isOAuthCallback(sdk);
+      const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
@@ -954,7 +954,7 @@ describe('isOAuthCallback', function() {
       window.location = {
         hash: '#random_token=fakerandomtoken'
       }
-      const result = oauthUtil.isOAuthCallback(sdk);
+      const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(false);
     });
   });
@@ -971,7 +971,7 @@ describe('isOAuthCallback', function() {
         issuer: 'https://auth-js-test.okta.com',
         clientId: 'foo'
       });
-      const result = oauthUtil.isOAuthCallback(sdk);
+      const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
@@ -985,7 +985,7 @@ describe('isOAuthCallback', function() {
         issuer: 'https://auth-js-test.okta.com',
         clientId: 'foo'
       });
-      const result = oauthUtil.isOAuthCallback(sdk);
+      const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
@@ -1000,7 +1000,7 @@ describe('isOAuthCallback', function() {
         issuer: 'https://auth-js-test.okta.com',
         clientId: 'foo'
       });
-      const result = oauthUtil.isOAuthCallback(sdk);
+      const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
   });

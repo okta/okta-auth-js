@@ -116,7 +116,7 @@ function get(storage, key) {
 
 function getAsync(sdk, tokenMgmtRef, storage, key) {
   return new Promise(function(resolve, reject) {
-    if (tokenMgmtRef.options.autoRenew && oauthUtil.isOAuthCallback(sdk)) {
+    if (tokenMgmtRef.options.autoRenew && oauthUtil.isLoginRedirect(sdk)) {
       return reject(new AuthSdkError(
         'The app should not attempt to call authorize API on callback. ' + 
         'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'

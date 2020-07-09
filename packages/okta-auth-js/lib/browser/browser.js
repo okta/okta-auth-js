@@ -132,7 +132,8 @@ function OktaAuthBuilder(args) {
     revoke: util.bind(token.revokeToken, null, sdk),
     renew: util.bind(token.renewToken, null, sdk),
     getUserInfo: util.bind(token.getUserInfo, null, sdk),
-    verify: util.bind(token.verifyToken, null, sdk)
+    verify: util.bind(token.verifyToken, null, sdk),
+    isLoginRedirect: util.bind(oauthUtil.isLoginRedirect, null, sdk)
   };
   // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
   Object.keys(sdk.token).forEach(key => {
@@ -175,10 +176,6 @@ function OktaAuthBuilder(args) {
   sdk.emitter = new Emitter();
   sdk.tokenManager = new TokenManager(sdk, args.tokenManager);
   sdk.tokenManager.on('error', this._onTokenManagerError, this);
-
-  sdk.oauthUtil = {
-    isOAuthCallback: util.bind(oauthUtil.isOAuthCallback, null, sdk)
-  };
 }
 
 var proto = OktaAuthBuilder.prototype;
