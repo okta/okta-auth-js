@@ -1808,7 +1808,7 @@ authClient.token.getUserInfo()
 // In this example, the access token is stored under the key 'myAccessToken', the ID token is stored under the key "myIdToken"
 Promise.all([
   authClient.tokenManager.get('myAccessToken'),
-  authClient.tokenManager.get('myAccessToken')
+  authClient.tokenManager.get('myIdToken')
 ])
 .then(([accessTokenObject, idTokenObject]) => {
   return authClient.token.getUserInfo(accessTokenObject, idTokenObject);
