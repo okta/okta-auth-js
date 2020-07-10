@@ -406,7 +406,6 @@ var config = {
 * [unlockAccount](#unlockaccountoptions)
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [webfinger](#webfingeroptions)
-* [fingerprint](#fingerprintoptions)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -453,7 +452,6 @@ The goal of an authentication flow is to [set an Okta session cookie on the user
 
 * `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
 * `password` - The password of the user
-* `sendFingerprint` - Enabling this will send a `X-Device-Fingerprint` header. Defaults to `false`. See [Primary authentication with device fingerprint](https://developer.okta.com/docs/reference/api/authn/#primary-authentication-with-device-fingerprinting) for more information on the `X-Device-Fingerprint` header.
 
 ```javascript
 authClient.signIn({
@@ -646,22 +644,6 @@ authClient.webfinger({
 .catch(function(err) {
   console.error(err);
 });
-```
-
-### `fingerprint(options)`
-
-Creates a browser fingerprint. See [Primary authentication with device fingerprint](https://developer.okta.com/docs/reference/api/authn/#primary-authentication-with-device-fingerprinting) for more information.
-
-* `timeout` - Time in ms until the operation times out. Defaults to `15000`.
-
-```javascript
-authClient.fingerprint()
-.then(function(fingerprint) {
-  // Do something with the fingerprint
-})
-.catch(function(err) {
-  console.log(err);
-})
 ```
 
 ### `tx.resume()`

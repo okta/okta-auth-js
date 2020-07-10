@@ -355,10 +355,6 @@ util.mockGetLocation = function (client, mockLocation) {
   jest.spyOn(client.token.parseFromUrl, '_getLocation').mockReturnValue(mockLocation);
 };
 
-util.mockUserAgent = function (client, mockUserAgent) {
-  jest.spyOn(client.fingerprint, '_getUserAgent').mockReturnValue(mockUserAgent);
-};
-
 util.expectErrorToEqual = function (actual, expected) {
   expect(actual.name).toEqual(expected.name);
   expect(actual.message).toEqual(expected.message);

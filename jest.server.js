@@ -17,7 +17,6 @@ module.exports = {
     './test/spec/browser.js',
     './test/spec/browserStorage.js',
     './test/spec/cookies.js',
-    './test/spec/fingerprint.js',
     './test/spec/general.js',
     './test/spec/oauthUtil.js',
     './test/spec/token.js',
