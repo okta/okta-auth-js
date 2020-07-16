@@ -1969,14 +1969,6 @@ authClient.tokenManager.on('error', function (err) {
 **NOTE**: If you manage the tokens state outside of this SDK, subscribe to `expired` event published by the `tokenManager` to get tokens properly renewed .
 
 ```javascript
-// autoRenew set to true
-authClient.tokenManager.on('expired', function(key, expiredToken) {
-  // retrieves a new valid token with tokenManager.get
-  const token = await authClient.tokenManager.get(key);
-  // manage the new token state
-});
-
-// autoRenew set to false
 authClient.tokenManager.on('expired', function(key, expiredToken) {
   // get a renewed token with tokenManager.renew
   const token = await authClient.tokenManager.renew(key);
