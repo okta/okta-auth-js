@@ -1966,7 +1966,7 @@ authClient.tokenManager.on('error', function (err) {
 });
 ```
 
-**NOTE**: If you manage the tokens state outside of this SDK, subscribe to `expired` event published by the `tokenManager` to get tokens properly renewed .
+**NOTE**: If you manage the tokens' state outside of this SDK, subscribe to `expired` event published by the `tokenManager` to get tokens properly renewed .
 
 ```javascript
 authClient.tokenManager.on('expired', function(key, expiredToken) {
