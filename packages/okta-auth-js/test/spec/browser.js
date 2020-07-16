@@ -144,10 +144,12 @@ describe('Browser', function() {
     it('will read from TokenManager and call token.revoke', function() {
       var accessToken = { accessToken: 'fake' };
       spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
+      spyOn(auth.tokenManager, 'remove').and.returnValue(Promise.resolve(accessToken));
       spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
       return auth.revokeAccessToken()
         .then(function() {
           expect(auth.tokenManager.get).toHaveBeenCalledWith('accessToken');
+          expect(auth.tokenManager.remove).toHaveBeenCalledWith('accessToken');
           expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
         });
     });

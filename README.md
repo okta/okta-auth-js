@@ -1870,7 +1870,7 @@ authClient.token.getWithPopup()
 
 #### `tokenManager.get(key)`
 
-Get a token that you have previously added to the `tokenManager` with the given `key`. The token object will be returned if it has not expired.
+Returns a Promise that resolves with a valid token that paired with the given `key` in the `tokenManager`.
 
 * `key` - Key for the token you want to get
 
@@ -1963,6 +1963,24 @@ authClient.tokenManager.on('error', function (err) {
     // The application should return to an unauthenticated state
     // This error can also be handled using the 'onSessionExpired' option
   }
+});
+```
+
+**NOTE**: If you manage the tokens state outside of this SDK, subscribe to `expired` event published by the `tokenManager` to get tokens properly renewed .
+
+```javascript
+// autoRenew set to true
+authClient.tokenManager.on('expired', function(key, expiredToken) {
+  // retrieves a new valid token with tokenManager.get
+  const token = await authClient.tokenManager.get(key);
+  // manage the new token state
+});
+
+// autoRenew set to false
+authClient.tokenManager.on('expired', function(key, expiredToken) {
+  // get a renewed token with tokenManager.renew
+  const token = await authClient.tokenManager.renew(key);
+  // manage the new token state
 });
 ```
 
