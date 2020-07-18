@@ -75,7 +75,7 @@
     "karma-jquery": "^0.2.3",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
-    "lodash": "4.17.11",
+    "lodash": "4.17.19",
     "promise.allsettled": "^1.0.1",
     "text-encoding": "^0.7.0",
     "webcrypto-shim": "^0.1.5",
