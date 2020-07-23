@@ -1,5 +1,11 @@
 # Changelog
 
+## 3,2.1
+
+### Bug Fixes
+
+- [#431](https://github.com/okta/okta-auth-js/pull/431) Skip non parsable iframe messages for `sdk.fingerprint`
+
 ## 3.2.0
 
 ### Features
