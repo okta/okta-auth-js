@@ -365,7 +365,10 @@ proto.fingerprint = function(options) {
       try {
         var msg = JSON.parse(e.data);
       } catch (err) {
-        return reject(new AuthSdkError('Unable to parse iframe response'));
+        // iframe messages should all be parsable
+        // skip not parsable messages come from other sources in same origin (browser extensions)
+        // TODO: add namespace flag in okta-core to distinguish messages that come from other sources
+        return;
       }
 
       if (!msg) { return; }
