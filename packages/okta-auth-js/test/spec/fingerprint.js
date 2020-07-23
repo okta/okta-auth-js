@@ -109,16 +109,6 @@ describe('fingerprint', function() {
     });
   });
 
-  it('fails if the iframe sends invalid message content', function () {
-    return setup({ firstMessage: 'invalidMessageContent' }).fingerprint()
-    .then(function() {
-      throw new Error('Fingerprint promise should have been rejected');
-    })
-    .catch(function(err) {
-      util.assertAuthSdkError(err, 'Unable to parse iframe response');
-    });
-  });
-
   it('fails if user agent is not defined', function () {
     return setup({ userAgent: '' }).fingerprint()
     .then(function() {
@@ -208,20 +198,5 @@ describe('fingerprint', function() {
         sendFingerprint: false
       });
     }
-  });
-
-  it('fails signIn request if fingerprinting fails', function() {
-    return setup({ firstMessage: 'invalidMessageContent' })
-    .signIn({
-      username: 'not',
-      password: 'real',
-      sendFingerprint: true
-    })
-    .then(function() {
-      throw new Error('signIn promise should have been rejected');
-    })
-    .catch(function(err) {
-      util.assertAuthSdkError(err, 'Unable to parse iframe response');
-    });
   });
 });
