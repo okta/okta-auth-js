@@ -16,7 +16,18 @@
 
 import { isPromise } from './util';
 
+interface QueueItem {
+  method: Function;
+  thisObject: object;
+  args: any[];
+  resolve: Function;
+  reject: Function;
+}
+
 class PromiseQueue {
+  queue: QueueItem[];
+  running: boolean;
+
   constructor() {
     this.queue = [];
     this.running = false;

@@ -11,12 +11,18 @@
  */
 
 export default class SdkClock {
-  static create: () => SdkClock;
   localOffset: number;
 
   constructor(localOffset) {
     // Calculated local clock offset from server time (in milliseconds). Can be positive or negative.
     this.localOffset = parseInt(localOffset || 0);
+  }
+
+  // factory method. Create an instance of a clock from current context.
+  static create(/* sdk, options */): SdkClock {
+    // TODO: calculate localOffset
+    var localOffset = 0;
+    return new SdkClock(localOffset);
   }
 
   // Return the current time (in seconds)
@@ -25,10 +31,3 @@ export default class SdkClock {
     return now;
   }
 }
-
-// factory method. Create an instance of a clock from current context.
-SdkClock.create = function(/* sdk, options */) {
-  // TODO: calculate localOffset
-  var localOffset = 0;
-  return new SdkClock(localOffset);
-};

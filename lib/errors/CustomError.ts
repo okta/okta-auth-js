@@ -10,12 +10,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export default class AuthPollStopError extends Error {
-  constructor() {
-    const message = 'The poll was stopped by the sdk';
+export default class CustomError extends Error {
+  constructor(message: string) {
+    // https://stackoverflow.com/questions/41102060/typescript-extending-error-class
     super(message); // 'Error' breaks prototype chain here
     Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
-
-    this.name = 'AuthPollStopError';
   }
 }

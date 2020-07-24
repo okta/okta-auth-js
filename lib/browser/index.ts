@@ -8,16 +8,11 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
+ *
  */
 
-export default class OAuthError extends Error {
-  constructor(errorCode, summary) {
-    super(summary); // 'Error' breaks prototype chain here
-    Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
-
-    this.name = 'OAuthError';
-    this.errorCode = errorCode;
-    this.errorSummary = summary;
-  }
-}
-
+export { default as OktaAuth } from './browser';
+export * from '../types';
+export * from '../tx';
+export * from '../errors';
+export * from '../TokenManager';

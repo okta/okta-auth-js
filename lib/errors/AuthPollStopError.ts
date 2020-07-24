@@ -10,19 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export default class AuthSdkError extends Error {
-  constructor(msg, xhr = null) {
-    super(msg); // 'Error' breaks prototype chain here
-    Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
+import CustomError from './CustomError';
 
-    this.name = 'AuthSdkError';
-    this.errorCode = 'INTERNAL';
-    this.errorSummary = msg;
-    this.errorLink = 'INTERNAL';
-    this.errorId = 'INTERNAL';
-    this.errorCauses = [];
-    if (xhr) {
-      this.xhr = xhr;
-    }
+export default class AuthPollStopError extends CustomError {
+  constructor() {
+    const message = 'The poll was stopped by the sdk';
+    super(message);
   }
 }

@@ -10,11 +10,20 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export default class AuthApiError extends Error {
-  constructor(err, xhr = null) {
+import CustomError from './CustomError';
+import { APIError } from '../types';
+
+export default class AuthApiError extends CustomError implements APIError {
+  errorSummary: string;
+  errorCode: string;
+  errorLink: string;
+  errorId: string;
+  errorCauses: string[];
+  xhr?: XMLHttpRequest;
+
+  constructor(err: APIError, xhr?: XMLHttpRequest) {
     const message = err.errorSummary;
-    super(message); // 'Error' breaks prototype chain here
-    Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
+    super(message);
 
     this.name = 'AuthApiError';
     this.errorSummary = err.errorSummary;

@@ -26,6 +26,14 @@ export interface OktaAuth {
   token?: TokenAPI;
 }
 
+export interface APIError {
+  errorSummary: string;
+  errorCode: string;
+  errorLink: string;
+  errorId: string;
+  errorCauses: string[];
+}
+
 // Transaction API
 
 export type TransactionExistsFunction = () => boolean;

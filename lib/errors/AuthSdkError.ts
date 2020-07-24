@@ -9,15 +9,28 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
-module.exports = {
-  'STATE_TOKEN_KEY_NAME': 'oktaStateToken',
-  'DEFAULT_POLLING_DELAY': 500,
-  'DEFAULT_MAX_CLOCK_SKEW': 300,
-  'DEFAULT_CACHE_DURATION': 86400,
-  'REDIRECT_OAUTH_PARAMS_COOKIE_NAME': 'okta-oauth-redirect-params',
-  'REDIRECT_STATE_COOKIE_NAME': 'okta-oauth-state',
-  'REDIRECT_NONCE_COOKIE_NAME': 'okta-oauth-nonce',
-  'TOKEN_STORAGE_NAME': 'okta-token-storage',
-  'CACHE_STORAGE_NAME': 'okta-cache-storage',
-  'PKCE_STORAGE_NAME': 'okta-pkce-storage'
-};
+
+import CustomError from './CustomError';
+import { APIError } from '../types';
+
+export default class AuthSdkError extends CustomError implements APIError {
+  errorSummary: string;
+  errorCode: string;
+  errorLink: string;
+  errorId: string;
+  errorCauses: string[];
+  xhr?: XMLHttpRequest;
+
+  constructor(msg: string, xhr?: XMLHttpRequest) {
+    super(msg);
+    this.name = 'AuthSdkError';
+    this.errorCode = 'INTERNAL';
+    this.errorSummary = msg;
+    this.errorLink = 'INTERNAL';
+    this.errorId = 'INTERNAL';
+    this.errorCauses = [];
+    if (xhr) {
+      this.xhr = xhr;
+    }
+  }
+}

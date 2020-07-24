@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
  *
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
@@ -8,11 +8,20 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- *
  */
 
-import OktaAuthNode from './server';
-export { OktaAuthNode as OktaAuth };
-export * from '../types';
-export * from '../tx';
-export * from '../errors';
+import CustomError from './CustomError';
+
+export default class OAuthError extends CustomError {
+  errorCode: string;
+  errorSummary: string;
+
+  constructor(errorCode: string, summary: string) {
+    super(summary);
+
+    this.name = 'OAuthError';
+    this.errorCode = errorCode;
+    this.errorSummary = summary;
+  }
+}
+

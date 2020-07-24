@@ -28,6 +28,7 @@
   "include": [
     "types/**/*.ts",
     "lib/**/*.js",
+    "lib/**/*.ts",
   ],
   "exclude": [
     "node_modules",
