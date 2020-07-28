@@ -1,5 +1,9 @@
 # Changelog
 
+## PENDING
+
+- [#413](https://github.com/okta/okta-auth-js/pull/413) Adds support for Typescript. Uses named exports instead of default export.
+
 ## 3,2.1
 
 ### Bug Fixes

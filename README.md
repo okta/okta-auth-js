@@ -16,6 +16,7 @@
 * [API Reference](#api-reference)
 * [Building the SDK](#building-the-sdk)
 * [Node JS and React Native Usage](#node-js-and-react-native-usage)
+* [Migrating from previous versions](#migrating-from-previous-versions)
 * [Contributing](#contributing)
 
 The Okta Auth JavaScript SDK builds on top of our [Authentication API](https://developer.okta.com/docs/api/resources/authn) and [OpenID Connect & OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
@@ -24,10 +25,13 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
+## Release Status
+
 :heavy_check_mark: The current stable major version series is: `3.x`
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
+| `4.x`     | :fire: Latest release            |
 | `3.x`     | :heavy_check_mark: Stable        |
 | `2.x`     | :warning: Retiring on 2020-09-30 |
 | `1.x`     | :x: Retired                      |
@@ -138,10 +142,17 @@ npm install --save @okta/okta-auth-js
 
 If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.min.js` file in a `<script>` tag.  
 
-However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module using CommonJS.
+However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module or require using CommonJS.
 
 ```javascript
-var OktaAuth = require('@okta/okta-auth-js');
+// ES module
+import { OktaAuth } from '@okta/okta-auth-js'
+const authClient = new OktaAuth(/* configOptions */)
+```
+
+```javascript
+// CommonJS
+var OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 var authClient = new OktaAuth(/* configOptions */);
 ```
 
@@ -153,6 +164,39 @@ For an overview of the client's features and authentication flows, check out [ou
 * Get an Okta session
 
 You can also browse the full [API reference documentation](#api-reference).
+
+### Usage with Typescript
+
+Types are implicitly provided by this library through the `types` entry in `package.json`. Types can also be referenced explicitly by importing them.
+
+```typescript
+import {
+  OktaAuth,
+  OktaAuthOptions,
+  TokenManager,
+  AccessToken,
+  IDToken,
+  UserClaims,
+  TokenParams
+} from '@okta/okta-auth-js'
+
+const config: OktaAuthOptions = {
+  issuer: 'https://{yourOktaDomain}'
+}
+
+const authClient: OktaAuth = new OktaAuth(config)
+const tokenManager: TokenManager = authClient.tokenManager;
+const accessToken: AccessToken = await tokenManager.get('accessToken') as AccessToken;
+const idToken: IDToken = await tokenManager.get('idToken') as IDToken;
+const userInfo: UserClaims = await authClient.getUserInfo(accessToken, idToken);
+
+if (!userInfo) {
+  const tokenParams: TokenParams = {
+    scopes: ['openid', 'email', 'custom_scope'],
+  }
+  authClient.token.getWithRedirect(tokenParams);
+}
+```
 
 ## Configuration reference
 
@@ -2063,6 +2107,48 @@ Before running the E2E tests, you will need to setup a test environment. See [te
 We have implemented a small SPA app, located at `./test/app/` which is used internally as a test harness for the E2E tests. The app can be run manually using `yarn start`. This will start a webpack dev server and open a new browser window at `http://localhost:8080`. The app provides a high level of feedback and configurability which make it useful as a tool for troubleshooting and manual testing scenarios. See [test/app/README](test/app/README.md) for more information on the test app.
 
 Because this test app is set up to dynamically change configuration and leak internal information, users should not use this test app as the basis for their own applications. Instead, use the example usage outlined elsewhere in this README.
+
+## Migrating from previous versions
+
+The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the original PR.
+
+### From 3.x to 4.x
+
+* Now using named exports. You should change code like
+
+```javascript
+import OktaAuth from '@okta/okta-auth-js'
+```
+
+to
+
+```javascript
+import { OktaAuth } from '@okta/okta-auth-js'
+```
+
+If using CommonJS, change
+
+```javascript
+const OktaAuth = require('@okta/okta-auth-js');
+```
+
+to
+
+```javascript
+const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
+```
+
+* Typescript definitions are now included. If you were providing your own definitions for `OktaAuth` you should remove these in favor of the types exported by this library.
+
+### From 2.x to 3.x
+
+* Option `issuer` is [required](README.md#configuration-reference). Option `url` has been deprecated and is no longer used.
+
+* The object returned from `token.parseFromUrl()` is no longer an array containing token objects. It is now an object with a property called `tokens` which is a dictionary containing token objects.
+
+* New behavior for [signOut()](README.md#signout).
+
+* The default `responseMode` for PKCE flow is now `query`.
 
 ## Contributing
 
