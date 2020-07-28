@@ -27,12 +27,12 @@ This library uses semantic versioning and follows Okta's [library version policy
 
 ## Release Status
 
-:heavy_check_mark: The current stable major version series is: `3.x`
+:heavy_check_mark: The current stable major version series is: `4.x`
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
-| `4.x`     | :fire: Latest release            |
-| `3.x`     | :heavy_check_mark: Stable        |
+| `4.x`     | :heavy_check_mark: Stable        |
+| `3.x`     | :warning: Retiring on 2021-05-30 |
 | `2.x`     | :warning: Retiring on 2020-09-30 |
 | `1.x`     | :x: Retired                      |
 | `0.x`     | :x: Retired                      |
@@ -2117,28 +2117,32 @@ The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the 
 * Now using named exports. You should change code like
 
 ```javascript
+// 3.x used default export
 import OktaAuth from '@okta/okta-auth-js'
 ```
 
 to
 
 ```javascript
+// 4.x uses named exports
 import { OktaAuth } from '@okta/okta-auth-js'
 ```
 
 If using CommonJS, change
 
 ```javascript
+// In 3.x module.exports was the OktaAuth object
 const OktaAuth = require('@okta/okta-auth-js');
 ```
 
 to
 
 ```javascript
+// In 4.x module.exports has a property named 'OktaAauth'
 const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 ```
 
-* Typescript definitions are now included. If you were providing your own definitions for `OktaAuth` you should remove these in favor of the types exported by this library.
+* For Typescript users: definitions for types in this library are now included. If you were providing your own definitions for `@okta/okta-auth-js` you should remove these in favor of the types exported by this library.
 
 ### From 2.x to 3.x
 
