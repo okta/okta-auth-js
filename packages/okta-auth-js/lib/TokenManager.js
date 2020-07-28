@@ -18,7 +18,6 @@ var storageUtil = require('./browser/browserStorage');
 var constants = require('./constants');
 var storageBuilder = require('./storageBuilder');
 var SdkClock = require('./clock');
-var oauthUtil = require('./oauthUtil');
 
 var DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -31,13 +30,12 @@ function getExpireTime(tokenMgmtRef, token) {
   return expireTime;
 }
 
-function hasExpired(tokenMgmtRef, token) {
-  var expireTime = getExpireTime(tokenMgmtRef, token);
-  return expireTime <= tokenMgmtRef.clock.now();
-}
-
 function emitExpired(tokenMgmtRef, key, token) {
   tokenMgmtRef.emitter.emit('expired', key, token);
+}
+
+function emitRemoved(tokenMgmtRef, key) {
+  tokenMgmtRef.emitter.emit('removed', key);
 }
 
 function emitError(tokenMgmtRef, error) {
@@ -116,23 +114,8 @@ function get(storage, key) {
 
 function getAsync(sdk, tokenMgmtRef, storage, key) {
   return new Promise(function(resolve, reject) {
-    if (tokenMgmtRef.options.autoRenew && oauthUtil.isLoginRedirect(sdk)) {
-      return reject(new AuthSdkError(
-        'The app should not attempt to call authorize API on callback. ' + 
-        'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
-      ));
-    }
-
     var token = get(storage, key);
-    if (!token || !hasExpired(tokenMgmtRef, token)) {
-      return resolve(token);
-    }
-
-    var tokenPromise = tokenMgmtRef.options.autoRenew
-      ? renew(sdk, tokenMgmtRef, storage, key)
-      : remove(tokenMgmtRef, storage, key);
-
-    return resolve(tokenPromise);
+    return resolve(token);
   });
 }
 
@@ -144,6 +127,8 @@ function remove(tokenMgmtRef, storage, key) {
   var tokenStorage = storage.getStorage();
   delete tokenStorage[key];
   storage.setStorage(tokenStorage);
+
+  emitRemoved(tokenMgmtRef, key);
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {
@@ -284,6 +269,15 @@ function TokenManager(sdk, options) {
   this.renew = util.bind(renew, this, sdk, tokenMgmtRef, storage);
   this.on = util.bind(tokenMgmtRef.emitter.on, tokenMgmtRef.emitter);
   this.off = util.bind(tokenMgmtRef.emitter.off, tokenMgmtRef.emitter);
+
+  this._onTokenExpiredHandler = (key) => {
+    if (options.autoRenew) {
+      this.renew(key);
+    } else {
+      this.remove(key);
+    }
+  }
+  this.on('expired', this._onTokenExpiredHandler);
 
   setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
 }
