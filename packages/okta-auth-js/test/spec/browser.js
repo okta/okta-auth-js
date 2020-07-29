@@ -4,6 +4,7 @@ jest.mock('cross-fetch');
 var Emitter = require('tiny-emitter');
 var OktaAuth = require('../../lib/browser/browserIndex');
 var AuthApiError = require('../../lib/errors/AuthApiError');
+var constants = require('../../lib/constants');
 
 describe('Browser', function() {
   let auth;
@@ -147,7 +148,7 @@ describe('Browser', function() {
       spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
       return auth.revokeAccessToken()
         .then(function() {
-          expect(auth.tokenManager.get).toHaveBeenCalledWith('accessToken');
+          expect(auth.tokenManager.get).toHaveBeenCalledWith(constants.ACCESS_TOKEN_STORAGE_KEY);
           expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
         });
     });
@@ -236,9 +237,9 @@ describe('Browser', function() {
 
       function initSpies() {
         spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === 'idToken') {
+          if (key === constants.ID_TOKEN_STORAGE_KEY) {
             return idToken;
-          } else if (key === 'token') {
+          } else if (key === constants.ACCESS_TOKEN_STORAGE_KEY) {
             return accessToken;
           } else {
             throw new Error(`Unknown token key: ${key}`);
@@ -258,8 +259,8 @@ describe('Browser', function() {
       it('Default options: will revokeAccessToken and use window.location.href for postLogoutRedirectUri', function() {
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'idToken');
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, 'token');
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ID_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, constants.ACCESS_TOKEN_STORAGE_KEY);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).not.toHaveBeenCalled();
@@ -285,7 +286,7 @@ describe('Browser', function() {
         return auth.signOut({ idToken: customToken })
           .then(function() {
             expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'token');
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ACCESS_TOKEN_STORAGE_KEY);
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${customToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -294,7 +295,7 @@ describe('Browser', function() {
         return auth.signOut({ idToken: false })
           .then(function() {
             expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'token');
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ACCESS_TOKEN_STORAGE_KEY);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.reload).toHaveBeenCalled();
           });
@@ -338,7 +339,7 @@ describe('Browser', function() {
         return auth.signOut({ revokeAccessToken: false })
           .then(function() {
             expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'idToken');
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ID_TOKEN_STORAGE_KEY);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -348,7 +349,7 @@ describe('Browser', function() {
         return auth.signOut({ accessToken: false })
           .then(function() {
             expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'idToken');
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ID_TOKEN_STORAGE_KEY);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -361,9 +362,9 @@ describe('Browser', function() {
       beforeEach(() => {
         accessToken = { accessToken: 'fake' };
         spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === 'idToken') {
+          if (key === constants.ID_TOKEN_STORAGE_KEY) {
             return;
-          } else if (key === 'token') {
+          } else if (key === constants.ACCESS_TOKEN_STORAGE_KEY) {
             return accessToken;
           } else {
             throw new Error(`Unknown token key: ${key}`);
@@ -377,8 +378,8 @@ describe('Browser', function() {
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'idToken');
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, 'token');
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ID_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, constants.ACCESS_TOKEN_STORAGE_KEY);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -434,9 +435,9 @@ describe('Browser', function() {
       beforeEach(() => {
         idToken = { idToken: 'fake' };
         spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === 'idToken') {
+          if (key === constants.ID_TOKEN_STORAGE_KEY) {
             return idToken;
-          } else if (key === 'token') {
+          } else if (key === constants.ACCESS_TOKEN_STORAGE_KEY) {
             return;
           } else {
             throw new Error(`Unknown token key: ${key}`);
