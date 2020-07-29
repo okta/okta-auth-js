@@ -262,7 +262,7 @@ proto.closeSession = function closeSession() {
 proto.revokeAccessToken = async function revokeAccessToken(accessToken) {
   var sdk = this;
   if (!accessToken) {
-    accessToken = await sdk.tokenManager.get('accessToken');
+    accessToken = await sdk.tokenManager.get(constants.ACCESS_TOKEN_STORAGE_KEY);
   }
   // Access token may have been removed. In this case, we will silently succeed.
   if (!accessToken) {
@@ -289,11 +289,11 @@ proto.signOut = async function (options) {
   var logoutUrl = oauthUtil.getOAuthUrls(sdk).logoutUrl;
 
   if (typeof idToken === 'undefined') {
-    idToken = await sdk.tokenManager.get('idToken');
+    idToken = await sdk.tokenManager.get(constants.ID_TOKEN_STORAGE_KEY);
   }
 
   if (revokeAccessToken && typeof accessToken === 'undefined') {
-    accessToken = await sdk.tokenManager.get('token');
+    accessToken = await sdk.tokenManager.get(constants.ACCESS_TOKEN_STORAGE_KEY);
   }
 
   // Clear all local tokens
