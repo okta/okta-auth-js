@@ -5,9 +5,12 @@
   "version": "4.0.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
-  "main": "lib/server/index.js",
+  "type": "commonjs",
+  "main": "cjs/server/index.js",
+  "module": "lib/server/index.js",
   "browser": "bundles/okta-auth-js.umd.js",
   "react-native": "lib/server/index.js",
+  "types": "lib/browser/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
@@ -22,6 +25,7 @@
     "dev": "webpack --config webpack.dev.config.js",
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",
+    "validate": "yarn tsc --noEmit && yarn lint && yarn --cwd test/app validate",
     "test": "yarn test:unit && yarn test:e2e && yarn test:e2e:saucelabs",
     "test:unit": "yarn test:karma && yarn test:browser && yarn test:server",
     "test:e2e": "yarn --cwd test/e2e start",
@@ -32,7 +36,7 @@
     "test:report": "yarn test --ci --silent || true",
     "build": "node build.js",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
-    "build:server": "cross-env babel lib -d dist/lib --config-file ./babel.node.json",
+    "build:server": "cross-env babel lib -d dist/cjs --config-file ./babel.node.json --extensions \".ts\",\".js\"",
     "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
     "prepare": "yarn build",
     "start": "yarn --cwd test/app start --open"
@@ -70,9 +74,16 @@
   "devDependencies": {
     "@babel/cli": "^7.8.0",
     "@babel/core": "^7.8.0",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@babel/plugin-transform-modules-commonjs": "^7.10.1",
     "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/plugin-transform-typescript": "^7.10.5",
     "@babel/preset-env": "^7.8.2",
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/jest": "^25.2.3",
+    "@types/node": "^14.0.3",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-add-module-exports": "^1.0.2",
@@ -83,6 +94,7 @@
     "eslint": "^7.1.0",
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-jasmine": "^2.10.1",
+    "eslint-plugin-jsdoc": "^25.4.2",
     "eslint-plugin-node": "^11.1.0",
     "globby": "^6.1.0",
     "istanbul-instrumenter-loader": "^3.0.1",
@@ -101,7 +113,9 @@
     "lodash": "4.17.11",
     "promise.allsettled": "^1.0.1",
     "shelljs": "0.8.3",
-    "webpack": "^3.0.0"
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.6",
+    "webpack": "^4.43.0"
   },
   "jest-junit": {
     "outputDirectory": "./build2/reports/unit/",

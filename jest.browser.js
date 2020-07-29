@@ -8,10 +8,10 @@ module.exports = {
   },
   'restoreMocks': true,
   'moduleNameMapper': {
-    '^OktaAuth(.*)$': OktaAuth
+    '^@okta/okta-auth-js$': OktaAuth
   },
   'testMatch': [
-    '**/test/spec/*.js'
+    '**/test/spec/*.{js,ts}'
   ],
   'roots': [
     'test/spec'

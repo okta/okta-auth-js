@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "composite": false,
+    "module": "es6",
+    "target": "es6",
+    "allowJs": true,
+    "checkJs": true,
+    "moduleResolution": "node",
+    "alwaysStrict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": false,
+    "skipLibCheck": false,
+    "rootDir": "./",
+    "baseUrl": "./"
+  },
+  "files": [
+    "package.json"
+  ],
+  "include": [
+    "types/**/*.ts",
+    "lib/**/*.js",
+    "lib/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "build2"
+  ]
+}

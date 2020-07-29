@@ -4,7 +4,7 @@ module.exports = {
   'coverageDirectory': '<rootDir>/build2/reports/coverage',
   'restoreMocks': true,
   'moduleNameMapper': {
-    '^OktaAuth(.*)$': OktaAuth
+    '^@okta/okta-auth-js$': OktaAuth
   },
   'testMatch': [
     '**/test/spec/*.js'
@@ -20,6 +20,7 @@ module.exports = {
     './test/spec/fingerprint.js',
     './test/spec/general.js',
     './test/spec/oauthUtil.js',
+    './test/spec/session.js',
     './test/spec/token.js',
     './test/spec/tokenManager.js',
     './test/spec/webfinger.js',

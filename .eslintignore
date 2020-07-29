@@ -1,4 +1,7 @@
 /test/support/xhr
+/test/app/public
 node_modules
 /dist/bundles
 /dist/lib
+/dist/types
+/dist/cjs

@@ -1,3 +1,4 @@
 node_modules/
 .yalc
 *.log
+public/oidc-app.js*

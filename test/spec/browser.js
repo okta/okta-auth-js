@@ -3,9 +3,7 @@
 jest.mock('cross-fetch');
 
 import Emitter from 'tiny-emitter';
-import OktaAuth from '../../lib/browser';
-import AuthApiError from '../../lib/errors/AuthApiError';
-import { ACCESS_TOKEN_STORAGE_KEY, ID_TOKEN_STORAGE_KEY } from '../../lib/constants';
+import { OktaAuth, AuthApiError, ACCESS_TOKEN_STORAGE_KEY, ID_TOKEN_STORAGE_KEY } from '@okta/okta-auth-js';
 
 describe('Browser', function() {
   let auth;
@@ -312,7 +310,7 @@ describe('Browser', function() {
         return auth.signOut({ idToken: false })
           .then(function() {
             expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ACCESS_TOKEN_STORAGE_KEY);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.reload).toHaveBeenCalled();
           });
@@ -395,8 +393,8 @@ describe('Browser', function() {
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ID_TOKEN_STORAGE_KEY);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, constants.ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ID_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, ACCESS_TOKEN_STORAGE_KEY);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();

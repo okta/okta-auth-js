@@ -2,8 +2,7 @@
 require('jasmine-ajax');
 
 import tokens from '@okta/test.support/tokens';
-import AuthSdkError from '../../../lib/errors/AuthSdkError';
-
+import { AuthSdkError } from '@okta/okta-auth-js';
 import { TestApp } from '@okta/test.app';
 import waitFor from '@okta/test.support/waitFor';
 

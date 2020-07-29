@@ -1,5 +1,5 @@
 /* global window, document */
-var util = require('../../lib/util');
+import * as util from '../../lib/util';
 
 describe('util', function() {
   beforeEach(function() {

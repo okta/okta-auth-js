@@ -1,5 +1,5 @@
 /* global window, document */
-import OktaAuth from 'OktaAuth';
+import { OktaAuth } from '@okta/okta-auth-js';
 
 describe('features', function() {
 

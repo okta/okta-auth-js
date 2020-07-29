@@ -2,7 +2,8 @@
 
 require('./env'); // update environment variables from testenv file
 
-const OktaAuthJS = require('../../dist/lib/server');
+// eslint-disable-next-line node/no-unpublished-require
+const OktaAuthJS = require('../../dist/cjs/server').OktaAuth;
 
 const util = require('./src/util');
 const express = require('express');

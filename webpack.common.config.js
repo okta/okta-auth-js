@@ -2,6 +2,15 @@
 var webpack = require('webpack');
 var SDK_VERSION = require('./package.json').version;
 
+var babelOptions = {
+  presets: ['@babel/preset-env'],
+  plugins: [
+    '@babel/plugin-proposal-class-properties',
+    '@babel/plugin-transform-runtime'
+  ],
+  sourceType: 'unambiguous'
+};
+
 module.exports = {
   module: {
     rules: [
@@ -9,13 +18,25 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-          plugins: ['@babel/plugin-transform-runtime'],
-          sourceType: 'unambiguous'
-        }
+        options: babelOptions
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: babelOptions
+          },
+          {
+            loader: 'ts-loader'
+          }
+        ]
       }
     ]
+  },
+  resolve: {
+    extensions: ['.js', '.ts']
   },
   plugins: [
     new webpack.DefinePlugin({
