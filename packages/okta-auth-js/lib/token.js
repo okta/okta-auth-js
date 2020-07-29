@@ -746,10 +746,10 @@ function parseFromUrl(sdk, options) {
 async function getUserInfo(sdk, accessTokenObject, idTokenObject) {
   // If token objects were not passed, attempt to read from the TokenManager
   if (!accessTokenObject) {
-    accessTokenObject = await sdk.tokenManager.get('accessToken');
+    accessTokenObject = await sdk.tokenManager.get(constants.ACCESS_TOKEN_STORAGE_KEY);
   }
   if (!idTokenObject) {
-    idTokenObject = await sdk.tokenManager.get('idToken');
+    idTokenObject = await sdk.tokenManager.get(constants.ID_TOKEN_STORAGE_KEY);
   }
 
   if (!accessTokenObject ||
