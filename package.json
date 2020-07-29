@@ -1,14 +1,17 @@
 {
   "private": true,
   "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "@babel/preset-env": "^7.6.3",
-    "@babel/register": "^7.6.2",
-    "dotenv": "^8.1.0",
-    "eslint-plugin-compat": "^3.3.0",
-    "eslint-plugin-jasmine": "^2.10.1",
-    "globby": "^6.1.0",
-    "lerna": "^2.11.0"
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/register": "^7.10.5",
+    "dotenv": "^8.2.0",
+    "eslint-plugin-compat": "^3.8.0",
+    "eslint-plugin-jasmine": "^4.1.1",
+    "globby": "^11.0.1",
+    "lerna": "^3.22.1"
+  },
+  "resolutions": {
+    "dot-prop": "^5.2.0"
   },
   "engines": {
     "yarn": "^1.7.0"
