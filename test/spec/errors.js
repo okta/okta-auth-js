@@ -2,7 +2,7 @@ jest.mock('cross-fetch');
 
 import _ from 'lodash';
 import util from '@okta/test.support/util';
-import OktaAuth from 'OktaAuth';
+import { OktaAuth } from '@okta/okta-auth-js';
 
 describe('General Errors', function () {
   util.itErrorsCorrectly({

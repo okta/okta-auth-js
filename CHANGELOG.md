@@ -1,6 +1,14 @@
 # Changelog
 
+## 4.0.0
+
+### Features
+
+- [#413](https://github.com/okta/okta-auth-js/pull/413) Adds support for Typescript. Uses named exports instead of default export.
+
 ## 3.2.3
+
+### Bug Fixes
 
 - [#440](https://github.com/okta/okta-auth-js/pull/440) Fixes signOut XHR fallback to reload page only if postLogoutRedirectUri matches the current URI
 - [#445](https://github.com/okta/okta-auth-js/pull/445) Clears access token from storage after token revocation

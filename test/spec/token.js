@@ -4,7 +4,7 @@ import allSettled from 'promise.allsettled';
 allSettled.shim(); // will be a no-op if not needed
 
 import _ from 'lodash';
-import OktaAuth from 'OktaAuth';
+import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
@@ -14,7 +14,6 @@ import * as sdkUtil from '../../lib/oauthUtil';
 import pkce from '../../lib/pkce';
 import http from '../../lib/http';
 import * as sdkCrypto from '../../lib/crypto';
-import AuthSdkError from '../../lib/errors/AuthSdkError';
 
 function setupSync(options) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);

@@ -1,12 +1,18 @@
 require('./env'); // update environment variables from testenv file
 
 const path = require('path');
-var webpack = require('webpack');
-var PORT = process.env.PORT || 8080;
+const webpack = require('webpack');
+const PORT = process.env.PORT || 8080;
+
+const babelOptions = {
+  presets: ['@babel/env'],
+  plugins: ['@babel/plugin-transform-runtime'],
+  sourceType: 'unambiguous'
+};
 
 module.exports = {
   mode: 'development',
-  entry: './src/webpackEntry.js',
+  entry: './src/webpackEntry.ts',
   output: {
     path: path.join(__dirname, 'public'),
     filename: 'oidc-app.js',
@@ -31,15 +37,25 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        query: {
-          presets: ['@babel/env'],
-          plugins: ['@babel/plugin-transform-runtime'],
-          sourceType: 'unambiguous'
-        }
+        options: babelOptions
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: babelOptions
+          },
+          {
+            loader: 'ts-loader'
+          }
+        ]
       }
     ]
   },
   resolve: {
+    extensions: ['.js', '.ts'],
     alias: {
       '@okta/okta-auth-js': path.join(__dirname, '..', '..', 'dist')
     }

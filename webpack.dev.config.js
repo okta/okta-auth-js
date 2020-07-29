@@ -7,10 +7,11 @@ var _ = require('lodash');
 var commonConfig = require('./webpack.common.config');
 
 module.exports = _.extend({}, _.cloneDeep(commonConfig), {
-  entry: './lib/browser/browserIndex.js',
+  mode: 'development',
+  entry: './lib/browser/',
   output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'okta-auth-js.min.js',
+    path: path.join(__dirname, 'dist', 'bundles'),
+    filename: 'okta-auth-js.umd.js',
     library: 'OktaAuth',
     libraryTarget: 'umd'
   },

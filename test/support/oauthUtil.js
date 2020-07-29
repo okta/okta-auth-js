@@ -2,7 +2,7 @@
 /* eslint-disable complexity, max-statements */
 var URL = require('url').URL;
 import util from './util';
-import OktaAuth from 'OktaAuth';
+import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from './tokens';
 import EventEmitter from 'tiny-emitter';
 var wellKnown = require('./xhr/well-known');

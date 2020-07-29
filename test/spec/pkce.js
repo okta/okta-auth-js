@@ -4,8 +4,7 @@ jest.mock('cross-fetch');
 import util from '@okta/test.support/util';
 import factory from '@okta/test.support/factory';
 import packageJson from '../../package.json';
-import AuthSdkError from '../../lib/errors/AuthSdkError';
-import OktaAuth from '../../lib/browser';
+import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import http from '../../lib/http';
 import pkce from '../../lib/pkce';
 import * as token from '../../lib/token';
@@ -82,12 +81,12 @@ describe('pkce', function() {
     });
   });
 
-  describe('prepare oauth params', function() {
+  describe('prepare token params', function() {
 
     it('throws an error if pkce is true and PKCE is not supported', function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
       var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: false });
-      return token.prepareOauthParams(sdk, {
+      return token.prepareTokenParams(sdk, {
         pkce: true,
       })
       .then(function() {
@@ -116,7 +115,7 @@ describe('pkce', function() {
         spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve());
         
         var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
-        return token.prepareOauthParams(sdk, {
+        return token.prepareTokenParams(sdk, {
           responseType: 'token'
         })
         .then(function(params) {
@@ -132,7 +131,7 @@ describe('pkce', function() {
       spyOn(oauthUtil, 'getWellKnown').and.returnValue(Promise.resolve({
         'code_challenge_methods_supported': []
       }));
-      return token.prepareOauthParams(sdk, {})
+      return token.prepareTokenParams(sdk, {})
       .then(function() {
         expect(false).toBe(true); // should not reach this line
       })
@@ -155,7 +154,7 @@ describe('pkce', function() {
       spyOn(pkce, 'generateVerifier').and.returnValue(codeVerifier);
       spyOn(pkce, 'saveMeta');
       spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
-      return token.prepareOauthParams(sdk, {
+      return token.prepareTokenParams(sdk, {
         codeChallengeMethod: codeChallengeMethod
       })
       .then(function(oauthParams) {

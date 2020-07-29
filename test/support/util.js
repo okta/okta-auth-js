@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 
-import OktaAuth from 'OktaAuth';
+import { OktaAuth } from '@okta/okta-auth-js';
 
 import browserStorage from '../../lib/browser/browserStorage';
 const cookies = browserStorage.storage;
@@ -356,7 +356,7 @@ util.mockGetLocation = function (client, mockLocation) {
 };
 
 util.mockUserAgent = function (client, mockUserAgent) {
-  jest.spyOn(client.fingerprint, '_getUserAgent').mockReturnValue(mockUserAgent);
+  jest.spyOn(global.window.navigator, 'userAgent', 'get').mockReturnValue(mockUserAgent);
 };
 
 util.expectErrorToEqual = function (actual, expected) {

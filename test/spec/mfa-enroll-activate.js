@@ -1,7 +1,7 @@
 jest.mock('cross-fetch');
 
 import util from '@okta/test.support/util';
-import sdkUtil from '../../lib/util';
+import * as sdkUtil from '../../lib/util';
 
 function mockDelay() {
   jest.spyOn(sdkUtil, 'delay').mockImplementation(function() {
