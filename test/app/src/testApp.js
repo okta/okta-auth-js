@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global document, window, Promise, console */
+/* global document, window, Promise, console, OktaSignIn */
 /* eslint-disable no-console */
 import OktaAuth from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig } from './config';
@@ -35,6 +35,11 @@ const Footer = `
 `;
 
 const Layout = `
+  <div id="modal">
+    <div id="widget-container">
+      <div id="widget"></div>
+    </div>
+  </div>
   <div id="layout">
     <div id="session-expired" style="color: orange"></div>
     <div id="token-error" style="color: red"></div>
@@ -57,6 +62,7 @@ function makeClickHandler(fn) {
 
 function bindFunctions(testApp, window) {
   var boundFunctions = {
+    loginWidget: testApp.loginWidget.bind(testApp),
     loginRedirect: testApp.loginRedirect.bind(testApp, {}),
     loginPopup: testApp.loginPopup.bind(testApp, {}),
     loginDirect: testApp.loginDirect.bind(testApp),
@@ -71,7 +77,8 @@ function bindFunctions(testApp, window) {
     handleCallback: testApp.handleCallback.bind(testApp),
     getUserInfo: testApp.getUserInfo.bind(testApp),
     testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
-    testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp)
+    testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp),
+    testConcurrentLoginViaTokenRenewFailure: testApp.testConcurrentLoginViaTokenRenewFailure.bind(testApp),
   };
   Object.keys(boundFunctions).forEach(functionName => {
     window[functionName] = makeClickHandler(boundFunctions[functionName]);
@@ -90,7 +97,8 @@ export default TestApp;
 Object.assign(TestApp.prototype, {
   // Mount into the DOM
   mount: function(window, rootElem) {
-    this.originalUrl = MOUNT_PATH + toQueryParams(flattenConfig(this.config));
+    const queryParams = toQueryParams(flattenConfig(this.config));
+    this.originalUrl = MOUNT_PATH + queryParams;
     this.rootElem = rootElem;
     this.rootElem.innerHTML = Layout;
     updateForm(this.config);
@@ -169,6 +177,23 @@ Object.assign(TestApp.prototype, {
       ${logoutLink(this)}
     `);
     this._afterRender('with-error');
+  },
+  loginWidget: function() {
+    document.getElementById('modal').style.display = 'block';
+    var config = window.getWidgetConfig();
+
+    var signIn = new OktaSignIn(config);
+  
+    signIn.showSignInToGetTokens({
+      clientId: config.clientId,
+      redirectUri: config.redirectUri,
+  
+      // Return an access token from the authorization server
+      getAccessToken: true,
+  
+      // Return an ID token from the authorization server
+      getIdToken: true,
+    });
   },
   loginDirect: async function() {
     const username = document.getElementById('username').value;
@@ -344,6 +369,27 @@ Object.assign(TestApp.prototype, {
         document.getElementById('token-msg').innerHTML = 'concurrent test passed';
       });
   },
+  // To test this, open another tab and logout from the Okta session
+  // The token renew should fail, triggering an error event.
+  // Two concurrent login attempts should then be running
+  testConcurrentLoginViaTokenRenewFailure: async function() {
+    this.oktaAuth.tokenManager.on('error', () => {
+      console.log('Received error event from TokenManager');
+      this.loginPopup();
+    });
+
+    const accessToken = await this.oktaAuth.tokenManager.get('accessToken');
+    accessToken.expiresAt = 0;
+    this.oktaAuth.tokenManager.add('accessToken', accessToken);
+
+    const freshToken = await this.oktaAuth.tokenManager.renew('accessToken');
+    if (freshToken) {
+      console.error('Token renew did not fail as expected');
+    } else {
+      console.log('Token renew failed as expected');
+      this.loginPopup();
+    }
+  },
   configHTML() {
     const config = htmlString(this.config);
     return `
@@ -382,6 +428,9 @@ Object.assign(TestApp.prototype, {
           <li>
             <a id="test-concurrent-get-token" href="/" onclick="testConcurrentGetToken(event)">Test Concurrent getToken</a>
           </li>
+          <li>
+            <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)">Test Concurrent login via token renew failure</a>
+          </li>
         </ul>
         <div id="user-info"></div>
         <hr/>
@@ -394,6 +443,9 @@ Object.assign(TestApp.prototype, {
       <strong>Greetings, unknown user!</strong>
       <hr/>
       <ul>
+        <li>
+          <a id="login-widget" href="/" onclick="loginWidget(event)">Login using SIGNIN WIDGET</a>
+        </li>
         <li>
           <a id="login-redirect" href="/" onclick="loginRedirect(event)">Login using REDIRECT</a>
         </li>
