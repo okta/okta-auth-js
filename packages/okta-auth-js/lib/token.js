@@ -152,42 +152,6 @@ function addPostMessageListener(sdk, timeout, state) {
     });
 }
 
-function addFragmentListener(sdk, windowEl, timeout) {
-  var timeoutId;
-  var promise = new Promise(function(resolve, reject) {
-    function hashChangeHandler() {
-      /*
-        We are only able to access window.location.hash on a window
-        that has the same domain. A try/catch is necessary because
-        there's no other way to determine that the popup is in
-        another domain. When we try to access a window on another
-        domain, an error is thrown.
-      */
-      try {
-        if (windowEl &&
-            windowEl.location &&
-            windowEl.location.hash) {
-          resolve(oauthUtil.hashToObject(windowEl.location.hash));
-        } else if (windowEl && !windowEl.closed) {
-          setTimeout(hashChangeHandler, 500);
-        }
-      } catch (err) {
-        setTimeout(hashChangeHandler, 500);
-      }
-    }
-  
-    hashChangeHandler();
-
-    timeoutId = setTimeout(function() {
-      reject(new AuthSdkError('OAuth flow timed out'));
-    }, timeout || 120000);
-  });
-
-  return promise.finally(function() {
-    clearTimeout(timeoutId);
-  });
-}
-
 function exchangeCodeForToken(sdk, oauthParams, authorizationCode, urls) {
   // PKCE authorization_code flow
   // Retrieve saved values and build oauthParams for call to /token
@@ -480,12 +444,6 @@ function getToken(sdk, options) {
       flowType = 'IMPLICIT';
     }
 
-    function getOrigin(url) {
-      /* eslint-disable-next-line no-useless-escape */
-      var originRegex = /^(https?\:\/\/)?([^:\/?#]*(?:\:[0-9]+)?)/;
-      return originRegex.exec(url)[0];
-    }
-
     // Execute the flow type
     switch (flowType) {
       case 'IFRAME':
@@ -518,17 +476,6 @@ function getToken(sdk, options) {
           popupTitle: options.popupTitle
         };
         var windowEl = oauthUtil.loadPopup(requestUrl, windowOptions);
-
-        // Poll until we get a valid hash fragment
-        if (oauthParams.responseMode === 'fragment') {
-          var windowOrigin = getOrigin(sdk.idToken.authorize._getLocationHref());
-          var redirectUriOrigin = getOrigin(oauthParams.redirectUri);
-          if (windowOrigin !== redirectUriOrigin) {
-            throw new AuthSdkError('Using fragment, the redirectUri origin (' + redirectUriOrigin +
-              ') must match the origin of this page (' + windowOrigin + ')');
-          }
-          oauthPromise = addFragmentListener(sdk, windowEl, options.timeout);
-        }
 
         // The popup may be closed without receiving an OAuth response. Setup a poller to monitor the window.
         var popupPromise = new Promise(function(resolve, reject) {
@@ -593,6 +540,13 @@ function getWithPopup(sdk, options) {
 }
 
 function prepareOauthParams(sdk, options) {
+  if (oauthUtil.isLoginRedirect(sdk)) {
+    return Promise.reject(new AuthSdkError(
+      'The app should not attempt to call getToken on callback. ' +
+      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
+    ));
+  }
+
   // clone and prepare options
   options = util.clone(options) || {};
 
@@ -792,10 +746,10 @@ function parseFromUrl(sdk, options) {
 async function getUserInfo(sdk, accessTokenObject, idTokenObject) {
   // If token objects were not passed, attempt to read from the TokenManager
   if (!accessTokenObject) {
-    accessTokenObject = await sdk.tokenManager.get('accessToken');
+    accessTokenObject = await sdk.tokenManager.get(constants.ACCESS_TOKEN_STORAGE_KEY);
   }
   if (!idTokenObject) {
-    idTokenObject = await sdk.tokenManager.get('idToken');
+    idTokenObject = await sdk.tokenManager.get(constants.ID_TOKEN_STORAGE_KEY);
   }
 
   if (!accessTokenObject ||

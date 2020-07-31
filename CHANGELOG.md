@@ -2,9 +2,23 @@
 
 ## PENDING
 
+### Bug Fixes
+
+- [#422](https://github.com/okta/okta-auth-js/pull/422) Fix bad accessToken storage key in signOut method
+
+## 3,2.1
+
+### Bug Fixes
+
+- [#431](https://github.com/okta/okta-auth-js/pull/431) Skips non parsable iframe messages for `sdk.fingerprint`
+
+## 3.2.0
+
 ### Features
 
 -[#408](https://github.com/okta/okta-auth-js/pull/408) Provides a polyfill for IE 11+
+
+-[#410](https://github.com/okta/okta-auth-js/pull/410) Add `token.isLoginRedirect` function to prevent app from starting new Oauth flow while already in OAuth callback state.
 
 ## 3.1.4
 

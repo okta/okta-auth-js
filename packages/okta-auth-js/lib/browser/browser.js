@@ -132,7 +132,8 @@ function OktaAuthBuilder(args) {
     revoke: util.bind(token.revokeToken, null, sdk),
     renew: util.bind(token.renewToken, null, sdk),
     getUserInfo: util.bind(token.getUserInfo, null, sdk),
-    verify: util.bind(token.verifyToken, null, sdk)
+    verify: util.bind(token.verifyToken, null, sdk),
+    isLoginRedirect: util.bind(oauthUtil.isLoginRedirect, null, sdk)
   };
   // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
   Object.keys(sdk.token).forEach(key => {
@@ -261,7 +262,7 @@ proto.closeSession = function closeSession() {
 proto.revokeAccessToken = async function revokeAccessToken(accessToken) {
   var sdk = this;
   if (!accessToken) {
-    accessToken = await sdk.tokenManager.get('accessToken');
+    accessToken = await sdk.tokenManager.get(constants.ACCESS_TOKEN_STORAGE_KEY);
   }
   // Access token may have been removed. In this case, we will silently succeed.
   if (!accessToken) {
@@ -288,11 +289,11 @@ proto.signOut = async function (options) {
   var logoutUrl = oauthUtil.getOAuthUrls(sdk).logoutUrl;
 
   if (typeof idToken === 'undefined') {
-    idToken = await sdk.tokenManager.get('idToken');
+    idToken = await sdk.tokenManager.get(constants.ID_TOKEN_STORAGE_KEY);
   }
 
   if (revokeAccessToken && typeof accessToken === 'undefined') {
-    accessToken = await sdk.tokenManager.get('token');
+    accessToken = await sdk.tokenManager.get(constants.ACCESS_TOKEN_STORAGE_KEY);
   }
 
   // Clear all local tokens
@@ -364,7 +365,10 @@ proto.fingerprint = function(options) {
       try {
         var msg = JSON.parse(e.data);
       } catch (err) {
-        return reject(new AuthSdkError('Unable to parse iframe response'));
+        // iframe messages should all be parsable
+        // skip not parsable messages come from other sources in same origin (browser extensions)
+        // TODO: add namespace flag in okta-core to distinguish messages that come from other sources
+        return;
       }
 
       if (!msg) { return; }
