@@ -511,6 +511,12 @@ function getToken(sdk, options) {
       default:
         throw new AuthSdkError('The full page redirect flow is not supported');
     }
+  })
+  .catch(e => {
+    if (sdk.options.pkce) {
+      PKCE.clearMeta(sdk);
+    }
+    throw e;
   });
 }
 

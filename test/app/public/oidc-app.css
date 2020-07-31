@@ -1,3 +1,32 @@
+#layout {
+  position: relative;
+  z-index: 1;
+}
+#modal {
+  display: none;
+  position: fixed;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  background: rgb(200, 200, 200, 0.8);
+}
+#widget-container {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+}
+#widget {
+  position: relative;
+  left: -50%;
+  background: white;
+  min-width: 100px;
+  min-height: 100px;
+  border: 1px black solid;
+}
+#okta-sign-in {
+  margin: 0 !important;
+}
+
 .flex-row {
   flex-direction: row;
   display: flex;
