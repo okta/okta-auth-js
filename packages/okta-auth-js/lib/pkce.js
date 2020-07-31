@@ -47,30 +47,54 @@ function getStorage(sdk, options) {
 }
 
 function saveMeta(sdk, meta) {
-  var storage = getStorage(sdk);
+  // There must be only one PKCE flow executing at a time.
+  // Before saving meta, check to see if a codeVerfier is already stored.
+  var storage = getStorage(sdk, { preferLocalStorage: true });
+  var obj = storage.getStorage();
+  if (obj.codeVerifier) {
+    // eslint-disable-next-line max-len
+    util.warn('saveMeta: PKCE codeVerifier exists in localStorage. This may indicate an auth flow is already in progress.');
+  }
+
+  storage = getStorage(sdk);
+  obj = storage.getStorage();
+  if (obj.codeVerifier) {
+    // eslint-disable-next-line max-len
+    util.warn('saveMeta: PKCE codeVerifier exists in sessionStorage. This may indicate an auth flow is already in progress.');
+  }
+
+  // clear all PKCE meta storage before saving.
+  clearMeta(sdk);
+
   storage.setStorage(meta);
 }
 
 function loadMeta(sdk) {
-  var storage = getStorage(sdk);
+  // Try reading from localStorage first.
+  // This is for compatibility with older versions of the signin widget. OKTA-304806
+  var storage = getStorage(sdk, { preferLocalStorage: true });
   var obj = storage.getStorage();
   // Verify the Meta
   if (!obj.codeVerifier) {
-    // If meta is not valid, try reading from localStorage.
-    // This is for compatibility with older versions of the signin widget. OKTA-304806
-    storage = getStorage(sdk, { preferLocalStorage: true });
+    // If meta is not valid, read from sessionStorage. This is expected for current versions of the SDK.
+    storage = getStorage(sdk, { preferLocalStorage: false });
     obj = storage.getStorage();
     if (!obj.codeVerifier) {
       // If meta is not valid, throw an exception to avoid misleading server-side error
       // The most likely cause of this error is trying to handle a callback twice
-      throw new AuthSdkError('Could not load PKCE codeVerifier from storage');
+      // eslint-disable-next-line max-len
+      throw new AuthSdkError('Could not load PKCE codeVerifier from storage. This may indicate the auth flow has already completed or multiple auth flows are executing concurrently.', null);
     }
   }
   return obj;
 }
 
 function clearMeta(sdk) {
+  // clear sessionStorage (current version)
   var storage = getStorage(sdk);
+  storage.clearStorage();
+  // clear localStorage (previous versions, signin widget)
+  storage = getStorage(sdk, { preferLocalStorage: true });
   storage.clearStorage();
 }
 

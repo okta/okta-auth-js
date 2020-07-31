@@ -21,8 +21,19 @@ describe('pkce', function() {
       const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
       window.sessionStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
       const sdk = new OktaAuth({ issuer: 'https://foo.com' });
+      expect(pkce.loadMeta(sdk)).toEqual(meta);
       pkce.clearMeta(sdk);
       const res = JSON.parse(window.sessionStorage.getItem('okta-pkce-storage'));
+      expect(res).toEqual({});
+    });
+    // This is for compatibility with older versions of the signin widget. OKTA-304806
+    it('clears meta from localStorage', () => {
+      const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
+      window.localStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
+      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
+      expect(pkce.loadMeta(sdk)).toEqual(meta);
+      pkce.clearMeta(sdk);
+      const res = JSON.parse(window.localStorage.getItem('okta-pkce-storage'));
       expect(res).toEqual({});
     });
   });
@@ -33,6 +44,18 @@ describe('pkce', function() {
       pkce.saveMeta(sdk, meta);
       const res = JSON.parse(window.sessionStorage.getItem('okta-pkce-storage'));
       expect(res).toEqual(meta);
+    });
+    it('clears old meta storage before save', () => {
+      const oldMeta = { codeVerifier: 'old', redirectUri: 'http://localhost/old' };
+      window.localStorage.setItem('okta-pkce-storage', JSON.stringify(oldMeta));
+      window.sessionStorage.setItem('okta-pkce-storage', JSON.stringify(oldMeta));
+
+      const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
+      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
+
+      pkce.saveMeta(sdk, meta);
+      expect(JSON.parse(window.sessionStorage.getItem('okta-pkce-storage'))).toEqual(meta);
+      expect(JSON.parse(window.localStorage.getItem('okta-pkce-storage'))).toEqual({});
     });
   });
   describe('loadMeta', () => {
