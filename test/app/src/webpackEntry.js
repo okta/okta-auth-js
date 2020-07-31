@@ -24,6 +24,19 @@ function mount() {
   return app;
 }
 
+// Login page, read config from URL
+window.getWidgetConfig = function() {
+  const siwConfig = window.location.search ? getConfigFromUrl() : getDefaultConfig();
+  Object.assign(siwConfig, {
+    baseUrl: config.issuer.split('/oauth2')[0],
+    el: '#widget',
+    authParams: {
+      display: 'page'
+    }
+  });
+  return siwConfig;
+};
+
 // Regular landing, read config from URL
 window.bootstrapLanding = function() {
   config = window.location.search ? getConfigFromUrl() : getDefaultConfig();
