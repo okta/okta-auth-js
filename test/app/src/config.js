@@ -3,7 +3,7 @@ import { CALLBACK_PATH, STORAGE_KEY } from './constants';
 const HOST = window.location.host;
 const PROTO = window.location.protocol;
 const REDIRECT_URI = `${PROTO}//${HOST}${CALLBACK_PATH}`;
-const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}`;
+const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}/`;
 
 function getDefaultConfig() {
   const ISSUER = process.env.ISSUER;
