@@ -136,8 +136,9 @@ function OktaAuthBuilder(args) {
     isLoginRedirect: util.bind(oauthUtil.isLoginRedirect, null, sdk)
   };
   // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
+  const syncMethods = ['decode', 'isLoginRedirect'];
   Object.keys(sdk.token).forEach(key => {
-    if (key === 'decode') { // sync methods should not be wrapped
+    if (syncMethods.indexOf(key) >= 0) { // sync methods should not be wrapped
       return;
     }
     var method = sdk.token[key];
