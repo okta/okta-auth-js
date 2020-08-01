@@ -18,7 +18,6 @@ import storageUtil from './browser/browserStorage';
 import { TOKEN_STORAGE_NAME } from './constants';
 import storageBuilder from './storageBuilder';
 import SdkClock from './clock';
-import { isLoginRedirect } from './oauthUtil';
 import { Token, TokenManagerOptions, isIDToken, isAccessToken } from './types';
 
 var DEFAULT_OPTIONS = {
@@ -39,6 +38,10 @@ function hasExpired(tokenMgmtRef, token) {
 
 function emitExpired(tokenMgmtRef, key, token) {
   tokenMgmtRef.emitter.emit('expired', key, token);
+}
+
+function emitRemoved(tokenMgmtRef, key) {
+  tokenMgmtRef.emitter.emit('removed', key);
 }
 
 function emitError(tokenMgmtRef, error) {
@@ -116,24 +119,9 @@ function get(storage, key) {
 }
 
 function getAsync(sdk, tokenMgmtRef, storage, key) {
-  return new Promise(function(resolve, reject) {
-    if (tokenMgmtRef.options.autoRenew && isLoginRedirect(sdk)) {
-      return reject(new AuthSdkError(
-        'The app should not attempt to call authorize API on callback. ' + 
-        'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
-      ));
-    }
-
+  return new Promise(function(resolve) {
     var token = get(storage, key);
-    if (!token || !hasExpired(tokenMgmtRef, token)) {
-      return resolve(token);
-    }
-
-    var tokenPromise = tokenMgmtRef.options.autoRenew
-      ? renew(sdk, tokenMgmtRef, storage, key)
-      : remove(tokenMgmtRef, storage, key);
-
-    return resolve(tokenPromise);
+    return resolve(token);
   });
 }
 
@@ -145,6 +133,8 @@ function remove(tokenMgmtRef, storage, key) {
   var tokenStorage = storage.getStorage();
   delete tokenStorage[key];
   storage.setStorage(tokenStorage);
+
+  emitRemoved(tokenMgmtRef, key);
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {
@@ -210,6 +200,7 @@ export class TokenManager {
   renew: (key: string) => Promise<Token>;
   on: (event: string, handler: Function, context?: object) => void;
   off: (event: string, handler: Function) => void;
+  hasExpired: (token: Token) => boolean;
 
   constructor(sdk, options: TokenManagerOptions) {
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
@@ -294,6 +285,16 @@ export class TokenManager {
     this.renew = renew.bind(this, sdk, tokenMgmtRef, storage);
     this.on = tokenMgmtRef.emitter.on.bind(tokenMgmtRef.emitter);
     this.off = tokenMgmtRef.emitter.off.bind(tokenMgmtRef.emitter);
+    this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
+  
+    const onTokenExpiredHandler = (key) => {
+      if (options.autoRenew) {
+        this.renew(key);
+      } else {
+        this.remove(key);
+      }
+    };
+    this.on('expired', onTokenExpiredHandler);
 
     setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
   }

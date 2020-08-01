@@ -5,6 +5,14 @@
 ### Features
 
 - [#413](https://github.com/okta/okta-auth-js/pull/413) Adds support for Typescript. Uses named exports instead of default export.
+- [#444](https://github.com/okta/okta-auth-js/pull/444) New method `tokenManager.hasExpired` to test if a token is expired
+
+### Breaking Changes
+
+- [#444](https://github.com/okta/okta-auth-js/pull/444)
+  - Implements "active" autoRenew.  Previously tokens would be renewed or removed when calling `tokenManager.get`. Now they will be renewed or removed in the background. If autoRenew is true, tokens will be renewed before expiration. If autoRenew is false, tokens will be removed from storage on expiration.
+  - `onSessionExpired` option has been removed. [TokenManager events](#tokenmanageronevent-callback-context) can be used to detect and handle token renewal errors.
+  - `tokenManager.get` no longer implements autoRenew functionality (autoRenew is done by a separate process within `TokenManager`). Even with `autoRenew`, it is possible that the token returned from the TokenManager may be expired, since renewal is an asynchronous process. New method `tokenManager.hasExpired` can be used to test the token and avoid this potential race condition.
 
 ## 3.2.3
 

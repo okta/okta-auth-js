@@ -163,6 +163,8 @@ For an overview of the client's features and authentication flows, check out [ou
 * Retrieve and store an OpenID Connect (OIDC) token
 * Get an Okta session
 
+> :warning: The developer docs may be written for an earlier version of this library. See [Migrating from previous versions](#migrating-from-previous-versions).
+
 You can also browse the full [API reference documentation](#api-reference).
 
 ### Usage with Typescript
@@ -265,7 +267,7 @@ tokenManager: {
 }
 ```
 
-By default, the `tokenManager` will attempt to renew expired tokens. When an expired token is requested by the `tokenManager.get()` method, a renewal request is executed to update the token. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to  [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
+By default, the `tokenManager` will attempt to renew tokens before they expire. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
 ```javascript
 tokenManager: {
@@ -273,7 +275,7 @@ tokenManager: {
 }
 ```
 
-Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration, if accessed with `tokenManager.get()`. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency between the client and Okta's servers.
+Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
 
 ```javascript
 // Emit expired event 2 minutes before expiration
@@ -328,7 +330,6 @@ In most cases you will not need to set a value for `responseMode`. Defaults are 
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. [Creating your Okta application](#creating-your-okta-appliation) |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be listed in your Okta application's [Login redirect URIs](#login-redirect-uris). If no `redirectUri` is provided, defaults to the current origin (`window.location.origin`). [Configuring your Okta application](#configuring-your-okta-application) |
 | `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [signOut](#signout). This url must be listed in your Okta application's [Logout redirect URIs](#logout-redirect-uris). If not specified, your application's origin (`window.location.origin`) will be used.  [Configuring your Okta application](#configuring-your-okta-application) |
-| `onSessionExpired` | **(deprecated)** A function to be called when the Okta SSO session has expired or was ended outside of the application. A typical handler would initiate a login flow. :warning: This option will be removed in an upcoming version. When a [token renew](#tokenrenewtokentorenew) fails, an "error" event will be fired from the [TokenManager](#tokenmanageronevent-callback-context) and the token will be [removed from storage](#tokenmanagergetkey). Presense of a token in storage can be used to determine if a login flow is needed. Take care when beginning a new login flow that there is not another login flow already in progress. |
 | `responseMode` | Applicable only for SPA clients using [PKCE OAuth Flow](#pkce-oauth-20-flow). By default, the authorization code is requested and parsed from the search query. Setting this value to `fragment` will cause the URL hash fragment to be used instead. If your application uses or alters the search query portion of the `redirectUri`, you may want to set this option to "fragment". This option affects both [token.getWithRedirect](#tokengetwithredirectoptions) and [token.parseFromUrl](#tokenparsefromurloptions) |
 | `pkce`  | Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and `grant_type=authorization_code` on the token request. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions) |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
@@ -340,7 +341,7 @@ In most cases you will not need to set a value for `responseMode`. Defaults are 
 | `tokenManager` | An object containing additional properties used to configure the internal token manager. |
 
 * `autoRenew`:
-  By default, the library will attempt to renew expired tokens. When an expired token is requested by the library, a renewal request is executed to update the token. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
+  By default, the library will attempt to renew tokens before they expire. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
 
 * `storage`:
   You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types:
@@ -1908,18 +1909,18 @@ authClient.token.getWithPopup()
 
 #### `tokenManager.get(key)`
 
-Get a token that you have previously added to the `tokenManager` with the given `key`. The token object will be returned if it has not expired.
+Get a token that you have previously added to the `tokenManager` with the given `key`. The token object will be returned if it exists in storage. Tokens will be removed from storage if they have expired and `autoRenew` is false or if there was an error while renewing the token. The `tokenManager` will emit a `removed` event when tokens are removed.
 
 * `key` - Key for the token you want to get
 
 ```javascript
 authClient.tokenManager.get('idToken')
 .then(function(token) {
-  if (token) {
+  if (token && !authClient.tokenManager.hasExpired(token)) {
     // Token is valid
     console.log(token);
   } else {
-    // Token has expired
+    // Token has been removed due to expiration or error while renewing
   }
 })
 .catch(function(err) {
@@ -1927,6 +1928,10 @@ authClient.tokenManager.get('idToken')
   console.error(err);
 });
 ```
+
+#### `tokenManager.hasExpired(token)`
+
+A synchronous method which returns `true` if the token has expired. The `tokenManager` will automatically remove expired tokens in the background. However, when the app first loads this background process may not have completed, so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition. 
 
 #### `tokenManager.remove(key)`
 
@@ -1971,7 +1976,11 @@ authClient.tokenManager.renew('idToken');
 
 Subscribe to an event published by the `tokenManager`.
 
-* `event` - Event to subscribe to. Possible events are `expired`, `error`, and `renewed`.
+* `event` - Event to subscribe to. Possible events are:
+  * `expired` - Fired before a token is set to expire (using `expireEarlySeconds` option, 30 seconds by default). If `autoRenew` option is set to true, a listener will be attached to this event and an attempt will be made to renew the token when the event fires.
+  * `error` - Fired when a token renew attempt has failed. This is a permanent error, and the token will be removed from storage.
+  * `renewed` - Fired when a token has been renewed by the `tokenManager`, either via the `autoRenew` process or as a result of calling `tokenManager.renew`
+  * `removed` - Fired when a token is removed from storage as a result of renew failure, or a call to `tokenManager.remove`. (This event will not fire from `tokenManager.clear`)
 * `callback` - Function to call when the event is triggered
 * `context` - Optional context to bind the callback to
 
@@ -1987,7 +1996,7 @@ authClient.tokenManager.on('renewed', function (key, newToken, oldToken) {
   console.log('Old token:', oldToken);
   console.log('New token:', newToken);
 });
-// Triggered when an OAuthError is returned via the API (typically during auto-renew)
+// Triggered when an OAuthError is returned via the API (typically during token renew)
 authClient.tokenManager.on('error', function (err) {
   console.log('TokenManager error:', err);
   // err.name
@@ -1996,11 +2005,6 @@ authClient.tokenManager.on('error', function (err) {
   // err.errorSummary
   // err.tokenKey
   // err.accessToken
-  if (err.errorCode === 'login_required' && err.accessToken) {
-    // The Okta session has expired or was closed outside the application
-    // The application should return to an unauthenticated state
-    // This error can also be handled using the 'onSessionExpired' option
-  }
 });
 ```
 
@@ -2137,6 +2141,8 @@ const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 ```
 
 * For Typescript users: definitions for types in this library are now included. If you were providing your own definitions for `@okta/okta-auth-js` you should remove these in favor of the types exported by this library.
+
+* `onSessionExpired` option has been removed. [TokenManager events](#tokenmanageronevent-callback-context) can be used to detect and handle token renewal errors.
 
 ### From 2.x to 3.x
 
