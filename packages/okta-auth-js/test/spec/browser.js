@@ -221,13 +221,16 @@ describe('Browser', function() {
 
   describe('signOut', function() {
     let origin;
+    let href;
     let encodedOrigin;
   
     beforeEach(function() {
       origin = 'https://somesite.local';
+      href = `${origin}/some-route`;
       encodedOrigin = encodeURIComponent(origin);
       Object.assign(global.window.location, {
         origin,
+        href,
         assign: jest.fn(),
         reload: jest.fn()
       });
@@ -258,7 +261,7 @@ describe('Browser', function() {
         initSpies();
       });
 
-      it('Default options: will revokeAccessToken and use window.location.href for postLogoutRedirectUri', function() {
+      it('Default options: will revokeAccessToken and use window.location.origin for postLogoutRedirectUri', function() {
         return auth.signOut()
           .then(function() {
             expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ID_TOKEN_STORAGE_KEY);
@@ -299,10 +302,21 @@ describe('Browser', function() {
             expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
             expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ACCESS_TOKEN_STORAGE_KEY);
             expect(auth.closeSession).toHaveBeenCalled();
-            expect(window.location.reload).toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
           });
       });
   
+      it('if idToken=false and origin===href will reload the page', function() {
+        global.window.location.href = origin;
+        return auth.signOut({ idToken: false })
+          .then(function() {
+            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.closeSession).toHaveBeenCalled();
+            expect(window.location.reload).toHaveBeenCalled();
+          });
+      });
+
       describe('postLogoutRedirectUri', function() {
         it('can be set by config', function() {
           const postLogoutRedirectUri = 'http://someother';
@@ -376,8 +390,22 @@ describe('Browser', function() {
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
       });
 
-      it('Default options: will revokeAccessToken and fallback to closeSession and window.location.reload()', function() {
+      it('Default options: will revokeAccessToken and fallback to closeSession and redirect to window.location.origin', function() {
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        return auth.signOut()
+          .then(function() {
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ID_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, constants.ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.closeSession).toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
+          });
+      });
+
+      it('Default options: if href===origin will reload the page', function() {
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        global.window.location.href = origin;
         return auth.signOut()
           .then(function() {
             expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, constants.ID_TOKEN_STORAGE_KEY);
