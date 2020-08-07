@@ -27,9 +27,7 @@ describe('token revoke', () => {
     await TestApp.getUserInfo();
     await TestApp.error.then(el => el.waitForExist(15000, false, 'wait for error'));
     const error = await TestApp.error.then(el => el.getText());
-    assert(error === 'AuthApiError');
-    const xhrError = await TestApp.xhrError.then(el => el.getText());
-    assert(xhrError === 'Network request failed');
+    assert(error === 'Error: Missing tokens');
 
     await TestApp.logoutRedirect();
   });

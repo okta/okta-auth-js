@@ -264,6 +264,7 @@ proto.revokeAccessToken = async function revokeAccessToken(accessToken) {
   var sdk = this;
   if (!accessToken) {
     accessToken = await sdk.tokenManager.get(constants.ACCESS_TOKEN_STORAGE_KEY);
+    sdk.tokenManager.remove(constants.ACCESS_TOKEN_STORAGE_KEY);
   }
   // Access token may have been removed. In this case, we will silently succeed.
   if (!accessToken) {
