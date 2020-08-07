@@ -279,6 +279,7 @@ proto.signOut = async function (options) {
 
   // postLogoutRedirectUri must be whitelisted in Okta Admin UI
   var defaultUri = window.location.origin;
+  var currentUri = window.location.href;
   var postLogoutRedirectUri = options.postLogoutRedirectUri
     || this.options.postLogoutRedirectUri
     || defaultUri;
@@ -306,12 +307,12 @@ proto.signOut = async function (options) {
   }
 
   // No idToken? This can happen if the storage was cleared.
-  // Fallback to XHR signOut, then redirect to the post logout uri
+  // Fallback to XHR signOut, then simulate a redirect to the post logout uri
   if (!idToken) {
     return sdk.closeSession() // can throw if the user cannot be signed out
     .then(function() {
-      if (postLogoutRedirectUri === defaultUri) {
-        window.location.reload();
+      if (postLogoutRedirectUri === currentUri) {
+        window.location.reload(); // force a hard reload if URI is not changing
       } else {
         window.location.assign(postLogoutRedirectUri);
       }
