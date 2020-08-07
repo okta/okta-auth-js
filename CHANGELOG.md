@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.3
+
+- [#445](https://github.com/okta/okta-auth-js/pull/445) Clears access token from storage after token revocation
+
 ## 3.2.2
 
 ### Bug Fixes
