@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "yarn workspace @okta/okta-auth-js build",
-    "clean": "yarn clean-node-modules",
+    "clean": "yarn clean-dist && yarn clean-node-modules",
     "clean-dist": "rimraf dist && lerna exec rimraf build2 && lerna exec rimraf dist",
     "clean-node-modules": "lerna exec rimraf node_modules && rimraf node_modules",
     "lint": "yarn workspaces run lint",
