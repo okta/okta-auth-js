@@ -1,0 +1,111 @@
+<html>
+  <head>
+    <!-- https://global.oktacdn.com/okta-auth-js/3.2.3/okta-auth-js.polyfill.js -->
+    <script src="/okta-auth-js.polyfill.js" type="text/javascript"></script>
+
+    <!-- https://global.oktacdn.com/okta-auth-js/3.2.3/okta-auth-js.min.js -->
+    <script src="/okta-auth-js.min.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div id="unauth" style="display: none">
+      <b>Please login</b><hr/>
+      <a id="login" href="#" onclick="login(event)">Login</a>
+    </div>
+    <div id="auth" style="display: none">
+      <b>Welcome back</b><hr/>
+      <div id="userinfo"></div><hr/>
+      <a id="logout" href=#" onclick="logout(event)">Logout</a>
+    </div>
+    <div id="error" style="color: red; padding-top: 20px">
+    </div>
+    <hr/>
+    <a href="/">Return Home</a>
+    <script type="text/javascript">
+      var authClient;
+      var issuer;
+      var clientId;
+      var redirectUri = window.location.origin + window.location.pathname; // http://localhost:8080/static/
+
+      var url = new URL(window.location.href);
+      var state = url.searchParams.get('state');
+      if (state) {
+        state = JSON.parse(state);
+        issuer = state.issuer;
+        clientId = state.clientId;
+      } else {
+        issuer = url.searchParams.get('issuer');
+        clientId = url.searchParams.get('clientId');
+      }
+
+      function main() {
+        try {
+          authClient = new OktaAuth({
+            issuer: issuer,
+            clientId: clientId,
+            redirectUri: redirectUri
+          });
+        } catch (error) {
+          return showError(error);
+        }
+
+        if (authClient.token.isLoginRedirect()) {
+          return handleLoginRedirect();
+        }
+
+        // normal app startup.
+        showUserInfo();
+      }
+
+      function handleLoginRedirect() {
+        authClient.token.parseFromUrl().then(function(res) {
+          var tokens = res.tokens;
+          if (tokens.idToken) {
+            authClient.tokenManager.add('idToken', tokens.idToken);
+          }
+          if (tokens.accessToken) {
+            authClient.tokenManager.add('accessToken', tokens.accessToken);
+          }
+          showUserInfo();
+        });
+      }
+    
+      function showError(error) {
+        console.error(error);
+        var node = document.createElement('DIV');
+        node.innerText = JSON.stringify(error, null, 2);
+        document.getElementById('error').appendChild(node);
+      }
+  
+      function showUserInfo() {
+        authClient.token.getUserInfo().then(function(userInfo) {
+          document.getElementById('auth').style.display = 'block';
+          document.getElementById('userinfo').innerText = JSON.stringify(userInfo, null, 2);
+        }).catch(function(error) {
+          showError(error);
+          showLogin();
+        });
+      }
+
+      function showLogin() {
+        document.getElementById('unauth').style.display = 'block';
+      }
+
+      function login(e) {
+        e.preventDefault();
+        authClient.token.getWithRedirect({
+          state: JSON.stringify({
+            issuer: issuer,
+            clientId: clientId
+          })
+        });
+      };
+  
+      function logout(e) {
+        e.preventDefault();
+        authClient.signOut()
+      }
+  
+      main();
+    </script>
+  </body>
+</html>

@@ -12,5 +12,19 @@
       bootstrapLanding();
     </script>
     <a href="/server">Server-side Login Form</a>
+    <script>
+      function staticApp(e) {
+        e.preventDefault();
+        var config = getAuthJSConfig();
+        var params = {
+          issuer: config.issuer,
+          clientId: config.clientId,
+          redirectUri: config.redirectUri
+        }
+        var url = '/static' + toQueryParams(params);
+        window.location.assign(url);
+      }
+    </script>
+    <a href="#" onclick="staticApp(event)">Static App</a>
   </body>
 </html>
