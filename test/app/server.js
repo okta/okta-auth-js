@@ -20,6 +20,7 @@ app.use(webpackDevMiddleware(compiler, {
 }));
 
 app.use(express.static('./public'));
+app.use(express.static('../../packages/okta-auth-js/dist'));
 
 app.use(express.urlencoded());
 app.post('/login', function(req, res) {
