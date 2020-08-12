@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 
 import TestApp from './testApp';
 import { getDefaultConfig, getConfigFromUrl, getConfigFromStorage, clearStorage } from './config';
+import { toQueryParams } from './util';
 
 let app;
 let config;
@@ -23,6 +24,9 @@ function mount() {
   app.mount(window, rootElem);
   return app;
 }
+
+window.getAuthJSConfig = getDefaultConfig;
+window.toQueryParams = toQueryParams;
 
 // Login page, read config from URL
 window.getWidgetConfig = function() {
