@@ -15,6 +15,8 @@ declare global {
     bootstrapLanding: () => void;
     bootstrapCallback: () => void;
     getWidgetConfig: () => any;
+    getAuthJSConfig: () => any;
+    toQueryParams: (obj: any) => string;
   }
 }
 

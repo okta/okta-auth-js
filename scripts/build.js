@@ -7,6 +7,7 @@ const path = require('path');
 
 const BUILD_DIR = path.resolve(__dirname, '..', 'build');
 const BUNDLE_LIB_CMD = 'yarn build:web';
+const BUNDLE_CDN_CMD = 'yarn build:cdn';
 const BUNDLE_POLYFILL_CMD = 'yarn build:polyfill';
 const DIST_DIR = `${BUILD_DIR}/dist`; // will be uploaded to CDN
 const BABEL_CMD = 'yarn build:server';
@@ -23,11 +24,18 @@ if (shell.exec(TS_CMD).code !== 0) {
   shell.exit(1);
 }
 
-// Bundle browser code using webpack
+// Bundle browser code (UMD) using webpack
 if (shell.exec(BUNDLE_LIB_CMD).code !== 0) {
-  shell.echo(chalk.red('Error: Webpack of lib failed'));
+  shell.echo(chalk.red('Error: Webpack of UMD lib failed'));
   shell.exit(1);
 }
+
+// Bundle browser code (For CDN) using webpack
+if (shell.exec(BUNDLE_CDN_CMD).code !== 0) {
+  shell.echo(chalk.red('Error: Webpack of CDN lib failed'));
+  shell.exit(1);
+}
+
 // Bundle polyfill code using webpack
 if (shell.exec(BUNDLE_POLYFILL_CMD).code !== 0) {
   shell.echo(chalk.red('Error: Webpack of polyfill failed'));

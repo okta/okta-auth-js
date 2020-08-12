@@ -145,8 +145,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       isLoginRedirect: isLoginRedirect.bind(null, this)
     };
     // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
+    const syncMethods = ['decode', 'isLoginRedirect'];
     Object.keys(this.token).forEach(key => {
-      if (key === 'decode') { // sync methods should not be wrapped
+      if (syncMethods.indexOf(key) >= 0) { // sync methods should not be wrapped
         return;
       }
       var method = this.token[key];
