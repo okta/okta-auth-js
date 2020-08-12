@@ -10,7 +10,7 @@ module.exports = _.extend({}, _.cloneDeep(commonConfig), {
   mode: 'production',
   entry: './polyfill/',
   output: {
-    path: path.join(__dirname, 'dist', 'bundles'),
+    path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.polyfill.js',
     library: 'OktaAuthPolyfill',
     libraryTarget: 'umd'

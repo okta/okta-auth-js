@@ -20,7 +20,7 @@ else
 fi
 
 
-pushd ./dist
+pushd ./build
 
 if ! ci-append-sha; then
   echo "ci-append-sha failed! Exiting..."

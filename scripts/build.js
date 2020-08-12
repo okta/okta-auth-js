@@ -3,18 +3,19 @@
 const shell = require('shelljs');
 const chalk = require('chalk');
 const fs = require('fs');
+const path = require('path');
 
-const DIST_DIR = 'dist';
+const BUILD_DIR = path.resolve(__dirname, '..', 'build');
 const BUNDLE_LIB_CMD = 'yarn build:web';
 const BUNDLE_POLYFILL_CMD = 'yarn build:polyfill';
-const BUNDLES_DIR = `${DIST_DIR}/bundles`;
+const DIST_DIR = `${BUILD_DIR}/dist`; // will be uploaded to CDN
 const BABEL_CMD = 'yarn build:server';
 const TS_CMD = 'yarn tsc';
 
 shell.echo('Start building...');
 
-shell.rm('-Rf', `${DIST_DIR}/*`);
-shell.mkdir('-p', `./${BUNDLES_DIR}`);
+shell.rm('-Rf', `${BUILD_DIR}/*`);
+shell.mkdir('-p', `${DIST_DIR}`);
 
 // Run typescript to generate ESM module source
 if (shell.exec(TS_CMD).code !== 0) {
@@ -44,12 +45,12 @@ shell.echo(chalk.green('Babel completed'));
 
 shell.echo(chalk.green('Bundling completed'));
 
-shell.cp('-Rf', ['package.json', 'LICENSE', 'THIRD-PARTY-NOTICES', '*.md', 'polyfill'], `${DIST_DIR}`);
+shell.cp('-Rf', ['package.json', 'LICENSE', 'THIRD-PARTY-NOTICES', '*.md', 'polyfill'], `${BUILD_DIR}`);
 
 shell.echo('Modifying final package.json');
-let packageJSON = JSON.parse(fs.readFileSync(`./${DIST_DIR}/package.json`));
+let packageJSON = JSON.parse(fs.readFileSync(`${BUILD_DIR}/package.json`));
 packageJSON.private = false;
 packageJSON.scripts.prepare = '';
-fs.writeFileSync(`./${DIST_DIR}/package.json`, JSON.stringify(packageJSON, null, 4));
+fs.writeFileSync(`${BUILD_DIR}/package.json`, JSON.stringify(packageJSON, null, 4));
 
 shell.echo(chalk.green('End building'));

@@ -29,7 +29,7 @@
   },
   "overrides": [
     {
-      "files": ["polyfill/**/*", "dist/polyfill/**/*"],
+      "files": ["polyfill/**/*", "build/polyfill/**/*"],
       "env": {
         "browser": true
       },
@@ -40,14 +40,14 @@
       }
     },
     {
-      "files": ["dist/**/*"],
+      "files": ["build/**/*"],
       "rules": {
         "node/no-unpublished-require": 1,
         "node/no-unpublished-import": 1
       }
     },
     {
-      "files": ["{lib,dist/lib}/{browser/*,crypto,pkce}.{js,ts}"],
+      "files": ["{lib,build/lib}/{browser/*,crypto,pkce}.{js,ts}"],
       "rules": {
         "node/no-unsupported-features/node-builtins": ["error", {
           "ignores": ["TextEncoder"]

@@ -2079,8 +2079,22 @@ git clone https://github.com/okta/okta-auth-js.git
 # Navigate into the new `okta-auth-js` filder
 cd okta-auth-js
 
-# Install Okta node dependencies and SDK will be built under `dist`
+# Install Okta node dependencies and SDK will be built under `build`
 yarn install
+```
+
+## Linking the built SDK locally
+
+```bash
+# navigate to the `build` folder
+cd build
+
+# create a link to the built package
+yarn link
+
+# navigate to your other project which has "@okta/okta-auth-js" as a dependency and create link
+cd ../../other
+yarn link @okta/okta-auth-js
 ```
 
 ### Build and Test Commands

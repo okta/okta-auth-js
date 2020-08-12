@@ -8,7 +8,7 @@
   "type": "commonjs",
   "main": "cjs/server/index.js",
   "module": "lib/server/index.js",
-  "browser": "bundles/okta-auth-js.umd.js",
+  "browser": "dist/okta-auth-js.umd.js",
   "react-native": "lib/server/index.js",
   "types": "lib/browser/index.d.ts",
   "repository": {
@@ -19,8 +19,8 @@
     "url": "https://github.com/okta/okta-auth-js/issues"
   },
   "scripts": {
-    "clean": "yarn clean:dist clean:modules",
-    "clean:dist": "rimraf dist && rimraf build2 && rimraf dist",
+    "clean": "yarn clean:build clean:modules",
+    "clean:build": "rimraf build && rimraf build2",
     "clean:modules": "lerna exec rimraf node_modules && rimraf node_modules",
     "dev": "webpack --config webpack.dev.config.js",
     "lint": "eslint .",
@@ -34,9 +34,9 @@
     "test:browser": "jest --config ./jest.browser.js",
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
-    "build": "node build.js",
+    "build": "node scripts/build.js",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
-    "build:server": "cross-env babel lib -d dist/cjs --config-file ./babel.node.json --extensions \".ts\",\".js\"",
+    "build:server": "cross-env babel lib -d build/cjs --config-file ./babel.node.json --extensions \".ts\",\".js\"",
     "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
     "prepare": "yarn build",
     "start": "yarn --cwd test/app start --open"
