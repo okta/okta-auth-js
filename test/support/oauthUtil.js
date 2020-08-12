@@ -108,7 +108,7 @@ var getTime = oauthUtil.getTime = function getTime(time) {
 function validateResponse(res, expectedResp) {
   function expectResponsesToEqual(actual, expected) {
     if (!actual || !expected) {
-      expect(actual, expected);
+      expect(actual).toEqual(expected);
       return;
     }
     expect(actual.value).toEqual(expected.value);
@@ -213,27 +213,25 @@ oauthUtil.setup = function(opts) {
   } else if (opts.tokenRenewArgs) {
     promise = authClient.token.renew.apply(this, opts.tokenRenewArgs);
   } else if (opts.autoRenew) {
-    promise = new Promise(function(resolve) {
-      // TODO: do we need to remove handlers?
+    promise = new Promise(function(resolve, reject) {
       authClient.tokenManager.on('renewed', function() {
         resolve();
       });
-      authClient.tokenManager.on('error', function() {
-        resolve();
+      authClient.tokenManager.on('error', function(error) {
+        reject(error);
       });
     });
   }
 
   if (opts.fastForwardToTime) {
-    // Since the token is "expired", we're going to attempt to
-    // retrieve it and kick-off the autoRenew and let the event listeners
-    // above pick up the 'renewed' and 'error' events.
-    promise = authClient.tokenManager.get(opts.autoRenewTokenKey);
     util.warpByTicksToUnixTime(opts.time);
   }
 
   return promise
     .then(function(res) {
+      if (opts.willFail) {
+        expect('not to be hit').toBe(true);
+      }
       if(opts.beforeCompletion) {
         opts.beforeCompletion(authClient);
       }
@@ -509,28 +507,6 @@ oauthUtil.setupSimultaneousPostMessage = function() {
   return Promise.resolve({
     client: client,
     emitter: emitter
-  });
-};
-
-oauthUtil.itpErrorsCorrectly = function(title, options, error) {
-  it(title, function () {
-    options.willFail = true;
-    var setupMethod;
-    if (options.setupMethod) {
-      setupMethod = options.setupMethod;
-    } else if (options.authorizeArgs &&
-        (options.authorizeArgs.responseMode === 'fragment' || options.authorizeArgs.idp)) {
-      setupMethod = oauthUtil.setupPopup;
-    } else {
-      setupMethod = oauthUtil.setupFrame;
-    }
-    return setupMethod(options)
-      .then(function() {
-        expect('not to be hit').toEqual(true);
-      })
-      .catch(function(e) {
-        util.expectErrorToEqual(e, error);
-      });
   });
 };
 

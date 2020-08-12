@@ -36,8 +36,6 @@ export interface CustomUrls {
   logoutUrl?: string;
 }
 
-export type OnSessionExpiredFunction = () => void;
-
 export interface OktaAuthOptions extends CustomUrls {
   pkce?: boolean;
   clientId?: string;
@@ -48,7 +46,6 @@ export interface OktaAuthOptions extends CustomUrls {
   ignoreSignature?: boolean;
   tokenManager?: TokenManagerOptions;
   postLogoutRedirectUri?: string;
-  onSessionExpired?: OnSessionExpiredFunction;
   storageUtil?: StorageUtil;
   ajaxRequest?: object;
   httpRequestClient?: HttpRequestClient;

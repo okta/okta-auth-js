@@ -98,9 +98,6 @@ class TestApp {
   oktaAuth?: OktaAuth;
   constructor(config: Config) {
     this.config = config;
-    Object.assign(this.config, {
-      onSessionExpired: this._onSessionExpired.bind(this)
-    });
   }
 
   // Mount into the DOM
@@ -141,10 +138,6 @@ class TestApp {
 
   _onTokenError(error: string): void {
     document.getElementById('token-error').innerText = error;
-  }
-
-  _onSessionExpired(): void {
-    document.getElementById('session-expired').innerText = 'SESSION EXPIRED';
   }
 
   async bootstrapCallback(): Promise<void> {

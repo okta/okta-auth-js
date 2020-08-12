@@ -88,9 +88,6 @@ describe('E2E token flows', () => {
         await TestApp.tokenError.then(el => el.getText()).then(msg => {
           assert(msg.trim() === 'OAuthError: The client specified not to prompt, but the user is not logged in.');
         });
-        await TestApp.sessionExpired.then(el => el.getText()).then(txt => {
-          assert(txt === 'SESSION EXPIRED');
-        });
         await TestApp.clearTokens();
         await browser.refresh();
         await TestApp.waitForLoginBtn(); // assert we are logged out

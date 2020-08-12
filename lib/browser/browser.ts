@@ -101,7 +101,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       postLogoutRedirectUri: args.postLogoutRedirectUri,
       responseMode: args.responseMode,
       transformErrorXHR: args.transformErrorXHR,
-      onSessionExpired: args.onSessionExpired,
       cookies: cookieSettings
     });
   
@@ -183,19 +182,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
     this.emitter = new Emitter();
     this.tokenManager = new TokenManager(this, args.tokenManager);
-    this.tokenManager.on('error', this._onTokenManagerError, this);
-  }
-
-  _onTokenManagerError(error) {
-    var code = error.errorCode;
-    if (code === 'login_required' && error.accessToken) {
-      if (this.options.onSessionExpired) {
-        this.options.onSessionExpired();
-      } else {
-        // eslint-disable-next-line no-console
-        console.error('Session has expired or was closed outside the application.');
-      }
-    }
   }
 
   signIn(opts) {

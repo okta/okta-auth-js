@@ -842,8 +842,19 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
-  oauthUtil.itpErrorsCorrectly('throws an error if multiple responseTypes are sent as a string',
-    {
+  it('throws an error if multiple responseTypes are sent as a string', () => {
+    const error = {
+      name: 'AuthSdkError',
+      message: 'Multiple OAuth responseTypes must be defined as an array',
+      errorCode: 'INTERNAL',
+      errorSummary: 'Multiple OAuth responseTypes must be defined as an array',
+      errorLink: 'INTERNAL',
+      errorId: 'INTERNAL',
+      errorCauses: []
+    };
+
+    return oauthUtil.setupFrame({
+      willFail: true,
       oktaAuthArgs: {
         pkce: false,
         issuer: 'https://auth-js-test.okta.com',
@@ -854,17 +865,11 @@ describe('token.getWithoutPrompt', function() {
         responseType: 'id_token token',
         sessionToken: 'testSessionToken'
       }
-    },
-    {
-      name: 'AuthSdkError',
-      message: 'Multiple OAuth responseTypes must be defined as an array',
-      errorCode: 'INTERNAL',
-      errorSummary: 'Multiple OAuth responseTypes must be defined as an array',
-      errorLink: 'INTERNAL',
-      errorId: 'INTERNAL',
-      errorCauses: []
-    }
-  );
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+  });
 
   it('should throw AuthSdkError when in callback state', async () => {
     delete global.window.location;
@@ -2609,9 +2614,18 @@ describe('token.parseFromUrl', function() {
     });
   });
 
-  oauthUtil.itpErrorsCorrectly('throws an error if nothing to parse',
-    {
-      setupMethod: oauthUtil.setupParseUrl,
+  it('throws an error if nothing to parse', () => {
+    const error = {
+      name: 'AuthSdkError',
+      message: 'Unable to parse a token from the url',
+      errorCode: 'INTERNAL',
+      errorSummary: 'Unable to parse a token from the url',
+      errorLink: 'INTERNAL',
+      errorId: 'INTERNAL',
+      errorCauses: []
+    };
+    return oauthUtil.setupParseUrl({
+      willFail: true,
       hashMock: '',
       oauthCookie: JSON.stringify({
         responseType: ['id_token', 'token'],
@@ -2625,29 +2639,15 @@ describe('token.parseFromUrl', function() {
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
       })
-    },
-    {
-      name: 'AuthSdkError',
-      message: 'Unable to parse a token from the url',
-      errorCode: 'INTERNAL',
-      errorSummary: 'Unable to parse a token from the url',
-      errorLink: 'INTERNAL',
-      errorId: 'INTERNAL',
-      errorCauses: []
-    }
-  );
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
 
-  oauthUtil.itpErrorsCorrectly('throws an error if no cookie set',
-    {
-      setupMethod: oauthUtil.setupParseUrl,
-      hashMock: '#access_token=' + tokens.standardAccessToken +
-                '&id_token=' + tokens.standardIdToken +
-                '&expires_in=3600' +
-                '&token_type=Bearer' +
-                '&state=' + oauthUtil.mockedState,
-      oauthCookie: ''
-    },
-    {
+  });
+
+  it('throws an error if no cookie set', () => {
+    const error = {
       name: 'AuthSdkError',
       message: 'Unable to retrieve OAuth redirect params cookie',
       errorCode: 'INTERNAL',
@@ -2655,12 +2655,35 @@ describe('token.parseFromUrl', function() {
       errorLink: 'INTERNAL',
       errorId: 'INTERNAL',
       errorCauses: []
-    }
-  );
+    };
 
-  oauthUtil.itpErrorsCorrectly('throws an error if state doesn\'t match',
-    {
-      setupMethod: oauthUtil.setupParseUrl,
+    return oauthUtil.setupParseUrl({
+      willFail: true,
+      hashMock: '#access_token=' + tokens.standardAccessToken +
+                '&id_token=' + tokens.standardIdToken +
+                '&expires_in=3600' +
+                '&token_type=Bearer' +
+                '&state=' + oauthUtil.mockedState,
+      oauthCookie: ''
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+  });
+
+  it('throws an error if state doesn\'t match', () => {
+    const error = {
+      name: 'AuthSdkError',
+      message: 'OAuth flow response state doesn\'t match request state',
+      errorCode: 'INTERNAL',
+      errorSummary: 'OAuth flow response state doesn\'t match request state',
+      errorLink: 'INTERNAL',
+      errorId: 'INTERNAL',
+      errorCauses: []
+    };
+
+    return oauthUtil.setupParseUrl({
+      willFail: true,
       hashMock: '#access_token=' + tokens.standardAccessToken +
                 '&id_token=' + tokens.standardIdToken +
                 '&expires_in=3600' +
@@ -2678,21 +2701,24 @@ describe('token.parseFromUrl', function() {
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
       })
-    },
-    {
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+  });
+
+  it('throws an error if nonce doesn\'t match', () => {
+    const error = {
       name: 'AuthSdkError',
-      message: 'OAuth flow response state doesn\'t match request state',
+      message: 'OAuth flow response nonce doesn\'t match request nonce',
       errorCode: 'INTERNAL',
-      errorSummary: 'OAuth flow response state doesn\'t match request state',
+      errorSummary: 'OAuth flow response nonce doesn\'t match request nonce',
       errorLink: 'INTERNAL',
       errorId: 'INTERNAL',
       errorCauses: []
-    }
-  );
-
-  oauthUtil.itpErrorsCorrectly('throws an error if nonce doesn\'t match',
-    {
-      setupMethod: oauthUtil.setupParseUrl,
+    };
+    return oauthUtil.setupParseUrl({
+      willFail: true,
       hashMock: '#access_token=' + tokens.standardAccessToken +
                 '&id_token=' + tokens.standardIdToken +
                 '&expires_in=3600' +
@@ -2710,74 +2736,78 @@ describe('token.parseFromUrl', function() {
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
       })
-    },
-    {
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+  });
+
+  it('throws an error if access_token was not returned', () => {
+    const error = {
       name: 'AuthSdkError',
-      message: 'OAuth flow response nonce doesn\'t match request nonce',
+      message: 'Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.',
       errorCode: 'INTERNAL',
-      errorSummary: 'OAuth flow response nonce doesn\'t match request nonce',
+      errorSummary: 'Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.',
       errorLink: 'INTERNAL',
       errorId: 'INTERNAL',
       errorCauses: []
-    }
-  );
-
-  oauthUtil.itpErrorsCorrectly('throws an error if access_token was not returned', {
-    setupMethod: oauthUtil.setupParseUrl,
-    hashMock: '#id_token=' + tokens.standardIdToken +
-              '&expires_in=3600' +
-              '&token_type=Bearer' +
-              '&state=' + oauthUtil.mockedState,
-    oauthCookie: JSON.stringify({
-      responseType: ['id_token', 'token'],
-      state: oauthUtil.mockedState,
-      nonce: oauthUtil.mockedNonce,
-      scopes: ['openid', 'email'],
-      urls: {
-        issuer: 'https://auth-js-test.okta.com',
-        tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
-        authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-      }
+    };
+    return oauthUtil.setupParseUrl({
+      willFail: true,
+      hashMock: '#id_token=' + tokens.standardIdToken +
+                '&expires_in=3600' +
+                '&token_type=Bearer' +
+                '&state=' + oauthUtil.mockedState,
+      oauthCookie: JSON.stringify({
+        responseType: ['id_token', 'token'],
+        state: oauthUtil.mockedState,
+        nonce: oauthUtil.mockedNonce,
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      })
     })
-  },
-  {
-    name: 'AuthSdkError',
-    message: 'Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.',
-    errorCode: 'INTERNAL',
-    errorSummary: 'Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.',
-    errorLink: 'INTERNAL',
-    errorId: 'INTERNAL',
-    errorCauses: []
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
   });
 
-  oauthUtil.itpErrorsCorrectly('throws an error if id_token was not returned', {
-    setupMethod: oauthUtil.setupParseUrl,
-    hashMock: '#access_token=' + tokens.standardAccessToken +
-              '&expires_in=3600' +
-              '&token_type=Bearer' +
-              '&state=' + oauthUtil.mockedState,
-    oauthCookie: JSON.stringify({
-      responseType: ['id_token', 'token'],
-      state: oauthUtil.mockedState,
-      nonce: oauthUtil.mockedNonce,
-      scopes: ['openid', 'email'],
-      urls: {
-        issuer: 'https://auth-js-test.okta.com',
-        tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
-        authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-      }
+  it('throws an error if id_token was not returned', () => {
+    const error = {
+      name: 'AuthSdkError',
+      message: 'Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.',
+      errorCode: 'INTERNAL',
+      errorSummary: 'Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.',
+      errorLink: 'INTERNAL',
+      errorId: 'INTERNAL',
+      errorCauses: []
+    };
+    return oauthUtil.setupParseUrl({
+      willFail: true,
+      hashMock: '#access_token=' + tokens.standardAccessToken +
+                '&expires_in=3600' +
+                '&token_type=Bearer' +
+                '&state=' + oauthUtil.mockedState,
+      oauthCookie: JSON.stringify({
+        responseType: ['id_token', 'token'],
+        state: oauthUtil.mockedState,
+        nonce: oauthUtil.mockedNonce,
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      })
     })
-  },
-  {
-    name: 'AuthSdkError',
-    message: 'Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.',
-    errorCode: 'INTERNAL',
-    errorSummary: 'Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.',
-    errorLink: 'INTERNAL',
-    errorId: 'INTERNAL',
-    errorCauses: []
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
   });
 });
 
@@ -2905,17 +2935,8 @@ describe('token.renew', function() {
     });
   });
 
-  oauthUtil.itpErrorsCorrectly('throws an error if a non-token is passed',
-    {
-      oktaAuthArgs: {
-        pkce: false,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect'
-      },
-      tokenRenewArgs: [{non:'token'}]
-    },
-    {
+  it('throws an error if a non-token is passed', () => {
+    const error = {
       name: 'AuthSdkError',
       message: 'Renew must be passed a token with an array of scopes and an accessToken or idToken',
       errorCode: 'INTERNAL',
@@ -2923,8 +2944,21 @@ describe('token.renew', function() {
       errorLink: 'INTERNAL',
       errorId: 'INTERNAL',
       errorCauses: []
-    }
-  );
+    };
+    return oauthUtil.setupFrame({
+      willFail: true,
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      },
+      tokenRenewArgs: [{non:'token'}]
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+  });
 });
 
 describe('token.getUserInfo', function() {
