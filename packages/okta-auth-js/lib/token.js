@@ -709,15 +709,15 @@ function parseFromUrl(sdk, options) {
   // https://openid.net/specs/openid-connect-core-1_0.html#Authentication
   var defaultResponseMode = sdk.options.pkce ? 'query' : 'fragment';
 
-  var url = options.url;
   var responseMode = options.responseMode || sdk.options.responseMode || defaultResponseMode;
   var nativeLoc = sdk.token.parseFromUrl._getLocation();
+  var url = options.url || nativeLoc.href;
   var paramStr;
 
   if (responseMode === 'query') {
-    paramStr = url ? url.substring(url.indexOf('?')) : nativeLoc.search;
+    paramStr = url ? url.substring(url.lastIndexOf('?')) : nativeLoc.search;
   } else {
-    paramStr = url ? url.substring(url.indexOf('#')) : nativeLoc.hash;
+    paramStr = url ? url.substring(url.lastIndexOf('#')) : nativeLoc.hash;
   }
 
   if (!paramStr) {
@@ -741,7 +741,7 @@ function parseFromUrl(sdk, options) {
 
   return Promise.resolve(oauthUtil.urlParamsToObject(paramStr))
     .then(function(res) {
-      if (!url) {
+      if (!options.url) {
         // Clean hash or search from the url
         responseMode === 'query' ? removeSearch(sdk) : removeHash(sdk);
       }
