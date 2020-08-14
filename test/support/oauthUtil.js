@@ -173,6 +173,9 @@ oauthUtil.setup = function(opts) {
     authClient = opts.authClient;
   } else {
     authClient = new OktaAuth({
+      tokenManager: {
+        autoRenew: false,
+      },
       pkce: false,
       issuer: 'https://auth-js-test.okta.com'
     });
@@ -247,6 +250,11 @@ oauthUtil.setup = function(opts) {
       } else {
         console.error(err); // eslint-disable-line
         expect('not to be hit').toBe(true);
+      }
+    })
+    .finally(function() {
+      if (authClient && authClient._tokenQueue) {
+        expect(authClient._tokenQueue.queue.length).toBe(0);
       }
     });
 };

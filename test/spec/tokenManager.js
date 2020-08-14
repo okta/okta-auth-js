@@ -607,6 +607,7 @@ describe('TokenManager', function() {
     });
     afterEach(function() {
       jest.useRealTimers();
+      client.tokenManager.clear(); // clear all timeouts
     });
     it('should register listener for "expired" event', function() {
       jest.spyOn(Emitter.prototype, 'on');
@@ -752,7 +753,6 @@ describe('TokenManager', function() {
       });
     });
 
-
     it('does not return the token after tokens were cleared before renew promise was resolved', function() {
       var expiresAt = tokens.standardIdTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
@@ -800,7 +800,7 @@ describe('TokenManager', function() {
       });
     });
 
-    it('Emits an "error" event on OAuth failure', function() {
+    it('Emits an "error" event on OAuth failure', function(done) {
       setupSync({
         tokenManager: {
           autoRenew: true
@@ -815,11 +815,15 @@ describe('TokenManager', function() {
         accessToken: false
       };
       var errorEventCallback = jest.fn().mockImplementation(function(err) {
-        util.expectErrorToEqual(err, error);
+        try {
+          util.expectErrorToEqual(err, error);
+        } catch (e) {
+          done.fail(e);
+        }
       });
       client.tokenManager.on('error', errorEventCallback);
 
-      return oauthUtil.setupFrame({
+      oauthUtil.setupFrame({
         authClient: client,
         autoRenew: true,
         willFail: true,
@@ -839,31 +843,41 @@ describe('TokenManager', function() {
         util.expectErrorToEqual(err, error);
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
         expect(errorEventCallback).toHaveBeenCalled();
+      })
+      .then(function() {
+        done();
+      })
+      .catch(function(err) {
+        done.fail(err);
       });
     });
 
-    it('Emits an "error" event on AuthSdkError', function() {
+    it('Emits an "error" event on AuthSdkError', function(done) {
       setupSync({
         tokenManager: {
           autoRenew: true
         }
       });
       var errorEventCallback = jest.fn().mockImplementation(function(err) {
-        util.expectErrorToEqual(err, {
-          name: 'AuthSdkError',
-          message: 'The request does not match client configuration',
-          errorCode: 'INTERNAL',
-          errorSummary: 'The request does not match client configuration',
-          errorLink: 'INTERNAL',
-          errorId: 'INTERNAL',
-          errorCauses: [],
-          tokenKey: 'test-idToken',
-          accessToken: false
-        });
+        try {
+          util.expectErrorToEqual(err, {
+            name: 'AuthSdkError',
+            message: 'The request does not match client configuration',
+            errorCode: 'INTERNAL',
+            errorSummary: 'The request does not match client configuration',
+            errorLink: 'INTERNAL',
+            errorId: 'INTERNAL',
+            errorCauses: [],
+            tokenKey: 'test-idToken',
+            accessToken: false
+          });
+        } catch (e) {
+          done.fail(e);
+        }
       });
       client.tokenManager.on('error', errorEventCallback);
 
-      return oauthUtil.setupFrame({
+      oauthUtil.setupFrame({
         authClient: client,
         autoRenew: true,
         willFail: true,
@@ -895,6 +909,12 @@ describe('TokenManager', function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
 
         expect(errorEventCallback).toHaveBeenCalled();
+      })
+      .then(function() {
+        done();
+      })
+      .catch(function(err) {
+        done.fail(err);
       });
     });
 
