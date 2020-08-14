@@ -10,6 +10,9 @@ module.exports = {
   'moduleNameMapper': {
     '^@okta/okta-auth-js$': OktaAuth
   },
+  'setupFiles': [
+    '<rootDir>/test/support/nodeExceptions.js'
+  ],
   'testMatch': [
     '**/test/spec/*.{js,ts}'
   ],

@@ -289,7 +289,7 @@ export class TokenManager {
   
     const onTokenExpiredHandler = (key) => {
       if (options.autoRenew) {
-        this.renew(key);
+        this.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
       } else {
         this.remove(key);
       }

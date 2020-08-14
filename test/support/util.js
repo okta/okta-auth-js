@@ -195,7 +195,10 @@ function setup(options) {
         issuer: options.issuer,
         transformErrorXHR: options.transformErrorXHR,
         headers: options.headers,
-        ignoreSignature: options.bypassCrypto === true
+        ignoreSignature: options.bypassCrypto === true,
+        tokenManager: {
+          autoRenew: false
+        }
       });
 
       // 3. Initialize status if passed in
