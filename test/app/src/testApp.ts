@@ -19,6 +19,13 @@ import { htmlString, toQueryParams } from './util';
 import { Form, updateForm } from './form';
 import { tokensHTML } from './tokens';
 
+declare global {
+  interface Window {
+    getWidgetConfig: () => any;
+  }
+}
+
+
 declare class OktaSignIn {
   constructor(options: any);
   showSignInToGetTokens(options: any): void;

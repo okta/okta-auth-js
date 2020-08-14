@@ -19,7 +19,7 @@
     "url": "https://github.com/okta/okta-auth-js/issues"
   },
   "scripts": {
-    "clean": "yarn clean:build clean:modules",
+    "clean": "yarn clean:build && yarn clean:modules",
     "clean:build": "rimraf build && rimraf build2",
     "clean:modules": "lerna exec rimraf node_modules && rimraf node_modules",
     "dev": "webpack --config webpack.dev.config.js",

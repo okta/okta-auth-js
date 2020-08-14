@@ -2,6 +2,9 @@
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
+# build everything
+yarn build
+
 REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-topic"
 
 export TEST_SUITE_TYPE="build"

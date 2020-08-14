@@ -5,6 +5,9 @@ source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 export TEST_SUITE_TYPE="checkstyle"
 export TEST_RESULT_FILE_DIR="${REPO}/build2"
 
+# CJS code must be built for lint to pass
+yarn build:server
+
 if ! yarn lint:report; then
   echo "lint failed! Exiting..."
   exit ${TEST_FAILURE}
