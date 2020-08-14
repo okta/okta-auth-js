@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # Install current version of Chrome
 setup_service google-chrome-stable 79.0.3945.88-1
@@ -7,6 +7,9 @@ source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
 export TEST_SUITE_TYPE="jsunit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/unit"
+
+# build is required to run E2E tests
+yarn build
 
 if ! yarn test:report; then
   echo "unit failed! Exiting..."
