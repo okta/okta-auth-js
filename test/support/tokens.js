@@ -292,4 +292,4 @@ tokens.standardKey = {
   kid: 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM'
 };
 
-module.exports = tokens;
+export default tokens;

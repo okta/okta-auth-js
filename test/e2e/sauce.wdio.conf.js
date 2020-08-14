@@ -95,7 +95,14 @@ exports.config = {
       // 5 instance gets started at a time.
       //maxInstances: 5,
       //
-      {browserName: 'firefox', platformName: 'Windows 10', browserVersion: 'latest', 'sauce:options': {'seleniumVersion': '3.14.0'}},
+      {
+        browserName: 'firefox',
+        platformName: 'Windows 10',
+        browserVersion: 'latest',
+        'sauce:options': {
+          'seleniumVersion': '3.14.0'
+        }
+      },
       {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'},
       // TODO - Enable after OKTA-284870 is fixed
       // {browserName: 'safari', platform: 'OS X 10.13', version: 'latest'},

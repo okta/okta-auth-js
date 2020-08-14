@@ -1,1 +1,7 @@
+/test/support/xhr
+/test/app/public
 node_modules
+/build/dist
+/build/lib
+/build/types
+/build/cjs

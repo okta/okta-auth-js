@@ -16,6 +16,7 @@
 * [API Reference](#api-reference)
 * [Building the SDK](#building-the-sdk)
 * [Node JS and React Native Usage](#node-js-and-react-native-usage)
+* [Migrating from previous versions](#migrating-from-previous-versions)
 * [Contributing](#contributing)
 
 The Okta Auth JavaScript SDK builds on top of our [Authentication API](https://developer.okta.com/docs/api/resources/authn) and [OpenID Connect & OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
@@ -24,11 +25,14 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
-:heavy_check_mark: The current stable major version series is: `3.x`
+## Release Status
+
+:heavy_check_mark: The current stable major version series is: `4.x`
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
-| `3.x`     | :heavy_check_mark: Stable        |
+| `4.x`     | :heavy_check_mark: Stable        |
+| `3.x`     | :warning: Retiring on 2021-05-30 |
 | `2.x`     | :warning: Retiring on 2020-09-30 |
 | `1.x`     | :x: Retired                      |
 | `0.x`     | :x: Retired                      |
@@ -138,10 +142,17 @@ npm install --save @okta/okta-auth-js
 
 If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.min.js` file in a `<script>` tag.  
 
-However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module using CommonJS.
+However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module or require using CommonJS.
 
 ```javascript
-var OktaAuth = require('@okta/okta-auth-js');
+// ES module
+import { OktaAuth } from '@okta/okta-auth-js'
+const authClient = new OktaAuth(/* configOptions */)
+```
+
+```javascript
+// CommonJS
+var OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 var authClient = new OktaAuth(/* configOptions */);
 ```
 
@@ -152,7 +163,42 @@ For an overview of the client's features and authentication flows, check out [ou
 * Retrieve and store an OpenID Connect (OIDC) token
 * Get an Okta session
 
+> :warning: The developer docs may be written for an earlier version of this library. See [Migrating from previous versions](#migrating-from-previous-versions).
+
 You can also browse the full [API reference documentation](#api-reference).
+
+### Usage with Typescript
+
+Types are implicitly provided by this library through the `types` entry in `package.json`. Types can also be referenced explicitly by importing them.
+
+```typescript
+import {
+  OktaAuth,
+  OktaAuthOptions,
+  TokenManager,
+  AccessToken,
+  IDToken,
+  UserClaims,
+  TokenParams
+} from '@okta/okta-auth-js'
+
+const config: OktaAuthOptions = {
+  issuer: 'https://{yourOktaDomain}'
+}
+
+const authClient: OktaAuth = new OktaAuth(config)
+const tokenManager: TokenManager = authClient.tokenManager;
+const accessToken: AccessToken = await tokenManager.get('accessToken') as AccessToken;
+const idToken: IDToken = await tokenManager.get('idToken') as IDToken;
+const userInfo: UserClaims = await authClient.getUserInfo(accessToken, idToken);
+
+if (!userInfo) {
+  const tokenParams: TokenParams = {
+    scopes: ['openid', 'email', 'custom_scope'],
+  }
+  authClient.token.getWithRedirect(tokenParams);
+}
+```
 
 ## Configuration reference
 
@@ -221,7 +267,7 @@ tokenManager: {
 }
 ```
 
-By default, the `tokenManager` will attempt to renew expired tokens. When an expired token is requested by the `tokenManager.get()` method, a renewal request is executed to update the token. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to  [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
+By default, the `tokenManager` will attempt to renew tokens before they expire. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
 ```javascript
 tokenManager: {
@@ -229,7 +275,7 @@ tokenManager: {
 }
 ```
 
-Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration, if accessed with `tokenManager.get()`. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency between the client and Okta's servers.
+Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
 
 ```javascript
 // Emit expired event 2 minutes before expiration
@@ -284,7 +330,6 @@ In most cases you will not need to set a value for `responseMode`. Defaults are 
 | `clientId`     | Client Id pre-registered with Okta for the OIDC authentication flow. [Creating your Okta application](#creating-your-okta-appliation) |
 | `redirectUri`  | The url that is redirected to when using `token.getWithRedirect`. This must be listed in your Okta application's [Login redirect URIs](#login-redirect-uris). If no `redirectUri` is provided, defaults to the current origin (`window.location.origin`). [Configuring your Okta application](#configuring-your-okta-application) |
 | `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [signOut](#signout). This url must be listed in your Okta application's [Logout redirect URIs](#logout-redirect-uris). If not specified, your application's origin (`window.location.origin`) will be used.  [Configuring your Okta application](#configuring-your-okta-application) |
-| `onSessionExpired` | **(deprecated)** A function to be called when the Okta SSO session has expired or was ended outside of the application. A typical handler would initiate a login flow. :warning: This option will be removed in an upcoming version. When a [token renew](#tokenrenewtokentorenew) fails, an "error" event will be fired from the [TokenManager](#tokenmanageronevent-callback-context) and the token will be [removed from storage](#tokenmanagergetkey). Presense of a token in storage can be used to determine if a login flow is needed. Take care when beginning a new login flow that there is not another login flow already in progress. |
 | `responseMode` | Applicable only for SPA clients using [PKCE OAuth Flow](#pkce-oauth-20-flow). By default, the authorization code is requested and parsed from the search query. Setting this value to `fragment` will cause the URL hash fragment to be used instead. If your application uses or alters the search query portion of the `redirectUri`, you may want to set this option to "fragment". This option affects both [token.getWithRedirect](#tokengetwithredirectoptions) and [token.parseFromUrl](#tokenparsefromurloptions) |
 | `pkce`  | Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and `grant_type=authorization_code` on the token request. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions) |
 | `authorizeUrl` | Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize". |
@@ -296,7 +341,7 @@ In most cases you will not need to set a value for `responseMode`. Defaults are 
 | `tokenManager` | An object containing additional properties used to configure the internal token manager. |
 
 * `autoRenew`:
-  By default, the library will attempt to renew expired tokens. When an expired token is requested by the library, a renewal request is executed to update the token. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
+  By default, the library will attempt to renew tokens before they expire. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
 
 * `storage`:
   You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types:
@@ -1864,18 +1909,18 @@ authClient.token.getWithPopup()
 
 #### `tokenManager.get(key)`
 
-Get a token that you have previously added to the `tokenManager` with the given `key`. The token object will be returned if it has not expired.
+Get a token that you have previously added to the `tokenManager` with the given `key`. The token object will be returned if it exists in storage. Tokens will be removed from storage if they have expired and `autoRenew` is false or if there was an error while renewing the token. The `tokenManager` will emit a `removed` event when tokens are removed.
 
 * `key` - Key for the token you want to get
 
 ```javascript
 authClient.tokenManager.get('idToken')
 .then(function(token) {
-  if (token) {
+  if (token && !authClient.tokenManager.hasExpired(token)) {
     // Token is valid
     console.log(token);
   } else {
-    // Token has expired
+    // Token has been removed due to expiration or error while renewing
   }
 })
 .catch(function(err) {
@@ -1883,6 +1928,10 @@ authClient.tokenManager.get('idToken')
   console.error(err);
 });
 ```
+
+#### `tokenManager.hasExpired(token)`
+
+A synchronous method which returns `true` if the token has expired. The `tokenManager` will automatically remove expired tokens in the background. However, when the app first loads this background process may not have completed, so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition. 
 
 #### `tokenManager.remove(key)`
 
@@ -1927,7 +1976,11 @@ authClient.tokenManager.renew('idToken');
 
 Subscribe to an event published by the `tokenManager`.
 
-* `event` - Event to subscribe to. Possible events are `expired`, `error`, and `renewed`.
+* `event` - Event to subscribe to. Possible events are:
+  * `expired` - Fired before a token is set to expire (using `expireEarlySeconds` option, 30 seconds by default). If `autoRenew` option is set to true, a listener will be attached to this event and an attempt will be made to renew the token when the event fires.
+  * `error` - Fired when a token renew attempt has failed. This is a permanent error, and the token will be removed from storage.
+  * `renewed` - Fired when a token has been renewed by the `tokenManager`, either via the `autoRenew` process or as a result of calling `tokenManager.renew`
+  * `removed` - Fired when a token is removed from storage as a result of renew failure, or a call to `tokenManager.remove`. (This event will not fire from `tokenManager.clear`)
 * `callback` - Function to call when the event is triggered
 * `context` - Optional context to bind the callback to
 
@@ -1943,7 +1996,7 @@ authClient.tokenManager.on('renewed', function (key, newToken, oldToken) {
   console.log('Old token:', oldToken);
   console.log('New token:', newToken);
 });
-// Triggered when an OAuthError is returned via the API (typically during auto-renew)
+// Triggered when an OAuthError is returned via the API (typically during token renew)
 authClient.tokenManager.on('error', function (err) {
   console.log('TokenManager error:', err);
   // err.name
@@ -1952,11 +2005,6 @@ authClient.tokenManager.on('error', function (err) {
   // err.errorSummary
   // err.tokenKey
   // err.accessToken
-  if (err.errorCode === 'login_required' && err.accessToken) {
-    // The Okta session has expired or was closed outside the application
-    // The application should return to an unauthenticated state
-    // This error can also be handled using the 'onSessionExpired' option
-  }
 });
 ```
 
@@ -2031,8 +2079,22 @@ git clone https://github.com/okta/okta-auth-js.git
 # Navigate into the new `okta-auth-js` filder
 cd okta-auth-js
 
-# Install Okta node dependencies and SDK will be built under `dist`
+# Install Okta node dependencies and SDK will be built under `build`
 yarn install
+```
+
+## Linking the built SDK locally
+
+```bash
+# navigate to the `build` folder
+cd build
+
+# create a link to the built package
+yarn link
+
+# navigate to your other project which has "@okta/okta-auth-js" as a dependency and create link
+cd ../../other
+yarn link @okta/okta-auth-js
 ```
 
 ### Build and Test Commands
@@ -2057,6 +2119,54 @@ Before running the E2E tests, you will need to setup a test environment. See [te
 We have implemented a small SPA app, located at `./test/app/` which is used internally as a test harness for the E2E tests. The app can be run manually using `yarn start`. This will start a webpack dev server and open a new browser window at `http://localhost:8080`. The app provides a high level of feedback and configurability which make it useful as a tool for troubleshooting and manual testing scenarios. See [test/app/README](test/app/README.md) for more information on the test app.
 
 Because this test app is set up to dynamically change configuration and leak internal information, users should not use this test app as the basis for their own applications. Instead, use the example usage outlined elsewhere in this README.
+
+## Migrating from previous versions
+
+The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the original PR.
+
+### From 3.x to 4.x
+
+* Now using named exports. You should change code like
+
+```javascript
+// 3.x used default export
+import OktaAuth from '@okta/okta-auth-js'
+```
+
+to
+
+```javascript
+// 4.x uses named exports
+import { OktaAuth } from '@okta/okta-auth-js'
+```
+
+If using CommonJS, change
+
+```javascript
+// In 3.x module.exports was the OktaAuth object
+const OktaAuth = require('@okta/okta-auth-js');
+```
+
+to
+
+```javascript
+// In 4.x module.exports has a property named 'OktaAauth'
+const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
+```
+
+* For Typescript users: definitions for types in this library are now included. If you were providing your own definitions for `@okta/okta-auth-js` you should remove these in favor of the types exported by this library.
+
+* `onSessionExpired` option has been removed. [TokenManager events](#tokenmanageronevent-callback-context) can be used to detect and handle token renewal errors.
+
+### From 2.x to 3.x
+
+* Option `issuer` is [required](README.md#configuration-reference). Option `url` has been deprecated and is no longer used.
+
+* The object returned from `token.parseFromUrl()` is no longer an array containing token objects. It is now an object with a property called `tokens` which is a dictionary containing token objects.
+
+* New behavior for [signOut()](README.md#signout).
+
+* The default `responseMode` for PKCE flow is now `query`.
 
 ## Contributing
 

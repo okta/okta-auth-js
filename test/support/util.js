@@ -1,10 +1,13 @@
-/* globals expect, JSON */
 /* eslint-disable max-statements, complexity */
 
-var _ = require('lodash'),
-    OktaAuth = require('OktaAuth'),
-    cookies = require('@okta/okta-auth-js/lib/browser/browserStorage').storage,
-    fetch = require('cross-fetch');
+import _ from 'lodash';
+
+import { OktaAuth } from '@okta/okta-auth-js';
+
+import browserStorage from '../../lib/browser/browserStorage';
+const cookies = browserStorage.storage;
+
+import fetch from 'cross-fetch';
 
 var util = {};
 
@@ -353,7 +356,7 @@ util.mockGetLocation = function (client, mockLocation) {
 };
 
 util.mockUserAgent = function (client, mockUserAgent) {
-  jest.spyOn(client.fingerprint, '_getUserAgent').mockReturnValue(mockUserAgent);
+  jest.spyOn(global.window.navigator, 'userAgent', 'get').mockReturnValue(mockUserAgent);
 };
 
 util.expectErrorToEqual = function (actual, expected) {
@@ -393,4 +396,4 @@ util.assertAuthSdkError = function (err, message) {
   expect(err.errorCauses).toEqual([]);
 };
 
-module.exports = util;
+export default util;
