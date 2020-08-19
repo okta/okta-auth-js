@@ -40,6 +40,10 @@ function emitExpired(tokenMgmtRef, key, token) {
   tokenMgmtRef.emitter.emit('expired', key, token);
 }
 
+function emitRenewed(tokenMgmtRef, key, freshToken, oldToken) {
+  tokenMgmtRef.emitter.emit('renewed', key, freshToken, oldToken);
+}
+
 function emitRemoved(tokenMgmtRef, key) {
   tokenMgmtRef.emitter.emit('removed', key);
 }
@@ -167,7 +171,7 @@ function renew(sdk, tokenMgmtRef, storage, key) {
         return;
       }
       add(sdk, tokenMgmtRef, storage, key, freshToken);
-      tokenMgmtRef.emitter.emit('renewed', key, freshToken, oldToken);
+      emitRenewed(tokenMgmtRef, key, freshToken, oldToken);
       return freshToken;
     })
     .catch(function(err) {
