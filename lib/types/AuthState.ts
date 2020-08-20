@@ -5,4 +5,5 @@ export interface AuthState {
   idToken?: IDToken;
   isAuthenticated?: boolean;
   isPending?: boolean;
+  error?: Error;
 }
