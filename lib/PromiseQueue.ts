@@ -36,11 +36,7 @@ class PromiseQueue {
   // Returns a promise
   // If the method is synchronous, it will resolve when the method completes
   // If the method returns a promise, it will resolve (or reject) with the value from the method's promise
-  push(/* method, thisObject, args... */) {
-    var args = Array.prototype.slice.call(arguments);
-    var method = args[0];
-    var thisObject = args[1];
-    args = args.slice(2);
+  push(method: Function, thisObject: object, ...args: any[]) {
     return new Promise((resolve, reject) => {
       this.queue.push({
         method,

@@ -69,7 +69,6 @@ import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
 
 const Emitter = require('tiny-emitter');
-const PCancelable = require('p-cancelable');
 
 class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   static features: FeaturesAPI;
@@ -79,18 +78,16 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   emitter: typeof Emitter;
   tokenManager: TokenManager;
   fingerprint: FingerprintAPI;
-  private authState: AuthState;
-  private pending;
+  private pending: { handleLogin: boolean } = { handleLogin: false };
+  private authState: AuthState = { ...DEFAULT_AUTH_STATE };
+  private authStateQueue: PromiseQueue;
 
   constructor(args: OktaAuthOptions) {
-    args = Object.assign({
+    super(Object.assign({
       httpRequestClient: fetchRequest,
       storageUtil: browserStorage
-    }, args);
-    super(args);
+    }, args));
 
-    this.pending = {};
-    this.authState = { ...DEFAULT_AUTH_STATE };
     var cookieSettings = Object.assign({
       secure: true
     }, args.cookies);
@@ -206,19 +203,21 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
     this.emitter = new Emitter();
     this.tokenManager = new TokenManager(this, args.tokenManager);
+    this.authStateQueue = new PromiseQueue();
 
-    // Listen on tokenManager events to update authState
+    // Listen on tokenManager events to update tokens in authState
+    // And push async authState evaluation and emit process into PromiseQ
     this.emitter.on('added', (key, token) => {
       this.authState = { ...this.authState, [key]: token };
-      this.updateAuthState();
+      this.authStateQueue.push(this.updateAuthState, this);
     });
     this.emitter.on('renewed', (key, token) => {
       this.authState = { ...this.authState, [key]: token };
-      this.updateAuthState();
+      this.authStateQueue.push(this.updateAuthState, this, false /* shouldEvaluateIsAuthenticated */);
     });
-    this.emitter.on('removed', async (key) => {
+    this.emitter.on('removed', (key) => {
       this.authState = omit(this.authState, key);
-      this.updateAuthState();
+      this.authStateQueue.push(this.updateAuthState, this);
     });
   }
 
@@ -339,36 +338,37 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   private emitAuthStateChange(authState) {
-    this.emitter.emit(EVENT_AUTH_STATE_CHANGE, authState);
+    this.authState = authState;
+    // emit new authState object
+    this.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
   }
 
-  private async updateAuthState() {
-    if (this.pending.updateAuthStatePromise) {
-      this.pending.updateAuthStatePromise.cancel();
-    }
-
-    const cancelablePromise = new PCancelable((resolve, _, onCancel) => {
-      onCancel.shouldReject = false;
-      onCancel(() => {
-        this.pending.updateAuthStatePromise = null;
-      });
-
-      const { accessToken, idToken } = this.authState;
-      let promise = this.options.isAuthenticated 
+  private async updateAuthState(shouldEvaluateIsAuthenticated = true) {
+    const { accessToken, idToken } = this.authState;
+    let promise
+    if (shouldEvaluateIsAuthenticated) {
+      promise = this.options.isAuthenticated 
         ? this.options.isAuthenticated() 
         : Promise.resolve(!!(accessToken && idToken));
-      return promise.then(isAuthenticated => {
-        if (cancelablePromise.isCanceled) {
-          resolve();
-          return;
-        }
-
-        this.emitAuthStateChange({ ...this.authState, isAuthenticated, isPending: false });  
-        this.pending.updateAuthStatePromise = null;
-        resolve();
+    } else {
+      promise = Promise.resolve(true);
+    }
+  
+    return promise.then(isAuthenticated => {
+      this.emitAuthStateChange({ 
+        ...this.authState, 
+        isAuthenticated, 
+        isPending: false 
+      });  
+    }).catch(error => {
+      this.emitAuthStateChange({ 
+        accessToken: null,
+        idToken: null,
+        isAuthenticated: false, 
+        isPending: false, 
+        error
       });
     });
-    this.pending.updateAuthStatePromise = cancelablePromise;
   }
 
 
@@ -445,6 +445,10 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     this.authState = { ...this.authState, accessToken, idToken };
     this.updateAuthState();
+  }
+
+  getAuthState() {
+    return this.authState;
   }
 
   /**
