@@ -18,7 +18,7 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryParams, clone } from '../util';
+import { removeTrailingSlash, toQueryParams, clone, omit } from '../util';
 import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
@@ -62,12 +62,14 @@ import {
   SignoutAPI, 
   FingerprintAPI,
   AuthState,
-  UserClaims
+  UserClaims,
+  IDToken
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
 
 const Emitter = require('tiny-emitter');
+const PCancelable = require('p-cancelable');
 
 class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   static features: FeaturesAPI;
@@ -206,13 +208,17 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.tokenManager = new TokenManager(this, args.tokenManager);
 
     // Listen on tokenManager events to update authState
-    this.emitter.on('renewed', (key, freshToken) => {
-      this.emitAuthStateChange({ ...this.authState, [key]: freshToken });
+    this.emitter.on('added', (key, token) => {
+      this.authState = { ...this.authState, [key]: token };
+      this.updateAuthState();
+    });
+    this.emitter.on('renewed', (key, token) => {
+      this.authState = { ...this.authState, [key]: token };
+      this.updateAuthState();
     });
     this.emitter.on('removed', async (key) => {
-      delete this.authState[key];
-      const isAuthenticated = this.options.isAuthenticated ? await this.options.isAuthenticated() : false;
-      this.emitAuthStateChange({ ...this.authState, isAuthenticated });
+      this.authState = omit(this.authState, key);
+      this.updateAuthState();
     });
   }
 
@@ -333,8 +339,36 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   private emitAuthStateChange(authState) {
-    this.authState = authState;
     this.emitter.emit(EVENT_AUTH_STATE_CHANGE, authState);
+  }
+
+  private async updateAuthState() {
+    if (this.pending.updateAuthStatePromise) {
+      this.pending.updateAuthStatePromise.cancel();
+    }
+
+    const cancelablePromise = new PCancelable((resolve, _, onCancel) => {
+      onCancel.shouldReject = false;
+      onCancel(() => {
+        this.pending.updateAuthStatePromise = null;
+      });
+
+      const { accessToken, idToken } = this.authState;
+      let promise = this.options.isAuthenticated 
+        ? this.options.isAuthenticated() 
+        : Promise.resolve(!!(accessToken && idToken));
+      return promise.then(isAuthenticated => {
+        if (cancelablePromise.isCanceled) {
+          resolve();
+          return;
+        }
+
+        this.emitAuthStateChange({ ...this.authState, isAuthenticated, isPending: false });  
+        this.pending.updateAuthStatePromise = null;
+        resolve();
+      });
+    });
+    this.pending.updateAuthStatePromise = cancelablePromise;
   }
 
 
@@ -388,38 +422,29 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       };
     }
     await this.signOut(options);
-    this.emitAuthStateChange({ ...DEFAULT_AUTH_STATE });
   }
 
   async handleAuthentication() {
-    const authState: AuthState = {};
     const { tokens } = await this.token.parseFromUrl();
     if (tokens.idToken) {
       this.tokenManager.add(ID_TOKEN_STORAGE_KEY, tokens.idToken);
-      authState.idToken = tokens.idToken;
-      authState.isAuthenticated = !!tokens.idToken;
     }
     if (tokens.accessToken) {
       this.tokenManager.add(ACCESS_TOKEN_STORAGE_KEY, tokens.accessToken);
-      authState.accessToken = tokens.accessToken;
-      authState.isAuthenticated = authState.isAuthenticated && !!tokens.idToken;
     }
-    this.emitAuthStateChange(authState);
   }
 
   async initialAuthState() {
-    const accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY);
-    const idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY);
-
-    // Use external check, or default to isAuthenticated if either the access or id token exist
-    const isAuthenticated = this.options.isAuthenticated 
-      ? await this.options.isAuthenticated() 
-      : !!(accessToken && idToken);
-    this.emitAuthStateChange({ 
-      isAuthenticated,
-      idToken,
-      accessToken
-    });
+    let accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
+    if (accessToken && this.tokenManager.hasExpired(accessToken)) {
+      accessToken = null;
+    }
+    let idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY) as IDToken;
+    if (idToken && this.tokenManager.hasExpired(idToken)) {
+      idToken = null;
+    }
+    this.authState = { ...this.authState, accessToken, idToken };
+    this.updateAuthState();
   }
 
   /**
