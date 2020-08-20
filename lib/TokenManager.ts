@@ -44,6 +44,10 @@ function emitRenewed(tokenMgmtRef, key, freshToken, oldToken) {
   tokenMgmtRef.emitter.emit('renewed', key, freshToken, oldToken);
 }
 
+function emitAdded(tokenMgmtRef, key, token) {
+  tokenMgmtRef.emitter.emit('added', key, token);
+}
+
 function emitRemoved(tokenMgmtRef, key) {
   tokenMgmtRef.emitter.emit('removed', key);
 }
@@ -114,6 +118,7 @@ function add(sdk, tokenMgmtRef, storage, key, token: Token) {
   }
   tokenStorage[key] = token;
   storage.setStorage(tokenStorage);
+  emitAdded(tokenMgmtRef, key, token);
   setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
 }
 
