@@ -22,11 +22,3 @@ export const CACHE_STORAGE_NAME = 'okta-cache-storage';
 export const PKCE_STORAGE_NAME = 'okta-pkce-storage';
 export const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
 export const ID_TOKEN_STORAGE_KEY =  'idToken';
-export const DEFAULT_AUTH_STATE = { 
-  isPending: true,
-  isAuthenticated: false,
-  idToken: null,
-  accessToken: null,
-};
-export const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
-export const REFERRER_PATH_STORAGE_KEY = 'referrerPath';
