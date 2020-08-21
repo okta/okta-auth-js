@@ -125,8 +125,8 @@ class AuthService {
 
   // React specific APIs
 
-  redirect(): Promise<void> {
-    return this.loginRedirect();
+  redirect(additionalParams?: object): Promise<void> {
+    return this.loginRedirect(additionalParams);
   }
 
   getAuthState(): AuthState {
