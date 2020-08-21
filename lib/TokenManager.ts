@@ -216,6 +216,10 @@ export class TokenManager {
   constructor(sdk, options: TokenManagerOptions) {
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
 
+    if (!sdk.emitter) {
+      throw new AuthSdkError('Emitter should be initialized before AuthStateManager');
+    }
+
     if (options.storage === 'localStorage' && !storageUtil.browserHasLocalStorage()) {
       warn('This browser doesn\'t support localStorage. Switching to sessionStorage.');
       options.storage = 'sessionStorage';

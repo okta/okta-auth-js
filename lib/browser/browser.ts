@@ -18,15 +18,12 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryParams, clone, omit } from '../util';
+import { removeTrailingSlash, toQueryParams, clone } from '../util';
 import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
-  DEFAULT_AUTH_STATE,
   ACCESS_TOKEN_STORAGE_KEY, 
-  ID_TOKEN_STORAGE_KEY,
-  EVENT_AUTH_STATE_CHANGE,
-  REFERRER_PATH_STORAGE_KEY
+  ID_TOKEN_STORAGE_KEY
 } from '../constants';
 import {
   closeSession,
@@ -60,13 +57,12 @@ import {
   TokenAPI, 
   FeaturesAPI, 
   SignoutAPI, 
-  FingerprintAPI,
-  AuthState,
-  UserClaims,
-  IDToken
+  FingerprintAPI
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
+import AuthStateManager from '../AuthStateManager';
+import AuthService from '../AuthService';
 
 const Emitter = require('tiny-emitter');
 
@@ -77,12 +73,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   _tokenQueue: PromiseQueue;
   emitter: typeof Emitter;
   tokenManager: TokenManager;
+  authStateManager: AuthStateManager;
+  authService: AuthService;
   fingerprint: FingerprintAPI;
-  private pending: { handleLogin: boolean, tokens: object } = { handleLogin: false, tokens: {} };
-  private authState: AuthState = { ...DEFAULT_AUTH_STATE };
-  private authStateQueue: PromiseQueue;
 
-  constructor(args: OktaAuthOptions) {
+  constructor(args: OktaAuthOptions, _authServiceType?: string) {
     super(Object.assign({
       httpRequestClient: fetchRequest,
       storageUtil: browserStorage
@@ -125,7 +120,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
-  
+
     // Digital clocks will drift over time, so the server
     // can misalign with the time reported by the browser.
     // The maxClockSkew allows relaxing the time-based
@@ -203,26 +198,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
     this.emitter = new Emitter();
     this.tokenManager = new TokenManager(this, args.tokenManager);
-    this.authStateQueue = new PromiseQueue();
-
-    // Listen on tokenManager events to sync update tokens in memory (this.pending)
-    // And push async update authState and emit process into PromiseQ
-    this.emitter.on('added', (key, token) => {
-      this.pending.tokens = { ...this.pending.tokens, [key]: token };
-      this.authStateQueue.push(this.updateAuthState, this, { ...this.pending.tokens, event: 'added' });
-    });
-    this.emitter.on('renewed', (key, token) => {
-      this.pending.tokens = { ...this.pending.tokens, [key]: token };
-      this.authStateQueue.push(
-        this.updateAuthState, 
-        this, 
-        { ...this.pending.tokens, shouldEvaluateIsAuthenticated: false }
-      );
-    });
-    this.emitter.on('removed', (key) => {
-      this.pending.tokens = omit(this.pending.tokens, key);
-      this.authStateQueue.push(this.updateAuthState, this, { ...this.pending.tokens });
-    });
+    this.authStateManager = new AuthStateManager(this);
+    
+    // authService instance for downstream SDKs existing public APIs
+    // TODO: deprecate
+    this.authService = new AuthService(this);
   }
 
   signIn(opts) {
@@ -339,162 +319,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       }
     };
     return http.get(this, url, options);
-  }
-
-  private async updateAuthState({ 
-    accessToken, 
-    idToken, 
-    shouldEvaluateIsAuthenticated = true
-  }) {
-    let promise
-    if (shouldEvaluateIsAuthenticated) {
-      promise = this.options.isAuthenticated 
-        ? this.options.isAuthenticated(accessToken, idToken)
-        : Promise.resolve(!!(accessToken && idToken));
-    } else {
-      promise = Promise.resolve(true);
-    }
-
-    const emitAuthStateChange = (authState) => {
-      this.authState = authState;
-      // emit new authState object
-      this.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
-    }
-  
-    // The ONLY place that updates authState then emit authStateChange event
-    // This guarantees a predictable state when call "getAuthState()" from downstream clients
-    return promise.then(isAuthenticated => {
-      emitAuthStateChange({ 
-        accessToken,
-        idToken, 
-        isAuthenticated, 
-        isPending: false 
-      });  
-    }).catch(error => {
-      emitAuthStateChange({ 
-        accessToken: null,
-        idToken: null,
-        isAuthenticated: false, 
-        isPending: false, 
-        error
-      });
-    });
-  }
-
-
-  //
-  // Methods from AuthService (downstream SDKs)
-  //
-
-  async login(fromUri?: string, additionalParams?: object) {
-    if(this.pending.handleLogin) { 
-      // Don't trigger second round
-      return;
-    }
-
-    this.setFromUri(fromUri);
-    try {
-      if (this.options.onAuthRequired) {
-        return await this.options.onAuthRequired(this);
-      }
-      return await this.loginRedirect(additionalParams);
-    } finally {
-      this.pending.handleLogin = null;
-    }
-  }
-
-  /**
-   * Launches the login redirect.
-   * @param fromUri
-   * @param additionalParams
-   * @throws {AuthSdkError}
-   */
-  private loginRedirect(additionalParams?: object) {
-    const params = Object.assign({
-      scopes: this.options.scopes || ['openid', 'email', 'profile'],
-      responseType: this.options.responseType || ['id_token', 'token']
-    }, additionalParams);
-
-    return this.token.getWithRedirect(params);
-  }
-
-  async logout(options?: any): Promise<void> {
-    let redirectUri = null;
-    options = options || {};
-    if (typeof options === 'string') {
-      redirectUri = options;
-      // If a relative path was passed, convert to absolute URI
-      if (redirectUri.charAt(0) === '/') {
-        redirectUri = window.location.origin + redirectUri;
-      }
-      options = {
-        postLogoutRedirectUri: redirectUri
-      };
-    }
-    await this.signOut(options);
-  }
-
-  async handleAuthentication() {
-    const { tokens } = await this.token.parseFromUrl();
-    if (tokens.idToken) {
-      this.tokenManager.add(ID_TOKEN_STORAGE_KEY, tokens.idToken);
-    }
-    if (tokens.accessToken) {
-      this.tokenManager.add(ACCESS_TOKEN_STORAGE_KEY, tokens.accessToken);
-    }
-  }
-
-  async initialAuthState() {
-    let accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
-    if (accessToken && this.tokenManager.hasExpired(accessToken)) {
-      accessToken = null;
-    }
-    let idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY) as IDToken;
-    if (idToken && this.tokenManager.hasExpired(idToken)) {
-      idToken = null;
-    }
-    this.updateAuthState({ accessToken, idToken });
-  }
-
-  getAuthState() {
-    return this.authState;
-  }
-
-  /**
-   * Returns user claims from the /userinfo endpoint.
-   */
-  async getUser(): Promise<UserClaims> {
-    return this.token.getUserInfo();
-  }
-
-  /**
-   * Stores the intended path to redirect after successful login.
-   * @param uri
-   * @param queryParams
-   */
-  setFromUri(fromUri?: string) {
-    // Use current location if fromUri was not passed
-    fromUri = fromUri || window.location.href;
-    // If a relative path was passed, convert to absolute URI
-    if (fromUri.charAt(0) === '/') {
-      fromUri = window.location.origin + fromUri;
-    }
-    sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
-  }
-
-  /**
-   * Returns the referrer path from sessionStorage or app root.
-   */
-  getFromUri(relative: boolean = false): string {
-    let fromUri = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
-    sessionStorage.removeItem(REFERRER_PATH_STORAGE_KEY);
-    if (!relative) {
-      return fromUri;
-    }
-
-    const url = new URL(fromUri);
-    fromUri = `${url.pathname}${url.search}${url.hash}`
-    return fromUri;
   }
 }
 
