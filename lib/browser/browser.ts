@@ -78,7 +78,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   emitter: typeof Emitter;
   tokenManager: TokenManager;
   fingerprint: FingerprintAPI;
-  private pending: { handleLogin: boolean } = { handleLogin: false };
+  private pending: { handleLogin: boolean, tokens: object } = { handleLogin: false, tokens: {} };
   private authState: AuthState = { ...DEFAULT_AUTH_STATE };
   private authStateQueue: PromiseQueue;
 
@@ -205,19 +205,23 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.tokenManager = new TokenManager(this, args.tokenManager);
     this.authStateQueue = new PromiseQueue();
 
-    // Listen on tokenManager events to update tokens in authState
-    // And push async authState evaluation and emit process into PromiseQ
+    // Listen on tokenManager events to sync update tokens in memory (this.pending)
+    // And push async update authState and emit process into PromiseQ
     this.emitter.on('added', (key, token) => {
-      this.authState = { ...this.authState, [key]: token };
-      this.authStateQueue.push(this.updateAuthState, this);
+      this.pending.tokens = { ...this.pending.tokens, [key]: token };
+      this.authStateQueue.push(this.updateAuthState, this, { ...this.pending.tokens, event: 'added' });
     });
     this.emitter.on('renewed', (key, token) => {
-      this.authState = { ...this.authState, [key]: token };
-      this.authStateQueue.push(this.updateAuthState, this, false /* shouldEvaluateIsAuthenticated */);
+      this.pending.tokens = { ...this.pending.tokens, [key]: token };
+      this.authStateQueue.push(
+        this.updateAuthState, 
+        this, 
+        { ...this.pending.tokens, shouldEvaluateIsAuthenticated: false }
+      );
     });
     this.emitter.on('removed', (key) => {
-      this.authState = omit(this.authState, key);
-      this.authStateQueue.push(this.updateAuthState, this);
+      this.pending.tokens = omit(this.pending.tokens, key);
+      this.authStateQueue.push(this.updateAuthState, this, { ...this.pending.tokens });
     });
   }
 
@@ -337,31 +341,37 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     return http.get(this, url, options);
   }
 
-  private emitAuthStateChange(authState) {
-    this.authState = authState;
-    // emit new authState object
-    this.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
-  }
-
-  private async updateAuthState(shouldEvaluateIsAuthenticated = true) {
-    const { accessToken, idToken } = this.authState;
+  private async updateAuthState({ 
+    accessToken, 
+    idToken, 
+    shouldEvaluateIsAuthenticated = true
+  }) {
     let promise
     if (shouldEvaluateIsAuthenticated) {
       promise = this.options.isAuthenticated 
-        ? this.options.isAuthenticated() 
+        ? this.options.isAuthenticated(accessToken, idToken)
         : Promise.resolve(!!(accessToken && idToken));
     } else {
       promise = Promise.resolve(true);
     }
+
+    const emitAuthStateChange = (authState) => {
+      this.authState = authState;
+      // emit new authState object
+      this.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
+    }
   
+    // The ONLY place that updates authState then emit authStateChange event
+    // This guarantees a predictable state when call "getAuthState()" from downstream clients
     return promise.then(isAuthenticated => {
-      this.emitAuthStateChange({ 
-        ...this.authState, 
+      emitAuthStateChange({ 
+        accessToken,
+        idToken, 
         isAuthenticated, 
         isPending: false 
       });  
     }).catch(error => {
-      this.emitAuthStateChange({ 
+      emitAuthStateChange({ 
         accessToken: null,
         idToken: null,
         isAuthenticated: false, 
@@ -443,8 +453,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     if (idToken && this.tokenManager.hasExpired(idToken)) {
       idToken = null;
     }
-    this.authState = { ...this.authState, accessToken, idToken };
-    this.updateAuthState();
+    this.updateAuthState({ accessToken, idToken });
   }
 
   getAuthState() {
