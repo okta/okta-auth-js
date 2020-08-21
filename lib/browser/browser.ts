@@ -78,10 +78,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   fingerprint: FingerprintAPI;
 
   constructor(args: OktaAuthOptions, _authServiceType?: string) {
-    super(Object.assign({
+    args = Object.assign({
       httpRequestClient: fetchRequest,
       storageUtil: browserStorage
-    }, args));
+    }, args)
+    super(args);
 
     var cookieSettings = Object.assign({
       secure: true
