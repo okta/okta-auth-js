@@ -11,5 +11,4 @@ export interface AuthState {
 export interface UpdateAuthStateOptions {
   accessToken: AccessToken;
   idToken: IDToken;
-  shouldEvaluateIsAuthenticated?: boolean;
 }
