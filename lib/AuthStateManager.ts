@@ -24,9 +24,9 @@ const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 
 class AuthStateManager {
   private sdk: OktaAuth;
-  private pending: { tokens: Tokens } = { tokens: {} };
-  private authStateQueue: PromiseQueue = new PromiseQueue();
-  private authState: AuthState = { ...DEFAULT_AUTH_STATE };
+  private pending: { tokens: Tokens };
+  private authStateQueue: PromiseQueue;
+  private authState: AuthState;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
@@ -34,23 +34,21 @@ class AuthStateManager {
     }
 
     this.sdk = sdk;
+    this.pending = { tokens: {} };
+    this.authStateQueue = new PromiseQueue();
+    this.authState = { ...DEFAULT_AUTH_STATE };
 
     // Listen on tokenManager events to sync update tokens in memory (this.pending)
     // And push async update authState and emit process into PromiseQ
+
+    // "added" event is emitted in both add and renew process
+    // Only listen on "added" (instead of both "added" and "renewed") to limit authState re-evaluation
     sdk.tokenManager.on('added', (key, token) => {
       this.pending.tokens = { ...this.pending.tokens, [key]: token };
       this.authStateQueue.push(
         this.updateAuthState, 
         this,
-        { ...this.pending.tokens, event: 'added' }
-      );
-    });
-    sdk.tokenManager.on('renewed', (key, token) => {
-      this.pending.tokens = { ...this.pending.tokens, [key]: token };
-      this.authStateQueue.push(
-        this.updateAuthState, 
-        this,
-        { ...this.pending.tokens, shouldEvaluateIsAuthenticated: false }
+        { ...this.pending.tokens }
       );
     });
     sdk.tokenManager.on('removed', (key) => {

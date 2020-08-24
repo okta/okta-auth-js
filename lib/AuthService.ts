@@ -6,11 +6,12 @@ import { AuthState } from './types';
 const REFERRER_PATH_STORAGE_KEY = 'referrerPath';
 
 class AuthService {
-  protected sdk: OktaAuth;
-  private pending: { handleLogin: boolean } = { handleLogin: false };
+  private sdk: OktaAuth;
+  private pending: { handleLogin: boolean };
 
   constructor(sdk: OktaAuth) {
     this.sdk = sdk;
+    this.pending = { handleLogin: false };
   }
 
   // Common APIs

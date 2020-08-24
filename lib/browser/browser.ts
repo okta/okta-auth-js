@@ -74,7 +74,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   emitter: typeof Emitter;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
-  authService: AuthService;
+  _authService: AuthService;
   fingerprint: FingerprintAPI;
 
   constructor(args: OktaAuthOptions) {
@@ -203,7 +203,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     
     // authService instance for downstream SDKs existing public APIs
     // TODO: deprecate
-    this.authService = new AuthService(this);
+    this._authService = new AuthService(this);
   }
 
   signIn(opts) {
