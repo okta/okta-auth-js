@@ -77,19 +77,10 @@ class AuthStateManager {
     this.updateAuthState({ accessToken, idToken });
   }
 
-  updateAuthState({
-    accessToken, 
-    idToken,
-    shouldEvaluateIsAuthenticated = true
-  }: UpdateAuthStateOptions): Promise<void> {
-    let promise
-    if (shouldEvaluateIsAuthenticated) {
-      promise = this.sdk.options.isAuthenticated 
+  updateAuthState({ accessToken, idToken }: UpdateAuthStateOptions): Promise<void> {
+    const promise = this.sdk.options.isAuthenticated 
         ? this.sdk.options.isAuthenticated(accessToken, idToken)
         : Promise.resolve(!!(accessToken && idToken));
-    } else {
-      promise = Promise.resolve(true);
-    }
 
     const emitAuthStateChange = (authState) => {
       this.authState = authState;
