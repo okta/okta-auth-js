@@ -108,7 +108,7 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
   }
 }
 
-function add(sdk, tokenMgmtRef, storage, key, token: Token, shouldEmitEvent = true) {
+function add(sdk, tokenMgmtRef, storage, key, token: Token) {
   var tokenStorage = storage.getStorage();
   if (!isObject(token) ||
       !token.scopes ||
@@ -118,9 +118,7 @@ function add(sdk, tokenMgmtRef, storage, key, token: Token, shouldEmitEvent = tr
   }
   tokenStorage[key] = token;
   storage.setStorage(tokenStorage);
-  if (shouldEmitEvent) {
-    emitAdded(tokenMgmtRef, key, token);
-  }
+  emitAdded(tokenMgmtRef, key, token);
   setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
 }
 
@@ -177,7 +175,7 @@ function renew(sdk, tokenMgmtRef, storage, key) {
         // renewed token, we verify the promise key doesn't exist and return.
         return;
       }
-      add(sdk, tokenMgmtRef, storage, key, freshToken, false /* shouldEmitEvent */);
+      add(sdk, tokenMgmtRef, storage, key, freshToken);
       emitRenewed(tokenMgmtRef, key, freshToken, oldToken);
       return freshToken;
     })
