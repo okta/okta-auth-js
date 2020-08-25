@@ -61,7 +61,8 @@ import {
   SignoutAPI, 
   FingerprintAPI,
   UserClaims, 
-  AuthState
+  AuthState,
+  Tokens
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
@@ -78,16 +79,15 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
   fingerprint: FingerprintAPI;
-  private pending: { handleLogin: boolean };
+  #pending: { handleLogin: boolean };
 
   constructor(args: OktaAuthOptions) {
-    args = Object.assign({
+    super(Object.assign({
       httpRequestClient: fetchRequest,
       storageUtil: browserStorage
-    }, args);
-    super(args);
+    }, args));
 
-    this.pending = { handleLogin: false };
+    this.#pending = { handleLogin: false };
     var cookieSettings = Object.assign({
       secure: true
     }, args.cookies);
@@ -329,15 +329,23 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   // Common APIs
 
   async updateAuthState(): Promise<void> {
-    let accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
-    if (accessToken && this.tokenManager.hasExpired(accessToken)) {
-      accessToken = null;
-    }
-    let idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY) as IDToken;
-    if (idToken && this.tokenManager.hasExpired(idToken)) {
-      idToken = null;
-    }
-    this.authStateManager.updateAuthState({ accessToken, idToken });
+    const handleUpdate = () => {
+      return Promise.all([
+        this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY),
+        this.tokenManager.get(ID_TOKEN_STORAGE_KEY)
+      ]).then(([accessToken, idToken]) => {
+        if (accessToken && this.tokenManager.hasExpired(accessToken)) {
+          accessToken = null;
+        }
+        if (idToken && this.tokenManager.hasExpired(idToken)) {
+          idToken = null;
+        }
+        return this.authStateManager._updateAuthState({ accessToken, idToken } as Tokens);
+      });
+    };
+
+    // push update process into promiseQ to generate sequential states
+    this.authStateManager._authStateQueue.push(handleUpdate, this);
   }
 
   async getUser(): Promise<UserClaims> {
@@ -363,7 +371,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   async login(fromUri?: string, additionalParams?: object): Promise<void> {
-    if(this.pending.handleLogin) { 
+    if(this.#pending.handleLogin) { 
       // Don't trigger second round
       return;
     }
@@ -375,7 +383,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       }
       return await this.loginRedirect(additionalParams);
     } finally {
-      this.pending.handleLogin = null;
+      this.#pending.handleLogin = null;
     }
   }
 
