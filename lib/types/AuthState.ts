@@ -7,8 +7,3 @@ export interface AuthState {
   isPending?: boolean;
   error?: Error;
 }
-
-export interface UpdateAuthStateOptions {
-  accessToken: AccessToken;
-  idToken: IDToken;
-}

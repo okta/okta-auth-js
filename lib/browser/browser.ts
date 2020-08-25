@@ -23,7 +23,8 @@ import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
   ACCESS_TOKEN_STORAGE_KEY, 
-  ID_TOKEN_STORAGE_KEY
+  ID_TOKEN_STORAGE_KEY,
+  REFERRER_PATH_STORAGE_KEY
 } from '../constants';
 import {
   closeSession,
@@ -54,15 +55,17 @@ import {
   OktaAuth, 
   OktaAuthOptions, 
   AccessToken, 
+  IDToken,
   TokenAPI, 
   FeaturesAPI, 
   SignoutAPI, 
-  FingerprintAPI
+  FingerprintAPI,
+  UserClaims, 
+  AuthState
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
 import AuthStateManager from '../AuthStateManager';
-import AuthService from '../AuthService';
 
 const Emitter = require('tiny-emitter');
 
@@ -74,8 +77,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   emitter: typeof Emitter;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
-  _authService: AuthService;
   fingerprint: FingerprintAPI;
+  private pending: { handleLogin: boolean };
 
   constructor(args: OktaAuthOptions) {
     args = Object.assign({
@@ -84,6 +87,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }, args);
     super(args);
 
+    this.pending = { handleLogin: false };
     var cookieSettings = Object.assign({
       secure: true
     }, args.cookies);
@@ -200,10 +204,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.emitter = new Emitter();
     this.tokenManager = new TokenManager(this, args.tokenManager);
     this.authStateManager = new AuthStateManager(this);
-    
-    // authService instance for downstream SDKs existing public APIs
-    // TODO: deprecate
-    this._authService = new AuthService(this);
   }
 
   signIn(opts) {
@@ -321,10 +321,150 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     };
     return http.get(this, url, options);
   }
+
+  //
+  // Methods from dowstream SDKs' AuthService
+  //
+
+  // Common APIs
+
+  async updateAuthState(): Promise<void> {
+    let accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
+    if (accessToken && this.tokenManager.hasExpired(accessToken)) {
+      accessToken = null;
+    }
+    let idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY) as IDToken;
+    if (idToken && this.tokenManager.hasExpired(idToken)) {
+      idToken = null;
+    }
+    this.authStateManager.updateAuthState({ accessToken, idToken });
+  }
+
+  async getUser(): Promise<UserClaims> {
+    return this.token.getUserInfo();
+  }
+
+  async getIdToken(): Promise<string> {
+    try {
+      const idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY) as IDToken;
+      return idToken ? idToken.idToken : undefined;
+    } catch (err) {
+      return undefined;
+    }
+  }
+
+  async getAccessToken(): Promise<string> {
+    try {
+      const accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
+      return accessToken ? accessToken.accessToken : undefined;
+    } catch (err) {
+      return undefined;
+    }
+  }
+
+  async login(fromUri?: string, additionalParams?: object): Promise<void> {
+    if(this.pending.handleLogin) { 
+      // Don't trigger second round
+      return;
+    }
+
+    this.setFromUri(fromUri);
+    try {
+      if (this.options.onAuthRequired) {
+        return await this.options.onAuthRequired(this);
+      }
+      return await this.loginRedirect(additionalParams);
+    } finally {
+      this.pending.handleLogin = null;
+    }
+  }
+
+  async logout(options?: any): Promise<void> {
+    let redirectUri = null;
+    options = options || {};
+    if (typeof options === 'string') {
+      redirectUri = options;
+      // If a relative path was passed, convert to absolute URI
+      if (redirectUri.charAt(0) === '/') {
+        redirectUri = window.location.origin + redirectUri;
+      }
+      options = {
+        postLogoutRedirectUri: redirectUri
+      };
+    }
+    await this.signOut(options);
+  }
+
+  async loginRedirect(additionalParams?: object): Promise<void> {
+    const { scopes, responseType } = this.options;
+    const params = Object.assign({
+      scopes: scopes || ['openid', 'email', 'profile'],
+      responseType: responseType || ['id_token', 'token']
+    }, additionalParams);
+
+    return this.token.getWithRedirect(params);
+  }
+
+  async handleAuthentication(): Promise<void> {
+    const { tokens } = await this.token.parseFromUrl();
+    if (tokens.idToken) {
+      this.tokenManager.add(ID_TOKEN_STORAGE_KEY, tokens.idToken);
+    }
+    if (tokens.accessToken) {
+      this.tokenManager.add(ACCESS_TOKEN_STORAGE_KEY, tokens.accessToken);
+    }
+  }
+
+  setFromUri(fromUri?: string): void {
+    // Use current location if fromUri was not passed
+    fromUri = fromUri || window.location.href;
+    // If a relative path was passed, convert to absolute URI
+    if (fromUri.charAt(0) === '/') {
+      fromUri = window.location.origin + fromUri;
+    }
+    sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
+  }
+
+  getFromUri(relative: boolean = false): string {
+    let fromUri = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
+    sessionStorage.removeItem(REFERRER_PATH_STORAGE_KEY);
+    if (!relative) {
+      return fromUri;
+    }
+
+    const url = new URL(fromUri);
+    fromUri = `${url.pathname}${url.search}${url.hash}`
+    return fromUri;
+  }
+
+  getTokenManager(): TokenManager {
+    return this.tokenManager;
+  }
+
+  // Angular specific APIs
+
+  isAuthenticated(): Promise<boolean> {
+    const authState = this.authStateManager.getAuthState();
+    return Promise.resolve(authState.isAuthenticated);
+  }
+
+  // React specific APIs
+
+  redirect(additionalParams?: object): Promise<void> {
+    return this.loginRedirect(additionalParams);
+  }
+
+  getAuthState(): AuthState {
+    return this.authStateManager.getAuthState();
+  }
+
+  on(eventName: String, callback: Function): Function {
+    this.emitter.on(eventName, callback);
+    return () => this.emitter.off(eventName);
+  }
 }
 
 // Hoist feature detection functions to static type
 OktaAuthBrowser.features = OktaAuthBrowser.prototype.features = features;
 
 export default OktaAuthBrowser;
-
