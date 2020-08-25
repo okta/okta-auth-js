@@ -16,80 +16,86 @@ const DEFAULT_AUTH_STATE = {
 const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 
 class AuthStateManager {
-  private sdk: OktaAuth;
-  private pending: { tokens: Tokens };
-  private authStateQueue: PromiseQueue;
-  private authState: AuthState;
+  #sdk: OktaAuth;
+  #pending: { tokens: Tokens };
+  #authState: AuthState;
+  
+  // expose the authState promiseQ for internal SDK usage
+  _authStateQueue: PromiseQueue;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
       throw new AuthSdkError('Emitter should be initialized before AuthStateManager');
     }
 
-    this.sdk = sdk;
-    this.pending = { tokens: {} };
-    this.authStateQueue = new PromiseQueue();
-    this.authState = { ...DEFAULT_AUTH_STATE };
+    this.#sdk = sdk;
+    this.#pending = { tokens: {} };
+    this.#authState = { ...DEFAULT_AUTH_STATE };
+    this._authStateQueue = new PromiseQueue();
 
     // Listen on tokenManager events to sync update tokens in memory (this.pending), and start updateState process
     // "added" event is emitted in both add and renew process
     // Only listen on "added" (instead of both "added" and "renewed") to limit authState re-evaluation
     sdk.tokenManager.on('added', (key, token) => {
-      this.pending.tokens = { ...this.pending.tokens, [key]: token };
-      this.updateAuthState(this.pending.tokens);
+      this.#pending.tokens = { ...this.#pending.tokens, [key]: token };
+      this._authStateQueue.push(
+        this._updateAuthState,
+        this,
+        { ...this.#pending.tokens }
+      );
     });
     sdk.tokenManager.on('removed', (key) => {
-      this.pending.tokens = omit(this.pending.tokens, key);
-      this.updateAuthState(this.pending.tokens);
+      this.#pending.tokens = omit(this.#pending.tokens, key);
+      this._authStateQueue.push(
+        this._updateAuthState,
+        this,
+        { ...this.#pending.tokens }
+      )
     });
   }
 
   getAuthState(): AuthState {
-    return this.authState;
+    return this.#authState;
   }
 
-  updateAuthState({ accessToken, idToken }: Tokens): void {
+  _updateAuthState({ accessToken, idToken }: Tokens): Promise<void> {
     const emitAuthStateChange = (authState) => {
-      this.authState = authState;
+      this.#authState = authState;
       // emit new authState object
-      this.sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
+      this.#sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
     };
 
-    const handleUpdate = () => {
-      const promise = this.sdk.options.isAuthenticated 
-        ? this.sdk.options.isAuthenticated(accessToken, idToken)
-        : Promise.resolve(!!(accessToken && idToken));
+    const { isAuthenticated } = this.#sdk.options;
+    const promise = isAuthenticated 
+      ? isAuthenticated(accessToken, idToken)
+      : Promise.resolve(!!(accessToken && idToken));
 
-      // The ONLY place that updates authState then emit authStateChange event
-      // This guarantees a predictable state when call "getAuthState()" from downstream clients
-      return promise.then(isAuthenticated => {
-        emitAuthStateChange({ 
-          accessToken,
-          idToken, 
-          isAuthenticated, 
-          isPending: false 
-        });  
-      }).catch(error => {
-        emitAuthStateChange({ 
-          accessToken: null,
-          idToken: null,
-          isAuthenticated: false, 
-          isPending: false, 
-          error
-        });
+    // The ONLY place that updates authState then emit authStateChange event
+    // This guarantees a predictable state when call "getAuthState()" from downstream clients
+    return promise.then(isAuthenticated => {
+      emitAuthStateChange({ 
+        accessToken,
+        idToken, 
+        isAuthenticated, 
+        isPending: false 
+      });  
+    }).catch(error => {
+      emitAuthStateChange({ 
+        accessToken: null,
+        idToken: null,
+        isAuthenticated: false, 
+        isPending: false, 
+        error
       });
-    };
-
-    // add update func to promiseQ
-    this.authStateQueue.push(handleUpdate, this);
+    });
   }
 
   onAuthStateChange(handler): void {
-    this.sdk.emitter.on(EVENT_AUTH_STATE_CHANGE, handler);
+    this.#sdk.emitter.on(EVENT_AUTH_STATE_CHANGE, handler);
   };
 
   offAuthStateChange(handler?): void {
-    this.sdk.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
+    this.#sdk.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
   };
 }
 
