@@ -1,12 +1,14 @@
 var OktaAuth = '<rootDir>/lib/browser';
 var SDK_VERSION = require('./package.json').version;
+var USER_AGENT = 'okta-auth-js/' + SDK_VERSION;
 
 module.exports = {
   'coverageDirectory': '<rootDir>/build2/reports/coverage-browser',
   'collectCoverage': true,
   'collectCoverageFrom': ['./lib/**','!./test/**'],
   'globals': {
-    SDK_VERSION: SDK_VERSION
+    SDK_VERSION,
+    USER_AGENT
   },
   'restoreMocks': true,
   'moduleNameMapper': {
