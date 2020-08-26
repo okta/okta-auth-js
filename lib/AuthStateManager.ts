@@ -10,11 +10,16 @@ const DEFAULT_AUTH_STATE = {
   idToken: null,
   accessToken: null,
 };
+const DEFAULT_PENDING = {
+  updateAuthStatePromise: null,
+  canceledTimes: 0
+};
 const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
+const MAX_PROMISE_CANCEL_TIMES = 10;
 
 class AuthStateManager {
   _sdk: OktaAuth;
-  _pending: { updateAuthStatePromise: typeof PCancelable };
+  _pending: { updateAuthStatePromise: typeof PCancelable, canceledTimes: number };
   _authState: AuthState;
 
   constructor(sdk: OktaAuth) {
@@ -23,7 +28,7 @@ class AuthStateManager {
     }
 
     this._sdk = sdk;
-    this._pending = { updateAuthStatePromise: null };
+    this._pending = { ...DEFAULT_PENDING };
     this._authState = { ...DEFAULT_AUTH_STATE };
 
     // Listen on tokenManager events to sync update tokens in memory (this.pending), and start updateState process
@@ -31,9 +36,6 @@ class AuthStateManager {
     // Only listen on "added" (instead of both "added" and "renewed") to limit authState re-evaluation
     sdk.tokenManager.on('added', (key, token) => {
       this.updateAuthState({ shouldCheckExpiration: false,  event: 'added', key, token });
-    });
-    sdk.tokenManager.on('renewed', (key, token) => {
-      this.updateAuthState({ shouldCheckExpiration: false,  event: 'renewed', key, token });
     });
     sdk.tokenManager.on('removed', (key, token) => {
       this.updateAuthState({ shouldCheckExpiration: false, event: 'removed', key, token });
@@ -46,7 +48,7 @@ class AuthStateManager {
 
   updateAuthState({ shouldCheckExpiration, event, key, token }: UpdateAuthStateOptions): void {
     const logger = (status) => {
-      console.group(`OKTA-AUTH-JS:updateAuthState:event:${event}:${status}`);
+      console.group(`OKTA-AUTH-JS:updateAuthState: Event:${event} Status:${status}`);
       console.log(key, token);
       console.log('Current authState', this._authState);
       console.groupEnd();
@@ -56,13 +58,17 @@ class AuthStateManager {
       this._authState = authState;
       // emit new authState object
       this._sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
-      if (devMode) {
-        logger('sent');
-      }
+      devMode && logger('sent');
     };
 
     if (this._pending.updateAuthStatePromise) {
-      this._pending.updateAuthStatePromise.cancel();
+      if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {
+        // stop canceling then starting a new promise
+        // let existing promise finish to prevent running into loops
+        return;
+      } else {
+        this._pending.updateAuthStatePromise.cancel();
+      }
     }
 
     const { isAuthenticated, devMode } = this._sdk.options;
@@ -70,9 +76,8 @@ class AuthStateManager {
       onCancel.shouldReject = false;
       onCancel(() => {
         this._pending.updateAuthStatePromise = null;
-        if (devMode) {
-          logger('canceled');
-        }
+        this._pending.canceledTimes = this._pending.canceledTimes + 1;
+        devMode && logger('canceled');
       });
 
       return Promise.all([
@@ -83,7 +88,6 @@ class AuthStateManager {
           resolve();
           return;
         }
-
         if (shouldCheckExpiration) {
           if (accessToken && this._sdk.tokenManager.hasExpired(accessToken)) {
             accessToken = null;
@@ -92,17 +96,24 @@ class AuthStateManager {
             idToken = null;
           }
         }
-
         let promise = isAuthenticated 
           ? isAuthenticated(this._sdk) 
           : Promise.resolve(!!(accessToken && idToken));
+
         return promise.then(isAuthenticated => {
           if (cancelablePromise.isCanceled) {
             resolve();
             return;
           }
-          emitAuthStateChange({ ...this._authState, accessToken, idToken, isAuthenticated, isPending: false });  
-          this._pending.updateAuthStatePromise = null;
+          // emit event and clear states
+          emitAuthStateChange({ 
+            ...this._authState, 
+            accessToken, 
+            idToken, 
+            isAuthenticated, 
+            isPending: false 
+          }); 
+          this._pending = { ...DEFAULT_PENDING };
           resolve();
         });
       });
