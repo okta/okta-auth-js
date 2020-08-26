@@ -48,8 +48,8 @@ function emitAdded(tokenMgmtRef, key, token) {
   tokenMgmtRef.emitter.emit('added', key, token);
 }
 
-function emitRemoved(tokenMgmtRef, key) {
-  tokenMgmtRef.emitter.emit('removed', key);
+function emitRemoved(tokenMgmtRef, key, token) {
+  tokenMgmtRef.emitter.emit('removed', key, token);
 }
 
 function emitError(tokenMgmtRef, error) {
@@ -140,10 +140,11 @@ function remove(tokenMgmtRef, storage, key) {
 
   // Remove it from storage
   var tokenStorage = storage.getStorage();
+  var removedToken = tokenStorage[key];
   delete tokenStorage[key];
   storage.setStorage(tokenStorage);
 
-  emitRemoved(tokenMgmtRef, key);
+  emitRemoved(tokenMgmtRef, key, removedToken);
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {

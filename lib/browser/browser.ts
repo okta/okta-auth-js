@@ -79,7 +79,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
   fingerprint: FingerprintAPI;
-  #pending: { handleLogin: boolean };
+  _pending: { handleLogin: boolean };
 
   constructor(args: OktaAuthOptions) {
     super(Object.assign({
@@ -87,7 +87,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       storageUtil: browserStorage
     }, args));
 
-    this.#pending = { handleLogin: false };
+    this._pending = { handleLogin: false };
     var cookieSettings = Object.assign({
       secure: true
     }, args.cookies);
@@ -121,7 +121,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       postLogoutRedirectUri: args.postLogoutRedirectUri,
       responseMode: args.responseMode,
       transformErrorXHR: args.transformErrorXHR,
-      cookies: cookieSettings
+      cookies: cookieSettings,
+      isAuthenticated: args.isAuthenticated,
+      onAuthRequired: args.onAuthRequired
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
@@ -328,24 +330,12 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   // Common APIs
 
-  async updateAuthState(): Promise<void> {
-    const handleUpdate = () => {
-      return Promise.all([
-        this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY),
-        this.tokenManager.get(ID_TOKEN_STORAGE_KEY)
-      ]).then(([accessToken, idToken]) => {
-        if (accessToken && this.tokenManager.hasExpired(accessToken)) {
-          accessToken = null;
-        }
-        if (idToken && this.tokenManager.hasExpired(idToken)) {
-          idToken = null;
-        }
-        return this.authStateManager._updateAuthState({ accessToken, idToken } as Tokens);
-      });
-    };
+  initialAuthState(): void {
+    this.authStateManager.updateAuthState({ shouldCheckExpiration: true, event: 'init' });
+  }
 
-    // push update process into promiseQ to generate sequential states
-    this.authStateManager._authStateQueue.push(handleUpdate, this);
+  updateAuthState(): void {
+    this.authStateManager.updateAuthState({ shouldCheckExpiration: false });
   }
 
   async getUser(): Promise<UserClaims> {
@@ -371,7 +361,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   async login(fromUri?: string, additionalParams?: object): Promise<void> {
-    if(this.#pending.handleLogin) { 
+    if(this._pending.handleLogin) { 
       // Don't trigger second round
       return;
     }
@@ -383,7 +373,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       }
       return await this.loginRedirect(additionalParams);
     } finally {
-      this.#pending.handleLogin = null;
+      this._pending.handleLogin = null;
     }
   }
 
