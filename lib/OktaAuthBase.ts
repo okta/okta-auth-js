@@ -42,7 +42,8 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
       issuer: removeTrailingSlash(args.issuer),
       httpRequestClient: args.httpRequestClient,
       storageUtil: args.storageUtil,
-      headers: args.headers
+      headers: args.headers,
+      devMode: args.devMode || false
     };
 
     this.tx = {
