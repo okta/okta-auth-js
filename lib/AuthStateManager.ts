@@ -40,6 +40,9 @@ class AuthStateManager {
     sdk.tokenManager.on('removed', (key, token) => {
       this.updateAuthState({ shouldCheckExpiration: false, event: 'removed', key, token });
     });
+
+    // Start the initial evaluation
+    this.updateAuthState({ shouldCheckExpiration: true });
   }
 
   getAuthState(): AuthState {
@@ -58,7 +61,7 @@ class AuthStateManager {
       this._authState = authState;
       // emit new authState object
       this._sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
-      devMode && logger('sent');
+      devMode && logger('emitted');
     };
 
     if (this._pending.updateAuthStatePromise) {

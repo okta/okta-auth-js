@@ -330,10 +330,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   // Common APIs
 
-  initialAuthState(): void {
-    this.authStateManager.updateAuthState({ shouldCheckExpiration: true, event: 'init' });
-  }
-
   updateAuthState(): void {
     this.authStateManager.updateAuthState({ shouldCheckExpiration: false });
   }
