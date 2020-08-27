@@ -122,6 +122,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       responseMode: args.responseMode,
       transformErrorXHR: args.transformErrorXHR,
       cookies: cookieSettings,
+      scopes: args.scopes,
       isAuthenticated: args.isAuthenticated,
       onAuthRequired: args.onAuthRequired
     });
@@ -330,8 +331,12 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   // Common APIs
 
+  getAuthState(): AuthState {
+    return this.authStateManager.getAuthState();
+  }
+
   updateAuthState(): void {
-    this.authStateManager.updateAuthState({ shouldCheckExpiration: false });
+    this.authStateManager.updateAuthState();
   }
 
   async getUser(): Promise<UserClaims> {
@@ -446,10 +451,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   redirect(additionalParams?: object): Promise<void> {
     return this.loginRedirect(additionalParams);
-  }
-
-  getAuthState(): AuthState {
-    return this.authStateManager.getAuthState();
   }
 
   on(eventName: String, callback: Function): Function {

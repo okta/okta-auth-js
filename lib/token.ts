@@ -703,22 +703,28 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
     });
 }
 
-function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
-  if (!isToken(token)) {
+function renewToken(sdk: OktaAuth, token?: AccessToken & IDToken, type?: string): Promise<Token> {
+  if (!isToken(token) && !type) {
     return Promise.reject(new AuthSdkError('Renew must be passed a token with ' +
-      'an array of scopes and an accessToken or idToken'));
+      'an array of scopes and an accessToken or idToken, or token type to indicate the token to be renewed'));
   }
 
-  var responseType;
+  const isRenewAccessToken = () => (isAccessToken(token) || type === 'accessToken');
+
+  let responseType;
   if (sdk.options.pkce) {
     responseType = 'code';
-  } else if (isAccessToken(token)) {
+  } else if (isRenewAccessToken()) {
     responseType = 'token';
   } else {
     responseType = 'id_token';
-  }
+  }  
 
-  const { scopes, authorizeUrl, userinfoUrl, issuer } = token as (AccessToken & IDToken);
+  const scopes = (token && token.scopes) || sdk.options.scopes;
+  const authorizeUrl = (token && token.authorizeUrl) || sdk.options.authorizeUrl;
+  const userinfoUrl = (token && token.userinfoUrl) || sdk.options.userinfoUrl;
+  const issuer = (token && token.issuer) || sdk.options.issuer;
+  
   return getWithoutPrompt(sdk, {
     responseType,
     scopes,
@@ -729,7 +735,7 @@ function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
   .then(function(res) {
     // Multiple tokens may have come back. Return only the token which was requested.
     var tokens = res.tokens;
-    return isIDToken(token) ? tokens.idToken : tokens.accessToken;
+    return isRenewAccessToken() ? tokens.accessToken : tokens.idToken;
   });
 }
 

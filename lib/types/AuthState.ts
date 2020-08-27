@@ -11,6 +11,5 @@ export interface AuthState {
 export interface UpdateAuthStateOptions {
   event?: string,
   key?: string,
-  token?: Token,
-  shouldCheckExpiration?: boolean
+  token?: Token
 }
