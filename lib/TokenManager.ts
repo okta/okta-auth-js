@@ -15,7 +15,7 @@
 import { removeNils, warn, isObject } from './util';
 import AuthSdkError from './errors/AuthSdkError';
 import storageUtil from './browser/browserStorage';
-import { TOKEN_STORAGE_NAME } from './constants';
+import { TOKEN_STORAGE_NAME, ACCESS_TOKEN_STORAGE_KEY } from './constants';
 import storageBuilder from './storageBuilder';
 import SdkClock from './clock';
 import { Token, TokenManagerOptions, isIDToken, isAccessToken } from './types';
@@ -74,19 +74,26 @@ function clearExpireEventTimeoutAll(tokenMgmtRef) {
   }
 }
 
-function setExpireEventTimeout(sdk, tokenMgmtRef, key, token) {
+function setExpireEventTimeout(sdk, tokenMgmtRef, storage, key, token) {
   var expireTime = getExpireTime(tokenMgmtRef, token);
   var expireEventWait = Math.max(expireTime - tokenMgmtRef.clock.now(), 0) * 1000;
 
   // Clear any existing timeout
   clearExpireEventTimeout(tokenMgmtRef, key);
 
-  var expireEventTimeout = setTimeout(function() {
+  if (expireEventWait === 0) {
+    // tokens in storage may have expired when app startup
+    // remove tokens from storage synchronously to prevent false-positive evaluation in AuthStateManager
+    removeFromStorage(storage, key);
     emitExpired(tokenMgmtRef, key, token);
-  }, expireEventWait);
-
-  // Add a new timeout
-  tokenMgmtRef.expireTimeouts[key] = expireEventTimeout;
+  } else {
+    var expireEventTimeout = setTimeout(function() {
+      emitExpired(tokenMgmtRef, key, token);
+    }, expireEventWait);
+  
+    // Add a new timeout
+    tokenMgmtRef.expireTimeouts[key] = expireEventTimeout;
+  }
 }
 
 function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
@@ -104,7 +111,7 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
       continue;
     }
     var token = tokenStorage[key];
-    setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
+    setExpireEventTimeout(sdk, tokenMgmtRef, storage, key, token);
   }
 }
 
@@ -119,7 +126,7 @@ function add(sdk, tokenMgmtRef, storage, key, token: Token) {
   tokenStorage[key] = token;
   storage.setStorage(tokenStorage);
   emitAdded(tokenMgmtRef, key, token);
-  setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
+  setExpireEventTimeout(sdk, tokenMgmtRef, storage, key, token);
 }
 
 function get(storage, key) {
@@ -137,14 +144,17 @@ function getAsync(sdk, tokenMgmtRef, storage, key) {
 function remove(tokenMgmtRef, storage, key) {
   // Clear any listener for this token
   clearExpireEventTimeout(tokenMgmtRef, key);
+  var removedToken = removeFromStorage(storage, key);
+  emitRemoved(tokenMgmtRef, key, removedToken);
+}
 
-  // Remove it from storage
+function removeFromStorage(storage, key): Token {
   var tokenStorage = storage.getStorage();
   var removedToken = tokenStorage[key];
   delete tokenStorage[key];
   storage.setStorage(tokenStorage);
 
-  emitRemoved(tokenMgmtRef, key, removedToken);
+  return removedToken;
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {
@@ -154,28 +164,14 @@ function renew(sdk, tokenMgmtRef, storage, key) {
     return existingPromise;
   }
 
-  try {
-    var token = get(storage, key);
-    if (!token) {
-      throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
-    }
-  } catch (e) {
-    return Promise.reject(e);
-  }
-
   // Remove existing autoRenew timeout for this key
   clearExpireEventTimeout(tokenMgmtRef, key);
 
   // Store the renew promise state, to avoid renewing again
-  tokenMgmtRef.renewPromise[key] = sdk.token.renew(token)
+  const type = key === ACCESS_TOKEN_STORAGE_KEY ? 'accessToken' : 'idToken';
+  tokenMgmtRef.renewPromise[key] = sdk.token.renew(null, type)
     .then(function(freshToken) {
       var oldToken = get(storage, key);
-      if (!oldToken) {
-        // It is possible to enter a state where the tokens have been cleared
-        // after a renewal request was triggered. To ensure we do not store a
-        // renewed token, we verify the promise key doesn't exist and return.
-        return;
-      }
       add(sdk, tokenMgmtRef, storage, key, freshToken);
       emitRenewed(tokenMgmtRef, key, freshToken, oldToken);
       return freshToken;
@@ -184,7 +180,6 @@ function renew(sdk, tokenMgmtRef, storage, key) {
       if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
         remove(tokenMgmtRef, storage, key);
         err.tokenKey = key;
-        err.accessToken = !!token.accessToken;
         emitError(tokenMgmtRef, err);
       }
       throw err;

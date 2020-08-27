@@ -31,25 +31,24 @@ class AuthStateManager {
     this._pending = { ...DEFAULT_PENDING };
     this._authState = { ...DEFAULT_AUTH_STATE };
 
-    // Listen on tokenManager events to sync update tokens in memory (this.pending), and start updateState process
-    // "added" event is emitted in both add and renew process
-    // Only listen on "added" (instead of both "added" and "renewed") to limit authState re-evaluation
+    // Listen on tokenManager events to start updateState process
+    // "added" event is emitted in both add and renew process, it will be canceled by the followed "renewed" event
     sdk.tokenManager.on('added', (key, token) => {
-      this.updateAuthState({ shouldCheckExpiration: false,  event: 'added', key, token });
+      this.updateAuthState({ event: 'added', key, token });
+    });
+    sdk.tokenManager.on('renewed', (key, token) => {
+      this.updateAuthState({ event: 'renewed', key, token });
     });
     sdk.tokenManager.on('removed', (key, token) => {
-      this.updateAuthState({ shouldCheckExpiration: false, event: 'removed', key, token });
+      this.updateAuthState({ event: 'removed', key, token });
     });
-
-    // Start the initial evaluation
-    this.updateAuthState({ shouldCheckExpiration: true });
   }
 
   getAuthState(): AuthState {
     return this._authState;
   }
 
-  updateAuthState({ shouldCheckExpiration, event, key, token }: UpdateAuthStateOptions): void {
+  updateAuthState({ event, key, token }: UpdateAuthStateOptions = {}): void {
     const logger = (status) => {
       console.group(`OKTA-AUTH-JS:updateAuthState: Event:${event} Status:${status}`);
       console.log(key, token);
@@ -90,14 +89,6 @@ class AuthStateManager {
         if (cancelablePromise.isCanceled) {
           resolve();
           return;
-        }
-        if (shouldCheckExpiration) {
-          if (accessToken && this._sdk.tokenManager.hasExpired(accessToken)) {
-            accessToken = null;
-          }
-          if (idToken && this._sdk.tokenManager.hasExpired(idToken)) {
-            idToken = null;
-          }
         }
         let promise = isAuthenticated 
           ? isAuthenticated(this._sdk) 
