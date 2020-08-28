@@ -372,7 +372,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       if (this.options.onAuthRequired) {
         return await this.options.onAuthRequired(this);
       }
-      return await this.loginRedirect(additionalParams);
+      return await this.loginRedirect(undefined, additionalParams);
     } finally {
       this._pending.handleLogin = null;
     }
@@ -394,7 +394,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     await this.signOut(options);
   }
 
-  async loginRedirect(additionalParams?: object): Promise<void> {
+  async loginRedirect(fromUri?: string, additionalParams?: object): Promise<void> {
+    if (fromUri) {
+      this.setFromUri(fromUri);
+    }
+
     const { scopes, responseType } = this.options;
     const params = Object.assign({
       scopes: scopes || ['openid', 'email', 'profile'],
@@ -450,7 +454,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   // React specific APIs
 
   redirect(additionalParams?: object): Promise<void> {
-    return this.loginRedirect(additionalParams);
+    return this.loginRedirect(undefined, additionalParams);
   }
 
   on(eventName: String, callback: Function): Function {
