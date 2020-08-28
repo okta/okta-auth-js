@@ -158,6 +158,7 @@ function removeFromStorage(storage, key): Token {
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {
+  console.log('tm:renew:called');
   // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
   var existingPromise = tokenMgmtRef.renewPromise[key];
   if (existingPromise) {
@@ -167,16 +168,19 @@ function renew(sdk, tokenMgmtRef, storage, key) {
   // Remove existing autoRenew timeout for this key
   clearExpireEventTimeout(tokenMgmtRef, key);
 
+  console.log('tm:renew', key);
   // Store the renew promise state, to avoid renewing again
   const type = key === ACCESS_TOKEN_STORAGE_KEY ? 'accessToken' : 'idToken';
   tokenMgmtRef.renewPromise[key] = sdk.token.renew(null, type)
     .then(function(freshToken) {
+      console.log('tm:renew', key, 1, freshToken);
       var oldToken = get(storage, key);
       add(sdk, tokenMgmtRef, storage, key, freshToken);
       emitRenewed(tokenMgmtRef, key, freshToken, oldToken);
       return freshToken;
     })
     .catch(function(err) {
+      console.log('tm:renew', key, 2, err);
       if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
         remove(tokenMgmtRef, storage, key);
         err.tokenKey = key;

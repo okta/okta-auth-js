@@ -2938,9 +2938,9 @@ describe('token.renew', function() {
   it('throws an error if a non-token is passed', () => {
     const error = {
       name: 'AuthSdkError',
-      message: 'Renew must be passed a token with an array of scopes and an accessToken or idToken',
+      message: 'Renew must be passed a token with an array of scopes and an accessToken or idToken, or token type to indicate the token to be renewed',
       errorCode: 'INTERNAL',
-      errorSummary: 'Renew must be passed a token with an array of scopes and an accessToken or idToken',
+      errorSummary: 'Renew must be passed a token with an array of scopes and an accessToken or idToken, or token type to indicate the token to be renewed',
       errorLink: 'INTERNAL',
       errorId: 'INTERNAL',
       errorCauses: []

@@ -4,7 +4,7 @@ import { OktaAuth } from './browser';
 import { ACCESS_TOKEN_STORAGE_KEY, ID_TOKEN_STORAGE_KEY } from './constants';
 const PCancelable = require('p-cancelable');
 
-const DEFAULT_AUTH_STATE = { 
+export const DEFAULT_AUTH_STATE = { 
   isPending: true,
   isAuthenticated: false,
   idToken: null,
@@ -14,7 +14,7 @@ const DEFAULT_PENDING = {
   updateAuthStatePromise: null,
   canceledTimes: 0
 };
-const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
+export const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 const MAX_PROMISE_CANCEL_TIMES = 10;
 
 class AuthStateManager {
