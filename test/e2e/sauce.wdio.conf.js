@@ -99,9 +99,9 @@ exports.config = {
         browserName: 'firefox',
         platformName: 'Windows 10',
         browserVersion: 'latest',
-        'sauce:options': {
-          'seleniumVersion': '3.14.0'
-        }
+        // 'sauce:options': {
+        //   'seleniumVersion': '3.14.0'
+        // }
       },
       {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'},
       // TODO - Enable after OKTA-284870 is fixed
