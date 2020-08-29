@@ -75,6 +75,14 @@ or
 require('@okta/okta-auth-js/polyfill');
 ```
 
+The built polyfill bundle is also available on our global CDN. Include the following script in your HTML file to load before any other scripts:
+
+```html
+<script src="https://global.oktacdn.com/okta-auth-js/4.0.0/okta-auth-js.polyfill.js" type="text/javascript"></script>
+```
+
+> :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
+
 ### Third party cookies
 
 Many browsers have started blocking cross-origin or "third party" cookies by default. Although most of the Okta APIs supported by this SDK do not rely upon cookies, there are a few methods which do. These methods will break if third party cookies are blocked:
@@ -142,6 +150,22 @@ npm install --save @okta/okta-auth-js
 
 If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.min.js` file in a `<script>` tag.  
 
+The built library bundle is also available on our global CDN. Include the following script in your HTML file to load before your application script:
+
+```html
+<script src="https://global.oktacdn.com/okta-auth-js/4.0.0/okta-auth-js.min.js" type="text/javascript"></script>
+```
+
+> :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
+
+Then you can create an instance of the `OktaAuth` object, available globally.
+
+```javascript
+const oktaAuth = new OktaAuth({
+  // config
+})
+```
+
 However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module or require using CommonJS.
 
 ```javascript
@@ -166,6 +190,8 @@ For an overview of the client's features and authentication flows, check out [ou
 > :warning: The developer docs may be written for an earlier version of this library. See [Migrating from previous versions](#migrating-from-previous-versions).
 
 You can also browse the full [API reference documentation](#api-reference).
+
+> :hourglass: Async methods return a promise which will resolve on success. The promise may reject if an error occurs.
 
 ### Usage with Typescript
 
@@ -262,8 +288,13 @@ var authClient = new OktaAuth(config);
 Even if you have specified `localStorage` or `sessionStorage` in your config, the `TokenManager` may fall back to using `cookie` storage on some clients. If your site will always be served over a HTTPS connection, you may want to enable "secure" cookies. This option will prevent cookies from being stored on an HTTP connection.
 
 ```javascript
-tokenManager: {
-  secure: true
+var config = {
+  tokenManager: {
+    storage: 'cookie'
+  },
+  cookies: {
+    secure: false
+  }
 }
 ```
 
@@ -488,6 +519,8 @@ var config = {
 
 ### `signIn(options)`
 
+> :hourglass: async
+
 The goal of an authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
 
 * `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
@@ -512,6 +545,8 @@ authClient.signIn({
 ```
 
 ### `signOut()`
+
+> :hourglass: async
 
 Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. By default, the access token is revoked so it can no longer be used. Some points to consider:
 
@@ -559,6 +594,7 @@ authClient.signOut({
 ### `closeSession()`
 
 > :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :hourglass: async
 
 Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. This method is an XHR-based alternative to [signOut](#signout), which will redirect to Okta before returning to your application. Here are some points to consider when using this method:
 
@@ -583,9 +619,13 @@ authClient.closeSession()
 
 ### `revokeAccessToken(accessToken)`
 
+> :hourglass: async
+
 Revokes the access token for this application so it can no longer be used to authenticate API requests. The `accessToken` parameter is optional. By default, `revokeAccessToken` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
 
 ### `forgotPassword(options)`
+
+> :hourglass: async
 
 Starts a [new password recovery transaction](https://developer.okta.com/docs/api/resources/authn#forgot-password) for a given user and issues a recovery token that can be used to reset a user’s password.
 
@@ -617,6 +657,8 @@ authClient.forgotPassword({
 
 ### `unlockAccount(options)`
 
+> :hourglass: async
+
 Starts a [new unlock recovery transaction](https://developer.okta.com/docs/api/resources/authn#unlock-account) for a given user and issues a recovery token that can be used to unlock a user’s account.
 
 * `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
@@ -647,6 +689,8 @@ authClient.unlockAccount({
 
 ### `verifyRecoveryToken(options)`
 
+> :hourglass: async
+
 Validates a recovery token that was distributed to the end-user to continue the [recovery transaction](https://developer.okta.com/docs/api/resources/authn#verify-recovery-token).
 
 * `recoveryToken` - Recovery token that was distributed to end-user via an out-of-band mechanism such as email
@@ -669,6 +713,8 @@ authClient.verifyRecoveryToken({
 
 ### `webfinger(options)`
 
+> :hourglass: async
+
 Calls the [Webfinger](https://tools.ietf.org/html/rfc7033) API and gets a response.
 
 * `resource` - URI that identifies the entity whose information is sought, currently only acct scheme is supported (e.g acct:dade.murphy@example.com)
@@ -689,6 +735,8 @@ authClient.webfinger({
 
 ### `fingerprint(options)`
 
+> :hourglass: async
+
 Creates a browser fingerprint. See [Primary authentication with device fingerprint](https://developer.okta.com/docs/reference/api/authn/#primary-authentication-with-device-fingerprinting) for more information.
 
 * `timeout` - Time in ms until the operation times out. Defaults to `15000`.
@@ -704,6 +752,8 @@ authClient.fingerprint()
 ```
 
 ### `tx.resume()`
+
+> :hourglass: async
 
 Resumes an in-progress **transaction**. This is useful if a user navigates away from the login page before authentication is complete.
 
@@ -735,6 +785,8 @@ if (exists) {
 
 ### `transaction.status`
 
+> :hourglass: async
+
 When Auth Client methods resolve, they return a **transaction** object that encapsulates [the new state in the authentication flow](https://developer.okta.com/docs/api/resources/authn#transaction-model). This **transaction** contains metadata about the current state, and methods that can be used to progress to the next state.
 
 ![State Model Diagram](https://developer.okta.com/img/auth-state-model.png "State Model Diagram")
@@ -743,6 +795,7 @@ When Auth Client methods resolve, they return a **transaction** object that enca
 
 ##### `cancel()`
 
+> :hourglass: async
 Terminates the current auth flow.
 
 ```javascript
@@ -1559,7 +1612,6 @@ The end of the authentication flow! This transaction contains a sessionToken you
 > :warning: This method requires access to [third party cookies](#third-party-cookies)
 
 This allows you to create a session using a sessionToken.
-
 * `sessionToken` - Ephemeral one-time token used to bootstrap an Okta session.
 * `redirectUri` - After setting a cookie, Okta redirects to the specified URI. The default is the current URI.
 
@@ -1570,6 +1622,7 @@ authClient.session.setCookieAndRedirect(transaction.sessionToken);
 #### `session.exists()`
 
 > :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :hourglass: async
 
 Returns a promise that resolves with `true` if there is an existing Okta [session](https://developer.okta.com/docs/api/resources/sessions#example), or `false` if not.
 
@@ -1587,6 +1640,7 @@ authClient.session.exists()
 #### `session.get()`
 
 > :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :hourglass: async
 
 Gets the active [session](https://developer.okta.com/docs/api/resources/sessions#example).
 
@@ -1603,6 +1657,7 @@ authClient.session.get()
 #### `session.refresh()`
 
 > :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :hourglass: async
 
 Refresh the current session by extending its lifetime. This can be used as a keep-alive operation.
 
@@ -1667,6 +1722,7 @@ authClient.token.getWithoutPrompt({
 #### `token.getWithoutPrompt(options)`
 
 > :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :hourglass: async
 
 When you've obtained a sessionToken from the authorization flows, or a session already exists, you can obtain a token or tokens without prompting the user to log in.
 
@@ -1690,6 +1746,8 @@ authClient.token.getWithoutPrompt({
 
 #### `token.getWithPopup(options)`
 
+> :hourglass: async
+
 Create token with a popup.
 
 * `options` - See [Authorize options](#authorize-options)
@@ -1708,6 +1766,8 @@ authClient.token.getWithPopup(options)
 ```
 
 #### `token.getWithRedirect(options)`
+
+> :hourglass: async
 
 Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#additional-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. Values will be returned in either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode)
 
@@ -1790,12 +1850,14 @@ Decode a raw ID Token
 * `idTokenString` - an id_token JWT
 
 ```javascript
-authClient.token.decode('YOUR_ID_TOKEN_JWT');
+const decodedToken = authClient.token.decode('YOUR_ID_TOKEN_JWT');
+console.log(decodedToken.header, decodedToken.payload, decodedToken.signature);
 ```
 
 #### `token.renew(tokenToRenew)`
 
 > :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :hourglass: async
 
 Returns a new token if the Okta [session](https://developer.okta.com/docs/api/resources/sessions#example) is still valid.
 
@@ -1823,6 +1885,8 @@ authClient.token.renew(tokenToRenew)
 ```
 
 #### `token.getUserInfo(accessTokenObject, idTokenObject)`
+
+> :hourglass: async
 
 Retrieve the [details about a user](https://developer.okta.com/docs/api/resources/oidc#response-example-success).
 
@@ -1862,6 +1926,8 @@ Promise.all([
 
 #### `token.verify(idTokenObject)`
 
+> :hourglass: async
+
 Manually verify the validity of an ID token's claims and check the signature on browsers that support web cryptography.
 
 > **Note:** Token validation occurs [automatically](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) when tokens are returned via `getWithoutPrompt`, `getWithPopup`, and `getWithRedirect`.
@@ -1888,7 +1954,16 @@ authClient.token.verify(idTokenObject, validationOptions)
 Check `window.location` to verify if the app is in OAuth callback state or not. This function is synchronous and returns `true` or `false`.
 
 ```javascript
-authClient.token.isLoginRedirect();
+const shouldHandleCallback = authClient.token.isLoginRedirect();
+if (shouldHandleCallback) {
+  // callback flow
+  authClient.parseFromUrl().then(res => {
+    authClient.tokenManager.add('idToken', res.tokens.idToken);
+    authClient.tokenManager.add('accessToken', res.tokens.accesstoken);
+  });
+} else {
+  // normal app flow
+}
 ```
 
 ### `tokenManager`
@@ -1908,6 +1983,8 @@ authClient.token.getWithPopup()
 ```
 
 #### `tokenManager.get(key)`
+
+> :hourglass: async
 
 Get a token that you have previously added to the `tokenManager` with the given `key`. The token object will be returned if it exists in storage. Tokens will be removed from storage if they have expired and `autoRenew` is false or if there was an error while renewing the token. The `tokenManager` will emit a `removed` event when tokens are removed.
 
@@ -1952,6 +2029,8 @@ authClient.tokenManager.clear();
 ```
 
 #### `tokenManager.renew(key)`
+
+> :hourglass: async
 
 Manually renew a token before it expires and update the stored value.
 
@@ -2118,7 +2197,7 @@ Before running the E2E tests, you will need to setup a test environment. See [te
 
 We have implemented a small SPA app, located at `./test/app/` which is used internally as a test harness for the E2E tests. The app can be run manually using `yarn start`. This will start a webpack dev server and open a new browser window at `http://localhost:8080`. The app provides a high level of feedback and configurability which make it useful as a tool for troubleshooting and manual testing scenarios. See [test/app/README](test/app/README.md) for more information on the test app.
 
-Because this test app is set up to dynamically change configuration and leak internal information, users should not use this test app as the basis for their own applications. Instead, use the example usage outlined elsewhere in this README.
+> :warning: Because this test app is set up to dynamically change configuration and leak internal information, users should not use source in the test app as the basis for their own applications. Instead, use the example usage outlined elsewhere in this README.
 
 ## Migrating from previous versions
 
