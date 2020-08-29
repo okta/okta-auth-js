@@ -98,7 +98,7 @@ exports.config = {
       {
         browserName: 'firefox',
         platformName: 'Windows 10',
-        browserVersion: 'latest',
+        browserVersion: '79',
         // 'sauce:options': {
         //   'seleniumVersion': '3.14.0'
         // }
