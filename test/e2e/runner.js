@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const spawn = require('cross-spawn');
 const waitOn = require('wait-on');
 
@@ -25,13 +26,19 @@ waitOn({
     wdioConfig
   ].concat(opts), { stdio: 'inherit' });
 
+  let returnCode = 1;
   runner.on('exit', function (code) {
+    console.log('Test runner exited with code: ' + code);
+    returnCode = code;
     server.kill();
-    // eslint-disable-next-line no-process-exit
-    process.exit(code);
   });
   runner.on('error', function (err) {
     server.kill();
     throw err;
+  });
+  server.on('exit', function(code) {
+    console.log('Server exited with code: ' + code);
+    // eslint-disable-next-line no-process-exit
+    process.exit(returnCode);
   });
 });
