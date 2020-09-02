@@ -1,5 +1,11 @@
 # Changelog
 
+## Pending
+
+### Features
+
+- [#462](https://github.com/okta/okta-auth-js/pull/462) Adds storageKeys option to accept custom keys for storage
+
 ## 4.0.0
 
 ### Features
