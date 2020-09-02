@@ -36,6 +36,11 @@ export interface CustomUrls {
   logoutUrl?: string;
 }
 
+export interface StorageKeysOptions {
+  idToken?: string;
+  accessToken?: string;
+}
+
 export interface OktaAuthOptions extends CustomUrls {
   pkce?: boolean;
   clientId?: string;
@@ -54,4 +59,5 @@ export interface OktaAuthOptions extends CustomUrls {
   transformErrorXHR?: (xhr: object) => any;
   headers?: object;
   maxClockSkew?: number;
+  storageKeys?: StorageKeysOptions;
 }

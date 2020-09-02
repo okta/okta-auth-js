@@ -101,7 +101,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       postLogoutRedirectUri: args.postLogoutRedirectUri,
       responseMode: args.responseMode,
       transformErrorXHR: args.transformErrorXHR,
-      cookies: cookieSettings
+      cookies: cookieSettings,
+      storageKeys: Object.assign({
+        idToken: ID_TOKEN_STORAGE_KEY,
+        accessToken: ACCESS_TOKEN_STORAGE_KEY
+      }, args.storageKeys)
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
@@ -222,8 +226,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   // Revokes the access token for the application session
   async revokeAccessToken(accessToken?: AccessToken) {
     if (!accessToken) {
-      accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
-      this.tokenManager.remove(ACCESS_TOKEN_STORAGE_KEY);
+      const { accessToken: accessTokenStorageKey } = this.options.storageKeys;
+      accessToken = await this.tokenManager.get(accessTokenStorageKey) as AccessToken;
+      this.tokenManager.remove(accessTokenStorageKey);
     }
     // Access token may have been removed. In this case, we will silently succeed.
     if (!accessToken) {
@@ -250,11 +255,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     var logoutUrl = getOAuthUrls(this).logoutUrl;
   
     if (typeof idToken === 'undefined') {
-      idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY);
+      idToken = await this.tokenManager.get(this.options.storageKeys.idToken);
     }
   
     if (revokeAccessToken && typeof accessToken === 'undefined') {
-      accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY);
+      accessToken = await this.tokenManager.get(this.options.storageKeys.accessToken);
     }
   
     // Clear all local tokens

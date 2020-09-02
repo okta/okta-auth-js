@@ -91,6 +91,32 @@ describe('Browser', function() {
         expect(auth.options.pkce).toBe(false);
       });
     });
+
+    describe('storageKeys', function() {
+      it('should use default storage keys if none is provided in options', () => {
+        auth = new OktaAuth({ issuer });
+        expect(auth.options.storageKeys.idToken).toBe(ID_TOKEN_STORAGE_KEY);
+        expect(auth.options.storageKeys.accessToken).toBe(ACCESS_TOKEN_STORAGE_KEY);
+      });
+
+      it('should override default keys with keys in options', () => {
+        auth = new OktaAuth({ issuer, storageKeys: {
+          idToken: 'custom-idToken',
+          accessToken: 'custom-accessToken'
+        }});
+        expect(auth.options.storageKeys.idToken).toBe('custom-idToken');
+        expect(auth.options.storageKeys.accessToken).toBe('custom-accessToken');
+      });
+
+      it('should not override default keys if no match key-value pairs in options', () => {
+        auth = new OktaAuth({ issuer, storageKeys: {
+          idTokenFake: 'custom-idToken',
+          accessTokenFake: 'custom-accessToken'
+        }});
+        expect(auth.options.storageKeys.idToken).toBe(ID_TOKEN_STORAGE_KEY);
+        expect(auth.options.storageKeys.accessToken).toBe(ACCESS_TOKEN_STORAGE_KEY);
+      });
+    });
   });
 
   describe('revokeAccessToken', function() {
@@ -104,6 +130,21 @@ describe('Browser', function() {
           expect(auth.tokenManager.get).toHaveBeenCalledWith(ACCESS_TOKEN_STORAGE_KEY);
           expect(auth.tokenManager.remove).toHaveBeenCalledWith(ACCESS_TOKEN_STORAGE_KEY);
           expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
+        });
+    });
+    it('should call tokenManager with customize storage key', () => {
+      expect.assertions(2);
+      auth = new OktaAuth({ 
+        issuer, 
+        storageKeys: { accessToken: 'custom-accessToken' }
+      });
+      auth.tokenManager.get = jest.fn().mockResolvedValue({ accessToken: 'fake' });
+      auth.tokenManager.remove = jest.fn().mockReturnValue(undefined);
+      auth.token.revoke = jest.fn().mockResolvedValue(undefined);
+      return auth.revokeAccessToken()
+        .then(function() {
+          expect(auth.tokenManager.get).toHaveBeenCalledWith('custom-accessToken');
+          expect(auth.tokenManager.remove).toHaveBeenCalledWith('custom-accessToken');
         });
     });
     it('will throw if token.revoke rejects with unknown error', function() {
@@ -235,6 +276,24 @@ describe('Browser', function() {
         return auth.signOut()
           .then(function() {
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+          });
+      });
+
+      it('supports custom storageKeys', function() {
+        auth = new OktaAuth({
+          pkce: false,
+          issuer,
+          storageKeys: {
+            idToken: 'custom-idToken',
+            accessToken: 'custom-accessToken'
+          }
+        });
+        initSpies();
+        auth.tokenManager.get = jest.fn();
+        return auth.signOut()
+          .then(function() {
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'custom-idToken');
+            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, 'custom-accessToken');
           });
       });
 

@@ -14,6 +14,7 @@ import * as sdkUtil from '../../lib/oauthUtil';
 import pkce from '../../lib/pkce';
 import http from '../../lib/http';
 import * as sdkCrypto from '../../lib/crypto';
+import { ACCESS_TOKEN_STORAGE_KEY, ID_TOKEN_STORAGE_KEY } from '../../lib/constants';
 
 function setupSync(options) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);
@@ -3155,6 +3156,32 @@ describe('token.getUserInfo', function() {
       expect(err.errorCode).toEqual('invalid_token');
       expect(err.errorSummary).toEqual('The access token is invalid.');
     }
+  });
+
+  it('should use default storage key to get tokens if no options is provided', async () => {
+    http.httpRequest = jest.fn().mockResolvedValue({ sub: 'sub' });
+    const auth = setupSync();
+    auth.tokenManager.get = jest.fn()
+      .mockResolvedValueOnce({ accessToken: 'fake token' })
+      .mockResolvedValueOnce({ idToken: 'fake token', claims: { sub: 'sub' } });
+    await auth.token.getUserInfo();
+    expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ACCESS_TOKEN_STORAGE_KEY);
+    expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, ID_TOKEN_STORAGE_KEY);
+  });
+  it('should use custom storage key to get tokens', async () => {
+    http.httpRequest = jest.fn().mockResolvedValue({ sub: 'sub' });
+    const auth = setupSync({
+      storageKeys: {
+        idToken: 'custom-idToken',
+        accessToken: 'custom-accessToken'
+      }
+    });
+    auth.tokenManager.get = jest.fn()
+      .mockResolvedValueOnce({ accessToken: 'fake token' })
+      .mockResolvedValueOnce({ idToken: 'fake token', claims: { sub: 'sub' } });
+    await auth.token.getUserInfo();
+    expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, 'custom-accessToken');
+    expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, 'custom-idToken');
   });
 });
 
