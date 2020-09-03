@@ -369,24 +369,8 @@ In most cases you will not need to set a value for `responseMode`. Defaults are 
 | `ignoreSignature` | ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`. |
 | | This option should be used only for browser support and testing purposes. |
 | `maxClockSkew` | Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation. |
-| `tokenManager` | An object containing additional properties used to configure the internal token manager. |
-
-* `autoRenew`:
-  By default, the library will attempt to renew tokens before they expire. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
-
-* `storage`:
-  You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types:
-  * [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) (default)
-  * [`sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
-  * [`cookie`](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)
-  * `memory`: a simple in-memory storage provider
-
-* `storageKey`: By default all tokens will be stored under the key `okta-token-storage`. You may want to change this if you have multiple apps running on a single domain which share the same storage type. Giving each app a unique storage key will prevent them from reading or writing each other's token values.
-
-| `cookies` | An object containing additional properties used when setting cookies. |
-
-* `secure`: Defaults to `true`, unless the application origin is `http://localhost`, in which case it is forced to `false`. If `true`, the SDK will set the "Secure" option on all cookies. When this option is `true`, an exception will be thrown if the application origin is not using the HTTPS protocol. Setting to `false` will allow setting cookies on an HTTP origin, but is not recommended for production applications.
-* `sameSite`: Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
+| `tokenManager` | An object containing additional properties used to configure the internal token manager. <ul><li>`autoRenew`: By default, the library will attempt to renew tokens before they expire. If you wish to  to disable auto renewal of tokens, set autoRenew to false.</li><li>`storage`: You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types: <ul><li>[`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) (default)</li><li>[`sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)</li><li>[`cookie`](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)</li><li>`memory`: a simple in-memory storage provider</li></ul></li><li>`storageKey`: By default all tokens will be stored under the key `okta-token-storage`. You may want to change this if you have multiple apps running on a single domain which share the same storage type. Giving each app a unique storage key will prevent them from reading or writing each other's token values.</li></ul> |
+| `cookies` | An object containing additional properties used when setting cookies <ul><li>`secure`: Defaults to `true`, unless the application origin is `http://localhost`, in which case it is forced to `false`. If `true`, the SDK will set the "Secure" option on all cookies. When this option is `true`, an exception will be thrown if the application origin is not using the HTTPS protocol. Setting to `false` will allow setting cookies on an HTTP origin, but is not recommended for production applications.</li><li>`sameSite`: Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.</li></ul> |
 
 ##### Example Client
 
