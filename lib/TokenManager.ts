@@ -74,26 +74,19 @@ function clearExpireEventTimeoutAll(tokenMgmtRef) {
   }
 }
 
-function setExpireEventTimeout(sdk, tokenMgmtRef, storage, key, token) {
+function setExpireEventTimeout(sdk, tokenMgmtRef, key, token) {
   var expireTime = getExpireTime(tokenMgmtRef, token);
   var expireEventWait = Math.max(expireTime - tokenMgmtRef.clock.now(), 0) * 1000;
 
   // Clear any existing timeout
   clearExpireEventTimeout(tokenMgmtRef, key);
 
-  if (expireEventWait === 0) {
-    // tokens in storage may have expired when app startup
-    // remove tokens from storage synchronously to prevent false-positive evaluation in AuthStateManager
-    removeFromStorage(storage, key);
+  var expireEventTimeout = setTimeout(function() {
     emitExpired(tokenMgmtRef, key, token);
-  } else {
-    var expireEventTimeout = setTimeout(function() {
-      emitExpired(tokenMgmtRef, key, token);
-    }, expireEventWait);
-  
-    // Add a new timeout
-    tokenMgmtRef.expireTimeouts[key] = expireEventTimeout;
-  }
+  }, expireEventWait);
+
+  // Add a new timeout
+  tokenMgmtRef.expireTimeouts[key] = expireEventTimeout;
 }
 
 function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
@@ -111,7 +104,7 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
       continue;
     }
     var token = tokenStorage[key];
-    setExpireEventTimeout(sdk, tokenMgmtRef, storage, key, token);
+    setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
   }
 }
 
@@ -126,7 +119,7 @@ function add(sdk, tokenMgmtRef, storage, key, token: Token) {
   tokenStorage[key] = token;
   storage.setStorage(tokenStorage);
   emitAdded(tokenMgmtRef, key, token);
-  setExpireEventTimeout(sdk, tokenMgmtRef, storage, key, token);
+  setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
 }
 
 function get(storage, key) {
@@ -144,21 +137,16 @@ function getAsync(sdk, tokenMgmtRef, storage, key) {
 function remove(tokenMgmtRef, storage, key) {
   // Clear any listener for this token
   clearExpireEventTimeout(tokenMgmtRef, key);
-  var removedToken = removeFromStorage(storage, key);
-  emitRemoved(tokenMgmtRef, key, removedToken);
-}
 
-function removeFromStorage(storage, key): Token {
   var tokenStorage = storage.getStorage();
   var removedToken = tokenStorage[key];
   delete tokenStorage[key];
   storage.setStorage(tokenStorage);
 
-  return removedToken;
+  emitRemoved(tokenMgmtRef, key, removedToken);
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {
-  console.log('tm:renew:called');
   // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
   var existingPromise = tokenMgmtRef.renewPromise[key];
   if (existingPromise) {
@@ -168,7 +156,6 @@ function renew(sdk, tokenMgmtRef, storage, key) {
   // Remove existing autoRenew timeout for this key
   clearExpireEventTimeout(tokenMgmtRef, key);
 
-  console.log('tm:renew', key);
   // Store the renew promise state, to avoid renewing again
   const type = key === ACCESS_TOKEN_STORAGE_KEY ? 'accessToken' : 'idToken';
   tokenMgmtRef.renewPromise[key] = sdk.token.renew(null, type)
