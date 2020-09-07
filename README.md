@@ -2292,7 +2292,7 @@ const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 
 ## Contributing
 
-We're happy to accept contributions and PRs! Please see the [contribution guide](contributing.md) to understand how to structure a contribution.
+We're happy to accept contributions and PRs! Please see the [contribution guide](CONTRIBUTING.md) to understand how to structure a contribution.
 
 [devforum]: https://devforum.okta.com/
 [lang-landing]: https://developer.okta.com/code/javascript
