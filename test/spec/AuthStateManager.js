@@ -82,11 +82,10 @@ describe('AuthStateManager', () => {
 
   describe('updateAuthState', () => {
     beforeEach(() => {
-      sdkMock.tokenManager.get = jest.fn()
-        .mockResolvedValueOnce('fakeToken0')
-        .mockResolvedValueOnce('fakeToken0')
-        .mockResolvedValueOnce('fakeToken1')
-        .mockResolvedValueOnce('fakeToken1');
+      sdkMock.tokenManager.getTokens = jest.fn()
+        .mockResolvedValueOnce({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' })
+        .mockResolvedValueOnce({ accessToken: 'fakeAccessToken1', idToken: 'fakeIdToken1' });
+      sdkMock.tokenManager.hasExpired = jest.fn().mockReturnValue(false);
     });
 
     it('should emit an authState with isAuthenticated === true', () => {
@@ -102,8 +101,8 @@ describe('AuthStateManager', () => {
           expect(handler).toHaveBeenCalledWith({
             isPending: false,
             isAuthenticated: true,
-            idToken: 'fakeToken0',
-            accessToken: 'fakeToken0'
+            idToken: 'fakeIdToken0',
+            accessToken: 'fakeAccessToken0'
           });
           resolve();
         }, 100);
@@ -124,8 +123,8 @@ describe('AuthStateManager', () => {
           expect(handler).toHaveBeenCalledWith({
             isPending: false,
             isAuthenticated: true,
-            idToken: 'fakeToken1',
-            accessToken: 'fakeToken1'
+            idToken: 'fakeIdToken1',
+            accessToken: 'fakeAccessToken1'
           })
           resolve();
         }, 100);
@@ -148,14 +147,14 @@ describe('AuthStateManager', () => {
           expect(handler).toHaveBeenCalledWith({
             isPending: false,
             isAuthenticated: true,
-            idToken: 'fakeToken0',
-            accessToken: 'fakeToken0'
+            idToken: 'fakeIdToken0',
+            accessToken: 'fakeAccessToken0'
           });
           expect(handler).toHaveBeenCalledWith({
             isPending: false,
             isAuthenticated: true,
-            idToken: 'fakeToken1',
-            accessToken: 'fakeToken1'
+            idToken: 'fakeIdToken1',
+            accessToken: 'fakeAccessToken1'
           });
           resolve();
         }, 100);
@@ -175,8 +174,32 @@ describe('AuthStateManager', () => {
           expect(sdkMock.options.isAuthenticated).toHaveBeenCalledTimes(1);
           expect(handler).toHaveBeenCalledTimes(1);
           expect(handler).toHaveBeenCalledWith({
-            accessToken: 'fakeToken0',
-            idToken: 'fakeToken0',
+            accessToken: 'fakeAccessToken0',
+            idToken: 'fakeIdToken0',
+            isAuthenticated: false,
+            isPending: false,
+          });
+          resolve();
+        }, 100);
+      });
+    });
+
+    it('should evaluate expired token as null', () => {
+      expect.assertions(2);
+      sdkMock.tokenManager.hasExpired = jest.fn()
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true);
+      return new Promise(resolve => {
+        const instance = new AuthStateManager(sdkMock);
+        instance.updateAuthState();
+        const handler = jest.fn();
+        instance.onAuthStateChange(handler);
+
+        setTimeout(() => {
+          expect(handler).toHaveBeenCalledTimes(1);
+          expect(handler).toHaveBeenCalledWith({
+            accessToken: 'fakeAccessToken0',
+            idToken: null,
             isAuthenticated: false,
             isPending: false,
           });
@@ -186,11 +209,13 @@ describe('AuthStateManager', () => {
     });
 
     it('should stop and evaluate at the 10th update if too many updateAuthState happen concurrently', () => {
-      sdkMock.tokenManager.get = jest.fn();
+      sdkMock.tokenManager.getTokens = jest.fn();
       for (let i = 0; i < 100; i++) {
-        sdkMock.tokenManager.get = sdkMock.tokenManager.get
-          .mockResolvedValueOnce(`fakeToken${i}`)
-          .mockResolvedValueOnce(`fakeToken${i}`);
+        sdkMock.tokenManager.getTokens = sdkMock.tokenManager.getTokens
+          .mockResolvedValueOnce({ 
+            accessToken: `fakeAccessToken${i}`,
+            idToken: `fakeIdToken${i}`,
+          });
       }
 
       return new Promise(resolve => {
@@ -204,8 +229,8 @@ describe('AuthStateManager', () => {
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
           expect(handler).toHaveBeenCalledWith({
-            accessToken: 'fakeToken10',
-            idToken: 'fakeToken10',
+            accessToken: 'fakeAccessToken10',
+            idToken: 'fakeIdToken10',
             isAuthenticated: true,
             isPending: false,
           });

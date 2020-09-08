@@ -1,7 +1,6 @@
 import { AuthSdkError } from './errors';
 import { AuthState, UpdateAuthStateOptions } from './types';
 import { OktaAuth } from './browser';
-import { ACCESS_TOKEN_STORAGE_KEY, ID_TOKEN_STORAGE_KEY } from './constants';
 const PCancelable = require('p-cancelable');
 
 export const DEFAULT_AUTH_STATE = { 
@@ -82,35 +81,40 @@ class AuthStateManager {
         devMode && logger('canceled');
       });
 
-      return Promise.all([
-        this._sdk.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY),
-        this._sdk.tokenManager.get(ID_TOKEN_STORAGE_KEY)
-      ]).then(([accessToken, idToken]) => {
-        if (cancelablePromise.isCanceled) {
-          resolve();
-          return;
-        }
-        let promise = isAuthenticated 
-          ? isAuthenticated(this._sdk) 
-          : Promise.resolve(!!(accessToken && idToken));
-
-        return promise.then(isAuthenticated => {
+      return this._sdk.tokenManager._getTokens()
+        .then(({ accessToken, idToken }) => {
           if (cancelablePromise.isCanceled) {
             resolve();
             return;
           }
-          // emit event and clear states
-          emitAuthStateChange({ 
-            ...this._authState, 
-            accessToken, 
-            idToken, 
-            isAuthenticated, 
-            isPending: false 
-          }); 
-          this._pending = { ...DEFAULT_PENDING };
-          resolve();
+
+          if (accessToken && this._sdk.tokenManager.hasExpired(accessToken)) {
+            accessToken = null;
+          }
+          if (idToken && this._sdk.tokenManager.hasExpired(idToken)) {
+            idToken = null;
+          }
+          let promise = isAuthenticated 
+            ? isAuthenticated(this._sdk) 
+            : Promise.resolve(!!(accessToken && idToken));
+
+          return promise.then(isAuthenticated => {
+            if (cancelablePromise.isCanceled) {
+              resolve();
+              return;
+            }
+            // emit event and clear states
+            emitAuthStateChange({ 
+              ...this._authState, 
+              accessToken, 
+              idToken, 
+              isAuthenticated, 
+              isPending: false 
+            }); 
+            this._pending = { ...DEFAULT_PENDING };
+            resolve();
+          });
         });
-      });
     });
     this._pending.updateAuthStatePromise = cancelablePromise;
   }
