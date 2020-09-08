@@ -133,6 +133,7 @@ export interface TokenAPI {
   decode(token: string): JWTObject;
   revoke(token: AccessToken): Promise<object>;
   renew(token: Token): Promise<Token>;
+  renewTokens(): Promise<Tokens>;
   verify(token: IDToken, params?: object): Promise<IDToken>;
   isLoginRedirect(): boolean;
 }

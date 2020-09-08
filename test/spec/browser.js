@@ -571,11 +571,11 @@ describe('Browser', function() {
       expect(auth.setFromUri).toHaveBeenCalledWith(fromUri);
     });
 
-    it('should not trigger second call if login is in progress', async () => {
+    it('should not trigger second call if login is in progress', () => {
       expect.assertions(1);
-      auth.redirect = jest.fn();
-      Promise.all([auth.login('/'), auth.login('/')]).then(() => {
-        expect(auth.redirect).toHaveBeenCalledTimes(1);
+      auth.loginRedirect = jest.fn();
+      return Promise.all([auth.login('/'), auth.login('/')]).then(() => {
+        expect(auth.loginRedirect).toHaveBeenCalledTimes(1);
       });
     });
   });

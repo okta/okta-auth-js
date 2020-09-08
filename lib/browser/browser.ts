@@ -41,6 +41,7 @@ import {
   decodeToken,
   revokeToken,
   renewToken,
+  renewTokens,
   getUserInfo,
   verifyToken
 } from '../token';
@@ -163,6 +164,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       decode: decodeToken,
       revoke: revokeToken.bind(null, this),
       renew: renewToken.bind(null, this),
+      renewTokens: renewTokens.bind(null, this),
       getUserInfo: getUserInfo.bind(null, this),
       verify: verifyToken.bind(null, this),
       isLoginRedirect: isLoginRedirect.bind(null, this)
@@ -367,6 +369,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       return;
     }
 
+    this._pending.handleLogin = true;
     this.setFromUri(fromUri);
     try {
       if (this.options.onAuthRequired) {

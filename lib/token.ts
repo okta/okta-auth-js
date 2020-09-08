@@ -703,28 +703,22 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
     });
 }
 
-function renewToken(sdk: OktaAuth, token?: AccessToken & IDToken, type?: string): Promise<Token> {
-  if (!isToken(token) && !type) {
+function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
+  if (!isToken(token)) {
     return Promise.reject(new AuthSdkError('Renew must be passed a token with ' +
-      'an array of scopes and an accessToken or idToken, or token type to indicate the token to be renewed'));
+      'an array of scopes and an accessToken or idToken'));
   }
 
-  const isRenewAccessToken = () => (isAccessToken(token) || type === 'accessToken');
-
-  let responseType;
+  var responseType;
   if (sdk.options.pkce) {
     responseType = 'code';
-  } else if (isRenewAccessToken()) {
+  } else if (isAccessToken(token)) {
     responseType = 'token';
   } else {
     responseType = 'id_token';
-  }  
+  }
 
-  const scopes = (token && token.scopes) || sdk.options.scopes;
-  const authorizeUrl = (token && token.authorizeUrl) || sdk.options.authorizeUrl;
-  const userinfoUrl = (token && token.userinfoUrl) || sdk.options.userinfoUrl;
-  const issuer = (token && token.issuer) || sdk.options.issuer;
-  
+  const { scopes, authorizeUrl, userinfoUrl, issuer } = token as (AccessToken & IDToken);
   return getWithoutPrompt(sdk, {
     responseType,
     scopes,
@@ -735,8 +729,26 @@ function renewToken(sdk: OktaAuth, token?: AccessToken & IDToken, type?: string)
   .then(function(res) {
     // Multiple tokens may have come back. Return only the token which was requested.
     var tokens = res.tokens;
-    return isRenewAccessToken() ? tokens.accessToken : tokens.idToken;
+    return isIDToken(token) ? tokens.idToken : tokens.accessToken;
   });
+}
+
+function renewTokens(sdk: OktaAuth, options: TokenParams): Promise<Tokens> {
+  options = Object.assign({
+    scopes: sdk.options.scopes,
+    authorizeUrl: sdk.options.authorizeUrl,
+    userinfoUrl: sdk.options.userinfoUrl,
+    issuer: sdk.options.issuer
+  }, options);
+
+  if (sdk.options.pkce) {
+    options.responseType = 'code';
+  } else {
+    options.responseType = ['token', 'id_token'];
+  }
+
+  return getWithoutPrompt(sdk, options)
+    .then(res => res.tokens);
 }
 
 function removeHash(sdk) {
@@ -885,6 +897,7 @@ export {
   parseFromUrl,
   decodeToken,
   renewToken,
+  renewTokens,
   getUserInfo,
   verifyToken,
   handleOAuthResponse,
