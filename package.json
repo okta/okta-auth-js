@@ -32,7 +32,7 @@
     "test:e2e": "yarn --cwd test/e2e start",
     "test:e2e:saucelabs": "export RUN_SAUCE_TESTS=true && yarn test:e2e",
     "test:karma": "karma start --single-run",
-    "test:browser": "jest --config ./jest.browser.js --coverage",
+    "test:browser": "jest --config ./jest.browser.js",
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
     "build": "node scripts/build.js",
