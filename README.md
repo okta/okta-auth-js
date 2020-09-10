@@ -586,8 +586,8 @@ var config = {
 * [authStateManager](#authstatemanager)
   * [authStateManager.getAuthState](#authstatemanagergetauthstate)
   * [authStateManager.updateAuthState](#authstatemanagerupdateauthstate)
-  * [authStateManager.onAuthStateChange](#authstatemanageronauthstatechangehandler)
-  * [authStateManager.offAuthStateChange](#authstatemanageroffauthstatechangehandler)
+  * [authStateManager.subscribe](#authstatemanagersubscribehandler)
+  * [authStateManager.unsubscribe](#authstatemanagerunsubscribehandler)
 
 ------
 
@@ -867,13 +867,13 @@ Alias method of [token.getUserInfo](#tokengetuserinfoaccesstokenobject-idtokenob
 
 > :hourglass: async
 
-Resolves with the id token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.onAuthStateChange](#authstatemanageronauthstatechangehandler).
+Resolves with the id token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
 
 ### `getAccessToken()`
 
 > :hourglass: async
 
-Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.onAuthStateChange](#authstatemanageronauthstatechangehandler).
+Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
 
 ### `handleAuthentication()`
 
@@ -2252,24 +2252,24 @@ The emitted `AuthState` object includes:
 Subscribes to `authStateChange` event:
 
 ```javascript
-authClient.authStateManager.onAuthStateChange((authState) => {
+authClient.authStateManager.subscribe((authState) => {
   // handle the latest evaluated authState, like integrate with client framework's state management store
 });
 ```
 
 #### `authStateManager.getAuthState()`
 
-Gets latest evaluated `authState` from the `authStateManager`. The `authState` is re-evaluated when .authStateManager.updateAuthState() is called.
+Gets latest evaluated `authState` from the `authStateManager`. The `authState` (a unique new object) is re-evaluated when `authStateManager.updateAuthState()` is called.
 
 #### `authStateManager.updateAuthState()`
 
-Evaludates `authState` based on tokens in `tokenManager` or custom `isAuthenticated` callback, then emit `authStateChange` event with latest evaludated `authState`. By default, the evaluation process is driven by tokens change. Might be need to be triggered manually for users that pass override of `isAuthenticated` to the [configuration](#configuration-reference).
+Evaludates `authState` (a unique new object) based on tokens in `tokenManager` or custom `isAuthenticated` callback, then emit `authStateChange` event with latest evaludated `authState`. By default, the evaluation process is driven by tokens change. Might be need to be triggered manually for users that pass override of `isAuthenticated` to the [configuration](#configuration-reference).
 
-#### `authStateManager.onAuthStateChange(handler)`
+#### `authStateManager.subscribe(handler)`
 
 Subscribes a callback that will be called when the `authStateChange` event happens.
 
-#### `authStateManager.offAuthStateChange(handler?)`
+#### `authStateManager.unsubscribe(handler?)`
 
 Unsubscribes callback for `authStateChange` event. It will unregister all handlers if no callback handler is provided.
 

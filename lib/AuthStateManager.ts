@@ -71,6 +71,7 @@ class AuthStateManager {
       if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {
         // stop canceling then starting a new promise
         // let existing promise finish to prevent running into loops
+        devMode && logger('terminated');
         return;
       } else {
         this._pending.updateAuthStatePromise.cancel();
@@ -97,7 +98,7 @@ class AuthStateManager {
         resolve();
       };
 
-      return this._sdk.tokenManager._getTokens()
+      this._sdk.tokenManager._getTokens()
         .then(({ accessToken, idToken }) => {
           if (cancelablePromise.isCanceled) {
             resolve();
@@ -114,7 +115,7 @@ class AuthStateManager {
             ? isAuthenticated(this._sdk)
             : Promise.resolve(!!(accessToken && idToken));
 
-          return promise
+          promise
             .then(isAuthenticated => emitAndResolve({ 
               ...this._authState,
               accessToken,
@@ -136,11 +137,11 @@ class AuthStateManager {
     this._pending.updateAuthStatePromise = cancelablePromise;
   }
 
-  onAuthStateChange(handler): void {
+  subscribe(handler): void {
     this._sdk.emitter.on(EVENT_AUTH_STATE_CHANGE, handler);
   }
 
-  offAuthStateChange(handler?): void {
+  unsubscribe(handler?): void {
     this._sdk.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
   }
 }

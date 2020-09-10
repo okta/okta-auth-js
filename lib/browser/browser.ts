@@ -63,7 +63,7 @@ import {
   FingerprintAPI,
   UserClaims, 
   SigninWithRedirectOptions,
-  isSigninOptions,
+  isSignInWithCredentialsOptions,
   TokenParams
 } from '../types';
 import fingerprint from './fingerprint';
@@ -250,7 +250,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       }
     };
 
-    if (isSigninOptions(opts)) {
+    if (isSignInWithCredentialsOptions(opts)) {
       return loginWithCredential(opts);
     } else {
       return loginWithRedirect(opts);

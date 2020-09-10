@@ -162,14 +162,17 @@ export interface FeaturesAPI {
   isPKCESupported(): boolean;
 }
 
-export interface SigninOptions {
+// TODO: deprecate
+export interface SigninOptions extends SignInWithCredentialsOptions {}
+
+export interface SignInWithCredentialsOptions {
   username: string;
   password: string;
   relayState?: string;
   context?: string;
 }
 
-export function isSigninOptions(obj: any): obj is SigninOptions {
+export function isSignInWithCredentialsOptions(obj: any): obj is SignInWithCredentialsOptions {
   return obj && obj.username && obj.password;
 } 
 
@@ -178,7 +181,7 @@ export interface SigninWithRedirectOptions extends TokenParams {
 }
 
 export interface SigninAPI {
-  signIn(opts?: SigninOptions|SigninWithRedirectOptions): Promise<AuthTransaction>|Promise<void>;
+  signIn(opts?: SignInWithCredentialsOptions|SigninWithRedirectOptions): Promise<AuthTransaction>|Promise<void>;
 }
 
 export interface SignoutOptions {

@@ -8,8 +8,8 @@
   - Implements `AuthStateManager` to evaluate and emit latest authState. Exposes new methods from `AuthStateManager`:
     - `authStateManager.getAuthState`
     - `authStateManager.updateAuthState`
-    - `authStateManager.onAuthStateChange`
-    - `authStateManager.offAuthStateChange`
+    - `authStateManager.subscribe`
+    - `authStateManager.unsubscribe`
   - Adds new methods in sdk scope:
     - `sdk.loginRedirect`
     - `sdk.getUser`
