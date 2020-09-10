@@ -564,10 +564,11 @@ describe('TokenManager', function() {
       });
     });
 
-    it('removes token if an OAuthError is thrown while renewing', function() {
+    it('removes expired token if an OAuthError is thrown while renewing', function() {
       return oauthUtil.setupFrame({
         authClient: client,
         willFail: true,
+        time: tokens.standardAccessTokenParsed.expiresAt + 1,
         tokenManagerAddKeys: {
           'test-accessToken': tokens.standardAccessTokenParsed,
           'test-idToken': tokens.standardIdTokenParsed
@@ -587,19 +588,21 @@ describe('TokenManager', function() {
           errorSummary: 'something went wrong',
           tokenKey: 'test-accessToken',
         });
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
-        });
+        oauthUtil.expectTokenStorageToEqual(localStorage, {});
       });
     });
 
-    it('removes token if an AuthSdkError is thrown while renewing', function() {
+    it('removes expired token if an AuthSdkError is thrown while renewing', function() {
       return oauthUtil.setupFrame({
         authClient: client,
         willFail: true,
+        time: tokens.standardAccessTokenParsed.expiresAt + 1,
         tokenManagerAddKeys: {
           'test-accessToken': tokens.standardAccessTokenParsed,
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': { 
+            ...tokens.standardIdTokenParsed, 
+            expiresAt: tokens.standardAccessTokenParsed.expiresAt + 10 
+          }
         },
         tokenManagerRenewArgs: ['test-accessToken'],
         postMessageSrc: {
@@ -621,7 +624,10 @@ describe('TokenManager', function() {
           tokenKey: 'test-accessToken'
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': { 
+            ...tokens.standardIdTokenParsed, 
+            expiresAt: tokens.standardAccessTokenParsed.expiresAt + 10 
+          }
         });
       });
     });

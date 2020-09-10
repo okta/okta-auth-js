@@ -105,11 +105,17 @@ class AuthStateManager {
             return;
           }
 
+          // evaluate isPending to true if any token is expired
+          // then wait for next renewed event to evaluate a new state with valid tokens
+          // isPending state should only apply to token driven evaluation
+          let isPending = false;
           if (accessToken && this._sdk.tokenManager.hasExpired(accessToken)) {
             accessToken = null;
+            isPending = true;
           }
           if (idToken && this._sdk.tokenManager.hasExpired(idToken)) {
             idToken = null;
+            isPending = true;
           }
           let promise = isAuthenticated 
             ? isAuthenticated(this._sdk)
@@ -121,7 +127,7 @@ class AuthStateManager {
               accessToken,
               idToken,
               isAuthenticated,
-              isPending: false 
+              isPending 
             }))
             .catch(error => emitAndResolve({ 
               ...this._authState, 
