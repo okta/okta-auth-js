@@ -1,21 +1,18 @@
 import Emitter from 'tiny-emitter';
-import AuthStateManager, { 
-  DEFAULT_AUTH_STATE, 
-  EVENT_AUTH_STATE_CHANGE 
-} from '../../lib/AuthStateManager';
+import AuthStateManager, { DEFAULT_AUTH_STATE } from '../../lib/AuthStateManager';
 import { AuthSdkError } from '../../lib/errors';
-import { resolve } from 'path';
 
 describe('AuthStateManager', () => {
   let sdkMock;
 
   beforeEach(function() {
+    const emitter = new Emitter();
     sdkMock = {
       options: {},
-      emitter: new Emitter(),
+      emitter,
       tokenManager: {
         on: jest.fn().mockImplementation((event, handler) => {
-          sdkMock.emitter.on(event, handler)
+          sdkMock.emitter.on(event, handler);
         })
       }
     };
@@ -23,7 +20,7 @@ describe('AuthStateManager', () => {
 
   describe('constructor', () => {
     it('should listen on "added", "renewed" and "removed" events from TokenManaget', () => {
-      new AuthStateManager(sdkMock);
+      new AuthStateManager(sdkMock); // eslint-disable-line no-new
       expect(sdkMock.tokenManager.on).toHaveBeenCalledWith('added', expect.any(Function));
       expect(sdkMock.tokenManager.on).toHaveBeenCalledWith('renewed', expect.any(Function));
       expect(sdkMock.tokenManager.on).toHaveBeenCalledWith('removed', expect.any(Function));
@@ -43,7 +40,7 @@ describe('AuthStateManager', () => {
       expect(instance.updateAuthState).toHaveBeenCalledWith({ event: 'renewed', key: 'fakeKey', token: 'fakeToken' });
     });
 
-    it('should call updateAuthState when "renewed" event emitted', () => {
+    it('should call updateAuthState when "removed" event emitted', () => {
       const instance = new AuthStateManager(sdkMock);
       instance.updateAuthState = jest.fn();
       sdkMock.emitter.emit('removed', 'fakeKey', 'fakeToken');
@@ -60,7 +57,7 @@ describe('AuthStateManager', () => {
     it('should throw AuthSdkError if no emitter in sdk', () => {
       delete sdkMock.emitter;
       try {
-        new AuthStateManager(sdkMock);
+        new AuthStateManager(sdkMock); // eslint-disable-line no-new
       } catch (err) {
         expect(err).toBeInstanceOf(AuthSdkError);
         expect(err.message).toBe('Emitter should be initialized before AuthStateManager');
@@ -125,7 +122,7 @@ describe('AuthStateManager', () => {
             isAuthenticated: true,
             idToken: 'fakeIdToken1',
             accessToken: 'fakeAccessToken1'
-          })
+          });
           resolve();
         }, 100);
       });
@@ -270,7 +267,7 @@ describe('AuthStateManager', () => {
       const handler = jest.fn();
       const instance = new AuthStateManager(sdkMock);
       instance.onAuthStateChange(handler);
-      expect(sdkMock.emitter.on).toHaveBeenCalledWith(EVENT_AUTH_STATE_CHANGE, handler);
+      expect(sdkMock.emitter.on).toHaveBeenCalledWith('authStateChange', handler);
     });
   });
 
@@ -280,7 +277,7 @@ describe('AuthStateManager', () => {
       const handler = jest.fn();
       const instance = new AuthStateManager(sdkMock);
       instance.offAuthStateChange(handler);
-      expect(sdkMock.emitter.off).toHaveBeenCalledWith(EVENT_AUTH_STATE_CHANGE, handler);
+      expect(sdkMock.emitter.off).toHaveBeenCalledWith('authStateChange', handler);
     });
   });
 });

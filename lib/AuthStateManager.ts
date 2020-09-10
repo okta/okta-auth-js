@@ -13,12 +13,15 @@ const DEFAULT_PENDING = {
   updateAuthStatePromise: null,
   canceledTimes: 0
 };
-export const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
+const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 const MAX_PROMISE_CANCEL_TIMES = 10;
 
 class AuthStateManager {
   _sdk: OktaAuth;
-  _pending: { updateAuthStatePromise: typeof PCancelable, canceledTimes: number };
+  _pending: { 
+    updateAuthStatePromise: typeof PCancelable;
+    canceledTimes: number; 
+  };
   _authState: AuthState;
 
   constructor(sdk: OktaAuth) {
@@ -48,6 +51,8 @@ class AuthStateManager {
   }
 
   updateAuthState({ event, key, token }: UpdateAuthStateOptions = {}): void {
+    const { isAuthenticated, devMode } = this._sdk.options;
+
     const logger = (status) => {
       console.group(`OKTA-AUTH-JS:updateAuthState: Event:${event} Status:${status}`);
       console.log(key, token);
@@ -72,7 +77,7 @@ class AuthStateManager {
       }
     }
 
-    const { isAuthenticated, devMode } = this._sdk.options;
+    /* eslint-disable complexity */
     const cancelablePromise = new PCancelable((resolve, _, onCancel) => {
       onCancel.shouldReject = false;
       onCancel(() => {
@@ -80,6 +85,17 @@ class AuthStateManager {
         this._pending.canceledTimes = this._pending.canceledTimes + 1;
         devMode && logger('canceled');
       });
+
+      const emitAndResolve = (authState) => {
+        if (cancelablePromise.isCanceled) {
+          resolve();
+          return;
+        }
+        // emit event and clear states
+        emitAuthStateChange(authState); 
+        this._pending = { ...DEFAULT_PENDING };
+        resolve();
+      };
 
       return this._sdk.tokenManager._getTokens()
         .then(({ accessToken, idToken }) => {
@@ -95,46 +111,38 @@ class AuthStateManager {
             idToken = null;
           }
           let promise = isAuthenticated 
-            ? isAuthenticated(this._sdk) 
+            ? isAuthenticated(this._sdk)
             : Promise.resolve(!!(accessToken && idToken));
 
-          return promise.then(isAuthenticated => {
-            if (cancelablePromise.isCanceled) {
-              resolve();
-              return;
-            }
-            // emit event and clear states
-            emitAuthStateChange({ 
-              ...this._authState, 
-              accessToken, 
-              idToken, 
-              isAuthenticated, 
+          return promise
+            .then(isAuthenticated => emitAndResolve({ 
+              ...this._authState,
+              accessToken,
+              idToken,
+              isAuthenticated,
               isPending: false 
-            }); 
-            this._pending = { ...DEFAULT_PENDING };
-            resolve();
-          }).catch(error => {
-            emitAuthStateChange({ 
+            }))
+            .catch(error => emitAndResolve({ 
               ...this._authState, 
               accessToken, 
               idToken, 
               isAuthenticated: false, 
               isPending: false,
               error
-            }); 
-          });
+            }));
         });
     });
+    /* eslint-enable complexity */
     this._pending.updateAuthStatePromise = cancelablePromise;
   }
 
   onAuthStateChange(handler): void {
     this._sdk.emitter.on(EVENT_AUTH_STATE_CHANGE, handler);
-  };
+  }
 
   offAuthStateChange(handler?): void {
     this._sdk.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
-  };
+  }
 }
 
 export default AuthStateManager;

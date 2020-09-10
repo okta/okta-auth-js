@@ -1,5 +1,5 @@
 /* eslint-disable no-new */
-/* global window */
+/* global window, sessionStorage */
 jest.mock('cross-fetch');
 jest.mock('../../lib/tx');
 
@@ -608,7 +608,7 @@ describe('Browser', function() {
         tokens: { idToken: 'fakeIdToken', accessToken: 'fakeAccessToken' }
       });
       auth.tokenManager.add = jest.fn();
-    })
+    });
     it('calls parseFromUrl', async () => {
       await auth.handleAuthentication();
       expect(auth.token.parseFromUrl).toHaveBeenCalled();

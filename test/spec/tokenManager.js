@@ -301,7 +301,7 @@ describe('TokenManager', function() {
       });
       const addedCallback = jest.fn();
       const renewedCallback = jest.fn();
-      client.tokenManager.on('added', addedCallback)
+      client.tokenManager.on('added', addedCallback);
       client.tokenManager.on('renewed', renewedCallback);
       return client.tokenManager.renew('test-idToken')
         .then(() => {
