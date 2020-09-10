@@ -18,7 +18,14 @@ import storageUtil from './browser/browserStorage';
 import { TOKEN_STORAGE_NAME } from './constants';
 import storageBuilder from './storageBuilder';
 import SdkClock from './clock';
-import { Token, Tokens, TokenManagerOptions, isIDToken, isAccessToken } from './types';
+import { 
+  Token, 
+  Tokens, 
+  TokenType, 
+  TokenManagerOptions, 
+  isIDToken, 
+  isAccessToken 
+} from './types';
 
 var DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -127,7 +134,7 @@ function get(storage, key) {
   return tokenStorage[key];
 }
 
-function getKeyByType(storage, type) {
+function getKeyByType(storage, type): string {
   const tokenStorage = storage.getStorage();
   const key = Object.keys(tokenStorage).filter(key => {
     const token = tokenStorage[key];
@@ -188,10 +195,11 @@ function renew(sdk, tokenMgmtRef, storage, key) {
     return Promise.reject(e);
   }
 
-  // Remove existing autoRenew timeout for this key
+  // Remove existing autoRenew timeouts
   clearExpireEventTimeoutAll(tokenMgmtRef);
 
   // Store the renew promise state, to avoid renewing again
+  // Renew both tokens in one process
   tokenMgmtRef.renewPromise[key] = sdk.token.renewTokens({
     scopes: token.scopes
   })
@@ -241,6 +249,7 @@ export class TokenManager {
   
   // This is exposed so we can get storage key agnostic tokens set in internal state managers
   _getTokens: () => Promise<Tokens>;
+  _getStorageKeyByType: (type: TokenType) => string;
   // This is exposed so we can set clear timeouts in our tests
   _clearExpireEventTimeoutAll: () => void;
 
@@ -333,6 +342,7 @@ export class TokenManager {
     this.off = tokenMgmtRef.emitter.off.bind(tokenMgmtRef.emitter);
     this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
     this._getTokens = getTokens.bind(this, storage);
+    this._getStorageKeyByType = getKeyByType.bind(this, storage);
     this._clearExpireEventTimeoutAll = clearExpireEventTimeoutAll.bind(this, tokenMgmtRef);
   
     const onTokenExpiredHandler = (key) => {

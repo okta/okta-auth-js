@@ -6,6 +6,26 @@
 
 - [#473](https://github.com/okta/okta-auth-js/pull/473) Fixes multiple tabs login issue
 
+## 4.1.0
+
+### Features
+
+- [#869](https://github.com/okta/okta-oidc-js/pull/869)
+  - Implements `AuthStateManager` to evaluate and emit latest authState. Exposes new methods from `AuthStateManager`:
+    - `authStateManager.getAuthState`
+    - `authStateManager.updateAuthState`
+    - `authStateManager.onAuthStateChange`
+    - `authStateManager.offAuthStateChange`
+  - Adds new methods in sdk scope:
+    - `sdk.loginRedirect`
+    - `sdk.getUser`
+    - `sdk.getIdToken`
+    - `sdk.getAccessToken`
+    - `sdk.handleAuthentication`
+    - `sdk.setFromUri`
+    - `sdk.getFromUri`
+  - Supports browser-based OpenID Connect flows in `sdk.signIn` method (browser bundle only).
+
 ## 4.0.0
 
 ### Features

@@ -82,7 +82,7 @@ describe('AuthStateManager', () => {
 
   describe('updateAuthState', () => {
     beforeEach(() => {
-      sdkMock.tokenManager.getTokens = jest.fn()
+      sdkMock.tokenManager._getTokens = jest.fn()
         .mockResolvedValueOnce({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' })
         .mockResolvedValueOnce({ accessToken: 'fakeAccessToken1', idToken: 'fakeIdToken1' });
       sdkMock.tokenManager.hasExpired = jest.fn().mockReturnValue(false);
@@ -208,10 +208,34 @@ describe('AuthStateManager', () => {
       });
     });
 
+    it('should emit error in authState if isAuthenticated throws error', () => {
+      expect.assertions(2);
+      const error = new Error('fake error');
+      sdkMock.options.isAuthenticated = jest.fn().mockRejectedValue(error);
+      return new Promise(resolve => {
+        const instance = new AuthStateManager(sdkMock);
+        instance.updateAuthState();
+        const handler = jest.fn();
+        instance.onAuthStateChange(handler);
+
+        setTimeout(() => {
+          expect(handler).toHaveBeenCalledTimes(1);
+          expect(handler).toHaveBeenCalledWith({
+            accessToken: 'fakeAccessToken0',
+            idToken: 'fakeIdToken0',
+            isAuthenticated: false,
+            isPending: false,
+            error
+          });
+          resolve();
+        }, 100);
+      });
+    });
+
     it('should stop and evaluate at the 10th update if too many updateAuthState happen concurrently', () => {
-      sdkMock.tokenManager.getTokens = jest.fn();
+      sdkMock.tokenManager._getTokens = jest.fn();
       for (let i = 0; i < 100; i++) {
-        sdkMock.tokenManager.getTokens = sdkMock.tokenManager.getTokens
+        sdkMock.tokenManager._getTokens = sdkMock.tokenManager._getTokens
           .mockResolvedValueOnce({ 
             accessToken: `fakeAccessToken${i}`,
             idToken: `fakeIdToken${i}`,

@@ -520,6 +520,13 @@ var config = {
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [webfinger](#webfingeroptions)
 * [fingerprint](#fingerprintoptions)
+* [loginRedirect](#loginRedirectfromuri-additionalparams)
+* [getUser](#getuser)
+* [getIdToken](#getidtoken)
+* [getAccessToken](#getaccesstoken)
+* [handleAuthentication](#handleauthentication)
+* [setFromUri](#setfromuriuri)
+* [getFromUri](#getfromurirelative)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -557,6 +564,11 @@ var config = {
   * [tokenManager.renew](#tokenmanagerrenewkey)
   * [tokenManager.on](#tokenmanageronevent-callback-context)
   * [tokenManager.off](#tokenmanageroffevent-callback)
+* [authStateManager](#authstatemanager)
+  * [authStateManager.getAuthState](#authstatemanagergetauthstate)
+  * [authStateManager.updateAuthState](#authstatemanagerupdateauthstate)
+  * [authStateManager.onAuthStateChange](#authstatemanageronauthstatechangehandler)
+  * [authStateManager.offAuthStateChange](#authstatemanageroffauthstatechangehandler)
 
 ------
 
@@ -564,7 +576,25 @@ var config = {
 
 > :hourglass: async
 
-The goal of an authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
+This method supports both `browser-based OpenID Connect` and `custom signIn with session cookie` flows by accepting different signInOptions. If the provided options are not valid for `custom signIn with session cookie`, this method fallbacks to the `browser-based OpenID Connect` flow.
+
+#### browser-based OpenID Connect flows
+
+This flow Calls `onAuthRequired` function if it was set on the initial configuration. Otherwise, it will call [loginRedirect](#loginRedirectfromuri-additionalparams). In this flow, there is a fromUri parameter in options to push the user to after successful authentication, and the addtional params are mapped to the [Authorize options](#authorize-options).
+
+For more information on the options, see the [loginRedirect](#loginRedirectfromuri-additionalparams) method below.
+
+```javascript
+// Start the browser based oidc flow, then parse tokens from the redirect callback url
+authClient.signIn();
+
+// Then call handleAuthentication to store tokens when redirect back from OKTA
+authClient.handleAuthentication();
+```
+
+#### custom signIn with session cookie
+
+The goal of this authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
 
 * `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
 * `password` - The password of the user
@@ -793,6 +823,42 @@ authClient.fingerprint()
   console.log(err);
 })
 ```
+
+### `loginRedirect(fromUri, additionalParams)`
+
+Performs a full-page redirect to Okta with optional request parameters.
+
+The `additionalParams` are mapped to Okta's [`/authorize` request parameters](https://developer.okta.com/docs/api/resources/oidc#authorize). This will override any existing [configuration](#configuration-options). As an example, if you have an Okta `sessionToken`, you can bypass the full-page redirect by passing in this token.
+
+```javascript
+authClient.loginRedirect({
+  sessionToken: '{sampleSessionToken}'
+});
+```
+
+### `getUser()`
+
+Alias method of [token.getUserInfo](#tokengetuserinfoaccesstokenobject-idtokenobject).
+
+### `getIdToken()`
+
+Resolves with the id token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.onAuthStateChange](#authstatemanageronauthstatechangehandler).
+
+### `getAccessToken()`
+
+Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.onAuthStateChange](#authstatemanageronauthstatechangehandler).
+
+### `handleAuthentication()`
+
+Parses tokens from the redirect url and stores them.
+
+### `setFromUri(uri?)`
+
+Store the current URL state before a redirect occurs. If a relative path is passed it will be converted to an absolute URI before storage.
+
+### `getFromUri(relative?)`
+
+Returns the stored URI string stored by [setFromUri](#setfromuriuri) and removes it from storage.  A relative uri is returned if `relative` is true.
 
 ### `tx.resume()`
 
@@ -2141,6 +2207,42 @@ Unsubscribe from `tokenManager` events. If no callback is provided, unsubscribes
 authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
+
+### `authStateManager`
+
+`AuthStateManager` evaluates and emits `AuthState` based on the events from `TokenManager` for downstream clients to consume.
+
+The emitted `AuthState` object includes:
+
+* `isPending`: true in the time after page load (first render) but before the asynchronous methods to see if the tokenManager is aware of a current authentication.
+* `isAuthenticated`: true if the user is considered authenticated. Normally this is true if both an idToken and an accessToken are present in the tokenManager, but this behavior can be overridden if you passed an isAuthenticated callback in the [configuration](#configuration-reference).
+* `accessToken`: the JWT accessToken for the currently authenticated user (if provided by the scopes).
+* `idToken`: the JWT idToken for the currently authenticated user (if provided by the scopes).
+* `error`: contains the error returned if an error occurs in the `authState` evaluation process.
+
+Subscribes to `authStateChange` event:
+
+```javascript
+authClient.authStateManager.onAuthStateChange((authState) => {
+  // handle the latest evaluated authState, like integrate with client framework's state management store
+});
+```
+
+#### `authStateManager.getAuthState()`
+
+Gets latest evaluated `authState` from the `authStateManager`. The `authState` is re-evaluated when .authStateManager.updateAuthState() is called.
+
+#### `authStateManager.updateAuthState()`
+
+Evaludates `authState` based on tokens in `tokenManager` or custom `isAuthenticated` callback, then emit `authStateChange` event with latest evaludated `authState`. By default, the evaluation process is driven by tokens change. Might be need to be triggered manually for users that pass override of `isAuthenticated` to the [configuration](#configuration-reference).
+
+#### `authStateManager.onAuthStateChange(handler)`
+
+Subscribes a callback that will be called when the `authStateChange` event happens.
+
+#### `authStateManager.offAuthStateChange(handler?)`
+
+Unsubscribes callback for `authStateChange` event. It will unregister all handlers if no callback handler is provided.
 
 ## Node JS and React Native Usage
 
