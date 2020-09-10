@@ -1,7 +1,9 @@
 var OktaAuth = '<rootDir>/lib/server';
 
 module.exports = {
-  'coverageDirectory': '<rootDir>/build2/reports/coverage',
+  'coverageDirectory': '<rootDir>/build2/reports/coverage-server',
+  'collectCoverage': true,
+  'collectCoverageFrom': ['./lib/**','!./test/**'],
   'restoreMocks': true,
   'moduleNameMapper': {
     '^@okta/okta-auth-js$': OktaAuth
