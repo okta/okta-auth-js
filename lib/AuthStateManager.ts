@@ -113,6 +113,15 @@ class AuthStateManager {
             }); 
             this._pending = { ...DEFAULT_PENDING };
             resolve();
+          }).catch(error => {
+            emitAuthStateChange({ 
+              ...this._authState, 
+              accessToken, 
+              idToken, 
+              isAuthenticated: false, 
+              isPending: false,
+              error
+            }); 
           });
         });
     });

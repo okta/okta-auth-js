@@ -63,7 +63,9 @@ import {
   FingerprintAPI,
   UserClaims, 
   AuthState,
-  Tokens
+  SigninWithRedirectOptions,
+  isSigninOptions,
+  TokenParams
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
@@ -212,22 +214,48 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   signIn(opts) {
-    opts = clone(opts || {});
-    const _postToTransaction = (options?) => {
-      delete opts.sendFingerprint;
-      return postToTransaction(this, '/api/v1/authn', opts, options);
-    };
-    if (!opts.sendFingerprint) {
-      return _postToTransaction();
-    }
-    return this.fingerprint()
-    .then(function(fingerprint) {
-      return _postToTransaction({
-        headers: {
-          'X-Device-Fingerprint': fingerprint
-        }
+    const loginWithCredential = (opts) => {
+      opts = clone(opts || {});
+      const _postToTransaction = (options?) => {
+        delete opts.sendFingerprint;
+        return postToTransaction(this, '/api/v1/authn', opts, options);
+      };
+      if (!opts.sendFingerprint) {
+        return _postToTransaction();
+      }
+      return this.fingerprint()
+      .then(function(fingerprint) {
+        return _postToTransaction({
+          headers: {
+            'X-Device-Fingerprint': fingerprint
+          }
+        });
       });
-    });
+    }
+
+    const loginWithRedirect = async (opts: SigninWithRedirectOptions = {}) => {
+      if(this._pending.handleLogin) { 
+        // Don't trigger second round
+        return;
+      }
+  
+      this._pending.handleLogin = true;
+      this.setFromUri(opts.fromUri);
+      try {
+        if (this.options.onAuthRequired) {
+          return await this.options.onAuthRequired(this);
+        }
+        return await this.loginRedirect(undefined, opts);
+      } finally {
+        this._pending.handleLogin = null;
+      }
+    }
+
+    if (isSigninOptions(opts)) {
+      return loginWithCredential(opts);
+    } else {
+      return loginWithRedirect(opts);
+    }
   }
   
   // Ends the current Okta SSO session without redirecting to Okta.
@@ -248,8 +276,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   // Revokes the access token for the application session
   async revokeAccessToken(accessToken?: AccessToken) {
     if (!accessToken) {
-      accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
-      this.tokenManager.remove(ACCESS_TOKEN_STORAGE_KEY);
+      accessToken = (await this.tokenManager._getTokens()).accessToken as AccessToken;
+      const accessTokenKey = this.tokenManager._getStorageKeyByType('accessToken');
+      this.tokenManager.remove(accessTokenKey);
     }
     // Access token may have been removed. In this case, we will silently succeed.
     if (!accessToken) {
@@ -276,11 +305,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     var logoutUrl = getOAuthUrls(this).logoutUrl;
   
     if (typeof idToken === 'undefined') {
-      idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY);
+      idToken = (await this.tokenManager._getTokens()).idToken as IDToken;
     }
   
     if (revokeAccessToken && typeof accessToken === 'undefined') {
-      accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY);
+      accessToken = (await this.tokenManager._getTokens()).accessToken as AccessToken;
     }
   
     // Clear all local tokens
@@ -333,71 +362,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   // Common APIs
 
-  getAuthState(): AuthState {
-    return this.authStateManager.getAuthState();
-  }
-
-  updateAuthState(): void {
-    this.authStateManager.updateAuthState();
-  }
-
-  async getUser(): Promise<UserClaims> {
-    return this.token.getUserInfo();
-  }
-
-  async getIdToken(): Promise<string> {
-    try {
-      const idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY) as IDToken;
-      return idToken ? idToken.idToken : undefined;
-    } catch (err) {
-      return undefined;
-    }
-  }
-
-  async getAccessToken(): Promise<string> {
-    try {
-      const accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
-      return accessToken ? accessToken.accessToken : undefined;
-    } catch (err) {
-      return undefined;
-    }
-  }
-
-  async login(fromUri?: string, additionalParams?: object): Promise<void> {
-    if(this._pending.handleLogin) { 
-      // Don't trigger second round
-      return;
-    }
-
-    this._pending.handleLogin = true;
-    this.setFromUri(fromUri);
-    try {
-      if (this.options.onAuthRequired) {
-        return await this.options.onAuthRequired(this);
-      }
-      return await this.loginRedirect(undefined, additionalParams);
-    } finally {
-      this._pending.handleLogin = null;
-    }
-  }
-
-  async logout(options?: any): Promise<void> {
-    let redirectUri = null;
-    options = options || {};
-    if (typeof options === 'string') {
-      redirectUri = options;
-      // If a relative path was passed, convert to absolute URI
-      if (redirectUri.charAt(0) === '/') {
-        redirectUri = window.location.origin + redirectUri;
-      }
-      options = {
-        postLogoutRedirectUri: redirectUri
-      };
-    }
-    await this.signOut(options);
-  }
-
-  async loginRedirect(fromUri?: string, additionalParams?: object): Promise<void> {
+  async loginRedirect(fromUri?: string, additionalParams?: TokenParams): Promise<void> {
     if (fromUri) {
       this.setFromUri(fromUri);
     }
@@ -409,6 +374,28 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }, additionalParams);
 
     return this.token.getWithRedirect(params);
+  }
+
+  async getUser(): Promise<UserClaims> {
+    return this.token.getUserInfo();
+  }
+
+  async getIdToken(): Promise<string> {
+    try {
+      const idToken = (await this.tokenManager._getTokens()).idToken as IDToken;
+      return idToken ? idToken.idToken : undefined;
+    } catch (err) {
+      return undefined;
+    }
+  }
+
+  async getAccessToken(): Promise<string> {
+    try {
+      const accessToken = (await this.tokenManager._getTokens()).accessToken as AccessToken;
+      return accessToken ? accessToken.accessToken : undefined;
+    } catch (err) {
+      return undefined;
+    }
   }
 
   async handleAuthentication(): Promise<void> {
@@ -441,28 +428,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     const url = new URL(fromUri);
     fromUri = `${url.pathname}${url.search}${url.hash}`
     return fromUri;
-  }
-
-  getTokenManager(): TokenManager {
-    return this.tokenManager;
-  }
-
-  // Angular specific APIs
-
-  isAuthenticated(): Promise<boolean> {
-    const authState = this.authStateManager.getAuthState();
-    return Promise.resolve(authState.isAuthenticated);
-  }
-
-  // React specific APIs
-
-  redirect(additionalParams?: object): Promise<void> {
-    return this.loginRedirect(undefined, additionalParams);
-  }
-
-  on(eventName: String, callback: Function): Function {
-    this.emitter.on(eventName, callback);
-    return () => this.emitter.off(eventName);
   }
 }
 

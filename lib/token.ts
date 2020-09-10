@@ -33,8 +33,6 @@ import * as sdkCrypto from './crypto';
 import AuthSdkError from './errors/AuthSdkError';
 import OAuthError from './errors/OAuthError';
 import {
-  ACCESS_TOKEN_STORAGE_KEY,
-  ID_TOKEN_STORAGE_KEY,
   REDIRECT_OAUTH_PARAMS_NAME,
   REDIRECT_NONCE_COOKIE_NAME,
   REDIRECT_STATE_COOKIE_NAME
@@ -835,22 +833,20 @@ function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<Token
     });
 }
 
-async function getUserInfo(sdk, accessTokenObject, idTokenObject): Promise<UserClaims> {
+async function getUserInfo(sdk, accessTokenObject: AccessToken, idTokenObject: IDToken): Promise<UserClaims> {
   // If token objects were not passed, attempt to read from the TokenManager
   if (!accessTokenObject) {
-    accessTokenObject = await sdk.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY);
+    accessTokenObject = (await sdk.tokenManager._getTokens()).accessToken as AccessToken;
   }
   if (!idTokenObject) {
-    idTokenObject = await sdk.tokenManager.get(ID_TOKEN_STORAGE_KEY);
+    idTokenObject = (await sdk.tokenManager._getTokens()).idToken as IDToken;
   }
 
-  if (!accessTokenObject ||
-      (!isToken(accessTokenObject) && !accessTokenObject.accessToken && !accessTokenObject.userinfoUrl)) {
+  if (!accessTokenObject || !isAccessToken(accessTokenObject)) {
     return Promise.reject(new AuthSdkError('getUserInfo requires an access token object'));
   }
 
-  if (!idTokenObject ||
-    (!isToken(idTokenObject) && !idTokenObject.idToken)) {
+  if (!idTokenObject || !isIDToken(idTokenObject)) {
     return Promise.reject(new AuthSdkError('getUserInfo requires an ID token object'));
   }
 

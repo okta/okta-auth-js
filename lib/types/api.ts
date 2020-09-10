@@ -169,8 +169,16 @@ export interface SigninOptions {
   context?: string;
 }
 
+export function isSigninOptions(obj: any): obj is SigninOptions {
+  return obj && obj.username && obj.password;
+} 
+
+export interface SigninWithRedirectOptions extends TokenParams {
+  fromUri?: string
+}
+
 export interface SigninAPI {
-  signIn(opts: SigninOptions): Promise<AuthTransaction>;
+  signIn(opts?: SigninOptions|SigninWithRedirectOptions): Promise<AuthTransaction>|Promise<void>;
 }
 
 export interface SignoutOptions {
