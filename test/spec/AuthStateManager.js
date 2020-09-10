@@ -91,7 +91,7 @@ describe('AuthStateManager', () => {
         const instance = new AuthStateManager(sdkMock);
         instance.updateAuthState();
         const handler = jest.fn();
-        instance.onAuthStateChange(handler);
+        instance.subscribe(handler);
 
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
@@ -113,7 +113,7 @@ describe('AuthStateManager', () => {
         instance.updateAuthState();
         instance.updateAuthState();
         const handler = jest.fn();
-        instance.onAuthStateChange(handler);
+        instance.subscribe(handler);
 
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
@@ -137,7 +137,7 @@ describe('AuthStateManager', () => {
           instance.updateAuthState();
         }, 50);
         const handler = jest.fn();
-        instance.onAuthStateChange(handler);
+        instance.subscribe(handler);
 
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(2);
@@ -165,7 +165,7 @@ describe('AuthStateManager', () => {
         const instance = new AuthStateManager(sdkMock);
         instance.updateAuthState();
         const handler = jest.fn();
-        instance.onAuthStateChange(handler);
+        instance.subscribe(handler);
 
         setTimeout(() => {
           expect(sdkMock.options.isAuthenticated).toHaveBeenCalledTimes(1);
@@ -190,7 +190,7 @@ describe('AuthStateManager', () => {
         const instance = new AuthStateManager(sdkMock);
         instance.updateAuthState();
         const handler = jest.fn();
-        instance.onAuthStateChange(handler);
+        instance.subscribe(handler);
 
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
@@ -213,7 +213,7 @@ describe('AuthStateManager', () => {
         const instance = new AuthStateManager(sdkMock);
         instance.updateAuthState();
         const handler = jest.fn();
-        instance.onAuthStateChange(handler);
+        instance.subscribe(handler);
 
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
@@ -245,7 +245,7 @@ describe('AuthStateManager', () => {
           instance.updateAuthState();
         }
         const handler = jest.fn();
-        instance.onAuthStateChange(handler);
+        instance.subscribe(handler);
 
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
@@ -261,22 +261,22 @@ describe('AuthStateManager', () => {
     });
   });
 
-  describe('onAuthStateChange', () => {
+  describe('subscribe', () => {
     it('should add "authStateChange" listener on sdk.emitter', () => {
       jest.spyOn(Emitter.prototype, 'on');
       const handler = jest.fn();
       const instance = new AuthStateManager(sdkMock);
-      instance.onAuthStateChange(handler);
+      instance.subscribe(handler);
       expect(sdkMock.emitter.on).toHaveBeenCalledWith('authStateChange', handler);
     });
   });
 
-  describe('offAuthStateChange', () => {
+  describe('unsubscribe', () => {
     it('should remove "authStateChange" listener from sdk.emitter', () => {
       jest.spyOn(Emitter.prototype, 'off');
       const handler = jest.fn();
       const instance = new AuthStateManager(sdkMock);
-      instance.offAuthStateChange(handler);
+      instance.unsubscribe(handler);
       expect(sdkMock.emitter.off).toHaveBeenCalledWith('authStateChange', handler);
     });
   });

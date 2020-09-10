@@ -22,7 +22,7 @@ import {
 import {
   OktaAuth,
   OktaAuthOptions,
-  SigninOptions,
+  SignInWithCredentialsOptions,
   SigninWithRedirectOptions,
   ForgotPasswordOptions,
   VerifyRecoveryTokenOptions,
@@ -62,7 +62,7 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
   }
 
   // { username, password, (relayState), (context) }
-  signIn(opts: SigninOptions | SigninWithRedirectOptions): Promise<AuthTransaction> | Promise<void> {
+  signIn(opts: SignInWithCredentialsOptions | SigninWithRedirectOptions): Promise<AuthTransaction> | Promise<void> {
     return postToTransaction(this, '/api/v1/authn', opts);
   }
 
