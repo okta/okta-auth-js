@@ -25,6 +25,9 @@
     - `sdk.setFromUri`
     - `sdk.getFromUri`
   - Supports browser-based OpenID Connect flows in `sdk.signIn` method (browser bundle only).
+  - Accepts new custom callbacks [options](README.md#configuration-options)
+    - `isAuthenticated`
+    - `onAuthRequired`
 
 ## 4.0.0
 
