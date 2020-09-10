@@ -174,7 +174,7 @@ export function isSigninOptions(obj: any): obj is SigninOptions {
 } 
 
 export interface SigninWithRedirectOptions extends TokenParams {
-  fromUri?: string
+  fromUri?: string;
 }
 
 export interface SigninAPI {

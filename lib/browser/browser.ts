@@ -18,7 +18,7 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryParams, clone } from '../util';
+import { removeTrailingSlash, toQueryParams, clone, getUrlParts } from '../util';
 import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
@@ -62,7 +62,6 @@ import {
   SignoutAPI, 
   FingerprintAPI,
   UserClaims, 
-  AuthState,
   SigninWithRedirectOptions,
   isSigninOptions,
   TokenParams
@@ -231,7 +230,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
           }
         });
       });
-    }
+    };
 
     const loginWithRedirect = async (opts: SigninWithRedirectOptions = {}) => {
       if(this._pending.handleLogin) { 
@@ -249,7 +248,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       } finally {
         this._pending.handleLogin = null;
       }
-    }
+    };
 
     if (isSigninOptions(opts)) {
       return loginWithCredential(opts);
@@ -418,15 +417,15 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
   }
 
-  getFromUri(relative: boolean = false): string {
+  getFromUri(relative = false): string {
     let fromUri = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
     sessionStorage.removeItem(REFERRER_PATH_STORAGE_KEY);
     if (!relative) {
       return fromUri;
     }
 
-    const url = new URL(fromUri);
-    fromUri = `${url.pathname}${url.search}${url.hash}`
+    const { pathname, search, hash } = getUrlParts(fromUri);
+    fromUri = `${pathname}${search}${hash}`;
     return fromUri;
   }
 }

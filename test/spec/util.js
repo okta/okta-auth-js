@@ -203,4 +203,19 @@ describe('util', function() {
       expect(util.isFunction(fn)).toBe(true);
     });
   });
+
+  describe('getUrlParts', () => {
+    it('should parse url', () => {
+      const url = 'https://www.example.com:8080/path?a=a#123';
+      const parts = util.getUrlParts(url);
+      expect(parts.href).toBe(url);
+      expect(parts.host).toBe('www.example.com:8080');
+      expect(parts.hostname).toBe('www.example.com');
+      expect(parts.port).toBe('8080');
+      expect(parts.pathname).toBe('/path');
+      expect(parts.protocol).toBe('https:');
+      expect(parts.hash).toBe('#123');
+      expect(parts.search).toBe('?a=a');
+    });
+  });
 });
