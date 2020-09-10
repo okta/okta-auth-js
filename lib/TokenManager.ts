@@ -218,7 +218,14 @@ function renew(sdk, tokenMgmtRef, storage, key) {
     })
     .catch(function(err) {
       if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
-        remove(tokenMgmtRef, storage, key);
+        // remove expired tokens in storage
+        const tokenStorage = storage.getStorage();
+        Object.keys(tokenStorage).forEach(key => {
+          const token = tokenStorage[key];
+          if (token && hasExpired(tokenMgmtRef, token)) {
+            remove(tokenMgmtRef, storage, key);
+          }
+        });
         err.tokenKey = key;
         emitError(tokenMgmtRef, err);
       }

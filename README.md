@@ -849,7 +849,7 @@ authClient.fingerprint()
 
 Performs a full-page redirect to Okta with optional request parameters.
 
-The `additionalParams` are mapped to Okta's [`/authorize` request parameters](https://developer.okta.com/docs/api/resources/oidc#authorize). This will override any existing [configuration](#configuration-options). As an example, if you have an Okta `sessionToken`, you can bypass the full-page redirect by passing in this token.
+The `additionalParams` accepts [token authorize options](#authorize-options).As an example, if you have an Okta `sessionToken`, you can bypass the full-page redirect by passing in this token.
 
 ```javascript
 authClient.loginRedirect({

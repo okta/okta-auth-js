@@ -181,7 +181,7 @@ describe('AuthStateManager', () => {
       });
     });
 
-    it('should evaluate expired token as null', () => {
+    it('should evaluate expired token as null with isPending state as true', () => {
       expect.assertions(2);
       sdkMock.tokenManager.hasExpired = jest.fn()
         .mockReturnValueOnce(false)
@@ -198,7 +198,7 @@ describe('AuthStateManager', () => {
             accessToken: 'fakeAccessToken0',
             idToken: null,
             isAuthenticated: false,
-            isPending: false,
+            isPending: true,
           });
           resolve();
         }, 100);
