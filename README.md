@@ -431,6 +431,25 @@ Defaults to `true`, unless the application origin is `http://localhost`, in whic
 
 Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
 
+##### `isAuthenticated`
+
+Callback function. By default, the SDK will consider a user authenticated if both valid idToken and accessToken are available from `tokenManager`. Setting a `isAuthenticated` function on the config will skip the default logic and call the supplied function instead. The function should return a Promise and resolve to either true or false. This callback is only evaluated when the `auth` code has reason to think the authentication state has changed, by default it's been triggered when token state changes.
+
+```javascript
+// Trigger a re-evaluation outside of the default token driven flow
+authClient.authStateManager.updateAuthState();
+```
+
+This callback function receives the sdk instance as the first function parameter.
+
+##### `onAuthRequired`
+
+> :warning: DO NOT trigger `authClient.signIn()` in this callback. This callback is used inside the `login` method, call it again will trigger the protection logic to end the function.
+
+Callback function. Called when authentication is required. This callback is triggered when [signIn](#signinoptions) method execute the `browser-based OpenID Connect` flows.
+
+This callback function receives the sdk instance as the first function parameter.
+
 #### Example Client
 
 ```javascript
