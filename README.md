@@ -826,6 +826,8 @@ authClient.fingerprint()
 
 ### `loginRedirect(fromUri, additionalParams)`
 
+> :hourglass: async
+
 Performs a full-page redirect to Okta with optional request parameters.
 
 The `additionalParams` are mapped to Okta's [`/authorize` request parameters](https://developer.okta.com/docs/api/resources/oidc#authorize). This will override any existing [configuration](#configuration-options). As an example, if you have an Okta `sessionToken`, you can bypass the full-page redirect by passing in this token.
@@ -838,17 +840,25 @@ authClient.loginRedirect({
 
 ### `getUser()`
 
+> :hourglass: async
+
 Alias method of [token.getUserInfo](#tokengetuserinfoaccesstokenobject-idtokenobject).
 
 ### `getIdToken()`
+
+> :hourglass: async
 
 Resolves with the id token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.onAuthStateChange](#authstatemanageronauthstatechangehandler).
 
 ### `getAccessToken()`
 
+> :hourglass: async
+
 Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.onAuthStateChange](#authstatemanageronauthstatechangehandler).
 
 ### `handleAuthentication()`
+
+> :hourglass: async
 
 Parses tokens from the redirect url and stores them.
 
