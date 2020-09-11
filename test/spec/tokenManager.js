@@ -107,6 +107,43 @@ describe('TokenManager', function() {
       client.emitter.emit('fake', payload);
       expect(handler).not.toHaveBeenCalled();
     });
+
+    it('should emit too many renew error when too many renews happen in a short peroid of time', () => {
+      expect.assertions(9);
+      setupSync({
+        tokenManager: { autoRenew: true }
+      });
+      const handler = jest.fn().mockImplementation(err => {
+        util.expectErrorToEqual(err, {
+          name: 'AuthSdkError',
+          message: 'Too many token renew requests',
+          errorCode: 'INTERNAL',
+          errorSummary: 'Too many token renew requests',
+          errorLink: 'INTERNAL',
+          errorId: 'INTERNAL',
+          errorCauses: []
+        });
+      });
+      client.tokenManager.on('error', handler);
+      client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
+      for (let i = 0; i <= 10; i++) {
+        client.emitter.emit('expired');
+      }
+    });
+
+    it('should not emit too many renew error if less than 10 renew process happened', () => {
+      expect.assertions(1);
+      setupSync({
+        tokenManager: { autoRenew: true }
+      });
+      const handler = jest.fn();
+      client.tokenManager.on('error', handler);
+      client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
+      for (let i = 0; i <= 5; i++) {
+        client.emitter.emit('expired');
+      }
+      expect(handler).not.toHaveBeenCalled();
+    });
   });
 
   describe('storageKey', function() {
