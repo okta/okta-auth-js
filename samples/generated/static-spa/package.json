@@ -1,0 +1,17 @@
+{
+  "name": "static-spa",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@okta/okta-auth-js": "*"
+  },
+  "devDependencies": {
+    "express": "^4.17.1"
+  }
+}

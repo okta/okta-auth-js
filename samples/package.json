@@ -1,0 +1,26 @@
+{
+  "name": "okta-auth-js-samples",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "clean": "gulp clean",
+    "build": "gulp",
+    "dev": "gulp watch",
+    "test": "yarn --cwd test start"
+  },
+  "dependencies": {
+    "@okta/okta-auth-js": "*",
+    "@okta/okta-signin-widget": "*"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-cli": "^2.3.0",
+    "gulp-compile-handlebars": "^0.6.1",
+    "gulp-handlebars": "^5.0.2",
+    "handlebars": "^4.7.6",
+    "through2": "^4.0.2",
+    "yargs": "^16.0.3"
+  }
+}

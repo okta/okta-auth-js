@@ -1,0 +1,31 @@
+<form target="/" method="GET">
+  <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
+  <label for="clientId">Client ID (SPA App)
+  </label><input id="clientId" name="clientId" type="text" /><br/>
+
+  <label for="flow">Authentication Flow</label>
+  <select id="flow" name="flow">
+    <option value="redirect">Redirect to Okta</option>
+    {{#if signinWidget}}
+    <option value="widget">Okta Signin Widget (self-hosted)</option>
+    {{/if}}
+    {{#if signinForm}}
+    <option value="form">Custom form (username/passsword)</option>
+    {{/if}}
+    <!-- Other login flows can be added -->
+  </select><br/>
+  
+  <label for="requireUserSession">Require Okta SSO session</label><br/>
+  <input id="requireUserSession-on" name="requireUserSession" type="radio" value="true"/>ON<br/>
+  <input id="requireUserSession-off" name="requireUserSession" type="radio" value="false"/>OFF<br/>
+
+  <label for="storage">Token storage</label>
+  <select id="storage" name="storage">
+    <option value="localStorage">localStorage</option>
+    <option value="sessionStorage">sessionStorage</option>
+    <option value="cookie">cookie</option>
+    <option value="memory">memory</option>
+  </select><br/>
+  <hr/>
+  <input id="login-submit" type="submit" value="Launch App"/>
+</form>

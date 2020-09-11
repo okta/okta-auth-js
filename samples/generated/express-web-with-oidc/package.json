@@ -1,0 +1,17 @@
+{
+  "name": "express-web-with-oidc",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "btoa": "^1.2.1",
+    "express": "^4.17.1",
+    "uuid": "^8.3.0",
+    "@okta/okta-auth-js": "*"
+  }
+}

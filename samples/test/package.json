@@ -1,0 +1,29 @@
+{
+  "name": "okta-auth-js-samples-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "scripts": {
+    "lint": "eslint .",
+    "start:runner": "wdio run wdio.conf.js",
+    "start": "node ./runner"
+  },
+  "dependencies": {
+    "@babel/register": "^7.8.2",
+    "cross-spawn": "^7.0.3",
+    "dotenv": "^8.2.0",
+    "regenerator-runtime": "^0.13.3"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-async-to-generator": "^7.5.0",
+    "@wdio/cli": "^6.4.0",
+    "@wdio/local-runner": "^6.4.0",
+    "@wdio/mocha-framework": "^6.4.0",
+    "@wdio/sauce-service": "^6.4.0",
+    "@wdio/spec-reporter": "^5.15.1",
+    "chromedriver": "^85.0.0",
+    "wait-on": "^3.3.0",
+    "wdio-chromedriver-service": "^6.0.3",
+    "webpack": "^3.0.0"
+  }
+}

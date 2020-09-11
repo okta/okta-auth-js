@@ -27,6 +27,7 @@
     }],
     "node/no-extraneous-import": ["error", {
       "allowModules": [
+        "@okta/okta-auth-js",
         "@okta/test.support"
       ]
     }],

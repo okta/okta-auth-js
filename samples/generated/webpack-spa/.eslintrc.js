@@ -1,8 +1,6 @@
 module.exports = {
   'extends': [
-    'eslint:recommended',
-    'plugin:node/recommended',
-    'plugin:@typescript-eslint/recommended'
+    'eslint:recommended'
   ],
   'env': {
     'browser': true,
@@ -15,19 +13,6 @@ module.exports = {
   'overrides': [
     {
       'files': [
-        '**/*.ts'
-      ],
-      'plugins': [
-        '@typescript-eslint'
-      ],
-      'parser': '@typescript-eslint/parser',
-      'parserOptions': {
-        'project': './tsconfig.json',
-        'tsconfigRootDir': __dirname,
-      }
-    },
-    {
-      'files': [
         '*.js'
       ],
       'rules': {
@@ -37,12 +22,6 @@ module.exports = {
     }
   ],
   'rules': {
-    'node/no-extraneous-import': ['error', {
-      'allowModules': [
-        '@okta/okta-auth-js',
-      ]
-    }],
-    '@typescript-eslint/no-explicit-any': 0,
     'node/no-unsupported-features/es-syntax': 0,
     'node/no-unsupported-features/node-builtins': 0,
     'node/no-extraneous-require': ['error', {

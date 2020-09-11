@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <!-- signin widget CSS, served locally from node_modules -->
+    <link rel="stylesheet" href="/css/okta-sign-in.min.css">
+
+    <!-- app styles -->
+    <style>
+      input {
+        margin-bottom: 10px;
+      }
+      input[type=text] {
+        width: 600px;
+      }
+      input[type=submit] {
+        background: #007dc1;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <!-- the href will be changed to config.appUri -->
+    <a id="home-link" href="/">Return Home</a>&nbsp;|&nbsp;
+    <!-- if the URL does not contain valid params a form will be shown -->
+    <a id="options-link" href="/">Change options</a>&nbsp;|&nbsp;
+    <!-- tests for a valid Okta SSO session -->
+    <a id="get-user-info" href="/" onclick="_getUserInfo(event)">Get user info</a>
+    <div id="error" style="color: red; padding-top: 20px"></div>
+    <hr/>
+    <!-- config is loaded from URL query parameters. This form sets params in the URL using the GET method-->
+    <div id="config-form" style="display: none">
+      <form target="/" method="GET">
+        <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
+        <label for="clientId">Client ID (SPA App)
+        </label><input id="clientId" name="clientId" type="text" /><br/>
+      
+        <label for="flow">Authentication Flow</label>
+        <select id="flow" name="flow">
+          <option value="redirect">Redirect to Okta</option>
+          <option value="widget">Okta Signin Widget (self-hosted)</option>
+          <option value="form">Custom form (username/passsword)</option>
+          <!-- Other login flows can be added -->
+        </select><br/>
+        
+        <label for="requireUserSession">Require Okta SSO session</label><br/>
+        <input id="requireUserSession-on" name="requireUserSession" type="radio" value="true"/>ON<br/>
+        <input id="requireUserSession-off" name="requireUserSession" type="radio" value="false"/>OFF<br/>
+      
+        <label for="storage">Token storage</label>
+        <select id="storage" name="storage">
+          <option value="localStorage">localStorage</option>
+          <option value="sessionStorage">sessionStorage</option>
+          <option value="cookie">cookie</option>
+          <option value="memory">memory</option>
+        </select><br/>
+        <hr/>
+        <input id="login-submit" type="submit" value="Launch App"/>
+      </form>
+    </div>
+    <!-- flow: redirect -->
+    <div id="flow-redirect" style="display: none">
+      <a id="login-redirect" href="#" onclick="_loginRedirect(event)">Click to login.</a>
+    </div>
+    <!-- flow: widget -->
+    <div id="flow-widget" style="display: none">
+      <b>Please login</b><hr/>
+      <div id="signin-widget"></div>
+    </div>
+    <!-- flow: form -->
+    <div id="flow-form" style="display: none">
+      <label for="username">Username</label>
+      <input id="username" name="username" type="email"><br/>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password"><br/>
+      <a href="/" id="login-direct" onclick="_submitSigninForm(event)">Signin</a>
+    </div>
+    <!-- authenticated -->
+    <div id="auth" style="display: none">
+      <b>Welcome back</b><hr/>
+      <a id="logout-redirect" href=#" onclick="_logout(event)">Logout</a>&nbsp;|&nbsp;
+      <a id="renew-token" href="#" onclick="_renewToken(event)">Renew Access Token</a>
+      <hr/>
+      <b>User Info</b><div id="userInfo"></div><hr/>
+      <b>Access Token</b><div id="accessToken"></div><hr/>
+    </div>
+    <hr/>
+    <b>Config</b><pre><code id="config"></code></pre>
+    <hr/>
+    <b>Auth state</b><pre><code id="authState"></code></pre>
+
+    <!-- main app webpack bundle -->
+    <script src="/app-bundle.js" type="text/javascript"></script>
+  </body>
+</html>

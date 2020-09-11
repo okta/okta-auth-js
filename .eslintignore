@@ -5,3 +5,4 @@ node_modules
 /build/lib
 /build/types
 /build/cjs
+/samples/templates

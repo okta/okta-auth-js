@@ -6,11 +6,11 @@
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "type": "commonjs",
-  "main": "cjs/server/index.js",
-  "module": "lib/server/index.js",
-  "browser": "dist/okta-auth-js.umd.js",
-  "react-native": "lib/server/index.js",
-  "types": "lib/browser/index.d.ts",
+  "main": "build/cjs/server/index.js",
+  "module": "build/lib/server/index.js",
+  "browser": "build/dist/okta-auth-js.umd.js",
+  "react-native": "build/lib/server/index.js",
+  "types": "build/lib/browser/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
@@ -26,7 +26,7 @@
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",
     "validate": "yarn tsc --noEmit && yarn lint && yarn --cwd test/app validate",
-    "test": "yarn test:unit && yarn test:e2e && yarn test:e2e:saucelabs",
+    "test": "yarn test:unit && yarn test:samples && yarn test:e2e && yarn test:e2e:saucelabs",
     "test:unit": "yarn test:karma && yarn test:server && yarn test:browser",
     "posttest:e2e": "yarn stop",
     "test:e2e": "yarn --cwd test/e2e start",
@@ -35,12 +35,14 @@
     "test:browser": "jest --config ./jest.browser.js",
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
+    "test:samples": "yarn --cwd samples test",
     "build": "node scripts/build.js",
     "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js -p",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
     "build:server": "cross-env babel lib -d build/cjs --config-file ./babel.node.json --extensions \".ts\",\".js\"",
     "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
-    "prepare": "yarn build",
+    "generate:samples": "yarn --cwd samples build && yarn install --ignore-scripts",
+    "prepare": "yarn build && yarn generate:samples",
     "start": "yarn --cwd test/app start --open",
     "stop": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true"
   },
@@ -125,8 +127,12 @@
     "outputName": "junit-result.xml"
   },
   "workspaces": [
+    "./",
     "test/app",
     "test/e2e",
-    "test/support"
+    "test/support",
+    "samples",
+    "samples/test",
+    "samples/generated/*"
   ]
 }
