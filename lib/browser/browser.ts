@@ -22,8 +22,6 @@ import { removeTrailingSlash, toQueryParams, clone, getUrlParts } from '../util'
 import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
-  ACCESS_TOKEN_STORAGE_KEY, 
-  ID_TOKEN_STORAGE_KEY,
   REFERRER_PATH_STORAGE_KEY
 } from '../constants';
 import {
@@ -275,7 +273,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   // Revokes the access token for the application session
   async revokeAccessToken(accessToken?: AccessToken) {
     if (!accessToken) {
-      accessToken = (await this.tokenManager._getTokens()).accessToken as AccessToken;
+      accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
       const accessTokenKey = this.tokenManager._getStorageKeyByType('accessToken');
       this.tokenManager.remove(accessTokenKey);
     }
@@ -304,11 +302,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     var logoutUrl = getOAuthUrls(this).logoutUrl;
   
     if (typeof idToken === 'undefined') {
-      idToken = (await this.tokenManager._getTokens()).idToken as IDToken;
+      idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
     }
   
     if (revokeAccessToken && typeof accessToken === 'undefined') {
-      accessToken = (await this.tokenManager._getTokens()).accessToken as AccessToken;
+      accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
     }
   
     // Clear all local tokens
@@ -381,7 +379,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   async getIdToken(): Promise<string> {
     try {
-      const idToken = (await this.tokenManager._getTokens()).idToken as IDToken;
+      const idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
       return idToken ? idToken.idToken : undefined;
     } catch (err) {
       return undefined;
@@ -390,7 +388,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   async getAccessToken(): Promise<string> {
     try {
-      const accessToken = (await this.tokenManager._getTokens()).accessToken as AccessToken;
+      const accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
       return accessToken ? accessToken.accessToken : undefined;
     } catch (err) {
       return undefined;
@@ -399,12 +397,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   async handleAuthentication(): Promise<void> {
     const { tokens } = await this.token.parseFromUrl();
-    if (tokens.idToken) {
-      this.tokenManager.add(ID_TOKEN_STORAGE_KEY, tokens.idToken);
-    }
-    if (tokens.accessToken) {
-      this.tokenManager.add(ACCESS_TOKEN_STORAGE_KEY, tokens.accessToken);
-    }
+    this.tokenManager.setTokens(tokens);
   }
 
   setFromUri(fromUri?: string): void {

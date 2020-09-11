@@ -174,19 +174,19 @@ describe('Browser', function() {
   describe('revokeAccessToken', function() {
     it('will read from TokenManager and call token.revoke', function() {
       var accessToken = { accessToken: 'fake' };
-      spyOn(auth.tokenManager, '_getTokens').and.returnValue(Promise.resolve({ accessToken }));
+      spyOn(auth.tokenManager, 'getTokens').and.returnValue(Promise.resolve({ accessToken }));
       spyOn(auth.tokenManager, 'remove').and.returnValue(Promise.resolve(accessToken));
       spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
       return auth.revokeAccessToken()
         .then(function() {
-          expect(auth.tokenManager._getTokens).toHaveBeenCalled();
+          expect(auth.tokenManager.getTokens).toHaveBeenCalled();
           expect(auth.tokenManager.remove).toHaveBeenCalled();
           expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
         });
     });
     it('will throw if token.revoke rejects with unknown error', function() {
       var accessToken = { accessToken: 'fake' };
-      spyOn(auth.tokenManager, '_getTokens').and.returnValue(Promise.resolve({ accessToken }));
+      spyOn(auth.tokenManager, 'getTokens').and.returnValue(Promise.resolve({ accessToken }));
       var testError = new Error('test error');
       spyOn(auth.token, 'revoke').and.callFake(function() {
         return Promise.reject(testError);
@@ -208,10 +208,10 @@ describe('Browser', function() {
     });
     it('if accessToken cannot be located, will resolve without error', function() {
       spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
-      spyOn(auth.tokenManager, '_getTokens').and.returnValue(Promise.resolve({}));
+      spyOn(auth.tokenManager, 'getTokens').and.returnValue(Promise.resolve({}));
       return auth.revokeAccessToken()
         .then(() => {
-          expect(auth.tokenManager._getTokens).toHaveBeenCalled();
+          expect(auth.tokenManager.getTokens).toHaveBeenCalled();
           expect(auth.token.revoke).not.toHaveBeenCalled();
         });
     });
@@ -271,7 +271,7 @@ describe('Browser', function() {
       let accessToken;
 
       function initSpies() {
-        auth.tokenManager._getTokens = jest.fn().mockResolvedValue({ accessToken, idToken });
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
@@ -286,7 +286,7 @@ describe('Browser', function() {
       it('Default options: will revokeAccessToken and use window.location.origin for postLogoutRedirectUri', function() {
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager._getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).not.toHaveBeenCalled();
@@ -311,7 +311,7 @@ describe('Browser', function() {
         var customToken = { idToken: 'fake-custom' };
         return auth.signOut({ idToken: customToken })
           .then(function() {
-            expect(auth.tokenManager._getTokens).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${customToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -319,7 +319,7 @@ describe('Browser', function() {
       it('if idToken=false will skip token manager read and call closeSession', function() {
         return auth.signOut({ idToken: false })
           .then(function() {
-            expect(auth.tokenManager._getTokens).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
           });
@@ -329,7 +329,7 @@ describe('Browser', function() {
         global.window.location.href = origin;
         return auth.signOut({ idToken: false })
           .then(function() {
-            expect(auth.tokenManager._getTokens).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.reload).toHaveBeenCalled();
           });
@@ -372,8 +372,7 @@ describe('Browser', function() {
       it('Can pass a "revokeAccessToken=false" to skip accessToken logic', function() {
         return auth.signOut({ revokeAccessToken: false })
           .then(function() {
-            expect(auth.tokenManager._getTokens).toHaveBeenCalledTimes(1);
-            // expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ID_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -382,7 +381,7 @@ describe('Browser', function() {
       it('Can pass a "accessToken=false" to skip accessToken logic', function() {
         return auth.signOut({ accessToken: false })
           .then(function() {
-            expect(auth.tokenManager._getTokens).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -394,7 +393,7 @@ describe('Browser', function() {
 
       beforeEach(() => {
         accessToken = { accessToken: 'fake' };
-        auth.tokenManager._getTokens = jest.fn().mockResolvedValue({ accessToken });
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
       });
@@ -403,7 +402,7 @@ describe('Browser', function() {
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager._getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -416,7 +415,7 @@ describe('Browser', function() {
         global.window.location.href = origin;
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager._getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -471,7 +470,7 @@ describe('Browser', function() {
       let idToken;
       beforeEach(() => {
         idToken = { idToken: 'fake' };
-        auth.tokenManager._getTokens = jest.fn().mockResolvedValue({ idToken });
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ idToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
       });
@@ -509,7 +508,7 @@ describe('Browser', function() {
   describe('getIdToken', () => {
     it('retrieves token from token manager', async () => {
       expect.assertions(1);
-      auth.tokenManager._getTokens = jest.fn().mockResolvedValue({
+      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
         accessToken: tokens.standardAccessTokenParsed,
         idToken: tokens.standardIdTokenParsed
       });
@@ -518,7 +517,7 @@ describe('Browser', function() {
     });
 
     it('catches exceptions', async () => {
-      auth.tokenManager._getTokens = jest.fn().mockImplementation(key => {
+      auth.tokenManager.getTokens = jest.fn().mockImplementation(key => {
         expect(key).toBe('idToken');
         throw new Error('expected test error');
       });
@@ -530,7 +529,7 @@ describe('Browser', function() {
   describe('getAccessToken', () => {
     it('retrieves token from token manager', async () => {
       expect.assertions(1);
-      auth.tokenManager._getTokens = jest.fn().mockResolvedValue({
+      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
         accessToken: tokens.standardAccessTokenParsed,
         idToken: tokens.standardIdTokenParsed
       });
@@ -539,7 +538,7 @@ describe('Browser', function() {
     });
 
     it('catches exceptions', async () => {
-      auth.tokenManager._getTokens = jest.fn().mockImplementation(key => {
+      auth.tokenManager.getTokens = jest.fn().mockImplementation(key => {
         expect(key).toBe('accessToken');
         throw new Error('expected test error');
       });

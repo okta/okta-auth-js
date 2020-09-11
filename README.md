@@ -2152,6 +2152,23 @@ authClient.tokenManager.get('idToken')
 });
 ```
 
+#### `tokenManager.getTokens()`
+
+> :hourglass: async
+
+Returns storage key agnostic tokens set for available tokens from storage. It returns empty object (`{}`) if no token is in storage.
+
+```javascript
+authClient.tokenManager.getTokens()
+  .then(({ accessToken, idToken }) => {
+    // handle accessToken and idToken
+  });
+```
+
+#### `tokenManager.setTokens(tokens)`
+
+Adds storage key agnostic tokens to storage. It uses default token storage keys (`idToken`, `accessToken`) in storage.
+
 #### `tokenManager.hasExpired(token)`
 
 A synchronous method which returns `true` if the token has expired. The `tokenManager` will automatically remove expired tokens in the background. However, when the app first loads this background process may not have completed, so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition. 
