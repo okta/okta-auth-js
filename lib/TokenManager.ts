@@ -287,9 +287,28 @@ export class TokenManager {
     this.off = tokenMgmtRef.emitter.off.bind(tokenMgmtRef.emitter);
     this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
   
+    let tooManyRenews = false;
+    const renewTimeQueue = [];
     const onTokenExpiredHandler = (key) => {
       if (options.autoRenew) {
-        this.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
+        // detect if there are too many renew requests
+        if (renewTimeQueue.length < 10) {
+          renewTimeQueue.push(+new Date());
+        } else {
+          // get and remove first item from queue
+          const firstTime = renewTimeQueue.shift();
+          const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
+          if (lastTime - firstTime < 30 * 1000) {
+            tooManyRenews = true;
+          }
+        }
+        
+        if (tooManyRenews) {
+          const error = new AuthSdkError('Too many token renew requests');
+          emitError(tokenMgmtRef, error);
+        } else {
+          this.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
+        }
       } else {
         this.remove(key);
       }
