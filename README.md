@@ -406,6 +406,10 @@ An object containing additional properties used to configure the internal token 
 
 By default, the library will attempt to renew tokens before they expire. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
 
+###### `autoRemove`
+
+By default, the library will attempt to remove expired tokens during initialization when `autoRenew` is off. If you wish to  to disable auto removal of tokens, set autoRemove to false.
+
 ###### `storage`
 
 You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types: 
@@ -449,6 +453,10 @@ This callback function receives the sdk instance as the first function parameter
 Callback function. Called when authentication is required. This callback is triggered when [signIn](#signinoptions) method execute the `browser-based OpenID Connect` flows.
 
 This callback function receives the sdk instance as the first function parameter.
+
+##### `devMode`
+
+Default to `false`. It enables debugging logs when set to `true`.
 
 #### Example Client
 

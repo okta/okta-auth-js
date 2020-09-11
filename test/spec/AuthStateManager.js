@@ -82,6 +82,10 @@ describe('AuthStateManager', () => {
       sdkMock.tokenManager._getTokens = jest.fn()
         .mockResolvedValueOnce({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' })
         .mockResolvedValueOnce({ accessToken: 'fakeAccessToken1', idToken: 'fakeIdToken1' });
+      sdkMock.tokenManager._getOptions = jest.fn().mockReturnValue({ 
+        autoRenew: true, 
+        autoRemove: true 
+      });
       sdkMock.tokenManager.hasExpired = jest.fn().mockReturnValue(false);
     });
 
@@ -199,6 +203,34 @@ describe('AuthStateManager', () => {
             idToken: null,
             isAuthenticated: false,
             isPending: true,
+          });
+          resolve();
+        }, 100);
+      });
+    });
+
+    it('should evaluate expired token as null with isPending state as false if both autoRenew and autoRemove are off', () => {
+      expect.assertions(2);
+      sdkMock.tokenManager.hasExpired = jest.fn()
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true);
+      sdkMock.tokenManager._getOptions = jest.fn().mockReturnValue({ 
+        autoRenew: false, 
+        autoRemove: false 
+      });
+      return new Promise(resolve => {
+        const instance = new AuthStateManager(sdkMock);
+        instance.updateAuthState();
+        const handler = jest.fn();
+        instance.subscribe(handler);
+
+        setTimeout(() => {
+          expect(handler).toHaveBeenCalledTimes(1);
+          expect(handler).toHaveBeenCalledWith({
+            accessToken: 'fakeAccessToken0',
+            idToken: null,
+            isAuthenticated: false,
+            isPending: false,
           });
           resolve();
         }, 100);

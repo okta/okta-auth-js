@@ -12,7 +12,7 @@
  */
 /* global localStorage, sessionStorage */
 /* eslint complexity:[0,8] max-statements:[0,21] */
-import { removeNils, warn, isObject } from './util';
+import { removeNils, warn, isObject, clone } from './util';
 import AuthSdkError from './errors/AuthSdkError';
 import storageUtil from './browser/browserStorage';
 import { TOKEN_STORAGE_NAME } from './constants';
@@ -29,6 +29,7 @@ import {
 
 var DEFAULT_OPTIONS = {
   autoRenew: true,
+  autoRemove: true,
   storage: 'localStorage',
   expireEarlySeconds: 30
 };
@@ -259,6 +260,8 @@ export class TokenManager {
   _getStorageKeyByType: (type: TokenType) => string;
   // This is exposed so we can set clear timeouts in our tests
   _clearExpireEventTimeoutAll: () => void;
+  // This is exposed read-only options for internal sdk use
+  _getOptions: () => TokenManagerOptions;
 
   constructor(sdk, options: TokenManagerOptions) {
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
@@ -351,11 +354,12 @@ export class TokenManager {
     this._getTokens = getTokens.bind(this, storage);
     this._getStorageKeyByType = getKeyByType.bind(this, storage);
     this._clearExpireEventTimeoutAll = clearExpireEventTimeoutAll.bind(this, tokenMgmtRef);
+    this._getOptions = () => clone(options);
   
     const onTokenExpiredHandler = (key) => {
       if (options.autoRenew) {
         this.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
-      } else {
+      } else if (options.autoRemove) {
         this.remove(key);
       }
     };

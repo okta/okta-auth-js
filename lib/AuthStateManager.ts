@@ -52,6 +52,7 @@ class AuthStateManager {
 
   updateAuthState({ event, key, token }: UpdateAuthStateOptions = {}): void {
     const { isAuthenticated, devMode } = this._sdk.options;
+    const { autoRenew, autoRemove } = this._sdk.tokenManager._getOptions();
 
     const logger = (status) => {
       console.group(`OKTA-AUTH-JS:updateAuthState: Event:${event} Status:${status}`);
@@ -66,6 +67,8 @@ class AuthStateManager {
       this._sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
       devMode && logger('emitted');
     };
+
+    const shouldEvaluateIsPending = () => (autoRenew || autoRemove);
 
     if (this._pending.updateAuthStatePromise) {
       if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {
@@ -105,17 +108,17 @@ class AuthStateManager {
             return;
           }
 
-          // evaluate isPending to true if any token is expired
+          // evaluate isPending if any token is expired
           // then wait for next renewed event to evaluate a new state with valid tokens
           // isPending state should only apply to token driven evaluation
           let isPending = false;
           if (accessToken && this._sdk.tokenManager.hasExpired(accessToken)) {
             accessToken = null;
-            isPending = true;
+            isPending = shouldEvaluateIsPending();
           }
           if (idToken && this._sdk.tokenManager.hasExpired(idToken)) {
             idToken = null;
-            isPending = true;
+            isPending = shouldEvaluateIsPending();
           }
           let promise = isAuthenticated 
             ? isAuthenticated(this._sdk)
