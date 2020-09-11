@@ -26,6 +26,7 @@ import {
   isIDToken, 
   isAccessToken 
 } from './types';
+import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY } from './constants';
 
 var DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -168,6 +169,15 @@ function getTokens(storage): Promise<Tokens> {
   });
 }
 
+function setTokens(sdk, tokenMgmtRef, storage, tokens: Tokens): void {
+  if (tokens.idToken) {
+    add(sdk, tokenMgmtRef, storage, ID_TOKEN_STORAGE_KEY, tokens.idToken);
+  }
+  if (tokens.accessToken) {
+    add(sdk, tokenMgmtRef, storage, ACCESS_TOKEN_STORAGE_KEY, tokens.accessToken);
+  }
+}
+
 function remove(tokenMgmtRef, storage, key) {
   // Clear any listener for this token
   clearExpireEventTimeout(tokenMgmtRef, key);
@@ -254,9 +264,10 @@ export class TokenManager {
   on: (event: string, handler: Function, context?: object) => void;
   off: (event: string, handler: Function) => void;
   hasExpired: (token: Token) => boolean;
+  getTokens: () => Promise<Tokens>;
+  setTokens: (tokens: Tokens) => void;
   
   // This is exposed so we can get storage key agnostic tokens set in internal state managers
-  _getTokens: () => Promise<Tokens>;
   _getStorageKeyByType: (type: TokenType) => string;
   // This is exposed so we can set clear timeouts in our tests
   _clearExpireEventTimeoutAll: () => void;
@@ -351,7 +362,8 @@ export class TokenManager {
     this.on = tokenMgmtRef.emitter.on.bind(tokenMgmtRef.emitter);
     this.off = tokenMgmtRef.emitter.off.bind(tokenMgmtRef.emitter);
     this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
-    this._getTokens = getTokens.bind(this, storage);
+    this.getTokens = getTokens.bind(this, storage);
+    this.setTokens = setTokens.bind(this, sdk, tokenMgmtRef, storage);
     this._getStorageKeyByType = getKeyByType.bind(this, storage);
     this._clearExpireEventTimeoutAll = clearExpireEventTimeoutAll.bind(this, tokenMgmtRef);
     this._getOptions = () => clone(options);

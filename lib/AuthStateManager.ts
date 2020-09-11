@@ -16,6 +16,15 @@ const DEFAULT_PENDING = {
 const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 const MAX_PROMISE_CANCEL_TIMES = 10;
 
+// only compare first level of authState
+const isSameAuthState = (prevState: AuthState, state: AuthState) => {
+  return prevState.isPending === state.isPending 
+    && prevState.isAuthenticated === state.isAuthenticated 
+    && prevState.idToken === state.idToken 
+    && prevState.accessToken === state.accessToken
+    && prevState.error === state.error;
+};
+
 class AuthStateManager {
   _sdk: OktaAuth;
   _pending: { 
@@ -34,12 +43,9 @@ class AuthStateManager {
     this._authState = { ...DEFAULT_AUTH_STATE };
 
     // Listen on tokenManager events to start updateState process
-    // "added" event is emitted in both add and renew process, it will be canceled by the followed "renewed" event
+    // "added" event is emitted in both add and renew process, just listen on "added" event to update auth state
     sdk.tokenManager.on('added', (key, token) => {
       this.updateAuthState({ event: 'added', key, token });
-    });
-    sdk.tokenManager.on('renewed', (key, token) => {
-      this.updateAuthState({ event: 'renewed', key, token });
     });
     sdk.tokenManager.on('removed', (key, token) => {
       this.updateAuthState({ event: 'removed', key, token });
@@ -62,6 +68,10 @@ class AuthStateManager {
     };
 
     const emitAuthStateChange = (authState) => {
+      if (isSameAuthState(this._authState, authState)) {
+        devMode && logger('unchanged'); 
+        return;
+      }
       this._authState = authState;
       // emit new authState object
       this._sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
@@ -95,13 +105,13 @@ class AuthStateManager {
           resolve();
           return;
         }
-        // emit event and clear states
+        // emit event and clear pending states
         emitAuthStateChange(authState); 
         this._pending = { ...DEFAULT_PENDING };
         resolve();
       };
 
-      this._sdk.tokenManager._getTokens()
+      this._sdk.tokenManager.getTokens()
         .then(({ accessToken, idToken }) => {
           if (cancelablePromise.isCanceled) {
             resolve();

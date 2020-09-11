@@ -836,10 +836,10 @@ function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<Token
 async function getUserInfo(sdk, accessTokenObject: AccessToken, idTokenObject: IDToken): Promise<UserClaims> {
   // If token objects were not passed, attempt to read from the TokenManager
   if (!accessTokenObject) {
-    accessTokenObject = (await sdk.tokenManager._getTokens()).accessToken as AccessToken;
+    accessTokenObject = (await sdk.tokenManager.getTokens()).accessToken as AccessToken;
   }
   if (!idTokenObject) {
-    idTokenObject = (await sdk.tokenManager._getTokens()).idToken as IDToken;
+    idTokenObject = (await sdk.tokenManager.getTokens()).idToken as IDToken;
   }
 
   if (!accessTokenObject || !isAccessToken(accessTokenObject)) {

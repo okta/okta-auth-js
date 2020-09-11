@@ -1363,6 +1363,95 @@ describe('TokenManager', function() {
     });
 
   });
+
+  describe('getTokens', () => {
+    it('should get key agnostic tokens set from storage', () => {
+      expect.assertions(2);
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-idToken': tokens.standardIdTokenParsed,
+        'test-accessToken': tokens.standardAccessTokenParsed
+      }));
+      setupSync();
+      return client.tokenManager.getTokens()
+      .then(({ accessToken, idToken }) => {
+        expect(accessToken).toEqual(tokens.standardAccessTokenParsed);
+        expect(idToken).toEqual(tokens.standardIdTokenParsed);
+      });
+    });
+
+    it('should get only idToken from storage', () => {
+      expect.assertions(2);
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-idToken': tokens.standardIdTokenParsed
+      }));
+      setupSync();
+      return client.tokenManager.getTokens()
+      .then(({ accessToken, idToken }) => {
+        expect(accessToken).toBeUndefined();
+        expect(idToken).toEqual(tokens.standardIdTokenParsed);
+      });
+    });
+
+    it('should get only accessToken from storage', () => {
+      expect.assertions(2);
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-accessToken': tokens.standardAccessTokenParsed
+      }));
+      setupSync();
+      return client.tokenManager.getTokens()
+      .then(({ accessToken, idToken }) => {
+        expect(idToken).toBeUndefined();
+        expect(accessToken).toEqual(tokens.standardAccessTokenParsed);
+      });
+    });
+
+    it('should get empty object if no token in storage', () => {
+      expect.assertions(1);
+      localStorage.setItem('okta-token-storage', JSON.stringify({}));
+      setupSync();
+      return client.tokenManager.getTokens()
+      .then((tokens) => {
+        expect(tokens).toEqual({});
+      });
+    });
+  });
+
+  describe('setTokens', () => {
+    it('should add tokens to storage', () => {
+      setupSync();
+      client.tokenManager.add = jest.fn();
+      client.tokenManager.setTokens({ 
+        accessToken: tokens.standardAccessTokenParsed, 
+        idToken: tokens.standardIdTokenParsed
+      });
+      oauthUtil.expectTokenStorageToEqual(localStorage, {
+        'accessToken': tokens.standardAccessTokenParsed,
+        'idToken': tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should add accessToken to storage', () => {
+      setupSync();
+      client.tokenManager.add = jest.fn();
+      client.tokenManager.setTokens({ 
+        accessToken: tokens.standardAccessTokenParsed
+      });
+      oauthUtil.expectTokenStorageToEqual(localStorage, {
+        'accessToken': tokens.standardAccessTokenParsed
+      });
+    });
+
+    it('should add idToken to storage', () => {
+      setupSync();
+      client.tokenManager.add = jest.fn();
+      client.tokenManager.setTokens({ 
+        idToken: tokens.standardIdTokenParsed
+      });
+      oauthUtil.expectTokenStorageToEqual(localStorage, {
+        'idToken': tokens.standardIdTokenParsed
+      });
+    });
+  });
 });
 
 
