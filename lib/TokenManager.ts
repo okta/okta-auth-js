@@ -22,7 +22,7 @@ import { Token, TokenManagerOptions, isIDToken, isAccessToken } from './types';
 
 var DEFAULT_OPTIONS = {
   autoRenew: true,
-  storage: 'localStorage',
+  storage: 'memory',
   expireEarlySeconds: 30
 };
 

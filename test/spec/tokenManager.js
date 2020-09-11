@@ -10,6 +10,7 @@ import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../lib/clock';
+import storageUtil from '../../lib/browser/browserStorage';
 
 // Expected settings on HTTPS
 var secureCookieSettings = {
@@ -21,6 +22,7 @@ function createAuth(options) {
   options = options || {};
   options.tokenManager = options.tokenManager || {};
   jest.spyOn(SdkClock, 'create').mockReturnValue(new SdkClock(options.localClockOffset));
+
   return new OktaAuth({
     pkce: false,
     issuer: 'https://auth-js-test.okta.com',
@@ -30,8 +32,7 @@ function createAuth(options) {
       expireEarlySeconds: options.tokenManager.expireEarlySeconds || 0,
       storage: options.tokenManager.storage,
       storageKey: options.tokenManager.storageKey,
-      autoRenew: options.tokenManager.autoRenew || false,
-      secure: options.tokenManager.secure // used by cookie storage
+      autoRenew: options.tokenManager.autoRenew || false
     }
   });
 }
@@ -39,8 +40,19 @@ function createAuth(options) {
 describe('TokenManager', function() {
   let originalLocation;
   let client;
+  let defaultStorage;
+
+  function setupStorage() {
+    // TokenManager will use our instance of storage by default
+    defaultStorage = storageUtil.getInMemoryStorage();
+    jest.spyOn(storageUtil, 'getInMemoryStorage').mockImplementation(() => defaultStorage);
+  }
 
   function setupSync(options) {
+    if (!defaultStorage) {
+      setupStorage();
+    }
+
     client = createAuth(options);
     return client;
   }
@@ -48,6 +60,7 @@ describe('TokenManager', function() {
   beforeEach(function() {
     localStorage.clear();
     sessionStorage.clear();
+    defaultStorage = null;
 
     // Mock window.location so we appear to be on an HTTPS origin
     originalLocation = global.window.location;
@@ -112,9 +125,9 @@ describe('TokenManager', function() {
   describe('storageKey', function() {
     it('Uses "okta-token-storage" by default', function() {
       setupSync();
-      expect(localStorage.getItem('okta-token-storage')).toBeFalsy();
+      expect(defaultStorage.getItem('okta-token-storage')).toBeFalsy();
       client.tokenManager.add('foo', tokens.standardIdTokenParsed);
-      expect(localStorage.getItem('okta-token-storage')).toBeTruthy();
+      expect(defaultStorage.getItem('okta-token-storage')).toBeTruthy();
     });
     it('Can use a custom value', function() {
       setupSync({
@@ -122,10 +135,10 @@ describe('TokenManager', function() {
           storageKey: 'custom1'
         }
       });
-      expect(localStorage.getItem('custom1')).toBeFalsy();
+      expect(defaultStorage.getItem('custom1')).toBeFalsy();
       client.tokenManager.add('foo', tokens.standardIdTokenParsed);
-      expect(localStorage.getItem('custom1')).toBeTruthy();
-      expect(localStorage.getItem('okta-token-storage')).toBeFalsy();
+      expect(defaultStorage.getItem('custom1')).toBeTruthy();
+      expect(defaultStorage.getItem('okta-token-storage')).toBeFalsy();
     });
   });
   describe('storage', function() {
@@ -177,17 +190,32 @@ describe('TokenManager', function() {
   });
 
   describe('general', function() {
-    it('defaults to localStorage', function() {
+    it('defaults to memory', function() {
       setupSync();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      oauthUtil.expectTokenStorageToEqual(defaultStorage, {
+        'test-idToken': tokens.standardIdTokenParsed
+      });
+    });
+    it('Can use localStorage', function() {
+      setupSync({
+        tokenManager: {
+          storage: 'localStorage'
+        }
+      });
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
       oauthUtil.expectTokenStorageToEqual(localStorage, {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
-    it('defaults to sessionStorage if localStorage isn\'t available', function() {
+    it('localStorage defaults to sessionStorage if localStorage isn\'t available', function() {
       jest.spyOn(window.console, 'log');
       oauthUtil.mockLocalStorageError();
-      setupSync();
+      setupSync({
+        tokenManager: {
+          storage: 'localStorage'
+        }
+      });
       expect(window.console.log).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support localStorage. Switching to sessionStorage.'
@@ -197,10 +225,14 @@ describe('TokenManager', function() {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
-    it('defaults to sessionStorage if localStorage cannot be written to', function() {
+    it('localStorage defaults to sessionStorage if localStorage cannot be written to', function() {
       jest.spyOn(window.console, 'log');
       oauthUtil.mockStorageSetItemError();
-      setupSync();
+      setupSync({
+        tokenManager: {
+          storage: 'localStorage'
+        }
+      });
       expect(window.console.log).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support localStorage. Switching to sessionStorage.'
@@ -210,11 +242,15 @@ describe('TokenManager', function() {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
-    it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
+    it('localStorage defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
       jest.spyOn(window.console, 'log');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockSessionStorageError();
-      setupSync();
+      setupSync({
+        tokenManager: {
+          storage: 'localStorage'
+        }
+      });
       expect(window.console.log).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support sessionStorage. Switching to cookie-based storage.'
@@ -228,7 +264,7 @@ describe('TokenManager', function() {
         secureCookieSettings
       );
     });
-    it('defaults to cookie-based storage if sessionStorage cannot be written to', function() {
+    it('sessionStorage defaults to cookie-based storage if sessionStorage cannot be written to', function() {
       jest.spyOn(window.console, 'log');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockStorageSetItemError();
@@ -400,7 +436,7 @@ describe('TokenManager', function() {
         expectedResp: tokens.standardIdTokenParsed
       })
       .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
@@ -444,7 +480,7 @@ describe('TokenManager', function() {
         expectedResp: tokens.standardAccessTokenParsed
       })
       .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {
           'accessToken': tokens.standardAccessTokenParsed
         });
       });
@@ -471,7 +507,7 @@ describe('TokenManager', function() {
     });
 
     it('throws an errors when the token is mangled', function() {
-      localStorage.setItem('okta-token-storage', '#unparseableJson#');
+      defaultStorage.setItem('okta-token-storage', '#unparseableJson#');
       return oauthUtil.setupFrame({
         authClient: client,
         willFail: true,
@@ -560,7 +596,7 @@ describe('TokenManager', function() {
           tokenKey: 'test-accessToken',
           accessToken: true
         });
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
@@ -594,7 +630,7 @@ describe('TokenManager', function() {
           tokenKey: 'test-accessToken',
           accessToken: true
         });
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
@@ -654,7 +690,7 @@ describe('TokenManager', function() {
         }
       })
       .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
@@ -701,7 +737,7 @@ describe('TokenManager', function() {
         }
       })
       .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
@@ -747,7 +783,7 @@ describe('TokenManager', function() {
         }
       })
       .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {
           'test-idToken': tokens.standardIdTokenParsed
         });
       });
@@ -796,7 +832,7 @@ describe('TokenManager', function() {
         }
       })
       .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {});
       });
     });
 
@@ -841,7 +877,7 @@ describe('TokenManager', function() {
       })
       .catch(function(err) {
         util.expectErrorToEqual(err, error);
-        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {});
         expect(errorEventCallback).toHaveBeenCalled();
       })
       .then(function() {
@@ -906,7 +942,7 @@ describe('TokenManager', function() {
           tokenKey: 'test-idToken',
           accessToken: false
         });
-        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {});
 
         expect(errorEventCallback).toHaveBeenCalled();
       })
@@ -948,7 +984,7 @@ describe('TokenManager', function() {
           tokenKey: 'test-idToken',
           accessToken: false
         });
-        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {});
       });
     });
 
@@ -986,13 +1022,14 @@ describe('TokenManager', function() {
           tokenKey: 'test-idToken',
           accessToken: false
         });
-        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        oauthUtil.expectTokenStorageToEqual(defaultStorage, {});
       });
     });
 
     it('emits "expired" on existing tokens even when autoRenew is disabled', function() {
       jest.useFakeTimers();
-      localStorage.setItem('okta-token-storage', JSON.stringify({
+      setupStorage();
+      defaultStorage.setItem('okta-token-storage', JSON.stringify({
         'test-idToken': tokens.standardIdTokenParsed
       }));
       setupSync({ tokenManager: { autoRenew: false } });
@@ -1280,12 +1317,14 @@ describe('TokenManager', function() {
   });
 
   describe('hasExpired', function() {
-
-    it('returns false for a token that has not expired', function() {
+    beforeEach(() => {
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-      localStorage.setItem('okta-token-storage', JSON.stringify({
+      setupStorage();
+      defaultStorage.setItem('okta-token-storage', JSON.stringify({
         'test-idToken': tokens.standardIdTokenParsed
       }));
+    });
+    it('returns false for a token that has not expired', function() {
       setupSync();
       return client.tokenManager.get('test-idToken')
       .then(function(token) {
@@ -1295,10 +1334,6 @@ describe('TokenManager', function() {
     });
 
     it('returns false when a token is not expired, accounting for local clock offset', function() {
-      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-      localStorage.setItem('okta-token-storage', JSON.stringify({
-        'test-idToken': tokens.standardIdTokenParsed
-      }));
       setupSync({
         localClockOffset: -2000 // local clock is 2 seconds ahead of server
       });
@@ -1312,10 +1347,6 @@ describe('TokenManager', function() {
     });
 
     it('returns true for a token that has expired', function() {
-      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-      localStorage.setItem('okta-token-storage', JSON.stringify({
-        'test-idToken': tokens.standardIdTokenParsed
-      }));
       setupSync();
       util.warpToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
       return client.tokenManager.get('test-idToken')
@@ -1326,10 +1357,6 @@ describe('TokenManager', function() {
     });
 
     it('returns true when a token is expired, accounting for local clock offset', function() {
-      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
-      localStorage.setItem('okta-token-storage', JSON.stringify({
-        'test-idToken': tokens.standardIdTokenParsed
-      }));
       setupSync({
         localClockOffset: 5000 // local clock is 5 seconds behind server
       });
@@ -1341,7 +1368,6 @@ describe('TokenManager', function() {
         expect(client.tokenManager.hasExpired(token)).toBe(true);
       });
     });
-
   });
 });
 

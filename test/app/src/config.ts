@@ -4,6 +4,7 @@ const HOST = window.location.host;
 const PROTO = window.location.protocol;
 const REDIRECT_URI = `${PROTO}//${HOST}${CALLBACK_PATH}`;
 const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}/`;
+const TOKEN_STORAGE = 'sessionStorage';
 
 export interface Config extends OktaAuthOptions {
   // redirectUri: string;
@@ -39,6 +40,9 @@ function getDefaultConfig(): Config {
     pkce: true,
     cookies: {
       secure: true
+    },
+    tokenManager: {
+      storage: TOKEN_STORAGE
     }
   };
 }
@@ -55,7 +59,7 @@ function getConfigFromUrl(): Config {
   const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
   const responseMode = url.searchParams.get('responseMode') || undefined;
-  const storage = url.searchParams.get('storage') || undefined;
+  const storage = url.searchParams.get('storage') || TOKEN_STORAGE;
   const secureCookies = url.searchParams.get('secure') !== 'false'; // On by default
   const sameSite = url.searchParams.get('sameSite') || undefined;
 

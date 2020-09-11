@@ -271,7 +271,21 @@ These configuration options can be included when instantiating Okta Auth JS (`ne
 
 **Important:** This configuration option can be included **only** when instantiating Okta Auth JS.
 
-Specify the type of storage for tokens. Defaults to [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and will fall back to [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), and/or [cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) if the previous type is not available.
+Specify the type of storage for tokens. Defaults to `memory`.
+
+Other storage options are available:
+
+* [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
+* [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
+* [cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)
+
+##### `memory` token storage
+
+This option keeps token storage securely in an in-memory hash, available only through the `tokenManager` interface. It does not persist across page loads.
+
+##### `sessionStorage` token storage
+
+To persist token storage securely across page loads, within a single browser tab, use `sessionStorage`
 
 ```javascript
 
@@ -285,7 +299,28 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-Even if you have specified `localStorage` or `sessionStorage` in your config, the `TokenManager` may fall back to using `cookie` storage on some clients. If your site will always be served over a HTTPS connection, you may want to enable "secure" cookies. This option will prevent cookies from being stored on an HTTP connection.
+##### `cookie` token storage
+
+To share token storage between client and server-side code, use `cookie`
+> :warning: With the "cookie" setting, tokens will be available to multiple app instances opened within browser tabs.
+
+```javascript
+
+var config = {
+  url: 'https://{yourOktaDomain}',
+  tokenManager: {
+    storage: 'cookie'
+  }
+};
+
+var authClient = new OktaAuth(config);
+```
+
+##### `localStorage` token storage
+
+Allows shared token storage between multiple app instances running within a browser. This option is not recommended as it can lead to concurrency and race conditions when multiple tabs attempt to update the storage simultaneously.
+
+> :warning: Even if you have specified `localStorage` or `sessionStorage` in your config, the `TokenManager` may fall back to using `cookie` storage on some clients. If your site will **always** be served over a HTTPS connection, you may want to enable "secure" cookies. This option will prevent cookies from being stored on an HTTP connection.
 
 ```javascript
 var config = {
@@ -307,6 +342,8 @@ tokenManager: {
 ```
 
 Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
+
+> :warning: Setting this value is useful for diagnosing some issues or within tests, but it may also lead to incorrect behavior which could negatively impact the user experience. It is recommended to not set this value in production.
 
 ```javascript
 // Emit expired event 2 minutes before expiration

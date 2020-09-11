@@ -23,7 +23,7 @@ const Form = `
   <input id="pkce-off" name="pkce" type="radio" value="false"/>OFF<br/>
   <label for="storage">Storage</label>
   <select id="storage" name="storage">
-    <option value="" selected>Auto</option>
+    <option value="" selected>Default (sessionStorage)</option>
     <option value="localStorage">Local Storage</option>
     <option value="sessionStorage">Session Storage</option>
     <option value="cookie">Cookie</option>
