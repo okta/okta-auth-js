@@ -163,7 +163,7 @@ export interface FeaturesAPI {
 }
 
 // TODO: deprecate
-export interface SigninOptions extends SignInWithCredentialsOptions {}
+export type SigninOptions = SignInWithCredentialsOptions; 
 
 export interface SignInWithCredentialsOptions {
   username: string;

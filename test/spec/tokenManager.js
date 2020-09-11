@@ -31,8 +31,8 @@ function createAuth(options) {
       storage: options.tokenManager.storage,
       storageKey: options.tokenManager.storageKey,
       autoRenew: options.tokenManager.autoRenew || false,
-      secure: options.tokenManager.secure, // used by cookie storage
-      tooManyRenewsSecondsWindow: options.tokenManager.tooManyRenewsSecondsWindow
+      autoRemove: options.tokenManager.autoRemove || false,
+      secure: options.tokenManager.secure // used by cookie storage
     }
   });
 }
@@ -1128,6 +1128,38 @@ describe('TokenManager', function() {
         expect(handler).toHaveBeenCalledTimes(11);
         expect(client.tokenManager.renew).toHaveBeenCalledTimes(19);
       });
+    });
+  });
+
+  describe('autoRemove', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should call tokenManager.remove() when autoRenew === false && autoRemove === true', () => {
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-idToken': tokens.standardIdTokenParsed
+      }));
+      setupSync({ tokenManager: { autoRenew: false, autoRemove: true } });
+      client.tokenManager.remove = jest.fn();
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(client.tokenManager.remove).toHaveBeenCalledWith('test-idToken');
+    });
+
+    it('should not call tokenManager.remove() when autoRenew === false && autoRemove === false', () => {
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-idToken': tokens.standardIdTokenParsed
+      }));
+
+      setupSync({ tokenManager: { autoRenew: false, autoRemove: false } });
+      client.tokenManager.remove = jest.fn();
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(client.tokenManager.remove).not.toHaveBeenCalled();
     });
   });
 
