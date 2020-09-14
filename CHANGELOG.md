@@ -24,7 +24,7 @@
     - `sdk.handleAuthentication`
     - `sdk.setFromUri`
     - `sdk.getFromUri`
-  - Adds new methods for `sdk.tokenManager`:
+  - Adds new methods in `sdk.tokenManager`:
     - `tokenManager.getTokens`
     - `tokenManager.setTokens`
   - Supports browser-based OpenID Connect flows in `sdk.signIn` method (browser bundle only).
