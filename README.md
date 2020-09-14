@@ -586,6 +586,8 @@ var config = {
 * [tokenManager](#tokenmanager)
   * [tokenManager.add](#tokenmanageraddkey-token)
   * [tokenManager.get](#tokenmanagergetkey)
+  * [tokenManager.getTokens](#tokenmanagergettokens)
+  * [tokenManager.setTokens](#tokenmanagersettokenstokens)
   * [tokenManager.remove](#tokenmanagerremovekey)
   * [tokenManager.clear](#tokenmanagerclear)
   * [tokenManager.renew](#tokenmanagerrenewkey)
