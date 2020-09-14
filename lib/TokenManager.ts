@@ -23,7 +23,8 @@ import { Token, TokenManagerOptions, isIDToken, isAccessToken } from './types';
 var DEFAULT_OPTIONS = {
   autoRenew: true,
   storage: 'localStorage',
-  expireEarlySeconds: 30
+  expireEarlySeconds: 30,
+  tooManyRenewsSecondsWindow: 30
 };
 
 function getExpireTime(tokenMgmtRef, token) {
@@ -192,6 +193,18 @@ function clear(tokenMgmtRef, storage) {
   storage.clearStorage();
 }
 
+function isTooManyRenews(tokenMgmtRef, renewTimeQueue) {
+  let tooManyRenews = false;
+  renewTimeQueue.push(Date.now());
+  if (renewTimeQueue.length >= 10) {
+    // get and remove first item from queue
+    const firstTime = renewTimeQueue.shift();
+    const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
+    tooManyRenews = lastTime - firstTime < tokenMgmtRef.options.tooManyRenewsSecondsWindow * 1000;
+  }
+  return tooManyRenews;
+};
+
 export class TokenManager {
   get: (key: string) => Promise<Token>;
   add: (key: string, token: Token) => void;
@@ -287,23 +300,10 @@ export class TokenManager {
     this.off = tokenMgmtRef.emitter.off.bind(tokenMgmtRef.emitter);
     this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
   
-    let tooManyRenews = false;
     const renewTimeQueue = [];
     const onTokenExpiredHandler = (key) => {
       if (options.autoRenew) {
-        // detect if there are too many renew requests
-        if (renewTimeQueue.length < 10) {
-          renewTimeQueue.push(+new Date());
-        } else {
-          // get and remove first item from queue
-          const firstTime = renewTimeQueue.shift();
-          const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
-          if (lastTime - firstTime < 30 * 1000) {
-            tooManyRenews = true;
-          }
-        }
-        
-        if (tooManyRenews) {
+        if (isTooManyRenews(tokenMgmtRef, renewTimeQueue)) {
           const error = new AuthSdkError('Too many token renew requests');
           emitError(tokenMgmtRef, error);
         } else {
