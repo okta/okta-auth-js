@@ -20,8 +20,8 @@ const MAX_PROMISE_CANCEL_TIMES = 10;
 const isSameAuthState = (prevState: AuthState, state: AuthState) => {
   return prevState.isPending === state.isPending 
     && prevState.isAuthenticated === state.isAuthenticated 
-    && prevState.idToken === state.idToken 
-    && prevState.accessToken === state.accessToken
+    && JSON.stringify(prevState.idToken) === JSON.stringify(state.idToken)
+    && JSON.stringify(prevState.accessToken) === JSON.stringify(state.accessToken)
     && prevState.error === state.error;
 };
 

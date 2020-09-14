@@ -606,7 +606,7 @@ describe('Browser', function() {
       auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
         tokens: { idToken: 'fakeIdToken', accessToken: 'fakeAccessToken' }
       });
-      auth.tokenManager.add = jest.fn();
+      auth.tokenManager.setTokens = jest.fn();
     });
     it('calls parseFromUrl', async () => {
       await auth.handleAuthentication();
@@ -619,8 +619,7 @@ describe('Browser', function() {
         tokens: { accessToken, idToken }
       });
       await auth.handleAuthentication();
-      expect(auth.tokenManager.add).toHaveBeenNthCalledWith(1, 'idToken', idToken);
-      expect(auth.tokenManager.add).toHaveBeenNthCalledWith(2, 'accessToken', accessToken);
+      expect(auth.tokenManager.setTokens).toHaveBeenCalledWith({ accessToken, idToken });
     });
   });
 
