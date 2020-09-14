@@ -285,12 +285,10 @@ describe('AuthStateManager', () => {
     });
 
     it('should emit unique authState object', () => {
-      expect.assertions(1);
+      expect.assertions(2);
       sdkMock.tokenManager.getTokens = jest.fn()
-        .mockResolvedValue({ 
-          accessToken: 'fakeAccessToken0', 
-          idToken: 'fakeIdToken0' 
-        });
+        .mockResolvedValueOnce({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' })
+        .mockResolvedValueOnce({ accessToken: 'fakeAccessToken1', idToken: 'fakeIdToken1' });
       return new Promise(resolve => {
         const instance = new AuthStateManager(sdkMock);
         instance.updateAuthState();
@@ -303,10 +301,32 @@ describe('AuthStateManager', () => {
             prevAuthState = authState;
           } else {
             expect(authState).not.toBe(prevAuthState);
-            resolve();
           }
         });
         instance.subscribe(handler);
+        setTimeout(() => {
+          expect(handler).toHaveBeenCalledTimes(2);
+          resolve();
+        }, 100);
+      });
+    });
+
+    it('should only emit same authState once', () => {
+      expect.assertions(1);
+      sdkMock.tokenManager.getTokens = jest.fn()
+        .mockResolvedValue({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' });
+      return new Promise(resolve => {
+        const instance = new AuthStateManager(sdkMock);
+        instance.updateAuthState();
+        setTimeout(() => {
+          instance.updateAuthState();
+        }, 50);
+        const handler = jest.fn();
+        instance.subscribe(handler);
+        setTimeout(() => {
+          expect(handler).toHaveBeenCalledTimes(1);
+          resolve();
+        }, 100);
       });
     });
   });
