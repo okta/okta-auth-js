@@ -31,6 +31,8 @@
   - Accepts new custom callbacks [options](README.md#configuration-options)
     - `isAuthenticated`
     - `onAuthRequired`
+    - `autoRemove`
+    - `devMode`
 
 ## 4.0.0
 
