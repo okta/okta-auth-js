@@ -35,7 +35,7 @@ import OAuthError from './errors/OAuthError';
 import {
   ACCESS_TOKEN_STORAGE_KEY,
   ID_TOKEN_STORAGE_KEY,
-  REDIRECT_OAUTH_PARAMS_COOKIE_NAME,
+  REDIRECT_OAUTH_PARAMS_NAME,
   REDIRECT_NONCE_COOKIE_NAME,
   REDIRECT_STATE_COOKIE_NAME
 } from './constants';
@@ -673,9 +673,9 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
       var urls = getOAuthUrls(sdk, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(tokenParams);
 
-      // Set session cookie to store the oauthParams
+      // Store the oauthParams in storage for re-visiting when redirect back
       const { responseType, state, nonce, scopes, clientId, ignoreSignature } = tokenParams;
-      cookies.set(REDIRECT_OAUTH_PARAMS_COOKIE_NAME, JSON.stringify({
+      const tokenParamsStr = JSON.stringify({
         responseType,
         state,
         nonce,
@@ -683,7 +683,12 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
         clientId,
         urls: urls,
         ignoreSignature
-      }), null, sdk.options.cookies);
+      });
+      if (browserStorage.browserHasSessionStorage()) {
+        browserStorage.getSessionStorage().setItem(REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr);
+      } else {
+        cookies.set(REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr, null, sdk.options.cookies);
+      }
 
       // Set nonce cookie for servers to validate nonce in id_token
       cookies.set(REDIRECT_NONCE_COOKIE_NAME, tokenParams.nonce, null, sdk.options.cookies);
@@ -772,19 +777,27 @@ function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<Token
     return Promise.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
-  var oauthParamsCookie = cookies.get(REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
-  if (!oauthParamsCookie) {
-    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params cookie'));
+  let oauthParamsStr;
+  if (browserStorage.browserHasSessionStorage()) {
+    const storage = browserStorage.getSessionStorage();
+    oauthParamsStr = storage.getItem(REDIRECT_OAUTH_PARAMS_NAME);
+    storage.removeItem(REDIRECT_OAUTH_PARAMS_NAME);
+  } else {
+    oauthParamsStr = cookies.get(REDIRECT_OAUTH_PARAMS_NAME);
+    cookies.delete(REDIRECT_OAUTH_PARAMS_NAME);
+  }
+  
+  if (!oauthParamsStr) {
+    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params from storage'));
   }
 
   try {
-    var oauthParams = JSON.parse(oauthParamsCookie);
+    var oauthParams = JSON.parse(oauthParamsStr);
     var urls = oauthParams.urls;
     delete oauthParams.urls;
-    cookies.delete(REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
   } catch(e) {
     return Promise.reject(new AuthSdkError('Unable to parse the ' +
-    REDIRECT_OAUTH_PARAMS_COOKIE_NAME + ' cookie: ' + e.message));
+    REDIRECT_OAUTH_PARAMS_NAME + ' value from storage: ' + e.message));
   }
 
   return Promise.resolve(urlParamsToObject(paramStr))
