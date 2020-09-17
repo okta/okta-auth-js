@@ -419,10 +419,6 @@ You may pass an object or a string. If passing an object, it should meet the req
 
 By default all tokens will be stored under the key `okta-token-storage`. You may want to change this if you have multiple apps running on a single domain which share the same storage type. Giving each app a unique storage key will prevent them from reading or writing each other's token values.
 
-###### `tooManyRenewsSecondsWindow`
-
-Default to 30 seconds. When [autorenew](#autorenew) is on, the client may run into a scenario that it keep sending renew requests (mostly caused by misconfigure of local clock), which may cause rate limit issue for the whole application. This SDK maintains a time window to detect if the latest 10 renew requests happen in the time window. When issue is detected the SDK emits an `error` event with `AuthSdkError` and blocks the autoRenew process.
-
 ##### `cookies`
 
 An object containing additional properties used when setting cookies
