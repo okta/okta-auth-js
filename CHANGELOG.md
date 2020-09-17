@@ -1,5 +1,11 @@
 # Changelog
 
+## Pending
+
+### Bug Fixes
+
+- [#473](https://github.com/okta/okta-auth-js/pull/473) Fixes multiple tabs login issue
+
 ## 4.0.0
 
 ### Features
