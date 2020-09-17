@@ -20,6 +20,7 @@ var AuthSdkError  = require('./errors/AuthSdkError');
 var OAuthError    = require('./errors/OAuthError');
 var constants     = require('./constants');
 var cookies       = require('./browser/browserStorage').storage;
+var browserStorage = require('./browser/browserStorage');
 var PKCE          = require('./pkce');
 
 // Only the access token can be revoked in SPA applications
@@ -617,6 +618,24 @@ function prepareOauthParams(sdk, options) {
     });
 }
 
+function addOAuthParamsToStorage(sdk, tokenParams, urls) {
+  const { responseType, state, nonce, scopes, clientId, ignoreSignature } = tokenParams;
+  const tokenParamsStr = JSON.stringify({
+    responseType,
+    state,
+    nonce,
+    scopes,
+    clientId,
+    urls,
+    ignoreSignature
+  });
+  if (browserStorage.browserHasSessionStorage()) {
+    browserStorage.getSessionStorage().setItem(constants.REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr);
+  } else {
+    cookies.set(constants.REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr, null, sdk.options.cookies);
+  }
+}
+
 function getWithRedirect(sdk, options) {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
@@ -628,16 +647,7 @@ function getWithRedirect(sdk, options) {
       var urls = oauthUtil.getOAuthUrls(sdk, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(oauthParams);
 
-      // Set session cookie to store the oauthParams
-      cookies.set(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME, JSON.stringify({
-        responseType: oauthParams.responseType,
-        state: oauthParams.state,
-        nonce: oauthParams.nonce,
-        scopes: oauthParams.scopes,
-        clientId: oauthParams.clientId,
-        urls: urls,
-        ignoreSignature: oauthParams.ignoreSignature
-      }), null, sdk.options.cookies);
+      addOAuthParamsToStorage(sdk, oauthParams, urls);
 
       // Set nonce cookie for servers to validate nonce in id_token
       cookies.set(constants.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce, null, sdk.options.cookies);
@@ -700,6 +710,19 @@ function removeSearch(sdk) {
   }
 }
 
+function getOAuthParamsStrFromStorage() {
+  let oauthParamsStr;
+  if (browserStorage.browserHasSessionStorage()) {
+    const storage = browserStorage.getSessionStorage();
+    oauthParamsStr = storage.getItem(constants.REDIRECT_OAUTH_PARAMS_NAME);
+    storage.removeItem(constants.REDIRECT_OAUTH_PARAMS_NAME);
+  } else {
+    oauthParamsStr = cookies.get(constants.REDIRECT_OAUTH_PARAMS_NAME);
+    cookies.delete(constants.REDIRECT_OAUTH_PARAMS_NAME);
+  }
+  return oauthParamsStr;
+}
+
 function parseFromUrl(sdk, options) {
   options = options || {};
   if (util.isString(options)) {
@@ -724,19 +747,18 @@ function parseFromUrl(sdk, options) {
     return Promise.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
-  var oauthParamsCookie = cookies.get(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
-  if (!oauthParamsCookie) {
-    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params cookie'));
+  const oauthParamsStr = getOAuthParamsStrFromStorage();  
+  if (!oauthParamsStr) {
+    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params from storage'));
   }
 
   try {
-    var oauthParams = JSON.parse(oauthParamsCookie);
+    var oauthParams = JSON.parse(oauthParamsStr);
     var urls = oauthParams.urls;
     delete oauthParams.urls;
-    cookies.delete(constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME);
   } catch(e) {
     return Promise.reject(new AuthSdkError('Unable to parse the ' +
-    constants.REDIRECT_OAUTH_PARAMS_COOKIE_NAME + ' cookie: ' + e.message));
+    constants.REDIRECT_OAUTH_PARAMS_NAME + ' value from storage: ' + e.message));
   }
 
   return Promise.resolve(oauthUtil.urlParamsToObject(paramStr))

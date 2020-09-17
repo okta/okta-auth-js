@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.4
+
+### Bug Fixes
+
+- [#473](https://github.com/okta/okta-auth-js/pull/473) Fixes multiple tabs login issue
+
 ## 3.2.3
 
 - [#440](https://github.com/okta/okta-auth-js/pull/440) Fixes signOut XHR fallback to reload page only if postLogoutRedirectUri matches the current URI
