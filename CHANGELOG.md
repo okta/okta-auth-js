@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- [#473](https://github.com/okta/okta-auth-js/pull/473) Fixes multiple tabs login issue
+- [#473](https://github.com/okta/okta-auth-js/pull/473) Fixes login issue when cookies are blocked or used as shared state storage
 
 ## 3.2.3
 
