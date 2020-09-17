@@ -23,8 +23,7 @@ import { Token, TokenManagerOptions, isIDToken, isAccessToken } from './types';
 var DEFAULT_OPTIONS = {
   autoRenew: true,
   storage: 'localStorage',
-  expireEarlySeconds: 30,
-  tooManyRenewsSecondsWindow: 30
+  expireEarlySeconds: 30
 };
 
 function getExpireTime(tokenMgmtRef, token) {
@@ -193,16 +192,16 @@ function clear(tokenMgmtRef, storage) {
   storage.clearStorage();
 }
 
-function isTooManyRenews(tokenMgmtRef, renewTimeQueue) {
-  let tooManyRenews = false;
+function shouldThrottleRenew(renewTimeQueue) {
+  let shoudlThrottleRenew = false;
   renewTimeQueue.push(Date.now());
   if (renewTimeQueue.length >= 10) {
     // get and remove first item from queue
     const firstTime = renewTimeQueue.shift();
     const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
-    tooManyRenews = lastTime - firstTime < tokenMgmtRef.options.tooManyRenewsSecondsWindow * 1000;
+    shoudlThrottleRenew = lastTime - firstTime < 30 * 1000;
   }
-  return tooManyRenews;
+  return shoudlThrottleRenew;
 };
 
 export class TokenManager {
@@ -303,7 +302,7 @@ export class TokenManager {
     const renewTimeQueue = [];
     const onTokenExpiredHandler = (key) => {
       if (options.autoRenew) {
-        if (isTooManyRenews(tokenMgmtRef, renewTimeQueue)) {
+        if (shouldThrottleRenew(renewTimeQueue)) {
           const error = new AuthSdkError('Too many token renew requests');
           emitError(tokenMgmtRef, error);
         } else {

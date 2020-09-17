@@ -1141,24 +1141,6 @@ describe('TokenManager', function() {
         expect(handler).toHaveBeenCalledTimes(11);
         expect(client.tokenManager.renew).toHaveBeenCalledTimes(19);
       });
-
-      it('should be able to pass tooManyRenewsSecondsWindow option', () => {
-        setupSync({
-          tokenManager: { autoRenew: true, tooManyRenewsSecondsWindow: 15 }
-        });
-        client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
-        const handler = jest.fn();
-        client.tokenManager.on('error', handler);
-        let startTime = Math.round(Date.now() / 1000);
-        // 10 * 2 > 15 => should not emit error
-        for (let i = 0; i < 15; i++) {
-          util.warpToUnixTime(startTime);
-          client.emitter.emit('expired');
-          startTime = startTime + 2;
-        }
-        expect(handler).not.toHaveBeenCalled();
-        expect(client.tokenManager.renew).toHaveBeenCalledTimes(15);
-      });
     });
   });
 
