@@ -1,5 +1,5 @@
 /* eslint-disable no-new */
-/* global window */
+/* global window, sessionStorage */
 jest.mock('cross-fetch');
 jest.mock('../../lib/tx');
 
