@@ -16,14 +16,14 @@ describe('fingerprint', function() {
 
   function setup(options) {
     options = options || {};
-    var listener;
+    var listeners = {};
     var postMessageSpy = jest.spyOn(window, 'postMessage').mockImplementation(function(msg, url) {
       // "receive" the message in the iframe
       expect(url).toEqual('http://example.okta.com');
       expect(msg).toEqual(expect.any(String));
       expect(JSON.parse(msg).type).toEqual('GetFingerprint');
-      expect(listener).toEqual(expect.any(Function));
-      listener({
+      expect(listeners.message).toEqual(expect.any(Function));
+      listeners.message({
         data: JSON.stringify({
           type: 'FingerprintAvailable',
           fingerprint: 'ABCD'
@@ -40,8 +40,8 @@ describe('fingerprint', function() {
     };
 
     jest.spyOn(window, 'addEventListener').mockImplementation(function(name, fn) {
-      expect(name).toEqual('message');
-      listener = fn;
+      // expect(name).toEqual('message');
+      listeners.message = fn;
     });
     jest.spyOn(document, 'createElement').mockReturnValue(test.iframe);
     jest.spyOn(document.body, 'contains').mockReturnValue(true);
@@ -50,14 +50,14 @@ describe('fingerprint', function() {
       // mimic async page load with setTimeouts
       if (options.sendOtherMessage) {
         setTimeout(function() {
-          listener({
+          listeners.message({
             data: '{"not":"forUs"}',
             origin: 'http://not.okta.com'
           });
         });
       }
       setTimeout(function() {
-        listener({
+        listeners.message({
           data: options.firstMessage || JSON.stringify({
             type: 'FingerprintServiceReady'
           }),

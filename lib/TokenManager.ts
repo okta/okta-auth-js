@@ -28,12 +28,18 @@ import {
 } from './types';
 import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY } from './constants';
 
-var DEFAULT_OPTIONS = {
+const DEFAULT_OPTIONS = {
   autoRenew: true,
   autoRemove: true,
   storage: 'localStorage',
-  expireEarlySeconds: 30
+  expireEarlySeconds: 30,
+  storageKey: TOKEN_STORAGE_NAME
 };
+export const EVENT_EXPIRED = 'expired';
+export const EVENT_RENEWED = 'renewed';
+export const EVENT_ADDED = 'added';
+export const EVENT_REMOVED = 'removed';
+export const EVENT_ERROR = 'error';
 
 function getExpireTime(tokenMgmtRef, token) {
   var expireTime = token.expiresAt - tokenMgmtRef.options.expireEarlySeconds;
@@ -46,23 +52,23 @@ function hasExpired(tokenMgmtRef, token) {
 }
 
 function emitExpired(tokenMgmtRef, key, token) {
-  tokenMgmtRef.emitter.emit('expired', key, token);
+  tokenMgmtRef.emitter.emit(EVENT_EXPIRED, key, token);
 }
 
 function emitRenewed(tokenMgmtRef, key, freshToken, oldToken) {
-  tokenMgmtRef.emitter.emit('renewed', key, freshToken, oldToken);
+  tokenMgmtRef.emitter.emit(EVENT_RENEWED, key, freshToken, oldToken);
 }
 
 function emitAdded(tokenMgmtRef, key, token) {
-  tokenMgmtRef.emitter.emit('added', key, token);
+  tokenMgmtRef.emitter.emit(EVENT_ADDED, key, token);
 }
 
-function emitRemoved(tokenMgmtRef, key, token) {
-  tokenMgmtRef.emitter.emit('removed', key, token);
+function emitRemoved(tokenMgmtRef, key, token?) {
+  tokenMgmtRef.emitter.emit(EVENT_REMOVED, key, token);
 }
 
 function emitError(tokenMgmtRef, error) {
-  tokenMgmtRef.emitter.emit('error', error);
+  tokenMgmtRef.emitter.emit(EVENT_ERROR, error);
 }
 
 function clearExpireEventTimeout(tokenMgmtRef, key) {
@@ -117,14 +123,18 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
   }
 }
 
-function add(sdk, tokenMgmtRef, storage, key, token: Token) {
-  var tokenStorage = storage.getStorage();
+function validateToken(token: Token) {
   if (!isObject(token) ||
       !token.scopes ||
       (!token.expiresAt && token.expiresAt !== 0) ||
       (!isIDToken(token) && !isAccessToken(token))) {
     throw new AuthSdkError('Token must be an Object with scopes, expiresAt, and an idToken or accessToken properties');
   }
+}
+
+function add(sdk, tokenMgmtRef, storage, key, token: Token) {
+  var tokenStorage = storage.getStorage();
+  validateToken(token);
   tokenStorage[key] = token;
   storage.setStorage(tokenStorage);
   emitAdded(tokenMgmtRef, key, token);
@@ -136,7 +146,7 @@ function get(storage, key) {
   return tokenStorage[key];
 }
 
-function getKeyByType(storage, type): string {
+function getKeyByType(storage, type: TokenType): string {
   const tokenStorage = storage.getStorage();
   const key = Object.keys(tokenStorage).filter(key => {
     const token = tokenStorage[key];
@@ -169,12 +179,36 @@ function getTokens(storage): Promise<Tokens> {
   });
 }
 
-function setTokens(sdk, tokenMgmtRef, storage, tokens: Tokens): void {
-  if (tokens.idToken) {
-    add(sdk, tokenMgmtRef, storage, ID_TOKEN_STORAGE_KEY, tokens.idToken);
+function setTokens(sdk, tokenMgmtRef, storage, tokens: Tokens, accessTokenCb?: Function, idTokenCb?: Function): void {
+  const { accessToken, idToken } = tokens;
+  if (idToken) {
+    validateToken(idToken);
   }
-  if (tokens.accessToken) {
-    add(sdk, tokenMgmtRef, storage, ACCESS_TOKEN_STORAGE_KEY, tokens.accessToken);
+  if (accessToken) {
+    validateToken(accessToken);
+  }
+  const idTokenKey = getKeyByType(storage, 'idToken') || ID_TOKEN_STORAGE_KEY;
+  const accessTokenKey = getKeyByType(storage, 'accessToken') || ACCESS_TOKEN_STORAGE_KEY;
+  // add token to storage
+  const tokenStorage = { 
+    ...(idToken && { [idTokenKey]: idToken }),
+    ...(accessToken && { [accessTokenKey]: accessToken })
+  };
+  storage.setStorage(tokenStorage);
+  // emit event and start expiration timer
+  if (idToken) {
+    emitAdded(tokenMgmtRef, idTokenKey, idToken);
+    setExpireEventTimeout(sdk, tokenMgmtRef, idTokenKey, idToken);
+    if (idTokenCb) {
+      idTokenCb(idTokenKey, idToken);
+    }
+  }
+  if (accessToken) {
+    emitAdded(tokenMgmtRef, accessTokenKey, accessToken);
+    setExpireEventTimeout(sdk, tokenMgmtRef, accessTokenKey, accessToken);
+    if (accessTokenCb) {
+      accessTokenCb(accessTokenKey, accessToken);
+    }
   }
 }
 
@@ -215,14 +249,19 @@ function renew(sdk, tokenMgmtRef, storage, key) {
     scopes: token.scopes
   })
     .then(function(freshTokens) {
-      // emit events for each freshTokens
-      Object.keys(freshTokens).forEach(tokenType => {
-        const freshToken = freshTokens[tokenType];
-        const tokenKey = getKeyByType(storage, tokenType);
-        const oldToken = get(storage, tokenKey);
-        add(sdk, tokenMgmtRef, storage, tokenKey, freshToken);
-        emitRenewed(tokenMgmtRef, tokenKey, freshToken, oldToken);
-      });
+      // store and emit events for freshTokens
+      const oldTokenStorage = storage.getStorage();
+      setTokens(
+        sdk, 
+        tokenMgmtRef, 
+        storage, 
+        freshTokens, 
+        (accessTokenKey, accessToken) =>
+          emitRenewed(tokenMgmtRef, accessTokenKey, accessToken, oldTokenStorage[accessTokenKey]),
+        (idTokenKey, idToken) =>
+          emitRenewed(tokenMgmtRef, idTokenKey, idToken, oldTokenStorage[idTokenKey])
+      )
+
       // return freshToken by key
       const freshToken = get(storage, key);
       return freshToken;
@@ -230,13 +269,27 @@ function renew(sdk, tokenMgmtRef, storage, key) {
     .catch(function(err) {
       if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
         // remove expired tokens in storage
+        const removedTokens = [];
         const tokenStorage = storage.getStorage();
         Object.keys(tokenStorage).forEach(key => {
           const token = tokenStorage[key];
           if (token && hasExpired(tokenMgmtRef, token)) {
-            remove(tokenMgmtRef, storage, key);
+            delete tokenStorage[key];
+            removedTokens.push({ key, token });
+            clearExpireEventTimeout(tokenMgmtRef, key);
           }
         });
+        storage.setStorage(tokenStorage);
+        // emit removed events
+        if (!removedTokens.length) {
+          // tokens have been removed from other tabs
+          // still trigger removed event for downstream listeners
+          emitRemoved(tokenMgmtRef, ID_TOKEN_STORAGE_KEY);
+          emitRemoved(tokenMgmtRef, ACCESS_TOKEN_STORAGE_KEY);
+        } else {
+          removedTokens.forEach((key, token) => emitRemoved(tokenMgmtRef, key, token));
+        }
+
         err.tokenKey = key;
         emitError(tokenMgmtRef, err);
       }
@@ -355,8 +408,7 @@ export class TokenManager {
           throw new AuthSdkError('Unrecognized storage option');
       }
     }
-    var storageKey = options.storageKey || TOKEN_STORAGE_NAME;
-    var storage = storageBuilder(storageProvider, storageKey);
+    var storage = storageBuilder(storageProvider, options.storageKey);
     var clock = SdkClock.create(/* sdk, options */);
     var tokenMgmtRef = {
       clock: clock,
@@ -393,7 +445,7 @@ export class TokenManager {
         this.remove(key);
       }
     };
-    this.on('expired', onTokenExpiredHandler);
+    this.on(EVENT_EXPIRED, onTokenExpiredHandler);
 
     setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
   }
