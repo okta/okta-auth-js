@@ -278,7 +278,7 @@ describe('TokenManager', function() {
     });
   });
 
-  describe.only('renew', function() {
+  describe('renew', function() {
     beforeEach(() => {
       setupSync();
     });
