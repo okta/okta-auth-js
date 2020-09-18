@@ -33,7 +33,7 @@ describe('NO AUTH STATUS', function () {
         response: 'primary-auth-error'
       },
       execute: function (test) {
-        return test.oa.signIn({});
+        return test.oa.signIn({username: 'fake', password: 'fake'});
       }
     });
   });

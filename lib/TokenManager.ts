@@ -12,16 +12,25 @@
  */
 /* global localStorage, sessionStorage */
 /* eslint complexity:[0,8] max-statements:[0,21] */
-import { removeNils, warn, isObject } from './util';
+import { removeNils, warn, isObject, clone } from './util';
 import AuthSdkError from './errors/AuthSdkError';
 import storageUtil from './browser/browserStorage';
 import { TOKEN_STORAGE_NAME } from './constants';
 import storageBuilder from './storageBuilder';
 import SdkClock from './clock';
-import { Token, TokenManagerOptions, isIDToken, isAccessToken } from './types';
+import { 
+  Token, 
+  Tokens, 
+  TokenType, 
+  TokenManagerOptions, 
+  isIDToken, 
+  isAccessToken 
+} from './types';
+import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY } from './constants';
 
 var DEFAULT_OPTIONS = {
   autoRenew: true,
+  autoRemove: true,
   storage: 'localStorage',
   expireEarlySeconds: 30
 };
@@ -40,8 +49,16 @@ function emitExpired(tokenMgmtRef, key, token) {
   tokenMgmtRef.emitter.emit('expired', key, token);
 }
 
-function emitRemoved(tokenMgmtRef, key) {
-  tokenMgmtRef.emitter.emit('removed', key);
+function emitRenewed(tokenMgmtRef, key, freshToken, oldToken) {
+  tokenMgmtRef.emitter.emit('renewed', key, freshToken, oldToken);
+}
+
+function emitAdded(tokenMgmtRef, key, token) {
+  tokenMgmtRef.emitter.emit('added', key, token);
+}
+
+function emitRemoved(tokenMgmtRef, key, token) {
+  tokenMgmtRef.emitter.emit('removed', key, token);
 }
 
 function emitError(tokenMgmtRef, error) {
@@ -110,6 +127,7 @@ function add(sdk, tokenMgmtRef, storage, key, token: Token) {
   }
   tokenStorage[key] = token;
   storage.setStorage(tokenStorage);
+  emitAdded(tokenMgmtRef, key, token);
   setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
 }
 
@@ -118,23 +136,58 @@ function get(storage, key) {
   return tokenStorage[key];
 }
 
-function getAsync(sdk, tokenMgmtRef, storage, key) {
+function getKeyByType(storage, type): string {
+  const tokenStorage = storage.getStorage();
+  const key = Object.keys(tokenStorage).filter(key => {
+    const token = tokenStorage[key];
+    return (isAccessToken(token) && type === 'accessToken') 
+      || (isIDToken(token) && type === 'idToken');
+  })[0];
+  return key;
+}
+
+function getAsync(storage, key) {
   return new Promise(function(resolve) {
     var token = get(storage, key);
     return resolve(token);
   });
 }
 
+function getTokens(storage): Promise<Tokens> {
+  return new Promise((resolve) => {
+    const tokens = {} as Tokens;
+    const tokenStorage = storage.getStorage();
+    Object.keys(tokenStorage).forEach(key => {
+      const token = tokenStorage[key];
+      if (isAccessToken(token)) {
+        tokens.accessToken = token;
+      } else if (isIDToken(token)) {
+        tokens.idToken = token;
+      }
+    });
+    return resolve(tokens);
+  });
+}
+
+function setTokens(sdk, tokenMgmtRef, storage, tokens: Tokens): void {
+  if (tokens.idToken) {
+    add(sdk, tokenMgmtRef, storage, ID_TOKEN_STORAGE_KEY, tokens.idToken);
+  }
+  if (tokens.accessToken) {
+    add(sdk, tokenMgmtRef, storage, ACCESS_TOKEN_STORAGE_KEY, tokens.accessToken);
+  }
+}
+
 function remove(tokenMgmtRef, storage, key) {
   // Clear any listener for this token
   clearExpireEventTimeout(tokenMgmtRef, key);
 
-  // Remove it from storage
   var tokenStorage = storage.getStorage();
+  var removedToken = tokenStorage[key];
   delete tokenStorage[key];
   storage.setStorage(tokenStorage);
 
-  emitRemoved(tokenMgmtRef, key);
+  emitRemoved(tokenMgmtRef, key, removedToken);
 }
 
 function renew(sdk, tokenMgmtRef, storage, key) {
@@ -153,28 +206,38 @@ function renew(sdk, tokenMgmtRef, storage, key) {
     return Promise.reject(e);
   }
 
-  // Remove existing autoRenew timeout for this key
-  clearExpireEventTimeout(tokenMgmtRef, key);
+  // Remove existing autoRenew timeouts
+  clearExpireEventTimeoutAll(tokenMgmtRef);
 
   // Store the renew promise state, to avoid renewing again
-  tokenMgmtRef.renewPromise[key] = sdk.token.renew(token)
-    .then(function(freshToken) {
-      var oldToken = get(storage, key);
-      if (!oldToken) {
-        // It is possible to enter a state where the tokens have been cleared
-        // after a renewal request was triggered. To ensure we do not store a
-        // renewed token, we verify the promise key doesn't exist and return.
-        return;
-      }
-      add(sdk, tokenMgmtRef, storage, key, freshToken);
-      tokenMgmtRef.emitter.emit('renewed', key, freshToken, oldToken);
+  // Renew both tokens in one process
+  tokenMgmtRef.renewPromise[key] = sdk.token.renewTokens({
+    scopes: token.scopes
+  })
+    .then(function(freshTokens) {
+      // emit events for each freshTokens
+      Object.keys(freshTokens).forEach(tokenType => {
+        const freshToken = freshTokens[tokenType];
+        const tokenKey = getKeyByType(storage, tokenType);
+        const oldToken = get(storage, tokenKey);
+        add(sdk, tokenMgmtRef, storage, tokenKey, freshToken);
+        emitRenewed(tokenMgmtRef, tokenKey, freshToken, oldToken);
+      });
+      // return freshToken by key
+      const freshToken = get(storage, key);
       return freshToken;
     })
     .catch(function(err) {
       if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
-        remove(tokenMgmtRef, storage, key);
+        // remove expired tokens in storage
+        const tokenStorage = storage.getStorage();
+        Object.keys(tokenStorage).forEach(key => {
+          const token = tokenStorage[key];
+          if (token && hasExpired(tokenMgmtRef, token)) {
+            remove(tokenMgmtRef, storage, key);
+          }
+        });
         err.tokenKey = key;
-        err.accessToken = !!token.accessToken;
         emitError(tokenMgmtRef, err);
       }
       throw err;
@@ -213,9 +276,22 @@ export class TokenManager {
   on: (event: string, handler: Function, context?: object) => void;
   off: (event: string, handler: Function) => void;
   hasExpired: (token: Token) => boolean;
+  getTokens: () => Promise<Tokens>;
+  setTokens: (tokens: Tokens) => void;
+  
+  // This is exposed so we can get storage key agnostic tokens set in internal state managers
+  _getStorageKeyByType: (type: TokenType) => string;
+  // This is exposed so we can set clear timeouts in our tests
+  _clearExpireEventTimeoutAll: () => void;
+  // This is exposed read-only options for internal sdk use
+  _getOptions: () => TokenManagerOptions;
 
   constructor(sdk, options: TokenManagerOptions) {
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
+
+    if (!sdk.emitter) {
+      throw new AuthSdkError('Emitter should be initialized before TokenManager');
+    }
 
     if (options.storage === 'localStorage' && !storageUtil.browserHasLocalStorage()) {
       warn('This browser doesn\'t support localStorage. Switching to sessionStorage.');
@@ -291,13 +367,18 @@ export class TokenManager {
     };
 
     this.add = add.bind(this, sdk, tokenMgmtRef, storage);
-    this.get = getAsync.bind(this, sdk, tokenMgmtRef, storage);
+    this.get = getAsync.bind(this, storage);
     this.remove = remove.bind(this, tokenMgmtRef, storage);
     this.clear = clear.bind(this, tokenMgmtRef, storage);
     this.renew = renew.bind(this, sdk, tokenMgmtRef, storage);
     this.on = tokenMgmtRef.emitter.on.bind(tokenMgmtRef.emitter);
     this.off = tokenMgmtRef.emitter.off.bind(tokenMgmtRef.emitter);
     this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
+    this.getTokens = getTokens.bind(this, storage);
+    this.setTokens = setTokens.bind(this, sdk, tokenMgmtRef, storage);
+    this._getStorageKeyByType = getKeyByType.bind(this, storage);
+    this._clearExpireEventTimeoutAll = clearExpireEventTimeoutAll.bind(this, tokenMgmtRef);
+    this._getOptions = () => clone(options);
   
     const renewTimeQueue = [];
     const onTokenExpiredHandler = (key) => {
@@ -308,7 +389,7 @@ export class TokenManager {
         } else {
           this.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
         }
-      } else {
+      } else if (options.autoRemove) {
         this.remove(key);
       }
     };

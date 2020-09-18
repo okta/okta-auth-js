@@ -133,6 +133,7 @@ export interface TokenAPI {
   decode(token: string): JWTObject;
   revoke(token: AccessToken): Promise<object>;
   renew(token: Token): Promise<Token>;
+  renewTokens(): Promise<Tokens>;
   verify(token: IDToken, params?: object): Promise<IDToken>;
   isLoginRedirect(): boolean;
 }
@@ -161,15 +162,26 @@ export interface FeaturesAPI {
   isPKCESupported(): boolean;
 }
 
-export interface SigninOptions {
+// TODO: deprecate
+export type SigninOptions = SignInWithCredentialsOptions; 
+
+export interface SignInWithCredentialsOptions {
   username: string;
   password: string;
   relayState?: string;
   context?: string;
 }
 
+export function isSignInWithCredentialsOptions(obj: any): obj is SignInWithCredentialsOptions {
+  return obj && obj.username && obj.password;
+} 
+
+export interface SigninWithRedirectOptions extends TokenParams {
+  fromUri?: string;
+}
+
 export interface SigninAPI {
-  signIn(opts: SigninOptions): Promise<AuthTransaction>;
+  signIn(opts?: SignInWithCredentialsOptions|SigninWithRedirectOptions): Promise<AuthTransaction>|Promise<void>;
 }
 
 export interface SignoutOptions {

@@ -1,8 +1,15 @@
 /* eslint-disable no-new */
-/* global window */
+/* global window, sessionStorage */
 jest.mock('cross-fetch');
+jest.mock('../../lib/tx');
 
-import { OktaAuth, AuthApiError, ACCESS_TOKEN_STORAGE_KEY, ID_TOKEN_STORAGE_KEY } from '@okta/okta-auth-js';
+import { 
+  OktaAuth, 
+  AuthApiError, 
+  REFERRER_PATH_STORAGE_KEY 
+} from '@okta/okta-auth-js';
+import tokens from '@okta/test.support/tokens';
+import {postToTransaction} from '../../lib/tx';
 
 describe('Browser', function() {
   let auth;
@@ -18,7 +25,8 @@ describe('Browser', function() {
     delete global.window.location;
     global.window.location = {
       protocol: 'https:',
-      hostname: 'somesite.local'
+      hostname: 'somesite.local',
+      href: 'https://somesite.local'
     };
 
     issuer =  'http://my-okta-domain';
@@ -93,22 +101,92 @@ describe('Browser', function() {
     });
   });
 
+  describe('signIn', () => {
+    describe('loginWithRedirect', () => {
+      beforeEach(() => {
+        auth.loginRedirect = jest.fn();
+        auth.setFromUri = jest.fn();
+      });
+      it('calls loginRedirect by default', async () => {
+        expect.assertions(1);
+        await auth.signIn();
+        expect(auth.loginRedirect).toHaveBeenCalled();
+      });
+  
+      it('calls onAuthRequired, if provided, instead of loginRedirect', async () => {
+        auth.options.onAuthRequired = jest.fn().mockResolvedValue();
+        await auth.signIn();
+        expect(auth.loginRedirect).not.toHaveBeenCalled();
+        expect(auth.options.onAuthRequired).toHaveBeenCalledWith(auth);
+      });
+  
+      it('Calls setFromUri with fromUri, if provided', () => {
+        const fromUri = 'notrandom';
+        auth.signIn({ fromUri });
+        expect(auth.setFromUri).toHaveBeenCalledWith(fromUri);
+      });
+  
+      it('Calls setFromUri with undefined, by default', () => {
+        auth.setFromUri = jest.fn();
+        auth.signIn();
+        expect(auth.setFromUri).toHaveBeenCalledWith(undefined);
+      });
+  
+      it('Passes "additionalParams" to loginRedirect', () => {
+        const fromUri = 'https://foo.random';
+        const additionalParams = { fromUri, foo: 'bar', baz: 'biz' };
+        auth.signIn(additionalParams);
+        expect(auth.loginRedirect).toHaveBeenCalledWith(undefined, additionalParams);
+        expect(auth.setFromUri).toHaveBeenCalledWith(fromUri);
+      });
+  
+      it('should not trigger second call if login is in progress', () => {
+        expect.assertions(1);
+        auth.loginRedirect = jest.fn();
+        return Promise.all([auth.signIn(), auth.signIn()]).then(() => {
+          expect(auth.loginRedirect).toHaveBeenCalledTimes(1);
+        });
+      });
+    });
+
+    describe('loginWithCredentials', () => {
+      let options;
+      beforeEach(() => {
+        options = { username: 'fake', password: 'fake' };
+        auth.fingerprint = jest.fn().mockResolvedValue('fake fingerprint');
+      });
+      it('should call "/api/v1/authn" endpoint with default options', async () => {
+        await auth.signIn(options);
+        expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
+      });
+      it('should call fingerprint if has sendFingerprint in options', async () => {
+        options.sendFingerprint = true;
+        await auth.signIn(options);
+        delete options.sendFingerprint;
+        expect(auth.fingerprint).toHaveBeenCalled();
+        expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, {
+          headers: { 'X-Device-Fingerprint': 'fake fingerprint' }
+        });
+      });
+    });
+  });
+
   describe('revokeAccessToken', function() {
     it('will read from TokenManager and call token.revoke', function() {
       var accessToken = { accessToken: 'fake' };
-      spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
+      spyOn(auth.tokenManager, 'getTokens').and.returnValue(Promise.resolve({ accessToken }));
       spyOn(auth.tokenManager, 'remove').and.returnValue(Promise.resolve(accessToken));
       spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
       return auth.revokeAccessToken()
         .then(function() {
-          expect(auth.tokenManager.get).toHaveBeenCalledWith(ACCESS_TOKEN_STORAGE_KEY);
-          expect(auth.tokenManager.remove).toHaveBeenCalledWith(ACCESS_TOKEN_STORAGE_KEY);
+          expect(auth.tokenManager.getTokens).toHaveBeenCalled();
+          expect(auth.tokenManager.remove).toHaveBeenCalled();
           expect(auth.token.revoke).toHaveBeenCalledWith(accessToken);
         });
     });
     it('will throw if token.revoke rejects with unknown error', function() {
       var accessToken = { accessToken: 'fake' };
-      spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve(accessToken));
+      spyOn(auth.tokenManager, 'getTokens').and.returnValue(Promise.resolve({ accessToken }));
       var testError = new Error('test error');
       spyOn(auth.token, 'revoke').and.callFake(function() {
         return Promise.reject(testError);
@@ -130,10 +208,10 @@ describe('Browser', function() {
     });
     it('if accessToken cannot be located, will resolve without error', function() {
       spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
-      spyOn(auth.tokenManager, 'get').and.returnValue(Promise.resolve());
+      spyOn(auth.tokenManager, 'getTokens').and.returnValue(Promise.resolve({}));
       return auth.revokeAccessToken()
         .then(() => {
-          expect(auth.tokenManager.get).toHaveBeenCalled();
+          expect(auth.tokenManager.getTokens).toHaveBeenCalled();
           expect(auth.token.revoke).not.toHaveBeenCalled();
         });
     });
@@ -193,15 +271,7 @@ describe('Browser', function() {
       let accessToken;
 
       function initSpies() {
-        spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === ID_TOKEN_STORAGE_KEY) {
-            return idToken;
-          } else if (key === ACCESS_TOKEN_STORAGE_KEY) {
-            return accessToken;
-          } else {
-            throw new Error(`Unknown token key: ${key}`);
-          }
-        });
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
@@ -216,8 +286,7 @@ describe('Browser', function() {
       it('Default options: will revokeAccessToken and use window.location.origin for postLogoutRedirectUri', function() {
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ID_TOKEN_STORAGE_KEY);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).not.toHaveBeenCalled();
@@ -242,8 +311,7 @@ describe('Browser', function() {
         var customToken = { idToken: 'fake-custom' };
         return auth.signOut({ idToken: customToken })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${customToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -251,8 +319,7 @@ describe('Browser', function() {
       it('if idToken=false will skip token manager read and call closeSession', function() {
         return auth.signOut({ idToken: false })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
           });
@@ -262,8 +329,7 @@ describe('Browser', function() {
         global.window.location.href = origin;
         return auth.signOut({ idToken: false })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.reload).toHaveBeenCalled();
           });
@@ -306,8 +372,7 @@ describe('Browser', function() {
       it('Can pass a "revokeAccessToken=false" to skip accessToken logic', function() {
         return auth.signOut({ revokeAccessToken: false })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ID_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -316,8 +381,7 @@ describe('Browser', function() {
       it('Can pass a "accessToken=false" to skip accessToken logic', function() {
         return auth.signOut({ accessToken: false })
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenCalledTimes(1);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ID_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -329,15 +393,7 @@ describe('Browser', function() {
 
       beforeEach(() => {
         accessToken = { accessToken: 'fake' };
-        spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === ID_TOKEN_STORAGE_KEY) {
-            return;
-          } else if (key === ACCESS_TOKEN_STORAGE_KEY) {
-            return accessToken;
-          } else {
-            throw new Error(`Unknown token key: ${key}`);
-          }
-        });        
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
       });
@@ -346,8 +402,7 @@ describe('Browser', function() {
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ID_TOKEN_STORAGE_KEY);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -360,8 +415,7 @@ describe('Browser', function() {
         global.window.location.href = origin;
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(1, ID_TOKEN_STORAGE_KEY);
-            expect(auth.tokenManager.get).toHaveBeenNthCalledWith(2, ACCESS_TOKEN_STORAGE_KEY);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -416,15 +470,7 @@ describe('Browser', function() {
       let idToken;
       beforeEach(() => {
         idToken = { idToken: 'fake' };
-        spyOn(auth.tokenManager, 'get').and.callFake(key => {
-          if (key === ID_TOKEN_STORAGE_KEY) {
-            return idToken;
-          } else if (key === ACCESS_TOKEN_STORAGE_KEY) {
-            return;
-          } else {
-            throw new Error(`Unknown token key: ${key}`);
-          }
-        });
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ idToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
       });
@@ -449,4 +495,165 @@ describe('Browser', function() {
 
   });
 
+  describe('getUser', () => {
+    it('should be an alias method of token.getUserInfo', () => {
+      auth.token = {
+        getUserInfo: jest.fn().mockResolvedValue(undefined)
+      };
+      auth.getUser();
+      expect(auth.token.getUserInfo).toHaveBeenCalled();
+    });
+  });
+
+  describe('getIdToken', () => {
+    it('retrieves token from token manager', async () => {
+      expect.assertions(1);
+      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
+        accessToken: tokens.standardAccessTokenParsed,
+        idToken: tokens.standardIdTokenParsed
+      });
+      const retVal = await auth.getIdToken();
+      expect(retVal).toBe(tokens.standardIdToken);
+    });
+
+    it('catches exceptions', async () => {
+      auth.tokenManager.getTokens = jest.fn().mockImplementation(key => {
+        expect(key).toBe('idToken');
+        throw new Error('expected test error');
+      });
+      const retVal = await auth.getIdToken();
+      expect(retVal).toBe(undefined);
+    });
+  });
+
+  describe('getAccessToken', () => {
+    it('retrieves token from token manager', async () => {
+      expect.assertions(1);
+      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
+        accessToken: tokens.standardAccessTokenParsed,
+        idToken: tokens.standardIdTokenParsed
+      });
+      const retVal = await auth.getAccessToken();
+      expect(retVal).toBe(tokens.standardAccessToken);
+    });
+
+    it('catches exceptions', async () => {
+      auth.tokenManager.getTokens = jest.fn().mockImplementation(key => {
+        expect(key).toBe('accessToken');
+        throw new Error('expected test error');
+      });
+      const retVal = await auth.getAccessToken();
+      expect(retVal).toBe(undefined);
+    });
+  });
+
+  describe('loginRedirect', () => {
+    beforeEach(() => {
+      auth.setFromUri = jest.fn();
+      auth.token.getWithRedirect = jest.fn();
+    });
+    it('If a URI is passed, it calls setFromUri', async () => {
+      const uri = 'https://foo.random';
+      await auth.loginRedirect(uri);
+      expect(auth.setFromUri).toHaveBeenCalledWith(uri);
+    });
+    it('If no URI is passed, it does not call setFromUri', async () => {
+      await auth.loginRedirect();
+      expect(auth.setFromUri).not.toHaveBeenCalled();
+    });
+    it('Sets responseType and scopes from config if none supplied', async () => {
+      auth.options = {
+        responseType: ['fake'], 
+        scopes: ['openid', 'fake']
+      };
+      const uri = 'https://foo.random';
+      await auth.loginRedirect(uri);
+      expect(auth.token.getWithRedirect).toHaveBeenCalledWith({
+        responseType: ['fake'],
+        scopes: ['openid', 'fake'],
+      });
+    });
+    it('Accepts additional parameters, which override config values', async () => {
+      const uri = 'https://foo.random';
+      const params = {
+        responseType: ['token', 'something'],
+        scopes: ['openid', 'foo'],
+        unknownParameter: 'super random',
+        unkownSection: {
+          other: 'stuff'
+        }
+      };
+      await auth.loginRedirect(uri, params);
+      expect(auth.token.getWithRedirect).toHaveBeenCalledWith(params);
+    });
+    it('Values for "scopes" and "responseType" can be completely overridden from base values', async () => {
+      auth.options = {
+        scopes: ['foo', 'bar', 'openid'],
+        responseType: ['unknown'],
+      };
+      const uri = 'https://foo.random';
+      const params2 = {
+        scopes: ['something', 'different'],
+        responseType: ['also', 'different'],
+      };
+      await auth.loginRedirect(uri, params2);
+      expect(auth.token.getWithRedirect).toHaveBeenCalledWith(params2);
+    });
+  });
+
+  describe('handleAuthentication', () => {
+    beforeEach(() => {
+      auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
+        tokens: { idToken: 'fakeIdToken', accessToken: 'fakeAccessToken' }
+      });
+      auth.tokenManager.setTokens = jest.fn();
+    });
+    it('calls parseFromUrl', async () => {
+      await auth.handleAuthentication();
+      expect(auth.token.parseFromUrl).toHaveBeenCalled();
+    });
+    it('stores tokens', async () => {
+      const accessToken = { accessToken: 'foo' };
+      const idToken = { idToken: 'bar' };
+      auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
+        tokens: { accessToken, idToken }
+      });
+      await auth.handleAuthentication();
+      expect(auth.tokenManager.setTokens).toHaveBeenCalledWith({ accessToken, idToken });
+    });
+  });
+
+  describe('setFromUri', () => {
+    it('should save the "referrerPath" in sessionStorage', () => {
+      sessionStorage.setItem('referrerPath', '');
+      expect(sessionStorage.getItem('referrerPath')).toBe('');
+      const uri = 'https://foo.random';
+      auth.setFromUri(uri);
+      const val = sessionStorage.getItem('referrerPath');
+      expect(val).toBe(uri);
+    });
+    it('should save the window.location.href by default', () => {
+      sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, '');
+      expect(sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY)).toBe('');
+      auth.setFromUri();
+      const val = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY);
+      expect(val).toBe(window.location.href);
+    });
+  });
+
+  describe('getFromUri', () => {
+    it('cleares referrer from localStorage', () => {
+      const TEST_VALUE = 'foo-bar';
+      sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, TEST_VALUE);
+      const res = auth.getFromUri();
+      expect(res).toBe(TEST_VALUE);
+      expect(sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY)).not.toBeTruthy();
+    });
+    it('returns window.location.origin if nothing was set', () => {
+      sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, '');
+      const res = auth.getFromUri();
+      expect(res).toBe(window.location.origin);
+      expect(sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY)).not.toBeTruthy();
+    });
+  });
 });

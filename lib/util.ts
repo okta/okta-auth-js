@@ -278,3 +278,20 @@ export function delay(ms) {
 export function isPromise(obj) {
   return obj && obj.finally && (typeof obj.finally === 'function');
 }
+
+// browser only
+export function getUrlParts(url) {
+  const a = document.createElement('a');
+  a.href = url;
+
+  return {
+    href: a.href,
+    host: a.host,
+    hostname: a.hostname,
+    port: a.port,
+    pathname: a.pathname,
+    protocol: a.protocol,
+    hash: a.hash,
+    search: a.search
+  };
+}
