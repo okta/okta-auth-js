@@ -614,11 +614,15 @@ This flow Calls `onAuthRequired` function if it was set on the initial configura
 For more information on the options, see the [loginRedirect](#loginRedirectfromuri-additionalparams) method below.
 
 ```javascript
-// Start the browser based oidc flow, then parse tokens from the redirect callback url
-authClient.signIn();
-
-// Then call handleAuthentication to store tokens when redirect back from OKTA
-authClient.handleAuthentication();
+if (authClient.token.isLoginRedirect()) {
+  // Call handleAuthentication to store tokens when redirect back from OKTA
+  authClient.handleAuthentication();
+} else if (!authClient.authStateManager.getAuthState().isAuthenticated) {
+  // Start the browser based oidc flow, then parse tokens from the redirect callback url
+  authClient.signIn();
+} else {
+  // user is authenticated
+}
 ```
 
 #### custom signIn with session cookie
@@ -2290,7 +2294,7 @@ Gets latest evaluated `authState` from the `authStateManager`. The `authState` (
 
 #### `authStateManager.updateAuthState()`
 
-Evaludates `authState` (a unique new object) based on tokens in `tokenManager` or custom `isAuthenticated` callback, then emit `authStateChange` event with latest evaludated `authState`. By default, the evaluation process is driven by tokens change. Might be need to be triggered manually for users that pass override of `isAuthenticated` to the [configuration](#configuration-reference).
+Produces a unique `authState` object and emits an `authStateChange` event. The [authState](#authstatemanager) object contains tokens from the `tokenManager` and the results of the [isAuthenticated](#isauthenticated) callback. By default, [isAuthenticated](#isauthenticated) will be true if both `idToken` and `accessToken` are present. This logic can be customized by defining a custom [isAuthenticated](#isauthenticated) function.
 
 #### `authStateManager.subscribe(handler)`
 
