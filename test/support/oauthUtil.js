@@ -377,12 +377,10 @@ oauthUtil.setupRedirect = function(opts) {
   var windowLocationMock = util.mockSetWindowLocation(client);
   var setCookieMock = util.mockSetCookie();
 
-  jest.spyOn(storageUtil, 'getSessionStorage')
-    .mockImplementation(() => ({
-      setItem: jest.fn()
-    }));
-  jest.spyOn(storageUtil, 'browserHasSessionStorage')
-    .mockImplementation(() => !!opts.hasSessionStorage);
+  storageUtil.getSessionStorage = jest.fn().mockReturnValue({
+    setItem: jest.fn()
+  });
+  storageUtil.browserHasSessionStorage = jest.fn().mockReturnValue(!!opts.hasSessionStorage);
 
   var promise;
   if (Array.isArray(opts.getWithRedirectArgs)) {
@@ -450,13 +448,11 @@ oauthUtil.setupParseUrl = function(opts) {
   util.mockGetCookie(opts.oauthParams);
   var deleteCookieMock = util.mockDeleteCookie();
 
-  jest.spyOn(storageUtil, 'getSessionStorage')
-    .mockImplementation(() => ({
-      getItem: jest.fn().mockReturnValue(opts.oauthParams || ''),
-      removeItem: jest.fn()
-    }));
-  jest.spyOn(storageUtil, 'browserHasSessionStorage')
-    .mockImplementation(() => !!opts.hasSessionStorage);
+  storageUtil.getSessionStorage = jest.fn().mockReturnValue({
+    getItem: jest.fn().mockReturnValue(opts.oauthParams || ''),
+    removeItem: jest.fn()
+  });
+  storageUtil.browserHasSessionStorage = jest.fn().mockReturnValue(!!opts.hasSessionStorage);
 
   return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {
