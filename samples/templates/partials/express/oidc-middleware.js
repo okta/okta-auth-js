@@ -5,7 +5,7 @@ app.get('{{ redirectPath }}', function(req, res) {
 
   // state can be any string. In this sample are using it to store our config
   const state = JSON.parse(req.query.state);
-  const { issuer, clientId, clientSecret } = state;
+  const { issuer, clientId, clientSecret, username } = state;
 
   const postData = querystring.stringify({
     'grant_type': 'authorization_code',
@@ -47,13 +47,12 @@ app.get('{{ redirectPath }}', function(req, res) {
   }).on('error', (err) => {
     console.log('Error: ' + err.message);
 
-    error = err;
+    const error = err;
 
     // Return data to the client-side
     const qs = querystring.stringify({
       username,
       issuer,
-      status,
       error: error.toString(),
     });
     res.redirect('/?' + qs);

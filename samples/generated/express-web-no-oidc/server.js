@@ -35,6 +35,7 @@ app.post('/login', function(req, res) {
   .then(function(transaction) {
     status = transaction.status;
     sessionToken = transaction.sessionToken;
+    error = transaction.error;
 
     // Return data to the client-side
     const qs = querystring.stringify({

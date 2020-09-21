@@ -53,6 +53,7 @@ app.post('/login', function(req, res) {
   .then(function(transaction) {
     status = transaction.status;
     sessionToken = transaction.sessionToken;
+    error = transaction.error;
 
     {{#if oidc}}
     const clientId = req.body.clientId;
