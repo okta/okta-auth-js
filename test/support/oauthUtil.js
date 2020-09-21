@@ -377,6 +377,11 @@ oauthUtil.setupRedirect = function(opts) {
   var windowLocationMock = util.mockSetWindowLocation(client);
   var setCookieMock = util.mockSetCookie();
 
+  storageUtil.getSessionStorage = jest.fn().mockReturnValue({
+    setItem: jest.fn()
+  });
+  storageUtil.browserHasSessionStorage = jest.fn().mockReturnValue(!!opts.hasSessionStorage);
+
   var promise;
   if (Array.isArray(opts.getWithRedirectArgs)) {
     promise = client.token.getWithRedirect.apply(null, opts.getWithRedirectArgs);
@@ -440,8 +445,14 @@ oauthUtil.setupParseUrl = function(opts) {
     });
   }
 
-  util.mockGetCookie(opts.oauthCookie);
+  util.mockGetCookie(opts.oauthParams);
   var deleteCookieMock = util.mockDeleteCookie();
+
+  storageUtil.getSessionStorage = jest.fn().mockReturnValue({
+    getItem: jest.fn().mockReturnValue(opts.oauthParams || ''),
+    removeItem: jest.fn()
+  });
+  storageUtil.browserHasSessionStorage = jest.fn().mockReturnValue(!!opts.hasSessionStorage);
 
   return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {

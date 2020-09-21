@@ -2221,7 +2221,7 @@ describe('token.parseFromUrl', function() {
       },
       searchMock: '?code=fake' +
       '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['code'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -2246,7 +2246,7 @@ describe('token.parseFromUrl', function() {
       parseFromUrlArgs: 'http://example.com#id_token=' + tokens.standardIdToken +
         '&access_token=' + tokens.standardAccessToken +
         '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2275,7 +2275,7 @@ describe('token.parseFromUrl', function() {
           '&access_token=' + tokens.standardAccessToken +    
           '&state=' + oauthUtil.mockedState,
       },
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2308,7 +2308,7 @@ describe('token.parseFromUrl', function() {
       },
       searchMock: '?code=fake' + 
         '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2345,7 +2345,7 @@ describe('token.parseFromUrl', function() {
       },
       hashMock: '#code=fake' + 
         '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2380,7 +2380,7 @@ describe('token.parseFromUrl', function() {
       },
       hashMock: '#code=fake' +
       '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['token', 'id_token'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -2412,7 +2412,7 @@ describe('token.parseFromUrl', function() {
       noHistory: true,
       hashMock: '#id_token=' + tokens.standardIdToken +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: 'id_token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -2442,7 +2442,7 @@ describe('token.parseFromUrl', function() {
     return oauthUtil.setupParseUrl({
       hashMock: '#id_token=' + tokens.standardIdToken +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: 'id_token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -2472,7 +2472,7 @@ describe('token.parseFromUrl', function() {
     return oauthUtil.setupParseUrl({
       hashMock: '#id_token=' + tokens.authServerIdToken +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: 'id_token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -2500,7 +2500,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: 'token',
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2528,7 +2528,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: 'token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -2557,7 +2557,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['id_token', 'token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2587,7 +2587,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['id_token', 'token'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -2613,7 +2613,7 @@ describe('token.parseFromUrl', function() {
     {
       setupMethod: oauthUtil.setupParseUrl,
       hashMock: '',
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['id_token', 'token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2637,7 +2637,7 @@ describe('token.parseFromUrl', function() {
     }
   );
 
-  oauthUtil.itpErrorsCorrectly('throws an error if no cookie set',
+  oauthUtil.itpErrorsCorrectly('throws an error if no oauth redirect params are set',
     {
       setupMethod: oauthUtil.setupParseUrl,
       hashMock: '#access_token=' + tokens.standardAccessToken +
@@ -2645,13 +2645,13 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: ''
+      oauthParams: ''
     },
     {
       name: 'AuthSdkError',
-      message: 'Unable to retrieve OAuth redirect params cookie',
+      message: 'Unable to retrieve OAuth redirect params from storage',
       errorCode: 'INTERNAL',
-      errorSummary: 'Unable to retrieve OAuth redirect params cookie',
+      errorSummary: 'Unable to retrieve OAuth redirect params from storage',
       errorLink: 'INTERNAL',
       errorId: 'INTERNAL',
       errorCauses: []
@@ -2666,7 +2666,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['id_token', 'token'],
         state: 'mismatchedState',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -2698,7 +2698,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthCookie: JSON.stringify({
+      oauthParams: JSON.stringify({
         responseType: ['id_token', 'token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'mismatchedNonce',
@@ -2728,7 +2728,7 @@ describe('token.parseFromUrl', function() {
               '&expires_in=3600' +
               '&token_type=Bearer' +
               '&state=' + oauthUtil.mockedState,
-    oauthCookie: JSON.stringify({
+    oauthParams: JSON.stringify({
       responseType: ['id_token', 'token'],
       state: oauthUtil.mockedState,
       nonce: oauthUtil.mockedNonce,
@@ -2757,7 +2757,7 @@ describe('token.parseFromUrl', function() {
               '&expires_in=3600' +
               '&token_type=Bearer' +
               '&state=' + oauthUtil.mockedState,
-    oauthCookie: JSON.stringify({
+    oauthParams: JSON.stringify({
       responseType: ['id_token', 'token'],
       state: oauthUtil.mockedState,
       nonce: oauthUtil.mockedNonce,
