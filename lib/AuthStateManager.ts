@@ -131,7 +131,7 @@ class AuthStateManager {
             isPending = shouldEvaluateIsPending();
           }
           let promise = isAuthenticated 
-            ? isAuthenticated(this._sdk)
+            ? isAuthenticated(this._sdk, isPending)
             : Promise.resolve(!!(accessToken && idToken));
 
           promise

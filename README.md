@@ -444,13 +444,13 @@ Callback function. By default, the SDK will consider a user authenticated if bot
 authClient.authStateManager.updateAuthState();
 ```
 
-This callback function receives the sdk instance as the first function parameter.
+This callback function receives the sdk instance as the first function parameter and [isPending](#authstatemanager) state as the second parameter.
 
 ##### `onAuthRequired`
 
-> :warning: DO NOT trigger `authClient.signIn()` in this callback. This callback is used inside the `login` method, call it again will trigger the protection logic to end the function.
+> :warning: DO NOT trigger `authClient.signInWithRedirect()` in this callback. This callback is used inside the `signInWithRedirect` method, call it again will trigger the protection logic to end the function.
 
-Callback function. Called when authentication is required. This callback is triggered when [signIn](#signinoptions) method execute the `browser-based OpenID Connect` flows.
+Callback function. Called when authentication is required. When this callback is avaliable, the provided flow is executed as an alternative of the default redirect signIn flow.
 
 This callback function receives the sdk instance as the first function parameter.
 
@@ -539,6 +539,9 @@ var config = {
 ## API Reference
 
 * [signIn](#signinoptions)
+* [signInWithCredentials](#signinwithcredentialsoptions)
+* [signInWithRedirect](#signinwithredirectoptions)
+* [handleAuthentication](#handleauthentication)
 * [signOut](#signout)
 * [closeSession](#closesession)
 * [revokeAccessToken](#revokeaccesstokenaccesstoken)
@@ -547,13 +550,9 @@ var config = {
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [webfinger](#webfingeroptions)
 * [fingerprint](#fingerprintoptions)
-* [loginRedirect](#loginRedirectfromuri-additionalparams)
 * [getUser](#getuser)
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
-* [handleAuthentication](#handleauthentication)
-* [setFromUri](#setfromuriuri)
-* [getFromUri](#getfromurirelative)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -603,29 +602,8 @@ var config = {
 
 ### `signIn(options)`
 
+> :warning: This method will be deprecated in the next major release, use [signInWithCredentials](#signinwithcredentialsoptions) instead.
 > :hourglass: async
-
-This method supports both `browser-based OpenID Connect` and `custom signIn with session cookie` flows by accepting different signInOptions. If the provided options are not valid for `custom signIn with session cookie`, this method fallbacks to the `browser-based OpenID Connect` flow.
-
-#### browser-based OpenID Connect flows
-
-This flow Calls `onAuthRequired` function if it was set on the initial configuration. Otherwise, it will call [loginRedirect](#loginRedirectfromuri-additionalparams). In this flow, there is a fromUri parameter in options to push the user to after successful authentication, and the addtional params are mapped to the [Authorize options](#authorize-options).
-
-For more information on the options, see the [loginRedirect](#loginRedirectfromuri-additionalparams) method below.
-
-```javascript
-if (authClient.token.isLoginRedirect()) {
-  // Call handleAuthentication to store tokens when redirect back from OKTA
-  authClient.handleAuthentication();
-} else if (!authClient.authStateManager.getAuthState().isAuthenticated) {
-  // Start the browser based oidc flow, then parse tokens from the redirect callback url
-  authClient.signIn();
-} else {
-  // user is authenticated
-}
-```
-
-#### custom signIn with session cookie
 
 The goal of this authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
 
@@ -649,6 +627,33 @@ authClient.signIn({
   console.error(err);
 });
 ```
+
+### `signInWithCredentials(options)`
+
+Alias method of [signIn method](#signinoptions).
+
+### `signInWithRedirect(options)`
+
+This method Calls `onAuthRequired` function if it was set on the initial configuration. Otherwise, it will start the default full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a fromUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
+You can use [handleAuthentication method](#handleauthentication) to store tokens and clear the intermediate state (the fromUri) after successful authentication.
+
+```javascript
+if (authClient.token.isLoginRedirect()) {
+  // Call handleAuthentication to store tokens when redirect back from OKTA
+  authClient.handleAuthentication();
+} else if (!authClient.authStateManager.getAuthState().isAuthenticated) {
+  // Start the browser based oidc flow, then parse tokens from the redirect callback url
+  authClient.signInWithRedirect();
+} else {
+  // user is authenticated
+}
+```
+
+### `handleAuthentication()`
+
+> :hourglass: async
+
+Parses tokens from the redirect url and stores them. Resolves to the [fromUri](#signinwithredirectoptions) or `null` if no fromUri has been set.
 
 ### `signOut()`
 
@@ -857,20 +862,6 @@ authClient.fingerprint()
 })
 ```
 
-### `loginRedirect(fromUri, additionalParams)`
-
-> :hourglass: async
-
-Performs a full-page redirect to Okta with optional request parameters.
-
-The `additionalParams` accepts [token authorize options](#authorize-options).As an example, if you have an Okta `sessionToken`, you can bypass the full-page redirect by passing in this token.
-
-```javascript
-authClient.loginRedirect({
-  sessionToken: '{sampleSessionToken}'
-});
-```
-
 ### `getUser()`
 
 > :hourglass: async
@@ -888,20 +879,6 @@ Resolves with the id token string retrieved from storage if it exists. Devs shou
 > :hourglass: async
 
 Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
-
-### `handleAuthentication()`
-
-> :hourglass: async
-
-Parses tokens from the redirect url and stores them.
-
-### `setFromUri(uri?)`
-
-Store the current URL state before a redirect occurs. If a relative path is passed it will be converted to an absolute URI before storage.
-
-### `getFromUri(relative?)`
-
-Returns the stored URI string stored by [setFromUri](#setfromuriuri) and removes it from storage.  A relative uri is returned if `relative` is true.
 
 ### `tx.resume()`
 
@@ -2295,6 +2272,15 @@ Gets latest evaluated `authState` from the `authStateManager`. The `authState` (
 #### `authStateManager.updateAuthState()`
 
 Produces a unique `authState` object and emits an `authStateChange` event. The [authState](#authstatemanager) object contains tokens from the `tokenManager` and the results of the [isAuthenticated](#isauthenticated) callback. By default, [isAuthenticated](#isauthenticated) will be true if both `idToken` and `accessToken` are present. This logic can be customized by defining a custom [isAuthenticated](#isauthenticated) function.
+
+The app needs call this method to call this method to initial the [authState](#authstatemanager).
+
+```javascript
+if (!authClient.token.isLoginRedirect()) {
+  // Trigger an initial authState change event when the app startup
+  authClient.authStateManager.updateAuthState();
+}
+```
 
 #### `authStateManager.subscribe(handler)`
 

@@ -61,8 +61,7 @@ import {
   FingerprintAPI,
   UserClaims, 
   SigninWithRedirectOptions,
-  isSignInWithCredentialsOptions,
-  TokenParams
+  SignInWithCredentialsOptions
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
@@ -210,48 +209,57 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.authStateManager = new AuthStateManager(this);
   }
 
+  // TODO: deprecate in 5.0
   signIn(opts) {
-    const loginWithCredential = (opts) => {
-      opts = clone(opts || {});
-      const _postToTransaction = (options?) => {
-        delete opts.sendFingerprint;
-        return postToTransaction(this, '/api/v1/authn', opts, options);
-      };
-      if (!opts.sendFingerprint) {
-        return _postToTransaction();
-      }
-      return this.fingerprint()
-      .then(function(fingerprint) {
-        return _postToTransaction({
-          headers: {
-            'X-Device-Fingerprint': fingerprint
-          }
-        });
-      });
-    };
+    console.warn('AuthSdkWarn: this method will be deprecated in v5.0, please use signInWithCredentials() instead.');
 
-    const loginWithRedirect = async (opts: SigninWithRedirectOptions = {}) => {
-      if(this._pending.handleLogin) { 
-        // Don't trigger second round
-        return;
-      }
-  
-      this._pending.handleLogin = true;
-      this.setFromUri(opts.fromUri);
-      try {
-        if (this.options.onAuthRequired) {
-          return await this.options.onAuthRequired(this);
+    opts = clone(opts || {});
+    const _postToTransaction = (options?) => {
+      delete opts.sendFingerprint;
+      return postToTransaction(this, '/api/v1/authn', opts, options);
+    };
+    if (!opts.sendFingerprint) {
+      return _postToTransaction();
+    }
+    return this.fingerprint()
+    .then(function(fingerprint) {
+      return _postToTransaction({
+        headers: {
+          'X-Device-Fingerprint': fingerprint
         }
-        return await this.loginRedirect(undefined, opts);
-      } finally {
-        this._pending.handleLogin = null;
-      }
-    };
+      });
+    });
+  }
 
-    if (isSignInWithCredentialsOptions(opts)) {
-      return loginWithCredential(opts);
-    } else {
-      return loginWithRedirect(opts);
+  // Alias method of signIn()
+  signInWithCredentials(opts: SignInWithCredentialsOptions) {
+    return this.signIn(opts);
+  }
+
+  async signInWithRedirect({ fromUri, ...additionalParams }: SigninWithRedirectOptions = {}) {
+    if(this._pending.handleLogin) { 
+      // Don't trigger second round
+      return;
+    }
+
+    this._pending.handleLogin = true;
+    const { onAuthRequired, scopes, responseType } = this.options;
+    try {
+      if (onAuthRequired) {
+        return await onAuthRequired(this);
+      }
+
+      // Trigger default signIn redirect flow
+      if (fromUri) {
+        sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
+      }
+      const params = Object.assign({
+        scopes: scopes || ['openid', 'email', 'profile'],
+        responseType: responseType || ['id_token', 'token']
+      }, additionalParams);
+      return this.token.getWithRedirect(params);
+    } finally {
+      this._pending.handleLogin = null;
     }
   }
   
@@ -354,24 +362,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   //
-  // Methods from dowstream SDKs' AuthService
+  // Common Methods from dowstream SDKs
   //
-
-  // Common APIs
-
-  async loginRedirect(fromUri?: string, additionalParams?: TokenParams): Promise<void> {
-    if (fromUri) {
-      this.setFromUri(fromUri);
-    }
-
-    const { scopes, responseType } = this.options;
-    const params = Object.assign({
-      scopes: scopes || ['openid', 'email', 'profile'],
-      responseType: responseType || ['id_token', 'token']
-    }, additionalParams);
-
-    return this.token.getWithRedirect(params);
-  }
 
   async getUser(): Promise<UserClaims> {
     return this.token.getUserInfo();
@@ -395,30 +387,14 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
   }
 
-  async handleAuthentication(): Promise<void> {
+  /**
+   * Store parsed tokens from redirect url and clean intermediate state
+   */
+  async handleAuthentication(): Promise<string | null> {
     const { tokens } = await this.token.parseFromUrl();
     this.tokenManager.setTokens(tokens);
-  }
-
-  setFromUri(fromUri?: string): void {
-    // Use current location if fromUri was not passed
-    fromUri = fromUri || window.location.href;
-    // If a relative path was passed, convert to absolute URI
-    if (fromUri.charAt(0) === '/') {
-      fromUri = window.location.origin + fromUri;
-    }
-    sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
-  }
-
-  getFromUri(relative = false): string {
-    let fromUri = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
+    const fromUri = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY);
     sessionStorage.removeItem(REFERRER_PATH_STORAGE_KEY);
-    if (!relative) {
-      return fromUri;
-    }
-
-    const { pathname, search, hash } = getUrlParts(fromUri);
-    fromUri = `${pathname}${search}${hash}`;
     return fromUri;
   }
 }

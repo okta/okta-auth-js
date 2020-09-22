@@ -56,7 +56,7 @@ export interface OktaAuthOptions extends CustomUrls {
   transformErrorXHR?: (xhr: object) => any;
   headers?: object;
   maxClockSkew?: number;
-  isAuthenticated?: (oktaAuth: OktaAuth) => Promise<boolean>;
+  isAuthenticated?: (oktaAuth: OktaAuth, isPending: boolean) => Promise<boolean>;
   onAuthRequired?: (oktaAuth: OktaAuth) => void;
   devMode?: boolean; 
 }
