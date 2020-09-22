@@ -1,5 +1,5 @@
 /* eslint-disable no-new */
-/* global window, sessionStorage */
+/* global window */
 jest.mock('cross-fetch');
 jest.mock('../../lib/tx');
 
@@ -153,7 +153,7 @@ describe('Browser', function() {
     it('should add fromUri to sessionStorage if provided in options', async () => {
       const fromUri = 'notrandom';
       await auth.signInWithRedirect({ fromUri });
-      expect(setItemMock).toHaveBeenCalledWith('referrerPath', fromUri);
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, fromUri);
     });
 
     it('should not add fromUri to sessionStorage if no fromUri in options', async () => {
