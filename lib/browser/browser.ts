@@ -210,7 +210,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   // TODO: deprecate in 5.0
   signIn(opts) {
-    console.warn('AuthSdkWarn: this method will be deprecated in v5.0, please use signInWithCredentials() instead.');
+    console.warn('This method will be deprecated in v5.0, please use signInWithCredentials() instead.');
 
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {
@@ -230,7 +230,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     });
   }
 
-  // Alias method of signIn()
+  /**
+   * Alias method of signIn()
+   */ 
   signInWithCredentials(opts: SignInWithCredentialsOptions) {
     return this.signIn(opts);
   }
@@ -246,15 +248,15 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     try {
       // Trigger default signIn redirect flow
       if (fromUri) {
-        sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
+        browserStorage.getSessionStorage().setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
       }
       const params = Object.assign({
         scopes: scopes || ['openid', 'email', 'profile'],
         responseType: responseType || ['id_token', 'token']
       }, additionalParams);
-      return this.token.getWithRedirect(params);
+      await this.token.getWithRedirect(params);
     } finally {
-      this._pending.handleLogin = null;
+      this._pending.handleLogin = false;
     }
   }
   
@@ -388,8 +390,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   async handleAuthentication(): Promise<string | null> {
     const { tokens } = await this.token.parseFromUrl();
     this.tokenManager.setTokens(tokens);
-    const fromUri = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY);
-    sessionStorage.removeItem(REFERRER_PATH_STORAGE_KEY);
+    const storage = browserStorage.getSessionStorage();
+    const fromUri = storage.getItem(REFERRER_PATH_STORAGE_KEY);
+    storage.removeItem(REFERRER_PATH_STORAGE_KEY);
     return fromUri;
   }
 }
