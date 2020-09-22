@@ -122,8 +122,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       transformErrorXHR: args.transformErrorXHR,
       cookies: cookieSettings,
       scopes: args.scopes,
-      isAuthenticated: args.isAuthenticated,
-      onAuthRequired: args.onAuthRequired
+      isAuthenticated: args.isAuthenticated
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
@@ -243,12 +242,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
 
     this._pending.handleLogin = true;
-    const { onAuthRequired, scopes, responseType } = this.options;
+    const { scopes, responseType } = this.options;
     try {
-      if (onAuthRequired) {
-        return await onAuthRequired(this);
-      }
-
       // Trigger default signIn redirect flow
       if (fromUri) {
         sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);

@@ -446,14 +446,6 @@ authClient.authStateManager.updateAuthState();
 
 This callback function receives the sdk instance as the first function parameter and [isPending](#authstatemanager) state as the second parameter.
 
-##### `onAuthRequired`
-
-> :warning: DO NOT trigger `authClient.signInWithRedirect()` in this callback. This callback is used inside the `signInWithRedirect` method, call it again will trigger the protection logic to end the function.
-
-Callback function. Called when authentication is required. When this callback is avaliable, the provided flow is executed as an alternative of the default redirect signIn flow.
-
-This callback function receives the sdk instance as the first function parameter.
-
 ##### `devMode`
 
 Default to `false`. It enables debugging logs when set to `true`.
@@ -634,7 +626,7 @@ Alias method of [signIn method](#signinoptions).
 
 ### `signInWithRedirect(options)`
 
-This method Calls `onAuthRequired` function if it was set on the initial configuration. Otherwise, it will start the default full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a fromUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
+Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a fromUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
 You can use [handleAuthentication method](#handleauthentication) to store tokens and clear the intermediate state (the fromUri) after successful authentication.
 
 ```javascript

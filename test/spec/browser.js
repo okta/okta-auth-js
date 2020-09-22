@@ -113,13 +113,6 @@ describe('Browser', function() {
         expect(auth.loginRedirect).toHaveBeenCalled();
       });
   
-      it('calls onAuthRequired, if provided, instead of loginRedirect', async () => {
-        auth.options.onAuthRequired = jest.fn().mockResolvedValue();
-        await auth.signIn();
-        expect(auth.loginRedirect).not.toHaveBeenCalled();
-        expect(auth.options.onAuthRequired).toHaveBeenCalledWith(auth);
-      });
-  
       it('Calls setFromUri with fromUri, if provided', () => {
         const fromUri = 'notrandom';
         auth.signIn({ fromUri });
