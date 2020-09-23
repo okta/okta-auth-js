@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-/* global localStorage, sessionStorage */
+/* global window, localStorage, sessionStorage */
 /* eslint complexity:[0,8] max-statements:[0,21] */
 import { removeNils, warn, isObject, clone, isIE11OrLess } from './util';
 import AuthSdkError from './errors/AuthSdkError';
@@ -203,7 +203,15 @@ function getTokens(storage): Promise<Tokens> {
   });
 }
 
-function setTokens(sdk, tokenMgmtRef, storage, { accessToken, idToken }: Tokens, accessTokenCb?: Function, idTokenCb?: Function): void {
+/* eslint-disable max-params */
+function setTokens(
+  sdk, 
+  tokenMgmtRef, 
+  storage, 
+  { accessToken, idToken }: Tokens, 
+  accessTokenCb?: Function, 
+  idTokenCb?: Function
+): void {
   if (idToken) {
     validateToken(idToken);
   }
@@ -236,6 +244,7 @@ function setTokens(sdk, tokenMgmtRef, storage, { accessToken, idToken }: Tokens,
     }
   }
 }
+/* eslint-enable max-params */
 
 function remove(tokenMgmtRef, storage, key) {
   // Clear any listener for this token
@@ -285,7 +294,7 @@ function renew(sdk, tokenMgmtRef, storage, key) {
           emitRenewed(tokenMgmtRef, accessTokenKey, accessToken, oldTokenStorage[accessTokenKey]),
         (idTokenKey, idToken) =>
           emitRenewed(tokenMgmtRef, idTokenKey, idToken, oldTokenStorage[idTokenKey])
-      )
+      );
 
       // return freshToken by key
       const freshToken = get(storage, key);
@@ -353,8 +362,7 @@ function getTokensFromStorageValue(value) {
     tokens = {};
   }
   return tokens;
-};
-
+}
 
 export class TokenManager {
   get: (key: string) => Promise<Token>;

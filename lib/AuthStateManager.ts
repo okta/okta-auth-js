@@ -17,7 +17,6 @@ const DEFAULT_PENDING = {
 };
 const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 const MAX_PROMISE_CANCEL_TIMES = 10;
-const EVENT_UPDATED_CROSS_TABS = 'updated-cross-tabs';
 
 // only compare first level of authState
 const isSameAuthState = (prevState: AuthState, state: AuthState) => {
@@ -101,7 +100,6 @@ export class AuthStateManager {
       devMode && log('emitted');
     };
 
-    // do not re-evaluate "isPending" for "updated" event (cross tab sync) in IE
     const shouldEvaluateIsPending = () => (autoRenew || autoRemove);
 
     if (this._pending.updateAuthStatePromise) {

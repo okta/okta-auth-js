@@ -1,4 +1,4 @@
-/* global window, localStorage, sessionStorage */
+/* global window, localStorage, sessionStorage, StorageEvent */
 
 // Promise.allSettled is added in Node 12.10
 import allSettled from 'promise.allsettled';
@@ -10,7 +10,7 @@ import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../lib/clock';
-import { TokenManager } from '../../lib/TokenManager'
+import { TokenManager } from '../../lib/TokenManager';
 
 // Expected settings on HTTPS
 var secureCookieSettings = {
