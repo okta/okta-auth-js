@@ -12,7 +12,7 @@
  */
 /* global localStorage, sessionStorage */
 /* eslint complexity:[0,8] max-statements:[0,21] */
-import { removeNils, warn, isObject, clone } from './util';
+import { removeNils, warn, isObject, clone, isIE11OrLess } from './util';
 import AuthSdkError from './errors/AuthSdkError';
 import storageUtil from './browser/browserStorage';
 import { TOKEN_STORAGE_NAME } from './constants';
@@ -71,6 +71,25 @@ function emitError(tokenMgmtRef, error) {
   tokenMgmtRef.emitter.emit(EVENT_ERROR, error);
 }
 
+function emitEventsForCrossTabsStorageUpdate(tokenMgmtRef, newValue, oldValue) {
+  const oldTokens = getTokensFromStorageValue(oldValue);
+  const newTokens = getTokensFromStorageValue(newValue);
+  Object.keys(newTokens).forEach(key => {
+    const oldToken = oldTokens[key];
+    const newToken = newTokens[key];
+    if (JSON.stringify(oldToken) !== JSON.stringify(newTokens)) {
+      emitAdded(tokenMgmtRef, key, newToken);
+    }
+  });
+  Object.keys(oldTokens).forEach(key => {
+    const oldToken = oldTokens[key];
+    const newToken = newTokens[key];
+    if (!newToken) {
+      emitRemoved(tokenMgmtRef, key, oldToken);
+    }
+  });
+}
+
 function clearExpireEventTimeout(tokenMgmtRef, key) {
   clearTimeout(tokenMgmtRef.expireTimeouts[key]);
   delete tokenMgmtRef.expireTimeouts[key];
@@ -121,6 +140,11 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
     var token = tokenStorage[key];
     setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
   }
+}
+
+function resetExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
+  clearExpireEventTimeoutAll(tokenMgmtRef);
+  setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
 }
 
 function validateToken(token: Token) {
@@ -179,8 +203,7 @@ function getTokens(storage): Promise<Tokens> {
   });
 }
 
-function setTokens(sdk, tokenMgmtRef, storage, tokens: Tokens, accessTokenCb?: Function, idTokenCb?: Function): void {
-  const { accessToken, idToken } = tokens;
+function setTokens(sdk, tokenMgmtRef, storage, { accessToken, idToken }: Tokens, accessTokenCb?: Function, idTokenCb?: Function): void {
   if (idToken) {
     validateToken(idToken);
   }
@@ -189,12 +212,14 @@ function setTokens(sdk, tokenMgmtRef, storage, tokens: Tokens, accessTokenCb?: F
   }
   const idTokenKey = getKeyByType(storage, 'idToken') || ID_TOKEN_STORAGE_KEY;
   const accessTokenKey = getKeyByType(storage, 'accessToken') || ACCESS_TOKEN_STORAGE_KEY;
+
   // add token to storage
   const tokenStorage = { 
     ...(idToken && { [idTokenKey]: idToken }),
     ...(accessToken && { [accessTokenKey]: accessToken })
   };
   storage.setStorage(tokenStorage);
+
   // emit event and start expiration timer
   if (idToken) {
     emitAdded(tokenMgmtRef, idTokenKey, idToken);
@@ -320,6 +345,17 @@ function shouldThrottleRenew(renewTimeQueue) {
   return res;
 }
 
+function getTokensFromStorageValue(value) {
+  let tokens;
+  try {
+    tokens = JSON.parse(value) || {};
+  } catch (e) {
+    tokens = {};
+  }
+  return tokens;
+};
+
+
 export class TokenManager {
   get: (key: string) => Promise<Token>;
   add: (key: string, token: Token) => void;
@@ -338,6 +374,9 @@ export class TokenManager {
   _clearExpireEventTimeoutAll: () => void;
   // This is exposed read-only options for internal sdk use
   _getOptions: () => TokenManagerOptions;
+  // Expose cross tabs communication helper functions to tests
+  _resetExpireEventTimeoutAll: () => void;
+  _emitEventsForCrossTabsStorageUpdate: (newValue: string, oldValue: string) => void;
 
   constructor(sdk, options: TokenManagerOptions) {
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
@@ -431,6 +470,8 @@ export class TokenManager {
     this._getStorageKeyByType = getKeyByType.bind(this, storage);
     this._clearExpireEventTimeoutAll = clearExpireEventTimeoutAll.bind(this, tokenMgmtRef);
     this._getOptions = () => clone(options);
+    this._resetExpireEventTimeoutAll = resetExpireEventTimeoutAll.bind(this, sdk, tokenMgmtRef, storage);
+    this._emitEventsForCrossTabsStorageUpdate = emitEventsForCrossTabsStorageUpdate.bind(this, tokenMgmtRef);
   
     const renewTimeQueue = [];
     const onTokenExpiredHandler = (key) => {
@@ -448,5 +489,24 @@ export class TokenManager {
     this.on(EVENT_EXPIRED, onTokenExpiredHandler);
 
     setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
+
+    // Sync authState cross multiple tabs when localStorage is used as the storageProvider
+    window.addEventListener('storage', ({ key, newValue, oldValue }: StorageEvent) => {
+      const emitEventsAndResetExpireEventTimeouts = () => {
+        this._resetExpireEventTimeoutAll();
+        this._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+      };
+
+      if (key !== options.storageKey) {
+        return;
+      }
+      // LocalStorage cross tabs update is not synced in IE, set a 1s timer to read latest value
+      // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
+      if (isIE11OrLess() && newValue !== oldValue) {
+        setTimeout(() => emitEventsAndResetExpireEventTimeouts(), 1000);
+      } else {
+        emitEventsAndResetExpireEventTimeouts();
+      }
+    });
   }
 }

@@ -67,16 +67,6 @@ describe('AuthStateManager', () => {
       const instance = new AuthStateManager(sdkMock);
       expect(instance._authState).toMatchObject(DEFAULT_AUTH_STATE);
     });
-
-    it('should call updateAuthState when storage event happen with token storage key', () => {
-      const instance = new AuthStateManager(sdkMock);
-      instance.updateAuthState = jest.fn();
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'okta-token-storage', 
-        newValue: 'test_value' 
-      }));
-      expect(instance.updateAuthState).toHaveBeenCalled();
-    });
   });
 
   describe('getAuthState', () => {
