@@ -111,7 +111,7 @@ describe('Browser', function() {
     it('should console warning for deprecation', async () => {
       jest.spyOn(console, 'warn').mockReturnValue(null);
       await auth.signIn(options);
-      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: This method will be deprecated in v5.0, please use signInWithCredentials() instead.');
+      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: This method has been deprecated, please use signInWithCredentials() instead.');
     });
     it('should call "/api/v1/authn" endpoint with default options', async () => {
       await auth.signIn(options);

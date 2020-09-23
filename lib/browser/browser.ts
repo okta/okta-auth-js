@@ -208,9 +208,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.authStateManager = new AuthStateManager(this);
   }
 
-  // TODO: deprecate in 5.0
+  // TODO: This method is deprecated. Remove it in 5.0
   signIn(opts) {
-    deprecate('This method will be deprecated in v5.0, please use signInWithCredentials() instead.');
+    deprecate('This method has been deprecated, please use signInWithCredentials() instead.');
 
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {
@@ -359,7 +359,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   //
-  // Common Methods from dowstream SDKs
+  // Common Methods from downstream SDKs
   //
 
   async getUser(): Promise<UserClaims> {

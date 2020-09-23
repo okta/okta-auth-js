@@ -594,7 +594,7 @@ var config = {
 
 ### `signIn(options)`
 
-> :warning: This method will be deprecated in the next major release, use [signInWithCredentials](#signinwithcredentialsoptions) instead.
+> :warning: Deprecated, this method will be removed in next major release, use [signInWithCredentials](#signinwithcredentialsoptions) instead.
 > :hourglass: async
 
 The goal of this authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
