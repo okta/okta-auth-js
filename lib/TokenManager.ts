@@ -505,12 +505,17 @@ export class TokenManager {
         this._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
       };
 
-      if (key !== options.storageKey) {
+      // Skip if:
+      // not from localStorage.clear (event.key is null)
+      // event.key is not the storageKey
+      // oldValue === newValue
+      if ((key && key !== options.storageKey) || newValue === oldValue) {
         return;
       }
+
       // LocalStorage cross tabs update is not synced in IE, set a 1s timer to read latest value
       // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
-      if (isIE11OrLess() && newValue !== oldValue) {
+      if (isIE11OrLess()) {
         setTimeout(() => emitEventsAndResetExpireEventTimeouts(), 1000);
       } else {
         emitEventsAndResetExpireEventTimeouts();
