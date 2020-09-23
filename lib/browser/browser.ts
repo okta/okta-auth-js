@@ -18,7 +18,7 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryString, clone, getUrlParts } from '../util';
+import { removeTrailingSlash, toQueryString, clone, getUrlParts, warn, deprecate } from '../util';
 import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
@@ -100,7 +100,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     if (cookieSettings.secure && !this.features.isHTTPS()) {
       // eslint-disable-next-line no-console
-      console.warn(
+      warn(
         'The current page is not being served with the HTTPS protocol.\n' +
         'For security reasons, we strongly recommend using HTTPS.\n' +
         'If you cannot use HTTPS, set "cookies.secure" option to false.'
@@ -210,7 +210,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
   // TODO: deprecate in 5.0
   signIn(opts) {
-    console.warn('This method will be deprecated in v5.0, please use signInWithCredentials() instead.');
+    deprecate('This method will be deprecated in v5.0, please use signInWithCredentials() instead.');
 
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {

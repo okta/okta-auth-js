@@ -81,6 +81,20 @@ describe('AuthStateManager', () => {
       sdkMock.tokenManager.hasExpired = jest.fn().mockReturnValue(false);
     });
 
+    it('should log console warning if no listener is registered for authStateChange', () => {
+      jest.spyOn(console, 'warn').mockReturnValue(null);
+      const instance = new AuthStateManager(sdkMock);
+      instance.updateAuthState();
+      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] WARN: updateAuthState is an asynchronous method with no return, please subscribe to the latest authState update with authStateManager.subscribe(handler) method before calling updateAuthState.');
+    });
+    it('should not log console warning if listener is registered for authStateChange', () => {
+      jest.spyOn(console, 'warn').mockReturnValue(null);
+      const instance = new AuthStateManager(sdkMock);
+      instance.subscribe(() => {});
+      instance.updateAuthState();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
     it('should emit an authState with isAuthenticated === true', () => {
       expect.assertions(2);
       return new Promise(resolve => {

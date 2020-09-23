@@ -70,7 +70,7 @@ describe('Browser', function() {
         
         // eslint-disable-next-line no-console
         expect(console.warn).toHaveBeenCalledWith(
-          'The current page is not being served with the HTTPS protocol.\n' +
+          '[okta-auth-sdk] WARN: The current page is not being served with the HTTPS protocol.\n' +
           'For security reasons, we strongly recommend using HTTPS.\n' +
           'If you cannot use HTTPS, set "cookies.secure" option to false.'
         );
@@ -111,7 +111,7 @@ describe('Browser', function() {
     it('should console warning for deprecation', async () => {
       jest.spyOn(console, 'warn').mockReturnValue(null);
       await auth.signIn(options);
-      expect(console.warn).toHaveBeenCalledWith('This method will be deprecated in v5.0, please use signInWithCredentials() instead.');
+      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: This method will be deprecated in v5.0, please use signInWithCredentials() instead.');
     });
     it('should call "/api/v1/authn" endpoint with default options', async () => {
       await auth.signIn(options);
