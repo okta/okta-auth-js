@@ -1,5 +1,5 @@
 import assert from 'assert';
-import toQueryParams from '../util/toQueryParams';
+import toQueryString from '../util/toQueryString';
 
 /* eslint-disable max-len */
 class TestApp {
@@ -52,7 +52,7 @@ class TestApp {
   get xhrError() { return $('#xhr-error'); }
 
   async open(queryObj) {
-    await browser.url(toQueryParams(queryObj));
+    await browser.url(toQueryString(queryObj));
     await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
   }
 

@@ -4,7 +4,7 @@ function htmlString(obj) {
   return JSON.stringify(obj, null, 2).replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;');
 }
 
-function toQueryParams(obj) {
+function toQueryString(obj) {
   const str = [];
   if (obj !== null) {
     for (const key in obj) {
@@ -24,5 +24,5 @@ function toQueryParams(obj) {
 
 module.exports = {
   htmlString,
-  toQueryParams 
+  toQueryString 
 };

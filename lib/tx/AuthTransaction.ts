@@ -12,7 +12,7 @@
  */
 
 import http from '../http';
-import { find, omit, toQueryParams, clone, isObject } from '../util';
+import { find, omit, toQueryString, clone, isObject } from '../util';
 import AuthSdkError from '../errors/AuthSdkError';
 import { TransactionState } from './TransactionState';
 import { addStateToken } from './util';
@@ -136,7 +136,7 @@ function link2fn(sdk, res, obj, link, ref) {
             }
             data.profile = omit(data.profile, 'updatePhone');
           }
-          var href = link.href + toQueryParams(params);
+          var href = link.href + toQueryString(params);
           return postToTransaction(sdk, href, data);
         };
     }

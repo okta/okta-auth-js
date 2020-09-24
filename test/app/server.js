@@ -54,7 +54,7 @@ app.post('/login', function(req, res) {
     console.error(error);
   })
   .finally(function() {
-    const qs = util.toQueryParams({
+    const qs = util.toQueryString({
       status,
       sessionToken,
       error

@@ -14,7 +14,7 @@
  /* eslint-disable complexity, max-statements */
 import AuthSdkError from './errors/AuthSdkError';
 import http from './http';
-import { warn, stringToBase64Url, removeNils, toQueryParams } from './util';
+import { warn, stringToBase64Url, removeNils, toQueryString } from './util';
 import { TokenParams, CustomUrls, PKCEMeta, OAuthResponse } from './types';
 
 // Code verifier: Random URL-safe string with a minimum length of 43 characters.
@@ -138,7 +138,7 @@ function getPostData(options: TokenParams): string {
     'code_verifier': options.codeVerifier
   });
   // Encode as URL string
-  return toQueryParams(params).slice(1);
+  return toQueryString(params).slice(1);
 }
 
 // exchange authorization code for an access token

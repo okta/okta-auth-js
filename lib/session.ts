@@ -11,7 +11,7 @@
  *
  */
 /* global window */
-import { omit, getLink, toQueryParams } from './util';
+import { omit, getLink, toQueryString } from './util';
 import http from './http';
 
 function sessionExists(sdk) {
@@ -62,7 +62,7 @@ function refreshSession(sdk) {
 function setCookieAndRedirect(sdk, sessionToken, redirectUrl) {
   redirectUrl = redirectUrl || window.location.href;
   window.location.assign(sdk.getIssuerOrigin() + '/login/sessionCookieRedirect' +
-    toQueryParams({
+    toQueryString({
       checkAccountSetupComplete: true,
       token: sessionToken,
       redirectUrl: redirectUrl

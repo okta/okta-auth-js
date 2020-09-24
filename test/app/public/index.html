@@ -21,7 +21,7 @@
           clientId: config.clientId,
           redirectUri: config.redirectUri
         }
-        var url = '/static' + toQueryParams(params);
+        var url = '/static' + toQueryString(params);
         window.location.assign(url);
       }
     </script>

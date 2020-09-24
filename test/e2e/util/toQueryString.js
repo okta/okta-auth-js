@@ -1,5 +1,5 @@
 
-export default function toQueryParams(obj) {
+export default function toQueryString(obj) {
   const str = [];
   if (obj !== null) {
     for (let key in obj) {
