@@ -1,6 +1,9 @@
+[sessionToken]: https://developer.okta.com/docs/reference/api/sessions/#session-token
+[signIn]: https://github.com/okta/okta-auth-js#signinoptions
+
 # {{ name }} sample
 
-This sample demonstrates using `@okta/okta-auth-js` in NodeJS. The `signIn` method is used to authenticate users given a username and password. On success, the `signIn` method returns a transaction object containing a `sessionToken`. {{#if oidc}}This sample will use the `sessionToken` to establish an Okta session and execute the OIDC flow to obtain tokens. {{else}}The `sessionToken` can be used to establish an Okta session.{{/if}}
+This sample demonstrates using `@okta/okta-auth-js` in NodeJS. The [signIn][signIn] method is used to authenticate users given a username and password. On success, the [signIn][signIn] method returns a transaction object containing a [sessionToken][sessionToken]. {{#if oidc}}This sample will use the [sessionToken][sessionToken] to establish an Okta session and execute the OIDC flow to obtain tokens. {{else}}The [sessionToken][sessionToken] can be used to establish an Okta session.{{/if}}
 
 By default the app server runs at `http://localhost:{{ port }}`.
 
