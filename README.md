@@ -444,7 +444,9 @@ Callback function. By default, the SDK will consider a user authenticated if bot
 authClient.authStateManager.updateAuthState();
 ```
 
-This callback function receives the sdk instance as the first function parameter and [isPending](#authstatemanager) state as the second parameter.
+This callback function receives the sdk instance as the first function parameter and additionalParams object as the second parameter, which includes:
+
+* [isPending](#authstatemanager): pre-evaluated `authState.isPending` which is passed back from [authStateManager.updateAuthState](#authstatemanagerupdateauthstate).
 
 ##### `devMode`
 

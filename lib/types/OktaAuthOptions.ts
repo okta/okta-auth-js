@@ -38,7 +38,7 @@ export interface CustomUrls {
   logoutUrl?: string;
 }
 
-export interface IsAuthenticatedOptions {
+export interface IsAuthenticatedParams {
   isPending: boolean;
 }
 
@@ -60,6 +60,6 @@ export interface OktaAuthOptions extends CustomUrls {
   transformErrorXHR?: (xhr: object) => any;
   headers?: object;
   maxClockSkew?: number;
-  isAuthenticated?: (oktaAuth: OktaAuth, options: IsAuthenticatedOptions) => Promise<boolean>;
+  isAuthenticated?: (oktaAuth: OktaAuth, params: IsAuthenticatedParams) => Promise<boolean>;
   devMode?: boolean; 
 }
