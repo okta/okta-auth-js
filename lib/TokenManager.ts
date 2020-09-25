@@ -52,23 +52,23 @@ function hasExpired(tokenMgmtRef, token) {
 }
 
 function emitExpired(tokenMgmtRef, key, token) {
-  tokenMgmtRef.emitter.emit(EVENT_EXPIRED, key, token);
+  tokenMgmtRef.emitter.emit(EVENT_EXPIRED, key, token, { timestamp: Date.now() });
 }
 
 function emitRenewed(tokenMgmtRef, key, freshToken, oldToken) {
-  tokenMgmtRef.emitter.emit(EVENT_RENEWED, key, freshToken, oldToken);
+  tokenMgmtRef.emitter.emit(EVENT_RENEWED, key, freshToken, oldToken, { timestamp: Date.now() });
 }
 
 function emitAdded(tokenMgmtRef, key, token) {
-  tokenMgmtRef.emitter.emit(EVENT_ADDED, key, token);
+  tokenMgmtRef.emitter.emit(EVENT_ADDED, key, token, { timestamp: Date.now() });
 }
 
 function emitRemoved(tokenMgmtRef, key, token?) {
-  tokenMgmtRef.emitter.emit(EVENT_REMOVED, key, token);
+  tokenMgmtRef.emitter.emit(EVENT_REMOVED, key, token, { timestamp: Date.now() });
 }
 
 function emitError(tokenMgmtRef, error) {
-  tokenMgmtRef.emitter.emit(EVENT_ERROR, error);
+  tokenMgmtRef.emitter.emit(EVENT_ERROR, error, { timestamp: Date.now() });
 }
 
 function emitEventsForCrossTabsStorageUpdate(tokenMgmtRef, newValue, oldValue) {
@@ -77,7 +77,8 @@ function emitEventsForCrossTabsStorageUpdate(tokenMgmtRef, newValue, oldValue) {
   Object.keys(newTokens).forEach(key => {
     const oldToken = oldTokens[key];
     const newToken = newTokens[key];
-    if (JSON.stringify(oldToken) !== JSON.stringify(newTokens)) {
+    if (JSON.stringify(oldToken) !== JSON.stringify(newToken)) {
+      console.log('emit events added', newTokens);
       emitAdded(tokenMgmtRef, key, newToken);
     }
   });
@@ -499,8 +500,11 @@ export class TokenManager {
     setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
 
     // Sync authState cross multiple tabs when localStorage is used as the storageProvider
+    // A StorageEvent is sent to a window when a storage area it has access to is changed 
+    // within the context of another document.
+    // https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent
     window.addEventListener('storage', ({ key, newValue, oldValue }: StorageEvent) => {
-      const emitEventsAndResetExpireEventTimeouts = () => {
+      const handleCrossTabsStorageChange = () => {
         this._resetExpireEventTimeoutAll();
         this._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
       };
@@ -509,16 +513,16 @@ export class TokenManager {
       // not from localStorage.clear (event.key is null)
       // event.key is not the storageKey
       // oldValue === newValue
-      if ((key && key !== options.storageKey) || newValue === oldValue) {
+      if (key && (key !== options.storageKey || newValue === oldValue)) {
         return;
       }
 
       // LocalStorage cross tabs update is not synced in IE, set a 1s timer to read latest value
       // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
       if (isIE11OrLess()) {
-        setTimeout(() => emitEventsAndResetExpireEventTimeouts(), 1000);
+        setTimeout(() => handleCrossTabsStorageChange(), 1000);
       } else {
-        emitEventsAndResetExpireEventTimeouts();
+        handleCrossTabsStorageChange();
       }
     });
   }

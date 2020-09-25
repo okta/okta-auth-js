@@ -12,4 +12,5 @@ export interface AuthStateLogOptions {
   event?: string;
   key?: string;
   token?: Token;
+  timestamp: number;
 }

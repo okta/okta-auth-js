@@ -35,6 +35,7 @@ export class AuthStateManager {
   };
   _authState: AuthState;
   _logOptions: AuthStateLogOptions;
+  _lastEventTimestamp: number;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
@@ -45,6 +46,7 @@ export class AuthStateManager {
     this._pending = { ...DEFAULT_PENDING };
     this._authState = { ...DEFAULT_AUTH_STATE };
     this._logOptions = {};
+    this._lastEventTimestamp = 0;
 
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process, just listen on "added" event to update auth state
@@ -101,6 +103,15 @@ export class AuthStateManager {
     };
 
     const shouldEvaluateIsPending = () => (autoRenew || autoRemove);
+
+    if (this._lastEventTimestamp > timestamp) {
+      // cancel evaludation if event is from the past 
+      devMode && logger('canceled');
+      return;
+    } else {
+      // track event timestamp
+      this._lastEventTimestamp = timestamp;
+    }
 
     if (this._pending.updateAuthStatePromise) {
       if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {

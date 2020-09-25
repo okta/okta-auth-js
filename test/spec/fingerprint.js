@@ -40,8 +40,9 @@ describe('fingerprint', function() {
     };
 
     jest.spyOn(window, 'addEventListener').mockImplementation(function(name, fn) {
-      // expect(name).toEqual('message');
-      listeners.message = fn;
+      if (name === 'message') {
+        listeners.message = fn;
+      }
     });
     jest.spyOn(document, 'createElement').mockReturnValue(test.iframe);
     jest.spyOn(document.body, 'contains').mockReturnValue(true);
