@@ -28,22 +28,19 @@ var tx                = require('../tx');
 var util              = require('../util');
 var PromiseQueue       = require('../PromiseQueue');
 
-function OktaAuthBuilder(args) {
-  var sdk = this;
-
-  builderUtil.assertValidConfig(args);
-
-  var cookieSettings = util.extend({
-    secure: true
-  }, args.cookies);
-  var isLocalhost = (sdk.features.isLocalhost() && !sdk.features.isHTTPS());
-  if (isLocalhost) {
-    cookieSettings.secure = false; // Force secure=false if running on http://localhost
+function getCookieSettings(sdk, args) {
+  // Secure cookies will be automatically used on a HTTPS connection
+  // Non-secure cookies will be automatically used on a HTTP connection
+  // secure option can override the automatic behavior
+  var cookieSettings = args.cookies || {};
+  if (typeof cookieSettings.secure === 'undefined') {
+    cookieSettings.secure = sdk.features.isHTTPS();
   }
   if (typeof cookieSettings.sameSite === 'undefined') {
-    // Chrome >= 80 will block cookies with SameSite=None unless they are also Secure
     cookieSettings.sameSite = cookieSettings.secure ? 'none' : 'lax';
   }
+
+  // If secure=true, but the connection is not HTTPS, set secure=false.
   if (cookieSettings.secure && !sdk.features.isHTTPS()) {
     // eslint-disable-next-line no-console
     console.warn(
@@ -53,6 +50,20 @@ function OktaAuthBuilder(args) {
     );
     cookieSettings.secure = false;
   }
+
+  // Chrome >= 80 will block cookies with SameSite=None unless they are also Secure
+  // If sameSite=none, but the connection is not HTTPS, set sameSite=lax.
+  if (cookieSettings.sameSite === 'none' && !cookieSettings.secure) {
+    cookieSettings.sameSite = 'lax';
+  }
+
+  return cookieSettings;
+}
+
+function OktaAuthBuilder(args) {
+  var sdk = this;
+
+  builderUtil.assertValidConfig(args);
 
   this.options = {
     clientId: args.clientId,
@@ -71,7 +82,7 @@ function OktaAuthBuilder(args) {
     transformErrorXHR: args.transformErrorXHR,
     headers: args.headers,
     onSessionExpired: args.onSessionExpired,
-    cookies: cookieSettings
+    cookies: getCookieSettings(sdk, args)
   };
 
   this.userAgent = builderUtil.getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
