@@ -170,6 +170,7 @@ export interface SignInWithCredentialsOptions {
   password: string;
   relayState?: string;
   context?: string;
+  sendFingerprint?: boolean;
 }
 
 export function isSignInWithCredentialsOptions(obj: any): obj is SignInWithCredentialsOptions {

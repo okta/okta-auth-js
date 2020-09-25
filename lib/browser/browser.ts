@@ -208,10 +208,19 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.authStateManager = new AuthStateManager(this);
   }
 
-  // TODO: This method is deprecated. Remove it in 5.0
+  /**
+   * Alias method of signInWithCredentials
+   * 
+   * @todo This method is deprecated. Remove it in 5.0
+   */ 
   signIn(opts) {
-    deprecate('This method has been deprecated, please use signInWithCredentials() instead.');
+    if (this.features.isLocalhost()) {
+      deprecate('This method has been deprecated, please use signInWithCredentials() instead.');
+    }
+    return this.signInWithCredentials(opts);
+  }
 
+  signInWithCredentials(opts: SignInWithCredentialsOptions) {
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {
       delete opts.sendFingerprint;
@@ -230,13 +239,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     });
   }
 
-  /**
-   * Alias method of signIn()
-   */ 
-  signInWithCredentials(opts: SignInWithCredentialsOptions) {
-    return this.signIn(opts);
-  }
-
   async signInWithRedirect({ fromUri, ...additionalParams }: SigninWithRedirectOptions = {}) {
     if(this._pending.handleLogin) { 
       // Don't trigger second round
@@ -248,7 +250,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     try {
       // Trigger default signIn redirect flow
       if (fromUri) {
-        browserStorage.getSessionStorage().setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
+        this.setFromUri(fromUri);
       }
       const params = Object.assign({
         scopes: scopes || ['openid', 'email', 'profile'],
@@ -385,13 +387,24 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   /**
-   * Store parsed tokens from redirect url and clean intermediate state
+   * Store parsed tokens from redirect url
    */
-  async handleAuthentication(): Promise<string | null> {
+  async parseAndStoreTokensFromUrl(): Promise<void> {
     const { tokens } = await this.token.parseFromUrl();
     this.tokenManager.setTokens(tokens);
+  }
+
+  setFromUri(fromUri?: string): void {
+    // Use current location if fromUri was not passed
+    fromUri = fromUri || window.location.href;
+    // Store fromUri
     const storage = browserStorage.getSessionStorage();
-    const fromUri = storage.getItem(REFERRER_PATH_STORAGE_KEY);
+    storage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
+  }
+
+  getFromUri(): string {
+    const storage = browserStorage.getSessionStorage();
+    const fromUri = storage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
     storage.removeItem(REFERRER_PATH_STORAGE_KEY);
     return fromUri;
   }

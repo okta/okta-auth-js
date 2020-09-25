@@ -446,7 +446,9 @@ authClient.authStateManager.updateAuthState();
 
 This callback function receives the sdk instance as the first function parameter and additionalParams object as the second parameter, which includes:
 
-* [isPending](#authstatemanager): pre-evaluated `authState.isPending` which is passed back from [authStateManager.updateAuthState](#authstatemanagerupdateauthstate).
+* [isPending]: evaluated [authState.isPending](#authstatemanager) from the current [updateAuthState](#authstatemanagerupdateauthstate) evaluation process.
+* [accessToken]: evaluated [authState.accessToken](#authstatemanager) from the current [updateAuthState](#authstatemanagerupdateauthstate) evaluation process.
+* [idToken]: evaluated [authState.idToken](#authstatemanager) from the current [updateAuthState](#authstatemanagerupdateauthstate) evaluation process.
 
 ##### `devMode`
 
@@ -535,7 +537,6 @@ var config = {
 * [signIn](#signinoptions)
 * [signInWithCredentials](#signinwithcredentialsoptions)
 * [signInWithRedirect](#signinwithredirectoptions)
-* [handleAuthentication](#handleauthentication)
 * [signOut](#signout)
 * [closeSession](#closesession)
 * [revokeAccessToken](#revokeaccesstokenaccesstoken)
@@ -547,6 +548,9 @@ var config = {
 * [getUser](#getuser)
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
+* [parseAndStoreTokensFromUrl](#parseandstoretokensfromurl)
+* [setFromUri](#setfromurifromuri)
+* [getFromUri](#getfromuri)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -597,16 +601,19 @@ var config = {
 ### `signIn(options)`
 
 > :warning: Deprecated, this method will be removed in next major release, use [signInWithCredentials](#signinwithcredentialsoptions) instead.
+
+### `signInWithCredentials(options)`
+
 > :hourglass: async
 
-The goal of this authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
+The goal of this authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signInWithCredentials`.
 
 * `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
 * `password` - The password of the user
 * `sendFingerprint` - Enabling this will send a `X-Device-Fingerprint` header. Defaults to `false`. See [Primary authentication with device fingerprint](https://developer.okta.com/docs/reference/api/authn/#primary-authentication-with-device-fingerprinting) for more information on the `X-Device-Fingerprint` header.
 
 ```javascript
-authClient.signIn({
+authClient.signInWithCredentials({
   username: 'some-username',
   password: 'some-password'
 })
@@ -622,32 +629,26 @@ authClient.signIn({
 });
 ```
 
-### `signInWithCredentials(options)`
-
-Alias method of [signIn method](#signinoptions).
-
 ### `signInWithRedirect(options)`
 
 Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a fromUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
-You can use [handleAuthentication method](#handleauthentication) to store tokens and clear the intermediate state (the fromUri) after successful authentication.
+You can use [parseAndStoreTokensFromUrl](#parseandstoretokensfromurl) to store tokens and [getFromUri](#getfromuri) to clear the intermediate state (the fromUri) after successful authentication.
 
 ```javascript
 if (authClient.token.isLoginRedirect()) {
   // Call handleAuthentication to store tokens when redirect back from OKTA
-  authClient.handleAuthentication();
+  authClient.parseAndStoreTokensFromUrl();
+  // Get and clear fromUri from storage
+  const fromUri = authClient.getFromUri();
+  // Redirect to fromUri
+  history.replaceState(null, '', fromUri);
 } else if (!authClient.authStateManager.getAuthState().isAuthenticated) {
   // Start the browser based oidc flow, then parse tokens from the redirect callback url
   authClient.signInWithRedirect();
 } else {
-  // user is authenticated
+  // User is authenticated
 }
 ```
-
-### `handleAuthentication()`
-
-> :hourglass: async
-
-Parses tokens from the redirect url and stores them. Resolves to the [fromUri](#signinwithredirectoptions) or `null` if no fromUri has been set.
 
 ### `signOut()`
 
@@ -873,6 +874,20 @@ Resolves with the id token string retrieved from storage if it exists. Devs shou
 > :hourglass: async
 
 Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
+
+### `parseAndStoreTokensFromUrl()`
+
+> :hourglass: async
+
+Parses tokens from the redirect url and stores them.
+
+### `setFromUri(fromUri?)`
+
+Stores the current URL state before a redirect occurs. By default it stores `window.location.href`.
+
+### `getFromUri()`
+
+Returns the stored URI string stored by [setFromUri](#setfromuriuri) and removes it from storage. By default it returns `window.location.origin`.
 
 ### `tx.resume()`
 

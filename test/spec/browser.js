@@ -102,24 +102,19 @@ describe('Browser', function() {
     });
   });
 
-  describe('signIn', () => {
+  describe('signInWithCredentials', () => {
     let options;
     beforeEach(() => {
       options = { username: 'fake', password: 'fake' };
       auth.fingerprint = jest.fn().mockResolvedValue('fake fingerprint');
     });
-    it('should console warning for deprecation', async () => {
-      jest.spyOn(console, 'warn').mockReturnValue(null);
-      await auth.signIn(options);
-      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: This method has been deprecated, please use signInWithCredentials() instead.');
-    });
     it('should call "/api/v1/authn" endpoint with default options', async () => {
-      await auth.signIn(options);
+      await auth.signInWithCredentials(options);
       expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
     });
     it('should call fingerprint if has sendFingerprint in options', async () => {
       options.sendFingerprint = true;
-      await auth.signIn(options);
+      await auth.signInWithCredentials(options);
       delete options.sendFingerprint;
       expect(auth.fingerprint).toHaveBeenCalled();
       expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, {
@@ -128,15 +123,30 @@ describe('Browser', function() {
     });
   });
 
-  describe('signInWithCredentials', () => {
+  describe('signIn', () => {
     let options;
     beforeEach(() => {
       options = { username: 'fake', password: 'fake' };
-      auth.signIn = jest.fn();
+      auth.signInWithCredentials = jest.fn();
+    });
+    it('should console warning for deprecation if is localhost', async () => {
+      global.window.location = {
+        protocol: 'http:',
+        hostname: 'localhost',
+        href: 'http://localhost'
+      };
+      jest.spyOn(console, 'warn').mockReturnValue(null);
+      await auth.signIn(options);
+      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: This method has been deprecated, please use signInWithCredentials() instead.');
+    });
+    it('should not console warning for deprecation if is not localhost', async () => {
+      jest.spyOn(console, 'warn').mockReturnValue(null);
+      await auth.signIn(options);
+      expect(console.warn).not.toHaveBeenCalled();
     });
     it('should call signIn() with provided options', async () => {
-      await auth.signInWithCredentials(options);
-      expect(auth.signIn).toHaveBeenCalledWith(options);
+      await auth.signIn(options);
+      expect(auth.signInWithCredentials).toHaveBeenCalledWith(options);
     });
   });
 
@@ -567,21 +577,15 @@ describe('Browser', function() {
     });
   });
 
-  describe('handleAuthentication', () => {
-    let removeItemMock;
+  describe('parseAndStoreTokensFromUrl', () => {
     beforeEach(() => {
-      removeItemMock = jest.fn();
-      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
-        getItem: jest.fn().mockReturnValue('fakeFromUri'),
-        removeItem: removeItemMock
-      }));
       auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
         tokens: { idToken: 'fakeIdToken', accessToken: 'fakeAccessToken' }
       });
       auth.tokenManager.setTokens = jest.fn();
     });
     it('calls parseFromUrl', async () => {
-      await auth.handleAuthentication();
+      await auth.parseAndStoreTokensFromUrl();
       expect(auth.token.parseFromUrl).toHaveBeenCalled();
     });
     it('stores tokens', async () => {
@@ -590,21 +594,50 @@ describe('Browser', function() {
       auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
         tokens: { accessToken, idToken }
       });
-      await auth.handleAuthentication();
+      await auth.parseAndStoreTokensFromUrl();
       expect(auth.tokenManager.setTokens).toHaveBeenCalledWith({ accessToken, idToken });
     });
-    it('should clear and resolve as the stored fromUri', async () => {
-      const fromUri = await auth.handleAuthentication();
-      expect(fromUri).toEqual('fakeFromUri');
-      expect(removeItemMock).toHaveBeenCalled();
-    });
-    it('should resolve as null if no fromUri has been set', async () => {
+  });
+
+  describe('setFromUri', () => {
+    let setItemMock;
+    beforeEach(() => {
+      setItemMock = jest.fn();
       storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
-        getItem: jest.fn().mockReturnValue(null),
+        setItem: setItemMock
+      }));
+    });
+    it('should save the "referrerPath" in sessionStorage', () => {
+      const uri = 'https://foo.random';
+      auth.setFromUri(uri);
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, uri);
+    });
+    it('should save the window.location.href by default', () => {
+      auth.setFromUri();
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, window.location.href);
+    });
+  });
+
+  describe('getFromUri', () => {
+    let removeItemMock;
+    let getItemMock;
+    beforeEach(() => {
+      removeItemMock = jest.fn();
+      getItemMock = jest.fn().mockReturnValue('fakeFromUri');
+      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+        getItem: getItemMock,
         removeItem: removeItemMock
       }));
-      const fromUri = await auth.handleAuthentication();
-      expect(fromUri).toEqual(null);
+    });
+    it('should get and cleare referrer from localStorage', () => {
+      const res = auth.getFromUri();
+      expect(res).toBe('fakeFromUri');
+      expect(removeItemMock).toHaveBeenCalled();
+    });
+    it('returns window.location.origin if nothing was set', () => {
+      getItemMock = jest.fn().mockReturnValue(null);
+      const res = auth.getFromUri();
+      expect(res).toBe(window.location.origin);
       expect(removeItemMock).toHaveBeenCalled();
     });
   });

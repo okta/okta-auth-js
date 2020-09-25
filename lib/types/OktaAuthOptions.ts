@@ -14,6 +14,7 @@ import { StorageUtil } from './Storage';
 import { CookieOptions } from './Cookies';
 import { HttpRequestClient } from './http';
 import { OktaAuth } from './';
+import { AccessToken, IDToken } from './Token';
 
 export interface TokenManagerOptions {
   autoRenew?: boolean;
@@ -40,6 +41,8 @@ export interface CustomUrls {
 
 export interface IsAuthenticatedParams {
   isPending: boolean;
+  accessToken: AccessToken;
+  idToken: IDToken;
 }
 
 export interface OktaAuthOptions extends CustomUrls {
