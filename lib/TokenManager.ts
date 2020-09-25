@@ -78,7 +78,6 @@ function emitEventsForCrossTabsStorageUpdate(tokenMgmtRef, newValue, oldValue) {
     const oldToken = oldTokens[key];
     const newToken = newTokens[key];
     if (JSON.stringify(oldToken) !== JSON.stringify(newToken)) {
-      console.log('emit events added', newTokens);
       emitAdded(tokenMgmtRef, key, newToken);
     }
   });

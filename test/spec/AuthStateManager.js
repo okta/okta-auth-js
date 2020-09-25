@@ -3,6 +3,7 @@
 import Emitter from 'tiny-emitter';
 import { AuthStateManager, DEFAULT_AUTH_STATE } from '../../lib/AuthStateManager';
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
+import tokens from '@okta/test.support/tokens';
 
 function createAuth() {
   return new OktaAuth({
@@ -394,7 +395,7 @@ describe('AuthStateManager', () => {
       });
     });
 
-    it('should call authStateManager.updateAuthState once when localStorage changed from other dom', () => {
+    it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', () => {
       const auth = createAuth();
       auth.authStateManager.updateAuthState = jest.fn();
       // simulate localStorage change from other dom context
@@ -404,6 +405,25 @@ describe('AuthStateManager', () => {
         oldValue: '{}'
       }));
       expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
+      expect(auth.authStateManager.updateAuthState).toHaveBeenCalledWith({ 
+        event: 'added',
+        key: 'idToken',
+        token: 'fake_id_token',
+        timestamp: expect.any(Number)
+      });
+    });
+
+    it('should only trigger authStateManager.updateAuthState once when call tokenManager.add', () => {
+      const auth = createAuth();
+      auth.authStateManager.updateAuthState = jest.fn();
+      auth.tokenManager.add('idToken', tokens.standardIdTokenParsed);
+      expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
+      expect(auth.authStateManager.updateAuthState).toHaveBeenCalledWith({ 
+        event: 'added', 
+        key: 'idToken', 
+        token: tokens.standardIdTokenParsed, 
+        timestamp: expect.any(Number) 
+      });
     });
   });
 
