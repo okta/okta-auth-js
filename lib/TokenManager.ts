@@ -193,16 +193,16 @@ function clear(tokenMgmtRef, storage) {
 }
 
 function shouldThrottleRenew(renewTimeQueue) {
-  let shoudlThrottleRenew = false;
+  let res = false;
   renewTimeQueue.push(Date.now());
   if (renewTimeQueue.length >= 10) {
     // get and remove first item from queue
     const firstTime = renewTimeQueue.shift();
     const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
-    shoudlThrottleRenew = lastTime - firstTime < 30 * 1000;
+    res = lastTime - firstTime < 30 * 1000;
   }
-  return shoudlThrottleRenew;
-};
+  return res;
+}
 
 export class TokenManager {
   get: (key: string) => Promise<Token>;
