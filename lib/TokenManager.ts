@@ -192,6 +192,18 @@ function clear(tokenMgmtRef, storage) {
   storage.clearStorage();
 }
 
+function shouldThrottleRenew(renewTimeQueue) {
+  let res = false;
+  renewTimeQueue.push(Date.now());
+  if (renewTimeQueue.length >= 10) {
+    // get and remove first item from queue
+    const firstTime = renewTimeQueue.shift();
+    const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
+    res = lastTime - firstTime < 30 * 1000;
+  }
+  return res;
+}
+
 export class TokenManager {
   get: (key: string) => Promise<Token>;
   add: (key: string, token: Token) => void;
@@ -287,9 +299,15 @@ export class TokenManager {
     this.off = tokenMgmtRef.emitter.off.bind(tokenMgmtRef.emitter);
     this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
   
+    const renewTimeQueue = [];
     const onTokenExpiredHandler = (key) => {
       if (options.autoRenew) {
-        this.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
+        if (shouldThrottleRenew(renewTimeQueue)) {
+          const error = new AuthSdkError('Too many token renew requests');
+          emitError(tokenMgmtRef, error);
+        } else {
+          this.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
+        }
       } else {
         this.remove(key);
       }

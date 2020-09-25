@@ -1,5 +1,17 @@
 # Changelog
 
+## Pending
+
+### Bug Fixes
+
+- [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.
+
+## 4.0.1
+
+### Bug Fixes
+
+- [#473](https://github.com/okta/okta-auth-js/pull/473) Fixes login issue when cookies are blocked or used as shared state storage
+  
 ## 4.0.0
 
 ### Features
