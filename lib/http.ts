@@ -12,7 +12,7 @@
  */
 
 /* eslint-disable complexity */
-import { isString, clone, isAbsoluteUrl } from './util';
+import { isString, clone, isAbsoluteUrl, removeNils } from './util';
 import AuthApiError from './errors/AuthApiError';
 import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION } from './constants';
 import { OktaAuth, RequestOptions, FetchOptions, RequestData } from './types';
@@ -37,12 +37,13 @@ function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any> {
     }
   }
 
-  var headers = {
+  var headers: HeadersInit = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'X-Okta-User-Agent-Extended': sdk.userAgent
   };
   Object.assign(headers, sdk.options.headers, options.headers);
+  headers = removeNils(headers) as HeadersInit;
 
   if (accessToken && isString(accessToken)) {
     headers['Authorization'] = 'Bearer ' + accessToken;
