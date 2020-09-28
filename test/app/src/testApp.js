@@ -179,6 +179,7 @@ Object.assign(TestApp.prototype, {
     this._afterRender('with-error');
   },
   loginWidget: function() {
+    saveConfigToStorage(this.config);
     document.getElementById('modal').style.display = 'block';
     var config = window.getWidgetConfig();
 
