@@ -6,6 +6,8 @@
 
 - [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.
 
+- [#468](https://github.com/okta/okta-auth-js/pull/468) Fixes issue where HTTP headers with an undefined value were being sent with the value "undefined". These headers are now removed before the request is sent.
+
 ## 4.0.1
 
 ### Bug Fixes
