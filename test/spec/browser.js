@@ -32,7 +32,7 @@ describe('Browser', function() {
   describe('options', function() {
     describe('cookies', () => {
 
-      it('"secure" is true by default', () => {
+      it('"secure" is true by default on HTTPS', () => {
         expect(auth.options.cookies.secure).toBe(true);
       });
 
@@ -40,24 +40,46 @@ describe('Browser', function() {
         expect(auth.options.cookies.sameSite).toBe('none');
       });
 
+      it('"secure" can be set to false on HTTPS', () => {
+        auth = new OktaAuth({ issuer, pkce: false, cookies: { secure: false } });
+        expect(auth.options.cookies.secure).toBe(false);
+        expect(auth.options.cookies.sameSite).toBe('lax');
+      });
+
       it('"sameSite" is "lax" if secure is false', () => {
         auth = new OktaAuth({ issuer, pkce: false, cookies: { secure: false }});
         expect(auth.options.cookies.sameSite).toBe('lax');
       });
 
-      it('"secure" is forced to false if running on http://localhost', () => {
+      it('"secure" is false by default on HTTP', () => {
         window.location.protocol = 'http:';
-        window.location.hostname = 'localhost';
+        window.location.hostname = 'my-site';
+        auth = new OktaAuth({ issuer, pkce: false });
+        expect(auth.options.cookies.secure).toBe(false);
+        expect(auth.options.cookies.sameSite).toBe('lax');
+      });
+
+      it('"secure" is forced to false if running on HTTP', () => {
+        window.location.protocol = 'http:';
+        window.location.hostname = 'my-site';
         auth = new OktaAuth({ issuer, pkce: false, cookies: { secure: true }});
         expect(auth.options.cookies.secure).toBe(false);
         expect(auth.options.cookies.sameSite).toBe('lax');
       });
 
-      it('console warning if running on HTTP (not localhost)', () => {
+      it('"sameSite" is forced to "lax" if running on HTTP', () => {
         window.location.protocol = 'http:';
-        window.location.hostname = 'not-localhost';
+        window.location.hostname = 'my-site';
+        auth = new OktaAuth({ issuer, pkce: false, cookies: { sameSite: 'none' }});
+        expect(auth.options.cookies.secure).toBe(false);
+        expect(auth.options.cookies.sameSite).toBe('lax');
+      });
+
+      it('console warning if secure is forced to false running on HTTP', () => {
+        window.location.protocol = 'http:';
+        window.location.hostname = 'my-site';
         jest.spyOn(console, 'warn').mockReturnValue(null);
-        auth = new OktaAuth({ issuer: 'http://my-okta-domain' });
+        auth = new OktaAuth({ issuer: 'http://my-okta-domain' , cookies: { secure: true }});
         
         // eslint-disable-next-line no-console
         expect(console.warn).toHaveBeenCalledWith(
