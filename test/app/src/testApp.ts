@@ -197,6 +197,7 @@ class TestApp {
   }
 
   loginWidget(): void {
+    saveConfigToStorage(this.config);
     document.getElementById('modal').style.display = 'block';
     const config = window.getWidgetConfig();
     const signIn = new OktaSignIn(config);

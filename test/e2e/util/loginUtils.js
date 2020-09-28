@@ -48,4 +48,11 @@ async function loginDirect(flow) {
   await TestApp.loginDirect();
   return handleCallback(flow);
 }
-export { loginDirect, loginPopup, loginRedirect };
+
+async function loginWidget(flow) {
+  await TestApp.showLoginWidget();
+  await OktaLogin.signin(USERNAME, PASSWORD);
+  return handleCallback(flow);
+}
+
+export { loginWidget, loginDirect, loginPopup, loginRedirect };
