@@ -52,6 +52,38 @@ import { postToTransaction } from '../tx';
 
 const Emitter = require('tiny-emitter');
 
+function getCookieSettings(sdk, args) {
+  // Secure cookies will be automatically used on a HTTPS connection
+  // Non-secure cookies will be automatically used on a HTTP connection
+  // secure option can override the automatic behavior
+  var cookieSettings = args.cookies || {};
+  if (typeof cookieSettings.secure === 'undefined') {
+    cookieSettings.secure = sdk.features.isHTTPS();
+  }
+  if (typeof cookieSettings.sameSite === 'undefined') {
+    cookieSettings.sameSite = cookieSettings.secure ? 'none' : 'lax';
+  }
+
+  // If secure=true, but the connection is not HTTPS, set secure=false.
+  if (cookieSettings.secure && !sdk.features.isHTTPS()) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'The current page is not being served with the HTTPS protocol.\n' +
+      'For security reasons, we strongly recommend using HTTPS.\n' +
+      'If you cannot use HTTPS, set "cookies.secure" option to false.'
+    );
+    cookieSettings.secure = false;
+  }
+
+  // Chrome >= 80 will block cookies with SameSite=None unless they are also Secure
+  // If sameSite=none, but the connection is not HTTPS, set sameSite=lax.
+  if (cookieSettings.sameSite === 'none' && !cookieSettings.secure) {
+    cookieSettings.sameSite = 'lax';
+  }
+
+  return cookieSettings;
+}
+
 class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   static features: FeaturesAPI;
   features: FeaturesAPI;
@@ -68,27 +100,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }, args);
     super(args);
 
-    var cookieSettings = Object.assign({
-      secure: true
-    }, args.cookies);
-    var isLocalhost = (this.features.isLocalhost() && !this.features.isHTTPS());
-    if (isLocalhost) {
-      cookieSettings.secure = false; // Force secure=false if running on http://localhost
-    }
-    if (typeof cookieSettings.sameSite === 'undefined') {
-      // Chrome >= 80 will block cookies with SameSite=None unless they are also Secure
-      cookieSettings.sameSite = cookieSettings.secure ? 'none' : 'lax';
-    }
-    if (cookieSettings.secure && !this.features.isHTTPS()) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        'The current page is not being served with the HTTPS protocol.\n' +
-        'For security reasons, we strongly recommend using HTTPS.\n' +
-        'If you cannot use HTTPS, set "cookies.secure" option to false.'
-      );
-      cookieSettings.secure = false;
-    }
-  
     this.options = Object.assign(this.options, {
       clientId: args.clientId,
       authorizeUrl: removeTrailingSlash(args.authorizeUrl),
@@ -101,7 +112,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       postLogoutRedirectUri: args.postLogoutRedirectUri,
       responseMode: args.responseMode,
       transformErrorXHR: args.transformErrorXHR,
-      cookies: cookieSettings
+      cookies: getCookieSettings(this, args)
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
