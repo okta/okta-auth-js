@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.2
+
+- [#491](https://github.com/okta/okta-auth-js/pull/491) Fixes issue with OAuth param cookie when using self-hosted signin widget
+
+- [#489](https://github.com/okta/okta-auth-js/pull/489) Fixes sameSite cookie setting when running on HTTP connection
+
 ## 4.0.1
 
 ### Bug Fixes
