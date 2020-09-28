@@ -1,7 +1,7 @@
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import { flows, openImplicit, openPKCE } from '../util/appUtils';
-import { loginRedirect, loginPopup, loginDirect } from '../util/loginUtils';
+import { loginWidget, loginRedirect, loginPopup, loginDirect } from '../util/loginUtils';
 
 describe('E2E login', () => {
 
@@ -21,6 +21,13 @@ describe('E2E login', () => {
     describe(flow + ' flow', () => {
       beforeEach(async () => {
         (flow === 'pkce') ? await openPKCE() : await openImplicit();
+      });
+
+      it('can login using signin widget', async () => {
+        await loginWidget(flow);
+        await TestApp.getUserInfo();
+        await TestApp.assertUserInfo();
+        await TestApp.logoutRedirect();
       });
 
       it('can login using redirect', async () => {

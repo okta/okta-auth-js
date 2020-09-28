@@ -711,14 +711,15 @@ function removeSearch(sdk) {
 }
 
 function getOAuthParamsStrFromStorage() {
-  let oauthParamsStr;
-  if (browserStorage.browserHasSessionStorage()) {
+  // try to read OAuth params from cookie first. This is for backward compatibility
+  let oauthParamsStr = cookies.get(constants.REDIRECT_OAUTH_PARAMS_NAME);
+  cookies.delete(constants.REDIRECT_OAUTH_PARAMS_NAME);
+
+  // latest version of auth-js will store params in session storage
+  if (!oauthParamsStr && browserStorage.browserHasSessionStorage()) {
     const storage = browserStorage.getSessionStorage();
     oauthParamsStr = storage.getItem(constants.REDIRECT_OAUTH_PARAMS_NAME);
     storage.removeItem(constants.REDIRECT_OAUTH_PARAMS_NAME);
-  } else {
-    oauthParamsStr = cookies.get(constants.REDIRECT_OAUTH_PARAMS_NAME);
-    cookies.delete(constants.REDIRECT_OAUTH_PARAMS_NAME);
   }
   return oauthParamsStr;
 }

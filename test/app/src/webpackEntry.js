@@ -35,7 +35,8 @@ window.getWidgetConfig = function() {
     baseUrl: config.issuer.split('/oauth2')[0],
     el: '#widget',
     authParams: {
-      display: 'page'
+      display: 'page',
+      pkce: config.pkce
     }
   });
   return siwConfig;
