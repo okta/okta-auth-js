@@ -100,7 +100,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       redirectUri: args.redirectUri,
       postLogoutRedirectUri: args.postLogoutRedirectUri,
       responseMode: args.responseMode,
-      transformErrorXHR: args.transformErrorXHR,
       cookies: cookieSettings
     });
   
