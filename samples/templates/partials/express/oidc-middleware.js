@@ -38,7 +38,8 @@ app.get('{{ redirectPath }}', function(req, res) {
           <body>
             <p>The OIDC flow succeeded. The access token is shown here as a convenience .<br/>
             In a real-world app, the access token should be stored server-side with the user's session.<br/>
-            Leaking the access token to the client-side may represent a security risk if the token can be used to access protected resources.
+            Leaking the access token to the client-side may represent a security risk<br/>
+            if the token can be used to access protected resources.
             </p>
             <code id="accessToken">${data}</code>
             <hr/>
