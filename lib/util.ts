@@ -94,7 +94,7 @@ export function isoToUTCString(str) {
   return isoDate.toUTCString();
 }
 
-export function toQueryParams(obj) {
+export function toQueryString(obj) {
   var str = [];
   if (obj !== null) {
     for (var key in obj) {

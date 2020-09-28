@@ -6,5 +6,12 @@
     "it": "readonly",
     "jest": "readonly",
     "expect": "readonly"
+  },
+  "rules": {
+    "node/no-extraneous-import": ["error", {
+      "allowModules": [
+        "@okta/okta-auth-js"
+      ]
+    }]
   }
 }

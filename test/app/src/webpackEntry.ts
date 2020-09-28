@@ -6,7 +6,7 @@ import * as Cookies from 'js-cookie';
 
 import TestApp from './testApp';
 import { Config, getDefaultConfig, getConfigFromUrl, getConfigFromStorage, clearStorage } from './config';
-import { toQueryParams } from './util';
+import { toQueryString } from './util';
 
 declare global {
   interface Window {
@@ -16,7 +16,7 @@ declare global {
     bootstrapCallback: () => void;
     getWidgetConfig: () => any;
     getAuthJSConfig: () => any;
-    toQueryParams: (obj: any) => string;
+    toQueryString: (obj: any) => string;
   }
 }
 
@@ -37,7 +37,7 @@ function mount(): TestApp {
 }
 
 window.getAuthJSConfig = getDefaultConfig;
-window.toQueryParams = toQueryParams;
+window.toQueryString = toQueryString;
 
 // Login page, read config from URL
 window.getWidgetConfig = function(): any {

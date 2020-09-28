@@ -59,6 +59,12 @@ shell.echo('Modifying final package.json');
 let packageJSON = JSON.parse(fs.readFileSync(`${BUILD_DIR}/package.json`));
 packageJSON.private = false;
 packageJSON.scripts.prepare = '';
+
+// Remove "build/" from the entrypoint paths.
+['main', 'module', 'browser', 'react-native', 'types'].forEach(function(key) {
+  packageJSON[key] = packageJSON[key].replace('build/', '');
+});
+
 fs.writeFileSync(`${BUILD_DIR}/package.json`, JSON.stringify(packageJSON, null, 4));
 
 shell.echo(chalk.green('End building'));

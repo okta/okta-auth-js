@@ -15,7 +15,7 @@
 import { OktaAuth, TokenResponse, Tokens, OktaAuthOptions, AccessToken, IDToken, AuthTransaction, TokenParams } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
-import { htmlString, toQueryParams } from './util';
+import { htmlString, toQueryString } from './util';
 import { Form, updateForm } from './form';
 import { tokensHTML } from './tokens';
 
@@ -109,7 +109,7 @@ class TestApp {
 
   // Mount into the DOM
   mount(window: Window, rootElem: Element): void {
-    const queryParams = toQueryParams(flattenConfig(this.config));
+    const queryParams = toQueryString(flattenConfig(this.config));
     this.originalUrl = MOUNT_PATH + queryParams;
     this.rootElem = rootElem;
     this.rootElem.innerHTML = Layout;

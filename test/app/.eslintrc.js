@@ -37,6 +37,11 @@ module.exports = {
     }
   ],
   'rules': {
+    'node/no-extraneous-import': ['error', {
+      'allowModules': [
+        '@okta/okta-auth-js',
+      ]
+    }],
     '@typescript-eslint/no-explicit-any': 0,
     'node/no-unsupported-features/es-syntax': 0,
     'node/no-unsupported-features/node-builtins': 0,

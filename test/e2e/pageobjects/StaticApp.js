@@ -1,5 +1,5 @@
 import assert from 'assert';
-import toQueryParams from '../util/toQueryParams';
+import toQueryString from '../util/toQueryString';
 
 class StaticApp {
   get unauth() { return $('#unauth'); }
@@ -12,7 +12,7 @@ class StaticApp {
   async open() {
     const ISSUER = process.env.ISSUER;
     const CLIENT_ID = process.env.CLIENT_ID;
-    const params = toQueryParams({
+    const params = toQueryString({
       issuer: ISSUER,
       clientId: CLIENT_ID
     });

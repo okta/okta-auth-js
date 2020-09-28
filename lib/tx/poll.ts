@@ -12,7 +12,7 @@
  */
 
 import http from '../http';
-import { isNumber, isObject, getLink, toQueryParams, delay as delayFn } from '../util';
+import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '../util';
 import { DEFAULT_POLLING_DELAY } from '../constants';
 import AuthSdkError from '../errors/AuthSdkError';
 import AuthPollStopError from '../errors/AuthPollStopError';
@@ -76,7 +76,7 @@ export function getPollFn(sdk, res: TransactionState, ref) {
         opts.rememberDevice = !!rememberDevice;
       }
 
-      var href = pollLink.href + toQueryParams(opts);
+      var href = pollLink.href + toQueryString(opts);
       return http.post(sdk, href, getStateToken(res), {
         saveAuthnState: false  
       });

@@ -18,7 +18,7 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryParams, clone } from '../util';
+import { removeTrailingSlash, toQueryString, clone } from '../util';
 import { getUserAgent } from '../builderUtil';
 import { DEFAULT_MAX_CLOCK_SKEW, ACCESS_TOKEN_STORAGE_KEY, ID_TOKEN_STORAGE_KEY } from '../constants';
 import {
@@ -291,7 +291,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   webfinger(opts) {
-    var url = '/.well-known/webfinger' + toQueryParams(opts);
+    var url = '/.well-known/webfinger' + toQueryString(opts);
     var options = {
       headers: {
         'Accept': 'application/jrd+json'

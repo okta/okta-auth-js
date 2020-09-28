@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <!-- signin widget CSS, served locally from node_modules -->
+    <link rel="stylesheet" href="/css/okta-sign-in.min.css">
+
+    {{> styles.html }}
+  </head>
+  <body>
+    {{> spa/ui.html }}
+
+    <!-- main app webpack bundle -->
+    <script src="/app-bundle.js" type="text/javascript"></script>
+  </body>
+</html>

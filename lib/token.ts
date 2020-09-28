@@ -14,7 +14,7 @@
 /* global window, document, btoa */
 /* eslint-disable complexity, max-statements */
 import http from './http';
-import { toQueryParams, base64UrlToString, clone, isString, removeNils, isFunction } from './util';
+import { toQueryString, base64UrlToString, clone, isString, removeNils, isFunction } from './util';
 import {
   getOAuthUrls,
   validateClaims,
@@ -78,7 +78,7 @@ function revokeToken(sdk: OktaAuth, token: AccessToken): Promise<any> {
     }
     var revokeUrl = getOAuthUrls(sdk).revokeUrl;
     var accessToken = token.accessToken;
-    var args = toQueryParams({
+    var args = toQueryString({
       // eslint-disable-next-line camelcase
       token_type_hint: 'access_token',
       token: accessToken
@@ -389,7 +389,7 @@ function convertTokenParamsToOAuthParams(tokenParams: TokenParams) {
 
 function buildAuthorizeParams(tokenParams: TokenParams) {
   var oauthQueryParams = convertTokenParamsToOAuthParams(tokenParams);
-  return toQueryParams(oauthQueryParams);
+  return toQueryString(oauthQueryParams);
 }
 
 /*

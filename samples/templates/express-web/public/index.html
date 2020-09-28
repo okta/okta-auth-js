@@ -1,0 +1,40 @@
+<html>
+  <head>
+    {{> styles.html }}
+  </head>
+  <body class="web-app landing">
+    <div id="root">
+      <strong>Server-side Login Form</strong>
+      <div id="form">
+        <form method="POST" action="/login">
+          <label for="username">Username:</label><input name="username" id="username" placeholder="username" type="email"/><br/>
+          <label for="password">Password:</label><input name="password" id="password" placeholder="password" type="password"/><br/>
+
+          <label for="issuer">Issuer:</label><input name="issuer" id="issuer" placeholder="issuer" type="text"/><br/>
+          {{#if oidc}}
+          <label for="clientId">Client ID (web app):</label><input name="clientId" id="clientId" placeholder="clientId" type="text"/><br/>
+          <label for="clientSecret">Client Secret (should be stored server-side):</label><input name="clientSecret" id="clientSecret" placeholder="clientSecret" type="text"/><br/>
+          {{/if}}
+          <input id="submitBtn" type="submit"/>
+        </form>
+      </div>
+      <div id="results">
+        <div class="box">
+          <strong>Status</strong><br/>
+          <div id="status"></div>
+        </div>
+        <div class="box">
+          <strong>Session Token</strong><br/>
+          <div id="sessionToken" style="color: green"></div>
+        </div>
+        <div class="box">
+          <strong>Error</strong><br/>
+          <div id="error" style="color: red"></div>
+        </div>
+      </div>
+    </div>
+    <!-- client-side script -->
+    <script src="/client.js" type="text/javascript"></script>
+    <a href="/">Home</a>
+  </body>
+</html>
