@@ -1846,7 +1846,7 @@ authClient.token.parseFromUrl()
 
   // Do something with tokens, such as
   authClient.tokenManager.add('idToken', tokens.idToken);
-  authClient.tokenManager.add('accessToken', tokens.accesstoken);
+  authClient.tokenManager.add('accessToken', tokens.accessToken);
 })
 .catch(function(err) {
   // handle OAuthError
