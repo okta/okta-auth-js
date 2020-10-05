@@ -2202,14 +2202,16 @@ In case of using path-base `/` routing strategy it is possible to define redirec
 1. Right before redirect, save the route you are on (we recommend sessionStorage)
 2. Do the redirect to okta
 3. Redirect back to a dedicated route
-4. Call parseFromUrl(), retrieve tokens, add to tokenManager
+4. Call *parseFromUrl()*, retrieve tokens, add to `tokenManager`
 5. Read saved route and redirect to it
 
 ### Hash-based routing strategy
 
 According to the OAuth 2.0 spec the redirect URI "MUST NOT contain a fragment component": <https://tools.ietf.org/html/rfc6749#section-3.1.2>
 So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific rout.
-That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define some logic that will parse redirect url at the very beginning of your app.
+That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define the logic that will parse redirect url at the very beginning of your app.
+
+Additionally if using hash routing, we recommend to use PKCE and responseMode query (which is the default for PKCE). Using implicit flow, with tokens in the hash could cause unpredictable results since hash routers like to rewrite the fragment.
 
 #### The flow for okta-auth-js with hash-based router:
   1. Create / configure your auth-js instance
