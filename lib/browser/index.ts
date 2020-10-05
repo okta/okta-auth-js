@@ -11,9 +11,11 @@
  *
  */
 
-export { default as OktaAuth } from './browser';
 export * from '../constants';
 export * from '../types';
 export * from '../tx';
 export * from '../errors';
 export * from '../TokenManager';
+
+// Keep the OktaAuth at the bottom of export to prevent from export name overriding
+export { default as OktaAuth } from './browser';
