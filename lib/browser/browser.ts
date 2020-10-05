@@ -18,7 +18,7 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryString, clone, getUrlParts, warn, deprecate } from '../util';
+import { removeTrailingSlash, toQueryString, clone, warn, deprecate } from '../util';
 import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
