@@ -2192,7 +2192,7 @@ The `SUCCESS` transaction will still include a `sessionToken` which you can use 
 
 ## Routing strategy
 
-Handling and defining of redirect URI depends on what rout strategy you use in your project.
+Handling and defining of redirect URI depends on what route strategy you use in your project.
 
 ### Path-based routing strategy
 
