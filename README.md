@@ -480,19 +480,6 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-#### Hash-based routing strategy
-
-According to the OAuth 2.0 spec the redirect URI "MUST NOT contain a fragment component": https://tools.ietf.org/html/rfc6749#section-3.1.2
-So in case of using hash-based strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific rout.
-That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define some logic that will parse redirect url at the very beginning of your app.
-
-### The flow for okta-auth-js with hash-based router:
-  1. Create / configure your auth-js instance
-  2. Before making **any other calls with auth-js** at the VERY BEGINNING of the app call *token.isLoginRedirect* - if this returns true, call *parseFromUrl* and save tokens in storage manager.
-      **It’s important that no other app logic runs until the async parseFromUrl / token manager logic is complete**
-  3. After continue normal app logic
-
-
 ### Optional configuration options
 
 ### `httpRequestClient`
@@ -2202,6 +2189,33 @@ Since the Node library can be used only for the Authentication flow, it implemen
 The main difference is that the Node library does **not** have a `session.setCookieAndRedirect` function, so you will have to redirect by yourself (for example using `res.redirect('https://www.yoursuccesspage.com')`).
 
 The `SUCCESS` transaction will still include a `sessionToken` which you can use with the session APIs: <https://github.com/okta/okta-sdk-nodejs#sessions.>
+
+## Routing strategy
+
+Handling and defining of redirect URI depends on what rout strategy you use in your project.
+
+### Path-based routing strategy
+
+In case of using path-base `/` routing strategy it is possible to define redirect URI with a dedicated callback route.
+
+#### The flow for okta-auth-js with path-based router:
+1. Right before redirect, save the route you are on (we recommend sessionStorage)
+2. Do the redirect to okta
+3. Redirect back to a dedicated route
+4. Call parseFromUrl(), retrieve tokens, add to tokenManager
+5. Read saved route and redirect to it
+
+### Hash-based routing strategy
+
+According to the OAuth 2.0 spec the redirect URI "MUST NOT contain a fragment component": <https://tools.ietf.org/html/rfc6749#section-3.1.2>
+So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific rout.
+That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define some logic that will parse redirect url at the very beginning of your app.
+
+#### The flow for okta-auth-js with hash-based router:
+  1. Create / configure your auth-js instance
+  2. Before making **any other calls with auth-js** at the VERY BEGINNING of the app call *token.isLoginRedirect* - if this returns true, call *parseFromUrl* and save tokens in storage manager.
+      **It’s important that no other app logic runs until the async parseFromUrl / token manager logic is complete**
+  3. After continue normal app logic
 
 ## Building the SDK
 
