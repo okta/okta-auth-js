@@ -649,7 +649,7 @@ describe('Browser', function() {
       }));
     });
     it('should cleare referrer from localStorage', () => {
-      const res = auth.removeFromUri();
+      auth.removeFromUri();
       expect(removeItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY);
     });
   });
