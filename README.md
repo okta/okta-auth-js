@@ -435,20 +435,16 @@ Defaults to `true`, unless the application origin is `http://localhost`, in whic
 
 Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
 
-##### `isAuthenticated`
+##### `transformAuthState`
 
-Callback function. By default, the SDK will consider a user authenticated if both valid idToken and accessToken are available from `tokenManager`. Setting a `isAuthenticated` function on the config will skip the default logic and call the supplied function instead. The function should return a Promise and resolve to either true or false. This callback is only evaluated when the `auth` code has reason to think the authentication state has changed, by default it's been triggered when token state changes.
+Callback function. By default, the SDK will consider a user authenticated if both valid idToken and accessToken are available from `tokenManager`. Setting a `transformAuthState` function on the config will emit a new transformed `authState` based on the evaludated authState from the default logic. The function should return a Promise and resolve to an [AuthState](#authstatemanager). This callback is only evaluated when the `auth` code has reason to think the authentication state has changed, by default it's been triggered when token state changes.
 
 ```javascript
 // Trigger a re-evaluation outside of the default token driven flow
 authClient.authStateManager.updateAuthState();
 ```
 
-This callback function receives the sdk instance as the first function parameter and evaluatedAuthState object as the second parameter, which includes:
-
-* [isPending]: evaluated [authState.isPending](#authstatemanager) from the current [updateAuthState](#authstatemanagerupdateauthstate) evaluation process.
-* [accessToken]: evaluated [authState.accessToken](#authstatemanager) from the current [updateAuthState](#authstatemanagerupdateauthstate) evaluation process.
-* [idToken]: evaluated [authState.idToken](#authstatemanager) from the current [updateAuthState](#authstatemanagerupdateauthstate) evaluation process.
+This callback function receives the sdk instance as the first function parameter and an [authState](#authstatemanager) object as the second parameter.
 
 ##### `devMode`
 

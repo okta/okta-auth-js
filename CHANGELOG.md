@@ -10,20 +10,22 @@
     - `authStateManager.updateAuthState`
     - `authStateManager.subscribe`
     - `authStateManager.unsubscribe`
-  - Adds new methods in sdk scope:
-    - `sdk.loginRedirect`
+  - Adds new methods in sdk browser scope:
+    - `sdk.signInWithCredentials`
+    - `sdk.signInWithRedirect`
     - `sdk.getUser`
     - `sdk.getIdToken`
     - `sdk.getAccessToken`
-    - `sdk.handleAuthentication`
+    - `sdk.parseAndStoreTokensFromUrl`
     - `sdk.setFromUri`
     - `sdk.getFromUri`
+  - Deprecates method in sdk browser scope:
+    - `sdk.signIn`
   - Adds new methods in `sdk.tokenManager`:
     - `tokenManager.getTokens`
     - `tokenManager.setTokens`
-  - Supports browser-based OpenID Connect flows in `sdk.signIn` method (browser bundle only).
-  - Accepts new custom callbacks [options](README.md#configuration-options)
-    - `isAuthenticated`
+  - Accepts new [options](README.md#configuration-options)
+    - `transformAuthState`
     - `autoRemove`
     - `devMode`
 - [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.

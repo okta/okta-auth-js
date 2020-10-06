@@ -66,7 +66,7 @@ class AuthStateManager {
         'authStateManager.subscribe(handler) method before calling updateAuthState.');
     }
 
-    const { isAuthenticated, devMode } = this._sdk.options;
+    const { transformAuthState, devMode } = this._sdk.options;
     const { autoRenew, autoRemove } = this._sdk.tokenManager._getOptions();
 
     const logger = (status) => {
@@ -139,20 +139,19 @@ class AuthStateManager {
             idToken = null;
             isPending = shouldEvaluateIsPending();
           }
-          let promise = isAuthenticated 
-            ? isAuthenticated(this._sdk, { isPending, accessToken, idToken })
-            : Promise.resolve(!!(accessToken && idToken));
+          const authState = {
+            accessToken,
+            idToken,
+            isPending,
+            isAuthenticated: !!(accessToken && idToken)
+          };
+          const promise: Promise<AuthState> = transformAuthState
+            ? transformAuthState(this._sdk, authState)
+            : Promise.resolve(authState);
 
           promise
-            .then(isAuthenticated => emitAndResolve({ 
-              ...this._authState,
-              accessToken,
-              idToken,
-              isAuthenticated,
-              isPending 
-            }))
-            .catch(error => emitAndResolve({ 
-              ...this._authState, 
+            .then(authState => emitAndResolve(authState))
+            .catch(error => emitAndResolve({
               accessToken, 
               idToken, 
               isAuthenticated: false, 

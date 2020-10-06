@@ -122,7 +122,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       transformErrorXHR: args.transformErrorXHR,
       cookies: cookieSettings,
       scopes: args.scopes,
-      isAuthenticated: args.isAuthenticated
+      transformAuthState: args.transformAuthState
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
