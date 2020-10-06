@@ -228,7 +228,7 @@ if (!userInfo) {
 ```
 
 ## Routing strategies
-**!** Routing is optional strategy for token handling. Instead you can use [popup](#tokengetwithpopupoptions) or [sign widget](https://github.com/okta/okta-signin-widget).
+**!** Routing is **optional** strategy for token handling. Instead you can use [popup](#tokengetwithpopupoptions) or [sign widget](https://github.com/okta/okta-signin-widget).
 
 Handling and defining of redirect URI depends on what route strategy you use in your project.
 
@@ -250,6 +250,12 @@ So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can 
 That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define the logic that will parse redirect url at the very beginning of your app.
 
 Additionally if using hash routing, we recommend to use PKCE and responseMode query (which is the default for PKCE). Using implicit flow, with tokens in the hash could cause unpredictable results since hash routers like to rewrite the fragment.
+
+#### The flow for okta-auth-js with hash-based router:
+  1. Create / configure your auth-js instance
+  2. Before making **any other calls with auth-js** at the VERY BEGINNING of the app call *token.isLoginRedirect* - if this returns true, call *parseFromUrl* and save tokens in storage manager.
+      **It’s important that no other app logic runs until the async parseFromUrl / token manager logic is complete**
+  3. After continue normal app logic
 
 ## Configuration reference
 
@@ -1850,12 +1856,6 @@ authClient.token.getWithRedirect({
   // handle AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
 });
 ```
-
-#### The flow for okta-auth-js with hash-based router:
-  1. Create / configure your auth-js instance
-  2. Before making **any other calls with auth-js** at the VERY BEGINNING of the app call *token.isLoginRedirect* - if this returns true, call *parseFromUrl* and save tokens in storage manager.
-      **It’s important that no other app logic runs until the async parseFromUrl / token manager logic is complete**
-  3. After continue normal app logic
 
 #### `token.parseFromUrl(options)`
 
