@@ -19,6 +19,7 @@
     - `sdk.storeTokensFromRedirect`
     - `sdk.setFromUri`
     - `sdk.getFromUri`
+    - `sdk.removeFromUri`
   - Deprecates method in sdk browser scope:
     - `sdk.signIn`
   - Adds new methods in `sdk.tokenManager`:
