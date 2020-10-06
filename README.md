@@ -651,6 +651,7 @@ if (authClient.token.isLoginRedirect()) {
   authClient.storeTokensFromRedirect();
   // Get and clear fromUri from storage
   const fromUri = authClient.getFromUri();
+  authClient.removeFromUri();
   // Redirect to fromUri
   history.replaceState(null, '', fromUri);
 } else if (!authClient.authStateManager.getAuthState().isAuthenticated) {
