@@ -18,7 +18,7 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryString, clone, getUrlParts } from '../util';
+import { removeTrailingSlash, toQueryString, clone, warn, deprecate } from '../util';
 import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
@@ -61,8 +61,7 @@ import {
   FingerprintAPI,
   UserClaims, 
   SigninWithRedirectOptions,
-  isSignInWithCredentialsOptions,
-  TokenParams
+  SignInWithCredentialsOptions
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
@@ -101,7 +100,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     if (cookieSettings.secure && !this.features.isHTTPS()) {
       // eslint-disable-next-line no-console
-      console.warn(
+      warn(
         'The current page is not being served with the HTTPS protocol.\n' +
         'For security reasons, we strongly recommend using HTTPS.\n' +
         'If you cannot use HTTPS, set "cookies.secure" option to false.'
@@ -123,8 +122,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       transformErrorXHR: args.transformErrorXHR,
       cookies: cookieSettings,
       scopes: args.scopes,
-      isAuthenticated: args.isAuthenticated,
-      onAuthRequired: args.onAuthRequired
+      transformAuthState: args.transformAuthState
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
@@ -210,48 +208,57 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.authStateManager = new AuthStateManager(this);
   }
 
+  /**
+   * Alias method of signInWithCredentials
+   * 
+   * @todo This method is deprecated. Remove it in 5.0
+   */ 
   signIn(opts) {
-    const loginWithCredential = (opts) => {
-      opts = clone(opts || {});
-      const _postToTransaction = (options?) => {
-        delete opts.sendFingerprint;
-        return postToTransaction(this, '/api/v1/authn', opts, options);
-      };
-      if (!opts.sendFingerprint) {
-        return _postToTransaction();
-      }
-      return this.fingerprint()
-      .then(function(fingerprint) {
-        return _postToTransaction({
-          headers: {
-            'X-Device-Fingerprint': fingerprint
-          }
-        });
-      });
-    };
+    if (this.features.isLocalhost()) {
+      deprecate('This method has been deprecated, please use signInWithCredentials() instead.');
+    }
+    return this.signInWithCredentials(opts);
+  }
 
-    const loginWithRedirect = async (opts: SigninWithRedirectOptions = {}) => {
-      if(this._pending.handleLogin) { 
-        // Don't trigger second round
-        return;
-      }
-  
-      this._pending.handleLogin = true;
-      this.setFromUri(opts.fromUri);
-      try {
-        if (this.options.onAuthRequired) {
-          return await this.options.onAuthRequired(this);
+  signInWithCredentials(opts: SignInWithCredentialsOptions) {
+    opts = clone(opts || {});
+    const _postToTransaction = (options?) => {
+      delete opts.sendFingerprint;
+      return postToTransaction(this, '/api/v1/authn', opts, options);
+    };
+    if (!opts.sendFingerprint) {
+      return _postToTransaction();
+    }
+    return this.fingerprint()
+    .then(function(fingerprint) {
+      return _postToTransaction({
+        headers: {
+          'X-Device-Fingerprint': fingerprint
         }
-        return await this.loginRedirect(undefined, opts);
-      } finally {
-        this._pending.handleLogin = null;
-      }
-    };
+      });
+    });
+  }
 
-    if (isSignInWithCredentialsOptions(opts)) {
-      return loginWithCredential(opts);
-    } else {
-      return loginWithRedirect(opts);
+  async signInWithRedirect({ fromUri, ...additionalParams }: SigninWithRedirectOptions = {}) {
+    if(this._pending.handleLogin) { 
+      // Don't trigger second round
+      return;
+    }
+
+    this._pending.handleLogin = true;
+    const { scopes, responseType } = this.options;
+    try {
+      // Trigger default signIn redirect flow
+      if (fromUri) {
+        this.setFromUri(fromUri);
+      }
+      const params = Object.assign({
+        scopes: scopes || ['openid', 'email', 'profile'],
+        responseType: responseType || ['id_token', 'token']
+      }, additionalParams);
+      await this.token.getWithRedirect(params);
+    } finally {
+      this._pending.handleLogin = false;
     }
   }
   
@@ -354,24 +361,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   //
-  // Methods from dowstream SDKs' AuthService
+  // Common Methods from downstream SDKs
   //
-
-  // Common APIs
-
-  async loginRedirect(fromUri?: string, additionalParams?: TokenParams): Promise<void> {
-    if (fromUri) {
-      this.setFromUri(fromUri);
-    }
-
-    const { scopes, responseType } = this.options;
-    const params = Object.assign({
-      scopes: scopes || ['openid', 'email', 'profile'],
-      responseType: responseType || ['id_token', 'token']
-    }, additionalParams);
-
-    return this.token.getWithRedirect(params);
-  }
 
   async getUser(): Promise<UserClaims> {
     return this.token.getUserInfo();
@@ -395,7 +386,10 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
   }
 
-  async handleAuthentication(): Promise<void> {
+  /**
+   * Store parsed tokens from redirect url
+   */
+  async storeTokensFromRedirect(): Promise<void> {
     const { tokens } = await this.token.parseFromUrl();
     this.tokenManager.setTokens(tokens);
   }
@@ -403,23 +397,20 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   setFromUri(fromUri?: string): void {
     // Use current location if fromUri was not passed
     fromUri = fromUri || window.location.href;
-    // If a relative path was passed, convert to absolute URI
-    if (fromUri.charAt(0) === '/') {
-      fromUri = window.location.origin + fromUri;
-    }
-    sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
+    // Store fromUri
+    const storage = browserStorage.getSessionStorage();
+    storage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
   }
 
-  getFromUri(relative = false): string {
-    let fromUri = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
-    sessionStorage.removeItem(REFERRER_PATH_STORAGE_KEY);
-    if (!relative) {
-      return fromUri;
-    }
-
-    const { pathname, search, hash } = getUrlParts(fromUri);
-    fromUri = `${pathname}${search}${hash}`;
+  getFromUri(): string {
+    const storage = browserStorage.getSessionStorage();
+    const fromUri = storage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
     return fromUri;
+  }
+
+  removeFromUri(): void {
+    const storage = browserStorage.getSessionStorage();
+    storage.removeItem(REFERRER_PATH_STORAGE_KEY);
   }
 }
 

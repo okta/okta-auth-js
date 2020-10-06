@@ -186,10 +186,10 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to sessionStorage if localStorage isn\'t available', function() {
-      jest.spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'warn');
       oauthUtil.mockLocalStorageError();
       setupSync();
-      expect(window.console.log).toHaveBeenCalledWith(
+      expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support localStorage. Switching to sessionStorage.'
       );
@@ -199,10 +199,10 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to sessionStorage if localStorage cannot be written to', function() {
-      jest.spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'warn');
       oauthUtil.mockStorageSetItemError();
       setupSync();
-      expect(window.console.log).toHaveBeenCalledWith(
+      expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support localStorage. Switching to sessionStorage.'
       );
@@ -212,11 +212,11 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
-      jest.spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'warn');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockSessionStorageError();
       setupSync();
-      expect(window.console.log).toHaveBeenCalledWith(
+      expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support sessionStorage. Switching to cookie-based storage.'
       );
@@ -230,7 +230,7 @@ describe('TokenManager', function() {
       );
     });
     it('defaults to cookie-based storage if sessionStorage cannot be written to', function() {
-      jest.spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'warn');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockStorageSetItemError();
       setupSync({
@@ -238,7 +238,7 @@ describe('TokenManager', function() {
           storage: 'sessionStorage'
         }
       });
-      expect(window.console.log).toHaveBeenCalledWith(
+      expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support sessionStorage. Switching to cookie-based storage.'
       );

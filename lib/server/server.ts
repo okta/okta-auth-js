@@ -16,8 +16,6 @@ import OktaAuthBase from '../OktaAuthBase';
 import fetchRequest from '../fetch/fetchRequest';
 import { getUserAgent } from '../builderUtil';
 import serverStorage from './serverStorage';
-import { isSignInWithCredentialsOptions } from '../types';
-import { AuthSdkError } from '../errors';
 const PACKAGE_JSON = require('../../package.json');
 
 const SDK_VERSION = PACKAGE_JSON.version;
@@ -31,12 +29,5 @@ export default class OktaAuthNode extends OktaAuthBase {
     super(args);
 
     this.userAgent = getUserAgent(args, `okta-auth-js-server/${SDK_VERSION}`);
-  }
-
-  signIn(opts) {
-    if (!isSignInWithCredentialsOptions(opts)) {
-      throw new AuthSdkError('Invalid signinOptions are provided.');
-    }
-    return super.signIn(opts);
   }
 }

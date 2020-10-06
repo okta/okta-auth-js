@@ -81,6 +81,20 @@ describe('AuthStateManager', () => {
       sdkMock.tokenManager.hasExpired = jest.fn().mockReturnValue(false);
     });
 
+    it('should log console warning if no listener is registered for authStateChange', () => {
+      jest.spyOn(console, 'warn').mockReturnValue(null);
+      const instance = new AuthStateManager(sdkMock);
+      instance.updateAuthState();
+      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] WARN: updateAuthState is an asynchronous method with no return, please subscribe to the latest authState update with authStateManager.subscribe(handler) method before calling updateAuthState.');
+    });
+    it('should not log console warning if listener is registered for authStateChange', () => {
+      jest.spyOn(console, 'warn').mockReturnValue(null);
+      const instance = new AuthStateManager(sdkMock);
+      instance.subscribe(() => {});
+      instance.updateAuthState();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
     it('should emit an authState with isAuthenticated === true', () => {
       expect.assertions(2);
       return new Promise(resolve => {
@@ -154,8 +168,14 @@ describe('AuthStateManager', () => {
       });
     });
 
-    it('should evaluate authState.isAuthenticated based on "isAuthenticated" callback if it\'s provided', () => {
-      sdkMock.options.isAuthenticated = jest.fn().mockResolvedValue(false);
+    it('should evaluate authState based on "transformAuthState" callback if it\'s provided', () => {
+      const fakeAuthState = {
+        accessToken: 'fakeAccessToken0',
+        idToken: 'fakeIdToken0',
+        isAuthenticated: false,
+        isPending: false,
+      };
+      sdkMock.options.transformAuthState = jest.fn().mockResolvedValue(fakeAuthState);
       expect.assertions(3);
       return new Promise(resolve => {
         const instance = new AuthStateManager(sdkMock);
@@ -164,14 +184,9 @@ describe('AuthStateManager', () => {
         instance.subscribe(handler);
 
         setTimeout(() => {
-          expect(sdkMock.options.isAuthenticated).toHaveBeenCalledTimes(1);
+          expect(sdkMock.options.transformAuthState).toHaveBeenCalledTimes(1);
           expect(handler).toHaveBeenCalledTimes(1);
-          expect(handler).toHaveBeenCalledWith({
-            accessToken: 'fakeAccessToken0',
-            idToken: 'fakeIdToken0',
-            isAuthenticated: false,
-            isPending: false,
-          });
+          expect(handler).toHaveBeenCalledWith(fakeAuthState);
           resolve();
         }, 100);
       });
@@ -229,10 +244,17 @@ describe('AuthStateManager', () => {
       });
     });
 
-    it('should emit error in authState if isAuthenticated throws error', () => {
+    it('should emit error in authState if transformAuthState throws error', () => {
       expect.assertions(2);
       const error = new Error('fake error');
-      sdkMock.options.isAuthenticated = jest.fn().mockRejectedValue(error);
+      const fakeAuthState = {
+        accessToken: 'fakeAccessToken0',
+        idToken: 'fakeIdToken0',
+        isAuthenticated: false,
+        isPending: false,
+        error
+      };
+      sdkMock.options.transformAuthState = jest.fn().mockRejectedValue(error);
       return new Promise(resolve => {
         const instance = new AuthStateManager(sdkMock);
         instance.updateAuthState();
@@ -241,13 +263,7 @@ describe('AuthStateManager', () => {
 
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
-          expect(handler).toHaveBeenCalledWith({
-            accessToken: 'fakeAccessToken0',
-            idToken: 'fakeIdToken0',
-            isAuthenticated: false,
-            isPending: false,
-            error
-          });
+          expect(handler).toHaveBeenCalledWith(fakeAuthState);
           resolve();
         }, 100);
       });

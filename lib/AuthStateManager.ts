@@ -1,6 +1,7 @@
 import { AuthSdkError } from './errors';
 import { AuthState, UpdateAuthStateOptions } from './types';
 import { OktaAuth } from './browser';
+import { getConsole, warn } from './util';
 const PCancelable = require('p-cancelable');
 
 export const DEFAULT_AUTH_STATE = { 
@@ -57,14 +58,22 @@ class AuthStateManager {
   }
 
   updateAuthState({ event, key, token }: UpdateAuthStateOptions = {}): void {
-    const { isAuthenticated, devMode } = this._sdk.options;
+    if (!this._sdk.emitter.e 
+        || !this._sdk.emitter.e[EVENT_AUTH_STATE_CHANGE] 
+        || !this._sdk.emitter.e[EVENT_AUTH_STATE_CHANGE].length) {
+      warn('updateAuthState is an asynchronous method with no return, ' + 
+        'please subscribe to the latest authState update with ' + 
+        'authStateManager.subscribe(handler) method before calling updateAuthState.');
+    }
+
+    const { transformAuthState, devMode } = this._sdk.options;
     const { autoRenew, autoRemove } = this._sdk.tokenManager._getOptions();
 
     const logger = (status) => {
-      console.group(`OKTA-AUTH-JS:updateAuthState: Event:${event} Status:${status}`);
-      console.log(key, token);
-      console.log('Current authState', this._authState);
-      console.groupEnd();
+      getConsole().group(`OKTA-AUTH-JS:updateAuthState: Event:${event} Status:${status}`);
+      getConsole().log(key, token);
+      getConsole().log('Current authState', this._authState);
+      getConsole().groupEnd();
     };
 
     const emitAuthStateChange = (authState) => {
@@ -130,20 +139,19 @@ class AuthStateManager {
             idToken = null;
             isPending = shouldEvaluateIsPending();
           }
-          let promise = isAuthenticated 
-            ? isAuthenticated(this._sdk)
-            : Promise.resolve(!!(accessToken && idToken));
+          const authState = {
+            accessToken,
+            idToken,
+            isPending,
+            isAuthenticated: !!(accessToken && idToken)
+          };
+          const promise: Promise<AuthState> = transformAuthState
+            ? transformAuthState(this._sdk, authState)
+            : Promise.resolve(authState);
 
           promise
-            .then(isAuthenticated => emitAndResolve({ 
-              ...this._authState,
-              accessToken,
-              idToken,
-              isAuthenticated,
-              isPending 
-            }))
-            .catch(error => emitAndResolve({ 
-              ...this._authState, 
+            .then(authState => emitAndResolve(authState))
+            .catch(error => emitAndResolve({
               accessToken, 
               idToken, 
               isAuthenticated: false, 

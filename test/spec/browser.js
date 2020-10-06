@@ -1,5 +1,5 @@
 /* eslint-disable no-new */
-/* global window, sessionStorage */
+/* global window */
 jest.mock('cross-fetch');
 jest.mock('../../lib/tx');
 
@@ -10,6 +10,7 @@ import {
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import {postToTransaction} from '../../lib/tx';
+import storageUtil from '../../lib/browser/browserStorage';
 
 describe('Browser', function() {
   let auth;
@@ -69,7 +70,7 @@ describe('Browser', function() {
         
         // eslint-disable-next-line no-console
         expect(console.warn).toHaveBeenCalledWith(
-          'The current page is not being served with the HTTPS protocol.\n' +
+          '[okta-auth-sdk] WARN: The current page is not being served with the HTTPS protocol.\n' +
           'For security reasons, we strongly recommend using HTTPS.\n' +
           'If you cannot use HTTPS, set "cookies.secure" option to false.'
         );
@@ -101,72 +102,101 @@ describe('Browser', function() {
     });
   });
 
+  describe('signInWithCredentials', () => {
+    let options;
+    beforeEach(() => {
+      options = { username: 'fake', password: 'fake' };
+      auth.fingerprint = jest.fn().mockResolvedValue('fake fingerprint');
+    });
+    it('should call "/api/v1/authn" endpoint with default options', async () => {
+      await auth.signInWithCredentials(options);
+      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
+    });
+    it('should call fingerprint if has sendFingerprint in options', async () => {
+      options.sendFingerprint = true;
+      await auth.signInWithCredentials(options);
+      delete options.sendFingerprint;
+      expect(auth.fingerprint).toHaveBeenCalled();
+      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, {
+        headers: { 'X-Device-Fingerprint': 'fake fingerprint' }
+      });
+    });
+  });
+
   describe('signIn', () => {
-    describe('loginWithRedirect', () => {
-      beforeEach(() => {
-        auth.loginRedirect = jest.fn();
-        auth.setFromUri = jest.fn();
-      });
-      it('calls loginRedirect by default', async () => {
-        expect.assertions(1);
-        await auth.signIn();
-        expect(auth.loginRedirect).toHaveBeenCalled();
-      });
-  
-      it('calls onAuthRequired, if provided, instead of loginRedirect', async () => {
-        auth.options.onAuthRequired = jest.fn().mockResolvedValue();
-        await auth.signIn();
-        expect(auth.loginRedirect).not.toHaveBeenCalled();
-        expect(auth.options.onAuthRequired).toHaveBeenCalledWith(auth);
-      });
-  
-      it('Calls setFromUri with fromUri, if provided', () => {
-        const fromUri = 'notrandom';
-        auth.signIn({ fromUri });
-        expect(auth.setFromUri).toHaveBeenCalledWith(fromUri);
-      });
-  
-      it('Calls setFromUri with undefined, by default', () => {
-        auth.setFromUri = jest.fn();
-        auth.signIn();
-        expect(auth.setFromUri).toHaveBeenCalledWith(undefined);
-      });
-  
-      it('Passes "additionalParams" to loginRedirect', () => {
-        const fromUri = 'https://foo.random';
-        const additionalParams = { fromUri, foo: 'bar', baz: 'biz' };
-        auth.signIn(additionalParams);
-        expect(auth.loginRedirect).toHaveBeenCalledWith(undefined, additionalParams);
-        expect(auth.setFromUri).toHaveBeenCalledWith(fromUri);
-      });
-  
-      it('should not trigger second call if login is in progress', () => {
-        expect.assertions(1);
-        auth.loginRedirect = jest.fn();
-        return Promise.all([auth.signIn(), auth.signIn()]).then(() => {
-          expect(auth.loginRedirect).toHaveBeenCalledTimes(1);
-        });
+    let options;
+    beforeEach(() => {
+      options = { username: 'fake', password: 'fake' };
+      auth.signInWithCredentials = jest.fn();
+    });
+    it('should console warning for deprecation if is localhost', async () => {
+      global.window.location = {
+        protocol: 'http:',
+        hostname: 'localhost',
+        href: 'http://localhost'
+      };
+      jest.spyOn(console, 'warn').mockReturnValue(null);
+      await auth.signIn(options);
+      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: This method has been deprecated, please use signInWithCredentials() instead.');
+    });
+    it('should not console warning for deprecation if is not localhost', async () => {
+      jest.spyOn(console, 'warn').mockReturnValue(null);
+      await auth.signIn(options);
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+    it('should call signIn() with provided options', async () => {
+      await auth.signIn(options);
+      expect(auth.signInWithCredentials).toHaveBeenCalledWith(options);
+    });
+  });
+
+  describe('signInWithRedirect', () => {
+    let setItemMock;
+    beforeEach(() => {
+      auth.token.getWithRedirect = jest.fn().mockResolvedValue('fake');
+      setItemMock = jest.fn();
+      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+        setItem: setItemMock
+      }));
+    });
+
+    it('should add fromUri to sessionStorage if provided in options', async () => {
+      const fromUri = 'notrandom';
+      await auth.signInWithRedirect({ fromUri });
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, fromUri);
+    });
+
+    it('should not add fromUri to sessionStorage if no fromUri in options', async () => {
+      await auth.signInWithRedirect();
+      expect(setItemMock).not.toHaveBeenCalled();
+    });
+
+    it('should use default scopes and responseType if none is provided', async () => {
+      await auth.signInWithRedirect({ foo: 'bar' });
+      expect(auth.token.getWithRedirect).toHaveBeenCalledWith({
+        foo: 'bar',
+        scopes: ['openid', 'email', 'profile'],
+        responseType: ['id_token', 'token']
       });
     });
 
-    describe('loginWithCredentials', () => {
-      let options;
-      beforeEach(() => {
-        options = { username: 'fake', password: 'fake' };
-        auth.fingerprint = jest.fn().mockResolvedValue('fake fingerprint');
-      });
-      it('should call "/api/v1/authn" endpoint with default options', async () => {
-        await auth.signIn(options);
-        expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
-      });
-      it('should call fingerprint if has sendFingerprint in options', async () => {
-        options.sendFingerprint = true;
-        await auth.signIn(options);
-        delete options.sendFingerprint;
-        expect(auth.fingerprint).toHaveBeenCalled();
-        expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, {
-          headers: { 'X-Device-Fingerprint': 'fake fingerprint' }
-        });
+    it('should use provided scopes and responseType', async () => {
+      const params = { scopes: ['openid'], responseType: ['token'] };
+      await auth.signInWithRedirect(params);
+      expect(auth.token.getWithRedirect).toHaveBeenCalledWith(params);
+    });
+
+    it('should passes "additionalParams" to token.getWithRedirect()', () => {
+      const additionalParams = { foo: 'bar', baz: 'biz', scopes: ['fake'], responseType: ['fake'] };
+      const params = { fromUri: 'https://foo.random', ...additionalParams };
+      auth.signInWithRedirect(params);
+      expect(auth.token.getWithRedirect).toHaveBeenCalledWith(additionalParams);
+    });
+
+    it('should not trigger second call if signIn flow is in progress', () => {
+      expect.assertions(1);
+      return Promise.all([auth.signInWithRedirect(), auth.signInWithRedirect()]).then(() => {
+        expect(auth.token.getWithRedirect).toHaveBeenCalledTimes(1);
       });
     });
   });
@@ -547,61 +577,7 @@ describe('Browser', function() {
     });
   });
 
-  describe('loginRedirect', () => {
-    beforeEach(() => {
-      auth.setFromUri = jest.fn();
-      auth.token.getWithRedirect = jest.fn();
-    });
-    it('If a URI is passed, it calls setFromUri', async () => {
-      const uri = 'https://foo.random';
-      await auth.loginRedirect(uri);
-      expect(auth.setFromUri).toHaveBeenCalledWith(uri);
-    });
-    it('If no URI is passed, it does not call setFromUri', async () => {
-      await auth.loginRedirect();
-      expect(auth.setFromUri).not.toHaveBeenCalled();
-    });
-    it('Sets responseType and scopes from config if none supplied', async () => {
-      auth.options = {
-        responseType: ['fake'], 
-        scopes: ['openid', 'fake']
-      };
-      const uri = 'https://foo.random';
-      await auth.loginRedirect(uri);
-      expect(auth.token.getWithRedirect).toHaveBeenCalledWith({
-        responseType: ['fake'],
-        scopes: ['openid', 'fake'],
-      });
-    });
-    it('Accepts additional parameters, which override config values', async () => {
-      const uri = 'https://foo.random';
-      const params = {
-        responseType: ['token', 'something'],
-        scopes: ['openid', 'foo'],
-        unknownParameter: 'super random',
-        unkownSection: {
-          other: 'stuff'
-        }
-      };
-      await auth.loginRedirect(uri, params);
-      expect(auth.token.getWithRedirect).toHaveBeenCalledWith(params);
-    });
-    it('Values for "scopes" and "responseType" can be completely overridden from base values', async () => {
-      auth.options = {
-        scopes: ['foo', 'bar', 'openid'],
-        responseType: ['unknown'],
-      };
-      const uri = 'https://foo.random';
-      const params2 = {
-        scopes: ['something', 'different'],
-        responseType: ['also', 'different'],
-      };
-      await auth.loginRedirect(uri, params2);
-      expect(auth.token.getWithRedirect).toHaveBeenCalledWith(params2);
-    });
-  });
-
-  describe('handleAuthentication', () => {
+  describe('storeTokensFromRedirect', () => {
     beforeEach(() => {
       auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
         tokens: { idToken: 'fakeIdToken', accessToken: 'fakeAccessToken' }
@@ -609,7 +585,7 @@ describe('Browser', function() {
       auth.tokenManager.setTokens = jest.fn();
     });
     it('calls parseFromUrl', async () => {
-      await auth.handleAuthentication();
+      await auth.storeTokensFromRedirect();
       expect(auth.token.parseFromUrl).toHaveBeenCalled();
     });
     it('stores tokens', async () => {
@@ -618,42 +594,63 @@ describe('Browser', function() {
       auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
         tokens: { accessToken, idToken }
       });
-      await auth.handleAuthentication();
+      await auth.storeTokensFromRedirect();
       expect(auth.tokenManager.setTokens).toHaveBeenCalledWith({ accessToken, idToken });
     });
   });
 
   describe('setFromUri', () => {
+    let setItemMock;
+    beforeEach(() => {
+      setItemMock = jest.fn();
+      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+        setItem: setItemMock
+      }));
+    });
     it('should save the "referrerPath" in sessionStorage', () => {
-      sessionStorage.setItem('referrerPath', '');
-      expect(sessionStorage.getItem('referrerPath')).toBe('');
       const uri = 'https://foo.random';
       auth.setFromUri(uri);
-      const val = sessionStorage.getItem('referrerPath');
-      expect(val).toBe(uri);
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, uri);
     });
     it('should save the window.location.href by default', () => {
-      sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, '');
-      expect(sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY)).toBe('');
       auth.setFromUri();
-      const val = sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY);
-      expect(val).toBe(window.location.href);
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, window.location.href);
     });
   });
 
   describe('getFromUri', () => {
-    it('cleares referrer from localStorage', () => {
-      const TEST_VALUE = 'foo-bar';
-      sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, TEST_VALUE);
+    let removeItemMock;
+    let getItemMock;
+    beforeEach(() => {
+      removeItemMock = jest.fn();
+      getItemMock = jest.fn().mockReturnValue('fakeFromUri');
+      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+        getItem: getItemMock,
+        removeItem: removeItemMock
+      }));
+    });
+    it('should get and cleare referrer from storage', () => {
       const res = auth.getFromUri();
-      expect(res).toBe(TEST_VALUE);
-      expect(sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY)).not.toBeTruthy();
+      expect(res).toBe('fakeFromUri');
     });
     it('returns window.location.origin if nothing was set', () => {
-      sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, '');
+      getItemMock = jest.fn().mockReturnValue(null);
       const res = auth.getFromUri();
       expect(res).toBe(window.location.origin);
-      expect(sessionStorage.getItem(REFERRER_PATH_STORAGE_KEY)).not.toBeTruthy();
+    });
+  });
+
+  describe('removeFromUri', () => {
+    let removeItemMock;
+    beforeEach(() => {
+      removeItemMock = jest.fn();
+      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+        removeItem: removeItemMock
+      }));
+    });
+    it('should cleare referrer from localStorage', () => {
+      const res = auth.removeFromUri();
+      expect(removeItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY);
     });
   });
 });
