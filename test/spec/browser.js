@@ -577,7 +577,7 @@ describe('Browser', function() {
     });
   });
 
-  describe('parseAndStoreTokensFromUrl', () => {
+  describe('storeTokensFromRedirect', () => {
     beforeEach(() => {
       auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
         tokens: { idToken: 'fakeIdToken', accessToken: 'fakeAccessToken' }
@@ -585,7 +585,7 @@ describe('Browser', function() {
       auth.tokenManager.setTokens = jest.fn();
     });
     it('calls parseFromUrl', async () => {
-      await auth.parseAndStoreTokensFromUrl();
+      await auth.storeTokensFromRedirect();
       expect(auth.token.parseFromUrl).toHaveBeenCalled();
     });
     it('stores tokens', async () => {
@@ -594,7 +594,7 @@ describe('Browser', function() {
       auth.token.parseFromUrl = jest.fn().mockResolvedValue({ 
         tokens: { accessToken, idToken }
       });
-      await auth.parseAndStoreTokensFromUrl();
+      await auth.storeTokensFromRedirect();
       expect(auth.tokenManager.setTokens).toHaveBeenCalledWith({ accessToken, idToken });
     });
   });

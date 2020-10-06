@@ -437,7 +437,7 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 
 ##### `transformAuthState`
 
-Callback function. By default, the SDK will consider a user authenticated if both valid idToken and accessToken are available from `tokenManager`. Setting a `transformAuthState` function on the config will emit a new transformed `authState` based on the evaludated authState from the default logic. The function should return a Promise and resolve to an [AuthState](#authstatemanager). This callback is only evaluated when the `auth` code has reason to think the authentication state has changed, by default it's been triggered when token state changes.
+Callback function. By default, the SDK will consider a user authenticated if both valid idToken and accessToken are available from `tokenManager`. Setting a `transformAuthState` function on the config will emit a new transformed `authState` based on the evaluated authState from the default logic. The function should return a Promise and resolve to an [AuthState](#authstatemanager). This callback is only evaluated when the `auth` code has reason to think the authentication state has changed, by default it's been triggered when token state changes.
 
 ```javascript
 // Trigger a re-evaluation outside of the default token driven flow
@@ -544,7 +544,7 @@ var config = {
 * [getUser](#getuser)
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
-* [parseAndStoreTokensFromUrl](#parseandstoretokensfromurl)
+* [storeTokensFromRedirect](#storetokensfromredirect)
 * [setFromUri](#setfromurifromuri)
 * [getFromUri](#getfromuri)
 * [tx.resume](#txresume)
@@ -628,12 +628,12 @@ authClient.signInWithCredentials({
 ### `signInWithRedirect(options)`
 
 Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a fromUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
-You can use [parseAndStoreTokensFromUrl](#parseandstoretokensfromurl) to store tokens and [getFromUri](#getfromuri) to clear the intermediate state (the fromUri) after successful authentication.
+You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getFromUri](#getfromuri) to clear the intermediate state (the fromUri) after successful authentication.
 
 ```javascript
 if (authClient.token.isLoginRedirect()) {
   // Call handleAuthentication to store tokens when redirect back from OKTA
-  authClient.parseAndStoreTokensFromUrl();
+  authClient.storeTokensFromRedirect();
   // Get and clear fromUri from storage
   const fromUri = authClient.getFromUri();
   // Redirect to fromUri
@@ -871,7 +871,7 @@ Resolves with the id token string retrieved from storage if it exists. Devs shou
 
 Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
 
-### `parseAndStoreTokensFromUrl()`
+### `storeTokensFromRedirect()`
 
 > :hourglass: async
 

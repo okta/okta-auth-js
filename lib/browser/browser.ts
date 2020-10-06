@@ -389,7 +389,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   /**
    * Store parsed tokens from redirect url
    */
-  async parseAndStoreTokensFromUrl(): Promise<void> {
+  async storeTokensFromRedirect(): Promise<void> {
     const { tokens } = await this.token.parseFromUrl();
     this.tokenManager.setTokens(tokens);
   }

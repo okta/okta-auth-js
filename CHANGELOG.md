@@ -16,7 +16,7 @@
     - `sdk.getUser`
     - `sdk.getIdToken`
     - `sdk.getAccessToken`
-    - `sdk.parseAndStoreTokensFromUrl`
+    - `sdk.storeTokensFromRedirect`
     - `sdk.setFromUri`
     - `sdk.getFromUri`
   - Deprecates method in sdk browser scope:
