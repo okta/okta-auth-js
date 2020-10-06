@@ -1,5 +1,5 @@
 import Emitter from 'tiny-emitter';
-import AuthStateManager, { DEFAULT_AUTH_STATE } from '../../lib/AuthStateManager';
+import { AuthStateManager, DEFAULT_AUTH_STATE } from '../../lib/AuthStateManager';
 import { AuthSdkError } from '../../lib/errors';
 
 describe('AuthStateManager', () => {

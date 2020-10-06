@@ -26,7 +26,7 @@ const isSameAuthState = (prevState: AuthState, state: AuthState) => {
     && prevState.error === state.error;
 };
 
-class AuthStateManager {
+export class AuthStateManager {
   _sdk: OktaAuth;
   _pending: { 
     updateAuthStatePromise: typeof PCancelable;
@@ -172,5 +172,3 @@ class AuthStateManager {
     this._sdk.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
   }
 }
-
-export default AuthStateManager;

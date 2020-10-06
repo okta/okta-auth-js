@@ -65,7 +65,7 @@ import {
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
-import AuthStateManager from '../AuthStateManager';
+import { AuthStateManager } from '../AuthStateManager';
 
 const Emitter = require('tiny-emitter');
 
