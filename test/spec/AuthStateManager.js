@@ -53,6 +53,16 @@ describe('AuthStateManager', () => {
       expect(instance.updateAuthState).toHaveBeenCalled();
     });
 
+    it('should not call updateAuthState when "added" event emitted before lastEventTimestamp', () => {
+      const instance = new AuthStateManager(sdkMock);
+      const now = Date.now();
+      instance._lastEventTimestamp = now;
+      instance.updateAuthState = jest.fn();
+      sdkMock.emitter.emit('added', 'fakeKey', 'fakeToken', { timestamp: now - 1000 });
+      expect(instance.updateAuthState).not.toHaveBeenCalled();
+    });
+
+
     it('should call updateAuthState when "removed" event emitted', () => {
       const instance = new AuthStateManager(sdkMock);
       instance.updateAuthState = jest.fn();
@@ -369,32 +379,6 @@ describe('AuthStateManager', () => {
       });
     });
 
-    it('should not trigger updateAuthState process if the comming event is earlier than last processed event', () => {
-      expect.assertions(2);
-      return new Promise(resolve => {
-        const latestTimestamp = Date.now();
-        const timestampFromPast = latestTimestamp - 1000;
-        const instance = new AuthStateManager(sdkMock);
-        instance.updateAuthState({ timestamp: latestTimestamp });
-        setTimeout(() => {
-          instance.updateAuthState({ timestamp: timestampFromPast });
-        }, 50);
-        const handler = jest.fn();
-        instance.subscribe(handler);
-
-        setTimeout(() => {
-          expect(handler).toHaveBeenCalledTimes(1);
-          expect(handler).toHaveBeenCalledWith({
-            isPending: false,
-            isAuthenticated: true,
-            idToken: 'fakeIdToken0',
-            accessToken: 'fakeAccessToken0'
-          });
-          resolve();
-        }, 100);
-      });
-    });
-
     it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', () => {
       const auth = createAuth();
       auth.authStateManager.updateAuthState = jest.fn();
@@ -408,8 +392,7 @@ describe('AuthStateManager', () => {
       expect(auth.authStateManager.updateAuthState).toHaveBeenCalledWith({ 
         event: 'added',
         key: 'idToken',
-        token: 'fake_id_token',
-        timestamp: expect.any(Number)
+        token: 'fake_id_token'
       });
     });
 
@@ -421,8 +404,7 @@ describe('AuthStateManager', () => {
       expect(auth.authStateManager.updateAuthState).toHaveBeenCalledWith({ 
         event: 'added', 
         key: 'idToken', 
-        token: tokens.standardIdTokenParsed, 
-        timestamp: expect.any(Number) 
+        token: tokens.standardIdTokenParsed
       });
     });
   });

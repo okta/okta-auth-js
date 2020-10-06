@@ -49,12 +49,27 @@ export class AuthStateManager {
     this._lastEventTimestamp = 0;
 
     // Listen on tokenManager events to start updateState process
-    // "added" event is emitted in both add and renew process, just listen on "added" event to update auth state
-    sdk.tokenManager.on(EVENT_ADDED, (key, token) => {
+    // "added" event is emitted in both add and renew process
+    // Only listen on "added" event to update auth state
+    const shouldUpdateAuthState = (timestamp: number): boolean => {
+      if (this._lastEventTimestamp > timestamp) {
+        return false;
+      }
+      // track event timestamp
+      this._lastEventTimestamp = timestamp;
+      return true;
+    };
+    sdk.tokenManager.on(EVENT_ADDED, (key, token, { timestamp }) => {
+      if (!shouldUpdateAuthState(timestamp)) {
+        return;
+      }
       this._setLogOptions({ event: EVENT_ADDED, key, token });
       this.updateAuthState();
     });
-    sdk.tokenManager.on(EVENT_REMOVED, (key, token) => {
+    sdk.tokenManager.on(EVENT_REMOVED, (key, token, { timestamp }) => {
+      if (!shouldUpdateAuthState(timestamp)) {
+        return;
+      }
       this._setLogOptions({ event: EVENT_REMOVED, key, token });
       this.updateAuthState();
     });
@@ -103,15 +118,6 @@ export class AuthStateManager {
     };
 
     const shouldEvaluateIsPending = () => (autoRenew || autoRemove);
-
-    if (this._lastEventTimestamp > timestamp) {
-      // cancel evaludation if event is from the past 
-      devMode && logger('canceled');
-      return;
-    } else {
-      // track event timestamp
-      this._lastEventTimestamp = timestamp;
-    }
 
     if (this._pending.updateAuthStatePromise) {
       if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {
