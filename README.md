@@ -437,14 +437,28 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 
 ##### `transformAuthState`
 
-Callback function. By default, the SDK will consider a user authenticated if both valid idToken and accessToken are available from `tokenManager`. Setting a `transformAuthState` function on the config will emit a new transformed `authState` based on the evaluated authState from the default logic. The function should return a Promise and resolve to an [AuthState](#authstatemanager). This callback is only evaluated when the `auth` code has reason to think the authentication state has changed, by default it's been triggered when token state changes.
+Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `isAuthenticated` to true if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
 
 ```javascript
-// Trigger a re-evaluation outside of the default token driven flow
-authClient.authStateManager.updateAuthState();
-```
+const config = {
+  // other config
+ transformAuthState: async (oktaAuth, authState) => {
+   if (!authState.isAuthenticated) {
+     return authState;
+  }
+  // extra requirement: user must have valid Okta SSO session
+  const user = await oktaAuth.token.getUserInfo();
+  authState.isAuthenticated = !!user; // convert to boolean
+  authState.users = user; // also store user object on authState
+  return authState;
+};
 
-This callback function receives the sdk instance as the first function parameter and an [authState](#authstatemanager) object as the second parameter.
+const oktaAuth = new OktaAuth(config);
+oktaAuth.authStateManager.subscribe(authState => {
+  // handle latest authState
+});
+oktaAuth.authStateManager.updateAuthState();
+```
 
 ##### `devMode`
 
@@ -547,6 +561,7 @@ var config = {
 * [storeTokensFromRedirect](#storetokensfromredirect)
 * [setFromUri](#setfromurifromuri)
 * [getFromUri](#getfromuri)
+* [removeFromUri](#removefromuri)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -883,7 +898,11 @@ Stores the current URL state before a redirect occurs. By default it stores `win
 
 ### `getFromUri()`
 
-Returns the stored URI string stored by [setFromUri](#setfromuriuri) and removes it from storage. By default it returns `window.location.origin`.
+Returns the stored URI string stored by [setFromUri](#setfromuriuri). By default it returns `window.location.origin`.
+
+### `removeFromUri()`
+
+Removes the stored URI string stored by [setFromUri](#setfromuriuri) from storage.
 
 ### `tx.resume()`
 

@@ -405,8 +405,12 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   getFromUri(): string {
     const storage = browserStorage.getSessionStorage();
     const fromUri = storage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
-    storage.removeItem(REFERRER_PATH_STORAGE_KEY);
     return fromUri;
+  }
+
+  removeFromUri(): void {
+    const storage = browserStorage.getSessionStorage();
+    storage.removeItem(REFERRER_PATH_STORAGE_KEY);
   }
 }
 

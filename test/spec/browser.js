@@ -629,16 +629,28 @@ describe('Browser', function() {
         removeItem: removeItemMock
       }));
     });
-    it('should get and cleare referrer from localStorage', () => {
+    it('should get and cleare referrer from storage', () => {
       const res = auth.getFromUri();
       expect(res).toBe('fakeFromUri');
-      expect(removeItemMock).toHaveBeenCalled();
     });
     it('returns window.location.origin if nothing was set', () => {
       getItemMock = jest.fn().mockReturnValue(null);
       const res = auth.getFromUri();
       expect(res).toBe(window.location.origin);
-      expect(removeItemMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('removeFromUri', () => {
+    let removeItemMock;
+    beforeEach(() => {
+      removeItemMock = jest.fn();
+      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+        removeItem: removeItemMock
+      }));
+    });
+    it('should cleare referrer from localStorage', () => {
+      const res = auth.removeFromUri();
+      expect(removeItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY);
     });
   });
 });
