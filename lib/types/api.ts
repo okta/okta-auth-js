@@ -182,7 +182,7 @@ export interface SigninWithRedirectOptions extends TokenParams {
 }
 
 export interface SigninAPI {
-  signIn(opts?: SignInWithCredentialsOptions|SigninWithRedirectOptions): Promise<AuthTransaction>|Promise<void>;
+  signIn(opts: SignInWithCredentialsOptions): Promise<AuthTransaction>;
 }
 
 export interface SignoutOptions {

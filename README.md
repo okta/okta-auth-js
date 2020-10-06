@@ -2301,6 +2301,9 @@ Produces a unique `authState` object and emits an `authStateChange` event. The [
 The app needs call this method to call this method to initial the [authState](#authstatemanager).
 
 ```javascript
+authClient.authStateManager.subscribe(authState => {
+  // handle emitted latest authState
+});
 if (!authClient.token.isLoginRedirect()) {
   // Trigger an initial authState change event when the app startup
   authClient.authStateManager.updateAuthState();
