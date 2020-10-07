@@ -142,6 +142,7 @@ function setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
   }
 }
 
+// reset timeouts to setup autoRenew for tokens from other document context (tabs)
 function resetExpireEventTimeoutAll(sdk, tokenMgmtRef, storage) {
   clearExpireEventTimeoutAll(tokenMgmtRef);
   setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
