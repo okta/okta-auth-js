@@ -48,7 +48,7 @@ describe('AuthStateManager', () => {
       const instance = new AuthStateManager(sdkMock);
       instance.updateAuthState = jest.fn();
       instance._setLogOptions = jest.fn();
-      sdkMock.emitter.emit('added', 'fakeKey', 'fakeToken');
+      sdkMock.emitter.emit('added', 'fakeKey', 'fakeToken', { timestamp: 111 });
       expect(instance._setLogOptions).toHaveBeenCalledWith({ event: 'added', key: 'fakeKey', token: 'fakeToken' });
       expect(instance.updateAuthState).toHaveBeenCalled();
     });
@@ -62,17 +62,16 @@ describe('AuthStateManager', () => {
       expect(instance.updateAuthState).not.toHaveBeenCalled();
     });
 
-
     it('should call updateAuthState when "removed" event emitted', () => {
       const instance = new AuthStateManager(sdkMock);
       instance.updateAuthState = jest.fn();
       instance._setLogOptions = jest.fn();
-      sdkMock.emitter.emit('removed', 'fakeKey', 'fakeToken');
+      sdkMock.emitter.emit('removed', 'fakeKey', 'fakeToken', { timestamp: 111 });
       expect(instance._setLogOptions).toHaveBeenCalledWith({ event: 'removed', key: 'fakeKey', token: 'fakeToken' });
       expect(instance.updateAuthState).toHaveBeenCalled();
     });
 
-    it('should not call updateAuthState if events is not any of "added", "renewed" or "removed"', () => {
+    it('should not call updateAuthState if events is neither "added" nor "removed"', () => {
       const instance = new AuthStateManager(sdkMock);
       instance.updateAuthState = jest.fn();
       sdkMock.emitter.emit('fakeEvent');
@@ -389,11 +388,6 @@ describe('AuthStateManager', () => {
         oldValue: '{}'
       }));
       expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
-      expect(auth.authStateManager.updateAuthState).toHaveBeenCalledWith({ 
-        event: 'added',
-        key: 'idToken',
-        token: 'fake_id_token'
-      });
     });
 
     it('should only trigger authStateManager.updateAuthState once when call tokenManager.add', () => {
@@ -401,11 +395,6 @@ describe('AuthStateManager', () => {
       auth.authStateManager.updateAuthState = jest.fn();
       auth.tokenManager.add('idToken', tokens.standardIdTokenParsed);
       expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
-      expect(auth.authStateManager.updateAuthState).toHaveBeenCalledWith({ 
-        event: 'added', 
-        key: 'idToken', 
-        token: tokens.standardIdTokenParsed
-      });
     });
   });
 

@@ -178,6 +178,10 @@ class TestApp {
     });
   }
 
+  async assertLoggedOut() {
+    await this.waitForLoginBtn();
+  }
+
   async assertUserInfo() {
     await this.waitForUserInfo();
     await this.userInfo.then(el => el.getText()).then(txt => {

@@ -9,10 +9,10 @@ async function openOktaHome() {
   return browser.newWindow(BASE_URL, 'Okta-hosted page');
 }
 
-async function switchToPopupWindow() {
+async function switchToPopupWindow(existingHandlesCount) {
   await browser.waitUntil(async () => {
     const handles = await browser.getWindowHandles();
-    return handles.length > 1;
+    return handles.length > existingHandlesCount;
   });
   const handles = await browser.getWindowHandles();
   return browser.switchToWindow(handles[handles.length - 1]);
@@ -23,5 +23,15 @@ async function switchToMainWindow() {
   return browser.switchToWindow(handles[0]);
 }
 
-export { openOktaHome, switchToMainWindow, switchToPopupWindow };
+async function switchToLastFocusedWindow() {
+  const handles = await browser.getWindowHandles();
+  return browser.switchToWindow(handles[handles.length - 2]);
+}
+
+export { 
+  openOktaHome, 
+  switchToMainWindow, 
+  switchToPopupWindow,
+  switchToLastFocusedWindow
+};
   

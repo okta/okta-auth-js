@@ -173,10 +173,6 @@ export interface SignInWithCredentialsOptions {
   sendFingerprint?: boolean;
 }
 
-export function isSignInWithCredentialsOptions(obj: any): obj is SignInWithCredentialsOptions {
-  return obj && obj.username && obj.password;
-} 
-
 export interface SigninWithRedirectOptions extends TokenParams {
   fromUri?: string;
 }
