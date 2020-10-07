@@ -45,6 +45,9 @@ describe('TokenManager', function() {
 
   function setupSync(options) {
     client = createAuth(options);
+    // clear downstream listeners
+    client.tokenManager.off('added');
+    client.tokenManager.off('removed');
     return client;
   }
 

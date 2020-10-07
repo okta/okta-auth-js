@@ -506,7 +506,6 @@ export class TokenManager {
     // https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent
     window.addEventListener('storage', ({ key, newValue, oldValue }: StorageEvent) => {
       const handleCrossTabsStorageChange = () => {
-        console.log('aaa');
         this._resetExpireEventTimeoutAll();
         this._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
       };
