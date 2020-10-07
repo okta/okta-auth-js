@@ -204,4 +204,35 @@ describe('util', function() {
       expect(util.isFunction(fn)).toBe(true);
     });
   });
+
+  describe('toAbsoluteUrl', () => {
+    it('should return same url if url is an absolute url', () => {
+      const url = 'http://fake.com';
+      expect(util.toAbsoluteUrl(url)).toEqual(url);
+    });
+
+    it('should return correct url when valid baseUrl and relative url are provided', () => {
+      const baseUrl = 'http://fake.com';
+      const url = '/relative';
+      expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
+    });
+
+    it('should return correct url when baseUrl has trialing "/"', () => {
+      const baseUrl = 'http://fake.com/';
+      const url = '/relative';
+      expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
+    });
+
+    it('should return correct url when relative url without "/"', () => {
+      const baseUrl = 'http://fake.com';
+      const url = 'relative';
+      expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
+    });
+
+    it('should return correct url when relative url without "/" and baseurl with trialing "/"', () => {
+      const baseUrl = 'http://fake.com/';
+      const url = 'relative';
+      expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
+    });
+  });
 });

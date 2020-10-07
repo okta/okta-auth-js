@@ -74,6 +74,14 @@ export function isAbsoluteUrl(url) {
   return /^(?:[a-z]+:)?\/\//i.test(url);
 }
 
+export function toAbsoluteUrl(url = '', baseUrl) {
+  if (isAbsoluteUrl(url)) {
+    return url;
+  }
+  baseUrl = removeTrailingSlash(baseUrl);
+  return url[0] === '/' ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
+}
+
 export function isString(obj: any): obj is string {
   return Object.prototype.toString.call(obj) === '[object String]';
 }
