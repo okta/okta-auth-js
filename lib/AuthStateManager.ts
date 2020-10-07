@@ -1,5 +1,5 @@
 import { AuthSdkError } from './errors';
-import { AuthState, UpdateAuthStateOptions } from './types';
+import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from './browser';
 import { getConsole, warn } from './util';
 const PCancelable = require('p-cancelable');
@@ -33,6 +33,7 @@ export class AuthStateManager {
     canceledTimes: number; 
   };
   _authState: AuthState;
+  _logOptions: AuthStateLogOptions;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
@@ -46,18 +47,24 @@ export class AuthStateManager {
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process, just listen on "added" event to update auth state
     sdk.tokenManager.on('added', (key, token) => {
-      this.updateAuthState({ event: 'added', key, token });
+      this._setLogOptions({ event: 'added', key, token });
+      this.updateAuthState();
     });
     sdk.tokenManager.on('removed', (key, token) => {
-      this.updateAuthState({ event: 'removed', key, token });
+      this._setLogOptions({ event: 'removed', key, token })
+      this.updateAuthState();
     });
+  }
+
+  _setLogOptions(options) {
+    this._logOptions = options;
   }
 
   getAuthState(): AuthState {
     return this._authState;
   }
 
-  updateAuthState({ event, key, token }: UpdateAuthStateOptions = {}): void {
+  updateAuthState(): void {
     if (!this._sdk.emitter.e 
         || !this._sdk.emitter.e[EVENT_AUTH_STATE_CHANGE] 
         || !this._sdk.emitter.e[EVENT_AUTH_STATE_CHANGE].length) {
@@ -69,22 +76,26 @@ export class AuthStateManager {
     const { transformAuthState, devMode } = this._sdk.options;
     const { autoRenew, autoRemove } = this._sdk.tokenManager._getOptions();
 
-    const logger = (status) => {
+    const log = (status) => {
+      const { event, key, token } = this._logOptions;
       getConsole().group(`OKTA-AUTH-JS:updateAuthState: Event:${event} Status:${status}`);
       getConsole().log(key, token);
       getConsole().log('Current authState', this._authState);
       getConsole().groupEnd();
+      
+      // clear log options after logging
+      this._logOptions = {};
     };
 
     const emitAuthStateChange = (authState) => {
       if (isSameAuthState(this._authState, authState)) {
-        devMode && logger('unchanged'); 
+        devMode && log('unchanged'); 
         return;
       }
       this._authState = authState;
       // emit new authState object
       this._sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
-      devMode && logger('emitted');
+      devMode && log('emitted');
     };
 
     const shouldEvaluateIsPending = () => (autoRenew || autoRemove);
@@ -93,7 +104,7 @@ export class AuthStateManager {
       if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {
         // stop canceling then starting a new promise
         // let existing promise finish to prevent running into loops
-        devMode && logger('terminated');
+        devMode && log('terminated');
         return;
       } else {
         this._pending.updateAuthStatePromise.cancel();
@@ -106,7 +117,7 @@ export class AuthStateManager {
       onCancel(() => {
         this._pending.updateAuthStatePromise = null;
         this._pending.canceledTimes = this._pending.canceledTimes + 1;
-        devMode && logger('canceled');
+        devMode && log('canceled');
       });
 
       const emitAndResolve = (authState) => {

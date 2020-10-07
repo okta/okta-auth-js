@@ -104,7 +104,7 @@ function getAuthState() {
     userInfo: null,
     tokens: null
   };
-  return getTokens().then(function(tokens) {
+  return authClient.tokenManager.getTokens().then(function(tokens) {
     authState.tokens = tokens;
     authState.hasTokens = !!(tokens.idToken && tokens.accessToken);
 
@@ -128,19 +128,6 @@ function handleLoginRedirect() {
     endAuthFlow(res); // save tokens
   }).catch(function(error) {
     showError(error);
-  });
-}
-
-function getTokens() {
-  return Promise.all([
-    authClient.tokenManager.get('idToken'),
-    authClient.tokenManager.get('accessToken')
-  ])
-  .then(function (values) {
-    const tokens = {};
-    tokens.idToken = values[0];
-    tokens.accessToken = values[1];
-    return tokens;
   });
 }
 

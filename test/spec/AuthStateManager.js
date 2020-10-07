@@ -28,15 +28,19 @@ describe('AuthStateManager', () => {
     it('should call updateAuthState when "added" event emitted', () => {
       const instance = new AuthStateManager(sdkMock);
       instance.updateAuthState = jest.fn();
+      instance._setLogOptions = jest.fn();
       sdkMock.emitter.emit('added', 'fakeKey', 'fakeToken');
-      expect(instance.updateAuthState).toHaveBeenCalledWith({ event: 'added', key: 'fakeKey', token: 'fakeToken' });
+      expect(instance._setLogOptions).toHaveBeenCalledWith({ event: 'added', key: 'fakeKey', token: 'fakeToken' });
+      expect(instance.updateAuthState).toHaveBeenCalled();
     });
 
     it('should call updateAuthState when "removed" event emitted', () => {
       const instance = new AuthStateManager(sdkMock);
       instance.updateAuthState = jest.fn();
+      instance._setLogOptions = jest.fn();
       sdkMock.emitter.emit('removed', 'fakeKey', 'fakeToken');
-      expect(instance.updateAuthState).toHaveBeenCalledWith({ event: 'removed', key: 'fakeKey', token: 'fakeToken' });
+      expect(instance._setLogOptions).toHaveBeenCalledWith({ event: 'removed', key: 'fakeKey', token: 'fakeToken' });
+      expect(instance.updateAuthState).toHaveBeenCalled();
     });
 
     it('should not call updateAuthState if events is not any of "added", "renewed" or "removed"', () => {

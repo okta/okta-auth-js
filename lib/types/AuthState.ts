@@ -8,7 +8,7 @@ export interface AuthState {
   error?: Error;
 }
 
-export interface UpdateAuthStateOptions {
+export interface AuthStateLogOptions {
   event?: string;
   key?: string;
   token?: Token;
