@@ -217,7 +217,7 @@ describe('util', function() {
       expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
     });
 
-    it('should return correct url when baseUrl has trialing "/"', () => {
+    it('should return correct url when baseUrl has trailing "/"', () => {
       const baseUrl = 'http://fake.com/';
       const url = '/relative';
       expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
@@ -229,7 +229,7 @@ describe('util', function() {
       expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
     });
 
-    it('should return correct url when relative url without "/" and baseurl with trialing "/"', () => {
+    it('should return correct url when relative url without "/" and baseurl with trailing "/"', () => {
       const baseUrl = 'http://fake.com/';
       const url = 'relative';
       expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
