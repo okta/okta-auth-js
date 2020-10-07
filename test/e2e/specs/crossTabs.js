@@ -55,9 +55,6 @@ describe('cross tabs AuthState update', () => {
   });
 
   it('should update tokens cross tabs', async () => {
-    // // login in the latest opened tab
-    // await loginPopup();
-    // const handles = await browser.getWindowHandles();
     const preTabTokenMap = {};
     const currentTabTokenMap = {};
     await assertSameTokensInTabs(preTabTokenMap, handles);

@@ -1593,6 +1593,7 @@ describe('TokenManager', function() {
         newValue: 'fake_new_value',
         oldValue: 'fake_old_value'
       }));
+      jest.runAllTimers();
       expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
       expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
     });
@@ -1623,7 +1624,7 @@ describe('TokenManager', function() {
         newValue: null,
         oldValue: null
       }));
-      console.log(utils.isIE11OrLess());
+      jest.runAllTimers();
       expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
       expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith(null, null);
     });

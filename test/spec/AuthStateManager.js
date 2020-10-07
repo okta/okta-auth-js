@@ -379,6 +379,7 @@ describe('AuthStateManager', () => {
     });
 
     it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', () => {
+      jest.useFakeTimers();
       const auth = createAuth();
       auth.authStateManager.updateAuthState = jest.fn();
       // simulate localStorage change from other dom context
@@ -387,7 +388,9 @@ describe('AuthStateManager', () => {
         newValue: '{"idToken": "fake_id_token"}',
         oldValue: '{}'
       }));
+      jest.runAllTimers();
       expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
+      jest.useRealTimers();
     });
 
     it('should only trigger authStateManager.updateAuthState once when call tokenManager.add', () => {
