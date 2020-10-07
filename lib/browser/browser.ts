@@ -18,7 +18,14 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryString, clone, warn, deprecate } from '../util';
+import { 
+  removeTrailingSlash, 
+  toQueryString, 
+  toAbsoluteUrl,
+  clone, 
+  warn, 
+  deprecate 
+} from '../util';
 import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
@@ -116,7 +123,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       revokeUrl: removeTrailingSlash(args.revokeUrl),
       logoutUrl: removeTrailingSlash(args.logoutUrl),
       pkce: args.pkce === false ? false : true,
-      redirectUri: args.redirectUri,
+      redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin),
       postLogoutRedirectUri: args.postLogoutRedirectUri,
       responseMode: args.responseMode,
       transformErrorXHR: args.transformErrorXHR,
