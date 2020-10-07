@@ -43,6 +43,7 @@ export class AuthStateManager {
     this._sdk = sdk;
     this._pending = { ...DEFAULT_PENDING };
     this._authState = { ...DEFAULT_AUTH_STATE };
+    this._logOptions = {};
 
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process, just listen on "added" event to update auth state
