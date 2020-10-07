@@ -35,6 +35,8 @@ export interface IDToken extends AbstractToken {
 
 export type Token = AccessToken | IDToken;
 
+export type TokenType = 'accessToken' | 'idToken';
+
 export function isToken(obj: any): obj is Token {
   if (obj &&
       (obj.accessToken || obj.idToken) &&

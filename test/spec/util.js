@@ -4,19 +4,20 @@ import * as util from '../../lib/util';
 describe('util', function() {
   beforeEach(function() {
     jest.spyOn(window.console, 'log');
+    jest.spyOn(window.console, 'warn');
   });
 
   describe('warn', function() {
     it('writes warning to console', function() {
       util.warn('sample warning');
-      expect(window.console.log).toHaveBeenCalledWith('[okta-auth-sdk] WARN: sample warning');
+      expect(window.console.warn).toHaveBeenCalledWith('[okta-auth-sdk] WARN: sample warning');
     });
   });
 
   describe('deprecate', function() {
     it('writes deprecation to console', function() {
       util.deprecate('sample deprecation');
-      expect(window.console.log).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: sample deprecation');
+      expect(window.console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: sample deprecation');
     });
   });
 

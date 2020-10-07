@@ -18,9 +18,12 @@ import OktaAuthBase from '../OktaAuthBase';
 import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
-import { removeTrailingSlash, toQueryString, clone } from '../util';
+import { removeTrailingSlash, toQueryString, clone, warn, deprecate } from '../util';
 import { getUserAgent } from '../builderUtil';
-import { DEFAULT_MAX_CLOCK_SKEW, ACCESS_TOKEN_STORAGE_KEY, ID_TOKEN_STORAGE_KEY } from '../constants';
+import { 
+  DEFAULT_MAX_CLOCK_SKEW, 
+  REFERRER_PATH_STORAGE_KEY
+} from '../constants';
 import {
   closeSession,
   sessionExists,
@@ -36,6 +39,7 @@ import {
   decodeToken,
   revokeToken,
   renewToken,
+  renewTokens,
   getUserInfo,
   verifyToken
 } from '../token';
@@ -46,9 +50,22 @@ import {
 } from '../oauthUtil';
 import http from '../http';
 import PromiseQueue from '../PromiseQueue';
-import { OktaAuth, OktaAuthOptions, AccessToken, TokenAPI, FeaturesAPI, SignoutAPI, FingerprintAPI } from '../types';
+import { 
+  OktaAuth, 
+  OktaAuthOptions, 
+  AccessToken, 
+  IDToken,
+  TokenAPI, 
+  FeaturesAPI, 
+  SignoutAPI, 
+  FingerprintAPI,
+  UserClaims, 
+  SigninWithRedirectOptions,
+  SignInWithCredentialsOptions
+} from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
+import { AuthStateManager } from '../AuthStateManager';
 
 const Emitter = require('tiny-emitter');
 
@@ -59,15 +76,17 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   _tokenQueue: PromiseQueue;
   emitter: typeof Emitter;
   tokenManager: TokenManager;
+  authStateManager: AuthStateManager;
   fingerprint: FingerprintAPI;
+  _pending: { handleLogin: boolean };
 
   constructor(args: OktaAuthOptions) {
-    args = Object.assign({
+    super(Object.assign({
       httpRequestClient: fetchRequest,
       storageUtil: browserStorage
-    }, args);
-    super(args);
+    }, args));
 
+    this._pending = { handleLogin: false };
     var cookieSettings = Object.assign({
       secure: true
     }, args.cookies);
@@ -81,7 +100,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     if (cookieSettings.secure && !this.features.isHTTPS()) {
       // eslint-disable-next-line no-console
-      console.warn(
+      warn(
         'The current page is not being served with the HTTPS protocol.\n' +
         'For security reasons, we strongly recommend using HTTPS.\n' +
         'If you cannot use HTTPS, set "cookies.secure" option to false.'
@@ -100,11 +119,14 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       redirectUri: args.redirectUri,
       postLogoutRedirectUri: args.postLogoutRedirectUri,
       responseMode: args.responseMode,
-      cookies: cookieSettings
+      transformErrorXHR: args.transformErrorXHR,
+      cookies: cookieSettings,
+      scopes: args.scopes,
+      transformAuthState: args.transformAuthState
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
-  
+
     // Digital clocks will drift over time, so the server
     // can misalign with the time reported by the browser.
     // The maxClockSkew allows relaxing the time-based
@@ -139,6 +161,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       decode: decodeToken,
       revoke: revokeToken.bind(null, this),
       renew: renewToken.bind(null, this),
+      renewTokens: renewTokens.bind(null, this),
       getUserInfo: getUserInfo.bind(null, this),
       verify: verifyToken.bind(null, this),
       isLoginRedirect: isLoginRedirect.bind(null, this)
@@ -182,9 +205,22 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
     this.emitter = new Emitter();
     this.tokenManager = new TokenManager(this, args.tokenManager);
+    this.authStateManager = new AuthStateManager(this);
   }
 
+  /**
+   * Alias method of signInWithCredentials
+   * 
+   * @todo This method is deprecated. Remove it in 5.0
+   */ 
   signIn(opts) {
+    if (this.features.isLocalhost()) {
+      deprecate('This method has been deprecated, please use signInWithCredentials() instead.');
+    }
+    return this.signInWithCredentials(opts);
+  }
+
+  signInWithCredentials(opts: SignInWithCredentialsOptions) {
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {
       delete opts.sendFingerprint;
@@ -201,6 +237,29 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
         }
       });
     });
+  }
+
+  async signInWithRedirect({ fromUri, ...additionalParams }: SigninWithRedirectOptions = {}) {
+    if(this._pending.handleLogin) { 
+      // Don't trigger second round
+      return;
+    }
+
+    this._pending.handleLogin = true;
+    const { scopes, responseType } = this.options;
+    try {
+      // Trigger default signIn redirect flow
+      if (fromUri) {
+        this.setFromUri(fromUri);
+      }
+      const params = Object.assign({
+        scopes: scopes || ['openid', 'email', 'profile'],
+        responseType: responseType || ['id_token', 'token']
+      }, additionalParams);
+      await this.token.getWithRedirect(params);
+    } finally {
+      this._pending.handleLogin = false;
+    }
   }
   
   // Ends the current Okta SSO session without redirecting to Okta.
@@ -221,8 +280,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   // Revokes the access token for the application session
   async revokeAccessToken(accessToken?: AccessToken) {
     if (!accessToken) {
-      accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY) as AccessToken;
-      this.tokenManager.remove(ACCESS_TOKEN_STORAGE_KEY);
+      accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
+      const accessTokenKey = this.tokenManager._getStorageKeyByType('accessToken');
+      this.tokenManager.remove(accessTokenKey);
     }
     // Access token may have been removed. In this case, we will silently succeed.
     if (!accessToken) {
@@ -230,7 +290,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     return this.token.revoke(accessToken);
   }
-  
+
   // Revokes accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
   async signOut(options?) {
     options = Object.assign({}, options);
@@ -249,11 +309,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     var logoutUrl = getOAuthUrls(this).logoutUrl;
   
     if (typeof idToken === 'undefined') {
-      idToken = await this.tokenManager.get(ID_TOKEN_STORAGE_KEY);
+      idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
     }
   
     if (revokeAccessToken && typeof accessToken === 'undefined') {
-      accessToken = await this.tokenManager.get(ACCESS_TOKEN_STORAGE_KEY);
+      accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
     }
   
     // Clear all local tokens
@@ -299,11 +359,62 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     };
     return http.get(this, url, options);
   }
-  
+
+  //
+  // Common Methods from downstream SDKs
+  //
+
+  async getUser(): Promise<UserClaims> {
+    return this.token.getUserInfo();
+  }
+
+  async getIdToken(): Promise<string> {
+    try {
+      const idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
+      return idToken ? idToken.idToken : undefined;
+    } catch (err) {
+      return undefined;
+    }
+  }
+
+  async getAccessToken(): Promise<string> {
+    try {
+      const accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
+      return accessToken ? accessToken.accessToken : undefined;
+    } catch (err) {
+      return undefined;
+    }
+  }
+
+  /**
+   * Store parsed tokens from redirect url
+   */
+  async storeTokensFromRedirect(): Promise<void> {
+    const { tokens } = await this.token.parseFromUrl();
+    this.tokenManager.setTokens(tokens);
+  }
+
+  setFromUri(fromUri?: string): void {
+    // Use current location if fromUri was not passed
+    fromUri = fromUri || window.location.href;
+    // Store fromUri
+    const storage = browserStorage.getSessionStorage();
+    storage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
+  }
+
+  getFromUri(): string {
+    const storage = browserStorage.getSessionStorage();
+    const fromUri = storage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
+    return fromUri;
+  }
+
+  removeFromUri(): void {
+    const storage = browserStorage.getSessionStorage();
+    storage.removeItem(REFERRER_PATH_STORAGE_KEY);
+  }
 }
 
 // Hoist feature detection functions to static type
 OktaAuthBrowser.features = OktaAuthBrowser.prototype.features = features;
 
 export default OktaAuthBrowser;
-

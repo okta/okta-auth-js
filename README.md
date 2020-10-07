@@ -406,6 +406,10 @@ An object containing additional properties used to configure the internal token 
 
 By default, the library will attempt to renew tokens before they expire. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
 
+###### `autoRemove`
+
+By default, the library will attempt to remove expired tokens during initialization when `autoRenew` is off. If you wish to  to disable auto removal of tokens, set autoRemove to false.
+
 ###### `storage`
 
 You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types: 
@@ -430,6 +434,35 @@ Defaults to `true`, unless the application origin is `http://localhost`, in whic
 ###### `sameSite`
 
 Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
+
+##### `transformAuthState`
+
+Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `isAuthenticated` to true if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
+
+```javascript
+const config = {
+  // other config
+ transformAuthState: async (oktaAuth, authState) => {
+   if (!authState.isAuthenticated) {
+     return authState;
+  }
+  // extra requirement: user must have valid Okta SSO session
+  const user = await oktaAuth.token.getUserInfo();
+  authState.isAuthenticated = !!user; // convert to boolean
+  authState.users = user; // also store user object on authState
+  return authState;
+};
+
+const oktaAuth = new OktaAuth(config);
+oktaAuth.authStateManager.subscribe(authState => {
+  // handle latest authState
+});
+oktaAuth.authStateManager.updateAuthState();
+```
+
+##### `devMode`
+
+Default to `false`. It enables debugging logs when set to `true`.
 
 #### Example Client
 
@@ -512,6 +545,8 @@ var config = {
 ## API Reference
 
 * [signIn](#signinoptions)
+* [signInWithCredentials](#signinwithcredentialsoptions)
+* [signInWithRedirect](#signinwithredirectoptions)
 * [signOut](#signout)
 * [closeSession](#closesession)
 * [revokeAccessToken](#revokeaccesstokenaccesstoken)
@@ -520,6 +555,13 @@ var config = {
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [webfinger](#webfingeroptions)
 * [fingerprint](#fingerprintoptions)
+* [getUser](#getuser)
+* [getIdToken](#getidtoken)
+* [getAccessToken](#getaccesstoken)
+* [storeTokensFromRedirect](#storetokensfromredirect)
+* [setFromUri](#setfromurifromuri)
+* [getFromUri](#getfromuri)
+* [removeFromUri](#removefromuri)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -552,26 +594,37 @@ var config = {
 * [tokenManager](#tokenmanager)
   * [tokenManager.add](#tokenmanageraddkey-token)
   * [tokenManager.get](#tokenmanagergetkey)
+  * [tokenManager.getTokens](#tokenmanagergettokens)
+  * [tokenManager.setTokens](#tokenmanagersettokenstokens)
   * [tokenManager.remove](#tokenmanagerremovekey)
   * [tokenManager.clear](#tokenmanagerclear)
   * [tokenManager.renew](#tokenmanagerrenewkey)
   * [tokenManager.on](#tokenmanageronevent-callback-context)
   * [tokenManager.off](#tokenmanageroffevent-callback)
+* [authStateManager](#authstatemanager)
+  * [authStateManager.getAuthState](#authstatemanagergetauthstate)
+  * [authStateManager.updateAuthState](#authstatemanagerupdateauthstate)
+  * [authStateManager.subscribe](#authstatemanagersubscribehandler)
+  * [authStateManager.unsubscribe](#authstatemanagerunsubscribehandler)
 
 ------
 
 ### `signIn(options)`
 
+> :warning: Deprecated, this method will be removed in next major release, use [signInWithCredentials](#signinwithcredentialsoptions) instead.
+
+### `signInWithCredentials(options)`
+
 > :hourglass: async
 
-The goal of an authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signIn`.
+The goal of this authentication flow is to [set an Okta session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or [retrieve an `id_token` or `access_token`](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-via-openid-connect-authorization-endpoint). The flow is started using `signInWithCredentials`.
 
 * `username` - User’s non-qualified short-name (e.g. dade.murphy) or unique fully-qualified login (e.g dade.murphy@example.com)
 * `password` - The password of the user
 * `sendFingerprint` - Enabling this will send a `X-Device-Fingerprint` header. Defaults to `false`. See [Primary authentication with device fingerprint](https://developer.okta.com/docs/reference/api/authn/#primary-authentication-with-device-fingerprinting) for more information on the `X-Device-Fingerprint` header.
 
 ```javascript
-authClient.signIn({
+authClient.signInWithCredentials({
   username: 'some-username',
   password: 'some-password'
 })
@@ -585,6 +638,28 @@ authClient.signIn({
 .catch(function(err) {
   console.error(err);
 });
+```
+
+### `signInWithRedirect(options)`
+
+Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a fromUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
+You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getFromUri](#getfromuri) to clear the intermediate state (the fromUri) after successful authentication.
+
+```javascript
+if (authClient.token.isLoginRedirect()) {
+  // Call handleAuthentication to store tokens when redirect back from OKTA
+  authClient.storeTokensFromRedirect();
+  // Get and clear fromUri from storage
+  const fromUri = authClient.getFromUri();
+  authClient.removeFromUri();
+  // Redirect to fromUri
+  history.replaceState(null, '', fromUri);
+} else if (!authClient.authStateManager.getAuthState().isAuthenticated) {
+  // Start the browser based oidc flow, then parse tokens from the redirect callback url
+  authClient.signInWithRedirect();
+} else {
+  // User is authenticated
+}
 ```
 
 ### `signOut()`
@@ -793,6 +868,42 @@ authClient.fingerprint()
   console.log(err);
 })
 ```
+
+### `getUser()`
+
+> :hourglass: async
+
+Alias method of [token.getUserInfo](#tokengetuserinfoaccesstokenobject-idtokenobject).
+
+### `getIdToken()`
+
+> :hourglass: async
+
+Resolves with the id token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
+
+### `getAccessToken()`
+
+> :hourglass: async
+
+Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
+
+### `storeTokensFromRedirect()`
+
+> :hourglass: async
+
+Parses tokens from the redirect url and stores them.
+
+### `setFromUri(fromUri?)`
+
+Stores the current URL state before a redirect occurs. By default it stores `window.location.href`.
+
+### `getFromUri()`
+
+Returns the stored URI string stored by [setFromUri](#setfromuriuri). By default it returns `window.location.origin`.
+
+### `removeFromUri()`
+
+Removes the stored URI string stored by [setFromUri](#setfromuriuri) from storage.
 
 ### `tx.resume()`
 
@@ -2049,6 +2160,23 @@ authClient.tokenManager.get('idToken')
 });
 ```
 
+#### `tokenManager.getTokens()`
+
+> :hourglass: async
+
+Returns storage key agnostic tokens set for available tokens from storage. It returns empty object (`{}`) if no token is in storage.
+
+```javascript
+authClient.tokenManager.getTokens()
+  .then(({ accessToken, idToken }) => {
+    // handle accessToken and idToken
+  });
+```
+
+#### `tokenManager.setTokens(tokens)`
+
+Adds storage key agnostic tokens to storage. It uses default token storage keys (`idToken`, `accessToken`) in storage.
+
 #### `tokenManager.hasExpired(token)`
 
 A synchronous method which returns `true` if the token has expired. The `tokenManager` will automatically remove expired tokens in the background. However, when the app first loads this background process may not have completed, so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition. 
@@ -2141,6 +2269,54 @@ Unsubscribe from `tokenManager` events. If no callback is provided, unsubscribes
 authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
+
+### `authStateManager`
+
+`AuthStateManager` evaluates and emits `AuthState` based on the events from `TokenManager` for downstream clients to consume.
+
+The emitted `AuthState` object includes:
+
+* `isPending`: true in the time after page load (first render) but before the asynchronous methods to see if the tokenManager is aware of a current authentication.
+* `isAuthenticated`: true if the user is considered authenticated. Normally this is true if both an idToken and an accessToken are present in the tokenManager, but this behavior can be overridden if you passed an isAuthenticated callback in the [configuration](#configuration-reference).
+* `accessToken`: the JWT accessToken for the currently authenticated user (if provided by the scopes).
+* `idToken`: the JWT idToken for the currently authenticated user (if provided by the scopes).
+* `error`: contains the error returned if an error occurs in the `authState` evaluation process.
+
+Subscribes to `authStateChange` event:
+
+```javascript
+authClient.authStateManager.subscribe((authState) => {
+  // handle the latest evaluated authState, like integrate with client framework's state management store
+});
+```
+
+#### `authStateManager.getAuthState()`
+
+Gets latest evaluated `authState` from the `authStateManager`. The `authState` (a unique new object) is re-evaluated when `authStateManager.updateAuthState()` is called.
+
+#### `authStateManager.updateAuthState()`
+
+Produces a unique `authState` object and emits an `authStateChange` event. The [authState](#authstatemanager) object contains tokens from the `tokenManager` and the results of the [isAuthenticated](#isauthenticated) callback. By default, [isAuthenticated](#isauthenticated) will be true if both `idToken` and `accessToken` are present. This logic can be customized by defining a custom [isAuthenticated](#isauthenticated) function.
+
+The app needs call this method to call this method to initial the [authState](#authstatemanager).
+
+```javascript
+authClient.authStateManager.subscribe(authState => {
+  // handle emitted latest authState
+});
+if (!authClient.token.isLoginRedirect()) {
+  // Trigger an initial authState change event when the app startup
+  authClient.authStateManager.updateAuthState();
+}
+```
+
+#### `authStateManager.subscribe(handler)`
+
+Subscribes a callback that will be called when the `authStateChange` event happens.
+
+#### `authStateManager.unsubscribe(handler?)`
+
+Unsubscribes callback for `authStateChange` event. It will unregister all handlers if no callback handler is provided.
 
 ## Node JS and React Native Usage
 

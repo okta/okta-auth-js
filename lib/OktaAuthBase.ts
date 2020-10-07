@@ -22,7 +22,7 @@ import {
 import {
   OktaAuth,
   OktaAuthOptions,
-  SigninOptions,
+  SignInWithCredentialsOptions,
   ForgotPasswordOptions,
   VerifyRecoveryTokenOptions,
   TransactionAPI,
@@ -43,7 +43,8 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
       httpRequestClient: args.httpRequestClient,
       transformErrorXHR: args.transformErrorXHR,
       storageUtil: args.storageUtil,
-      headers: args.headers
+      headers: args.headers,
+      devMode: args.devMode || false
     };
 
     this.tx = {
@@ -61,7 +62,7 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
   }
 
   // { username, password, (relayState), (context) }
-  signIn(opts: SigninOptions): Promise<AuthTransaction> {
+  signIn(opts: SignInWithCredentialsOptions): Promise<AuthTransaction> {
     return postToTransaction(this, '/api/v1/authn', opts);
   }
 

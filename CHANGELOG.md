@@ -1,10 +1,37 @@
 # Changelog
 
-## Pending
+## 4.1.0
+
+### Features
+
+- [#869](https://github.com/okta/okta-oidc-js/pull/869)
+  - Implements `AuthStateManager` to evaluate and emit latest authState. Exposes new methods from `AuthStateManager`:
+    - `authStateManager.getAuthState`
+    - `authStateManager.updateAuthState`
+    - `authStateManager.subscribe`
+    - `authStateManager.unsubscribe`
+  - Adds new methods in sdk browser scope:
+    - `sdk.signInWithCredentials`
+    - `sdk.signInWithRedirect`
+    - `sdk.getUser`
+    - `sdk.getIdToken`
+    - `sdk.getAccessToken`
+    - `sdk.storeTokensFromRedirect`
+    - `sdk.setFromUri`
+    - `sdk.getFromUri`
+    - `sdk.removeFromUri`
+  - Deprecates method in sdk browser scope:
+    - `sdk.signIn`
+  - Adds new methods in `sdk.tokenManager`:
+    - `tokenManager.getTokens`
+    - `tokenManager.setTokens`
+  - Accepts new [options](README.md#configuration-options)
+    - `transformAuthState`
+    - `autoRemove`
+    - `devMode`
+- [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.
 
 ### Bug Fixes
-
-- [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.
 
 - [#468](https://github.com/okta/okta-auth-js/pull/468) Fixes issue where HTTP headers with an undefined value were being sent with the value "undefined". These headers are now removed before the request is sent.
 

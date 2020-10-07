@@ -44,7 +44,7 @@ describe('General Methods', function () {
         response: 'primary-auth-error'
       },
       execute: function (test) {
-        return test.oa.signIn({})
+        return test.oa.signIn({username: 'fake', password: 'fake'})
           .catch(function(err) {
             expect(err.errorCode).toEqual('E0000004');
             expect(err.errorSummary).toEqual('Authentication failed');

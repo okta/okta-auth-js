@@ -226,19 +226,22 @@ export function getConsole() {
     return nativeConsole;
   }
   return {
-    log: function() {}
+    log: function() {},
+    warn: function() {},
+    group: function() {},
+    groupEnd: function() {}
   };
 }
 
 export function warn(text) {
   /* eslint-disable no-console */
-  getConsole().log('[okta-auth-sdk] WARN: ' + text);
+  getConsole().warn('[okta-auth-sdk] WARN: ' + text);
   /* eslint-enable */
 }
 
 export function deprecate(text) {
   /* eslint-disable no-console */
-  getConsole().log('[okta-auth-sdk] DEPRECATION: ' + text);
+  getConsole().warn('[okta-auth-sdk] DEPRECATION: ' + text);
   /* eslint-enable */
 }
 
