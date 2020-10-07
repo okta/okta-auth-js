@@ -68,7 +68,7 @@ function emitRemoved(tokenMgmtRef, key, token?) {
 }
 
 function emitError(tokenMgmtRef, error) {
-  tokenMgmtRef.emitter.emit(EVENT_ERROR, error, { timestamp: Date.now() });
+  tokenMgmtRef.emitter.emit(EVENT_ERROR, error);
 }
 
 function emitEventsForCrossTabsStorageUpdate(tokenMgmtRef, newValue, oldValue) {
