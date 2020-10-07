@@ -51,7 +51,7 @@ export class AuthStateManager {
       this.updateAuthState();
     });
     sdk.tokenManager.on('removed', (key, token) => {
-      this._setLogOptions({ event: 'removed', key, token })
+      this._setLogOptions({ event: 'removed', key, token });
       this.updateAuthState();
     });
   }
