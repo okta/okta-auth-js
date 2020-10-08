@@ -33,6 +33,9 @@ declare global {
   }
 }
 
+interface getSDKInstanceOptions {
+  subscribeAuthStateChange?: boolean;
+}
 
 declare class OktaSignIn {
   constructor(options: any);
@@ -127,7 +130,7 @@ class TestApp {
     bindFunctions(this, window);
   }
 
-  getSDKInstance(): Promise<void> {
+  getSDKInstance({ subscribeAuthStateChange }: getSDKInstanceOptions = { subscribeAuthStateChange: true }): Promise<void> {
     return Promise.resolve()
       .then(() => {
         // can throw
@@ -135,7 +138,9 @@ class TestApp {
           scopes: this.config._defaultScopes ? [] : this.config.scopes
         }));
         this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
-        this.oktaAuth.authStateManager.subscribe(this.render.bind(this));
+        if (subscribeAuthStateChange) {
+          this.oktaAuth.authStateManager.subscribe(this.render.bind(this));
+        }
       });
   }
 
@@ -162,7 +167,7 @@ class TestApp {
       <hr/>
       ${homeLink(this)}
     `;
-    return this.getSDKInstance()
+    return this.getSDKInstance({ subscribeAuthStateChange: false })
       .then(() => this._setContent(content))
       .then(() => this._afterRender('callback'));
   }
