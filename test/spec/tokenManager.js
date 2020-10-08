@@ -1600,11 +1600,19 @@ describe('TokenManager', function() {
       expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
       expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
     });
-    it('should handle storage change after 1s if in IE11OrLess env', () => {
+    it('should set options._storageEventDelay default to 1000 in isIE11OrLess env', () => {
       // eslint-disable-next-line no-import-assign
       utils.isIE11OrLess = jest.fn().mockReturnValue(true);
-      jest.spyOn(window, 'setTimeout');
       const instance = new TokenManager(sdkMock);
+      expect(instance._getOptions()._storageEventDelay).toBe(1000);
+    });
+    it('should use options._storageEventDelay from passed options', () => {
+      const instance = new TokenManager(sdkMock, { _storageEventDelay: 100 });
+      expect(instance._getOptions()._storageEventDelay).toBe(100);
+    });
+    it('should handle storage change based on _storageEventDelay option', () => {
+      jest.spyOn(window, 'setTimeout');
+      const instance = new TokenManager(sdkMock, { _storageEventDelay: 500 });
       instance._resetExpireEventTimeoutAll = jest.fn();
       instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
       window.dispatchEvent(new StorageEvent('storage', {
@@ -1612,7 +1620,7 @@ describe('TokenManager', function() {
         newValue: 'fake_new_value',
         oldValue: 'fake_old_value'
       }));
-      expect(window.setTimeout).toHaveBeenCalledWith(expect.any(Function), 1000);
+      expect(window.setTimeout).toHaveBeenCalledWith(expect.any(Function), 500);
       jest.runAllTimers();
       expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
       expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
