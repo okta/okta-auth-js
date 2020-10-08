@@ -524,7 +524,6 @@ export class TokenManager {
 
       // LocalStorage cross tabs update is not synced in IE, set a 1s timer by default to read latest value
       // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
-      console.log(options._storageEventDelay);
       setTimeout(() => handleCrossTabsStorageChange(), options._storageEventDelay);
     });
   }
