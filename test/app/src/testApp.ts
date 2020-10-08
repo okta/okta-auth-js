@@ -12,7 +12,15 @@
 
 /* eslint-disable no-console */
 /* eslint-disable max-len */
-import { OktaAuth, TokenResponse, Tokens, OktaAuthOptions, AccessToken, IDToken, AuthTransaction, TokenParams } from '@okta/okta-auth-js';
+import { 
+  OktaAuth, 
+  TokenResponse, 
+  Tokens, 
+  OktaAuthOptions, 
+  AccessToken, 
+  AuthTransaction, 
+  TokenParams
+} from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryString } from './util';
@@ -25,6 +33,9 @@ declare global {
   }
 }
 
+interface GetSDKInstanceOptions {
+  subscribeAuthStateChange?: boolean;
+}
 
 declare class OktaSignIn {
   constructor(options: any);
@@ -119,7 +130,7 @@ class TestApp {
     bindFunctions(this, window);
   }
 
-  getSDKInstance(): Promise<void> {
+  getSDKInstance({ subscribeAuthStateChange }: GetSDKInstanceOptions = { subscribeAuthStateChange: true }): Promise<void> {
     return Promise.resolve()
       .then(() => {
         // can throw
@@ -127,6 +138,9 @@ class TestApp {
           scopes: this.config._defaultScopes ? [] : this.config.scopes
         }));
         this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
+        if (subscribeAuthStateChange) {
+          this.oktaAuth.authStateManager.subscribe(this.render.bind(this));
+        }
       });
   }
 
@@ -153,7 +167,7 @@ class TestApp {
       <hr/>
       ${homeLink(this)}
     `;
-    return this.getSDKInstance()
+    return this.getSDKInstance({ subscribeAuthStateChange: false })
       .then(() => this._setContent(content))
       .then(() => this._afterRender('callback'));
   }
@@ -165,7 +179,7 @@ class TestApp {
   }
 
   render(): Promise<void> {
-    return this.getTokens()
+    return this.oktaAuth.tokenManager.getTokens()
     .catch((e) => {
       this.renderError(e);
       throw e;
@@ -252,7 +266,7 @@ class TestApp {
     }, options);
     return this.oktaAuth.token.getWithPopup(options)
     .then(res => {
-      this.saveTokens(res.tokens);
+      this.oktaAuth.tokenManager.setTokens(res.tokens);
       this.render();
     });
   }
@@ -264,7 +278,7 @@ class TestApp {
     }, options);
     return this.oktaAuth.token.getWithoutPrompt(options)
     .then(res => {
-      this.saveTokens(res.tokens);
+      this.oktaAuth.tokenManager.setTokens(res.tokens);
       this.render();
     });
   }
@@ -327,24 +341,8 @@ class TestApp {
   async getTokensFromUrl(): Promise<TokenResponse> {
     // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
     const res = await this.oktaAuth.token.parseFromUrl();
-    this.saveTokens(res.tokens);
+    this.oktaAuth.tokenManager.setTokens(res.tokens);
     return res;
-  }
-
-  saveTokens(tokens: Tokens): void {
-    const { idToken, accessToken } = tokens;
-    if (idToken) {
-      this.oktaAuth.tokenManager.add('idToken', idToken);
-    }
-    if (accessToken) {
-      this.oktaAuth.tokenManager.add('accessToken', accessToken);
-    }
-  }
-
-  async getTokens(): Promise<Tokens> {
-    const accessToken = await this.oktaAuth.tokenManager.get('accessToken') as AccessToken;
-    const idToken = await this.oktaAuth.tokenManager.get('idToken') as IDToken;
-    return { accessToken, idToken };
   }
 
   clearTokens(): void {
@@ -352,7 +350,7 @@ class TestApp {
   }
 
   async getUserInfo(): Promise<void> {
-    const { accessToken, idToken } = await this.getTokens();
+    const { accessToken, idToken } = await this.oktaAuth.tokenManager.getTokens();
     if (accessToken && idToken) {
       return this.oktaAuth.token.getUserInfo(accessToken as AccessToken)
         .catch(error => {

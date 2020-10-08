@@ -1,4 +1,4 @@
-/* global window, localStorage, sessionStorage */
+/* global window, localStorage, sessionStorage, StorageEvent */
 
 // Promise.allSettled is added in Node 12.10
 import allSettled from 'promise.allsettled';
@@ -10,6 +10,8 @@ import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../lib/clock';
+import { TokenManager } from '../../lib/TokenManager';
+import * as utils from '../../lib/util';
 
 // Expected settings on HTTPS
 var secureCookieSettings = {
@@ -43,6 +45,9 @@ describe('TokenManager', function() {
 
   function setupSync(options) {
     client = createAuth(options);
+    // clear downstream listeners
+    client.tokenManager.off('added');
+    client.tokenManager.off('removed');
     return client;
   }
 
@@ -1513,38 +1518,219 @@ describe('TokenManager', function() {
   });
 
   describe('setTokens', () => {
-    it('should add tokens to storage', () => {
-      setupSync();
-      client.tokenManager.add = jest.fn();
-      client.tokenManager.setTokens({ 
+    let setItemMock;
+    let storageProvider;
+    beforeEach(() => {
+      setItemMock = jest.fn();
+      storageProvider = {
+        getItem: jest.fn(),
+        setItem: setItemMock
+      };
+    });
+
+    it('should add tokens to storage and only call storage.setItem() once', () => {
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
+      });
+      const tokensObj = { 
+        idToken: tokens.standardIdTokenParsed,
         accessToken: tokens.standardAccessTokenParsed, 
-        idToken: tokens.standardIdTokenParsed
-      });
-      oauthUtil.expectTokenStorageToEqual(localStorage, {
-        'accessToken': tokens.standardAccessTokenParsed,
-        'idToken': tokens.standardIdTokenParsed
-      });
+      };
+      client.tokenManager.setTokens(tokensObj);
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
     });
 
     it('should add accessToken to storage', () => {
-      setupSync();
-      client.tokenManager.add = jest.fn();
-      client.tokenManager.setTokens({ 
-        accessToken: tokens.standardAccessTokenParsed
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
       });
-      oauthUtil.expectTokenStorageToEqual(localStorage, {
-        'accessToken': tokens.standardAccessTokenParsed
-      });
+      const tokensObj = { 
+        accessToken: tokens.standardAccessTokenParsed, 
+      };
+      client.tokenManager.setTokens(tokensObj);
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
     });
 
     it('should add idToken to storage', () => {
-      setupSync();
-      client.tokenManager.add = jest.fn();
-      client.tokenManager.setTokens({ 
-        idToken: tokens.standardIdTokenParsed
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
       });
-      oauthUtil.expectTokenStorageToEqual(localStorage, {
-        'idToken': tokens.standardIdTokenParsed
+      const tokensObj = { 
+        idToken: tokens.standardIdTokenParsed,
+      };
+      client.tokenManager.setTokens(tokensObj);
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+    });
+  });
+
+  describe('cross tabs communication', () => {
+    let sdkMock;
+    beforeEach(function() {
+      jest.useFakeTimers();
+      const emitter = new Emitter();
+      sdkMock = {
+        options: {},
+        emitter
+      };
+      // eslint-disable-next-line no-import-assign
+      utils.isIE11OrLess = jest.fn().mockReturnValue(false);
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+    it('should emit events and reset timeouts when storage event happen with token storage key', () => {
+      const instance = new TokenManager(sdkMock);
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'okta-token-storage', 
+        newValue: 'fake_new_value',
+        oldValue: 'fake_old_value'
+      }));
+      jest.runAllTimers();
+      expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
+    });
+    it('should set options._storageEventDelay default to 1000 in isIE11OrLess env', () => {
+      // eslint-disable-next-line no-import-assign
+      utils.isIE11OrLess = jest.fn().mockReturnValue(true);
+      const instance = new TokenManager(sdkMock);
+      expect(instance._getOptions()._storageEventDelay).toBe(1000);
+    });
+    it('should use options._storageEventDelay from passed options', () => {
+      const instance = new TokenManager(sdkMock, { _storageEventDelay: 100 });
+      expect(instance._getOptions()._storageEventDelay).toBe(100);
+    });
+    it('should use options._storageEventDelay from passed options in isIE11OrLess env', () => {
+      // eslint-disable-next-line no-import-assign
+      utils.isIE11OrLess = jest.fn().mockReturnValue(true);
+      const instance = new TokenManager(sdkMock, { _storageEventDelay: 100 });
+      expect(instance._getOptions()._storageEventDelay).toBe(100);
+    });
+    it('should handle storage change based on _storageEventDelay option', () => {
+      jest.spyOn(window, 'setTimeout');
+      const instance = new TokenManager(sdkMock, { _storageEventDelay: 500 });
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'okta-token-storage', 
+        newValue: 'fake_new_value',
+        oldValue: 'fake_old_value'
+      }));
+      expect(window.setTimeout).toHaveBeenCalledWith(expect.any(Function), 500);
+      jest.runAllTimers();
+      expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
+    });
+    it('should emit events and reset timeouts when localStorage.clear() has been called from other tabs', () => {
+      const instance = new TokenManager(sdkMock);
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      // simulate localStorage.clear()
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: null,
+        newValue: null,
+        oldValue: null
+      }));
+      jest.runAllTimers();
+      expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith(null, null);
+    });
+    it('should not call localStorage.setItem when token storage changed', () => {
+      new TokenManager(sdkMock); // eslint-disable-line no-new
+      // https://github.com/facebook/jest/issues/6798#issuecomment-440988627
+      jest.spyOn(window.localStorage.__proto__, 'setItem');
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'okta-token-storage', 
+        newValue: 'fake_new_value',
+        oldValue: 'fake_old_value'
+      }));
+      expect(localStorage.setItem).not.toHaveBeenCalled();
+    });
+    it('should not emit events or reset timeouts if the key is not token storage key', () => {
+      const instance = new TokenManager(sdkMock);
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'fake-key', 
+        newValue: 'fake_new_value',
+        oldValue: 'fake_old_value'
+      }));
+      expect(instance._resetExpireEventTimeoutAll).not.toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).not.toHaveBeenCalled();
+    });
+    it('should not emit events or reset timeouts if oldValue === newValue', () => {
+      const instance = new TokenManager(sdkMock);
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'okta-token-storage', 
+        newValue: 'fake_unchanged_value',
+        oldValue: 'fake_unchanged_value'
+      }));
+      expect(instance._resetExpireEventTimeoutAll).not.toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).not.toHaveBeenCalled();
+    });
+    
+    describe('_emitEventsForCrossTabsStorageUpdate', () => {
+      it('should emit "added" event if new token is added', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = '{"idToken": "fake-idToken"}';
+        const oldValue = null;
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', 'fake-idToken');
+      });
+      it('should emit "added" event if token is changed', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = '{"idToken": "fake-idToken"}';
+        const oldValue = '{"idToken": "old-fake-idToken"}';
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', 'fake-idToken');
+      });
+      it('should emit two "added" event if two token are added', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = '{"idToken": "fake-idToken", "accessToken": "fake-accessToken"}';
+        const oldValue = null;
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(1, 'added', 'idToken', 'fake-idToken');
+        expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(2, 'added', 'accessToken', 'fake-accessToken');
+      });
+      it('should not emit "added" event if oldToken equal to newToken', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = '{"idToken": "fake-idToken"}';
+        const oldValue = '{"idToken": "fake-idToken"}';
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).not.toHaveBeenCalled();
+      });
+      it('should emit "removed" event if token is removed', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = null;
+        const oldValue = '{"idToken": "old-fake-idToken"}';
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenCalledWith('removed', 'idToken', 'old-fake-idToken');
+      });
+      it('should emit two "removed" event if two token are removed', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = null;
+        const oldValue = '{"idToken": "fake-idToken", "accessToken": "fake-accessToken"}';
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(1, 'removed', 'idToken', 'fake-idToken');
+        expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(2, 'removed', 'accessToken', 'fake-accessToken');
       });
     });
   });

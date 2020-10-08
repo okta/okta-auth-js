@@ -23,6 +23,7 @@ export interface TokenManagerOptions {
   storage?: string;
   storageKey?: string;
   expireEarlySeconds?: number;
+  _storageEventDelay?: number;
 }
 
 export interface CustomUserAgent {

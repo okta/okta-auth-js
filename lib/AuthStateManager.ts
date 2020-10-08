@@ -2,6 +2,7 @@ import { AuthSdkError } from './errors';
 import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from './browser';
 import { getConsole, warn } from './util';
+import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
 const PCancelable = require('p-cancelable');
 
 export const DEFAULT_AUTH_STATE = { 
@@ -34,6 +35,7 @@ export class AuthStateManager {
   };
   _authState: AuthState;
   _logOptions: AuthStateLogOptions;
+  _lastEventTimestamp: number;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
@@ -46,13 +48,14 @@ export class AuthStateManager {
     this._logOptions = {};
 
     // Listen on tokenManager events to start updateState process
-    // "added" event is emitted in both add and renew process, just listen on "added" event to update auth state
-    sdk.tokenManager.on('added', (key, token) => {
-      this._setLogOptions({ event: 'added', key, token });
+    // "added" event is emitted in both add and renew process
+    // Only listen on "added" event to update auth state
+    sdk.tokenManager.on(EVENT_ADDED, (key, token) => {
+      this._setLogOptions({ event: EVENT_ADDED, key, token });
       this.updateAuthState();
     });
-    sdk.tokenManager.on('removed', (key, token) => {
-      this._setLogOptions({ event: 'removed', key, token });
+    sdk.tokenManager.on(EVENT_REMOVED, (key, token) => {
+      this._setLogOptions({ event: EVENT_REMOVED, key, token });
       this.updateAuthState();
     });
   }
