@@ -33,7 +33,7 @@ declare global {
   }
 }
 
-interface getSDKInstanceOptions {
+interface GetSDKInstanceOptions {
   subscribeAuthStateChange?: boolean;
 }
 
@@ -130,7 +130,7 @@ class TestApp {
     bindFunctions(this, window);
   }
 
-  getSDKInstance({ subscribeAuthStateChange }: getSDKInstanceOptions = { subscribeAuthStateChange: true }): Promise<void> {
+  getSDKInstance({ subscribeAuthStateChange }: GetSDKInstanceOptions = { subscribeAuthStateChange: true }): Promise<void> {
     return Promise.resolve()
       .then(() => {
         // can throw
