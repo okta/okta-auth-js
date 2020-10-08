@@ -53,19 +53,19 @@ function hasExpired(tokenMgmtRef, token) {
 }
 
 function emitExpired(tokenMgmtRef, key, token) {
-  tokenMgmtRef.emitter.emit(EVENT_EXPIRED, key, token, { timestamp: Date.now() });
+  tokenMgmtRef.emitter.emit(EVENT_EXPIRED, key, token);
 }
 
 function emitRenewed(tokenMgmtRef, key, freshToken, oldToken) {
-  tokenMgmtRef.emitter.emit(EVENT_RENEWED, key, freshToken, oldToken, { timestamp: Date.now() });
+  tokenMgmtRef.emitter.emit(EVENT_RENEWED, key, freshToken, oldToken);
 }
 
 function emitAdded(tokenMgmtRef, key, token) {
-  tokenMgmtRef.emitter.emit(EVENT_ADDED, key, token, { timestamp: Date.now() });
+  tokenMgmtRef.emitter.emit(EVENT_ADDED, key, token);
 }
 
 function emitRemoved(tokenMgmtRef, key, token?) {
-  tokenMgmtRef.emitter.emit(EVENT_REMOVED, key, token, { timestamp: Date.now() });
+  tokenMgmtRef.emitter.emit(EVENT_REMOVED, key, token);
 }
 
 function emitError(tokenMgmtRef, error) {
@@ -406,7 +406,7 @@ export class TokenManager {
     }
 
     if (isIE11OrLess()) {
-      options._storageEventDelay = 1000;
+      options._storageEventDelay = options._storageEventDelay || 1000;
     }
 
     var storageProvider;

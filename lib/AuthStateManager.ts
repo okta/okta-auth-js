@@ -46,30 +46,15 @@ export class AuthStateManager {
     this._pending = { ...DEFAULT_PENDING };
     this._authState = { ...DEFAULT_AUTH_STATE };
     this._logOptions = {};
-    this._lastEventTimestamp = 0;
 
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process
     // Only listen on "added" event to update auth state
-    const shouldUpdateAuthState = (timestamp: number): boolean => {
-      if (this._lastEventTimestamp > timestamp) {
-        return false;
-      }
-      // track event timestamp
-      this._lastEventTimestamp = timestamp;
-      return true;
-    };
-    sdk.tokenManager.on(EVENT_ADDED, (key, token, { timestamp }) => {
-      if (!shouldUpdateAuthState(timestamp)) {
-        return;
-      }
+    sdk.tokenManager.on(EVENT_ADDED, (key, token) => {
       this._setLogOptions({ event: EVENT_ADDED, key, token });
       this.updateAuthState();
     });
-    sdk.tokenManager.on(EVENT_REMOVED, (key, token, { timestamp }) => {
-      if (!shouldUpdateAuthState(timestamp)) {
-        return;
-      }
+    sdk.tokenManager.on(EVENT_REMOVED, (key, token) => {
       this._setLogOptions({ event: EVENT_REMOVED, key, token });
       this.updateAuthState();
     });

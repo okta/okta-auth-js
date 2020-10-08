@@ -53,15 +53,6 @@ describe('AuthStateManager', () => {
       expect(instance.updateAuthState).toHaveBeenCalled();
     });
 
-    it('should not call updateAuthState when "added" event emitted before lastEventTimestamp', () => {
-      const instance = new AuthStateManager(sdkMock);
-      const now = Date.now();
-      instance._lastEventTimestamp = now;
-      instance.updateAuthState = jest.fn();
-      sdkMock.emitter.emit('added', 'fakeKey', 'fakeToken', { timestamp: now - 1000 });
-      expect(instance.updateAuthState).not.toHaveBeenCalled();
-    });
-
     it('should call updateAuthState when "removed" event emitted', () => {
       const instance = new AuthStateManager(sdkMock);
       instance.updateAuthState = jest.fn();
