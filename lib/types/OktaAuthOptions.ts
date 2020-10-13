@@ -13,13 +13,17 @@
 import { StorageUtil } from './Storage';
 import { CookieOptions } from './Cookies';
 import { HttpRequestClient } from './http';
+import { OktaAuth } from './';
+import { AuthState } from './AuthState';
 
 export interface TokenManagerOptions {
   autoRenew?: boolean;
+  autoRemove?: boolean;
   secure?: boolean;
   storage?: string;
   storageKey?: string;
   expireEarlySeconds?: number;
+  _storageEventDelay?: number;
 }
 
 export interface CustomUserAgent {
@@ -54,4 +58,6 @@ export interface OktaAuthOptions extends CustomUrls {
   transformErrorXHR?: (xhr: object) => any;
   headers?: object;
   maxClockSkew?: number;
+  transformAuthState?: (oktaAuth: OktaAuth, authState: AuthState) => Promise<AuthState>;
+  devMode?: boolean; 
 }

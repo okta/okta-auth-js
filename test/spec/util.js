@@ -4,19 +4,20 @@ import * as util from '../../lib/util';
 describe('util', function() {
   beforeEach(function() {
     jest.spyOn(window.console, 'log');
+    jest.spyOn(window.console, 'warn');
   });
 
   describe('warn', function() {
     it('writes warning to console', function() {
       util.warn('sample warning');
-      expect(window.console.log).toHaveBeenCalledWith('[okta-auth-sdk] WARN: sample warning');
+      expect(window.console.warn).toHaveBeenCalledWith('[okta-auth-sdk] WARN: sample warning');
     });
   });
 
   describe('deprecate', function() {
     it('writes deprecation to console', function() {
       util.deprecate('sample deprecation');
-      expect(window.console.log).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: sample deprecation');
+      expect(window.console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: sample deprecation');
     });
   });
 
@@ -201,6 +202,37 @@ describe('util', function() {
     it('returns true if argument is a function', function() {
       var fn = function() { return 'I am a function!'; };
       expect(util.isFunction(fn)).toBe(true);
+    });
+  });
+
+  describe('toAbsoluteUrl', () => {
+    it('should return same url if url is an absolute url', () => {
+      const url = 'http://fake.com';
+      expect(util.toAbsoluteUrl(url)).toEqual(url);
+    });
+
+    it('should return correct url when valid baseUrl and relative url are provided', () => {
+      const baseUrl = 'http://fake.com';
+      const url = '/relative';
+      expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
+    });
+
+    it('should return correct url when baseUrl has trailing "/"', () => {
+      const baseUrl = 'http://fake.com/';
+      const url = '/relative';
+      expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
+    });
+
+    it('should return correct url when relative url without "/"', () => {
+      const baseUrl = 'http://fake.com';
+      const url = 'relative';
+      expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
+    });
+
+    it('should return correct url when relative url without "/" and baseurl with trailing "/"', () => {
+      const baseUrl = 'http://fake.com/';
+      const url = 'relative';
+      expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
     });
   });
 });

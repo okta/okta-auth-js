@@ -22,3 +22,4 @@ export const CACHE_STORAGE_NAME = 'okta-cache-storage';
 export const PKCE_STORAGE_NAME = 'okta-pkce-storage';
 export const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
 export const ID_TOKEN_STORAGE_KEY =  'idToken';
+export const REFERRER_PATH_STORAGE_KEY = 'referrerPath';

@@ -1,4 +1,4 @@
-/* global window, localStorage, sessionStorage */
+/* global window, localStorage, sessionStorage, StorageEvent */
 
 // Promise.allSettled is added in Node 12.10
 import allSettled from 'promise.allsettled';
@@ -10,6 +10,8 @@ import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../lib/clock';
+import { TokenManager } from '../../lib/TokenManager';
+import * as utils from '../../lib/util';
 
 // Expected settings on HTTPS
 var secureCookieSettings = {
@@ -31,7 +33,8 @@ function createAuth(options) {
       storage: options.tokenManager.storage,
       storageKey: options.tokenManager.storageKey,
       autoRenew: options.tokenManager.autoRenew || false,
-      secure: options.tokenManager.secure, // used by cookie storage
+      autoRemove: options.tokenManager.autoRemove || false,
+      secure: options.tokenManager.secure // used by cookie storage
     }
   });
 }
@@ -42,6 +45,9 @@ describe('TokenManager', function() {
 
   function setupSync(options) {
     client = createAuth(options);
+    // clear downstream listeners
+    client.tokenManager.off('added');
+    client.tokenManager.off('removed');
     return client;
   }
 
@@ -185,10 +191,10 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to sessionStorage if localStorage isn\'t available', function() {
-      jest.spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'warn');
       oauthUtil.mockLocalStorageError();
       setupSync();
-      expect(window.console.log).toHaveBeenCalledWith(
+      expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support localStorage. Switching to sessionStorage.'
       );
@@ -198,10 +204,10 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to sessionStorage if localStorage cannot be written to', function() {
-      jest.spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'warn');
       oauthUtil.mockStorageSetItemError();
       setupSync();
-      expect(window.console.log).toHaveBeenCalledWith(
+      expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support localStorage. Switching to sessionStorage.'
       );
@@ -211,11 +217,11 @@ describe('TokenManager', function() {
       });
     });
     it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
-      jest.spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'warn');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockSessionStorageError();
       setupSync();
-      expect(window.console.log).toHaveBeenCalledWith(
+      expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support sessionStorage. Switching to cookie-based storage.'
       );
@@ -229,7 +235,7 @@ describe('TokenManager', function() {
       );
     });
     it('defaults to cookie-based storage if sessionStorage cannot be written to', function() {
-      jest.spyOn(window.console, 'log');
+      jest.spyOn(window.console, 'warn');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockStorageSetItemError();
       setupSync({
@@ -237,7 +243,7 @@ describe('TokenManager', function() {
           storage: 'sessionStorage'
         }
       });
-      expect(window.console.log).toHaveBeenCalledWith(
+      expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support sessionStorage. Switching to cookie-based storage.'
       );
@@ -282,26 +288,37 @@ describe('TokenManager', function() {
       setupSync();
     });
 
-    it('on success, emits a "renewed" event with the new token', function() {
-      var key = 'test-idToken';
-      var origToken = tokens.standardIdTokenParsed;
-      var renewedToken = Object.assign({}, origToken);
-      client.tokenManager.add(key, origToken);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
-        return Promise.resolve(renewedToken);
+    it('on success, emits "renewed" event with the new tokens', function() {
+      expect.assertions(2);
+      
+      const idTokenKey = 'test-idToken';
+      const origIdToken = tokens.standardIdTokenParsed;
+      const renewedIdToken = Object.assign({}, origIdToken);
+      client.tokenManager.add(idTokenKey, origIdToken);
+
+      const accessTokenKey = 'test-accessToken';
+      const origAccessToken = tokens.standardAccessTokenParsed;
+      const renewedAccessToken = Object.assign({}, origAccessToken);
+      client.tokenManager.add(accessTokenKey, origAccessToken);
+
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
+        return Promise.resolve({ idToken: renewedIdToken, accessToken: renewedAccessToken });
       });
-      var callback = jest.fn();
-      client.tokenManager.on('renewed', callback);
+      const addedCallback = jest.fn();
+      const renewedCallback = jest.fn();
+      client.tokenManager.on('added', addedCallback);
+      client.tokenManager.on('renewed', renewedCallback);
       return client.tokenManager.renew('test-idToken')
-        .then(function() {
-          expect(callback).toHaveBeenCalledWith(key, renewedToken, origToken);
+        .then(() => {
+          expect(renewedCallback).toHaveBeenNthCalledWith(1, idTokenKey, renewedIdToken, origIdToken);
+          expect(renewedCallback).toHaveBeenNthCalledWith(2, accessTokenKey, renewedAccessToken, origAccessToken);
         });
     });
 
     it('multiple overlapping calls will produce a single request and promise', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
-        return Promise.resolve(tokens.standardIdTokenParsed);
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
+        return Promise.resolve({ idToken: tokens.standardIdTokenParsed, accessToken: tokens.standardAccessTokenParsed });
       });
       var p1 = client.tokenManager.renew('test-idToken');
       var p2 = client.tokenManager.renew('test-idToken');
@@ -311,7 +328,7 @@ describe('TokenManager', function() {
 
     it('multiple overlapping calls will produce a single request and promise (failure case)', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
         return Promise.reject(new Error('expected'));
       });
       var p1 = client.tokenManager.renew('test-idToken');
@@ -331,8 +348,8 @@ describe('TokenManager', function() {
 
     it('sequential calls will produce a unique request and promise', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
-        return Promise.resolve(tokens.standardIdTokenParsed);
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
+        return Promise.resolve({ idToken: tokens.standardIdTokenParsed, accessToken: tokens.standardAccessTokenParsed });
       });
       var p1 = client.tokenManager.renew('test-idToken').then(function() {
         var p2 = client.tokenManager.renew('test-idToken');
@@ -344,7 +361,7 @@ describe('TokenManager', function() {
 
     it('sequential calls will produce a unique request and promise (failure case)', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
         return Promise.reject(new Error('expected'));
       });
       var p1 = client.tokenManager.renew('test-idToken').then(function() {
@@ -377,6 +394,11 @@ describe('TokenManager', function() {
             claims: {'fake': 'claims'},
             expiresAt: 0,
             scopes: ['openid', 'email']
+          },
+          'test-accessToken': {
+            accessToken: 'testInitialToken',
+            expiresAt: 0,
+            scopes: ['openid', 'email']
           }
         },
         tokenManagerRenewArgs: ['test-idToken'],
@@ -385,7 +407,7 @@ describe('TokenManager', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
+            'response_type': 'token id_token',
             'response_mode': 'okta_post_message',
             'state': oauthUtil.mockedState,
             'nonce': oauthUtil.mockedNonce,
@@ -393,15 +415,20 @@ describe('TokenManager', function() {
             'prompt': 'none'
           }
         },
+        time: 1449699929,
         postMessageResp: {
           'id_token': tokens.standardIdToken,
-          state: oauthUtil.mockedState
+          'access_token': tokens.standardAccessToken,
+          'expires_in': 3600,
+          'token_type': 'Bearer',
+          'state': oauthUtil.mockedState
         },
         expectedResp: tokens.standardIdTokenParsed
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed,
+          'test-accessToken': tokens.standardAccessTokenParsed
         });
       });
     });
@@ -413,6 +440,12 @@ describe('TokenManager', function() {
       return oauthUtil.setupFrame({
         authClient: client,
         tokenManagerAddKeys: {
+          'idToken': {
+            idToken: 'testInitialToken',
+            claims: {'fake': 'claims'},
+            expiresAt: 0,
+            scopes: ['openid', 'email']
+          },
           'accessToken': {
             accessToken: 'testInitialToken',
             expiresAt: mockTime + 100,
@@ -427,7 +460,7 @@ describe('TokenManager', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'token',
+            'response_type': 'token id_token',
             'response_mode': 'okta_post_message',
             'state': oauthUtil.mockedState,
             'nonce': oauthUtil.mockedNonce,
@@ -436,15 +469,17 @@ describe('TokenManager', function() {
           }
         },
         postMessageResp: {
+          'id_token': tokens.standardIdToken,
           'access_token': tokens.standardAccessToken,
-          'token_type': 'Bearer',
           'expires_in': 3600,
+          'token_type': 'Bearer',
           'state': oauthUtil.mockedState
         },
         expectedResp: tokens.standardAccessTokenParsed
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
+          'idToken': tokens.standardIdTokenParsed,
           'accessToken': tokens.standardAccessTokenParsed
         });
       });
@@ -502,8 +537,7 @@ describe('TokenManager', function() {
         errorLink: 'INTERNAL',
         errorId: 'INTERNAL',
         errorCauses: [],
-        tokenKey: 'test-idToken',
-        accessToken: false
+        tokenKey: 'test-idToken'
       };
 
       return oauthUtil.setupFrame({
@@ -536,10 +570,11 @@ describe('TokenManager', function() {
       });
     });
 
-    it('removes token if an OAuthError is thrown while renewing', function() {
+    it('removes expired token if an OAuthError is thrown while renewing', function() {
       return oauthUtil.setupFrame({
         authClient: client,
         willFail: true,
+        time: tokens.standardAccessTokenParsed.expiresAt + 1,
         tokenManagerAddKeys: {
           'test-accessToken': tokens.standardAccessTokenParsed,
           'test-idToken': tokens.standardIdTokenParsed
@@ -558,21 +593,22 @@ describe('TokenManager', function() {
           errorCode: 'sampleErrorCode',
           errorSummary: 'something went wrong',
           tokenKey: 'test-accessToken',
-          accessToken: true
         });
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
-        });
+        oauthUtil.expectTokenStorageToEqual(localStorage, {});
       });
     });
 
-    it('removes token if an AuthSdkError is thrown while renewing', function() {
+    it('removes expired token if an AuthSdkError is thrown while renewing', function() {
       return oauthUtil.setupFrame({
         authClient: client,
         willFail: true,
+        time: tokens.standardAccessTokenParsed.expiresAt + 1,
         tokenManagerAddKeys: {
           'test-accessToken': tokens.standardAccessTokenParsed,
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': { 
+            ...tokens.standardIdTokenParsed, 
+            expiresAt: tokens.standardAccessTokenParsed.expiresAt + 10 
+          }
         },
         tokenManagerRenewArgs: ['test-accessToken'],
         postMessageSrc: {
@@ -591,23 +627,60 @@ describe('TokenManager', function() {
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: [],
-          tokenKey: 'test-accessToken',
-          accessToken: true
+          tokenKey: 'test-accessToken'
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': { 
+            ...tokens.standardIdTokenParsed, 
+            expiresAt: tokens.standardAccessTokenParsed.expiresAt + 10 
+          }
         });
       });
     });
   });
 
   describe('autoRenew', function() {
+    let tokenManagerAddKeys;
+    let postMessageSrc;
+    let postMessageResp;
     beforeEach(function() {
       jest.useFakeTimers();
+      tokenManagerAddKeys = {
+        'test-idToken': {
+          idToken: 'testInitialToken',
+          claims: {'fake': 'claims'},
+          expiresAt: 0,
+          scopes: ['openid', 'email']
+        },
+        'test-accessToken': {
+          accessToken: 'testInitialToken',
+          expiresAt: 0,
+          scopes: ['openid', 'email']
+        }
+      };
+      postMessageSrc = {
+        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+        queryParams: {
+          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+          'redirect_uri': 'https://example.com/redirect',
+          'response_type': 'token id_token',
+          'response_mode': 'okta_post_message',
+          'state': oauthUtil.mockedState,
+          'nonce': oauthUtil.mockedNonce,
+          'scope': 'openid email',
+          'prompt': 'none'
+        }
+      };
+      postMessageResp = {
+        'id_token': tokens.standardIdToken,
+        'access_token': tokens.standardAccessToken,
+        'expires_in': 3600,
+        'token_type': 'Bearer',
+        'state': oauthUtil.mockedState
+      };
     });
-    afterEach(function() {
+    afterEach(async () => {
       jest.useRealTimers();
-      client.tokenManager.clear(); // clear all timeouts
     });
     it('should register listener for "expired" event', function() {
       jest.spyOn(Emitter.prototype, 'on');
@@ -616,46 +689,29 @@ describe('TokenManager', function() {
     });
 
     it('automatically renews a token by default', function() {
-      var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+      const expiresAt = tokens.standardIdTokenParsed.expiresAt;
+      const authClient = setupSync({
+        tokenManager: {
+          autoRenew: true
+        }
+      });
       return oauthUtil.setupFrame({
-        authClient: setupSync({
-          tokenManager: {
-            autoRenew: true
-          }
-        }),
+        authClient,
         autoRenew: true,
         fastForwardToTime: true,
         autoRenewTokenKey: 'test-idToken',
         time: expiresAt + 1,
-        tokenManagerAddKeys: {
-          'test-idToken': {
-            idToken: 'testInitialToken',
-            claims: {'fake': 'claims'},
-            expiresAt: expiresAt,
-            scopes: ['openid', 'email']
-          }
-        },
-        postMessageSrc: {
-          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          queryParams: {
-            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-            'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
-            'response_mode': 'okta_post_message',
-            'state': oauthUtil.mockedState,
-            'nonce': oauthUtil.mockedNonce,
-            'scope': 'openid email',
-            'prompt': 'none'
-          }
-        },
-        postMessageResp: {
-          'id_token': tokens.standardIdToken,
-          state: oauthUtil.mockedState
-        }
+        tokenManagerAddKeys,
+        postMessageSrc,
+        postMessageResp
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed,
+          'test-accessToken': { 
+            ...tokens.standardAccessTokenParsed, 
+            expiresAt: expiresAt + 1 + 3600
+          }
         });
       });
     });
@@ -674,35 +730,17 @@ describe('TokenManager', function() {
         fastForwardToTime: true,
         autoRenewTokenKey: 'test-idToken',
         time: expiresAt - 10, // set local time to 10 seconds until expiration
-        tokenManagerAddKeys: {
-          'test-idToken': {
-            idToken: 'testInitialToken',
-            claims: {'fake': 'claims'},
-            expiresAt: expiresAt,
-            scopes: ['openid', 'email']
-          }
-        },
-        postMessageSrc: {
-          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          queryParams: {
-            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-            'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
-            'response_mode': 'okta_post_message',
-            'state': oauthUtil.mockedState,
-            'nonce': oauthUtil.mockedNonce,
-            'scope': 'openid email',
-            'prompt': 'none'
-          }
-        },
-        postMessageResp: {
-          'id_token': tokens.standardIdToken,
-          state: oauthUtil.mockedState
-        }
+        tokenManagerAddKeys,
+        postMessageSrc,
+        postMessageResp
       })
-      .then(function() {
+      .then(() => {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed,
+          'test-accessToken': { 
+            ...tokens.standardAccessTokenParsed, 
+            expiresAt: expiresAt - 10 + 3600
+          }
         });
       });
     });
@@ -720,35 +758,17 @@ describe('TokenManager', function() {
         fastForwardToTime: true,
         autoRenewTokenKey: 'test-idToken',
         time: expiresAt - 10, // set local time to 10 seconds until expiration
-        tokenManagerAddKeys: {
-          'test-idToken': {
-            idToken: 'testInitialToken',
-            claims: {'fake': 'claims'},
-            expiresAt: expiresAt,
-            scopes: ['openid', 'email']
-          }
-        },
-        postMessageSrc: {
-          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          queryParams: {
-            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-            'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
-            'response_mode': 'okta_post_message',
-            'state': oauthUtil.mockedState,
-            'nonce': oauthUtil.mockedNonce,
-            'scope': 'openid email',
-            'prompt': 'none'
-          }
-        },
-        postMessageResp: {
-          'id_token': tokens.standardIdToken,
-          state: oauthUtil.mockedState
-        }
+        tokenManagerAddKeys,
+        postMessageSrc,
+        postMessageResp
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed,
+          'test-accessToken': { 
+            ...tokens.standardAccessTokenParsed, 
+            expiresAt: expiresAt - 10 + 3600
+          }
         });
       });
     });
@@ -765,31 +785,9 @@ describe('TokenManager', function() {
         fastForwardToTime: true,
         autoRenewTokenKey: 'test-idToken',
         time: expiresAt + 1,
-        tokenManagerAddKeys: {
-          'test-idToken': {
-            idToken: 'testInitialToken',
-            claims: {'fake': 'claims'},
-            expiresAt: expiresAt,
-            scopes: ['openid', 'email']
-          }
-        },
-        postMessageSrc: {
-          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          queryParams: {
-            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-            'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
-            'response_mode': 'okta_post_message',
-            'state': oauthUtil.mockedState,
-            'nonce': oauthUtil.mockedNonce,
-            'scope': 'openid email',
-            'prompt': 'none'
-          }
-        },
-        postMessageResp: {
-          'id_token': tokens.standardIdToken,
-          state: oauthUtil.mockedState
-        },
+        tokenManagerAddKeys,
+        postMessageSrc,
+        postMessageResp,
         beforeCompletion: function(authClient) {
           // Simulate tokens being cleared while the renew request is performed
           authClient.tokenManager.clear();
@@ -811,8 +809,7 @@ describe('TokenManager', function() {
         message: 'something went wrong',
         errorCode: 'sampleErrorCode',
         errorSummary: 'something went wrong',
-        tokenKey: 'test-idToken',
-        accessToken: false
+        tokenKey: 'test-idToken'
       };
       var errorEventCallback = jest.fn().mockImplementation(function(err) {
         try {
@@ -868,8 +865,7 @@ describe('TokenManager', function() {
             errorLink: 'INTERNAL',
             errorId: 'INTERNAL',
             errorCauses: [],
-            tokenKey: 'test-idToken',
-            accessToken: false
+            tokenKey: 'test-idToken'
           });
         } catch (e) {
           done.fail(e);
@@ -903,8 +899,7 @@ describe('TokenManager', function() {
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: [],
-          tokenKey: 'test-idToken',
-          accessToken: false
+          tokenKey: 'test-idToken'
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
 
@@ -945,8 +940,7 @@ describe('TokenManager', function() {
           message: 'something went wrong',
           errorCode: 'sampleErrorCode',
           errorSummary: 'something went wrong',
-          tokenKey: 'test-idToken',
-          accessToken: false
+          tokenKey: 'test-idToken'
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
       });
@@ -983,8 +977,7 @@ describe('TokenManager', function() {
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: [],
-          tokenKey: 'test-idToken',
-          accessToken: false
+          tokenKey: 'test-idToken'
         });
         oauthUtil.expectTokenStorageToEqual(localStorage, {});
       });
@@ -1140,6 +1133,38 @@ describe('TokenManager', function() {
         expect(handler).toHaveBeenCalledTimes(11);
         expect(client.tokenManager.renew).toHaveBeenCalledTimes(19);
       });
+    });
+  });
+
+  describe('autoRemove', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should call tokenManager.remove() when autoRenew === false && autoRemove === true', () => {
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-idToken': tokens.standardIdTokenParsed
+      }));
+      setupSync({ tokenManager: { autoRenew: false, autoRemove: true } });
+      client.tokenManager.remove = jest.fn();
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(client.tokenManager.remove).toHaveBeenCalledWith('test-idToken');
+    });
+
+    it('should not call tokenManager.remove() when autoRenew === false && autoRemove === false', () => {
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-idToken': tokens.standardIdTokenParsed
+      }));
+
+      setupSync({ tokenManager: { autoRenew: false, autoRemove: false } });
+      client.tokenManager.remove = jest.fn();
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(client.tokenManager.remove).not.toHaveBeenCalled();
     });
   });
 
@@ -1438,6 +1463,276 @@ describe('TokenManager', function() {
       });
     });
 
+  });
+
+  describe('getTokens', () => {
+    it('should get key agnostic tokens set from storage', () => {
+      expect.assertions(2);
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-idToken': tokens.standardIdTokenParsed,
+        'test-accessToken': tokens.standardAccessTokenParsed
+      }));
+      setupSync();
+      return client.tokenManager.getTokens()
+      .then(({ accessToken, idToken }) => {
+        expect(accessToken).toEqual(tokens.standardAccessTokenParsed);
+        expect(idToken).toEqual(tokens.standardIdTokenParsed);
+      });
+    });
+
+    it('should get only idToken from storage', () => {
+      expect.assertions(2);
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-idToken': tokens.standardIdTokenParsed
+      }));
+      setupSync();
+      return client.tokenManager.getTokens()
+      .then(({ accessToken, idToken }) => {
+        expect(accessToken).toBeUndefined();
+        expect(idToken).toEqual(tokens.standardIdTokenParsed);
+      });
+    });
+
+    it('should get only accessToken from storage', () => {
+      expect.assertions(2);
+      localStorage.setItem('okta-token-storage', JSON.stringify({
+        'test-accessToken': tokens.standardAccessTokenParsed
+      }));
+      setupSync();
+      return client.tokenManager.getTokens()
+      .then(({ accessToken, idToken }) => {
+        expect(idToken).toBeUndefined();
+        expect(accessToken).toEqual(tokens.standardAccessTokenParsed);
+      });
+    });
+
+    it('should get empty object if no token in storage', () => {
+      expect.assertions(1);
+      localStorage.setItem('okta-token-storage', JSON.stringify({}));
+      setupSync();
+      return client.tokenManager.getTokens()
+      .then((tokens) => {
+        expect(tokens).toEqual({});
+      });
+    });
+  });
+
+  describe('setTokens', () => {
+    let setItemMock;
+    let storageProvider;
+    beforeEach(() => {
+      setItemMock = jest.fn();
+      storageProvider = {
+        getItem: jest.fn(),
+        setItem: setItemMock
+      };
+    });
+
+    it('should add tokens to storage and only call storage.setItem() once', () => {
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
+      });
+      const tokensObj = { 
+        idToken: tokens.standardIdTokenParsed,
+        accessToken: tokens.standardAccessTokenParsed, 
+      };
+      client.tokenManager.setTokens(tokensObj);
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+    });
+
+    it('should add accessToken to storage', () => {
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
+      });
+      const tokensObj = { 
+        accessToken: tokens.standardAccessTokenParsed, 
+      };
+      client.tokenManager.setTokens(tokensObj);
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+    });
+
+    it('should add idToken to storage', () => {
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
+      });
+      const tokensObj = { 
+        idToken: tokens.standardIdTokenParsed,
+      };
+      client.tokenManager.setTokens(tokensObj);
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+    });
+  });
+
+  describe('cross tabs communication', () => {
+    let sdkMock;
+    beforeEach(function() {
+      jest.useFakeTimers();
+      const emitter = new Emitter();
+      sdkMock = {
+        options: {},
+        emitter
+      };
+      // eslint-disable-next-line no-import-assign
+      utils.isIE11OrLess = jest.fn().mockReturnValue(false);
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+    it('should emit events and reset timeouts when storage event happen with token storage key', () => {
+      const instance = new TokenManager(sdkMock);
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'okta-token-storage', 
+        newValue: 'fake_new_value',
+        oldValue: 'fake_old_value'
+      }));
+      jest.runAllTimers();
+      expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
+    });
+    it('should set options._storageEventDelay default to 1000 in isIE11OrLess env', () => {
+      // eslint-disable-next-line no-import-assign
+      utils.isIE11OrLess = jest.fn().mockReturnValue(true);
+      const instance = new TokenManager(sdkMock);
+      expect(instance._getOptions()._storageEventDelay).toBe(1000);
+    });
+    it('should use options._storageEventDelay from passed options', () => {
+      const instance = new TokenManager(sdkMock, { _storageEventDelay: 100 });
+      expect(instance._getOptions()._storageEventDelay).toBe(100);
+    });
+    it('should use options._storageEventDelay from passed options in isIE11OrLess env', () => {
+      // eslint-disable-next-line no-import-assign
+      utils.isIE11OrLess = jest.fn().mockReturnValue(true);
+      const instance = new TokenManager(sdkMock, { _storageEventDelay: 100 });
+      expect(instance._getOptions()._storageEventDelay).toBe(100);
+    });
+    it('should handle storage change based on _storageEventDelay option', () => {
+      jest.spyOn(window, 'setTimeout');
+      const instance = new TokenManager(sdkMock, { _storageEventDelay: 500 });
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'okta-token-storage', 
+        newValue: 'fake_new_value',
+        oldValue: 'fake_old_value'
+      }));
+      expect(window.setTimeout).toHaveBeenCalledWith(expect.any(Function), 500);
+      jest.runAllTimers();
+      expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
+    });
+    it('should emit events and reset timeouts when localStorage.clear() has been called from other tabs', () => {
+      const instance = new TokenManager(sdkMock);
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      // simulate localStorage.clear()
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: null,
+        newValue: null,
+        oldValue: null
+      }));
+      jest.runAllTimers();
+      expect(instance._resetExpireEventTimeoutAll).toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith(null, null);
+    });
+    it('should not call localStorage.setItem when token storage changed', () => {
+      new TokenManager(sdkMock); // eslint-disable-line no-new
+      // https://github.com/facebook/jest/issues/6798#issuecomment-440988627
+      jest.spyOn(window.localStorage.__proto__, 'setItem');
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'okta-token-storage', 
+        newValue: 'fake_new_value',
+        oldValue: 'fake_old_value'
+      }));
+      expect(localStorage.setItem).not.toHaveBeenCalled();
+    });
+    it('should not emit events or reset timeouts if the key is not token storage key', () => {
+      const instance = new TokenManager(sdkMock);
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'fake-key', 
+        newValue: 'fake_new_value',
+        oldValue: 'fake_old_value'
+      }));
+      expect(instance._resetExpireEventTimeoutAll).not.toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).not.toHaveBeenCalled();
+    });
+    it('should not emit events or reset timeouts if oldValue === newValue', () => {
+      const instance = new TokenManager(sdkMock);
+      instance._resetExpireEventTimeoutAll = jest.fn();
+      instance._emitEventsForCrossTabsStorageUpdate = jest.fn();
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'okta-token-storage', 
+        newValue: 'fake_unchanged_value',
+        oldValue: 'fake_unchanged_value'
+      }));
+      expect(instance._resetExpireEventTimeoutAll).not.toHaveBeenCalled();
+      expect(instance._emitEventsForCrossTabsStorageUpdate).not.toHaveBeenCalled();
+    });
+    
+    describe('_emitEventsForCrossTabsStorageUpdate', () => {
+      it('should emit "added" event if new token is added', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = '{"idToken": "fake-idToken"}';
+        const oldValue = null;
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', 'fake-idToken');
+      });
+      it('should emit "added" event if token is changed', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = '{"idToken": "fake-idToken"}';
+        const oldValue = '{"idToken": "old-fake-idToken"}';
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', 'fake-idToken');
+      });
+      it('should emit two "added" event if two token are added', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = '{"idToken": "fake-idToken", "accessToken": "fake-accessToken"}';
+        const oldValue = null;
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(1, 'added', 'idToken', 'fake-idToken');
+        expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(2, 'added', 'accessToken', 'fake-accessToken');
+      });
+      it('should not emit "added" event if oldToken equal to newToken', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = '{"idToken": "fake-idToken"}';
+        const oldValue = '{"idToken": "fake-idToken"}';
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).not.toHaveBeenCalled();
+      });
+      it('should emit "removed" event if token is removed', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = null;
+        const oldValue = '{"idToken": "old-fake-idToken"}';
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenCalledWith('removed', 'idToken', 'old-fake-idToken');
+      });
+      it('should emit two "removed" event if two token are removed', () => {
+        const instance = new TokenManager(sdkMock);
+        const newValue = null;
+        const oldValue = '{"idToken": "fake-idToken", "accessToken": "fake-accessToken"}';
+        jest.spyOn(sdkMock.emitter, 'emit');
+        instance._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(1, 'removed', 'idToken', 'fake-idToken');
+        expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(2, 'removed', 'accessToken', 'fake-accessToken');
+      });
+    });
   });
 });
 

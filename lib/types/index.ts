@@ -19,3 +19,4 @@ export * from './OktaAuthOptions';
 export * from './Storage';
 export * from './Token';
 export * from './UserClaims';
+export * from './AuthState';

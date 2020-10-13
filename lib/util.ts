@@ -74,6 +74,14 @@ export function isAbsoluteUrl(url) {
   return /^(?:[a-z]+:)?\/\//i.test(url);
 }
 
+export function toAbsoluteUrl(url = '', baseUrl) {
+  if (isAbsoluteUrl(url)) {
+    return url;
+  }
+  baseUrl = removeTrailingSlash(baseUrl);
+  return url[0] === '/' ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
+}
+
 export function isString(obj: any): obj is string {
   return Object.prototype.toString.call(obj) === '[object String]';
 }
@@ -226,19 +234,22 @@ export function getConsole() {
     return nativeConsole;
   }
   return {
-    log: function() {}
+    log: function() {},
+    warn: function() {},
+    group: function() {},
+    groupEnd: function() {}
   };
 }
 
 export function warn(text) {
   /* eslint-disable no-console */
-  getConsole().log('[okta-auth-sdk] WARN: ' + text);
+  getConsole().warn('[okta-auth-sdk] WARN: ' + text);
   /* eslint-enable */
 }
 
 export function deprecate(text) {
   /* eslint-disable no-console */
-  getConsole().log('[okta-auth-sdk] DEPRECATION: ' + text);
+  getConsole().warn('[okta-auth-sdk] DEPRECATION: ' + text);
   /* eslint-enable */
 }
 

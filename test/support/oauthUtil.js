@@ -9,6 +9,7 @@ var wellKnown = require('./xhr/well-known');
 var wellKnownSharedResource = require('./xhr/well-known-shared-resource');
 var keys = require('./xhr/keys');
 import storageUtil from '../../lib/browser/browserStorage';
+import { isAccessToken, isIDToken } from '../../lib/types';
 
 var oauthUtil = {};
 
@@ -131,6 +132,8 @@ function validateResponse(res, expectedResp) {
   }
 }
 
+oauthUtil.validateResponse = validateResponse;
+
 oauthUtil.setup = function(opts) {
 
   if (opts &&
@@ -140,6 +143,7 @@ oauthUtil.setup = function(opts) {
       opts.tokenManagerRenewArgs ||
       opts.renewArgs ||
       opts.tokenRenewArgs ||
+      opts.tokenRenewTokensArgs ||
       opts.autoRenew) {
     // Simulate the postMessage between the window and the popup or iframe
     jest.spyOn(window, 'addEventListener').mockImplementation(function(eventName, fn) {
@@ -215,10 +219,23 @@ oauthUtil.setup = function(opts) {
     promise = authClient.tokenManager.renew.apply(this, opts.tokenManagerRenewArgs);
   } else if (opts.tokenRenewArgs) {
     promise = authClient.token.renew.apply(this, opts.tokenRenewArgs);
+  } else if (opts.tokenRenewTokensArgs) {
+    promise = authClient.token.renewTokens.apply(this, opts.tokenRenewTokensArgs);
   } else if (opts.autoRenew) {
+    const tokenTypesTobeRenewed = ['accessToken', 'idToken'];
     promise = new Promise(function(resolve, reject) {
-      authClient.tokenManager.on('renewed', function() {
-        resolve();
+      authClient.tokenManager.on('renewed', function(key, freshToken) {
+        if (isAccessToken(freshToken)) {
+          const index = tokenTypesTobeRenewed.indexOf('accessToken');
+          tokenTypesTobeRenewed.splice(index, 1);
+        } else if (isIDToken(freshToken)) {
+          const index = tokenTypesTobeRenewed.indexOf('accessToken');
+          tokenTypesTobeRenewed.splice(index, 1);
+        }
+        if (!tokenTypesTobeRenewed.length) {
+          authClient.tokenManager._clearExpireEventTimeoutAll();
+          resolve();
+        } 
       });
       authClient.tokenManager.on('error', function(error) {
         reject(error);
@@ -242,7 +259,11 @@ oauthUtil.setup = function(opts) {
         return;
       }
       var expectedResp = opts.expectedResp || defaultResponse;
-      validateResponse(res, expectedResp);
+      if (opts.validateFunc) {
+        opts.validateFunc(res);
+      } else {
+        validateResponse(res, expectedResp);
+      }
     })
     .catch(function(err) {
       if (opts.willFail) {

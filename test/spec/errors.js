@@ -15,7 +15,7 @@ describe('General Errors', function () {
       response: 'error-throttle'
     },
     execute: function (test) {
-      return test.oa.signIn({});
+      return test.oa.signIn({username: 'fake', password: 'fake'});
     }
   });
 
@@ -29,7 +29,7 @@ describe('General Errors', function () {
       response: 'error-internal'
     },
     execute: function (test) {
-      return test.oa.signIn({});
+      return test.oa.signIn({username: 'fake', password: 'fake'});
     },
     expectations: function (test, err) {
       var expected = _.cloneDeep(test.responseBody);
@@ -58,7 +58,7 @@ describe('General Errors', function () {
       response: 'error-network'
     },
     execute: function (test) {
-      return test.oa.signIn({});
+      return test.oa.signIn({username: 'fake', password: 'fake'});
     },
     expectations: function (test, err) {
       expect(err.name).toEqual('AuthApiError');

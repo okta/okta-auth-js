@@ -185,7 +185,7 @@ describe('Renew token', function() {
       expect(url.pathname).toBe('/oauth2/v1/authorize');
       expect(url.searchParams.get('client_id')).toBe(CLIENT_ID);
       expect(url.searchParams.get('redirect_uri')).toBe(REDIRECT_URI);
-      expect(url.searchParams.get('response_type')).toBe('token');
+      expect(url.searchParams.get('response_type')).toBe('token id_token');
       expect(url.searchParams.get('response_mode')).toBe('okta_post_message');
       expect(url.searchParams.get('scope')).toBe('openid email');
       expect(url.searchParams.get('state')).toBeTruthy();
@@ -195,6 +195,7 @@ describe('Renew token', function() {
       const scope = url.searchParams.get('scope');
       var response = {
         access_token: ACCESS_TOKEN_STR,
+        id_token: ID_TOKEN_STR,
         expires_in: 3600,
         scope,
         state,
@@ -208,6 +209,7 @@ describe('Renew token', function() {
       window.dispatchEvent(event);
     });
     
+    mockNonce(NONCE);
     return bootstrap({
       pkce: false
     })

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaLogin from '../pageobjects/OktaLogin';
-import { switchToPopupWindow, switchToMainWindow } from './browserUtils';
+import { switchToPopupWindow, switchToLastFocusedWindow } from './browserUtils';
 
 const USERNAME = process.env.USERNAME;
 const PASSWORD = process.env.PASSWORD;
@@ -29,10 +29,11 @@ async function handleCallback(flow, responseMode) {
 }
 
 async function loginPopup() {
+  const existingHandlesCount = (await browser.getWindowHandles()).length;
   await TestApp.loginPopup();
-  await switchToPopupWindow();
+  await switchToPopupWindow(existingHandlesCount);
   await OktaLogin.signin(USERNAME, PASSWORD);
-  await switchToMainWindow();
+  await switchToLastFocusedWindow();
   await TestApp.assertLoggedIn();
 }
 
