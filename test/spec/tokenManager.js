@@ -1517,7 +1517,7 @@ describe('TokenManager', function() {
     });
   });
 
-  describe.only('setTokens', () => {
+  describe('setTokens', () => {
     let setItemMock;
     let storageProvider;
     beforeEach(() => {
