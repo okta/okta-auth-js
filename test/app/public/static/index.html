@@ -58,13 +58,7 @@
 
       function handleLoginRedirect() {
         authClient.token.parseFromUrl().then(function(res) {
-          var tokens = res.tokens;
-          if (tokens.idToken) {
-            authClient.tokenManager.add('idToken', tokens.idToken);
-          }
-          if (tokens.accessToken) {
-            authClient.tokenManager.add('accessToken', tokens.accessToken);
-          }
+          authClient.tokenManager.setTokens(res.tokens);
           showUserInfo();
         });
       }

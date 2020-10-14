@@ -159,6 +159,14 @@ function validateToken(token: Token) {
 }
 
 function add(sdk, tokenMgmtRef, storage, key, token: Token) {
+  if (sdk.features.isLocalhost()) {
+    warn(
+      'Use setTokens() instead if you want to add a set of tokens at same time.\n' + 
+      'It prevents current tab from emitting unnecessary StorageEvent,\n' + 
+      'which may cause false-positive authState change cross tabs.'
+    );
+  }
+
   var tokenStorage = storage.getStorage();
   validateToken(token);
   tokenStorage[key] = token;
@@ -189,18 +197,23 @@ function getAsync(storage, key) {
   });
 }
 
-function getTokens(storage): Promise<Tokens> {
+function getTokens(storage): Tokens {
+  const tokens = {} as Tokens;
+  const tokenStorage = storage.getStorage();
+  Object.keys(tokenStorage).forEach(key => {
+    const token = tokenStorage[key];
+    if (isAccessToken(token)) {
+      tokens.accessToken = token;
+    } else if (isIDToken(token)) {
+      tokens.idToken = token;
+    }
+  });
+  return tokens;
+}
+
+function getTokensAsync(storage): Promise<Tokens> {
   return new Promise((resolve) => {
-    const tokens = {} as Tokens;
-    const tokenStorage = storage.getStorage();
-    Object.keys(tokenStorage).forEach(key => {
-      const token = tokenStorage[key];
-      if (isAccessToken(token)) {
-        tokens.accessToken = token;
-      } else if (isIDToken(token)) {
-        tokens.idToken = token;
-      }
-    });
+    const tokens = getTokens(storage);
     return resolve(tokens);
   });
 }
@@ -214,6 +227,21 @@ function setTokens(
   accessTokenCb?: Function, 
   idTokenCb?: Function
 ): void {
+  const handleAdded = (key, token, tokenCb) => {
+    emitAdded(tokenMgmtRef, key, token);
+    setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
+    if (tokenCb) {
+      tokenCb(key, token);
+    }
+  };
+  const handleRemoved = (key, token, tokenCb) => {
+    clearExpireEventTimeout(tokenMgmtRef, key);
+    emitRemoved(tokenMgmtRef, key, token);
+    if (tokenCb) {
+      tokenCb(key, token);
+    }
+  };
+
   if (idToken) {
     validateToken(idToken);
   }
@@ -231,19 +259,16 @@ function setTokens(
   storage.setStorage(tokenStorage);
 
   // emit event and start expiration timer
+  const existingTokens = getTokens(storage);
   if (idToken) {
-    emitAdded(tokenMgmtRef, idTokenKey, idToken);
-    setExpireEventTimeout(sdk, tokenMgmtRef, idTokenKey, idToken);
-    if (idTokenCb) {
-      idTokenCb(idTokenKey, idToken);
-    }
+    handleAdded(idTokenKey, idToken, idTokenCb);
+  } else if (existingTokens.idToken) {
+    handleRemoved(idTokenKey, existingTokens.idToken, idTokenCb);
   }
   if (accessToken) {
-    emitAdded(tokenMgmtRef, accessTokenKey, accessToken);
-    setExpireEventTimeout(sdk, tokenMgmtRef, accessTokenKey, accessToken);
-    if (accessTokenCb) {
-      accessTokenCb(accessTokenKey, accessToken);
-    }
+    handleAdded(accessTokenKey, accessToken, accessTokenCb);
+  } else if (existingTokens.accessToken) {
+    handleRemoved(accessTokenKey, existingTokens.accessToken, accessTokenCb);
   }
 }
 /* eslint-enable max-params */
@@ -479,7 +504,7 @@ export class TokenManager {
     this.on = tokenMgmtRef.emitter.on.bind(tokenMgmtRef.emitter);
     this.off = tokenMgmtRef.emitter.off.bind(tokenMgmtRef.emitter);
     this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
-    this.getTokens = getTokens.bind(this, storage);
+    this.getTokens = getTokensAsync.bind(this, storage);
     this.setTokens = setTokens.bind(this, sdk, tokenMgmtRef, storage);
     this._getStorageKeyByType = getKeyByType.bind(this, storage);
     this._clearExpireEventTimeoutAll = clearExpireEventTimeoutAll.bind(this, tokenMgmtRef);

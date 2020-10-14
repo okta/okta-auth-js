@@ -1866,7 +1866,7 @@ authClient.token.getWithoutPrompt({
   var tokens = res.tokens;
 
   // Do something with tokens, such as
-  authClient.tokenManager.add('idToken', tokens.idToken);
+  authClient.tokenManager.setTokens(tokens);
 })
 .catch(function(err) {
   // handle OAuthError or AuthSdkError
@@ -1891,7 +1891,7 @@ authClient.token.getWithoutPrompt({
   var tokens = res.tokens;
 
   // Do something with tokens, such as
-  authClient.tokenManager.add('idToken', tokens.idToken);
+  authClient.tokenManager.setTokens(tokens);
 })
 .catch(function(err) {
   // handle OAuthError or AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
@@ -1912,7 +1912,7 @@ authClient.token.getWithPopup(options)
   var tokens = res.tokens;
 
   // Do something with tokens, such as
-  authClient.tokenManager.add('idToken', tokens.idToken);
+  authClient.tokenManager.setTokens(tokens);
 })
 .catch(function(err) {
   // handle OAuthError or AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
@@ -1956,8 +1956,7 @@ authClient.token.parseFromUrl()
   var tokens = res.tokens;
 
   // Do something with tokens, such as
-  authClient.tokenManager.add('idToken', tokens.idToken);
-  authClient.tokenManager.add('accessToken', tokens.accessToken);
+  authClient.tokenManager.setTokens(tokens);
 })
 .catch(function(err) {
   // handle OAuthError
@@ -1983,7 +1982,7 @@ authClient.token.getWithRedirect({
 authClient.token.parseFromUrl()
 .then(function(res) {
   // Save token
-  authClient.tokenManager.add('accessToken', res.tokens.accessToken);
+  authClient.tokenManager.setTokens(tokens);
 
   // Read saved URL from storage
   const url = sessionStorage.getItem('url');
@@ -2112,8 +2111,7 @@ const shouldHandleCallback = authClient.token.isLoginRedirect();
 if (shouldHandleCallback) {
   // callback flow
   authClient.parseFromUrl().then(res => {
-    authClient.tokenManager.add('idToken', res.tokens.idToken);
-    authClient.tokenManager.add('accessToken', res.tokens.accesstoken);
+    authClient.tokenManager.setTokens(res.tokens);
   });
 } else {
   // normal app flow

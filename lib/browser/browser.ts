@@ -375,7 +375,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     return this.token.getUserInfo();
   }
 
-  async getIdToken(): Promise<string> {
+  async getIdToken(): Promise<string | undefined> {
     try {
       const idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
       return idToken ? idToken.idToken : undefined;
@@ -384,7 +384,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
   }
 
-  async getAccessToken(): Promise<string> {
+  async getAccessToken(): Promise<string | undefined> {
     try {
       const accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
       return accessToken ? accessToken.accessToken : undefined;

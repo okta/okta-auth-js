@@ -191,8 +191,7 @@ function endAuthFlow(res) {
   history.replaceState(null, '', config.appUri);
 
   // Store tokens
-  authClient.tokenManager.add('idToken', res.tokens.idToken);
-  authClient.tokenManager.add('accessToken', res.tokens.accessToken);
+  authClient.tokenManager.setTokens(res.tokens);
 
   // Normal app startup
   renderApp();
