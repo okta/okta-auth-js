@@ -13,7 +13,7 @@ const config = {
   sampleName,
   sampleConfig,
   issuer,
-  clientId: sampleConfig.webApp ? webClientId : clientId,
+  clientId: sampleConfig.express ? webClientId : clientId,
   username,
   password,
   clientSecret
