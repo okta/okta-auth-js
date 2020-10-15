@@ -66,20 +66,31 @@ function runWithConfig(sampleConfig) {
   const { name } = sampleConfig;
   const sampleDir = `../generated/${name}`;
   const port = sampleConfig.port || 8080;
+  let server;
 
-  // 1. start the sample's web server
-  const server = spawn('yarn', [
-    '--cwd',
-    sampleDir,
-    'start'
-  ], { stdio: 'inherit' });
-
+  // 1. wait for the port to be free
   waitOn({
     resources: [
       `http-get://localhost:${port}`
-    ]
+    ],
+    reverse: true,
+    timeout: 15000
   }).then(() => {
-    // 2. run webdriver based on if sauce is needed or not
+
+    // 2. start the sample's web server
+    server = spawn('yarn', [
+      '--cwd',
+      sampleDir,
+      'start'
+    ], { stdio: 'inherit' });
+
+    return waitOn({
+      resources: [
+        `http-get://localhost:${port}`
+      ]
+    });
+  }).then(() => {
+    // 3. run webdriver based on if sauce is needed or not
     let wdioConfig = 'wdio.conf.js';
     if (process.env.RUN_SAUCE_TESTS) {
       wdioConfig = 'sauce.wdio.conf.js';
