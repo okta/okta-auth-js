@@ -105,6 +105,7 @@ Object.assign(config, {
         browserName: 'firefox',
         platformName: 'Windows 10',
         browserVersion: '79',
+        acceptInsecureCerts: true,
         // 'sauce:options': {
         //   'seleniumVersion': '3.14.0'
         // }
