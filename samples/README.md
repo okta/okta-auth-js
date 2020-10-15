@@ -36,7 +36,7 @@ To run tests for all samples, run `yarn test`
 Tests for an individual sample can be run using the `SAMPLE_NAME` environment variable:
 
 ```bash
-SAMPLE_NAME=webpack-spa test
+SAMPLE_NAME=webpack-spa
 ```
 
 ## Generating samples

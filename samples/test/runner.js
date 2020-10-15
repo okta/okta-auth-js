@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
+require('@okta/env');
+
 const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
 const config = require('../config');
+
 const testName = process.env.SAMPLE_NAME;
 let tasks;
 

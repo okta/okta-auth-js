@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-require('./env'); // update environment variables from testenv file
+require('@okta/env'); // update environment variables from testenv file
 
 // eslint-disable-next-line node/no-unpublished-require
 const OktaAuthJS = require('../../build/cjs/server').OktaAuth;

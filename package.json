@@ -129,6 +129,7 @@
   },
   "workspaces": [
     "./",
+    "env",
     "test/app",
     "test/e2e",
     "test/support",
