@@ -38,17 +38,17 @@ waitOn({
   ].concat(opts), { stdio: 'inherit' });
 
   let returnCode = 1;
-  runner.on('exit', function (code) {
-    console.log('Test runner exited with code: ' + code);
+  runner.on('close', function (code, signal) {
+    console.log(`Test runner exited with code ${code} via signal ${signal}`);
     returnCode = code;
     server.kill();
   });
   runner.on('error', function (err) {
-    server.kill();
-    throw err;
+    console.error('Test runner emitted an error: ', err);
+    runner.kill();
   });
-  server.on('exit', function(code) {
-    console.log('Server exited with code: ' + code);
+  server.on('close', function(code, signal) {
+    console.log(`Server exited with code: ${code} via signal ${signal}`);
     // eslint-disable-next-line no-process-exit
     process.exit(returnCode);
   });

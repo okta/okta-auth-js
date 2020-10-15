@@ -34,11 +34,11 @@ if (testName) {
           })
         });
         runner.on('error', function (err) {
-          throw err;
+          console.error('Test runner emitted an error: ', err);
         });
-        runner.on('exit', function(code) {
+        runner.on('close', function(code, signal) {
           if (code !== 0) {
-            console.log('Runner exited with code: ' + code);
+            console.log(`Runner exited with code: ${code} via signal ${signal}`);
             // eslint-disable-next-line no-process-exit
             process.exit(code);
           }
@@ -57,7 +57,9 @@ function runNextTask() {
     return;
   }
   const task = tasks.shift();
-  task().then(() => {
+  task().catch(err => {
+    throw err;
+  }).then(() => {
     runNextTask();
   });
 }
@@ -103,17 +105,19 @@ function runWithConfig(sampleConfig) {
     ].concat(opts), { stdio: 'inherit' });
 
     let returnCode = 1;
-    runner.on('exit', function (code) {
-      console.log('Test runner exited with code: ' + code);
+    runner.on('close', function (code, signal) {
+      console.log(`Test runner exited with code ${code} via signal ${signal}`);
       returnCode = code;
       server.kill();
     });
     runner.on('error', function (err) {
-      server.kill();
-      throw err;
+      console.error('Test runner emitted an error: ', err);
     });
-    server.on('exit', function(code) {
-      console.log('Server exited with code: ' + code);
+    server.on('error', function(err) {
+      console.error('Server emitted an error: ', err);
+    });
+    server.on('close', function(code, signal) {
+      console.log(`Server exited with code: ${code} via signal ${signal}`);
       // eslint-disable-next-line no-process-exit
       process.exit(returnCode);
     });
