@@ -229,27 +229,33 @@ if (!userInfo) {
 
 ## Strategies for Obtaining Tokens
 
-**!** Routing is **optional** strategy for token handling. Instead you can use [popup](#tokengetwithpopupoptions) or [sign widget](https://github.com/okta/okta-signin-widget).
+### Redirect to Okta
 
-### None routing strategy
+**!** Routing is **optional** for the callback portion of the redirect strategy. Instead you can use [popup](#tokengetwithpopupoptions) or [sign widget](https://github.com/okta/okta-signin-widget).
+
+To sign a user in, your application must redirect the browser to the Okta-hosted sign-in page.
+After successful authentication, the browser is redirected back to your application along with information about the user.
+Depends on your preferences it is possible to use the following callback strategies.
+
+#### Handling the callback without routing
 1. Create / configure your auth-js instance
 2. Before making **any other calls with auth-js** at the VERY BEGINNING of the app call *token.isLoginRedirect* - if this returns true, call *parseFromUrl* and save tokens in storage manager.
       **It’s important that no other app logic runs until the async parseFromUrl / token manager logic is complete**
 3. After continue normal app logic
 
-### Strategy with a dedicated route
+#### Handling the callback with hash routing
+According to the OAuth 2.0 spec the redirect URI "MUST NOT contain a fragment component": <https://tools.ietf.org/html/rfc6749#section-3.1.2>
+So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific rout.
+That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define the logic that will parse redirect url at the very beginning of your app. So the flow will be similar to [Handling the callback without routing](#handling-the-callback-without-routing)
+
+Additionally if using hash routing, we recommend to use PKCE and responseMode query (which is the default for PKCE). Using implicit flow, with tokens in the hash could cause unpredictable results since hash routers like to rewrite the fragment.
+
+#### Handling the callback with path routing (on a dedicated route)
 1. Right before redirect, save the route you are on (we recommend sessionStorage)
 2. Do the redirect to okta
 3. Redirect back to a dedicated route
 4. Call *parseFromUrl()*, retrieve tokens, add to `tokenManager`
 5. Read saved route and redirect to it
-
-### Hash-based routing strategy
-According to the OAuth 2.0 spec the redirect URI "MUST NOT contain a fragment component": <https://tools.ietf.org/html/rfc6749#section-3.1.2>
-So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific rout.
-That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define the logic that will parse redirect url at the very beginning of your app. So the flow will be similar to [none routing strategy](#none-routing-strategy)
-
-Additionally if using hash routing, we recommend to use PKCE and responseMode query (which is the default for PKCE). Using implicit flow, with tokens in the hash could cause unpredictable results since hash routers like to rewrite the fragment.
 
 ## Configuration reference
 
