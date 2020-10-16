@@ -1,18 +1,6 @@
+require('@okta/env'); // Read environment variables from "testenv"
 require('@babel/register'); // Allows use of import module syntax
 require('regenerator-runtime'); // Allows use of async/await
-
-const dotenv = require('dotenv');
-const fs = require('fs');
-const path = require('path');
-
-// Read environment variables from "testenv". Override environment vars if they are already set.
-const TESTENV = path.resolve(__dirname, '../..', 'testenv');
-if (fs.existsSync(TESTENV)) {
-  const envConfig = dotenv.parse(fs.readFileSync(TESTENV));
-  Object.keys(envConfig).forEach((k) => {
-    process.env[k] = envConfig[k];
-  });
-}
 
 const DEBUG = process.env.DEBUG;
 const CI = process.env.TRAVIS;

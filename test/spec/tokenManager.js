@@ -1523,52 +1523,98 @@ describe('TokenManager', function() {
     beforeEach(() => {
       setItemMock = jest.fn();
       storageProvider = {
-        getItem: jest.fn(),
+        getItem: jest.fn().mockReturnValue(JSON.stringify({})),
         setItem: setItemMock
       };
     });
 
-    it('should add tokens to storage and only call storage.setItem() once', () => {
+    it('should add set tokens with provided token object (two tokens in object)', () => {
       setupSync({
         tokenManager: {
           storage: storageProvider
         }
       });
+      const handler = jest.fn();
+      client.tokenManager.on('added', handler);
       const tokensObj = { 
         idToken: tokens.standardIdTokenParsed,
         accessToken: tokens.standardAccessTokenParsed, 
       };
       client.tokenManager.setTokens(tokensObj);
-      expect(setItemMock).toHaveBeenCalledTimes(1);
       expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenCalledTimes(2);
     });
 
-    it('should add accessToken to storage', () => {
+    it('should add set tokens with provided token object (one tokens in object)', () => {
       setupSync({
         tokenManager: {
           storage: storageProvider
         }
       });
+      const handler = jest.fn();
+      client.tokenManager.on('added', handler);
       const tokensObj = { 
-        accessToken: tokens.standardAccessTokenParsed, 
+        idToken: tokens.standardIdTokenParsed
       };
       client.tokenManager.setTokens(tokensObj);
-      expect(setItemMock).toHaveBeenCalledTimes(1);
       expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    it('should add idToken to storage', () => {
+    it('should remove tokens if no token in tokenObject but tokens exist in storage', () => {
+      storageProvider = {
+        getItem: jest.fn().mockReturnValue(JSON.stringify({ 
+          idToken: tokens.standardIdTokenParsed,
+          accessToken: tokens.standardAccessTokenParsed, 
+        })),
+        setItem: setItemMock
+      };
       setupSync({
         tokenManager: {
           storage: storageProvider
         }
       });
+      const addedHandler = jest.fn();
+      client.tokenManager.on('added', addedHandler);
+      const removedHandler = jest.fn();
+      client.tokenManager.on('removed', removedHandler);
+      const tokensObj = {};
+      client.tokenManager.setTokens(tokensObj);
+      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+      expect(addedHandler).not.toHaveBeenCalled();
+      expect(removedHandler).toHaveBeenCalledTimes(2);
+    });
+
+    it('should add and remove tokens based on existing tokens from storage', () => {
+      // add token if token is provided in setTokens object
+      // remove token if there is existing token in storage, but not in setTokens object 
+      storageProvider = {
+        getItem: jest.fn().mockReturnValue(JSON.stringify({ 
+          idToken: tokens.standardIdTokenParsed,
+          accessToken: tokens.standardAccessTokenParsed, 
+        })),
+        setItem: setItemMock
+      };
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
+      });
+      const addedHandler = jest.fn();
+      client.tokenManager.on('added', addedHandler);
+      const removedHandler = jest.fn();
+      client.tokenManager.on('removed', removedHandler);
       const tokensObj = { 
-        idToken: tokens.standardIdTokenParsed,
+        idToken: tokens.standardIdToken2Parsed,
       };
       client.tokenManager.setTokens(tokensObj);
       expect(setItemMock).toHaveBeenCalledTimes(1);
       expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+      expect(addedHandler).toHaveBeenCalledWith('idToken', tokens.standardIdToken2Parsed);
+      expect(removedHandler).toHaveBeenCalledWith('accessToken', tokens.standardAccessTokenParsed);
     });
   });
 

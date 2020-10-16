@@ -96,7 +96,6 @@
     "babel-plugin-mockable-imports": "^1.7.1",
     "chalk": "2.4.2",
     "cross-env": "^5.1.1",
-    "dotenv": "^8.1.0",
     "eslint": "^7.1.0",
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-jasmine": "^2.10.1",
@@ -129,6 +128,7 @@
   },
   "workspaces": [
     "./",
+    "env",
     "test/app",
     "test/e2e",
     "test/support",
