@@ -102,6 +102,11 @@ exports.config = {
         // it is possible to configure which logTypes to include/exclude.
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
         // excludeDriverLogs: ['bugreport', 'server'],
+    }, {
+        maxInstances: 1, // all tests use the same user and local storage. they must run in series
+        browserName: 'firefox',
+        'moz:firefoxOptions': chromeOptions,
+        acceptInsecureCerts: true,
     }],
     //
     // ===================
@@ -150,7 +155,14 @@ exports.config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: ['chromedriver'],
+    services: [
+        ['selenium-standalone', {
+            args: {
+                version: "3.141.59",
+                // seleniumArgs: ['-host', '127.0.0.1','-port', '5555']
+            },
+        }]
+    ],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks.html
