@@ -158,8 +158,7 @@ exports.config = {
     services: [
         ['selenium-standalone', {
             args: {
-                version: "3.141.59",
-                // seleniumArgs: ['-host', '127.0.0.1','-port', '5555']
+                version: '3.141.59',
             },
         }]
     ],
