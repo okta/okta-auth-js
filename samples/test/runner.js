@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const spawn = require('cross-spawn');
+const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
 const config = require('../config');
 const testName = process.env.SAMPLE_NAME;
