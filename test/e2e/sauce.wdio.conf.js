@@ -177,6 +177,14 @@ exports.config = {
     //
     // The number of times to retry the entire specfile when it fails as a whole
     specFileRetries: 3,
+    /**
+     * Delay in seconds between the spec file retry attempts
+     */
+    specFileRetriesDelay: 10,
+    /**
+     * Retried specfiles are inserted at the beginning of the queue and retried immediately
+     */
+    specFileRetriesDeferred: false
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
