@@ -184,7 +184,7 @@ exports.config = {
     /**
      * Retried specfiles are inserted at the beginning of the queue and retried immediately
      */
-    specFileRetriesDeferred: false
+    specFileRetriesDeferred: false,
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
