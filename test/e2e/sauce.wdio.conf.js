@@ -96,6 +96,7 @@ exports.config = {
       //maxInstances: 5,
       //
       {
+        maxInstances: 1,
         browserName: 'firefox',
         platformName: 'Windows 10',
         browserVersion: '79',
@@ -104,7 +105,12 @@ exports.config = {
         //   'seleniumVersion': '3.14.0'
         // }
       },
-      {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'},
+      {
+        maxInstances: 1,
+        browserName: 'chrome', 
+        platform: 'OS X 10.13', 
+        version: 'latest'
+      },
       // TODO - Enable after OKTA-284870 is fixed
       // {browserName: 'safari', platform: 'OS X 10.13', version: 'latest'},
     ],
