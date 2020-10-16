@@ -18,12 +18,12 @@ const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
-const chromeOptions = {
+const browserOptions = {
     args: []
 };
 
 if (CI) {
-    chromeOptions.args = chromeOptions.args.concat([
+    browserOptions.args = browserOptions.args.concat([
         '--headless',
         '--disable-gpu',
         '--window-size=1600x1200',
@@ -95,13 +95,17 @@ exports.config = {
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
         maxInstances: 1, // all tests use the same user and local storage. they must run in series
-        //
         browserName: 'chrome',
-        'goog:chromeOptions': chromeOptions
+        'goog:chromeOptions': browserOptions
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
         // excludeDriverLogs: ['bugreport', 'server'],
+    }, {
+        maxInstances: 1, // all tests use the same user and local storage. they must run in series
+        browserName: 'firefox',
+        'moz:firefoxOptions': browserOptions,
+        acceptInsecureCerts: true,
     }],
     //
     // ===================
@@ -150,7 +154,7 @@ exports.config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: ['chromedriver'],
+    services: ['selenium-standalone'],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks.html

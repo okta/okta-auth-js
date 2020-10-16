@@ -26,7 +26,7 @@
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",
     "validate": "yarn tsc --noEmit && yarn lint && yarn --cwd test/app validate",
-    "test": "yarn test:unit && yarn test:samples && yarn test:e2e && yarn test:e2e:saucelabs",
+    "test": "yarn test:unit && yarn test:samples && yarn test:e2e",
     "test:unit": "yarn test:karma && yarn test:server && yarn test:browser",
     "posttest:e2e": "yarn stop",
     "test:e2e": "yarn --cwd test/e2e start",
