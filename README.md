@@ -2114,7 +2114,7 @@ Promise.all([
 
 Manually verify the validity of an ID token's claims and check the signature on browsers that support web cryptography.
 
-> **Note:** Token validation occurs [automatically](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) when tokens are returned via `getWithoutPrompt`, `getWithPopup`, and `getWithRedirect`.
+> **Note:** Token validation occurs automatically when tokens are returned via `getWithoutPrompt`, `getWithPopup`, and `getWithRedirect`.
 
 * `idTokenObject` - an ID token returned by this library. note: this is not the raw ID token JWT
 * `validationOptions` - Optional object to assert ID token claim values. Defaults to the configuration passed in during client instantiation.
