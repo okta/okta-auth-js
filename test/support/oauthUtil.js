@@ -408,8 +408,6 @@ oauthUtil.setupRedirect = function(opts) {
     .mockImplementation(() => ({
       setItem: jest.fn()
     }));
-  jest.spyOn(storageUtil, 'browserHasSessionStorage')
-    .mockImplementation(() => !!opts.hasSessionStorage);
 
   var promise;
   if (Array.isArray(opts.getWithRedirectArgs)) {
@@ -479,12 +477,10 @@ oauthUtil.setupParseUrl = function(opts) {
 
   jest.spyOn(storageUtil, 'getSessionStorage')
     .mockImplementation(() => ({
-      getItem: jest.fn().mockReturnValue(opts.oauthParams || ''),
+      getItem: jest.fn().mockReturnValue(opts.disableSessionStorage ? '' : opts.oauthParams),
       removeItem: jest.fn()
     }));
-  jest.spyOn(storageUtil, 'browserHasSessionStorage')
-    .mockImplementation(() => !!opts.hasSessionStorage);
-
+  
   return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {
       var expectedResp = opts.expectedResp;
