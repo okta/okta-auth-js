@@ -408,6 +408,8 @@ oauthUtil.setupRedirect = function(opts) {
     .mockImplementation(() => ({
       setItem: jest.fn()
     }));
+  jest.spyOn(storageUtil, 'browserHasSessionStorage')
+    .mockImplementation(() => !!opts.hasSessionStorage);
 
   var promise;
   if (Array.isArray(opts.getWithRedirectArgs)) {
@@ -420,6 +422,9 @@ oauthUtil.setupRedirect = function(opts) {
     .then(function() {
       expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
       expect(setCookieMock.mock.calls).toEqual(opts.expectedCookies);
+      if (opts.hasSessionStorage) {
+        expect(sessionStorageSetItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params', expectedCookies['okta-oauth-redirect-params']);
+      }
     });
 };
 
@@ -480,6 +485,8 @@ oauthUtil.setupParseUrl = function(opts) {
       getItem: jest.fn().mockReturnValue(opts.disableSessionStorage ? '' : opts.oauthParams),
       removeItem: jest.fn()
     }));
+  jest.spyOn(storageUtil, 'browserHasSessionStorage')
+    .mockImplementation(() => !!opts.hasSessionStorage);
   
   return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {

@@ -14,8 +14,6 @@ import * as sdkUtil from '../../lib/oauthUtil';
 import pkce from '../../lib/pkce';
 import http from '../../lib/http';
 import * as sdkCrypto from '../../lib/crypto';
-import browserStorage from '../../lib/browser/browserStorage';
-const cookies = browserStorage.storage;
 
 function setupSync(options) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);
@@ -2613,41 +2611,6 @@ describe('token.parseFromUrl', function() {
           idToken: tokens.authServerIdTokenParsed
         }
       }
-    });
-  });
-
-  it('should fallback to cookies when sessionStorage is not available', function() {
-    return oauthUtil.setupParseUrl({
-      time: 1449699929,
-      hashMock: '#access_token=' + tokens.authServerAccessToken +
-                '&id_token=' + tokens.authServerIdToken +
-                '&expires_in=3600' +
-                '&token_type=Bearer' +
-                '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
-        responseType: ['id_token', 'token'],
-        state: oauthUtil.mockedState,
-        nonce: oauthUtil.mockedNonce,
-        scopes: ['openid', 'email'],
-        urls: {
-          issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-          tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
-          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
-        }
-      }),
-      disableSessionStorage: true,
-      expectedResp: {
-        state: oauthUtil.mockedState,
-        tokens: {
-          accessToken: tokens.authServerAccessTokenParsed,
-          idToken: tokens.authServerIdTokenParsed
-        }
-      }
-    })
-    .then(() => {
-      expect(cookies.get).toHaveBeenCalledTimes(1);
-      expect(cookies.delete).toHaveBeenCalledTimes(1);
     });
   });
 

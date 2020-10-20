@@ -673,7 +673,9 @@ function addOAuthParamsToStorage(sdk: OktaAuth, tokenParams: TokenParams, urls) 
   });
   // Add oauth_params to both cookies and sessionStorage for broader support
   cookies.set(REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr, null, sdk.options.cookies);
-  browserStorage.getSessionStorage().setItem(REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr);
+  if (browserStorage.browserHasSessionStorage()) {
+    browserStorage.getSessionStorage().setItem(REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr);
+  }
 }
 
 function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
@@ -770,16 +772,19 @@ function removeSearch(sdk) {
 }
 
 function getOAuthParamsStrFromStorage() {
-  const storage = browserStorage.getSessionStorage();
   let oauthParamsStr;
-  oauthParamsStr = storage.getItem(REDIRECT_OAUTH_PARAMS_NAME);
+  if (browserStorage.browserHasSessionStorage()) {
+    oauthParamsStr = browserStorage.getSessionStorage().getItem(REDIRECT_OAUTH_PARAMS_NAME);  
+  }
   if (!oauthParamsStr) {
     // fallback to cookies to support legacy browsers, eg: IE/Edge, iphone 8
     oauthParamsStr = cookies.get(REDIRECT_OAUTH_PARAMS_NAME);
   }
 
   // clear storages
-  storage.removeItem(REDIRECT_OAUTH_PARAMS_NAME);
+  if (browserStorage.browserHasSessionStorage()) {
+    browserStorage.getSessionStorage().removeItem(REDIRECT_OAUTH_PARAMS_NAME);
+  }
   cookies.delete(REDIRECT_OAUTH_PARAMS_NAME);
 
   return oauthParamsStr;
