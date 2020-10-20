@@ -777,7 +777,7 @@ function _getOAuthParamsStrFromStorage() {
     oauthParamsStr = browserStorage.getSessionStorage().getItem(REDIRECT_OAUTH_PARAMS_NAME);  
   }
   if (!oauthParamsStr) {
-    // fallback to cookies to support legacy browsers, eg: IE/Edge, iphone 8
+    // fallback to cookies to support legacy browsers, e.g. IE/Edge
     oauthParamsStr = cookies.get(REDIRECT_OAUTH_PARAMS_NAME);
   }
 
