@@ -112,7 +112,6 @@ function validateResponse(res, expectedResp) {
       expect(actual).toEqual(expected);
       return;
     }
-    expect(actual.value).toEqual(expected.value);
     expect(actual.idToken).toEqual(expected.idToken);
     expect(actual.claims).toEqual(expected.claims);
     expect(actual.accessToken).toEqual(expected.accessToken);
