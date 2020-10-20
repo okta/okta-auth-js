@@ -660,7 +660,7 @@ function prepareTokenParams(sdk: OktaAuth, options: TokenParams): Promise<TokenP
     });
 }
 
-function addOAuthParamsToStorage(sdk: OktaAuth, tokenParams: TokenParams, urls) {
+function _addOAuthParamsToStorage(sdk: OktaAuth, tokenParams: TokenParams, urls) {
   const { responseType, state, nonce, scopes, clientId, ignoreSignature } = tokenParams;
   const tokenParamsStr = JSON.stringify({
     responseType,
@@ -689,7 +689,7 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
       var urls = getOAuthUrls(sdk, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(tokenParams);
 
-      addOAuthParamsToStorage(sdk, tokenParams, urls);
+      _addOAuthParamsToStorage(sdk, tokenParams, urls);
 
       // Set nonce cookie for servers to validate nonce in id_token
       cookies.set(REDIRECT_NONCE_COOKIE_NAME, tokenParams.nonce, null, sdk.options.cookies);
@@ -771,7 +771,7 @@ function removeSearch(sdk) {
   }
 }
 
-function getOAuthParamsStrFromStorage() {
+function _getOAuthParamsStrFromStorage() {
   let oauthParamsStr;
   if (browserStorage.browserHasSessionStorage()) {
     oauthParamsStr = browserStorage.getSessionStorage().getItem(REDIRECT_OAUTH_PARAMS_NAME);  
@@ -784,8 +784,8 @@ function getOAuthParamsStrFromStorage() {
   // clear storages
   if (browserStorage.browserHasSessionStorage()) {
     browserStorage.getSessionStorage().removeItem(REDIRECT_OAUTH_PARAMS_NAME);
-  }
-  cookies.delete(REDIRECT_OAUTH_PARAMS_NAME);
+  } 
+  cookies.delete(REDIRECT_OAUTH_PARAMS_NAME); 
 
   return oauthParamsStr;
 }
@@ -815,7 +815,7 @@ function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<Token
     return Promise.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
-  const oauthParamsStr = getOAuthParamsStrFromStorage();  
+  const oauthParamsStr = _getOAuthParamsStrFromStorage();  
   if (!oauthParamsStr) {
     return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params from storage'));
   }
@@ -903,5 +903,7 @@ export {
   getUserInfo,
   verifyToken,
   handleOAuthResponse,
-  prepareTokenParams
+  prepareTokenParams,
+  _addOAuthParamsToStorage, // export for testing purpose
+  _getOAuthParamsStrFromStorage // export for testing purpose
 };
