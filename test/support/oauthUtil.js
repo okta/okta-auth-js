@@ -484,7 +484,7 @@ oauthUtil.setupParseUrl = function(opts) {
     }));
   jest.spyOn(storageUtil, 'browserHasSessionStorage')
     .mockImplementation(() => !!opts.hasSessionStorage);
-
+  
   return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {
       var expectedResp = opts.expectedResp;
