@@ -24,6 +24,7 @@ class TestApp {
   get tokenMsg() { return $('#token-msg'); }
   
   // Unauthenticated landing
+  get loginWidgetBtn() { return $('#login-widget'); }
   get loginRedirectBtn() { return $('#login-redirect'); }
   get loginPopupBtn() { return $('#login-popup'); }
   get loginDirectBtn() { return $('#login-direct'); }
@@ -54,6 +55,11 @@ class TestApp {
   async open(queryObj) {
     await browser.url(toQueryString(queryObj));
     await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
+  }
+
+  async showLoginWidget() {
+    await this.waitForLoginBtn();
+    await this.loginWidgetBtn.then(el => el.click());
   }
 
   async loginRedirect() {
