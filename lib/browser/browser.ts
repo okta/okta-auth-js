@@ -23,7 +23,6 @@ import {
   toQueryString, 
   toAbsoluteUrl,
   clone, 
-  warn, 
   deprecate 
 } from '../util';
 import { getUserAgent } from '../builderUtil';
