@@ -2,6 +2,13 @@
   <head>
     <!-- app styles -->
     <style>
+      /* margin can cause issues in e2e tests, when the elements move slightly */
+      body, hr, pre {
+        margin: 0;
+      }
+      div {
+        padding: 4px;
+      }
       input {
         margin-bottom: 10px;
       }

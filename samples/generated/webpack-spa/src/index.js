@@ -138,7 +138,7 @@ function renderUnauthenticated() {
 function handleLoginRedirect() {
   // The URL contains a code, `parseFromUrl` will exchange the code for tokens
   return authClient.token.parseFromUrl().then(function (res) {
-    endAuthFlow(res); // save tokens
+    endAuthFlow(res.tokens); // save tokens
   }).catch(function(error) {
     showError(error);
   });
@@ -180,13 +180,13 @@ function beginAuthFlow() {
   }
 }
 
-function endAuthFlow(res) {
+function endAuthFlow(tokens) {
   // parseFromUrl clears location.search. There may also be a leftover "error" param from the auth flow.
   // Replace state with the canonical app uri so the page can be reloaded cleanly.
   history.replaceState(null, '', config.appUri);
 
   // Store tokens. This will update the auth state and we will re-render
-  authClient.tokenManager.setTokens(res.tokens);
+  authClient.tokenManager.setTokens(tokens);
 }
 
 function showRedirectButton() {
@@ -205,23 +205,17 @@ function showSigninWidget() {
       }
     });
   
-    signIn.renderEl({
-        el: '#signin-widget'
-      },
-      function success(res) {
-        console.log('login success', res);
-  
-        if (res.status === 'SUCCESS') {
-          // Hide login UI
-          document.getElementById('flow-widget').style.display = 'none';
-          signIn.remove();
-          endAuthFlow(res);
-        }
-      },
-      function error(err) {
-        console.log('login error', err);
-      }
-    );
+    signIn.showSignInToGetTokens({
+      el: '#signin-widget'
+    })
+    .then(function(tokens) {
+      document.getElementById('flow-widget').style.display = 'none';
+      signIn.remove();
+      endAuthFlow(tokens);
+    })
+    .catch(function(error) {
+      console.log('login error', error);
+    });
   
     document.getElementById('flow-widget').style.display = 'block'; // show login UI
 }
