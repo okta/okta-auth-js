@@ -3,7 +3,6 @@ jest.mock('cross-fetch');
 import allSettled from 'promise.allsettled';
 allSettled.shim(); // will be a no-op if not needed
 
-import _ from 'lodash';
 import { OktaAuth, AuthSdkError, AccessToken, IDToken } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
@@ -15,6 +14,7 @@ import http from '../../lib/http';
 import * as sdkCrypto from '../../lib/crypto';
 import * as token from '../../lib/token';
 
+const _ = require('lodash');
 const packageJson = require('../../package.json');
 
 function setupSync(options?) {

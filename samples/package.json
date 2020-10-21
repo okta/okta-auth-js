@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "*"
+    "@okta/okta-signin-widget": "^5.0.0"
   },
   "devDependencies": {
     "gulp": "^4.0.2",
