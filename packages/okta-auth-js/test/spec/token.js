@@ -3321,55 +3321,55 @@ describe('token._getOAuthParamsStrFromStorage', () => {
   let sessionStorageRemoveItemMock;
   beforeEach(() => {
     fakeParams = { fake: 'fake' };
-    getCookieMock = util.mockGetCookie(JSON.stringify(fakeParams));
-    deleteCookieMock = util.mockDeleteCookie();
+    sessionStorageGetItemMock = jest.fn();
     sessionStorageRemoveItemMock = jest.fn();
+    util.mockSessionStorage({
+      enabled: true,
+      getItemMock: sessionStorageGetItemMock,
+      removeItemMock: sessionStorageRemoveItemMock
+    });
+  });
+  afterEach(() => {
+    getCookieMock = null;
+    deleteCookieMock = null;
   });
 
   describe('has sessionStorage', () => {
-    it('should read from sessionStorage and clear both storages', () => {
-      sessionStorageGetItemMock = jest.fn().mockReturnValue(JSON.stringify(fakeParams));
-      util.mockSessionStorage({
-        enabled: true,
-        getItemMock: sessionStorageGetItemMock,
-        removeItemMock: sessionStorageRemoveItemMock
-      });
+    it('should read from cookies and clear cookies storages', () => {
+      getCookieMock = util.mockGetCookie(JSON.stringify(fakeParams));
+      deleteCookieMock = util.mockDeleteCookie();
       const paramsStr = token._getOAuthParamsStrFromStorage();
-      expect(sessionStorageGetItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
-      expect(sessionStorageRemoveItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
-      expect(getCookieMock).not.toHaveBeenCalled();
+      expect(getCookieMock).toHaveBeenCalled();
       expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(sessionStorageGetItemMock).not.toHaveBeenCalled();
+      expect(sessionStorageRemoveItemMock).not.toHaveBeenCalled();
       expect(paramsStr).toEqual(JSON.stringify(fakeParams));
     });
-    it('should read from cookies and clear both storages when no data in sessinStorage', () => {
-      sessionStorageGetItemMock = jest.fn().mockReturnValue(undefined);
-      util.mockSessionStorage({
-        enabled: true,
-        getItemMock: sessionStorageGetItemMock,
-        removeItemMock: sessionStorageRemoveItemMock
-      });
+    it('should read from sessionStorage and clear both storages when no data in cookies', () => {
+      getCookieMock = util.mockGetCookie('');
+      deleteCookieMock = util.mockDeleteCookie();
       const paramsStr = token._getOAuthParamsStrFromStorage();
-      expect(sessionStorageGetItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
-      expect(sessionStorageRemoveItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
       expect(getCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
       expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
-      expect(paramsStr).toEqual(JSON.stringify(fakeParams));
+      expect(sessionStorageGetItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(sessionStorageRemoveItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
     });
   });
 
   describe('not has sessionStorage', () => {
     it('should read from cookies and clear cookies', () => {
-      sessionStorageGetItemMock = jest.fn();
+      getCookieMock = util.mockGetCookie(JSON.stringify(fakeParams));
+      deleteCookieMock = util.mockDeleteCookie();
       util.mockSessionStorage({
         enabled: false,
         getItemMock: sessionStorageGetItemMock,
         removeItemMock: sessionStorageRemoveItemMock
       });
       const paramsStr = token._getOAuthParamsStrFromStorage();
-      expect(sessionStorageGetItemMock).not.toHaveBeenCalled();
-      expect(sessionStorageRemoveItemMock).not.toHaveBeenCalled();
       expect(getCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
       expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(sessionStorageGetItemMock).not.toHaveBeenCalled();
+      expect(sessionStorageRemoveItemMock).not.toHaveBeenCalled();
       expect(paramsStr).toEqual(JSON.stringify(fakeParams));
     });
   });

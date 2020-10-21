@@ -2,7 +2,9 @@
 dist
 target
 node_modules
+build
 build2
+samples
 test/SpecRunner.html
 npm-debug.log
 testenv

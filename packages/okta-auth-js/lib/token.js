@@ -647,7 +647,7 @@ function getWithRedirect(sdk, options) {
       var urls = oauthUtil.getOAuthUrls(sdk, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(oauthParams);
 
-      _addOAuthParamsToStorage(sdk, tokenParams, urls);
+      _addOAuthParamsToStorage(sdk, oauthParams, urls);
 
       // Set nonce cookie for servers to validate nonce in id_token
       cookies.set(constants.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce, null, sdk.options.cookies);
