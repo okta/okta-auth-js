@@ -3348,7 +3348,7 @@ describe('token._getOAuthParamsStrFromStorage', () => {
     it('should read from sessionStorage and clear both storages when no data in cookies', () => {
       getCookieMock = util.mockGetCookie('');
       deleteCookieMock = util.mockDeleteCookie();
-      const paramsStr = token._getOAuthParamsStrFromStorage();
+      token._getOAuthParamsStrFromStorage();
       expect(getCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
       expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
       expect(sessionStorageGetItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');

@@ -357,15 +357,19 @@ util.mockUserAgent = function (client, mockUserAgent) {
   jest.spyOn(client.fingerprint, '_getUserAgent').mockReturnValue(mockUserAgent);
 };
 
-util.mockSessionStorage = function ({ enabled, getItemMock, setItemMock, removeItemMock }) {
+util.mockSessionStorage = function (opts) {
   jest.spyOn(browserStorage, 'browserHasSessionStorage')
-    .mockImplementation(() => !!enabled);
+    .mockImplementation(function() { 
+      return !!opts.enabled;
+    });
   jest.spyOn(browserStorage, 'getSessionStorage')
-    .mockImplementation(() => ({
-      setItem: setItemMock,
-      getItem: getItemMock,
-      removeItem: removeItemMock
-    }));
+    .mockImplementation(function() {
+      return {
+        setItem: opts.setItemMock,
+        getItem: opts.getItemMock,
+        removeItem: opts.removeItemMock
+      };
+    });
 };
 
 util.expectErrorToEqual = function (actual, expected) {
