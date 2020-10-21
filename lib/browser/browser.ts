@@ -23,6 +23,7 @@ import {
   toQueryString, 
   toAbsoluteUrl,
   clone, 
+  warn,
   deprecate 
 } from '../util';
 import { getUserAgent } from '../builderUtil';
@@ -90,7 +91,7 @@ function getCookieSettings(sdk, args) {
   // If secure=true, but the connection is not HTTPS, set secure=false.
   if (cookieSettings.secure && !sdk.features.isHTTPS()) {
     // eslint-disable-next-line no-console
-    console.warn(
+    warn(
       'The current page is not being served with the HTTPS protocol.\n' +
       'For security reasons, we strongly recommend using HTTPS.\n' +
       'If you cannot use HTTPS, set "cookies.secure" option to false.'
