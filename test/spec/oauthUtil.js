@@ -1009,5 +1009,21 @@ describe('isLoginRedirect', function() {
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
+
+    it('should return false if current URI is not redirect URI', () => {
+      delete window.location;
+      window.location = {
+        search: '?code=somecode',
+        href: 'https://exmple.com/products/search?code=somecode'
+      };
+      sdk = new OktaAuth({
+        pkce: true,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'foo',
+        redirectUri: 'https://exmple.com/implicit/callback'
+      });
+      const result = oauthUtil.isLoginRedirect(sdk);
+      expect(result).toBe(false);
+    });
   });
 });
