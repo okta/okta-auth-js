@@ -239,7 +239,7 @@ function hasCodeInUrl(hashOrSearch) {
   return /(code=)/i.test(hashOrSearch);
 }
 
-function isRedirectUri(uri: string, sdk: OktaAuth): boolean {
+function isRedirectUri(uri, sdk) {
   var authParams = sdk.options;
   return uri && uri.indexOf(authParams.redirectUri) == 0;
 }
