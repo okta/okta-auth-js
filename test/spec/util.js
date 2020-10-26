@@ -235,4 +235,29 @@ describe('util', function() {
       expect(util.toAbsoluteUrl(url, baseUrl)).toEqual('http://fake.com/relative');
     });
   });
+
+  describe('toRelativeUrl', () => {
+    it('should return same url if url is an relative url', () => {
+      const url = '/path';
+      expect(util.toRelativeUrl(url)).toEqual(url);
+    });
+
+    it('should return correct url when valid baseUrl and relative url are provided', () => {
+      const baseUrl = 'http://fake.com';
+      const url = 'http://fake.com/relative';
+      expect(util.toRelativeUrl(url, baseUrl)).toEqual('/relative');
+    });
+
+    it('should return correct url when baseUrl has trailing "/"', () => {
+      const baseUrl = 'http://fake.com/';
+      const url = 'http://fake.com/relative';
+      expect(util.toRelativeUrl(url, baseUrl)).toEqual('/relative');
+    });
+
+    it('should return correct url when relative url without "/"', () => {
+      const baseUrl = 'http://fake.com';
+      const url = 'http://fake.com/relative';
+      expect(util.toRelativeUrl(url, baseUrl)).toEqual('/relative');
+    });
+  });
 });
