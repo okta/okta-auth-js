@@ -3,8 +3,9 @@
 
 var _ = require('lodash'),
     OktaAuth = require('OktaAuth'),
-    cookies = require('@okta/okta-auth-js/lib/browser/browserStorage').storage,
-    fetch = require('cross-fetch');
+    browserStorage = require('@okta/okta-auth-js/lib/browser/browserStorage'),
+    fetch = require('cross-fetch'),
+    cookies = browserStorage.storage;
 
 var util = {};
 
@@ -354,6 +355,21 @@ util.mockGetLocation = function (client, mockLocation) {
 
 util.mockUserAgent = function (client, mockUserAgent) {
   jest.spyOn(client.fingerprint, '_getUserAgent').mockReturnValue(mockUserAgent);
+};
+
+util.mockSessionStorage = function (opts) {
+  jest.spyOn(browserStorage, 'browserHasSessionStorage')
+    .mockImplementation(function() { 
+      return !!opts.enabled;
+    });
+  jest.spyOn(browserStorage, 'getSessionStorage')
+    .mockImplementation(function() {
+      return {
+        setItem: opts.setItemMock,
+        getItem: opts.getItemMock,
+        removeItem: opts.removeItemMock
+      };
+    });
 };
 
 util.expectErrorToEqual = function (actual, expected) {

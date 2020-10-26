@@ -14,6 +14,7 @@ var sdkUtil = require('../../lib/oauthUtil');
 var pkce = require('../../lib/pkce');
 var http = require('../../lib/http');
 var sdkCrypto = require('../../lib/crypto');
+var token = require('../../lib/token');
 var AuthSdkError = require('../../lib/errors/AuthSdkError');
 
 function setupSync(options) {
@@ -3269,6 +3270,107 @@ describe('token.verify', function() {
     it('expired before issued', function() {
       return expectError([tokens.expiredBeforeIssuedIdTokenParsed, validationParams],
         'The JWT expired before it was issued');
+    });
+  });
+});
+
+describe('token._addOAuthParamsToStorage', () => {
+  let sdkMock;
+  let setCookieMock;
+  let sessionStorageSetItemMock;
+  let fakeTokenParams;
+  let fakeUrls;
+  beforeEach(() => {
+    sdkMock = {
+      options: { cookies: { secure: true, sameSite: 'none' } }
+    };
+    setCookieMock = util.mockSetCookie();
+    sessionStorageSetItemMock = jest.fn();
+    fakeTokenParams = { responseType: 'fake response type' };
+    fakeUrls = ['http://fake.com'];
+  });
+
+  it('should store in both cookies and sessionStorage when sessionStorage is available', () => {
+    util.mockSessionStorage({
+      enabled: true,
+      setItemMock: sessionStorageSetItemMock
+    });
+    token._addOAuthParamsToStorage(sdkMock, fakeTokenParams, fakeUrls);
+    const expectedParamStr = JSON.stringify({ ...fakeTokenParams, urls: fakeUrls });
+    expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params', expectedParamStr, null, { secure: true, sameSite: 'none' });
+    expect(sessionStorageSetItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params', expectedParamStr);
+  });
+
+  it('should only  store in cookies when sessionStorage is not available', () => {
+    util.mockSessionStorage({
+      enabled: false,
+      setItemMock: sessionStorageSetItemMock
+    });
+    token._addOAuthParamsToStorage(sdkMock, fakeTokenParams, fakeUrls);
+    const expectedParamStr = JSON.stringify({ ...fakeTokenParams, urls: fakeUrls });
+    expect(setCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params', expectedParamStr, null, { secure: true, sameSite: 'none' });
+    expect(sessionStorageSetItemMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('token._getOAuthParamsStrFromStorage', () => {
+  let fakeParams;
+  let getCookieMock;
+  let deleteCookieMock;
+  let sessionStorageGetItemMock;
+  let sessionStorageRemoveItemMock;
+  beforeEach(() => {
+    fakeParams = { fake: 'fake' };
+    sessionStorageGetItemMock = jest.fn();
+    sessionStorageRemoveItemMock = jest.fn();
+    util.mockSessionStorage({
+      enabled: true,
+      getItemMock: sessionStorageGetItemMock,
+      removeItemMock: sessionStorageRemoveItemMock
+    });
+  });
+  afterEach(() => {
+    getCookieMock = null;
+    deleteCookieMock = null;
+  });
+
+  describe('has sessionStorage', () => {
+    it('should read from cookies and clear cookies storages', () => {
+      getCookieMock = util.mockGetCookie(JSON.stringify(fakeParams));
+      deleteCookieMock = util.mockDeleteCookie();
+      const paramsStr = token._getOAuthParamsStrFromStorage();
+      expect(getCookieMock).toHaveBeenCalled();
+      expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(sessionStorageGetItemMock).not.toHaveBeenCalled();
+      expect(sessionStorageRemoveItemMock).not.toHaveBeenCalled();
+      expect(paramsStr).toEqual(JSON.stringify(fakeParams));
+    });
+    it('should read from sessionStorage and clear both storages when no data in cookies', () => {
+      getCookieMock = util.mockGetCookie('');
+      deleteCookieMock = util.mockDeleteCookie();
+      token._getOAuthParamsStrFromStorage();
+      expect(getCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(sessionStorageGetItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(sessionStorageRemoveItemMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+    });
+  });
+
+  describe('not has sessionStorage', () => {
+    it('should read from cookies and clear cookies', () => {
+      getCookieMock = util.mockGetCookie(JSON.stringify(fakeParams));
+      deleteCookieMock = util.mockDeleteCookie();
+      util.mockSessionStorage({
+        enabled: false,
+        getItemMock: sessionStorageGetItemMock,
+        removeItemMock: sessionStorageRemoveItemMock
+      });
+      const paramsStr = token._getOAuthParamsStrFromStorage();
+      expect(getCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
+      expect(sessionStorageGetItemMock).not.toHaveBeenCalled();
+      expect(sessionStorageRemoveItemMock).not.toHaveBeenCalled();
+      expect(paramsStr).toEqual(JSON.stringify(fakeParams));
     });
   });
 });

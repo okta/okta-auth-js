@@ -618,7 +618,7 @@ function prepareOauthParams(sdk, options) {
     });
 }
 
-function addOAuthParamsToStorage(sdk, tokenParams, urls) {
+function _addOAuthParamsToStorage(sdk, tokenParams, urls) {
   const { responseType, state, nonce, scopes, clientId, ignoreSignature } = tokenParams;
   const tokenParamsStr = JSON.stringify({
     responseType,
@@ -629,10 +629,10 @@ function addOAuthParamsToStorage(sdk, tokenParams, urls) {
     urls,
     ignoreSignature
   });
+  // Add oauth_params to both cookies and sessionStorage for broader support
+  cookies.set(constants.REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr, null, sdk.options.cookies);
   if (browserStorage.browserHasSessionStorage()) {
     browserStorage.getSessionStorage().setItem(constants.REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr);
-  } else {
-    cookies.set(constants.REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr, null, sdk.options.cookies);
   }
 }
 
@@ -647,7 +647,7 @@ function getWithRedirect(sdk, options) {
       var urls = oauthUtil.getOAuthUrls(sdk, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(oauthParams);
 
-      addOAuthParamsToStorage(sdk, oauthParams, urls);
+      _addOAuthParamsToStorage(sdk, oauthParams, urls);
 
       // Set nonce cookie for servers to validate nonce in id_token
       cookies.set(constants.REDIRECT_NONCE_COOKIE_NAME, oauthParams.nonce, null, sdk.options.cookies);
@@ -710,7 +710,7 @@ function removeSearch(sdk) {
   }
 }
 
-function getOAuthParamsStrFromStorage() {
+function _getOAuthParamsStrFromStorage() {
   // try to read OAuth params from cookie first. This is for backward compatibility
   let oauthParamsStr = cookies.get(constants.REDIRECT_OAUTH_PARAMS_NAME);
   cookies.delete(constants.REDIRECT_OAUTH_PARAMS_NAME);
@@ -721,6 +721,7 @@ function getOAuthParamsStrFromStorage() {
     oauthParamsStr = storage.getItem(constants.REDIRECT_OAUTH_PARAMS_NAME);
     storage.removeItem(constants.REDIRECT_OAUTH_PARAMS_NAME);
   }
+
   return oauthParamsStr;
 }
 
@@ -748,7 +749,7 @@ function parseFromUrl(sdk, options) {
     return Promise.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
-  const oauthParamsStr = getOAuthParamsStrFromStorage();  
+  const oauthParamsStr = _getOAuthParamsStrFromStorage();  
   if (!oauthParamsStr) {
     return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params from storage'));
   }
@@ -837,5 +838,7 @@ module.exports = {
   getUserInfo: getUserInfo,
   verifyToken: verifyToken,
   handleOAuthResponse: handleOAuthResponse,
-  prepareOauthParams: prepareOauthParams
+  prepareOauthParams: prepareOauthParams,
+  _addOAuthParamsToStorage, // export for testing purpose
+  _getOAuthParamsStrFromStorage // export for testing purpose
 };

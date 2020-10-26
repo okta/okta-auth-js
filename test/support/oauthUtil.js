@@ -448,12 +448,18 @@ oauthUtil.setupParseUrl = function(opts) {
   util.mockGetCookie(opts.oauthParams);
   var deleteCookieMock = util.mockDeleteCookie();
 
-  storageUtil.getSessionStorage = jest.fn().mockReturnValue({
-    getItem: jest.fn().mockReturnValue(opts.oauthParams || ''),
-    removeItem: jest.fn()
-  });
-  storageUtil.browserHasSessionStorage = jest.fn().mockReturnValue(!!opts.hasSessionStorage);
-
+  jest.spyOn(storageUtil, 'getSessionStorage')
+    .mockImplementation(function() {
+      return {
+        getItem: jest.fn().mockReturnValue(opts.oauthParams || ''),
+        removeItem: jest.fn()
+      };
+    });
+  jest.spyOn(storageUtil, 'browserHasSessionStorage')
+    .mockImplementation(function() {
+      return !!opts.hasSessionStorage;
+    });
+  
   return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {
       var expectedResp = opts.expectedResp;
