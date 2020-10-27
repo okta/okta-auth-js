@@ -127,35 +127,46 @@ function verifyToken(sdk: OktaAuth, token: IDToken, validationParams: TokenVerif
 
     Object.assign(validationOptions, validationParams);
 
+
+    return getWellKnown(sdk, null)
+    .then (function (wellKnownInfo: WellKnownResponse) {
+      
+      if(wellKnownInfo.issuer != validationOptions.issuer) {
+        validationOptions.issuer = wellKnownInfo.issuer
+      }
+      
+      validateClaims(sdk, jwt.payload, validationOptions);
+
+      // If the browser doesn't support native crypto or we choose not
+      // to verify the signature, bail early
+      if (validationOptions.ignoreSignature == true || !sdk.features.isTokenVerifySupported()) {
+        return token;
+      }
+  
+      return getKey(sdk, token.issuer, jwt.header.kid)
+      .then(function(key) {
+        return sdkCrypto.verifyToken(token.idToken, key);
+      })
+      .then(function(valid) {
+        if (!valid) {
+          throw new AuthSdkError('The token signature is not valid');
+        }
+        if (validationParams && validationParams.accessToken && token.claims.at_hash) {
+          return sdkCrypto.getOidcHash(validationParams.accessToken)
+            .then(hash => {
+              if (hash !== token.claims.at_hash) {
+                throw new AuthSdkError('Token hash verification failed');
+              }
+            });
+        }
+      })
+      .then(() => {
+        return token;
+      });      
+    })
+
     // Standard claim validation
-    validateClaims(sdk, jwt.payload, validationOptions);
 
-    // If the browser doesn't support native crypto or we choose not
-    // to verify the signature, bail early
-    if (validationOptions.ignoreSignature == true || !sdk.features.isTokenVerifySupported()) {
-      return token;
-    }
-
-    return getKey(sdk, token.issuer, jwt.header.kid)
-    .then(function(key) {
-      return sdkCrypto.verifyToken(token.idToken, key);
-    })
-    .then(function(valid) {
-      if (!valid) {
-        throw new AuthSdkError('The token signature is not valid');
-      }
-      if (validationParams && validationParams.accessToken && token.claims.at_hash) {
-        return sdkCrypto.getOidcHash(validationParams.accessToken)
-          .then(hash => {
-            if (hash !== token.claims.at_hash) {
-              throw new AuthSdkError('Token hash verification failed');
-            }
-          });
-      }
-    })
-    .then(() => {
-      return token;
-    });
   });
 }
 
@@ -294,24 +305,16 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
         accessToken: accessToken
       };
 
-      return getWellKnown(sdk, null)
-      .then (function (wellKnownInfo: WellKnownResponse) {
 
-        if (tokenParams.ignoreSignature !== undefined) {
-          validationParams.ignoreSignature = tokenParams.ignoreSignature;
-        }
-
-        if (validationParams.issuer != wellKnownInfo.issuer) {
-          validationParams.issuer = wellKnownInfo.issuer
-        }
-
-        return verifyToken(sdk, idTokenObj, validationParams)
-        .then(function() {
-          tokenDict.idToken = idTokenObj;
-          return tokenDict;
-        });
-        
-      })
+      if (tokenParams.ignoreSignature !== undefined) {
+        validationParams.ignoreSignature = tokenParams.ignoreSignature;
+      }
+      
+      return verifyToken(sdk, idTokenObj, validationParams)
+      .then(function() {
+        tokenDict.idToken = idTokenObj;
+        return tokenDict;
+      });
     }
 
     return tokenDict;
