@@ -57,6 +57,7 @@ import {
   TokenResponse,
   CustomUrls,
   PKCEMeta,
+  WellKnownResponse,
   ParseFromUrlOptions,
   Tokens
 } from './types';
@@ -293,15 +294,24 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
         accessToken: accessToken
       };
 
-      if (tokenParams.ignoreSignature !== undefined) {
-        validationParams.ignoreSignature = tokenParams.ignoreSignature;
-      }
+      return getWellKnown(sdk, urls.issuer)
+      .then (function (wellKnownInfo: WellKnownResponse) {
 
-      return verifyToken(sdk, idTokenObj, validationParams)
-      .then(function() {
-        tokenDict.idToken = idTokenObj;
-        return tokenDict;
-      });
+        if (tokenParams.ignoreSignature !== undefined) {
+          validationParams.ignoreSignature = tokenParams.ignoreSignature;
+        }
+
+        if (validationParams.issuer != wellKnownInfo.issuer) {
+          validationParams.issuer = wellKnownInfo.issuer
+        }
+
+        return verifyToken(sdk, idTokenObj, validationParams)
+        .then(function() {
+          tokenDict.idToken = idTokenObj;
+          return tokenDict;
+        });
+        
+      })
     }
 
     return tokenDict;
