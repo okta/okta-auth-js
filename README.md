@@ -403,9 +403,13 @@ Specify the url where the browser should be redirected after [signOut](#signout)
 
 Applicable only for SPA clients using [PKCE OAuth Flow](#pkce-oauth-20-flow). By default, the authorization code is requested and parsed from the search query. Setting this value to `fragment` will cause the URL hash fragment to be used instead. If your application uses or alters the search query portion of the `redirectUri`, you may want to set this option to "fragment". This option affects both [token.getWithRedirect](#tokengetwithredirectoptions) and [token.parseFromUrl](#tokenparsefromurloptions)
 
+##### `responseType`
+
+Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication when using the [Implicit OAuth Flow](#implicit-oauth-20-flow). The default value is `['token', 'id_token']` which will request both an access token and ID token. If `pkce` is `true`, both the access and ID token will be requested and this option will be ignored. For web/native applications using the `authorization_code` flow, this value should be set to `"code"` and `pkce` should be set to `false`.
+
 ##### `pkce`
 
-Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and `grant_type=authorization_code` on the token request. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions)
+Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and the token request will use `grant_type=authorization_code`. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions)
 
 ##### `authorizeUrl`
 
@@ -535,6 +539,25 @@ var config = {
   tokenManager: {
     storage: 'sessionStorage'
   }
+};
+
+var authClient = new OktaAuth(config);
+```
+
+#### Authorization Code flow for web and native client types
+
+Web and native clients can obtain tokens using the `authorization_code` flow which uses a client secret stored in a secure location. SPA applications should use the `PKCE` flow which does not use a client secret. To use the `authorization_code` flow, set `responseType` to `"code"` and `pkce` to `false`:
+
+```javascript
+var config = {
+  // Required config
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+  clientId: 'GHtf9iJdr60A9IYrR0jw',
+  redirectUri: 'https://acme.com/oauth2/callback/home',
+
+  // Use authorization_code flow
+  responseType: 'code',
+  pkce: false
 };
 
 var authClient = new OktaAuth(config);
@@ -1898,7 +1921,7 @@ authClient.session.refresh()
 
 #### Authorize options
 
-The following configuration options can **only** be included in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect`.
+The following configuration options can be included in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect`. If an option with the same name is accepted in the constructor, passing the option to one of these methods will override the previously set value.
 
 | Options | Description |
 | :-------: | ----------|
