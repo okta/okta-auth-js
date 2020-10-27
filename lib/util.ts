@@ -87,7 +87,7 @@ export function toRelativeUrl(url = '', baseUrl) {
     url = url.substring(baseUrl.length);
   }
 
-  return url[0] === '/' ? url : `/${url}`
+  return url[0] === '/' ? url : `/${url}`;
 }
 
 export function isString(obj: any): obj is string {

@@ -388,19 +388,19 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       return Promise.resolve(authState.isAuthenticated);
     }
 
+    let clear, handler, timeoutId;
     return new Promise(resolve => {
-      const clear = () => {
+      clear = () => {
         this.authStateManager.unsubscribe(handler);
         clearTimeout(timeoutId);
       };
-      const handler = ({isAuthenticated, isPending}) => {
-        console.log(isAuthenticated, isPending);
+      handler = ({isAuthenticated, isPending}) => {
         if (!isPending) {
           resolve(isAuthenticated);
           clear();
         }
       };
-      const timeoutId = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         resolve(false);
         clear();
       }, timeout || 60 * 1000);
