@@ -294,7 +294,7 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
         accessToken: accessToken
       };
 
-      return getWellKnown(sdk, urls.issuer)
+      return getWellKnown(sdk, null)
       .then (function (wellKnownInfo: WellKnownResponse) {
 
         if (tokenParams.ignoreSignature !== undefined) {
