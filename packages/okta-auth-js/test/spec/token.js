@@ -873,12 +873,14 @@ describe('token.getWithoutPrompt', function() {
     global.window.location = {
       protocol: 'https:',
       hostname: 'somesite.local',
-      search: '?code=fakecode'
+      search: '?code=fakecode',
+      href: 'https://somesite.local/implicit/callback?code=fakecode'
     };
     const client = new OktaAuth({
       pkce: true,
       issuer: 'https://auth-js-test.okta.com',
-      clientId: 'foo'
+      clientId: 'foo',
+      redirectUri: 'https://somesite.local/implicit/callback'
     });
 
     try {
@@ -1369,12 +1371,14 @@ describe('token.getWithPopup', function() {
     global.window.location = {
       protocol: 'https:',
       hostname: 'somesite.local',
-      search: '?code=fakecode'
+      search: '?code=fakecode',
+      href: 'https://somesite.local/implicit/callback?code=fakecode'
     };
     const client = new OktaAuth({
       pkce: true,
       issuer: 'https://auth-js-test.okta.com',
-      clientId: 'foo'
+      clientId: 'foo',
+      redirectUri: 'https://somesite.local/implicit/callback'
     });
 
     try {
@@ -2181,12 +2185,14 @@ describe('token.getWithRedirect', function() {
     global.window.location = {
       protocol: 'https:',
       hostname: 'somesite.local',
-      search: '?code=fakecode'
+      search: '?code=fakecode',
+      href: 'https://somesite.local/implicit/callback?code=fakecode'
     };
     const client = new OktaAuth({
       pkce: true,
       issuer: 'https://auth-js-test.okta.com',
-      clientId: 'foo'
+      clientId: 'foo',
+      redirectUri: 'https://somesite.local/implicit/callback'
     });
 
     try {

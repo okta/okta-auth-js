@@ -963,13 +963,15 @@ describe('isLoginRedirect', function() {
     it('there should be code in hash when responseMode is fragment', () => {
       delete window.location;
       window.location = {
-        hash: '#code=fakecode'
-      }
+        hash: '#code=fakecode',
+        href: 'https://exmple.com/implicit/callback#code=fakecode'
+      };
       sdk = new OktaAuth({
         pkce: true,
         responseMode: 'fragment',
         issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo'
+        clientId: 'foo',
+        redirectUri: 'https://exmple.com/implicit/callback'
       });
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
@@ -978,12 +980,14 @@ describe('isLoginRedirect', function() {
     it('there should be code in query when use default responseMode', () => {
       delete window.location;
       window.location = {
-        search: '?code=fakecode'
-      }
+        search: '?code=fakecode',
+        href: 'https://exmple.com/implicit/callback?code=fakecode'
+      };
       sdk = new OktaAuth({
         pkce: true,
         issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo'
+        clientId: 'foo',
+        redirectUri: 'https://exmple.com/implicit/callback'
       });
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
@@ -992,16 +996,34 @@ describe('isLoginRedirect', function() {
     it('there should be code in query when responseMode is query', () => {
       delete window.location;
       window.location = {
-        search: '?code=fakecode'
-      }
+        search: '?code=fakecode',
+        href: 'https://exmple.com/implicit/callback?code=fakecode'
+      };
       sdk = new OktaAuth({
         pkce: true,
         responseMode: 'query',
         issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo'
+        clientId: 'foo',
+        redirectUri: 'https://exmple.com/implicit/callback'
       });
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
+    });
+
+    it('should return false if current URI is not redirect URI', () => {
+      delete window.location;
+      window.location = {
+        search: '?code=somecode',
+        href: 'https://exmple.com/products/search?code=somecode'
+      };
+      sdk = new OktaAuth({
+        pkce: true,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'foo',
+        redirectUri: 'https://exmple.com/implicit/callback'
+      });
+      const result = oauthUtil.isLoginRedirect(sdk);
+      expect(result).toBe(false);
     });
   });
 });

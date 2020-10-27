@@ -239,6 +239,11 @@ function hasCodeInUrl(hashOrSearch) {
   return /(code=)/i.test(hashOrSearch);
 }
 
+function isRedirectUri(uri, sdk) {
+  var authParams = sdk.options;
+  return uri && uri.indexOf(authParams.redirectUri) == 0;
+}
+
 /**
  * Check if tokens or a code have been passed back into the url, which happens in
  * the social auth IDP redirect flow.
@@ -247,9 +252,10 @@ function isLoginRedirect (sdk) {
   var authParams = sdk.options;
   if (authParams.pkce || authParams.responseType === 'code' || authParams.responseMode === 'query') {
     // Look for code
-    return authParams.responseMode === 'fragment' ?
+    var hasCode = authParams.responseMode === 'fragment' ?
       hasCodeInUrl(window.location.hash) :
       hasCodeInUrl(window.location.search);
+    return isRedirectUri(window.location.href, sdk) && hasCode;
   }
   // Look for tokens (Implicit OIDC flow)
   return hasTokensInHash(window.location.hash);
