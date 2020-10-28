@@ -491,6 +491,25 @@ oktaAuth.authStateManager.subscribe(authState => {
 oktaAuth.authStateManager.updateAuthState();
 ```
 
+##### `onPostLoginRedirect`
+
+Callback function. When [sdk.handlePostLoginRedirect](#handlepostloginredirecttokens) is called, by default it uses `window.location.replace` to redirect back to `fromUri`. This option overrides the default behavior.
+
+```javascript
+const config = {
+  // other config
+  onPostLoginRedirect: async (oktaAuth, fromUri) => {
+    // custom router
+    router.push({
+      path: toRelativeUrl(fromUri)
+    });
+  }
+};
+if (oktaAuth.token.isLoginRedirect()) {
+  oktaAuth.handlePostLoginRedirect();
+}
+```
+
 ##### `devMode`
 
 Default to `false`. It enables debugging logs when set to `true`.
@@ -594,6 +613,7 @@ var config = {
 * [setFromUri](#setfromurifromuri)
 * [getFromUri](#getfromuri)
 * [removeFromUri](#removefromuri)
+* [handlePostLoginRedirect](#handlepostloginredirecttokens)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -679,14 +699,8 @@ You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens 
 
 ```javascript
 if (authClient.token.isLoginRedirect()) {
-  // Store tokens when redirect back from OKTA
-  await authClient.storeTokensFromRedirect();
-  // Get and clear fromUri from storage
-  const fromUri = authClient.getFromUri();
-  authClient.removeFromUri();
-  // Redirect to fromUri
-  history.replaceState(null, '', fromUri);
-} else if (!authClient.authStateManager.getAuthState().isAuthenticated) {
+  await authClient.handlePostLoginRedirect();
+} else if (!await authClient.isAuthenticated()) {
   // Start the browser based oidc flow, then parse tokens from the redirect callback url
   authClient.signInWithRedirect();
 } else {
@@ -938,6 +952,10 @@ Returns the stored URI string stored by [setFromUri](#setfromuriuri). By default
 ### `removeFromUri()`
 
 Removes the stored URI string stored by [setFromUri](#setfromuriuri) from storage.
+
+### `handlePostLoginRedirect(tokens?)`
+
+Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [fromUri](#setfromurifromuri). By default it calls `window.location.replace` for the redirection. The default behavior can be override by providing [options.onPostLoginRedirect](#additional-options)
 
 ### `tx.resume()`
 

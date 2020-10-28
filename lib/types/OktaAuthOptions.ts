@@ -59,5 +59,6 @@ export interface OktaAuthOptions extends CustomUrls {
   headers?: object;
   maxClockSkew?: number;
   transformAuthState?: (oktaAuth: OktaAuth, authState: AuthState) => Promise<AuthState>;
+  onPostLoginRedirect?: (oktaAuth: OktaAuth, fromUri: string) => Promise<void>,
   devMode?: boolean; 
 }

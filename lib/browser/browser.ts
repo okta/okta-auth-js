@@ -68,7 +68,8 @@ import {
   FingerprintAPI,
   UserClaims, 
   SigninWithRedirectOptions,
-  SignInWithCredentialsOptions
+  SignInWithCredentialsOptions,
+  Tokens
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
@@ -140,7 +141,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       transformErrorXHR: args.transformErrorXHR,
       cookies: getCookieSettings(this, args),
       scopes: args.scopes,
-      transformAuthState: args.transformAuthState
+      transformAuthState: args.transformAuthState,
+      onPostLoginRedirect: args.onPostLoginRedirect
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
@@ -449,6 +451,41 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   removeFromUri(): void {
     const storage = browserStorage.getSessionStorage();
     storage.removeItem(REFERRER_PATH_STORAGE_KEY);
+  }
+
+  async handlePostLoginRedirect(tokens?: Tokens): Promise<void> {
+    const handleRedirect = async ({ isPending }) => {
+      if (isPending) {
+        return;
+      }
+
+      // Unsubscribe listener
+      this.authStateManager.unsubscribe(handleRedirect);
+
+      // Get and clear fromUri from storage
+      const fromUri = this.getFromUri();
+      this.removeFromUri();
+
+      // Redirect to fromUri
+      const { onPostLoginRedirect } = this.options;
+      if (onPostLoginRedirect) {
+        await onPostLoginRedirect(this, fromUri);
+      } else {
+        window.location.replace(fromUri);
+      }
+    };
+
+    // Handle redirect after authState is updated 
+    this.authStateManager.subscribe(handleRedirect);
+
+    // Store tokens and update AuthState by the emitted events
+    if (tokens) {
+      this.tokenManager.setTokens(tokens);
+    } else if (this.token.isLoginRedirect()) {
+      await this.storeTokensFromRedirect();
+    } else {
+      this.authStateManager.unsubscribe(handleRedirect);
+    }
   }
 }
 
