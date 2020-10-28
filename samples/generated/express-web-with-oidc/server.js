@@ -158,5 +158,5 @@ app.get('/authorization-code/callback', function(req, res) {
   post.end();
 });
 app.listen(port, function () {
-  console.log(`Test app running at http://localhost/${port}!\n`);
+  console.log(`Test app running at http://localhost:${port}!\n`);
 });

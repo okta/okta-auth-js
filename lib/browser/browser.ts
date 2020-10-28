@@ -426,6 +426,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     return accessToken ? accessToken.accessToken : undefined;
   }
 
+  getRefreshToken(): string | undefined {
+    const { refreshToken } = this.authStateManager.getAuthState();
+    return refreshToken ? refreshToken.refreshToken : undefined;
+  }
+  
   /**
    * Store parsed tokens from redirect url
    */

@@ -4,6 +4,7 @@
 var config = {
   issuer: '',
   clientId: '',
+  scopes: '{{ scopes }}',
   storage: '{{ storage }}',
   requireUserSession: {{ requireUserSession }},
   flow: '{{ flow }}'
@@ -141,7 +142,6 @@ function handleLoginRedirect() {
   });
 }
 
-// called when the "get user info" link is clicked
 function getUserInfo() {
   return authClient.token.getUserInfo()
     .then(function(value) {
@@ -287,7 +287,8 @@ function redirectToGetTokens(additionalParams) {
 function redirectToLogin(additionalParams) {
   // Redirect to Okta and show the signin widget if there is no active session
   authClient.token.getWithRedirect(Object.assign({
-    state: JSON.stringify(config.state)
+    state: JSON.stringify(config.state),
+    // scopes: config.state.scopes.split(/\s+/) || config.scopes, // getWithRedirect doesn't obey scopes in constructor yet
   }, additionalParams));
 }
 
@@ -304,6 +305,7 @@ function createAuthClient() {
       issuer: config.issuer,
       clientId: config.clientId,
       redirectUri: config.redirectUri,
+      scopes: config.scopes.split(/\s+/),
       tokenManager: {
         storage: config.storage
       },
@@ -340,6 +342,7 @@ function showForm() {
   // Set values from config
   document.getElementById('issuer').value = config.issuer;
   document.getElementById('clientId').value = config.clientId;
+  document.getElementById('scopes').value = config.scopes;
   try {
     document.querySelector(`#flow [value="${config.flow || ''}"]`).selected = true;
   } catch (e) { showError(e); }
@@ -382,6 +385,7 @@ function loadConfig() {
   var storage;
   var flow;
   var requireUserSession;
+  var scopes;
 
   var state;
   if (stateParam) {
@@ -392,6 +396,7 @@ function loadConfig() {
     storage = state.storage;
     flow = state.flow;
     requireUserSession = state.requireUserSession;
+    scopes = state.scopes;
   } else {
     // Read from URL
     issuer = url.searchParams.get('issuer') || config.issuer;
@@ -400,6 +405,7 @@ function loadConfig() {
     flow = url.searchParams.get('flow') || config.flow;
     requireUserSession = url.searchParams.get('requireUserSession') ? 
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
+    scopes = url.searchParams.get('scopes') || config.scopes;
   }
   // Create a canonical app URI that allows clean reloading with this config
   appUri = window.location.origin + '/' +
@@ -407,7 +413,8 @@ function loadConfig() {
     '&clientId=' + encodeURIComponent(clientId) +
     '&storage=' + encodeURIComponent(storage) + 
     '&requireUserSession=' + encodeURIComponent(requireUserSession) + 
-    '&flow=' + encodeURIComponent(flow);
+    '&flow=' + encodeURIComponent(flow),
+    '&scopes=' + encodeURIComponent(scopes);
   
   // Add all app options to the state, to preserve config across redirects
   state = {
@@ -415,7 +422,8 @@ function loadConfig() {
     clientId,
     storage,
     requireUserSession,
-    flow
+    flow,
+    scopes,
   };
   var newConfig = {};
   Object.assign(newConfig, state);

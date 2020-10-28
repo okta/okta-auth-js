@@ -259,6 +259,7 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
     var tokenType = res.token_type;
     var accessToken = res.access_token;
     var idToken = res.id_token;
+    var refreshToken = res.refresh_token;
     
     if (accessToken) {
       tokenDict.accessToken = {
@@ -269,6 +270,16 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
         scopes: scopes,
         authorizeUrl: urls.authorizeUrl,
         userinfoUrl: urls.userinfoUrl
+      };
+    }
+
+    if (refreshToken) {
+      tokenDict.refreshToken = {
+        refreshToken: refreshToken,
+        value: refreshToken,
+        expiresAt: Number(expiresIn) + Math.floor(Date.now()/1000),
+        scopes: scopes,
+        authorizeUrl: urls.authorizeUrl,
       };
     }
 
@@ -703,6 +714,7 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
 }
 
 function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
+  // Note: This is not used when a refresh token is present
   if (!isToken(token)) {
     return Promise.reject(new AuthSdkError('Renew must be passed a token with ' +
       'an array of scopes and an accessToken or idToken'));
@@ -745,6 +757,11 @@ function renewTokens(sdk: OktaAuth, options: TokenParams): Promise<Tokens> {
   } else {
     options.responseType = ['token', 'id_token'];
   }
+
+  // XXX: Magical detection of refresh token.  Passed?
+  // if( refreshToken ) { 
+  //  return renewWithRefreshToken();
+  // }
 
   return getWithoutPrompt(sdk, options)
     .then(res => res.tokens);

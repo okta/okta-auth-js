@@ -16,5 +16,5 @@ app.use(express.static('./public')); // app html
 app.use(express.static(authJSAssets)); // okta-auth-js assets
 
 app.listen(port, function () {
-  console.log(`Test app running at http://localhost/${port}!\n`);
+  console.log(`Test app running at http://localhost:${port}!\n`);
 });

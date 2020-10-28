@@ -24,9 +24,10 @@ import {
   TokenType, 
   TokenManagerOptions, 
   isIDToken, 
-  isAccessToken 
+  isAccessToken,
+  isRefreshToken
 } from './types';
-import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY } from './constants';
+import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_KEY } from './constants';
 
 const DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -153,7 +154,7 @@ function validateToken(token: Token) {
   if (!isObject(token) ||
       !token.scopes ||
       (!token.expiresAt && token.expiresAt !== 0) ||
-      (!isIDToken(token) && !isAccessToken(token))) {
+      (!isIDToken(token) && !isAccessToken(token) && !isRefreshToken(token))) {
     throw new AuthSdkError('Token must be an Object with scopes, expiresAt, and an idToken or accessToken properties');
   }
 }
@@ -185,7 +186,8 @@ function getKeyByType(storage, type: TokenType): string {
   const key = Object.keys(tokenStorage).filter(key => {
     const token = tokenStorage[key];
     return (isAccessToken(token) && type === 'accessToken') 
-      || (isIDToken(token) && type === 'idToken');
+      || (isIDToken(token) && type === 'idToken')
+      || (isRefreshToken(token) && type === 'refreshToken');
   })[0];
   return key;
 }
@@ -206,6 +208,8 @@ function getTokens(storage): Tokens {
       tokens.accessToken = token;
     } else if (isIDToken(token)) {
       tokens.idToken = token;
+    } else if (isRefreshToken(token)) { 
+      tokens.refreshToken = token;
     }
   });
   return tokens;
@@ -223,9 +227,10 @@ function setTokens(
   sdk, 
   tokenMgmtRef, 
   storage, 
-  { accessToken, idToken }: Tokens, 
+  { accessToken, idToken, refreshToken }: Tokens, 
   accessTokenCb?: Function, 
-  idTokenCb?: Function
+  idTokenCb?: Function,
+  refreshTokenCb?: Function
 ): void {
   const handleAdded = (key, token, tokenCb) => {
     emitAdded(tokenMgmtRef, key, token);
@@ -250,11 +255,13 @@ function setTokens(
   }
   const idTokenKey = getKeyByType(storage, 'idToken') || ID_TOKEN_STORAGE_KEY;
   const accessTokenKey = getKeyByType(storage, 'accessToken') || ACCESS_TOKEN_STORAGE_KEY;
+  const refreshTokenKey = getKeyByType(storage, 'refreshToken') || REFRESH_TOKEN_STORAGE_KEY;
 
   // add token to storage
   const tokenStorage = { 
     ...(idToken && { [idTokenKey]: idToken }),
-    ...(accessToken && { [accessTokenKey]: accessToken })
+    ...(accessToken && { [accessTokenKey]: accessToken }),
+    ...(refreshToken && { [refreshTokenKey]: refreshToken })
   };
   storage.setStorage(tokenStorage);
 
@@ -269,6 +276,11 @@ function setTokens(
     handleAdded(accessTokenKey, accessToken, accessTokenCb);
   } else if (existingTokens.accessToken) {
     handleRemoved(accessTokenKey, existingTokens.accessToken, accessTokenCb);
+  }
+  if (refreshToken) {
+    handleAdded(refreshTokenKey, refreshToken, refreshTokenCb);
+  } else if (existingTokens.refreshToken) {
+    handleRemoved(refreshTokenKey, existingTokens.refreshToken, refreshTokenCb);
   }
 }
 /* eslint-enable max-params */
@@ -304,10 +316,14 @@ function renew(sdk, tokenMgmtRef, storage, key) {
   // Remove existing autoRenew timeouts
   clearExpireEventTimeoutAll(tokenMgmtRef);
 
+  // A refresh token means a refresh instead of renewal
+  // TODO: XXX  
+
   // Store the renew promise state, to avoid renewing again
-  // Renew both tokens in one process
+  // Renew/refresh all tokens in one process
   tokenMgmtRef.renewPromise[key] = sdk.token.renewTokens({
-    scopes: token.scopes
+    scopes: token.scopes,
+    refreshToken: storage.getStorage()
   })
     .then(function(freshTokens) {
       // store and emit events for freshTokens

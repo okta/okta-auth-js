@@ -136,7 +136,7 @@ export class AuthStateManager {
       };
 
       this._sdk.tokenManager.getTokens()
-        .then(({ accessToken, idToken }) => {
+        .then(({ accessToken, idToken, refreshToken }) => {
           if (cancelablePromise.isCanceled) {
             resolve();
             return;
@@ -157,6 +157,7 @@ export class AuthStateManager {
           const authState = {
             accessToken,
             idToken,
+            refreshToken,
             isPending,
             isAuthenticated: !!(accessToken && idToken)
           };
@@ -169,6 +170,7 @@ export class AuthStateManager {
             .catch(error => emitAndResolve({
               accessToken, 
               idToken, 
+              refreshToken,
               isAuthenticated: false, 
               isPending: false,
               error

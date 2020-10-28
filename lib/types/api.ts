@@ -11,7 +11,7 @@
  */
 
 import { AuthTransaction } from '../tx/AuthTransaction';
-import { Token, AccessToken, IDToken } from './Token';
+import { Token, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
@@ -98,6 +98,7 @@ export interface TokenParams extends CustomUrls {
 export interface Tokens {
   accessToken?: AccessToken;
   idToken?: IDToken;
+  refreshToken?: RefreshToken;
 }
 
 export interface TokenResponse {

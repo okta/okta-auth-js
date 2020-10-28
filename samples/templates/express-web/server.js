@@ -108,5 +108,5 @@ app.post('/login', function(req, res) {
 {{/if}}
 
 app.listen(port, function () {
-  console.log(`Test app running at http://localhost/${port}!\n`);
+  console.log(`Test app running at http://localhost:${port}!\n`);
 });
