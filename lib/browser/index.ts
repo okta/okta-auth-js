@@ -17,3 +17,4 @@ export * from '../types';
 export * from '../tx';
 export * from '../errors';
 export * from '../TokenManager';
+export * from '../util';

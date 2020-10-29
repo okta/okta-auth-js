@@ -547,54 +547,107 @@ describe('Browser', function() {
 
   });
 
+  describe('isAuthenticated', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should return from authState if not in isPending state', async () => {
+      let retVal;
+      // expect true
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        isAuthenticated: true,
+        isPending: false
+      });
+      retVal = await auth.isAuthenticated();
+      expect(retVal).toBe(true);
+      // expect false
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        isAuthenticated: false,
+        isPending: false
+      });
+      retVal = await auth.isAuthenticated();
+      expect(retVal).toBe(false);
+    });
+
+    it('should return based on next emitted non-pending authState', async () => {
+      let retVal;
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        isAuthenticated: false,
+        isPending: true
+      });
+      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
+        accessToken: 'fake access token',
+        idToken: 'fake id token'
+      });
+      retVal = await auth.isAuthenticated();
+      expect(retVal).toBe(true);
+      expect(auth.emitter.e.authStateChange).toBe(undefined);
+    });
+
+    it('should timeout and return false no non-pending state is emitted', async () => {
+      expect.assertions(2);
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        isAuthenticated: false,
+        isPending: true
+      });
+      auth.authStateManager.updateAuthState = jest.fn();
+      return new Promise(resolve => {
+        auth.isAuthenticated().then(isAuthenticated => {
+          expect(isAuthenticated).toBe(false);
+          expect(auth.emitter.e.authStateChange).toBe(undefined);
+          resolve();
+        });
+        jest.runAllTimers();
+      });
+    });
+  });
+
   describe('getUser', () => {
-    it('should be an alias method of token.getUserInfo', () => {
+    it('should call token.getUserInfo with tokens from authState', () => {
       auth.token = {
         getUserInfo: jest.fn().mockResolvedValue(undefined)
       };
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        idToken: tokens.standardIdTokenParsed,
+        accessToken: tokens.standardAccessTokenParsed
+      });
       auth.getUser();
-      expect(auth.token.getUserInfo).toHaveBeenCalled();
+      expect(auth.token.getUserInfo).toHaveBeenCalledWith(tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed);
     });
   });
 
   describe('getIdToken', () => {
-    it('retrieves token from token manager', async () => {
-      expect.assertions(1);
-      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
-        accessToken: tokens.standardAccessTokenParsed,
+    it('retrieves token from authStateManager', () => {
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
         idToken: tokens.standardIdTokenParsed
       });
-      const retVal = await auth.getIdToken();
+      const retVal = auth.getIdToken();
       expect(retVal).toBe(tokens.standardIdToken);
     });
 
-    it('catches exceptions', async () => {
-      auth.tokenManager.getTokens = jest.fn().mockImplementation(key => {
-        expect(key).toBe('idToken');
-        throw new Error('expected test error');
-      });
-      const retVal = await auth.getIdToken();
+    it('should return undefined if no idToken in authState', () => {
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({});
+      const retVal = auth.getIdToken();
       expect(retVal).toBe(undefined);
     });
   });
 
   describe('getAccessToken', () => {
-    it('retrieves token from token manager', async () => {
-      expect.assertions(1);
-      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
-        accessToken: tokens.standardAccessTokenParsed,
-        idToken: tokens.standardIdTokenParsed
+    it('retrieves token from authStateManager', () => {
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        accessToken: tokens.standardAccessTokenParsed
       });
-      const retVal = await auth.getAccessToken();
+      const retVal = auth.getAccessToken();
       expect(retVal).toBe(tokens.standardAccessToken);
     });
 
-    it('catches exceptions', async () => {
-      auth.tokenManager.getTokens = jest.fn().mockImplementation(key => {
-        expect(key).toBe('accessToken');
-        throw new Error('expected test error');
-      });
-      const retVal = await auth.getAccessToken();
+    it('should return undefined if no accessToken in authState', async () => {
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({});
+      const retVal = auth.getAccessToken();
       expect(retVal).toBe(undefined);
     });
   });

@@ -13,6 +13,7 @@
   - Adds new methods in sdk browser scope:
     - `sdk.signInWithCredentials`
     - `sdk.signInWithRedirect`
+    - `sdk.isAuthenticated`
     - `sdk.getUser`
     - `sdk.getIdToken`
     - `sdk.getAccessToken`

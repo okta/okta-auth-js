@@ -586,6 +586,7 @@ var config = {
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [webfinger](#webfingeroptions)
 * [fingerprint](#fingerprintoptions)
+* [isAuthenticated](#isAuthenticated)
 * [getUser](#getuser)
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
@@ -678,8 +679,8 @@ You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens 
 
 ```javascript
 if (authClient.token.isLoginRedirect()) {
-  // Call handleAuthentication to store tokens when redirect back from OKTA
-  authClient.storeTokensFromRedirect();
+  // Store tokens when redirect back from OKTA
+  await authClient.storeTokensFromRedirect();
   // Get and clear fromUri from storage
   const fromUri = authClient.getFromUri();
   authClient.removeFromUri();
@@ -900,6 +901,12 @@ authClient.fingerprint()
 })
 ```
 
+### `isAuthenticated(timeout?)`
+
+> :hourglass: async
+
+Resolves with `authState.isAuthenticated` from non-pending [authState](#authstatemanager).
+
 ### `getUser()`
 
 > :hourglass: async
@@ -908,15 +915,11 @@ Alias method of [token.getUserInfo](#tokengetuserinfoaccesstokenobject-idtokenob
 
 ### `getIdToken()`
 
-> :hourglass: async
-
-Resolves with the id token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
+Returns the id token string retrieved from [authState](#authstatemanager) if it exists.
 
 ### `getAccessToken()`
 
-> :hourglass: async
-
-Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
+Returns the access token string retrieved from [authState](#authstatemanager) if it exists.
 
 ### `storeTokensFromRedirect()`
 
@@ -2077,7 +2080,7 @@ Retrieve the [details about a user](https://developer.okta.com/docs/api/resource
 * `accessTokenObject` - (optional) an access token returned by this library. **Note**: this is not the raw access token.
 * `idTokenObject` - (optional) an ID token returned by this library. **Note**: this is not the raw ID token.
 
-By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager. If either token has expired it will be renewed automatically by the TokenManager before the user info is requested. It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken". If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
+By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager. It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken". If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
 
 
 ```javascript
