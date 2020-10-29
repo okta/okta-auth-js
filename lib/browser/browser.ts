@@ -382,26 +382,46 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   // Common Methods from downstream SDKs
   //
 
+  async isAuthenticated(timeout?: number): Promise<boolean> {
+    const authState = this.authStateManager.getAuthState();
+    if (!authState.isPending) {
+      return Promise.resolve(authState.isAuthenticated);
+    }
+
+    let clear, handler, timeoutId;
+    return new Promise(resolve => {
+      clear = () => {
+        this.authStateManager.unsubscribe(handler);
+        clearTimeout(timeoutId);
+      };
+      handler = ({isAuthenticated, isPending}) => {
+        if (!isPending) {
+          resolve(isAuthenticated);
+          clear();
+        }
+      };
+      timeoutId = setTimeout(() => {
+        resolve(false);
+        clear();
+      }, timeout || 60 * 1000);
+      this.authStateManager.subscribe(handler);
+      this.authStateManager.updateAuthState();
+    });
+  }
+
   async getUser(): Promise<UserClaims> {
-    return this.token.getUserInfo();
+    const { idToken, accessToken } = this.authStateManager.getAuthState();
+    return this.token.getUserInfo(accessToken, idToken);
   }
 
-  async getIdToken(): Promise<string | undefined> {
-    try {
-      const idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
-      return idToken ? idToken.idToken : undefined;
-    } catch (err) {
-      return undefined;
-    }
+  getIdToken(): string | undefined {
+    const { idToken } = this.authStateManager.getAuthState();
+    return idToken ? idToken.idToken : undefined;
   }
 
-  async getAccessToken(): Promise<string | undefined> {
-    try {
-      const accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
-      return accessToken ? accessToken.accessToken : undefined;
-    } catch (err) {
-      return undefined;
-    }
+  getAccessToken(): string | undefined {
+    const { accessToken } = this.authStateManager.getAuthState();
+    return accessToken ? accessToken.accessToken : undefined;
   }
 
   /**

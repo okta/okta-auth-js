@@ -82,6 +82,14 @@ export function toAbsoluteUrl(url = '', baseUrl) {
   return url[0] === '/' ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
 }
 
+export function toRelativeUrl(url = '', baseUrl) {
+  if (isAbsoluteUrl(url)) {
+    url = url.substring(baseUrl.length);
+  }
+
+  return url[0] === '/' ? url : `/${url}`;
+}
+
 export function isString(obj: any): obj is string {
   return Object.prototype.toString.call(obj) === '[object String]';
 }
