@@ -85,7 +85,6 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
       if (accessToken) {
         var accessJwt = sdk.token.decode(accessToken);
         tokenDict.accessToken = {
-          value: accessToken, 
           accessToken: accessToken,
           claims: accessJwt.payload,
           expiresAt: Number(expiresIn) + Math.floor(Date.now() / 1000),
@@ -98,7 +97,6 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
 
       if (refreshToken) {
         tokenDict.refreshToken = {
-          value: refreshToken, 
           refreshToken: refreshToken,
           expiresAt: Number(expiresIn) + Math.floor(Date.now() / 1000),
           scopes: scopes,
@@ -112,7 +110,6 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
         var idJwt = sdk.token.decode(idToken);
 
         var idTokenObj: IDToken = {
-          value: idToken,
           idToken: idToken,
           claims: idJwt.payload,
           expiresAt: idJwt.payload.exp,
