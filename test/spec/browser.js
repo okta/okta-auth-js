@@ -27,7 +27,8 @@ describe('Browser', function() {
     global.window.location = {
       protocol: 'https:',
       hostname: 'somesite.local',
-      href: 'https://somesite.local'
+      href: 'https://somesite.local',
+      replace: jest.fn()
     };
 
     issuer =  'http://my-okta-domain';
@@ -182,13 +183,13 @@ describe('Browser', function() {
       }));
     });
 
-    it('should add fromUri to sessionStorage if provided in options', async () => {
-      const fromUri = 'notrandom';
-      await auth.signInWithRedirect({ fromUri });
-      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, fromUri);
+    it('should add originalUri to sessionStorage if provided in options', async () => {
+      const originalUri = 'notrandom';
+      await auth.signInWithRedirect({ originalUri });
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, originalUri);
     });
 
-    it('should not add fromUri to sessionStorage if no fromUri in options', async () => {
+    it('should not add originalUri to sessionStorage if no originalUri in options', async () => {
       await auth.signInWithRedirect();
       expect(setItemMock).not.toHaveBeenCalled();
     });
@@ -210,7 +211,7 @@ describe('Browser', function() {
 
     it('should passes "additionalParams" to token.getWithRedirect()', () => {
       const additionalParams = { foo: 'bar', baz: 'biz', scopes: ['fake'], responseType: ['fake'] };
-      const params = { fromUri: 'https://foo.random', ...additionalParams };
+      const params = { originalUri: 'https://foo.random', ...additionalParams };
       auth.signInWithRedirect(params);
       expect(auth.token.getWithRedirect).toHaveBeenCalledWith(additionalParams);
     });
@@ -674,7 +675,7 @@ describe('Browser', function() {
     });
   });
 
-  describe('setFromUri', () => {
+  describe('setOriginalUri', () => {
     let setItemMock;
     beforeEach(() => {
       setItemMock = jest.fn();
@@ -684,38 +685,38 @@ describe('Browser', function() {
     });
     it('should save the "referrerPath" in sessionStorage', () => {
       const uri = 'https://foo.random';
-      auth.setFromUri(uri);
+      auth.setOriginalUri(uri);
       expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, uri);
     });
     it('should save the window.location.href by default', () => {
-      auth.setFromUri();
+      auth.setOriginalUri();
       expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, window.location.href);
     });
   });
 
-  describe('getFromUri', () => {
+  describe('getOriginalUri', () => {
     let removeItemMock;
     let getItemMock;
     beforeEach(() => {
       removeItemMock = jest.fn();
-      getItemMock = jest.fn().mockReturnValue('fakeFromUri');
+      getItemMock = jest.fn().mockReturnValue('fakeOriginalUri');
       storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
         getItem: getItemMock,
         removeItem: removeItemMock
       }));
     });
     it('should get and cleare referrer from storage', () => {
-      const res = auth.getFromUri();
-      expect(res).toBe('fakeFromUri');
+      const res = auth.getOriginalUri();
+      expect(res).toBe('fakeOriginalUri');
     });
     it('returns window.location.origin if nothing was set', () => {
       getItemMock = jest.fn().mockReturnValue(null);
-      const res = auth.getFromUri();
+      const res = auth.getOriginalUri();
       expect(res).toBe(window.location.origin);
     });
   });
 
-  describe('removeFromUri', () => {
+  describe('removeOriginalUri', () => {
     let removeItemMock;
     beforeEach(() => {
       removeItemMock = jest.fn();
@@ -724,8 +725,92 @@ describe('Browser', function() {
       }));
     });
     it('should cleare referrer from localStorage', () => {
-      auth.removeFromUri();
+      auth.removeOriginalUri();
       expect(removeItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY);
+    });
+  });
+
+  describe('handleLoginRedirect', () => {
+    beforeEach(() => {
+      jest.spyOn(auth.authStateManager, 'unsubscribe');
+      jest.spyOn(auth, 'getOriginalUri').mockReturnValue('/fakeuri');
+      jest.spyOn(auth, 'removeOriginalUri');
+    });
+
+    it('should redirect to originalUri when tokens are provided', async () => {
+      await auth.handleLoginRedirect({
+        accessToken: tokens.standardAccessTokenParsed,
+        idToken: tokens.standardIdTokenParsed
+      });
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).toHaveBeenCalled();
+          expect(auth.removeOriginalUri).toHaveBeenCalled();
+          expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
+          resolve();    
+        }, 100);
+      });
+    });
+
+    it('should get tokens from the callback url when under login redirect flow', async () => {
+      auth.token.parseFromUrl = jest.fn().mockResolvedValue({
+        tokens: {
+          accessToken: tokens.standardAccessTokenParsed,
+          idToken: tokens.standardIdTokenParsed
+        }
+      });
+      auth.isLoginRedirect = jest.fn().mockReturnValue(true);
+      await auth.handleLoginRedirect();
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).toHaveBeenCalled();
+          expect(auth.removeOriginalUri).toHaveBeenCalled();
+          expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
+          resolve();    
+        }, 100);
+      });
+    });
+
+    it('should use options.restoreOriginalUri if provided', async () => {
+      auth.options.restoreOriginalUri = jest.fn();
+      auth.token.parseFromUrl = jest.fn().mockResolvedValue({
+        tokens: {
+          accessToken: tokens.standardAccessTokenParsed,
+          idToken: tokens.standardIdTokenParsed
+        }
+      });
+      auth.isLoginRedirect = jest.fn().mockReturnValue(true);
+      await auth.handleLoginRedirect();
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).toHaveBeenCalled();
+          expect(auth.removeOriginalUri).toHaveBeenCalled();
+          expect(auth.options.restoreOriginalUri).toHaveBeenCalledWith(auth, '/fakeuri');
+          expect(window.location.replace).not.toHaveBeenCalled();
+          resolve();    
+        }, 100);
+      });
+    });
+
+    it('should unsubscribe authState listener if neither tokens are provided, nor under login redirect flow', async () => {
+      auth.isLoginRedirect = jest.fn().mockReturnValue(false);
+      await auth.handleLoginRedirect();
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).not.toHaveBeenCalled();
+          expect(auth.removeOriginalUri).not.toHaveBeenCalled();
+          expect(window.location.replace).not.toHaveBeenCalled();
+          resolve();    
+        }, 100);
+      });
     });
   });
 });
