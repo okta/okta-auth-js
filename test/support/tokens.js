@@ -62,7 +62,6 @@ tokens.standardIdTokenClaims = {
 };
 
 tokens.standardIdTokenParsed = {
-  value: tokens.standardIdToken,
   idToken: tokens.standardIdToken,
   claims: tokens.standardIdTokenClaims,
   expiresAt: 1449699930,
@@ -108,7 +107,6 @@ tokens.standardIdToken2Claims = {
 };
 
 tokens.standardIdToken2Parsed = {
-  value: tokens.standardIdToken2,
   idToken: tokens.standardIdToken2,
   claims: tokens.standardIdToken2Claims,
   expiresAt: 1449699930,
@@ -153,7 +151,6 @@ tokens.expiredBeforeIssuedIdTokenClaims = {
 };
 
 tokens.expiredBeforeIssuedIdTokenParsed = {
-  value: tokens.expiredBeforeIssuedIdToken,
   idToken: tokens.expiredBeforeIssuedIdToken,
   claims: tokens.expiredBeforeIssuedIdTokenClaims,
   expiresAt: 1449690000,
@@ -191,7 +188,6 @@ tokens.authServerIdTokenClaims = {
 };
 
 tokens.authServerIdTokenParsed = {
-  value: tokens.authServerIdToken,
   idToken: tokens.authServerIdToken,
   claims: tokens.authServerIdTokenClaims,
   expiresAt: 1449699930,
@@ -266,7 +262,6 @@ tokens.standardAccessTokenClaims = {
 };
 
 tokens.standardAccessTokenParsed = {
-  value: tokens.standardAccessToken,
   accessToken: tokens.standardAccessToken,
   claims: tokens.standardAccessTokenClaims,
   expiresAt: 1449703529, // assuming time = 1449699929
@@ -306,7 +301,6 @@ tokens.authServerAccessTokenClaims = {
 };
 
 tokens.authServerAccessTokenParsed = {
-  value: tokens.authServerAccessToken,
   accessToken: tokens.authServerAccessToken,
   claims: tokens.authServerAccessTokenClaims,
   expiresAt: 1449703529, // assuming time = 1449699929
