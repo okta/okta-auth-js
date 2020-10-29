@@ -897,4 +897,5 @@ describe('Browser', function() {
       expect(auth.isAuthorizationCodeFlow()).toBe(true);
     });
   });
+
 });
