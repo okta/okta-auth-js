@@ -262,7 +262,6 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
     
     if (accessToken) {
       tokenDict.accessToken = {
-        value: accessToken,
         accessToken: accessToken,
         expiresAt: Number(expiresIn) + Math.floor(Date.now()/1000),
         tokenType: tokenType,
@@ -276,7 +275,6 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
       var jwt = sdk.token.decode(idToken);
 
       var idTokenObj: IDToken = {
-        value: idToken,
         idToken: idToken,
         claims: jwt.payload,
         expiresAt: jwt.payload.exp,
