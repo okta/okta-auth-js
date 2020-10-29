@@ -58,7 +58,8 @@ import {
   CustomUrls,
   PKCEMeta,
   ParseFromUrlOptions,
-  Tokens
+  Tokens,
+  RefreshToken
 } from './types';
 
 const cookies = browserStorage.storage;
@@ -263,7 +264,6 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
     
     if (accessToken) {
       tokenDict.accessToken = {
-        value: accessToken,
         accessToken: accessToken,
         expiresAt: Number(expiresIn) + Math.floor(Date.now()/1000),
         tokenType: tokenType,
@@ -276,10 +276,9 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
     if (refreshToken) {
       tokenDict.refreshToken = {
         refreshToken: refreshToken,
-        value: refreshToken,
         expiresAt: Number(expiresIn) + Math.floor(Date.now()/1000),
         scopes: scopes,
-        authorizeUrl: urls.authorizeUrl,
+        tokenUrl: urls.tokenUrl,
       };
     }
 
@@ -287,7 +286,6 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
       var jwt = sdk.token.decode(idToken);
 
       var idTokenObj: IDToken = {
-        value: idToken,
         idToken: idToken,
         claims: jwt.payload,
         expiresAt: jwt.payload.exp,
@@ -715,6 +713,7 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
 
 function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
   // Note: This is not used when a refresh token is present
+  console.log('renewing', token);
   if (!isToken(token)) {
     return Promise.reject(new AuthSdkError('Renew must be passed a token with ' +
       'an array of scopes and an accessToken or idToken'));
@@ -744,7 +743,34 @@ function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
   });
 }
 
+// async function renewTokensWithRefresh(sdk: OktaAuth, refreshTokenObject: RefreshToken): Promise<Tokens> {
+async function renewTokensWithRefresh(sdk: OktaAuth, refreshTokenObject: RefreshToken): Promise<any> {
+    console.log('starting use of refresh token', refreshTokenObject.tokenUrl);
+    var url = refreshTokenObject.tokenUrl + "?" + 
+      Object.entries({
+        grant_type: 'refresh_token',
+        refresh_token: refreshTokenObject.refreshToken,
+        scope: refreshTokenObject.scopes.join(' '),
+      }).map( function(name, value) { 
+        return name + "=" + encodeURIComponent(value);
+      })
+      .join('&');
+    console.log({url});
+  // try {
+  //   const result = await http.httpRequest(sdk, {
+  //     url: refreshTokenObject.refreshUrl,
+  //     method: 'GET',
+  //     refreshToken: refreshTokenObject.refreshToken
+  //   });
+  //   console.log('result', result);
+  //   return result;
+  // } catch (err) {
+  //   console.log({ err });
+  // }
+}
+
 function renewTokens(sdk: OktaAuth, options: TokenParams): Promise<Tokens> {
+  console.log('renewing all tokens?');
   options = Object.assign({
     scopes: sdk.options.scopes,
     authorizeUrl: sdk.options.authorizeUrl,

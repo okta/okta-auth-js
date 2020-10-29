@@ -301,6 +301,7 @@ function createAuthClient() {
       redirectUri: config.redirectUri,
       scopes: config.scopes.split(/\s+/),
       tokenManager: {
+        expireEarlySeconds: 3600, // DEBUG
         storage: config.storage
       },
       transformAuthState

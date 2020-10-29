@@ -14,19 +14,19 @@ import { UserClaims } from './UserClaims';
 
 export interface AbstractToken {
   expiresAt: number;
-  value: string;
-  authorizeUrl: string;
   scopes: string[];
 }
 
 export interface AccessToken extends AbstractToken {
   accessToken: string;
   tokenType: string;
+  authorizeUrl: string;
   userinfoUrl: string;
 }
 
 export interface RefreshToken extends AbstractToken {
   refreshToken: string;
+  tokenUrl: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/interface-name-prefix
@@ -35,6 +35,7 @@ export interface IDToken extends AbstractToken {
   claims: UserClaims;
   issuer: string;
   clientId: string;
+  authorizeUrl: string;
 }
 
 export type Token = AccessToken | IDToken | RefreshToken;
