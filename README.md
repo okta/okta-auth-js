@@ -473,15 +473,16 @@ Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is c
 ```javascript
 const config = {
   // other config
- transformAuthState: async (oktaAuth, authState) => {
-   if (!authState.isAuthenticated) {
-     return authState;
+  transformAuthState: async (oktaAuth, authState) => {
+    if (!authState.isAuthenticated) {
+      return authState;
+    }
+    // extra requirement: user must have valid Okta SSO session
+    const user = await oktaAuth.token.getUserInfo();
+    authState.isAuthenticated = !!user; // convert to boolean
+    authState.users = user; // also store user object on authState
+    return authState;
   }
-  // extra requirement: user must have valid Okta SSO session
-  const user = await oktaAuth.token.getUserInfo();
-  authState.isAuthenticated = !!user; // convert to boolean
-  authState.users = user; // also store user object on authState
-  return authState;
 };
 
 const oktaAuth = new OktaAuth(config);
@@ -491,22 +492,24 @@ oktaAuth.authStateManager.subscribe(authState => {
 oktaAuth.authStateManager.updateAuthState();
 ```
 
-##### `onPostLoginRedirect`
+##### `restoreOriginalUri`
 
-Callback function. When [sdk.handlePostLoginRedirect](#handlepostloginredirecttokens) is called, by default it uses `window.location.replace` to redirect back to `fromUri`. This option overrides the default behavior.
+Callback function. When [sdk.handleLoginRedirect](#handleloginredirecttokens) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
 
 ```javascript
 const config = {
   // other config
-  onPostLoginRedirect: async (oktaAuth, fromUri) => {
-    // custom router
-    router.push({
-      path: toRelativeUrl(fromUri)
+  restoreOriginalUri: async (oktaAuth, originalUri) => {
+    // redirect with custom router
+    router.replace({
+      path: toRelativeUrl(originalUri, baseUrl)
     });
   }
 };
-if (oktaAuth.token.isLoginRedirect()) {
-  oktaAuth.handlePostLoginRedirect();
+
+const oktaAuth = new OktaAuth(config);
+if (oktaAuth.isLoginRedirect()) {
+  oktaAuth.handleLoginRedirect();
 }
 ```
 
@@ -610,10 +613,11 @@ var config = {
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
 * [storeTokensFromRedirect](#storetokensfromredirect)
-* [setFromUri](#setfromurifromuri)
-* [getFromUri](#getfromuri)
-* [removeFromUri](#removefromuri)
-* [handlePostLoginRedirect](#handlepostloginredirecttokens)
+* [setOriginalUri](#setoriginaluriuri)
+* [getOriginalUri](#getoriginaluri)
+* [removeOriginalUri](#removeoriginaluri)
+* [isLoginRedirect](#isloginredirect)
+* [handleLoginRedirect](#handleloginredirecttokens)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -694,12 +698,12 @@ authClient.signInWithCredentials({
 
 ### `signInWithRedirect(options)`
 
-Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a fromUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
-You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getFromUri](#getfromuri) to clear the intermediate state (the fromUri) after successful authentication.
+Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a originalUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
+You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getOriginalUri](#getoriginaluri) to clear the intermediate state (the originalUri) after successful authentication.
 
 ```javascript
-if (authClient.token.isLoginRedirect()) {
-  await authClient.handlePostLoginRedirect();
+if (authClient.isLoginRedirect()) {
+  await authClient.handleLoginRedirect();
 } else if (!await authClient.isAuthenticated()) {
   // Start the browser based oidc flow, then parse tokens from the redirect callback url
   authClient.signInWithRedirect();
@@ -941,21 +945,34 @@ Returns the access token string retrieved from [authState](#authstatemanager) if
 
 Parses tokens from the redirect url and stores them.
 
-### `setFromUri(fromUri?)`
+### `setOriginalUri(uri?)`
 
 Stores the current URL state before a redirect occurs. By default it stores `window.location.href`.
 
-### `getFromUri()`
+### `getOriginalUri()`
 
-Returns the stored URI string stored by [setFromUri](#setfromuriuri). By default it returns `window.location.origin`.
+Returns the stored URI string stored by [setOriginal](#setoriginaluriuri). By default it returns `window.location.origin`.
 
-### `removeFromUri()`
+### `removeOriginalUri()`
 
-Removes the stored URI string stored by [setFromUri](#setfromuriuri) from storage.
+Removes the stored URI string stored by [setOriginal](#setoriginaluriuri) from storage.
 
-### `handlePostLoginRedirect(tokens?)`
+#### `isLoginRedirect()`
 
-Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [fromUri](#setfromurifromuri). By default it calls `window.location.replace` for the redirection. The default behavior can be override by providing [options.onPostLoginRedirect](#additional-options)
+Check `window.location` to verify if the app is in OAuth callback state or not. This function is synchronous and returns `true` or `false`.
+
+```javascript
+if (authClient.isLoginRedirect()) {
+  // callback flow
+  await authClient.handleLoginRedirect();
+} else {
+  // normal app flow
+}
+```
+
+### `handleLoginRedirect(tokens?)`
+
+Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#additional-options).
 
 ### `tx.resume()`
 
@@ -2156,19 +2173,7 @@ authClient.token.verify(idTokenObject, validationOptions)
 
 #### `token.isLoginRedirect`
 
-Check `window.location` to verify if the app is in OAuth callback state or not. This function is synchronous and returns `true` or `false`.
-
-```javascript
-const shouldHandleCallback = authClient.token.isLoginRedirect();
-if (shouldHandleCallback) {
-  // callback flow
-  authClient.parseFromUrl().then(res => {
-    authClient.tokenManager.setTokens(res.tokens);
-  });
-} else {
-  // normal app flow
-}
-```
+> :warning: Deprecated, this method will be removed in next major release, use [sdk.isLoginRedirect](#isloginredirect) instead.
 
 ### `tokenManager`
 
@@ -2354,7 +2359,7 @@ The app needs call this method to call this method to initial the [authState](#a
 authClient.authStateManager.subscribe(authState => {
   // handle emitted latest authState
 });
-if (!authClient.token.isLoginRedirect()) {
+if (!authClient.isLoginRedirect()) {
   // Trigger an initial authState change event when the app startup
   authClient.authStateManager.updateAuthState();
 }

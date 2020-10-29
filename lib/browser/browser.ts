@@ -142,7 +142,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       cookies: getCookieSettings(this, args),
       scopes: args.scopes,
       transformAuthState: args.transformAuthState,
-      onPostLoginRedirect: args.onPostLoginRedirect
+      restoreOriginalUri: args.restoreOriginalUri
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
@@ -259,7 +259,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     });
   }
 
-  async signInWithRedirect({ fromUri, ...additionalParams }: SigninWithRedirectOptions = {}) {
+  async signInWithRedirect({ originalUri, ...additionalParams }: SigninWithRedirectOptions = {}) {
     if(this._pending.handleLogin) { 
       // Don't trigger second round
       return;
@@ -269,8 +269,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     const { scopes, responseType } = this.options;
     try {
       // Trigger default signIn redirect flow
-      if (fromUri) {
-        this.setFromUri(fromUri);
+      if (originalUri) {
+        this.setOriginalUri(originalUri);
       }
       const params = Object.assign({
         scopes: scopes || ['openid', 'email', 'profile'],
@@ -434,26 +434,30 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.tokenManager.setTokens(tokens);
   }
 
-  setFromUri(fromUri?: string): void {
-    // Use current location if fromUri was not passed
-    fromUri = fromUri || window.location.href;
-    // Store fromUri
+  setOriginalUri(originalUri?: string): void {
+    // Use current location if originalUri was not passed
+    originalUri = originalUri || window.location.href;
+    // Store originalUri
     const storage = browserStorage.getSessionStorage();
-    storage.setItem(REFERRER_PATH_STORAGE_KEY, fromUri);
+    storage.setItem(REFERRER_PATH_STORAGE_KEY, originalUri);
   }
 
-  getFromUri(): string {
+  getOriginalUri(): string {
     const storage = browserStorage.getSessionStorage();
-    const fromUri = storage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
-    return fromUri;
+    const originalUri = storage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
+    return originalUri;
   }
 
-  removeFromUri(): void {
+  removeOriginalUri(): void {
     const storage = browserStorage.getSessionStorage();
     storage.removeItem(REFERRER_PATH_STORAGE_KEY);
   }
 
-  async handlePostLoginRedirect(tokens?: Tokens): Promise<void> {
+  isLoginRedirect(): boolean {
+    return isLoginRedirect(this);
+  }
+
+  async handleLoginRedirect(tokens?: Tokens): Promise<void> {
     const handleRedirect = async ({ isPending }) => {
       if (isPending) {
         return;
@@ -462,16 +466,16 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       // Unsubscribe listener
       this.authStateManager.unsubscribe(handleRedirect);
 
-      // Get and clear fromUri from storage
-      const fromUri = this.getFromUri();
-      this.removeFromUri();
+      // Get and clear originalUri from storage
+      const originalUri = this.getOriginalUri();
+      this.removeOriginalUri();
 
-      // Redirect to fromUri
-      const { onPostLoginRedirect } = this.options;
-      if (onPostLoginRedirect) {
-        await onPostLoginRedirect(this, fromUri);
+      // Redirect to originalUri
+      const { restoreOriginalUri } = this.options;
+      if (restoreOriginalUri) {
+        await restoreOriginalUri(this, originalUri);
       } else {
-        window.location.replace(fromUri);
+        window.location.replace(originalUri);
       }
     };
 
@@ -481,7 +485,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     // Store tokens and update AuthState by the emitted events
     if (tokens) {
       this.tokenManager.setTokens(tokens);
-    } else if (this.token.isLoginRedirect()) {
+    } else if (this.isLoginRedirect()) {
       await this.storeTokensFromRedirect();
     } else {
       this.authStateManager.unsubscribe(handleRedirect);

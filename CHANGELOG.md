@@ -18,10 +18,11 @@
     - `sdk.getIdToken`
     - `sdk.getAccessToken`
     - `sdk.storeTokensFromRedirect`
-    - `sdk.setFromUri`
-    - `sdk.getFromUri`
-    - `sdk.removeFromUri`
-    - `sdk.handlePostLoginRedirect`
+    - `sdk.setOriginalUri`
+    - `sdk.getOriginalUri`
+    - `sdk.removeOriginalUri`
+    - `sdk.isLoginRedirect`
+    - `sdk.handleLoginRedirect`
   - Deprecates method in sdk browser scope:
     - `sdk.signIn`
   - Adds new methods in `sdk.tokenManager`:
@@ -29,7 +30,7 @@
     - `tokenManager.setTokens`
   - Accepts new [options](README.md#configuration-options)
     - `transformAuthState`
-    - `onPostLoginRedirect`
+    - `restoreOriginalUri`
     - `autoRemove`
     - `devMode`
 - [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.
