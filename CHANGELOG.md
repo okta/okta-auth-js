@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.0
+
+### Other
+
+- [#515](https://github.com/okta/okta-auth-js/pull/515) Removes `token.value` field
+
 ## 4.7.2
 
 ### Bug Fixes
