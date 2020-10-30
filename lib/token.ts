@@ -330,7 +330,7 @@ function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
     pkce: sdk.options.pkce,
     clientId: sdk.options.clientId,
     redirectUri: sdk.options.redirectUri || window.location.href,
-    responseType: ['token', 'id_token'],
+    responseType: sdk.options.responseType || ['token', 'id_token'],
     responseMode: sdk.options.responseMode,
     state: generateState(),
     nonce: generateNonce(),

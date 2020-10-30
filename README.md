@@ -403,9 +403,13 @@ Specify the url where the browser should be redirected after [signOut](#signout)
 
 Applicable only for SPA clients using [PKCE OAuth Flow](#pkce-oauth-20-flow). By default, the authorization code is requested and parsed from the search query. Setting this value to `fragment` will cause the URL hash fragment to be used instead. If your application uses or alters the search query portion of the `redirectUri`, you may want to set this option to "fragment". This option affects both [token.getWithRedirect](#tokengetwithredirectoptions) and [token.parseFromUrl](#tokenparsefromurloptions)
 
+##### `responseType`
+
+Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication when using the [Implicit OAuth Flow](#implicit-oauth-20-flow). The default value is `['token', 'id_token']` which will request both an access token and ID token. If `pkce` is `true`, both the access and ID token will be requested and this option will be ignored. For web/native applications using the `authorization_code` flow, this value should be set to `"code"` and `pkce` should be set to `false`.
+
 ##### `pkce`
 
-Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and `grant_type=authorization_code` on the token request. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions)
+Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and the token request will use `grant_type=authorization_code`. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions)
 
 ##### `authorizeUrl`
 
@@ -473,15 +477,16 @@ Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is c
 ```javascript
 const config = {
   // other config
- transformAuthState: async (oktaAuth, authState) => {
-   if (!authState.isAuthenticated) {
-     return authState;
+  transformAuthState: async (oktaAuth, authState) => {
+    if (!authState.isAuthenticated) {
+      return authState;
+    }
+    // extra requirement: user must have valid Okta SSO session
+    const user = await oktaAuth.token.getUserInfo();
+    authState.isAuthenticated = !!user; // convert to boolean
+    authState.users = user; // also store user object on authState
+    return authState;
   }
-  // extra requirement: user must have valid Okta SSO session
-  const user = await oktaAuth.token.getUserInfo();
-  authState.isAuthenticated = !!user; // convert to boolean
-  authState.users = user; // also store user object on authState
-  return authState;
 };
 
 const oktaAuth = new OktaAuth(config);
@@ -489,6 +494,27 @@ oktaAuth.authStateManager.subscribe(authState => {
   // handle latest authState
 });
 oktaAuth.authStateManager.updateAuthState();
+```
+
+##### `restoreOriginalUri`
+
+Callback function. When [sdk.handleLoginRedirect](#handleloginredirecttokens) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
+
+```javascript
+const config = {
+  // other config
+  restoreOriginalUri: async (oktaAuth, originalUri) => {
+    // redirect with custom router
+    router.replace({
+      path: toRelativeUrl(originalUri, baseUrl)
+    });
+  }
+};
+
+const oktaAuth = new OktaAuth(config);
+if (oktaAuth.isLoginRedirect()) {
+  oktaAuth.handleLoginRedirect();
+}
 ```
 
 ##### `devMode`
@@ -513,6 +539,25 @@ var config = {
   tokenManager: {
     storage: 'sessionStorage'
   }
+};
+
+var authClient = new OktaAuth(config);
+```
+
+#### Authorization Code flow for web and native client types
+
+Web and native clients can obtain tokens using the `authorization_code` flow which uses a client secret stored in a secure location. SPA applications should use the `PKCE` flow which does not use a client secret. To use the `authorization_code` flow, set `responseType` to `"code"` and `pkce` to `false`:
+
+```javascript
+var config = {
+  // Required config
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+  clientId: 'GHtf9iJdr60A9IYrR0jw',
+  redirectUri: 'https://acme.com/oauth2/callback/home',
+
+  // Use authorization_code flow
+  responseType: 'code',
+  pkce: false
 };
 
 var authClient = new OktaAuth(config);
@@ -586,13 +631,16 @@ var config = {
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [webfinger](#webfingeroptions)
 * [fingerprint](#fingerprintoptions)
+* [isAuthenticated](#isAuthenticated)
 * [getUser](#getuser)
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
 * [storeTokensFromRedirect](#storetokensfromredirect)
-* [setFromUri](#setfromurifromuri)
-* [getFromUri](#getfromuri)
-* [removeFromUri](#removefromuri)
+* [setOriginalUri](#setoriginaluriuri)
+* [getOriginalUri](#getoriginaluri)
+* [removeOriginalUri](#removeoriginaluri)
+* [isLoginRedirect](#isloginredirect)
+* [handleLoginRedirect](#handleloginredirecttokens)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -673,19 +721,13 @@ authClient.signInWithCredentials({
 
 ### `signInWithRedirect(options)`
 
-Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a fromUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
-You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getFromUri](#getfromuri) to clear the intermediate state (the fromUri) after successful authentication.
+Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a originalUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
+You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getOriginalUri](#getoriginaluri) to clear the intermediate state (the originalUri) after successful authentication.
 
 ```javascript
-if (authClient.token.isLoginRedirect()) {
-  // Call handleAuthentication to store tokens when redirect back from OKTA
-  authClient.storeTokensFromRedirect();
-  // Get and clear fromUri from storage
-  const fromUri = authClient.getFromUri();
-  authClient.removeFromUri();
-  // Redirect to fromUri
-  history.replaceState(null, '', fromUri);
-} else if (!authClient.authStateManager.getAuthState().isAuthenticated) {
+if (authClient.isLoginRedirect()) {
+  await authClient.handleLoginRedirect();
+} else if (!await authClient.isAuthenticated()) {
   // Start the browser based oidc flow, then parse tokens from the redirect callback url
   authClient.signInWithRedirect();
 } else {
@@ -900,6 +942,12 @@ authClient.fingerprint()
 })
 ```
 
+### `isAuthenticated(timeout?)`
+
+> :hourglass: async
+
+Resolves with `authState.isAuthenticated` from non-pending [authState](#authstatemanager).
+
 ### `getUser()`
 
 > :hourglass: async
@@ -908,15 +956,11 @@ Alias method of [token.getUserInfo](#tokengetuserinfoaccesstokenobject-idtokenob
 
 ### `getIdToken()`
 
-> :hourglass: async
-
-Resolves with the id token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
+Returns the id token string retrieved from [authState](#authstatemanager) if it exists.
 
 ### `getAccessToken()`
 
-> :hourglass: async
-
-Resolves with the access token string retrieved from storage if it exists. Devs should prefer to consult the synchronous results emitted from subscribing to the [authStateManager.subscribe](#authstatemanagersubscribehandler).
+Returns the access token string retrieved from [authState](#authstatemanager) if it exists.
 
 ### `storeTokensFromRedirect()`
 
@@ -924,17 +968,34 @@ Resolves with the access token string retrieved from storage if it exists. Devs 
 
 Parses tokens from the redirect url and stores them.
 
-### `setFromUri(fromUri?)`
+### `setOriginalUri(uri?)`
 
 Stores the current URL state before a redirect occurs. By default it stores `window.location.href`.
 
-### `getFromUri()`
+### `getOriginalUri()`
 
-Returns the stored URI string stored by [setFromUri](#setfromuriuri). By default it returns `window.location.origin`.
+Returns the stored URI string stored by [setOriginal](#setoriginaluriuri). By default it returns `window.location.origin`.
 
-### `removeFromUri()`
+### `removeOriginalUri()`
 
-Removes the stored URI string stored by [setFromUri](#setfromuriuri) from storage.
+Removes the stored URI string stored by [setOriginal](#setoriginaluriuri) from storage.
+
+#### `isLoginRedirect()`
+
+Check `window.location` to verify if the app is in OAuth callback state or not. This function is synchronous and returns `true` or `false`.
+
+```javascript
+if (authClient.isLoginRedirect()) {
+  // callback flow
+  await authClient.handleLoginRedirect();
+} else {
+  // normal app flow
+}
+```
+
+### `handleLoginRedirect(tokens?)`
+
+Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#additional-options).
 
 ### `tx.resume()`
 
@@ -1860,7 +1921,7 @@ authClient.session.refresh()
 
 #### Authorize options
 
-The following configuration options can **only** be included in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect`.
+The following configuration options can be included in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect`. If an option with the same name is accepted in the constructor, passing the option to one of these methods will override the previously set value.
 
 | Options | Description |
 | :-------: | ----------|
@@ -2077,7 +2138,7 @@ Retrieve the [details about a user](https://developer.okta.com/docs/api/resource
 * `accessTokenObject` - (optional) an access token returned by this library. **Note**: this is not the raw access token.
 * `idTokenObject` - (optional) an ID token returned by this library. **Note**: this is not the raw ID token.
 
-By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager. If either token has expired it will be renewed automatically by the TokenManager before the user info is requested. It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken". If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
+By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager. It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken". If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
 
 
 ```javascript
@@ -2135,19 +2196,7 @@ authClient.token.verify(idTokenObject, validationOptions)
 
 #### `token.isLoginRedirect`
 
-Check `window.location` to verify if the app is in OAuth callback state or not. This function is synchronous and returns `true` or `false`.
-
-```javascript
-const shouldHandleCallback = authClient.token.isLoginRedirect();
-if (shouldHandleCallback) {
-  // callback flow
-  authClient.parseFromUrl().then(res => {
-    authClient.tokenManager.setTokens(res.tokens);
-  });
-} else {
-  // normal app flow
-}
-```
+> :warning: Deprecated, this method will be removed in next major release, use [sdk.isLoginRedirect](#isloginredirect) instead.
 
 ### `tokenManager`
 
@@ -2333,7 +2382,7 @@ The app needs call this method to call this method to initial the [authState](#a
 authClient.authStateManager.subscribe(authState => {
   // handle emitted latest authState
 });
-if (!authClient.token.isLoginRedirect()) {
+if (!authClient.isLoginRedirect()) {
   // Trigger an initial authState change event when the app startup
   authClient.authStateManager.updateAuthState();
 }

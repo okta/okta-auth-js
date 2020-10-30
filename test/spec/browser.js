@@ -27,7 +27,8 @@ describe('Browser', function() {
     global.window.location = {
       protocol: 'https:',
       hostname: 'somesite.local',
-      href: 'https://somesite.local'
+      href: 'https://somesite.local',
+      replace: jest.fn()
     };
 
     issuer =  'http://my-okta-domain';
@@ -122,6 +123,23 @@ describe('Browser', function() {
         expect(auth.options.pkce).toBe(false);
       });
     });
+  
+    describe('getToken options', function() {
+      it('responseType is undefined by default', function() {
+        expect(auth.options.responseType).toBeUndefined();
+      });
+      it('can set responseType', function() {
+        auth = new OktaAuth({ issuer, responseType: 'code' });
+        expect(auth.options.responseType).toBe('code');
+      });
+      it('scopes is undefined by default', function() {
+        expect(auth.options.scopes).toBeUndefined();
+      });
+      it('can set scopes', function() {
+        auth = new OktaAuth({ issuer, scopes: ['fake', 'scope']});
+        expect(auth.options.scopes).toEqual(['fake', 'scope']);
+      });
+    });
   });
 
   describe('signInWithCredentials', () => {
@@ -182,13 +200,13 @@ describe('Browser', function() {
       }));
     });
 
-    it('should add fromUri to sessionStorage if provided in options', async () => {
-      const fromUri = 'notrandom';
-      await auth.signInWithRedirect({ fromUri });
-      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, fromUri);
+    it('should add originalUri to sessionStorage if provided in options', async () => {
+      const originalUri = 'notrandom';
+      await auth.signInWithRedirect({ originalUri });
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, originalUri);
     });
 
-    it('should not add fromUri to sessionStorage if no fromUri in options', async () => {
+    it('should not add originalUri to sessionStorage if no originalUri in options', async () => {
       await auth.signInWithRedirect();
       expect(setItemMock).not.toHaveBeenCalled();
     });
@@ -210,7 +228,7 @@ describe('Browser', function() {
 
     it('should passes "additionalParams" to token.getWithRedirect()', () => {
       const additionalParams = { foo: 'bar', baz: 'biz', scopes: ['fake'], responseType: ['fake'] };
-      const params = { fromUri: 'https://foo.random', ...additionalParams };
+      const params = { originalUri: 'https://foo.random', ...additionalParams };
       auth.signInWithRedirect(params);
       expect(auth.token.getWithRedirect).toHaveBeenCalledWith(additionalParams);
     });
@@ -547,54 +565,107 @@ describe('Browser', function() {
 
   });
 
+  describe('isAuthenticated', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should return from authState if not in isPending state', async () => {
+      let retVal;
+      // expect true
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        isAuthenticated: true,
+        isPending: false
+      });
+      retVal = await auth.isAuthenticated();
+      expect(retVal).toBe(true);
+      // expect false
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        isAuthenticated: false,
+        isPending: false
+      });
+      retVal = await auth.isAuthenticated();
+      expect(retVal).toBe(false);
+    });
+
+    it('should return based on next emitted non-pending authState', async () => {
+      let retVal;
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        isAuthenticated: false,
+        isPending: true
+      });
+      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
+        accessToken: 'fake access token',
+        idToken: 'fake id token'
+      });
+      retVal = await auth.isAuthenticated();
+      expect(retVal).toBe(true);
+      expect(auth.emitter.e.authStateChange).toBe(undefined);
+    });
+
+    it('should timeout and return false no non-pending state is emitted', async () => {
+      expect.assertions(2);
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        isAuthenticated: false,
+        isPending: true
+      });
+      auth.authStateManager.updateAuthState = jest.fn();
+      return new Promise(resolve => {
+        auth.isAuthenticated().then(isAuthenticated => {
+          expect(isAuthenticated).toBe(false);
+          expect(auth.emitter.e.authStateChange).toBe(undefined);
+          resolve();
+        });
+        jest.runAllTimers();
+      });
+    });
+  });
+
   describe('getUser', () => {
-    it('should be an alias method of token.getUserInfo', () => {
+    it('should call token.getUserInfo with tokens from authState', () => {
       auth.token = {
         getUserInfo: jest.fn().mockResolvedValue(undefined)
       };
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        idToken: tokens.standardIdTokenParsed,
+        accessToken: tokens.standardAccessTokenParsed
+      });
       auth.getUser();
-      expect(auth.token.getUserInfo).toHaveBeenCalled();
+      expect(auth.token.getUserInfo).toHaveBeenCalledWith(tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed);
     });
   });
 
   describe('getIdToken', () => {
-    it('retrieves token from token manager', async () => {
-      expect.assertions(1);
-      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
-        accessToken: tokens.standardAccessTokenParsed,
+    it('retrieves token from authStateManager', () => {
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
         idToken: tokens.standardIdTokenParsed
       });
-      const retVal = await auth.getIdToken();
+      const retVal = auth.getIdToken();
       expect(retVal).toBe(tokens.standardIdToken);
     });
 
-    it('catches exceptions', async () => {
-      auth.tokenManager.getTokens = jest.fn().mockImplementation(key => {
-        expect(key).toBe('idToken');
-        throw new Error('expected test error');
-      });
-      const retVal = await auth.getIdToken();
+    it('should return undefined if no idToken in authState', () => {
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({});
+      const retVal = auth.getIdToken();
       expect(retVal).toBe(undefined);
     });
   });
 
   describe('getAccessToken', () => {
-    it('retrieves token from token manager', async () => {
-      expect.assertions(1);
-      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
-        accessToken: tokens.standardAccessTokenParsed,
-        idToken: tokens.standardIdTokenParsed
+    it('retrieves token from authStateManager', () => {
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+        accessToken: tokens.standardAccessTokenParsed
       });
-      const retVal = await auth.getAccessToken();
+      const retVal = auth.getAccessToken();
       expect(retVal).toBe(tokens.standardAccessToken);
     });
 
-    it('catches exceptions', async () => {
-      auth.tokenManager.getTokens = jest.fn().mockImplementation(key => {
-        expect(key).toBe('accessToken');
-        throw new Error('expected test error');
-      });
-      const retVal = await auth.getAccessToken();
+    it('should return undefined if no accessToken in authState', async () => {
+      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({});
+      const retVal = auth.getAccessToken();
       expect(retVal).toBe(undefined);
     });
   });
@@ -621,7 +692,7 @@ describe('Browser', function() {
     });
   });
 
-  describe('setFromUri', () => {
+  describe('setOriginalUri', () => {
     let setItemMock;
     beforeEach(() => {
       setItemMock = jest.fn();
@@ -631,38 +702,38 @@ describe('Browser', function() {
     });
     it('should save the "referrerPath" in sessionStorage', () => {
       const uri = 'https://foo.random';
-      auth.setFromUri(uri);
+      auth.setOriginalUri(uri);
       expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, uri);
     });
     it('should save the window.location.href by default', () => {
-      auth.setFromUri();
+      auth.setOriginalUri();
       expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, window.location.href);
     });
   });
 
-  describe('getFromUri', () => {
+  describe('getOriginalUri', () => {
     let removeItemMock;
     let getItemMock;
     beforeEach(() => {
       removeItemMock = jest.fn();
-      getItemMock = jest.fn().mockReturnValue('fakeFromUri');
+      getItemMock = jest.fn().mockReturnValue('fakeOriginalUri');
       storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
         getItem: getItemMock,
         removeItem: removeItemMock
       }));
     });
     it('should get and cleare referrer from storage', () => {
-      const res = auth.getFromUri();
-      expect(res).toBe('fakeFromUri');
+      const res = auth.getOriginalUri();
+      expect(res).toBe('fakeOriginalUri');
     });
     it('returns window.location.origin if nothing was set', () => {
       getItemMock = jest.fn().mockReturnValue(null);
-      const res = auth.getFromUri();
+      const res = auth.getOriginalUri();
       expect(res).toBe(window.location.origin);
     });
   });
 
-  describe('removeFromUri', () => {
+  describe('removeOriginalUri', () => {
     let removeItemMock;
     beforeEach(() => {
       removeItemMock = jest.fn();
@@ -671,8 +742,141 @@ describe('Browser', function() {
       }));
     });
     it('should cleare referrer from localStorage', () => {
-      auth.removeFromUri();
+      auth.removeOriginalUri();
       expect(removeItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY);
+    });
+  });
+
+  describe('handleLoginRedirect', () => {
+    beforeEach(() => {
+      jest.spyOn(auth.authStateManager, 'unsubscribe');
+      jest.spyOn(auth, 'getOriginalUri').mockReturnValue('/fakeuri');
+      jest.spyOn(auth, 'removeOriginalUri');
+    });
+
+    it('should redirect to originalUri when tokens are provided', async () => {
+      await auth.handleLoginRedirect({
+        accessToken: tokens.standardAccessTokenParsed,
+        idToken: tokens.standardIdTokenParsed
+      });
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).toHaveBeenCalled();
+          expect(auth.removeOriginalUri).toHaveBeenCalled();
+          expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
+          resolve();    
+        }, 100);
+      });
+    });
+
+    it('should get tokens from the callback url when under login redirect flow', async () => {
+      auth.token.parseFromUrl = jest.fn().mockResolvedValue({
+        tokens: {
+          accessToken: tokens.standardAccessTokenParsed,
+          idToken: tokens.standardIdTokenParsed
+        }
+      });
+      auth.isLoginRedirect = jest.fn().mockReturnValue(true);
+      await auth.handleLoginRedirect();
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).toHaveBeenCalled();
+          expect(auth.removeOriginalUri).toHaveBeenCalled();
+          expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
+          resolve();    
+        }, 100);
+      });
+    });
+
+    it('should use options.restoreOriginalUri if provided', async () => {
+      auth.options.restoreOriginalUri = jest.fn();
+      auth.token.parseFromUrl = jest.fn().mockResolvedValue({
+        tokens: {
+          accessToken: tokens.standardAccessTokenParsed,
+          idToken: tokens.standardIdTokenParsed
+        }
+      });
+      auth.isLoginRedirect = jest.fn().mockReturnValue(true);
+      await auth.handleLoginRedirect();
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).toHaveBeenCalled();
+          expect(auth.removeOriginalUri).toHaveBeenCalled();
+          expect(auth.options.restoreOriginalUri).toHaveBeenCalledWith(auth, '/fakeuri');
+          expect(window.location.replace).not.toHaveBeenCalled();
+          resolve();    
+        }, 100);
+      });
+    });
+
+    it('should unsubscribe authState listener if neither tokens are provided, nor under login redirect flow', async () => {
+      auth.isLoginRedirect = jest.fn().mockReturnValue(false);
+      await auth.handleLoginRedirect();
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).not.toHaveBeenCalled();
+          expect(auth.removeOriginalUri).not.toHaveBeenCalled();
+          expect(window.location.replace).not.toHaveBeenCalled();
+          resolve();    
+        }, 100);
+      });
+    });
+  });
+
+  describe('isPKCE', () => {
+    it('is true by default', () => {
+      auth = new OktaAuth({ issuer });
+      expect(auth.isPKCE()).toBe(true);
+    });
+    it('is false if pkce option is false', () => {
+      auth = new OktaAuth({ issuer, pkce: false });
+      expect(auth.isPKCE()).toBe(false);
+    });
+  });
+
+  describe('hasResponseType', () => {
+    it('returns true if responseType is a string', () => {
+      auth = new OktaAuth({ issuer, responseType: 'fake' });
+      expect(auth.hasResponseType('fake')).toBe(true);
+    });
+    it('returns true if responseType is an array', () => {
+      auth = new OktaAuth({ issuer, responseType: ['fake', 'alsofake'] });
+      expect(auth.hasResponseType('fake')).toBe(true);
+    });
+    it('returns false if responseType does not match string', () => {
+      auth = new OktaAuth({ issuer, responseType: 'abc' });
+      expect(auth.hasResponseType('fake')).toBe(false);
+    });
+    it('returns false if responseType does not match entry in array', () => {
+      auth = new OktaAuth({ issuer, responseType: ['abc', 'def'] });
+      expect(auth.hasResponseType('fake')).toBe(false);
+    });
+  });
+
+  describe('isAuthorizationCodeFlow', () => {
+    it('is false by default', () => {
+      auth = new OktaAuth({ issuer });
+      expect(auth.isAuthorizationCodeFlow()).toBe(false);
+    });
+    it('will be true if is "code"', () => {
+      auth = new OktaAuth({ issuer, responseType: 'code' });
+      expect(auth.isAuthorizationCodeFlow()).toBe(true);
+    });
+    it('will be true if responseType is ["code"]', () => {
+      auth = new OktaAuth({ issuer, pkce: false, responseType: ['code'] });
+      expect(auth.isAuthorizationCodeFlow()).toBe(true);
+    });
+    it('will be true if responseType is [..., "code"]', () => {
+      auth = new OktaAuth({ issuer, pkce: false, responseType: ['abc', 'code'] });
+      expect(auth.isAuthorizationCodeFlow()).toBe(true);
     });
   });
 });
