@@ -346,11 +346,11 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
 function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
   const { pkce, clientId, redirectUri, responseType, responseMode, scopes, ignoreSignature } = sdk.options;
   return {
-    pkce,
-    clientId,
-    redirectUri: redirectUri || window.location.href,
-    responseType: responseType || ['token', 'id_token'],
-    responseMode,
+    pkce: sdk.options.pkce,
+    clientId: sdk.options.clientId,
+    redirectUri: sdk.options.redirectUri || window.location.href,
+    responseType: sdk.options.responseType || ['token', 'id_token'],
+    responseMode: sdk.options.responseMode,
     state: generateState(),
     nonce: generateNonce(),
     scopes: scopes || ['openid', 'email'],
