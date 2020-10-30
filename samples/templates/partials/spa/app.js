@@ -307,7 +307,6 @@ function createAuthClient() {
       redirectUri: config.redirectUri,
       scopes: config.scopes.split(/\s+/),
       tokenManager: {
-        expireEarlySeconds: 3600, // DEBUG
         storage: config.storage
       },
       transformAuthState
@@ -414,7 +413,7 @@ function loadConfig() {
     '&clientId=' + encodeURIComponent(clientId) +
     '&storage=' + encodeURIComponent(storage) + 
     '&requireUserSession=' + encodeURIComponent(requireUserSession) + 
-    '&flow=' + encodeURIComponent(flow),
+    '&flow=' + encodeURIComponent(flow) +
     '&scopes=' + encodeURIComponent(scopes);
   
   // Add all app options to the state, to preserve config across redirects

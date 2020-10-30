@@ -10,6 +10,7 @@ export const DEFAULT_AUTH_STATE = {
   isAuthenticated: false,
   idToken: null,
   accessToken: null,
+  refreshToken: null,
 };
 const DEFAULT_PENDING = {
   updateAuthStatePromise: null,
