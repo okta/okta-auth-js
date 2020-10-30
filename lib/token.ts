@@ -68,6 +68,7 @@ const cookies = browserStorage.storage;
 function revokeToken(sdk: OktaAuth, token: AccessToken): Promise<any> {
   return Promise.resolve()
     .then(function () {
+      //if (!token || (!token.accessToken && !token.refreshToken)) {
       if (!token || !token.accessToken) {
         throw new AuthSdkError('A valid access token object is required');
       }
@@ -744,7 +745,7 @@ function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
     });
 }
 
-async function renewTokensWithRefresh(sdk: OktaAuth, options: TokenParams, refreshTokenObject: RefreshToken): Promise<any> {
+async function renewTokensWithRefresh(sdk: OktaAuth, options: TokenParams, refreshTokenObject: RefreshToken): Promise<Tokens> {
   var clientId = sdk.options.clientId;
   if (!clientId) {
     throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to revoke a token');
@@ -752,7 +753,8 @@ async function renewTokensWithRefresh(sdk: OktaAuth, options: TokenParams, refre
 
   var urls = { 
     issuer: refreshTokenObject.issuer,
-    authorizeUrl: refreshTokenObject.authorizeUrl, 
+    authorizeUrl: refreshTokenObject.authorizeUrl,
+    tokenUrl: refreshTokenObject.tokenUrl, 
   };
 
   try {
@@ -772,7 +774,7 @@ async function renewTokensWithRefresh(sdk: OktaAuth, options: TokenParams, refre
         return name + "=" + encodeURIComponent(value);
       }).join('&'),
     });
-    return handleOAuthResponse(sdk, options, response, urls);
+    return handleOAuthResponse(sdk, options, response, urls).then(res => res.tokens);
   } catch (err) {
     console.log({ err });
   }
