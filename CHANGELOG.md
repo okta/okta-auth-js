@@ -36,6 +36,7 @@
 - [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.
 - [#503](https://github.com/okta/okta-auth-js/pull/503) Supports relative uri for [options.redirectUri](README.md#additional-options)
 - [#478](https://github.com/okta/okta-auth-js/pull/478) Adds cross tabs communication to sync `AuthState`.
+- [#525](https://github.com/okta/okta-auth-js/pull/525) Adds new methods `hasResponseType`, `isPKCE`, `isAuthorizationCodeFlow`. The option `responseType` is now accepted in the constructor.
 
 ### Bug Fixes
 

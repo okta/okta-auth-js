@@ -138,6 +138,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin),
       postLogoutRedirectUri: args.postLogoutRedirectUri,
       responseMode: args.responseMode,
+      responseType: args.responseType,
       transformErrorXHR: args.transformErrorXHR,
       cookies: getCookieSettings(this, args),
       scopes: args.scopes,
@@ -490,6 +491,24 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     } else {
       this.authStateManager.unsubscribe(handleRedirect);
     }
+  }
+
+  isPKCE(): boolean {
+    return !!this.options.pkce;
+  }
+
+  hasResponseType(responseType: string): boolean {
+    let hasResponseType = false;
+    if (Array.isArray(this.options.responseType) && this.options.responseType.length) {
+      hasResponseType = this.options.responseType.indexOf(responseType) >= 0;
+    } else {
+      hasResponseType = this.options.responseType === responseType;
+    }
+    return hasResponseType;
+  }
+
+  isAuthorizationCodeFlow(): boolean {
+    return this.hasResponseType('code');
   }
 }
 

@@ -123,6 +123,23 @@ describe('Browser', function() {
         expect(auth.options.pkce).toBe(false);
       });
     });
+  
+    describe('getToken options', function() {
+      it('responseType is undefined by default', function() {
+        expect(auth.options.responseType).toBeUndefined();
+      });
+      it('can set responseType', function() {
+        auth = new OktaAuth({ issuer, responseType: 'code' });
+        expect(auth.options.responseType).toBe('code');
+      });
+      it('scopes is undefined by default', function() {
+        expect(auth.options.scopes).toBeUndefined();
+      });
+      it('can set scopes', function() {
+        auth = new OktaAuth({ issuer, scopes: ['fake', 'scope']});
+        expect(auth.options.scopes).toEqual(['fake', 'scope']);
+      });
+    });
   });
 
   describe('signInWithCredentials', () => {
@@ -811,6 +828,55 @@ describe('Browser', function() {
           resolve();    
         }, 100);
       });
+    });
+  });
+
+  describe('isPKCE', () => {
+    it('is true by default', () => {
+      auth = new OktaAuth({ issuer });
+      expect(auth.isPKCE()).toBe(true);
+    });
+    it('is false if pkce option is false', () => {
+      auth = new OktaAuth({ issuer, pkce: false });
+      expect(auth.isPKCE()).toBe(false);
+    });
+  });
+
+  describe('hasResponseType', () => {
+    it('returns true if responseType is a string', () => {
+      auth = new OktaAuth({ issuer, responseType: 'fake' });
+      expect(auth.hasResponseType('fake')).toBe(true);
+    });
+    it('returns true if responseType is an array', () => {
+      auth = new OktaAuth({ issuer, responseType: ['fake', 'alsofake'] });
+      expect(auth.hasResponseType('fake')).toBe(true);
+    });
+    it('returns false if responseType does not match string', () => {
+      auth = new OktaAuth({ issuer, responseType: 'abc' });
+      expect(auth.hasResponseType('fake')).toBe(false);
+    });
+    it('returns false if responseType does not match entry in array', () => {
+      auth = new OktaAuth({ issuer, responseType: ['abc', 'def'] });
+      expect(auth.hasResponseType('fake')).toBe(false);
+    });
+  });
+
+  describe('isAuthorizationCodeFlow', () => {
+    it('is false by default', () => {
+      auth = new OktaAuth({ issuer });
+      expect(auth.isAuthorizationCodeFlow()).toBe(false);
+    });
+    it('will be true if is "code"', () => {
+      auth = new OktaAuth({ issuer, responseType: 'code' });
+      expect(auth.isAuthorizationCodeFlow()).toBe(true);
+    });
+    it('will be true if responseType is ["code"]', () => {
+      auth = new OktaAuth({ issuer, pkce: false, responseType: ['code'] });
+      expect(auth.isAuthorizationCodeFlow()).toBe(true);
+    });
+    it('will be true if responseType is [..., "code"]', () => {
+      auth = new OktaAuth({ issuer, pkce: false, responseType: ['abc', 'code'] });
+      expect(auth.isAuthorizationCodeFlow()).toBe(true);
     });
   });
 });
