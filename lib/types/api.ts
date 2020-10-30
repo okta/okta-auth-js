@@ -174,7 +174,7 @@ export interface SignInWithCredentialsOptions {
 }
 
 export interface SigninWithRedirectOptions extends TokenParams {
-  fromUri?: string;
+  originalUri?: string;
 }
 
 export interface SigninAPI {
