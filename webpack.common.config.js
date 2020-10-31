@@ -11,18 +11,20 @@ var babelOptions = {
   sourceType: 'unambiguous'
 };
 
+var babelExclude = /node_modules\/(?!p-cancelable)/;
+
 module.exports = {
   module: {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/,
+        exclude: babelExclude,
         loader: 'babel-loader',
         options: babelOptions
       },
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
+        exclude: babelExclude,
         use: [
           {
             loader: 'babel-loader',
