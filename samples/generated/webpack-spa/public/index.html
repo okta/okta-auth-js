@@ -22,9 +22,7 @@
     <!-- the href will be changed to config.appUri -->
     <a id="home-link" href="/">Return Home</a>&nbsp;|&nbsp;
     <!-- if the URL does not contain valid params a form will be shown -->
-    <a id="options-link" href="/">Change options</a>&nbsp;|&nbsp;
-    <!-- tests for a valid Okta SSO session -->
-    <a id="get-user-info" href="/" onclick="_getUserInfo(event)">Get user info</a>
+    <a id="options-link" href="/">Change options</a>
     <div id="error" style="color: red; padding-top: 20px"></div>
     <hr/>
     <!-- config is loaded from URL query parameters. This form sets params in the URL using the GET method-->
@@ -78,7 +76,9 @@
     <div id="auth" style="display: none">
       <b>Welcome back</b><hr/>
       <a id="logout-redirect" href=#" onclick="_logout(event)">Logout</a>&nbsp;|&nbsp;
-      <a id="renew-token" href="#" onclick="_renewToken(event)">Renew Access Token</a>
+      <a id="renew-token" href="#" onclick="_renewToken(event)">Renew Access Token</a>&nbsp;|&nbsp;
+      <!-- tests for a valid Okta SSO session -->
+      <a id="get-user-info" href="/" onclick="_getUserInfo(event)">Get user info</a>
       <hr/>
       <b>User Info</b><div id="userInfo"></div><hr/>
       <b>Access Token</b><div id="accessToken"></div><hr/>
@@ -87,6 +87,10 @@
     <b>Config</b><pre><code id="config"></code></pre>
     <hr/>
     <b>Auth state</b><pre><code id="authState"></code></pre>
+    <!-- loading -->
+    <div id="loading" style="display: none">
+      Loading...
+    </div>
 
     <!-- main app webpack bundle -->
     <script src="/app-bundle.js" type="text/javascript"></script>

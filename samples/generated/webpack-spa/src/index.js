@@ -12,7 +12,9 @@ var config = {
   requireUserSession: true,
   flow: 'redirect'
 };
+
 var authClient;
+var userInfo;
 
 // bind methods called from HTML
 function bindClick(method, args) {
@@ -28,7 +30,11 @@ window._getUserInfo = bindClick(getUserInfo);
 window._renewToken = bindClick(renewToken);
 window._submitSigninForm = bindClick(submitSigninForm);
 
-function formatJSON(obj) {
+function stringify(obj) {
+  // Convert false/undefined/null into "null"
+  if (!obj) {
+    return 'null';
+  }
   return JSON.stringify(obj, null, 2);
 }
 
@@ -52,118 +58,108 @@ function main() {
 
   createAuthClient();
 
+  // Subscribe to authState change event. Logic based on authState is done here.
+  authClient.authStateManager.subscribe(function(authState) {
+    if (!authState.isAuthenticated) {
+      // If not authenticated, reset values related to user session
+      userInfo = null;
+    }
+
+    // If there is an active session, we can get tokens via a redirect
+    // This allows in-memory token storage without prompting for credentials on each page load
+    if (shouldRedirectToGetTokens(authState)) {
+      return redirectToGetTokens();
+    }
+
+    // Render app based on the new authState
+    renderApp();
+  });
+
   // During the OIDC auth flow, the app will receive a code passed to the `redirectUri`
   // This event occurs *in the middle* of an authorization flow
   // The callback handler logic should happen *before and instead of* any other auth logic
   // In most apps this callback will be handled by a special route
   // For SPA apps like this, with no routing or hash-based routing, the callback is handled in the main function
+  // Once the callback is handled, the app can startup normally
   if (authClient.token.isLoginRedirect()) {
-    return handleLoginRedirect();
-  }
-
+    return handleLoginRedirect().then(function() {
+      startApp();
+    });
+  } 
+  
   // Normal app startup
-  renderApp();
+  startApp();
+}
+
+function startApp() {
+  // Calculate initial auth state and fire change event for listeners
+  authClient.authStateManager.updateAuthState();
 }
 
 function renderApp() {
-  return getAuthState().then(function(authState) {
-    document.getElementById('authState').innerText = formatJSON(authState);
-    if (authState.isAuthenticated) {
-      // User is authenticated. Update UI
-      document.getElementById('accessToken').innerText = formatJSON(authState.tokens.accessToken);
-      document.getElementById('userInfo').innerText = formatJSON(authState.userInfo);
-      document.getElementById('auth').style.display = 'block';
-      return;
-    }
+  const authState = authClient.authStateManager.getAuthState();
+  document.getElementById('authState').innerText = stringify(authState);
 
-    // The user is not authenticated, the app will begin an auth flow.
+  // If auth state is "pending", render in the loading state
+  if (authState.isPending) {
+    return renderLoading();
+  }
 
-    // Special handling for memory-based token storage.
-    // There will be a redirect on each page load to acquire fresh tokens.
-    if (!authState.hasTokens && (config.storage === 'memory' || config.getTokens)) {
+  // Not loading
+  document.getElementById('loading').style.display = 'none';
 
-      // Callback from Okta triggered by `redirectToGetTokens`
-      // If the callback has errored, it means there is no Okta session and we should begin a new auth flow
-      if (config.error === 'login_required') {
-        return beginAuthFlow();
-      }
+  if (authState.isAuthenticated) {
+    return renderAuthenticated(authState);
+  }
 
-      // Call Okta to get tokens. Okta will redirect back to this app
-      // The callback is handled by `handleLoginRedirect` which will call `renderApp` again
-      return redirectToGetTokens();
-    }
-
-    // Unauthenticated state
-    return beginAuthFlow();
-  });
+  // Default: Unauthenticated state
+  return renderUnauthenticated();
 }
 
-// Async function, gathers all information into a unique object for synchronous use. May become out-of-date.
-function getAuthState() {
-  var authState = {
-    isAuthenticated: false,
-    hasTokens: false,
-    userInfo: null,
-    tokens: null
-  };
-  return getTokens().then(function(tokens) {
-    authState.tokens = tokens;
-    authState.hasTokens = !!(tokens.idToken && tokens.accessToken);
+function renderLoading() {
+  document.getElementById('loading').style.display = 'block';
+}
 
-     if (config.requireUserSession) {
-       // checking `hasTokens` before calling getUserInfo API avoids unnecessary calls
-       if (authState.hasTokens) {
-        return getUserInfo().then(function(userInfo) {
-          authState.userInfo = userInfo;
-        });
-       }
-    }
-  }).then(function() {
-    authState.isAuthenticated = config.requireUserSession ? !!authState.userInfo : authState.hasTokens;
-    return authState;
-  });
+function renderAuthenticated(authState) {
+  document.getElementById('auth').style.display = 'block';
+  document.getElementById('accessToken').innerText = stringify(authState.accessToken);
+  document.getElementById('userInfo').innerText = stringify(userInfo || authState.userInfo);
+}
+
+function renderUnauthenticated() {
+  // The user is not authenticated, the app will begin an auth flow.
+  document.getElementById('auth').style.display = 'none';
+
+  // Unauthenticated state, begin an auth flow
+  return beginAuthFlow();
 }
 
 function handleLoginRedirect() {
   // The URL contains a code, `parseFromUrl` will exchange the code for tokens
-  authClient.token.parseFromUrl().then(function (res) {
+  return authClient.token.parseFromUrl().then(function (res) {
     endAuthFlow(res); // save tokens
   }).catch(function(error) {
     showError(error);
   });
 }
 
-function getTokens() {
-  return Promise.all([
-    authClient.tokenManager.get('idToken'),
-    authClient.tokenManager.get('accessToken')
-  ])
-  .then(function (values) {
-    const tokens = {};
-    tokens.idToken = values[0];
-    tokens.accessToken = values[1];
-    return tokens;
-  });
-}
-
+// called when the "get user info" link is clicked
 function getUserInfo() {
   return authClient.token.getUserInfo()
-    .then(function(userInfo) {
-      document.getElementById('userInfo').innerText = formatJSON(userInfo);
-      return userInfo;
+    .then(function(value) {
+      userInfo = value;
+      renderApp();
     })
     .catch(function (error) {
       // This is expected when Okta SSO does not exist
       showError(error);
-      return false;
     });
 }
 
+// called when the "renew token" link is clicked
 function renewToken() {
+  // when the token is written to storage, the authState will change and we will re-render.
   return authClient.tokenManager.renew('accessToken')
-    .then(function(accessToken) {
-      document.getElementById('accessToken').innerText = formatJSON(accessToken);
-    })
     .catch(function(error) {
       showError(error);
     });
@@ -188,11 +184,8 @@ function endAuthFlow(res) {
   // Replace state with the canonical app uri so the page can be reloaded cleanly.
   history.replaceState(null, '', config.appUri);
 
-  // Store tokens
+  // Store tokens. This will update the auth state and we will re-render
   authClient.tokenManager.setTokens(res.tokens);
-
-  // Normal app startup
-  renderApp();
 }
 
 function showRedirectButton() {
@@ -254,6 +247,28 @@ function submitSigninForm() {
   });
 }
 
+function shouldRedirectToGetTokens(authState) {
+  if (authState.isAuthenticated || authState.isPending) {
+    return false;
+  }
+
+  // Special handling for memory-based token storage.
+  // There will be a redirect on each page load to acquire fresh tokens.
+  if (config.storage === 'memory' || config.getTokens) {
+
+    // Callback from Okta triggered by `redirectToGetTokens`
+    // If the callback has errored, it means there is no Okta session and we should begin a new auth flow
+    // This condition breaks a potential infinite rediret loop
+    if (config.error === 'login_required') {
+      return false;
+    }
+
+    // Call Okta to get tokens. Okta will redirect back to this app
+    // The callback is handled by `handleLoginRedirect` which will call `renderApp` again
+    return true;
+  }
+}
+
 function redirectToGetTokens(additionalParams) {
   // If an Okta SSO exists, the redirect will return a code which can be exchanged for tokens
   // If a session does not exist, it will return with "error=login_required"
@@ -264,6 +279,7 @@ function redirectToGetTokens(additionalParams) {
 }
 
 function redirectToLogin(additionalParams) {
+  // Redirect to Okta and show the signin widget if there is no active session
   authClient.token.getWithRedirect(Object.assign({
     state: JSON.stringify(config.state)
   }, additionalParams));
@@ -271,6 +287,7 @@ function redirectToLogin(additionalParams) {
 
 function logout(e) {
   e.preventDefault();
+  userInfo = null;
   authClient.signOut();
 }
 
@@ -283,11 +300,34 @@ function createAuthClient() {
       redirectUri: config.redirectUri,
       tokenManager: {
         storage: config.storage
-      }
+      },
+      transformAuthState
     });
   } catch (error) {
     return showError(error);
   }
+}
+
+// Modifies the "authState" object before it is emitted. This is a chance to add custom logic and extra properties.
+function transformAuthState(_authClient, authState) {
+  var promise = Promise.resolve(authState);
+
+  if (authState.accessToken && authState.idToken) {
+    authState.hasTokens = true;
+  }
+
+  // With this option we require the user to have not only valid tokens, but a valid Okta SSO session as well
+  if (config.requireUserSession && authState.hasTokens) {
+    promise = promise.then(function() {
+      return userInfo || authClient.token.getUserInfo();
+    }).then(function(value) {
+      userInfo = value;
+      authState.isAuthenticated = authState.isAuthenticated && !!userInfo;
+      return authState;
+    });
+  }
+
+  return promise;
 }
 
 function showForm() {
@@ -333,11 +373,11 @@ function loadConfig() {
   var issuer;
   var clientId;
   var appUri;
-  var state;
   var storage;
   var flow;
   var requireUserSession;
 
+  var state;
   if (stateParam) {
     // Read from state
     state = JSON.parse(stateParam);
@@ -384,5 +424,14 @@ function loadConfig() {
   });
 
   Object.assign(config, newConfig);
-  document.getElementById('config').innerText = formatJSON(config);
+
+  // Render the config to HTML
+  var logConfig = {};
+  var skipKeys = ['state', 'appUri', 'error', 'showForm', 'getTokens']; // internal config
+  Object.keys(config).forEach(function(key) {
+    if (skipKeys.indexOf(key) < 0) {
+      logConfig[key] = config[key];
+    }
+  });
+  document.getElementById('config').innerText = stringify(logConfig);
 }
