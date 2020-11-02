@@ -142,6 +142,7 @@ function handleLoginRedirect() {
   });
 }
 
+// called when the "get user info" link is clicked
 function getUserInfo() {
   return authClient.token.getUserInfo()
     .then(function(value) {
