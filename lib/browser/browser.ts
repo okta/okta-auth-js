@@ -360,9 +360,9 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.tokenManager.clear();
 
     if (revokeTokens && refreshToken) {
-      await this.revokeAccessToken(accessToken);
+      await this.revokeRefreshToken(refreshToken);
     }
-    
+
     if (revokeTokens && accessToken) {
       await this.revokeAccessToken(accessToken);
     }

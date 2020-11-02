@@ -344,6 +344,7 @@ describe('Browser', function() {
         auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
+        spyOn(auth, 'revokeRefreshToken').and.returnValue(Promise.resolve());
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
       }
 
@@ -353,11 +354,27 @@ describe('Browser', function() {
         initSpies();
       });
 
-      it('Default options: will revokeAccessToken and use window.location.origin for postLogoutRedirectUri', function() {
+      it('Default options when no refreshToken: will revokeAccessToken and use window.location.origin for postLogoutRedirectUri', function() {
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(3);
+            expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.closeSession).not.toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+          });
+      });
+
+      it('Default options when refreshToken present: will revokeRefreshToken and use window.location.origin for postLogoutRedirectUri', function() {
+        const refreshToken = { refreshToken: 'fake'};
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken, refreshToken });
+
+        return auth.signOut()
+          .then(function() {
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(3);
+            expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
+            expect(auth.revokeRefreshToken).toHaveBeenCalledWith(refreshToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
@@ -381,7 +398,7 @@ describe('Browser', function() {
         var customToken = { idToken: 'fake-custom' };
         return auth.signOut({ idToken: customToken })
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${customToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -389,7 +406,7 @@ describe('Browser', function() {
       it('if idToken=false will skip token manager read and call closeSession', function() {
         return auth.signOut({ idToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
           });
@@ -399,7 +416,7 @@ describe('Browser', function() {
         global.window.location.href = origin;
         return auth.signOut({ idToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.reload).toHaveBeenCalled();
           });
@@ -439,11 +456,12 @@ describe('Browser', function() {
           });
       });
 
-      it('Can pass a "revokeAccessToken=false" to skip accessToken logic', function() {
-        return auth.signOut({ revokeAccessToken: false })
+      it('Can pass a "revokeTokens=false" to skip revoke logic', function() {
+        return auth.signOut({ revokeTokens: false })
           .then(function() {
             expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
+            expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -451,7 +469,7 @@ describe('Browser', function() {
       it('Can pass a "accessToken=false" to skip accessToken logic', function() {
         return auth.signOut({ accessToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -472,7 +490,7 @@ describe('Browser', function() {
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(3);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -485,7 +503,7 @@ describe('Browser', function() {
         global.window.location.href = origin;
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(3);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
