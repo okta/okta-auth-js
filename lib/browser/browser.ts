@@ -312,7 +312,21 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     return this.token.revoke(accessToken);
   }
 
-  // Revokes accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
+  // Revokes the refresh token for the application session
+  async revokeRefreshToken(refreshToken?: RefreshToken) {
+    if (!refreshToken) {
+      refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
+      const refreshTokenKey = this.tokenManager._getStorageKeyByType('refreshToken');
+      this.tokenManager.remove(refreshTokenKey);
+    }
+    // Refresh token may have been removed. In this case, we will silently succeed.
+    if (!refreshToken) {
+      return Promise.resolve();
+    }
+    return this.token.revoke(refreshToken);
+  }
+
+  // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
   async signOut(options?) {
     options = Object.assign({}, options);
   
@@ -324,7 +338,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       || defaultUri;
   
     var accessToken = options.accessToken;
-    var revokeAccessToken = options.revokeAccessToken !== false;
+    var refreshToken = options.refreshToken;
+    var revokeTokens = options.revokeTokens !== false;
     var idToken = options.idToken;
   
     var logoutUrl = getOAuthUrls(this).logoutUrl;
@@ -333,17 +348,25 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
     }
   
-    if (revokeAccessToken && typeof accessToken === 'undefined') {
+    if (revokeTokens && typeof refreshToken === 'undefined') {
+      refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
+    }
+
+    if (revokeTokens && typeof accessToken === 'undefined') {
       accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
     }
   
     // Clear all local tokens
     this.tokenManager.clear();
-  // TODO: handle refresh token
-    if (revokeAccessToken && accessToken) {
+
+    if (revokeTokens && refreshToken) {
       await this.revokeAccessToken(accessToken);
     }
-  
+    
+    if (revokeTokens && accessToken) {
+      await this.revokeAccessToken(accessToken);
+    }
+
     // No idToken? This can happen if the storage was cleared.
     // Fallback to XHR signOut, then simulate a redirect to the post logout uri
     if (!idToken) {

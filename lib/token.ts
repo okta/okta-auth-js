@@ -43,6 +43,7 @@ import PKCE from './pkce';
 import {
   OktaAuth,
   Token,
+  RevocableToken,
   isToken,
   isAccessToken,
   isIDToken,
@@ -64,24 +65,29 @@ import {
 
 const cookies = browserStorage.storage;
 
-// Only the access token can be revoked in SPA applications
-function revokeToken(sdk: OktaAuth, token: AccessToken): Promise<any> {
+// refresh tokens have precedence to be revoked if no token is specified
+function revokeToken(sdk: OktaAuth, token: RevocableToken): Promise<any> {
   return Promise.resolve()
     .then(function () {
-      //if (!token || (!token.accessToken && !token.refreshToken)) {
-      if (!token || !token.accessToken) {
-        throw new AuthSdkError('A valid access token object is required');
+      var accessToken: string;
+      var refreshToken: string;
+      if (token) { 
+          accessToken = (token as AccessToken).accessToken;
+          refreshToken = (token as RefreshToken).refreshToken;  
+      }
+        
+      if(!accessToken && !refreshToken) { 
+        throw new AuthSdkError('A valid access or refresh token object is required');
       }
       var clientId = sdk.options.clientId;
       if (!clientId) {
         throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to revoke a token');
       }
       var revokeUrl = getOAuthUrls(sdk).revokeUrl;
-      var accessToken = token.accessToken;
       var args = toQueryString({
         // eslint-disable-next-line camelcase
-        token_type_hint: 'access_token',
-        token: accessToken
+        token_type_hint: refreshToken ? 'refresh_token' : 'access_token', 
+        token: refreshToken || accessToken,
       }).slice(1);
       var creds = btoa(clientId);
       return http.post(sdk, revokeUrl, args, {

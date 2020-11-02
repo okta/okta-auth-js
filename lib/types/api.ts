@@ -11,7 +11,7 @@
  */
 
 import { AuthTransaction } from '../tx/AuthTransaction';
-import { Token, AccessToken, IDToken, RefreshToken } from './Token';
+import { Token, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
@@ -132,7 +132,7 @@ export interface TokenAPI {
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
   decode(token: string): JWTObject;
-  revoke(token: AccessToken): Promise<object>;
+  revoke(token: RevocableToken): Promise<object>;
   renew(token: Token): Promise<Token>;
   renewTokens(): Promise<Tokens>;
   verify(token: IDToken, params?: object): Promise<IDToken>;

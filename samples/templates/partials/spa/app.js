@@ -288,7 +288,6 @@ function redirectToLogin(additionalParams) {
   // Redirect to Okta and show the signin widget if there is no active session
   authClient.token.getWithRedirect(Object.assign({
     state: JSON.stringify(config.state),
-    // scopes: config.state.scopes.split(/\s+/) || config.scopes, // getWithRedirect doesn't obey scopes in constructor yet
   }, additionalParams));
 }
 

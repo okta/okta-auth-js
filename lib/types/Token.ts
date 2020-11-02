@@ -39,6 +39,7 @@ export interface IDToken extends AbstractToken {
 }
 
 export type Token = AccessToken | IDToken | RefreshToken;
+export type RevocableToken = AccessToken | RefreshToken;
 
 export type TokenType = 'accessToken' | 'idToken' | 'refreshToken';
 
