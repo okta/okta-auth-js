@@ -245,8 +245,8 @@ Depends on your preferences it is possible to use the following callback strateg
 
 #### Handling the callback with hash routing
 According to the OAuth 2.0 spec the redirect URI "MUST NOT contain a fragment component": <https://tools.ietf.org/html/rfc6749#section-3.1.2>
-So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific rout.
-That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define the logic that will parse redirect url at the very beginning of your app. So the flow will be similar to [Handling the callback without routing](#handling-the-callback-without-routing)
+So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific route.
+That means that hash-based router will receive the redirect callback on the main / default route. So we recommend to define the logic that will parse redirect url at the very beginning of your app. So the flow will be similar to [Handling the callback without routing](#handling-the-callback-without-routing)
 
 Additionally if using hash routing, we recommend to use PKCE and responseMode query (which is the default for PKCE). Using implicit flow, with tokens in the hash could cause unpredictable results since hash routers like to rewrite the fragment.
 
@@ -337,11 +337,11 @@ tokenManager: {
 }
 ```
 
-Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
+Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed 30 seconds before they expire. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
 
 ```javascript
 // Emit expired event 2 minutes before expiration
-// Tokens accessed with tokenManager.get() will auto-renew within 2 minutes of expiration
+// Tokens accessed with tokenManager.get() will auto-renew 2 minutes before expiration
 tokenManager: {
   expireEarlySeconds: 120
 }
@@ -354,7 +354,7 @@ You may provide a custom storage provider. It should implement two functions:
 * `getItem(key)`
 * `setItem(key, value)`
 
-The storage provider will receive the users's raw tokens, as a string. Any custom storage provider should take care to save this string in a secure location which is not accessible by other users.
+The storage provider will receive the user's raw tokens, as a string. Any custom storage provider should take care to save this string in a secure location which is not accessible by other users.
 
 ```javascript
 tokenManager: {
@@ -375,7 +375,7 @@ When requesting tokens using [token.getWithRedirect](#tokengetwithredirectoption
 
 In most cases you will not need to set a value for `responseMode`. Defaults are set according to the [OpenID Connect 1.0 specification](https://openid.net/specs/openid-connect-core-1_0.html#Authentication).
 
-* For [PKCE OAuth Flow](#pkce-oauth-20-flow)), the authorization code will be in search query of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#additional-options) option to "fragment".
+* For [PKCE OAuth Flow](#pkce-oauth-20-flow)), the authorization code will be appended as a query parameter of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#additional-options) option to "fragment".
 
 * For [Implicit OAuth Flow](#implicit-oauth-20-flow)), tokens will be in the hash fragment of the URL. This cannot be changed.
 
@@ -468,11 +468,11 @@ Defaults to `true`, unless the application origin is `http://localhost`, in whic
 
 ###### `sameSite`
 
-Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
+Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is `false`. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
 
 ##### `transformAuthState`
 
-Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `isAuthenticated` to true if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
+Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `isAuthenticated` to `true` if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
 
 ```javascript
 const config = {
