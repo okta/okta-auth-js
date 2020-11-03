@@ -3,6 +3,8 @@ const through = require('through2');
 const Handlebars = require('handlebars');
 const handlebars = require('gulp-compile-handlebars');
 const clean = require('gulp-clean');
+const shell = require('shelljs');
+
 const config = require('./config');
 
 const SRC_DIR = 'templates';
@@ -37,7 +39,7 @@ function generateSampleTaskFactory(options) {
     const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${name}`;
     const hbParams = Object.assign({}, options, {
       siwVersion: config.getModuleVersion('@okta/okta-signin-widget'),
-      authJSVersion: config.getModuleVersion('@okta/okta-auth-js')
+      authJSVersion: getPublishedAuthJSVersion()
     });
     console.log(`generating sample: "${name}"`, hbParams);
     return src(inDir, { dot: true })
@@ -75,9 +77,20 @@ const watchTask = series(
   watchSamples
 );
 
+function getPublishedAuthJSVersion(cb) {
+  const stdout = shell.exec('yarn info @okta/okta-auth-js versions', { silent: true });
+  const arrayStr = stdout.substring(stdout.indexOf('['), stdout.lastIndexOf(']') + 1).replace(/'/g, '"');
+  const versions = JSON.parse(arrayStr);
+  const authJSVersion = versions[versions.length - 1];
+  console.log('Last published okta-auth-js version: ', authJSVersion);
+  cb && cb();
+  return authJSVersion;
+}
+
 module.exports = {
   default: defaultTask,
   clean: cleanTask,
-  watch: watchTask
+  watch: watchTask,
+  getPublishedAuthJSVersion
 };
 
