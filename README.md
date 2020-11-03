@@ -752,8 +752,9 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 * `postLogoutRedirectUri` - Setting a value will override the `postLogoutRedirectUri` configured on the SDK.
 * `state` - An optional value, used along with `postLogoutRedirectUri`. If set, this value will be returned as a query parameter during the redirect to the `postLogoutRedirectUri`
 * `idToken` - Specifies the ID token object. By default, `signOut` will look for a token object named `idToken` within the `TokenManager`. If you have stored the id token object in a different location, you should retrieve it first and then pass it here.
-* `revokeTokens` - If `false` (default: `true`), neither the access token nor the refresh token (if any) will be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.
-* `accessToken` - Specifies the access token object. By default, `signOut` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. This options is ignored if the `revokeTokens` option is `false`.
+* `revokeAccessToken` - If `false` (default: `true`) the access token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.
+* `revokeRefreshToken` - If `false` (default: `true`) the refresh token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.  Revoking a refersh token will revoke any access tokens minted by it, even if `revokeAccessToken` is `false`.
+* `accessToken` - Specifies the access token object. By default, `signOut` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. This options is ignored if the `revokeAccessToken` option is `false`.
 
 ```javascript
 // Sign out using the default options

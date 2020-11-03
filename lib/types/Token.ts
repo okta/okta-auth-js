@@ -13,8 +13,9 @@
 import { UserClaims } from './UserClaims';
 
 export interface AbstractToken {
-  authorizeUrl: string;
   expiresAt: number;
+  value: string;
+  authorizeUrl: string;
   scopes: string[];
 }
 

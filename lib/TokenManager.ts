@@ -316,14 +316,12 @@ function renew(sdk, tokenMgmtRef, storage, key) {
   // Remove existing autoRenew timeouts
   clearExpireEventTimeoutAll(tokenMgmtRef);
 
-  // A refresh token means a refresh instead of renewal
-  // TODO: XXX  
+  // A refresh token means a replace instead of renewal
 
   // Store the renew promise state, to avoid renewing again
   // Renew/refresh all tokens in one process
   tokenMgmtRef.renewPromise[key] = sdk.token.renewTokens({
     scopes: token.scopes,
-    refreshToken: storage.getStorage()
   })
     .then(function(freshTokens) {
       // store and emit events for freshTokens
@@ -336,7 +334,8 @@ function renew(sdk, tokenMgmtRef, storage, key) {
         (accessTokenKey, accessToken) =>
           emitRenewed(tokenMgmtRef, accessTokenKey, accessToken, oldTokenStorage[accessTokenKey]),
         (idTokenKey, idToken) =>
-          emitRenewed(tokenMgmtRef, idTokenKey, idToken, oldTokenStorage[idTokenKey])
+          emitRenewed(tokenMgmtRef, idTokenKey, idToken, oldTokenStorage[idTokenKey]),
+        // not emitting refresh token as an internal detail, not a usable token
       );
 
       // return freshToken by key
