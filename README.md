@@ -472,7 +472,7 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 
 ##### `transformAuthState`
 
-Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `isAuthenticated` to true if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
+Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `authState.isAuthenticated` to true if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
 
 ```javascript
 const config = {
@@ -631,7 +631,7 @@ var config = {
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [webfinger](#webfingeroptions)
 * [fingerprint](#fingerprintoptions)
-* [isAuthenticated](#isAuthenticated)
+* [isAuthenticated](#isauthenticatedtimeout)
 * [getUser](#getuser)
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
@@ -2355,7 +2355,7 @@ authClient.tokenManager.off('renewed', myRenewedCallback);
 The emitted `AuthState` object includes:
 
 * `isPending`: true in the time after page load (first render) but before the asynchronous methods to see if the tokenManager is aware of a current authentication.
-* `isAuthenticated`: true if the user is considered authenticated. Normally this is true if both an idToken and an accessToken are present in the tokenManager, but this behavior can be overridden if you passed an isAuthenticated callback in the [configuration](#configuration-reference).
+* `isAuthenticated`: true if the user is considered authenticated. Normally this is true if both an idToken and an accessToken are present in the tokenManager, but this behavior can be overridden if you passed a [transformAuthState](#transformauthstate) callback in the [configuration](#configuration-reference).
 * `accessToken`: the JWT accessToken for the currently authenticated user (if provided by the scopes).
 * `idToken`: the JWT idToken for the currently authenticated user (if provided by the scopes).
 * `error`: contains the error returned if an error occurs in the `authState` evaluation process.
@@ -2374,7 +2374,7 @@ Gets latest evaluated `authState` from the `authStateManager`. The `authState` (
 
 #### `authStateManager.updateAuthState()`
 
-Produces a unique `authState` object and emits an `authStateChange` event. The [authState](#authstatemanager) object contains tokens from the `tokenManager` and the results of the [isAuthenticated](#isauthenticated) callback. By default, [isAuthenticated](#isauthenticated) will be true if both `idToken` and `accessToken` are present. This logic can be customized by defining a custom [isAuthenticated](#isauthenticated) function.
+Produces a unique `authState` object and emits an `authStateChange` event. The [authState](#authstatemanager) object contains tokens from the `tokenManager` and a calculated `isAuthenticated` value. By default, `authState.isAuthenticated` will be true if both `idToken` and `accessToken` are present. This logic can be customized by defining a custom [transformAuthState](#transformauthstate) function.
 
 The app needs call this method to call this method to initial the [authState](#authstatemanager).
 
