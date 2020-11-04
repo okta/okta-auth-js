@@ -267,15 +267,14 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
 
     this._pending.handleLogin = true;
-    const { scopes, responseType } = this.options;
     try {
       // Trigger default signIn redirect flow
       if (originalUri) {
         this.setOriginalUri(originalUri);
       }
       const params = Object.assign({
-        scopes: scopes || ['openid', 'email', 'profile'],
-        responseType: responseType || ['id_token', 'token']
+        // TODO: remove this line when default scopes are changed OKTA-343294
+        scopes: this.options.scopes || ['openid', 'email', 'profile']
       }, additionalParams);
       await this.token.getWithRedirect(params);
     } finally {
