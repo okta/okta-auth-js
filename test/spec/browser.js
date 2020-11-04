@@ -211,12 +211,12 @@ describe('Browser', function() {
       expect(setItemMock).not.toHaveBeenCalled();
     });
 
-    it('should use default scopes and responseType if none is provided', async () => {
+    // TODO: remove this test when default scopes are changed OKTA-343294
+    it('should use default scopes if none is provided', async () => {
       await auth.signInWithRedirect({ foo: 'bar' });
       expect(auth.token.getWithRedirect).toHaveBeenCalledWith({
         foo: 'bar',
-        scopes: ['openid', 'email', 'profile'],
-        responseType: ['id_token', 'token']
+        scopes: ['openid', 'email', 'profile']
       });
     });
 
