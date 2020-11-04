@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.1
+
+### Bug Fixes
+
+- [#535](https://github.com/okta/okta-auth-js/pull/535) Respects `scopes` that are set in the constructor
+
 ## 4.1.0
 
 ### Features
