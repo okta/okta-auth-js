@@ -1,7 +1,8 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:jasmine/recommended"
+    "plugin:jasmine/recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   "plugins": [
     "jasmine"
@@ -17,7 +18,16 @@
     "sourceType": "module",
     "ecmaVersion": 2020
   },
+  "overrides": [{
+    "files": "**/*.ts",
+    "plugins": [
+      "@typescript-eslint"
+    ]
+  }],
   "rules": {
+    "no-var": 0,
+    "prefer-const": 0,
+    "prefer-rest-params": 0,
     "max-len": 0,
     "camelcase": 0,
     "node/no-extraneous-require": ["error", {
@@ -46,6 +56,10 @@
     "jasmine/prefer-toHaveBeenCalledWith": 0,
     "jasmine/new-line-between-declarations": 0,
     "jasmine/no-spec-dupes": [1, "branch"],
-    "jasmine/no-suite-dupes": [1, "branch"]
+    "jasmine/no-suite-dupes": [1, "branch"],
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/camelcase": 0,
+    "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/no-var-requires": 0
   }
 }

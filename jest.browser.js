@@ -7,8 +7,15 @@ module.exports = {
   'collectCoverage': true,
   'collectCoverageFrom': ['./lib/**','!./test/**'],
   'globals': {
+    'ts-jest': {
+      'tsconfig': '<rootDir>/test/spec/tsconfig.spec.json'
+    },
     SDK_VERSION,
     USER_AGENT
+  },
+  'transform': {
+    '^.+\\.(js)$': 'babel-jest',
+    '^.+\\.(ts|html)$': 'ts-jest'
   },
   'restoreMocks': true,
   'moduleNameMapper': {

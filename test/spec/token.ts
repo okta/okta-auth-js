@@ -4,21 +4,50 @@ import allSettled from 'promise.allsettled';
 allSettled.shim(); // will be a no-op if not needed
 
 import _ from 'lodash';
-import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
+import { OktaAuth, AuthSdkError, AccessToken, IDToken } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import waitFor from '@okta/test.support/waitFor';
-import packageJson from '../../package.json';
 import * as sdkUtil from '../../lib/oauthUtil';
 import pkce from '../../lib/pkce';
 import http from '../../lib/http';
 import * as sdkCrypto from '../../lib/crypto';
 import * as token from '../../lib/token';
 
-function setupSync(options) {
+const packageJson = require('../../package.json');
+
+function setupSync(options?) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);
   return new OktaAuth(options);
+}
+
+function createAccessToken(strValue): AccessToken {
+  return {
+    accessToken: strValue,
+    value: strValue,
+    userinfoUrl: '',
+    authorizeUrl: '',
+    tokenType: 'accessToken',
+    expiresAt: 0,
+    scopes: []
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function createIDToken(strValue): IDToken {
+  return {
+    idToken: strValue,
+    value: strValue,
+    claims: {
+      sub: ''
+    },
+    issuer: '',
+    clientId: '',
+    scopes: [],
+    expiresAt: 0,
+    authorizeUrl: ''
+  };
 }
 
 // Expected settings when testing on HTTP protocol
@@ -36,22 +65,22 @@ var secureCookieSettings = {
 describe('token.revoke', function() {
   it('throws if token is not passed', function() {
     var oa = setupSync();
-    return oa.token.revoke()
+    return oa.token.revoke(undefined as AccessToken)
       .catch(function(err) {
         util.assertAuthSdkError(err, 'A valid access token object is required');
       });
   });
   it('throws if invalid token is passed', function() {
     var oa = setupSync();
-    var accessToken = { foo: 'bar' };
-    return oa.token.revoke(accessToken)
+    var accessToken: unknown = { foo: 'bar' };
+    return oa.token.revoke(accessToken as AccessToken)
       .catch(function(err) {
         util.assertAuthSdkError(err, 'A valid access token object is required');
       });
   });
   it('throws if clientId is not set', function() {
     var oa = setupSync();
-    var accessToken = { accessToken: 'fake' };
+    var accessToken = createAccessToken('fake');
     return oa.token.revoke(accessToken)
       .catch(function(err) {
         util.assertAuthSdkError(err, 'A clientId must be specified in the OktaAuth constructor to revoke a token');
@@ -61,7 +90,7 @@ describe('token.revoke', function() {
     spyOn(http, 'post').and.returnValue(Promise.resolve());
     var clientId = 'fake-client-id';
     var oa = setupSync({ clientId: clientId });
-    var accessToken = { accessToken: 'fake/ &token' };
+    var accessToken = createAccessToken('fake/ &token');
     return oa.token.revoke(accessToken)
       .then(function() {
         expect(http.post).toHaveBeenCalledWith(oa, 
@@ -81,7 +110,7 @@ describe('token.revoke', function() {
     });
     var clientId = 'fake-client-id';
     var oa = setupSync({ clientId: clientId });
-    var accessToken = { accessToken: 'fake/ &token' };
+    var accessToken = createAccessToken('fake/ &token');
     return oa.token.revoke(accessToken)
       .catch(function(err) {
         expect(err).toBe(testError);
@@ -120,7 +149,7 @@ describe('token.getWithoutPrompt', function() {
     var messageCallbacks;
     var body;
 
-    function fireCallback(index, origin) {
+    function fireCallback(index, origin?) {
       var fn = messageCallbacks[index];
       fn({
         data: {
@@ -166,7 +195,7 @@ describe('token.getWithoutPrompt', function() {
       // Capture the iframe
       body = document.getElementsByTagName('body')[0];
       var origAppend = body.appendChild;
-      jest.spyOn(body, 'appendChild').mockImplementation(function (el) {
+      jest.spyOn(body, 'appendChild').mockImplementation(function (el: HTMLFrameElement) {
         if (el.tagName === 'IFRAME') {
           // Remove the src so it doesn't actually load
           el.src = '';
@@ -528,7 +557,7 @@ describe('token.getWithoutPrompt', function() {
       // mock frame creation
       body = document.getElementsByTagName('body')[0];
       var origAppend = body.appendChild;
-      jest.spyOn(body, 'appendChild').mockImplementation(function(el) {
+      jest.spyOn(body, 'appendChild').mockImplementation(function(el: HTMLFrameElement) {
         if (el.tagName === 'IFRAME') {
           // Remove the src so it doesn't actually load
           el.src = '';
@@ -879,7 +908,7 @@ describe('token.getWithoutPrompt', function() {
       hostname: 'somesite.local',
       search: '?code=fakecode',
       href: 'https://somesite.local/implicit/callback?code=fakecode'
-    };
+    } as Location;
     const client = new OktaAuth({
       pkce: true,
       issuer: 'https://auth-js-test.okta.com',
@@ -937,7 +966,7 @@ describe('token.getWithPopup', function() {
       close: jest.fn()
     };
     jest.spyOn(window, 'open').mockImplementation(function () {
-      return mockWindow; // valid window is returned
+      return mockWindow as unknown as Window; // valid window is returned
     });
     jest.useFakeTimers();
     var promise = oauthUtil.setup({
@@ -1138,10 +1167,9 @@ describe('token.getWithPopup', function() {
     .then(function(context) {
 
       function FakePopup() {
-        var popup = this;
-        popup.closed = false;
-        popup.close = function() {
-          popup.closed = true;
+        this.closed = false;
+        this.close = () => {
+          this.closed = true;
         };
       }
       jest.spyOn(window, 'open').mockImplementation(function() {
@@ -1377,7 +1405,7 @@ describe('token.getWithPopup', function() {
       hostname: 'somesite.local',
       search: '?code=fakecode',
       href: 'https://somesite.local/implicit/callback?code=fakecode'
-    };
+    } as Location;
     const client = new OktaAuth({
       pkce: true,
       issuer: 'https://auth-js-test.okta.com',
@@ -1416,7 +1444,7 @@ describe('token.getWithRedirect', function() {
     global.window.location = {
       protocol: 'https:',
       hostname: 'somesite.local'
-    };
+    } as Location;
 
     defaultUrls = {
       issuer: 'https://auth-js-test.okta.com',
@@ -1467,7 +1495,7 @@ describe('token.getWithRedirect', function() {
     window.location = {
       protocol: 'http:',
       hostname: 'localhost'
-    };
+    } as Location;
     return oauthUtil.setupRedirect({
       getWithRedirectArgs: {},
       expectedCookies: [
@@ -2192,7 +2220,7 @@ describe('token.getWithRedirect', function() {
       hostname: 'somesite.local',
       search: '?code=fakecode',
       href: 'https://somesite.local/implicit/callback?code=fakecode'
-    };
+    } as Location;
     const client = new OktaAuth({
       pkce: true,
       issuer: 'https://auth-js-test.okta.com',
@@ -3168,7 +3196,7 @@ describe('token.getUserInfo', function() {
   it('throws an error if no arguments are passed', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
-      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve());
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined));
       return oa.token.getUserInfo();
     })
     .then(function() {
@@ -3183,8 +3211,8 @@ describe('token.getUserInfo', function() {
   it('throws an error if a string is passed instead of an accessToken object', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
-      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve());
-      return oa.token.getUserInfo('just a string');
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined));
+      return oa.token.getUserInfo('just a string' as unknown as AccessToken);
     })
     .then(function() {
       expect('not to be hit').toBe(true);
@@ -3198,7 +3226,7 @@ describe('token.getUserInfo', function() {
   it('throws an error if no idTokenObject is passed', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
-      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve());
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined));
       return oa.token.getUserInfo(tokens.standardAccessTokenParsed);
     })
     .then(function() {
@@ -3213,8 +3241,8 @@ describe('token.getUserInfo', function() {
   it('throws an error if a string is passed instead of an idTokenObject', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
-      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve());
-      return oa.token.getUserInfo(tokens.standardAccessTokenParsed, 'some string');
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined));
+      return oa.token.getUserInfo(tokens.standardAccessTokenParsed, 'some string' as unknown as IDToken);
     })
     .then(function() {
       expect('not to be hit').toBe(true);
@@ -3298,7 +3326,7 @@ describe('token.verify', function() {
 
       // Mock out sdk crypto
       jest.spyOn(client.features, 'isTokenVerifySupported').mockReturnValue(true);
-      jest.spyOn(sdkCrypto, 'verifyToken').mockReturnValue(true);
+      jest.spyOn(sdkCrypto, 'verifyToken').mockReturnValue(Promise.resolve(true));
       jest.spyOn(sdkCrypto, 'getOidcHash').mockReturnValue(Promise.resolve(atHash));
 
       // Return modified idToken
