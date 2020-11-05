@@ -43,6 +43,20 @@
 - [#468](https://github.com/okta/okta-auth-js/pull/468) Fixes issue where HTTP headers with an undefined value were being sent with the value "undefined". These headers are now removed before the request is sent.
 - [#514](https://github.com/okta/okta-auth-js/pull/514) Fixes OAuth redirect params issue in legacy browsers.
 
+## 4.0.3
+
+### Bug Fixes
+
+- [#468](https://github.com/okta/okta-auth-js/pull/468) Fixes issue where HTTP headers with an undefined value were being sent with the value "undefined". These headers are now removed before the request is sent.
+- [#514](https://github.com/okta/okta-auth-js/pull/514) Fixes OAuth redirect params issue in legacy browsers.
+- [#520](https://github.com/okta/okta-auth-js/pull/520) token.isLoginRedirect will check that current URL matches the redirectUri
+
+## 4.0.2
+
+- [#491](https://github.com/okta/okta-auth-js/pull/491) Fixes issue with OAuth param cookie when using self-hosted signin widget
+
+- [#489](https://github.com/okta/okta-auth-js/pull/489) Fixes sameSite cookie setting when running on HTTP connection
+
 ## 4.0.1
 
 ### Bug Fixes
@@ -62,6 +76,23 @@
   - Implements "active" autoRenew.  Previously tokens would be renewed or removed when calling `tokenManager.get`. Now they will be renewed or removed in the background. If autoRenew is true, tokens will be renewed before expiration. If autoRenew is false, tokens will be removed from storage on expiration.
   - `onSessionExpired` option has been removed. [TokenManager events](#tokenmanageronevent-callback-context) can be used to detect and handle token renewal errors.
   - `tokenManager.get` no longer implements autoRenew functionality (autoRenew is done by a separate process within `TokenManager`). Even with `autoRenew`, it is possible that the token returned from the TokenManager may be expired, since renewal is an asynchronous process. New method `tokenManager.hasExpired` can be used to test the token and avoid this potential race condition.
+
+## 3.2.6
+
+- [#522](https://github.com/okta/okta-auth-js/pull/522) Fixes `token.isLoginRedirect` issue with `code` query params in url
+- [#517](https://github.com/okta/okta-auth-js/pull/517) Fixes OAuth redirect params issue in legacy browsers
+
+## 3.2.5
+
+- [#491](https://github.com/okta/okta-auth-js/pull/491) Fixes issue with OAuth param cookie when using self-hosted signin widget
+
+- [#489](https://github.com/okta/okta-auth-js/pull/489) Fixes sameSite cookie setting when running on HTTP connection
+
+## 3.2.4
+
+### Bug Fixes
+
+- [#473](https://github.com/okta/okta-auth-js/pull/473) Fixes login issue when cookies are blocked or used as shared state storage
 
 ## 3.2.3
 
