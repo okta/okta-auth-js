@@ -456,8 +456,8 @@ describe('Browser', function() {
           });
       });
 
-      it('Can pass a "revokeTokens=false" to skip revoke logic', function() {
-        return auth.signOut({ revokeTokens: false })
+      it('Can pass a "revokeAccessToken=false" to skip revoke logic', function() {
+        return auth.signOut({ revokeAccessToken: false })
           .then(function() {
             expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(1);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();

@@ -96,6 +96,7 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     logoutApp: testApp.logoutApp.bind(testApp),
     refreshSession: testApp.refreshSession.bind(testApp),
     renewToken: testApp.renewToken.bind(testApp),
+    renewTokens: testApp.renewTokens.bind(testApp),
     revokeToken: testApp.revokeToken.bind(testApp),
     handleCallback: testApp.handleCallback.bind(testApp),
     getUserInfo: testApp.getUserInfo.bind(testApp),
@@ -218,13 +219,17 @@ class TestApp {
   
     signIn.showSignInToGetTokens({
       clientId: config.clientId,
-      redirectUri: config.redirectUri,
+      redirectUri: config.redirectUri,  
+      scope: ['openid', 'email', 'offline_access'],
   
       // Return an access token from the authorization server
       getAccessToken: true,
   
       // Return an ID token from the authorization server
       getIdToken: true,
+
+      // Return a Refresh token from the authorization server
+      getRefreshToken: true
     });
   }
 
@@ -302,6 +307,13 @@ class TestApp {
       });
   }
 
+  async renewTokens(): Promise<void> {
+    return this.oktaAuth.token.renewTokens()
+      .then(() => {
+        this.render();
+      });
+  }
+
   logoutRedirect(): void {
     this.oktaAuth.signOut()
       .catch(e => {
@@ -351,7 +363,7 @@ class TestApp {
   }
 
   async getUserInfo(): Promise<void> {
-    const { accessToken, idToken } = await this.oktaAuth.tokenManager.getTokens();
+    const { accessToken, idToken, refreshToken } = await this.oktaAuth.tokenManager.getTokens();
     if (accessToken && idToken) {
       return this.oktaAuth.token.getUserInfo(accessToken as AccessToken)
         .catch(error => {
@@ -435,7 +447,7 @@ class TestApp {
   }
 
   appHTML(props: Tokens): string {
-    const { idToken, accessToken } = props || {};
+    const { idToken, accessToken, refreshToken } = props || {};
     if (idToken || accessToken) {
       // Authenticated user home page
       return `
@@ -449,6 +461,9 @@ class TestApp {
           </li>
           <li>
             <a id="renew-token" href="/" onclick="renewToken(event)">Renew Token</a>
+          </li>
+          <li>
+            <a id="renew-tokens" href="/" onclick="renewTokens(event)">Renew Tokens</a>
           </li>
           <li>
             <a id="get-token" href="/" onclick="getToken(event)">Get Token (without prompt)</a>
@@ -471,7 +486,7 @@ class TestApp {
         </ul>
         <div id="user-info"></div>
         <hr/>
-        ${ tokensHTML({idToken, accessToken})}
+        ${ tokensHTML({idToken, accessToken, refreshToken})}
       `;
     }
 

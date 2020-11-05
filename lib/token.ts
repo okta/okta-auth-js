@@ -790,28 +790,34 @@ async function renewTokensWithRefresh(sdk: OktaAuth, options: TokenParams, refre
 }
 
 function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
-  // If we have a refresh token, renew in a different way
-  var refreshTokenObject = sdk.authStateManager.getAuthState().refreshToken as RefreshToken;
+  
+  // If we have a refresh token, renew using that, otherwise getWithoutPrompt
 
-  if (refreshTokenObject) {
-    return renewTokensWithRefresh(sdk, options, refreshTokenObject);
-  }
+  // Calling via async as auth-js doesn't yet (as of 4.2) ensure that updateAuthState() was ever called
+  this.tokenManager.getTokens()
+    .then(tokens => tokens.refreshToken as RefreshToken)
+    .then(refreshTokenObject => {
 
-  options = Object.assign({
-    scopes: sdk.options.scopes,
-    authorizeUrl: sdk.options.authorizeUrl,
-    userinfoUrl: sdk.options.userinfoUrl,
-    issuer: sdk.options.issuer
-  }, options);
+      if (refreshTokenObject) {
+        return renewTokensWithRefresh(sdk, options, refreshTokenObject);
+      }
 
-  if (sdk.options.pkce) {
-    options.responseType = 'code';
-  } else {
-    options.responseType = ['token', 'id_token'];
-  }
+      options = Object.assign({
+        scopes: sdk.options.scopes,
+        authorizeUrl: sdk.options.authorizeUrl,
+        userinfoUrl: sdk.options.userinfoUrl,
+        issuer: sdk.options.issuer
+      }, options);
 
-  return getWithoutPrompt(sdk, options)
-    .then(res => res.tokens);
+      if (sdk.options.pkce) {
+        options.responseType = 'code';
+      } else {
+        options.responseType = ['token', 'id_token'];
+      }
+
+      return getWithoutPrompt(sdk, options)
+        .then(res => res.tokens);
+    });
 }
 
 function removeHash(sdk) {
@@ -970,5 +976,5 @@ export {
   handleOAuthResponse,
   prepareTokenParams,
   _addOAuthParamsToStorage, // export for testing purpose
-  _getOAuthParamsStrFromStorage // export for testing purpose
+  _getOAuthParamsStrFromStorage, // export for testing purpose
 };
