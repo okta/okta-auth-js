@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.0
+
+### Breaking Changes
+
+- [#540](https://github.com/okta/okta-auth-js/pull/540) Locks `tokenManager.expireEarlySeconds` option with the default value (30s) for non-dev environment
+
 ## 4.1.0
 
 ### Features
