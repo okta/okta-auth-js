@@ -12,6 +12,7 @@ import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../lib/clock';
 import { TokenManager } from '../../lib/TokenManager';
 import * as utils from '../../lib/util';
+import * as features from '../../lib/browser/features';
 
 // Expected settings on HTTPS
 var secureCookieSettings = {
@@ -256,6 +257,24 @@ describe('TokenManager', function() {
         secureCookieSettings
       );
     });
+    it('should be locked with default expireEarlySeconds for non-dev env', () => {
+      jest.spyOn(features, 'isLocalhost').mockReturnValue(false);
+      setupSync();
+      const options = {
+        expireEarlySeconds: 60
+      };
+      const instance = new TokenManager(client, options);
+      expect(instance._getOptions().expireEarlySeconds).toBe(30);
+    });
+    it('should be able to set expireEarlySeconds for dev env', () => {
+      jest.spyOn(features, 'isLocalhost').mockReturnValue(true);
+      setupSync();
+      const options = {
+        expireEarlySeconds: 60
+      };
+      const instance = new TokenManager(client, options);
+      expect(instance._getOptions().expireEarlySeconds).toBe(60);
+    });
   });
 
   describe('add', function() {
@@ -285,6 +304,7 @@ describe('TokenManager', function() {
 
   describe('renew', function() {
     beforeEach(() => {
+      jest.spyOn(features, 'isLocalhost').mockReturnValue(true);
       setupSync();
     });
 
@@ -645,6 +665,7 @@ describe('TokenManager', function() {
     let postMessageResp;
     beforeEach(function() {
       jest.useFakeTimers();
+      jest.spyOn(features, 'isLocalhost').mockReturnValue(true);
       tokenManagerAddKeys = {
         'test-idToken': {
           idToken: 'testInitialToken',
@@ -1401,6 +1422,9 @@ describe('TokenManager', function() {
   });
 
   describe('hasExpired', function() {
+    beforeEach(() => {
+      jest.spyOn(features, 'isLocalhost').mockReturnValue(true);
+    });
 
     it('returns false for a token that has not expired', function() {
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
@@ -1627,8 +1651,8 @@ describe('TokenManager', function() {
         options: {},
         emitter
       };
-      // eslint-disable-next-line no-import-assign
-      utils.isIE11OrLess = jest.fn().mockReturnValue(false);
+      jest.spyOn(utils, 'isIE11OrLess').mockReturnValue(false);
+      jest.spyOn(features, 'isLocalhost').mockReturnValue(true);
     });
     afterEach(() => {
       jest.useRealTimers();
@@ -1647,8 +1671,7 @@ describe('TokenManager', function() {
       expect(instance._emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
     });
     it('should set options._storageEventDelay default to 1000 in isIE11OrLess env', () => {
-      // eslint-disable-next-line no-import-assign
-      utils.isIE11OrLess = jest.fn().mockReturnValue(true);
+      jest.spyOn(utils, 'isIE11OrLess').mockReturnValue(true);
       const instance = new TokenManager(sdkMock);
       expect(instance._getOptions()._storageEventDelay).toBe(1000);
     });
@@ -1657,8 +1680,7 @@ describe('TokenManager', function() {
       expect(instance._getOptions()._storageEventDelay).toBe(100);
     });
     it('should use options._storageEventDelay from passed options in isIE11OrLess env', () => {
-      // eslint-disable-next-line no-import-assign
-      utils.isIE11OrLess = jest.fn().mockReturnValue(true);
+      jest.spyOn(utils, 'isIE11OrLess').mockReturnValue(true);
       const instance = new TokenManager(sdkMock, { _storageEventDelay: 100 });
       expect(instance._getOptions()._storageEventDelay).toBe(100);
     });

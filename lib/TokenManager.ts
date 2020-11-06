@@ -15,6 +15,7 @@
 import { removeNils, warn, isObject, clone, isIE11OrLess } from './util';
 import AuthSdkError from './errors/AuthSdkError';
 import storageUtil from './browser/browserStorage';
+import { isLocalhost } from './browser/features';
 import { TOKEN_STORAGE_NAME } from './constants';
 import storageBuilder from './storageBuilder';
 import SdkClock from './clock';
@@ -432,6 +433,10 @@ export class TokenManager {
 
     if (isIE11OrLess()) {
       options._storageEventDelay = options._storageEventDelay || 1000;
+    }
+
+    if (!isLocalhost()) {
+      options.expireEarlySeconds = DEFAULT_OPTIONS.expireEarlySeconds;
     }
 
     var storageProvider;
