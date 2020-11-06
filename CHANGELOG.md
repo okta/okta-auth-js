@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.2
+
+### Bug Fixes
+
+- [#541](https://github.com/okta/okta-auth-js/pull/541) Fixes type error in `VerifyRecoveryTokenOptions`
+
 ## 4.1.1
 
 ### Bug Fixes
