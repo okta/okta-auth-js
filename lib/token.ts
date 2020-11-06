@@ -234,6 +234,7 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
 // eslint-disable-next-line max-len
 function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuthResponse, urls: CustomUrls): Promise<TokenResponse> {
   urls = urls || {};
+  tokenParams = tokenParams || {};
 
   var responseType = tokenParams.responseType;
   if (!Array.isArray(responseType)) {
@@ -794,7 +795,7 @@ function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
   // If we have a refresh token, renew using that, otherwise getWithoutPrompt
 
   // Calling via async as auth-js doesn't yet (as of 4.2) ensure that updateAuthState() was ever called
-  return this.tokenManager.getTokens()
+  return sdk.tokenManager.getTokens()
     .then(tokens => tokens.refreshToken as RefreshToken)
     .then(refreshTokenObject => {
 
