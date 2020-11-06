@@ -794,7 +794,7 @@ function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
   // If we have a refresh token, renew using that, otherwise getWithoutPrompt
 
   // Calling via async as auth-js doesn't yet (as of 4.2) ensure that updateAuthState() was ever called
-  this.tokenManager.getTokens()
+  return this.tokenManager.getTokens()
     .then(tokens => tokens.refreshToken as RefreshToken)
     .then(refreshTokenObject => {
 
