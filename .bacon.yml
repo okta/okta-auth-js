@@ -1,0 +1,29 @@
+test_suites:
+    - name: lint
+      script_path: /root/okta/okta-auth-js/scripts
+      sort_order: '1'
+      timeout: '60'
+      script_name: lint
+      criteria: MERGE
+      queue_name: small
+    - name: unit
+      script_path: /root/okta/okta-auth-js/scripts
+      sort_order: '2'
+      timeout: '10'
+      script_name: unit
+      criteria: MERGE
+      queue_name: small
+    - name: e2e
+      script_path: /root/okta/okta-auth-js/scripts
+      sort_order: '3'
+      timeout: '10'
+      script_name: e2e
+      criteria: MERGE
+      queue_name: small
+    - name: publish
+      script_path: /root/okta/okta-auth-js/scripts
+      sort_order: '4'
+      timeout: '60'
+      script_name: publish
+      criteria: MERGE
+      queue_name: small
