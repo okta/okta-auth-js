@@ -1,8 +1,10 @@
 #!/bin/bash -xe
 
-export NVM_DIR="/root/.nvm"
+# Add yarn to the $PATH so npm cli commands do not fail
+export PATH="${PATH}:$(yarn global bin)"
 
 # Install required node version
+export NVM_DIR="/root/.nvm"
 setup_service node v12.13.0
 
 cd ${OKTA_HOME}/${REPO}
