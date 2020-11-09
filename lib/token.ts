@@ -336,7 +336,7 @@ function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
     responseMode: sdk.options.responseMode,
     state: generateState(),
     nonce: generateNonce(),
-    scopes: ['openid', 'email'],
+    scopes: sdk.options.scopes || ['openid', 'email'],
     ignoreSignature: sdk.options.ignoreSignature
   };
 }
