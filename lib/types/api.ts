@@ -199,5 +199,5 @@ export interface ForgotPasswordOptions {
 }
 
 export interface VerifyRecoveryTokenOptions {
-  relayState?: string;
+  recoveryToken: string;
 }
