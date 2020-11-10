@@ -2,10 +2,11 @@
 
 ## 5.0.0
 
-### Other
+### Breaking Changes
 
 - [#515](https://github.com/okta/okta-auth-js/pull/515) Removes `token.value` field
-
+- [#540](https://github.com/okta/okta-auth-js/pull/540) Locks `tokenManager.expireEarlySeconds` option with the default value (30s) for non-dev environment
+  
 ## 4.7.2
 
 ### Bug Fixes
