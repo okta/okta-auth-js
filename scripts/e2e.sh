@@ -2,6 +2,7 @@
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
+setup_service java 1.8.222
 setup_service google-chrome-stable 83.0.4103.61-1
 
 export TEST_SUITE_TYPE="junit"
@@ -11,6 +12,9 @@ export ISSUER=https://samples-javascript.okta.com/oauth2/default
 export CLIENT_ID=0oapmwm72082GXal14x6
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
+
+export CI=true
+export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # build is required to run E2E tests
 if ! yarn build; then
