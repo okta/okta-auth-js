@@ -350,11 +350,11 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
 function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
   const { pkce, clientId, redirectUri, responseType, responseMode, scopes, ignoreSignature } = sdk.options;
   return {
-    pkce: sdk.options.pkce,
-    clientId: sdk.options.clientId,
-    redirectUri: sdk.options.redirectUri || window.location.href,
-    responseType: sdk.options.responseType || ['token', 'id_token'],
-    responseMode: sdk.options.responseMode,
+    pkce,
+    clientId,
+    redirectUri: redirectUri || window.location.href,
+    responseType: responseType || ['token', 'id_token'],
+    responseMode,
     state: generateState(),
     nonce: generateNonce(),
     scopes: scopes || ['openid', 'email'],
@@ -755,17 +755,17 @@ function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
     });
 }
 
-async function renewTokensWithRefresh(sdk: OktaAuth, options: TokenParams, refreshTokenObject: RefreshToken): Promise<Tokens> {
+async function renewTokensWithRefresh(
+  sdk: OktaAuth,
+  tokenParams: TokenParams,
+  refreshTokenObject: RefreshToken
+): Promise<Tokens> {
   var clientId = sdk.options.clientId;
   if (!clientId) {
     throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to revoke a token');
   }
 
-  var urls = { 
-    issuer: refreshTokenObject.issuer,
-    authorizeUrl: refreshTokenObject.authorizeUrl,
-    tokenUrl: refreshTokenObject.tokenUrl, 
-  };
+  var urls = getOAuthUrls(sdk, tokenParams);
 
   try {
     const response = await http.httpRequest(sdk, {
@@ -775,16 +775,17 @@ async function renewTokensWithRefresh(sdk: OktaAuth, options: TokenParams, refre
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+
       args: Object.entries({
-        client_id: clientId,
-        grant_type: 'refresh_token',
+        client_id: clientId, // eslint-disable-line camelcase
+        grant_type: 'refresh_token', // eslint-disable-line camelcase
         scope: refreshTokenObject.scopes.join(' '),
-        refresh_token: refreshTokenObject.refreshToken,
+        refresh_token: refreshTokenObject.refreshToken, // eslint-disable-line camelcase
       }).map(function ([name, value]) {
-        return name + "=" + encodeURIComponent(value);
+        return name + '=' + encodeURIComponent(value);
       }).join('&'),
     });
-    return handleOAuthResponse(sdk, options, response, urls).then(res => res.tokens);
+    return handleOAuthResponse(sdk, tokenParams, response, urls).then(res => res.tokens);
   } catch (err) {
     console.log({ err });
   }

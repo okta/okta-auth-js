@@ -155,7 +155,9 @@ function validateToken(token: Token) {
       !token.scopes ||
       (!token.expiresAt && token.expiresAt !== 0) ||
       (!isIDToken(token) && !isAccessToken(token) && !isRefreshToken(token))) {
-    throw new AuthSdkError('Token must be an Object with scopes, expiresAt, and one of: an idToken, accessToken, or refreshToken property');
+    throw new AuthSdkError(
+      'Token must be an Object with scopes, expiresAt, and one of: an idToken, accessToken, or refreshToken property'
+      );
   }
 }
 

@@ -363,7 +363,7 @@ class TestApp {
   }
 
   async getUserInfo(): Promise<void> {
-    const { accessToken, idToken, refreshToken } = await this.oktaAuth.tokenManager.getTokens();
+    const { accessToken, idToken } = await this.oktaAuth.tokenManager.getTokens();
     if (accessToken && idToken) {
       return this.oktaAuth.token.getUserInfo(accessToken as AccessToken)
         .catch(error => {

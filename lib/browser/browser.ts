@@ -340,7 +340,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     var accessToken = options.accessToken;
     var refreshToken = options.refreshToken;
     var revokeAccessToken = options.revokeAccessToken !== false;
-    var revokeRefreshToken = options.revokeRefreshToken !== false;
     var idToken = options.idToken;
   
     var logoutUrl = getOAuthUrls(this).logoutUrl;

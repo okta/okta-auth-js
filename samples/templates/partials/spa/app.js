@@ -6,7 +6,7 @@ var config = {
   clientId: '',
   scopes: '{{ scopes }}',
   storage: '{{ storage }}',
-  requireUserSession: {{ requireUserSession }},
+  requireUserSession: '{{ requireUserSession }}',
   flow: '{{ flow }}'
 };
 
@@ -366,7 +366,7 @@ function showError(error) {
   document.getElementById('error').appendChild(node);
 }
 
-/* eslint-disable max-statements */
+/* eslint-disable max-statements,complexity */
 function loadConfig() {
   // Read all config from the URL
   var url = new URL(window.location.href);
