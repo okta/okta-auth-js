@@ -12,6 +12,12 @@ export SPA_CLIENT_ID=0oapmwm72082GXal14x6
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 
+# build is required to run E2E tests
+if ! yarn build; then
+  echo "build failed! Exiting..."
+  exit ${TEST_FAILURE}
+fi
+
 if ! yarn test:e2e; then
   echo "e2e tests failed! Exiting..."
   exit ${TEST_FAILURE}
