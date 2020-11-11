@@ -89,12 +89,14 @@ exports.config = {
         // it is possible to configure which logTypes to include/exclude.
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
         // excludeDriverLogs: ['bugreport', 'server'],
-    }, {
-        maxInstances: 1, // all tests use the same user and local storage. they must run in series
-        browserName: 'firefox',
-        'moz:firefoxOptions': browserOptions,
-        acceptInsecureCerts: true,
-    }],
+    }
+    // ,{
+    //     maxInstances: 1, // all tests use the same user and local storage. they must run in series
+    //     browserName: 'firefox',
+    //     'moz:firefoxOptions': browserOptions,
+    //     acceptInsecureCerts: true,
+    // }
+    ],
     //
     // ===================
     // Test Configurations
