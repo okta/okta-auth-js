@@ -8,7 +8,7 @@ export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/e2e"
 
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
-export SPA_CLIENT_ID=0oapmwm72082GXal14x6
+export CLIENT_ID=0oapmwm72082GXal14x6
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 
