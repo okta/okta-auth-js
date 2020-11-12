@@ -162,7 +162,7 @@ exports.config = {
     reporters: [
         'spec',
         ['junit', {
-            outputDir: './',
+            outputDir: '../../build2/reports/e2e',
             outputFileFormat: function() { // optional
                 return 'junit-results.xml';
             }
