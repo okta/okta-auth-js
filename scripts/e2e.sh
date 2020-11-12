@@ -6,7 +6,7 @@ setup_service java 1.8.222
 setup_service google-chrome-stable 85.0.4183.102-1
 
 export TEST_SUITE_TYPE="junit"
-export TEST_RESULT_FILE_DIR="${REPO}/test/e2e"
+export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
 export CLIENT_ID=0oapmwm72082GXal14x6
