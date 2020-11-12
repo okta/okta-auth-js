@@ -9,3 +9,4 @@ testenv
 junit.xml
 lerna-debug.*
 yarn-error.*
+test/e2e/junit-results.xml
