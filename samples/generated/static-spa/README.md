@@ -29,7 +29,6 @@ The following parameters are accepted by this app:
 * `storage` - ("memory"|"sessionStorage"|"localStorage"|"cookie") - set the `storage` option for the `TokenManager` token storage
 * `requireUserSession` - (true|false) - by default, a user will be considered authenticated if there are tokens in storage. This check does not require a network request. If the `requireUserSession` option is set to `true`, an additional check will be done to verify that the user has a valid Okta SSO
 * `flow` - ("redirect"|"form"|"widget") - set the authorization flow
-* `scopes` - (space-separated string) - defaults to "openid profile".  Sets the scopes that will be used to request tokens
 
 ## Authorization flows
 
