@@ -1,6 +1,6 @@
 # Changelog
 
-## PENDING
+## 4.2.0
 
 ### Features
 - Adding the ability to use refresh tokens with single page applications (SPA) (Early Access feature - reach out to our support team)
@@ -10,7 +10,7 @@
   - `renewTokens()` will now use an XHR call to replace tokens if the app has a refresh token.  This does not rely on "3rd party cookies"
     - The `autoRenew` option (defaults to `true`) already calls `renewTokens()` shortly before tokens expire.  The `autoRenew` feature will now automatically make use of the refresh token if present
   - `signOut()` now revokes the refresh token (if present) by default, which in turn will revoke all tokens minted with that refresh token
-    - The revoke calls by `signOut()` follow the existing `revokeAccessToken` parameter - when `true` (the default) any refreshToken will be also be revoked, and when `false`, any tokens are not explicitly revoked.
+    - The revoke calls by `signOut()` follow the existing `revokeAccessToken` parameter - when `true` (the default) any refreshToken will be also be revoked, and when `false`, any tokens are not explicitly revoked.  This parameter name becomes slightly misleading (as it controls both access AND refresh token revocation) and will change in a future version.
    
 ## 4.1.2
 
