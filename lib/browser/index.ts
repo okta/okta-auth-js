@@ -18,3 +18,4 @@ export * from '../tx';
 export * from '../errors';
 export * from '../TokenManager';
 export * from '../util';
+export * from '../AuthStateManager';
