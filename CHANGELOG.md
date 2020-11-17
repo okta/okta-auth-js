@@ -3,7 +3,8 @@
 ## 4.2.0
 
 ### Features
-- Adding the ability to use refresh tokens with single page applications (SPA) (Early Access feature - reach out to our support team)
+
+- [#527](https://github.com/okta/okta-auth-js/pull/527) Adding the ability to use refresh tokens with single page applications (SPA) (Early Access feature - reach out to our support team)
   - `scopes` configuration option now handles 'offline_access' as an option, which will use refresh tokens IF your client app is configured to do so in the Okta settings
     - If you already have tokens (from a separate instance of auth-js or the okta-signin-widget) those tokens must already include a refresh token and have the 'offline_access' scope
     - 'offline_access' is not requested by default.  Anyone using the default `scopes` and wishing to add 'offline_access' should pass `scopes: ['openid', 'email', 'offline_access']` to their constructor
@@ -11,7 +12,9 @@
     - The `autoRenew` option (defaults to `true`) already calls `renewTokens()` shortly before tokens expire.  The `autoRenew` feature will now automatically make use of the refresh token if present
   - `signOut()` now revokes the refresh token (if present) by default, which in turn will revoke all tokens minted with that refresh token
     - The revoke calls by `signOut()` follow the existing `revokeAccessToken` parameter - when `true` (the default) any refreshToken will be also be revoked, and when `false`, any tokens are not explicitly revoked.  This parameter name becomes slightly misleading (as it controls both access AND refresh token revocation) and will change in a future version.
-   
+
+- [#546](https://github.com/okta/okta-auth-js/pull/546) Adds types from `AuthStateManager`
+
 ## 4.1.2
 
 ### Bug Fixes
