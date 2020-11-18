@@ -2,7 +2,7 @@ import { htmlString } from './util';
 import { Tokens, IDToken, UserClaims } from '@okta/okta-auth-js';
 
 function tokensHTML(tokens: Tokens): string {
-  const { idToken, accessToken } = tokens;
+  const { idToken, accessToken, refreshToken } = tokens;
   const claims: UserClaims = idToken ? (idToken as IDToken).claims : {} as UserClaims;
   const html = `
   <table id="claims">
@@ -28,6 +28,10 @@ function tokensHTML(tokens: Tokens): string {
     <div class="box">
       <strong>ID Token</strong><br/>
       <div id="id-token">${ idToken ? htmlString(idToken) : 'N/A' }</div>
+    </div>
+    <div class="box">
+      <strong>Refresh Token</strong><br/>
+      <div id="refresh-token">${ refreshToken ? htmlString(refreshToken) : 'N/A' }</div>
     </div>
   </div>
   `;

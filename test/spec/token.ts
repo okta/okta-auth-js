@@ -67,7 +67,7 @@ describe('token.revoke', function() {
     var oa = setupSync();
     return oa.token.revoke(undefined as AccessToken)
       .catch(function(err) {
-        util.assertAuthSdkError(err, 'A valid access token object is required');
+        util.assertAuthSdkError(err, 'A valid access or refresh token object is required');
       });
   });
   it('throws if invalid token is passed', function() {
@@ -75,7 +75,7 @@ describe('token.revoke', function() {
     var accessToken: unknown = { foo: 'bar' };
     return oa.token.revoke(accessToken as AccessToken)
       .catch(function(err) {
-        util.assertAuthSdkError(err, 'A valid access token object is required');
+        util.assertAuthSdkError(err, 'A valid access or refresh token object is required');
       });
   });
   it('throws if clientId is not set', function() {

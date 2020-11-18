@@ -626,6 +626,7 @@ var config = {
 * [signOut](#signout)
 * [closeSession](#closesession)
 * [revokeAccessToken](#revokeaccesstokenaccesstoken)
+* [revokeRefreshToken](#revokerefreshtokenrefreshtoken)
 * [forgotPassword](#forgotpasswordoptions)
 * [unlockAccount](#unlockaccountoptions)
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
@@ -739,7 +740,7 @@ if (authClient.isLoginRedirect()) {
 
 > :hourglass: async
 
-Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. By default, the access token is revoked so it can no longer be used. Some points to consider:
+Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. By default, the refresh token (if any) and access token are revoked so they can no longer be used. Some points to consider:
 
 * Will redirect to an Okta-hosted page before returning to your app.
 * If a `postLogoutRedirectUri` has not been specified or configured, `window.location.origin` will be used as the return URI. This URI must be listed in the Okta application's [Login redirect URIs](#login-redirect-uris). If the URI is unknown or invalid the redirect will end on a 400 error page from Okta. This error will be visible to the user and cannot be handled by the app.
@@ -751,7 +752,8 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 * `postLogoutRedirectUri` - Setting a value will override the `postLogoutRedirectUri` configured on the SDK.
 * `state` - An optional value, used along with `postLogoutRedirectUri`. If set, this value will be returned as a query parameter during the redirect to the `postLogoutRedirectUri`
 * `idToken` - Specifies the ID token object. By default, `signOut` will look for a token object named `idToken` within the `TokenManager`. If you have stored the id token object in a different location, you should retrieve it first and then pass it here.
-* `revokeAccessToken` - If `false`, the access token will not be revoked. Use this option with care: not revoking the access token may pose a security risk if the token has been leaked outside the application.
+* `revokeAccessToken` - If `false` (default: `true`) the access token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.
+* `revokeRefreshToken` - If `false` (default: `true`) the refresh token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.  Revoking a refersh token will revoke any access tokens minted by it, even if `revokeAccessToken` is `false`.
 * `accessToken` - Specifies the access token object. By default, `signOut` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. This options is ignored if the `revokeAccessToken` option is `false`.
 
 ```javascript
@@ -813,6 +815,13 @@ authClient.closeSession()
 > :hourglass: async
 
 Revokes the access token for this application so it can no longer be used to authenticate API requests. The `accessToken` parameter is optional. By default, `revokeAccessToken` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
+
+### `revokeRefreshToken(refreshToken)`
+
+> :hourglass: async
+
+Revokes the refresh token (if any) for this application so it can no longer be used to mint new tokens. The `refreshToken` parameter is optional. By default, `revokeRefreshToken` will look for a token object named `refreshToken` within the `TokenManager`. If you have stored the refresh token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the refresh token has already been revoked or removed.
+
 
 ### `forgotPassword(options)`
 

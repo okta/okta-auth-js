@@ -65,5 +65,5 @@ app.post('/login', function(req, res) {
 
 const port = config.devServer.port;
 app.listen(port, function () {
-  console.log(`Test app running at http://localhost/${port}!\n`);
+  console.log(`Test app running at http://localhost:${port}!\n`);
 });

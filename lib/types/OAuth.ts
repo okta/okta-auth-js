@@ -37,6 +37,7 @@ export interface OAuthResponse {
   token_type?: string;
   access_token?: string;
   id_token?: string;
+  refresh_token?: string;
   error?: string;
   error_description?: string;
 }

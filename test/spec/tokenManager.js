@@ -272,9 +272,9 @@ describe('TokenManager', function() {
       } catch (e) {
         util.expectErrorToEqual(e, {
           name: 'AuthSdkError',
-          message: 'Token must be an Object with scopes, expiresAt, and an idToken or accessToken properties',
+          message: 'Token must be an Object with scopes, expiresAt, and one of: an idToken, accessToken, or refreshToken property',
           errorCode: 'INTERNAL',
-          errorSummary: 'Token must be an Object with scopes, expiresAt, and an idToken or accessToken properties',
+          errorSummary: 'Token must be an Object with scopes, expiresAt, and one of: an idToken, accessToken, or refreshToken property',
           errorLink: 'INTERNAL',
           errorId: 'INTERNAL',
           errorCauses: []

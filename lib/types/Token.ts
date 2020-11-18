@@ -25,6 +25,12 @@ export interface AccessToken extends AbstractToken {
   userinfoUrl: string;
 }
 
+export interface RefreshToken extends AbstractToken {
+  refreshToken: string;
+  tokenUrl: string;
+  issuer: string;
+}
+
 // eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IDToken extends AbstractToken {
   idToken: string;
@@ -33,13 +39,14 @@ export interface IDToken extends AbstractToken {
   clientId: string;
 }
 
-export type Token = AccessToken | IDToken;
+export type Token = AccessToken | IDToken | RefreshToken;
+export type RevocableToken = AccessToken | RefreshToken;
 
-export type TokenType = 'accessToken' | 'idToken';
+export type TokenType = 'accessToken' | 'idToken' | 'refreshToken';
 
 export function isToken(obj: any): obj is Token {
   if (obj &&
-      (obj.accessToken || obj.idToken) &&
+      (obj.accessToken || obj.idToken || obj.refreshToken) &&
       Array.isArray(obj.scopes)) {
     return true;
   }
@@ -53,3 +60,8 @@ export function isAccessToken(obj: any): obj is AccessToken {
 export function isIDToken(obj: any): obj is IDToken {
   return obj && obj.idToken;
 }
+
+export function isRefreshToken(obj: any): obj is RefreshToken {
+  return obj && obj.refreshToken;
+}
+
