@@ -117,7 +117,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
     "lerna": "^2.11.0",
-    "lodash": "4.17.11",
+    "lodash": "4.17.20",
     "promise.allsettled": "^1.0.1",
     "shelljs": "0.8.3",
     "ts-jest": "^26.4.3",
