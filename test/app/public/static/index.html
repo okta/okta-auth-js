@@ -1,9 +1,9 @@
 <html>
   <head>
-    <!-- https://global.oktacdn.com/okta-auth-js/3.2.3/okta-auth-js.polyfill.js -->
+    <!-- https://global.oktacdn.com/okta-auth-js/4.2.0/okta-auth-js.polyfill.js -->
     <script src="/okta-auth-js.polyfill.js" type="text/javascript"></script>
 
-    <!-- https://global.oktacdn.com/okta-auth-js/3.2.3/okta-auth-js.min.js -->
+    <!-- https://global.oktacdn.com/okta-auth-js/4.2.0/okta-auth-js.min.js -->
     <script src="/okta-auth-js.min.js" type="text/javascript"></script>
   </head>
   <body>
@@ -62,14 +62,14 @@
           showUserInfo();
         });
       }
-    
+
       function showError(error) {
         console.error(error);
         var node = document.createElement('DIV');
         node.innerText = JSON.stringify(error, null, 2);
         document.getElementById('error').appendChild(node);
       }
-  
+
       function showUserInfo() {
         authClient.token.getUserInfo().then(function(userInfo) {
           document.getElementById('auth').style.display = 'block';
@@ -93,12 +93,12 @@
           })
         });
       };
-  
+
       function logout(e) {
         e.preventDefault();
         authClient.signOut()
       }
-  
+
       main();
     </script>
   </body>

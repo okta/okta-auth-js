@@ -120,9 +120,9 @@
     "lodash": "4.17.20",
     "promise.allsettled": "^1.0.1",
     "shelljs": "0.8.4",
-    "ts-jest": "^26.4.3",
-    "ts-loader": "^8.0.1",
-    "typescript": "^3.9.6",
+    "ts-jest": "^26.4.4",
+    "ts-loader": "^8.0.11",
+    "typescript": "^3.9.7",
     "webpack": "^4.44.2"
   },
   "jest-junit": {

@@ -22,7 +22,7 @@
     "babel-loader": "^8.2.1",
     "express": "^4.17.1",
     "js-cookie": "2.2.0",
-    "source-map-loader": "^0.2.4",
+    "source-map-loader": "^1.1.2",
     "webpack": "^4.44.2",
     "webpack-cli": "^4.2.0",
     "webpack-dev-middleware": "^4.0.2",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^2.2.6",
-    "ts-loader": "^8.0.0",
-    "typescript": "^3.9.6"
+    "ts-loader": "^8.0.11",
+    "typescript": "^3.9.7"
   }
 }

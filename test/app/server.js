@@ -23,7 +23,9 @@ app.use(webpackDevMiddleware(compiler, {
 app.use(express.static('./public'));
 app.use(express.static('../../build/dist'));
 
-app.use(express.urlencoded());
+app.use(express.urlencoded({
+  extended: true
+}));
 app.post('/login', function(req, res) {
   const issuer = req.body.issuer;
   const username = req.body.username;

@@ -2,15 +2,5 @@
   "lerna": "2.1.0",
   "version": "independent",
   "npmClient": "yarn",
-  "useWorkspaces": true,
-  "packages": [
-    "./",
-    "env",
-    "test/app",
-    "test/e2e",
-    "test/support",
-    "samples",
-    "samples/test",
-    "samples/generated/*"
-  ]
+  "useWorkspaces": true
 }
