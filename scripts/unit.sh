@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 # Install current version of Chrome
-setup_service google-chrome-stable 79.0.3945.88-1
+setup_service google-chrome-stable 87.0.4280.66-1
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 

@@ -5421,10 +5421,10 @@ chrome-trace-event@^1.0.2:
   dependencies:
     tslib "^1.9.0"
 
-chromedriver@^85.0.0:
-  version "85.0.0"
-  resolved "https://registry.yarnpkg.com/chromedriver/-/chromedriver-85.0.0.tgz#5b9b6a184569f5e2b22b45a928bbc66d1c4bb36f"
-  integrity sha512-Noinnkl9gRsfC1EYA5trcOVf9r/P6JJnWf+mU6KZS3xLjV9x/o71VZ+gqRl3oSI4PnTGnqYRISZFQk/teYVTRg==
+chromedriver@^87.0.0:
+  version "87.0.0"
+  resolved "https://registry.yarnpkg.com/chromedriver/-/chromedriver-87.0.0.tgz#e8390deed8ada791719a67ad6bf1116614f1ba2d"
+  integrity sha512-PY7FnHOQKfH0oPfSdhpLx5nEy5g4dGYySf2C/WZGkAaCaldYH8/3lPPucZ8MlOCi4bCSGoKoCUTeG6+wYWavvw==
   dependencies:
     "@testim/chrome-version" "^1.0.7"
     axios "^0.19.2"
@@ -8164,13 +8164,6 @@ from@~0:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/from/-/from-0.1.7.tgz#83c60afc58b9c56997007ed1a768b3ab303a44fe"
   integrity sha1-g8YK/Fi5xWmXAH7Rp2izqzA6RP4=
-
-fs-access@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/fs-access/-/fs-access-1.0.1.tgz#d6a87f262271cefebec30c553407fb995da8777a"
-  integrity sha1-1qh/JiJxzv6+wwxVNAf7mV2od3o=
-  dependencies:
-    null-check "^1.0.0"
 
 fs-constants@^1.0.0:
   version "1.0.0"
@@ -11197,12 +11190,11 @@ just-debounce@^1.0.0:
   resolved "https://registry.yarnpkg.com/just-debounce/-/just-debounce-1.0.0.tgz#87fccfaeffc0b68cd19d55f6722943f929ea35ea"
   integrity sha1-h/zPrv/AtozRnVX2cilD+SnqNeo=
 
-karma-chrome-launcher@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/karma-chrome-launcher/-/karma-chrome-launcher-2.2.0.tgz#cf1b9d07136cc18fe239327d24654c3dbc368acf"
-  integrity sha512-uf/ZVpAabDBPvdPdveyk1EPgbnloPvFFGgmRhYLTDH7gEB4nZdSBk8yTU47w1g/drLSx5uMOkjKk7IWKfWg/+w==
+karma-chrome-launcher@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/karma-chrome-launcher/-/karma-chrome-launcher-3.1.0.tgz#805a586799a4d05f4e54f72a204979f3f3066738"
+  integrity sha512-3dPs/n7vgz1rxxtynpzZTvb9y/GIaW8xjAwcIGttLbycqoFtI7yo1NGnQi6oFTherRE+GIhCAHZC4vEqWGhNvg==
   dependencies:
-    fs-access "^1.0.0"
     which "^1.2.1"
 
 karma-coverage-istanbul-reporter@^2.0.5:
@@ -12789,11 +12781,6 @@ npmlog@^4.1.2:
     console-control-strings "~1.1.0"
     gauge "~2.7.3"
     set-blocking "~2.0.0"
-
-null-check@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/null-check/-/null-check-1.0.0.tgz#977dffd7176012b9ec30d2a39db5cf72a0439edd"
-  integrity sha1-l33/1xdgErnsMNKjnbXPcqBDnt0=
 
 number-is-nan@^1.0.0:
   version "1.0.1"
@@ -16854,10 +16841,10 @@ wcwidth@>=1.0.1, wcwidth@^1.0.0:
   dependencies:
     defaults "^1.0.3"
 
-wdio-chromedriver-service@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/wdio-chromedriver-service/-/wdio-chromedriver-service-6.0.3.tgz#ac1ff82f772dce9b77500e9df5384c73786d8b5a"
-  integrity sha512-1KZUQH1/b5iD/3B/VJ3EOy8fArNA7cuIop9GPFxxRAmkA33qeCrx+5TbZ6hQl6+GUZtRQoqGeUUZ5y0W0afQLw==
+wdio-chromedriver-service@^6.0.4:
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/wdio-chromedriver-service/-/wdio-chromedriver-service-6.0.4.tgz#dc2205b496479318cba7f746a11627a3d507a1fc"
+  integrity sha512-ed0ctxRJ4KbhAX/BkGUFS/sy6zDrZ3oB1Tqvokrs3r7GPX115w/AcOySofXdAk7Pdjm2JLDW/marHG/LmVoBuw==
   dependencies:
     fs-extra "^9.0.0"
 
