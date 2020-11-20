@@ -17,12 +17,12 @@ module.exports = _.extend({}, _.cloneDeep(commonConfig), {
     path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.umd.js',
     library: 'OktaAuth',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    globalObject: 'this',
   },
   plugins: commonConfig.plugins.concat([
-
     // Add a single Okta license after removing others
-    new webpack.BannerPlugin(license)
+    new webpack.BannerPlugin(license),
   ]),
-  devtool: 'source-map'
+  devtool: 'source-map',
 });

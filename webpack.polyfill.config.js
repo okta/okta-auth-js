@@ -13,7 +13,8 @@ module.exports = _.extend({}, _.cloneDeep(commonConfig), {
     path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.polyfill.js',
     library: 'OktaAuthPolyfill',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    globalObject: 'this'
   },
   plugins: commonConfig.plugins.concat([
     // Add a single Okta license after removing others

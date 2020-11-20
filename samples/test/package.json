@@ -21,7 +21,7 @@
     "@wdio/sauce-service": "^6.8.0",
     "@wdio/spec-reporter": "^6.8.1",
     "chromedriver": "^87.0.0",
-    "wait-on": "^3.3.0",
+    "wait-on": "^5.2.0",
     "wdio-chromedriver-service": "^6.0.4",
     "webpack": "^4.44.2"
   }

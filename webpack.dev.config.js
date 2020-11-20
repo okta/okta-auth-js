@@ -13,8 +13,9 @@ module.exports = _.extend({}, _.cloneDeep(commonConfig), {
     path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.umd.js',
     library: 'OktaAuth',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    globalObject: 'this',
   },
   devtool: 'source-map',
-  watch: true
+  watch: true,
 });
