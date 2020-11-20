@@ -20,7 +20,7 @@
     "gulp-compile-handlebars": "^0.6.1",
     "gulp-handlebars": "^5.0.2",
     "handlebars": "^4.7.6",
-    "shelljs": "0.8.3",
+    "shelljs": "0.8.4",
     "through2": "^4.0.2",
     "yargs": "^16.0.3"
   }
