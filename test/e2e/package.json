@@ -25,6 +25,6 @@
     "chromedriver": "^87.0.0",
     "wait-on": "^3.3.0",
     "wdio-chromedriver-service": "^6.0.4",
-    "webpack": "^3.0.0"
+    "webpack": "^4.44.2"
   }
 }
