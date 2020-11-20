@@ -20,7 +20,7 @@
     "@wdio/mocha-framework": "^6.4.0",
     "@wdio/sauce-service": "^6.4.0",
     "@wdio/spec-reporter": "^5.15.1",
-    "chromedriver": "^85.0.0",
+    "chromedriver": "^87.0.0",
     "wait-on": "^3.3.0",
     "wdio-chromedriver-service": "^6.0.3",
     "webpack": "^3.0.0"
