@@ -247,9 +247,26 @@ tokens.standardAccessToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOj' +
                               'JOEhR6vs11qVmIgbwZ4--MqUIRU3WoFEsr0muLl039QrUa1' +
                               'EQ9-Ua9rPOMaO0pFC6h2lfB_HfzGifXATKsN-wLdxk6cgA';
 
+tokens.standardAccessTokenClaims = {
+  'aud': 'https://lboyette.trexcloud.com/as/ors1rg3zyc8mvVTJO0g7',
+  'cid': 'Pf0aifrhYZu1v0P1bFFz',
+  'exp': 1468471247,
+  'iat': 1468467647,
+  'iss': 'https://lboyette.trexcloud.com/as/ors1rg3zyc8mvVTJO0g7',
+  'jti': 'AT.rvbnS4iWu2aDNca3bwTf0H9eWcWllKQeiNY_VeImMZA',
+  'scp': [
+    'openid',
+    'email',
+  ],
+  'sub': '00u1pcla5qYIREDLWCQV',
+  'uid': '00u1pcla5qYIREDLWCQV',
+  'ver': 1,
+};
+
 tokens.standardAccessTokenParsed = {
   value: tokens.standardAccessToken,
   accessToken: tokens.standardAccessToken,
+  claims: tokens.standardAccessTokenClaims,
   expiresAt: 1449703529, // assuming time = 1449699929
   scopes: ['openid', 'email'],
   tokenType: 'Bearer',
@@ -270,9 +287,26 @@ tokens.authServerAccessToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjE
                                 'EE8wXbgYjzGH5T6dazwgGfGmVf2PTa1pKfPew7f_XKE_t1O_tJ9C' +
                                 'h9gY9Z3xd92ac407ZIOHkabLvZ0-45ANM3Gm0LC0c';
 
+tokens.authServerAccessTokenClaims = {
+  'ver': 1,
+  'jti': 'AT._0Y3BbEy_f42ScS2VOwksTp8B8QojYS3bMtXCDFrxh8',
+  'iss': 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+  'aud': 'http://example.com',
+  'sub': 'samljackson@okta.com',
+  'iat': 1449699929,
+  'exp': 1449703529,
+  'cid': 'gLzF0DhjQIGCT4qO0SMB',
+  'uid': '00ukoeEqIogiFHpDe0g3',
+  'scp': [
+    'openid',
+    'email',
+  ],
+};
+
 tokens.authServerAccessTokenParsed = {
   value: tokens.authServerAccessToken,
   accessToken: tokens.authServerAccessToken,
+  claims: tokens.authServerAccessTokenClaims,
   expiresAt: 1449703529, // assuming time = 1449699929
   scopes: ['openid', 'email'],
   tokenType: 'Bearer',
