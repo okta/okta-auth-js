@@ -19,7 +19,7 @@ describe('Renew token', function() {
     redirectUri: REDIRECT_URI,
   };
 
-  const ACCESS_TOKEN_STR = 'fakeytoken'; // will not be verified in this flow
+  const ACCESS_TOKEN_STR = tokens.standardAccessToken;
   const ID_TOKEN_STR = tokens.standardIdToken;
   const ACCCESS_TOKEN_PARSED = tokens.standardAccessTokenParsed;
   const NONCE = tokens.standardIdTokenClaims.nonce;
