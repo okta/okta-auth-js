@@ -130,8 +130,10 @@ function verifyToken(sdk: OktaAuth, token: IDToken, validationParams: TokenVerif
 
     return getWellKnown(sdk, null)
     .then (function (wellKnownInfo: WellKnownResponse) {
+
+      var temp = validationOptions.issuer;
       
-      if(wellKnownInfo.issuer != validationOptions.issuer) {
+      if(jwt.payload.iss != validationOptions.issuer) {
         validationOptions.issuer = wellKnownInfo.issuer
       }
       
@@ -309,7 +311,7 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
       if (tokenParams.ignoreSignature !== undefined) {
         validationParams.ignoreSignature = tokenParams.ignoreSignature;
       }
-      
+
       return verifyToken(sdk, idTokenObj, validationParams)
       .then(function() {
         tokenDict.idToken = idTokenObj;
