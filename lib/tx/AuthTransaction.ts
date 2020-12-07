@@ -25,16 +25,43 @@ interface PostToTransactionParams {
   updatePhone?: boolean;
 }
 
+type AuthTransactionFunction = (obj?: any) => Promise<AuthTransaction>;
+
 interface AuthTransactionFunctions {
-  poll?: Function;
+  // common
+  next?: AuthTransactionFunction;
+  cancel?: AuthTransactionFunction;
+  skip?: AuthTransactionFunction;
+  // locked_out
+  unlock?: AuthTransactionFunction;
+  // password
+  changePassword?: AuthTransactionFunction;
+  resetPassword?: AuthTransactionFunction;
+  // recovery
+  answer?: AuthTransactionFunction;
+  recovery?: AuthTransactionFunction;
+  // recovery_challenge
+  verify?: AuthTransactionFunction;
+  resend?: AuthTransactionFunction;
+  // mfa_enroll_activate
+  activate?: AuthTransactionFunction;
+  poll?: AuthTransactionFunction;
+  prev?: AuthTransactionFunction;
 }
 
-export class AuthTransaction implements TransactionState {
+export class AuthTransaction implements TransactionState, AuthTransactionFunctions {
   data: TransactionState;
-  cancel?: () => Promise<AuthTransaction>;
+  cancel?: AuthTransactionFunction;
   stateToken?: string;
   sessionToken?: string;
   status: string;
+  user?: Record<string, any>;
+  factor?: Record<string, any>;
+  factors?: Array<Record<string, any> >;
+  policy?: Record<string, any>;
+  scopes?: Array<Record<string, any> >;
+  target?: Record<string, any>;
+  authentication?: Record<string, any>;
   constructor(sdk, res = null) {
     if (res) {
       this.data = res;
