@@ -1,4 +1,4 @@
-[<img src="https://devforum.okta.com/uploads/oktadev/original/1X/bf54a16b5fda189e4ad2706fb57cbb7a1e5b8deb.png" align="right" width="256px"/>](https://devforum.okta.com/)
+[<img src="https://aws1.discourse-cdn.com/standard14/uploads/oktadev/original/1X/0c6402653dfb70edc661d4976a43a46f33e5e919.png" align="right" width="256px"/>](https://devforum.okta.com/)
 
 [![Support](https://img.shields.io/badge/support-developer%20forum-blue.svg)](https://devforum.okta.com)
 [![Build Status](https://travis-ci.org/okta/okta-auth-js.svg?branch=master)](https://travis-ci.org/okta/okta-auth-js)
@@ -375,9 +375,9 @@ When requesting tokens using [token.getWithRedirect](#tokengetwithredirectoption
 
 In most cases you will not need to set a value for `responseMode`. Defaults are set according to the [OpenID Connect 1.0 specification](https://openid.net/specs/openid-connect-core-1_0.html#Authentication).
 
-* For [PKCE OAuth Flow](#pkce-oauth-20-flow)), the authorization code will be in search query of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#additional-options) option to "fragment".
+* For [PKCE OAuth Flow](#pkce-oauth-20-flow), the authorization code will be in search query of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#additional-options) option to "fragment".
 
-* For [Implicit OAuth Flow](#implicit-oauth-20-flow)), tokens will be in the hash fragment of the URL. This cannot be changed.
+* For [Implicit OAuth Flow](#implicit-oauth-20-flow), tokens will be in the hash fragment of the URL. This cannot be changed.
 
 #### Required Options
 
@@ -389,7 +389,7 @@ The URL for your Okta organization or an Okta authentication server. [About the 
 
 ##### `clientId`
 
-Client Id pre-registered with Okta for the OIDC authentication flow. [Creating your Okta application](#creating-your-okta-appliation)
+Client Id pre-registered with Okta for the OIDC authentication flow. [Creating your Okta application](#creating-your-okta-application)
 
 ##### `redirectUri`
 
@@ -2555,7 +2555,7 @@ const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 
 ## Contributing
 
-We're happy to accept contributions and PRs! Please see the [contribution guide](contributing.md) to understand how to structure a contribution.
+We're happy to accept contributions and PRs! Please see the [contribution guide](CONTRIBUTING.md) to understand how to structure a contribution.
 
 [devforum]: https://devforum.okta.com/
 [lang-landing]: https://developer.okta.com/code/javascript
