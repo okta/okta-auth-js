@@ -1,4 +1,4 @@
-[<img src="https://devforum.okta.com/uploads/oktadev/original/1X/bf54a16b5fda189e4ad2706fb57cbb7a1e5b8deb.png" align="right" width="256px"/>](https://devforum.okta.com/)
+[<img src="https://www.okta.com/sites/default/files/Dev_Logo-01_Large-thumbnail.png" align="right" width="256px"/>](https://devforum.okta.com/)
 
 [![Support](https://img.shields.io/badge/support-developer%20forum-blue.svg)](https://devforum.okta.com)
 [![Build Status](https://travis-ci.org/okta/okta-auth-js.svg?branch=master)](https://travis-ci.org/okta/okta-auth-js)
@@ -34,7 +34,7 @@ This library uses semantic versioning and follows Okta's [library version policy
 | -------   | -------------------------------- |
 | `4.x`     | :heavy_check_mark: Stable        |
 | `3.x`     | :warning: Retiring on 2021-05-30 |
-| `2.x`     | :warning: Retiring on 2020-09-30 |
+| `2.x`     | :x: Retired                      |
 | `1.x`     | :x: Retired                      |
 | `0.x`     | :x: Retired                      |
 
@@ -238,12 +238,14 @@ After successful authentication, the browser is redirected back to your applicat
 Depends on your preferences it is possible to use the following callback strategies.
 
 #### Handling the callback without routing
+
 1. Create / configure your auth-js instance
 2. Before making **any other calls with auth-js** at the VERY BEGINNING of the app call *token.isLoginRedirect* - if this returns true, call *parseFromUrl* and save tokens in storage manager.
       **It’s important that no other app logic runs until the async parseFromUrl / token manager logic is complete**
 3. After continue normal app logic
 
 #### Handling the callback with hash routing
+
 According to the OAuth 2.0 spec the redirect URI "MUST NOT contain a fragment component": <https://tools.ietf.org/html/rfc6749#section-3.1.2>
 So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific rout.
 That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define the logic that will parse redirect url at the very beginning of your app. So the flow will be similar to [Handling the callback without routing](#handling-the-callback-without-routing)
@@ -251,6 +253,7 @@ That's mean that hash-based router will receive the redirect callback on the mai
 Additionally if using hash routing, we recommend to use PKCE and responseMode query (which is the default for PKCE). Using implicit flow, with tokens in the hash could cause unpredictable results since hash routers like to rewrite the fragment.
 
 #### Handling the callback with path routing (on a dedicated route)
+
 1. Right before redirect, save the route you are on (we recommend sessionStorage)
 2. Do the redirect to okta
 3. Redirect back to a dedicated route
@@ -354,7 +357,7 @@ You may provide a custom storage provider. It should implement two functions:
 * `getItem(key)`
 * `setItem(key, value)`
 
-The storage provider will receive the users's raw tokens, as a string. Any custom storage provider should take care to save this string in a secure location which is not accessible by other users.
+The storage provider will receive the user's raw tokens, as a string. Any custom storage provider should take care to save this string in a secure location which is not accessible by other users.
 
 ```javascript
 tokenManager: {
@@ -447,7 +450,7 @@ By default, the library will attempt to remove expired tokens during initializat
 
 ###### `storage`
 
-You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types: 
+You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types:
 
 * [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) (default)
 * [`sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
@@ -821,7 +824,6 @@ Revokes the access token for this application so it can no longer be used to aut
 > :hourglass: async
 
 Revokes the refresh token (if any) for this application so it can no longer be used to mint new tokens. The `refreshToken` parameter is optional. By default, `revokeRefreshToken` will look for a token object named `refreshToken` within the `TokenManager`. If you have stored the refresh token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the refresh token has already been revoked or removed.
-
 
 ### `forgotPassword(options)`
 
@@ -2149,7 +2151,6 @@ Retrieve the [details about a user](https://developer.okta.com/docs/api/resource
 
 By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager. It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken". If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
 
-
 ```javascript
 // access and ID tokens are retrieved automatically from the TokenManager
 authClient.token.getUserInfo()
@@ -2266,7 +2267,7 @@ Adds storage key agnostic tokens to storage. It uses default token storage keys 
 
 #### `tokenManager.hasExpired(token)`
 
-A synchronous method which returns `true` if the token has expired. The `tokenManager` will automatically remove expired tokens in the background. However, when the app first loads this background process may not have completed, so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition. 
+A synchronous method which returns `true` if the token has expired. The `tokenManager` will automatically remove expired tokens in the background. However, when the app first loads this background process may not have completed, so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition.
 
 #### `tokenManager.remove(key)`
 
@@ -2349,10 +2350,10 @@ authClient.tokenManager.on('error', function (err) {
 
 Unsubscribe from `tokenManager` events. If no callback is provided, unsubscribes all listeners from the event.
 
-* `event` - Event to unsubscribe from 
+* `event` - Event to unsubscribe from
 * `callback` - Optional callback that was used to subscribe to the event
 
-```javascript 
+```javascript
 authClient.tokenManager.off('renewed');
 authClient.tokenManager.off('renewed', myRenewedCallback);
 ```
