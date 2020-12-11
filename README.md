@@ -2045,7 +2045,7 @@ Parses the authorization code, access, or ID Tokens from the URL after a success
 If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint.
 
 The ID token will be [verified and validated](https://github.com/okta/okta-auth-js#tokenverifyidtokenobject) before available for use.
-In case access token is a part of OAuth2 flow response, its hash will be checked against ID token's `at_hash` claim.
+In case access token is a part of OIDC flow response, its hash will be checked against ID token's `at_hash` claim.
 
 The `state` string which was passed to `getWithRedirect` will be also be available on the response.
 
