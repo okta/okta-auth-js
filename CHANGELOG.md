@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.5.0
+
+### Features
+
+- [#567](https://github.com/okta/okta-auth-js/pull/567) Adds new methods:
+  - `token.prepareTokenParams`
+  - `token.exchangeCodeForTokens`
+  - `pkce.generateVerifier`
+  - `pkce.computeChallenge`
+  and constant:
+  - `pkce.DEFAULT_CODE_CHALLENGE_METHOD`
+  This API allows more control over the `PKCE` authorization flow and is enabled for both browser and nodeJS.
+
 ## 4.4.0
 
 ### Features
