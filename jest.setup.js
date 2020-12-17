@@ -1,7 +1,8 @@
 // crypto to mimic browser environment
-import { Crypto } from "@peculiar/webcrypto";
+const Crypto = require('@peculiar/webcrypto').Crypto;
 global.crypto = new Crypto();
 
 // TextEncoder
-import { TextEncoder } from 'util';
+const TextEncoder = require('util').TextEncoder;
+// eslint-disable-next-line node/no-unsupported-features/node-builtins
 global.TextEncoder = TextEncoder;
