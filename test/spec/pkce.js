@@ -97,8 +97,7 @@ describe('pkce', function() {
         expect(e.name).toEqual('AuthSdkError');
         expect(e.errorSummary).toEqual(
           'PKCE requires a modern browser with encryption support running in a secure context.\n' +
-          'The current page is not being served with HTTPS protocol. PKCE requires secure HTTPS protocol.\n' +
-          '"TextEncoder" is not defined. To use PKCE, you may need to include a polyfill/shim for this browser.'
+          'The current page is not being served with HTTPS protocol. PKCE requires secure HTTPS protocol.'
         );
       });
     });
@@ -164,7 +163,7 @@ describe('pkce', function() {
     
   });
 
-  describe('exchangeCodeForToken', function() {
+  describe('exchangeCodeForTokens', function() {
     var ISSUER = 'http://example.okta.com';
     var REDIRECT_URI = 'http://fake.local';
     var CLIENT_ID = 'fake';
@@ -207,7 +206,7 @@ describe('pkce', function() {
         ]
       },
       execute: function (test) {
-        return pkce.exchangeCodeForToken(test.oa, {
+        return pkce.exchangeCodeForTokens(test.oa, {
           clientId: CLIENT_ID,
           redirectUri: REDIRECT_URI,
           authorizationCode: authorizationCode,
@@ -241,14 +240,14 @@ describe('pkce', function() {
         var urls = {
           tokenUrl: 'http://superfake'
         };
-        pkce.exchangeCodeForToken(authClient, oauthOptions, urls);
+        pkce.exchangeCodeForTokens(authClient, oauthOptions, urls);
         expect(httpRequst).toHaveBeenCalled();
       });
   
       it('Throws if no clientId', function() {
         oauthOptions.clientId = undefined;
         try {
-          pkce.exchangeCodeForToken(authClient, oauthOptions);
+          pkce.exchangeCodeForTokens(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('A clientId must be specified in the OktaAuth constructor to get a token');
@@ -258,7 +257,7 @@ describe('pkce', function() {
       it('Throws if no redirectUri', function() {
         oauthOptions.redirectUri = undefined;
         try {
-          pkce.exchangeCodeForToken(authClient, oauthOptions);
+          pkce.exchangeCodeForTokens(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('The redirectUri passed to /authorize must also be passed to /token');
@@ -268,7 +267,7 @@ describe('pkce', function() {
       it('Throws if no authorizationCode', function() {
         oauthOptions.authorizationCode = undefined;
         try {
-          pkce.exchangeCodeForToken(authClient, oauthOptions);
+          pkce.exchangeCodeForTokens(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('An authorization code (returned from /authorize) must be passed to /token');
@@ -278,7 +277,7 @@ describe('pkce', function() {
       it('Throws if no codeVerifier', function() {
         oauthOptions.codeVerifier = undefined;
         try {
-          pkce.exchangeCodeForToken(authClient, oauthOptions);
+          pkce.exchangeCodeForTokens(authClient, oauthOptions);
         } catch(e) {
           expect(e instanceof AuthSdkError).toBe(true);
           expect(e.message).toBe('The "codeVerifier" (generated and saved by your app) must be passed to /token');

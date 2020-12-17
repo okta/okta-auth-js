@@ -176,7 +176,7 @@ describe('token.getWithoutPrompt', function() {
       messageCallbacks = [];
 
       // Mock the well-known and keys request
-      oauthUtil.loadWellKnownAndKeysCache();
+      oauthUtil.loadWellKnownAndKeysCache(authClient);
       oauthUtil.mockStateAndNonce();
       util.warpToUnixTime(oauthUtil.getTime());
   
@@ -2252,7 +2252,7 @@ describe('token.parseFromUrl', function() {
       redirectUri
     });
     spyOn(pkce, 'clearMeta');
-    spyOn(pkce, 'exchangeCodeForToken').and.returnValue(Promise.resolve(response));
+    spyOn(pkce, 'exchangeCodeForTokens').and.returnValue(Promise.resolve(response));
   }
 
   it('authorization_code: Will return code', function() {
@@ -2364,6 +2364,7 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
+        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           accessToken: tokens.standardAccessTokenParsed,
@@ -2400,6 +2401,7 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
+        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           accessToken: tokens.standardAccessTokenParsed,
@@ -2434,6 +2436,7 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
+        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           idToken: {
@@ -3336,7 +3339,7 @@ describe('token.verify', function() {
 
     it('verifies idToken at_hash claim against accessToken', () => {
       util.warpToUnixTime(1449699929);
-      oauthUtil.loadWellKnownAndKeysCache();
+      oauthUtil.loadWellKnownAndKeysCache(client);
       validationParams.accessToken = tokens.standardAccessToken;
       return client.token.verify(idToken, validationParams)
       .then(function(res) {
@@ -3347,7 +3350,7 @@ describe('token.verify', function() {
 
     it('throws if idToken at_hash claim does not match accessToken', () => {
       util.warpToUnixTime(1449699929);
-      oauthUtil.loadWellKnownAndKeysCache();
+      oauthUtil.loadWellKnownAndKeysCache(client);
       validationParams.accessToken = tokens.standardAccessToken;
       idToken.claims.at_hash = 'other_hash';
       return client.token.verify(idToken, validationParams)
@@ -3361,7 +3364,7 @@ describe('token.verify', function() {
 
     it('skips verification if idToken does not have at_hash claim', () => {
       util.warpToUnixTime(1449699929);
-      oauthUtil.loadWellKnownAndKeysCache();
+      oauthUtil.loadWellKnownAndKeysCache(client);
       validationParams.accessToken = tokens.standardAccessToken;
       delete idToken.claims.at_hash;
       return client.token.verify(idToken, validationParams)
@@ -3374,7 +3377,7 @@ describe('token.verify', function() {
 
   it('verifies a valid idToken with nonce', function() {
     util.warpToUnixTime(1449699929);
-    oauthUtil.loadWellKnownAndKeysCache();
+    oauthUtil.loadWellKnownAndKeysCache(client);
     validationParams.nonce = tokens.standardIdTokenParsed.nonce;
     return client.token.verify(tokens.standardIdTokenParsed, validationParams)
     .then(function(res) {
@@ -3383,7 +3386,7 @@ describe('token.verify', function() {
   });
   it('verifies a valid idToken without nonce or accessToken', function() {
     util.warpToUnixTime(1449699929);
-    oauthUtil.loadWellKnownAndKeysCache();
+    oauthUtil.loadWellKnownAndKeysCache(client);
     return client.token.verify(tokens.standardIdTokenParsed, validationParams)
     .then(function(res) {
       expect(res).toEqual(tokens.standardIdTokenParsed);
@@ -3391,11 +3394,11 @@ describe('token.verify', function() {
   });
   it('validationParams are optional', () => {
     util.warpToUnixTime(1449699929);
-    oauthUtil.loadWellKnownAndKeysCache();
     client = setupSync({
       issuer: tokens.standardIdTokenParsed.issuer,
       clientId: tokens.standardIdTokenParsed.clientId,
     });
+    oauthUtil.loadWellKnownAndKeysCache(client);
     return client.token.verify(tokens.standardIdTokenParsed, undefined)
     .then(function(res) {
       expect(res).toEqual(tokens.standardIdTokenParsed);

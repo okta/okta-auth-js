@@ -2,6 +2,8 @@
 
 var tokens = {};
 
+tokens.ISSUER = 'https://auth-js-test.okta.com'; // must match what is in oauthUtil
+
 tokens.unicodeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
   'eyAibXNnX2VuIjogIkhlbGxvIiwKICAibXNnX2pwIjogIuOBk-OCk-OBq' +
   '-OBoeOBryIsCiAgIm1zZ19jbiI6ICLkvaDlpb0iLAogICJtc2dfa3IiOi' +

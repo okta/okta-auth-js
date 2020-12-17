@@ -14,6 +14,9 @@ module.exports = {
   'moduleNameMapper': {
     '^@okta/okta-auth-js$': OktaAuth
   },
+  'setupFiles': [
+    '<rootDir>/jest.setup.js'
+  ],
   'testMatch': [
     '**/test/spec/*.js'
   ],

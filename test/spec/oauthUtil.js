@@ -367,7 +367,7 @@ describe('getKey', function() {
       time: 1449699929
     },
     execute: function(test) {
-      oauthUtilHelpers.loadWellKnownAndKeysCache();
+      oauthUtilHelpers.loadWellKnownAndKeysCache(test.oa);
       return oauthUtil.getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {

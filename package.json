@@ -87,6 +87,7 @@
     "@babel/plugin-transform-typescript": "^7.10.5",
     "@babel/preset-env": "^7.8.2",
     "@babel/preset-typescript": "^7.10.4",
+    "@peculiar/webcrypto": "^1.1.4",
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.3",
     "@typescript-eslint/eslint-plugin": "^2.34.0",

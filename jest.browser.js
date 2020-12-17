@@ -22,7 +22,8 @@ module.exports = {
     '^@okta/okta-auth-js$': OktaAuth
   },
   'setupFiles': [
-    '<rootDir>/test/support/nodeExceptions.js'
+    '<rootDir>/test/support/nodeExceptions.js',
+    '<rootDir>/jest.setup.js'
   ],
   'testMatch': [
     '**/test/spec/*.{js,ts}'
