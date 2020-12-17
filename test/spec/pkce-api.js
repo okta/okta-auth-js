@@ -4,7 +4,6 @@ jest.mock('cross-fetch');
 import fetch from 'cross-fetch';
 import util from '@okta/test.support/util';
 import factory from '@okta/test.support/factory';
-import packageJson from '../../package.json';
 import { OktaAuth } from '@okta/okta-auth-js';
 import pkce from '../../lib/pkce';
 import tokens from '@okta/test.support/tokens';
