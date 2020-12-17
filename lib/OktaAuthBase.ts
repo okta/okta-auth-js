@@ -19,6 +19,7 @@ import {
   postToTransaction,
   AuthTransaction
 } from './tx';
+import PKCE from './pkce';
 import {
   OktaAuth,
   OktaAuthOptions,
@@ -27,7 +28,8 @@ import {
   VerifyRecoveryTokenOptions,
   TransactionAPI,
   SessionAPI,
-  SigninAPI
+  SigninAPI,
+  PkceAPI,
 } from './types';
 
 export default class OktaAuthBase implements OktaAuth, SigninAPI {
@@ -35,11 +37,13 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
   tx: TransactionAPI;
   userAgent: string;
   session: SessionAPI;
+  pkce: PkceAPI;
 
   constructor(args: OktaAuthOptions) {
     assertValidConfig(args);
     this.options = {
       issuer: removeTrailingSlash(args.issuer),
+      tokenUrl: removeTrailingSlash(args.tokenUrl),
       httpRequestClient: args.httpRequestClient,
       transformErrorXHR: args.transformErrorXHR,
       storageUtil: args.storageUtil,
@@ -58,7 +62,12 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
       }),
       introspect: introspect.bind(null, this)
     };
-    
+
+    this.pkce = {
+      DEFAULT_CODE_CHALLENGE_METHOD: PKCE.DEFAULT_CODE_CHALLENGE_METHOD,
+      generateVerifier: PKCE.generateVerifier,
+      computeChallenge: PKCE.computeChallenge
+    };
   }
 
   // { username, password, (relayState), (context) }

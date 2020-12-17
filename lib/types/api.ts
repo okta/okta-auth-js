@@ -85,6 +85,8 @@ export interface TokenParams extends CustomUrls {
   codeVerifier?: string;
   authorizationCode?: string;
   codeChallenge?: string;
+  grantType?: string;
+  interactionCode?: string;
   idp?: string;
   idpScope?: string | string[];
   loginHint?: string;
@@ -126,6 +128,8 @@ export interface GetWithRedirectAPI extends GetWithRedirectFunction {
 }
 
 export interface TokenAPI {
+  prepareTokenParams(params: TokenParams): Promise<TokenParams>;
+  exchangeCodeForToken(params: TokenParams, urls?: CustomUrls): Promise<TokenResponse>;
   getUserInfo(accessToken?: AccessToken, idToken?: IDToken): Promise<UserClaims>;
   getWithRedirect: GetWithRedirectAPI;
   parseFromUrl: ParseFromUrlInterface;
@@ -201,4 +205,10 @@ export interface ForgotPasswordOptions {
 
 export interface VerifyRecoveryTokenOptions {
   recoveryToken: string;
+}
+
+export interface PkceAPI {
+  DEFAULT_CODE_CHALLENGE_METHOD: string;
+  generateVerifier(prefix: string): string;
+  computeChallenge(str: string): PromiseLike<any>;
 }

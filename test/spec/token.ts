@@ -2252,7 +2252,7 @@ describe('token.parseFromUrl', function() {
       redirectUri
     });
     spyOn(pkce, 'clearMeta');
-    spyOn(pkce, 'getToken').and.returnValue(Promise.resolve(response));
+    spyOn(pkce, 'exchangeCodeForToken').and.returnValue(Promise.resolve(response));
   }
 
   it('authorization_code: Will return code', function() {
@@ -2364,7 +2364,6 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
-        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           accessToken: tokens.standardAccessTokenParsed,
@@ -2401,7 +2400,6 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
-        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           accessToken: tokens.standardAccessTokenParsed,
@@ -2436,7 +2434,6 @@ describe('token.parseFromUrl', function() {
         }
       }),
       expectedResp: {
-        code: 'fake',
         state: oauthUtil.mockedState,
         tokens: {
           idToken: {

@@ -12,22 +12,25 @@
  */
 
 export interface OAuthParams {
-  client_id: string;
-  code_challenge: string;
-  code_challenge_method: string;
-  display: string;
-  idp: string;
-  idp_scope: string | string[];
-  login_hint: string;
-  max_age: string | number;
-  nonce: string;
-  prompt: string;
-  redirect_uri: string;
-  response_mode: string;
-  response_type: string | string[];
+  client_id?: string;
+  code_challenge?: string;
+  code_challenge_method?: string;
+  display?: string;
+  idp?: string;
+  idp_scope?: string | string[];
+  login_hint?: string;
+  max_age?: string | number;
+  nonce?: string;
+  prompt?: string;
+  redirect_uri?: string;
+  response_mode?: string;
+  response_type?: string | string[];
   scope?: string;
-  sessionToken: string;
-  state: string;
+  sessionToken?: string;
+  state?: string;
+  grant_type?: string;
+  code?: string;
+  interaction_code?: string;
 }
 
 export interface OAuthResponse {

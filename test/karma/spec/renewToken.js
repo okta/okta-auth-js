@@ -17,6 +17,9 @@ describe('Renew token', function() {
     issuer: ISSUER,
     clientId: CLIENT_ID,
     redirectUri: REDIRECT_URI,
+    tokenManager: {
+      autoRenew: false
+    }
   };
 
   const ACCESS_TOKEN_STR = tokens.standardAccessToken;
