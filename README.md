@@ -60,7 +60,7 @@ Compatibility with IE 11 / Edge can be accomplished by adding polyfill/shims for
 * UInt8 typed array
 * webcrypto (crypto.subtle)
 
-> :warning: crypto polyfills are unable to use the operating system as a source of good quality entropy used to generate pseudo-random numbers that are the key to good cryptography.  As such we take the posture that polyfills are less secure and we advise against using them.
+> :warning: crypto polyfills are unable to use the operating system as a source of good quality entropy used to generate pseudo-random numbers that are the key to good cryptography.  As such we take the posture that crypto polyfills are less secure and we advise against using them.
 
 This module provides an entrypoint that implements all required polyfills.
 
