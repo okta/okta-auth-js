@@ -52,10 +52,12 @@ oauthUtil.loadWellKnownCache = function() {
   }));
 };
 
-oauthUtil.loadWellKnownAndKeysCache = function() {
+oauthUtil.loadWellKnownAndKeysCache = function(authClient) {
   // add /.well-known/openid-configuration and /oauth2/v1/keys to cache
   // so we don't make unnecessary requests
-  localStorage.setItem('okta-cache-storage', JSON.stringify({
+
+  const httpCache = authClient.options.storageUtil.getHttpCache();
+  httpCache.setStorage({
     'https://auth-js-test.okta.com/.well-known/openid-configuration': {
       expiresAt: 1449786329,
       response: wellKnown.response
@@ -72,7 +74,7 @@ oauthUtil.loadWellKnownAndKeysCache = function() {
       expiresAt: 1449786329,
       response: keys.response
     }
-  }));
+  });
 };
 
 var defaultPostMessage = oauthUtil.defaultPostMessage = {
@@ -188,7 +190,7 @@ oauthUtil.setup = function(opts) {
   util.warpToUnixTime(getTime(opts.time));
 
   // Mock the well-known and keys request
-  oauthUtil.loadWellKnownAndKeysCache();
+  oauthUtil.loadWellKnownAndKeysCache(authClient);
 
   if (opts.tokenManagerAddKeys) {
     for (var key in opts.tokenManagerAddKeys) {
@@ -398,7 +400,7 @@ oauthUtil.setupRedirect = function(opts) {
   }, opts.oktaAuthArgs));
 
   // Mock the well-known and keys request
-  oauthUtil.loadWellKnownAndKeysCache();
+  oauthUtil.loadWellKnownAndKeysCache(client);
 
   oauthUtil.mockStateAndNonce();
   var windowLocationMock = util.mockSetWindowLocation(client);
@@ -434,7 +436,7 @@ oauthUtil.setupParseUrl = function(opts) {
   }, opts.oktaAuthArgs));
 
   // Mock the well-known and keys request
-  oauthUtil.loadWellKnownAndKeysCache();
+  oauthUtil.loadWellKnownAndKeysCache(client);
 
   util.warpToUnixTime(getTime(opts.time));
 
@@ -516,7 +518,7 @@ oauthUtil.setupSimultaneousPostMessage = function() {
   });
 
   // Mock the well-known and keys request
-  oauthUtil.loadWellKnownAndKeysCache();
+  oauthUtil.loadWellKnownAndKeysCache(client);
 
   var emitter = new EventEmitter();
   jest.spyOn(window, 'addEventListener').mockImplementation(function(eventName, fn) {

@@ -6,6 +6,7 @@ module.exports = {
     "authorization_endpoint": "https://auth-js-test.okta.com/oauth2/v1/authorize",
     "userinfo_endpoint": "https://auth-js-test.okta.com/oauth2/v1/userinfo",
     "jwks_uri": "https://auth-js-test.okta.com/oauth2/v1/keys",
+    "code_challenge_methods_supported": ["S256"],
     "response_types_supported": [
       "id_token",
       "id_token token"

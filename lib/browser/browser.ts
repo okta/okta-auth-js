@@ -48,7 +48,9 @@ import {
   renewToken,
   renewTokens,
   getUserInfo,
-  verifyToken
+  verifyToken,
+  prepareTokenParams,
+  exchangeCodeForTokens
 } from '../token';
 import { TokenManager } from '../TokenManager';
 import {
@@ -132,7 +134,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       clientId: args.clientId,
       authorizeUrl: removeTrailingSlash(args.authorizeUrl),
       userinfoUrl: removeTrailingSlash(args.userinfoUrl),
-      tokenUrl: removeTrailingSlash(args.tokenUrl),
       revokeUrl: removeTrailingSlash(args.revokeUrl),
       logoutUrl: removeTrailingSlash(args.logoutUrl),
       pkce: args.pkce === false ? false : true,
@@ -161,10 +162,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     } else {
       this.options.maxClockSkew = args.maxClockSkew;
     }
-  
-    // Give the developer the ability to disable token signature
-    // validation.
-    this.options.ignoreSignature = !!args.ignoreSignature;
 
     this.session = {
       close: closeSession.bind(null, this),
@@ -176,6 +173,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
     this._tokenQueue = new PromiseQueue();
     this.token = {
+      prepareTokenParams: prepareTokenParams.bind(null, this),
+      exchangeCodeForTokens: exchangeCodeForTokens.bind(null, this),
       getWithoutPrompt: getWithoutPrompt.bind(null, this),
       getWithPopup: getWithPopup.bind(null, this),
       getWithRedirect: getWithRedirect.bind(null, this),

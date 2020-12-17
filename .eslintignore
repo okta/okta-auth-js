@@ -6,3 +6,4 @@ node_modules
 /build/types
 /build/cjs
 /samples/templates
+/samples/generated/webpack-spa/public/*-bundle.*

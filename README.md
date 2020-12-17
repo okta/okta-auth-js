@@ -624,7 +624,7 @@ var config = {
 ```
 
 ## API Reference
-
+<!-- no toc -->
 * [signIn](#signinoptions)
 * [signInWithCredentials](#signinwithcredentialsoptions)
 * [signInWithRedirect](#signinwithredirectoptions)
@@ -676,6 +676,8 @@ var config = {
   * [token.getUserInfo](#tokengetuserinfoaccesstokenobject-idtokenobject)
   * [token.verify](#tokenverifyidtokenobject)
   * [token.isLoginRedirect](#tokenisloginredirect)
+  * [token.prepareTokenParams](#tokenpreparetokenparams)
+  * [token.exchangeCodeForTokens](#tokenexchangecodefortokens)
 * [tokenManager](#tokenmanager)
   * [tokenManager.add](#tokenmanageraddkey-token)
   * [tokenManager.get](#tokenmanagergetkey)
@@ -2209,6 +2211,15 @@ authClient.token.verify(idTokenObject, validationOptions)
 #### `token.isLoginRedirect`
 
 > :warning: Deprecated, this method will be removed in next major release, use [sdk.isLoginRedirect](#isloginredirect) instead.
+
+
+#### `token.prepareTokenParams`
+
+Returns a `TokenParams` object. If `PKCE` is enabled, this object will contain values for `codeVerifier`, `codeChallenge` and `codeChallengeMethod`.
+
+#### `token.exchangeCodeForTokens`
+
+Used internally to perform the final step of the `PKCE` authorization code flow. Accepts a `TokenParams` object which should contain a `codeVerifier` and an `authorizationCode`.
 
 ### `tokenManager`
 

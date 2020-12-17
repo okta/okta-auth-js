@@ -15,13 +15,8 @@
 import AuthSdkError from './errors/AuthSdkError';
 import http from './http';
 import { warn, stringToBase64Url, removeNils, toQueryString } from './util';
-import { TokenParams, CustomUrls, PKCEMeta, OAuthResponse } from './types';
-
-// Code verifier: Random URL-safe string with a minimum length of 43 characters.
-// Code challenge: Base64 URL-encoded SHA-256 hash of the code verifier.
-var MIN_VERIFIER_LENGTH = 43;
-var MAX_VERIFIER_LENGTH = 128;
-var DEFAULT_CODE_CHALLENGE_METHOD = 'S256';
+import { TokenParams, CustomUrls, PKCEMeta, OAuthResponse, OAuthParams } from './types';
+import { MIN_VERIFIER_LENGTH, MAX_VERIFIER_LENGTH, DEFAULT_CODE_CHALLENGE_METHOD } from './constants';
 
 function dec2hex (dec) {
   return ('0' + dec.toString(16)).substr(-2);
@@ -34,7 +29,7 @@ function getRandomString(length) {
   return str.slice(0, length);
 }
 
-function generateVerifier(prefix) {
+function generateVerifier(prefix?: string): string {
   var verifier = prefix || '';
   if (verifier.length < MIN_VERIFIER_LENGTH) {
     verifier = verifier + getRandomString(MIN_VERIFIER_LENGTH - verifier.length);
@@ -99,7 +94,7 @@ function clearMeta(sdk) {
   storage.clearStorage();
 }
 
-function computeChallenge(str) {  
+function computeChallenge(str: string): PromiseLike<any> {  
   var buffer = new TextEncoder().encode(str);
   return crypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
     var hash = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
@@ -119,7 +114,7 @@ function validateOptions(options: TokenParams) {
     throw new AuthSdkError('The redirectUri passed to /authorize must also be passed to /token');
   }
 
-  if (!options.authorizationCode) {
+  if (!options.authorizationCode && !options.interactionCode) {
     throw new AuthSdkError('An authorization code (returned from /authorize) must be passed to /token');
   }
 
@@ -129,20 +124,26 @@ function validateOptions(options: TokenParams) {
 }
 
 function getPostData(options: TokenParams): string {
-  // Convert options to OAuth params
-  var params = removeNils({
+  // Convert Token params to OAuth params, sent to the /token endpoint
+  var params: OAuthParams = removeNils({
     'client_id': options.clientId,
     'redirect_uri': options.redirectUri,
-    'grant_type': 'authorization_code',
-    'code': options.authorizationCode,
+    'grant_type': options.interactionCode ? 'interaction_code' : 'authorization_code',
     'code_verifier': options.codeVerifier
   });
+
+  if (options.interactionCode) {
+    params['interaction_code'] = options.interactionCode;
+  } else if (options.authorizationCode) {
+    params.code = options.authorizationCode;
+  }
+
   // Encode as URL string
   return toQueryString(params).slice(1);
 }
 
 // exchange authorization code for an access token
-function getToken(sdk, options: TokenParams, urls: CustomUrls): Promise<OAuthResponse> {
+function exchangeCodeForTokens(sdk, options: TokenParams, urls: CustomUrls): Promise<OAuthResponse> {
   validateOptions(options);
   var data = getPostData(options);
 
@@ -158,11 +159,11 @@ function getToken(sdk, options: TokenParams, urls: CustomUrls): Promise<OAuthRes
 }
 
 export default {
-  DEFAULT_CODE_CHALLENGE_METHOD: DEFAULT_CODE_CHALLENGE_METHOD,
-  generateVerifier: generateVerifier,
-  clearMeta: clearMeta,
-  saveMeta: saveMeta,
-  loadMeta: loadMeta,
-  computeChallenge: computeChallenge,
-  getToken: getToken
+  DEFAULT_CODE_CHALLENGE_METHOD,
+  generateVerifier,
+  clearMeta,
+  saveMeta,
+  loadMeta,
+  computeChallenge,
+  exchangeCodeForTokens
 };

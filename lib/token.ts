@@ -35,7 +35,8 @@ import OAuthError from './errors/OAuthError';
 import {
   REDIRECT_OAUTH_PARAMS_NAME,
   REDIRECT_NONCE_COOKIE_NAME,
-  REDIRECT_STATE_COOKIE_NAME
+  REDIRECT_STATE_COOKIE_NAME,
+  DEFAULT_CODE_CHALLENGE_METHOD
 } from './constants';
 import browserStorage from './browser/browserStorage';
 import PKCE from './pkce';
@@ -201,23 +202,56 @@ function addPostMessageListener(sdk: OktaAuth, timeout, state) {
     });
 }
 
-function exchangeCodeForToken(sdk: OktaAuth, oauthParams: TokenParams, authorizationCode: string, urls: CustomUrls) {
-  // PKCE authorization_code flow
-  // Retrieve saved values and build oauthParams for call to /token
-  var meta = PKCE.loadMeta(sdk);
-  var getTokenParams = {
-    clientId: oauthParams.clientId,
-    authorizationCode: authorizationCode,
-    codeVerifier: meta.codeVerifier,
-    redirectUri: meta.redirectUri
+// codeVerifier is required. May pass either an authorizationCode or interactionCode
+function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
+  if (!sdk.options.pkce) {
+    return Promise.reject(
+      new AuthSdkError('"pkce.exchangeCodeForTokens" method requires "pkce" SDK option to be true.')
+    );
+  }
+  urls = urls || getOAuthUrls(sdk, tokenParams);
+  // build params using defaults + options
+  tokenParams = Object.assign({}, getDefaultTokenParams(sdk), clone(tokenParams));
+
+  const {
+    authorizationCode,
+    interactionCode,
+    codeVerifier,
+    clientId,
+    redirectUri,
+    scopes,
+    ignoreSignature,
+  } = tokenParams;
+
+  var getTokenOptions = {
+    clientId,
+    redirectUri,
+    authorizationCode,
+    interactionCode,
+    codeVerifier,
   };
-  return PKCE.getToken(sdk, getTokenParams, urls)
-    .then(function (res) {
-      validateResponse(res, getTokenParams);
-      return res;
-    })
-    .finally(function () {
-      PKCE.clearMeta(sdk);
+  return PKCE.exchangeCodeForTokens(sdk, getTokenOptions, urls)
+    .then((response: OAuthResponse) => {
+      // `handleOAuthResponse` hanadles responses from both `/authorize` and `/token` endpoints
+      // Here we modify the response from `/token` so that it more closely matches a response from `/authorize`
+      // `responseType` is used to validate that the expected tokens were returned
+      const responseType = ['token']; // an accessToken will always be returned
+      if (scopes.indexOf('openid') !== -1) {
+        responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
+      }
+      const handleResponseOptions: TokenParams = {
+        clientId,
+        redirectUri,
+        scopes,
+        responseType,
+        ignoreSignature,
+      };
+      return handleOAuthResponse(sdk, handleResponseOptions, response, urls)
+        .then((response: TokenResponse) => {
+          // For compatibility, "code" is returned in the TokenResponse. OKTA-326091
+          response.code = authorizationCode;
+          return response;
+        });
     });
 }
 
@@ -233,8 +267,18 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
 
 // eslint-disable-next-line max-len
 function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuthResponse, urls: CustomUrls): Promise<TokenResponse> {
-  urls = urls || {};
-  tokenParams = tokenParams || {};
+  var pkce = sdk.options.pkce !== false;
+
+  // The result contains an authorization_code and PKCE is enabled 
+  // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
+  if (res.code && pkce) {
+    return exchangeCodeForTokens(sdk, Object.assign({}, tokenParams, {
+      authorizationCode: res.code
+    }), urls);
+  }
+
+  tokenParams = tokenParams || getDefaultTokenParams(sdk);
+  urls = urls || getOAuthUrls(sdk, tokenParams);
 
   var responseType = tokenParams.responseType;
   if (!Array.isArray(responseType)) {
@@ -243,26 +287,12 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
 
   var scopes = clone(tokenParams.scopes);
   var clientId = tokenParams.clientId || sdk.options.clientId;
-  var pkce = sdk.options.pkce !== false;
 
+  // Handling the result from implicit flow or PKCE token exchange
   return Promise.resolve()
     .then(function () {
       validateResponse(res, tokenParams);
-
-      // PKCE flow
-      // We do not support "hybrid" scenarios where the response includes both a code and a token.
-      // If the response contains a code it is used immediately to obtain new tokens.
-      if (res.code && pkce) {
-        // responseType is not sent to the token endpoint.
-        // We populate this array to validate the response below
-        responseType = ['token']; // an accessToken will always be returned
-        if (scopes.indexOf('openid') !== -1) {
-          responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
-        }
-        return exchangeCodeForToken(sdk, tokenParams, res.code, urls);
-      }
-      return res;
-    }).then(function (res: OAuthResponse) {
+    }).then(function () {
       var tokenDict = {} as Tokens;
       var expiresIn = res.expires_in;
       var tokenType = res.token_type;
@@ -330,7 +360,7 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
 
       return tokenDict;
     })
-    .then(function (tokenDict) {
+    .then(function (tokenDict): TokenResponse {
       // Validate received tokens against requested response types 
       if (responseType.indexOf('token') !== -1 && !tokenDict.accessToken) {
         // eslint-disable-next-line max-len
@@ -579,18 +609,18 @@ function getToken(sdk: OktaAuth, options: TokenParams) {
         default:
           throw new AuthSdkError('The full page redirect flow is not supported');
       }
-    })
-    .catch(e => {
-      if (sdk.options.pkce) {
-        PKCE.clearMeta(sdk);
-      }
-      throw e;
     });
 }
 
 function getWithoutPrompt(sdk: OktaAuth, options: TokenParams): Promise<TokenResponse> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithoutPrompt" takes only a single set of options'));
+  }
+  if (isLoginRedirect(sdk)) {
+    return Promise.reject(new AuthSdkError(
+      'The app should not attempt to call getToken on callback. ' +
+      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
+    ));
   }
   options = clone(options) || {};
   Object.assign(options, {
@@ -605,6 +635,12 @@ function getWithPopup(sdk: OktaAuth, options: TokenParams): Promise<TokenRespons
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithPopup" takes only a single set of options'));
   }
+  if (isLoginRedirect(sdk)) {
+    return Promise.reject(new AuthSdkError(
+      'The app should not attempt to call getToken on callback. ' +
+      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
+    ));
+  }
   options = clone(options) || {};
   Object.assign(options, {
     display: 'popup',
@@ -613,22 +649,13 @@ function getWithPopup(sdk: OktaAuth, options: TokenParams): Promise<TokenRespons
   return getToken(sdk, options);
 }
 
-function prepareTokenParams(sdk: OktaAuth, options: TokenParams): Promise<TokenParams> {
-  if (isLoginRedirect(sdk)) {
-    return Promise.reject(new AuthSdkError(
-      'The app should not attempt to call getToken on callback. ' +
-      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
-    ));
-  }
-
-  // clone and prepare options
-  options = clone(options) || {};
-
+// Prepares params for a call to /authorize or /token
+function prepareTokenParams(sdk: OktaAuth, tokenParams: TokenParams): Promise<TokenParams> {
   // build params using defaults + options
-  var tokenParams: TokenParams = getDefaultTokenParams(sdk);
-  Object.assign(tokenParams, options);
+  tokenParams = Object.assign({}, getDefaultTokenParams(sdk), clone(tokenParams));
 
   if (tokenParams.pkce === false) {
+    // Implicit flow or authorization_code without PKCE
     return Promise.resolve(tokenParams);
   }
 
@@ -648,7 +675,7 @@ function prepareTokenParams(sdk: OktaAuth, options: TokenParams): Promise<TokenP
 
   // set default code challenge method, if none provided
   if (!tokenParams.codeChallengeMethod) {
-    tokenParams.codeChallengeMethod = PKCE.DEFAULT_CODE_CHALLENGE_METHOD;
+    tokenParams.codeChallengeMethod = DEFAULT_CODE_CHALLENGE_METHOD;
   }
 
   // responseType is forced
@@ -662,20 +689,12 @@ function prepareTokenParams(sdk: OktaAuth, options: TokenParams): Promise<TokenP
       }
     })
     .then(function () {
-      // PKCE authorization_code flow
-      var codeVerifier = PKCE.generateVerifier(tokenParams.codeVerifier);
-
-      // We will need these values after redirect when we call /token
-      var meta: PKCEMeta = {
-        codeVerifier: codeVerifier,
-        redirectUri: tokenParams.redirectUri
-      };
-      PKCE.saveMeta(sdk, meta);
-
-      return PKCE.computeChallenge(codeVerifier);
+      if (!tokenParams.codeVerifier) {
+        tokenParams.codeVerifier = PKCE.generateVerifier();
+      }
+      return PKCE.computeChallenge(tokenParams.codeVerifier);
     })
     .then(function (codeChallenge) {
-
       // Clone/copy the params. Set codeChallenge
       var clonedParams = clone(tokenParams) || {};
       Object.assign(clonedParams, tokenParams, {
@@ -707,6 +726,12 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
   }
+  if (isLoginRedirect(sdk)) {
+    return Promise.reject(new AuthSdkError(
+      'The app should not attempt to call getToken on callback. ' +
+      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
+    ));
+  }
   options = clone(options) || {};
 
   return prepareTokenParams(sdk, options)
@@ -722,6 +747,14 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
       // Set state cookie for servers to validate state
       cookies.set(REDIRECT_STATE_COOKIE_NAME, tokenParams.state, null, sdk.options.cookies);
 
+      if (sdk.options.pkce) {
+        // We will need these values after redirect when we call /token
+        var meta: PKCEMeta = {
+          codeVerifier: tokenParams.codeVerifier,
+          redirectUri: tokenParams.redirectUri
+        };
+        PKCE.saveMeta(sdk, meta);
+      }
       sdk.token.getWithRedirect._setLocation(requestUrl);
     });
 }
@@ -910,7 +943,20 @@ function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<Token
         // Clean hash or search from the url
         responseMode === 'query' ? removeSearch(sdk) : removeHash(sdk);
       }
-      return handleOAuthResponse(sdk, oauthParams, res, urls);
+      if (sdk.options.pkce) {
+        const meta: PKCEMeta = PKCE.loadMeta(sdk);
+        const { codeVerifier, redirectUri } = meta;
+        oauthParams = Object.assign({
+          codeVerifier,
+          redirectUri
+        }, oauthParams);
+      }
+      return handleOAuthResponse(sdk, oauthParams, res, urls)
+        .finally(() => {
+          if (sdk.options.pkce) {
+            PKCE.clearMeta(sdk);
+          }
+        });
     });
 }
 
@@ -978,7 +1024,9 @@ export {
   getUserInfo,
   verifyToken,
   handleOAuthResponse,
+  getDefaultTokenParams,
   prepareTokenParams,
+  exchangeCodeForTokens,
   _addOAuthParamsToStorage, // export for testing purpose
   _getOAuthParamsStrFromStorage, // export for testing purpose
 };

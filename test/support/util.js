@@ -91,7 +91,7 @@ function mockAjax(pairs) {
   fetch.mockImplementation(function (url, args) {
     var pair = allPairs.shift();
     if (!pair) {
-      throw new Error('We are making a request that we have not anticipated.');
+      throw new Error('We are making a request that we have not anticipated: ' + url);
     }
 
     if (pair.request.withCredentials !== false) {
@@ -193,6 +193,8 @@ function setup(options) {
       oa = new OktaAuth({
         pkce: options.pkce,
         issuer: options.issuer,
+        clientId: options.clientId,
+        redirectUri: options.redirectUri,
         transformErrorXHR: options.transformErrorXHR,
         headers: options.headers,
         ignoreSignature: options.bypassCrypto === true,

@@ -24,3 +24,9 @@ export const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
 export const ID_TOKEN_STORAGE_KEY =  'idToken';
 export const REFRESH_TOKEN_STORAGE_KEY =  'refreshToken';
 export const REFERRER_PATH_STORAGE_KEY = 'referrerPath';
+
+// Code verifier: Random URL-safe string with a minimum length of 43 characters.
+// Code challenge: Base64 URL-encoded SHA-256 hash of the code verifier.
+export const MIN_VERIFIER_LENGTH = 43;
+export const MAX_VERIFIER_LENGTH = 128;
+export const DEFAULT_CODE_CHALLENGE_METHOD = 'S256';

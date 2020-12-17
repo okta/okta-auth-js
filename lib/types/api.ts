@@ -85,6 +85,8 @@ export interface TokenParams extends CustomUrls {
   codeVerifier?: string;
   authorizationCode?: string;
   codeChallenge?: string;
+  grantType?: string;
+  interactionCode?: string;
   idp?: string;
   idpScope?: string | string[];
   loginHint?: string;
@@ -104,6 +106,7 @@ export interface Tokens {
 export interface TokenResponse {
   tokens: Tokens;
   state: string;
+  code?: string;
 }
 
 export interface ParseFromUrlOptions {
@@ -125,13 +128,18 @@ export interface GetWithRedirectAPI extends GetWithRedirectFunction {
   _setLocation: (loc: string) => void;
 }
 
-export interface TokenAPI {
+export interface BaseTokenAPI {
+  decode(token: string): JWTObject;
+  prepareTokenParams(params: TokenParams): Promise<TokenParams>;
+  exchangeCodeForTokens(params: TokenParams, urls?: CustomUrls): Promise<TokenResponse>;
+}
+
+export interface TokenAPI extends BaseTokenAPI {
   getUserInfo(accessToken?: AccessToken, idToken?: IDToken): Promise<UserClaims>;
   getWithRedirect: GetWithRedirectAPI;
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
-  decode(token: string): JWTObject;
   revoke(token: RevocableToken): Promise<object>;
   renew(token: Token): Promise<Token>;
   renewTokens(): Promise<Tokens>;
@@ -201,4 +209,10 @@ export interface ForgotPasswordOptions {
 
 export interface VerifyRecoveryTokenOptions {
   recoveryToken: string;
+}
+
+export interface PkceAPI {
+  DEFAULT_CODE_CHALLENGE_METHOD: string;
+  generateVerifier(prefix: string): string;
+  computeChallenge(str: string): PromiseLike<any>;
 }
