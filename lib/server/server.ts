@@ -18,7 +18,7 @@ import { getUserAgent } from '../builderUtil';
 import serverStorage from './serverStorage';
 import * as features from './features';
 import { BaseTokenAPI, FeaturesAPI } from '../types';
-import { prepareTokenParams, exchangeCodeForToken, decodeToken } from '../token';
+import { prepareTokenParams, exchangeCodeForTokens, decodeToken } from '../token';
 
 const PACKAGE_JSON = require('../../package.json');
 
@@ -40,7 +40,7 @@ class OktaAuthNode extends OktaAuthBase {
     this.token = {
       decode: decodeToken,
       prepareTokenParams: prepareTokenParams.bind(null, this),
-      exchangeCodeForToken: exchangeCodeForToken.bind(null, this)
+      exchangeCodeForTokens: exchangeCodeForTokens.bind(null, this)
     };
   }
 }

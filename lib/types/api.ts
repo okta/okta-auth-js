@@ -106,6 +106,7 @@ export interface Tokens {
 export interface TokenResponse {
   tokens: Tokens;
   state: string;
+  code?: string;
 }
 
 export interface ParseFromUrlOptions {
@@ -130,7 +131,7 @@ export interface GetWithRedirectAPI extends GetWithRedirectFunction {
 export interface BaseTokenAPI {
   decode(token: string): JWTObject;
   prepareTokenParams(params: TokenParams): Promise<TokenParams>;
-  exchangeCodeForToken(params: TokenParams, urls?: CustomUrls): Promise<TokenResponse>;
+  exchangeCodeForTokens(params: TokenParams, urls?: CustomUrls): Promise<TokenResponse>;
 }
 
 export interface TokenAPI extends BaseTokenAPI {

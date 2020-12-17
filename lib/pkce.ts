@@ -143,7 +143,7 @@ function getPostData(options: TokenParams): string {
 }
 
 // exchange authorization code for an access token
-function exchangeCodeForToken(sdk, options: TokenParams, urls: CustomUrls): Promise<OAuthResponse> {
+function exchangeCodeForTokens(sdk, options: TokenParams, urls: CustomUrls): Promise<OAuthResponse> {
   validateOptions(options);
   var data = getPostData(options);
 
@@ -165,5 +165,5 @@ export default {
   saveMeta,
   loadMeta,
   computeChallenge,
-  exchangeCodeForToken
+  exchangeCodeForTokens
 };

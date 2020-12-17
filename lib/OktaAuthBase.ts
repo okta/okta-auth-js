@@ -54,6 +54,9 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
       pkce: args.pkce
     };
 
+    // Give the developer the ability to disable token signature validation.
+    this.options.ignoreSignature = !!args.ignoreSignature;
+
     this.tx = {
       status: transactionStatus.bind(null, this),
       resume: resumeTransaction.bind(null, this),

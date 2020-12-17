@@ -203,10 +203,10 @@ function addPostMessageListener(sdk: OktaAuth, timeout, state) {
 }
 
 // codeVerifier is required. May pass either an authorizationCode or interactionCode
-function exchangeCodeForToken(sdk: OktaAuth, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
+function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
   if (!sdk.options.pkce) {
     return Promise.reject(
-      new AuthSdkError('"pkce.exchangeCodeForToken" method requires "pkce" SDK option to be true.')
+      new AuthSdkError('"pkce.exchangeCodeForTokens" method requires "pkce" SDK option to be true.')
     );
   }
   urls = urls || getOAuthUrls(sdk, tokenParams);
@@ -230,21 +230,28 @@ function exchangeCodeForToken(sdk: OktaAuth, tokenParams: TokenParams, urls?: Cu
     interactionCode,
     codeVerifier,
   };
-  return PKCE.exchangeCodeForToken(sdk, getTokenOptions, urls)
-    .then(function (response) {
-      // We populate this array to validate that the response contains the expected tokens.
+  return PKCE.exchangeCodeForTokens(sdk, getTokenOptions, urls)
+    .then((response: OAuthResponse) => {
+      // `handleOAuthResponse` hanadles responses from both `/authorize` and `/token` endpoints
+      // Here we modify the response from `/token` so that it more closely matches a response from `/authorize`
+      // `responseType` is used to validate that the expected tokens were returned
       const responseType = ['token']; // an accessToken will always be returned
       if (scopes.indexOf('openid') !== -1) {
         responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
       }
-      const handleResponseOptions = {
+      const handleResponseOptions: TokenParams = {
         clientId,
         redirectUri,
         scopes,
         responseType,
         ignoreSignature,
       };
-      return handleOAuthResponse(sdk, handleResponseOptions, response, urls);
+      return handleOAuthResponse(sdk, handleResponseOptions, response, urls)
+        .then((response: TokenResponse) => {
+          // For compatibility, "code" is returned in the TokenResponse. OKTA-326091
+          response.code = authorizationCode;
+          return response;
+        });
     });
 }
 
@@ -263,9 +270,9 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
   var pkce = sdk.options.pkce !== false;
 
   // The result contains an authorization_code and PKCE is enabled 
-  // `exchangeCodeForToken` will call /token then call `handleOauthResponse` recursively with the result
+  // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
   if (res.code && pkce) {
-    return exchangeCodeForToken(sdk, Object.assign({}, tokenParams, {
+    return exchangeCodeForTokens(sdk, Object.assign({}, tokenParams, {
       authorizationCode: res.code
     }), urls);
   }
@@ -353,7 +360,7 @@ function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuth
 
       return tokenDict;
     })
-    .then(function (tokenDict) {
+    .then(function (tokenDict): TokenResponse {
       // Validate received tokens against requested response types 
       if (responseType.indexOf('token') !== -1 && !tokenDict.accessToken) {
         // eslint-disable-next-line max-len
@@ -1019,7 +1026,7 @@ export {
   handleOAuthResponse,
   getDefaultTokenParams,
   prepareTokenParams,
-  exchangeCodeForToken,
+  exchangeCodeForTokens,
   _addOAuthParamsToStorage, // export for testing purpose
   _getOAuthParamsStrFromStorage, // export for testing purpose
 };
