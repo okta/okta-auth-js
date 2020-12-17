@@ -127,15 +127,18 @@ export interface GetWithRedirectAPI extends GetWithRedirectFunction {
   _setLocation: (loc: string) => void;
 }
 
-export interface TokenAPI {
+export interface BaseTokenAPI {
+  decode(token: string): JWTObject;
   prepareTokenParams(params: TokenParams): Promise<TokenParams>;
   exchangeCodeForToken(params: TokenParams, urls?: CustomUrls): Promise<TokenResponse>;
+}
+
+export interface TokenAPI extends BaseTokenAPI {
   getUserInfo(accessToken?: AccessToken, idToken?: IDToken): Promise<UserClaims>;
   getWithRedirect: GetWithRedirectAPI;
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
-  decode(token: string): JWTObject;
   revoke(token: RevocableToken): Promise<object>;
   renew(token: Token): Promise<Token>;
   renewTokens(): Promise<Tokens>;

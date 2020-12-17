@@ -17,7 +17,9 @@ import fetchRequest from '../fetch/fetchRequest';
 import { getUserAgent } from '../builderUtil';
 import serverStorage from './serverStorage';
 import * as features from './features';
-import { FeaturesAPI } from '../types';
+import { BaseTokenAPI, FeaturesAPI } from '../types';
+import { prepareTokenParams, exchangeCodeForToken, decodeToken } from '../token';
+
 const PACKAGE_JSON = require('../../package.json');
 
 const SDK_VERSION = PACKAGE_JSON.version;
@@ -25,6 +27,7 @@ const SDK_VERSION = PACKAGE_JSON.version;
 class OktaAuthNode extends OktaAuthBase {
   static features: FeaturesAPI;
   features: FeaturesAPI;
+  token: BaseTokenAPI;
   constructor(args) {
     args = Object.assign({
       httpRequestClient: fetchRequest,
@@ -33,6 +36,12 @@ class OktaAuthNode extends OktaAuthBase {
     super(args);
 
     this.userAgent = getUserAgent(args, `okta-auth-js-server/${SDK_VERSION}`);
+
+    this.token = {
+      decode: decodeToken,
+      prepareTokenParams: prepareTokenParams.bind(null, this),
+      exchangeCodeForToken: exchangeCodeForToken.bind(null, this)
+    };
   }
 }
 

@@ -48,7 +48,10 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
       transformErrorXHR: args.transformErrorXHR,
       storageUtil: args.storageUtil,
       headers: args.headers,
-      devMode: args.devMode || false
+      devMode: args.devMode || false,
+      clientId: args.clientId,
+      redirectUri: args.redirectUri,
+      pkce: args.pkce
     };
 
     this.tx = {
