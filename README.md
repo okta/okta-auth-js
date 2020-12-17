@@ -60,6 +60,8 @@ Compatibility with IE 11 / Edge can be accomplished by adding polyfill/shims for
 * UInt8 typed array
 * webcrypto (crypto.subtle)
 
+> :warning: crypto polyfills are unable to use the operating system as a source of good quality entropy used to generate pseudo-random numbers that are the key to good cryptography.  As such we take the posture that crypto polyfills are less secure and we advise against using them.
+
 This module provides an entrypoint that implements all required polyfills.
 
 If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.polyfill.js` file in a `<script>` tag. It should be loaded before any other scripts which depend on the polyfill.  
