@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.5.1
+
+### Fix
+- [#574](https://github.com/okta/okta-auth-js/pull/574) Removes overeager `catch` when using refresh token
+
 ## 4.5.0
 
 ### Features
