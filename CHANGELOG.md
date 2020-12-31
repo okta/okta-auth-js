@@ -10,6 +10,11 @@
 
 - [#583](https://github.com/okta/okta-auth-js/pull/583) Better error handling for redirect flows: if redirect URI contains `error` or `error_description` then `isLoginRedirect` will return true and `parseFromUrl` will throw `OAuthError`
 
+## 4.5.1
+
+### Bug Fixes
+- [#579](https://github.com/okta/okta-auth-js/pull/579) Removes overeager `catch` when using refresh token
+
 ## 4.5.0
 
 ### Features
