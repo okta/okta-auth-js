@@ -802,26 +802,28 @@ async function renewTokensWithRefresh(
 
   var urls = getOAuthUrls(sdk, tokenParams);
 
+  try {
+    const response = await http.httpRequest(sdk, {
+      url: refreshTokenObject.tokenUrl,
+      method: 'POST',
+      withCredentials: false,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
 
-  const response = await http.httpRequest(sdk, {
-    url: refreshTokenObject.tokenUrl,
-    method: 'POST',
-    withCredentials: false,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-
-    args: Object.entries({
-      client_id: clientId, // eslint-disable-line camelcase
-      grant_type: 'refresh_token', // eslint-disable-line camelcase
-      scope: refreshTokenObject.scopes.join(' '),
-      refresh_token: refreshTokenObject.refreshToken, // eslint-disable-line camelcase
-    }).map(function ([name, value]) {
-      return name + '=' + encodeURIComponent(value);
-    }).join('&'),
-  });
-  return handleOAuthResponse(sdk, tokenParams, response, urls).then(res => res.tokens);
-
+      args: Object.entries({
+        client_id: clientId, // eslint-disable-line camelcase
+        grant_type: 'refresh_token', // eslint-disable-line camelcase
+        scope: refreshTokenObject.scopes.join(' '),
+        refresh_token: refreshTokenObject.refreshToken, // eslint-disable-line camelcase
+      }).map(function ([name, value]) {
+        return name + '=' + encodeURIComponent(value);
+      }).join('&'),
+    });
+    return handleOAuthResponse(sdk, tokenParams, response, urls).then(res => res.tokens);
+  } catch (err) {
+    console.log({ err });
+  }
 }
 
 function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
