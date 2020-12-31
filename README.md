@@ -1048,7 +1048,7 @@ if (exists) {
 
 > :hourglass: async
 
-When Auth Client methods resolve, they return a **transaction** object that encapsulates [the new state in the authentication flow](https://developer.okta.com/docs/api/resources/authn#transaction-model). This **transaction** contains metadata about the current state, and methods that can be used to progress to the next state.
+When Auth Client methods resolve, they return a **transaction** object that encapsulates [the new state in the authentication flow](https://developer.okta.com/docs/reference/api/authn/#transaction-state). This **transaction** contains metadata about the current state, and methods that can be used to progress to the next state.
 
 ![State Model Diagram](https://developer.okta.com/img/auth-state-model.png "State Model Diagram")
 
@@ -2050,7 +2050,8 @@ Parses the authorization code, access, or ID Tokens from the URL after a success
 
 If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint.
 
-The ID token will be [verified and validated](https://github.com/okta/okta-auth-js/blob/master/lib/token.js#L186-L190) before available for use.
+The ID token will be [verified and validated](https://github.com/okta/okta-auth-js#tokenverifyidtokenobject) before available for use.
+In case access token is a part of OIDC flow response, its hash will be checked against ID token's `at_hash` claim.
 
 The `state` string which was passed to `getWithRedirect` will be also be available on the response.
 
