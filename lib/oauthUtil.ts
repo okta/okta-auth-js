@@ -231,25 +231,40 @@ function hasCodeInUrl(hashOrSearch: string): boolean {
   return /(code=)/i.test(hashOrSearch);
 }
 
+function hasErrorInUrl(hashOrSearch: string): boolean {
+  return /(error=)/i.test(hashOrSearch) || /(error_description)/i.test(hashOrSearch);
+}
+
 function isRedirectUri(uri: string, sdk: OktaAuth): boolean {
   var authParams = sdk.options;
-  return uri && uri.indexOf(authParams.redirectUri) == 0;
+  return uri && uri.indexOf(authParams.redirectUri) === 0;
 }
 
 /**
  * Check if tokens or a code have been passed back into the url, which happens in
- * the social auth IDP redirect flow.
+ * the OIDC (including social auth IDP) redirect flow.
  */
 function isLoginRedirect (sdk: OktaAuth) {
-  var authParams = sdk.options;
-  if (authParams.pkce || authParams.responseType === 'code' || authParams.responseMode === 'query') {
-    // Look for code
-    var hasCode = authParams.responseMode === 'fragment' ?
-      hasCodeInUrl(window.location.hash) :
-      hasCodeInUrl(window.location.search);
-    return isRedirectUri(window.location.href, sdk) && hasCode;
+  // First check, is this a redirect URI?
+  if (!isRedirectUri(window.location.href, sdk)){
+    return false;
   }
-  // Look for tokens (Implicit OIDC flow)
+
+  // The location contains either a code, token, or an error&error_description
+  var authParams = sdk.options;
+  var codeFlow = authParams.pkce || authParams.responseType === 'code' || authParams.responseMode === 'query';
+  var useQuery = codeFlow && authParams.responseMode !== 'fragment';
+
+  if (hasErrorInUrl(useQuery ? window.location.search : window.location.hash)) {
+    return true;
+  }
+
+  if (codeFlow) {
+    var hasCode =  useQuery ? hasCodeInUrl(window.location.search) : hasCodeInUrl(window.location.hash);
+    return hasCode;
+  }
+
+  // implicit flow, will always be hash fragment
   return hasTokensInHash(window.location.hash);
 }
 
