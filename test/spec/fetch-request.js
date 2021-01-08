@@ -1,3 +1,4 @@
+/* global window */
 describe('fetchRequest', function () {
   let fetchSpy;
 
@@ -43,6 +44,34 @@ describe('fetchRequest', function () {
     };
     requestMethod = 'GET';
     requestUrl = 'http://fakey.local';
+  });
+
+  describe('fetch implementation', () => {
+    let defaultFetch;
+    beforeEach(() => {
+      defaultFetch = window.fetch;
+      window.fetch = null;
+    });
+    afterEach(() => {
+      window.fetch = defaultFetch;
+    });
+    it('uses cross-fetch if no native fetch', () => {
+      return fetchRequest(requestMethod, requestUrl, {})
+      .then(() => {
+        expect(fetchSpy).toHaveBeenCalled();
+      });
+    });
+    it('uses native fetch if available', () => {
+      const globalFetch = jest.fn(() => {
+        return Promise.resolve(response);
+      });
+      window.fetch = globalFetch;
+      return fetchRequest(requestMethod, requestUrl, {})
+      .then(() => {
+        expect(globalFetch).toHaveBeenCalled();
+        expect(fetchSpy).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe('request', () => {
