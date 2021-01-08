@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import fetch from 'cross-fetch';
+import crossFetch from 'cross-fetch';
 import { FetchOptions, FetchResponse, HttpResponse } from '../types';
 
 function readData(response: FetchResponse): Promise<object | string> {
@@ -52,7 +52,7 @@ function fetchRequest(method: string, url: string, args: FetchOptions) {
   if (contentType === 'application/json' && body && typeof body !== 'string') {
     body = JSON.stringify(body);
   }
-
+  var fetch = global.fetch || crossFetch;
   var fetchPromise = fetch(url, {
     method: method,
     headers: args.headers,

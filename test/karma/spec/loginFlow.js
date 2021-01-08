@@ -46,6 +46,7 @@ describe('Complete login flow', function() {
   var _history;
   var _location;
   var $app;
+  var fetch;
 
   beforeEach(function() {
     _history = {
@@ -60,12 +61,15 @@ describe('Complete login flow', function() {
     date.setTime(ASSUMED_TIME * 1000);
     jasmine.clock().mockDate(date);
     jasmine.Ajax.install();
+    fetch = window.fetch;
+    window.fetch = null; // disable native fetch, force XHR
   });
 
   afterEach(function() {
     document.body.removeChild(document.getElementById('root'));
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
+    window.fetch = fetch;
   });
 
   async function bootstrap(config, pathname) {
