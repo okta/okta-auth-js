@@ -30,7 +30,7 @@ describe('Renew token', function() {
   const JWKS_URI = 'http://myfake.jwks.local';
 
   var sdk;
-
+  var fetch;
 
   beforeEach(function() {
     document.body.insertAdjacentHTML('beforeend', '<div id="root"></div>');
@@ -38,6 +38,8 @@ describe('Renew token', function() {
     date.setTime(ASSUMED_TIME * 1000);
     jasmine.clock().mockDate(date);
     jasmine.Ajax.install();
+    fetch = window.fetch;
+    window.fetch = null; // disable native fetch, force XHR
   });
 
   afterEach(function() {
@@ -45,6 +47,7 @@ describe('Renew token', function() {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
     token.$imports.$restore();
+    window.fetch = fetch;
   });
 
   function bootstrap(config) {
