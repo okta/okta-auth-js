@@ -913,6 +913,10 @@ describe('validateClaims', function () {
 });
 
 describe('isLoginRedirect', function() {
+  const redirectUri = 'http://fake/login/callback';
+  const issuer = 'https://auth-js-test.okta.com';
+  const clientId = 'foo';
+
   let sdk;
   let originalLocation;
   beforeEach(() => {
@@ -922,38 +926,54 @@ describe('isLoginRedirect', function() {
     window.location = originalLocation;
   });
 
+
+  function mockHash(hash) {
+    delete window.location;
+    window.location = {
+      hash: `#${hash}`,
+      href: `${redirectUri}#${hash}`
+    };
+  }
+
+  function mockSearch(search) {
+    delete window.location;
+    window.location = {
+      search: `?${search}`,
+      href: `${redirectUri}?${search}`
+    };
+  }
+
   describe('Implicit OIDC flow', () => {
     beforeEach(() => {
       sdk = new OktaAuth({
         pkce: false,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo'
+        issuer,
+        clientId,
+        redirectUri
       });
     });
 
     it('should return true if there is id_token in hash', () => {
-      delete window.location;
-      window.location = {
-        hash: '#id_token=fakeidtoken'
-      };
+      mockHash('id_token=fakeidtoken');
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
     it('should return true if there is access_token in hash', () => {
-      delete window.location;
-      window.location = {
-        hash: '#access_token=fakeaccesstoken'
-      };
+      mockHash('access_token=fakeaccesstoken');
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
     it('should return false if there is no id or access token in hash', () => {
-      delete window.location;
-      window.location = {
-        hash: '#random_token=fakerandomtoken'
-      };
+      mockHash('random_token=fakerandomtoken');
+      const result = oauthUtil.isLoginRedirect(sdk);
+      expect(result).toBe(false);
+    });
+
+    it('should return false if current URI is not redirect URI', () => {
+      mockHash('id_token=fakeidtoken');
+      window.location.href = 'http://fake/product/search' + window.location.hash;
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(false);
     });
@@ -961,69 +981,107 @@ describe('isLoginRedirect', function() {
 
   describe('PKCE', () => {
     it('there should be code in hash when responseMode is fragment', () => {
-      delete window.location;
-      window.location = {
-        hash: '#code=fakecode',
-        href: 'https://exmple.com/implicit/callback#code=fakecode'
-      };
       sdk = new OktaAuth({
         pkce: true,
         responseMode: 'fragment',
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo',
-        redirectUri: 'https://exmple.com/implicit/callback'
+        issuer,
+        clientId,
+        redirectUri
       });
+      mockHash('code=fakecode');
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
     it('there should be code in query when use default responseMode', () => {
-      delete window.location;
-      window.location = {
-        search: '?code=fakecode',
-        href: 'https://exmple.com/implicit/callback?code=fakecode'
-      };
       sdk = new OktaAuth({
         pkce: true,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo',
-        redirectUri: 'https://exmple.com/implicit/callback'
+        issuer,
+        clientId,
+        redirectUri
       });
+      mockSearch('code=fakecode');
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
     it('there should be code in query when responseMode is query', () => {
-      delete window.location;
-      window.location = {
-        search: '?code=fakecode',
-        href: 'https://exmple.com/implicit/callback?code=fakecode'
-      };
       sdk = new OktaAuth({
         pkce: true,
         responseMode: 'query',
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo',
-        redirectUri: 'https://exmple.com/implicit/callback'
+        issuer,
+        clientId,
+        redirectUri
       });
+      mockSearch('code=fakecode');
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(true);
     });
 
     it('should return false if current URI is not redirect URI', () => {
-      delete window.location;
-      window.location = {
-        search: '?code=somecode',
-        href: 'https://exmple.com/products/search?code=somecode'
-      };
       sdk = new OktaAuth({
         pkce: true,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'foo',
-        redirectUri: 'https://exmple.com/implicit/callback'
+        issuer,
+        clientId,
+        redirectUri
       });
+      mockSearch('code=fakecode');
+      window.location.href = 'https://exmple.com/products/search?code=somecode';
       const result = oauthUtil.isLoginRedirect(sdk);
       expect(result).toBe(false);
     });
+  });
+
+  describe('OAuth errors', () => {
+    it('PKCE: should recognize error', () => {
+      sdk = new OktaAuth({
+        pkce: true,
+        issuer,
+        clientId,
+        redirectUri
+      });
+      mockSearch('error=fakeerror&error_description=fakedescription');
+      const result = oauthUtil.isLoginRedirect(sdk);
+      expect(result).toBe(true);
+    });
+    
+    it('PKCE (fragment): should recognize error', () => {
+      sdk = new OktaAuth({
+        pkce: true,
+        responseMode: 'fragment',
+        issuer,
+        clientId,
+        redirectUri
+      });
+      mockHash('error=fakeerror&error_description=fakedescription');
+      const result = oauthUtil.isLoginRedirect(sdk);
+      expect(result).toBe(true);
+    });
+
+    it('implicit flow: should recognize error', () => {
+      sdk = new OktaAuth({
+        pkce: false,
+        issuer,
+        clientId,
+        redirectUri
+      });
+      mockHash('error=fakeerror&error_description=fakedescription');
+      const result = oauthUtil.isLoginRedirect(sdk);
+      expect(result).toBe(true);
+    });
+
+    it('should return false if current URI is not redirect URI', () => {
+      sdk = new OktaAuth({
+        pkce: true,
+        issuer,
+        clientId,
+        redirectUri
+      });
+      mockSearch('error=fakeerror&error_description=fakedescription');
+      window.location.href = 'http://fake/product/search?error=fakeerror&error_description=fakedescription';
+      const result = oauthUtil.isLoginRedirect(sdk);
+      expect(result).toBe(false);
+    });
+
   });
 });

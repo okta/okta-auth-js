@@ -2847,6 +2847,38 @@ describe('token.parseFromUrl', function() {
       util.expectErrorToEqual(e, error);
     });
   });
+
+  it('throws an OAuthError error if "error" and "error_description" in the url', () => {
+    const error = {
+      name: 'OAuthError',
+      message: 'fake_description',
+      errorCode: 'fake_error',
+      errorSummary: 'fake_description',
+      errorId: 'INTERNAL',
+      errorCauses: []
+    };
+    return oauthUtil.setupParseUrl({
+      willFail: true,
+      hashMock: '#error=fake_error&error_description=fake_description',
+      oauthParams: JSON.stringify({
+        responseType: ['id_token', 'token'],
+        state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      })
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+
+  });
+
 });
 
 describe('token.renew', function() {
