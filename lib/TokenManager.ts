@@ -34,6 +34,7 @@ const DEFAULT_OPTIONS = {
   autoRemove: true,
   storage: 'localStorage',
   expireEarlySeconds: 30,
+  sessionCookie: false,
   storageKey: TOKEN_STORAGE_NAME,
   _storageEventDelay: 0
 };
@@ -437,6 +438,11 @@ export class TokenManager {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }
 
+    if (options.storage === 'sessionStorage')
+    {
+      options.sessionCookie = true;
+    }
+
     if (options.storage === 'localStorage' && !storageUtil.browserHasLocalStorage()) {
       warn('This browser doesn\'t support localStorage. Switching to sessionStorage.');
       options.storage = 'sessionStorage';
@@ -465,8 +471,8 @@ export class TokenManager {
           break;
         case 'cookie':
           // Implement customized cookie storage to make sure each token is stored separatedly in cookie
-          storageProvider = (function(options) {
-            var storage = storageUtil.getCookieStorage(options);
+          storageProvider = (function(storageOptions) {
+            var storage = storageUtil.getCookieStorage({...storageOptions, sessionCookie: options.sessionCookie});
             return {
               getItem: function(key) {
                 var data = storage.getItem();

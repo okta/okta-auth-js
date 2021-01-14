@@ -30,6 +30,7 @@ export interface PKCEStorage extends StorageProvider {
 }
 
 export interface StorageOptions extends CookieOptions {
+  sessionCookie?: boolean;
   preferLocalStorage?: boolean;
 }
 

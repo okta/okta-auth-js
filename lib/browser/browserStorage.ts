@@ -77,14 +77,14 @@ var storageUtil: StorageUtil = {
   getCookieStorage: function(options) {
     const secure = options.secure;
     const sameSite = options.sameSite;
+    const sessionCookie = options.sessionCookie;
     if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
       throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
     }
     return {
       getItem: storageUtil.storage.get,
       setItem: function(key, value) {
-        // Cookie shouldn't expire
-        storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
+        storageUtil.storage.set(key, value, sessionCookie ? null : '2200-01-01T00:00:00.000Z', {
           secure: secure, 
           sameSite: sameSite
         });

@@ -20,6 +20,7 @@ export interface TokenManagerOptions {
   autoRenew?: boolean;
   autoRemove?: boolean;
   secure?: boolean;
+  sessionCookie?: boolean
   storage?: string;
   storageKey?: string;
   expireEarlySeconds?: number;

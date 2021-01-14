@@ -334,6 +334,16 @@ var config = {
 }
 ```
 
+If `cookie` storage is specified, it possible specify whether or not a session cookie is used by the tokenManager. This will automatically be configured if `sessionStorage` is specified and you fall back to `cookie` storage. If sessionCookie is not specified it will create a cookie with an expiry date of `2200-01-01T00:00:00.000Z`
+
+```javascript
+var config = {
+  tokenManager: {
+    sessionCookie: true
+  }
+}
+```
+
 By default, the `tokenManager` will attempt to renew tokens before they expire. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
 ```javascript
