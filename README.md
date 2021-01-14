@@ -2090,7 +2090,7 @@ authClient.token.getWithRedirect({
 authClient.token.parseFromUrl()
 .then(function(res) {
   // Save token
-  authClient.tokenManager.setTokens(tokens);
+  authClient.tokenManager.setTokens(res.tokens);
 
   // Read saved URL from storage
   const url = sessionStorage.getItem('url');
