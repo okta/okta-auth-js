@@ -134,6 +134,7 @@ var storageUtil: BrowserStorageUtil = {
   getCookieStorage: function(options): CookieStorage {
     const secure = options.secure;
     const sameSite = options.sameSite;
+    const sessionCookie = options.sessionCookie;
     if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
       throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
     }
@@ -141,7 +142,7 @@ var storageUtil: BrowserStorageUtil = {
       getItem: storageUtil.storage.get,
       setItem: function(key, value, expiresAt?: string) {
         // By defauilt, cookie shouldn't expire
-        expiresAt = typeof expiresAt === 'undefined' ? '2200-01-01T00:00:00.000Z' : expiresAt;
+        expiresAt = sessionCookie ? null : typeof expiresAt === 'undefined' ? '2200-01-01T00:00:00.000Z' : expiresAt;
         storageUtil.storage.set(key, value, expiresAt, {
           secure: secure, 
           sameSite: sameSite

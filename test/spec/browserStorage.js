@@ -141,13 +141,25 @@ describe('browserStorage', () => {
       expect(browserStorage.storage.get).toHaveBeenCalledWith(key);
     });
 
-    it('setItem: will call storage.set, passing secure and sameSite options', () => {
+    it('setItem: will call storage.set, passing secure and sameSite options but no sessionCookie option', () => {
       jest.spyOn(browserStorage.storage, 'set').mockReturnValue(null);
       const storage = browserStorage.getCookieStorage({ secure: 'fakey', sameSite: 'strictly fakey' });
       const key = 'fake-key';
       const val = { fakeValue: true };
       storage.setItem(key, val);
       expect(browserStorage.storage.set).toHaveBeenCalledWith(key, val, '2200-01-01T00:00:00.000Z', {
+        secure: 'fakey',
+        sameSite: 'strictly fakey'
+      });
+    });
+
+    it('setItem: will call storage.set, passing sessionCookie, secure and sameSite options ', () => {
+      jest.spyOn(browserStorage.storage, 'set').mockReturnValue(null);
+      const storage = browserStorage.getCookieStorage({ secure: 'fakey', sameSite: 'strictly fakey', sessionCookie: true });
+      const key = 'fake-key';
+      const val = { fakeValue: true };
+      storage.setItem(key, val);
+      expect(browserStorage.storage.set).toHaveBeenCalledWith(key, val, null, {
         secure: 'fakey',
         sameSite: 'strictly fakey'
       });
