@@ -67,6 +67,7 @@
     "yarn": "^1.7.0"
   },
   "dependencies": {
+    "@babel/runtime": "^7.12.5",
     "Base64": "0.3.0",
     "core-js": "^3.6.5",
     "cross-fetch": "^3.0.6",
