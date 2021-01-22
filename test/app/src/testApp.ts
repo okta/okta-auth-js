@@ -98,6 +98,7 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     renewToken: testApp.renewToken.bind(testApp),
     renewTokens: testApp.renewTokens.bind(testApp),
     revokeToken: testApp.revokeToken.bind(testApp),
+    revokeRefreshToken: testApp.revokeRefreshToken.bind(testApp),
     handleCallback: testApp.handleCallback.bind(testApp),
     getUserInfo: testApp.getUserInfo.bind(testApp),
     testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
@@ -220,7 +221,7 @@ class TestApp {
     signIn.showSignInToGetTokens({
       clientId: config.clientId,
       redirectUri: config.redirectUri,  
-      scope: ['openid', 'email'],
+      scopes: config.scopes,
   
       // Return an access token from the authorization server
       getAccessToken: true,
@@ -297,6 +298,13 @@ class TestApp {
     return this.oktaAuth.revokeAccessToken()
     .then(() => {
       document.getElementById('token-msg').innerHTML = 'access token revoked';
+    });
+  }
+
+  async revokeRefreshToken(): Promise<void> {
+    return this.oktaAuth.revokeRefreshToken()
+    .then(() => {
+      document.getElementById('token-msg').innerHTML = 'refresh token revoked';
     });
   }
 
@@ -473,6 +481,9 @@ class TestApp {
           </li>
           <li>
             <a id="revoke-token" href="/" onclick="revokeToken(event)">Revoke Access Token</a>
+          </li>
+          <li>
+            <a id="revoke-refresh-token" href="/" onclick="revokeRefreshToken(event)">Revoke Refresh Token</a>
           </li>
           <li>
             <a id="refresh-session" href="/" onclick="refreshSession(event)">Refresh Session</a>

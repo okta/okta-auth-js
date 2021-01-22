@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "start:runner": "wdio run wdio.conf.js",
+    "start:tokens:runner": "wdio run tokens.wdio.conf.js",
     "start:app": "yarn --cwd ../app start --open",
     "start": "node ./runner"
   },
