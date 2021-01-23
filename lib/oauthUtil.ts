@@ -14,7 +14,6 @@
 /* eslint-disable complexity, max-statements */
 import http from './http';
 import { genRandomString, isIE11OrLess, find, removeTrailingSlash } from './util';
-import storageUtil from './browser/browserStorage';
 import AuthSdkError from './errors/AuthSdkError';
 import { OktaAuth, CustomUrls, TokenVerifyParams, UserClaims, WellKnownResponse } from './types';
 
@@ -75,7 +74,7 @@ function getWellKnown(sdk: OktaAuth, issuer: string): Promise<WellKnownResponse>
 }
 
 function getKey(sdk: OktaAuth, issuer: string, kid: string): Promise<string> {
-  var httpCache = storageUtil.getHttpCache(sdk.options.cookies);
+  var httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies);
 
   return getWellKnown(sdk, issuer)
   .then(function(wellKnown) {

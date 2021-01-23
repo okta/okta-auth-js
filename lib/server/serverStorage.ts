@@ -11,19 +11,50 @@
  *
  */
 
-import storageBuilder from '../storageBuilder';
-import { CACHE_STORAGE_NAME } from '../constants';
+import { SimpleStorage, StorageType } from '../types';
+import { AuthSdkError } from '../errors';
 const NodeCache = require('node-cache'); // commonJS module cannot be imported without esModuleInterop
 var storage = new NodeCache();
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil = {
 
-  getHttpCache() {
-    return storageBuilder(storageUtil.getStorage(), CACHE_STORAGE_NAME);
+  testStorageType: function(storageType: StorageType): boolean {
+    var supported = false;
+    switch (storageType) {
+      case 'memory':
+        supported = true;
+        break;
+      default:
+        break;
+    }
+    return supported;
   },
 
-  getStorage() {
+  getStorageByType: function(storageType: StorageType): SimpleStorage {
+    let storageProvider = null;
+    switch (storageType) {
+      case 'memory':
+        storageProvider = storageUtil.getStorage();
+        break;
+      default:
+        throw new AuthSdkError(`Unrecognized storage option: ${storageType}`);
+        break;
+    }
+    return storageProvider;
+  },
+
+  findStorageType: function() {
+    return 'memory';
+  },
+
+  // will be removed in next version. OKTA-362589
+  getHttpCache() {
+    return null; // stubbed in server.js
+  },
+
+  // default in memory using node cache
+  getStorage(): SimpleStorage {
     return {
       getItem: storageUtil.storage.get,
       setItem: function(key, value) {

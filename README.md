@@ -1,3 +1,12 @@
+[devforum]: https://devforum.okta.com/
+[lang-landing]: https://developer.okta.com/code/javascript
+[github-issues]: https://github.com/okta/okta-auth-js/issues
+[github-releases]: https://github.com/okta/okta-auth-js/releases
+[social-login]: https://developer.okta.com/docs/concepts/social-login/
+[localStorage]: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+[sessionStorage]: https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
+[cookie]: https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
+
 [<img src="https://www.okta.com/sites/default/files/Dev_Logo-01_Large-thumbnail.png" align="right" width="256px"/>](https://devforum.okta.com/)
 
 [![Support](https://img.shields.io/badge/support-developer%20forum-blue.svg)](https://devforum.okta.com)
@@ -301,13 +310,99 @@ var authClient = new OktaAuth(config);
 
 ### Configuration options
 
-These configuration options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`) or in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect` (unless noted otherwise). If included in both, the value passed in the method takes priority.
+Most configuration options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`) or in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect` (unless noted otherwise). If included in both, the value passed in the method takes priority.
+
+**Important:** These configuration options can **only** be used when instantiating Okta Auth JS.
+
+#### `storageManager`
+
+The `storageManager` provides access to client storage for specific purposes. `storageManager` configuration is divided into named sections. The default configuration is shown below:
+
+```javascript
+
+var config = {
+  storageManager: {
+    token: {
+      storageTypes: [
+        'localStorage',
+        'sessionStorage',
+        'cookie'
+      ],
+      useMultipleCookies: true // puts each token in its own cookie
+    },
+    cache: {
+      storageTypes: [
+        'localStorage',
+        'sessionStorage',
+        'cookie'
+      ]
+    },
+    transaction: {
+      storageTypes: [
+        'sessionStorage',
+        'localStorage',
+        'cookie'
+      ]
+    }
+  }
+}
+```
+
+**Important:** If neither [localStorage][] nor [sessionStorage][] are available, the default storage provider may fall back to using [cookie][] storage on some clients, . If your site will always be served over a HTTPS connection, you may want to forcibly enable "secure" cookies. This option will prevent cookies from being stored on an HTTP connection.
+
+```javascript
+var config = {
+  cookies: {
+    secure: true
+  }
+}
+```
+
+##### `storageType`
+
+The following values for `storageType` are recognized:
+
+* `memory`: values are stored in a closure and will not survive a page reload
+* `sessionStorage`: will only be available to the current browser tab
+* `localStorage`: available to all browser tabs
+* `cookie`: available to all browser tabs, and server-side code
+
+##### `storageProvider`
+
+This option allows you to pass a custom storage provider instance. If a `storageProvider` is set, the `storageType` will be ignored.
+
+**Important:** A storage provider will receive sensitive data, such as the user's raw tokens, as a string. Any custom storage provider should take care to save this string in a secure location which is not accessible by other users.
+
+A custom storage provider should implement two functions:
+
+* `getItem(key)`
+* `setItem(key, value)`
+
+```javascript
+var myMemoryStore = {};
+var config = {
+  storage: {
+    token: {
+      storageProvider: {
+        getItem: function(key) {
+          // custom get
+          return myMemoryStore[key];
+        },
+        setItem: function(key, val) {
+          // custom set
+          myMemoryStore[key] = val;
+        }
+      }
+    }
+  }
+}
+```
 
 #### The `tokenManager`
 
-**Important:** This configuration option can be included **only** when instantiating Okta Auth JS.
+##### `storage`
 
-Specify the type of storage for tokens. Defaults to [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and will fall back to [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), and/or [cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) if the previous type is not available.
+Specify the [storage type](#storagetype) for tokens. This will override any value set for `token` in the [storageManager](#storagemanager) configuration. By default, [localStorage][] will be used. This will fall back to [sessionStorage][] or [cookie][] if the previous type is not available.
 
 ```javascript
 
@@ -321,18 +416,30 @@ var config = {
 var authClient = new OktaAuth(config);
 ```
 
-Even if you have specified `localStorage` or `sessionStorage` in your config, the `TokenManager` may fall back to using `cookie` storage on some clients. If your site will always be served over a HTTPS connection, you may want to enable "secure" cookies. This option will prevent cookies from being stored on an HTTP connection.
+A custom [storage provider](#storageprovider) instance can also be passed here. (This will override any `storageProvider` value set under the `token` section of the [storageManager](#storagemanager) configuration)
 
 ```javascript
+var myMemoryStore = {};
 var config = {
+  url: 'https://{yourOktaDomain}',
   tokenManager: {
-    storage: 'cookie'
-  },
-  cookies: {
-    secure: false
+    storage: {
+      getItem: function(key) {
+        // custom get
+        return myMemoryStore[key];
+      },
+      setItem: function(key, val) {
+        // custom set
+        myMemoryStore[key] = val;
+      }
+    }
   }
-}
+};
+
+var authClient = new OktaAuth(config);
 ```
+
+##### `autoRenew`
 
 By default, the `tokenManager` will attempt to renew tokens before they expire. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
 
@@ -349,28 +456,6 @@ Renewing tokens slightly early helps ensure a stable user experience. By default
 // Tokens accessed with tokenManager.get() will auto-renew within 2 minutes of expiration
 tokenManager: {
   expireEarlySeconds: 120
-}
-```
-
-##### Storage
-
-You may provide a custom storage provider. It should implement two functions:
-
-* `getItem(key)`
-* `setItem(key, value)`
-
-The storage provider will receive the user's raw tokens, as a string. Any custom storage provider should take care to save this string in a secure location which is not accessible by other users.
-
-```javascript
-tokenManager: {
-  storage: {
-    getItem: function(key) {
-      // custom get
-    },
-    setItem: function(key, val) {
-      // custom set
-    }
-  }
 }
 ```
 
@@ -2571,9 +2656,3 @@ const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 ## Contributing
 
 We're happy to accept contributions and PRs! Please see the [contribution guide](contributing.md) to understand how to structure a contribution.
-
-[devforum]: https://devforum.okta.com/
-[lang-landing]: https://developer.okta.com/code/javascript
-[github-issues]: https://github.com/okta/okta-auth-js/issues
-[github-releases]: https://github.com/okta/okta-auth-js/releases
-[social-login]: https://developer.okta.com/docs/concepts/social-login/
