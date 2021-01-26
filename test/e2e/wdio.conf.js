@@ -4,11 +4,14 @@ require('regenerator-runtime'); // Allows use of async/await
 
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
 const browserOptions = {
     args: []
 };
+const specs = REFRESH_TOKEN ? ['./specs/**/refreshTokens.js', './specs/**/crossTabs.js'] : ['./specs/**/*.js'];
+const excludeSpecs = REFRESH_TOKEN ? [] : ['./specs/**/refreshTokens.js'];
 
 if (CI) {
     browserOptions.args = browserOptions.args.concat([
@@ -49,13 +52,9 @@ exports.config = {
     // NPM script (see https://docs.npmjs.com/cli/run-script) then the current working
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
-    specs: [
-        './specs/**/*.js'
-    ],
+    specs: specs,
     // Patterns to exclude.
-    exclude: [
-        // 'path/to/excluded/files'
-    ],
+    exclude: excludeSpecs,
     //
     // ============
     // Capabilities

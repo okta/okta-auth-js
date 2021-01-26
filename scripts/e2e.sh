@@ -9,7 +9,6 @@ export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
-export CLIENT_ID=0oa1xyzajgPFGWlLP4x7
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 
@@ -21,6 +20,19 @@ if ! yarn build; then
   echo "build failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
+
+# This client has refresh token enabled
+export CLIENT_ID=0oapmwm72082GXal14x6
+export REFRESH_TOKEN=true
+
+if ! yarn test:e2e; then
+  echo "Refresh token e2e tests failed! Exiting..."
+  exit ${TEST_FAILURE}
+fi
+
+# This client doesn't have refresh token enabled
+export CLIENT_ID=0oa1xyzajgPFGWlLP4x7
+unset REFRESH_TOKEN
 
 if ! yarn test:e2e; then
   echo "e2e tests failed! Exiting..."

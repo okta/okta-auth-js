@@ -13,6 +13,7 @@ class TestApp {
   get logoutAppBtn() { return $('#logout-app'); }
   get renewTokenBtn() { return $('#renew-token'); }
   get revokeTokenBtn() { return $('#revoke-token'); }
+  get revokeRefreshTokenBtn() { return $('#revoke-refresh-token'); }
   get getTokenBtn() { return $('#get-token'); }
   get clearTokensBtn() { return $('#clear-tokens'); }
   get getUserInfoBtn() { return $('#get-userinfo'); }
@@ -48,6 +49,7 @@ class TestApp {
   get returnHomeBtn() { return $('#return-home'); }
   get accessToken() { return $('#access-token'); }
   get idToken() { return $('#id-token'); }
+  get refreshToken() { return $('#refresh-token'); }
   get success() { return $('#success'); }
   get error() { return $('#error'); }
   get xhrError() { return $('#xhr-error'); }
@@ -99,6 +101,10 @@ class TestApp {
 
   async revokeToken() {
     return this.revokeTokenBtn.then(el => el.click());
+  }
+
+  async revokeRefreshToken() {
+    return this.revokeRefreshTokenBtn.then(el => el.click());
   }
 
   async getUserInfo() {

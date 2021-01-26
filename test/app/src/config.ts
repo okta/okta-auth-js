@@ -34,7 +34,7 @@ function getDefaultConfig(): Config {
     issuer: ISSUER,
     clientId: CLIENT_ID,
     responseType: ['token', 'id_token'],
-    scopes: ['openid', 'email'],
+    scopes: ['openid', 'email', 'offline_access'],
     _defaultScopes: false,
     pkce: true,
     cookies: {
@@ -52,7 +52,7 @@ function getConfigFromUrl(): Config {
   const clientId = url.searchParams.get('clientId');
   const pkce = url.searchParams.get('pkce') !== 'false'; // On by default
   const _defaultScopes = url.searchParams.get('_defaultScopes') === 'true';
-  const scopes = (url.searchParams.get('scopes') || 'openid,email').split(',');
+  const scopes = (url.searchParams.get('scopes') || 'openid,email,offline_access').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
   const responseMode = url.searchParams.get('responseMode') || undefined;
   const storage = url.searchParams.get('storage') || undefined;

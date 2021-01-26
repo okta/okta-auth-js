@@ -17,7 +17,8 @@ const assertSameTokensInTabs = async (tabTokenMap, handles) => {
     await browser.switchToWindow(handle);
     tabTokenMap[handle] = {
       idToken: await TestApp.idToken.then(el => el.getText()),
-      accessToken: await TestApp.accessToken.then(el => el.getText())
+      accessToken: await TestApp.accessToken.then(el => el.getText()),
+      refreshToken: await TestApp.refreshToken.then(el => el.getText())
     };
     if (preToken) {
       assert(JSON.stringify(preToken) === JSON.stringify(tabTokenMap[handle]));
@@ -65,9 +66,14 @@ describe('cross tabs AuthState update', () => {
     await browser.waitUntil(async () => {
       const idToken = await TestApp.idToken.then(el => el.getText());
       const accessToken = await TestApp.accessToken.then(el => el.getText());
+      let refreshToken;
+      if (process.env.REFRESH_TOKEN) {
+        refreshToken = await TestApp.refreshToken.then(el => el.getText());
+      } 
       return (
         idToken !== preTabTokenMap[handle].idToken &&
-        accessToken !== preTabTokenMap[handle].accessToken
+        accessToken !== preTabTokenMap[handle].accessToken &&
+        refreshToken !== preTabTokenMap[handle].refreshToken
       );
     }, 10000);
     await assertSameTokensInTabs(currentTabTokenMap, handles);
