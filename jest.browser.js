@@ -26,7 +26,7 @@ module.exports = {
     '<rootDir>/jest.setup.js'
   ],
   'testMatch': [
-    '**/test/spec/*.{js,ts}'
+    '**/test/spec/**/*.{js,ts}'
   ],
   'roots': [
     'test/spec'

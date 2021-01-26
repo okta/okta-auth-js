@@ -1,4 +1,6 @@
 /* global window */
+jest.mock('cross-fetch');
+
 import {
   closeSession,
   sessionExists,
@@ -7,6 +9,9 @@ import {
   setCookieAndRedirect
 } from '../../lib/session';
 import http from '../../lib/http';
+import util from '@okta/test.support/util';
+import _ from 'lodash';
+import packageJson from '../../package.json';
 
 describe('session', function() {
   var sdk;
@@ -237,6 +242,158 @@ describe('session', function() {
       setCookieAndRedirect(sdk, sessionToken, redirectUrl);
       expect(window.location.assign).toHaveBeenCalledWith(baseUrl + '/login/sessionCookieRedirect?checkAccountSetupComplete=true&token=' +
         encodeURIComponent(sessionToken) + '&redirectUrl=' + encodeURIComponent(redirectUrl));
+    });
+  });
+
+  describe('session.close', function () {
+    util.itMakesCorrectRequestResponse({
+      title: 'allows deleting a session',
+      setup: {
+        calls: [
+          {
+            request: {
+              uri: '/api/v1/sessions/me'
+            },
+            response: 'empty'
+          }
+        ]
+      },
+      execute: function (test) {
+        return test.oa.session.close();
+      },
+      expectations: function () {
+        // Assertions of the correct uri and response handling
+        // are implicitly expected when the test runs
+      }
+    });
+  });
+
+  describe('session.get', function () {
+    util.itMakesCorrectRequestResponse({
+      title: 'return ACTIVE session with refresh method on success',
+      setup: {
+        calls: [
+          {
+            request: {
+              uri: '/api/v1/sessions/me'
+            },
+            response: 'session'
+          }
+        ]
+      },
+      execute: function (test) {
+        return test.oa.session.get();
+      },
+      expectations: function (test, res) {
+        expect(res.refresh).toBeDefined();
+        expect(res.user).toBeDefined();
+        expect(_.omit(res, 'refresh', 'user')).toEqual({
+          'id': '000SFn2Do5LSEeE7ETg1JewvQ',
+          'userId': '00uih5GNExguYaK6I0g3',
+          'login': 'administrator1@clouditude.net',
+          'expiresAt': '2016-01-27T03:59:35.000Z',
+          'status': 'ACTIVE',
+          'lastPasswordVerification': '2016-01-27T01:15:39.000Z',
+          'lastFactorVerification': null,
+          'amr': ['pwd'],
+          'idp': {
+            'id': '00oigpTeBgc5cgQh50g3',
+            'type': 'OKTA'
+          },
+          'mfaActive': false
+        });
+      }
+    });
+
+    util.itMakesCorrectRequestResponse({
+      title: 'returns INACTIVE on failure',
+      setup: {
+        request: {
+          uri: '/api/v1/sessions/me'
+        },
+        response: 'error-session-not-found'
+      },
+      execute: function (test) {
+        return test.oa.session.get();
+      },
+      expectations: function (test, res) {
+        expect(res.status).toEqual('INACTIVE');
+      }
+    });
+  });
+
+  describe('modified user agent', function () {
+    util.itMakesCorrectRequestResponse({
+      title: 'should be added to requests headers',
+      setup: {
+        request: {
+          uri: '/api/v1/sessions/me',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'custom okta-auth-js/' + packageJson.version
+          }
+        },
+        response: 'session'
+      },
+      execute: function (test) {
+        test.oa.userAgent = 'custom ' + test.oa.userAgent;
+        return test.oa.session.get();
+      },
+      expectations: function () {
+        // We validate the headers for each request in our ajaxMock
+      }
+    });
+  });
+
+  describe('custom headers', function () {
+    util.itMakesCorrectRequestResponse({
+      title: 'adds custom headers',
+      setup: {
+        headers: {
+          'X-Custom-Header': 'custom'
+        },
+        request: {
+          uri: '/api/v1/sessions/me',
+          headers: {
+            'X-Custom-Header': 'custom',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version
+          }
+        },
+        response: 'session'
+      },
+      execute: function (test) {
+        return test.oa.session.get();
+      },
+      expectations: function () {
+        // We validate the headers for each request in our ajaxMock
+      }
+    });
+
+    util.itMakesCorrectRequestResponse({
+      title: 'override headers',
+      setup: {
+        headers: {
+          'X-Okta-User-Agent-Extended': 'another-sdk-version'
+        },
+        request: {
+          uri: '/api/v1/sessions/me',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'another-sdk-version'
+          }
+        },
+        response: 'session'
+      },
+      execute: function (test) {
+        return test.oa.session.get();
+      },
+      expectations: function () {
+        // We validate the headers for each request in our ajaxMock
+      }
     });
   });
 });

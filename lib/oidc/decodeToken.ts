@@ -10,13 +10,23 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+import { AuthSdkError } from '../errors';
+import { JWTObject } from '../types';
+import { base64UrlToString } from '../util';
 
-export { default as OktaAuth } from './browser';
-export * from '../constants';
-export * from '../types';
-export * from '../tx';
-export * from '../errors';
-export * from '../StorageManager';
-export * from '../TransactionManager';
-export * from '../TokenManager';
-export * from '../util';
+export function decodeToken(token: string): JWTObject {
+  var jwt = token.split('.');
+  var decodedToken: JWTObject;
+
+  try {
+    decodedToken = {
+      header: JSON.parse(base64UrlToString(jwt[0])),
+      payload: JSON.parse(base64UrlToString(jwt[1])),
+      signature: jwt[2]
+    };
+  } catch (e) {
+    throw new AuthSdkError('Malformed token');
+  }
+
+  return decodedToken;
+}

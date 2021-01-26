@@ -1,3 +1,5 @@
+
+/* global window */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -10,13 +12,20 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+import { generateNonce, generateState } from './oauth';
+import { OktaAuth, TokenParams } from '../../types';
 
-export { default as OktaAuth } from './browser';
-export * from '../constants';
-export * from '../types';
-export * from '../tx';
-export * from '../errors';
-export * from '../StorageManager';
-export * from '../TransactionManager';
-export * from '../TokenManager';
-export * from '../util';
+export function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
+  const { pkce, clientId, redirectUri, responseType, responseMode, scopes, ignoreSignature } = sdk.options;
+  return {
+    pkce,
+    clientId,
+    redirectUri: redirectUri || window.location.href,
+    responseType: responseType || ['token', 'id_token'],
+    responseMode,
+    state: generateState(),
+    nonce: generateNonce(),
+    scopes: scopes || ['openid', 'email'],
+    ignoreSignature
+  };
+}

@@ -3,8 +3,10 @@ require('jasmine-ajax');
 import tokens from '@okta/test.support/tokens';
 
 import { OktaAuth, OAuthError, AuthSdkError } from '@okta/okta-auth-js';
-import pkce from '../../../lib/pkce';
-import * as token from '../../../lib/token';
+import { pkce } from '../../../lib/oidc';
+
+import * as getToken from '../../../lib/oidc/getToken';
+import * as getDefaultTokenParams from '../../../lib/oidc/util/defaultTokenParams';
 
 describe('Renew token', function() {
 
@@ -46,7 +48,7 @@ describe('Renew token', function() {
     document.body.removeChild(document.getElementById('root'));
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
-    token.$imports.$restore();
+    getToken.$imports.$restore();
     window.fetch = fetch;
   });
 
@@ -87,8 +89,8 @@ describe('Renew token', function() {
 
   function mockLoadFrame(fn) {
     const loadFrame = jasmine.createSpy('loadFrame').and.callFake(fn);
-    token.$imports.$mock({
-      './oauthUtil': {
+    getToken.$imports.$mock({
+      './util': {
         loadFrame
       }
     });
@@ -96,8 +98,8 @@ describe('Renew token', function() {
   }
 
   function mockNonce(nonce) {
-    token.$imports.$mock({
-      './oauthUtil': {
+    getDefaultTokenParams.$imports.$mock({
+      './oauth': {
         generateNonce: () => nonce
       }
     });

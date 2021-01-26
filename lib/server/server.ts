@@ -18,7 +18,7 @@ import { getUserAgent } from '../builderUtil';
 import serverStorage from './serverStorage';
 import * as features from './features';
 import { BaseTokenAPI, FeaturesAPI, OktaAuthOptions } from '../types';
-import { prepareTokenParams, exchangeCodeForTokens, decodeToken } from '../token';
+import { prepareTokenParams, exchangeCodeForTokens, decodeToken } from '../oidc';
 
 const PACKAGE_JSON = require('../../package.json');
 
