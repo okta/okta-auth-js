@@ -402,9 +402,9 @@ A list of storageTypes, in order of preference. If a type is not available, the 
 
 This option allows you to pass a custom storage provider instance. If a `storageProvider` is set, the `storageType` will be ignored.
 
-A `storageProvider` provides low-level access to storage. An example of a `storageProvider` is [localStorage][]. It has a method called `getItem` that returns a string value for a key and a method called `setItem` which accepts a string value and key.
-
 **Important:** A storage provider will receive sensitive data, such as the user's raw tokens, as a readable string. Any custom storage provider should take care to save this string in a secure location which is not accessible to unauthorized users.
+
+A `storageProvider` must provide a simple but specific API to access client storage. An example of a `storageProvider` is the built-in [localStorage][]. It has a method called `getItem` that returns a string for a key and a method called `setItem` which accepts a string and key.
 
 A custom storage provider must implement two functions:
 
@@ -461,23 +461,32 @@ A custom [storage provider](#storageprovider) instance can also be passed here. 
 
 ```javascript
 var myMemoryStore = {};
-var config = {
+const storageProvider = {
+  getItem: function(key) {
+    // custom get
+    return myMemoryStore[key];
+  },
+  setItem: function(key, val) {
+    // custom set
+    myMemoryStore[key] = val;
+  },
+  // optional
+  removeItem: function(key) {
+    delete myMemoryStore[key];
+  }
+}
+
+const config = {
   url: 'https://{yourOktaDomain}',
   tokenManager: {
-    storage: {
-      getItem: function(key) {
-        // custom get
-        return myMemoryStore[key];
-      },
-      setItem: function(key, val) {
-        // custom set
-        myMemoryStore[key] = val;
-      }
-    }
+    storage: storageProvider
   }
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
+const tokens = await authClient.token.getWithoutPrompt();
+authClient.tokenManager.setTokens(tokens); // storageProvider.setItem
+
 ```
 
 ##### `autoRenew`
