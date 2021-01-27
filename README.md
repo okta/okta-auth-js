@@ -367,32 +367,73 @@ The following values for `storageType` are recognized:
 * `localStorage`: available to all browser tabs
 * `cookie`: available to all browser tabs, and server-side code
 
+**Note:** If the specified `storageType` is not available, but matches an entry in `storageTypes`, then default fallback logic will be applied. To disable this behavior, set `storageTypes` to an empty array:
+
+```javascript
+var config = {
+  storageManager: {
+    token: {
+      storageType: 'sessionStorage',
+      storageTypes: []
+    }
+  }
+}
+```
+
+or set the `storageTypes` property with only one entry:
+
+```javascript
+var config = {
+  storageManager: {
+    token: {
+      storageTypes: ['sessionStorage']
+    }
+  }
+}
+```
+
+If fallback logic is disabled, the [storageManager](#storagemanager) may throw an exception if an instance of the given `storageType` cannot be created.
+
+##### `storageTypes`
+
+A list of storageTypes, in order of preference. If a type is not available, the next type in the list will be tried.
+
 ##### `storageProvider`
 
 This option allows you to pass a custom storage provider instance. If a `storageProvider` is set, the `storageType` will be ignored.
 
-**Important:** A storage provider will receive sensitive data, such as the user's raw tokens, as a string. Any custom storage provider should take care to save this string in a secure location which is not accessible by other users.
+A `storageProvider` provides low-level access to storage. An example of a `storageProvider` is [localStorage][]. It has a method called `getItem` that returns a string value for a key and a method called `setItem` which accepts a string value and key.
 
-A custom storage provider should implement two functions:
+**Important:** A storage provider will receive sensitive data, such as the user's raw tokens, as a readable string. Any custom storage provider should take care to save this string in a secure location which is not accessible to unauthorized users.
+
+A custom storage provider must implement two functions:
 
 * `getItem(key)`
 * `setItem(key, value)`
 
+Optionally, a storage provider can also implement a `removeItem` function. If `removeItem` is not implemented, values will be cleared but keys will persist.
+
 ```javascript
-var myMemoryStore = {};
+const myMemoryStore = {};
+const storageProvider = {
+  getItem: function(key) {
+    // custom get
+    return myMemoryStore[key];
+  },
+  setItem: function(key, val) {
+    // custom set
+    myMemoryStore[key] = val;
+  },
+  // optional
+  removeItem: function(key) {
+    delete myMemoryStore[key];
+  }
+}
+
 var config = {
   storage: {
     token: {
-      storageProvider: {
-        getItem: function(key) {
-          // custom get
-          return myMemoryStore[key];
-        },
-        setItem: function(key, val) {
-          // custom set
-          myMemoryStore[key] = val;
-        }
-      }
+      storageProvider: storageProvider
     }
   }
 }
@@ -402,7 +443,7 @@ var config = {
 
 ##### `storage`
 
-Specify the [storage type](#storagetype) for tokens. This will override any value set for `token` in the [storageManager](#storagemanager) configuration. By default, [localStorage][] will be used. This will fall back to [sessionStorage][] or [cookie][] if the previous type is not available.
+Specify the [storage type](#storagetype) for tokens. This will override any value set for the `token` section in the [storageManager](#storagemanager) configuration. By default, [localStorage][] will be used. This will fall back to [sessionStorage][] or [cookie][] if the previous type is not available.
 
 ```javascript
 
