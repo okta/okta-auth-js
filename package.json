@@ -19,9 +19,8 @@
     "url": "https://github.com/okta/okta-auth-js/issues"
   },
   "scripts": {
-    "clean": "yarn clean:build && yarn clean:modules",
+    "clean": "yarn clean:build",
     "clean:build": "rimraf build && rimraf build2",
-    "clean:modules": "lerna exec rimraf node_modules && rimraf node_modules",
     "dev": "webpack --config webpack.dev.config.js",
     "lint": "eslint .",
     "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",
@@ -118,7 +117,6 @@
     "karma-jquery": "^0.2.3",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
-    "lerna": "^2.11.0",
     "lodash": "4.17.11",
     "promise.allsettled": "^1.0.1",
     "shelljs": "0.8.3",
