@@ -424,6 +424,9 @@ oauthUtil.setupRedirect = function(opts) {
     .then(function() {
       expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
       expect(setCookieMock.mock.calls).toEqual(opts.expectedCookies);
+    })
+    .finally(() => {
+      client.transactionManager.clear();
     });
 };
 
@@ -557,7 +560,7 @@ oauthUtil.setupSimultaneousPostMessage = function() {
 };
 
 oauthUtil.expectTokenStorageToEqual = function(storage, obj) {
-  var parsed = JSON.parse(storage.getItem('okta-token-storage'));
+  var parsed = JSON.parse(storage.getItem('okta-token-storage') || '{}');
   expect(parsed).toEqual(obj);
 };
 

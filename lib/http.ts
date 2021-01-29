@@ -27,7 +27,7 @@ function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any> {
       withCredentials = options.withCredentials !== false, // default value is true
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil.storage,
-      httpCache = storageUtil.getHttpCache(sdk.options.cookies);
+      httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies);
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();

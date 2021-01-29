@@ -1,4 +1,3 @@
-/* global window */
 jest.mock('cross-fetch');
 
 import util from '@okta/test.support/util';
@@ -11,76 +10,7 @@ import * as token from '../../lib/token';
 import * as oauthUtil from '../../lib/oauthUtil';
 
 describe('pkce', function() {
-  afterEach(() => {
-    window.sessionStorage.clear();
-    window.localStorage.clear();
-  });
-  describe('clearMeta', () => {
-    it('clears meta from sessionStorage', () => {
-      const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
-      window.sessionStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
-      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
-      expect(pkce.loadMeta(sdk)).toEqual(meta);
-      pkce.clearMeta(sdk);
-      const res = JSON.parse(window.sessionStorage.getItem('okta-pkce-storage'));
-      expect(res).toEqual({});
-    });
-    // This is for compatibility with older versions of the signin widget. OKTA-304806
-    it('clears meta from localStorage', () => {
-      const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
-      window.localStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
-      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
-      expect(pkce.loadMeta(sdk)).toEqual(meta);
-      pkce.clearMeta(sdk);
-      const res = JSON.parse(window.localStorage.getItem('okta-pkce-storage'));
-      expect(res).toEqual({});
-    });
-  });
-  describe('saveMeta', () => {
-    it('saves meta in sessionStorage', () => {
-      const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
-      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
-      pkce.saveMeta(sdk, meta);
-      const res = JSON.parse(window.sessionStorage.getItem('okta-pkce-storage'));
-      expect(res).toEqual(meta);
-    });
-    it('clears old meta storage before save', () => {
-      const oldMeta = { codeVerifier: 'old', redirectUri: 'http://localhost/old' };
-      window.localStorage.setItem('okta-pkce-storage', JSON.stringify(oldMeta));
-      window.sessionStorage.setItem('okta-pkce-storage', JSON.stringify(oldMeta));
-
-      const meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
-      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
-
-      pkce.saveMeta(sdk, meta);
-      expect(JSON.parse(window.sessionStorage.getItem('okta-pkce-storage'))).toEqual(meta);
-      expect(JSON.parse(window.localStorage.getItem('okta-pkce-storage'))).toEqual({});
-    });
-  });
-  describe('loadMeta', () => {
-    it('can return the meta from sessionStorage', () => {
-      const meta = { codeVerifier: 'fake' };
-      window.sessionStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
-      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
-      const res = pkce.loadMeta(sdk);
-      expect(res.codeVerifier).toBe(meta.codeVerifier);
-    });
-    it('can return the meta from localStorage', () => {
-      const meta = { codeVerifier: 'fake' };
-      window.localStorage.setItem('okta-pkce-storage', JSON.stringify(meta));
-      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
-      const res = pkce.loadMeta(sdk);
-      expect(res.codeVerifier).toBe(meta.codeVerifier);
-    });
-    it('throws an error if meta cannot be found', () => {
-      const sdk = new OktaAuth({ issuer: 'https://foo.com' });
-      const fn = () => {
-        pkce.loadMeta(sdk);
-      };
-      expect(fn).toThrowError('Could not load PKCE codeVerifier from storage');
-    });
-  });
-
+  
   describe('prepare token params', function() {
 
     it('throws an error if pkce is true and PKCE is not supported', function() {
@@ -110,7 +40,6 @@ describe('pkce', function() {
         }));
 
         spyOn(pkce, 'generateVerifier').and.returnValue(Promise.resolve());
-        spyOn(pkce, 'saveMeta').and.returnValue(Promise.resolve());        
         spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve());
         
         var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
@@ -151,7 +80,6 @@ describe('pkce', function() {
         'code_challenge_methods_supported': [codeChallengeMethod]
       }));
       spyOn(pkce, 'generateVerifier').and.returnValue(codeVerifier);
-      spyOn(pkce, 'saveMeta');
       spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
       return token.prepareTokenParams(sdk, {
         codeChallengeMethod: codeChallengeMethod

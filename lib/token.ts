@@ -33,12 +33,8 @@ import * as sdkCrypto from './crypto';
 import AuthSdkError from './errors/AuthSdkError';
 import OAuthError from './errors/OAuthError';
 import {
-  REDIRECT_OAUTH_PARAMS_NAME,
-  REDIRECT_NONCE_COOKIE_NAME,
-  REDIRECT_STATE_COOKIE_NAME,
   DEFAULT_CODE_CHALLENGE_METHOD
 } from './constants';
-import browserStorage from './browser/browserStorage';
 import PKCE from './pkce';
 
 import {
@@ -58,13 +54,11 @@ import {
   TokenParams,
   TokenResponse,
   CustomUrls,
-  PKCEMeta,
   ParseFromUrlOptions,
   Tokens,
-  RefreshToken
+  RefreshToken,
+  TransactionMeta,
 } from './types';
-
-const cookies = browserStorage.storage;
 
 // refresh tokens have precedence to be revoked if no token is specified
 function revokeToken(sdk: OktaAuth, token: RevocableToken): Promise<any> {
@@ -704,24 +698,6 @@ function prepareTokenParams(sdk: OktaAuth, tokenParams: TokenParams): Promise<To
     });
 }
 
-function _addOAuthParamsToStorage(sdk: OktaAuth, tokenParams: TokenParams, urls) {
-  const { responseType, state, nonce, scopes, clientId, ignoreSignature } = tokenParams;
-  const tokenParamsStr = JSON.stringify({
-    responseType,
-    state,
-    nonce,
-    scopes,
-    clientId,
-    urls,
-    ignoreSignature
-  });
-  // Add oauth_params to both cookies and sessionStorage for broader support
-  cookies.set(REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr, null, sdk.options.cookies);
-  if (browserStorage.browserHasSessionStorage()) {
-    browserStorage.getSessionStorage().setItem(REDIRECT_OAUTH_PARAMS_NAME, tokenParamsStr);
-  }
-}
-
 function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
@@ -739,22 +715,35 @@ function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
       var urls = getOAuthUrls(sdk, options);
       var requestUrl = urls.authorizeUrl + buildAuthorizeParams(tokenParams);
 
-      _addOAuthParamsToStorage(sdk, tokenParams, urls);
+      // Gather the values we want to save in the transaction
+      const {
+        responseType,
+        state,
+        nonce,
+        scopes,
+        clientId,
+        ignoreSignature,
+        redirectUri,
+        codeVerifier,
+        codeChallenge,
+        codeChallengeMethod,
+      } = tokenParams;
 
-      // Set nonce cookie for servers to validate nonce in id_token
-      cookies.set(REDIRECT_NONCE_COOKIE_NAME, tokenParams.nonce, null, sdk.options.cookies);
+      const oauthMeta: TransactionMeta = {
+        responseType,
+        state,
+        nonce,
+        scopes,
+        clientId,
+        urls,
+        ignoreSignature,
+        redirectUri,
+        codeVerifier,
+        codeChallenge,
+        codeChallengeMethod,
+      };
 
-      // Set state cookie for servers to validate state
-      cookies.set(REDIRECT_STATE_COOKIE_NAME, tokenParams.state, null, sdk.options.cookies);
-
-      if (sdk.options.pkce) {
-        // We will need these values after redirect when we call /token
-        var meta: PKCEMeta = {
-          codeVerifier: tokenParams.codeVerifier,
-          redirectUri: tokenParams.redirectUri
-        };
-        PKCE.saveMeta(sdk, meta);
-      }
+      sdk.transactionManager.save(oauthMeta, { oauth: true });
       sdk.token.getWithRedirect._setLocation(requestUrl);
     });
 }
@@ -877,25 +866,6 @@ function removeSearch(sdk) {
   }
 }
 
-function _getOAuthParamsStrFromStorage() {
-  let oauthParamsStr;
-  if (browserStorage.browserHasSessionStorage()) {
-    oauthParamsStr = browserStorage.getSessionStorage().getItem(REDIRECT_OAUTH_PARAMS_NAME);
-  }
-  if (!oauthParamsStr) {
-    // fallback to cookies to support legacy browsers, e.g. IE/Edge
-    oauthParamsStr = cookies.get(REDIRECT_OAUTH_PARAMS_NAME);
-  }
-
-  // clear storages
-  if (browserStorage.browserHasSessionStorage()) {
-    browserStorage.getSessionStorage().removeItem(REDIRECT_OAUTH_PARAMS_NAME);
-  }
-  cookies.delete(REDIRECT_OAUTH_PARAMS_NAME);
-
-  return oauthParamsStr;
-}
-
 function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<TokenResponse> {
   options = options || {};
   if (isString(options)) {
@@ -921,19 +891,12 @@ function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<Token
     return Promise.reject(new AuthSdkError('Unable to parse a token from the url'));
   }
 
-  const oauthParamsStr = _getOAuthParamsStrFromStorage();
-  if (!oauthParamsStr) {
-    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params from storage'));
-  }
-
-  try {
-    var oauthParams = JSON.parse(oauthParamsStr);
-    var urls = oauthParams.urls;
-    delete oauthParams.urls;
-  } catch (e) {
-    return Promise.reject(new AuthSdkError('Unable to parse the ' +
-      REDIRECT_OAUTH_PARAMS_NAME + ' value from storage: ' + e.message));
-  }
+  const oauthParams: TransactionMeta = sdk.transactionManager.load({
+    oauth: true,
+    pkce: sdk.options.pkce
+  });
+  const urls: CustomUrls = oauthParams.urls as CustomUrls;
+  delete oauthParams.urls;
 
   return Promise.resolve(urlParamsToObject(paramStr))
     .then(function (res) {
@@ -941,19 +904,9 @@ function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<Token
         // Clean hash or search from the url
         responseMode === 'query' ? removeSearch(sdk) : removeHash(sdk);
       }
-      if (sdk.options.pkce) {
-        const meta: PKCEMeta = PKCE.loadMeta(sdk);
-        const { codeVerifier, redirectUri } = meta;
-        oauthParams = Object.assign({
-          codeVerifier,
-          redirectUri
-        }, oauthParams);
-      }
       return handleOAuthResponse(sdk, oauthParams, res, urls)
         .finally(() => {
-          if (sdk.options.pkce) {
-            PKCE.clearMeta(sdk);
-          }
+          sdk.transactionManager.clear();
         });
     });
 }
@@ -1024,7 +977,5 @@ export {
   handleOAuthResponse,
   getDefaultTokenParams,
   prepareTokenParams,
-  exchangeCodeForTokens,
-  _addOAuthParamsToStorage, // export for testing purpose
-  _getOAuthParamsStrFromStorage, // export for testing purpose
+  exchangeCodeForTokens
 };

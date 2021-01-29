@@ -11,18 +11,32 @@
  *
  */
 
-import storageBuilder from '../storageBuilder';
-import {
-  PKCE_STORAGE_NAME,
-  CACHE_STORAGE_NAME
-} from '../constants';
 import AuthSdkError from '../errors/AuthSdkError';
-import { StorageUtil, StorageProvider, StorageOptions, PKCEStorage, CookieOptions } from '../types';
+import {
+  StorageProvider,
+  StorageOptions,
+  PKCEStorage,
+  CookieOptions,
+  SimpleStorage,
+  StorageType,
+  BrowserStorageUtil,
+  CookieStorage
+} from '../types';
+import { warn } from '../util';
 
 const Cookies = require('js-cookie');
 
 // Building this as an object allows us to mock the functions in our tests
-var storageUtil: StorageUtil = {
+var storageUtil: BrowserStorageUtil = {
+
+  // These are shimmed in `OktaAuthBase.ts`
+  getHttpCache(): StorageProvider {
+    return null;
+  },
+
+  getPKCEStorage(): PKCEStorage {
+    return null;
+  },
 
   // IE11 bug that Microsoft doesn't plan to fix
   // https://connect.microsoft.com/IE/Feedback/Details/1496040
@@ -44,25 +58,68 @@ var storageUtil: StorageUtil = {
     }
   },
 
-  getPKCEStorage: function(options: StorageOptions): PKCEStorage {
-    options = options || {};
-    if (!options.preferLocalStorage && storageUtil.browserHasSessionStorage()) {
-      return storageBuilder(storageUtil.getSessionStorage(), PKCE_STORAGE_NAME);
-    } else if (storageUtil.browserHasLocalStorage()) {
-      return storageBuilder(storageUtil.getLocalStorage(), PKCE_STORAGE_NAME);
-    } else {
-      return storageBuilder(storageUtil.getCookieStorage(options), PKCE_STORAGE_NAME);
+  testStorageType: function(storageType: StorageType): boolean {
+    var supported = false;
+    switch (storageType) {
+      case 'sessionStorage':
+        supported = storageUtil.browserHasSessionStorage();
+        break;
+      case 'localStorage':
+        supported = storageUtil.browserHasLocalStorage();
+        break;
+      case 'cookie':
+      case 'memory':
+        supported = true;
+        break;
+      default:
+        supported = false;
+        break;
     }
+    return supported;
   },
 
-  getHttpCache: function(options: StorageOptions): StorageProvider {
-    if (storageUtil.browserHasLocalStorage()) {
-      return storageBuilder(storageUtil.getLocalStorage(), CACHE_STORAGE_NAME);
-    } else if (storageUtil.browserHasSessionStorage()) {
-      return storageBuilder(storageUtil.getSessionStorage(), CACHE_STORAGE_NAME);
-    } else {
-      return storageBuilder(storageUtil.getCookieStorage(options), CACHE_STORAGE_NAME);
+  getStorageByType: function(storageType: StorageType, options: StorageOptions): SimpleStorage {
+    let storageProvider = null;
+    switch (storageType) {
+      case 'sessionStorage':
+        storageProvider = storageUtil.getSessionStorage();
+        break;
+      case 'localStorage':
+        storageProvider = storageUtil.getLocalStorage();
+        break;
+      case 'cookie':
+        storageProvider = storageUtil.getCookieStorage(options);
+        break;
+      case 'memory':
+        storageProvider = storageUtil.getInMemoryStorage();
+        break;
+      default:
+        throw new AuthSdkError(`Unrecognized storage option: ${storageType}`);
+        break;
     }
+    return storageProvider;
+  },
+
+  findStorageType: function(types: StorageType[]) {
+    let curType;
+    let nextType;
+    
+    types = types.slice(); // copy array
+    curType = types.shift();
+    nextType = types.length ? types[0] : null;
+    if (!nextType) {
+      return curType;
+    }
+
+    if (storageUtil.testStorageType(curType)) {
+      return curType;
+    }
+
+    // preferred type was unsupported.
+    warn(`This browser doesn't support ${curType}. Switching to ${nextType}.`);
+
+    // fallback to the next type. this is a recursive call
+    return storageUtil.findStorageType(types);
   },
 
   getLocalStorage: function() {
@@ -74,19 +131,64 @@ var storageUtil: StorageUtil = {
   },
 
   // Provides webStorage-like interface for cookies
-  getCookieStorage: function(options) {
+  getCookieStorage: function(options): CookieStorage {
     const secure = options.secure;
     const sameSite = options.sameSite;
     if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
       throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
     }
-    return {
+    const storage: CookieStorage = {
       getItem: storageUtil.storage.get,
-      setItem: function(key, value) {
-        // Cookie shouldn't expire
-        storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z', {
+      setItem: function(key, value, expiresAt?: string) {
+        // By defauilt, cookie shouldn't expire
+        expiresAt = typeof expiresAt === 'undefined' ? '2200-01-01T00:00:00.000Z' : expiresAt;
+        storageUtil.storage.set(key, value, expiresAt, {
           secure: secure, 
           sameSite: sameSite
+        });
+      },
+      removeItem: function(key) {
+        storageUtil.storage.delete(key);
+      }
+    };
+
+    if (!options.useMultipleCookies) {
+      return storage;
+    }
+
+    // options.useMultipleCookies - because cookies have size limits.
+    // Can only be used when storing an object value. Object properties will be saved to separate cookies.
+    //  Each property of the object must also be an object.
+    return {
+      getItem: function(key) {
+        var data = storage.getItem(); // read all cookies
+        var value = {};
+        Object.keys(data).forEach(k => {
+          if (k.indexOf(key) === 0) { // filter out unrelated cookies
+            value[k.replace(`${key}_`, '')] = JSON.parse(data[k]); // populate with cookie dataa
+          }
+        });
+        return JSON.stringify(value);
+      },
+      setItem: function(key, value) {
+        var existingValues = JSON.parse(this.getItem(key));
+        value = JSON.parse(value);
+        // Set key-value pairs from input to cookies
+        Object.keys(value).forEach(k => {
+          var storageKey = key + '_' + k;
+          var valueToStore = JSON.stringify(value[k]);
+          storage.setItem(storageKey, valueToStore);
+          delete existingValues[k];
+        });
+        // Delete unmatched keys from existing cookies
+        Object.keys(existingValues).forEach(k => {
+          storage.removeItem(key + '_' + k);
+        });
+      },
+      removeItem: function(key) {
+        var existingValues = JSON.parse(this.getItem(key));
+        Object.keys(existingValues).forEach(k => {
+          storage.removeItem(key + '_' + k);
         });
       }
     };
@@ -146,7 +248,7 @@ var storageUtil: StorageUtil = {
       return Cookies.get(name);
     },
 
-    delete: function(name) {
+    delete: function(name: string): string {
       return Cookies.remove(name, { path: '/' });
     }
   }

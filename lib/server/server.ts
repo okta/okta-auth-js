@@ -17,7 +17,7 @@ import fetchRequest from '../fetch/fetchRequest';
 import { getUserAgent } from '../builderUtil';
 import serverStorage from './serverStorage';
 import * as features from './features';
-import { BaseTokenAPI, FeaturesAPI } from '../types';
+import { BaseTokenAPI, FeaturesAPI, OktaAuthOptions } from '../types';
 import { prepareTokenParams, exchangeCodeForTokens, decodeToken } from '../token';
 
 const PACKAGE_JSON = require('../../package.json');
@@ -28,12 +28,34 @@ class OktaAuthNode extends OktaAuthBase {
   static features: FeaturesAPI;
   features: FeaturesAPI;
   token: BaseTokenAPI;
-  constructor(args) {
+  constructor(args: OktaAuthOptions = {}) {
     args = Object.assign({
       httpRequestClient: fetchRequest,
-      storageUtil: serverStorage
+      storageUtil: args.storageUtil || serverStorage,
+      storageManager: Object.assign({
+        token: {
+          storageTypes: [
+            'memory'
+          ]
+        },
+        cache: {
+          storageTypes: [
+            'memory'
+          ]
+        },
+        transaction: {
+          storageTypes: [
+            'memory'
+          ]
+        }
+      })
     }, args);
     super(args);
+
+    // Add shim for compatibility. This will be removed in next major version. OKTA-362589
+    Object.assign(this.options.storageUtil, {
+      getHttpCache: this.storageManager.getHttpCache.bind(this.storageManager),
+    });
 
     this.userAgent = getUserAgent(args, `okta-auth-js-server/${SDK_VERSION}`);
 

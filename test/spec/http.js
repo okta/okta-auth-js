@@ -152,13 +152,11 @@ describe('HTTP Requestor', () => {
     });
   });
   describe('cacheResponse', () => {
-    let storageUtil;
     let httpCache;
     beforeEach(() => {
       createAuthClient();
-      storageUtil = sdk.options.storageUtil;
-      httpCache = storageUtil.getHttpCache(sdk.options.cookies);
-      jest.spyOn(storageUtil, 'getHttpCache').mockReturnValue(httpCache); // force same object on each call
+      httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies);
+      jest.spyOn(sdk.storageManager, 'getHttpCache').mockReturnValue(httpCache); // force same object on each call
     });
     afterEach(() => {
       httpCache.clearStorage();

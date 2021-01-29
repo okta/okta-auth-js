@@ -223,7 +223,7 @@ describe('TokenManager', function() {
       setupSync();
       expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
-        'support sessionStorage. Switching to cookie-based storage.'
+        'support sessionStorage. Switching to cookie.'
       );
       var setCookieMock = util.mockSetCookie();
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
@@ -245,7 +245,7 @@ describe('TokenManager', function() {
       });
       expect(window.console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
-        'support sessionStorage. Switching to cookie-based storage.'
+        'support sessionStorage. Switching to cookie.'
       );
       var setCookieMock = util.mockSetCookie();
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
@@ -1625,6 +1625,9 @@ describe('TokenManager', function() {
       const emitter = new Emitter();
       sdkMock = {
         options: {},
+        storageManager: {
+          getTokenStorage: jest.fn()
+        },
         emitter
       };
       // eslint-disable-next-line no-import-assign

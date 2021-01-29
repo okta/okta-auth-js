@@ -31,9 +31,13 @@ import {
   SigninAPI,
   PkceAPI,
 } from './types';
+import StorageManager from './StorageManager';
+import TransactionManager from './TransactionManager';
 
 export default class OktaAuthBase implements OktaAuth, SigninAPI {
   options: OktaAuthOptions;
+  storageManager: StorageManager;
+  transactionManager: TransactionManager;
   tx: TransactionAPI;
   userAgent: string;
   session: SessionAPI;
@@ -51,18 +55,29 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
       devMode: args.devMode || false,
       clientId: args.clientId,
       redirectUri: args.redirectUri,
-      pkce: args.pkce
+      pkce: args.pkce,
+      storageManager: Object.assign({
+        token: {},
+        transaction: {}
+      }, args.storageManager),
+      cookies: args.cookies
     };
 
     // Give the developer the ability to disable token signature validation.
     this.options.ignoreSignature = !!args.ignoreSignature;
 
+    const { storageManager, cookies, storageUtil } = this.options;
+    this.storageManager = new StorageManager(storageManager, cookies, storageUtil);
+    this.transactionManager = new TransactionManager(Object.assign({
+      storageManager: this.storageManager
+    }, args.transactionManager));
+  
     this.tx = {
       status: transactionStatus.bind(null, this),
       resume: resumeTransaction.bind(null, this),
       exists: Object.assign(transactionExists.bind(null, this), {
         _get: (name) => {
-          const storage = this.options.storageUtil.storage;
+          const storage = storageUtil.storage;
           return storage.get(name);
         }
       }),

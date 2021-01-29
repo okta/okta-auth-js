@@ -1,8 +1,6 @@
 /* global window */
-jest.mock('../../lib/storageBuilder');
 
 import browserStorage from '../../lib/browser/browserStorage';
-import storageBuilder from '../../lib/storageBuilder';
 
 describe('browserStorage', () => {
   let originalLocalStorage;
@@ -19,7 +17,6 @@ describe('browserStorage', () => {
     global.window.localStorage = originalLocalStorage;
     global.window.sessionStorage = originalSessionStorage;
     global.window.location = originalLocation;
-    storageBuilder.mockClear();
   });
 
   it('can return localStorage', () => {
@@ -101,77 +98,6 @@ describe('browserStorage', () => {
         }),
       };
       expect(browserStorage.testStorage(fakeStorage)).toBe(false);
-    });
-
-  });
-
-  describe('getPKCEStorage', () => {
-
-    it('Uses sessionStorage by default', () => {
-      browserStorage.getPKCEStorage();
-      expect(storageBuilder).toHaveBeenCalledTimes(1);
-      // .toHaveBeenCalledWith doesn't do a strict comparison, so an empty localStorage reads the same as an empty sessionStorage
-      expect(storageBuilder.mock.calls[0][0]).toBe(global.window.sessionStorage);
-      expect(storageBuilder.mock.calls[0][1]).toBe('okta-pkce-storage');
-    });
-
-    it('Uses localStorage if sessionStorage is not available', () => {
-      delete global.window.sessionStorage;
-      browserStorage.getPKCEStorage();
-      expect(storageBuilder).toHaveBeenCalledTimes(1);
-      // .toHaveBeenCalledWith doesn't do a strict comparison, so an empty localStorage reads the same as an empty sessionStorage
-      expect(storageBuilder.mock.calls[0][0]).toBe(global.window.localStorage);
-      expect(storageBuilder.mock.calls[0][1]).toBe('okta-pkce-storage');
-    });
-
-    it('Uses cookie storage if localStorage and sessionStorage are not available', () => {
-      delete global.window.localStorage;
-      delete global.window.sessionStorage;
-      const fakeStorage = { fakeStorage: true };
-      jest.spyOn(browserStorage, 'getCookieStorage').mockReturnValue(fakeStorage);
-      const opts = { fakeOptions: true };
-      browserStorage.getPKCEStorage(opts);
-      expect(storageBuilder).toHaveBeenCalledWith(fakeStorage, 'okta-pkce-storage');
-      expect(browserStorage.getCookieStorage).toHaveBeenCalledWith(opts);
-    });
-
-    it('Uses localStorage instead of sessionStorage if options.preferLocalStorage is set', () => {
-      browserStorage.getPKCEStorage({ preferLocalStorage: true });
-      expect(storageBuilder).toHaveBeenCalledTimes(1);
-      // .toHaveBeenCalledWith doesn't do a strict comparison, so an empty localStorage reads the same as an empty sessionStorage
-      expect(storageBuilder.mock.calls[0][0]).toBe(global.window.localStorage);
-      expect(storageBuilder.mock.calls[0][1]).toBe('okta-pkce-storage');
-    });
-  });
-
-  describe('getHttpCache', () => {
-
-    it('Uses localStorage by default', () => {
-      browserStorage.getHttpCache();
-      expect(storageBuilder).toHaveBeenCalledTimes(1);
-      // .toHaveBeenCalledWith doesn't do a strict comparison, so an empty localStorage reads the same as an empty sessionStorage
-      expect(storageBuilder.mock.calls[0][0]).toBe(global.window.localStorage);
-      expect(storageBuilder.mock.calls[0][1]).toBe('okta-cache-storage');
-    });
-
-    it('Uses sessionStorage if localStorage is not available', () => {
-      delete global.window.localStorage;
-      browserStorage.getHttpCache();
-      expect(storageBuilder).toHaveBeenCalledTimes(1);
-      // .toHaveBeenCalledWith doesn't do a strict comparison, so an empty localStorage reads the same as an empty sessionStorage
-      expect(storageBuilder.mock.calls[0][0]).toBe(global.window.sessionStorage);
-      expect(storageBuilder.mock.calls[0][1]).toBe('okta-cache-storage');
-    });
-
-    it('Uses cookie storage if localStorage and sessionStorage are not available', () => {
-      delete global.window.localStorage;
-      delete global.window.sessionStorage;
-      const fakeStorage = { fakeStorage: true };
-      jest.spyOn(browserStorage, 'getCookieStorage').mockReturnValue(fakeStorage);
-      const opts = { fakeOptions: true };
-      browserStorage.getHttpCache(opts);
-      expect(storageBuilder).toHaveBeenCalledWith(fakeStorage, 'okta-cache-storage');
-      expect(browserStorage.getCookieStorage).toHaveBeenCalledWith(opts);
     });
 
   });

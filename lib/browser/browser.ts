@@ -80,20 +80,20 @@ import { AuthStateManager } from '../AuthStateManager';
 
 const Emitter = require('tiny-emitter');
 
-function getCookieSettings(sdk, args) {
+function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS: boolean) {
   // Secure cookies will be automatically used on a HTTPS connection
   // Non-secure cookies will be automatically used on a HTTP connection
   // secure option can override the automatic behavior
   var cookieSettings = args.cookies || {};
   if (typeof cookieSettings.secure === 'undefined') {
-    cookieSettings.secure = sdk.features.isHTTPS();
+    cookieSettings.secure = isHTTPS;
   }
   if (typeof cookieSettings.sameSite === 'undefined') {
     cookieSettings.sameSite = cookieSettings.secure ? 'none' : 'lax';
   }
 
   // If secure=true, but the connection is not HTTPS, set secure=false.
-  if (cookieSettings.secure && !sdk.features.isHTTPS()) {
+  if (cookieSettings.secure && !isHTTPS) {
     // eslint-disable-next-line no-console
     warn(
       'The current page is not being served with the HTTPS protocol.\n' +
@@ -123,11 +123,42 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   fingerprint: FingerprintAPI;
   _pending: { handleLogin: boolean };
 
-  constructor(args: OktaAuthOptions) {
+  constructor(args: OktaAuthOptions = {}) {
     super(Object.assign({
       httpRequestClient: fetchRequest,
-      storageUtil: browserStorage
+      storageUtil: args.storageUtil || browserStorage,
+      cookies: getCookieSettings(args, OktaAuthBrowser.features.isHTTPS()),
+      storageManager: Object.assign({
+        token: {
+          storageTypes: [
+            'localStorage',
+            'sessionStorage',
+            'cookie'
+          ],
+          useMultipleCookies: true
+        },
+        cache: {
+          storageTypes: [
+            'localStorage',
+            'sessionStorage',
+            'cookie'
+          ]
+        },
+        transaction: {
+          storageTypes: [
+            'sessionStorage',
+            'localStorage',
+            'cookie'
+          ]
+        }
+      }, args.storageManager)
     }, args));
+
+    // Add shims for compatibility, these will be removed in next major version. OKTA-362589
+    Object.assign(this.options.storageUtil, {
+      getPKCEStorage: this.storageManager.getLegacyPKCEStorage.bind(this.storageManager),
+      getHttpCache: this.storageManager.getHttpCache.bind(this.storageManager),
+    });
 
     this._pending = { handleLogin: false };
     this.options = Object.assign(this.options, {
@@ -142,7 +173,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
       responseMode: args.responseMode,
       responseType: args.responseType,
       transformErrorXHR: args.transformErrorXHR,
-      cookies: getCookieSettings(this, args),
       scopes: args.scopes,
       transformAuthState: args.transformAuthState,
       restoreOriginalUri: args.restoreOriginalUri

@@ -15,11 +15,16 @@ import { Token, RevocableToken, AccessToken, IDToken, RefreshToken } from './Tok
 import { JWTObject } from './JWT';
 import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
+import StorageManager from '../StorageManager';
+import TransactionManager from '../TransactionManager';
 
 export interface OktaAuth {
   options: OktaAuthOptions;
   userAgent: string;
   getIssuerOrigin(): string;
+
+  storageManager: StorageManager;
+  transactionManager: TransactionManager;
 
   // Browser only
   features?: FeaturesAPI;

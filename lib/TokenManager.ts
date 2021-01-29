@@ -10,13 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-/* global window, localStorage, sessionStorage */
+/* global window */
 /* eslint complexity:[0,8] max-statements:[0,21] */
 import { removeNils, warn, isObject, clone, isIE11OrLess } from './util';
 import AuthSdkError from './errors/AuthSdkError';
-import storageUtil from './browser/browserStorage';
 import { TOKEN_STORAGE_NAME } from './constants';
-import storageBuilder from './storageBuilder';
 import SdkClock from './clock';
 import { 
   Token, 
@@ -25,7 +23,10 @@ import {
   TokenManagerOptions, 
   isIDToken, 
   isAccessToken,
-  isRefreshToken
+  isRefreshToken,
+  StorageOptions,
+  StorageType,
+  OktaAuth
 } from './types';
 import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_KEY } from './constants';
 
@@ -430,85 +431,36 @@ export class TokenManager {
   _resetExpireEventTimeoutAll: () => void;
   _emitEventsForCrossTabsStorageUpdate: (newValue: string, oldValue: string) => void;
 
-  constructor(sdk, options: TokenManagerOptions) {
+  constructor(sdk: OktaAuth, options: TokenManagerOptions) {
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
 
-    if (!sdk.emitter) {
+    const emitter = (sdk as any).emitter;
+    if (!emitter) {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
-    }
-
-    if (options.storage === 'localStorage' && !storageUtil.browserHasLocalStorage()) {
-      warn('This browser doesn\'t support localStorage. Switching to sessionStorage.');
-      options.storage = 'sessionStorage';
-    }
-
-    if (options.storage === 'sessionStorage' && !storageUtil.browserHasSessionStorage()) {
-      warn('This browser doesn\'t support sessionStorage. Switching to cookie-based storage.');
-      options.storage = 'cookie';
     }
 
     if (isIE11OrLess()) {
       options._storageEventDelay = options._storageEventDelay || 1000;
     }
 
-    var storageProvider;
+    const storageOptions: StorageOptions = removeNils({
+      storageKey: options.storageKey,
+      secure: options.secure
+    });
     if (typeof options.storage === 'object') {
       // A custom storage provider must implement getItem(key) and setItem(key, val)
-      storageProvider = options.storage;
-    } else {
-      switch(options.storage) {
-        case 'localStorage':
-          storageProvider = localStorage;
-          break;
-        case 'sessionStorage':
-          storageProvider = sessionStorage;
-          break;
-        case 'cookie':
-          // Implement customized cookie storage to make sure each token is stored separatedly in cookie
-          storageProvider = (function(options) {
-            var storage = storageUtil.getCookieStorage(options);
-            return {
-              getItem: function(key) {
-                var data = storage.getItem();
-                var value = {};
-                Object.keys(data).forEach(k => {
-                  if (k.indexOf(key) === 0) {
-                    value[k.replace(`${key}_`, '')] = JSON.parse(data[k]);
-                  }
-                });
-                return JSON.stringify(value);
-              },
-              setItem: function(key, value) {
-                var existingValues = JSON.parse(this.getItem(key));
-                value = JSON.parse(value);
-                // Set key-value pairs from input to cookies
-                Object.keys(value).forEach(k => {
-                  var storageKey = key + '_' + k;
-                  var valueToStore = JSON.stringify(value[k]);
-                  storage.setItem(storageKey, valueToStore);
-                  delete existingValues[k];
-                });
-                // Delete unmatched keys from existing cookies
-                Object.keys(existingValues).forEach(k => {
-                  storageUtil.storage.delete(key + '_' + k);
-                });
-              }
-            };
-          }(sdk.options.cookies));
-          break;
-        case 'memory':
-          storageProvider = storageUtil.getInMemoryStorage();
-          break;
-        default:
-          throw new AuthSdkError('Unrecognized storage option');
-      }
+      storageOptions.storageProvider = options.storage;
+    } else if (options.storage) {
+      storageOptions.storageType = options.storage as StorageType;
     }
-    var storage = storageBuilder(storageProvider, options.storageKey);
+
+    const storage = sdk.storageManager.getTokenStorage(storageOptions);
+
     var clock = SdkClock.create(/* sdk, options */);
     var tokenMgmtRef = {
       clock: clock,
       options: options,
-      emitter: sdk.emitter,
+      emitter: emitter,
       expireTimeouts: {},
       renewPromise: {}
     };
