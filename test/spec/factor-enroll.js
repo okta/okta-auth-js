@@ -23,7 +23,7 @@ describe('FACTOR_ENROLL', function () {
           return factor.questions();
         },
         expectations: function (test, res) {
-          expect(test.resReply.status).toEqual(200);
+          expect(test.resReply.status).toEqual(300);
           expect(test.responseBody).toEqual(res);
         }
       });
