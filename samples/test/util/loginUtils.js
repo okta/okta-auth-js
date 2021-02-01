@@ -1,5 +1,6 @@
 import OktaSigninPage from '../pageobjects/OktaSigninPage';
 import { getConfig } from './configUtils';
+import { waitForPopup } from './browserUtils';
 
 async function loginRedirect(App) {
   const config = getConfig();
@@ -20,4 +21,9 @@ async function loginWidget() {
   await OktaSigninPage.signin(config.username, config.password);
 }
 
-export { loginDirect, loginRedirect, loginWidget };
+async function clickSocialLoginButtons() {
+  await waitForPopup(() => OktaSigninPage.clickSigninWithFacebook());
+  await waitForPopup(() => OktaSigninPage.clickSigninWithGoogle());
+}
+
+export { loginDirect, loginRedirect, loginWidget, clickSocialLoginButtons };

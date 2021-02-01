@@ -7,7 +7,10 @@ var config = {
   scopes: '{{ scopes }}',
   storage: '{{ storage }}',
   requireUserSession: '{{ requireUserSession }}',
-  flow: '{{ flow }}'
+  flow: '{{ flow }}',
+  {{#if signinWidget}}
+  idps: '',
+  {{/if}}
 };
 
 var authClient;
@@ -28,6 +31,7 @@ window._renewToken = bindClick(renewToken);
 {{#if signinForm}}
 window._submitSigninForm = bindClick(submitSigninForm);
 {{/if}}
+window._onChangeFlow = onChangeFlow;
 
 function stringify(obj) {
   // Convert false/undefined/null into "null"
@@ -182,6 +186,15 @@ function beginAuthFlow() {
   }
 }
 
+function onChangeFlow() {
+  const flow = document.getElementById('flow').value;
+  {{#if signinWidget}}
+  const display = flow == 'widget' ? 'block' : 'none';
+  document.getElementById('idps').style.display = display;
+  document.querySelector(`label[for=idps]`).style.display = display;
+  {{/if}}
+}
+
 function endAuthFlow(tokens) {
   // parseFromUrl clears location.search. There may also be a leftover "error" param from the auth flow.
   // Replace state with the canonical app uri so the page can be reloaded cleanly.
@@ -206,7 +219,14 @@ function showSigninWidget() {
       authParams: {
         issuer: config.issuer,
         state: JSON.stringify(config.state),
-      }
+      },
+      idps: config.idps.split(/\s+/).map(idpToken => {
+        const [type, id] = idpToken.split(/:/);
+        if (!type || !id) {
+           return null;
+        }
+        return { type, id };
+      }).filter(idpToken => idpToken)
     });
   
     signIn.showSignInToGetTokens({
@@ -338,6 +358,9 @@ function showForm() {
   document.getElementById('issuer').value = config.issuer;
   document.getElementById('clientId').value = config.clientId;
   document.getElementById('scopes').value = config.scopes;
+  {{#if signinWidget}}
+  document.getElementById('idps').value = config.idps;
+  {{/if}}
   try {
     document.querySelector(`#flow [value="${config.flow || ''}"]`).selected = true;
   } catch (e) { showError(e); }
@@ -357,6 +380,8 @@ function showForm() {
   }
   // Show the form
   document.getElementById('config-form').style.display = 'block'; // show form
+
+  onChangeFlow();
 }
 
 function showError(error) {
@@ -387,6 +412,9 @@ function loadConfig() {
   var requireUserSession;
   var scopes;
   var useInteractionCodeFlow;
+  {{#if signinWidget}}
+  var idps;
+  {{/if}}
 
   var state;
   if (stateParam) {
@@ -399,6 +427,9 @@ function loadConfig() {
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
     useInteractionCodeFlow = state.useInteractionCodeFlow;
+    {{#if signinWidget}}
+    idps = state.idps;
+    {{/if}}
   } else {
     // Read from URL
     issuer = url.searchParams.get('issuer') || config.issuer;
@@ -409,16 +440,24 @@ function loadConfig() {
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
     scopes = url.searchParams.get('scopes') || config.scopes;
     useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true' || config.useInteractionCodeFlow;
+    {{#if signinWidget}}
+    idps = url.searchParams.get('idps') || config.idps;
+    {{/if}}
   }
   // Create a canonical app URI that allows clean reloading with this config
-  appUri = window.location.origin + '/' +
-    '?issuer=' + encodeURIComponent(issuer) +
-    '&clientId=' + encodeURIComponent(clientId) +
-    '&storage=' + encodeURIComponent(storage) + 
-    '&requireUserSession=' + encodeURIComponent(requireUserSession) + 
-    '&flow=' + encodeURIComponent(flow) +
-    '&scopes=' + encodeURIComponent(scopes) +
-    '&useInteractionCodeFlow=' + encodeURIComponent(useInteractionCodeFlow);
+  appUri = window.location.origin + '/' + '?' + Object.entries({
+    issuer,
+    clientId,
+    storage,
+    requireUserSession,
+    flow,
+    scopes,
+    useInteractionCodeFlow,
+    {{#if signinWidget}}
+    idps,
+    {{/if}}
+  }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+
   
   // Add all app options to the state, to preserve config across redirects
   state = {
@@ -428,7 +467,10 @@ function loadConfig() {
     requireUserSession,
     flow,
     scopes,
-    useInteractionCodeFlow
+    useInteractionCodeFlow,
+    {{#if signinWidget}}
+    idps,
+    {{/if}}
   };
   var newConfig = {};
   Object.assign(newConfig, state);
