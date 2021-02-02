@@ -15,7 +15,7 @@ import { find } from '../../util';
 import { OktaAuth, WellKnownResponse } from '../../types';
 import AuthSdkError from '../../errors/AuthSdkError';
 
-export function getWellKnown(sdk: OktaAuth, issuer: string): Promise<WellKnownResponse> {
+export function getWellKnown(sdk: OktaAuth, issuer?: string): Promise<WellKnownResponse> {
   var authServerUri = (issuer || sdk.options.issuer);
   return http.get(sdk, authServerUri + '/.well-known/openid-configuration', {
     cacheResponse: true

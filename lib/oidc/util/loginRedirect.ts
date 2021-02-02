@@ -12,14 +12,20 @@
  */
 /* global window */
 /* eslint-disable complexity, max-statements */
-import { OktaAuth } from '../../types';
+import { OktaAuth, OktaAuthOptions } from '../../types';
 
 export function hasTokensInHash(hash: string): boolean {
   return /((id|access)_token=)/i.test(hash);
 }
 
-export function hasCodeInUrl(hashOrSearch: string): boolean {
+// authorization_code
+export function hasAuthorizationCode(hashOrSearch: string): boolean {
   return /(code=)/i.test(hashOrSearch);
+}
+
+// interaction_code
+export function hasInteractionCode(hashOrSearch: string): boolean {
+  return /(interaction_code=)/i.test(hashOrSearch);
 }
 
 export function hasErrorInUrl(hashOrSearch: string): boolean {
@@ -29,6 +35,16 @@ export function hasErrorInUrl(hashOrSearch: string): boolean {
 export function isRedirectUri(uri: string, sdk: OktaAuth): boolean {
   var authParams = sdk.options;
   return uri && uri.indexOf(authParams.redirectUri) === 0;
+}
+
+export function isCodeFlow(options: OktaAuthOptions) {
+  return options.pkce || options.responseType === 'code' || options.responseMode === 'query';
+}
+
+export function getHashOrSearch(options: OktaAuthOptions) {
+  var codeFlow = isCodeFlow(options);
+  var useQuery = codeFlow && options.responseMode !== 'fragment';
+  return useQuery ? window.location.search : window.location.hash;
 }
 
 /**
@@ -41,20 +57,33 @@ export function isLoginRedirect (sdk: OktaAuth) {
     return false;
   }
 
-  // The location contains either a code, token, or an error&error_description
-  var authParams = sdk.options;
-  var codeFlow = authParams.pkce || authParams.responseType === 'code' || authParams.responseMode === 'query';
-  var useQuery = codeFlow && authParams.responseMode !== 'fragment';
+  // The location contains either a code, token, or an error + error_description
+  var codeFlow = isCodeFlow(sdk.options);
+  var hashOrSearch = getHashOrSearch(sdk.options);
 
-  if (hasErrorInUrl(useQuery ? window.location.search : window.location.hash)) {
+  if (hasErrorInUrl(hashOrSearch)) {
     return true;
   }
 
   if (codeFlow) {
-    var hasCode =  useQuery ? hasCodeInUrl(window.location.search) : hasCodeInUrl(window.location.hash);
+    var hasCode =  hasAuthorizationCode(hashOrSearch) || hasInteractionCode(hashOrSearch);
     return hasCode;
   }
 
   // implicit flow, will always be hash fragment
   return hasTokensInHash(window.location.hash);
+}
+
+/**
+ * Check if error=interaction_required has been passed back in the url, which happens in
+ * the social auth IDP redirect flow.
+ */
+export function isInteractionRequired (sdk: OktaAuth) {
+    // First check, is this a redirect URI?
+    if (!isLoginRedirect(sdk)){
+      return false;
+    }
+  
+  var hashOrSearch = getHashOrSearch(sdk.options);
+  return /(error=interaction_required)/i.test(hashOrSearch);
 }

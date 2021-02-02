@@ -3,3 +3,4 @@ node_modules/
 *.log
 public/*.js
 public/*.map
+public/dist/*

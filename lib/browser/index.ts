@@ -16,6 +16,7 @@ export * from '../constants';
 export * from '../types';
 export * from '../tx';
 export * from '../errors';
+export * from '../oidc';
 export * from '../StorageManager';
 export * from '../TransactionManager';
 export * from '../TokenManager';

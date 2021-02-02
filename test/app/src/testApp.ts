@@ -20,7 +20,8 @@ import {
   OktaAuthOptions, 
   AccessToken, 
   AuthTransaction, 
-  TokenParams
+  TokenParams,
+  isInteractionRequiredError
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -32,10 +33,6 @@ declare global {
   interface Window {
     getWidgetConfig: () => any;
   }
-}
-
-interface GetSDKInstanceOptions {
-  subscribeAuthStateChange?: boolean;
 }
 
 declare class OktaSignIn {
@@ -57,8 +54,12 @@ function logoutLink(app: TestApp): string {
   `;
 }
 
-const Footer = `
-`;
+const subscribeLinks = [
+  `<a id="subscribe-auth-state" onclick="subscribeToAuthState(event)">Subscribe to AuthState</a>`,
+  `<a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)">Subscribe to TokenManager events</a>`
+];
+
+const Toolbar = `${ subscribeLinks.join('&nbsp;|&nbsp;') }`;
 
 const Layout = `
   <div id="modal">
@@ -71,11 +72,11 @@ const Layout = `
     <div id="token-error" style="color: red"></div>
     <div id="token-msg" style="color: green"></div>
     <div id="page-content"></div>
+    ${Toolbar}
     <div id="config-area" class="flex-row">
       <div id="form-content" class="box">${Form}</div>
       <div id="config-dump" class="box"></div>
     </div>
-    ${Footer}
   </div>
 `;
 
@@ -107,25 +108,31 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
     testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp),
     testConcurrentLoginViaTokenRenewFailure: testApp.testConcurrentLoginViaTokenRenewFailure.bind(testApp),
+    subscribeToAuthState: testApp.subscribeToAuthState.bind(testApp),
+    subscribeToTokenEvents: testApp.subscribeToTokenEvents.bind(testApp)
   };
   Object.keys(boundFunctions).forEach(functionName => {
     (window as any)[functionName] = makeClickHandler((boundFunctions as any)[functionName]);
   });
 }
 
-function injectWidgetFromCDN(widgetVersion: string): void {
-  // inject script
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/js/okta-sign-in.min.js`;    
-  document.getElementsByTagName('head')[0].appendChild(script);
+async function injectWidgetFromCDN(widgetVersion: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // inject CSS
+    const link = document.createElement('link');
+    link.type='text/css';
+    link.rel='stylesheet';
+    link.href = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/css/okta-sign-in.min.css`;
+    document.getElementsByTagName('head')[0].appendChild(link);
 
-  // inject CSS
-  const link = document.createElement('link');
-  link.type='text/css';
-  link.rel='stylesheet';
-  link.href = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/css/okta-sign-in.min.css`;
-  document.getElementsByTagName('head')[0].appendChild(link);
+    // inject script
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    document.getElementsByTagName('head')[0].appendChild(script);
+    script.onload = (): void => { resolve(); };
+    script.onerror = (e): void => { reject(e); };
+    script.src = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/js/okta-sign-in.min.js`;
+  }); 
 }
 
 class TestApp {
@@ -134,8 +141,11 @@ class TestApp {
   rootElem?: Element;
   contentElem?: Element;
   oktaAuth?: OktaAuth;
+  getCount?: number;
+
   constructor(config: Config) {
     this.config = config;
+    this.getCount = 0;
   }
 
   // Mount into the DOM
@@ -148,22 +158,25 @@ class TestApp {
     document.getElementById('config-dump').innerHTML = this.configHTML();
     this.contentElem = document.getElementById('page-content');
     bindFunctions(this, window);
-    const widgetVersion = this.config._siwVersion;
-    injectWidgetFromCDN(widgetVersion);
   }
 
-  getSDKInstance({ subscribeAuthStateChange }: GetSDKInstanceOptions = { subscribeAuthStateChange: true }): Promise<void> {
-    return Promise.resolve()
-      .then(() => {
-        // can throw
-        this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config, {
-          scopes: this.config._defaultScopes ? [] : this.config.scopes
-        }));
-        this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
-        if (subscribeAuthStateChange) {
-          this.oktaAuth.authStateManager.subscribe(this.render.bind(this));
-        }
-      });
+  async getSDKInstance(): Promise<OktaAuth> {
+    // can throw
+    this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config, {
+      scopes: this.config._defaultScopes ? [] : this.config.scopes
+    }));
+    return this.oktaAuth;
+  }
+
+  subscribeToAuthState(): void {
+    this.oktaAuth.authStateManager.subscribe(() => {
+      console.log('new AuthState', this.oktaAuth.authStateManager.getAuthState());
+      this.render();
+    });
+  }
+
+  subscribeToTokenEvents(): void {
+    this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
   }
 
   _setContent(content: string): void {
@@ -189,7 +202,7 @@ class TestApp {
       <hr/>
       ${homeLink(this)}
     `;
-    return this.getSDKInstance({ subscribeAuthStateChange: false })
+    return this.getSDKInstance(/*{ subscribeAuthStateChange: false }*/)
       .then(() => this._setContent(content))
       .then(() => this._afterRender('callback'));
   }
@@ -200,9 +213,9 @@ class TestApp {
       .then(() => this.render());
   }
 
-  render(): Promise<void> {
-    return this.oktaAuth.tokenManager.getTokens()
-    .catch((e) => {
+  render(forceUnauth = false): Promise<void> {
+    const p = forceUnauth ? Promise.resolve({}) : this.oktaAuth.tokenManager.getTokens();
+    return p.catch((e) => {
       this.renderError(e);
       throw e;
     })
@@ -232,7 +245,8 @@ class TestApp {
     this._afterRender('with-error');
   }
 
-  loginWidget(): void {
+  async loginWidget(): Promise<void> {
+    await injectWidgetFromCDN(this.config._siwVersion);
     saveConfigToStorage(this.config);
     document.getElementById('modal').style.display = 'block';
     const widgetConfig = window.getWidgetConfig();
@@ -419,15 +433,25 @@ class TestApp {
 
   async handleCallback(): Promise<void> {
     return this.getTokensFromUrl()
-      .catch(e => {
+      .then(res => {
+        return this.renderCallback(res);
+      }, e => {
+        if (isInteractionRequiredError(e)) {
+          return this.renderInteractionRequired();
+        }
         this.renderError(e);
         throw e;
-      })
-      .then(res => {
-        return this.callbackHTML(res);
-      })
+      });
+  }
+
+  async renderCallback(res: TokenResponse): Promise<void> {
+    return Promise.resolve(this.callbackHTML(res))
       .then(content => this._setContent(content))
       .then(() => this._afterRender('callback-handled'));
+  }
+
+  async renderInteractionRequired(): Promise<void> {
+    return this.render(true).then(() => this.loginWidget());
   }
 
   async getTokensFromUrl(): Promise<TokenResponse> {

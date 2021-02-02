@@ -44,6 +44,10 @@ class TestApp {
   get callbackSelector() { return $('#root.callback'); }
   get callbackHandledSelector() { return $('#root.callback-handled'); }
 
+  // Toolbar
+  get subscribeAuthStateBtn() { return $('#subscribe-auth-state'); }
+  get subscribeTokenEventsBtn() { return $('#subscribe-token-events'); }
+  
   get handleCallbackBtn() { return $('#handle-callback'); }
   get callbackResult() { return $('#callback-result'); }
   get returnHomeBtn() { return $('#return-home'); }
@@ -131,6 +135,14 @@ class TestApp {
   async logoutApp() {
     await this.logoutAppBtn.then(el => el.click());
     await this.waitForLoginBtn();
+  }
+
+  async subscribeToAuthState() {
+    await this.subscribeAuthStateBtn.then(el => el.click());
+  }
+
+  async subscribeToTokenEvents() {
+    await this.subscribeTokenEventsBtn.then(el => el.click());
   }
 
   async testConcurrentLogin() {
