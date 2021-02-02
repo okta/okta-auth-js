@@ -1532,6 +1532,22 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
+"@okta/okta-auth-js@*":
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/@okta/okta-auth-js/-/okta-auth-js-4.6.1.tgz#b82cfa72216aeab452dbea7a4c27c8603200a071"
+  integrity sha512-D7RRI356IAoKORDuxfK6Kd9ipoZxPYNlWkR1N0UhTMHOhsQ8PSfjCQy4z/pYCnD6AtaZRbjq0KQfTQrzIq2+rA==
+  dependencies:
+    Base64 "0.3.0"
+    core-js "^3.6.5"
+    cross-fetch "^3.0.0"
+    js-cookie "2.2.0"
+    node-cache "^4.2.0"
+    p-cancelable "^2.0.0"
+    text-encoding "^0.7.0"
+    tiny-emitter "1.1.0"
+    webcrypto-shim "^0.1.5"
+    xhr2 "0.1.3"
+
 "@okta/okta-signin-widget@^5.2.3":
   version "5.2.3"
   resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.2.3.tgz#d642a9fd881480506037daf0fc4895ec59fb8fb0"
@@ -14048,9 +14064,9 @@ uri-js@^4.2.2:
     punycode "^2.1.0"
 
 urijs@^1.19.1:
-  version "1.19.2"
-  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.2.tgz#f9be09f00c4c5134b7cb3cf475c1dd394526265a"
-  integrity sha512-s/UIq9ap4JPZ7H1EB5ULo/aOUbWqfDi7FKzMC2Nz+0Si8GiT1rIEaprt8hy3Vy2Ex2aJPpOQv4P4DuOZ+K1c6w==
+  version "1.19.5"
+  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.5.tgz#119683ab4b2fb0bd637e5ea6dd9117bcac68d3e4"
+  integrity sha512-48z9VGWwdCV5KfizHsE05DWS5fhK6gFlx5MjO7xu0Krc5FGPWzjlXEVV0nPMrdVuP7xmMHiPZ2HoYZwKOFTZOg==
 
 urix@^0.1.0:
   version "0.1.0"
