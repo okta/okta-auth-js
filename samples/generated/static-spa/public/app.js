@@ -200,6 +200,7 @@ function showSigninWidget() {
       baseUrl: config.issuer.split('oauth2')[0],
       clientId: config.clientId,
       redirectUri: config.redirectUri,
+      useInteractionCodeFlow: config.useInteractionCodeFlow,
       authParams: {
         issuer: config.issuer,
         state: JSON.stringify(config.state),
@@ -344,6 +345,11 @@ function showForm() {
     document.querySelector(`#storage [value="${config.storage || ''}"]`).selected = true;
   } catch (e) { showError(e); }
 
+  if (config.useInteractionCodeFlow) {
+    document.getElementById('useInteractionCodeFlow-on').checked = true;
+  } else {
+    document.getElementById('useInteractionCodeFlow-off').checked = true;
+  }
   // Show the form
   document.getElementById('config-form').style.display = 'block'; // show form
 }
@@ -375,6 +381,7 @@ function loadConfig() {
   var flow;
   var requireUserSession;
   var scopes;
+  var useInteractionCodeFlow;
 
   var state;
   if (stateParam) {
@@ -386,6 +393,7 @@ function loadConfig() {
     flow = state.flow;
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
+    useInteractionCodeFlow = state.useInteractionCodeFlow;
   } else {
     // Read from URL
     issuer = url.searchParams.get('issuer') || config.issuer;
@@ -395,6 +403,7 @@ function loadConfig() {
     requireUserSession = url.searchParams.get('requireUserSession') ? 
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
     scopes = url.searchParams.get('scopes') || config.scopes;
+    useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true' || config.useInteractionCodeFlow;
   }
   // Create a canonical app URI that allows clean reloading with this config
   appUri = window.location.origin + '/' +
@@ -403,7 +412,8 @@ function loadConfig() {
     '&storage=' + encodeURIComponent(storage) + 
     '&requireUserSession=' + encodeURIComponent(requireUserSession) + 
     '&flow=' + encodeURIComponent(flow) +
-    '&scopes=' + encodeURIComponent(scopes);
+    '&scopes=' + encodeURIComponent(scopes) +
+    '&useInteractionCodeFlow=' + encodeURIComponent(useInteractionCodeFlow);
   
   // Add all app options to the state, to preserve config across redirects
   state = {
@@ -413,6 +423,7 @@ function loadConfig() {
     requireUserSession,
     flow,
     scopes,
+    useInteractionCodeFlow
   };
   var newConfig = {};
   Object.assign(newConfig, state);

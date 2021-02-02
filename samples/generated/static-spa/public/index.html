@@ -1,14 +1,15 @@
+<!DOCTYPE html>
 <html>
   <head>
     <!-- In this sample, okta-auth-js assets are being served locally from node_modules. Assets are also available on CDN -->
-    <!-- https://global.oktacdn.com/okta-auth-js/4.4.0/okta-auth-js.polyfill.js -->
-    <!-- https://global.oktacdn.com/okta-auth-js/4.4.0/okta-auth-js.min.js -->
+    <!-- https://global.oktacdn.com/okta-auth-js/4.6.1/okta-auth-js.polyfill.js -->
+    <!-- https://global.oktacdn.com/okta-auth-js/4.6.1/okta-auth-js.min.js -->
     <script src="/okta-auth-js.polyfill.js" type="text/javascript"></script>
     <script src="/okta-auth-js.min.js" type="text/javascript"></script>
 
     <!-- okta-signin-widget assets are avilable on CDN -->
-    <script src="https://global.oktacdn.com/okta-signin-widget/5.0.0/js/okta-sign-in.min.js" type="text/javascript"></script>
-    <link href="https://global.oktacdn.com/okta-signin-widget/5.0.0/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
+    <script src="https://global.oktacdn.com/okta-signin-widget/5.2.3/js/okta-sign-in.min.js" type="text/javascript"></script>
+    <link href="https://global.oktacdn.com/okta-signin-widget/5.2.3/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
 
     <!-- app styles -->
     <style>
@@ -68,6 +69,11 @@
           <option value="cookie">cookie</option>
           <option value="memory">memory</option>
         </select><br/>
+      
+        <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label><br/>
+        <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
+        <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
+      
         <hr/>
         <input id="login-submit" type="submit" value="Launch App"/>
       </form>

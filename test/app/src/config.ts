@@ -4,42 +4,37 @@ const HOST = window.location.host;
 const PROTO = window.location.protocol;
 const REDIRECT_URI = `${PROTO}//${HOST}${CALLBACK_PATH}`;
 const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}/`;
+const DEFAULT_SIW_VERSION = '5.2.3';
 
 export interface Config extends OktaAuthOptions {
-  // redirectUri: string;
-  // postLogoutRedirectUri: string;
-  // issuer: string;
-  // clientId: string;
-  // responseType: string[];
-  // responseMode?: string;
-  // scopes: string[];
   _defaultScopes: boolean;
-  // pkce: boolean;
-  // cookies: {
-  //   secure: boolean;
-  //   sameSite?: string;
-  // };
-  // tokenManager?: {
-  //   storage: string;
-  // };
+  _siwVersion: string;
+  _clientSecret: string;
+  _forceRedirect: boolean;
+  useInteractionCodeFlow: boolean; // widget option
 }
 
 function getDefaultConfig(): Config {
   const ISSUER = process.env.ISSUER;
   const CLIENT_ID = process.env.CLIENT_ID;
-  
+  const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
+
   return {
+    _forceRedirect: false,
+    _siwVersion: DEFAULT_SIW_VERSION,
     redirectUri: REDIRECT_URI,
     postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
     issuer: ISSUER,
     clientId: CLIENT_ID,
+    _clientSecret: CLIENT_SECRET,
     responseType: ['token', 'id_token'],
     scopes: ['openid', 'email', 'offline_access'],
     _defaultScopes: false,
     pkce: true,
     cookies: {
       secure: true
-    }
+    },
+    useInteractionCodeFlow: false
   };
 }
 
@@ -50,6 +45,7 @@ function getConfigFromUrl(): Config {
   const redirectUri = url.searchParams.get('redirectUri') || REDIRECT_URI;
   const postLogoutRedirectUri = url.searchParams.get('postLogoutRedirectUri') || POST_LOGOUT_REDIRECT_URI;
   const clientId = url.searchParams.get('clientId');
+  const _clientSecret = url.searchParams.get('_clientSecret');
   const pkce = url.searchParams.get('pkce') !== 'false'; // On by default
   const _defaultScopes = url.searchParams.get('_defaultScopes') === 'true';
   const scopes = (url.searchParams.get('scopes') || 'openid,email,offline_access').split(',');
@@ -58,12 +54,18 @@ function getConfigFromUrl(): Config {
   const storage = url.searchParams.get('storage') || undefined;
   const secureCookies = url.searchParams.get('secure') !== 'false'; // On by default
   const sameSite = url.searchParams.get('sameSite') || undefined;
+  const _siwVersion = url.searchParams.get('_siwVersion') || DEFAULT_SIW_VERSION;
+  const useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true'; // off by default
+  const _forceRedirect = url.searchParams.get('_forceRedirect') === 'true'; // off by default
 
   return {
+    _forceRedirect,
+    _siwVersion,
     redirectUri,
     postLogoutRedirectUri,
     issuer,
     clientId,
+    _clientSecret,
     pkce,
     _defaultScopes,
     scopes,
@@ -76,6 +78,7 @@ function getConfigFromUrl(): Config {
     tokenManager: {
       storage,
     },
+    useInteractionCodeFlow
   };
 }
 

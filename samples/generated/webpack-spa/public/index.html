@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <!-- signin widget CSS, served locally from node_modules -->
@@ -61,6 +62,11 @@
           <option value="cookie">cookie</option>
           <option value="memory">memory</option>
         </select><br/>
+      
+        <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label><br/>
+        <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
+        <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
+      
         <hr/>
         <input id="login-submit" type="submit" value="Launch App"/>
       </form>

@@ -47,7 +47,8 @@ window.getWidgetConfig = function(): any {
     el: '#widget',
     authParams: {
       display: 'page',
-      pkce: config.pkce
+      pkce: config.pkce,
+      responseType: config.responseType
     }
   });
   return siwConfig;

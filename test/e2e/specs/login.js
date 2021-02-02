@@ -19,18 +19,28 @@ describe('E2E login', () => {
 
   flows.forEach(flow => {
     describe(flow + ' flow', () => {
-      beforeEach(async () => {
-        (flow === 'pkce') ? await openPKCE() : await openImplicit();
-      });
+      async function bootstrap(options = {}) {
+        (flow === 'pkce') ? await openPKCE(options) : await openImplicit(options);
+      }
 
-      it('can login using signin widget', async () => {
+      it('can login using signin widget (no redirect)', async () => {
+        await bootstrap();
         await loginWidget(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
         await TestApp.logoutRedirect();
       });
 
+      it('can login using signin widget (with redirect)', async () => {
+        await bootstrap({ _forceRedirect: true });
+        await loginWidget(flow, true);
+        await TestApp.getUserInfo();
+        await TestApp.assertUserInfo();
+        await TestApp.logoutRedirect();
+      });
+
       it('can login using redirect', async () => {
+        await bootstrap();
         await loginRedirect(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
@@ -38,6 +48,7 @@ describe('E2E login', () => {
       });
 
       it('can login using a popup window', async() => {
+        await bootstrap();
         await loginPopup(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
@@ -45,6 +56,7 @@ describe('E2E login', () => {
       });
 
       it('can login directly, calling signin() with username and password', async () => {
+        await bootstrap();
         await loginDirect(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();

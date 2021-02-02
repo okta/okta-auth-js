@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 /*
  * Copyright (c) 2019, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -39,7 +40,9 @@ interface GetSDKInstanceOptions {
 
 declare class OktaSignIn {
   constructor(options: any);
+  renderEl(options: any, successFn: Function, errorFn: Function): void;
   showSignInToGetTokens(options: any): void;
+  remove(): void;
 }
 
 function homeLink(app: TestApp): string {
@@ -110,6 +113,21 @@ function bindFunctions(testApp: TestApp, window: Window): void {
   });
 }
 
+function injectWidgetFromCDN(widgetVersion: string): void {
+  // inject script
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/js/okta-sign-in.min.js`;    
+  document.getElementsByTagName('head')[0].appendChild(script);
+
+  // inject CSS
+  const link = document.createElement('link');
+  link.type='text/css';
+  link.rel='stylesheet';
+  link.href = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/css/okta-sign-in.min.css`;
+  document.getElementsByTagName('head')[0].appendChild(link);
+}
+
 class TestApp {
   config: Config;
   originalUrl?: string;
@@ -130,6 +148,8 @@ class TestApp {
     document.getElementById('config-dump').innerHTML = this.configHTML();
     this.contentElem = document.getElementById('page-content');
     bindFunctions(this, window);
+    const widgetVersion = this.config._siwVersion;
+    injectWidgetFromCDN(widgetVersion);
   }
 
   getSDKInstance({ subscribeAuthStateChange }: GetSDKInstanceOptions = { subscribeAuthStateChange: true }): Promise<void> {
@@ -215,14 +235,18 @@ class TestApp {
   loginWidget(): void {
     saveConfigToStorage(this.config);
     document.getElementById('modal').style.display = 'block';
-    const config = window.getWidgetConfig();
-    const signIn = new OktaSignIn(config);
-  
-    signIn.showSignInToGetTokens({
-      clientId: config.clientId,
-      redirectUri: config.redirectUri,  
-      scopes: config.scopes,
-  
+    const widgetConfig = window.getWidgetConfig();
+    const { issuer, clientId, _clientSecret, redirectUri, _forceRedirect, scopes } = this.config;
+    const state = JSON.stringify({ issuer, clientId, _clientSecret, redirectUri });
+
+    // This test app allows selecting arbitrary widget versions. We must use `renderEl` for compatibility with older versions.
+    const renderOptions: any = {
+      clientId,
+      redirectUri,
+
+      scopes,
+      state, // Not working: OKTA-361428
+      
       // Return an access token from the authorization server
       getAccessToken: true,
   
@@ -231,7 +255,54 @@ class TestApp {
 
       // Return a Refresh token from the authorization server
       getRefreshToken: true
-    });
+    };
+
+    widgetConfig.authParams.state = state; // Must set authParams in constructor: OKTA-361428
+
+    if (_forceRedirect) {
+      renderOptions.mode = 'remediation';
+    } else {
+      widgetConfig.authParams.display = 'none';
+    }
+
+    const signIn = new OktaSignIn(widgetConfig);
+    signIn.renderEl(renderOptions,
+      (res: any) => {
+        console.log(`signin.renderEl: success callback fired: `, res);
+        if (res.status === 'SUCCESS') {
+          // remove widget
+          signIn.remove();
+          document.getElementById('modal').style.display = 'none';
+
+          // save tokens
+          let tokens: Tokens;
+          // Older widget versions returned tokens as an array
+          if (Array.isArray(res)) {
+            tokens = {};
+            for (let i = 0; i < res.length; i++) {
+              const token = res[i];
+              if (token.idToken) {
+                tokens.idToken = token;
+              } else if (token.accessToken) {
+                tokens.accessToken = token;
+              }
+            }
+          } else {
+            // Current versions return an object hash
+            tokens = res.tokens;
+          }
+          this.oktaAuth.tokenManager.setTokens(tokens);
+
+          // re-render
+          this.render();
+        } else {
+          console.log(`signin.renderEl: result status was ${res.status}`, res);
+        }
+      },
+      (err: any) => {
+        console.log(`signin.renderEl: error callback fired`, err);
+      }
+    );
   }
 
   async loginDirect(): Promise<void> {

@@ -9,10 +9,6 @@
     "dev": "gulp watch",
     "test": "yarn --cwd test start"
   },
-  "dependencies": {
-    "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "^5.0.0"
-  },
   "devDependencies": {
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
