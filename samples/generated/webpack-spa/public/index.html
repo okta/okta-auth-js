@@ -42,7 +42,7 @@
         </label><input id="clientId" name="clientId" type="text" /><br/>
       
         <label for="flow">Authentication Flow</label>
-        <select id="flow" name="flow">
+        <select id="flow" name="flow" onchange="_onChangeFlow(event)">
           <option value="redirect">Redirect to Okta</option>
           <option value="widget">Okta Signin Widget (self-hosted)</option>
           <option value="form">Custom form (username/passsword)</option>
@@ -66,6 +66,9 @@
         <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label><br/>
         <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
         <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
+        
+        <label style="display: none" for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
+        <input style="display: none" id="idps" name="idps" type="text" /><br/>
       
         <hr/>
         <input id="login-submit" type="submit" value="Launch App"/>
