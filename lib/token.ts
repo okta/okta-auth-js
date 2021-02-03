@@ -836,7 +836,8 @@ function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
       if (sdk.options.pkce) {
         options.responseType = 'code';
       } else {
-        options.responseType = ['token', 'id_token'];
+        const { responseType } = getDefaultTokenParams(sdk);
+        options.responseType = responseType;
       }
 
       return getWithoutPrompt(sdk, options)

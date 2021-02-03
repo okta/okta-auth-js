@@ -3143,6 +3143,78 @@ describe('token.renewTokens', function() {
       }
     });
   });
+
+  it('returns access token when SDK is configured with { responseType: \'token\' }', function() {
+    return oauthUtil.setupFrame({
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect',
+        responseType: ['token'],
+      },
+      tokenRenewTokensArgs: [],
+      postMessageSrc: {
+        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+        queryParams: {
+          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+          'redirect_uri': 'https://example.com/redirect',
+          'response_type': 'token',
+          'response_mode': 'okta_post_message',
+          'state': oauthUtil.mockedState,
+          'nonce': oauthUtil.mockedNonce,
+          'scope': 'openid email',
+          'prompt': 'none'
+        }
+      },
+      time: 1449699929,
+      postMessageResp: {
+        'access_token': tokens.standardAccessToken,
+        'expires_in': 3600,
+        'token_type': 'Bearer',
+        'state': oauthUtil.mockedState
+      },
+      validateFunc: ({ accessToken }) => {
+        oauthUtil.validateResponse(accessToken, tokens.standardAccessTokenParsed);
+      }
+    });
+  });
+
+  it('returns ID token when SDK is configured with { responseType: \'id_token\' }', function() {
+    return oauthUtil.setupFrame({
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect',
+        responseType: ['id_token'],
+      },
+      tokenRenewTokensArgs: [],
+      postMessageSrc: {
+        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+        queryParams: {
+          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+          'redirect_uri': 'https://example.com/redirect',
+          'response_type': 'id_token',
+          'response_mode': 'okta_post_message',
+          'state': oauthUtil.mockedState,
+          'nonce': oauthUtil.mockedNonce,
+          'scope': 'openid email',
+          'prompt': 'none'
+        }
+      },
+      time: 1449699929,
+      postMessageResp: {
+        'id_token': tokens.standardIdToken,
+        'expires_in': 3600,
+        'token_type': 'Bearer',
+        'state': oauthUtil.mockedState
+      },
+      validateFunc: ({ idToken }) => {
+        oauthUtil.validateResponse(idToken, tokens.standardIdTokenParsed);
+      }
+    });
+  });
 });
 
 describe('token.getUserInfo', function() {
