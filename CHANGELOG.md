@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.6.2
+
+### Bug Fixes
+
+- [#616](https://github.com/okta/okta-auth-js/pull/616) Fixes issue with `fetch` on IE Edge versions 14-17.
+
 ## 4.6.1 
 - [#595](https://github.com/okta/okta-auth-js/pull/595) Ports fix for overeager `catch` when using refresh token originally from [#579](https://github.com/okta/okta-auth-js/pull/579)
 
