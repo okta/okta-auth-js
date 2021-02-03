@@ -30,7 +30,7 @@ function readData(response: FetchResponse): Promise<object | string> {
 }
 
 function formatResult(status: number, data: object | string) {
-  const isObject = typeof data === 'object'; 
+  const isObject = typeof data === 'object';
   const result: HttpResponse = {
     responseText: isObject ? JSON.stringify(data) : data as string,
     status: status
@@ -58,8 +58,13 @@ function fetchRequest(method: string, url: string, args: FetchOptions) {
     headers: args.headers,
     body: body as string,
     credentials: args.withCredentials ? 'include' : 'omit'
-  })
-  .then(function(response) {
+  });
+
+  if (!fetchPromise.finally) {
+    fetchPromise = Promise.resolve(fetchPromise);
+  }
+
+  return fetchPromise.then(function(response) {
     var error = !response.ok;
     var status = response.status;
     return readData(response)
@@ -74,7 +79,6 @@ function fetchRequest(method: string, url: string, args: FetchOptions) {
         return result;
       });
   });
-  return fetchPromise;
 }
 
 export default fetchRequest;
