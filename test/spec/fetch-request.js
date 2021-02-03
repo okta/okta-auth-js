@@ -72,6 +72,25 @@ describe('fetchRequest', function () {
         expect(fetchSpy).not.toHaveBeenCalled();
       });
     });
+    it('fetchRequest returns a promise with finally on it', () => {
+      const globalFetch = jest.fn(() => {
+        return Promise.resolve(response);
+      });
+      window.fetch = globalFetch;
+      const fetchRequestPromise = fetchRequest(requestMethod, requestUrl, {});
+      expect(fetchRequestPromise.finally).toBeDefined();
+    });
+    it('fetchRequest returns a promise with finally on it even if fetch doesnt return a promise with fetch', () => {
+      const globalFetch = jest.fn(() => {
+        return {
+          then: () => {},
+          catch: () => {}
+        };
+      });
+      window.fetch = globalFetch;
+      const fetchRequestPromise = fetchRequest(requestMethod, requestUrl, {});
+      expect(fetchRequestPromise.finally).toBeDefined();
+    });
   });
 
   describe('request', () => {
