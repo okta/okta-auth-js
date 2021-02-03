@@ -82,9 +82,10 @@ describe('fetchRequest', function () {
     });
     it('fetchRequest returns a promise with finally on it even if fetch doesnt return a promise with fetch', () => {
       const globalFetch = jest.fn(() => {
-        const resolvedPromise = Promise.resolve(response);
-        resolvedPromise.finally = null;
-        return resolvedPromise;
+        return {
+          then: () => {},
+          catch: () => {}
+        };
       });
       window.fetch = globalFetch;
       const fetchRequestPromise = fetchRequest(requestMethod, requestUrl, {});
