@@ -18,24 +18,22 @@ module.exports = {
     '<rootDir>/jest.setup.js'
   ],
   'testMatch': [
-    '**/test/spec/*.js'
+    '**/test/spec/**/*.{js,ts}'
   ],
   'roots': [
     'test/spec'
   ],
   'testPathIgnorePatterns': [
+    './test/spec/oidc',
     './test/spec/promiseQueue.js',
-    './test/spec/browser.js',
+    './test/spec/OktaAuth/browser.ts',
     './test/spec/browserStorage.js',
     './test/spec/cookies.js',
     './test/spec/fingerprint.js',
-    './test/spec/general.js',
     './test/spec/oauthUtil.js',
     './test/spec/session.js',
-    './test/spec/token.js',
     './test/spec/tokenManager.js',
     './test/spec/webfinger.js',
-    './test/spec/pkce.js',
     './test/spec/features.js',
     './test/spec/AuthStateManager.js'
   ],

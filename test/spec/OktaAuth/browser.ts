@@ -1,7 +1,7 @@
 /* eslint-disable no-new */
 /* global window */
 jest.mock('cross-fetch');
-jest.mock('../../lib/tx');
+jest.mock('../../../lib/tx');
 
 import { 
   OktaAuth, 
@@ -9,8 +9,9 @@ import {
   REFERRER_PATH_STORAGE_KEY 
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import {postToTransaction} from '../../lib/tx';
-import storageUtil from '../../lib/browser/browserStorage';
+import {postToTransaction} from '../../../lib/tx';
+import storageUtil from '../../../lib/browser/browserStorage';
+import { APIError } from '../../../lib/types';
 
 describe('Browser', function() {
   let auth;
@@ -29,7 +30,7 @@ describe('Browser', function() {
       hostname: 'somesite.local',
       href: 'https://somesite.local',
       replace: jest.fn()
-    };
+    } as unknown as Location;
 
     issuer =  'http://my-okta-domain';
     auth = new OktaAuth({ issuer, pkce: false });
@@ -174,7 +175,7 @@ describe('Browser', function() {
         protocol: 'http:',
         hostname: 'localhost',
         href: 'http://localhost'
-      };
+      } as unknown as Location;
       jest.spyOn(console, 'warn').mockReturnValue(null);
       await auth.signIn(options);
       expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: This method has been deprecated, please use signInWithCredentials() instead.');
@@ -298,7 +299,7 @@ describe('Browser', function() {
         });
     });
     it('catches and absorbs "AuthApiError" errors with errorCode E0000007 (RESOURCE_NOT_FOUND_EXCEPTION)', function() {
-      var testError = new AuthApiError({ errorCode: 'E0000007' });
+      var testError = new AuthApiError({ errorCode: 'E0000007' } as unknown as APIError);
       spyOn(auth.session, 'close').and.callFake(function() {
         return Promise.reject(testError);
       });
@@ -635,7 +636,7 @@ describe('Browser', function() {
         auth.isAuthenticated().then(isAuthenticated => {
           expect(isAuthenticated).toBe(false);
           expect(auth.emitter.e.authStateChange).toBe(undefined);
-          resolve();
+          resolve(undefined);
         });
         jest.runAllTimers();
       });
@@ -784,7 +785,7 @@ describe('Browser', function() {
           expect(auth.getOriginalUri).toHaveBeenCalled();
           expect(auth.removeOriginalUri).toHaveBeenCalled();
           expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
-          resolve();    
+          resolve(undefined);    
         }, 100);
       });
     });
@@ -805,7 +806,7 @@ describe('Browser', function() {
           expect(auth.getOriginalUri).toHaveBeenCalled();
           expect(auth.removeOriginalUri).toHaveBeenCalled();
           expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
-          resolve();    
+          resolve(undefined);    
         }, 100);
       });
     });
@@ -828,7 +829,7 @@ describe('Browser', function() {
           expect(auth.removeOriginalUri).toHaveBeenCalled();
           expect(auth.options.restoreOriginalUri).toHaveBeenCalledWith(auth, '/fakeuri');
           expect(window.location.replace).not.toHaveBeenCalled();
-          resolve();    
+          resolve(undefined);    
         }, 100);
       });
     });
@@ -843,7 +844,7 @@ describe('Browser', function() {
           expect(auth.getOriginalUri).not.toHaveBeenCalled();
           expect(auth.removeOriginalUri).not.toHaveBeenCalled();
           expect(window.location.replace).not.toHaveBeenCalled();
-          resolve();    
+          resolve(undefined);    
         }, 100);
       });
     });

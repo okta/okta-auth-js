@@ -19,7 +19,7 @@ import {
   postToTransaction,
   AuthTransaction
 } from './tx';
-import PKCE from './pkce';
+import PKCE from './oidc/util/pkce';
 import {
   OktaAuth,
   OktaAuthOptions,

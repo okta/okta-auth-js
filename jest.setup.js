@@ -6,3 +6,6 @@ global.crypto = new Crypto();
 const TextEncoder = require('util').TextEncoder;
 // eslint-disable-next-line node/no-unsupported-features/node-builtins
 global.TextEncoder = TextEncoder;
+
+// Suppress warning messages
+global.console.warn = function() {};

@@ -1,5 +1,5 @@
 import { DEFAULT_CODE_CHALLENGE_METHOD, OktaAuth } from '@okta/okta-auth-js';
-import pkce from '../../lib/pkce';
+import { pkce } from '../../lib/oidc';
 
 describe('pkce API', function() {
   let oktaAuth;

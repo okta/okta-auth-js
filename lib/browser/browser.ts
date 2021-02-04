@@ -39,9 +39,11 @@ import {
   setCookieAndRedirect
 } from '../session';
 import {
+  getOAuthUrls,
   getWithoutPrompt,
   getWithPopup,
   getWithRedirect,
+  isLoginRedirect,
   parseFromUrl,
   decodeToken,
   revokeToken,
@@ -51,12 +53,8 @@ import {
   verifyToken,
   prepareTokenParams,
   exchangeCodeForTokens
-} from '../token';
+} from '../oidc';
 import { TokenManager } from '../TokenManager';
-import {
-  getOAuthUrls,
-  isLoginRedirect
-} from '../oauthUtil';
 import http from '../http';
 import PromiseQueue from '../PromiseQueue';
 import { 

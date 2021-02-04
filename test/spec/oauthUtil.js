@@ -2,7 +2,8 @@
 jest.mock('cross-fetch');
 
 import { OktaAuth } from '@okta/okta-auth-js';
-import * as oauthUtil from '../../lib/oauthUtil';
+import * as oauthUtil from '../../lib/oidc/util';
+import { getWellKnown, getKey } from '../../lib/oidc/endpoints/well-known';
 import * as libUtil from '../../lib/util';
 import oauthUtilHelpers from '@okta/test.support/oauthUtil';
 import util from '@okta/test.support/util';
@@ -88,7 +89,7 @@ describe('getWellKnown', function() {
       time: 1449699929
     },
     execute: function(test) {
-      return oauthUtil.getWellKnown(test.oa);
+      return getWellKnown(test.oa);
     },
     expectations: function (test, res) {
       expect(test.resReply.status).toEqual(200);
@@ -111,7 +112,7 @@ describe('getWellKnown', function() {
       time: 1449699929
     },
     execute: function(test) {
-      return oauthUtil.getWellKnown(test.oa);
+      return getWellKnown(test.oa);
     },
     expectations: function (test, res) {
       expect(test.resReply.status).toEqual(200);
@@ -134,7 +135,7 @@ describe('getWellKnown', function() {
       time: 1449699929
     },
     execute: function(test) {
-      return oauthUtil.getWellKnown(test.oa);
+      return getWellKnown(test.oa);
     },
     expectations: function (test, res) {
       expect(test.resReply.status).toEqual(200);
@@ -156,7 +157,7 @@ describe('getWellKnown', function() {
       time: 1449699929
     },
     execute: function(test) {
-      return oauthUtil.getWellKnown(test.oa, 'https://auth-js-test.okta.com/oauth2/custom2');
+      return getWellKnown(test.oa, 'https://auth-js-test.okta.com/oauth2/custom2');
     },
     expectations: function (test, res) {
       expect(test.resReply.status).toEqual(200);
@@ -179,9 +180,9 @@ describe('getWellKnown', function() {
     },
     execute: function(test) {
       localStorage.clear();
-      return oauthUtil.getWellKnown(test.oa)
+      return getWellKnown(test.oa)
       .then(function() {
-        return oauthUtil.getWellKnown(test.oa);
+        return getWellKnown(test.oa);
       });
     },
     expectations: function() {
@@ -206,7 +207,7 @@ describe('getWellKnown', function() {
           response: wellKnown.response
         }
       }));
-      return oauthUtil.getWellKnown(test.oa);
+      return getWellKnown(test.oa);
     },
     expectations: function() {
       var cache = localStorage.getItem('okta-cache-storage');
@@ -239,7 +240,7 @@ describe('getWellKnown', function() {
           response: wellKnown.response
         }
       }));
-      return oauthUtil.getWellKnown(test.oa);
+      return getWellKnown(test.oa);
     },
     expectations: function() {
       var cache = localStorage.getItem('okta-cache-storage');
@@ -270,7 +271,7 @@ describe('getWellKnown', function() {
     },
     execute: function(test) {
       sessionStorage.clear();
-      return oauthUtil.getWellKnown(test.oa);
+      return getWellKnown(test.oa);
     },
     expectations: function() {
       var cache = sessionStorage.getItem('okta-cache-storage');
@@ -302,7 +303,7 @@ describe('getWellKnown', function() {
     },
     execute: function(test) {
       test.setCookieMock = util.mockSetCookie().mockReturnValue(null);
-      return oauthUtil.getWellKnown(test.oa);
+      return getWellKnown(test.oa);
     },
     expectations: function(test) {
       expect(test.setCookieMock).toHaveBeenCalledWith(
@@ -342,7 +343,7 @@ describe('getWellKnown', function() {
     },
     execute: function(test) {
       test.setCookieMock = util.mockSetCookie().mockReturnValue(null);
-      return oauthUtil.getWellKnown(test.oa);
+      return getWellKnown(test.oa);
     },
     expectations: function(test) {
       expect(test.setCookieMock).toHaveBeenCalledWith(
@@ -368,7 +369,7 @@ describe('getKey', function() {
     },
     execute: function(test) {
       oauthUtilHelpers.loadWellKnownAndKeysCache(test.oa);
-      return oauthUtil.getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -390,7 +391,7 @@ describe('getKey', function() {
     },
     execute: function(test) {
       oauthUtilHelpers.loadWellKnownCache();
-      return oauthUtil.getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -444,7 +445,7 @@ describe('getKey', function() {
         }
       }));
 
-      return oauthUtil.getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -489,7 +490,7 @@ describe('getKey', function() {
         }
       }));
 
-      return oauthUtil.getKey(test.oa, null, 'invalidKid');
+      return getKey(test.oa, null, 'invalidKid');
     },
     expectations: function(test, err) {
       util.assertAuthSdkError(err, 'The key id, invalidKid, was not found in the server\'s keys');

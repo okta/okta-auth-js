@@ -47,7 +47,7 @@
       }
     },
     {
-      "files": ["{lib,build/lib}/{browser/*,crypto,pkce}.{js,ts}"],
+      "files": ["{lib,build/lib}/{browser/*,crypto,oidc/util/pkce}.{js,ts}"],
       "rules": {
         "node/no-unsupported-features/node-builtins": ["error", {
           "ignores": ["TextEncoder"]

@@ -4,7 +4,7 @@ import { isFingerprintSupported } from './features';
 import {
   addListener,
   removeListener
-} from '../oauthUtil';
+} from '../oidc';
 import { FingerprintOptions } from '../types';
 
 export default function fingerprint(sdk: OktaAuth, options: FingerprintOptions) {
