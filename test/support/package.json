@@ -6,8 +6,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "cross-fetch": "^3.0.0",
-    "lodash": "4.17.11",
+    "cross-fetch": "^3.0.6",
+    "lodash": "4.17.20",
     "tiny-emitter": "1.1.0"
   }
 }
