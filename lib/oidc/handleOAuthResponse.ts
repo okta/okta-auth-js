@@ -41,16 +41,16 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
   }
 }
 
-
 // eslint-disable-next-line max-len
 export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuthResponse, urls: CustomUrls): Promise<TokenResponse> {
   var pkce = sdk.options.pkce !== false;
 
   // The result contains an authorization_code and PKCE is enabled 
   // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
-  if (res.code && pkce) {
+  if (pkce && (res.code || res.interaction_code)) {
     return exchangeCodeForTokens(sdk, Object.assign({}, tokenParams, {
-      authorizationCode: res.code
+      authorizationCode: res.code,
+      interactionCode: res.interaction_code
     }), urls);
   }
 

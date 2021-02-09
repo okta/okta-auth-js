@@ -5,9 +5,12 @@ import { flows, openImplicit, openPKCE } from '../util/appUtils';
 import { loginPopup } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 
+// Refresh tokens are tested in a separate file
+const scopes = ['openid', 'email']; // do not include "offline_access"
+
 describe('token revoke', () => {
   it('can revoke the access token', async () => {
-    await openPKCE();
+    await openPKCE({ scopes });
     await loginPopup();
     
     // We should be able to request and display user info with no errors
@@ -37,12 +40,17 @@ describe('E2E token flows', () => {
 
   flows.forEach(flow => {
     describe(flow + ' flow', () => {
-      beforeEach(async () => {
-        (flow === 'pkce') ? await openPKCE() : await openImplicit();
-      });
+
+      async function login(options) {
+        options = Object.assign({
+          scopes
+        }, options);
+        (flow === 'pkce') ? await openPKCE(options) : await openImplicit(options);
+        await loginPopup(flow);
+      }
 
       it('can renew the access token', async () => {
-        await loginPopup(flow);
+        await login();
         const prevToken = await TestApp.accessToken.then(el => el.getText());
         await TestApp.renewToken();
         await browser.waitUntil(async () => {
@@ -54,7 +62,7 @@ describe('E2E token flows', () => {
       });
 
       it('can refresh all tokens', async () => {
-        await loginPopup(flow);
+        await login();
         const prev = {
           idToken: await TestApp.idToken.then(el => el.getText()),
           accessToken: await TestApp.accessToken.then(el => el.getText())
@@ -73,7 +81,8 @@ describe('E2E token flows', () => {
       });
 
       it('Can receive an error on token renew if user has signed out from Okta page', async () => {
-        await loginPopup(flow);
+        await login();
+        await TestApp.subscribeToTokenEvents();
         let tokenError = await TestApp.tokenError.then(el => el.getText());
         assert(tokenError.trim() === '');
         await openOktaHome();

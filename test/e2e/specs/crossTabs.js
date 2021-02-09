@@ -5,9 +5,12 @@ import { loginPopup } from '../util/loginUtils';
 
 const openMultipleTabs = async () => {
   await openPKCE();
+  await TestApp.subscribeToAuthState(); // re-render on auth state change
+
   // open in new tab
   await browser.newWindow('/');
   await openPKCE();
+  await TestApp.subscribeToAuthState(); // re-render on auth state change
 };
 
 const assertSameTokensInTabs = async (tabTokenMap, handles) => {

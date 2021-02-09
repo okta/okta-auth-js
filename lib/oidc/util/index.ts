@@ -14,6 +14,7 @@
 
 export * from './browser';
 export * from './defaultTokenParams';
+export * from './errors';
 export * from './loginRedirect';
 export * from './oauth';
 import pkce from './pkce';

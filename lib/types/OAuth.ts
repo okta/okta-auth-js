@@ -36,6 +36,7 @@ export interface OAuthParams {
 export interface OAuthResponse {
   state?: string;
   code?: string;
+  interaction_code?: string;
   expires_in?: string;
   token_type?: string;
   access_token?: string;

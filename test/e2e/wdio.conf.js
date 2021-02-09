@@ -25,10 +25,15 @@ if (CI) {
     ]);
 }
 
-// drivers may need to be set to run tests locally. Leave undefined for Bacon.
+// Leave this line uncommented for Bacon.
 const drivers = undefined;
+
+// Local developers may neeed to set driver version explicitly
+// check for more recent versions of chrome driver here:
+// https://chromedriver.storage.googleapis.com/index.html
+// const CHROMEDRIVER_VERSION = '88.0.4324.96';
 // const drivers = {
-//   chrome: { version: '88.0.4324.96' }
+//   chrome: { version: CHROMEDRIVER_VERSION }
 // };
 
 exports.config = {
@@ -151,8 +156,12 @@ exports.config = {
     // commands. Instead, they hook themselves up into the test process.
     services: [
       ['selenium-standalone', {
-        installArgs: { drivers },
-        args: { drivers }
+        installArgs: {
+          drivers
+        },
+        args: {
+          drivers
+        }
       }]
     ],
     // Framework you want to run your specs with.
