@@ -2,9 +2,20 @@
 
 ## 4.7.0
 
+### Features
+
+- [#620](https://github.com/okta/okta-auth-js/pull/620) Adds support for `interaction_code` and `error=interaction_required` on redirect callback
+- [#604](https://github.com/okta/okta-auth-js/pull/604) Adds new utility objects: `storageManager` and `transactionManager`
+
+### Bug Fixes
+
+- [#614](https://github.com/okta/okta-auth-js/pull/614) Fixes issue with renewTokens and implicit flow: get responseType value from SDK configuration
+
 ### Other
 
 - [#594](https://github.com/okta/okta-auth-js/pull/594) Adds `@babel/runtime` to dependencies list.
+- [#572](https://github.com/okta/okta-auth-js/pull/572) Add idps options for Signin widget flow in samples
+- [#565](https://github.com/okta/okta-auth-js/pull/565) Adds support for widget version and interaction code to test app and samples
 
 ## 4.6.2
 
