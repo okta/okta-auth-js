@@ -1,4 +1,4 @@
-<form target="/" method="GET">
+<form id="form" target="/" method="GET" onsubmit="_onSubmitForm(event)" onformdata="_onFormData(event)">
   <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
   <label for="clientId">Client ID (SPA App)
   </label><input id="clientId" name="clientId" type="text" /><br/>
@@ -39,5 +39,5 @@
   {{/if}}
 
   <hr/>
-  <input id="login-submit" type="submit" value="Launch App"/>
+  <input id="login-submit" type="submit" value="Update Config"/>
 </form>

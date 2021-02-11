@@ -18,6 +18,7 @@
     "@babel/core": "^7.8.0",
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.2",
+    "@okta/okta-signin-widget": "^5.3.1",
     "babel-loader": "^8.0.6",
     "btoa": "^1.2.1",
     "express": "^4.17.1",

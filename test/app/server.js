@@ -5,6 +5,9 @@ require('@okta/env'); // update environment variables from testenv file
 // eslint-disable-next-line node/no-unpublished-require
 const OktaAuthJS = require('../../build/cjs/server').OktaAuth;
 
+const path = require('path');
+const SIW_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-signin-widget')), '..');
+
 const util = require('./src/util');
 const express = require('express');
 const webpack = require('webpack');
@@ -38,6 +41,7 @@ app.use(webpackDevMiddleware(compiler, {
 
 app.use(express.static('./public'));
 app.use(express.static('../../build/dist'));
+app.use('/siw', express.static(SIW_DIST));
 
 app.use(express.urlencoded());
 app.post('/login', function(req, res) {

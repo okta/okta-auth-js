@@ -43,7 +43,7 @@
     "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
     "generate:samples": "yarn --cwd samples build && yarn install --ignore-scripts",
     "dev:samples": "yarn --cwd samples dev",
-    "prepare": "yarn build && yarn generate:samples",
+    "prepare": "yarn build",
     "start": "yarn --cwd test/app start --open",
     "stop": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true"
   },

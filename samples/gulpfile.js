@@ -37,7 +37,16 @@ function generateSampleTaskFactory(options) {
     const { name, template, subDir } = options;
     const inDir = `${SRC_DIR}/${template}/**/*`;
     const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${name}`;
-    const hbParams = Object.assign({}, options, {
+    const strOptions = {};
+    Object.keys(options).forEach(key => {
+      let val = options[key];
+      if (Array.isArray(val) || typeof val === 'object') {
+        val = JSON.stringify(val).replace(/"/g, '\'');
+      }
+      strOptions[key] = val;
+    });
+
+    const hbParams = Object.assign({}, strOptions, {
       siwVersion: config.getModuleVersion('@okta/okta-signin-widget'),
       authJSVersion: getPublishedAuthJSVersion()
     });

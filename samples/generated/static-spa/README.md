@@ -1,6 +1,6 @@
 # static-spa sample
 
-This sample demonstrates using `@okta/okta-auth-js` within a SPA (single-page application). By default the app server runs at `http://localhost:8080`. The callback redirect URI is `http://localhost:8080/implicit/callback`
+This sample demonstrates using `@okta/okta-auth-js` within a SPA (single-page application). By default the app server runs at `http://localhost:8080`. The callback redirect URI is `http://localhost:8080/login/callback`
 
 This sample uses a [polyfill](https://github.com/okta/okta-auth-js#browser-compatibility--polyfill) for compatibility with Internet Explorer 11. IE 10 and below are not supported.
 

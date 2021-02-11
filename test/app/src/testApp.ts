@@ -21,6 +21,7 @@ import {
   AccessToken, 
   AuthTransaction, 
   TokenParams,
+  isInteractionRequired,
   isInteractionRequiredError
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
@@ -28,9 +29,14 @@ import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryString } from './util';
 import { Form, updateForm } from './form';
 import { tokensHTML } from './tokens';
+import { buildWidgetConfig } from './widget';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const BundledOktaSignIn = require('@okta/okta-signin-widget');
 
 declare global {
   interface Window {
+    OktaSignIn: any;
     getWidgetConfig: () => any;
   }
 }
@@ -116,15 +122,23 @@ function bindFunctions(testApp: TestApp, window: Window): void {
   });
 }
 
-async function injectWidgetFromCDN(widgetVersion: string): Promise<void> {
+async function injectWidgetCSS(widgetVersion = ''): Promise<void> {
+  const useBundled = widgetVersion === '';
+  const baseUrl = useBundled ? `${window.location.origin}/siw` : 'https://global.oktacdn.com/okta-signin-widget';
   return new Promise((resolve, reject) => {
-    // inject CSS
-    const link = document.createElement('link');
-    link.type='text/css';
-    link.rel='stylesheet';
-    link.href = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/css/okta-sign-in.min.css`;
-    document.getElementsByTagName('head')[0].appendChild(link);
+      // inject CSS
+      const link = document.createElement('link');
+      link.type='text/css';
+      link.rel='stylesheet';
+      document.getElementsByTagName('head')[0].appendChild(link);
+      link.onload = (): void => { resolve(); };
+      link.onerror = (e): void => { reject(e); };
+      link.href = `${baseUrl}/${widgetVersion}/css/okta-sign-in.min.css`;
+  });
+}
 
+async function injectWidgetScript(widgetVersion: string): Promise<void> {
+  return new Promise((resolve, reject) => {
     // inject script
     const script = document.createElement('script');
     script.type = 'text/javascript';
@@ -133,6 +147,11 @@ async function injectWidgetFromCDN(widgetVersion: string): Promise<void> {
     script.onerror = (e): void => { reject(e); };
     script.src = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/js/okta-sign-in.min.js`;
   }); 
+}
+
+async function injectWidgetFromCDN(widgetVersion: string): Promise<void> {
+  await injectWidgetCSS(widgetVersion);
+  await injectWidgetScript(widgetVersion);
 }
 
 class TestApp {
@@ -246,10 +265,17 @@ class TestApp {
   }
 
   async loginWidget(): Promise<void> {
-    await injectWidgetFromCDN(this.config._siwVersion);
+    const siwVersion = this.config._siwVersion;
+    if (siwVersion) {
+      await injectWidgetFromCDN(siwVersion);
+    } else {
+      await injectWidgetCSS();
+      window.OktaSignIn = BundledOktaSignIn;
+    }
+
     saveConfigToStorage(this.config);
     document.getElementById('modal').style.display = 'block';
-    const widgetConfig = window.getWidgetConfig();
+    const widgetConfig = buildWidgetConfig(this.config);
     const { issuer, clientId, _clientSecret, redirectUri, _forceRedirect, scopes } = this.config;
     const state = JSON.stringify({ issuer, clientId, _clientSecret, redirectUri });
 
@@ -274,9 +300,10 @@ class TestApp {
     widgetConfig.authParams.state = state; // Must set authParams in constructor: OKTA-361428
 
     if (_forceRedirect) {
-      renderOptions.mode = 'remediation';
+      renderOptions.mode = 'remediation'; // since version 5.0
+      widgetConfig.authParams.display = 'page'; // version < 5.0
     } else {
-      widgetConfig.authParams.display = 'none';
+      widgetConfig.authParams.display = 'none'; // pversion < 5.0
     }
 
     const signIn = new OktaSignIn(widgetConfig);
@@ -432,10 +459,15 @@ class TestApp {
   }
 
   async handleCallback(): Promise<void> {
+    if (isInteractionRequired(this.oktaAuth)) {
+      return this.renderInteractionRequired();
+    }
+
     return this.getTokensFromUrl()
       .then(res => {
         return this.renderCallback(res);
       }, e => {
+        // we will not see this if we are intercepting interaction_required earlier
         if (isInteractionRequiredError(e)) {
           return this.renderInteractionRequired();
         }
@@ -450,6 +482,7 @@ class TestApp {
       .then(() => this._afterRender('callback-handled'));
   }
 
+  // Renders the login widget
   async renderInteractionRequired(): Promise<void> {
     return this.render(true).then(() => this.loginWidget());
   }
@@ -618,8 +651,10 @@ class TestApp {
         </li>
       </ul>
       <h4/>
-      <input name="username" id="username" placeholder="username" type="email"/>
-      <input name="password" id="password" placeholder="password" type="password"/>
+      <form>
+        <input name="username" id="username" placeholder="username" type="email"/>
+        <input name="password" id="password" placeholder="password" type="password"/>
+      </form>
       <a href="/" id="login-direct" onclick="loginDirect(event)">Login DIRECT</a>
       `;
   }

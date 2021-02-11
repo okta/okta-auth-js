@@ -23,7 +23,7 @@ module.exports = {
     ],
     port: PORT,
     before: function(app) {
-      app.get('/implicit/callback', function(req, res, next) {
+      app.get('/login/callback', function(req, res, next) {
         req.url = '/';
         next();
       });

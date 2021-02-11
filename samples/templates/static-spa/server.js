@@ -7,6 +7,7 @@ const app = express();
 const port = '8080';
 const authJSAssets = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js')), '..', '..', 'dist');
 
+console.log('Login Redirect URI: {{ redirectPath }}');
 app.get('{{ redirectPath }}', function(req, res, next) {
   req.url = '/';
   next();

@@ -2,9 +2,11 @@
 /* eslint-disable complexity */
 /* eslint-disable max-len */
 import { flattenConfig, Config } from './config';
+import { FormDataEvent } from './types';
 
+const id = 'config-form';
 const Form = `
-  <form target="/oidc" method="GET">
+  <form id="${id}" method="GET" onsubmit="onSubmitForm(event)" onformdata="onFormData(event)">
   <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
   <label for="clientId">Client ID</label><input id="clientId" name="clientId" type="text" /><br/>
   <label for="_clientSecret">Client Secret</label><input id="_clientSecret" name="_clientSecret" type="text" /><br/>
@@ -42,19 +44,23 @@ const Form = `
     <option value="lax">Lax</option>
     <option value="strict">Strict</option>
   </select><br/>
-  <label for="_siwVersion">Sign-in Widget version</label><input id="_siwVersion" name="_siwVersion" type="text" /><br/>
+  <label for="_siwVersion">Sign-in Widget version (leave blank for bundled version)</label><input id="_siwVersion" name="_siwVersion" type="text" /><br/>
   <label for="_forceRedirect">Force redirect (for SPA applications)?</label><br/>
   <input id="_forceRedirect-on" name="_forceRedirect" type="radio" value="true"/>YES<br/>
   <input id="_forceRedirect-off" name="_forceRedirect" type="radio" value="false"/>NO<br/>
   <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label><br/>
   <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
   <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
+  <label for="_idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
+  <input id="_idps" name="_idps" type="text" /><br/>
   <hr/>
   <input id="login-submit" type="submit" value="Update Config"/>
   </form>
 `;
 
-function updateForm(origConfig: Config): void {
+export { Form };
+
+export function updateForm(origConfig: Config): void {
   const config = flattenConfig(origConfig);
   (document.getElementById('issuer') as HTMLInputElement).value = config.issuer;
   (document.getElementById('redirectUri') as HTMLInputElement).value = config.redirectUri;
@@ -67,6 +73,7 @@ function updateForm(origConfig: Config): void {
   (document.querySelector(`#storage [value="${config.storage || ''}"]`) as HTMLOptionElement).selected = true;
   (document.querySelector(`#sameSite [value="${config.sameSite || ''}"]`) as HTMLOptionElement).selected = true;
   (document.getElementById('_siwVersion') as HTMLInputElement).value = config._siwVersion;
+  (document.getElementById('_idps') as HTMLInputElement).value = config._idps;
 
   if (config.pkce) {
     (document.getElementById('pkce-on') as HTMLInputElement).checked = true;
@@ -101,4 +108,21 @@ function updateForm(origConfig: Config): void {
   }
 }
 
-export { Form, updateForm };
+// Keeps us in the same tab
+export function onSubmitForm(event: Event): void {
+  event.preventDefault();
+  // eslint-disable-next-line no-new
+  new FormData(document.getElementById(id) as HTMLFormElement); // will fire formdata event
+}
+
+// Take the data from the form and update query parameters on the current page
+export function onFormData(event: FormDataEvent): void {
+  const formData = event.formData;
+  const params: any = {};
+  formData.forEach((value, key) => {
+    params[key] = value;
+  });
+  const query = '?' + Object.entries(params).map(([k, v]) => `${k}=${encodeURIComponent(v as string)}`).join('&');
+  const newUri = window.location.origin + '/' + query;
+  window.location.replace(newUri);
+}

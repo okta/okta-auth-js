@@ -7,7 +7,8 @@ const app = express();
 const port = '8080';
 const authJSAssets = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js')), '..', '..', 'dist');
 
-app.get('/implicit/callback', function(req, res, next) {
+console.log('Login Redirect URI: /login/callback');
+app.get('/login/callback', function(req, res, next) {
   req.url = '/';
   next();
 });
