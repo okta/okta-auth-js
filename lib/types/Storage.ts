@@ -100,5 +100,5 @@ export interface CookieStorage extends SimpleStorage {
 export interface StorageManagerOptions {
   token?: StorageOptions;
   transaction?: StorageOptions;
-  [propName: string]: StorageOptions; // custom sections are allowed
+  [propName: string]: StorageOptions | undefined; // custom sections are allowed
 }
