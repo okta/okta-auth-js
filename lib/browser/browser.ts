@@ -31,6 +31,7 @@ import {
   DEFAULT_MAX_CLOCK_SKEW, 
   REFERRER_PATH_STORAGE_KEY
 } from '../constants';
+import * as constants from '../constants';
 import {
   closeSession,
   sessionExists,
@@ -52,7 +53,9 @@ import {
   getUserInfo,
   verifyToken,
   prepareTokenParams,
-  exchangeCodeForTokens
+  exchangeCodeForTokens,
+  isInteractionRequiredError,
+  isInteractionRequired,
 } from '../oidc';
 import { TokenManager } from '../TokenManager';
 import http from '../http';
@@ -255,6 +258,18 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     this.emitter = new Emitter();
     this.tokenManager = new TokenManager(this, args.tokenManager);
     this.authStateManager = new AuthStateManager(this);
+  }
+
+  // ES6 module users can use named exports to access all symbols
+  // CommonJS module users (CDN) need all exports on this object
+
+  // Utility methods for interaction code flow
+  isInteractionRequired(): boolean {
+    return isInteractionRequired(this);
+  }
+
+  isInteractionRequiredError(error: Error): boolean {
+    return isInteractionRequiredError(error);
   }
 
   /**
@@ -570,5 +585,11 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
 // Hoist feature detection functions to static type
 OktaAuthBrowser.features = OktaAuthBrowser.prototype.features = features;
+
+// Also hoist values and utility functions for CommonJS users
+Object.assign(OktaAuthBrowser, {
+  constants,
+  isInteractionRequiredError
+});
 
 export default OktaAuthBrowser;
