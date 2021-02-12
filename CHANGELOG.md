@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.1
+
+### Bug Fixes
+
+- [#627](https://github.com/okta/okta-auth-js/pull/627) Fixes an issue with Typescript and `StorageManagerOptions`
+
 ## 4.7.0
 
 ### Features
