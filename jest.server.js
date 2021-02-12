@@ -27,6 +27,7 @@ module.exports = {
     './test/spec/oidc',
     './test/spec/promiseQueue.js',
     './test/spec/OktaAuth/browser.ts',
+    './test/spec/OktaAuth/commonJS.js', // includes OIDC utils
     './test/spec/browserStorage.js',
     './test/spec/cookies.js',
     './test/spec/fingerprint.js',
