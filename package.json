@@ -71,7 +71,7 @@
     "Base64": "0.3.0",
     "core-js": "^3.6.5",
     "cross-fetch": "^3.0.6",
-    "js-cookie": "2.2.0",
+    "js-cookie": "2.2.1",
     "node-cache": "^4.2.0",
     "p-cancelable": "^2.0.0",
     "text-encoding": "^0.7.0",
