@@ -18,7 +18,8 @@ import AuthSdkError from '../../errors/AuthSdkError';
 export function getWellKnown(sdk: OktaAuth, issuer?: string): Promise<WellKnownResponse> {
   var authServerUri = (issuer || sdk.options.issuer);
   return http.get(sdk, authServerUri + '/.well-known/openid-configuration', {
-    cacheResponse: true
+    cacheResponse: true,
+    withCredentials: false,
   });
 }
 
@@ -47,7 +48,8 @@ export function getKey(sdk: OktaAuth, issuer: string, kid: string): Promise<stri
 
     // Pull the latest keys if the key wasn't in the cache
     return http.get(sdk, jwksUri, {
-      cacheResponse: true
+      cacheResponse: true,
+      withCredentials: false,
     })
     .then(function(res) {
       var key = find(res.keys, {
