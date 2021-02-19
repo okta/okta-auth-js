@@ -303,7 +303,7 @@ class TestApp {
       renderOptions.mode = 'remediation'; // since version 5.0
       widgetConfig.authParams.display = 'page'; // version < 5.0
     } else {
-      widgetConfig.authParams.display = 'none'; // pversion < 5.0
+      widgetConfig.authParams.display = 'none'; // version < 5.0
     }
 
     const signIn = new OktaSignIn(widgetConfig);
