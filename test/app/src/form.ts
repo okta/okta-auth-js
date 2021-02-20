@@ -45,7 +45,7 @@ const Form = `
     <option value="strict">Strict</option>
   </select><br/>
   <label for="_siwVersion">Sign-in Widget version (leave blank for bundled version)</label><input id="_siwVersion" name="_siwVersion" type="text" /><br/>
-  <label for="_siwAuthClient">Use authClient option?</label><br/>
+  <label for="_siwAuthClient">Use authClient option? (requires widget version >= 5.3)</label><br/>
   <input id="authclient-on" name="_siwAuthClient" type="radio" value="true"/>YES (inject current instance)<br/>
   <input id="authclient-off" name="_siwAuthClient" type="radio" value="false"/>NO (use widget bundled auth-js)<br/>
 
