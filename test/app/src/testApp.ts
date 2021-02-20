@@ -306,6 +306,12 @@ class TestApp {
       widgetConfig.authParams.display = 'none'; // version < 5.0
     }
 
+    // if authClient option is on, all authParams are ignored
+    if (this.config._siwAuthClient) {
+      widgetConfig.authParams = undefined;
+      widgetConfig.authClient = this.oktaAuth;
+    }
+
     const signIn = new OktaSignIn(widgetConfig);
     signIn.renderEl(renderOptions,
       (res: any) => {
