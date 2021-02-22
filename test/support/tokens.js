@@ -316,6 +316,20 @@ tokens.authServerAccessTokenParsed = {
   userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
 };
 
+tokens.standardRefreshToken = {
+  'value': 'NrJBJ5-89k9CHZ7CJz4Q42yNqoIjm7BclN-1TH_B7z0',
+  'refreshToken': 'NrJBJ5-89k9CHZ7CJz4Q42yNqoIjm7BclN-1TH_B7z0',
+  'expiresAt': 1613750805,
+  'scopes': [
+    'openid',
+    'email',
+    'offline_access'
+  ],
+  'tokenUrl': 'https://auth-js-test.okta.com//oauth2/v1/token',
+  'authorizeUrl': 'https://auth-js-test.okta.com//oauth2/v1/authorize',
+  'issuer': 'https://auth-js-test.okta.com'
+};
+
 tokens.standardAuthorizationCode = '35cFyfgCU2u0a1EzAqbO';
 
 tokens.standardKey = {
