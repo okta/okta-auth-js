@@ -90,13 +90,14 @@ module.exports = function (config) {
       'karma-coverage-istanbul-reporter',
       'karma-webpack',
       'karma-jquery',
-      'karma-sourcemap-loader'
+      'karma-sourcemap-loader',
+      'karma-coverage'
     ],
     files: [
       { pattern: './test/karma/main.js', watched: false }
     ],
     preprocessors: {
-      'test/karma/main.js': ['webpack', 'sourcemap']
+      'test/karma/main.js': ['webpack', 'sourcemap', 'coverage']
     },
     webpack: webpackConf,
     webpackMiddleware: {
@@ -114,10 +115,10 @@ module.exports = function (config) {
     },
     coverageIstanbulReporter: {
       dir: REPORTS_DIR,
-      reports: [ 'html', 'lcovonly' ],
+      reports: [ 'html', 'lcovonly','text-summary' ],
       fixWebpackSourcePaths: true
     },
-    reporters: ['progress', 'coverage-istanbul'],
+    reporters: ['progress', 'coverage-istanbul', 'coverage'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
