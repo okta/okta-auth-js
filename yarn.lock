@@ -1544,10 +1544,25 @@
     "@nodelib/fs.scandir" "2.1.4"
     fastq "^1.6.0"
 
-"@okta/okta-signin-widget@^5.2.3":
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.2.3.tgz#d642a9fd881480506037daf0fc4895ec59fb8fb0"
-  integrity sha512-0w0e1+hBHnadCDsyEzahB0LeGGohHbgndvGnrUeNIRrsoB2dqk5nCviaBVJS0HmCjJpVdAcrQ9xmfKiYjTyJ+g==
+"@okta/okta-signin-widget@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.3.1.tgz#114c38a27a640e9c3e3a97cae8e3be20f8418b67"
+  integrity sha512-BK9+81c79AXDjwspJkr0mFft1NczYTle4/kz1Cbp4+DdoM+ISyP7UEGNrSJWYBrexEsnHO0w7jNnqhOR36fypg==
+  dependencies:
+    "@babel/polyfill" "^7.10.1"
+    "@babel/runtime" "^7.10.3"
+    cross-fetch "^3.0.4"
+    handlebars "^4.5.3"
+    q "1.4.1"
+    u2f-api-polyfill "0.4.3"
+    underscore "1.8.3"
+  optionalDependencies:
+    fsevents "*"
+
+"@okta/okta-signin-widget@^5.3.2":
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.3.2.tgz#34b90a84a57c338acd480215ff1b7b6a8f194088"
+  integrity sha512-GmO0ZmCACUWBbDN4nJcTRa+gwe3sYbHdgSdcNzRK4yV8//XravQkcZAjFoXSaGtUE4wTEbm6TkbQBjCMwlb1xg==
   dependencies:
     "@babel/polyfill" "^7.10.1"
     "@babel/runtime" "^7.10.3"

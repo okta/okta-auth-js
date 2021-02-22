@@ -4,11 +4,13 @@ const HOST = window.location.host;
 const PROTO = window.location.protocol;
 const REDIRECT_URI = `${PROTO}//${HOST}${CALLBACK_PATH}`;
 const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}/`;
-const DEFAULT_SIW_VERSION = '5.2.3';
+const DEFAULT_SIW_VERSION = ''; // blank for local/npm/bundled version
 
 export interface Config extends OktaAuthOptions {
   _defaultScopes: boolean;
   _siwVersion: string;
+  _siwAuthClient:  boolean;
+  _idps: string;
   _clientSecret: string;
   _forceRedirect: boolean;
   useInteractionCodeFlow: boolean; // widget option
@@ -22,6 +24,8 @@ function getDefaultConfig(): Config {
   return {
     _forceRedirect: false,
     _siwVersion: DEFAULT_SIW_VERSION,
+    _siwAuthClient: false,
+    _idps: '',
     redirectUri: REDIRECT_URI,
     postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
     issuer: ISSUER,
@@ -55,12 +59,16 @@ function getConfigFromUrl(): Config {
   const secureCookies = url.searchParams.get('secure') !== 'false'; // On by default
   const sameSite = url.searchParams.get('sameSite') || undefined;
   const _siwVersion = url.searchParams.get('_siwVersion') || DEFAULT_SIW_VERSION;
+  const _siwAuthClient = url.searchParams.get('_siwAuthClient') === 'true'; // off by default
+  const _idps = url.searchParams.get('_idps') || '';
   const useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true'; // off by default
   const _forceRedirect = url.searchParams.get('_forceRedirect') === 'true'; // off by default
 
   return {
     _forceRedirect,
     _siwVersion,
+    _siwAuthClient,
+    _idps,
     redirectUri,
     postLogoutRedirectUri,
     issuer,

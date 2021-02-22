@@ -2,14 +2,14 @@
 <html>
   <head>
     <!-- In this sample, okta-auth-js assets are being served locally from node_modules. Assets are also available on CDN -->
-    <!-- https://global.oktacdn.com/okta-auth-js/4.6.2/okta-auth-js.polyfill.js -->
-    <!-- https://global.oktacdn.com/okta-auth-js/4.6.2/okta-auth-js.min.js -->
+    <!-- https://global.oktacdn.com/okta-auth-js/4.7.1/okta-auth-js.polyfill.js -->
+    <!-- https://global.oktacdn.com/okta-auth-js/4.7.1/okta-auth-js.min.js -->
     <script src="/okta-auth-js.polyfill.js" type="text/javascript"></script>
     <script src="/okta-auth-js.min.js" type="text/javascript"></script>
 
     <!-- okta-signin-widget assets are avilable on CDN -->
-    <script src="https://global.oktacdn.com/okta-signin-widget/5.2.3/js/okta-sign-in.min.js" type="text/javascript"></script>
-    <link href="https://global.oktacdn.com/okta-signin-widget/5.2.3/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
+    <script src="https://global.oktacdn.com/okta-signin-widget/5.3.2/js/okta-sign-in.min.js" type="text/javascript"></script>
+    <link href="https://global.oktacdn.com/okta-signin-widget/5.3.2/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
 
     <!-- app styles -->
     <style>
@@ -37,13 +37,13 @@
       <!-- the href will be changed to config.appUri -->
       <a id="home-link" href="/">Return Home</a>&nbsp;|&nbsp;
       <!-- if the URL does not contain valid params a form will be shown -->
-      <a id="options-link" href="/">Change options</a>
+      <a id="options-link" href="/">Edit Config</a>
     </div>
     <div id="error" style="color: red; padding-top: 20px"></div>
     <hr/>
     <!-- config is loaded from URL query parameters. This form sets params in the URL using the GET method-->
     <div id="config-form" style="display: none">
-      <form target="/" method="GET">
+      <form id="form" target="/" method="GET" onsubmit="_onSubmitForm(event)" onformdata="_onFormData(event)">
         <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
         <label for="clientId">Client ID (SPA App)
         </label><input id="clientId" name="clientId" type="text" /><br/>
@@ -78,7 +78,7 @@
         <input style="display: none" id="idps" name="idps" type="text" /><br/>
       
         <hr/>
-        <input id="login-submit" type="submit" value="Launch App"/>
+        <input id="login-submit" type="submit" value="Update Config"/>
       </form>
     </div>
     <!-- flow: redirect -->
