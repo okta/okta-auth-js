@@ -28,7 +28,6 @@ export async function renewTokensWithRefresh(
 
   var urls = getOAuthUrls(sdk, tokenParams);
 
-
   const response = await http.httpRequest(sdk, {
     url: refreshTokenObject.tokenUrl,
     method: 'POST',
@@ -46,6 +45,9 @@ export async function renewTokensWithRefresh(
       return name + '=' + encodeURIComponent(value);
     }).join('&'),
   });
-  return handleOAuthResponse(sdk, tokenParams, response, urls).then(res => res.tokens);
 
+  const renewTokenOptions = {
+    clientId,
+  };
+  return handleOAuthResponse(sdk, renewTokenOptions, response, urls).then(res => res.tokens);
 }
