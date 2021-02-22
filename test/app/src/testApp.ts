@@ -46,6 +46,7 @@ declare class OktaSignIn {
   renderEl(options: any, successFn: Function, errorFn: Function): void;
   showSignInToGetTokens(options: any): void;
   remove(): void;
+  on(event: string, fn: Function): void;
 }
 
 function homeLink(app: TestApp): string {
@@ -265,6 +266,12 @@ class TestApp {
   }
 
   async loginWidget(): Promise<void> {
+    saveConfigToStorage(this.config);
+    return this.renderWidget();
+
+  }
+
+  async renderWidget(): Promise<void> {
     const siwVersion = this.config._siwVersion;
     if (siwVersion) {
       await injectWidgetFromCDN(siwVersion);
@@ -273,7 +280,6 @@ class TestApp {
       window.OktaSignIn = BundledOktaSignIn;
     }
 
-    saveConfigToStorage(this.config);
     document.getElementById('modal').style.display = 'block';
     const widgetConfig = buildWidgetConfig(this.config);
     const { issuer, clientId, _clientSecret, redirectUri, _forceRedirect, scopes } = this.config;
@@ -313,6 +319,9 @@ class TestApp {
     }
 
     const signIn = new OktaSignIn(widgetConfig);
+    signIn.on('afterError', function (context: any, error: any) {
+        console.log('Sign-in Widget afterError: ', context.controller, error);
+    });
     signIn.renderEl(renderOptions,
       (res: any) => {
         console.log(`signin.renderEl: success callback fired: `, res);
@@ -490,7 +499,7 @@ class TestApp {
 
   // Renders the login widget
   async renderInteractionRequired(): Promise<void> {
-    return this.render(true).then(() => this.loginWidget());
+    return this.render(true).then(() => this.renderWidget());
   }
 
   async getTokensFromUrl(): Promise<TokenResponse> {

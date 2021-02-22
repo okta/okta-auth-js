@@ -58,6 +58,9 @@ class TestApp {
   get error() { return $('#error'); }
   get xhrError() { return $('#xhr-error'); }
 
+  // Widget
+  get signinWidget() { return $('#widget .primary-auth'); }
+  
   async open(queryObj) {
     await browser.url(toQueryString(queryObj));
     await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
@@ -171,6 +174,10 @@ class TestApp {
 
   async waitForUserInfo() {
     return browser.waitUntil(async () => this.userInfo.then(el => el.isDisplayed()), 5000, 'wait for user info');
+  }
+
+  async waitForSigninWidget() {
+    return browser.waitUntil(async () => this.signinWidget.then(el => el.isDisplayed()), 5000, 'wait for signin widget');
   }
 
   async assertCallbackSuccess() {

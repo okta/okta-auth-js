@@ -14,17 +14,12 @@ describe('interaction flow', () => {
     await TestApp.waitForCallback();
 
     // Manually change the URL. All other data should be present in browser storage
-    await browser.url('/implicit/callback?error=interaction_required');
+    await browser.url('/login/callback?error=interaction_required');
 
     // Now handle the callback
     await TestApp.handleCallback();
 
     // Test app should display the signin widget
-    await TestApp.waitForLoginBtn();
-    await OktaLogin.signin(USERNAME, PASSWORD); // on widget
-    await TestApp.assertLoggedIn();
-    await TestApp.getUserInfo();
-    await TestApp.assertUserInfo();
-    await TestApp.logoutRedirect();
+    await TestApp.waitForSigninWidget();
   });
 });
