@@ -1,5 +1,7 @@
 import tokens from '@okta/test.support/tokens';
 import oauthUtil from '@okta/test.support/oauthUtil';
+import http from '../../../lib/http';
+import { OktaAuth } from '@okta/okta-auth-js';
 
 describe('token.renewTokens', function() {
   it('should return tokens', function() {
@@ -184,4 +186,33 @@ describe('token.renewTokens', function() {
       }
     });
   });
+
+  describe('renewTokensWithRefresh', function () {
+    beforeEach(function () {
+      jest.spyOn(http, 'httpRequest').mockImplementation(function () {
+        return Promise.resolve({
+          'id_token': tokens.standardIdToken,
+          'access_token': tokens.standardAccessToken,
+          'refresh_token': 'fakeRerfeshTalken'
+        });
+      });
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+
+    it('is called when refresh token is available in browser storage', async function() {
+      const authInstance = new OktaAuth({
+          issuer: 'https://auth-js-test.okta.com',
+          clientId: 'NPSfOkH5eZrTy8PMDlvx',
+      });
+      authInstance.tokenManager.add('refreshToken', tokens.standardRefreshToken);
+      const newTokens = await authInstance.token.renewTokens();
+      expect(Object.keys(newTokens)).toContain('idToken');
+      expect(Object.keys(newTokens)).toContain('accessToken');
+      expect(Object.keys(newTokens)).toContain('refreshToken');
+    });
+  });
+
 });
