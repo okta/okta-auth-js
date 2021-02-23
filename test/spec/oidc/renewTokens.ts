@@ -1,8 +1,9 @@
 import tokens from '@okta/test.support/tokens';
 import oauthUtil from '@okta/test.support/oauthUtil';
-import http from '../../../lib/http';
 import { OktaAuth } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
+import * as tokenEndpoint from '../../../lib/oidc/endpoints/token';
+
 
 describe('token.renewTokens', function() {
   it('should return tokens', function() {
@@ -191,7 +192,7 @@ describe('token.renewTokens', function() {
   describe('renewTokensWithRefresh', function () {
     beforeEach(function () {
       util.warpToUnixTime(tokens.standardIdToken2Claims.iat);
-      jest.spyOn(http, 'httpRequest').mockImplementation(function () {
+      jest.spyOn(tokenEndpoint, 'postRenewTokensWithRefreshToken').mockImplementation(function () {
 
         return Promise.resolve({
           'id_token': tokens.standardIdToken,
@@ -202,7 +203,6 @@ describe('token.renewTokens', function() {
     afterEach(() => {
       jest.clearAllMocks();
     });
-
 
     it('is called when refresh token is available in browser storage', async function() {
       const authInstance = new OktaAuth({
