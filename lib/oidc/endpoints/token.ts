@@ -1,7 +1,5 @@
-import { RefreshToken } from './../../../build/lib/types/Token.d';
-
 import { AuthSdkError } from '../../errors';
-import { CustomUrls, OAuthParams, OAuthResponse, TokenParams } from '../../types';
+import { CustomUrls, OAuthParams, OAuthResponse, RefreshToken, TokenParams } from '../../types';
 import { removeNils, toQueryString } from '../../util';
 import http from '../../http';
 
