@@ -1,9 +1,5 @@
 import tokens from '@okta/test.support/tokens';
 import oauthUtil from '@okta/test.support/oauthUtil';
-import { OktaAuth } from '@okta/okta-auth-js';
-import util from '@okta/test.support/util';
-import * as tokenEndpoint from '../../../lib/oidc/endpoints/token';
-
 
 describe('token.renewTokens', function() {
   it('should return tokens', function() {
@@ -188,32 +184,4 @@ describe('token.renewTokens', function() {
       }
     });
   });
-
-  describe('renewTokensWithRefresh', function () {
-    beforeEach(function () {
-      util.warpToUnixTime(tokens.standardIdToken2Claims.iat);
-      jest.spyOn(tokenEndpoint, 'postRefreshToken').mockImplementation(function () {
-
-        return Promise.resolve({
-          'id_token': tokens.standardIdToken,
-          'refresh_token': 'fakeRerfeshTalken'
-        });
-      });
-    });
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it('is called when refresh token is available in browser storage', async function() {
-      const authInstance = new OktaAuth({
-          issuer: 'https://auth-js-test.okta.com',
-          clientId: 'NPSfOkH5eZrTy8PMDlvx',
-      });
-      authInstance.tokenManager.add('refreshToken', tokens.standardRefreshToken);
-      const newTokens = await authInstance.token.renewTokens();
-      expect(Object.keys(newTokens)).toContain('idToken');
-      expect(Object.keys(newTokens)).toContain('refreshToken');
-    });
-  });
-
 });
