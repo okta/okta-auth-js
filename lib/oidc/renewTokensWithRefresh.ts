@@ -15,23 +15,28 @@ import { getOAuthUrls } from './util/oauth';
 import { OktaAuth, TokenParams, RefreshToken, Tokens } from '../types';
 import { handleOAuthResponse } from './handleOAuthResponse';
 import { postRefreshToken } from './endpoints/token';
+import { getDefaultTokenParams } from './util';
 
 export async function renewTokensWithRefresh(
   sdk: OktaAuth,
   tokenParams: TokenParams,
   refreshTokenObject: RefreshToken
 ): Promise<Tokens> {
-  var clientId = sdk.options.clientId;
+  const { clientId } = sdk.options;
   if (!clientId) {
     throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to renew tokens');
   }
 
-  var urls = getOAuthUrls(sdk, tokenParams);
   const renewTokenParams = {
     clientId,
   };
-
   const tokenResponse = await postRefreshToken(sdk, renewTokenParams, refreshTokenObject);
-  const { tokens } = await handleOAuthResponse(sdk, renewTokenParams, tokenResponse, urls);
+
+  const { scopes } = getDefaultTokenParams(sdk);
+  const handleResponseParams = {
+    scopes
+  };
+  const urls = getOAuthUrls(sdk, tokenParams);
+  const { tokens } = await handleOAuthResponse(sdk, handleResponseParams, tokenResponse, urls);
   return tokens;
 }
