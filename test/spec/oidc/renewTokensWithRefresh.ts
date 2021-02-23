@@ -65,6 +65,6 @@ describe('renewTokensWithRefresh', function () {
     });
     authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
     await expect(authInstance.token.renewTokens()).rejects.toThrow(
-      'A clientId and scopes must be specified in the OktaAuth constructor to renew tokens');
+      'A clientId must be specified in the OktaAuth constructor to renew tokens');
   });
 });
