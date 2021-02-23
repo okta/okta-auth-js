@@ -192,7 +192,7 @@ describe('token.renewTokens', function() {
   describe('renewTokensWithRefresh', function () {
     beforeEach(function () {
       util.warpToUnixTime(tokens.standardIdToken2Claims.iat);
-      jest.spyOn(tokenEndpoint, 'postRenewTokensWithRefreshToken').mockImplementation(function () {
+      jest.spyOn(tokenEndpoint, 'postRefreshToken').mockImplementation(function () {
 
         return Promise.resolve({
           'id_token': tokens.standardIdToken,

@@ -14,7 +14,7 @@ import { AuthSdkError } from '../errors';
 import { getOAuthUrls } from './util/oauth';
 import { OktaAuth, TokenParams, RefreshToken, Tokens } from '../types';
 import { handleOAuthResponse } from './handleOAuthResponse';
-import { postRenewTokensWithRefreshToken } from './endpoints/token';
+import { postRefreshToken } from './endpoints/token';
 
 export async function renewTokensWithRefresh(
   sdk: OktaAuth,
@@ -31,7 +31,7 @@ export async function renewTokensWithRefresh(
     clientId,
   };
 
-  const tokenResponse = await postRenewTokensWithRefreshToken(sdk, renewTokenParams, refreshTokenObject);
+  const tokenResponse = await postRefreshToken(sdk, renewTokenParams, refreshTokenObject);
   const { tokens } = await handleOAuthResponse(sdk, renewTokenParams, tokenResponse, urls);
   return tokens;
 }

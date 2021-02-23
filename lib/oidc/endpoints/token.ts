@@ -57,9 +57,9 @@ export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls)
   });
 }
 
-export function postRenewTokensWithRefreshToken(sdk, options: TokenParams, refreshTokenObject: RefreshToken): Promise<OAuthResponse> {
+export function postRefreshToken(sdk, options: TokenParams, refreshToken: RefreshToken): Promise<OAuthResponse> {
   return http.httpRequest(sdk, {
-    url: refreshTokenObject.tokenUrl,
+    url: refreshToken.tokenUrl,
     method: 'POST',
     withCredentials: false,
     headers: {
@@ -69,8 +69,8 @@ export function postRenewTokensWithRefreshToken(sdk, options: TokenParams, refre
     args: Object.entries({
       client_id: options.clientId, // eslint-disable-line camelcase
       grant_type: 'refresh_token', // eslint-disable-line camelcase
-      scope: refreshTokenObject.scopes.join(' '),
-      refresh_token: refreshTokenObject.refreshToken, // eslint-disable-line camelcase
+      scope: refreshToken.scopes.join(' '),
+      refresh_token: refreshToken.refreshToken, // eslint-disable-line camelcase
     }).map(function ([name, value]) {
       return name + '=' + encodeURIComponent(value);
     }).join('&'),
