@@ -325,8 +325,8 @@ tokens.standardRefreshToken = {
     'email',
     'offline_access'
   ],
-  'tokenUrl': 'https://auth-js-test.okta.com//oauth2/v1/token',
-  'authorizeUrl': 'https://auth-js-test.okta.com//oauth2/v1/authorize',
+  'tokenUrl': 'https://auth-js-test.okta.com/oauth2/v1/token',
+  'authorizeUrl': 'https://auth-js-test.okta.com/oauth2/v1/authorize',
   'issuer': 'https://auth-js-test.okta.com'
 };
 
