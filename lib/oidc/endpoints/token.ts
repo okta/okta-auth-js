@@ -1,3 +1,4 @@
+import { RefreshToken } from './../../../build/lib/types/Token.d';
 
 import { AuthSdkError } from '../../errors';
 import { CustomUrls, OAuthParams, OAuthResponse, TokenParams } from '../../types';
@@ -55,5 +56,25 @@ export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls)
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
+  });
+}
+
+export function postRenewTokensWithRefreshToken(sdk, options: TokenParams, refreshTokenObject: RefreshToken): Promise<OAuthResponse> {
+  return http.httpRequest(sdk, {
+    url: refreshTokenObject.tokenUrl,
+    method: 'POST',
+    withCredentials: false,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+
+    args: Object.entries({
+      client_id: options.clientId, // eslint-disable-line camelcase
+      grant_type: 'refresh_token', // eslint-disable-line camelcase
+      scope: refreshTokenObject.scopes.join(' '),
+      refresh_token: refreshTokenObject.refreshToken, // eslint-disable-line camelcase
+    }).map(function ([name, value]) {
+      return name + '=' + encodeURIComponent(value);
+    }).join('&'),
   });
 }
