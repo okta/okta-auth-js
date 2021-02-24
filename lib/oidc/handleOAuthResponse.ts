@@ -62,7 +62,13 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
     responseType = [responseType];
   }
 
-  var scopes = clone(tokenParams.scopes);
+  var scopes;
+  if (res.scope) {
+    scopes = res.scope.split(' ');
+  } else {
+    var scopes = clone(tokenParams.scopes);
+
+  }
   var clientId = tokenParams.clientId || sdk.options.clientId;
 
   // Handling the result from implicit flow or PKCE token exchange

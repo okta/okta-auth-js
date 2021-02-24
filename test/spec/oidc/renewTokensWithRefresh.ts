@@ -25,6 +25,7 @@ describe('renewTokensWithRefresh', function () {
         'id_token': tokens.standardIdToken,
         'refresh_token': tokens.standardRefreshToken2,
         'expires_in': '0',
+        'scope': 'openid email',
       });
     });
     renewTokenSpy = jest.spyOn(renewTokensWithRefreshTokenModule, 'renewTokensWithRefresh');
