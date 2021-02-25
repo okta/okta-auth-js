@@ -8,3 +8,4 @@ npm-debug.log
 testenv
 junit.xml
 yarn-error.*
+coverage
