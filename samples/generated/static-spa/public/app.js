@@ -153,7 +153,8 @@ function renderUnauthenticated() {
 
 function handleLoginRedirect() {
   if (authClient.isInteractionRequired()) {
-    return beginAuthFlow(); // widget will resume transaction
+    beginAuthFlow(); // widget will resume transaction
+    return Promise.resolve();
   }
   
   // If the URL contains a code, `parseFromUrl` will grab it and exchange the code for tokens
@@ -228,8 +229,7 @@ function showSigninWidget() {
       redirectUri: config.redirectUri,
       useInteractionCodeFlow: config.useInteractionCodeFlow,
       authParams: {
-        issuer: config.issuer,
-        state: JSON.stringify(config.state),
+        issuer: config.issuer
       },
       idps: config.idps.split(/\s+/).map(idpToken => {
         const [type, id] = idpToken.split(/:/);
@@ -241,7 +241,8 @@ function showSigninWidget() {
     });
   
     signIn.showSignInToGetTokens({
-      el: '#signin-widget'
+      el: '#signin-widget',
+      state: JSON.stringify(config.state)
     })
     .then(function(tokens) {
       document.getElementById('flow-widget').style.display = 'none';
@@ -421,9 +422,12 @@ function loadConfig() {
   var idps;
 
   var state;
-  if (stateParam) {
-    // Read from state
+  try {
     state = JSON.parse(stateParam);
+  } catch{};
+
+  if (state) {
+    // Read from state
     issuer = state.issuer;
     clientId = state.clientId;
     storage = state.storage;
