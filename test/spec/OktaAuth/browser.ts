@@ -458,6 +458,9 @@ describe('Browser', function() {
       });
 
       it('Can pass a "revokeAccessToken=false" to skip revoke logic', function() {
+        const refreshToken = { refreshToken: 'fake'};
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken, refreshToken });
+
         return auth.signOut({ revokeAccessToken: false })
           .then(function() {
             expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
@@ -468,6 +471,9 @@ describe('Browser', function() {
       });
 
       it('Can pass a "revokeRefreshToken=false" to skip revoke logic', function() {
+        const refreshToken = { refreshToken: 'fake'};
+        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken, refreshToken });
+        
         return auth.signOut({ revokeRefreshToken: false })
           .then(function() {
             expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
