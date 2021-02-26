@@ -199,6 +199,7 @@ export interface SignoutOptions {
   postLogoutRedirectUri?: string;
   accessToken?: AccessToken;
   revokeAccessToken?: boolean;
+  revokeRefreshToken?: boolean;
   idToken?: IDToken;
   state?: string;
 }

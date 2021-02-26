@@ -382,6 +382,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     var accessToken = options.accessToken;
     var refreshToken = options.refreshToken;
     var revokeAccessToken = options.revokeAccessToken !== false;
+    var revokeRefreshToken = options.revokeRefreshToken !== false;
     var idToken = options.idToken;
   
     var logoutUrl = getOAuthUrls(this).logoutUrl;
@@ -391,7 +392,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
   
  
-    if (revokeAccessToken && typeof refreshToken === 'undefined') {
+    if (revokeRefreshToken && typeof refreshToken === 'undefined') {
       refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
     }
 
@@ -402,7 +403,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     // Clear all local tokens
     this.tokenManager.clear();
 
-    if (revokeAccessToken && refreshToken) {
+    if (revokeRefreshToken && refreshToken) {
       await this.revokeRefreshToken(refreshToken);
     }
 
