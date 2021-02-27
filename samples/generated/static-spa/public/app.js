@@ -405,10 +405,10 @@ function loadConfig() {
   var redirectUri = window.location.origin + '/login/callback'; // Should also be set in Okta Admin UI
   
   // Params which are not in the state
-  var stateParam = url.searchParams.get('state');
-  var error = url.searchParams.get('error');
-  var showForm = url.searchParams.get('showForm');
-  var getTokens = url.searchParams.get('getTokens');
+  var stateParam = url.searchParams.get('state'); // received on login redirect callback
+  var error = url.searchParams.get('error'); // received on login redirect callback
+  var showForm = url.searchParams.get('showForm'); // forces config form to show
+  var getTokens = url.searchParams.get('getTokens'); // forces redirect to get tokens
 
   // Params which are encoded into the state
   var issuer;
@@ -423,9 +423,11 @@ function loadConfig() {
 
   var state;
   try {
-    state = JSON.parse(stateParam);
-  } catch{};
-
+    // State will be passed on callback. If state exists in the URL parse it as a JSON object and use those values.
+    state = stateParam ? JSON.parse(stateParam) : null;
+  } catch (e) {
+    console.warn('Could not parse state from the URL.');
+  }
   if (state) {
     // Read from state
     issuer = state.issuer;
@@ -437,7 +439,7 @@ function loadConfig() {
     useInteractionCodeFlow = state.useInteractionCodeFlow;
     idps = state.idps;
   } else {
-    // Read from URL
+    // Read individually named parameters from URL, or use defaults
     issuer = url.searchParams.get('issuer') || config.issuer;
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
@@ -459,8 +461,6 @@ function loadConfig() {
     useInteractionCodeFlow,
     idps,
   }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-
-  
   // Add all app options to the state, to preserve config across redirects
   state = {
     issuer,
@@ -483,9 +483,7 @@ function loadConfig() {
     showForm,
     getTokens
   });
-
   Object.assign(config, newConfig);
-
   // Render the config to HTML
   var logConfig = {};
   var skipKeys = ['state', 'appUri', 'error', 'showForm', 'getTokens']; // internal config
