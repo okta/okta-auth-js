@@ -60,6 +60,14 @@ describe('handleOAuthResponse', () => {
         expect(res.tokens.refreshToken).toBeTruthy();
         expect(res.tokens.refreshToken.refreshToken).toBe('bloo');
       });
+      it('prefers "scope" value from endpoint response over method parameter', async () => {
+        const tokenParams = { responseType: ['token', 'id_token', 'refresh_token'], scopes: ['profile'] };
+        const oauthRes = { id_token: 'foo', access_token: 'blar', refresh_token: 'bloo', scope: 'openid offline_access' };
+        const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined);
+        expect(res.tokens.accessToken.scopes).toEqual(['openid', 'offline_access']);
+        expect(res.tokens.idToken.scopes).toEqual(['openid', 'offline_access']);
+        expect(res.tokens.refreshToken.scopes).toEqual(['openid', 'offline_access']);
+      });
 
       describe('errors', () => {
         beforeEach(() => {
