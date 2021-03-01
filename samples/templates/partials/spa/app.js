@@ -152,7 +152,8 @@ function renderUnauthenticated() {
 
 function handleLoginRedirect() {
   if (authClient.isInteractionRequired()) {
-    return beginAuthFlow(); // widget will resume transaction
+    beginAuthFlow(); // widget will resume transaction
+    return Promise.resolve();
   }
   
   // If the URL contains a code, `parseFromUrl` will grab it and exchange the code for tokens
@@ -234,8 +235,7 @@ function showSigninWidget() {
       redirectUri: config.redirectUri,
       useInteractionCodeFlow: config.useInteractionCodeFlow,
       authParams: {
-        issuer: config.issuer,
-        state: JSON.stringify(config.state),
+        issuer: config.issuer
       },
       idps: config.idps.split(/\s+/).map(idpToken => {
         const [type, id] = idpToken.split(/:/);
@@ -247,7 +247,8 @@ function showSigninWidget() {
     });
   
     signIn.showSignInToGetTokens({
-      el: '#signin-widget'
+      el: '#signin-widget',
+      state: JSON.stringify(config.state)
     })
     .then(function(tokens) {
       document.getElementById('flow-widget').style.display = 'none';
@@ -415,10 +416,10 @@ function loadConfig() {
   var redirectUri = window.location.origin + '{{ redirectPath }}'; // Should also be set in Okta Admin UI
   
   // Params which are not in the state
-  var stateParam = url.searchParams.get('state');
-  var error = url.searchParams.get('error');
-  var showForm = url.searchParams.get('showForm');
-  var getTokens = url.searchParams.get('getTokens');
+  var stateParam = url.searchParams.get('state'); // received on login redirect callback
+  var error = url.searchParams.get('error'); // received on login redirect callback
+  var showForm = url.searchParams.get('showForm'); // forces config form to show
+  var getTokens = url.searchParams.get('getTokens'); // forces redirect to get tokens
 
   // Params which are encoded into the state
   var issuer;
@@ -434,9 +435,14 @@ function loadConfig() {
   {{/if}}
 
   var state;
-  if (stateParam) {
+  try {
+    // State will be passed on callback. If state exists in the URL parse it as a JSON object and use those values.
+    state = stateParam ? JSON.parse(stateParam) : null;
+  } catch (e) {
+    console.warn('Could not parse state from the URL.');
+  }
+  if (state) {
     // Read from state
-    state = JSON.parse(stateParam);
     issuer = state.issuer;
     clientId = state.clientId;
     storage = state.storage;
@@ -448,7 +454,7 @@ function loadConfig() {
     idps = state.idps;
     {{/if}}
   } else {
-    // Read from URL
+    // Read individually named parameters from URL, or use defaults
     issuer = url.searchParams.get('issuer') || config.issuer;
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
@@ -474,8 +480,6 @@ function loadConfig() {
     idps,
     {{/if}}
   }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-
-  
   // Add all app options to the state, to preserve config across redirects
   state = {
     issuer,
@@ -500,9 +504,7 @@ function loadConfig() {
     showForm,
     getTokens
   });
-
   Object.assign(config, newConfig);
-
   // Render the config to HTML
   var logConfig = {};
   var skipKeys = ['state', 'appUri', 'error', 'showForm', 'getTokens']; // internal config
