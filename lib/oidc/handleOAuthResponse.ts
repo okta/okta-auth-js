@@ -66,8 +66,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
   if (res.scope) {
     scopes = res.scope.split(' ');
   } else {
-    var scopes = clone(tokenParams.scopes);
-
+    scopes = clone(tokenParams.scopes);
   }
   var clientId = tokenParams.clientId || sdk.options.clientId;
 
