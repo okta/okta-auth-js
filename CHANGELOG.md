@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.7.2
+
+### Bug Fixes
+
+- [#638](https://github.com/okta/okta-auth-js/pull/638) Fixes an issue with revoking refresh tokens
+- [#632](https://github.com/okta/okta-auth-js/pull/632) Fixes an issue with renewing refresh tokens
+- [#616](https://github.com/okta/okta-auth-js/pull/616) Fixes issue with `fetch` on IE Edge versions 14-17.
+
 ## 4.7.1
 
 ### Bug Fixes
