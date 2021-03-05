@@ -1,3 +1,50 @@
+const modulesToMock = {
+  validateClaims: '../../../lib/oidc/util/validateClaims',
+  decodeToken: '../../../lib/oidc/decodeToken',
+  wellKnown: '../../../lib/oidc/endpoints/well-known',
+  crypto: '../../../lib/crypto'
+};
+
+const mocked = {
+  validateClaims: jest.fn(),
+  decodeToken: jest.fn(),
+  getWellKnown: jest.fn(),
+  getKey: jest.fn(),
+  verifyToken: jest.fn(),
+  getOidcHash: jest.fn()
+};
+
+const original = {
+  validateClaims: jest.requireActual(modulesToMock.validateClaims).validateClaims,
+  decodeToken: jest.requireActual(modulesToMock.decodeToken).decodeToken
+};
+
+jest.doMock(modulesToMock.validateClaims, () => {
+  return {
+    validateClaims: mocked.validateClaims
+  };
+});
+
+jest.doMock(modulesToMock.decodeToken, () => {
+  return {
+    decodeToken: mocked.decodeToken
+  };
+});
+
+jest.doMock(modulesToMock.wellKnown, () => {
+  return {
+    getKey: mocked.getKey,
+    getWellKnown: mocked.getWellKnown
+  };
+});
+
+jest.doMock(modulesToMock.crypto, () => {
+  return {
+    verifyToken: mocked.verifyToken,
+    getOidcHash: mocked.getOidcHash
+  };
+});
+
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
@@ -15,11 +62,147 @@ describe('token.verify', function() {
   var validationParams;
   var client;
   beforeEach(() => {
+    mocked.decodeToken.mockImplementation(original.decodeToken);
+    mocked.validateClaims.mockImplementation(original.validateClaims);
+    mocked.getWellKnown.mockReturnValue(Promise.resolve({
+      issuer: tokens.standardIdTokenParsed.issuer
+    }));
+    mocked.getKey.mockReturnValue(Promise.resolve('fake-test-key'));
+    mocked.verifyToken.mockReturnValue(Promise.resolve(true));
+    util.warpToUnixTime(1449699929);
     validationParams = {
       clientId: tokens.standardIdTokenParsed.clientId,
       issuer: tokens.standardIdTokenParsed.issuer
     };
     client = setupSync();
+    oauthUtil.loadWellKnownAndKeysCache(client);
+  });
+  afterEach(() => {
+    Object.keys(mocked).forEach(key => {
+      mocked[key].mockReset();
+    });
+  });
+  describe('decodeToken', () => {
+    it('passes the idToken string to decodeToken', async () => {
+      await client.token.verify(tokens.standardIdTokenParsed, validationParams);
+      expect(mocked.decodeToken).toHaveBeenCalledWith(tokens.standardIdTokenParsed.idToken);
+    });
+    it('will throw errors from decodeToken', async () => {
+      const error = new Error('a fake test error');
+      mocked.decodeToken.mockImplementation(() => {
+        throw error;
+      });
+      await expect(client.token.verify(tokens.standardIdTokenParsed, validationParams)).rejects.toThrow(error);
+    });
+  });
+  describe('validationOptions', () => {
+    describe('defaults', () => {
+      it('issuer: will use well-known endpoint', async () => {
+        client = setupSync({
+          issuer: 'http://some-proxy'
+        });
+        await client.token.verify(tokens.standardIdTokenParsed, { clientId: tokens.standardIdTokenParsed.clientId });
+        expect(mocked.validateClaims.mock.calls[0][2].issuer).toBe(tokens.standardIdTokenParsed.issuer);
+      });
+      it('clientId: will use sdk option', async () => {
+        client = setupSync({
+          clientId: tokens.standardIdTokenParsed.clientId,
+        });
+        await client.token.verify(tokens.standardIdTokenParsed, undefined);
+        expect(mocked.validateClaims.mock.calls[0][2].clientId).toBe(tokens.standardIdTokenParsed.clientId);
+      });
+      it('ignoreSignature: will use sdk option', async () => {
+        client = setupSync({
+          clientId: tokens.standardIdTokenParsed.clientId,
+          ignoreSignature: true
+        });
+        await client.token.verify(tokens.standardIdTokenParsed, undefined);
+        expect(mocked.validateClaims.mock.calls[0][2].ignoreSignature).toBe(true);
+      });
+    });
+    it('can override all defaults by passing validationParams', async () => {
+      client = setupSync({
+        issuer: 'http://nope',
+        clientId: 'wrong',
+        ignoreSignature: false
+      });
+      mocked.getWellKnown.mockReturnValue(Promise.resolve({
+        issuer: 'http://also-nope'
+      }));
+      const { issuer, clientId } = tokens.standardIdTokenParsed;
+      await client.token.verify(tokens.standardIdTokenParsed, {
+        issuer,
+        clientId,
+        ignoreSignature: true
+      });
+      expect(mocked.validateClaims.mock.calls[0][2]).toEqual({
+        issuer,
+        clientId,
+        ignoreSignature: true
+      });
+    });
+  });
+
+  describe('getKey', () => {
+    it('passes the issuer from the token', async () => {
+      const issuer = 'http://fake-for-my-test';
+      const idToken = {
+        issuer,
+        idToken: 'something-or-other'
+      };
+      mocked.decodeToken.mockReturnValue({ header: {} });
+      mocked.validateClaims.mockReturnValue(null);
+      const res = await client.token.verify(idToken, validationParams);
+      expect(res).toBe(idToken);
+      expect(mocked.getKey.mock.calls[0][1]).toBe(issuer);
+    });
+
+    it('passes the kid from the token header', async () => {
+      const issuer = 'http://fake-for-my-test';
+      const idToken = {
+        issuer,
+        idToken: 'something-or-other'
+      };
+      const kid = 'my-fake-kid';
+      mocked.decodeToken.mockReturnValue({ header: { kid } });
+      mocked.validateClaims.mockReturnValue(null);
+      const res = await client.token.verify(idToken, validationParams);
+      expect(res).toBe(idToken);
+      expect(mocked.getKey.mock.calls[0][2]).toBe(kid);
+    });
+
+    it('can throw', async () => {
+      const error = new Error('my-fake-error');
+      mocked.getKey.mockImplementation(() => {
+        throw error;
+      });
+      await expect(client.token.verify(tokens.standardIdTokenParsed, validationParams)).rejects.toThrow(error);
+    });
+  });
+
+  describe('crypto.verifyToken', () => {
+    it('will skip crypto.verify if `ignoreSignature` is true', async () => {
+      validationParams.ignoreSignature = true;
+      const res = await client.token.verify(tokens.standardIdTokenParsed, validationParams);
+      expect(mocked.verifyToken).not.toHaveBeenCalled();
+      expect(res).toBe(tokens.standardIdTokenParsed);
+    });
+    it('will skip crypto.verify if `isTokenVerifySupported` is fales', async () => {
+      jest.spyOn(client.features, 'isTokenVerifySupported').mockReturnValue(false);
+      await client.token.verify(tokens.standardIdTokenParsed, validationParams);
+      expect(mocked.verifyToken).not.toHaveBeenCalled();
+    });
+    it('passes the idToken string and well-known key', async () => {
+      const { idToken } = tokens.standardIdTokenParsed;
+      const key = 'my-fake-key';
+      mocked.getKey.mockReturnValue(Promise.resolve(key));
+      await client.token.verify(tokens.standardIdTokenParsed, validationParams);
+      expect(mocked.verifyToken).toHaveBeenCalledWith(idToken, key);
+    });
+    it('throws if sdkCrypto.verifyToken returns false', async () => {
+      mocked.verifyToken.mockReturnValue(Promise.resolve(false));
+      await expect(client.token.verify(tokens.standardIdTokenParsed, validationParams)).rejects.toThrow('The token signature is not valid');
+    });
   });
 
   describe('with access token', () => {
@@ -40,8 +223,6 @@ describe('token.verify', function() {
     });
 
     it('verifies idToken at_hash claim against accessToken', () => {
-      util.warpToUnixTime(1449699929);
-      oauthUtil.loadWellKnownAndKeysCache(client);
       validationParams.accessToken = tokens.standardAccessToken;
       return client.token.verify(idToken, validationParams)
       .then(function(res) {
@@ -51,8 +232,6 @@ describe('token.verify', function() {
     });
 
     it('throws if idToken at_hash claim does not match accessToken', () => {
-      util.warpToUnixTime(1449699929);
-      oauthUtil.loadWellKnownAndKeysCache(client);
       validationParams.accessToken = tokens.standardAccessToken;
       idToken.claims.at_hash = 'other_hash';
       return client.token.verify(idToken, validationParams)
@@ -65,8 +244,6 @@ describe('token.verify', function() {
     });
 
     it('skips verification if idToken does not have at_hash claim', () => {
-      util.warpToUnixTime(1449699929);
-      oauthUtil.loadWellKnownAndKeysCache(client);
       validationParams.accessToken = tokens.standardAccessToken;
       delete idToken.claims.at_hash;
       return client.token.verify(idToken, validationParams)
@@ -74,36 +251,6 @@ describe('token.verify', function() {
         expect(res).toEqual(idToken);
         expect(sdkCrypto.getOidcHash).not.toHaveBeenCalled();
       });
-    });
-  });
-
-  it('verifies a valid idToken with nonce', function() {
-    util.warpToUnixTime(1449699929);
-    oauthUtil.loadWellKnownAndKeysCache(client);
-    validationParams.nonce = tokens.standardIdTokenParsed.nonce;
-    return client.token.verify(tokens.standardIdTokenParsed, validationParams)
-    .then(function(res) {
-      expect(res).toEqual(tokens.standardIdTokenParsed);
-    });
-  });
-  it('verifies a valid idToken without nonce or accessToken', function() {
-    util.warpToUnixTime(1449699929);
-    oauthUtil.loadWellKnownAndKeysCache(client);
-    return client.token.verify(tokens.standardIdTokenParsed, validationParams)
-    .then(function(res) {
-      expect(res).toEqual(tokens.standardIdTokenParsed);
-    });
-  });
-  it('validationParams are optional', () => {
-    util.warpToUnixTime(1449699929);
-    client = setupSync({
-      issuer: tokens.standardIdTokenParsed.issuer,
-      clientId: tokens.standardIdTokenParsed.clientId,
-    });
-    oauthUtil.loadWellKnownAndKeysCache(client);
-    return client.token.verify(tokens.standardIdTokenParsed, undefined)
-    .then(function(res) {
-      expect(res).toEqual(tokens.standardIdTokenParsed);
     });
   });
 
@@ -123,8 +270,7 @@ describe('token.verify', function() {
         util.assertAuthSdkError(err, message);
       });
     }
-
-    it('isn\'t an idToken', function() {
+    it('throws if token is not an idToken', function() {
       return expectError([tokens.standardAccessTokenParsed],
         'Only idTokens may be verified');
     });
