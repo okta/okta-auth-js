@@ -1,7 +1,5 @@
-/* global USER_AGENT */
-jest.mock('cross-fetch');
+/* global USER_AGENT, fetch */
 
-import fetch from 'cross-fetch';
 import util from '@okta/test.support/util';
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
@@ -13,7 +11,12 @@ describe('base token API', function() {
 
   function createOktaAuth(options = {}) {
     return new OktaAuth(Object.assign({
-      issuer: tokens.ISSUER
+      issuer: tokens.ISSUER,
+      storageManager: {
+        cache: {
+          storageType: 'memory'
+        }
+      }
     }, options));
   }
   describe('prepareTokenParams', function() {
@@ -113,14 +116,11 @@ describe('base token API', function() {
       util.warpToUnixTime(oauthUtil.getTime());
     });
 
-    afterEach(() => {
-      fetch.mockReset();
-    });
-
     util.itMakesCorrectRequestResponse({
       title: 'requests a token using authorizationCode',
       setup: _.cloneDeep(setup),
       execute: function (test) {
+        oauthUtil.loadWellKnownAndKeysCache(test.oa);
         return test.oa.token.exchangeCodeForTokens({
           authorizationCode,
           codeVerifier,

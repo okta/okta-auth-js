@@ -1,5 +1,4 @@
 /* global window, document */
-jest.mock('cross-fetch');
 
 import { OktaAuth } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';

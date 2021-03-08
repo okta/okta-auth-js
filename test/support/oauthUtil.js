@@ -68,14 +68,15 @@ oauthUtil.getResponseForUrl = function(url) {
 
 oauthUtil.loadWellKnownAndKeysCache = function(authClient) {
   // mock responses to /.well-known/openid-configuration and /oauth2/v1/keys
-  jest.spyOn(authClient.options, 'httpRequestClient').mockImplementation(async (method, url) => {
+  const origMethod = authClient.options.httpRequestClient;
+  jest.spyOn(authClient.options, 'httpRequestClient').mockImplementation(async (method, url, options) => {
     const response = oauthUtil.getResponseForUrl(url);
     if (response) {
       return {
         responseText: JSON.stringify(response)
       };
     }
-    throw new Error(`Unexpected HTTP call: ${url}`);
+    return origMethod.apply(this, [method, url, options]);
   });
 };
 

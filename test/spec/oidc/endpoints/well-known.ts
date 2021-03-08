@@ -1,6 +1,4 @@
 /* global window, localStorage, sessionStorage */
-jest.mock('cross-fetch');
-
 import { getWellKnown, getKey } from '../../../../lib/oidc/endpoints/well-known';
 import oauthUtilHelpers from '@okta/test.support/oauthUtil';
 import util from '@okta/test.support/util';

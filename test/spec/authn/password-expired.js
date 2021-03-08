@@ -1,5 +1,3 @@
-jest.mock('cross-fetch');
-
 import util from '@okta/test.support/util';
 
 describe('PASSWORD_EXPIRED', function () {

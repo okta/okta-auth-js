@@ -1,5 +1,3 @@
-jest.mock('cross-fetch');
-
 const getWellKnown = jest.fn();
 jest.mock('../../../../lib/oidc/endpoints/well-known', () => {
   return { getWellKnown };

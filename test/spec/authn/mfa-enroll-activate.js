@@ -1,5 +1,3 @@
-jest.mock('cross-fetch');
-
 import util from '@okta/test.support/util';
 import * as sdkUtil from '../../../lib/util';
 

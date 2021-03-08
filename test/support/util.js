@@ -7,8 +7,6 @@ import { OktaAuth } from '@okta/okta-auth-js';
 import browserStorage from '../../lib/browser/browserStorage';
 const cookies = browserStorage.storage;
 
-import fetch from 'cross-fetch';
-
 var util = {};
 
 
@@ -88,7 +86,7 @@ function mockAjax(pairs) {
     setNextPair(pairs);
   }
 
-  fetch.mockImplementation(function (url, args) {
+  jest.spyOn(global, 'fetch').mockImplementation(function (url, args) {
     var pair = allPairs.shift();
     if (!pair) {
       throw new Error('We are making a request that we have not anticipated: ' + url);

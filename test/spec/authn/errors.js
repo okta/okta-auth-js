@@ -1,5 +1,3 @@
-jest.mock('cross-fetch');
-
 import _ from 'lodash';
 import util from '@okta/test.support/util';
 

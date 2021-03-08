@@ -1,5 +1,3 @@
-jest.mock('cross-fetch');
-
 import { OktaAuth, AccessToken, IDToken } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';

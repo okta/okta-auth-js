@@ -1,5 +1,4 @@
 /* global window */
-jest.mock('cross-fetch');
 
 import {
   closeSession,

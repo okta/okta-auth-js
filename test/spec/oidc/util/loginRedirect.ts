@@ -1,6 +1,4 @@
 /* global window */
-jest.mock('cross-fetch');
-
 import { OktaAuth } from '@okta/okta-auth-js';
 import {
   isInteractionRequired,

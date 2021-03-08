@@ -1,4 +1,12 @@
 /* global window */
+const mocked = {
+  crossFetch: jest.fn()
+};
+
+jest.mock('cross-fetch', () => {
+  return mocked.crossFetch;
+});
+
 describe('fetchRequest', function () {
   let fetchSpy;
 
@@ -10,18 +18,16 @@ describe('fetchRequest', function () {
   let responseJSON;
   let responseText;
 
-  const mockFetchObj = {
-    fetch: function mockFetchFunc() {
-      return Promise.resolve(response);
-    }
-  };
-  jest.setMock('cross-fetch', function() {
-    return mockFetchObj.fetch.apply(null, arguments);
-  });
   const fetchRequest = require('../../lib/fetch/fetchRequest').default;
 
   beforeEach(function() {
-    fetchSpy = jest.spyOn(mockFetchObj, 'fetch');
+    mocked.crossFetch.mockReset();
+    mocked.crossFetch.mockImplementation(() => {
+      return Promise.resolve(response);
+    });
+    fetchSpy = jest.spyOn(global, 'fetch').mockImplementation(() => {
+      return Promise.resolve(response);
+    });
     responseHeaders = new Map();
     responseHeaders.set('Content-Type', 'application/json');
     responseJSON = { isFakeResponse: true };
@@ -58,7 +64,7 @@ describe('fetchRequest', function () {
     it('uses cross-fetch if no native fetch', () => {
       return fetchRequest(requestMethod, requestUrl, {})
       .then(() => {
-        expect(fetchSpy).toHaveBeenCalled();
+        expect(mocked.crossFetch).toHaveBeenCalled();
       });
     });
     it('uses native fetch if available', () => {
