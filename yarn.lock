@@ -1544,10 +1544,10 @@
     "@nodelib/fs.scandir" "2.1.4"
     fastq "^1.6.0"
 
-"@okta/okta-signin-widget@^5.4.0":
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.4.0.tgz#021eeeb60c68aff8b01abe41f5df47b3ac14ab7b"
-  integrity sha512-HzhGnaJongWBiIveGyf/x03cky1AON4X+orCEntuiyK//ZCYPjbg1htMShkLuaEqpQYP3rHvbGVVSobW7kR7aQ==
+"@okta/okta-signin-widget@^5.4.2":
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.4.2.tgz#30b13db1fd3a4c85e8229e9a05616cd2fae28060"
+  integrity sha512-XXyaVywRTjlY8G7YJAqz5AtaDRJlUp+OkyOtvxLRju0sGnpwLMlD/Pyt6cJNuH42iKmNMi1iEBVoKyA4vWqREg==
   dependencies:
     "@babel/polyfill" "^7.10.1"
     "@babel/runtime" "^7.10.3"
@@ -2485,11 +2485,6 @@
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
-
-Base64@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/Base64/-/Base64-0.3.0.tgz#6da261a4e80d4fa0f5c684254e5bccd16bbdce9f"
-  integrity sha1-baJhpOgNT6D1xoQlTlvM0Wu9zp8=
 
 Base64@1.1.0:
   version "1.1.0"
