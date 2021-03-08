@@ -2328,7 +2328,12 @@ Manually verify the validity of an ID token's claims and check the signature on 
 > **Note:** Token validation occurs automatically when tokens are returned via `getWithoutPrompt`, `getWithPopup`, and `getWithRedirect`.
 
 * `idTokenObject` - an ID token returned by this library. note: this is not the raw ID token JWT
-* `validationOptions` - Optional object to assert ID token claim values. Defaults to the configuration passed in during client instantiation.
+* `validationOptions` - Optional object to assert ID token claim values.
+  * `clientId` - Default: the `clientId` passed to the `OktaAuth` constructor
+  * `issuer` - Default: the `issuer` from [/.well-known/openid-configuration](https://developer.okta.com/docs/reference/api/oidc/#well-known-openid-configuration)
+  * `ignoreSignature` - Default: `false`. If `true`, the token's cryptographic signature will not be verified. This may be required if running on an insecure connection or an embedded browser where crypto libraries are not available.
+  * `accessToken` - Default: none. A raw access token string to be validated against the idToken's `at_hash` claim. This check validates that the `accessToken` was issued to the same user represented by the `idToken`. Note: the raw access token string is available as the `accessToken` property on the object returned by this library: `tokenManager.get('accessToken').accessToken`
+  * `nonce` - Default: none. The `nonce` value was created by the client and sent to the server in the original token request. Pass the `nonce` option here to verify that the token matches that request.
 
 ```javascript
 var validationOptions = {
