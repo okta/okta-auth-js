@@ -163,20 +163,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
     this._pending = { handleLogin: false };
     this.options = Object.assign(this.options, {
-      clientId: args.clientId,
-      authorizeUrl: removeTrailingSlash(args.authorizeUrl),
-      userinfoUrl: removeTrailingSlash(args.userinfoUrl),
-      revokeUrl: removeTrailingSlash(args.revokeUrl),
-      logoutUrl: removeTrailingSlash(args.logoutUrl),
-      pkce: args.pkce === false ? false : true,
-      redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin),
-      postLogoutRedirectUri: args.postLogoutRedirectUri,
-      responseMode: args.responseMode,
-      responseType: args.responseType,
-      transformErrorXHR: args.transformErrorXHR,
-      scopes: args.scopes,
-      transformAuthState: args.transformAuthState,
-      restoreOriginalUri: args.restoreOriginalUri
+      pkce: args.pkce === false ? false : true, // PKCE defaults to true for browser
+      redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin), // allow relative URIs
     });
   
     this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);

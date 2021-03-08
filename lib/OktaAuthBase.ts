@@ -46,25 +46,39 @@ export default class OktaAuthBase implements OktaAuth, SigninAPI {
   constructor(args: OktaAuthOptions) {
     assertValidConfig(args);
     this.options = {
+      // OIDC configuration
       issuer: removeTrailingSlash(args.issuer),
       tokenUrl: removeTrailingSlash(args.tokenUrl),
+      authorizeUrl: removeTrailingSlash(args.authorizeUrl),
+      userinfoUrl: removeTrailingSlash(args.userinfoUrl),
+      revokeUrl: removeTrailingSlash(args.revokeUrl),
+      logoutUrl: removeTrailingSlash(args.logoutUrl),
+      clientId: args.clientId,
+      redirectUri: args.redirectUri,
+      state: args.state,
+      scopes: args.scopes,
+      postLogoutRedirectUri: args.postLogoutRedirectUri,
+      responseMode: args.responseMode,
+      responseType: args.responseType,
+      pkce: args.pkce,
+
+      // Internal options
       httpRequestClient: args.httpRequestClient,
       transformErrorXHR: args.transformErrorXHR,
+      transformAuthState: args.transformAuthState,
+      restoreOriginalUri: args.restoreOriginalUri,
       storageUtil: args.storageUtil,
       headers: args.headers,
       devMode: args.devMode || false,
-      clientId: args.clientId,
-      redirectUri: args.redirectUri,
-      pkce: args.pkce,
       storageManager: Object.assign({
         token: {},
         transaction: {}
       }, args.storageManager),
-      cookies: args.cookies
-    };
+      cookies: args.cookies,
 
-    // Give the developer the ability to disable token signature validation.
-    this.options.ignoreSignature = !!args.ignoreSignature;
+      // Give the developer the ability to disable token signature validation.
+      ignoreSignature: !!args.ignoreSignature
+    };
 
     const { storageManager, cookies, storageUtil } = this.options;
     this.storageManager = new StorageManager(storageManager, cookies, storageUtil);
