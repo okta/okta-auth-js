@@ -19,7 +19,6 @@ import * as features from './features';
 import fetchRequest from '../fetch/fetchRequest';
 import browserStorage from './browserStorage';
 import { 
-  removeTrailingSlash, 
   toQueryString, 
   toAbsoluteUrl,
   clone, 
