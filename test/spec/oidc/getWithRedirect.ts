@@ -825,28 +825,4 @@ describe('token.getWithRedirect', function() {
     });
   });
 
-  it('should throw AuthSdkError when in callback state', async () => {
-    delete global.window.location;
-    global.window.location = {
-      protocol: 'https:',
-      hostname: 'somesite.local',
-      search: '?code=fakecode',
-      href: 'https://somesite.local/implicit/callback?code=fakecode'
-    } as Location;
-    const client = new OktaAuth({
-      pkce: true,
-      issuer: 'https://auth-js-test.okta.com',
-      clientId: 'foo',
-      redirectUri: 'https://somesite.local/implicit/callback'
-    });
-
-    try {
-      await client.token.getWithRedirect();
-    } catch (err) {
-      expect(err).toBeInstanceOf(AuthSdkError);
-      expect(err.message).toBe('The app should not attempt to call getToken on callback. Authorize flow is already in process. Use parseFromUrl() to receive tokens.');
-    }
-    client.transactionManager.clear();
-  });
-
 });

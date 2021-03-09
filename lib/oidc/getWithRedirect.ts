@@ -13,19 +13,14 @@
 import { AuthSdkError } from '../errors';
 import { OktaAuth, TokenParams, TransactionMeta } from '../types';
 import { clone } from '../util';
-import { getOAuthUrls, isLoginRedirect, prepareTokenParams } from './util';
+import { getOAuthUrls, prepareTokenParams } from './util';
 import { buildAuthorizeParams } from './endpoints/authorize';
 
 export function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
   }
-  if (isLoginRedirect(sdk)) {
-    return Promise.reject(new AuthSdkError(
-      'The app should not attempt to call getToken on callback. ' +
-      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
-    ));
-  }
+
   options = clone(options) || {};
 
   return prepareTokenParams(sdk, options)
