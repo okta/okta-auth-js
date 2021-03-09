@@ -1,5 +1,4 @@
 /* global USER_AGENT */
-jest.mock('cross-fetch');
 
 import http from '../../lib/http';
 import { OktaAuth, DEFAULT_CACHE_DURATION, AuthApiError, STATE_TOKEN_KEY_NAME } from '@okta/okta-auth-js';

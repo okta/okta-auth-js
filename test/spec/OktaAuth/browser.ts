@@ -1,6 +1,5 @@
 /* eslint-disable no-new */
 /* global window */
-jest.mock('cross-fetch');
 jest.mock('../../../lib/tx');
 
 import { 

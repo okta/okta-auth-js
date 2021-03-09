@@ -1,7 +1,3 @@
-
-
-jest.mock('cross-fetch');
-
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 import http from '../../../../lib/http';

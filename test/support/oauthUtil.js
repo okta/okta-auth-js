@@ -52,28 +52,31 @@ oauthUtil.loadWellKnownCache = function() {
   }));
 };
 
-oauthUtil.loadWellKnownAndKeysCache = function(authClient) {
-  // add /.well-known/openid-configuration and /oauth2/v1/keys to cache
-  // so we don't make unnecessary requests
+oauthUtil.getResponseForUrl = function(url) {
+  if (url.match(/'.*\/oauth2\/.*\/\.well-known\/openid-configuration$/)) {
+    return wellKnownSharedResource.response;
+  }
 
-  const httpCache = authClient.options.storageUtil.getHttpCache();
-  httpCache.setStorage({
-    'https://auth-js-test.okta.com/.well-known/openid-configuration': {
-      expiresAt: 1449786329,
-      response: wellKnown.response
-    },
-    'https://auth-js-test.okta.com/oauth2/v1/keys': {
-      expiresAt: 1449786329,
-      response: keys.response
-    },
-    'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/.well-known/openid-configuration': {
-      expiresAt: 1449786329,
-      response: wellKnownSharedResource.response
-    },
-    'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/keys': {
-      expiresAt: 1449786329,
-      response: keys.response
+  if (url.match(/.*\.well-known\/openid-configuration$/)) {
+    return wellKnown.response;
+  }
+
+  if (url.match(/.*\/v1\/keys$/)) {
+    return keys.response;
+  }
+};
+
+oauthUtil.loadWellKnownAndKeysCache = function(authClient) {
+  // mock responses to /.well-known/openid-configuration and /oauth2/v1/keys
+  const origMethod = authClient.options.httpRequestClient;
+  jest.spyOn(authClient.options, 'httpRequestClient').mockImplementation(async (method, url, options) => {
+    const response = oauthUtil.getResponseForUrl(url);
+    if (response) {
+      return {
+        responseText: JSON.stringify(response)
+      };
     }
+    return origMethod.apply(this, [method, url, options]);
   });
 };
 
