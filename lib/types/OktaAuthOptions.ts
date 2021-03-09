@@ -48,6 +48,7 @@ export interface OktaAuthOptions extends CustomUrls {
   responseType?: string | string[];
   responseMode?: string;
   scopes?: string[];
+  state?: string;
   ignoreSignature?: boolean;
   tokenManager?: TokenManagerOptions;
   postLogoutRedirectUri?: string;

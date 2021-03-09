@@ -16,14 +16,14 @@ import { generateNonce, generateState } from './oauth';
 import { OktaAuth, TokenParams } from '../../types';
 
 export function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
-  const { pkce, clientId, redirectUri, responseType, responseMode, scopes, ignoreSignature } = sdk.options;
+  const { pkce, clientId, redirectUri, responseType, responseMode, scopes, state, ignoreSignature } = sdk.options;
   return {
     pkce,
     clientId,
     redirectUri: redirectUri || window.location.href,
     responseType: responseType || ['token', 'id_token'],
     responseMode,
-    state: generateState(),
+    state: state || generateState(),
     nonce: generateNonce(),
     scopes: scopes || ['openid', 'email'],
     ignoreSignature
