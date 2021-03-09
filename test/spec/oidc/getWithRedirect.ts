@@ -14,7 +14,7 @@ jest.mock('../../../lib/oidc/endpoints/well-known', () => {
   return { getWellKnown, getKey };
 });
 
-import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
+import { OktaAuth } from '@okta/okta-auth-js';
 import TransactionManager from '../../../lib/TransactionManager';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';

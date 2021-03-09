@@ -7,7 +7,7 @@ jest.mock('../../../lib/oidc/util/oauth', () => {
   return { generateState, generateNonce, getOAuthUrls };
 });
 
-import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
+import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
