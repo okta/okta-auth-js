@@ -7,7 +7,6 @@ jest.mock('../../../lib/oidc/util/oauth', () => {
   return { generateState, generateNonce, getOAuthUrls };
 });
 
-import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
@@ -487,29 +486,6 @@ describe('token.getWithPopup', function() {
         }
       }
     });
-  });
-
-  it('should throw AuthSdkError when in callback state', async () => {
-    delete global.window.location;
-    global.window.location = {
-      protocol: 'https:',
-      hostname: 'somesite.local',
-      search: '?code=fakecode',
-      href: 'https://somesite.local/implicit/callback?code=fakecode'
-    } as Location;
-    const client = new OktaAuth({
-      pkce: true,
-      issuer: 'https://auth-js-test.okta.com',
-      clientId: 'foo',
-      redirectUri: 'https://somesite.local/implicit/callback'
-    });
-
-    try {
-      await client.token.getWithPopup();
-    } catch (err) {
-      expect(err).toBeInstanceOf(AuthSdkError);
-      expect(err.message).toBe('The app should not attempt to call getToken on callback. Authorize flow is already in process. Use parseFromUrl() to receive tokens.');
-    }
   });
 
 });

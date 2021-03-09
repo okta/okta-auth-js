@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { isLoginRedirect } from './util';
 import { AuthSdkError } from '../errors';
 import { OktaAuth, TokenParams, TokenResponse } from '../types';
 import { clone } from '../util';
@@ -20,12 +19,7 @@ export function getWithPopup(sdk: OktaAuth, options: TokenParams): Promise<Token
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithPopup" takes only a single set of options'));
   }
-  if (isLoginRedirect(sdk)) {
-    return Promise.reject(new AuthSdkError(
-      'The app should not attempt to call getToken on callback. ' +
-      'Authorize flow is already in process. Use parseFromUrl() to receive tokens.'
-    ));
-  }
+
   options = clone(options) || {};
   Object.assign(options, {
     display: 'popup',
