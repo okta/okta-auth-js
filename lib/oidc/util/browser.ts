@@ -14,7 +14,7 @@
 /* eslint-disable complexity, max-statements */
 import { AuthSdkError } from '../../errors';
 import { OktaAuth } from '../../types';
-import { isIE11OrLess } from '../../util';
+import { isIE11OrLess } from '../../features';
 
 export function addListener(eventTarget, name, fn) {
   if (eventTarget.addEventListener) {

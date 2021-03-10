@@ -10,7 +10,18 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/* eslint-disable node/no-unsupported-features/node-builtins */
+/* global document, window, TextEncoder, crypto, navigator */
+
 const isWindowsPhone = /windows phone|iemobile|wpdesktop/i;	
+
+export function isBrowser() {
+  return typeof document !== 'undefined' && typeof window !== 'undefined';
+}
+
+export function isIE11OrLess() {
+  return isBrowser() && !!document.documentMode && document.documentMode <= 11;
+}
 
 export function getUserAgent() {
   return navigator.userAgent;
@@ -22,6 +33,9 @@ export function isFingerprintSupported() {
 }
 
 export function isPopupPostMessageSupported() {
+  if (!isBrowser()) {
+    return false;
+  }
   var isIE8or9 = document.documentMode && document.documentMode < 10;
   if (window.postMessage && !isIE8or9) {
     return true;
@@ -46,6 +60,6 @@ export function isHTTPS() {
 }
 
 export function isLocalhost() {
-  return window.location.hostname === 'localhost';
+  return isBrowser() && window.location.hostname === 'localhost';
 }
 

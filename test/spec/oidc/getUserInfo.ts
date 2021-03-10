@@ -4,7 +4,6 @@ import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 
 const _ = require('lodash');
-const packageJson = require('../../../package.json');
 
 function setupSync(options?) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);
@@ -27,7 +26,7 @@ describe('token.getUserInfo', function() {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
+            'X-Okta-User-Agent-Extended': global['USER_AGENT'],
             'Authorization': 'Bearer ' + tokens.standardAccessToken
           }
         },
@@ -52,7 +51,7 @@ describe('token.getUserInfo', function() {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
+            'X-Okta-User-Agent-Extended': global['USER_AGENT'],
             'Authorization': 'Bearer ' + tokens.standardAccessToken
           }
         },
@@ -80,7 +79,7 @@ describe('token.getUserInfo', function() {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
+            'X-Okta-User-Agent-Extended': global['USER_AGENT'],
             'Authorization': 'Bearer ' + tokens.authServerAccessToken
           }
         },
@@ -163,7 +162,7 @@ describe('token.getUserInfo', function() {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
+          'X-Okta-User-Agent-Extended': global['USER_AGENT'],
           'Authorization': 'Bearer ' + tokens.standardAccessToken
         }
       },
@@ -190,7 +189,7 @@ describe('token.getUserInfo', function() {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version,
+          'X-Okta-User-Agent-Extended': global['USER_AGENT'],
           'Authorization': 'Bearer ' + tokens.standardAccessToken
         }
       },

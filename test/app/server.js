@@ -3,7 +3,7 @@
 require('@okta/env'); // update environment variables from testenv file
 
 // eslint-disable-next-line node/no-unpublished-require
-const OktaAuthJS = require('../../build/cjs/server').OktaAuth;
+const OktaAuthJS = require('../../build/cjs/index').OktaAuth;
 
 const path = require('path');
 const SIW_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-signin-widget')), '..');

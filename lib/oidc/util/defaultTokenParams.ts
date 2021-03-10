@@ -14,18 +14,21 @@
  */
 import { generateNonce, generateState } from './oauth';
 import { OktaAuth, TokenParams } from '../../types';
+import { isBrowser } from '../../features';
+import { removeNils } from '../../util';
 
 export function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
   const { pkce, clientId, redirectUri, responseType, responseMode, scopes, state, ignoreSignature } = sdk.options;
-  return {
+  const defaultRedirectUri = isBrowser() ? window.location.href : undefined;
+  return removeNils({
     pkce,
     clientId,
-    redirectUri: redirectUri || window.location.href,
+    redirectUri: redirectUri || defaultRedirectUri,
     responseType: responseType || ['token', 'id_token'],
     responseMode,
     state: state || generateState(),
     nonce: generateNonce(),
     scopes: scopes || ['openid', 'email'],
     ignoreSignature
-  };
+  });
 }

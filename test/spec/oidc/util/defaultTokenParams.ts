@@ -1,9 +1,32 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* global window */
+const mocked = {
+  features: {
+    isBrowser: () => { return false; }
+  }
+};
+jest.mock('lib/features',() => {
+  return mocked.features;
+});
 import { getDefaultTokenParams } from '../../../../lib/oidc/util/defaultTokenParams';
 import { OktaAuth } from '../../../../lib/types';
 
 describe('getDefaultTokenParams', () => {
-
+  beforeEach(() => {
+    if (typeof global.window === 'undefined') {
+      global.window = {
+        fake: true,
+        location: {
+          href: 'fake'
+        } as Location
+      } as any;
+    }
+  });
+  afterEach(() => {
+    if ((global.window as any).fake) {
+      delete global.window;
+    }
+  });
   it('`pkce`: uses value from sdk.options', () => {
     const sdk = { options: { pkce: true } } as OktaAuth;
     expect(getDefaultTokenParams(sdk).pkce).toBe(true);
@@ -15,7 +38,8 @@ describe('getDefaultTokenParams', () => {
   });
   
   describe('`redirectUri`: ', () => {
-    it('defaults to window.location.href', () => {
+    it('isBrowser: defaults to window.location.href', () => {
+      jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(true);
       expect(window.location.href).toBeTruthy();
       expect(getDefaultTokenParams({ options: {} } as OktaAuth).redirectUri).toBe(window.location.href);
     });

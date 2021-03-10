@@ -1,12 +1,12 @@
 /* global window */
 
 import { loadPopup } from '../../../../lib/oidc/util';
-import * as libUtil from '../../../../lib/util';
+import * as libFeatures from '../../../../lib/features';
 
 describe('loadPopup', function() {
   it('popups window with full src url directly when none-IE', function () {
     var mockElem = {} as unknown as Window;
-    jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(false);
+    jest.spyOn(libFeatures, 'isIE11OrLess').mockReturnValue(false);
     jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
     var winEl = loadPopup('/path/to/foo', {
@@ -24,7 +24,7 @@ describe('loadPopup', function() {
 
   it('popups window with full src url directly and default title', function () {
     var mockElem = {} as unknown as Window;
-    jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(false);
+    jest.spyOn(libFeatures, 'isIE11OrLess').mockReturnValue(false);
     jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
     var winEl = loadPopup('/path/to/foo', {});
@@ -44,7 +44,7 @@ describe('loadPopup', function() {
 
       }
     } as unknown as Window;
-    jest.spyOn(libUtil, 'isIE11OrLess').mockReturnValue(true);
+    jest.spyOn(libFeatures, 'isIE11OrLess').mockReturnValue(true);
     jest.spyOn(window, 'open').mockReturnValue(mockElem);
 
     var winEl = loadPopup('/path/to/foo', {

@@ -1,4 +1,5 @@
-import OktaAuthBase from '../../lib/OktaAuthBase';
+/* eslint-disable complexity */
+import OktaAuthBase from '../../lib/OktaAuth';
 
 describe('OktaAuthBase', () => {
   const apiUrlOptions = [
@@ -15,11 +16,11 @@ describe('OktaAuthBase', () => {
     'transformErrorXHR',
     'transformAuthState',
     'restoreOriginalUri',
-    'storageUtil',
   ];
 
   const objOptions = [
     'storageManager',
+    'cookies'
   ];
 
   const savedOptions = apiUrlOptions
@@ -36,9 +37,8 @@ describe('OktaAuthBase', () => {
     'pkce',
     'headers',
     'devMode',
-
-    'cookies',
-    'ignoreSignature'
+    'ignoreSignature',
+    'storageUtil',
   ]);
 
   describe('constructor', function() {
@@ -46,19 +46,42 @@ describe('OktaAuthBase', () => {
     it('saves expected options', () => {
       const config = {};
       savedOptions.forEach((option) => {
-        let val: string | object | boolean = 'fake_' + option;
-        switch (option) {
+        let val: string | object | boolean = 'fake_' + option; // default "fake" value
+        switch (option) { // some types are strictly enforced. These should differ from the default
           case 'issuer':
+          case 'redirectUri':
             val = 'http://' + val;
             break;
           case 'storageManager':
             val = {
-              token: {},
-              transaction: {}
+              cache: {
+                storageTypes: ['a']
+              },
+              token: {
+                storageTypes: ['a', 'b']
+              },
+              transaction: {
+                storageTypes: ['a', 'b']
+              }
+            };
+            break;
+          case 'cookies':
+            val = { secure: false };
+            break;
+          case 'storageUtil':
+            val = {
+              findStorageType: () => {},
+              getStorageByType: () => {
+                return {};
+              }
             };
             break;
           case 'ignoreSignature':
+          case 'devMode':
             val = true;
+            break;
+          case 'pkce':
+            val = false;
             break;
         }
         config[option] = val;

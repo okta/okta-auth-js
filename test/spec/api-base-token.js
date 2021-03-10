@@ -20,6 +20,7 @@ describe('base token API', function() {
     }, options));
   }
   describe('prepareTokenParams', function() {
+    const defaultRedirectUri = typeof window === 'undefined' ? undefined : 'http://localhost/';
     let oktaAuth;
 
     beforeEach(() => {
@@ -35,7 +36,7 @@ describe('base token API', function() {
         const params = await oktaAuth.token.prepareTokenParams();
         expect(params).toEqual({
           'pkce': true,
-          'redirectUri': 'http://localhost/',
+          'redirectUri': defaultRedirectUri,
           'responseType': 'code',
           'state': expect.any(String),
           'nonce': expect.any(String),
@@ -60,7 +61,7 @@ describe('base token API', function() {
         expect(params).toEqual({
           'ignoreSignature': false,
           'pkce': false,
-          'redirectUri': 'http://localhost/',
+          'redirectUri': defaultRedirectUri,
           'responseType': [
             'token',
             'id_token'

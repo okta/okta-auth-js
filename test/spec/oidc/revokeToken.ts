@@ -14,7 +14,6 @@ function createAccessToken(strValue): AccessToken {
     claims: {
       sub: ''
     },
-    value: strValue,
     userinfoUrl: '',
     authorizeUrl: '',
     tokenType: 'accessToken',

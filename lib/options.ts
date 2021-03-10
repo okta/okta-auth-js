@@ -1,0 +1,138 @@
+/* eslint-disable complexity */
+import { removeTrailingSlash, warn, removeNils } from './util';
+import { assertValidConfig } from './builderUtil';
+import { OktaAuthOptions, StorageManagerOptions } from './types';
+
+import fetchRequest from './fetch/fetchRequest';
+import browserStorage from './browser/browserStorage';
+import serverStorage from './server/serverStorage';
+import { isBrowser, isHTTPS } from './features';
+
+const BROWSER_STORAGE: StorageManagerOptions = {
+  token: {
+    storageTypes: [
+      'localStorage',
+      'sessionStorage',
+      'cookie'
+    ],
+    useMultipleCookies: true
+  },
+  cache: {
+    storageTypes: [
+      'localStorage',
+      'sessionStorage',
+      'cookie'
+    ]
+  },
+  transaction: {
+    storageTypes: [
+      'sessionStorage',
+      'localStorage',
+      'cookie'
+    ]
+  }
+};
+
+const SERVER_STORAGE: StorageManagerOptions = {
+  token: {
+    storageTypes: [
+      'memory'
+    ]
+  },
+  cache: {
+    storageTypes: [
+      'memory'
+    ]
+  },
+  transaction: {
+    storageTypes: [
+      'memory'
+    ]
+  }
+};
+
+function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS: boolean) {
+  // Secure cookies will be automatically used on a HTTPS connection
+  // Non-secure cookies will be automatically used on a HTTP connection
+  // secure option can override the automatic behavior
+  var cookieSettings = args.cookies || {};
+  if (typeof cookieSettings.secure === 'undefined') {
+    cookieSettings.secure = isHTTPS;
+  }
+  if (typeof cookieSettings.sameSite === 'undefined') {
+    cookieSettings.sameSite = cookieSettings.secure ? 'none' : 'lax';
+  }
+
+  // If secure=true, but the connection is not HTTPS, set secure=false.
+  if (cookieSettings.secure && !isHTTPS) {
+    // eslint-disable-next-line no-console
+    warn(
+      'The current page is not being served with the HTTPS protocol.\n' +
+      'For security reasons, we strongly recommend using HTTPS.\n' +
+      'If you cannot use HTTPS, set "cookies.secure" option to false.'
+    );
+    cookieSettings.secure = false;
+  }
+
+  // Chrome >= 80 will block cookies with SameSite=None unless they are also Secure
+  // If sameSite=none, but the connection is not HTTPS, set sameSite=lax.
+  if (cookieSettings.sameSite === 'none' && !cookieSettings.secure) {
+    cookieSettings.sameSite = 'lax';
+  }
+
+  return cookieSettings;
+}
+
+
+export function getDefaultOptions(): OktaAuthOptions {
+  const storageUtil = isBrowser() ? browserStorage : serverStorage;
+  const storageManager = isBrowser() ? BROWSER_STORAGE : SERVER_STORAGE;
+  return {
+    devMode: false,
+    httpRequestClient: fetchRequest,
+    storageUtil,
+    storageManager
+  };
+}
+
+function mergeOptions(options, args): OktaAuthOptions {
+  return Object.assign({}, options, removeNils(args), {
+    storageManager: Object.assign({}, options.storageManager, args.storageManager)
+  });
+}
+
+export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
+  assertValidConfig(args);
+  args = mergeOptions(getDefaultOptions(), args);
+  return removeNils({
+    // OIDC configuration
+    issuer: removeTrailingSlash(args.issuer),
+    tokenUrl: removeTrailingSlash(args.tokenUrl),
+    authorizeUrl: removeTrailingSlash(args.authorizeUrl),
+    userinfoUrl: removeTrailingSlash(args.userinfoUrl),
+    revokeUrl: removeTrailingSlash(args.revokeUrl),
+    logoutUrl: removeTrailingSlash(args.logoutUrl),
+    clientId: args.clientId,
+    redirectUri: args.redirectUri,
+    state: args.state,
+    scopes: args.scopes,
+    postLogoutRedirectUri: args.postLogoutRedirectUri,
+    responseMode: args.responseMode,
+    responseType: args.responseType,
+    pkce: args.pkce,
+
+    // Internal options
+    httpRequestClient: args.httpRequestClient,
+    transformErrorXHR: args.transformErrorXHR,
+    transformAuthState: args.transformAuthState,
+    restoreOriginalUri: args.restoreOriginalUri,
+    storageUtil: args.storageUtil,
+    headers: args.headers,
+    devMode: !!args.devMode,
+    storageManager: args.storageManager,
+    cookies: isBrowser() ? getCookieSettings(args, isHTTPS()) : args.cookies,
+
+    // Give the developer the ability to disable token signature validation.
+    ignoreSignature: !!args.ignoreSignature
+  });
+}

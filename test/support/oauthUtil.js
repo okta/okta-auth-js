@@ -1,4 +1,4 @@
-/* global window, document, Storage, localStorage */
+/* global window, document, Storage */
 /* eslint-disable complexity, max-statements */
 var URL = require('url').URL;
 import util from './util';
@@ -41,15 +41,6 @@ oauthUtil.mockSessionStorageError = function() {
   jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(function() {
     throw 'This function is not supported on this system.';
   });
-};
-
-oauthUtil.loadWellKnownCache = function() {
-  localStorage.setItem('okta-cache-storage', JSON.stringify({
-    'https://auth-js-test.okta.com/.well-known/openid-configuration': {
-      expiresAt: 1449786329,
-      response: wellKnown.response
-    }
-  }));
 };
 
 oauthUtil.getResponseForUrl = function(url) {

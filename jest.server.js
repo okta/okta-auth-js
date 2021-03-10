@@ -1,45 +1,30 @@
-var SDK_VERSION = require('./package.json').version;
-var USER_AGENT = 'okta-auth-js-server/' + SDK_VERSION;
-var OktaAuth = '<rootDir>/lib/server';
-
-module.exports = {
-  'coverageDirectory': '<rootDir>/build2/reports/coverage-server',
-  'collectCoverage': true,
-  'collectCoverageFrom': ['./lib/**','!./test/**'],
-  'globals': {
-    SDK_VERSION,
+const SDK_VERSION = require('./package.json').version;
+const USER_AGENT = 'okta-auth-js-server/' + SDK_VERSION;
+const baseConfig = require('./test/support/jest/jest.config');
+const config = Object.assign({}, baseConfig, {
+  testEnvironment: 'node',
+  setupFiles: baseConfig.setupFiles.concat([
+    '<rootDir>/test/support/jest/jest.setup.server.js'
+  ]),
+  globals: Object.assign({}, baseConfig.globals, {
     USER_AGENT
-  },
-  'restoreMocks': true,
-  'moduleNameMapper': {
-    '^@okta/okta-auth-js$': OktaAuth
-  },
-  'setupFiles': [
-    '<rootDir>/jest.setup.js'
-  ],
-  'testMatch': [
-    '**/test/spec/**/*.{js,ts}'
-  ],
-  'roots': [
-    'test/spec'
-  ],
-  'testPathIgnorePatterns': [
-    './test/spec/oidc',
-    './test/spec/promiseQueue.js',
-    './test/spec/OktaAuth/browser.ts',
-    './test/spec/OktaAuth/commonJS.js', // includes OIDC utils
-    './test/spec/browserStorage.js',
-    './test/spec/cookies.js',
-    './test/spec/fingerprint.js',
-    './test/spec/oauthUtil.js',
-    './test/spec/session.js',
-    './test/spec/tokenManager.js',
-    './test/spec/webfinger.js',
-    './test/spec/features.js',
-    './test/spec/AuthStateManager.js'
-  ],
-  'reporters': [
-    'default',
-    'jest-junit'
-  ]
-};
+  }),
+  testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
+    'browserStorage',
+    'fingerprint',
+    'renewToken',
+    'session',
+    'features/browser',
+    'OktaAuth/browser',
+    'oidc/util/browser',
+    'oidc/util/loginRedirect',
+    'oidc/parseFromUrl',
+    'oidc/getWithPopup',
+    'oidc/getWithRedirect',
+    'oidc/getWithoutPrompt',
+    'TokenManager/browser',
+    'TokenManager/crossTabs'
+  ])
+});
+
+module.exports = config;

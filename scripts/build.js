@@ -10,7 +10,7 @@ const BUNDLE_LIB_CMD = 'yarn build:web';
 const BUNDLE_CDN_CMD = 'yarn build:cdn';
 const BUNDLE_POLYFILL_CMD = 'yarn build:polyfill';
 const DIST_DIR = `${BUILD_DIR}/dist`; // will be uploaded to CDN
-const BABEL_CMD = 'yarn build:server';
+const BABEL_CMD = 'yarn build:cjs';
 const TS_CMD = 'yarn tsc';
 
 shell.echo('Start building...');
