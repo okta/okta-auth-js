@@ -2119,7 +2119,8 @@ authClient.token.getWithoutPrompt({
 
 #### `token.getWithoutPrompt(options)`
 
-> :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :link: web only <br>
+> :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
 > :hourglass: async
 
 When you've obtained a sessionToken from the authorization flows, or a session already exists, you can obtain a token or tokens without prompting the user to log in.
@@ -2144,6 +2145,7 @@ authClient.token.getWithoutPrompt({
 
 #### `token.getWithPopup(options)`
 
+> :link: web only <br>
 > :hourglass: async
 
 Create token with a popup.
@@ -2165,6 +2167,7 @@ authClient.token.getWithPopup(options)
 
 #### `token.getWithRedirect(options)`
 
+> :link: web only <br>
 > :hourglass: async
 
 Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#additional-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. Values will be returned in either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode)
@@ -2182,6 +2185,9 @@ authClient.token.getWithRedirect({
 ```
 
 #### `token.parseFromUrl(options)`
+
+> :link: web only <br>
+> :hourglass: async
 
 Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. Values are parsed from either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode).
 

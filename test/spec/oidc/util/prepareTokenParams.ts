@@ -1,6 +1,21 @@
-const getWellKnown = jest.fn();
+const mocked = {
+  features: {
+    isBrowser: () => typeof window !== 'undefined',
+    isLocalhost: () => true,
+    isIE11OrLess: () => false,
+    isHTTPS: () => false,
+    isPKCESupported: () => true,
+    hasTextEncoder: () => true
+  },
+  wellKnown: {
+    getWellKnown: (): Promise<unknown> => Promise.resolve()
+  }
+};
+jest.mock('../../../../lib/features', () => {
+  return mocked.features;
+});
 jest.mock('../../../../lib/oidc/endpoints/well-known', () => {
-  return { getWellKnown };
+  return mocked.wellKnown;
 });
 import { OktaAuth } from '@okta/okta-auth-js';
 import { prepareTokenParams, pkce }  from '../../../../lib/oidc';
@@ -9,7 +24,7 @@ import TransactionManager from '../../../../lib/TransactionManager';
 describe('prepareTokenParams', function() {
 
   it('throws an error if pkce is true and PKCE is not supported', function() {
-    spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
+    spyOn(mocked.features, 'isPKCESupported').and.returnValue(false);
     var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: false });
     return prepareTokenParams(sdk, {
       pkce: true,
@@ -29,8 +44,8 @@ describe('prepareTokenParams', function() {
   
   describe('responseType', function() {
     it('Is set to "code" if pkce is true', function() {
-      spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-      getWellKnown.mockReturnValue(Promise.resolve({
+      spyOn(mocked.features, 'isPKCESupported').and.returnValue(true);
+      jest.spyOn(mocked.wellKnown, 'getWellKnown').mockReturnValue(Promise.resolve({
         code_challenge_methods_supported: ['S256']
       }));
 
@@ -50,9 +65,9 @@ describe('prepareTokenParams', function() {
   });
 
   it('Checks codeChallengeMethod against well-known', function() {
-    spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+    spyOn(mocked.features, 'isPKCESupported').and.returnValue(true);
     var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
-    getWellKnown.mockReturnValue(Promise.resolve({
+    jest.spyOn(mocked.wellKnown, 'getWellKnown').mockReturnValue(Promise.resolve({
       'code_challenge_methods_supported': []
     }));
     return prepareTokenParams(sdk, {})
@@ -70,9 +85,9 @@ describe('prepareTokenParams', function() {
     var codeVerifier = 'alsofake';
     var codeChallenge = 'ohsofake';
 
-    spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+    spyOn(mocked.features, 'isPKCESupported').and.returnValue(true);
     var sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: true });
-    getWellKnown.mockReturnValue(Promise.resolve({
+    jest.spyOn(mocked.wellKnown, 'getWellKnown').mockReturnValue(Promise.resolve({
       'code_challenge_methods_supported': [codeChallengeMethod]
     }));
     spyOn(pkce, 'generateVerifier').and.returnValue(codeVerifier);

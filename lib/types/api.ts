@@ -175,12 +175,13 @@ export interface FeaturesAPI {
   hasTextEncoder(): boolean;
   isTokenVerifySupported(): boolean;
   isPKCESupported(): boolean;
+  isIE11OrLess(): boolean;
 }
 
 // TODO: deprecate
-export type SigninOptions = SignInWithCredentialsOptions; 
+export type SigninOptions = SigninWithCredentialsOptions; 
 
-export interface SignInWithCredentialsOptions {
+export interface SigninWithCredentialsOptions {
   username: string;
   password: string;
   relayState?: string;
@@ -193,7 +194,7 @@ export interface SigninWithRedirectOptions extends TokenParams {
 }
 
 export interface SigninAPI {
-  signIn(opts: SignInWithCredentialsOptions): Promise<AuthTransaction>;
+  signIn(opts: SigninWithCredentialsOptions): Promise<AuthTransaction>;
 }
 
 export interface SignoutOptions {

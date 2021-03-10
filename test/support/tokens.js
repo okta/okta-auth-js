@@ -312,7 +312,6 @@ tokens.authServerAccessTokenParsed = {
 
 tokens.standardRefreshToken = 'NrJBJ5-89k9CHZ7CJz4Q42yNqoIjm7BclN-1TH_B7z0';
 tokens.standardRefreshTokenParsed = {
-  'value': 'NrJBJ5-89k9CHZ7CJz4Q42yNqoIjm7BclN-1TH_B7z0',
   'refreshToken': 'NrJBJ5-89k9CHZ7CJz4Q42yNqoIjm7BclN-1TH_B7z0',
   'expiresAt': 1613750805,
   'scopes': [
@@ -326,7 +325,6 @@ tokens.standardRefreshTokenParsed = {
 
 tokens.standardRefreshToken2 = 'fUlkhRyaAFvlsEHXzkz0KYnThBEs-j3yRZwXBwbPTUA';
 tokens.standardRefreshToken2Parsed = {
-  'value': 'fUlkhRyaAFvlsEHXzkz0KYnThBEs-j3yRZwXBwbPTUA',
   'refreshToken': 'fUlkhRyaAFvlsEHXzkz0KYnThBEs-j3yRZwXBwbPTUA',
   'expiresAt': 1449696330,
   'scopes': [
