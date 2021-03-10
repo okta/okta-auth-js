@@ -1,3 +1,5 @@
+/* eslint-disable max-statements */
+/* eslint-disable complexity */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -9,35 +11,51 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
-/* eslint-disable complexity */
-/* eslint-disable max-statements */
 /* SDK_VERSION is defined in webpack config */ 
-/* global SDK_VERSION */
+/* global SDK_VERSION, window */
 
-import OktaAuthBase from '../OktaAuthBase';
-import * as features from './features';
-import fetchRequest from '../fetch/fetchRequest';
-import browserStorage from './browserStorage';
-import { 
-  toQueryString, 
-  toAbsoluteUrl,
-  clone, 
-  warn,
-  deprecate 
-} from '../util';
-import { getUserAgent } from '../builderUtil';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
   REFERRER_PATH_STORAGE_KEY
-} from '../constants';
-import * as constants from '../constants';
+} from './constants';
+import * as constants from './constants';
+import {
+  OktaAuthOptions, 
+  AccessToken, 
+  IDToken,
+  RefreshToken,
+  TokenAPI, 
+  FeaturesAPI, 
+  SignoutAPI, 
+  FingerprintAPI,
+  UserClaims, 
+  SigninWithRedirectOptions,
+  SigninWithCredentialsOptions,
+  SignoutOptions,
+  Tokens,
+  ForgotPasswordOptions,
+  VerifyRecoveryTokenOptions,
+  TransactionAPI,
+  SessionAPI,
+  SigninAPI,
+  PkceAPI
+} from './types';
+import {
+  transactionStatus,
+  resumeTransaction,
+  transactionExists,
+  introspect,
+  postToTransaction,
+  AuthTransaction
+} from './tx';
+import PKCE from './oidc/util/pkce';
 import {
   closeSession,
   sessionExists,
   getSession,
   refreshSession,
   setCookieAndRedirect
-} from '../session';
+} from './session';
 import {
   getOAuthUrls,
   getWithoutPrompt,
@@ -56,65 +74,36 @@ import {
   exchangeCodeForTokens,
   isInteractionRequiredError,
   isInteractionRequired,
-} from '../oidc';
-import { TokenManager } from '../TokenManager';
-import http from '../http';
-import PromiseQueue from '../PromiseQueue';
+} from './oidc';
+import { isBrowser } from './features';
+import * as features from './features';
+import browserStorage from './browser/browserStorage';
 import { 
-  OktaAuth, 
-  OktaAuthOptions, 
-  AccessToken, 
-  IDToken,
-  RefreshToken,
-  TokenAPI, 
-  FeaturesAPI, 
-  SignoutAPI, 
-  FingerprintAPI,
-  UserClaims, 
-  SigninWithRedirectOptions,
-  SignInWithCredentialsOptions,
-  Tokens,
-  SignoutOptions
-} from '../types';
-import fingerprint from './fingerprint';
-import { postToTransaction } from '../tx';
-import { AuthStateManager } from '../AuthStateManager';
+  toQueryString, 
+  toAbsoluteUrl,
+  clone, 
+  deprecate 
+} from './util';
+import { getUserAgent } from './builderUtil';
+import { TokenManager } from './TokenManager';
+import http from './http';
+import PromiseQueue from './PromiseQueue';
+import fingerprint from './browser/fingerprint';
+import { AuthStateManager } from './AuthStateManager';
+import StorageManager from './StorageManager';
+import TransactionManager from './TransactionManager';
+import { buildOptions } from './options';
 
 const Emitter = require('tiny-emitter');
 
-function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS: boolean) {
-  // Secure cookies will be automatically used on a HTTPS connection
-  // Non-secure cookies will be automatically used on a HTTP connection
-  // secure option can override the automatic behavior
-  var cookieSettings = args.cookies || {};
-  if (typeof cookieSettings.secure === 'undefined') {
-    cookieSettings.secure = isHTTPS;
-  }
-  if (typeof cookieSettings.sameSite === 'undefined') {
-    cookieSettings.sameSite = cookieSettings.secure ? 'none' : 'lax';
-  }
-
-  // If secure=true, but the connection is not HTTPS, set secure=false.
-  if (cookieSettings.secure && !isHTTPS) {
-    // eslint-disable-next-line no-console
-    warn(
-      'The current page is not being served with the HTTPS protocol.\n' +
-      'For security reasons, we strongly recommend using HTTPS.\n' +
-      'If you cannot use HTTPS, set "cookies.secure" option to false.'
-    );
-    cookieSettings.secure = false;
-  }
-
-  // Chrome >= 80 will block cookies with SameSite=None unless they are also Secure
-  // If sameSite=none, but the connection is not HTTPS, set sameSite=lax.
-  if (cookieSettings.sameSite === 'none' && !cookieSettings.secure) {
-    cookieSettings.sameSite = 'lax';
-  }
-
-  return cookieSettings;
-}
-
-class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
+class OktaAuth implements SigninAPI, SignoutAPI {
+  options: OktaAuthOptions;
+  storageManager: StorageManager;
+  transactionManager: TransactionManager;
+  tx: TransactionAPI;
+  userAgent: string;
+  session: SessionAPI;
+  pkce: PkceAPI;
   static features: FeaturesAPI;
   features: FeaturesAPI;
   token: TokenAPI;
@@ -124,37 +113,31 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   authStateManager: AuthStateManager;
   fingerprint: FingerprintAPI;
   _pending: { handleLogin: boolean };
-
-  constructor(args: OktaAuthOptions = {}) {
-    super(Object.assign({
-      httpRequestClient: fetchRequest,
-      storageUtil: args.storageUtil || browserStorage,
-      cookies: getCookieSettings(args, OktaAuthBrowser.features.isHTTPS()),
-      storageManager: Object.assign({
-        token: {
-          storageTypes: [
-            'localStorage',
-            'sessionStorage',
-            'cookie'
-          ],
-          useMultipleCookies: true
-        },
-        cache: {
-          storageTypes: [
-            'localStorage',
-            'sessionStorage',
-            'cookie'
-          ]
-        },
-        transaction: {
-          storageTypes: [
-            'sessionStorage',
-            'localStorage',
-            'cookie'
-          ]
+  constructor(args: OktaAuthOptions) {
+    this.options = buildOptions(args);
+    const { storageManager, cookies, storageUtil } = this.options;
+    this.storageManager = new StorageManager(storageManager, cookies, storageUtil);
+    this.transactionManager = new TransactionManager(Object.assign({
+      storageManager: this.storageManager
+    }, args.transactionManager));
+  
+    this.tx = {
+      status: transactionStatus.bind(null, this),
+      resume: resumeTransaction.bind(null, this),
+      exists: Object.assign(transactionExists.bind(null, this), {
+        _get: (name) => {
+          const storage = storageUtil.storage;
+          return storage.get(name);
         }
-      }, args.storageManager)
-    }, args));
+      }),
+      introspect: introspect.bind(null, this)
+    };
+
+    this.pkce = {
+      DEFAULT_CODE_CHALLENGE_METHOD: PKCE.DEFAULT_CODE_CHALLENGE_METHOD,
+      generateVerifier: PKCE.generateVerifier,
+      computeChallenge: PKCE.computeChallenge
+    };
 
     // Add shims for compatibility, these will be removed in next major version. OKTA-362589
     Object.assign(this.options.storageUtil, {
@@ -163,12 +146,16 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     });
 
     this._pending = { handleLogin: false };
-    this.options = Object.assign(this.options, {
-      pkce: args.pkce === false ? false : true, // PKCE defaults to true for browser
-      redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin), // allow relative URIs
-    });
-  
-    this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
+
+    if (isBrowser()) {
+      this.options = Object.assign(this.options, {
+        pkce: args.pkce === false ? false : true, // PKCE defaults to true for browser
+        redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin), // allow relative URIs
+      });
+      this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
+    } else {
+      this.userAgent = getUserAgent(args, `okta-auth-js-server/${SDK_VERSION}`);
+    }
 
     // Digital clocks will drift over time, so the server
     // can misalign with the time reported by the browser.
@@ -243,8 +230,6 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
 
     // Fingerprint API
     this.fingerprint = fingerprint.bind(null, this);
-    
-
     this.emitter = new Emitter();
     this.tokenManager = new TokenManager(this, args.tokenManager);
     this.authStateManager = new AuthStateManager(this);
@@ -274,7 +259,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     return this.signInWithCredentials(opts);
   }
 
-  signInWithCredentials(opts: SignInWithCredentialsOptions) {
+  signInWithCredentials(opts: SigninWithCredentialsOptions) {
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {
       delete opts.sendFingerprint;
@@ -573,15 +558,40 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   isAuthorizationCodeFlow(): boolean {
     return this.hasResponseType('code');
   }
+
+  // { username, password, (relayState), (context) }
+  // signIn(opts: SignInWithCredentialsOptions): Promise<AuthTransaction> {
+  //   return postToTransaction(this, '/api/v1/authn', opts);
+  // }
+
+  getIssuerOrigin(): string {
+    // Infer the URL from the issuer URL, omitting the /oauth2/{authServerId}
+    return this.options.issuer.split('/oauth2/')[0];
+  }
+
+  // { username, (relayState) }
+  forgotPassword(opts): Promise<AuthTransaction> {
+    return postToTransaction(this, '/api/v1/authn/recovery/password', opts);
+  }
+
+  // { username, (relayState) }
+  unlockAccount(opts: ForgotPasswordOptions): Promise<AuthTransaction> {
+    return postToTransaction(this, '/api/v1/authn/recovery/unlock', opts);
+  }
+
+  // { recoveryToken }
+  verifyRecoveryToken(opts: VerifyRecoveryTokenOptions): Promise<AuthTransaction> {
+    return postToTransaction(this, '/api/v1/authn/recovery/token', opts);
+  }
 }
 
 // Hoist feature detection functions to static type
-OktaAuthBrowser.features = OktaAuthBrowser.prototype.features = features;
+OktaAuth.features = OktaAuth.prototype.features = features;
 
 // Also hoist values and utility functions for CommonJS users
-Object.assign(OktaAuthBrowser, {
+Object.assign(OktaAuth, {
   constants,
   isInteractionRequiredError
 });
 
-export default OktaAuthBrowser;
+export default OktaAuth;

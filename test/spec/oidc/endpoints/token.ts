@@ -1,7 +1,6 @@
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 import http from '../../../../lib/http';
-const packageJson = require('../../../../package.json');
 
 import { postToTokenEndpoint } from '../../../../lib/oidc/endpoints/token';
 import factory from '@okta/test.support/factory';
@@ -33,7 +32,7 @@ describe('token endpoint', function() {
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/x-www-form-urlencoded',
-              'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version
+              'X-Okta-User-Agent-Extended': global['USER_AGENT']
             }
           },
           response: 'pkce-token-success',

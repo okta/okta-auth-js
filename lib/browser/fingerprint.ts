@@ -1,6 +1,6 @@
 import { OktaAuth } from '../types';
 import { AuthSdkError } from '../errors';
-import { isFingerprintSupported } from './features';
+import { isFingerprintSupported } from '../features';
 import {
   addListener,
   removeListener

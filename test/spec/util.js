@@ -1,33 +1,42 @@
-/* global window, document */
 import * as util from '../../lib/util';
+import testUtil from '@okta/test.support/util';
 
 describe('util', function() {
+  let console;
   beforeEach(function() {
-    jest.spyOn(window.console, 'log');
-    jest.spyOn(window.console, 'warn');
+    console = testUtil.getConsole();
+    jest.spyOn(console, 'log');
+    jest.spyOn(console, 'warn');
   });
 
   describe('warn', function() {
     it('writes warning to console', function() {
       util.warn('sample warning');
-      expect(window.console.warn).toHaveBeenCalledWith('[okta-auth-sdk] WARN: sample warning');
+      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] WARN: sample warning');
     });
   });
 
   describe('deprecate', function() {
     it('writes deprecation to console', function() {
       util.deprecate('sample deprecation');
-      expect(window.console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: sample deprecation');
+      expect(console.warn).toHaveBeenCalledWith('[okta-auth-sdk] DEPRECATION: sample deprecation');
     });
   });
 
   describe('getConsole', function() {
+    let originalConsole;
+    beforeEach(() => {
+      originalConsole = testUtil.getConsole();
+    });
+    afterEach(() => {
+      testUtil.restoreConsole(originalConsole);
+    });
     it('returns actual console', function() {
-      expect(util.getConsole()).toBe(window.console);
+      expect(util.getConsole()).toBe(originalConsole);
     });
 
     it('returns fake console if native console does not exist', function() {
-      jest.spyOn(util, 'getNativeConsole').mockReturnValue(undefined);
+      testUtil.removeConsole();
       expect(util.getConsole().log).toBeDefined();
     });
   });
@@ -99,32 +108,7 @@ describe('util', function() {
     });
   });
 
-  describe('isIE11OrLess', function() {
-    it('returns false when document doesnot have documentMode', function() {
-      expect(document.documentMode).toBeUndefined();
-      expect(util.isIE11OrLess()).toBe(false);
-    });
 
-    it('returns true documentMode is 11', function() {
-      document.documentMode = 11;
-      expect(util.isIE11OrLess()).toBe(true);
-    });
-
-    it('returns true documentMode is 10', function() {
-      document.documentMode = 10;
-      expect(util.isIE11OrLess()).toBe(true);
-    });
-
-    it('returns true documentMode is 9', function() {
-      document.documentMode = 9;
-      expect(util.isIE11OrLess()).toBe(true);
-    });
-
-    it('returns true documentMode is 8', function() {
-      document.documentMode = 8;
-      expect(util.isIE11OrLess()).toBe(true);
-    });
-  });
 
   describe('removeTrailingSlash', function() {
     it('returns a url with a trailing slash without the trailing slash', function() {

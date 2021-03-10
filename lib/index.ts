@@ -11,13 +11,13 @@
  *
  */
 
-export { default as OktaAuth } from './browser';
-export * from '../constants';
-export * from '../types';
-export * from '../tx';
-export * from '../errors';
-export * from '../oidc';
-export * from '../StorageManager';
-export * from '../TransactionManager';
-export * from '../TokenManager';
-export * from '../util';
+export { default as OktaAuth } from './OktaAuth';
+export * from './constants';
+export * from './types';
+export * from './tx';
+export * from './errors';
+export * from './oidc';
+export * from './StorageManager';
+export * from './TransactionManager';
+export * from './TokenManager';
+export * from './util';

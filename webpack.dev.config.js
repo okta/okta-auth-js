@@ -8,7 +8,7 @@ var commonConfig = require('./webpack.common.config');
 
 module.exports = _.extend({}, _.cloneDeep(commonConfig), {
   mode: 'development',
-  entry: './lib/browser/',
+  entry: './lib/',
   output: {
     path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.umd.js',
