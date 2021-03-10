@@ -22,7 +22,7 @@ babelOptions.plugins = babelOptions.plugins.concat(extraBabelPlugins);
 
 module.exports = _.extend({}, baseConfig, {
   mode: 'production',
-  entry: './lib/browser/browser', // only export OktaAuth constructor
+  entry: './lib/OktaAuth', // only export OktaAuth constructor
   output: {
     path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.min.js',

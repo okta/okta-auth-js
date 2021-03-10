@@ -10,34 +10,22 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global crypto */
-
-export function isFingerprintSupported() {
-  return false;
+export function isString(obj: any): obj is string {
+  return Object.prototype.toString.call(obj) === '[object String]';
 }
 
-export function isPopupPostMessageSupported() {
-  return false;
+export function isObject(obj: any): obj is object {
+  return Object.prototype.toString.call(obj) === '[object Object]';
 }
 
-export function isTokenVerifySupported() {
-  return typeof crypto !== 'undefined' && crypto.subtle && typeof Uint8Array !== 'undefined';
+export function isNumber(obj: any): obj is number {
+  return Object.prototype.toString.call(obj) === '[object Number]';
 }
 
-export function hasTextEncoder() {
-  // eslint-disable-next-line node/no-unsupported-features/node-builtins
-  return typeof TextEncoder !== 'undefined';
+export function isFunction(fn: any): fn is Function {
+  return !!fn && {}.toString.call(fn) === '[object Function]';
 }
 
-export function isPKCESupported() {
-  return isTokenVerifySupported() && hasTextEncoder();
+export function isPromise(obj) {
+  return obj && obj.finally && (typeof obj.finally === 'function');
 }
-
-export function isHTTPS() {
-  return false;
-}
-
-export function isLocalhost() {
-  return false;
-}
-

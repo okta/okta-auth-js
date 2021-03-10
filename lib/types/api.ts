@@ -174,6 +174,7 @@ export interface FeaturesAPI {
   hasTextEncoder(): boolean;
   isTokenVerifySupported(): boolean;
   isPKCESupported(): boolean;
+  isIE11OrLess(): boolean;
 }
 
 // TODO: deprecate

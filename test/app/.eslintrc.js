@@ -1,7 +1,7 @@
 module.exports = {
   'extends': [
     'eslint:recommended',
-    'plugin:node/recommended',
+    'plugin:node/recommended-script',
     'plugin:@typescript-eslint/recommended'
   ],
   'env': {

@@ -55,12 +55,28 @@ describe('fetchRequest', function () {
   describe('fetch implementation', () => {
     let defaultFetch;
     beforeEach(() => {
-      defaultFetch = window.fetch;
-      window.fetch = null;
+      if (typeof window === 'undefined') {
+        defaultFetch = global.fetch;
+        delete global.fetch;
+      } else {
+        defaultFetch = window.fetch;
+        window.fetch = null;
+      }
     });
     afterEach(() => {
-      window.fetch = defaultFetch;
+      if (typeof window === 'undefined') {
+        global.fetch = defaultFetch;
+      } else {
+        window.fetch = defaultFetch;
+      }
     });
+    function setGlobalFetch(fetchObj) {
+      if (typeof window === 'undefined') {
+        global.fetch = fetchObj;
+      } else {
+        window.fetch = fetchObj;
+      }
+    }
     it('uses cross-fetch if no native fetch', () => {
       return fetchRequest(requestMethod, requestUrl, {})
       .then(() => {
@@ -71,7 +87,7 @@ describe('fetchRequest', function () {
       const globalFetch = jest.fn(() => {
         return Promise.resolve(response);
       });
-      window.fetch = globalFetch;
+      setGlobalFetch(globalFetch);
       return fetchRequest(requestMethod, requestUrl, {})
       .then(() => {
         expect(globalFetch).toHaveBeenCalled();
@@ -82,7 +98,7 @@ describe('fetchRequest', function () {
       const globalFetch = jest.fn(() => {
         return Promise.resolve(response);
       });
-      window.fetch = globalFetch;
+      setGlobalFetch(globalFetch);
       const fetchRequestPromise = fetchRequest(requestMethod, requestUrl, {});
       expect(fetchRequestPromise.finally).toBeDefined();
     });
@@ -93,7 +109,7 @@ describe('fetchRequest', function () {
           catch: () => {}
         };
       });
-      window.fetch = globalFetch;
+      setGlobalFetch(globalFetch);
       const fetchRequestPromise = fetchRequest(requestMethod, requestUrl, {});
       expect(fetchRequestPromise.finally).toBeDefined();
     });
