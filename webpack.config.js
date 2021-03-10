@@ -12,7 +12,7 @@ var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 
 module.exports = _.extend({}, _.cloneDeep(commonConfig), {
   mode: 'production',
-  entry: './lib/browser/',
+  entry: './lib/',
   output: {
     path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.umd.js',

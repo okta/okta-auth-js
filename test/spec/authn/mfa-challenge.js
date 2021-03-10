@@ -1,18 +1,11 @@
+jest.mock('../../../lib/util/misc', () => {
+  return {
+    delay: () => { return Promise.resolve(); }
+  };
+});
 import util from '@okta/test.support/util';
-import * as sdkUtil from '../../../lib/util';
-
-function mockDelay() {
-  jest.spyOn(sdkUtil, 'delay').mockImplementation(function() {
-    return Promise.resolve();
-  });
-}
-
-
 
 describe('MFA_CHALLENGE', function () {
-  beforeEach(() => {
-    mockDelay();
-  });
 
   describe('trans.verify', function () {
     util.itMakesCorrectRequestResponse({

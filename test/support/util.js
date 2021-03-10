@@ -1,5 +1,5 @@
 /* eslint-disable max-statements, complexity */
-
+/* global window */
 import _ from 'lodash';
 
 import { OktaAuth } from '@okta/okta-auth-js';
@@ -9,6 +9,25 @@ const cookies = browserStorage.storage;
 
 var util = {};
 
+util.getConsole = function getConsole() {
+  return (typeof window === 'undefined') ? global.console : window.console;
+};
+
+util.restoreConsole = function restoreConsole(origConsole) {
+  if (typeof window === 'undefined') {
+    global.console = origConsole;
+  } else {
+    window.console = origConsole;
+  }
+};
+
+util.removeConsole = function removeConsole() {
+  if (typeof window === 'undefined') {
+    global.console = null;
+  } else {
+    window.console = null;
+  }
+};
 
 function warpByTicksToUnixTime(unixTime) {
   util.warpToUnixTime(unixTime);

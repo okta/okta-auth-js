@@ -75,7 +75,7 @@ var webpackConf =  _.extend({}, _.cloneDeep(commonConfig), {
     extensions: ['.js', '.ts'],
     alias: {
       '@okta/test.app': path.join(__dirname, 'test/app'),
-      '@okta/okta-auth-js': path.join(__dirname, '/lib/browser')
+      '@okta/okta-auth-js': path.join(__dirname, '/lib')
     }
   }
 });

@@ -11,15 +11,49 @@
  *
  */
 
-import { SimpleStorage, StorageType } from '../types';
+import { SimpleStorage, StorageType, StorageUtil, Cookies } from '../types';
 import { AuthSdkError } from '../errors';
 const NodeCache = require('node-cache'); // commonJS module cannot be imported without esModuleInterop
-var storage = new NodeCache();
+const sharedStorage = new NodeCache(); // this is a SHARED memory storage to support a stateless http server
 
+class ServerCookies implements Cookies {
+  nodeCache: any; // NodeCache
+  
+  constructor(nodeCache) {
+    this.nodeCache = nodeCache;
+  }
+
+  set(name: string, value: string, expiresAt: string): string {
+    // eslint-disable-next-line no-extra-boolean-cast
+    if (!!(Date.parse(expiresAt))) {
+      // Time to expiration in seconds
+      var ttl = (Date.parse(expiresAt) - Date.now()) / 1000;
+      this.nodeCache.set(name, value, ttl);
+    } else {
+      this.nodeCache.set(name, value);
+    }
+
+    return this.get(name);
+  }
+
+  get(name): string {
+    return this.nodeCache.get(name);
+  }
+
+  delete(name) {
+    return this.nodeCache.del(name);
+  }
+}
 // Building this as an object allows us to mock the functions in our tests
-var storageUtil = {
+class ServerStorage implements StorageUtil {
+  nodeCache: any; // NodeCache
+  storage: Cookies;
+  constructor(nodeCache) {
+    this.nodeCache = nodeCache;
+    this.storage = new ServerCookies(nodeCache);
+  }
 
-  testStorageType: function(storageType: StorageType): boolean {
+  testStorageType(storageType: StorageType): boolean {
     var supported = false;
     switch (storageType) {
       case 'memory':
@@ -29,62 +63,39 @@ var storageUtil = {
         break;
     }
     return supported;
-  },
+  }
 
-  getStorageByType: function(storageType: StorageType): SimpleStorage {
+  getStorageByType(storageType: StorageType): SimpleStorage {
     let storageProvider = null;
     switch (storageType) {
       case 'memory':
-        storageProvider = storageUtil.getStorage();
+        storageProvider = this.getStorage();
         break;
       default:
         throw new AuthSdkError(`Unrecognized storage option: ${storageType}`);
         break;
     }
     return storageProvider;
-  },
+  }
 
-  findStorageType: function() {
+  findStorageType(): StorageType {
     return 'memory';
-  },
+  }
 
   // will be removed in next version. OKTA-362589
   getHttpCache() {
     return null; // stubbed in server.js
-  },
+  }
 
-  // default in memory using node cache
+  // shared in-memory using node cache
   getStorage(): SimpleStorage {
     return {
-      getItem: storageUtil.storage.get,
-      setItem: function(key, value) {
-        storageUtil.storage.set(key, value, '2200-01-01T00:00:00.000Z');
+      getItem: this.nodeCache.get,
+      setItem: (key, value) => {
+        this.nodeCache.set(key, value, '2200-01-01T00:00:00.000Z');
       }
     };
-  },
-
-  storage: {
-    set: function(name, value, expiresAt) {
-      // eslint-disable-next-line no-extra-boolean-cast
-      if (!!(Date.parse(expiresAt))) {
-        // Time to expiration in seconds
-        var ttl = (Date.parse(expiresAt) - Date.now()) / 1000;
-        storage.set(name, value, ttl);
-      } else {
-        storage.set(name, value);
-      }
-
-      return storageUtil.storage.get(name);
-    },
-
-    get: function(name) {
-      return storage.get(name);
-    },
-
-    delete: function(name) {
-      return storage.del(name);
-    }
   }
-};
+}
 
-export default storageUtil;
+export default new ServerStorage(sharedStorage);

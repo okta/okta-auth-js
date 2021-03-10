@@ -104,6 +104,26 @@ describe('AuthStateManager', () => {
       sdkMock.tokenManager.hasExpired = jest.fn().mockReturnValue(false);
     });
 
+    describe('browser', () => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+      it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', () => {
+        jest.useFakeTimers();
+        const auth = createAuth();
+        auth.authStateManager.updateAuthState = jest.fn();
+        // simulate localStorage change from other dom context
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'okta-token-storage', 
+          newValue: '{"idToken": "fake_id_token"}',
+          oldValue: '{}'
+        }));
+        jest.runAllTimers();
+        expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
+        jest.useRealTimers();
+      });
+    });
+
     it('should log console warning if no listener is registered for authStateChange', () => {
       jest.spyOn(console, 'warn').mockReturnValue(null);
       const instance = new AuthStateManager(sdkMock);
@@ -367,21 +387,6 @@ describe('AuthStateManager', () => {
           resolve();
         }, 100);
       });
-    });
-
-    it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', () => {
-      jest.useFakeTimers();
-      const auth = createAuth();
-      auth.authStateManager.updateAuthState = jest.fn();
-      // simulate localStorage change from other dom context
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'okta-token-storage', 
-        newValue: '{"idToken": "fake_id_token"}',
-        oldValue: '{}'
-      }));
-      jest.runAllTimers();
-      expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
-      jest.useRealTimers();
     });
 
     it('should only trigger authStateManager.updateAuthState once when call tokenManager.add', () => {

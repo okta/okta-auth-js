@@ -12,10 +12,9 @@
  */
 /* global window */
 /* eslint complexity:[0,8] max-statements:[0,21] */
-import { removeNils, warn, isObject, clone, isIE11OrLess } from './util';
+import { removeNils, warn, isObject, clone } from './util';
 import AuthSdkError from './errors/AuthSdkError';
-import storageUtil from './browser/browserStorage';
-import { isLocalhost } from './browser/features';
+import { isLocalhost, isIE11OrLess, isBrowser } from './features';
 import { TOKEN_STORAGE_NAME } from './constants';
 import SdkClock from './clock';
 import { 
@@ -36,7 +35,7 @@ import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_K
 const DEFAULT_OPTIONS = {
   autoRenew: true,
   autoRemove: true,
-  storage: 'localStorage',
+  storage: undefined, // will use value from storageManager config
   expireEarlySeconds: 30,
   storageKey: TOKEN_STORAGE_NAME,
   _storageEventDelay: 0
@@ -443,7 +442,7 @@ export class TokenManager {
   _resetExpireEventTimeoutAll: () => void;
   _emitEventsForCrossTabsStorageUpdate: (newValue: string, oldValue: string) => void;
 
-  constructor(sdk: OktaAuth, options: TokenManagerOptions) {
+  constructor(sdk: OktaAuth, options: TokenManagerOptions = {}) {
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
 
     const emitter = (sdk as any).emitter;
@@ -514,27 +513,29 @@ export class TokenManager {
 
     setExpireEventTimeoutAll(sdk, tokenMgmtRef, storage);
 
+    if (isBrowser()) {
     // Sync authState cross multiple tabs when localStorage is used as the storageProvider
     // A StorageEvent is sent to a window when a storage area it has access to is changed 
     // within the context of another document.
     // https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent
     window.addEventListener('storage', ({ key, newValue, oldValue }: StorageEvent) => {
-      const handleCrossTabsStorageChange = () => {
-        this._resetExpireEventTimeoutAll();
-        this._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-      };
+        const handleCrossTabsStorageChange = () => {
+          this._resetExpireEventTimeoutAll();
+          this._emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+        };
 
-      // Skip if:
-      // not from localStorage.clear (event.key is null)
-      // event.key is not the storageKey
-      // oldValue === newValue
-      if (key && (key !== options.storageKey || newValue === oldValue)) {
-        return;
-      }
+        // Skip if:
+        // not from localStorage.clear (event.key is null)
+        // event.key is not the storageKey
+        // oldValue === newValue
+        if (key && (key !== options.storageKey || newValue === oldValue)) {
+          return;
+        }
 
-      // LocalStorage cross tabs update is not synced in IE, set a 1s timer by default to read latest value
-      // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
-      setTimeout(() => handleCrossTabsStorageChange(), options._storageEventDelay);
-    });
+        // LocalStorage cross tabs update is not synced in IE, set a 1s timer by default to read latest value
+        // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
+        setTimeout(() => handleCrossTabsStorageChange(), options._storageEventDelay);
+      });
+    }
   }
 }
