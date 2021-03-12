@@ -288,8 +288,8 @@ describe('TokenManager', function() {
       setupSync();
     });
 
-    it('on success, emits "renewed" event with the new tokens', function() {
-      expect.assertions(2);
+    it('on success, emits "renewed" event with the new token', function() {
+      expect.assertions(3);
       
       const idTokenKey = 'test-idToken';
       const origIdToken = tokens.standardIdTokenParsed;
@@ -298,27 +298,29 @@ describe('TokenManager', function() {
 
       const accessTokenKey = 'test-accessToken';
       const origAccessToken = tokens.standardAccessTokenParsed;
-      const renewedAccessToken = Object.assign({}, origAccessToken);
       client.tokenManager.add(accessTokenKey, origAccessToken);
 
-      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
-        return Promise.resolve({ idToken: renewedIdToken, accessToken: renewedAccessToken });
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+        return Promise.resolve(renewedIdToken);
       });
       const addedCallback = jest.fn();
       const renewedCallback = jest.fn();
+      const removedCallback = jest.fn();
       client.tokenManager.on('added', addedCallback);
       client.tokenManager.on('renewed', renewedCallback);
+      client.tokenManager.on('removed', removedCallback);
       return client.tokenManager.renew('test-idToken')
         .then(() => {
           expect(renewedCallback).toHaveBeenNthCalledWith(1, idTokenKey, renewedIdToken, origIdToken);
-          expect(renewedCallback).toHaveBeenNthCalledWith(2, accessTokenKey, renewedAccessToken, origAccessToken);
+          expect(addedCallback).toHaveBeenNthCalledWith(1, idTokenKey, renewedIdToken);
+          expect(removedCallback).toHaveBeenNthCalledWith(1, idTokenKey, origIdToken);
         });
     });
 
     it('multiple overlapping calls will produce a single request and promise', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
-        return Promise.resolve({ idToken: tokens.standardIdTokenParsed, accessToken: tokens.standardAccessTokenParsed });
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+        return Promise.resolve(tokens.standardIdTokenParsed);
       });
       var p1 = client.tokenManager.renew('test-idToken');
       var p2 = client.tokenManager.renew('test-idToken');
@@ -328,7 +330,7 @@ describe('TokenManager', function() {
 
     it('multiple overlapping calls will produce a single request and promise (failure case)', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
         return Promise.reject(new Error('expected'));
       });
       var p1 = client.tokenManager.renew('test-idToken');
@@ -348,8 +350,8 @@ describe('TokenManager', function() {
 
     it('sequential calls will produce a unique request and promise', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
-        return Promise.resolve({ idToken: tokens.standardIdTokenParsed, accessToken: tokens.standardAccessTokenParsed });
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+        return Promise.resolve(tokens.standardIdTokenParsed);
       });
       var p1 = client.tokenManager.renew('test-idToken').then(function() {
         var p2 = client.tokenManager.renew('test-idToken');
@@ -361,7 +363,7 @@ describe('TokenManager', function() {
 
     it('sequential calls will produce a unique request and promise (failure case)', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
+      jest.spyOn(client.token, 'renew').mockImplementation(function() {
         return Promise.reject(new Error('expected'));
       });
       var p1 = client.tokenManager.renew('test-idToken').then(function() {
@@ -385,21 +387,23 @@ describe('TokenManager', function() {
       return p1;
     });
 
-    it('allows renewing an idToken', function() {
+    it('allows renewing an idToken, without renewing accessToken', function() {
+      const testInitialIdToken = {
+        idToken: 'testInitialToken',
+        claims: {'fake': 'claims'},
+        expiresAt: 0,
+        scopes: ['openid', 'email']
+      };
+      const testInitialAccessToken = {
+        accessToken: 'testInitialToken',
+        expiresAt: 0,
+        scopes: ['openid', 'email']
+      };
       return oauthUtil.setupFrame({
         authClient: client,
         tokenManagerAddKeys: {
-          'test-idToken': {
-            idToken: 'testInitialToken',
-            claims: {'fake': 'claims'},
-            expiresAt: 0,
-            scopes: ['openid', 'email']
-          },
-          'test-accessToken': {
-            accessToken: 'testInitialToken',
-            expiresAt: 0,
-            scopes: ['openid', 'email']
-          }
+          'test-idToken': testInitialIdToken,
+          'test-accessToken': testInitialAccessToken
         },
         tokenManagerRenewArgs: ['test-idToken'],
         postMessageSrc: {
@@ -407,7 +411,7 @@ describe('TokenManager', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'token id_token',
+            'response_type': 'id_token',
             'response_mode': 'okta_post_message',
             'state': oauthUtil.mockedState,
             'nonce': oauthUtil.mockedNonce,
@@ -418,7 +422,6 @@ describe('TokenManager', function() {
         time: 1449699929,
         postMessageResp: {
           'id_token': tokens.standardIdToken,
-          'access_token': tokens.standardAccessToken,
           'expires_in': 3600,
           'token_type': 'Bearer',
           'state': oauthUtil.mockedState
@@ -428,30 +431,31 @@ describe('TokenManager', function() {
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-idToken': tokens.standardIdTokenParsed,
-          'test-accessToken': tokens.standardAccessTokenParsed
+          'test-accessToken': testInitialAccessToken
         });
       });
     });
 
-    it('allows renewing an accessToken', function() {
+    it('allows renewing an accessToken, without renewing idToken', function() {
       var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
       var mockTime = expiresAt - 3600;
+      const testInitialIdToken = {
+        idToken: 'testInitialToken',
+        claims: {'fake': 'claims'},
+        expiresAt: 0,
+        scopes: ['openid', 'email']
+      };
+      const testInitialAccessToken = {
+        accessToken: 'testInitialToken',
+        expiresAt: 0,
+        scopes: ['openid', 'email']
+      };
 
       return oauthUtil.setupFrame({
         authClient: client,
         tokenManagerAddKeys: {
-          'idToken': {
-            idToken: 'testInitialToken',
-            claims: {'fake': 'claims'},
-            expiresAt: 0,
-            scopes: ['openid', 'email']
-          },
-          'accessToken': {
-            accessToken: 'testInitialToken',
-            expiresAt: mockTime + 100,
-            scopes: ['openid', 'email'],
-            tokenType: 'Bearer'
-          }
+          'idToken': testInitialIdToken,
+          'accessToken': testInitialAccessToken
         },
         time: mockTime,
         tokenManagerRenewArgs: ['accessToken'],
@@ -460,7 +464,7 @@ describe('TokenManager', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'token id_token',
+            'response_type': 'token',
             'response_mode': 'okta_post_message',
             'state': oauthUtil.mockedState,
             'nonce': oauthUtil.mockedNonce,
@@ -469,7 +473,6 @@ describe('TokenManager', function() {
           }
         },
         postMessageResp: {
-          'id_token': tokens.standardIdToken,
           'access_token': tokens.standardAccessToken,
           'expires_in': 3600,
           'token_type': 'Bearer',
@@ -479,7 +482,7 @@ describe('TokenManager', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'idToken': tokens.standardIdTokenParsed,
+          'idToken': testInitialIdToken,
           'accessToken': tokens.standardAccessTokenParsed
         });
       });
@@ -552,7 +555,7 @@ describe('TokenManager', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'token',
+            'response_type': 'id_token',
             'response_mode': 'okta_post_message',
             'state': oauthUtil.mockedState,
             'nonce': oauthUtil.mockedNonce,
@@ -594,7 +597,9 @@ describe('TokenManager', function() {
           errorSummary: 'something went wrong',
           tokenKey: 'test-accessToken',
         });
-        oauthUtil.expectTokenStorageToEqual(localStorage, {});
+        oauthUtil.expectTokenStorageToEqual(localStorage, {
+          'test-idToken': tokens.standardIdTokenParsed
+        });
       });
     });
 
@@ -646,12 +651,6 @@ describe('TokenManager', function() {
     beforeEach(function() {
       jest.useFakeTimers();
       tokenManagerAddKeys = {
-        'test-idToken': {
-          idToken: 'testInitialToken',
-          claims: {'fake': 'claims'},
-          expiresAt: 0,
-          scopes: ['openid', 'email']
-        },
         'test-accessToken': {
           accessToken: 'testInitialToken',
           expiresAt: 0,
@@ -663,7 +662,7 @@ describe('TokenManager', function() {
         queryParams: {
           'client_id': 'NPSfOkH5eZrTy8PMDlvx',
           'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'token id_token',
+          'response_type': 'token',
           'response_mode': 'okta_post_message',
           'state': oauthUtil.mockedState,
           'nonce': oauthUtil.mockedNonce,
@@ -672,7 +671,6 @@ describe('TokenManager', function() {
         }
       };
       postMessageResp = {
-        'id_token': tokens.standardIdToken,
         'access_token': tokens.standardAccessToken,
         'expires_in': 3600,
         'token_type': 'Bearer',
@@ -682,6 +680,7 @@ describe('TokenManager', function() {
     afterEach(async () => {
       jest.useRealTimers();
     });
+    
     it('should register listener for "expired" event', function() {
       jest.spyOn(Emitter.prototype, 'on');
       setupSync();
@@ -689,7 +688,7 @@ describe('TokenManager', function() {
     });
 
     it('automatically renews a token by default', function() {
-      const expiresAt = tokens.standardIdTokenParsed.expiresAt;
+      const expiresAt = tokens.standardAccessTokenParsed.expiresAt;
       const authClient = setupSync({
         tokenManager: {
           autoRenew: true
@@ -699,7 +698,8 @@ describe('TokenManager', function() {
         authClient,
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'test-idToken',
+        autoRenewTokenKey: 'test-accessToken',
+        tokenTypesTobeRenewed: ['access_token'],
         time: expiresAt + 1,
         tokenManagerAddKeys,
         postMessageSrc,
@@ -707,7 +707,6 @@ describe('TokenManager', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed,
           'test-accessToken': { 
             ...tokens.standardAccessTokenParsed, 
             expiresAt: expiresAt + 1 + 3600
@@ -717,7 +716,7 @@ describe('TokenManager', function() {
     });
 
     it('automatically renews a token early when local clock offset is considered', function() {
-      var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: setupSync({
           // local clock offset: 10 seconds behind the server
@@ -728,7 +727,8 @@ describe('TokenManager', function() {
         }),
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'test-idToken',
+        autoRenewTokenKey: 'test-accessToken',
+        tokenTypesTobeRenewed: ['access_token'],
         time: expiresAt - 10, // set local time to 10 seconds until expiration
         tokenManagerAddKeys,
         postMessageSrc,
@@ -736,7 +736,6 @@ describe('TokenManager', function() {
       })
       .then(() => {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed,
           'test-accessToken': { 
             ...tokens.standardAccessTokenParsed, 
             expiresAt: expiresAt - 10 + 3600
@@ -746,7 +745,7 @@ describe('TokenManager', function() {
     });
 
     it('renews a token early when "expireEarlySeconds" option is considered', function() {
-      var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: setupSync({
           tokenManager: {
@@ -756,7 +755,8 @@ describe('TokenManager', function() {
         }),
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'test-idToken',
+        autoRenewTokenKey: 'test-accessToken',
+        tokenTypesTobeRenewed: ['access_token'],
         time: expiresAt - 10, // set local time to 10 seconds until expiration
         tokenManagerAddKeys,
         postMessageSrc,
@@ -764,7 +764,6 @@ describe('TokenManager', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed,
           'test-accessToken': { 
             ...tokens.standardAccessTokenParsed, 
             expiresAt: expiresAt - 10 + 3600
@@ -774,7 +773,7 @@ describe('TokenManager', function() {
     });
 
     it('does not return the token after tokens were cleared before renew promise was resolved', function() {
-      var expiresAt = tokens.standardIdTokenParsed.expiresAt;
+      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: setupSync({
           tokenManager: {
@@ -783,7 +782,8 @@ describe('TokenManager', function() {
         }),
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'test-idToken',
+        autoRenewTokenKey: 'test-accessToken',
+        tokenTypesTobeRenewed: ['access_token'],
         time: expiresAt + 1,
         tokenManagerAddKeys,
         postMessageSrc,

@@ -227,7 +227,7 @@ oauthUtil.setup = function(opts) {
   } else if (opts.tokenRenewTokensArgs) {
     promise = authClient.token.renewTokens.apply(this, opts.tokenRenewTokensArgs);
   } else if (opts.autoRenew) {
-    const tokenTypesTobeRenewed = ['accessToken', 'idToken'];
+    const tokenTypesTobeRenewed = opts.tokenTypesTobeRenewed || ['accessToken', 'idToken'];
     promise = new Promise(function(resolve, reject) {
       authClient.tokenManager.on('renewed', function(key, freshToken) {
         if (isAccessToken(freshToken)) {

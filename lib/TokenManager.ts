@@ -162,6 +162,15 @@ function validateToken(token: Token) {
   }
 }
 
+function _add(sdk, tokenMgmtRef, storage, key, token: Token) {
+  var tokenStorage = storage.getStorage();
+  validateToken(token);
+  tokenStorage[key] = token;
+  storage.setStorage(tokenStorage);
+  emitAdded(tokenMgmtRef, key, token);
+  setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
+}
+
 function add(sdk, tokenMgmtRef, storage, key, token: Token) {
   if (sdk.features.isLocalhost()) {
     warn(
@@ -171,12 +180,7 @@ function add(sdk, tokenMgmtRef, storage, key, token: Token) {
     );
   }
 
-  var tokenStorage = storage.getStorage();
-  validateToken(token);
-  tokenStorage[key] = token;
-  storage.setStorage(tokenStorage);
-  emitAdded(tokenMgmtRef, key, token);
-  setExpireEventTimeout(sdk, tokenMgmtRef, key, token);
+  _add(sdk, tokenMgmtRef, storage, key, token);
 }
 
 function get(storage, key) {
@@ -316,59 +320,36 @@ function renew(sdk, tokenMgmtRef, storage, key) {
     return Promise.reject(e);
   }
 
-  // Remove existing autoRenew timeouts
-  clearExpireEventTimeoutAll(tokenMgmtRef);
+  // Remove existing autoRenew timeout
+  clearExpireEventTimeout(tokenMgmtRef, key);
 
   // A refresh token means a replace instead of renewal
-
   // Store the renew promise state, to avoid renewing again
-  // Renew/refresh all tokens in one process
-  tokenMgmtRef.renewPromise[key] = sdk.token.renewTokens({
-    scopes: token.scopes,
-  })
-    .then(function(freshTokens) {
-      // store and emit events for freshTokens
+  tokenMgmtRef.renewPromise[key] = sdk.token.renew(token)
+    .then(function(freshToken) {
+      // store and emit events for freshToken
       const oldTokenStorage = storage.getStorage();
-      setTokens(
-        sdk, 
-        tokenMgmtRef, 
-        storage, 
-        freshTokens, 
-        (accessTokenKey, accessToken) =>
-          emitRenewed(tokenMgmtRef, accessTokenKey, accessToken, oldTokenStorage[accessTokenKey]),
-        (idTokenKey, idToken) =>
-          emitRenewed(tokenMgmtRef, idTokenKey, idToken, oldTokenStorage[idTokenKey]),
-        // not emitting refresh token as an internal detail, not a usable token
-      );
-
-      // return freshToken by key
-      const freshToken = get(storage, key);
+      remove(tokenMgmtRef, storage, key);
+      _add(sdk, tokenMgmtRef, storage, key, freshToken);
+      emitRenewed(tokenMgmtRef, key, freshToken, oldTokenStorage[key]);
       return freshToken;
     })
     .catch(function(err) {
       if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
-        // remove expired tokens in storage
-        const removedTokens = [];
+        // remove expired token in storage
         const tokenStorage = storage.getStorage();
-        Object.keys(tokenStorage).forEach(key => {
-          const token = tokenStorage[key];
-          if (token && hasExpired(tokenMgmtRef, token)) {
-            delete tokenStorage[key];
-            removedTokens.push({ key, token });
-            clearExpireEventTimeout(tokenMgmtRef, key);
-          }
-        });
-        storage.setStorage(tokenStorage);
-        // emit removed events
-        if (!removedTokens.length) {
-          // tokens have been removed from other tabs
-          // still trigger removed event for downstream listeners
-          emitRemoved(tokenMgmtRef, ID_TOKEN_STORAGE_KEY);
-          emitRemoved(tokenMgmtRef, ACCESS_TOKEN_STORAGE_KEY);
+        const currentToken = tokenStorage[key];
+        if (currentToken && hasExpired(tokenMgmtRef, currentToken)) {
+          delete tokenStorage[key];
+          clearExpireEventTimeout(tokenMgmtRef, key);
+          storage.setStorage(tokenStorage);
+          emitRemoved(tokenMgmtRef, key, currentToken);
         } else {
-          removedTokens.forEach((key, token) => emitRemoved(tokenMgmtRef, key, token));
+          // token have been removed from other tabs
+          // still trigger removed event for downstream listeners
+          emitRemoved(tokenMgmtRef, key);
         }
-
+        
         err.tokenKey = key;
         emitError(tokenMgmtRef, err);
       }
