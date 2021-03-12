@@ -313,7 +313,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
   
   // Ends the current Okta SSO session without redirecting to Okta.
-  closeSession() {
+  closeSession(): Promise<object> {
     // Clear all local tokens
     this.tokenManager.clear();
   
@@ -321,7 +321,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     .catch(function(e) {
       if (e.name === 'AuthApiError' && e.errorCode === 'E0000007') {
         // Session does not exist or has already been closed
-        return;
+        return null;
       }
       throw e;
     });
@@ -336,7 +336,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     // Access token may have been removed. In this case, we will silently succeed.
     if (!accessToken) {
-      return Promise.resolve();
+      return Promise.resolve(null);
     }
     return this.token.revoke(accessToken);
   }
@@ -350,7 +350,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     // Refresh token may have been removed. In this case, we will silently succeed.
     if (!refreshToken) {
-      return Promise.resolve();
+      return Promise.resolve(null);
     }
     return this.token.revoke(refreshToken);
   }

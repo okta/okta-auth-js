@@ -7,8 +7,8 @@ export class TransactionState {
   factorType?: string;
   recoveryToken?: string;
   recoveryType?: string;
-  autoPush?: boolean | Function;
-  rememberDevice?: boolean | Function;
+  autoPush?: boolean | (() => boolean);
+  rememberDevice?: boolean | (() => boolean);
   profile?: {
     updatePhone?: boolean;
   };

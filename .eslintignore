@@ -7,3 +7,4 @@ node_modules
 /build/cjs
 /samples/templates
 /samples/generated/webpack-spa/public/*-bundle.*
+/scripts

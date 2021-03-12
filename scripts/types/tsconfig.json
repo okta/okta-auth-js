@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "lib": [
+      "es6", "dom"
+    ],
+    "noEmit": false,
+    "strict": true,
+    "alwaysStrict": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "target": "es2017",
+    "baseUrl": ".."
+  },
+  "include": [
+    "./**/*.d.ts"
+  ]
+}

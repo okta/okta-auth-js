@@ -415,8 +415,8 @@ export class TokenManager {
   clear: () => void;
   remove: (key: string) => void;
   renew: (key: string) => Promise<Token>;
-  on: (event: string, handler: Function, context?: object) => void;
-  off: (event: string, handler: Function) => void;
+  on: (event: string, handler: (key: string, token: Token) => void, context?: object) => void;
+  off: (event: string, handler: (key: string, token: Token) => void) => void;
   hasExpired: (token: Token) => boolean;
   getTokens: () => Promise<Tokens>;
   setTokens: (tokens: Tokens) => void;

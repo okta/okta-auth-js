@@ -17,11 +17,11 @@
 import { isPromise } from './util';
 
 interface QueueItem {
-  method: Function;
+  method: () => void;
   thisObject: object;
   args: any[];
-  resolve: Function;
-  reject: Function;
+  resolve: (value?: unknown) => void;
+  reject: (reason?: unknown) => void;
 }
 
 class PromiseQueue {
@@ -36,7 +36,7 @@ class PromiseQueue {
   // Returns a promise
   // If the method is synchronous, it will resolve when the method completes
   // If the method returns a promise, it will resolve (or reject) with the value from the method's promise
-  push(method: Function, thisObject: object, ...args: any[]) {
+  push(method: () => void, thisObject: object, ...args: any[]) {
     return new Promise((resolve, reject) => {
       this.queue.push({
         method,
