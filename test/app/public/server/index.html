@@ -1,16 +1,33 @@
 <html>
   <head>
     <link rel="stylesheet" href="/oidc-app.css"/>
+    <!-- for nav functions-->
+    <script src="/oidc-app.js"></script>
   </head>
   <body class="web-app landing">
     <div id="root">
-      <strong>Server-side Login Form</strong>
-      <div id="form">
+      <div class="box">
+        <a class="config-link" href="#" onclick="showConfigForm(event)">⚙️</a>
+        <a href="/" onclick="navigateToApp('/', event)">Webpack SPA App</a>
+        <div class="link selected">Server-side Web App</div>
+        <a href="/static" onclick="navigateToApp('/static', event)">Static SPA App</a>
+      </div>
+      <div id="form" class="box">
+        <strong>Authn V1</strong>
+        <hr/>
         <form method="POST" action="/login">
           <label for="issuer">Issuer:</label><input name="issuer" id="issuer" placeholder="issuer" type="text"/><br/>
           <label for="username">Username:</label><input name="username" id="username" placeholder="username" type="email"/><br/>
           <label for="password">Password:</label><input name="password" id="password" placeholder="password" type="password"/><br/>
           <input id="submitBtn" type="submit"/>
+        </form>
+      </div>
+      <div class="box">
+        <strong>OIE V2</strong>
+        <hr/>
+        <form method="POST" action="/interact">
+          <input id="issuer2" type="hidden" name="issuer"/>
+          <input id="interactBtn" type="submit" value="Interact"/>
         </form>
       </div>
       <div id="results">
@@ -30,6 +47,10 @@
     </div>
     <script type="text/javascript">
       var url = new URL(window.location.href);
+      var issuer = url.searchParams.get('issuer');
+      document.getElementById('issuer').value = issuer;
+      document.getElementById('issuer2').value = issuer;
+
       ['status', 'sessionToken', 'error'].forEach(function(param) {
         var value = url.searchParams.get(param);
         document.getElementById(param).innerText = value;

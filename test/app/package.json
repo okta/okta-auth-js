@@ -8,7 +8,7 @@
     "validate": "yarn tsc --noEmit && yarn lint",
     "lint": "eslint .",
     "watch": "webpack --watch",
-    "start": "node server.js",
+    "start": "node server",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
