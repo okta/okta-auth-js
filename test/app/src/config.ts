@@ -16,7 +16,7 @@ export interface Config extends OktaAuthOptions {
   useInteractionCodeFlow: boolean; // widget option
 }
 
-function getDefaultConfig(): Config {
+export function getDefaultConfig(): Config {
   const ISSUER = process.env.ISSUER;
   const CLIENT_ID = process.env.CLIENT_ID;
   const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
@@ -43,7 +43,7 @@ function getDefaultConfig(): Config {
 }
 
 // eslint-disable-next-line complexity
-function getConfigFromUrl(): Config {
+export function getConfigFromUrl(): Config {
   const url = new URL(window.location.href);
   const issuer = url.searchParams.get('issuer');
   const redirectUri = url.searchParams.get('redirectUri') || REDIRECT_URI;
@@ -90,7 +90,7 @@ function getConfigFromUrl(): Config {
   };
 }
 
-function saveConfigToStorage(config: Config): void {
+export function saveConfigToStorage(config: Config): void {
   const configCopy: any = {};
   Object.keys(config).forEach(key => {
     if (typeof (config as any)[key] !== 'function') {
@@ -100,16 +100,16 @@ function saveConfigToStorage(config: Config): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(configCopy));
 }
 
-function getConfigFromStorage(): Config {
+export function getConfigFromStorage(): Config {
   const config = JSON.parse(localStorage.getItem(STORAGE_KEY));
   return config;
 }
 
-function clearStorage(): void {
+export function clearStorage(): void {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-function flattenConfig(config: Config): any {
+export function flattenConfig(config: Config): any {
   const flat: Record<string, any> = {};
   Object.assign(flat, config.tokenManager);
   Object.assign(flat, config.cookies);
@@ -120,5 +120,3 @@ function flattenConfig(config: Config): any {
   });
   return flat;
 }
-
-export { getDefaultConfig, getConfigFromUrl, saveConfigToStorage, getConfigFromStorage, clearStorage, flattenConfig };
