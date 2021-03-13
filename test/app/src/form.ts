@@ -3,6 +3,7 @@
 /* eslint-disable max-len */
 import { flattenConfig, Config } from './config';
 import { FormDataEvent } from './types';
+import { htmlString } from './util';
 
 const id = 'config-form';
 const Form = `
@@ -135,4 +136,26 @@ export function onFormData(event: FormDataEvent): void {
   const query = '?' + Object.entries(params).map(([k, v]) => `${k}=${encodeURIComponent(v as string)}`).join('&');
   const newUri = window.location.origin + '/' + query;
   window.location.replace(newUri);
+}
+
+export function showConfigForm(config: Config): void {
+  let el = document.getElementById('config-area');
+  if (el) {
+    el.remove();
+    return; // act as a toggle
+  }
+  el = document.createElement('DIV');
+  document.body.appendChild(el);
+  el.innerHTML = `
+    <div id="config-area" class="flex-row">
+      <div id="form-content" class="box">${Form}</div>
+      <div id="config-dump" class="box"></div>
+    </div>
+  `;
+
+  updateForm(config);
+  document.getElementById('config-dump').innerHTML = `
+    <h2>Config</h2>
+    ${ htmlString(config) }
+  `;
 }
