@@ -53,7 +53,7 @@ select {
 label {
   margin-right: 10px;
 }
-a {
+a, .link {
   padding: 4px;
   margin: 4px;
   display: inline-block;
@@ -63,4 +63,13 @@ a {
 a:active, a.clicked {
   background-color: green;
   color: white;
+}
+
+.selected {
+  font-weight: bold;
+}
+
+.config-link {
+  font-size: 24px;
+  text-decoration: none;
 }

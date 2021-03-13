@@ -27,7 +27,7 @@ import {
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryString } from './util';
-import { Form, updateForm } from './form';
+import { showConfigForm } from './form';
 import { tokensHTML } from './tokens';
 import { buildWidgetConfig } from './widget';
 
@@ -80,10 +80,6 @@ const Layout = `
     <div id="token-msg" style="color: green"></div>
     <div id="page-content"></div>
     ${Toolbar}
-    <div id="config-area" class="flex-row">
-      <div id="form-content" class="box">${Form}</div>
-      <div id="config-dump" class="box"></div>
-    </div>
   </div>
 `;
 
@@ -174,10 +170,9 @@ class TestApp {
     this.originalUrl = MOUNT_PATH + queryParams;
     this.rootElem = rootElem;
     this.rootElem.innerHTML = Layout;
-    updateForm(this.config);
-    document.getElementById('config-dump').innerHTML = this.configHTML();
     this.contentElem = document.getElementById('page-content');
     bindFunctions(this, window);
+    showConfigForm(this.config);
   }
 
   async getSDKInstance(): Promise<OktaAuth> {
@@ -669,11 +664,13 @@ class TestApp {
         </li>
       </ul>
       <h4/>
-      <form>
-        <input name="username" id="username" placeholder="username" type="email"/>
-        <input name="password" id="password" placeholder="password" type="password"/>
-      </form>
-      <a href="/" id="login-direct" onclick="loginDirect(event)">Login DIRECT</a>
+      <div class="box">
+        <form>
+          <input name="username" id="username" placeholder="username" type="email"/>
+          <input name="password" id="password" placeholder="password" type="password"/>
+          <a href="/" id="login-direct" onclick="loginDirect(event)">Login DIRECT</a>
+        </form>
+      </div>
       `;
   }
 
