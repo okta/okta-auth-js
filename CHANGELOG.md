@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.8.0
+
+### Features
+
+- [#652](https://github.com/okta/okta-auth-js/pull/652) Accepts 'state' as a constructor option
+
+### Bug Fixes
+
+- [#646](https://github.com/okta/okta-auth-js/pull/646) Fixes validate token using issuer from well-known config
+
+### Other
+
+- [#648](https://github.com/okta/okta-auth-js/pull/648) Updates widget to 5.4.2
+- [#653](https://github.com/okta/okta-auth-js/pull/653) Removes isLoginRedirect check in oidc logic
+
 ## 4.7.2
 
 ### Bug Fixes
