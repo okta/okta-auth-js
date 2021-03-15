@@ -73,7 +73,7 @@
     "cross-fetch": "^3.0.6",
     "js-cookie": "2.2.1",
     "karma-coverage": "^2.0.3",
-    "node-cache": "^4.2.0",
+    "node-cache": "^5.1.2",
     "p-cancelable": "^2.0.0",
     "text-encoding": "^0.7.0",
     "tiny-emitter": "1.1.0",
