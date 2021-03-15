@@ -11,11 +11,11 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuth, Token, isToken, isAccessToken, AccessToken, IDToken, isIDToken } from '../types';
+import { Token, isToken, isAccessToken, AccessToken, IDToken, isIDToken, RefreshToken } from '../types';
 import { getWithoutPrompt } from './getWithoutPrompt';
+import { renewTokensWithRefresh } from './renewTokensWithRefresh';
 
-export function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
-  // Note: This is not used when a refresh token is present
+export function renewToken(sdk, token: Token): Promise<Token> {
   if (!isToken(token)) {
     return Promise.reject(new AuthSdkError('Renew must be passed a token with ' +
       'an array of scopes and an accessToken or idToken'));
@@ -31,13 +31,27 @@ export function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
   }
 
   const { scopes, authorizeUrl, userinfoUrl, issuer } = token as (AccessToken & IDToken);
-  return getWithoutPrompt(sdk, {
-    responseType,
-    scopes,
-    authorizeUrl,
-    userinfoUrl,
-    issuer
-  })
+
+  // If we have a refresh token, renew using that, otherwise getWithoutPrompt
+  // Calling via async as auth-js doesn't yet (as of 4.2) ensure that updateAuthState() was ever called
+  return sdk.tokenManager.getTokens()
+    .then(tokens => tokens.refreshToken as RefreshToken)
+    .then(refreshTokenObject => {
+
+      if (refreshTokenObject) {
+        return renewTokensWithRefresh(sdk, {
+          scopes,
+        }, refreshTokenObject);
+      } else {
+        return getWithoutPrompt(sdk, {
+          responseType,
+          scopes,
+          authorizeUrl,
+          userinfoUrl,
+          issuer
+        });
+      }
+    })
     .then(function (res) {
       // Multiple tokens may have come back. Return only the token which was requested.
       var tokens = res.tokens;
