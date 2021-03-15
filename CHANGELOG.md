@@ -14,6 +14,7 @@
 
 - [#648](https://github.com/okta/okta-auth-js/pull/648) Updates widget to 5.4.2
 - [#653](https://github.com/okta/okta-auth-js/pull/653) Removes isLoginRedirect check in oidc logic
+- [#661](https://github.com/okta/okta-auth-js/pull/661) Upgrades node-cache to 5.1.2
 
 ## 4.7.2
 
