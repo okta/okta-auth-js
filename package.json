@@ -68,6 +68,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
+    "@okta/okta-idx-js": "^0.11.0",
     "Base64": "1.1.0",
     "core-js": "^3.6.5",
     "cross-fetch": "^3.0.6",

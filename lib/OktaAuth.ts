@@ -37,7 +37,8 @@ import {
   TransactionAPI,
   SessionAPI,
   SigninAPI,
-  PkceAPI
+  PkceAPI,
+  IdxAPI
 } from './types';
 import {
   transactionStatus,
@@ -73,6 +74,9 @@ import {
   isInteractionRequiredError,
   isInteractionRequired,
 } from './oidc';
+import {
+  authenticate,
+} from './idx';
 import { isBrowser } from './features';
 import * as features from './features';
 import browserStorage from './browser/browserStorage';
@@ -105,6 +109,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   static features: FeaturesAPI;
   features: FeaturesAPI;
   token: TokenAPI;
+  idx: IdxAPI;
   _tokenQueue: PromiseQueue;
   emitter: typeof Emitter;
   tokenManager: TokenManager;
@@ -224,6 +229,11 @@ class OktaAuth implements SigninAPI, SignoutAPI {
         return window.document;
       }
     });
+
+    // Idx convenience API
+    this.idx = {
+      authenticate: authenticate.bind(null, this)
+    };
 
     // Fingerprint API
     this.fingerprint = fingerprint.bind(null, this);

@@ -223,3 +223,7 @@ export interface PkceAPI {
   generateVerifier(prefix: string): string;
   computeChallenge(str: string): PromiseLike<any>;
 }
+
+export interface IdxAPI {
+  authenticate: Promise<TokenResponse>;
+}
