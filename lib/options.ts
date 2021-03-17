@@ -120,6 +120,7 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     responseMode: args.responseMode,
     responseType: args.responseType,
     pkce: args.pkce,
+    useInteractionCodeFlow: args.useInteractionCodeFlow,
 
     // Internal options
     httpRequestClient: args.httpRequestClient,

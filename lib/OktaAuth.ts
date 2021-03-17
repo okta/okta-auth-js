@@ -30,14 +30,15 @@ import {
   FingerprintAPI,
   UserClaims, 
   SigninWithRedirectOptions,
-  SignInWithCredentialsOptions,
+  SigninWithCredentialsOptions,
   Tokens,
   ForgotPasswordOptions,
   VerifyRecoveryTokenOptions,
   TransactionAPI,
   SessionAPI,
   SigninAPI,
-  PkceAPI
+  PkceAPI,
+  SigninOptions
 } from './types';
 import {
   transactionStatus,
@@ -91,6 +92,7 @@ import { AuthStateManager } from './AuthStateManager';
 import StorageManager from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
+import { interact } from './idx';
 
 const Emitter = require('tiny-emitter');
 
@@ -244,19 +246,20 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     return isInteractionRequiredError(error);
   }
 
-  /**
-   * Alias method of signInWithCredentials
-   * 
-   * @todo This method is deprecated. Remove it in 5.0
-   */ 
-  signIn(opts) {
-    if (this.features.isLocalhost()) {
-      deprecate('This method has been deprecated, please use signInWithCredentials() instead.');
+  async signIn(opts: SigninOptions = { useInteractionCodeFlow: true }): Promise<AuthTransaction> {
+    const useInteractionCodeFlow = opts.useInteractionCodeFlow || this.options.useInteractionCodeFlow;
+    if (useInteractionCodeFlow) {
+      const { state, scopes } = opts;
+      const interactionHandle = await interact(this, { state, scopes });
+      const idxResponse = await introspect(this, { interactionHandle });
+
     }
-    return this.signInWithCredentials(opts);
+
+    // Authn V1 flow
+    return this.signInWithCredentials(opts as SigninWithCredentialsOptions);
   }
 
-  signInWithCredentials(opts: SignInWithCredentialsOptions) {
+  async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction> {
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {
       delete opts.sendFingerprint;

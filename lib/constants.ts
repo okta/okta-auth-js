@@ -31,3 +31,5 @@ export const REFERRER_PATH_STORAGE_KEY = 'referrerPath';
 export const MIN_VERIFIER_LENGTH = 43;
 export const MAX_VERIFIER_LENGTH = 128;
 export const DEFAULT_CODE_CHALLENGE_METHOD = 'S256';
+
+export const IDX_API_VERSION = '1.0.0';

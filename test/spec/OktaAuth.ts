@@ -29,6 +29,7 @@ describe('OktaAuthBase', () => {
   .concat([
     'clientId',
     'redirectUri',
+    'useInteractionCodeFlow',
     'state',
     'scopes',
     'postLogoutRedirectUri',

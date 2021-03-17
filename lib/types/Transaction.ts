@@ -16,6 +16,7 @@ export interface TransactionMetaOptions {
 
 // formerly known as "Redirect OAuth Params"
 export interface OAuthTransactionMeta {
+  issuer: string;
   redirectUri: string;
   state: string;
   nonce: string;
@@ -33,10 +34,10 @@ export interface PKCETransactionMeta extends OAuthTransactionMeta {
 }
 
 export interface IdxTransactionMeta extends PKCETransactionMeta {
-  interactionHandle: string;
+  interactionHandle?: string;
 }
 
-export type CustomAuthTransactionMeta = Record<string, string>;
+export type CustomAuthTransactionMeta = Record<string, string | undefined>;
 
 export type TransactionMeta =
   IdxTransactionMeta |

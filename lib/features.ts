@@ -56,6 +56,9 @@ export function isPKCESupported() {
 }
 
 export function isHTTPS() {
+  if (!isBrowser()) {
+    return false;
+  }
   return window.location.protocol === 'https:';
 }
 

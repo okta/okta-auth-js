@@ -45,6 +45,7 @@ export interface OktaAuthOptions extends CustomUrls {
   pkce?: boolean;
   clientId?: string;
   redirectUri?: string;
+  useInteractionCodeFlow?: boolean;
   responseType?: string | string[];
   responseMode?: string;
   scopes?: string[];
