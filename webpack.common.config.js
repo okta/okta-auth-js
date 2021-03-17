@@ -40,6 +40,12 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts']
   },
+  externals: {
+    // use built-in objects and functions
+    './atob': 'atob',
+    './btoa': 'btoa',
+    './webcrypto': 'crypto'
+  },
   plugins: [
     new webpack.DefinePlugin({
       SDK_VERSION: JSON.stringify(SDK_VERSION)

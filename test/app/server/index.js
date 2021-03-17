@@ -3,9 +3,7 @@
 require('@okta/env'); // update environment variables from testenv file
 
 const loginMiddleware = require('./loginMiddleware');
-const handleAuthorizationCode = require('./authorizationCodeFlow');
-const interactMiddleware = require('./interact');
-const handleInteractionCode = require('./interactionCodeFlow');
+const callbackMiddleware = require('./callbackMiddleware');
 
 const path = require('path');
 const SIW_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-signin-widget')), '..');
@@ -30,13 +28,8 @@ app.use('/siw', express.static(SIW_DIST));
 
 app.use(express.urlencoded());
 
-// Authn V1
 app.post('/login', loginMiddleware);
-app.get('/authorization-code/callback', handleAuthorizationCode);
-
-// OIE V2
-app.post('/interact', interactMiddleware);
-app.get('/interaction-code/callback', handleInteractionCode);
+app.get('/authorization-code/callback', callbackMiddleware);
 
 const port = config.devServer.port;
 app.listen(port, function () {

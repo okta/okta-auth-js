@@ -17,10 +17,7 @@ import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
 import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
-
-export interface SupportsCodeFlow {
-  useInteractionCodeFlow?: boolean;
-}
+import { AuthorizeOptions } from './idx';
 
 export interface OktaAuth {
   options: OktaAuthOptions;
@@ -37,10 +34,10 @@ export interface OktaAuth {
 
 export interface APIError {
   errorSummary: string;
-  errorCode: string;
-  errorLink: string;
-  errorId: string;
-  errorCauses: string[];
+  errorCode?: string;
+  errorLink?: string;
+  errorId?: string;
+  errorCauses?: string[];
 }
 
 // Transaction API
@@ -180,29 +177,12 @@ export interface FeaturesAPI {
   isIE11OrLess(): boolean;
 }
 
-export interface IdentifyOptions {
-  identifier?: string;
-  username?: string;
-  password?: string;
-}
-
-export interface InteractOptions {
-  state?: string;
-  scopes?: string[];
-}
-
-export interface IntrospectOptions {
-  stateHandle?: string;
-  interactionHandle?: string;
-}
-
-export interface SigninOptions extends IdentifyOptions, InteractOptions, SupportsCodeFlow {
+export interface SigninOptions extends AuthorizeOptions {
   // Only used in Authn V1
   relayState?: string;
   context?: string;
   sendFingerprint?: boolean;
 }
-
 
 export interface SigninWithRedirectOptions extends SigninOptions {
   originalUri?: string;

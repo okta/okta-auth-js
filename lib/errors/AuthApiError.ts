@@ -15,10 +15,10 @@ import { APIError } from '../types';
 
 export default class AuthApiError extends CustomError implements APIError {
   errorSummary: string;
-  errorCode: string;
-  errorLink: string;
-  errorId: string;
-  errorCauses: string[];
+  errorCode?: string;
+  errorLink?: string;
+  errorId?: string;
+  errorCauses?: string[];
   xhr?: XMLHttpRequest;
 
   constructor(err: APIError, xhr?: XMLHttpRequest) {

@@ -15,12 +15,12 @@
 // responsible for adding new routes)
 
 import idx from '@okta/okta-idx-js';
-import { InteractOptions, OktaAuth } from '../types';
+import { InteractOptions, InteractResponse, OktaAuth } from '../types';
 import { IDX_API_VERSION } from '../constants';
 import { getTransactionMeta, saveTransactionMeta } from './transactionMeta';
 
 // Begin or resume a transaction. Returns an interaction handle
-export async function interact (authClient: OktaAuth, options?: InteractOptions): Promise<string> {
+export async function interact (authClient: OktaAuth, options?: InteractOptions): Promise<InteractResponse> {
 
   let meta = await getTransactionMeta(authClient);
 
@@ -68,6 +68,7 @@ export async function interact (authClient: OktaAuth, options?: InteractOptions)
     codeChallengeMethod
   })
     .then(response => {
+      console.log('RESPONse, ', response);
       // If this is a new transaction an interactionHandle was returned
       if (!interactionHandle && response.toPersist.interactionHandle) {
         meta = Object.assign({}, meta, {
@@ -78,7 +79,10 @@ export async function interact (authClient: OktaAuth, options?: InteractOptions)
       // Save transaction meta so it can be resumed
       saveTransactionMeta(authClient, meta);
 
-      // return interaction handle
-      return meta.interactionHandle;
+      return {
+        interactionHandle: meta.interactionHandle,
+        stateHandle: response.context.stateHandle,
+        state
+      };
     });
 }

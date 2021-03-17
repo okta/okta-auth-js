@@ -1,1 +1,1 @@
-export * from './interact';
+export * from './authenticate';

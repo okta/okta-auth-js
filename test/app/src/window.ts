@@ -25,7 +25,7 @@ declare global {
     bootstrapLanding: () => void;
     bootstrapCallback: () => void;
     getWidgetConfig: () => any;
-    getAuthJSConfig: () => any;
+    getConfig: () => any;
     toQueryString: (obj: any) => string;
     constructAppUrl: (basePath: string) => string;
     navigateToApp: (appPath: string, event: Event) => void;
@@ -58,11 +58,11 @@ Object.assign(window, {
   onSubmitForm: onSubmitForm,
   onFormData: onFormData,
 
-  getAuthJSConfig: function(): Config {
+  getConfig: function(): Config {
     return window.location.search ? getConfigFromUrl() : getDefaultConfig();
   },
   constructAppUrl: function(basePath = ''): string {
-    const config = window.getAuthJSConfig();
+    const config = window.getConfig();
     const queryParams = toQueryString(flattenConfig(config));
     return basePath + queryParams;
   },
@@ -75,7 +75,7 @@ Object.assign(window, {
     if (event) {
       event.preventDefault();
     }
-    const config = window.getAuthJSConfig();
+    const config = window.getConfig();
     showConfigForm(config);
   },
   // Login page, read config from URL

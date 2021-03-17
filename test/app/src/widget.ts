@@ -1,7 +1,7 @@
 import { Config } from './config';
 
 export function buildIdpsConfig(config: Config): any {
-  return config._idps.split(/\s+/).map(idpToken => {
+  return config.idps.split(/\s+/).map(idpToken => {
       const [type, id] = idpToken.split(/:/);
       if (!type || !id) {
         return null;

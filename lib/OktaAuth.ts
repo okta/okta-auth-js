@@ -80,8 +80,7 @@ import browserStorage from './browser/browserStorage';
 import { 
   toQueryString, 
   toAbsoluteUrl,
-  clone, 
-  deprecate 
+  clone
 } from './util';
 import { getUserAgent } from './builderUtil';
 import { TokenManager } from './TokenManager';
@@ -92,7 +91,7 @@ import { AuthStateManager } from './AuthStateManager';
 import StorageManager from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
-import { interact } from './idx';
+import { authenticate } from './idx';
 
 const Emitter = require('tiny-emitter');
 
@@ -249,10 +248,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   async signIn(opts: SigninOptions = { useInteractionCodeFlow: true }): Promise<AuthTransaction> {
     const useInteractionCodeFlow = opts.useInteractionCodeFlow || this.options.useInteractionCodeFlow;
     if (useInteractionCodeFlow) {
-      const { state, scopes } = opts;
-      const interactionHandle = await interact(this, { state, scopes });
-      const idxResponse = await introspect(this, { interactionHandle });
-
+      return authenticate(this, opts);
     }
 
     // Authn V1 flow

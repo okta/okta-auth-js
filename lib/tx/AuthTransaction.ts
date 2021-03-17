@@ -63,8 +63,15 @@ export class AuthTransaction implements TransactionState, AuthTransactionFunctio
   target?: Record<string, any>;
   authentication?: Record<string, any>;
   constructor(sdk, res = null) {
+    console.log('CREATING AUTH TRANSACTION: ', res);
     if (res) {
       this.data = res;
+
+      if (this.data.interactionHandle) {
+        return;
+      }
+
+      // Parse response from Authn V1
       Object.assign(this, flattenEmbedded(sdk, res, res, {}));
       delete this.stateToken;
 

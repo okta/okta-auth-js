@@ -11,7 +11,9 @@
  */
 
 /* eslint-disable node/no-unsupported-features/node-builtins */
-/* global document, window, TextEncoder, crypto, navigator */
+/* global document, window, TextEncoder, navigator */
+
+import { webcrypto } from './crypto';
 
 const isWindowsPhone = /windows phone|iemobile|wpdesktop/i;	
 
@@ -44,7 +46,8 @@ export function isPopupPostMessageSupported() {
 }
 
 export function isTokenVerifySupported() {
-  return typeof crypto !== 'undefined' && crypto.subtle && typeof Uint8Array !== 'undefined';
+  console.log('CRYPTO: ', webcrypto);
+  return typeof webcrypto !== 'undefined' && webcrypto.subtle && typeof Uint8Array !== 'undefined';
 }
 
 export function hasTextEncoder() {

@@ -16,14 +16,20 @@
         <strong>SignIn</strong>
         <hr/>
         <form method="POST" action="/login">
-          <input id="_useInteractionCodeFlow" type="hidden" name="useInteractionCodeFlow"/>
-          <label for="issuer">Issuer:</label><input name="issuer" id="issuer" placeholder="issuer" type="text"/><br/>
+          <input id="config" type="hidden" name="config"/>
           <label for="username">Username:</label><input name="username" id="username" placeholder="username" type="email"/><br/>
           <label for="password">Password:</label><input name="password" id="password" placeholder="password" type="password"/><br/>
           <input id="submitBtn" type="submit"/>
         </form>
       </div>
       <div id="results">
+        <div class="box">
+          <span>Issuer:</span>&nbsp;
+          <strong id="issuer"></strong>
+          <br/>
+          <span>useInteractionCodeFlow:</span>&nbsp;
+          <strong id="useInteractionCodeFlow"></strong>
+        </div>
         <div class="box">
           <strong>Status</strong><br/>
           <div id="status"></div>
@@ -39,14 +45,21 @@
       </div>
     </div>
     <script type="text/javascript">
-    debugger;
-      var url = new URL(window.location.href);
-      var issuer = url.searchParams.get('issuer');
-      document.getElementById('issuer').value = issuer;
-      var useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow');
-      document.getElementById('_useInteractionCodeFlow').value = useInteractionCodeFlow;
-      ['status', 'sessionToken', 'error'].forEach(function(param) {
-        var value = url.searchParams.get(param);
+      var query = new URL(window.location.href).searchParams;
+      // config
+      var config = window.getConfig();
+      document.getElementById('config').value = JSON.stringify(config);
+
+      // form elements
+      ['username', 'password'].forEach(function(param) {
+        var value = query.get(param);
+        if (!value) return;
+        document.getElementById(param).value = value;
+      });
+      // display elements
+      ['issuer', 'useInteractionCodeFlow', 'status', 'sessionToken', 'error'].forEach(function(param) {
+        var value = query.get(param);
+        if (!value) return;
         document.getElementById(param).innerText = value;
       });
     </script>

@@ -8,25 +8,19 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *
  * See the License for the specific language governing permissions and limitations under the License.
- *
  */
-import { AuthSdkError } from '../errors';
-import { JWTObject } from '../types';
-import { base64UrlToString } from '../crypto';
 
-export function decodeToken(token: string): JWTObject {
-  var jwt = token.split('.');
-  var decodedToken: JWTObject;
+/* global TextEncoder */
+import { stringToBase64Url } from './base64';
+import webcrypto from './webcrypto';
 
-  try {
-    decodedToken = {
-      header: JSON.parse(base64UrlToString(jwt[0])),
-      payload: JSON.parse(base64UrlToString(jwt[1])),
-      signature: jwt[2]
-    };
-  } catch (e) {
-    throw new AuthSdkError('Malformed token');
-  }
-
-  return decodedToken;
+export function getOidcHash(str) {  
+  var buffer = new TextEncoder().encode(str);
+  return webcrypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
+    var intBuffer = new Uint8Array(arrayBuffer);
+    var firstHalf = intBuffer.slice(0, 16);
+    var hash = String.fromCharCode.apply(null, firstHalf);
+    var b64u = stringToBase64Url(hash); // url-safe base64 variant
+    return b64u;
+  });
 }

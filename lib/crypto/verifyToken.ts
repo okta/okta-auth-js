@@ -9,21 +9,12 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
-/* global crypto */
-import { stringToBase64Url, clone, stringToBuffer, base64UrlDecode } from './util';
 
-function getOidcHash(str) {  
-  var buffer = new TextEncoder().encode(str);
-  return crypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
-    var intBuffer = new Uint8Array(arrayBuffer);
-    var firstHalf = intBuffer.slice(0, 16);
-    var hash = String.fromCharCode.apply(null, firstHalf);
-    var b64u = stringToBase64Url(hash); // url-safe base64 variant
-    return b64u;
-  });
-}
+import { clone } from '../util';
+import { stringToBuffer, base64UrlDecode } from './base64';
+import webcrypto from './webcrypto';
 
-function verifyToken(idToken, key) {
+export function verifyToken(idToken, key) {
   key = clone(key);
 
   var format = 'jwk';
@@ -40,7 +31,7 @@ function verifyToken(idToken, key) {
   delete key.use;
 
   // @ts-ignore
-  return crypto.subtle.importKey(
+  return webcrypto.subtle.importKey(
     format,
     key,
     algo,
@@ -53,7 +44,7 @@ function verifyToken(idToken, key) {
     var b64Signature = base64UrlDecode(jwt[2]);
     var signature = stringToBuffer(b64Signature);
 
-    return crypto.subtle.verify(
+    return webcrypto.subtle.verify(
       algo,
       cryptoKey,
       signature,
@@ -62,7 +53,3 @@ function verifyToken(idToken, key) {
   });
 }
 
-export {
-  getOidcHash,
-  verifyToken
-};

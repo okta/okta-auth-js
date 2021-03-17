@@ -178,7 +178,7 @@ class TestApp {
   async getSDKInstance(): Promise<OktaAuth> {
     // can throw
     this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config, {
-      scopes: this.config._defaultScopes ? [] : this.config.scopes
+      scopes: this.config.defaultScopes ? [] : this.config.scopes
     }));
     return this.oktaAuth;
   }
@@ -267,7 +267,7 @@ class TestApp {
   }
 
   async renderWidget(): Promise<void> {
-    const siwVersion = this.config._siwVersion;
+    const siwVersion = this.config.siwVersion;
     if (siwVersion) {
       await injectWidgetFromCDN(siwVersion);
     } else {
@@ -277,8 +277,8 @@ class TestApp {
 
     document.getElementById('modal').style.display = 'block';
     const widgetConfig = buildWidgetConfig(this.config);
-    const { issuer, clientId, _clientSecret, redirectUri, _forceRedirect, scopes } = this.config;
-    const state = JSON.stringify({ issuer, clientId, _clientSecret, redirectUri });
+    const { issuer, clientId, clientSecret, redirectUri, forceRedirect, scopes } = this.config;
+    const state = JSON.stringify({ issuer, clientId, clientSecret, redirectUri });
 
     // This test app allows selecting arbitrary widget versions. We must use `renderEl` for compatibility with older versions.
     const renderOptions: any = {
@@ -300,7 +300,7 @@ class TestApp {
 
     widgetConfig.authParams.state = state; // Must set authParams in constructor: OKTA-361428
 
-    if (_forceRedirect) {
+    if (forceRedirect) {
       renderOptions.mode = 'remediation'; // since version 5.0
       widgetConfig.authParams.display = 'page'; // version < 5.0
     } else {
@@ -308,7 +308,7 @@ class TestApp {
     }
 
     // if authClient option is on, all authParams are ignored
-    if (this.config._siwAuthClient) {
+    if (this.config.siwAuthClient) {
       widgetConfig.authParams = undefined;
       widgetConfig.authClient = this.oktaAuth;
     }
@@ -379,7 +379,7 @@ class TestApp {
     saveConfigToStorage(this.config);
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config._defaultScopes ? [] : this.config.scopes,
+      scopes: this.config.defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithRedirect(options)
       .catch(e => {
@@ -391,7 +391,7 @@ class TestApp {
   async loginPopup(options?: TokenParams): Promise<void> {
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config._defaultScopes ? [] : this.config.scopes,
+      scopes: this.config.defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithPopup(options)
     .then(res => {
@@ -403,7 +403,7 @@ class TestApp {
   async getToken(options?: OktaAuthOptions): Promise<void> {
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config._defaultScopes ? [] : this.config.scopes,
+      scopes: this.config.defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithoutPrompt(options)
     .then(res => {
