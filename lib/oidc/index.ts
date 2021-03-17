@@ -16,6 +16,7 @@ export * from './util';
 export { decodeToken } from './decodeToken';
 export { revokeToken } from './revokeToken';
 export { renewToken } from './renewToken';
+export { renewTokensWithRefresh } from './renewTokensWithRefresh';
 export { renewTokens } from './renewTokens';
 export { verifyToken } from './verifyToken';
 export { getUserInfo } from './getUserInfo';

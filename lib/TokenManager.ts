@@ -26,7 +26,8 @@ import {
   isRefreshToken,
   StorageOptions,
   StorageType,
-  OktaAuth
+  OktaAuth,
+  RefreshToken
 } from './types';
 import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_KEY } from './constants';
 
@@ -325,7 +326,21 @@ function renew(sdk, tokenMgmtRef, storage, key) {
 
   // A refresh token means a replace instead of renewal
   // Store the renew promise state, to avoid renewing again
-  tokenMgmtRef.renewPromise[key] = sdk.token.renew(token)
+  tokenMgmtRef.renewPromise[key] = this.getTokens()
+    .then(tokens => tokens.refreshToken as RefreshToken)
+    .then(refreshTokenObject => {
+      if (refreshTokenObject) {
+        return sdk.token.renewTokensWithRefresh({
+          scopes: token.scopes,
+        }, refreshTokenObject)
+        .then(function(freshTokens) {
+          // Multiple tokens may have come back. Return only the token which was requested.
+          return isIDToken(token) ? freshTokens.idToken : freshTokens.accessToken;
+        });
+      } else {
+        return sdk.token.renew(token);
+      }
+    })
     .then(function(freshToken) {
       // store and emit events for freshToken
       const oldTokenStorage = storage.getStorage();
