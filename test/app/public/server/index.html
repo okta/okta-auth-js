@@ -13,21 +13,14 @@
         <a href="/static" onclick="navigateToApp('/static', event)">Static SPA App</a>
       </div>
       <div id="form" class="box">
-        <strong>Authn V1</strong>
+        <strong>SignIn</strong>
         <hr/>
         <form method="POST" action="/login">
+          <input id="_useInteractionCodeFlow" type="hidden" name="useInteractionCodeFlow"/>
           <label for="issuer">Issuer:</label><input name="issuer" id="issuer" placeholder="issuer" type="text"/><br/>
           <label for="username">Username:</label><input name="username" id="username" placeholder="username" type="email"/><br/>
           <label for="password">Password:</label><input name="password" id="password" placeholder="password" type="password"/><br/>
           <input id="submitBtn" type="submit"/>
-        </form>
-      </div>
-      <div class="box">
-        <strong>OIE V2</strong>
-        <hr/>
-        <form method="POST" action="/interact">
-          <input id="issuer2" type="hidden" name="issuer"/>
-          <input id="interactBtn" type="submit" value="Interact"/>
         </form>
       </div>
       <div id="results">
@@ -46,11 +39,12 @@
       </div>
     </div>
     <script type="text/javascript">
+    debugger;
       var url = new URL(window.location.href);
       var issuer = url.searchParams.get('issuer');
       document.getElementById('issuer').value = issuer;
-      document.getElementById('issuer2').value = issuer;
-
+      var useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow');
+      document.getElementById('_useInteractionCodeFlow').value = useInteractionCodeFlow;
       ['status', 'sessionToken', 'error'].forEach(function(param) {
         var value = url.searchParams.get(param);
         document.getElementById(param).innerText = value;

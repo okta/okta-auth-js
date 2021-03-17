@@ -2,8 +2,7 @@
 
 require('@okta/env'); // update environment variables from testenv file
 
-const idx = require('@okta/okta-idx-js');
-const loginMiddleware = require('./v1/loginMiddleware');
+const loginMiddleware = require('./loginMiddleware');
 const handleAuthorizationCode = require('./authorizationCodeFlow');
 const interactMiddleware = require('./interact');
 const handleInteractionCode = require('./interactionCodeFlow');
