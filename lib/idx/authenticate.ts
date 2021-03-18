@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { AuthTransaction } from '../tx';
-import { OktaAuth, AuthorizeOptions, IdxTransactionMeta } from '../types';
+import { OktaAuth, AuthorizeOptions, IdxTransactionMeta, RemediationValues } from '../types';
 import { interact } from './interact';
 import { introspect } from './introspect';
 import { remediate } from './remediate';
@@ -21,8 +21,12 @@ export async function authenticate(authClient: OktaAuth, options: AuthorizeOptio
 
   let idxResponse = await introspect(authClient, { stateHandle });
 
+  const values: RemediationValues = Object.assign({}, options, {
+    stateHandle
+  });
+
   // Can we handle the remediations?
-  idxResponse = await remediate(authClient, options, idxResponse, stateHandle);
+  idxResponse = await remediate(idxResponse, values);
 
   // Did we get an interaction code?
   let status = 'FAILURE';

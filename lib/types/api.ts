@@ -17,7 +17,7 @@ import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
 import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
-import { AuthorizeOptions } from './idx';
+import { AuthorizeOptions } from '../idx/types';
 
 export interface OktaAuth {
   options: OktaAuthOptions;

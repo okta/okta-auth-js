@@ -1,65 +1,82 @@
 /* eslint-disable complexity */
-import { OktaAuth, AuthorizeOptions, IdxResponse, isRawIdxResponse } from '../types';
-import { createApiError } from './util';
+import { IdxResponse, isRawIdxResponse, RemediationValues, Remediator, IdxRemediation } from '../types';
+import { createApiError, isErrorResponse } from './util';
+import Identify from './remediatiors/Identify';
+import { create } from 'lodash';
 
+const REMEDIATORS = {
+  'identify': Identify
+  // add more
+};
 
-function canSatisfyRemediation(options: AuthorizeOptions, idxResponse: IdxResponse) {
-  const { username, password } = options;
-  const { neededToProceed } = idxResponse;
-  if (neededToProceed.length !== 1) {
-    return false;
-  }
-
-  const form = neededToProceed[0];
-  if (form.name === 'identify') {
-    if (username && form.value.find(el => el.name === 'identifier')) {
-      return true;
-    }
-    if (password && form.value.find(el => el.name === 'credentials')) {
-      return true;
+function canRemediate(remediators: Remediator[]) {
+  for (let i = 0; i < remediators.length; i++) {
+    const r = remediators[i];
+    if (r.canRemediate() !== true) {
+      return false;
     }
   }
-
-  if (form.name === 'challenge-authenticator') {
-    if (password && form.value.find(el => el.name === 'credentials')) {
-      return true;
-    }
-  }
-
-  return false;
+  return true;
 }
 
-export async function remediate(
-  authClient: OktaAuth,
-  options: AuthorizeOptions,
+function getData(remediators: Remediator[]) {
+  return remediators.reduce((data, r) => {
+    Object.assign(data, r.getData());
+    return data;
+  }, {});
+}
+
+async function remediateRecursive(
+  neededToProceed: IdxRemediation[],
+  remediators: Remediator[],
+  values: RemediationValues,
   idxResponse: IdxResponse,
-  stateHandle: string
 ) {
   // Recursive loop breaker
-  if (!canSatisfyRemediation(options, idxResponse)) {
+  if (!canRemediate(remediators)) {
     console.log('REMEDIATION CANNOT BE SATISIFIED', idxResponse);
     return idxResponse;
   }
 
-  const { username, password } = options;
-  const { neededToProceed } = idxResponse;
-
-  const form = neededToProceed[0];
-  const data = { stateHandle, identifier: undefined, credentials: undefined };
-  if (form.value.find(el => el.name === 'identifier')) {
-    data.identifier = username;
-  }
-  if (form.value.find(el => el.name === 'credentials')) {
-    data.credentials = { passcode: password };
-  }
-  console.log('PASSING DATA to proceed: ', data);
+  const data = getData(remediators);
+  const form = neededToProceed[0]; // Only considering first remediation
   try {
     idxResponse = await idxResponse.proceed(form.name, data);
-    return remediate(authClient, options, idxResponse, stateHandle); // recursive call
+    if (isErrorResponse(idxResponse)) {
+      throw createApiError(idxResponse.rawIdxState);
+    }
+    if (idxResponse.interactionCode) {
+      return idxResponse;
+    }
+    return remediateRecursive(neededToProceed, remediators, values, idxResponse); // recursive call
   } catch (e) {
-    if (isRawIdxResponse(e)) { // idx responses are sometimes thrown
+    if (isRawIdxResponse(e)) { // idx responses are sometimes thrown, these will be "raw"
       throw createApiError(e);
     }
     throw e;
   }
+}
+
+export async function remediate(
+  idxResponse: IdxResponse,
+  values: RemediationValues
+) {
+  // Only consider the first remediation
+  const neededToProceed = idxResponse.neededToProceed.slice(0, 1);
+  
+  const remediators = [];
+  for (let i = 0; i < neededToProceed.length; i++) {
+    const idxRemediation = neededToProceed[i];
+    const name = idxRemediation.name;
+    const T = REMEDIATORS[name];
+    if (!T) {
+      // No remediator is registered. bail!
+      console.log(`No remediator registered for "${name}"`);
+      return idxResponse;
+    }
+    const remediator = new T(idxRemediation, values);
+    remediators.push(remediator);
+  }
+
+  return remediateRecursive(neededToProceed, remediators, values, idxResponse);
 }

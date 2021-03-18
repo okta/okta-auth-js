@@ -357,6 +357,9 @@ class TestApp {
   }
 
   async loginDirect(): Promise<void> {
+    // Make sure we are starting a fresh transaction
+    this.oktaAuth.storageManager.getTransactionStorage().clearStorage();
+
     const username = (document.getElementById('username') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
     return this.oktaAuth.signIn({username, password})
