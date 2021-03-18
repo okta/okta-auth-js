@@ -12,7 +12,7 @@
 
 /* global TextEncoder */
 import { stringToBase64Url } from './base64';
-import webcrypto from './webcrypto';
+import { webcrypto } from './webcrypto';
 
 export function getOidcHash(str) {  
   var buffer = new TextEncoder().encode(str);

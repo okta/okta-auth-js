@@ -12,7 +12,7 @@
 
 import { clone } from '../util';
 import { stringToBuffer, base64UrlDecode } from './base64';
-import webcrypto from './webcrypto';
+import { webcrypto } from './webcrypto';
 
 export function verifyToken(idToken, key) {
   key = clone(key);

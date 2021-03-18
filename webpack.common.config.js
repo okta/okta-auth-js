@@ -38,13 +38,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.ts']
-  },
-  externals: {
-    // use built-in objects and functions
-    './atob': 'atob',
-    './btoa': 'btoa',
-    './webcrypto': 'crypto'
+    extensions: ['.js', '.ts'],
+    alias: {
+      './node$': './browser' // use browser built-in objects and functions
+    }
   },
   plugins: [
     new webpack.DefinePlugin({
