@@ -82,6 +82,12 @@ async function satisfyRemediations(
 
 export async function authenticate(authClient: OktaAuth, options: AuthorizeOptions): Promise<AuthTransaction> {
   let { state, scopes, interactionHandle } = options;
+
+  if (interactionHandle) {
+    // resume existing transaction, not supported yet
+    throw new Error('Unexpectedly found a saved interaction handle. Check storageManager config');
+  }
+
   const interactResponse = await interact(authClient, { state, scopes, interactionHandle });
   const { stateHandle } = interactResponse;
   if (!interactionHandle) {

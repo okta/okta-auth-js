@@ -23,7 +23,7 @@ import { getTransactionMeta, saveTransactionMeta } from './transactionMeta';
 export async function interact (authClient: OktaAuth, options?: InteractOptions): Promise<InteractResponse> {
 
   let meta = await getTransactionMeta(authClient);
-
+console.log('INTERACT META: ', meta);
   // These properties are always loaded from meta (or calculated fresh)
   const {
     interactionHandle,
@@ -68,7 +68,6 @@ export async function interact (authClient: OktaAuth, options?: InteractOptions)
     codeChallengeMethod
   })
     .then(response => {
-      console.log('RESPONse, ', response);
       // If this is a new transaction an interactionHandle was returned
       if (!interactionHandle && response.toPersist.interactionHandle) {
         meta = Object.assign({}, meta, {

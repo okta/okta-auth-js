@@ -1,10 +1,17 @@
 const util = require('../src/util');
 const getAuthClient = require('./authClient');
 
+const crypto = require('crypto');
+
+function uniqueId() {
+  return crypto.randomBytes(16).toString('hex');
+}
+
 module.exports = function loginMiddleware(req, res) {
   console.log('loginMiddleware received form data:', req.body, req.query, req.url, req.originalUrl);
   const username = req.body.username;
   const password = req.body.password;
+  const transactionId = req.body.transactionId || uniqueId();
 
   const config = JSON.parse(req.body.config);
   const issuer = config.issuer;
@@ -17,6 +24,12 @@ module.exports = function loginMiddleware(req, res) {
   let error = '';
   
   const authClient = getAuthClient({
+    // Each transaction needs unique storage, there may be several clients
+    storageManager: {
+      transaction: {
+        storageKey: 'transaction-' + transactionId
+      }
+    },
     issuer,
     clientId,
     redirectUri,

@@ -46,6 +46,7 @@ export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls)
   validateOptions(options);
   var data = getPostData(options);
 
+  console.log('POSTING TO TOKEN: ', urls.tokenUrl, data);
   return http.httpRequest(sdk, {
     url: urls.tokenUrl,
     method: 'POST',
