@@ -38,6 +38,7 @@ export interface InteractResponse {
   state?: string;
   stateHandle?: string;
   interactionHandle?: string;
+  idxResponse?: IdxResponse;
 }
 
 

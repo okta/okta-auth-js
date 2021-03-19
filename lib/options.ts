@@ -134,6 +134,9 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     cookies: isBrowser() ? getCookieSettings(args, isHTTPS()) : args.cookies,
 
     // Give the developer the ability to disable token signature validation.
-    ignoreSignature: !!args.ignoreSignature
+    ignoreSignature: !!args.ignoreSignature,
+
+    // Server-side web applications
+    clientSecret: args.clientSecret
   });
 }

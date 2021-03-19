@@ -38,7 +38,7 @@ let config: Config;
 const rootElem = document.getElementById('root');
 
 window.addEventListener('load', () => {
-  rootElem.classList.add('loaded');
+  rootElem && rootElem.classList.add('loaded');
 });
 
 function mount(): TestApp {

@@ -46,7 +46,6 @@ export function isPopupPostMessageSupported() {
 }
 
 export function isTokenVerifySupported() {
-  console.log('CRYPTO: ', webcrypto);
   return typeof webcrypto !== 'undefined' && webcrypto.subtle && typeof Uint8Array !== 'undefined';
 }
 

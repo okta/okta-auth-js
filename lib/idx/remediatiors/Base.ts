@@ -17,13 +17,8 @@ export default class Base {
       return false;
     }
     const required = getRequiredValues(this.remediation);
-    const needed = required.find((key) => {
-      if (!this.hasData(key)) {
-        return key;
-      }
-    });
+    const needed = required.find((key) => !this.hasData(key));
     if (needed) {
-      console.log(`Missing value for required field: "${needed}"`);
       return false; // missing data for a required field
     }
     return true; // all required fields have available data

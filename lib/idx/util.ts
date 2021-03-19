@@ -2,7 +2,6 @@ import { AuthApiError } from '../errors';
 import { APIError, IdxRemediation, IdxResponse } from '../types';
 
 export function createApiError(res): APIError {
-  console.log('CREATE API ERROR: ', JSON.stringify(res.messages, null, 2));
   let allErrors = [];
 
   if (res.messages && Array.isArray(res.messages.value)) {

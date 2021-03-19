@@ -63,7 +63,6 @@ export class AuthTransaction implements TransactionState, AuthTransactionFunctio
   target?: Record<string, any>;
   authentication?: Record<string, any>;
   constructor(sdk, res = null) {
-    console.log('CREATING AUTH TRANSACTION: ', res);
     if (res) {
       this.data = res;
 

@@ -24,15 +24,13 @@ let crypto;
 try {
   crypto = require('crypto');
 } catch (err) {
-  console.log('could not require("crypto")');
+  // this environment has no crypto module!
 }
 
 let webCrypto;
 if (typeof crypto !== 'undefined' && crypto['webcrypto']) {
-  console.log('UING BUILT IN CRYPTO');
   webCrypto = crypto['webcrypto'];
 } else {
-  console.log('PONYFILLING');
   const { Crypto } = require('@peculiar/webcrypto');
   webCrypto = new Crypto();
 }

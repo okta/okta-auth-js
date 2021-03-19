@@ -17,6 +17,9 @@ module.exports = function loginMiddleware(req, res) {
   const issuer = config.issuer;
   const clientId = config.clientId;
   const redirectUri = config.redirectUri;
+  const scopes = config.scopes;
+  const responseType = config.responseType;
+  const clientSecret = config.clientSecret;
   const useInteractionCodeFlow = config.useInteractionCodeFlow;
 
   let status = '';
@@ -33,6 +36,9 @@ module.exports = function loginMiddleware(req, res) {
     issuer,
     clientId,
     redirectUri,
+    scopes,
+    responseType,
+    clientSecret,
     useInteractionCodeFlow
   });
 

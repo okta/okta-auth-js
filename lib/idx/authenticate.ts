@@ -14,12 +14,10 @@ export async function authenticate(authClient: OktaAuth, options: AuthorizeOptio
   }
 
   const interactResponse = await interact(authClient, { state, scopes, interactionHandle });
-  const { stateHandle } = interactResponse;
+  let { stateHandle, idxResponse } = interactResponse;
   if (!interactionHandle) {
     interactionHandle = interactResponse.interactionHandle;
   }
-
-  let idxResponse = await introspect(authClient, { stateHandle });
 
   const values: RemediationValues = Object.assign({}, options, {
     stateHandle
@@ -43,7 +41,6 @@ export async function authenticate(authClient: OktaAuth, options: AuthorizeOptio
       ignoreSignature
     } = meta;
 
-    console.log('META', meta);
     tokens = await authClient.token.exchangeCodeForTokens({
       interactionCode,
       codeVerifier,

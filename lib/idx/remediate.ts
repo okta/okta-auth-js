@@ -22,14 +22,12 @@ export async function remediate(
   const T = REMEDIATORS[name];
   if (!T) {
     // No remediator is registered. bail!
-    console.log(`No remediator registered for "${name}"`);
     return idxResponse;
   }
   const remediator = new T(idxRemediation, values);
 
   // Recursive loop breaker
   if (!remediator.canRemediate()) {
-    console.log('REMEDIATION CANNOT BE SATISIFIED', idxResponse);
     return idxResponse;
   }
 

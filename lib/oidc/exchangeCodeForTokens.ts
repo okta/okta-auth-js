@@ -42,11 +42,8 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
     codeVerifier,
   };
 
-  console.log('GETTOKEN OPTIONS', getTokenOptions, urls);
   return postToTokenEndpoint(sdk, getTokenOptions, urls)
     .then((response: OAuthResponse) => {
-
-      console.log('OAUTH RESPONSE', response);
 
       // `handleOAuthResponse` hanadles responses from both `/authorize` and `/token` endpoints
       // Here we modify the response from `/token` so that it more closely matches a response from `/authorize`
