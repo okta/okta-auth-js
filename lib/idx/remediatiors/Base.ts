@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { RemediationValues, IdxRemediation, IdxToRemediationValueMap } from '../types';
-import { getRequiredValues } from '../util';
+import { getAllValues, getRequiredValues } from '../util';
 
 export default class Base {
   remediation: IdxRemediation;
@@ -36,7 +36,8 @@ export default class Base {
     }
 
     if (!key) {
-      let res = Object.keys(this.map).reduce((data, key) => {
+      let allValues = getAllValues(this.remediation);
+      let res = allValues.reduce((data, key) => {
         data[key] = this.getData(key); // recursive
         return data;
       }, {});
@@ -78,7 +79,6 @@ export default class Base {
     });
   }
 
-  
   // only handles primitive types
   formatValue(key: string) {
     return this.values[key];

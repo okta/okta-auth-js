@@ -15,6 +15,10 @@ export function createApiError(res): APIError {
   });
 }
 
+export function getAllValues(idxRemediation: IdxRemediation) {
+  return idxRemediation.value.map(r => r.name);
+}
+
 export function getRequiredValues(idxRemediation: IdxRemediation) {
   return idxRemediation.value.reduce((required, cur) => {
     if (cur.required) {

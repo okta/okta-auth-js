@@ -28,7 +28,6 @@ try {
 }
 
 let webCrypto;
-console.log('crypto: ', crypto);
 if (typeof crypto !== 'undefined' && crypto['webcrypto']) {
   console.log('UING BUILT IN CRYPTO');
   webCrypto = crypto['webcrypto'];
