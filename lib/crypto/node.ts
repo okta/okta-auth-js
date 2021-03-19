@@ -20,10 +20,18 @@ if (typeof btoa !== 'undefined') {
 }
 export { b as btoa };
 
+let crypto;
+try {
+  crypto = require('crypto');
+} catch (err) {
+  console.log('could not require("crypto")');
+}
+
 let webCrypto;
-if (typeof crypto !== 'undefined' && crypto.subtle) {
+console.log('crypto: ', crypto);
+if (typeof crypto !== 'undefined' && crypto['webcrypto']) {
   console.log('UING BUILT IN CRYPTO');
-  webCrypto = crypto;
+  webCrypto = crypto['webcrypto'];
 } else {
   console.log('PONYFILLING');
   const { Crypto } = require('@peculiar/webcrypto');
