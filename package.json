@@ -23,9 +23,9 @@
     "clean:build": "rimraf build && rimraf build2",
     "dev": "webpack --config webpack.dev.config.js",
     "lint": "eslint .",
-    "dtslint": "scripts/dtslint.sh",
+    "tsd": "scripts/tsd.sh",
     "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",
-    "validate": "yarn tsc --noEmit && yarn lint && yarn --cwd test/app validate && yarn dtslint",
+    "validate": "yarn tsc --noEmit && yarn lint && yarn --cwd test/app validate && yarn tsd",
     "test": "yarn test:unit && yarn test:samples && yarn test:e2e",
     "test:unit": "yarn test:karma && yarn test:server && yarn test:browser",
     "posttest:e2e": "yarn stop",
@@ -78,6 +78,7 @@
     "p-cancelable": "^2.0.0",
     "text-encoding": "^0.7.0",
     "tiny-emitter": "1.1.0",
+    "tsd": "^0.14.0",
     "webcrypto-shim": "^0.1.5",
     "xhr2": "0.1.3"
   },
@@ -102,7 +103,6 @@
     "babel-plugin-mockable-imports": "^1.7.1",
     "chalk": "2.4.2",
     "cross-env": "^5.1.1",
-    "dtslint": "^4.0.7",
     "eslint": "^7.1.0",
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-jasmine": "^2.10.1",
@@ -142,5 +142,19 @@
     "samples",
     "samples/test",
     "samples/generated/*"
-  ]
+  ],
+  "tsd": {
+    "directory": "build",
+    "compilerOptions": {
+      "skipLibCheck": true,
+      "lib": [
+        "dom"
+      ],
+      "paths": {
+        "@okta/okta-auth-js": [
+          "./build"
+        ]
+      }
+    }
+  }
 }

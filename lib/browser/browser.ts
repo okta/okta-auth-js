@@ -72,7 +72,8 @@ import {
   UserClaims, 
   SigninWithRedirectOptions,
   SignInWithCredentialsOptions,
-  Tokens
+  Tokens,
+  SignoutOptions
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
@@ -290,7 +291,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     });
   }
 
-  async signInWithRedirect({ originalUri, ...additionalParams }: SigninWithRedirectOptions = {}) {
+  async signInWithRedirect(opts: SigninWithRedirectOptions = {}) {
+    const { originalUri, ...additionalParams } = opts;
     if(this._pending.handleLogin) { 
       // Don't trigger second round
       return;
@@ -328,7 +330,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
   
   // Revokes the access token for the application session
-  async revokeAccessToken(accessToken?: AccessToken) {
+  async revokeAccessToken(accessToken?: AccessToken): Promise<object> {
     if (!accessToken) {
       accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
       const accessTokenKey = this.tokenManager._getStorageKeyByType('accessToken');
@@ -342,7 +344,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   // Revokes the refresh token for the application session
-  async revokeRefreshToken(refreshToken?: RefreshToken) {
+  async revokeRefreshToken(refreshToken?: RefreshToken): Promise<object> {
     if (!refreshToken) {
       refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
       const refreshTokenKey = this.tokenManager._getStorageKeyByType('refreshToken');
@@ -356,7 +358,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
 
   // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
-  async signOut(options?) {
+  async signOut(options?: SignoutOptions) {
     options = Object.assign({}, options);
   
     // postLogoutRedirectUri must be whitelisted in Okta Admin UI
@@ -425,7 +427,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     window.location.assign(logoutUri);
   }
 
-  webfinger(opts) {
+  webfinger(opts): Promise<object> {
     var url = '/.well-known/webfinger' + toQueryString(opts);
     var options = {
       headers: {

@@ -13,7 +13,12 @@
     "isolatedModules": true,
     "moduleResolution": "node",
     "target": "es2017",
-    "baseUrl": ".."
+    "baseUrl": ".",
+    "paths": {
+      "@okta/okta-auth-js": [
+        "."
+      ]
+    }
   },
   "include": [
     "./**/*.d.ts"
