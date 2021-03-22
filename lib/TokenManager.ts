@@ -305,6 +305,24 @@ function remove(tokenMgmtRef, storage, key) {
   emitRemoved(tokenMgmtRef, key, removedToken);
 }
 
+function _renewToken(sdk, token) {
+  return this.getTokens()
+    .then(tokens => tokens.refreshToken as RefreshToken)
+    .then(refreshTokenObject => {
+      if (refreshTokenObject) {
+        return sdk.token.renewTokensWithRefresh({
+          scopes: token.scopes,
+        }, refreshTokenObject)
+        .then(function(freshTokens) {
+          // Multiple tokens may have come back. Return only the token which was requested.
+          return isIDToken(token) ? freshTokens.idToken : freshTokens.accessToken;
+        });
+      } else {
+        return sdk.token.renew(token);
+      }
+    });
+}
+
 function renew(sdk, tokenMgmtRef, storage, key) {
   // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
   var existingPromise = tokenMgmtRef.renewPromise[key];
@@ -326,21 +344,7 @@ function renew(sdk, tokenMgmtRef, storage, key) {
 
   // A refresh token means a replace instead of renewal
   // Store the renew promise state, to avoid renewing again
-  tokenMgmtRef.renewPromise[key] = this.getTokens()
-    .then(tokens => tokens.refreshToken as RefreshToken)
-    .then(refreshTokenObject => {
-      if (refreshTokenObject) {
-        return sdk.token.renewTokensWithRefresh({
-          scopes: token.scopes,
-        }, refreshTokenObject)
-        .then(function(freshTokens) {
-          // Multiple tokens may have come back. Return only the token which was requested.
-          return isIDToken(token) ? freshTokens.idToken : freshTokens.accessToken;
-        });
-      } else {
-        return sdk.token.renew(token);
-      }
-    })
+  tokenMgmtRef.renewPromise[key] = _renewToken.call(this, sdk, token)
     .then(function(freshToken) {
       // store and emit events for freshToken
       const oldTokenStorage = storage.getStorage();
