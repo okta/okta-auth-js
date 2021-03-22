@@ -148,6 +148,7 @@ export interface TokenAPI extends BaseTokenAPI {
   revoke(token: RevocableToken): Promise<object>;
   renew(token: Token): Promise<Token>;
   renewTokens(): Promise<Tokens>;
+  renewTokensWithRefresh(refreshTokenObject: RefreshToken): Promise<Tokens>;
   verify(token: IDToken, params?: object): Promise<IDToken>;
   isLoginRedirect(): boolean;
 }

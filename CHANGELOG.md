@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.9.0
+
+### Bug Fixes
+
+- [#656](https://github.com/okta/okta-auth-js/pull/656) Fixes `TokenManager.renew` to renew only requested token
+
+### Features
+
+- [#656](https://github.com/okta/okta-auth-js/pull/656) Adds `token.renewTokensWithRefresh`
+
 ## 4.8.0
 
 ### Features
