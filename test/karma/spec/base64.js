@@ -1,6 +1,6 @@
-import { base64ToBase64Url, stringToBase64Url, base64UrlToString } from '../../../lib/util';
+import { base64ToBase64Url, stringToBase64Url, base64UrlToString } from '../../../lib/crypto/base64';
 
-describe('util', function() {
+describe('base64', function() {
 
   const LONG_STRING = 'Contrary to popular belief, Lorem Ipsum is not simply random text. ' +
     'It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. ';

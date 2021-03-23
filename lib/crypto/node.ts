@@ -1,4 +1,4 @@
-/* global atob, btoa, crypto */
+/* global atob, btoa */
 
 // Ponyfill for NodeJS
 // Webpack config excludes this file
