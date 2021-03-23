@@ -1,15 +1,15 @@
 const handleAuthorizationCode = require('./authorizationCodeFlow');
 const handleInteractionCode = require('./interactionCodeFlow');
 
-function getTokens(req) {
+function getTokens(req, res, next) {
   const interactionCode = req.query.interaction_code;
   if (interactionCode) {
-    return handleInteractionCode(req);
+    return handleInteractionCode(req, res, next);
   }
 
   const authorizationCode = req.query.code;
   if (authorizationCode) {
-    return handleAuthorizationCode(req);
+    return handleAuthorizationCode(req, res, next);
   }
 
   // We don't understand the URL, or there are no query parameters
@@ -40,7 +40,7 @@ function responseHtml(req, result, error, errorDescription) {
   `;
 }
 
-module.exports = function callbackMiddleware(req, res) {
+module.exports = function callbackMiddleware(req, res, next) {
   // OAuth errors may be returned as a query parameter
   const error = req.query.error;
   if (error) {
@@ -49,7 +49,7 @@ module.exports = function callbackMiddleware(req, res) {
   }
 
   let result = '';
-  getTokens(req)
+  getTokens(req, res, next)
   .then(tokens => {
     result = JSON.stringify(tokens, null, 2);
   })

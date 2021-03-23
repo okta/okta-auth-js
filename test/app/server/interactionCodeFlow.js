@@ -1,6 +1,6 @@
 const getAuthClient = require('./authClient');
 
-// The request query should contain a code and state, or an error and error_description.
+// The request query should contain an interaction_code and state OR an error and error_description.
 module.exports = function handleInteractionCode(req) {
   const interactionCode = req.query.interaction_code;
 
@@ -8,7 +8,6 @@ module.exports = function handleInteractionCode(req) {
   const state = JSON.parse(req.query.state);
   const { issuer, clientId, redirectUri, transactionId, clientSecret } = state;
 
-  console.log('TRANSCATION ID', transactionId);
   const authClient = getAuthClient({
     // Each transaction needs unique storage, there may be several clients
     storageManager: {
@@ -23,13 +22,6 @@ module.exports = function handleInteractionCode(req) {
   });
 
   const meta = authClient.transactionManager.load();
-  console.log('READ META FROM STORAG: ', meta);
   const { codeVerifier } = meta;
-  return authClient.token.exchangeCodeForTokens({ interactionCode, codeVerifier })
-    .then((res) => {
-      console.log('Result', res);
-    })
-    .catch(err => {
-      console.error('Caught error: ', err);
-    });
+  return authClient.token.exchangeCodeForTokens({ interactionCode, codeVerifier });
 };
