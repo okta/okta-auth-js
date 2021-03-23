@@ -67,6 +67,7 @@ export class AuthTransaction implements TransactionState, AuthTransactionFunctio
       this.data = res;
 
       if (this.data.interactionHandle) {
+        this.status = res.status;
         return;
       }
 

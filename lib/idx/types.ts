@@ -1,3 +1,11 @@
+import { AuthTransaction } from '../tx';
+import { IdxTransactionMeta } from '../types/Transaction';
+
+export interface IdxApi {
+  authenticate: (options: AuthorizeOptions) => Promise<AuthTransaction>;
+  interact: (options?: InteractOptions) => Promise<InteractResponse>;
+}
+
 // Values used to resolve remediations
 export interface RemediationValues {
   credentials?: {
@@ -39,6 +47,7 @@ export interface InteractResponse {
   stateHandle?: string;
   interactionHandle?: string;
   idxResponse?: IdxResponse;
+  meta?: IdxTransactionMeta;
 }
 
 

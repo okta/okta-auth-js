@@ -6,11 +6,30 @@ module.exports = function handleInteractionCode(req) {
 
   // state can be any string. In this sample are using it to store our config
   const state = JSON.parse(req.query.state);
-  const { issuer, clientId, redirectUri } = state;
+  const { issuer, clientId, redirectUri, transactionId, clientSecret } = state;
 
-  const authClient = getAuthClient({ issuer, clientId, redirectUri });
-  return authClient.token.exchangeCodeForTokens({ interactionCode })
+  console.log('TRANSCATION ID', transactionId);
+  const authClient = getAuthClient({
+    // Each transaction needs unique storage, there may be several clients
+    storageManager: {
+      transaction: {
+        storageKey: 'transaction-' + transactionId
+      }
+    },
+    issuer,
+    clientId,
+    redirectUri,
+    clientSecret
+  });
+
+  const meta = authClient.transactionManager.load();
+  console.log('READ META FROM STORAG: ', meta);
+  const { codeVerifier } = meta;
+  return authClient.token.exchangeCodeForTokens({ interactionCode, codeVerifier })
     .then((res) => {
       console.log('Result', res);
+    })
+    .catch(err => {
+      console.error('Caught error: ', err);
     });
 };

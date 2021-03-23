@@ -29,25 +29,7 @@ import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryString } from './util';
 import { showConfigForm } from './form';
 import { tokensHTML } from './tokens';
-import { buildWidgetConfig } from './widget';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const BundledOktaSignIn = require('@okta/okta-signin-widget');
-
-declare global {
-  interface Window {
-    OktaSignIn: any;
-    getWidgetConfig: () => any;
-  }
-}
-
-declare class OktaSignIn {
-  constructor(options: any);
-  renderEl(options: any, successFn: Function, errorFn: Function): void;
-  showSignInToGetTokens(options: any): void;
-  remove(): void;
-  on(event: string, fn: Function): void;
-}
+import { renderWidget } from './widget';
 
 function homeLink(app: TestApp): string {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
@@ -69,11 +51,6 @@ const subscribeLinks = [
 const Toolbar = `${ subscribeLinks.join('&nbsp;|&nbsp;') }`;
 
 const Layout = `
-  <div id="modal">
-    <div id="widget-container">
-      <div id="widget"></div>
-    </div>
-  </div>
   <div id="layout">
     <div id="session-expired" style="color: orange"></div>
     <div id="token-error" style="color: red"></div>
@@ -117,38 +94,6 @@ function bindFunctions(testApp: TestApp, window: Window): void {
   Object.keys(boundFunctions).forEach(functionName => {
     (window as any)[functionName] = makeClickHandler((boundFunctions as any)[functionName]);
   });
-}
-
-async function injectWidgetCSS(widgetVersion = ''): Promise<void> {
-  const useBundled = widgetVersion === '';
-  const baseUrl = useBundled ? `${window.location.origin}/siw` : 'https://global.oktacdn.com/okta-signin-widget';
-  return new Promise((resolve, reject) => {
-      // inject CSS
-      const link = document.createElement('link');
-      link.type='text/css';
-      link.rel='stylesheet';
-      document.getElementsByTagName('head')[0].appendChild(link);
-      link.onload = (): void => { resolve(); };
-      link.onerror = (e): void => { reject(e); };
-      link.href = `${baseUrl}/${widgetVersion}/css/okta-sign-in.min.css`;
-  });
-}
-
-async function injectWidgetScript(widgetVersion: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // inject script
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    document.getElementsByTagName('head')[0].appendChild(script);
-    script.onload = (): void => { resolve(); };
-    script.onerror = (e): void => { reject(e); };
-    script.src = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/js/okta-sign-in.min.js`;
-  }); 
-}
-
-async function injectWidgetFromCDN(widgetVersion: string): Promise<void> {
-  await injectWidgetCSS(widgetVersion);
-  await injectWidgetScript(widgetVersion);
 }
 
 class TestApp {
@@ -267,93 +212,13 @@ class TestApp {
   }
 
   async renderWidget(): Promise<void> {
-    const siwVersion = this.config.siwVersion;
-    if (siwVersion) {
-      await injectWidgetFromCDN(siwVersion);
-    } else {
-      await injectWidgetCSS();
-      window.OktaSignIn = BundledOktaSignIn;
-    }
+    const tokens: Tokens = await renderWidget(this.config, this.oktaAuth);
 
-    document.getElementById('modal').style.display = 'block';
-    const widgetConfig = buildWidgetConfig(this.config);
-    const { issuer, clientId, clientSecret, redirectUri, forceRedirect, scopes } = this.config;
-    const state = JSON.stringify({ issuer, clientId, clientSecret, redirectUri });
+    // save tokens
+    this.oktaAuth.tokenManager.setTokens(tokens);
 
-    // This test app allows selecting arbitrary widget versions. We must use `renderEl` for compatibility with older versions.
-    const renderOptions: any = {
-      clientId,
-      redirectUri,
-
-      scopes,
-      state, // Not working: OKTA-361428
-      
-      // Return an access token from the authorization server
-      getAccessToken: true,
-  
-      // Return an ID token from the authorization server
-      getIdToken: true,
-
-      // Return a Refresh token from the authorization server
-      getRefreshToken: true
-    };
-
-    widgetConfig.authParams.state = state; // Must set authParams in constructor: OKTA-361428
-
-    if (forceRedirect) {
-      renderOptions.mode = 'remediation'; // since version 5.0
-      widgetConfig.authParams.display = 'page'; // version < 5.0
-    } else {
-      widgetConfig.authParams.display = 'none'; // version < 5.0
-    }
-
-    // if authClient option is on, all authParams are ignored
-    if (this.config.siwAuthClient) {
-      widgetConfig.authParams = undefined;
-      widgetConfig.authClient = this.oktaAuth;
-    }
-
-    const signIn = new OktaSignIn(widgetConfig);
-    signIn.on('afterError', function (context: any, error: any) {
-        console.log('Sign-in Widget afterError: ', context.controller, error);
-    });
-    signIn.renderEl(renderOptions,
-      (res: any) => {
-        console.log(`signin.renderEl: success callback fired: `, res);
-        if (res.status === 'SUCCESS') {
-          // remove widget
-          signIn.remove();
-          document.getElementById('modal').style.display = 'none';
-
-          // save tokens
-          let tokens: Tokens;
-          // Older widget versions returned tokens as an array
-          if (Array.isArray(res)) {
-            tokens = {};
-            for (let i = 0; i < res.length; i++) {
-              const token = res[i];
-              if (token.idToken) {
-                tokens.idToken = token;
-              } else if (token.accessToken) {
-                tokens.accessToken = token;
-              }
-            }
-          } else {
-            // Current versions return an object hash
-            tokens = res.tokens;
-          }
-          this.oktaAuth.tokenManager.setTokens(tokens);
-
-          // re-render
-          this.render();
-        } else {
-          console.log(`signin.renderEl: result status was ${res.status}`, res);
-        }
-      },
-      (err: any) => {
-        console.log(`signin.renderEl: error callback fired`, err);
-      }
-    );
+    // re-render
+    this.render();
   }
 
   async loginDirect(): Promise<void> {

@@ -2,7 +2,6 @@
 import { AuthTransaction } from '../tx';
 import { OktaAuth, AuthorizeOptions, IdxTransactionMeta, RemediationValues } from '../types';
 import { interact } from './interact';
-import { introspect } from './introspect';
 import { remediate } from './remediate';
 
 export async function authenticate(authClient: OktaAuth, options: AuthorizeOptions): Promise<AuthTransaction> {

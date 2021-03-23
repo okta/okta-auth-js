@@ -38,7 +38,8 @@ import {
   SessionAPI,
   SigninAPI,
   PkceAPI,
-  SigninOptions
+  SigninOptions,
+  IdxApi
 } from './types';
 import {
   transactionStatus,
@@ -91,7 +92,7 @@ import { AuthStateManager } from './AuthStateManager';
 import StorageManager from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
-import { authenticate } from './idx';
+import { authenticate, interact } from './idx';
 
 const Emitter = require('tiny-emitter');
 
@@ -100,6 +101,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   storageManager: StorageManager;
   transactionManager: TransactionManager;
   tx: TransactionAPI;
+  idx: IdxApi;
   userAgent: string;
   session: SessionAPI;
   pkce: PkceAPI;
@@ -225,6 +227,12 @@ class OktaAuth implements SigninAPI, SignoutAPI {
         return window.document;
       }
     });
+
+    // IDX
+    this.idx = {
+      authenticate: authenticate.bind(null, this),
+      interact: interact.bind(null, this)
+    };
 
     // Fingerprint API
     this.fingerprint = fingerprint.bind(null, this);

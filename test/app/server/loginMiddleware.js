@@ -1,11 +1,6 @@
-const util = require('../src/util');
+const uniqueId = require('./util').uniqueId;
 const getAuthClient = require('./authClient');
-
-const crypto = require('crypto');
-
-function uniqueId() {
-  return crypto.randomBytes(16).toString('hex');
-}
+const toQueryString = require('../src/util').toQueryString;
 
 module.exports = function loginMiddleware(req, res) {
   console.log('loginMiddleware received form data:', req.body, req.query, req.url, req.originalUrl);
@@ -53,11 +48,12 @@ module.exports = function loginMiddleware(req, res) {
     console.error('loginMiddleware caught error: ', error, JSON.stringify(error, null, 2));
   })
   .finally(function() {
-    const qs = util.toQueryString(Object.assign({}, config, {
+    const qs = toQueryString(Object.assign({}, config, {
       status,
       sessionToken,
       error: JSON.stringify(error, null, 2)
     }));
+    console.log('Reloading the page. STATUS=', status);
     res.redirect('/server' + qs);
   });
 };

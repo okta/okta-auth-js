@@ -21,6 +21,8 @@
           <label for="password">Password:</label><input name="password" id="password" placeholder="password" type="password"/><br/>
           <input id="submitBtn" type="submit"/>
         </form>
+        <hr/>
+        <a id="widget-link" href="/login">Use Sign-In Widget</a>
       </div>
       <div id="results">
         <div class="box">
@@ -62,6 +64,8 @@
         if (!value) return;
         document.getElementById(param).innerText = value;
       });
+      // widget link
+      document.getElementById('widget-link').href = '/login?' + query;
     </script>
     <a href="/">Back to SPA app</a>
   </body>

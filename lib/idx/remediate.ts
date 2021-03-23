@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
-import { IdxResponse, isRawIdxResponse, RemediationValues, Remediator, IdxRemediation } from '../types';
+import { IdxResponse, isRawIdxResponse, RemediationValues } from '../types';
 import { createApiError, isErrorResponse } from './util';
 import Identify from './remediatiors/Identify';
 import ChallengeAuthenticator from './remediatiors/ChallengeAuthenticator';

@@ -14,7 +14,7 @@ import {
 import { onSubmitForm, onFormData, showConfigForm } from './form';
 import { toQueryString } from './util';
 import { FormDataEvent } from './types';
-import { buildWidgetConfig } from './widget';
+import { renderWidget, buildWidgetConfig } from './widget';
 
 declare global {
   interface Window {
@@ -83,7 +83,13 @@ Object.assign(window, {
     const siwConfig = window.location.search ? getConfigFromUrl() : getDefaultConfig();
     return buildWidgetConfig(siwConfig);
   },
-
+  renderWidget: function(event?: Event, extraConfig?: Config): any {
+    if (event) {
+      event.preventDefault();
+    }
+    const config = Object.assign({}, window.getConfig(), extraConfig);
+    return renderWidget(config);
+  },
   // Regular landing, read config from URL
   bootstrapLanding: function(): void {
     config = window.location.search ? getConfigFromUrl() : getDefaultConfig();

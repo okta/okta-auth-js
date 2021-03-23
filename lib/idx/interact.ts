@@ -81,6 +81,7 @@ export async function interact (authClient: OktaAuth, options?: InteractOptions)
       return {
         idxResponse,
         interactionHandle: meta.interactionHandle,
+        meta,
         stateHandle: idxResponse.context.stateHandle,
         state
       };
