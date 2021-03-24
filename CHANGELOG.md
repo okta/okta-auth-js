@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - [#656](https://github.com/okta/okta-auth-js/pull/656) Fixes `TokenManager.renew` to renew only requested token
+- [#669](https://github.com/okta/okta-auth-js/pull/669) Fixes reset password magic link pkce error
 
 ### Features
 
