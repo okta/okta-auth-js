@@ -128,7 +128,9 @@ export default class TransactionManager {
   }
 
   // load transaction meta from storage
+  // eslint-disable-next-line complexity, max-statements
   load(options: TransactionMetaOptions = {}): TransactionMeta {
+
     let storage: StorageProvider = this.storageManager.getTransactionStorage();
     let meta = storage.getStorage();
     if (isTransactionMeta(meta)) {
