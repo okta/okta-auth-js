@@ -4,11 +4,14 @@ describe('TransactionManager', () => {
   let transactionManager;
   let storageManager;
   let mockStorage;
+  let mockStorageLocal;
+  let mockStorageOptions;
 
   beforeEach(() => {
     transactionManager = null;
     storageManager = null;
     mockStorage = null;
+    mockStorageOptions = { storageTypes: [] };
     jest.spyOn(global.console, 'warn').mockReturnValue(null); // ignore storage warnings
   });
 
@@ -21,11 +24,18 @@ describe('TransactionManager', () => {
 
   function createInstance() {
     mockStorage = createMockStorage();
+    mockStorageLocal = createMockStorage();
     storageManager = {
       storageUtil: {},
-      getTransactionStorage: jest.fn().mockReturnValue(mockStorage),
+      getTransactionStorage: jest.fn().mockImplementation(({ storageType } = {}) => {
+        if (storageType === 'localStorage') {
+          return mockStorageLocal;
+        }
+        return mockStorage;
+      }),
       getLegacyPKCEStorage: jest.fn().mockReturnValue(mockStorage),
-      getLegacyOAuthParamsStorage: jest.fn().mockReturnValue(mockStorage)
+      getLegacyOAuthParamsStorage: jest.fn().mockReturnValue(mockStorage),
+      getOptionsForSection: jest.fn().mockImplementation(() => mockStorageOptions),
     };
     transactionManager = new TransactionManager({ storageManager });
   }
@@ -43,6 +53,10 @@ describe('TransactionManager', () => {
         clearStorage
       });
       transactionManager.clear();
+      expect(storageManager.getTransactionStorage).toHaveBeenCalledTimes(2);
+      expect(storageManager.getTransactionStorage).toHaveBeenNthCalledWith(1);
+      expect(storageManager.getTransactionStorage).toHaveBeenNthCalledWith(2, { storageType: 'localStorage' });
+      expect(clearStorage).toHaveBeenCalledTimes(2);
       expect(clearStorage).toHaveBeenCalledWith();
     });
     // This is for compatibility with older versions of the signin widget. OKTA-304806
@@ -73,10 +87,20 @@ describe('TransactionManager', () => {
         getStorage
       });
       meta = { codeVerifier: 'fake', redirectUri: 'http://localhost/fake' };
-      transactionManager.save(meta);
     });
     it('saves to transaction storage', () => {
+      transactionManager.save(meta);
       expect(setStorage).toHaveBeenCalledWith(meta);
+    });
+    it('saves to localStorage as fallback if sessionStorage is the preferred option', () => {
+      mockStorageOptions = { storageTypes: ['sessionStorage'] };
+      transactionManager.save(meta);
+      expect(storageManager.getTransactionStorage).toHaveBeenCalledTimes(2);
+      expect(storageManager.getTransactionStorage).toHaveBeenNthCalledWith(1);
+      expect(storageManager.getTransactionStorage).toHaveBeenNthCalledWith(2, { storageType: 'localStorage' });
+      expect(setStorage).toHaveBeenCalledTimes(2);
+      expect(setStorage).toHaveBeenNthCalledWith(1, meta);
+      expect(setStorage).toHaveBeenNthCalledWith(2, meta);
     });
   });
   describe('load', () => {
@@ -92,6 +116,16 @@ describe('TransactionManager', () => {
     });
     it('can return the meta from transaction storage', () => {
       const res = transactionManager.load();
+      expect(res.codeVerifier).toBe(meta.codeVerifier);
+    });
+    it('tries localStorage as fallback if sessionStorage is the preferred option', () => {
+      mockStorageOptions = { storageTypes: ['sessionStorage'] };
+      mockStorage.getStorage.mockReturnValue({});
+      mockStorageLocal.getStorage.mockReturnValue(meta);
+      const res = transactionManager.load();
+      expect(storageManager.getTransactionStorage).toHaveBeenCalledTimes(2);
+      expect(storageManager.getTransactionStorage).toHaveBeenNthCalledWith(1);
+      expect(storageManager.getTransactionStorage).toHaveBeenNthCalledWith(2, { storageType: 'localStorage' });
       expect(res.codeVerifier).toBe(meta.codeVerifier);
     });
     describe('pkce', () => {

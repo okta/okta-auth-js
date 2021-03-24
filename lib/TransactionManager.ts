@@ -35,6 +35,11 @@ export default class TransactionManager {
     let storage: StorageProvider = this.storageManager.getTransactionStorage();
     storage.clearStorage();
 
+    // Transaction meta is set in localStorage to handle redirect from magic link (different tab)
+    // Always clear meta in localStorage
+    storage = this.storageManager.getTransactionStorage({ storageType: 'localStorage' });
+    storage.clearStorage();
+
     if (!this.legacyWidgetSupport) {
       return;
     }
@@ -63,6 +68,14 @@ export default class TransactionManager {
     }
 
     storage.setStorage(meta);
+
+    // Transaction may continue in a different tab (magic link)
+    // Save meta to both sessionStorage and localStorage if sessionStorage is the preferred option
+    const { storageTypes = [] } = this.storageManager.getOptionsForSection('transaction');
+    if (storageTypes[0] === 'sessionStorage') {
+      storage = this.storageManager.getTransactionStorage({ storageType: 'localStorage' });
+      storage.setStorage(meta);
+    }
 
     if (!options.oauth) {
       return;
@@ -121,6 +134,18 @@ export default class TransactionManager {
     if (isTransactionMeta(meta)) {
       // if we have meta in the new location, there is no need to go further
       return meta;
+    }
+
+    // Try load meta in localStorage to handle transaction continued from different tab (magic link)
+    const { storageTypes = [] } = this.storageManager.getOptionsForSection('transaction');
+    if (storageTypes[0] === 'sessionStorage') {
+      console.log('load from local');
+      storage = this.storageManager.getTransactionStorage({ storageType: 'localStorage' });
+      meta = storage.getStorage();
+
+      if (isTransactionMeta(meta)) {
+        return meta;
+      }
     }
 
     if (!this.legacyWidgetSupport) {
