@@ -284,7 +284,7 @@ export function isIE11OrLess() {
   return !!document.documentMode && document.documentMode <= 11;
 }
 
-export function isFunction(fn: any): fn is Function {
+export function isFunction(fn: any): fn is (() => void) {
   return !!fn && {}.toString.call(fn) === '[object Function]';
 }
 

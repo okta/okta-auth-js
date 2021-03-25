@@ -50,8 +50,21 @@ interface AuthTransactionFunctions {
 }
 
 export class AuthTransaction implements TransactionState, AuthTransactionFunctions {
-  data: TransactionState;
+  next?: AuthTransactionFunction;
   cancel?: AuthTransactionFunction;
+  skip?: AuthTransactionFunction;
+  unlock?: AuthTransactionFunction;
+  changePassword?: AuthTransactionFunction;
+  resetPassword?: AuthTransactionFunction;
+  answer?: AuthTransactionFunction;
+  recovery?: AuthTransactionFunction;
+  verify?: AuthTransactionFunction;
+  resend?: AuthTransactionFunction;
+  activate?: AuthTransactionFunction;
+  poll?: AuthTransactionFunction;
+  prev?: AuthTransactionFunction;
+
+  data: TransactionState;
   stateToken?: string;
   sessionToken?: string;
   status: string;

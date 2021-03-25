@@ -63,8 +63,8 @@ export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
 // Session API
 export interface SessionObject {
   status: string;
-  refresh?: () => Promise<any>;
-  user?: () => Promise<any>;
+  refresh?: () => Promise<object>;
+  user?: () => Promise<object>;
 }
 
 export interface SessionAPI {
@@ -203,6 +203,7 @@ export interface SignoutOptions {
   revokeRefreshToken?: boolean;
   idToken?: IDToken;
   state?: string;
+  refreshToken?: RefreshToken;
 }
 
 export interface SignoutAPI {
@@ -211,6 +212,7 @@ export interface SignoutAPI {
 
 export interface ForgotPasswordOptions {
   username: string;
+  factorType: 'SMS' | 'EMAIL' | 'CALL';
   relayState?: string;
 }
 

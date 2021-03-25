@@ -73,7 +73,8 @@ import {
   UserClaims, 
   SigninWithRedirectOptions,
   SignInWithCredentialsOptions,
-  Tokens
+  Tokens,
+  SignoutOptions
 } from '../types';
 import fingerprint from './fingerprint';
 import { postToTransaction } from '../tx';
@@ -292,7 +293,8 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     });
   }
 
-  async signInWithRedirect({ originalUri, ...additionalParams }: SigninWithRedirectOptions = {}) {
+  async signInWithRedirect(opts: SigninWithRedirectOptions = {}) {
+    const { originalUri, ...additionalParams } = opts;
     if(this._pending.handleLogin) { 
       // Don't trigger second round
       return;
@@ -315,7 +317,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
   }
   
   // Ends the current Okta SSO session without redirecting to Okta.
-  closeSession() {
+  closeSession(): Promise<object> {
     // Clear all local tokens
     this.tokenManager.clear();
   
@@ -323,14 +325,14 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     .catch(function(e) {
       if (e.name === 'AuthApiError' && e.errorCode === 'E0000007') {
         // Session does not exist or has already been closed
-        return;
+        return null;
       }
       throw e;
     });
   }
   
   // Revokes the access token for the application session
-  async revokeAccessToken(accessToken?: AccessToken) {
+  async revokeAccessToken(accessToken?: AccessToken): Promise<object> {
     if (!accessToken) {
       accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
       const accessTokenKey = this.tokenManager._getStorageKeyByType('accessToken');
@@ -338,13 +340,13 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     // Access token may have been removed. In this case, we will silently succeed.
     if (!accessToken) {
-      return Promise.resolve();
+      return Promise.resolve(null);
     }
     return this.token.revoke(accessToken);
   }
 
   // Revokes the refresh token for the application session
-  async revokeRefreshToken(refreshToken?: RefreshToken) {
+  async revokeRefreshToken(refreshToken?: RefreshToken): Promise<object> {
     if (!refreshToken) {
       refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
       const refreshTokenKey = this.tokenManager._getStorageKeyByType('refreshToken');
@@ -352,13 +354,13 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     }
     // Refresh token may have been removed. In this case, we will silently succeed.
     if (!refreshToken) {
-      return Promise.resolve();
+      return Promise.resolve(null);
     }
     return this.token.revoke(refreshToken);
   }
 
   // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
-  async signOut(options?) {
+  async signOut(options?: SignoutOptions) {
     options = Object.assign({}, options);
   
     // postLogoutRedirectUri must be whitelisted in Okta Admin UI
@@ -427,7 +429,7 @@ class OktaAuthBrowser extends OktaAuthBase implements OktaAuth, SignoutAPI {
     window.location.assign(logoutUri);
   }
 
-  webfinger(opts) {
+  webfinger(opts): Promise<object> {
     var url = '/.well-known/webfinger' + toQueryString(opts);
     var options = {
       headers: {

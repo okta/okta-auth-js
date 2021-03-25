@@ -16,12 +16,13 @@ import { HttpRequestClient } from './http';
 import { OktaAuth } from './';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
+import { SimpleStorage } from './Storage';
 
 export interface TokenManagerOptions {
   autoRenew?: boolean;
   autoRemove?: boolean;
   secure?: boolean;
-  storage?: string;
+  storage?: string | SimpleStorage;
   storageKey?: string;
   expireEarlySeconds?: number;
   _storageEventDelay?: number;

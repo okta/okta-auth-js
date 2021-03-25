@@ -409,14 +409,24 @@ function getTokensFromStorageValue(value) {
   return tokens;
 }
 
+interface TokenError {
+  errorSummary: string;
+  errorCode: string;
+  message: string;
+  name: string;
+  tokenKey: string;
+}
+type TokenErrorEventHandler = (error: TokenError) => void;
+type TokenEventHandler = (key: string, token: Token, oldtoken?: Token) => void;
+
 export class TokenManager {
   get: (key: string) => Promise<Token>;
   add: (key: string, token: Token) => void;
   clear: () => void;
   remove: (key: string) => void;
   renew: (key: string) => Promise<Token>;
-  on: (event: string, handler: Function, context?: object) => void;
-  off: (event: string, handler: Function) => void;
+  on: (event: string, handler: TokenErrorEventHandler | TokenEventHandler, context?: object) => void;
+  off: (event: string, handler?: TokenErrorEventHandler | TokenEventHandler) => void;
   hasExpired: (token: Token) => boolean;
   getTokens: () => Promise<Tokens>;
   setTokens: (tokens: Tokens) => void;
