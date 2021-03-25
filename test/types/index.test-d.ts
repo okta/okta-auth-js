@@ -305,7 +305,7 @@ const main = async () => {
     issuer: 'https://{yourOktaDomain}',
     clientId: 'NPSfOkH5eZrTy8PMDlvx'
   };
-  expectAssignable<IDToken>(idTokenExample);
+  expectType<IDToken>(idTokenExample);
   const accessTokenExample = {
     expiresAt: 1449699930,
     scopes: ['openid', 'email'],
@@ -316,18 +316,17 @@ const main = async () => {
     tokenType: 'aud',
     userinfoUrl: 'https://some.com/userinfo'
   };
-  expectAssignable<AccessToken>(accessTokenExample);
+  expectType<AccessToken>(accessTokenExample);
   const refreshTokenExample = {
     expiresAt: 1449699930,
     scopes: ['openid', 'email'],
     authorizeUrl: 'https://{yourOktaDomain}/oauth2/v1/authorize',
     value: 'TOKEN_JWT',
     refreshToken: 'TOKEN_JWT',
-    claims: { /* token claims */ } as UserClaims,
     tokenUrl: 'https://some.com/token',
     issuer: 'https://{yourOktaDomain}'
   };
-  expectAssignable<RefreshToken>(refreshTokenExample);
+  expectType<RefreshToken>(refreshTokenExample);
   expectType<TokenResponse>(await authClient.token.getWithPopup(authorizeOptions));
   expectType<void>(await authClient.token.getWithRedirect(authorizeOptions));
   expectType<TokenResponse>(await authClient.token.parseFromUrl());
@@ -351,9 +350,9 @@ const main = async () => {
   expectType<TokenManager>(tokenManager);
   expectType<void>(tokenManager.add('accessToken', accessTokenExample));
   const accessToken = await tokenManager.get('accessToken') as AccessToken;
-  expectAssignable<AccessToken>(accessToken);
+  expectType<AccessToken>(accessToken);
   const idToken = await tokenManager.get('idToken') as IDToken;
-  expectAssignable<IDToken>(idToken);
+  expectType<IDToken>(idToken);
   const tokens = await tokenManager.getTokens();
   expectType<Tokens>(tokens);
   const refreshToken = tokens.refreshToken;
@@ -361,15 +360,15 @@ const main = async () => {
   tokenManager.setTokens(tokenRes.tokens);
   expectType<void>(tokenManager.remove('accessToken'));
   expectType<void>(tokenManager.clear());
-  expectAssignable<Token>(await tokenManager.renew('idToken'));
+  expectType<Token>(await tokenManager.renew('idToken'));
   tokenManager.on('expired', function (key, expiredToken) {
     expectType<string>(key);
-    expectAssignable<Token>(expiredToken);
+    expectType<Token>(expiredToken);
   });
   tokenManager.on('renewed', function (key, newToken, oldToken) {
-    expectAssignable<string>(key);
-    expectAssignable<Token>(newToken);
-    expectAssignable<Token>(oldToken);
+    expectType<string>(key);
+    expectType<Token>(newToken);
+    expectType<Token>(oldToken);
   });
   tokenManager.on('error', function (error) {
     expectAssignable<object>(error);
