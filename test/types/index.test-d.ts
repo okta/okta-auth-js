@@ -28,7 +28,7 @@ import {
   RefreshToken,
   AuthState
 } from '@okta/okta-auth-js';
-import {expectType, expectError, expectAssignable} from 'tsd';
+import {expectType, expectAssignable} from 'tsd';
 
 const main = async () => {
   // Custom storage provider
