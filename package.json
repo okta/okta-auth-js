@@ -23,7 +23,7 @@
     "clean:build": "rimraf build && rimraf build2",
     "dev": "webpack --config webpack.dev.config.js",
     "lint": "eslint .",
-    "tsd": "scripts/tsd.sh",
+    "tsd": "tsd",
     "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",
     "validate": "yarn tsc --noEmit && yarn lint && yarn --cwd test/app validate && yarn tsd",
     "test": "yarn test:unit && yarn test:samples && yarn test:e2e",
@@ -144,7 +144,7 @@
     "samples/generated/*"
   ],
   "tsd": {
-    "directory": "build",
+    "directory": "test/types",
     "compilerOptions": {
       "skipLibCheck": true,
       "lib": [

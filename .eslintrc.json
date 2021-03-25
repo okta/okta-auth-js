@@ -40,7 +40,7 @@
       }
     },
     {
-      "files": ["build/*.ts"],
+      "files": ["test/types/*.ts"],
       "env": {
         "browser": true,
         "node": true

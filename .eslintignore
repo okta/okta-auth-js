@@ -8,4 +8,3 @@ node_modules
 /samples/templates
 /samples/generated/webpack-spa/public/*-bundle.*
 /scripts
-/test/types
