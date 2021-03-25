@@ -40,7 +40,21 @@
       }
     },
     {
-      "files": ["build/**/*"],
+      "files": ["build/*.ts"],
+      "env": {
+        "browser": true,
+        "node": true
+      },
+      "rules": {
+        "node/no-unsupported-features/es-syntax": 0,
+        "node/no-extraneous-import": 0,
+        "no-unused-vars": 0,
+        "@typescript-eslint/no-unused-vars": 0,
+        "max-statements": 0
+      }
+    },
+    {
+      "files": ["build/**/*.js"],
       "rules": {
         "node/no-unpublished-require": 1,
         "node/no-unpublished-import": 1
