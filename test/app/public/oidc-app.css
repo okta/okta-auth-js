@@ -23,7 +23,7 @@
   min-height: 100px;
   border: 1px black solid;
 }
-#okta-sign-in {
+#okta-sign-in, hr, ul {
   margin: 0 !important;
 }
 
@@ -35,7 +35,6 @@
 .box {
   border: 1px solid darkgray;
   padding: 10px;
-  margin: 10px;
   max-width: 700px;
   overflow-wrap: break-word;
 }
