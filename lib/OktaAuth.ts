@@ -150,7 +150,6 @@ class OktaAuth implements SigninAPI, SignoutAPI {
 
     if (isBrowser()) {
       this.options = Object.assign(this.options, {
-        pkce: args.pkce === false ? false : true, // PKCE defaults to true for browser
         redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin), // allow relative URIs
       });
       this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);

@@ -46,7 +46,9 @@ export function isPopupPostMessageSupported() {
 }
 
 export function isTokenVerifySupported() {
-  return typeof webcrypto !== 'undefined' && webcrypto.subtle && typeof Uint8Array !== 'undefined';
+  return typeof webcrypto !== 'undefined'
+    && typeof webcrypto.subtle !== 'undefined'
+    && typeof Uint8Array !== 'undefined';
 }
 
 export function hasTextEncoder() {

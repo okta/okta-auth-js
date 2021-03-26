@@ -119,7 +119,7 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     postLogoutRedirectUri: args.postLogoutRedirectUri,
     responseMode: args.responseMode,
     responseType: args.responseType,
-    pkce: args.pkce,
+    pkce: args.pkce === false ? false : true, // PKCE defaults to true
     useInteractionCodeFlow: args.useInteractionCodeFlow,
 
     // Internal options

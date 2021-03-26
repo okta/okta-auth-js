@@ -27,12 +27,12 @@ try {
   // this environment has no crypto module!
 }
 
-let webCrypto;
+let webcrypto;
 if (typeof crypto !== 'undefined' && crypto['webcrypto']) {
-  webCrypto = crypto['webcrypto'];
+  webcrypto = crypto['webcrypto'];
 } else {
   const { Crypto } = require('@peculiar/webcrypto');
-  webCrypto = new Crypto();
+  webcrypto = new Crypto();
 }
 
-export { webCrypto as webcrypto };
+export { webcrypto };
