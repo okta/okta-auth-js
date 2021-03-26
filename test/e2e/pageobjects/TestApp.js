@@ -34,11 +34,11 @@ class TestApp {
   get testConcurrentLoginBtn() { return $('#test-concurrent-login'); }
 
   // Form
-  get responseModeQuery() { return $('#responseMode [value="query"]'); }
-  get responseModeFragment() { return $('#responseMode [value="fragment"]'); }
-  get pkceOption() { return $('#pkce-on'); }
-  get clientId() { return $('#clientId'); }
-  get issuer() { return $('#issuer'); }
+  get responseModeQuery() { return $('#f_responseMode [value="query"]'); }
+  get responseModeFragment() { return $('#f_responseMode [value="fragment"]'); }
+  get pkceOption() { return $('#f_pkce-on'); }
+  get clientId() { return $('#f_clientId'); }
+  get issuer() { return $('#f_issuer'); }
 
   // Callback
   get callbackSelector() { return $('#root.callback'); }
