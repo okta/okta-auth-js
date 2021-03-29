@@ -1,6 +1,26 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  line-height: 30px;
+}
+
+.actions {
+  line-height: 30px;
+}
+.actions a {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 5px;
+}
 #layout {
   position: relative;
   z-index: 1;
+}
+
+#tokens-dump, #config-dump {
+  line-height: 24px;
 }
 #modal {
   display: none;
@@ -54,10 +74,11 @@ label {
 }
 a, .link {
   padding: 4px;
-  margin: 4px;
   display: inline-block;
   background-color: #eeeeee;
   border: 1px #333 solid;
+  height: 40px;
+  font-size: 16px;
 }
 a:active, a.clicked {
   background-color: green;
@@ -71,4 +92,13 @@ a:active, a.clicked {
 .config-link {
   font-size: 24px;
   text-decoration: none;
+}
+
+.box.nav {
+  display: flex;
+  line-height: 30px;
+  height: 60px;
+}
+.box.nav .link, .box.nav a {
+  margin-right: 10px;
 }

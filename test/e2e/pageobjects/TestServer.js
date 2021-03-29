@@ -36,7 +36,7 @@ class TestServer {
       assert(txt.trim() === 'SUCCESS');
     });
     await this.error.then(el => el.getText()).then(txt => {
-      assert(txt.trim() === '');
+      assert(txt.trim() === '""');
     });
     await this.sessionToken.then(el => el.getText()).then(txt => {
       assert(txt.trim() !== '');

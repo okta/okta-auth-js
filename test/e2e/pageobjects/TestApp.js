@@ -41,7 +41,7 @@ class TestApp {
   get issuer() { return $('#f_issuer'); }
 
   // Callback
-  get callbackSelector() { return $('#root.callback'); }
+  get callbackSelector() { return $('#root.rendered.loaded.callback'); }
   get callbackHandledSelector() { return $('#root.callback-handled'); }
 
   // Toolbar
@@ -115,14 +115,22 @@ class TestApp {
   }
 
   async getUserInfo() {
-    await browser.waitUntil(async () => this.getUserInfoBtn.then(el => el.isDisplayed()));
-    await this.getUserInfoBtn.then(el => el.click());
+    await browser.waitUntil(async () => this.getUserInfoBtn.then(el => {
+      // Was facing an issue where click would not work without using browser.pause to add a delay
+      // Clicking directly in javascript solves the issue.
+      // It may be related to webdriver logic which is to scroll to the element.
+      if (el.isDisplayed()) {
+        browser.execute('arguments[0].click();', el);
+        return true;
+      }
+    }), 5000, 'wait for get user info btn');
   }
 
   async returnHome() {
     await browser.waitUntil(async () => this.returnHomeBtn.then(el => el.isDisplayed()));
     await this.returnHomeBtn.then(el => el.click());
     await browser.waitUntil(async () => this.landingSelector.then(el => el.isDisplayed()));
+    await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
   }
 
   async logoutRedirect() {

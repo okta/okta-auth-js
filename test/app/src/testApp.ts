@@ -37,18 +37,20 @@ function homeLink(app: TestApp): string {
 
 function logoutLink(app: TestApp): string {
   return `
-  <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)">Logout (and redirect here)</a><br/>
-  <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)">Logout (XHR + reload)</a><br/>
-  <a id="logout-app" href="${app.originalUrl}" onclick="logoutApp(event)">Logout (app only)</a><br/>
+    <div class="actions signout">
+      <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)">Logout (and redirect here)</a>
+      <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)">Logout (XHR + reload)</a>
+      <a id="logout-app" href="${app.originalUrl}" onclick="logoutApp(event)">Logout (app only)</a>
+    </div>
   `;
 }
 
-const subscribeLinks = [
-  `<a id="subscribe-auth-state" onclick="subscribeToAuthState(event)">Subscribe to AuthState</a>`,
-  `<a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)">Subscribe to TokenManager events</a>`
-];
-
-const Toolbar = `${ subscribeLinks.join('&nbsp;|&nbsp;') }`;
+const Toolbar = `
+  <div class="actions subscribe">
+    <a id="subscribe-auth-state" onclick="subscribeToAuthState(event)">Subscribe to AuthState</a>
+    <a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)">Subscribe to TokenManager events</a>
+  </div>
+`;
 
 const Layout = `
   <div id="layout">
@@ -469,38 +471,18 @@ class TestApp {
         <hr/>
         ${logoutLink(this)}
         <hr/>
-        <ul>
-          <li>
+        <div class="actions authenticated">
             <a id="get-userinfo" href="/" onclick="getUserInfo(event)">Get User Info</a>
-          </li>
-          <li>
             <a id="renew-token" href="/" onclick="renewToken(event)">Renew Token</a>
-          </li>
-          <li>
             <a id="renew-tokens" href="/" onclick="renewTokens(event)">Renew Tokens</a>
-          </li>
-          <li>
             <a id="get-token" href="/" onclick="getToken(event)">Get Token (without prompt)</a>
-          </li>
-          <li>
             <a id="clear-tokens" href="/" onclick="clearTokens(event)">Clear Tokens</a>
-          </li>
-          <li>
             <a id="revoke-token" href="/" onclick="revokeToken(event)">Revoke Access Token</a>
-          </li>
-          <li>
             <a id="revoke-refresh-token" href="/" onclick="revokeRefreshToken(event)">Revoke Refresh Token</a>
-          </li>
-          <li>
             <a id="refresh-session" href="/" onclick="refreshSession(event)">Refresh Session</a>
-          </li>
-          <li>
             <a id="test-concurrent-get-token" href="/" onclick="testConcurrentGetToken(event)">Test Concurrent getToken</a>
-          </li>
-          <li>
             <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)">Test Concurrent login via token renew failure</a>
-          </li>
-        </ul>
+        </div>
         <div id="user-info"></div>
         <hr/>
         ${ tokensHTML({idToken, accessToken, refreshToken})}
