@@ -31,7 +31,7 @@ const drivers = undefined;
 // Local developers may neeed to set driver version explicitly
 // check for more recent versions of chrome driver here:
 // https://chromedriver.storage.googleapis.com/index.html
-// const CHROMEDRIVER_VERSION = '88.0.4324.96';
+// const CHROMEDRIVER_VERSION = '89.0.4389.23';
 // const drivers = {
 //   chrome: { version: CHROMEDRIVER_VERSION }
 // };
