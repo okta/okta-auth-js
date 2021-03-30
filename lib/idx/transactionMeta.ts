@@ -1,0 +1,83 @@
+/*!
+ * Copyright (c) 2021, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+
+import { OktaAuth, IdxTransactionMeta } from '../types';
+import { warn } from '../util';
+import { getOAuthUrls } from '../oidc';
+
+export async function getTransactionMeta (authClient: OktaAuth): Promise<IdxTransactionMeta> {
+  // Load existing transaction meta from storage
+  if (authClient.transactionManager.exists()) {
+    const existing = authClient.transactionManager.load();
+    if (isTransactionMetaValid(authClient, existing)) {
+      return existing as IdxTransactionMeta;
+    }
+    // existing meta is not valid for this configuration
+    // this is common when changing configuration in local development environment
+    // in a production environment, this may indicate that two apps are sharing a storage key
+    warn('Saved transaction meta does not match the current configuration. ' + 
+      'This may indicate that two apps are sharing a storage key.');
+  }
+
+  // Calculate new values
+  const tokenParams = await authClient.token.prepareTokenParams();
+  const urls = getOAuthUrls(authClient, tokenParams);
+  const issuer = authClient.options.issuer;
+  const {
+    pkce,
+    clientId,
+    redirectUri,
+    responseType,
+    responseMode,
+    scopes,
+    state,
+    nonce,
+    ignoreSignature,
+    codeVerifier,
+    codeChallengeMethod,
+    codeChallenge,
+  } = tokenParams;
+  const meta = {
+    issuer,
+    pkce,
+    clientId,
+    redirectUri,
+    responseType,
+    responseMode,
+    scopes,
+    state,
+    nonce,
+    urls,
+    ignoreSignature,
+    codeVerifier,
+    codeChallengeMethod,
+    codeChallenge 
+  };
+  return meta;
+}
+
+export function saveTransactionMeta (authClient: OktaAuth, meta) {
+  authClient.transactionManager.save(meta);
+}
+
+export function clearTransactionMeta (authClient: OktaAuth) {
+  authClient.transactionManager.clear();
+}
+
+// returns true if values in meta match current authClient options
+export function isTransactionMetaValid (authClient: OktaAuth, meta) {
+  const keys = ['issuer', 'clientId', 'redirectUri'];
+  const mismatch = keys.find(key => {
+    return authClient.options[key] !== meta[key];
+  });
+  return !mismatch;
+}

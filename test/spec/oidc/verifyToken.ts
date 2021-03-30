@@ -1,4 +1,5 @@
 const modulesToMock = {
+  features: '../../../lib/features',
   validateClaims: '../../../lib/oidc/util/validateClaims',
   decodeToken: '../../../lib/oidc/decodeToken',
   wellKnown: '../../../lib/oidc/endpoints/well-known',
@@ -11,10 +12,12 @@ const mocked = {
   getWellKnown: jest.fn(),
   getKey: jest.fn(),
   verifyToken: jest.fn(),
-  getOidcHash: jest.fn()
+  getOidcHash: jest.fn(),
+  isTokenVerifySupported: jest.fn()
 };
 
 const original = {
+  features: jest.requireActual(modulesToMock.features),
   validateClaims: jest.requireActual(modulesToMock.validateClaims).validateClaims,
   decodeToken: jest.requireActual(modulesToMock.decodeToken).decodeToken
 };
@@ -45,6 +48,12 @@ jest.doMock(modulesToMock.crypto, () => {
   };
 });
 
+jest.doMock(modulesToMock.features, () => {
+  return Object.assign({}, original.features, {
+    isTokenVerifySupported: mocked.isTokenVerifySupported
+  });
+});
+
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
@@ -69,6 +78,7 @@ describe('token.verify', function() {
     }));
     mocked.getKey.mockReturnValue(Promise.resolve('fake-test-key'));
     mocked.verifyToken.mockReturnValue(Promise.resolve(true));
+    mocked.isTokenVerifySupported.mockReturnValue(true);
     util.warpToUnixTime(1449699929);
     validationParams = {
       clientId: tokens.standardIdTokenParsed.clientId,

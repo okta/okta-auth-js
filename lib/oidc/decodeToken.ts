@@ -12,7 +12,7 @@
  */
 import { AuthSdkError } from '../errors';
 import { JWTObject } from '../types';
-import { base64UrlToString } from '../util';
+import { base64UrlToString } from '../crypto';
 
 export function decodeToken(token: string): JWTObject {
   var jwt = token.split('.');

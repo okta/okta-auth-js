@@ -78,6 +78,13 @@ export class AuthTransaction implements TransactionState, AuthTransactionFunctio
   constructor(sdk, res = null) {
     if (res) {
       this.data = res;
+
+      if (this.data.interactionHandle) {
+        this.status = res.status;
+        return;
+      }
+
+      // Parse response from Authn V1
       Object.assign(this, flattenEmbedded(sdk, res, res, {}));
       delete this.stateToken;
 

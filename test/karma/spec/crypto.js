@@ -1,7 +1,6 @@
 import tokens from '@okta/test.support/tokens';
 import factory from '@okta/test.support/factory';
 import * as sdkCrypto from '../../../lib/crypto';
-import * as sdkUtil from '../../../lib/util';
 
 describe('crypto', function() {
   describe('getOidcHash', () => {
@@ -42,7 +41,7 @@ describe('crypto', function() {
     it('fails with a bad key', function() {
       var idToken = tokens.standardIdToken;
       var key = Object.assign({}, tokens.standardKey, {
-        n: sdkUtil.stringToBase64Url('bad key value')
+        n: sdkCrypto.stringToBase64Url('bad key value')
       });
       return sdkCrypto.verifyToken(idToken, key)
         .then(function(res) {

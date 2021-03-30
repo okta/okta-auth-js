@@ -7,12 +7,12 @@ const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}/`;
 const DEFAULT_SIW_VERSION = ''; // blank for local/npm/bundled version
 
 export interface Config extends OktaAuthOptions {
-  _defaultScopes: boolean;
-  _siwVersion: string;
-  _siwAuthClient:  boolean;
-  _idps: string;
-  _clientSecret: string;
-  _forceRedirect: boolean;
+  defaultScopes: boolean;
+  siwVersion: string;
+  siwAuthClient:  boolean;
+  idps: string;
+  clientSecret: string;
+  forceRedirect: boolean;
   useInteractionCodeFlow: boolean; // widget option
 }
 
@@ -22,18 +22,18 @@ export function getDefaultConfig(): Config {
   const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
 
   return {
-    _forceRedirect: false,
-    _siwVersion: DEFAULT_SIW_VERSION,
-    _siwAuthClient: false,
-    _idps: '',
+    forceRedirect: false,
+    siwVersion: DEFAULT_SIW_VERSION,
+    siwAuthClient: false,
+    idps: '',
     redirectUri: REDIRECT_URI,
     postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
     issuer: ISSUER,
     clientId: CLIENT_ID,
-    _clientSecret: CLIENT_SECRET,
+    clientSecret: CLIENT_SECRET,
     responseType: ['token', 'id_token'],
     scopes: ['openid', 'email', 'offline_access'],
-    _defaultScopes: false,
+    defaultScopes: false,
     pkce: true,
     cookies: {
       secure: true
@@ -49,33 +49,33 @@ export function getConfigFromUrl(): Config {
   const redirectUri = url.searchParams.get('redirectUri') || REDIRECT_URI;
   const postLogoutRedirectUri = url.searchParams.get('postLogoutRedirectUri') || POST_LOGOUT_REDIRECT_URI;
   const clientId = url.searchParams.get('clientId');
-  const _clientSecret = url.searchParams.get('_clientSecret');
+  const clientSecret = url.searchParams.get('clientSecret');
   const pkce = url.searchParams.get('pkce') !== 'false'; // On by default
-  const _defaultScopes = url.searchParams.get('_defaultScopes') === 'true';
+  const defaultScopes = url.searchParams.get('defaultScopes') === 'true';
   const scopes = (url.searchParams.get('scopes') || 'openid,email,offline_access').split(',');
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
   const responseMode = url.searchParams.get('responseMode') || undefined;
   const storage = url.searchParams.get('storage') || undefined;
   const secureCookies = url.searchParams.get('secure') !== 'false'; // On by default
   const sameSite = url.searchParams.get('sameSite') || undefined;
-  const _siwVersion = url.searchParams.get('_siwVersion') || DEFAULT_SIW_VERSION;
-  const _siwAuthClient = url.searchParams.get('_siwAuthClient') === 'true'; // off by default
-  const _idps = url.searchParams.get('_idps') || '';
+  const siwVersion = url.searchParams.get('siwVersion') || DEFAULT_SIW_VERSION;
+  const siwAuthClient = url.searchParams.get('siwAuthClient') === 'true'; // off by default
+  const idps = url.searchParams.get('idps') || '';
   const useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true'; // off by default
-  const _forceRedirect = url.searchParams.get('_forceRedirect') === 'true'; // off by default
+  const forceRedirect = url.searchParams.get('forceRedirect') === 'true'; // off by default
 
   return {
-    _forceRedirect,
-    _siwVersion,
-    _siwAuthClient,
-    _idps,
+    forceRedirect,
+    siwVersion,
+    siwAuthClient,
+    idps,
     redirectUri,
     postLogoutRedirectUri,
     issuer,
     clientId,
-    _clientSecret,
+    clientSecret,
     pkce,
-    _defaultScopes,
+    defaultScopes,
     scopes,
     responseType,
     responseMode,
