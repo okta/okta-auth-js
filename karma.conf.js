@@ -17,68 +17,7 @@ var path = require('path');
 
 var ROOT_DIR = path.resolve(__dirname, '..', '..');
 var REPORTS_DIR = path.join(ROOT_DIR, 'build2', 'reports', 'karma');
-var _ = require('lodash');
-var commonConfig = require('./webpack.common.config');
-var babelOptions = {
-  presets: [
-    '@babel/preset-env'
-  ],
-  plugins: [
-    '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-transform-runtime',
-    'mockable-imports'
-  ],
-  sourceType: 'unambiguous'
-};
-
-var webpackConf =  _.extend({}, _.cloneDeep(commonConfig), {
-  devtool: 'inline-source-map',
-  mode: 'development',
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        options: babelOptions
-      },
-      {
-        test: /\.ts$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: babelOptions
-          },
-          {
-            loader: 'ts-loader',
-            options: {
-              configFile: require.resolve('./tsconfig.json')
-            }
-          }
-        ]
-      },
-      {
-        test: /\.{js,ts}$/,
-        use: {
-          loader: 'istanbul-instrumenter-loader',
-          options: { esModules: true }
-        },
-        enforce: 'post',
-        include: [
-          path.resolve(__dirname, 'lib')
-        ]
-      }
-    ]
-  },
-  resolve: {
-    extensions: ['.js', '.ts'],
-    alias: {
-      '@okta/test.app': path.join(__dirname, 'test/app'),
-      '@okta/okta-auth-js': path.join(__dirname, '/lib')
-    }
-  }
-});
+var webpackConf =  require('./webpack.karma.config');
 
 module.exports = function (config) {
   config.set({

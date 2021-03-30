@@ -9,7 +9,8 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
-/* global btoa, atob */
+
+import { atob, btoa } from './webcrypto';
 
 // converts a string to base64 (url/filename safe variant)
 export function stringToBase64Url(str) {

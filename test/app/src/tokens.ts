@@ -20,7 +20,7 @@ function tokensHTML(tokens: Tokens): string {
     </tbody>
   </table>
   <hr/>
-  <div class="flex-row">
+  <div id="tokens-dump" class="flex-row">
     <div class="box">
       <strong>Access Token</strong><br/>
       <div id="access-token">${ accessToken ? htmlString(accessToken) : 'N/A' }</div>
