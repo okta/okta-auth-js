@@ -17,6 +17,7 @@ import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
 import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
+import { AuthorizeOptions } from '../idx/types';
 
 export interface OktaAuth {
   options: OktaAuthOptions;
@@ -33,10 +34,10 @@ export interface OktaAuth {
 
 export interface APIError {
   errorSummary: string;
-  errorCode: string;
-  errorLink: string;
-  errorId: string;
-  errorCauses: string[];
+  errorCode?: string;
+  errorLink?: string;
+  errorId?: string;
+  errorCauses?: string[];
 }
 
 // Transaction API
@@ -135,7 +136,7 @@ export interface GetWithRedirectAPI extends GetWithRedirectFunction {
 
 export interface BaseTokenAPI {
   decode(token: string): JWTObject;
-  prepareTokenParams(params: TokenParams): Promise<TokenParams>;
+  prepareTokenParams(params?: TokenParams): Promise<TokenParams>;
   exchangeCodeForTokens(params: TokenParams, urls?: CustomUrls): Promise<TokenResponse>;
 }
 
@@ -166,7 +167,6 @@ export interface IDTokenAPI {
   };
 }
 
-
 export interface FeaturesAPI {
   isLocalhost(): boolean;
   isHTTPS(): boolean;
@@ -177,23 +177,26 @@ export interface FeaturesAPI {
   isIE11OrLess(): boolean;
 }
 
-// TODO: deprecate
-export type SigninOptions = SignInWithCredentialsOptions; 
-
-export interface SignInWithCredentialsOptions {
-  username: string;
-  password: string;
+export interface SigninOptions extends AuthorizeOptions {
+  // Only used in Authn V1
   relayState?: string;
   context?: string;
   sendFingerprint?: boolean;
 }
 
-export interface SigninWithRedirectOptions extends TokenParams {
+export interface SigninWithRedirectOptions extends SigninOptions {
   originalUri?: string;
 }
 
+export interface SigninWithCredentialsOptions extends SigninOptions {
+  // Require a username and password
+  username: string;
+  password: string;
+}
+
 export interface SigninAPI {
-  signIn(opts: SignInWithCredentialsOptions): Promise<AuthTransaction>;
+  signIn(opts: SigninOptions): Promise<AuthTransaction>;
+  signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction>;
 }
 
 export interface SignoutOptions {

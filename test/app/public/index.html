@@ -3,13 +3,14 @@
     <link rel="stylesheet" href="/oidc-app.css"/>
   </head>
   <body class="oidc-app landing">
-    <div class="box">
+    <div class="box nav">
       <a class="config-link" href="#" onclick="showConfigForm(event)">⚙️</a>
       <div class="link selected">Webpack SPA App</div>
       <a href="/server" onclick="navigateToApp('/server', event)">Server-side Web App</a>
       <a href="/static" onclick="navigateToApp('/static', event)">Static SPA App</a>
     </div>
-    <div id="root"></div>
+    <div id="root">
+    </div>
     <script src="/oidc-app.js"></script>
     <script type="text/javascript">
       bootstrapLanding();

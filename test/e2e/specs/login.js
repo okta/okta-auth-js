@@ -32,7 +32,7 @@ describe('E2E login', () => {
       });
 
       it('can login using signin widget (with redirect)', async () => {
-        await bootstrap({ _forceRedirect: true });
+        await bootstrap({ forceRedirect: true });
         await loginWidget(flow, true);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();

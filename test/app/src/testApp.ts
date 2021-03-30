@@ -29,25 +29,7 @@ import { MOUNT_PATH } from './constants';
 import { htmlString, toQueryString } from './util';
 import { showConfigForm } from './form';
 import { tokensHTML } from './tokens';
-import { buildWidgetConfig } from './widget';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const BundledOktaSignIn = require('@okta/okta-signin-widget');
-
-declare global {
-  interface Window {
-    OktaSignIn: any;
-    getWidgetConfig: () => any;
-  }
-}
-
-declare class OktaSignIn {
-  constructor(options: any);
-  renderEl(options: any, successFn: Function, errorFn: Function): void;
-  showSignInToGetTokens(options: any): void;
-  remove(): void;
-  on(event: string, fn: Function): void;
-}
+import { renderWidget } from './widget';
 
 function homeLink(app: TestApp): string {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
@@ -55,25 +37,22 @@ function homeLink(app: TestApp): string {
 
 function logoutLink(app: TestApp): string {
   return `
-  <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)">Logout (and redirect here)</a><br/>
-  <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)">Logout (XHR + reload)</a><br/>
-  <a id="logout-app" href="${app.originalUrl}" onclick="logoutApp(event)">Logout (app only)</a><br/>
+    <div class="actions signout">
+      <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)">Logout (and redirect here)</a>
+      <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)">Logout (XHR + reload)</a>
+      <a id="logout-app" href="${app.originalUrl}" onclick="logoutApp(event)">Logout (app only)</a>
+    </div>
   `;
 }
 
-const subscribeLinks = [
-  `<a id="subscribe-auth-state" onclick="subscribeToAuthState(event)">Subscribe to AuthState</a>`,
-  `<a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)">Subscribe to TokenManager events</a>`
-];
-
-const Toolbar = `${ subscribeLinks.join('&nbsp;|&nbsp;') }`;
+const Toolbar = `
+  <div class="actions subscribe">
+    <a id="subscribe-auth-state" onclick="subscribeToAuthState(event)">Subscribe to AuthState</a>
+    <a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)">Subscribe to TokenManager events</a>
+  </div>
+`;
 
 const Layout = `
-  <div id="modal">
-    <div id="widget-container">
-      <div id="widget"></div>
-    </div>
-  </div>
   <div id="layout">
     <div id="session-expired" style="color: orange"></div>
     <div id="token-error" style="color: red"></div>
@@ -119,38 +98,6 @@ function bindFunctions(testApp: TestApp, window: Window): void {
   });
 }
 
-async function injectWidgetCSS(widgetVersion = ''): Promise<void> {
-  const useBundled = widgetVersion === '';
-  const baseUrl = useBundled ? `${window.location.origin}/siw` : 'https://global.oktacdn.com/okta-signin-widget';
-  return new Promise((resolve, reject) => {
-      // inject CSS
-      const link = document.createElement('link');
-      link.type='text/css';
-      link.rel='stylesheet';
-      document.getElementsByTagName('head')[0].appendChild(link);
-      link.onload = (): void => { resolve(); };
-      link.onerror = (e): void => { reject(e); };
-      link.href = `${baseUrl}/${widgetVersion}/css/okta-sign-in.min.css`;
-  });
-}
-
-async function injectWidgetScript(widgetVersion: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // inject script
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    document.getElementsByTagName('head')[0].appendChild(script);
-    script.onload = (): void => { resolve(); };
-    script.onerror = (e): void => { reject(e); };
-    script.src = `https://global.oktacdn.com/okta-signin-widget/${widgetVersion}/js/okta-sign-in.min.js`;
-  }); 
-}
-
-async function injectWidgetFromCDN(widgetVersion: string): Promise<void> {
-  await injectWidgetCSS(widgetVersion);
-  await injectWidgetScript(widgetVersion);
-}
-
 class TestApp {
   config: Config;
   originalUrl?: string;
@@ -178,7 +125,7 @@ class TestApp {
   async getSDKInstance(): Promise<OktaAuth> {
     // can throw
     this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config, {
-      scopes: this.config._defaultScopes ? [] : this.config.scopes
+      scopes: this.config.defaultScopes ? [] : this.config.scopes
     }));
     return this.oktaAuth;
   }
@@ -267,96 +214,19 @@ class TestApp {
   }
 
   async renderWidget(): Promise<void> {
-    const siwVersion = this.config._siwVersion;
-    if (siwVersion) {
-      await injectWidgetFromCDN(siwVersion);
-    } else {
-      await injectWidgetCSS();
-      window.OktaSignIn = BundledOktaSignIn;
-    }
+    const tokens: Tokens = await renderWidget(this.config, this.oktaAuth);
 
-    document.getElementById('modal').style.display = 'block';
-    const widgetConfig = buildWidgetConfig(this.config);
-    const { issuer, clientId, _clientSecret, redirectUri, _forceRedirect, scopes } = this.config;
-    const state = JSON.stringify({ issuer, clientId, _clientSecret, redirectUri });
+    // save tokens
+    this.oktaAuth.tokenManager.setTokens(tokens);
 
-    // This test app allows selecting arbitrary widget versions. We must use `renderEl` for compatibility with older versions.
-    const renderOptions: any = {
-      clientId,
-      redirectUri,
-
-      scopes,
-      state, // Not working: OKTA-361428
-      
-      // Return an access token from the authorization server
-      getAccessToken: true,
-  
-      // Return an ID token from the authorization server
-      getIdToken: true,
-
-      // Return a Refresh token from the authorization server
-      getRefreshToken: true
-    };
-
-    widgetConfig.authParams.state = state; // Must set authParams in constructor: OKTA-361428
-
-    if (_forceRedirect) {
-      renderOptions.mode = 'remediation'; // since version 5.0
-      widgetConfig.authParams.display = 'page'; // version < 5.0
-    } else {
-      widgetConfig.authParams.display = 'none'; // version < 5.0
-    }
-
-    // if authClient option is on, all authParams are ignored
-    if (this.config._siwAuthClient) {
-      widgetConfig.authParams = undefined;
-      widgetConfig.authClient = this.oktaAuth;
-    }
-
-    const signIn = new OktaSignIn(widgetConfig);
-    signIn.on('afterError', function (context: any, error: any) {
-        console.log('Sign-in Widget afterError: ', context.controller, error);
-    });
-    signIn.renderEl(renderOptions,
-      (res: any) => {
-        console.log(`signin.renderEl: success callback fired: `, res);
-        if (res.status === 'SUCCESS') {
-          // remove widget
-          signIn.remove();
-          document.getElementById('modal').style.display = 'none';
-
-          // save tokens
-          let tokens: Tokens;
-          // Older widget versions returned tokens as an array
-          if (Array.isArray(res)) {
-            tokens = {};
-            for (let i = 0; i < res.length; i++) {
-              const token = res[i];
-              if (token.idToken) {
-                tokens.idToken = token;
-              } else if (token.accessToken) {
-                tokens.accessToken = token;
-              }
-            }
-          } else {
-            // Current versions return an object hash
-            tokens = res.tokens;
-          }
-          this.oktaAuth.tokenManager.setTokens(tokens);
-
-          // re-render
-          this.render();
-        } else {
-          console.log(`signin.renderEl: result status was ${res.status}`, res);
-        }
-      },
-      (err: any) => {
-        console.log(`signin.renderEl: error callback fired`, err);
-      }
-    );
+    // re-render
+    this.render();
   }
 
   async loginDirect(): Promise<void> {
+    // Make sure we are starting a fresh transaction
+    this.oktaAuth.storageManager.getTransactionStorage().clearStorage();
+
     const username = (document.getElementById('username') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
     return this.oktaAuth.signIn({username, password})
@@ -379,7 +249,7 @@ class TestApp {
     saveConfigToStorage(this.config);
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config._defaultScopes ? [] : this.config.scopes,
+      scopes: this.config.defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithRedirect(options)
       .catch(e => {
@@ -391,7 +261,7 @@ class TestApp {
   async loginPopup(options?: TokenParams): Promise<void> {
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config._defaultScopes ? [] : this.config.scopes,
+      scopes: this.config.defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithPopup(options)
     .then(res => {
@@ -403,7 +273,7 @@ class TestApp {
   async getToken(options?: OktaAuthOptions): Promise<void> {
     options = Object.assign({}, {
       responseType: this.config.responseType,
-      scopes: this.config._defaultScopes ? [] : this.config.scopes,
+      scopes: this.config.defaultScopes ? [] : this.config.scopes,
     }, options);
     return this.oktaAuth.token.getWithoutPrompt(options)
     .then(res => {
@@ -601,38 +471,18 @@ class TestApp {
         <hr/>
         ${logoutLink(this)}
         <hr/>
-        <ul>
-          <li>
+        <div class="actions authenticated">
             <a id="get-userinfo" href="/" onclick="getUserInfo(event)">Get User Info</a>
-          </li>
-          <li>
             <a id="renew-token" href="/" onclick="renewToken(event)">Renew Token</a>
-          </li>
-          <li>
             <a id="renew-tokens" href="/" onclick="renewTokens(event)">Renew Tokens</a>
-          </li>
-          <li>
             <a id="get-token" href="/" onclick="getToken(event)">Get Token (without prompt)</a>
-          </li>
-          <li>
             <a id="clear-tokens" href="/" onclick="clearTokens(event)">Clear Tokens</a>
-          </li>
-          <li>
             <a id="revoke-token" href="/" onclick="revokeToken(event)">Revoke Access Token</a>
-          </li>
-          <li>
             <a id="revoke-refresh-token" href="/" onclick="revokeRefreshToken(event)">Revoke Refresh Token</a>
-          </li>
-          <li>
             <a id="refresh-session" href="/" onclick="refreshSession(event)">Refresh Session</a>
-          </li>
-          <li>
             <a id="test-concurrent-get-token" href="/" onclick="testConcurrentGetToken(event)">Test Concurrent getToken</a>
-          </li>
-          <li>
             <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)">Test Concurrent login via token renew failure</a>
-          </li>
-        </ul>
+        </div>
         <div id="user-info"></div>
         <hr/>
         ${ tokensHTML({idToken, accessToken, refreshToken})}

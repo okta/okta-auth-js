@@ -34,14 +34,14 @@ class TestApp {
   get testConcurrentLoginBtn() { return $('#test-concurrent-login'); }
 
   // Form
-  get responseModeQuery() { return $('#responseMode [value="query"]'); }
-  get responseModeFragment() { return $('#responseMode [value="fragment"]'); }
-  get pkceOption() { return $('#pkce-on'); }
-  get clientId() { return $('#clientId'); }
-  get issuer() { return $('#issuer'); }
+  get responseModeQuery() { return $('#f_responseMode [value="query"]'); }
+  get responseModeFragment() { return $('#f_responseMode [value="fragment"]'); }
+  get pkceOption() { return $('#f_pkce-on'); }
+  get clientId() { return $('#f_clientId'); }
+  get issuer() { return $('#f_issuer'); }
 
   // Callback
-  get callbackSelector() { return $('#root.callback'); }
+  get callbackSelector() { return $('#root.rendered.loaded.callback'); }
   get callbackHandledSelector() { return $('#root.callback-handled'); }
 
   // Toolbar
@@ -115,14 +115,22 @@ class TestApp {
   }
 
   async getUserInfo() {
-    await browser.waitUntil(async () => this.getUserInfoBtn.then(el => el.isDisplayed()));
-    await this.getUserInfoBtn.then(el => el.click());
+    await browser.waitUntil(async () => this.getUserInfoBtn.then(el => {
+      // Was facing an issue where click would not work without using browser.pause to add a delay
+      // Clicking directly in javascript solves the issue.
+      // It may be related to webdriver logic which is to scroll to the element.
+      if (el.isDisplayed()) {
+        browser.execute('arguments[0].click();', el);
+        return true;
+      }
+    }), 5000, 'wait for get user info btn');
   }
 
   async returnHome() {
     await browser.waitUntil(async () => this.returnHomeBtn.then(el => el.isDisplayed()));
     await this.returnHomeBtn.then(el => el.click());
     await browser.waitUntil(async () => this.landingSelector.then(el => el.isDisplayed()));
+    await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
   }
 
   async logoutRedirect() {

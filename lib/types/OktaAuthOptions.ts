@@ -45,6 +45,7 @@ export interface OktaAuthOptions extends CustomUrls {
   pkce?: boolean;
   clientId?: string;
   redirectUri?: string;
+  useInteractionCodeFlow?: boolean;
   responseType?: string | string[];
   responseMode?: string;
   scopes?: string[];
@@ -65,4 +66,7 @@ export interface OktaAuthOptions extends CustomUrls {
   devMode?: boolean;
   storageManager?: StorageManagerOptions;
   transactionManager?: TransactionManagerOptions;
+
+  // For server-side web applications ONLY!
+  clientSecret?: string;
 }

@@ -30,14 +30,16 @@ import {
   FingerprintAPI,
   UserClaims, 
   SigninWithRedirectOptions,
-  SignInWithCredentialsOptions,
+  SigninWithCredentialsOptions,
   Tokens,
   ForgotPasswordOptions,
   VerifyRecoveryTokenOptions,
   TransactionAPI,
   SessionAPI,
   SigninAPI,
-  PkceAPI
+  PkceAPI,
+  SigninOptions,
+  IdxApi
 } from './types';
 import {
   transactionStatus,
@@ -79,8 +81,7 @@ import browserStorage from './browser/browserStorage';
 import { 
   toQueryString, 
   toAbsoluteUrl,
-  clone, 
-  deprecate 
+  clone
 } from './util';
 import { getUserAgent } from './builderUtil';
 import { TokenManager } from './TokenManager';
@@ -91,6 +92,7 @@ import { AuthStateManager } from './AuthStateManager';
 import StorageManager from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
+import { authenticate, interact } from './idx';
 
 const Emitter = require('tiny-emitter');
 
@@ -99,6 +101,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   storageManager: StorageManager;
   transactionManager: TransactionManager;
   tx: TransactionAPI;
+  idx: IdxApi;
   userAgent: string;
   session: SessionAPI;
   pkce: PkceAPI;
@@ -147,7 +150,6 @@ class OktaAuth implements SigninAPI, SignoutAPI {
 
     if (isBrowser()) {
       this.options = Object.assign(this.options, {
-        pkce: args.pkce === false ? false : true, // PKCE defaults to true for browser
         redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin), // allow relative URIs
       });
       this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
@@ -225,6 +227,12 @@ class OktaAuth implements SigninAPI, SignoutAPI {
       }
     });
 
+    // IDX
+    this.idx = {
+      authenticate: authenticate.bind(null, this),
+      interact: interact.bind(null, this)
+    };
+
     // Fingerprint API
     this.fingerprint = fingerprint.bind(null, this);
     this.emitter = new Emitter();
@@ -244,19 +252,17 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     return isInteractionRequiredError(error);
   }
 
-  /**
-   * Alias method of signInWithCredentials
-   * 
-   * @todo This method is deprecated. Remove it in 5.0
-   */ 
-  signIn(opts) {
-    if (this.features.isLocalhost()) {
-      deprecate('This method has been deprecated, please use signInWithCredentials() instead.');
+  async signIn(opts: SigninOptions = { useInteractionCodeFlow: true }): Promise<AuthTransaction> {
+    const useInteractionCodeFlow = opts.useInteractionCodeFlow || this.options.useInteractionCodeFlow;
+    if (useInteractionCodeFlow) {
+      return authenticate(this, opts);
     }
-    return this.signInWithCredentials(opts);
+
+    // Authn V1 flow
+    return this.signInWithCredentials(opts as SigninWithCredentialsOptions);
   }
 
-  signInWithCredentials(opts: SignInWithCredentialsOptions) {
+  async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction> {
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {
       delete opts.sendFingerprint;

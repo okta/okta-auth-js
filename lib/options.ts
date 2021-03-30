@@ -119,7 +119,8 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     postLogoutRedirectUri: args.postLogoutRedirectUri,
     responseMode: args.responseMode,
     responseType: args.responseType,
-    pkce: args.pkce,
+    pkce: args.pkce === false ? false : true, // PKCE defaults to true
+    useInteractionCodeFlow: args.useInteractionCodeFlow,
 
     // Internal options
     httpRequestClient: args.httpRequestClient,
@@ -133,6 +134,9 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     cookies: isBrowser() ? getCookieSettings(args, isHTTPS()) : args.cookies,
 
     // Give the developer the ability to disable token signature validation.
-    ignoreSignature: !!args.ignoreSignature
+    ignoreSignature: !!args.ignoreSignature,
+
+    // Server-side web applications
+    clientSecret: args.clientSecret
   });
 }

@@ -6,31 +6,32 @@
   </head>
   <body class="web-app landing">
     <div id="root">
-      <div class="box">
+      <div class="box nav">
         <a class="config-link" href="#" onclick="showConfigForm(event)">⚙️</a>
         <a href="/" onclick="navigateToApp('/', event)">Webpack SPA App</a>
         <div class="link selected">Server-side Web App</div>
         <a href="/static" onclick="navigateToApp('/static', event)">Static SPA App</a>
       </div>
       <div id="form" class="box">
-        <strong>Authn V1</strong>
+        <strong>SignIn</strong>
         <hr/>
         <form method="POST" action="/login">
-          <label for="issuer">Issuer:</label><input name="issuer" id="issuer" placeholder="issuer" type="text"/><br/>
+          <input id="config" type="hidden" name="config"/>
           <label for="username">Username:</label><input name="username" id="username" placeholder="username" type="email"/><br/>
           <label for="password">Password:</label><input name="password" id="password" placeholder="password" type="password"/><br/>
           <input id="submitBtn" type="submit"/>
         </form>
-      </div>
-      <div class="box">
-        <strong>OIE V2</strong>
         <hr/>
-        <form method="POST" action="/interact">
-          <input id="issuer2" type="hidden" name="issuer"/>
-          <input id="interactBtn" type="submit" value="Interact"/>
-        </form>
+        <a id="widget-link" href="/login">Use Sign-In Widget</a>
       </div>
       <div id="results">
+        <div class="box">
+          <span>Issuer:</span>&nbsp;
+          <strong id="issuer"></strong>
+          <br/>
+          <span>useInteractionCodeFlow:</span>&nbsp;
+          <strong id="useInteractionCodeFlow"></strong>
+        </div>
         <div class="box">
           <strong>Status</strong><br/>
           <div id="status"></div>
@@ -46,15 +47,25 @@
       </div>
     </div>
     <script type="text/javascript">
-      var url = new URL(window.location.href);
-      var issuer = url.searchParams.get('issuer');
-      document.getElementById('issuer').value = issuer;
-      document.getElementById('issuer2').value = issuer;
+      var query = new URL(window.location.href).searchParams;
+      // config
+      var config = window.getConfig();
+      document.getElementById('config').value = JSON.stringify(config);
 
-      ['status', 'sessionToken', 'error'].forEach(function(param) {
-        var value = url.searchParams.get(param);
+      // form elements
+      ['username', 'password'].forEach(function(param) {
+        var value = query.get(param);
+        if (!value) return;
+        document.getElementById(param).value = value;
+      });
+      // display elements
+      ['issuer', 'useInteractionCodeFlow', 'status', 'sessionToken', 'error'].forEach(function(param) {
+        var value = query.get(param);
+        if (!value) return;
         document.getElementById(param).innerText = value;
       });
+      // widget link
+      document.getElementById('widget-link').href = '/login?' + query;
     </script>
     <a href="/">Back to SPA app</a>
   </body>
