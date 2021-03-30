@@ -10,10 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-/* global crypto */
+
  /* eslint-disable complexity, max-statements */
-import { stringToBase64Url } from '../../util';
+import { stringToBase64Url } from '../../crypto';
 import { MIN_VERIFIER_LENGTH, MAX_VERIFIER_LENGTH, DEFAULT_CODE_CHALLENGE_METHOD } from '../../constants';
+import { webcrypto } from '../../crypto';
 
 function dec2hex (dec) {
   return ('0' + dec.toString(16)).substr(-2);
@@ -21,7 +22,7 @@ function dec2hex (dec) {
 
 function getRandomString(length) {
   var a = new Uint8Array(Math.ceil(length / 2));
-  crypto.getRandomValues(a);
+  webcrypto.getRandomValues(a);
   var str = Array.from(a, dec2hex).join('');
   return str.slice(0, length);
 }
@@ -36,7 +37,7 @@ function generateVerifier(prefix?: string): string {
 
 function computeChallenge(str: string): PromiseLike<any> {  
   var buffer = new TextEncoder().encode(str);
-  return crypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
+  return webcrypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
     var hash = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
     var b64u = stringToBase64Url(hash); // url-safe base64 variant
     return b64u;

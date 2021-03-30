@@ -1,4 +1,7 @@
 export class TransactionState {
+  interactionHandle?: string;
+
+// Authn V1 only
   stateToken?: string;
   type?: string;
   expiresAt?: string;

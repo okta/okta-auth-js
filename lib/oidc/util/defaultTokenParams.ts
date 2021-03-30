@@ -18,7 +18,16 @@ import { isBrowser } from '../../features';
 import { removeNils } from '../../util';
 
 export function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
-  const { pkce, clientId, redirectUri, responseType, responseMode, scopes, state, ignoreSignature } = sdk.options;
+  const {
+    pkce,
+    clientId,
+    redirectUri,
+    responseType,
+    responseMode,
+    scopes,
+    state,
+    ignoreSignature
+  } = sdk.options;
   const defaultRedirectUri = isBrowser() ? window.location.href : undefined;
   return removeNils({
     pkce,

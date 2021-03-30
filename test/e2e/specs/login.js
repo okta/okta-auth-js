@@ -37,7 +37,7 @@ describe('E2E login', () => {
       });
 
       it('can login using signin widget (with redirect)', async () => {
-        let options = { _forceRedirect: true };
+        let options = { forceRedirect: true };
         if (process.env.ORG_OIE_ENABLED && flow === 'pkce') {
           options = Object.assign({ useInteractionCodeFlow: true }, options);
         }

@@ -8,27 +8,27 @@ import { htmlString } from './util';
 const id = 'config-form';
 const Form = `
   <form id="${id}" method="GET" onsubmit="onSubmitForm(event)" onformdata="onFormData(event)">
-  <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
-  <label for="clientId">Client ID</label><input id="clientId" name="clientId" type="text" /><br/>
-  <label for="_clientSecret">Client Secret</label><input id="_clientSecret" name="_clientSecret" type="text" /><br/>
-  <label for="responseType">Response Type (comma separated)</label><input id="responseType" name="responseType" type="text" /><br/>
-  <label for="_defaultScopes">Use DEFAULT scopes (defined by authorization server)</label><br/>
-  <input id="default-scopes-yes" name="_defaultScopes" type="radio" value="true"/>YES<br/>
-  <input id="default-scopes-no" name="_defaultScopes" type="radio" value="false"/>NO (list scopes below)<br/>
-  <label for="scopes">Scopes (comma separated)</label><input id="scopes" name="scopes" type="text" /><br/>
-  <label for="redirectUri">Redirect URI</label><input id="redirectUri" name="redirectUri" type="text" /><br/>
-  <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" /><br/>
+  <label for="issuer">Issuer</label><input id="f_issuer" name="issuer" type="text" /><br/>
+  <label for="clientId">Client ID</label><input id="f_clientId" name="clientId" type="text" /><br/>
+  <label for="clientSecret">Client Secret</label><input id="f_clientSecret" name="clientSecret" type="text" /><br/>
+  <label for="responseType">Response Type (comma separated)</label><input id="f_responseType" name="responseType" type="text" /><br/>
+  <label for="defaultScopes">Use DEFAULT scopes (defined by authorization server)</label><br/>
+  <input id="f_default-scopes-yes" name="defaultScopes" type="radio" value="true"/>YES<br/>
+  <input id="f_default-scopes-no" name="defaultScopes" type="radio" value="false"/>NO (list scopes below)<br/>
+  <label for="scopes">Scopes (comma separated)</label><input id="f_scopes" name="scopes" type="text" /><br/>
+  <label for="redirectUri">Redirect URI</label><input id="f_redirectUri" name="redirectUri" type="text" /><br/>
+  <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="f_postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" /><br/>
   <label for="responseMode">Response Mode</label>
-  <select id="responseMode" name="responseMode">
+  <select id="f_responseMode" name="responseMode">
     <option value="" selected>Auto</option>
     <option value="fragment">Fragment</option>
     <option value="query">Query</option>
   </select><br/>
   <label for="pkce">PKCE</label><br/>
-  <input id="pkce-on" name="pkce" type="radio" value="true"/>ON<br/>
-  <input id="pkce-off" name="pkce" type="radio" value="false"/>OFF<br/>
+  <input id="f_pkce-on" name="pkce" type="radio" value="true"/>ON<br/>
+  <input id="f_pkce-off" name="pkce" type="radio" value="false"/>OFF<br/>
   <label for="storage">Storage</label>
-  <select id="storage" name="storage">
+  <select id="f_storage" name="storage">
     <option value="" selected>Auto</option>
     <option value="localStorage">Local Storage</option>
     <option value="sessionStorage">Session Storage</option>
@@ -36,30 +36,30 @@ const Form = `
     <option value="memory">Memory</option>
   </select><br/>
   <label for="secure">Secure Cookies</label><br/>
-  <input id="secureCookies-on" name="secure" type="radio" value="true"/>ON<br/>
-  <input id="secureCookies-off" name="secure" type="radio" value="false"/>OFF<br/>
+  <input id="f_secureCookies-on" name="secure" type="radio" value="true"/>ON<br/>
+  <input id="f_secureCookies-off" name="secure" type="radio" value="false"/>OFF<br/>
   <label for="sameSite">SameSite</label>
-  <select id="sameSite" name="sameSite">
+  <select id="f_sameSite" name="sameSite">
     <option value="" selected>Auto</option>
     <option value="none">None</option>
     <option value="lax">Lax</option>
     <option value="strict">Strict</option>
   </select><br/>
-  <label for="_siwVersion">Sign-in Widget version (leave blank for bundled version)</label><input id="_siwVersion" name="_siwVersion" type="text" /><br/>
-  <label for="_siwAuthClient">Use authClient option? (requires widget version >= 5.3)</label><br/>
-  <input id="authClient-on" name="_siwAuthClient" type="radio" value="true"/>YES (inject current instance)<br/>
-  <input id="authClient-off" name="_siwAuthClient" type="radio" value="false"/>NO (use widget bundled auth-js)<br/>
+  <label for="siwVersion">Sign-in Widget version (leave blank for bundled version)</label><input id="f_siwVersion" name="siwVersion" type="text" /><br/>
+  <label for="siwAuthClient">Use authClient option? (requires widget version >= 5.3)</label><br/>
+  <input id="f_authClient-on" name="f_siwAuthClient" type="radio" value="true"/>YES (inject current instance)<br/>
+  <input id="f_authClient-off" name="f_siwAuthClient" type="radio" value="false"/>NO (use widget bundled auth-js)<br/>
 
-  <label for="_forceRedirect">Force redirect (for SPA applications)?</label><br/>
-  <input id="_forceRedirect-on" name="_forceRedirect" type="radio" value="true"/>YES<br/>
-  <input id="_forceRedirect-off" name="_forceRedirect" type="radio" value="false"/>NO<br/>
+  <label for="forceRedirect">Force redirect (for SPA applications)?</label><br/>
+  <input id="f_forceRedirect-on" name="forceRedirect" type="radio" value="true"/>YES<br/>
+  <input id="f_forceRedirect-off" name="forceRedirect" type="radio" value="false"/>NO<br/>
   <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label><br/>
-  <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
-  <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
-  <label for="_idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
-  <input id="_idps" name="_idps" type="text" /><br/>
+  <input id="f_useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
+  <input id="f_useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
+  <label for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
+  <input id="f_idps" name="idps" type="text" /><br/>
   <hr/>
-  <input id="login-submit" type="submit" value="Update Config"/>
+  <input id="f_submit" type="submit" value="Update Config"/>
   </form>
 `;
 
@@ -67,55 +67,55 @@ export { Form };
 
 export function updateForm(origConfig: Config): void {
   const config = flattenConfig(origConfig);
-  (document.getElementById('issuer') as HTMLInputElement).value = config.issuer;
-  (document.getElementById('redirectUri') as HTMLInputElement).value = config.redirectUri;
-  (document.getElementById('responseType') as HTMLInputElement).value = config.responseType.join(',');
-  (document.getElementById('scopes') as HTMLInputElement).value = config.scopes.join(',');
-  (document.getElementById('postLogoutRedirectUri') as HTMLInputElement).value = config.postLogoutRedirectUri;
-  (document.getElementById('clientId') as HTMLInputElement).value = config.clientId;
-  (document.getElementById('_clientSecret') as HTMLInputElement).value = config._clientSecret;
-  (document.querySelector(`#responseMode [value="${config.responseMode || ''}"]`) as HTMLOptionElement).selected = true;
-  (document.querySelector(`#storage [value="${config.storage || ''}"]`) as HTMLOptionElement).selected = true;
-  (document.querySelector(`#sameSite [value="${config.sameSite || ''}"]`) as HTMLOptionElement).selected = true;
-  (document.getElementById('_siwVersion') as HTMLInputElement).value = config._siwVersion;
-  (document.getElementById('_idps') as HTMLInputElement).value = config._idps;
+  (document.getElementById('f_issuer') as HTMLInputElement).value = config.issuer;
+  (document.getElementById('f_redirectUri') as HTMLInputElement).value = config.redirectUri;
+  (document.getElementById('f_responseType') as HTMLInputElement).value = config.responseType.join(',');
+  (document.getElementById('f_scopes') as HTMLInputElement).value = config.scopes.join(',');
+  (document.getElementById('f_postLogoutRedirectUri') as HTMLInputElement).value = config.postLogoutRedirectUri;
+  (document.getElementById('f_clientId') as HTMLInputElement).value = config.clientId;
+  (document.getElementById('f_clientSecret') as HTMLInputElement).value = config.clientSecret;
+  (document.querySelector(`#f_responseMode [value="${config.responseMode || ''}"]`) as HTMLOptionElement).selected = true;
+  (document.querySelector(`#f_storage [value="${config.storage || ''}"]`) as HTMLOptionElement).selected = true;
+  (document.querySelector(`#f_sameSite [value="${config.sameSite || ''}"]`) as HTMLOptionElement).selected = true;
+  (document.getElementById('f_siwVersion') as HTMLInputElement).value = config.siwVersion;
+  (document.getElementById('f_idps') as HTMLInputElement).value = config.idps;
 
   if (config.pkce) {
-    (document.getElementById('pkce-on') as HTMLInputElement).checked = true;
+    (document.getElementById('f_pkce-on') as HTMLInputElement).checked = true;
   } else {
-    (document.getElementById('pkce-off') as HTMLInputElement).checked = true;
+    (document.getElementById('f_pkce-off') as HTMLInputElement).checked = true;
   }
 
   if (config.secure) {
-    (document.getElementById('secureCookies-on') as HTMLInputElement).checked = true;
+    (document.getElementById('f_secureCookies-on') as HTMLInputElement).checked = true;
   } else {
-    (document.getElementById('secureCookies-off') as HTMLInputElement).checked = true;
+    (document.getElementById('f_secureCookies-off') as HTMLInputElement).checked = true;
   }
 
-  if (config._defaultScopes) {
-    (document.getElementById('default-scopes-yes') as HTMLInputElement).checked = true;
-    (document.getElementById('scopes') as HTMLInputElement).disabled = true;
+  if (config.defaultScopes) {
+    (document.getElementById('f_default-scopes-yes') as HTMLInputElement).checked = true;
+    (document.getElementById('f_scopes') as HTMLInputElement).disabled = true;
   } else {
-    (document.getElementById('default-scopes-no') as HTMLInputElement).checked = true;
-    (document.getElementById('scopes') as HTMLInputElement).disabled = false;
+    (document.getElementById('f_default-scopes-no') as HTMLInputElement).checked = true;
+    (document.getElementById('f_scopes') as HTMLInputElement).disabled = false;
   }
 
   if (config.useInteractionCodeFlow) {
-    (document.getElementById('useInteractionCodeFlow-on') as HTMLInputElement).checked = true;
+    (document.getElementById('f_useInteractionCodeFlow-on') as HTMLInputElement).checked = true;
   } else {
-    (document.getElementById('useInteractionCodeFlow-off') as HTMLInputElement).checked = true;
+    (document.getElementById('f_useInteractionCodeFlow-off') as HTMLInputElement).checked = true;
   }
 
-  if (config._forceRedirect) {
-    (document.getElementById('_forceRedirect-on') as HTMLInputElement).checked = true;
+  if (config.forceRedirect) {
+    (document.getElementById('f_forceRedirect-on') as HTMLInputElement).checked = true;
   } else {
-    (document.getElementById('_forceRedirect-off') as HTMLInputElement).checked = true;
+    (document.getElementById('f_forceRedirect-off') as HTMLInputElement).checked = true;
   }
 
-  if (config._siwAuthClient) {
-    (document.getElementById('authClient-on') as HTMLInputElement).checked = true;
+  if (config.siwAuthClient) {
+    (document.getElementById('f_authClient-on') as HTMLInputElement).checked = true;
   } else {
-    (document.getElementById('authClient-off') as HTMLInputElement).checked = true;
+    (document.getElementById('f_authClient-off') as HTMLInputElement).checked = true;
   }
 }
 

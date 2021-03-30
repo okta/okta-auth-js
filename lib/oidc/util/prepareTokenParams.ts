@@ -19,7 +19,7 @@ import { DEFAULT_CODE_CHALLENGE_METHOD } from '../../constants';
 import pkce from './pkce';
 
 // Prepares params for a call to /authorize or /token
-export function prepareTokenParams(sdk: OktaAuth, tokenParams: TokenParams): Promise<TokenParams> {
+export function prepareTokenParams(sdk: OktaAuth, tokenParams?: TokenParams): Promise<TokenParams> {
   // build params using defaults + options
   const defaults = getDefaultTokenParams(sdk);
   tokenParams = Object.assign({}, defaults, clone(tokenParams));
