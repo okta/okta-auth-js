@@ -15,6 +15,7 @@ export * from './AuthState';
 export * from './Transaction';
 export * from './Cookies';
 export * from './http';
+export * from '../idx/types';
 export * from './JWT';
 export * from './OAuth';
 export * from './OktaAuthOptions';

@@ -25,8 +25,9 @@ export function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<vo
 
   return prepareTokenParams(sdk, options)
     .then(function (tokenParams: TokenParams) {
-      var urls = getOAuthUrls(sdk, options);
-      var requestUrl = urls.authorizeUrl + buildAuthorizeParams(tokenParams);
+      const urls = getOAuthUrls(sdk, options);
+      const requestUrl = urls.authorizeUrl + buildAuthorizeParams(tokenParams);
+      const issuer = sdk.options.issuer;
 
       // Gather the values we want to save in the transaction
       const {
@@ -43,6 +44,7 @@ export function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<vo
       } = tokenParams;
 
       const oauthMeta: TransactionMeta = {
+        issuer,
         responseType,
         state,
         nonce,

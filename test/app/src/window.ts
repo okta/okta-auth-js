@@ -14,7 +14,7 @@ import {
 import { onSubmitForm, onFormData, showConfigForm } from './form';
 import { toQueryString } from './util';
 import { FormDataEvent } from './types';
-import { buildWidgetConfig } from './widget';
+import { renderWidget, buildWidgetConfig } from './widget';
 
 declare global {
   interface Window {
@@ -25,7 +25,7 @@ declare global {
     bootstrapLanding: () => void;
     bootstrapCallback: () => void;
     getWidgetConfig: () => any;
-    getAuthJSConfig: () => any;
+    getConfig: () => any;
     toQueryString: (obj: any) => string;
     constructAppUrl: (basePath: string) => string;
     navigateToApp: (appPath: string, event: Event) => void;
@@ -38,7 +38,7 @@ let config: Config;
 const rootElem = document.getElementById('root');
 
 window.addEventListener('load', () => {
-  rootElem.classList.add('loaded');
+  rootElem && rootElem.classList.add('loaded');
 });
 
 function mount(): TestApp {
@@ -58,11 +58,11 @@ Object.assign(window, {
   onSubmitForm: onSubmitForm,
   onFormData: onFormData,
 
-  getAuthJSConfig: function(): Config {
+  getConfig: function(): Config {
     return window.location.search ? getConfigFromUrl() : getDefaultConfig();
   },
   constructAppUrl: function(basePath = ''): string {
-    const config = window.getAuthJSConfig();
+    const config = window.getConfig();
     const queryParams = toQueryString(flattenConfig(config));
     return basePath + queryParams;
   },
@@ -75,7 +75,7 @@ Object.assign(window, {
     if (event) {
       event.preventDefault();
     }
-    const config = window.getAuthJSConfig();
+    const config = window.getConfig();
     showConfigForm(config);
   },
   // Login page, read config from URL
@@ -83,7 +83,13 @@ Object.assign(window, {
     const siwConfig = window.location.search ? getConfigFromUrl() : getDefaultConfig();
     return buildWidgetConfig(siwConfig);
   },
-
+  renderWidget: function(event?: Event, extraConfig?: Config): any {
+    if (event) {
+      event.preventDefault();
+    }
+    const config = Object.assign({}, window.getConfig(), extraConfig);
+    return renderWidget(config);
+  },
   // Regular landing, read config from URL
   bootstrapLanding: function(): void {
     config = window.location.search ? getConfigFromUrl() : getDefaultConfig();
