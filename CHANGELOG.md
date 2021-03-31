@@ -6,6 +6,7 @@
 
 - [#515](https://github.com/okta/okta-auth-js/pull/515) Removes `token.value` field
 - [#540](https://github.com/okta/okta-auth-js/pull/540) Locks `tokenManager.expireEarlySeconds` option with the default value (30s) for non-dev environment
+- [#675](https://github.com/okta/okta-auth-js/pull/675) Calls updateAuthState in the constructor to trigger update authState to the latest state
   
 ## 4.7.2
 
