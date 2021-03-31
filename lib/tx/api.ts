@@ -20,7 +20,7 @@ import { AuthTransaction } from './AuthTransaction';
 
 function transactionStatus(sdk, args) {
   args = addStateToken(sdk, args);
-  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn', args);
+  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn', args, { withCredentials: true });
 }
 
 function resumeTransaction(sdk, args) {
@@ -60,7 +60,7 @@ function introspect (sdk, args) {
 function transactionStep(sdk, args) {
   args = addStateToken(sdk, args);
   // v1 pipeline introspect API
-  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn/introspect', args);
+  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn/introspect', args, { withCredentials: true });
 }
 
 function transactionExists(sdk) {
