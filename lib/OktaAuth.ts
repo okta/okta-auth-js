@@ -492,17 +492,14 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     this.tokenManager.setTokens(tokens);
   }
 
-  setOriginalUri(originalUri?: string): void {
-    // Use current location if originalUri was not passed
-    originalUri = originalUri || window.location.href;
-    // Store originalUri
+  setOriginalUri(originalUri: string): void {
     const storage = browserStorage.getSessionStorage();
     storage.setItem(REFERRER_PATH_STORAGE_KEY, originalUri);
   }
 
   getOriginalUri(): string {
     const storage = browserStorage.getSessionStorage();
-    const originalUri = storage.getItem(REFERRER_PATH_STORAGE_KEY) || window.location.origin;
+    const originalUri = storage.getItem(REFERRER_PATH_STORAGE_KEY);
     return originalUri;
   }
 

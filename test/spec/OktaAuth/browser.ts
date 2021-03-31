@@ -469,9 +469,9 @@ describe('OktaAuth (browser)', function() {
       auth.setOriginalUri(uri);
       expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, uri);
     });
-    it('should save the window.location.href by default', () => {
+    it('does not have a default value', () => {
       auth.setOriginalUri();
-      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, window.location.href);
+      expect(setItemMock).toHaveBeenCalledWith(REFERRER_PATH_STORAGE_KEY, undefined);
     });
   });
 
@@ -490,10 +490,10 @@ describe('OktaAuth (browser)', function() {
       const res = auth.getOriginalUri();
       expect(res).toBe('fakeOriginalUri');
     });
-    it('returns window.location.origin if nothing was set', () => {
+    it('returns null if nothing was set', () => {
       getItemMock = jest.fn().mockReturnValue(null);
       const res = auth.getOriginalUri();
-      expect(res).toBe(window.location.origin);
+      expect(res).toBe(null);
     });
   });
 
