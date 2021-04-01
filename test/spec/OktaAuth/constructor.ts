@@ -1,6 +1,7 @@
 /* eslint-disable complexity */
 import { 
-  OktaAuth
+  OktaAuth, 
+  AuthStateManager
 } from '@okta/okta-auth-js';
 
 describe('OktaAuth (constructor)', () => {
@@ -112,6 +113,22 @@ describe('OktaAuth (constructor)', () => {
     const oa = new OktaAuth(config);
     fnOptions.forEach((option) => {
       expect(oa.options[option]).toBe(config[option]);
+    });
+  });
+
+  describe('AuthStateManager', () => {
+    it('initials authStateManager', () => {
+      const config = { issuer: 'http://fake' };
+      const oa = new OktaAuth(config);
+      expect(oa.authStateManager).toBeDefined();
+    });
+
+    it('calls updateAuthState', () => {
+      jest.spyOn(AuthStateManager.prototype, 'updateAuthState');
+      const config = { issuer: 'http://fake' };
+      // eslint-disable-next-line no-new
+      new OktaAuth(config);
+      expect(AuthStateManager.prototype.updateAuthState).toHaveBeenCalledTimes(1);
     });
   });
 
