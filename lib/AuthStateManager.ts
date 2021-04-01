@@ -1,7 +1,7 @@
 import { AuthSdkError } from './errors';
 import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from '.';
-import { getConsole, warn } from './util';
+import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
 const PCancelable = require('p-cancelable');
 
