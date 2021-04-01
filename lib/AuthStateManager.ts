@@ -1,7 +1,7 @@
 import { AuthSdkError } from './errors';
 import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from '.';
-import { getConsole, warn } from './util';
+import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
 const PCancelable = require('p-cancelable');
 
@@ -70,14 +70,6 @@ export class AuthStateManager {
   }
 
   updateAuthState(): void {
-    if (!this._sdk.emitter.e 
-        || !this._sdk.emitter.e[EVENT_AUTH_STATE_CHANGE] 
-        || !this._sdk.emitter.e[EVENT_AUTH_STATE_CHANGE].length) {
-      warn('updateAuthState is an asynchronous method with no return, ' + 
-        'please subscribe to the latest authState update with ' + 
-        'authStateManager.subscribe(handler) method before calling updateAuthState.');
-    }
-
     const { transformAuthState, devMode } = this._sdk.options;
     const { autoRenew, autoRemove } = this._sdk.tokenManager._getOptions();
 
