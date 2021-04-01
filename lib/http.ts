@@ -24,7 +24,7 @@ function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any> {
       args = options.args,
       saveAuthnState = options.saveAuthnState,
       accessToken = options.accessToken,
-      withCredentials = options.withCredentials !== false, // default value is true
+      withCredentials = options.withCredentials === true, // default value is false
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil.storage,
       httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies);
@@ -50,9 +50,9 @@ function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any> {
   }
 
   var ajaxOptions: FetchOptions = {
-    headers: headers,
+    headers,
     data: args || undefined,
-    withCredentials: withCredentials
+    withCredentials
   };
 
   var err, res;

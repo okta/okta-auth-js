@@ -124,7 +124,7 @@ function link2fn(sdk, res, obj, link, ref) {
 
       case 'GET':
         return function() {
-          return http.get(sdk, link.href);
+          return http.get(sdk, link.href, { withCredentials: true });
         };
 
       case 'POST':
