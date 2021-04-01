@@ -6,6 +6,8 @@
 
 - [#515](https://github.com/okta/okta-auth-js/pull/515) Removes `token.value` field
 - [#540](https://github.com/okta/okta-auth-js/pull/540) Locks `tokenManager.expireEarlySeconds` option with the default value (30s) for non-dev environment
+- [#678](https://github.com/okta/okta-auth-js/pull/678) Default value for `originalUri` is null.
+
 ### Other
 
 - [#675](https://github.com/okta/okta-auth-js/pull/675) Calls updateAuthState in the constructor to trigger update authState to the latest state
@@ -35,6 +37,7 @@
 - [#648](https://github.com/okta/okta-auth-js/pull/648) Updates widget to 5.4.2
 - [#653](https://github.com/okta/okta-auth-js/pull/653) Removes isLoginRedirect check in oidc logic
 - [#661](https://github.com/okta/okta-auth-js/pull/661) Upgrades node-cache to 5.1.2
+
 ## 4.7.2
 
 ### Bug Fixes
