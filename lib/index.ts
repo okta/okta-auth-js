@@ -20,4 +20,5 @@ export * from './oidc';
 export * from './StorageManager';
 export * from './TransactionManager';
 export * from './TokenManager';
+export * from './AuthStateManager';
 export * from './util';
