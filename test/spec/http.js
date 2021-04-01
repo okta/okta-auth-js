@@ -31,9 +31,9 @@ describe('HTTP Requestor', () => {
     }, options));
   }
   describe('withCredentials', () => {
-    it('can be disabled', () => {
+    it('can be enabled', () => {
       createAuthClient();
-      return http.httpRequest(sdk, { url, withCredentials: false })
+      return http.httpRequest(sdk, { url, withCredentials: true })
       .then(res => {
         expect(res).toBe(response1);
         expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
@@ -43,7 +43,7 @@ describe('HTTP Requestor', () => {
             'Content-Type': 'application/json',
             'X-Okta-User-Agent-Extended': USER_AGENT
           },
-          withCredentials: false
+          withCredentials: true
         });
       });
     });
@@ -61,7 +61,7 @@ describe('HTTP Requestor', () => {
             'Content-Type': 'application/json',
             'X-Okta-User-Agent-Extended': USER_AGENT
           },
-          withCredentials: true
+          withCredentials: false
         });
       });
     });
@@ -82,7 +82,7 @@ describe('HTTP Requestor', () => {
             'X-Okta-User-Agent-Extended': USER_AGENT,
             'fake': 'value'
           },
-          withCredentials: true
+          withCredentials: false
         });
       });
     });
@@ -104,7 +104,7 @@ describe('HTTP Requestor', () => {
             'X-Okta-User-Agent-Extended': USER_AGENT,
             'fake': 'value'
           },
-          withCredentials: true
+          withCredentials: false
         });
       });
     });
@@ -125,7 +125,7 @@ describe('HTTP Requestor', () => {
             'Content-Type': 'application/json',
             'X-Okta-User-Agent-Extended': USER_AGENT
           },
-          withCredentials: true
+          withCredentials: false
         });
       });
     });
@@ -145,7 +145,7 @@ describe('HTTP Requestor', () => {
             'X-Okta-User-Agent-Extended': USER_AGENT,
             'Authorization': 'Bearer fake'
           },
-          withCredentials: true
+          withCredentials: false
         });
       });
     });

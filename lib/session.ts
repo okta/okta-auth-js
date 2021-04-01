@@ -28,16 +28,16 @@ function sessionExists(sdk) {
 }
 
 function getSession(sdk) { 
-  return http.get(sdk, '/api/v1/sessions/me')
+  return http.get(sdk, '/api/v1/sessions/me', { withCredentials: true })
   .then(function(session) {
     var res = omit(session, '_links');
 
     res.refresh = function() {
-      return http.post(sdk, getLink(session, 'refresh').href);
+      return http.post(sdk, getLink(session, 'refresh').href, {}, { withCredentials: true });
     };
 
     res.user = function() {
-      return http.get(sdk, getLink(session, 'user').href);
+      return http.get(sdk, getLink(session, 'user').href, { withCredentials: true });
     };
 
     return res;
@@ -51,12 +51,13 @@ function getSession(sdk) {
 function closeSession(sdk) {
   return http.httpRequest(sdk, {
     url: sdk.getIssuerOrigin() + '/api/v1/sessions/me',
-    method: 'DELETE'
+    method: 'DELETE',
+    withCredentials: true
   });
 }
 
 function refreshSession(sdk) {
-  return http.post(sdk, '/api/v1/sessions/me/lifecycle/refresh');
+  return http.post(sdk, '/api/v1/sessions/me/lifecycle/refresh', {}, { withCredentials: true });
 }
 
 function setCookieAndRedirect(sdk, sessionToken, redirectUrl) {
