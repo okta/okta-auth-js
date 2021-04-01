@@ -78,7 +78,8 @@ export function getPollFn(sdk, res: TransactionState, ref) {
 
       var href = pollLink.href + toQueryString(opts);
       return http.post(sdk, href, getStateToken(res), {
-        saveAuthnState: false  
+        saveAuthnState: false,
+        withCredentials: true
       });
     }
 

@@ -81,7 +81,7 @@ describe('session', function() {
       jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
       return getSession(sdk)
         .then(function() {
-          expect(http.get).toHaveBeenCalledWith(sdk, '/api/v1/sessions/me');
+          expect(http.get).toHaveBeenCalledWith(sdk, '/api/v1/sessions/me', { withCredentials: true });
         });
     });
 
@@ -149,7 +149,7 @@ describe('session', function() {
       return getSession(sdk)
         .then(function(res) {
           res.refresh();
-          expect(http.post).toHaveBeenCalledWith(sdk, href);
+          expect(http.post).toHaveBeenCalledWith(sdk, href, {}, { withCredentials: true });
         });
     });
 
@@ -170,7 +170,7 @@ describe('session', function() {
           http.get.mockReset();
           jest.spyOn(http, 'get').mockReturnValue(null);
           res.user();
-          expect(http.get).toHaveBeenCalledWith(sdk, href);
+          expect(http.get).toHaveBeenCalledWith(sdk, href, { withCredentials: true });
         });
     });
   });
@@ -182,7 +182,8 @@ describe('session', function() {
         .then(function() {
           expect(http.httpRequest).toHaveBeenCalledWith(sdk, {
             url: baseUrl + '/api/v1/sessions/me',
-            method: 'DELETE'
+            method: 'DELETE',
+            withCredentials: true
           });
         });
     });
@@ -202,7 +203,7 @@ describe('session', function() {
       jest.spyOn(http, 'post').mockReturnValue(Promise.resolve());
       return refreshSession(sdk)
         .then(function() {
-          expect(http.post).toHaveBeenCalledWith(sdk,'/api/v1/sessions/me/lifecycle/refresh');
+          expect(http.post).toHaveBeenCalledWith(sdk,'/api/v1/sessions/me/lifecycle/refresh', {}, { withCredentials: true });
         });
     });
     it('can throw', function() {
