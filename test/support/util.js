@@ -111,7 +111,7 @@ function mockAjax(pairs) {
       throw new Error('We are making a request that we have not anticipated: ' + url);
     }
 
-    if (pair.request.withCredentials !== false) {
+    if (pair.request.withCredentials === true) {
       // Make sure every request is attaching cookies
       expect(args.credentials).toEqual('include');
     }

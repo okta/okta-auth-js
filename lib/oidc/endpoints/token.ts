@@ -59,7 +59,6 @@ export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls)
     url: urls.tokenUrl,
     method: 'POST',
     args: data,
-    withCredentials: false,
     headers
   });
 }
@@ -68,7 +67,6 @@ export function postRefreshToken(sdk, options: TokenParams, refreshToken: Refres
   return http.httpRequest(sdk, {
     url: refreshToken.tokenUrl,
     method: 'POST',
-    withCredentials: false,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
