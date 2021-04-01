@@ -238,9 +238,16 @@ class OktaAuth implements SigninAPI, SignoutAPI {
 
     // Fingerprint API
     this.fingerprint = fingerprint.bind(null, this);
+
     this.emitter = new Emitter();
+
+    // TokenManager
     this.tokenManager = new TokenManager(this, args.tokenManager);
+
+    // AuthStateManager
     this.authStateManager = new AuthStateManager(this);
+    // Trigger an initial change event to make sure authState is latest
+    this.authStateManager.updateAuthState();
   }
 
   // ES6 module users can use named exports to access all symbols
