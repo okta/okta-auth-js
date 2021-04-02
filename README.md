@@ -640,6 +640,8 @@ oktaAuth.authStateManager.updateAuthState();
 
 ##### `restoreOriginalUri`
 
+> :link: web browser only <br>
+
 Callback function. When [sdk.handleLoginRedirect](#handleloginredirecttokens) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
 
 ```javascript
@@ -662,6 +664,14 @@ if (oktaAuth.isLoginRedirect()) {
 ##### `devMode`
 
 Default to `false`. It enables debugging logs when set to `true`.
+
+##### `useInteractionCodeFlow`
+
+Enables interaction code flow for direct auth clients.
+
+##### `clientSecret`
+
+Used in authorization and interaction code flows by server-side web applications to obtain OAuth tokens. In a production application, this value should **never** be visible on the client side.
 
 #### Example Client
 
@@ -866,6 +876,8 @@ authClient.signInWithCredentials({
 
 ### `signInWithRedirect(options)`
 
+> :link: web browser only <br>
+
 Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a originalUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
 You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getOriginalUri](#getoriginaluri) to clear the intermediate state (the originalUri) after successful authentication.
 
@@ -930,7 +942,7 @@ authClient.signOut({
 
 ### `closeSession()`
 
-> :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
 > :hourglass: async
 
 Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. This method is an XHR-based alternative to [signOut](#signout), which will redirect to Okta before returning to your application. Here are some points to consider when using this method:
@@ -1134,6 +1146,8 @@ Removes the stored URI string stored by [setOriginal](#setoriginaluriuri) from s
 
 #### `isLoginRedirect()`
 
+> :link: web browser only <br>
+
 Check `window.location` to verify if the app is in OAuth callback state or not. This function is synchronous and returns `true` or `false`.
 
 ```javascript
@@ -1146,6 +1160,8 @@ if (authClient.isLoginRedirect()) {
 ```
 
 ### `handleLoginRedirect(tokens?)`
+
+> :link: web browser only <br>
 
 Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#additional-options).
 
@@ -2007,7 +2023,8 @@ The end of the authentication flow! This transaction contains a sessionToken you
 
 #### `session.setCookieAndRedirect(sessionToken, redirectUri)`
 
-> :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :link: web browser only <br>
+> :warning: method requires access to [third party cookies] <br>(#third-party-cookies)
 
 This allows you to create a session using a sessionToken.
 * `sessionToken` - Ephemeral one-time token used to bootstrap an Okta session.
@@ -2019,7 +2036,8 @@ authClient.session.setCookieAndRedirect(transaction.sessionToken);
 
 #### `session.exists()`
 
-> :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :link: web browser only <br>
+> :warning: This method requires access to [third party cookies] <br>(#third-party-cookies)
 > :hourglass: async
 
 Returns a promise that resolves with `true` if there is an existing Okta [session](https://developer.okta.com/docs/api/resources/sessions#example), or `false` if not.
@@ -2037,7 +2055,8 @@ authClient.session.exists()
 
 #### `session.get()`
 
-> :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :link: web browser only <br>
+> :warning: This method requires access to [third party cookies] <br>(#third-party-cookies)
 > :hourglass: async
 
 Gets the active [session](https://developer.okta.com/docs/api/resources/sessions#example).
@@ -2054,7 +2073,8 @@ authClient.session.get()
 
 #### `session.refresh()`
 
-> :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :link: web browser only <br>
+> :warning: This method requires access to [third party cookies] <br>(#third-party-cookies)
 > :hourglass: async
 
 Refresh the current session by extending its lifetime. This can be used as a keep-alive operation.
@@ -2119,7 +2139,7 @@ authClient.token.getWithoutPrompt({
 
 #### `token.getWithoutPrompt(options)`
 
-> :link: web only <br>
+> :link: web browser only <br>
 > :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
 > :hourglass: async
 
@@ -2145,7 +2165,7 @@ authClient.token.getWithoutPrompt({
 
 #### `token.getWithPopup(options)`
 
-> :link: web only <br>
+> :link: web browser only <br>
 > :hourglass: async
 
 Create token with a popup.
@@ -2167,7 +2187,7 @@ authClient.token.getWithPopup(options)
 
 #### `token.getWithRedirect(options)`
 
-> :link: web only <br>
+> :link: web browser only <br>
 > :hourglass: async
 
 Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#additional-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. Values will be returned in either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode)
@@ -2186,7 +2206,7 @@ authClient.token.getWithRedirect({
 
 #### `token.parseFromUrl(options)`
 
-> :link: web only <br>
+> :link: web browser only <br>
 > :hourglass: async
 
 Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. Values are parsed from either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode).
@@ -2354,8 +2374,8 @@ authClient.token.verify(idTokenObject, validationOptions)
 
 #### `token.isLoginRedirect`
 
+> :link: web browser only <br>
 > :warning: Deprecated, this method will be removed in next major release, use [sdk.isLoginRedirect](#isloginredirect) instead.
-
 
 #### `token.prepareTokenParams`
 
@@ -2565,7 +2585,9 @@ Unsubscribes callback for `authStateChange` event. It will unregister all handle
 
 ## Node JS and React Native Usage
 
-You can use this library on server side in your Node application or mobile client side in React Native environment as an Authentication SDK. It can only be used in this way for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), **not** to implement an OIDC flow.
+You can use this library on the server side in your Node application or mobile client side in React Native environment. Some methods are only available in a web browser environment. These methods are marked in the README with this note:
+
+> :link: web browser only <br>
 
 To include this library in your project, you can follow the instructions in the [Getting started](#getting-started) section.
 
@@ -2574,7 +2596,7 @@ To include this library in your project, you can follow the instructions in the 
 You only need to set the `issuer` for your Okta Domain:
 
 ```javascript
-var OktaAuth = require('@okta/okta-auth-js');
+var OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 
 var config = {
   // The URL for your Okta organization
