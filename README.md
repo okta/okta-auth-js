@@ -2466,7 +2466,7 @@ Subscribe to an event published by the `tokenManager`.
 * `event` - Event to subscribe to. Possible events are:
   * `expired` - Fired before a token is set to expire (using `expireEarlySeconds` option, 30 seconds by default). If `autoRenew` option is set to true, a listener will be attached to this event and an attempt will be made to renew the token when the event fires.
   * `error` - Fired when a token renew attempt has failed. This is a permanent error, and the token will be removed from storage.
-  * `added` - Fired when a new token has been added or a new token has been added that did not change the original.
+* `added` - Fired when a new token has been added or a token has been updated that did not change from the original value.
   * `renewed` - Fired when a token has been renewed by the `tokenManager`, either via the `autoRenew` process or as a result of calling `tokenManager.renew`
   * `removed` - Fired when a token is removed from storage as a result of renew failure, or a call to `tokenManager.remove`. (This event will not fire from `tokenManager.clear`)
 * `callback` - Function to call when the event is triggered
