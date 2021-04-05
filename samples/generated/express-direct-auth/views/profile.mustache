@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+
+    {{>menu}}
+
+    <div id="content" class="ui padded grid relaxed">
+      <div id="doc" class="column eight wide">
+        <div class="doc-overview">
+          <h2 class="ui dividing header" data-se="overview-doc-header">
+            My Profile
+          </h2>
+          <p>Hello, {{userinfo.name}}. Below is the information that was read from the <a href="https://developer.okta.com/docs/api/resources/oidc#get-user-information">User Info Endpoint</a>
+            and persisted by the <a href="https://github.com/okta/okta-oidc-js/tree/master/packages/oidc-middleware">Okta OIDC Middleware Library</a> at <code>req.userinfo</code>.
+          </p>
+          <p>This route is protected with the <code>oidc.ensureAuthenticated()</code> middleware, which will ensure that this page cannot be accessed until you have authenticated.</p>
+        </div>
+        <table class="ui table compact collapsing">
+          <thead>
+            <tr>
+              <th>Claim</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#attributes}}
+              <tr>
+                <td>{{0}}</td>
+                <td id="claim-{{0}}">{{1}}</td>
+              </tr>
+            {{/attributes}}
+          </tbody>
+        </table>
+      </div>
+
+      {{>server-config}}
+
+    </div>
+  </body>
+</html>
