@@ -272,7 +272,6 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   async signIn(opts: SigninOptions = { useInteractionCodeFlow: true }): Promise<AuthTransaction> {
     const useInteractionCodeFlow = opts.useInteractionCodeFlow || this.options.useInteractionCodeFlow;
     if (useInteractionCodeFlow) {
-      console.log('use interaction flow');
       return authenticate(this, opts);
     }
 

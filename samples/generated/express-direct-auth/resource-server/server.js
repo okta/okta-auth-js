@@ -14,13 +14,13 @@ const express = require('express');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 var cors = require('cors');
 
-const sampleConfig = require('../config.js');
+const { port, oidc, assertClaims } = require('../config.js').resourceServer;
 
 const oktaJwtVerifier = new OktaJwtVerifier({
-  clientId: sampleConfig.resourceServer.oidc.clientId,
-  issuer: sampleConfig.resourceServer.oidc.issuer,
-  assertClaims: sampleConfig.resourceServer.assertClaims,
-  testing: sampleConfig.resourceServer.oidc.testing
+  clientId: oidc.clientId,
+  issuer: oidc.issuer,
+  assertClaims: assertClaims,
+  testing: oidc.testing
 });
 
 /**
@@ -31,14 +31,14 @@ const oktaJwtVerifier = new OktaJwtVerifier({
 function authenticationRequired(req, res, next) {
   const authHeader = req.headers.authorization || '';
   const match = authHeader.match(/Bearer (.+)/);
-
+  
   if (!match) {
     res.status(401);
     return next('Unauthorized');
   }
-
+  
   const accessToken = match[1];
-  const audience = sampleConfig.resourceServer.assertClaims.aud;
+  const audience = assertClaims.aud;
   return oktaJwtVerifier.verifyAccessToken(accessToken, audience)
     .then((jwt) => {
       req.jwt = jwt;
@@ -90,6 +90,6 @@ app.get('/api/messages', authenticationRequired, (req, res) => {
   });
 });
 
-app.listen(sampleConfig.resourceServer.port, () => {
-  console.log(`Resource Server Ready on port ${sampleConfig.resourceServer.port}`);
+app.listen(port, () => {
+  console.log(`Resource Server Ready on port ${port}`);
 });

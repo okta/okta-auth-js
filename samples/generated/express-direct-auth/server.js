@@ -10,6 +10,7 @@ const passport = require('passport');
 const Strategy = require('passport-local').Strategy;
 const mustacheExpress = require('mustache-express');
 const path = require('path');
+// const { logout } = require('@okta/oidc-middleware');
 const logout = require('./logout');
 
 const templateDir = path.join(__dirname, '', 'views');
@@ -41,7 +42,6 @@ passport.use(new Strategy(
         { tokens: { tokens } } 
       } = await authClient.idx.authenticate({ username, password });
       const { accessToken, idToken } = tokens;
-      console.log('tokens -> ', tokens);
       const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
       cb(null, { userinfo, tokens });
     } catch (err) {

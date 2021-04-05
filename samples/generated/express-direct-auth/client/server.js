@@ -10,7 +10,7 @@ const passport = require('passport');
 const Strategy = require('passport-local').Strategy;
 const mustacheExpress = require('mustache-express');
 const path = require('path');
-const logout = require('./logout');
+const { ExpressOIDC } = require('@okta/oidc-middleware');
 
 const templateDir = path.join(__dirname, '', 'views');
 const frontendDir = path.join(__dirname, '', 'assets');
@@ -28,6 +28,14 @@ const sampleConfig = {
     logoutRedirectUri: 'http://localhost:8080'
   },
 };
+
+const oidc = new ExpressOIDC({
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+  client_id: '{clientId}',
+  client_secret: '{clientSecret}',
+  appBaseUrl: '{appBaseUrl}',
+  scope: 'openid profile'
+});
 
 function createAuthClient() {
   return new OktaAuthJS(sampleConfig.oidc);
@@ -140,7 +148,9 @@ app.get('/profile',
     });
   });
 
-app.post('/logout', logout.forceLogoutAndRevoke({ options: sampleConfig.oidc }));
+app.post('/forces-logout', oidc.forceLogoutAndRevoke(), (req, res) => {
+  // Nothing here will execute, after the redirects the user will end up wherever the `routes.logoutCallback.path` specifies (default `/`)
+});
 
 app.listen(8080, () => {
   console.log('on port 8080');
