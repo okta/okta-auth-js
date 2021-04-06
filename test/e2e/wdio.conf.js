@@ -5,13 +5,16 @@ require('regenerator-runtime'); // Allows use of async/await
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+const ORG_OIE_ENABLED = process.env.ORG_OIE_ENABLED;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
 const browserOptions = {
     args: []
 };
-const specs = REFRESH_TOKEN ? ['./specs/**/refreshTokens.js', './specs/**/crossTabs.js'] : ['./specs/**/*.js'];
-const excludeSpecs = REFRESH_TOKEN ? [] : ['./specs/**/refreshTokens.js'];
+
+/* eslint-disable max-len */
+const specs = (REFRESH_TOKEN && !ORG_OIE_ENABLED) ? ['./specs/**/refreshTokens.js', './specs/**/crossTabs.js'] : ['./specs/**/*.js'];
+const excludeSpecs = (REFRESH_TOKEN || ORG_OIE_ENABLED) ? [] : ['./specs/**/refreshTokens.js'];
 
 if (CI) {
     browserOptions.args = browserOptions.args.concat([
@@ -21,7 +24,8 @@ if (CI) {
         '--no-sandbox',
         '--whitelisted-ips',
         '--disable-extensions',
-        '--verbose'
+        '--verbose',
+        '--disable-dev-shm-usage'
     ]);
 }
 

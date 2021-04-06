@@ -20,6 +20,13 @@ test_suites:
       script_name: e2e
       criteria: MERGE
       queue_name: small
+    - name: e2e-oie
+      script_path: /root/okta/okta-auth-js/scripts
+      sort_order: '3'
+      timeout: '10'
+      script_name: e2e-oie
+      criteria: MERGE
+      queue_name: small
     - name: publish
       script_path: /root/okta/okta-auth-js/scripts
       sort_order: '4'

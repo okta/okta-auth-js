@@ -1,6 +1,7 @@
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaLogin from '../pageobjects/OktaLogin';
+import OIEOktaLogin from '../pageobjects/OIEOktaLogin';
 import { switchToPopupWindow, switchToLastFocusedWindow } from './browserUtils';
 
 const USERNAME = process.env.USERNAME;
@@ -32,14 +33,23 @@ async function loginPopup() {
   const existingHandlesCount = (await browser.getWindowHandles()).length;
   await TestApp.loginPopup();
   await switchToPopupWindow(existingHandlesCount);
-  await OktaLogin.signin(USERNAME, PASSWORD);
+
+  if (process.env.ORG_OIE_ENABLED) {
+    await OIEOktaLogin.signin(USERNAME, PASSWORD);
+  } else {
+    await OktaLogin.signin(USERNAME, PASSWORD);
+  }
   await switchToLastFocusedWindow();
   await TestApp.assertLoggedIn();
 }
 
 async function loginRedirect(flow, responseMode) {
   await TestApp.loginRedirect();
-  await OktaLogin.signin(USERNAME, PASSWORD);
+  if (process.env.ORG_OIE_ENABLED) {
+    await OIEOktaLogin.signin(USERNAME, PASSWORD);
+  } else {
+    await OktaLogin.signin(USERNAME, PASSWORD);
+  }
   return handleCallback(flow, responseMode);
 }
 
@@ -52,7 +62,11 @@ async function loginDirect(flow) {
 
 async function loginWidget(flow, forceRedirect) {
   await TestApp.showLoginWidget();
-  await OktaLogin.signin(USERNAME, PASSWORD);
+  if (process.env.ORG_OIE_ENABLED && flow === 'pkce') {
+    await OIEOktaLogin.signin(USERNAME, PASSWORD);
+  } else {
+    await OktaLogin.signin(USERNAME, PASSWORD);
+  }
   if (forceRedirect) {
     return handleCallback(flow);
   }
