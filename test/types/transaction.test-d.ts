@@ -13,7 +13,7 @@
 import { AuthTransaction, OktaAuth } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
-const authClient = new OktaAuth();
+const authClient = new OktaAuth({});
 
 (async () => {
   const tx = await authClient.tx.introspect();

@@ -9,7 +9,6 @@
   "main": "build/cjs/index.js",
   "module": "build/lib/index.js",
   "browser": "build/dist/okta-auth-js.umd.js",
-  "react-native": "build/lib/server/index.js",
   "types": "build/lib/index.d.ts",
   "repository": {
     "type": "git",

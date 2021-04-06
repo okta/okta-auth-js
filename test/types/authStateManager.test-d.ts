@@ -19,7 +19,7 @@ import {
 } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
-const authClient = new OktaAuth();
+const authClient = new OktaAuth({});
 
 (async () => {
   const authStateManager = authClient.authStateManager;

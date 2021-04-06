@@ -1,7 +1,6 @@
 import { OktaAuth, AccessToken, IDToken } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
-import oauthUtil from '@okta/test.support/oauthUtil';
 
 const _ = require('lodash');
 
@@ -59,7 +58,6 @@ describe('token.getUserInfo', function() {
       };
     },
     execute: function(test) {
-      util.warpToUnixTime(oauthUtil.getTime());
       test.oa.tokenManager.add('accessToken', tokens.standardAccessTokenParsed);
       test.oa.tokenManager.add('idToken', tokens.standardIdTokenParsed);
       return test.oa.token.getUserInfo();
