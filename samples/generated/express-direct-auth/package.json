@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "concurrently --kill-others \"yarn start:web-server\" \"yarn start:resource-server\"",
+    "dev": "concurrently --kill-others \"yarn dev:web-server\" \"yarn dev:resource-server\"",
     "start:web-server": "node ./web-server/server.js",
     "dev:web-server": "nodemon ./web-server/server.js",
     "start:resource-server": "node ./resource-server/server.js",
@@ -22,6 +24,7 @@
     "@okta/okta-auth-js": "*"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "concurrently": "^6.0.1"
   }
 }

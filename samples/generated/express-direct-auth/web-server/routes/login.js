@@ -14,9 +14,6 @@ passport.use(new Strategy(
       } = await authClient.idx.authenticate({ username, password });
       const { accessToken, idToken } = tokens;
       const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
-      // TODO: add id_token string for oidc-middleware logout to consume
-      // should be fixed in oidc-middleware or add method in auth-js
-      tokens.id_token = idToken.idToken;
       // Clear transaction meta after authentication
       authClient.transactionManager.clear();
       cb(null, { userinfo, tokens });

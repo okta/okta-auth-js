@@ -17,7 +17,7 @@ module.exports = {
       appBaseUrl: 'http://localhost:8080',
       scope: 'openid profile email',
       redirectUri: 'http://localhost:8080/login/callback',
-      logoutRedirectUri: 'http://localhost:8080',
+      postLogoutRedirectUri: 'http://localhost:8080',
       testing: {
         disableHttpsCheck: OKTA_TESTING_DISABLEHTTPSCHECK
       }

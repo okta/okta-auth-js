@@ -1,6 +1,7 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const { isAuthenticated } = require('../middlewares');
+
 const sampleConfig = require('../../config').webServer;
 
 const router = express.Router();

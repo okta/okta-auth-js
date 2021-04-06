@@ -40,7 +40,8 @@ import {
   SigninAPI,
   PkceAPI,
   SigninOptions,
-  IdxApi
+  IdxApi,
+  SignoutRedirectUrlOptions
 } from './types';
 import {
   transactionStatus,
@@ -364,6 +365,36 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     return this.token.revoke(refreshToken);
   }
 
+  async getSignOutRedirectUrl(options: SignoutRedirectUrlOptions) {
+    let {
+      idToken,
+      postLogoutRedirectUri,
+      state,
+    } = options;
+    if (!idToken) {
+      idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
+    }
+    if (!idToken) {
+      return '';
+    }
+    if (!postLogoutRedirectUri) {
+      postLogoutRedirectUri = this.options.postLogoutRedirectUri;
+    }
+
+    const logoutUrl = getOAuthUrls(this).logoutUrl;
+    const idTokenHint = idToken.idToken; // a string
+    let logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint);
+    if (postLogoutRedirectUri) {
+      logoutUri += '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
+    } 
+    // State allows option parameters to be passed to logout redirect uri
+    if (state) {
+      logoutUri += '&state=' + encodeURIComponent(state);
+    }
+
+    return logoutUri;
+  }
+
   // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
   async signOut(options?: SignoutOptions) {
     options = Object.assign({}, options);
@@ -380,8 +411,6 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     var revokeAccessToken = options.revokeAccessToken !== false;
     var revokeRefreshToken = options.revokeRefreshToken !== false;
     var idToken = options.idToken;
-  
-    var logoutUrl = getOAuthUrls(this).logoutUrl;
   
     if (typeof idToken === 'undefined') {
       idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
@@ -407,9 +436,10 @@ class OktaAuth implements SigninAPI, SignoutAPI {
       await this.revokeAccessToken(accessToken);
     }
 
-    // No idToken? This can happen if the storage was cleared.
+    const logoutUri = await this.getSignOutRedirectUrl(options);
+    // No logoutUri? This can happen if the storage was cleared.
     // Fallback to XHR signOut, then simulate a redirect to the post logout uri
-    if (!idToken) {
+    if (!logoutUri) {
       return this.closeSession() // can throw if the user cannot be signed out
       .then(function() {
         if (postLogoutRedirectUri === currentUri) {
@@ -418,20 +448,10 @@ class OktaAuth implements SigninAPI, SignoutAPI {
           window.location.assign(postLogoutRedirectUri);
         }
       });
+    } else {
+      // Flow ends with logout redirect
+      window.location.assign(logoutUri);
     }
-  
-    // logout redirect using the idToken.
-    var state = options.state;
-    var idTokenHint = idToken.idToken; // a string
-    var logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint) +
-      '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
-  
-    // State allows option parameters to be passed to logout redirect uri
-    if (state) {
-      logoutUri += '&state=' + encodeURIComponent(state);
-    }
-    
-    window.location.assign(logoutUri);
   }
 
   webfinger(opts): Promise<object> {

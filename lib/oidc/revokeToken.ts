@@ -16,6 +16,7 @@ import { toQueryString } from '../util';
 import {
   getOAuthUrls,
 } from './util/oauth';
+import { btoa } from '../crypto';
 import AuthSdkError from '../errors/AuthSdkError';
 import {
   OktaAuth,
@@ -39,6 +40,7 @@ export function revokeToken(sdk: OktaAuth, token: RevocableToken): Promise<any> 
         throw new AuthSdkError('A valid access or refresh token object is required');
       }
       var clientId = sdk.options.clientId;
+      var clientSecret = sdk.options.clientSecret;
       if (!clientId) {
         throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to revoke a token');
       }
@@ -48,7 +50,7 @@ export function revokeToken(sdk: OktaAuth, token: RevocableToken): Promise<any> 
         token_type_hint: refreshToken ? 'refresh_token' : 'access_token', 
         token: refreshToken || accessToken,
       }).slice(1);
-      var creds = btoa(clientId);
+      var creds = clientSecret ? btoa(`${clientId}:${clientSecret}`) : btoa(clientId);
       return http.post(sdk, revokeUrl, args, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

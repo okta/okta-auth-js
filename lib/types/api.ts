@@ -200,13 +200,16 @@ export interface SigninAPI {
   signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction>;
 }
 
-export interface SignoutOptions {
+export interface SignoutRedirectUrlOptions {
   postLogoutRedirectUri?: string;
+  idToken?: IDToken;
+  state?: string;
+}
+
+export interface SignoutOptions extends SignoutRedirectUrlOptions {
   accessToken?: AccessToken;
   revokeAccessToken?: boolean;
   revokeRefreshToken?: boolean;
-  idToken?: IDToken;
-  state?: string;
   refreshToken?: RefreshToken;
 }
 
