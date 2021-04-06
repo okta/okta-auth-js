@@ -61,7 +61,7 @@ packageJSON.private = false;
 packageJSON.scripts.prepare = '';
 
 // Remove "build/" from the entrypoint paths.
-['main', 'module', 'browser', 'react-native', 'types'].forEach(function(key) {
+['main', 'module', 'browser', 'types'].forEach(function(key) {
   packageJSON[key] = packageJSON[key].replace('build/', '');
 });
 

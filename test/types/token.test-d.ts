@@ -24,14 +24,13 @@ import {
 } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
-const authClient = new OktaAuth();
+const authClient = new OktaAuth({});
 
 // Tokens
 const idTokenExample = {
   expiresAt: 1449699930,
   scopes: ['openid', 'email'],
   authorizeUrl: 'https://{yourOktaDomain}/oauth2/v1/authorize',
-  value: 'TOKEN_JWT',
   idToken: 'TOKEN_JWT',
   claims: { /* token claims */ } as UserClaims,
   issuer: 'https://{yourOktaDomain}',
@@ -43,7 +42,6 @@ const accessTokenExample = {
   expiresAt: 1449699930,
   scopes: ['openid', 'email'],
   authorizeUrl: 'https://{yourOktaDomain}/oauth2/v1/authorize',
-  value: 'TOKEN_JWT',
   accessToken: 'TOKEN_JWT',
   claims: { /* token claims */ } as UserClaims,
   tokenType: 'aud',
@@ -55,7 +53,6 @@ const refreshTokenExample = {
   expiresAt: 1449699930,
   scopes: ['openid', 'email'],
   authorizeUrl: 'https://{yourOktaDomain}/oauth2/v1/authorize',
-  value: 'TOKEN_JWT',
   refreshToken: 'TOKEN_JWT',
   tokenUrl: 'https://some.com/token',
   issuer: 'https://{yourOktaDomain}'

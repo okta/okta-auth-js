@@ -8,6 +8,11 @@ export TEST_RESULT_FILE_DIR="${REPO}/build2"
 # build modules and samples
 yarn build
 
+if ! yarn tsd; then
+  echo "tsd failed! Exiting..."
+  exit ${TEST_FAILURE}
+fi
+
 if ! yarn lint:report; then
   echo "lint failed! Exiting..."
   exit ${TEST_FAILURE}
