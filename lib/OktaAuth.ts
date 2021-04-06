@@ -246,8 +246,6 @@ class OktaAuth implements SigninAPI, SignoutAPI {
 
     // AuthStateManager
     this.authStateManager = new AuthStateManager(this);
-    // Trigger an initial change event to make sure authState is latest
-    this.authStateManager.updateAuthState();
   }
 
   // ES6 module users can use named exports to access all symbols

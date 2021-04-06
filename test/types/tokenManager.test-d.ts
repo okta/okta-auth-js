@@ -21,7 +21,7 @@ import {
 } from '@okta/okta-auth-js';
 import { expectType, expectAssignable } from 'tsd';
 
-const authClient = new OktaAuth();
+const authClient = new OktaAuth({});
 
 (async () => {
   const tokenManager = authClient.tokenManager;
