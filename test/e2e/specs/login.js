@@ -1,7 +1,7 @@
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import { flows, openImplicit, openPKCE } from '../util/appUtils';
-import { loginWidget, loginRedirect, loginPopup, loginDirect } from '../util/loginUtils';
+import { loginWidget, loginRedirect, loginPopup, loginDirect, loginWidgetFacebook } from '../util/loginUtils';
 
 describe('E2E login', () => {
 
@@ -11,6 +11,7 @@ describe('E2E login', () => {
     await TestApp.responseModeFragment.then(el => el.isSelected()).then(isSelected => {
       assert(isSelected === true);
     });
+    await TestApp.interactionCodeOption.then(el => el.click());
     await loginRedirect('pkce', 'fragment');
     await TestApp.getUserInfo();
     await TestApp.assertUserInfo();
@@ -24,7 +25,11 @@ describe('E2E login', () => {
       }
 
       it('can login using signin widget (no redirect)', async () => {
-        await bootstrap();
+        let options = {};
+        if (process.env.ORG_OIE_ENABLED && flow === 'pkce') {
+          options = { useInteractionCodeFlow: true };
+        }
+        await bootstrap(options);
         await loginWidget(flow);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
@@ -32,7 +37,11 @@ describe('E2E login', () => {
       });
 
       it('can login using signin widget (with redirect)', async () => {
-        await bootstrap({ _forceRedirect: true });
+        let options = { _forceRedirect: true };
+        if (process.env.ORG_OIE_ENABLED && flow === 'pkce') {
+          options = Object.assign({ useInteractionCodeFlow: true }, options);
+        }
+        await bootstrap(options);
         await loginWidget(flow, true);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
@@ -62,6 +71,35 @@ describe('E2E login', () => {
         await TestApp.assertUserInfo();
         await TestApp.logoutRedirect();
       });
+
+      it('can login to social idp using signin widget (with redirect)', async () => {
+        // Federated social auth with pinned social login buttons only works with OIE
+        if (!process.env.ORG_OIE_ENABLED) {
+          return;
+        }
+
+        let options = { _forceRedirect: true };
+        await bootstrap(options);
+        await loginWidgetFacebook(flow, true);
+        await TestApp.getUserInfo();
+        await TestApp.assertUserInfo();
+        await TestApp.logoutRedirect();
+      });
+
+      it('can login to social idp using signin widget (no redirect)', async () => {
+        // Federated social auth with pinned social login buttons only works with OIE
+        if (!process.env.ORG_OIE_ENABLED) {
+          return;
+        }
+
+        let options = { useInteractionCodeFlow: true };
+        await bootstrap(options);
+        await loginWidgetFacebook(flow, true);
+        await TestApp.getUserInfo();
+        await TestApp.assertUserInfo();
+        await TestApp.logoutRedirect();
+      });
+
     });
   });
 });

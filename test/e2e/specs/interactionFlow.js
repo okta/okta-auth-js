@@ -10,7 +10,7 @@ describe('interaction flow', () => {
   it('detects `interaction_required` on the redirect callback', async () => {
     await openPKCE({});
     await TestApp.loginRedirect();
-    await OktaLogin.signin(USERNAME, PASSWORD); // on Okta
+    await OktaLogin.signin(USERNAME, PASSWORD);
     await TestApp.waitForCallback();
 
     // Manually change the URL. All other data should be present in browser storage

@@ -5,6 +5,8 @@ import { switchToPopupWindow, switchToLastFocusedWindow } from './browserUtils';
 
 const USERNAME = process.env.USERNAME;
 const PASSWORD = process.env.PASSWORD;
+const FB_USERNAME = process.env.FB_USERNAME;
+const FB_PASSWORD = process.env.FB_PASSWORD;
 
 function assertPKCE(url, responseMode) {
   const char = responseMode === 'fragment' ? '#' : '?';
@@ -32,7 +34,13 @@ async function loginPopup() {
   const existingHandlesCount = (await browser.getWindowHandles()).length;
   await TestApp.loginPopup();
   await switchToPopupWindow(existingHandlesCount);
-  await OktaLogin.signin(USERNAME, PASSWORD);
+
+  if (process.env.ORG_OIE_ENABLED) {
+    await OktaLogin.signinOIE(USERNAME, PASSWORD);
+  } else {
+    await OktaLogin.signinLegacy(USERNAME, PASSWORD);
+  }
+
   await switchToLastFocusedWindow();
   await TestApp.assertLoggedIn();
 }
@@ -50,13 +58,31 @@ async function loginDirect(flow) {
   return handleCallback(flow);
 }
 
-async function loginWidget(flow, forceRedirect) {
+async function loginWidget(flow, forceRedirect=false) {
   await TestApp.showLoginWidget();
-  await OktaLogin.signin(USERNAME, PASSWORD);
+
+  // OIE widget is only displayed for direct auth with PKCE even with OIE enabled orgs
+  // For direct auth implicit flow, we still use the v1 flow (since interaction code doesn't)
+  if (flow === 'implicit' || !process.env.ORG_OIE_ENABLED) {
+    await OktaLogin.signinLegacy(USERNAME, PASSWORD);   
+  } else {
+    await OktaLogin.signinOIE(USERNAME, PASSWORD);
+  }
+  
   if (forceRedirect) {
     return handleCallback(flow);
   }
   await TestApp.assertLoggedIn();
 }
 
-export { loginWidget, loginDirect, loginPopup, loginRedirect };
+async function loginWidgetFacebook(flow, forceRedirect) {
+  await TestApp.loginRedirect();
+  await OktaLogin.signinFacebook(FB_USERNAME, FB_PASSWORD);
+
+  if (forceRedirect) {
+    return handleCallback(flow);
+  }
+  await TestApp.assertLoggedIn();
+}
+
+export { loginWidget, loginDirect, loginPopup, loginRedirect, loginWidgetFacebook };

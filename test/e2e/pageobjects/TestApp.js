@@ -39,6 +39,7 @@ class TestApp {
   get pkceOption() { return $('#pkce-on'); }
   get clientId() { return $('#clientId'); }
   get issuer() { return $('#issuer'); }
+  get interactionCodeOption() { return $('#useInteractionCodeFlow-on'); }
 
   // Callback
   get callbackSelector() { return $('#root.callback'); }

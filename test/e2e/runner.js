@@ -20,10 +20,6 @@ waitOn({
     wdioConfig = 'sauce.wdio.conf.js';
   }
 
-  if (process.env.REFRESH_TOKEN) {
-    wdioConfig = 'tokens.wdio.conf.js'; 
-  }
-
   let opts = process.argv.slice(2); // pass extra arguments through
   const runner = spawn('./node_modules/.bin/wdio', [
     'run',
