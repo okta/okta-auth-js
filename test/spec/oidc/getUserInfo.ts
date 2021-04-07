@@ -95,7 +95,7 @@ describe('token.getUserInfo', function() {
   it('throws an error if no arguments are passed', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
-      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined));
+      jest.spyOn(oa.tokenManager, 'getTokens').mockReturnValue(Promise.resolve({}));
       return oa.token.getUserInfo();
     })
     .then(function() {
@@ -125,7 +125,7 @@ describe('token.getUserInfo', function() {
   it('throws an error if no idTokenObject is passed', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
-      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined));
+      jest.spyOn(oa.tokenManager, 'getTokens').mockReturnValue(Promise.resolve({}));
       return oa.token.getUserInfo(tokens.standardAccessTokenParsed);
     })
     .then(function() {
