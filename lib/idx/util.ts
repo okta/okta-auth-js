@@ -4,6 +4,8 @@ import { APIError, IdxRemediation, IdxResponse } from '../types';
 export function createApiError(res): APIError {
   let allErrors = [];
 
+  console.log('creating api error', res);
+
   if (res.messages && Array.isArray(res.messages.value)) {
     allErrors = res.messages.value.map(o => o.message);
   }

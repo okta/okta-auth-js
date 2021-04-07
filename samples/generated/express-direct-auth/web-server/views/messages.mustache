@@ -13,27 +13,43 @@
           <h2 class="ui dividing header" data-se="overview-doc-header">
             Messages
           </h2>
-          <p>Hello, {{userinfo.name}}. Below is the information that was read from the <a href="https://developer.okta.com/docs/api/resources/oidc#get-user-information">User Info Endpoint</a>
-            and persisted by the <a href="https://github.com/okta/okta-oidc-js/tree/master/packages/oidc-middleware">Okta OIDC Middleware Library</a> at <code>req.userinfo</code>.
+          <p>
+            This component makes a GET request to the resource server example, which must be running at
+            <code>localhost:8000/api/messages</code>
           </p>
-          <p>This route is protected with the <code>oidc.ensureAuthenticated()</code> middleware, which will ensure that this page cannot be accessed until you have authenticated.</p>
+          <p>
+            It attaches your current access token in the
+            <code>Authorization</code>
+            header on the request,
+            and the resource server will attempt to authenticate this access token.
+            If the token is valid the server will return a list of messages.  If the token is not valid
+            or the resource server is incorrectly configured, you will see a 401
+            <code>Unauthorized response</code>.
+          </p>
+          <p>This route is protected with the <code>ensureAuthenticated()</code> middleware, which will ensure that this page cannot be accessed until you have authenticated.</p>
         </div>
-        <table class="ui table compact collapsing">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Text</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#messages}}
-            <tr>
-              <td>{{date}}</td>
-              <td>{{text}}</td>
-            </tr>
-            {{/messages}}  
-          </tbody>
-        </table>
+        
+        {{>error}}
+
+        {{^error}}
+          <table class="ui table compact collapsing">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#messages}}
+              <tr>
+                <td>{{date}}</td>
+                <td>{{text}}</td>
+              </tr>
+              {{/messages}}  
+            </tbody>
+          </table>
+        {{/error}}
+
       </div>
 
       {{>server-config}}

@@ -152,69 +152,12 @@ ol.ui.list li {
   text-align: center;
 }
 
-/* Sample App *****************************************************************/
+/* Sign In Page ***************************************************************/
 
-#okta-sign-in.main-container {
-  background-color: transparent;
-  border-width: 0;
-  color: #fff;
-  box-shadow: none;
+#sign-in {
+  margin-top: 30px;
 }
 
-#okta-sign-in .infobox,
-#okta-sign-in .infobox-md {
-  border: 0;
-  color: #000;
-  border-radius: 0;
-}
-
-#okta-sign-in .infobox:before,
-#okta-sign-in .infobox-md:before,
-#okta-sign-in .infobox-compact:before {
-  top: 0;
-  bottom: 0;
-  border-radius: 0;
-}
-
-#okta-sign-in.auth-container {
-  margin-top: 0;
-}
-
-#okta-sign-in .okta-sign-in-header {
-  border-width: 0;
-}
-
-#okta-sign-in h2 {
-  color: #F0EBD8;
-  font-weight: normal;
-}
-
-#okta-sign-in .link:link,
-#okta-sign-in .link:visited,
-#okta-sign-in .link:hover,
-#okta-sign-in .link:active {
-  color: #fff;
-}
-
-#okta-sign-in .o-form-head {
-  font-size: 20px;
-}
-
-#okta-sign-in .button-primary {
-  border-width: 0;
-  border-radius: 0;
-  background: #899D78;
-}
-
-#okta-sign-in .button-primary:hover,
-#okta-sign-in .button-primary:focus,
-#okta-sign-in .button-primary:active {
-  background: #9EAE90;
-}
-
-#okta-sign-in .okta-form-input-field {
-  border-width: 0;
-  border-radius: 0;
-  background-color: #fff;
-  color: #777;
+#sign-in form {
+  max-width: 400px;
 }

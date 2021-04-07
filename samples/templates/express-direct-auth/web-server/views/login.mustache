@@ -4,17 +4,50 @@
     {{>head}}
   </head>
   <body id="samples">
-    <div class="sign-in-header">
-      <h1>Sign In</h1>
-    </div>
-    <div class="sign-in-body">
-      <form action="/login" method="POST">
-        <label for="username">Username:</label>
-        <input id="username" name="username" type="text" />
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password" />
-        <button type="submit">Sign In</button>
-      </form>
+    <div id="sign-in" class="ui middle aligned center aligned relaxed grid">
+      <div class="row">
+        <div class="ui header">
+          <h2>Sign In</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>errors}}
+      </div>
+
+      <div class="row">
+        <form action="/login" method="POST" class="ui large form">
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Username
+              </div>
+              <input type="text" name="username" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Password
+              </div>
+              <input type="password" name="password" />
+            </div>
+          </div>
+          <button class="ui fluid large primary submit button" type="submit">
+            Sign In
+          </button>
+        </form>
+      </div>
+
+      <div class="ui row grid">
+        <div class="ui messages row">
+          Don't have an account? &nbsp; <a href="/signup">Sign Up</a>
+        </div>
+        <div class="ui messages row">
+          Forgot password? &nbsp; <a href="/signup">Recovery password</a>
+        </div>
+      </div>
+
     </div>
   </body>
 </html>

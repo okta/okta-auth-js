@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/logout', async (req, res) => {
   try {
-    // revoke tokens
+    // Revoke tokens
     const { 
       tokens : { idToken, accessToken, refreshToken } 
     } = req.userContext;
@@ -17,14 +17,14 @@ router.post('/logout', async (req, res) => {
       await authClient.revokeAccessToken(accessToken);
     }
 
-    // clear local session
-    req.logout();
+    // Clear local session
+    req.session.destroy();
 
-    // logout redirect to clear okta session
+    // Clear okta session with logout redirect
     const signoutRedirectUrl = await authClient.getSignOutRedirectUrl({ idToken });
     res.redirect(signoutRedirectUrl);
   } catch (err) {
-    console.log('logout error', err);
+    console.log('/logout error: ', err);
   }
 });
 

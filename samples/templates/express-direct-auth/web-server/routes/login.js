@@ -1,44 +1,39 @@
 const express = require('express');
-const passport = require('passport');
-const Strategy = require('passport-local').Strategy;
 const { getAuthClient } = require('../utils');
 
 const router = express.Router();
-
-passport.use(new Strategy(
-  async function(username, password, cb) {
-    const authClient = getAuthClient();
-    try {
-      const { data: 
-        { tokens: { tokens } } 
-      } = await authClient.idx.authenticate({ username, password });
-      const { accessToken, idToken } = tokens;
-      const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
-      // Clear transaction meta after authentication
-      authClient.transactionManager.clear();
-      cb(null, { userinfo, tokens });
-    } catch (err) {
-      console.log('err', err);
-      cb(err, null);
-    }
-  }));
-
-passport.serializeUser(function(userContext, cb) {
-  cb(null, userContext);
-});
-
-passport.deserializeUser(function(userContext, cb) {
-  cb(null, userContext);
-});
 
 router.get('/login', (_, res) => {
   res.render('login');
 });
 
-router.post('/login',
-  passport.authenticate('local', { failureRedirect: '/login' }), 
-  (_, res) => {
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Get tokens and userInfo
+  const authClient = getAuthClient();
+  try {
+    const { data: 
+      { tokens: { tokens } } 
+    } = await authClient.idx.authenticate({ username, password });
+    const { accessToken, idToken } = tokens;
+    const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
+    
+    // Persist userContext in session
+    req.session.userContext = JSON.stringify({ userinfo, tokens });
+    
+    // Redirect back to home page
     res.redirect('/');
-  });
+  } catch (err) {
+    console.log('/login error: ', err);
+
+    const errors = err.errorCauses ? err.errorCauses : ['Authentication failed'];
+    res.render('login', { 
+      hasError: errors && errors.length,
+      errors 
+    });
+  }
+});
+
 
 module.exports = router;

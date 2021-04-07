@@ -1,13 +1,13 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const { isAuthenticated } = require('../middlewares');
+const { ensureAuthenticated } = require('../middlewares');
 
 const sampleConfig = require('../../config').webServer;
 
 const router = express.Router();
 
 router.get('/profile', 
-  isAuthenticated,
+  ensureAuthenticated,
   (req, res) => {
     // Convert the userinfo object into an attribute array, for rendering with mustache
     const userinfo = req.userContext && req.userContext.userinfo;
@@ -20,7 +20,7 @@ router.get('/profile',
   });
 
 router.get('/api/messages', 
-  isAuthenticated, 
+  ensureAuthenticated, 
   (req, res) => {
     const { 
       tokens: { 
@@ -45,9 +45,11 @@ router.get('/api/messages',
           isLoggedIn: !!userinfo,
           messages,
         });
+        // throw new Error('Failed to get messages');
       })
-      .catch(err => {
-        res.send(err);
+      .catch(error => {
+        console.log('/api/messages error: ', error);
+        res.render('messages', { error: error.message });
       })
   });
 

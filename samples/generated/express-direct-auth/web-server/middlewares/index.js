@@ -1,5 +1,7 @@
-const isAuthenticated = require('./isAuthenticated');
+const ensureAuthenticated = require('./ensureAuthenticated');
+const userContext = require('./userContext');
 
 module.exports = {
-  isAuthenticated,
+  ensureAuthenticated,
+  userContext,
 };

@@ -3,9 +3,9 @@
 
 const express = require('express');
 const session = require('express-session');
-const passport = require('passport');
 const mustacheExpress = require('mustache-express');
 const path = require('path');
+const { userContext } = require('./middlewares');
 
 const templateDir = path.join(__dirname, '', 'views');
 const frontendDir = path.join(__dirname, '', 'assets');
@@ -19,8 +19,6 @@ app.use(session({
   resave: true, 
   saveUninitialized: false
 }));
-app.use(passport.initialize({ userProperty: 'userContext' }));
-app.use(passport.session());
 
 // Provide the configuration to the view layer because we show it on the homepage
 const displayConfig = Object.assign(
@@ -38,6 +36,8 @@ app.use('/assets', express.static(frontendDir));
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', templateDir);
+
+app.use(userContext);
 
 app.use(require('./routes'));
 

@@ -49,6 +49,9 @@ export async function authenticate(authClient: OktaAuth, options: AuthorizeOptio
       ignoreSignature
     }, urls);
     status = 'SUCCESS';
+
+    // Clear transaction meta after getting the tokens
+    authClient.transactionManager.clear();
   }
 
   const authTransaction = new AuthTransaction(authClient, {
