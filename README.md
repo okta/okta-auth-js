@@ -245,8 +245,10 @@ if (!userInfo) {
 **!** Routing is **optional** for the callback portion of the redirect strategy. Instead you can use [popup](#tokengetwithpopupoptions) or [sign widget](https://github.com/okta/okta-signin-widget).
 
 To sign a user in, your application must redirect the browser to the Okta-hosted sign-in page.
+> **Note:** Initial redirect to Okta-hosted sign-in page starts a transaction with a stateToken lifetime set to one hour.
+
 After successful authentication, the browser is redirected back to your application along with information about the user.
-Depends on your preferences it is possible to use the following callback strategies.
+Depending on your preferences it is possible to use the following callback strategies.
 
 #### Handling the callback without routing
 
@@ -258,7 +260,7 @@ Depends on your preferences it is possible to use the following callback strateg
 #### Handling the callback with hash routing
 
 According to the OAuth 2.0 spec the redirect URI "MUST NOT contain a fragment component": <https://tools.ietf.org/html/rfc6749#section-3.1.2>
-So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific rout.
+So in case of using hash-based `#` strategy and OAuth 2.0, the redirect URI can be defined only like a base url, without any specific route.
 That's mean that hash-based router will receive the redirect callback on the main / default route. So we recommend to define the logic that will parse redirect url at the very beginning of your app. So the flow will be similar to [Handling the callback without routing](#handling-the-callback-without-routing)
 
 Additionally if using hash routing, we recommend to use PKCE and responseMode query (which is the default for PKCE). Using implicit flow, with tokens in the hash could cause unpredictable results since hash routers like to rewrite the fragment.
@@ -2183,7 +2185,8 @@ authClient.token.getWithRedirect({
 
 Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. Values are parsed from either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode).
 
-If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint.
+If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint. 
+> **Note:** Authorization code has a lifetime of one minute and can only be used once.
 
 The ID token will be [verified and validated](https://github.com/okta/okta-auth-js#tokenverifyidtokenobject) before available for use.
 In case access token is a part of OIDC flow response, its hash will be checked against ID token's `at_hash` claim.

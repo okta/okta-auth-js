@@ -1,9 +1,13 @@
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaHome from '../pageobjects/OktaHome';
+import OktaLogin from '../pageobjects/OktaLogin';
 import { flows, openImplicit, openPKCE } from '../util/appUtils';
 import { loginPopup } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
+
+const USERNAME = process.env.USERNAME;
+const PASSWORD = process.env.PASSWORD;
 
 // Refresh tokens are tested in a separate file
 const scopes = ['openid', 'email']; // do not include "offline_access"
@@ -33,6 +37,21 @@ describe('token revoke', () => {
     assert(error === 'Error: Missing tokens');
 
     await TestApp.logoutRedirect();
+  });
+});
+
+describe('PKCE flow', () => {
+  it('encounters an error when authorization code is expired', async () => {
+    await openPKCE({ scopes });
+    await TestApp.loginRedirect();
+    await OktaLogin.signin(USERNAME, PASSWORD);
+    await browser.waitUntil(async () => {
+      return new Promise(resolve => setTimeout(() => resolve('ok'), 65000));
+    }, {timeout: 70000});
+    await TestApp.handleCallbackBtn.then(el => el.click());
+    await (await (TestApp.xhrError).getText()).then(msg => {
+      assert(msg.trim() === 'Authorization code is invalid or expired.');
+    });
   });
 });
 
