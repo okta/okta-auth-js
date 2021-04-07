@@ -19,7 +19,6 @@
     "passport-local": "^1.0.0",
     "cors": "^2.8.5",
     "node-fetch": "^2.6.1",
-    "@okta/oidc-middleware": "^4.0.3",
     "@okta/jwt-verifier": "^2.1.0",
     "@okta/okta-auth-js": "*"
   },

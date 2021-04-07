@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+    <div class="sign-up-header">
+      <h1>Email Authenticator</h1>
+    </div>
+    {{error}}
+    <div class="sign-in-body">
+      <form action="/signup/email-authenticator" method="POST">
+        <label for="code">Code:</label>
+        <input id="code" name="code" type="text" />
+        <button type="submit">Verify</button>
+      </form>
+    </div>
+  </body>
+</html>

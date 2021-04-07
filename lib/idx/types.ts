@@ -4,6 +4,7 @@ import { IdxTransactionMeta } from '../types/Transaction';
 export interface IdxApi {
   authenticate: (options: AuthorizeOptions) => Promise<AuthTransaction>;
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
+  introspect: (options?: IntrospectOptions) => Promise<any>;
 }
 
 // Values used to resolve remediations
