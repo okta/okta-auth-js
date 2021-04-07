@@ -4,7 +4,8 @@ import { IdxTransactionMeta } from '../types/Transaction';
 export interface IdxApi {
   authenticate: (options: AuthorizeOptions) => Promise<AuthTransaction>;
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
-  introspect: (options?: IntrospectOptions) => Promise<any>;
+  introspect: (options?: IntrospectOptions) => Promise<any>; // TODO: add type
+  cancel: (options?: CancelOptions) => Promise<any>; // TODO: add type
 }
 
 // Values used to resolve remediations
@@ -37,6 +38,8 @@ export interface AcceptsInteractionHandle {
 export interface IntrospectOptions extends AcceptsInteractionHandle {
   stateHandle?: string;
 }
+
+export interface CancelOptions extends IntrospectOptions {}
 
 export interface InteractOptions extends AcceptsInteractionHandle {
   state?: string;

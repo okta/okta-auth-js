@@ -4,16 +4,39 @@
     {{>head}}
   </head>
   <body id="samples">
-    <div class="sign-up-header">
-      <h1>Enroll Email Authenticator</h1>
-    </div>
-    {{error}}
-    <div class="sign-in-body">
-      <form action="/signup/enroll-email-authenticator" method="POST">
-        <label for="code">Code:</label>
-        <input id="code" name="code" type="text" />
-        <button type="submit">Verify</button>
-      </form>
+    <div id="registration" class="ui center aligned relaxed grid">
+      <div class="row">
+        <div class="ui header">
+          <h2>Enroll email authenticator</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        <p>Please check your email and enter the code below</p>
+      </div>
+
+      <div class="row">
+        {{>errors}}
+      </div>
+
+      <div class="row">
+        <form class="ui large form" action="/signup/enroll-email-authenticator" method="POST">
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Enter Code
+              </div>
+              <input type="text" name="code" />
+            </div>
+          </div>
+          <button class="ui fluid large primary submit button" type="submit">
+            Verify
+          </button>
+        </form>
+      </div>
+
+      {{>cancel}}
+
     </div>
   </body>
 </html>

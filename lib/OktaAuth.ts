@@ -95,7 +95,12 @@ import { AuthStateManager } from './AuthStateManager';
 import StorageManager from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
-import { authenticate, interact, introspect as introspectIDX } from './idx';
+import { 
+  authenticate, 
+  interact, 
+  introspect as introspectIDX,
+  cancel
+} from './idx';
 
 const Emitter = require('tiny-emitter');
 
@@ -235,7 +240,8 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     this.idx = {
       authenticate: authenticate.bind(null, this),
       interact: interact.bind(null, this),
-      introspect: introspectIDX.bind(null, this)
+      introspect: introspectIDX.bind(null, this),
+      cancel: cancel.bind(null, this)
     };
 
     // Fingerprint API

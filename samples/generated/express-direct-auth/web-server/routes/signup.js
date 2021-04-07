@@ -15,7 +15,7 @@ function hasError(idxResponse, previousStep) {
 // continueRegistration
 
 router.get('/signup', (_, res) => {
-  res.render('signup');
+  res.render('registration');
 });
 
 router.post('/signup', (req, res) => {
@@ -52,8 +52,13 @@ router.post('/signup', (req, res) => {
       res.render('enroll-email-authenticator');
     })
     .catch(err => {
-      console.log('err ->', err, err.messages);
-      res.render('signup', { error: 'error!!!' });
+      console.log('/ signup error: ', err);
+      
+      const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
+      res.render('registration', {
+        hasError: errors && errors.length,
+        errors, 
+      });
     });
 });
 
@@ -109,8 +114,16 @@ router.post('/signup/enroll-password-authenticator', (req, res) => {
       // then exchangeCodeForToken
       const transactionData = authClient.storageManager.getTransactionStorage().getStorage();
       console.log(transactionData);
-    })
-  
+    });
+});
+
+// Debugging
+router.get('/signup/enroll-email-authenticator', (req, res) => {
+  res.render('enroll-email-authenticator');
+});
+
+router.get('/signup/enroll-password-authenticator', (req, res) => {
+  res.render('enroll-password-authenticator');
 });
 
 module.exports = router;

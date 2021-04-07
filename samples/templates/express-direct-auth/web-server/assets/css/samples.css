@@ -154,10 +154,12 @@ ol.ui.list li {
 
 /* Sign In Page ***************************************************************/
 
-#sign-in {
-  margin-top: 30px;
+#sign-in,
+#registration {
+  margin: 30px auto;
 }
 
-#sign-in form {
+#sign-in,
+#registration form {
   max-width: 400px;
 }

@@ -7,7 +7,7 @@
     <div id="registration" class="ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
-          <h2>Set up password</h2>
+          <h2>Self Service Registration</h2>
         </div>
       </div>
 
@@ -16,31 +16,43 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="/signup/enroll-password-authenticator" method="POST">
+        <form class="ui large form" action="/signup" method="POST">
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
-                Enter password
+                First Name
               </div>
-              <input type="password" name="password" />
+              <input type="text" name="firstname" />
             </div>
           </div>
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
-                Re-enter password
+                Last Name
               </div>
-              <input type="password" name="confirmPassword" />
+              <input type="text" name="lastname" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Email
+              </div>
+              <input type="email" name="email" />
             </div>
           </div>
           <button class="ui fluid large primary submit button" type="submit">
-            Next
+            Sign Up
           </button>
         </form>
       </div>
 
-      {{>cancel}}
-      
+      <div class="ui row grid">
+        <div class="ui messages row">
+          Already have an account? &nbsp; <a href="/login">Sign In</a>
+        </div>
+      </div>
+
     </div>
   </body>
 </html>
