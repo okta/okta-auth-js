@@ -4,7 +4,6 @@ import { openPKCE } from '../util/appUtils';
 import { loginPopup } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 import OktaLogin from '../pageobjects/OktaLogin';
-import OIEOktaLogin from '../pageobjects/OIEOktaLogin';
 
 describe('E2E logout', () => {
     beforeEach(async () => {
@@ -36,11 +35,7 @@ describe('E2E logout', () => {
   
         // We should not be logged into Okta
         await openOktaHome();
-        if (process.env.ORG_OIE_ENABLED) {
-          await OIEOktaLogin.waitForLoad();
-        } else {
-          await OktaLogin.waitForLoad();
-        }
+        await OktaLogin.waitForLoad();
   
         // cleanup
         await browser.closeWindow();
@@ -53,12 +48,8 @@ describe('E2E logout', () => {
 
         // We should not be logged into Okta
         await openOktaHome();
-        if (process.env.ORG_OIE_ENABLED) {
-          await OIEOktaLogin.waitForLoad();
-        } else {
-          await OktaLogin.waitForLoad();
-        }
-        
+        await OktaLogin.waitForLoad();
+  
         // cleanup
         await browser.closeWindow();
         await switchToMainWindow();
@@ -71,11 +62,7 @@ describe('E2E logout', () => {
   
         // We should not be logged into Okta
         await openOktaHome();
-        if (process.env.ORG_OIE_ENABLED) {
-          await OIEOktaLogin.waitForLoad();
-        } else {
-          await OktaLogin.waitForLoad();
-        }
+        await OktaLogin.waitForLoad();
   
         // cleanup
         await browser.closeWindow();

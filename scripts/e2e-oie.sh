@@ -26,6 +26,9 @@ fi
 export CLIENT_ID=0oa3n0cgbfiNvI6Aa0g7
 export REFRESH_TOKEN=true
 
+export FB_USERNAME=ycfjikukbl_1613767309@tfbnw.net 
+get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
+
 if ! yarn test:e2e; then
   echo "OIE e2e tests failed! Exiting..."
   exit ${TEST_FAILURE}
