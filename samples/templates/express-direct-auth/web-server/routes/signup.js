@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAuthClient } = require('../utils');
+const { getAuthClient, uniqueId } = require('../utils');
 
 const router = express.Router();
 
@@ -20,11 +20,22 @@ router.get('/signup', (_, res) => {
 
 router.post('/signup', (req, res) => {
   let previousStep;
+
   const { firstname, lastname, email } = req.body;
-  const authClient = getAuthClient();
+  const transactionId = uniqueId();
+  const authClient = getAuthClient({ 
+    storageManager: {
+      transaction: {
+        storageKey: `transaction-${transactionId}`
+      }
+    }
+  });
   authClient.idx.interact()
     .then(({ idxResponse }) => {
-      // console.log('interact resp -> ', idxResponse.neededToProceed);
+      // Add transactionId to session
+      req.session.transactionId = transactionId;
+
+      // Proceed with enroll-profile
       previousStep = 'select-enroll-profile';
       return idxResponse.proceed('select-enroll-profile', {});
     })
@@ -64,8 +75,14 @@ router.post('/signup', (req, res) => {
 
 router.post('/signup/enroll-email-authenticator', (req, res) => {
   const { code } = req.body;
-  const { stateHandle } = req.session;
-  const authClient = getAuthClient();
+  const { stateHandle, transactionId } = req.session;
+  const authClient = getAuthClient({
+    storageManager: {
+      transaction: {
+        storageKey: `transaction-${transactionId}`
+      }
+    }
+  });
   authClient.idx.introspect({ stateHandle })
     .then(idxResponse => {
       console.log('resume -> ', idxResponse);
@@ -94,10 +111,16 @@ router.post('/signup/enroll-email-authenticator', (req, res) => {
     });
 });
 
-router.post('/signup/enroll-password-authenticator', (req, res) => {
+router.post('/signup/enroll-password-authenticator', async (req, res) => {
   const { password } = req.body;
-  const { stateHandle } = req.session;
-  const authClient = getAuthClient();
+  const { stateHandle, transactionId } = req.session;
+  const authClient = getAuthClient({
+    storageManager: {
+      transaction: {
+        storageKey: `transaction-${transactionId}`
+      }
+    }
+  });
   authClient.idx.introspect({ stateHandle })
     .then(idxResponse => {
       console.log('resume -> ', idxResponse);
@@ -110,14 +133,39 @@ router.post('/signup/enroll-password-authenticator', (req, res) => {
     .then(idxResponse => {
       console.log(idxResponse); // get interactionCode here
 
-      // TODO: get transaction meta (from transaction id)
-      // then exchangeCodeForToken
-      const transactionData = authClient.storageManager.getTransactionStorage().getStorage();
-      console.log(transactionData);
+      const meta = authClient.transactionManager.load();
+      const {
+        codeVerifier,
+        clientId,
+        redirectUri,
+        scopes,
+        urls,
+        ignoreSignature
+      } = meta;
+  
+      return authClient.token.exchangeCodeForTokens({
+        interactionCode: idxResponse.interactionCode,
+        codeVerifier,
+        clientId,
+        redirectUri,
+        scopes,
+        ignoreSignature
+      }, urls);
+
+    })
+    .then(async tokens => {
+      const { tokens: { accessToken, idToken } } = tokens;
+      const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
+
+      // Persist userContext in session
+      req.session.userContext = JSON.stringify({ userinfo, tokens });
+
+      // Redirect back to home page
+      res.redirect('/');
     });
 });
 
-// Debugging
+// Debugging views
 router.get('/signup/enroll-email-authenticator', (req, res) => {
   res.render('enroll-email-authenticator');
 });
