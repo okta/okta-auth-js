@@ -60,7 +60,6 @@ describe('Complete login flow', function() {
     document.body.insertAdjacentHTML('beforeend', '<div id="root"></div>');
     var date = new Date();
     date.setTime(ASSUMED_TIME * 1000);
-    jasmine.clock().install();
     jasmine.clock().mockDate(date);
     jasmine.Ajax.install();
     fetch = window.fetch;
@@ -306,27 +305,22 @@ describe('Complete login flow', function() {
       const pathname = `${CALLBACK_PATH}?code=${AUTHORIZATION_CODE}&state=${state}`;
 
       // simulate authorization code expiration
-      setTimeout(function () {
-        jasmine.Ajax.stubRequest(
-          /.*v1\/token/
-        ).andReturn({
-          status: 400,
-          responseJSON: {
-            'error': 'invalid_grant',
-            'error_description': 'The authorization code is invalid or has expired.'
-          }
-        });
-      }, 60000);
+      jasmine.Ajax.stubRequest(
+        /.*v1\/token/
+      ).andReturn({
+        status: 400,
+        responseJSON: {
+          'error': 'invalid_grant',
+          'error_description': 'The authorization code is invalid or has expired.'
+        }
+      });
 
-      return Promise.resolve().then(function () {
-        jasmine.clock().tick(60000);
-        return bootstrap({}, pathname)
-        .then(function() {
-          expect(false).toBe(true, '/token call should not succeed after 1 minute since authorization code issuing');
-        }).catch(function (err) {
-          expect(err instanceof AuthApiError).toBe(true);
-          expect(err.xhr.message).toBe('Authorization code is invalid or expired.');
-        });
+      return bootstrap({}, pathname)
+      .then(function() {
+        expect(false).toBe(true, '/token call should not succeed after 1 minute since authorization code issuing');
+      }).catch(function (err) {
+        expect(err instanceof AuthApiError).toBe(true);
+        expect(err.xhr.message).toBe('Authorization code is invalid or expired.');
       });
     });
   });
