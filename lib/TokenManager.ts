@@ -74,26 +74,8 @@ export class TokenManager {
   private options: TokenManagerOptions;
   private service: TokenService;
 
-  // get: (key: string) => Promise<Token>;
-  // add: (key: string, token: Token) => void;
-  // clear: () => void;
-  // remove: (key: string) => void;
-  // renew: (key: string) => Promise<Token>;
   on: (event: string, handler: TokenErrorEventHandler | TokenEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenErrorEventHandler | TokenEventHandler) => void;
-  // hasExpired: (token: Token) => boolean;
-  // getTokens: () => Promise<Tokens>;
-  // setTokens: (tokens: Tokens) => void;
-  
-  // // This is exposed so we can get storage key agnostic tokens set in internal state managers
-  // _getStorageKeyByType: (type: TokenType) => string;
-  // // This is exposed so we can set clear timeouts in our tests
-  // _clearExpireEventTimeoutAll: () => void;
-  // // This is exposed read-only options for internal sdk use
-  // _getOptions: () => TokenManagerOptions;
-  // // Expose cross tabs communication helper functions to tests
-  // _resetExpireEventTimeoutAll: () => void;
-  // _emitEventsForCrossTabsStorageUpdate: (newValue: string, oldValue: string) => void;
 
   constructor(sdk: OktaAuth, options: TokenManagerOptions = {}) {
     this.sdk = sdk;
@@ -126,21 +108,8 @@ export class TokenManager {
     this.clock = SdkClock.create(/* sdk, options */);
     this.state = defaultState();
 
-    // this.add = add.bind(this, sdk, tokenMgmtRef, storage);
-    // this.get = getAsync.bind(this, storage);
-    // this.remove = remove.bind(this, tokenMgmtRef, storage);
-    // this.clear = clear.bind(this, tokenMgmtRef, storage);
-    // this.renew = renew.bind(this, sdk, tokenMgmtRef, storage);
     this.on = this.emitter.on.bind(this.emitter);
     this.off = this.emitter.off.bind(this.emitter);
-    // this.hasExpired = hasExpired.bind(this, tokenMgmtRef);
-    // this.getTokens = getTokensAsync.bind(this, storage);
-    // this.setTokens = setTokens.bind(this, sdk, tokenMgmtRef, storage);
-    // this._getStorageKeyByType = getKeyByType.bind(this, storage);
-    // this._clearExpireEventTimeoutAll = clearExpireEventTimeoutAll.bind(this, tokenMgmtRef);
-    // this._getOptions = () => clone(options);
-    // this._resetExpireEventTimeoutAll = resetExpireEventTimeoutAll.bind(this, tokenMgmtRef, storage);
-    // this._emitEventsForCrossTabsStorageUpdate = emitEventsForCrossTabsStorageUpdate.bind(this, tokenMgmtRef);
   }
 
   start() {

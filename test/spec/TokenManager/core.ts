@@ -4,6 +4,7 @@ import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../../lib/clock';
 import * as features from '../../../lib/features';
+import { TokenService } from '../../../lib/services/TokenService';
 
 const Emitter = require('tiny-emitter');
 
@@ -66,6 +67,54 @@ describe('TokenManager', function() {
       client.tokenManager.clear();
     }
     jest.useRealTimers();
+  });
+
+  describe('service methods', () => {
+    beforeEach(() => {
+      setupSync();
+    });
+    describe('start', () => {
+      it('instantiates the token service', () => {
+        expect(client.tokenManager.service).not.toBeTruthy();
+        client.tokenManager.start();
+        expect(client.tokenManager.service).toBeTruthy();
+      });
+      it('starts the token service', () => {
+        jest.spyOn(TokenService.prototype, 'start');
+        client.tokenManager.start();
+        expect(TokenService.prototype.start).toHaveBeenCalled();
+      });
+      it('stops existing service', () => {
+        const myService = client.tokenManager.service = {
+          stop: jest.fn()
+        };
+        client.tokenManager.start();
+        expect(myService.stop).toHaveBeenCalled();
+        expect(myService).not.toBe(client.tokenManager.service); 
+      });
+    });
+
+    describe('stop', () => {
+      it('stops the token service, if it exists', () => {
+        const myService = client.tokenManager.service = {
+          stop: jest.fn()
+        };
+        client.tokenManager.stop();
+        expect(myService.stop).toHaveBeenCalled();
+      });
+      it('sets service instance to null', () => {
+        client.tokenManager.service = {
+          stop: jest.fn()
+        };
+        client.tokenManager.stop();
+        expect(client.tokenManager.service).toBe(null); 
+      });
+      it('does not error if there is no service instance', () => {
+        expect(client.tokenManager.service).toBe(undefined); 
+        client.tokenManager.stop();
+      });
+    });
+
   });
 
   describe('Event emitter', function() {
