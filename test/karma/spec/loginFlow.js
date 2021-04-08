@@ -5,6 +5,7 @@ import tokens from '@okta/test.support/tokens';
 import { AuthSdkError } from '@okta/okta-auth-js';
 import { TestApp } from '@okta/test.app';
 import waitFor from '@okta/test.support/waitFor';
+import { AuthApiError } from '../../../lib/errors';
 
 // eslint-disable-next-line max-statements
 describe('Complete login flow', function() {
@@ -59,6 +60,7 @@ describe('Complete login flow', function() {
     document.body.insertAdjacentHTML('beforeend', '<div id="root"></div>');
     var date = new Date();
     date.setTime(ASSUMED_TIME * 1000);
+    jasmine.clock().install();
     jasmine.clock().mockDate(date);
     jasmine.Ajax.install();
     fetch = window.fetch;
@@ -274,6 +276,58 @@ describe('Complete login flow', function() {
     }).catch(function(e) {
       expect(e instanceof AuthSdkError).toBe(true);
       expect(e.message).toBe('Invalid code_challenge_method');
+    });
+  });
+
+  it('PKCE: throws when authorization code is expired', function() {
+    // First hit /authorize
+    return bootstrap()
+    .then(function(app) {
+      mockWellKnown();
+      return app.loginRedirect({
+        pkce: true,
+        nonce: NONCE,
+        codeVerifier: CODE_VERIFIER
+      });
+    }).then(function() {
+      return waitFor(function() {
+        return setLocation.calls.any();
+      });
+    })
+    .then(function() {
+      var url = new URL(setLocation.calls.first().args[0]);
+      return url;
+    })
+    .then(function(url) {
+      jasmine.Ajax.requests.reset();
+
+      // Now we handle the redirect & hit /token
+      const state = url.searchParams.get('state');
+      const pathname = `${CALLBACK_PATH}?code=${AUTHORIZATION_CODE}&state=${state}`;
+
+      // simulate authorization code expiration
+      setTimeout(function () {
+        jasmine.Ajax.stubRequest(
+          /.*v1\/token/
+        ).andReturn({
+          status: 400,
+          responseJSON: {
+            'error': 'invalid_grant',
+            'error_description': 'The authorization code is invalid or has expired.'
+          }
+        });
+      }, 60000);
+
+      return Promise.resolve().then(function () {
+        jasmine.clock().tick(60000);
+        return bootstrap({}, pathname)
+        .then(function() {
+          expect(false).toBe(true, '/token call should not succeed after 1 minute since authorization code issuing');
+        }).catch(function (err) {
+          expect(err instanceof AuthApiError).toBe(true);
+          expect(err.xhr.message).toBe('Authorization code is invalid or expired.');
+        });
+      });
     });
   });
 
