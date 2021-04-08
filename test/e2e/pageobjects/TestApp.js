@@ -47,7 +47,7 @@ class TestApp {
   // Toolbar
   get subscribeAuthStateBtn() { return $('#subscribe-auth-state'); }
   get subscribeTokenEventsBtn() { return $('#subscribe-token-events'); }
-  
+  get startServiceBtn() { return $('#start-service'); }
   get handleCallbackBtn() { return $('#handle-callback'); }
   get callbackResult() { return $('#callback-result'); }
   get returnHomeBtn() { return $('#return-home'); }
@@ -148,6 +148,10 @@ class TestApp {
     await this.waitForLoginBtn();
   }
 
+  async startService() {
+    await this.startServiceBtn.then(el => el.click());
+  }
+  
   async subscribeToAuthState() {
     await this.subscribeAuthStateBtn.then(el => el.click());
   }
