@@ -1,4 +1,3 @@
-/* global btoa */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -11,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+
+/* eslint complexity:[0,8] */
 import http from '../http';
 import { toQueryString } from '../util';
 import {

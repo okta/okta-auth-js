@@ -96,9 +96,7 @@ import StorageManager from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
 import { 
-  authenticate, 
-  interact, 
-  introspect as introspectIDX,
+  authenticate,
   cancel,
   registration
 } from './idx';

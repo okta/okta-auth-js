@@ -49,7 +49,7 @@ router.get('/api/messages',
       .catch(error => {
         console.log('/api/messages error: ', error);
         res.render('messages', { errors: error.message });
-      })
+      });
   });
 
 module.exports = router;

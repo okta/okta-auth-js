@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "scripts": {
     "start": "concurrently --kill-others \"yarn start:web-server\" \"yarn start:resource-server\"",
     "dev": "concurrently --kill-others \"yarn dev:web-server\" \"yarn dev:resource-server\"",

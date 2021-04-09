@@ -7,7 +7,7 @@ router.post('/cancel', async (req, res) => {
   // Cancel in progress flow with stateHandle
   const { stateHandle } = req.session;
   const authClient = getAuthClient();
-  await authClient.idx.cancel({ stateHandle })
+  await authClient.idx.cancel({ stateHandle });
     
   // Redirect back to home page
   res.redirect('/');

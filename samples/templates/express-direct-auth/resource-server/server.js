@@ -58,6 +58,7 @@ app.use(cors());
 
 app.get('/', (req, res) => {
   res.json({
+    // eslint-disable-next-line max-len
     message: 'Hello!  There\'s not much to see here :) Please grab one of our front-end samples for use with this sample resource server'
   });
 });

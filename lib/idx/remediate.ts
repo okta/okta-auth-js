@@ -11,12 +11,12 @@ import {
   isErrorResponse, 
   getIdxRemediation 
 } from './util';
-import Identify from './remediatiors/Identify';
-import ChallengeAuthenticator from './remediatiors/ChallengeAuthenticator';
-import SelectEnrollProfile from './remediatiors/SelectEnrollProfile';
-import EnrollProfile from './remediatiors/EnrollProfile';
-import SelectAuthenticatorEnroll from './remediatiors/SelectAuthenticatorEnroll';
-import EnrollAuthenticator from './remediatiors/EnrollAuthenticator';
+import Identify from './remediators/Identify';
+import ChallengeAuthenticator from './remediators/ChallengeAuthenticator';
+import SelectEnrollProfile from './remediators/SelectEnrollProfile';
+import EnrollProfile from './remediators/EnrollProfile';
+import SelectAuthenticatorEnroll from './remediators/SelectAuthenticatorEnroll';
+import EnrollAuthenticator from './remediators/EnrollAuthenticator';
 
 const REMEDIATORS = {
   [RemediatorFlow.Authenticate]: {

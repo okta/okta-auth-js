@@ -20,4 +20,4 @@ module.exports = function getAuthClient(options = {}) {
     console.error('Caught exception in OktaAuth constructor: ', e);
   }
   return authClient;
-}
+};

@@ -1,14 +1,13 @@
 import { AuthTransaction } from '../tx';
 import { 
   OktaAuth, 
-  AuthenticationRemediationValues,
-  RemediatorFlow,
-  RunOptions
+  AuthenticationOptions,
+  RemediatorFlow
 } from '../types';
 import { run } from './run';
 
 export async function authenticate(
-  authClient: OktaAuth, options: RunOptions | AuthenticationRemediationValues
+  authClient: OktaAuth, options: AuthenticationOptions
 ): Promise<AuthTransaction> {
   return run(authClient, { 
     ...options, 
