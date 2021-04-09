@@ -22,6 +22,34 @@ describe('OktaAuth (api)', function() {
     expect(auth instanceof OktaAuth).toBe(true);
   });
 
+  describe('service methods', () => {
+    afterEach(() => {
+      auth.stop();
+    });
+
+    describe('start', () => {
+      it('starts the token service', () => {
+        jest.spyOn(auth.tokenManager, 'start');
+        auth.start();
+        expect(auth.tokenManager.start).toHaveBeenCalled(); 
+      });
+      it('updates auth state', () => {
+        jest.spyOn(auth.authStateManager, 'updateAuthState');
+        auth.start();
+        expect(auth.authStateManager.updateAuthState).toHaveBeenCalled(); 
+      });
+    });
+
+    describe('stop', () => {
+      it('stops the token service', () => {
+        jest.spyOn(auth.tokenManager, 'stop');
+        auth.start();
+        auth.stop();
+        expect(auth.tokenManager.stop).toHaveBeenCalled(); 
+      });
+    });
+
+  });
   describe('signInWithCredentials', () => {
     let options;
     beforeEach(() => {

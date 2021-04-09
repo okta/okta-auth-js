@@ -51,11 +51,14 @@ describe('TokenManager (browser)', function() {
     });
   }
 
-  function setupSync(options = {}) {
+  function setupSync(options = {}, start = false) {
     client = createAuth(options);
     // clear downstream listeners
     client.tokenManager.off('added');
     client.tokenManager.off('removed');
+    if (start) {
+      client.tokenManager.start();
+    }
     return client;
   }
   
@@ -65,6 +68,12 @@ describe('TokenManager (browser)', function() {
     sessionStorage.clear();
   });
   
+  afterEach(() => {
+    if (client && client.tokenManager) {
+      client.tokenManager.stop();
+    }
+  });
+
   describe('options', () => {
     it('defaults to localStorage', function() {
       setupSync();
@@ -150,7 +159,7 @@ describe('TokenManager (browser)', function() {
         expireEarlySeconds: 60
       };
       const instance = new TokenManager(client, options);
-      expect(instance._getOptions().expireEarlySeconds).toBe(30);
+      expect(instance.getOptions().expireEarlySeconds).toBe(30);
     });
     it('should be able to set expireEarlySeconds for dev env', () => {
       jest.spyOn(mocked.features, 'isLocalhost').mockReturnValue(true);
@@ -159,14 +168,14 @@ describe('TokenManager (browser)', function() {
         expireEarlySeconds: 60
       };
       const instance = new TokenManager(client, options);
-      expect(instance._getOptions().expireEarlySeconds).toBe(60);
+      expect(instance.getOptions().expireEarlySeconds).toBe(60);
     });
   });
 
   describe('renew', () => {
     beforeEach(() => {
       jest.spyOn(mocked.features, 'isLocalhost').mockReturnValue(true);
-      setupSync();
+      setupSync({}, true);
     });
 
     it('allows renewing an idToken, without renewing accessToken', function() {

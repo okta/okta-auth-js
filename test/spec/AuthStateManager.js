@@ -4,6 +4,7 @@ import Emitter from 'tiny-emitter';
 import { AuthStateManager, DEFAULT_AUTH_STATE } from '../../lib/AuthStateManager';
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
+import waitFor from '@okta/test.support/waitFor';
 
 function createAuth() {
   return new OktaAuth({
@@ -30,7 +31,7 @@ describe('AuthStateManager', () => {
         on: jest.fn().mockImplementation((event, handler) => {
           sdkMock.emitter.on(event, handler);
         }),
-        _getOptions: jest.fn().mockReturnValue({ 
+        getOptions: jest.fn().mockReturnValue({ 
           storageKey: 'okta-token-storage' 
         })
       }
@@ -97,7 +98,7 @@ describe('AuthStateManager', () => {
       sdkMock.tokenManager.getTokens = jest.fn()
         .mockResolvedValueOnce({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' })
         .mockResolvedValueOnce({ accessToken: 'fakeAccessToken1', idToken: 'fakeIdToken1' });
-      sdkMock.tokenManager._getOptions = jest.fn().mockReturnValue({ 
+      sdkMock.tokenManager.getOptions = jest.fn().mockReturnValue({ 
         autoRenew: true, 
         autoRemove: true 
       });
@@ -112,6 +113,7 @@ describe('AuthStateManager', () => {
         jest.useFakeTimers();
         const auth = createAuth();
         auth.authStateManager.updateAuthState = jest.fn();
+        auth.tokenManager.start(); // uses TokenService / crossTabs
         // simulate localStorage change from other dom context
         window.dispatchEvent(new StorageEvent('storage', {
           key: 'okta-token-storage', 
@@ -121,6 +123,7 @@ describe('AuthStateManager', () => {
         jest.runAllTimers();
         expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
         jest.useRealTimers();
+        auth.tokenManager.stop();
       });
     });
 
@@ -223,25 +226,25 @@ describe('AuthStateManager', () => {
 
     it('should evaluate expired token as null with isPending state as true', () => {
       expect.assertions(2);
-      sdkMock.tokenManager.hasExpired = jest.fn()
+      jest.spyOn(sdkMock.tokenManager, 'hasExpired')
         .mockReturnValueOnce(false)
         .mockReturnValueOnce(true);
-      return new Promise(resolve => {
-        const instance = new AuthStateManager(sdkMock);
-        const handler = jest.fn();
-        instance.subscribe(handler);
-        instance.updateAuthState();
-        
-        setTimeout(() => {
-          expect(handler).toHaveBeenCalledTimes(1);
-          expect(handler).toHaveBeenCalledWith({
-            accessToken: 'fakeAccessToken0',
-            idToken: null,
-            isAuthenticated: false,
-            isPending: true,
-          });
-          resolve();
-        }, 100);
+
+      const instance = new AuthStateManager(sdkMock);
+      const handler = jest.fn();
+      instance.subscribe(handler);
+      instance.updateAuthState();
+      
+      return waitFor(() => {
+        return handler.mock.calls.length > 0;
+      }).then(() => {
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(handler).toHaveBeenCalledWith({
+          accessToken: 'fakeAccessToken0',
+          idToken: null,
+          isAuthenticated: false,
+          isPending: true,
+        });
       });
     });
 
@@ -250,7 +253,7 @@ describe('AuthStateManager', () => {
       sdkMock.tokenManager.hasExpired = jest.fn()
         .mockReturnValueOnce(false)
         .mockReturnValueOnce(true);
-      sdkMock.tokenManager._getOptions = jest.fn().mockReturnValue({ 
+      sdkMock.tokenManager.getOptions = jest.fn().mockReturnValue({ 
         autoRenew: false, 
         autoRemove: false 
       });

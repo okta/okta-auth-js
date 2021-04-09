@@ -25,6 +25,7 @@ export interface TokenManagerOptions {
   storage?: string | SimpleStorage;
   storageKey?: string;
   expireEarlySeconds?: number;
+  syncStorage?: boolean;
   _storageEventDelay?: number;
 }
 

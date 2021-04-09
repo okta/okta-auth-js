@@ -248,6 +248,15 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     this.authStateManager = new AuthStateManager(this);
   }
 
+  start() {
+    this.tokenManager.start();
+    this.authStateManager.updateAuthState();
+  }
+
+  stop() {
+    this.tokenManager.stop();
+  }
+
   // ES6 module users can use named exports to access all symbols
   // CommonJS module users (CDN) need all exports on this object
 
@@ -331,7 +340,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   async revokeAccessToken(accessToken?: AccessToken): Promise<object> {
     if (!accessToken) {
       accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
-      const accessTokenKey = this.tokenManager._getStorageKeyByType('accessToken');
+      const accessTokenKey = this.tokenManager.getStorageKeyByType('accessToken');
       this.tokenManager.remove(accessTokenKey);
     }
     // Access token may have been removed. In this case, we will silently succeed.
@@ -345,7 +354,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   async revokeRefreshToken(refreshToken?: RefreshToken): Promise<object> {
     if (!refreshToken) {
       refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
-      const refreshTokenKey = this.tokenManager._getStorageKeyByType('refreshToken');
+      const refreshTokenKey = this.tokenManager.getStorageKeyByType('refreshToken');
       this.tokenManager.remove(refreshTokenKey);
     }
     // Refresh token may have been removed. In this case, we will silently succeed.
