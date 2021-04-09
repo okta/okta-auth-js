@@ -1,6 +1,8 @@
 import Base from './Base';
+import { RegistrationRemediationValues } from '../types';
 
 export default class SelectAuthenticatorEnroll extends Base {
+  values: RegistrationRemediationValues;
   map = {};
 
   mapAuthenticator(remediationValue: any) {

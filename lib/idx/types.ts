@@ -2,28 +2,30 @@ import { AuthTransaction } from '../tx';
 import { IdxTransactionMeta } from '../types/Transaction';
 
 export interface IdxApi {
-  authenticate: (options: AuthorizeOptions) => Promise<AuthTransaction>;
-  registration: (options: any) => Promise<AuthTransaction>; // TODO: use RegistrationOptions
-  interact: (options?: InteractOptions) => Promise<InteractResponse>;
-  introspect: (options?: IntrospectOptions) => Promise<any>; // TODO: add type
-  cancel: (options?: CancelOptions) => Promise<any>; // TODO: add type
+  authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
+  registration: (options: RegistrationOptions) => Promise<AuthTransaction>;
+  cancel: (options?: CancelOptions) => Promise<IdxResponse>;
 }
 
 // Values used to resolve remediations
-export interface RemediationValues {
+export interface RemediationValues {}
+
+export interface AuthenticationRemediationValues extends RemediationValues {
   credentials?: {
     passcode?: string;
   };
 
-  // Needed for V1 compatability
   username?: string;
   password?: string;
+}
 
+export interface RegistrationRemediationValues extends RemediationValues {
+  authenticators: [string];
   firstName?: string;
   lastName?: string;
   email?: string;
-  authenticators?: [string];
   emailVerificationCode?: string;
+  password?: string;
 }
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
@@ -39,9 +41,6 @@ export enum RemediatorFlow {
   Registration
 }
 
-export interface SupportsCodeFlow {
-  useInteractionCodeFlow?: boolean;
-}
 
 export interface AcceptsInteractionHandle {
   interactionHandle?: string;
@@ -66,15 +65,26 @@ export interface InteractResponse {
   meta?: IdxTransactionMeta;
 }
 
-
-export interface AuthorizeOptions extends
+export interface IdxOptions extends
   RemediationValues,
   InteractOptions,
-  SupportsCodeFlow,
   AcceptsInteractionHandle {
 }
 
-// export interface RegistrationOptions extends 
+export interface RunOptions {
+  flow: RemediatorFlow;
+  needInteraction: boolean
+}
+
+export interface AuthenticationOptions extends 
+  IdxOptions,
+  AuthenticationRemediationValues {
+}
+
+export interface RegistrationOptions extends 
+  IdxOptions, 
+  RegistrationRemediationValues {
+}
 
 // TODO: remove when idx-js provides type information
 export interface IdxRemeditionValue {

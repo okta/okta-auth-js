@@ -1,6 +1,9 @@
 import Base from './Base';
+import { RegistrationRemediationValues } from '../types';
 
 export default class EnrollAuthenticator extends Base {
+  values: RegistrationRemediationValues;
+
   map = {
     'credentials': ['credentials', 'password', 'emailVerificationCode']
   };

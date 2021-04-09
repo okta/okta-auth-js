@@ -1,6 +1,9 @@
 import Base from './Base';
+import { RegistrationRemediationValues } from '../types';
 
 export default class EnrollProfile extends Base {
+  values: RegistrationRemediationValues;
+
   map = {
     'userProfile': ['userProfile', 'firstName', 'lastName', 'email']
   };
