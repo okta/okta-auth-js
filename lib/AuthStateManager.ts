@@ -71,7 +71,7 @@ export class AuthStateManager {
 
   updateAuthState(): void {
     const { transformAuthState, devMode } = this._sdk.options;
-    const { autoRenew, autoRemove } = this._sdk.tokenManager._getOptions();
+    const { autoRenew, autoRemove } = this._sdk.tokenManager.getOptions();
 
     const log = (status) => {
       const { event, key, token } = this._logOptions;
@@ -95,7 +95,7 @@ export class AuthStateManager {
       devMode && log('emitted');
     };
 
-    const shouldEvaluateIsPending = () => (autoRenew || autoRemove);
+    const shouldEvaluateIsPending = () => !!(autoRenew || autoRemove);
 
     if (this._pending.updateAuthStatePromise) {
       if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {

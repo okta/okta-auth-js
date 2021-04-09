@@ -47,6 +47,8 @@ function logoutLink(app: TestApp): string {
 
 const Toolbar = `
   <div class="actions subscribe">
+    <a id="start-service" onclick="startService(event)">Start service</a>
+    <a id="stop-service" onclick="stopService(event)">Stop service</a>
     <a id="subscribe-auth-state" onclick="subscribeToAuthState(event)">Subscribe to AuthState</a>
     <a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)">Subscribe to TokenManager events</a>
   </div>
@@ -91,7 +93,9 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp),
     testConcurrentLoginViaTokenRenewFailure: testApp.testConcurrentLoginViaTokenRenewFailure.bind(testApp),
     subscribeToAuthState: testApp.subscribeToAuthState.bind(testApp),
-    subscribeToTokenEvents: testApp.subscribeToTokenEvents.bind(testApp)
+    subscribeToTokenEvents: testApp.subscribeToTokenEvents.bind(testApp),
+    startService: testApp.startService.bind(testApp),
+    stopService: testApp.stopService.bind(testApp),
   };
   Object.keys(boundFunctions).forEach(functionName => {
     (window as any)[functionName] = makeClickHandler((boundFunctions as any)[functionName]);
@@ -128,6 +132,14 @@ class TestApp {
       scopes: this.config.defaultScopes ? [] : this.config.scopes
     }));
     return this.oktaAuth;
+  }
+
+  startService(): void {
+    this.oktaAuth.start();
+  }
+
+  stopService(): void {
+    this.oktaAuth.stop();
   }
 
   subscribeToAuthState(): void {

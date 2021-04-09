@@ -516,6 +516,7 @@ describe('OktaAuth (browser)', function() {
       jest.spyOn(auth.authStateManager, 'unsubscribe');
       jest.spyOn(auth, 'getOriginalUri').mockReturnValue('/fakeuri');
       jest.spyOn(auth, 'removeOriginalUri');
+      jest.spyOn(auth.tokenManager, 'hasExpired').mockReturnValue(false);
     });
 
     it('should redirect to originalUri when tokens are provided', async () => {
