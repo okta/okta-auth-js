@@ -45,11 +45,10 @@ router.get('/api/messages',
           isLoggedIn: !!userinfo,
           messages,
         });
-        // throw new Error('Failed to get messages');
       })
       .catch(error => {
         console.log('/api/messages error: ', error);
-        res.render('messages', { error: error.message });
+        res.render('messages', { errors: error.message });
       })
   });
 

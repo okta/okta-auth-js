@@ -99,7 +99,7 @@ router.post('/signup/enroll-password-authenticator', async (req, res) => {
     const { tokens: { accessToken, idToken } } = tokens;
     const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
     // Persist userContext in session
-    req.session.userContext = JSON.stringify({ userinfo, tokens });
+    req.session.userContext = JSON.stringify({ userinfo, tokens: { accessToken, idToken } });
     // Redirect back to home page
     res.redirect('/');
   } catch (err) {

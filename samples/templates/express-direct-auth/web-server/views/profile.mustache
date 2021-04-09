@@ -19,9 +19,9 @@
           <p>This route is protected with the <code>ensureAuthenticated()</code> middleware, which will ensure that this page cannot be accessed until you have authenticated.</p>
         </div>
 
-        {{>error}}
+        {{>errors}}
 
-        {{^error}}
+        {{^errors}}
           <table class="ui table compact collapsing">
             <thead>
               <tr>
@@ -38,7 +38,7 @@
               {{/attributes}}
             </tbody>
           </table>
-        {{/error}}
+        {{/errors}}
       </div>
 
       {{>server-config}}
