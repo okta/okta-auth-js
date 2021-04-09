@@ -28,7 +28,7 @@ const REMEDIATORS = {
     'enroll-profile': EnrollProfile,
     'select-authenticator-enroll': SelectAuthenticatorEnroll,
     'enroll-authenticator': EnrollAuthenticator,
-  }
+  },
   // add more
 };
 
@@ -65,7 +65,11 @@ export async function remediate(
     return remediate(idxResponse, flow, values); // recursive call
   } catch (e) {
     if (isRawIdxResponse(e)) { // idx responses are sometimes thrown, these will be "raw"
-      throw createApiError(e);
+      if (e.messages) {
+        throw createApiError(e);
+      } else {
+        throw remediator.createApiError(e);
+      }
     }
     throw e;
   }

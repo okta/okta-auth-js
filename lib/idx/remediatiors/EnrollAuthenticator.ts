@@ -20,4 +20,13 @@ export default class EnrollAuthenticator extends Base {
       passcode: this.values.emailVerificationCode || this.values.password 
     };
   }
+
+  getErrorMessages(errorRemediation) {
+    return errorRemediation.value[0].form.value.reduce((errors, field) => {
+      if (field.messages) {
+        errors.push(field.messages.value[0].message);
+      }
+      return errors;
+    }, []);
+  }
 }

@@ -1,6 +1,7 @@
 /* eslint-disable complexity */
+import { AuthApiError } from '../../errors';
 import { RemediationValues, IdxRemediation, IdxToRemediationValueMap } from '../types';
-import { getAllValues, getRequiredValues, titleCase } from '../util';
+import { createApiError, getAllValues, getRequiredValues, titleCase } from '../util';
 
 export default class Base {
   remediation: IdxRemediation;
@@ -83,5 +84,18 @@ export default class Base {
   // only handles primitive types
   formatValue(key: string) {
     return this.values[key];
+  }
+
+  getErrorMessages(errorRemediation) {
+    return [];
+  }
+
+  createApiError(err) {
+    const errorRemediation = err.remediation.value.find(({ name }) => name === this.remediation.name);
+    const errors = this.getErrorMessages(errorRemediation);
+    return new AuthApiError({
+      errorSummary: errors.join('. '),
+      errorCauses: errors
+    });
   }
 }
