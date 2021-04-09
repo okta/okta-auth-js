@@ -205,6 +205,41 @@ You can also browse the full [API reference documentation](#api-reference).
 
 > :hourglass: Async methods return a promise which will resolve on success. The promise may reject if an error occurs.
 
+### Example Client
+
+```javascript
+var config = {
+  // Required config
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+
+  // Required for login flow using getWithRedirect()
+  clientId: 'GHtf9iJdr60A9IYrR0jw',
+  redirectUri: 'https://acme.com/oauth2/callback/home',
+
+  // Parse authorization code from hash fragment instead of search query
+  responseMode: 'fragment',
+
+  // Configure TokenManager to use sessionStorage instead of localStorage
+  tokenManager: {
+    storage: 'sessionStorage'
+  }
+};
+
+var authClient = new OktaAuth(config);
+```
+
+### Running as a service
+
+By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method. To terminate all background processes, call `stop`.
+
+```javascript
+  var authClient = new OktaAuth(config);
+  authClient.start(); // start the service
+  authClient.stop(); // stop the service
+```
+
+Starting the service will also call [authStateManager.updateAuthState](#authstatemanagerupdateauthstate).
+
 ### Usage with Typescript
 
 Types are implicitly provided by this library through the `types` entry in `package.json`. Types can also be referenced explicitly by importing them.
@@ -238,9 +273,54 @@ if (!userInfo) {
 }
 ```
 
-## Strategies for Obtaining Tokens
+### Strategies for Obtaining Tokens
 
-### Redirect to Okta
+#### Authorization Code flow for web and native client types
+
+Web and native clients can obtain tokens using the `authorization_code` flow which uses a client secret stored in a secure location. SPA applications should use the `PKCE` flow which does not use a client secret. To use the `authorization_code` flow, set `responseType` to `"code"` and `pkce` to `false`:
+
+```javascript
+var config = {
+  // Required config
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+  clientId: 'GHtf9iJdr60A9IYrR0jw',
+  redirectUri: 'https://acme.com/oauth2/callback/home',
+
+  // Use authorization_code flow
+  responseType: 'code',
+  pkce: false
+};
+
+var authClient = new OktaAuth(config);
+```
+
+#### PKCE OAuth 2.0 flow
+
+The PKCE OAuth flow will be used by default. This library includes built-in support for Node applications. PKCE is widely supported by most modern browsers when running on an HTTPS connection. PKCE requires that the browser implements `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is available on all major browsers except IE Edge. In this case, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
+
+If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
+
+`OktaAuth.features.isPKCESupported()`
+
+#### Implicit OAuth 2.0 flow
+
+Implicit OAuth flow is available as an option if PKCE flow cannot be supported in your deployment. It is widely supported by most browsers, and can work over an insecure HTTP connection. Note that implicit flow is less secure than PKCE flow, even over HTTPS, since raw tokens are exposed in the browser's history. For this reason, we highly recommending using the PKCE flow if possible.
+
+Implicit flow can be enabled by setting the `pkce` option to `false`
+
+```javascript
+
+var config = {
+  pkce:  false,
+
+  // other config
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+};
+
+var authClient = new OktaAuth(config);
+```
+
+### Redirects and Routing
 
 **!** Routing is **optional** for the callback portion of the redirect strategy. Instead you can use [popup](#tokengetwithpopupoptions) or [sign widget](https://github.com/okta/okta-signin-widget).
 
@@ -310,9 +390,161 @@ var authClient = new OktaAuth(config);
 
 ### Configuration options
 
-Most configuration options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`) or in `token.getWithoutPrompt`, `token.getWithPopup`, or `token.getWithRedirect` (unless noted otherwise). If included in both, the value passed in the method takes priority.
+These options can be included when instantiating Okta Auth JS (`new OktaAuth(config)`).
 
-**Important:** These configuration options can **only** be used when instantiating Okta Auth JS.
+#### `issuer`
+
+> :warning: This option is required
+
+The URL for your Okta organization or an Okta authentication server. [About the issuer](#about-the-issuer)
+
+#### `clientId`
+
+Client Id pre-registered with Okta for the OIDC authentication flow. [Creating your Okta application](#creating-your-okta-appliation)
+
+#### `redirectUri`
+
+The url that is redirected to when using `token.getWithRedirect`. This must be listed in your Okta application's [Login redirect URIs](#login-redirect-uris). If no `redirectUri` is provided, defaults to the current origin (`window.location.origin`). [Configuring your Okta application](#configuring-your-okta-application)
+
+#### `postLogoutRedirectUri`
+
+Specify the url where the browser should be redirected after [signOut](#signout). This url must be listed in your Okta application's [Logout redirect URIs](#logout-redirect-uris). If not specified, your application's origin (`window.location.origin`) will be used.  [Configuring your Okta application](#configuring-your-okta-application) |
+
+#### `scopes`
+
+Specify what information to make available in the returned `id_token` or `access_token`. For OIDC, you must include `openid` as one of the scopes. Defaults to `['openid', 'email']`. For a list of available scopes, see [Scopes and Claims](https://developer.okta.com/docs/api/resources/oidc#access-token-scopes-and-claims)
+
+#### `state`
+
+A client-provided string that will be passed to the server endpoint and returned in the OAuth response. The value can be used to validate the OAuth response and prevent cross-site request forgery (CSRF). Defaults to a random string.
+
+#### `pkce`
+
+Default value is `true` which enables the [PKCE OAuth Flow](#pkce-oauth-20-flow). To use the [Implicit Flow](#implicit-oauth-20-flow) or [Authorization Code Flow](#authorization-code-flow-for-web-and-native-client-types), set `pkce` to `false`.
+
+#### responseMode
+
+When requesting tokens using [token.getWithRedirect](#tokengetwithredirectoptions) values will be returned as parameters appended to the [redirectUri](#additional-options).
+
+In most cases you will not need to set a value for `responseMode`. Defaults are set according to the [OpenID Connect 1.0 specification](https://openid.net/specs/openid-connect-core-1_0.html#Authentication).
+
+* For [PKCE OAuth Flow](#pkce-oauth-20-flow)), the authorization code will be in search query of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#additional-options) option to "fragment".
+
+* For [Implicit OAuth Flow](#implicit-oauth-20-flow)), tokens will be in the hash fragment of the URL. This cannot be changed.
+
+#### `responseType`
+
+Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication when using the [Implicit OAuth Flow](#implicit-oauth-20-flow). The default value is `['token', 'id_token']` which will request both an access token and ID token. If `pkce` is `true`, both the access and ID token will be requested and this option will be ignored. For web/native applications using the `authorization_code` flow, this value should be set to `"code"` and `pkce` should be set to `false`.
+
+#### `authorizeUrl`
+
+Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize".
+
+#### `userinfoUrl`
+
+Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo".
+
+#### `tokenUrl`
+
+Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token".
+
+#### `ignoreSignature`
+
+> :warning: This option should be used only for browser support and testing purposes.
+
+ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`.
+
+#### `maxClockSkew`
+
+Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
+
+#### `transformAuthState`
+
+Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `authState.isAuthenticated` to true if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
+
+```javascript
+const config = {
+  // other config
+  transformAuthState: async (oktaAuth, authState) => {
+    if (!authState.isAuthenticated) {
+      return authState;
+    }
+    // extra requirement: user must have valid Okta SSO session
+    const user = await oktaAuth.token.getUserInfo();
+    authState.isAuthenticated = !!user; // convert to boolean
+    authState.users = user; // also store user object on authState
+    return authState;
+  }
+};
+
+const oktaAuth = new OktaAuth(config);
+oktaAuth.authStateManager.subscribe(authState => {
+  // handle latest authState
+});
+oktaAuth.authStateManager.updateAuthState();
+```
+
+#### `restoreOriginalUri`
+
+> :link: web browser only <br>
+
+Callback function. When [sdk.handleLoginRedirect](#handleloginredirecttokens) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
+
+```javascript
+const config = {
+  // other config
+  restoreOriginalUri: async (oktaAuth, originalUri) => {
+    // redirect with custom router
+    router.replace({
+      path: toRelativeUrl(originalUri, baseUrl)
+    });
+  }
+};
+
+const oktaAuth = new OktaAuth(config);
+if (oktaAuth.isLoginRedirect()) {
+  oktaAuth.handleLoginRedirect();
+}
+```
+
+#### `devMode`
+
+Default to `false`. It enables debugging logs when set to `true`.
+
+#### `useInteractionCodeFlow`
+
+Enables interaction code flow for direct auth clients.
+
+#### `clientSecret`
+
+Used in authorization and interaction code flows by server-side web applications to obtain OAuth tokens. In a production application, this value should **never** be visible on the client side.
+
+#### `httpRequestClient`
+
+The http request implementation. By default, this is implemented using [cross-fetch](https://github.com/lquixada/cross-fetch). To provide your own request library, implement the following interface:
+
+  1. Must accept:
+      * method (http method)
+      * url (target url)
+      * args (object containing headers and data)
+  2. Must return a Promise that resolves with a raw XMLHttpRequest response
+
+```javascript
+var config = {
+  url: 'https://{yourOktaDomain}',
+  httpRequestClient: function(method, url, args) {
+    // args is in the form:
+    // {
+    //   headers: {
+    //     headerName: headerValue
+    //   },
+    //   data: postBodyData,
+    //   withCredentials: true|false,
+    // }
+    return Promise.resolve(/* a raw XMLHttpRequest response */);
+  }
+}
+```
 
 #### `storageManager`
 
@@ -439,11 +671,56 @@ var config = {
 }
 ```
 
-#### The `tokenManager`
+#### `tokenManager`
 
-##### `storage`
+##### `autoRenew`
 
-Specify the [storage type](#storagetype) for tokens. This will override any value set for the `token` section in the [storageManager](#storagemanager) configuration. By default, [localStorage][] will be used. This will fall back to [sessionStorage][] or [cookie][] if the previous type is not available.
+> :gear: Requires a [running service](#running-as-a-service)
+
+By default, the `tokenManager` will attempt to renew tokens before they expire. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
+
+```javascript
+tokenManager: {
+  autoRenew: false
+}
+```
+
+Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
+
+**NOTE** `expireEarlySeconds` option is only allowed in the **DEV** environment (localhost). It will be reset to 30 seconds when running in environments other than **DEV**.
+
+```javascript
+// Emit expired event 2 minutes before expiration
+// Tokens accessed with tokenManager.get() will auto-renew within 2 minutes of expiration
+tokenManager: {
+  expireEarlySeconds: 120
+}
+```
+
+###### `autoRemove`
+
+> :gear: Requires a [running service](#running-as-a-service)
+
+By default, the library will attempt to remove expired tokens during initialization when `autoRenew` is off. If you wish to  to disable auto removal of tokens, set autoRemove to false.
+
+##### `syncStorage`
+
+> :gear: Requires a [running service](#running-as-a-service)
+
+Automatically syncs tokens across browser tabs when token storage is `localStorage`. To disable this behavior, set `syncStorage` to false.
+
+###### `storageKey`
+
+By default all tokens will be stored under the key `okta-token-storage`. You may want to change this if you have multiple apps running on a single domain which share the same storage type. Giving each app a unique storage key will prevent them from reading or writing each other's token values.
+
+###### `storage`
+
+Specify the [storage type](#storagetype) for tokens. This will override any value set for the `token` section in the [storageManager](#storagemanager) configuration. By default, [localStorage][] will be used. This will fall back to [sessionStorage][] or [cookie][] if the previous type is not available. You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types:
+
+* [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) (default)
+* [`sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
+* [`cookie`](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)
+* `memory`: a simple in-memory storage provider
 
 ```javascript
 
@@ -489,289 +766,22 @@ authClient.tokenManager.setTokens(tokens); // storageProvider.setItem
 
 ```
 
-##### `autoRenew`
-
-By default, the `tokenManager` will attempt to renew tokens before they expire. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
-
-```javascript
-tokenManager: {
-  autoRenew: false
-}
-```
-
-Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
-
-**NOTE** `expireEarlySeconds` option is only allowed in the **DEV** environment (localhost). It will be reset to 30 seconds when running in environments other than **DEV**.
-
-```javascript
-// Emit expired event 2 minutes before expiration
-// Tokens accessed with tokenManager.get() will auto-renew within 2 minutes of expiration
-tokenManager: {
-  expireEarlySeconds: 120
-}
-```
-
-#### responseMode
-
-When requesting tokens using [token.getWithRedirect](#tokengetwithredirectoptions) values will be returned as parameters appended to the [redirectUri](#additional-options).
-
-In most cases you will not need to set a value for `responseMode`. Defaults are set according to the [OpenID Connect 1.0 specification](https://openid.net/specs/openid-connect-core-1_0.html#Authentication).
-
-* For [PKCE OAuth Flow](#pkce-oauth-20-flow)), the authorization code will be in search query of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#additional-options) option to "fragment".
-
-* For [Implicit OAuth Flow](#implicit-oauth-20-flow)), tokens will be in the hash fragment of the URL. This cannot be changed.
-
-#### Required Options
-
-##### `issuer`
-
-The URL for your Okta organization or an Okta authentication server. [About the issuer](#about-the-issuer)
-
-#### Additional Options
-
-##### `clientId`
-
-Client Id pre-registered with Okta for the OIDC authentication flow. [Creating your Okta application](#creating-your-okta-appliation)
-
-##### `redirectUri`
-
-The url that is redirected to when using `token.getWithRedirect`. This must be listed in your Okta application's [Login redirect URIs](#login-redirect-uris). If no `redirectUri` is provided, defaults to the current origin (`window.location.origin`). [Configuring your Okta application](#configuring-your-okta-application)
-
-##### `postLogoutRedirectUri`
-
-Specify the url where the browser should be redirected after [signOut](#signout). This url must be listed in your Okta application's [Logout redirect URIs](#logout-redirect-uris). If not specified, your application's origin (`window.location.origin`) will be used.  [Configuring your Okta application](#configuring-your-okta-application) |
-
-##### `responseMode`
-
-Applicable only for SPA clients using [PKCE OAuth Flow](#pkce-oauth-20-flow). By default, the authorization code is requested and parsed from the search query. Setting this value to `fragment` will cause the URL hash fragment to be used instead. If your application uses or alters the search query portion of the `redirectUri`, you may want to set this option to "fragment". This option affects both [token.getWithRedirect](#tokengetwithredirectoptions) and [token.parseFromUrl](#tokenparsefromurloptions)
-
-##### `responseType`
-
-Specify the [response type](https://developer.okta.com/docs/api/resources/oidc#request-parameters) for OIDC authentication when using the [Implicit OAuth Flow](#implicit-oauth-20-flow). The default value is `['token', 'id_token']` which will request both an access token and ID token. If `pkce` is `true`, both the access and ID token will be requested and this option will be ignored. For web/native applications using the `authorization_code` flow, this value should be set to `"code"` and `pkce` should be set to `false`.
-
-##### `pkce`
-
-Enable the [PKCE OAuth Flow](#pkce-oauth-20-flow). Default value is `true`. If set to `false`, the authorization flow will use the [Implicit OAuth Flow](#implicit-oauth-20-flow). When PKCE flow is enabled the authorize request will use `response_type=code` and the token request will use `grant_type=authorization_code`. All these details are handled for you, including the creation and verification of code verifiers. Tokens can be retrieved on the login callback by calling [token.parseFromUrl](#tokenparsefromurloptions)
-
-##### `authorizeUrl`
-
-Specify a custom authorizeUrl to perform the OIDC flow. Defaults to the issuer plus "/v1/authorize".
-
-##### `userinfoUrl`
-
-Specify a custom userinfoUrl. Defaults to the issuer plus "/v1/userinfo".
-
-##### `tokenUrl`
-
-Specify a custom tokenUrl. Defaults to the issuer plus "/v1/token".
-
-##### `ignoreSignature`
-
-> :warning: This option should be used only for browser support and testing purposes.
-
-ID token signatures are validated by default when `token.getWithoutPrompt`, `token.getWithPopup`,  `token.getWithRedirect`, and `token.verify` are called. To disable ID token signature validation for these methods, set this value to `true`.
-
-##### `maxClockSkew`
-
-Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
-
-##### `tokenManager`
-
-An object containing additional properties used to configure the internal token manager.
-
-###### `autoRenew`
-
-By default, the library will attempt to renew tokens before they expire. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
-
-###### `autoRemove`
-
-By default, the library will attempt to remove expired tokens during initialization when `autoRenew` is off. If you wish to  to disable auto removal of tokens, set autoRemove to false.
-
-###### `storage`
-
-You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types:
-
-* [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) (default)
-* [`sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
-* [`cookie`](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)
-* `memory`: a simple in-memory storage provider
-
-###### `storageKey`
-
-By default all tokens will be stored under the key `okta-token-storage`. You may want to change this if you have multiple apps running on a single domain which share the same storage type. Giving each app a unique storage key will prevent them from reading or writing each other's token values.
-
-##### `cookies`
+#### `cookies`
 
 An object containing additional properties used when setting cookies
 
-###### `secure`
+##### `secure`
 
 Defaults to `true`, unless the application origin is `http://localhost`, in which case it is forced to `false`. If `true`, the SDK will set the "Secure" option on all cookies. When this option is `true`, an exception will be thrown if the application origin is not using the HTTPS protocol. Setting to `false` will allow setting cookies on an HTTP origin, but is not recommended for production applications.
 
-###### `sameSite`
+##### `sameSite`
 
 Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
 
-##### `transformAuthState`
-
-Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `authState.isAuthenticated` to true if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
-
-```javascript
-const config = {
-  // other config
-  transformAuthState: async (oktaAuth, authState) => {
-    if (!authState.isAuthenticated) {
-      return authState;
-    }
-    // extra requirement: user must have valid Okta SSO session
-    const user = await oktaAuth.token.getUserInfo();
-    authState.isAuthenticated = !!user; // convert to boolean
-    authState.users = user; // also store user object on authState
-    return authState;
-  }
-};
-
-const oktaAuth = new OktaAuth(config);
-oktaAuth.authStateManager.subscribe(authState => {
-  // handle latest authState
-});
-oktaAuth.authStateManager.updateAuthState();
-```
-
-##### `restoreOriginalUri`
-
-> :link: web browser only <br>
-
-Callback function. When [sdk.handleLoginRedirect](#handleloginredirecttokens) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
-
-```javascript
-const config = {
-  // other config
-  restoreOriginalUri: async (oktaAuth, originalUri) => {
-    // redirect with custom router
-    router.replace({
-      path: toRelativeUrl(originalUri, baseUrl)
-    });
-  }
-};
-
-const oktaAuth = new OktaAuth(config);
-if (oktaAuth.isLoginRedirect()) {
-  oktaAuth.handleLoginRedirect();
-}
-```
-
-##### `devMode`
-
-Default to `false`. It enables debugging logs when set to `true`.
-
-##### `useInteractionCodeFlow`
-
-Enables interaction code flow for direct auth clients.
-
-##### `clientSecret`
-
-Used in authorization and interaction code flows by server-side web applications to obtain OAuth tokens. In a production application, this value should **never** be visible on the client side.
-
-#### Example Client
-
-```javascript
-var config = {
-  // Required config
-  issuer: 'https://{yourOktaDomain}/oauth2/default',
-
-  // Required for login flow using getWithRedirect()
-  clientId: 'GHtf9iJdr60A9IYrR0jw',
-  redirectUri: 'https://acme.com/oauth2/callback/home',
-
-  // Parse authorization code from hash fragment instead of search query
-  responseMode: 'fragment',
-
-  // Configure TokenManager to use sessionStorage instead of localStorage
-  tokenManager: {
-    storage: 'sessionStorage'
-  }
-};
-
-var authClient = new OktaAuth(config);
-```
-
-#### Authorization Code flow for web and native client types
-
-Web and native clients can obtain tokens using the `authorization_code` flow which uses a client secret stored in a secure location. SPA applications should use the `PKCE` flow which does not use a client secret. To use the `authorization_code` flow, set `responseType` to `"code"` and `pkce` to `false`:
-
-```javascript
-var config = {
-  // Required config
-  issuer: 'https://{yourOktaDomain}/oauth2/default',
-  clientId: 'GHtf9iJdr60A9IYrR0jw',
-  redirectUri: 'https://acme.com/oauth2/callback/home',
-
-  // Use authorization_code flow
-  responseType: 'code',
-  pkce: false
-};
-
-var authClient = new OktaAuth(config);
-```
-
-#### PKCE OAuth 2.0 flow
-
-The PKCE OAuth flow will be used by default. It is widely supported by most modern browsers when running on an HTTPS connection. PKCE requires that the browser implements `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is available on all major browsers except IE Edge. In this case, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
-
-If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
-
-`OktaAuth.features.isPKCESupported()`
-
-#### Implicit OAuth 2.0 flow
-
-Implicit OAuth flow is available as an option if PKCE flow cannot be supported in your deployment. It is widely supported by most browsers, and can work over an insecure HTTP connection. Note that implicit flow is less secure than PKCE flow, even over HTTPS, since raw tokens are exposed in the browser's history. For this reason, we highly recommending using the PKCE flow if possible.
-
-Implicit flow can be enabled by setting the `pkce` option to `false`
-
-```javascript
-
-var config = {
-  pkce:  false,
-
-  // other config
-  issuer: 'https://{yourOktaDomain}/oauth2/default',
-};
-
-var authClient = new OktaAuth(config);
-```
-
-### Optional configuration options
-
-### `httpRequestClient`
-
-The http request implementation. By default, this is implemented using [cross-fetch](https://github.com/lquixada/cross-fetch). To provide your own request library, implement the following interface:
-
-  1. Must accept:
-      * method (http method)
-      * url (target url)
-      * args (object containing headers and data)
-  2. Must return a Promise that resolves with a raw XMLHttpRequest response
-
-```javascript
-var config = {
-  url: 'https://{yourOktaDomain}',
-  httpRequestClient: function(method, url, args) {
-    // args is in the form:
-    // {
-    //   headers: {
-    //     headerName: headerValue
-    //   },
-    //   data: postBodyData,
-    //   withCredentials: true|false,
-    // }
-    return Promise.resolve(/* a raw XMLHttpRequest response */);
-  }
-}
-```
-
 ## API Reference
 <!-- no toc -->
+* [start](#start)
+* [stop](#stop)
 * [signIn](#signinoptions)
 * [signInWithCredentials](#signinwithcredentialsoptions)
 * [signInWithRedirect](#signinwithredirectoptions)
@@ -825,7 +835,7 @@ var config = {
   * [token.isLoginRedirect](#tokenisloginredirect)
   * [token.prepareTokenParams](#tokenpreparetokenparams)
   * [token.exchangeCodeForTokens](#tokenexchangecodefortokens)
-* [tokenManager](#tokenmanager)
+* [tokenManager](#tokenmanager-api)
   * [tokenManager.add](#tokenmanageraddkey-token)
   * [tokenManager.get](#tokenmanagergetkey)
   * [tokenManager.getTokens](#tokenmanagergettokens)
@@ -842,6 +852,14 @@ var config = {
   * [authStateManager.unsubscribe](#authstatemanagerunsubscribehandler)
 
 ------
+
+### `start()`
+
+Starts the `OktaAuth` service. See [running as a service](#running-as-a-service) for more details.
+
+### `stop()`
+
+Starts the `OktaAuth` service. See [running as a service](#running-as-a-service) for more details.
 
 ### `signIn(options)`
 
@@ -2385,7 +2403,7 @@ Returns a `TokenParams` object. If `PKCE` is enabled, this object will contain v
 
 Used internally to perform the final step of the `PKCE` authorization code flow. Accepts a `TokenParams` object which should contain a `codeVerifier` and an `authorizationCode`.
 
-### `tokenManager`
+### `tokenManager` API
 
 #### `tokenManager.add(key, token)`
 
