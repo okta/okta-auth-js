@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { RemediationValues, IdxRemediation, IdxToRemediationValueMap } from '../types';
-import { getAllValues, getRequiredValues } from '../util';
+import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 export default class Base {
   remediation: IdxRemediation;
@@ -37,6 +37,12 @@ export default class Base {
         return data;
       }, {});
       return res;
+    }
+
+    if (typeof this[`map${titleCase(key)}`] === 'function') {
+      return this[`map${titleCase(key)}`](
+        this.remediation.value.find(({name}) => name === key)
+      );
     }
 
     const entry = this.map[key];

@@ -3,6 +3,7 @@ import { IdxTransactionMeta } from '../types/Transaction';
 
 export interface IdxApi {
   authenticate: (options: AuthorizeOptions) => Promise<AuthTransaction>;
+  registration: (options: any) => Promise<AuthTransaction>; // TODO: use RegistrationOptions
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   introspect: (options?: IntrospectOptions) => Promise<any>; // TODO: add type
   cancel: (options?: CancelOptions) => Promise<any>; // TODO: add type
@@ -17,6 +18,12 @@ export interface RemediationValues {
   // Needed for V1 compatability
   username?: string;
   password?: string;
+
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  authenticators?: [string];
+  emailVerificationCode?: string;
 }
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
@@ -25,6 +32,11 @@ export type IdxToRemediationValueMap = Record<string, string[] | string | boolea
 export interface Remediator {
   canRemediate: () => boolean;
   getData: () => unknown;
+}
+
+export enum RemediatorFlow {
+  Authenticate,
+  Registration
 }
 
 export interface SupportsCodeFlow {
@@ -62,6 +74,8 @@ export interface AuthorizeOptions extends
   AcceptsInteractionHandle {
 }
 
+// export interface RegistrationOptions extends 
+
 // TODO: remove when idx-js provides type information
 export interface IdxRemeditionValue {
   name: string;
@@ -71,6 +85,7 @@ export interface IdxRemeditionValue {
 export interface IdxRemediation {
   name: string;
   value: IdxRemeditionValue[];
+  relatesTo: any; // TODO: add type
 }
 
 export interface IdxMessage {
@@ -86,6 +101,7 @@ export interface IdxMessages {
 // JSON response from the server
 export interface RawIdxResponse {
   version: string;
+  stateHandle: string;
   remediation?: IdxRemediation[];
   messages?: IdxMessages;
 }

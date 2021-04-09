@@ -1,6 +1,12 @@
 /* eslint-disable complexity */
 import { AuthTransaction } from '../tx';
-import { OktaAuth, AuthorizeOptions, IdxTransactionMeta, RemediationValues } from '../types';
+import { 
+  OktaAuth, 
+  AuthorizeOptions, 
+  IdxTransactionMeta, 
+  RemediationValues,
+  RemediatorFlow
+} from '../types';
 import { interact } from './interact';
 import { remediate } from './remediate';
 
@@ -23,7 +29,7 @@ export async function authenticate(authClient: OktaAuth, options: AuthorizeOptio
   });
 
   // Can we handle the remediations?
-  idxResponse = await remediate(idxResponse, values);
+  idxResponse = await remediate(idxResponse, RemediatorFlow.Authenticate, values);
 
   // Did we get an interaction code?
   let status = 'FAILURE';

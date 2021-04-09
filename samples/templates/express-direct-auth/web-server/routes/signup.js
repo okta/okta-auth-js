@@ -3,175 +3,112 @@ const { getAuthClient, uniqueId } = require('../utils');
 
 const router = express.Router();
 
-// TODO: extract error message from response, then show error in UI
-function hasError(idxResponse, previousStep) {
-  return idxResponse.neededToProceed
-    .filter(({ name }) => name === previousStep)
-    .map(({ value }) => value)
-
-}
-
-// startRegistration
-// continueRegistration
+const authenticators = ['email', 'password']; // ordered authenticators
 
 router.get('/signup', (_, res) => {
   res.render('registration');
 });
 
-router.post('/signup', (req, res) => {
-  let previousStep;
-
-  const { firstname, lastname, email } = req.body;
-  const transactionId = uniqueId();
-  const authClient = getAuthClient({ 
-    storageManager: {
-      transaction: {
-        storageKey: `transaction-${transactionId}`
+router.post('/signup', async (req, res) => {
+  try {
+    const { firstName, lastName, email } = req.body;
+    const transactionId = uniqueId();
+    const authClient = getAuthClient({ 
+      storageManager: {
+        transaction: {
+          storageKey: `transaction-${transactionId}`
+        }
       }
-    }
-  });
-  authClient.idx.interact()
-    .then(({ idxResponse }) => {
-      // Add transactionId to session
-      req.session.transactionId = transactionId;
-
-      // Proceed with enroll-profile
-      previousStep = 'select-enroll-profile';
-      return idxResponse.proceed('select-enroll-profile', {});
-    })
-    .then(idxResponse => {
-      // console.log('idxResponse [select-enroll-profile] -> ', idxResponse);
-      previousStep = 'enroll-profile';
-      return idxResponse.proceed('enroll-profile', {
-        userProfile: {
-          email,
-          firstName: firstname,
-          lastName: lastname,
-        }
-      });
-    })
-    .then(idxResponse => {
-      return idxResponse.proceed('select-authenticator-enroll', {
-        authenticator: {
-          id: 'aut59pqMlE2tA5IQe4w4' // select email
-        }
-      });
-    })
-    .then(idxResponse => {
-      console.log('select-authenticator-enroll resp ->', idxResponse);
-      req.session.stateHandle = idxResponse.context.stateHandle;
-      res.render('enroll-email-authenticator');
-    })
-    .catch(err => {
-      console.log('/ signup error: ', err);
-      
-      const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
-      res.render('registration', {
-        hasError: errors && errors.length,
-        errors, 
-      });
     });
+    // Start registration
+    const { stateHandle } = await authClient.idx.registration({ 
+      firstName, 
+      lastName, 
+      email,
+      authenticators,
+    });
+    // Persist transactionId and stateHandle to session
+    req.session.transactionId = transactionId;
+    req.session.stateHandle = stateHandle;
+    // Render first authenticator page (email)
+    res.render(`enroll-${authenticators[0]}-authenticator`);
+  } catch (err) {
+    const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
+    res.render('registration', {
+      hasError: errors && errors.length,
+      errors, 
+    });
+  }
 });
 
-router.post('/signup/enroll-email-authenticator', (req, res) => {
-  const { code } = req.body;
-  const { stateHandle, transactionId } = req.session;
-  const authClient = getAuthClient({
-    storageManager: {
-      transaction: {
-        storageKey: `transaction-${transactionId}`
+router.post('/signup/enroll-email-authenticator', async (req, res) => {
+  try {
+    const { emailVerificationCode } = req.body;
+    const { stateHandle, transactionId } = req.session;
+    const authClient = getAuthClient({
+      storageManager: {
+        transaction: {
+          storageKey: `transaction-${transactionId}`
+        }
       }
-    }
-  });
-  authClient.idx.introspect({ stateHandle })
-    .then(idxResponse => {
-      console.log('resume -> ', idxResponse);
-      return idxResponse.proceed('enroll-authenticator', {
-        credentials: {
-          passcode: code
-        }
-      })
-    })
-    .then(idxResponse => {
-      console.log(idxResponse);
-      return idxResponse.proceed('select-authenticator-enroll', {
-        authenticator: {
-          id: 'aut59ppeMG1hUTsqO4w4' // select password authenticator
-        }
-      });
-    })
-    .then(idxResponse => {
-      console.log('select-authenticator-enroll resp ->', idxResponse);
-      req.session.stateHandle = idxResponse.context.stateHandle;
-      res.render('enroll-password-authenticator');
-    })
-    .catch(err => {
-      console.log('err ->', err, err.messages);
-      res.render('enroll-email-authenticator', { error: 'error!!!' });
     });
+    // Continue registration
+    const authTransaction = await authClient.idx.registration({ 
+      emailVerificationCode, 
+      authenticators,
+      stateHandle 
+    });
+    // Persist stateHandle to session
+    req.session.stateHandle = authTransaction.stateHandle;
+    // Render second authenticator page (password)
+    res.render(`enroll-${authenticators[1]}-authenticator`);
+  } catch (err) {
+    const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
+    res.render(`enroll-${authenticators[0]}-authenticator`, {
+      hasError: errors && errors.length,
+      errors, 
+    });
+  }
 });
 
 router.post('/signup/enroll-password-authenticator', async (req, res) => {
-  const { password } = req.body;
-  const { stateHandle, transactionId } = req.session;
-  const authClient = getAuthClient({
-    storageManager: {
-      transaction: {
-        storageKey: `transaction-${transactionId}`
-      }
-    }
-  });
-  authClient.idx.introspect({ stateHandle })
-    .then(idxResponse => {
-      console.log('resume -> ', idxResponse);
-      return idxResponse.proceed('enroll-authenticator', {
-        credentials: {
-          passcode: password
-        }
-      })
-    })
-    .then(idxResponse => {
-      console.log(idxResponse); // get interactionCode here
-
-      const meta = authClient.transactionManager.load();
-      const {
-        codeVerifier,
-        clientId,
-        redirectUri,
-        scopes,
-        urls,
-        ignoreSignature
-      } = meta;
-  
-      return authClient.token.exchangeCodeForTokens({
-        interactionCode: idxResponse.interactionCode,
-        codeVerifier,
-        clientId,
-        redirectUri,
-        scopes,
-        ignoreSignature
-      }, urls);
-
-    })
-    .then(async tokens => {
-      const { tokens: { accessToken, idToken } } = tokens;
-      const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
-
-      // Persist userContext in session
-      req.session.userContext = JSON.stringify({ userinfo, tokens });
-
-      // Redirect back to home page
-      res.redirect('/');
+  const { password, confirmPassword } = req.body;
+  if (password !== confirmPassword) {
+    return res.render(`enroll-${authenticators[1]}-authenticator`, {
+      hasError: true,
+      errors: ['Password not match']
     });
-});
+  }
 
-// Debugging views
-router.get('/signup/enroll-email-authenticator', (req, res) => {
-  res.render('enroll-email-authenticator');
-});
-
-router.get('/signup/enroll-password-authenticator', (req, res) => {
-  res.render('enroll-password-authenticator');
+  try {
+    const { stateHandle, transactionId } = req.session;
+    const authClient = getAuthClient({
+      storageManager: {
+        transaction: {
+          storageKey: `transaction-${transactionId}`
+        }
+      }
+    });
+    // Continue registration
+    const { tokens } = await authClient.idx.registration({ 
+      password, 
+      authenticators,
+      stateHandle 
+    });
+    // Get userInfo with tokens
+    const { tokens: { accessToken, idToken } } = tokens;
+    const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
+    // Persist userContext in session
+    req.session.userContext = JSON.stringify({ userinfo, tokens });
+    // Redirect back to home page
+    res.redirect('/');
+  } catch (err) {
+    const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
+    res.render(`enroll-${authenticators[1]}-authenticator`, {
+      hasError: errors && errors.length,
+      errors, 
+    });
+  }
 });
 
 module.exports = router;

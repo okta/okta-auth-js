@@ -18,7 +18,7 @@ export async function cancel (authClient: OktaAuth, options: CancelOptions) {
     .then(idxResponse => {
       return idxResponse.actions.cancel();
     })
-    .then(() => {
+    .finally(() => {
       authClient.transactionManager.clear();
     });
 }
