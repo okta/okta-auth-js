@@ -22,7 +22,7 @@ import {
   AuthTransaction, 
   TokenParams,
   isInteractionRequired,
-  isInteractionRequiredError
+  isInteractionRequiredError, isAuthorizationCodeError
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -485,6 +485,9 @@ class TestApp {
         // we will not see this if we are intercepting interaction_required earlier
         if (isInteractionRequiredError(e)) {
           return this.renderInteractionRequired();
+        }
+        if (isAuthorizationCodeError(this.oktaAuth, e)){
+          e.xhr.message = 'Authorization code is invalid or expired.';
         }
         this.renderError(e);
         throw e;

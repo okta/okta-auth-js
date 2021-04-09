@@ -5,6 +5,7 @@ import { flows, openImplicit, openPKCE } from '../util/appUtils';
 import { loginPopup } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 
+
 // Refresh tokens are tested in a separate file
 const scopes = ['openid', 'email']; // do not include "offline_access"
 
