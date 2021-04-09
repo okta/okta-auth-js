@@ -6,10 +6,7 @@ export default class Identify extends Base {
     'credentials': ['credentials', 'password']
   };
 
-  formatValue(key: string) {
-    if (key === 'password' && this.values.password) {
-      return { passcode: this.values.password };
-    }
-    return super.formatValue(key);
+  mapCredentials() {
+    return { passcode: this.values.password };
   }
 }

@@ -1,7 +1,9 @@
 import Base from './Base';
 
 export default class EnrollProfile extends Base {
-  map = {};
+  map = {
+    'userProfile': ['userProfile', 'firstName', 'lastName', 'email']
+  };
 
   mapUserProfile() {
     const { firstName, lastName, email } = this.values;

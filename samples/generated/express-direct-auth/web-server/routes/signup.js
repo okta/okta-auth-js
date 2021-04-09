@@ -30,14 +30,23 @@ router.post('/signup', async (req, res) => {
     // Persist transactionId and stateHandle to session
     req.session.transactionId = transactionId;
     req.session.stateHandle = stateHandle;
-    // Render first authenticator page (email)
-    res.render(`enroll-${authenticators[0]}-authenticator`);
+    // Proceed to email authenticator page
+    res.redirect('/signup/enroll-email-authenticator');
   } catch (err) {
     const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
     res.render('registration', {
       hasError: errors && errors.length,
       errors, 
     });
+  }
+});
+
+router.get('/signup/enroll-email-authenticator', (req, res) => {
+  const { stateHandle } = req.session;
+  if (stateHandle) {
+    res.render(`enroll-${authenticators[0]}-authenticator`);
+  } else {
+    res.redirect('/signup');
   }
 });
 
@@ -68,6 +77,15 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
       hasError: errors && errors.length,
       errors, 
     });
+  }
+});
+
+router.get('/signup/enroll-password-authenticator', (req, res) => {
+  const { stateHandle } = req.session;
+  if (stateHandle) {
+    res.render(`enroll-${authenticators[1]}-authenticator`);
+  } else {
+    res.redirect('/signup');
   }
 });
 

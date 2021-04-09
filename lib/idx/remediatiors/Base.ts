@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 import { AuthApiError } from '../../errors';
-import { RemediationValues, IdxRemediation, IdxToRemediationValueMap } from '../types';
-import { createApiError, getAllValues, getRequiredValues, titleCase } from '../util';
+import { RemediationValues, IdxRemediation, IdxToRemediationValueMap, IdxResponse } from '../types';
+import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 export default class Base {
   remediation: IdxRemediation;
@@ -13,6 +13,7 @@ export default class Base {
     this.values = values;
   }
 
+  // Override this method to provide custom check
   canRemediate() {
     if (!this.map) {
       return false;
@@ -40,19 +41,21 @@ export default class Base {
       return res;
     }
 
+    // Map value by "map${Property}" function in each subClass
     if (typeof this[`map${titleCase(key)}`] === 'function') {
       return this[`map${titleCase(key)}`](
         this.remediation.value.find(({name}) => name === key)
       );
     }
 
+    // Handle general primitive types
     const entry = this.map[key];
     if (!entry) {
       return;
     }
 
     if (typeof entry === 'string') {
-      return this.formatValue(entry);
+      return this.values[entry];
     }
 
     if (!Array.isArray(entry) || entry.length === 0) {
@@ -61,7 +64,7 @@ export default class Base {
 
     // find the first aliased property that returns a truthy value
     for (let i = 0; i < entry.length; i++) {
-      let val = this.formatValue(entry[i]);
+      let val = this.values[entry[i]];
       if (val) {
         return val;
       }
@@ -81,12 +84,8 @@ export default class Base {
     });
   }
 
-  // only handles primitive types
-  formatValue(key: string) {
-    return this.values[key];
-  }
-
-  getErrorMessages(errorRemediation) {
+  // Override this method to extract error message from remediation form fields
+  getErrorMessages(errorRemediation: IdxResponse) {
     return [];
   }
 
