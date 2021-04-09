@@ -69,8 +69,8 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
     });
     // Persist stateHandle to session
     req.session.stateHandle = authTransaction.stateHandle;
-    // Render second authenticator page (password)
-    res.render(`enroll-${authenticators[1]}-authenticator`);
+    // Proceed to password authenticator page
+    res.redirect('/signup/enroll-password-authenticator');
   } catch (err) {
     const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
     res.render(`enroll-${authenticators[0]}-authenticator`, {

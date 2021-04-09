@@ -10,18 +10,16 @@ router.get('/login', (_, res) => {
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  // Get tokens and userInfo
-  const authClient = getAuthClient();
   try {
+    // Get tokens and userInfo
+    const authClient = getAuthClient();
     const { data: 
       { tokens: { tokens } } 
     } = await authClient.idx.authenticate({ username, password });
     const { accessToken, idToken } = tokens;
     const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
-    
     // Persist userContext in session
     req.session.userContext = JSON.stringify({ userinfo, tokens });
-    
     // Redirect back to home page
     res.redirect('/');
   } catch (err) {
