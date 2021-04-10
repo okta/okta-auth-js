@@ -36,7 +36,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/.well-known/openid-configuration'
+            uri: '/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -59,7 +60,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/default/.well-known/openid-configuration'
+            uri: '/oauth2/default/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -82,7 +84,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/custom/.well-known/openid-configuration'
+            uri: '/oauth2/custom/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -104,7 +107,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/custom2/.well-known/openid-configuration'
+            uri: '/oauth2/custom2/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -126,7 +130,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/.well-known/openid-configuration'
+            uri: '/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -181,7 +186,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/.well-known/openid-configuration'
+            uri: '/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -217,7 +223,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/.well-known/openid-configuration'
+            uri: '/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -249,7 +256,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/.well-known/openid-configuration'
+            uri: '/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -289,7 +297,8 @@ describe('getWellKnown', function() {
         {
           request: {
             method: 'get',
-            uri: '/.well-known/openid-configuration'
+            uri: '/.well-known/openid-configuration',
+            withCredentials: false
           },
           response: 'well-known'
         }
@@ -337,7 +346,8 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/v1/keys'
+            uri: '/oauth2/v1/keys',
+            withCredentials: false
           },
           response: 'keys'
         }
@@ -371,7 +381,8 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/v1/keys'
+            uri: '/oauth2/v1/keys',
+            withCredentials: false
           },
           response: 'keys'
         }
@@ -425,7 +436,8 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/v1/keys'
+            uri: '/oauth2/v1/keys',
+            withCredentials: false
           },
           response: 'keys'
         }
