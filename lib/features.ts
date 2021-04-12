@@ -67,6 +67,7 @@ export function isHTTPS() {
 }
 
 export function isLocalhost() {
+  // eslint-disable-next-line compat/compat
   return isBrowser() && window.location.hostname === 'localhost';
 }
 

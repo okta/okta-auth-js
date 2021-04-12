@@ -1,15 +1,15 @@
 import Base from './Base';
+import { AuthenticationRemediationValues } from '../types';
 
 export default class Identify extends Base {
+  values: AuthenticationRemediationValues;
+
   map = {
     'identifier': ['identifier', 'username'],
     'credentials': ['credentials', 'password']
   };
 
-  formatValue(key: string) {
-    if (key === 'password' && this.values.password) {
-      return { passcode: this.values.password };
-    }
-    return super.formatValue(key);
+  mapCredentials() {
+    return { passcode: this.values.password };
   }
 }

@@ -4,6 +4,7 @@ const Handlebars = require('handlebars');
 const handlebars = require('gulp-compile-handlebars');
 const clean = require('gulp-clean');
 const shell = require('shelljs');
+const merge = require('merge-stream');
 
 const config = require('./config');
 
@@ -36,6 +37,7 @@ function generateSampleTaskFactory(options) {
   return function generateSample() {
     const { name, template, subDir } = options;
     const inDir = `${SRC_DIR}/${template}/**/*`;
+    const viewTemplatesDir = `${SRC_DIR}/${template}/**/views/*`;
     const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${name}`;
     const strOptions = {};
     Object.keys(options).forEach(key => {
@@ -51,9 +53,12 @@ function generateSampleTaskFactory(options) {
       authJSVersion: getPublishedAuthJSVersion()
     });
     console.log(`generating sample: "${name}"`, hbParams);
-    return src(inDir, { dot: true })
+    const generateWithoutViewTemplates = src([inDir, `!${viewTemplatesDir}`], { dot: true })
       .pipe(handlebars(hbParams))
       .pipe(dest(outDir));
+    const copyViewTemplates = src(viewTemplatesDir, { dot: true })
+      .pipe(dest(outDir));
+    return merge(generateWithoutViewTemplates, copyViewTemplates);
    };
 }
 
