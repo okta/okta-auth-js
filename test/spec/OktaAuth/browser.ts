@@ -176,7 +176,7 @@ describe('OktaAuth (browser)', function() {
       let accessToken;
 
       function initSpies() {
-        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken });
+        auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ accessToken, idToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
         spyOn(auth, 'revokeRefreshToken').and.returnValue(Promise.resolve());
@@ -192,7 +192,7 @@ describe('OktaAuth (browser)', function() {
       it('Default options when no refreshToken: will revokeAccessToken and use window.location.origin for postLogoutRedirectUri', function() {
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(3);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(3);
             expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
@@ -203,11 +203,11 @@ describe('OktaAuth (browser)', function() {
 
       it('Default options when refreshToken present: will revokeRefreshToken and use window.location.origin for postLogoutRedirectUri', function() {
         const refreshToken = { refreshToken: 'fake'};
-        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken, refreshToken });
+        auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ accessToken, idToken, refreshToken });
 
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(3);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(3);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.revokeRefreshToken).toHaveBeenCalledWith(refreshToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
@@ -233,30 +233,11 @@ describe('OktaAuth (browser)', function() {
         var customToken = { idToken: 'fake-custom' };
         return auth.signOut({ idToken: customToken })
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${customToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
   
-      it('if idToken=false will skip token manager read and call closeSession', function() {
-        return auth.signOut({ idToken: false })
-          .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
-            expect(auth.closeSession).toHaveBeenCalled();
-            expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
-          });
-      });
-  
-      it('if idToken=false and origin===href will reload the page', function() {
-        global.window.location.href = origin;
-        return auth.signOut({ idToken: false })
-          .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
-            expect(auth.closeSession).toHaveBeenCalled();
-            expect(window.location.reload).toHaveBeenCalled();
-          });
-      });
-
       describe('postLogoutRedirectUri', function() {
         it('can be set by config', function() {
           const postLogoutRedirectUri = 'http://someother';
@@ -293,11 +274,11 @@ describe('OktaAuth (browser)', function() {
 
       it('Can pass a "revokeAccessToken=false" to skip revoke logic', function() {
         const refreshToken = { refreshToken: 'fake'};
-        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken, refreshToken });
+        auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ accessToken, idToken, refreshToken });
 
         return auth.signOut({ revokeAccessToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(auth.revokeRefreshToken).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
@@ -306,11 +287,11 @@ describe('OktaAuth (browser)', function() {
 
       it('Can pass a "revokeRefreshToken=false" to skip revoke logic', function() {
         const refreshToken = { refreshToken: 'fake'};
-        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken, idToken, refreshToken });
+        auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ accessToken, idToken, refreshToken });
         
         return auth.signOut({ revokeRefreshToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalled();
             expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
@@ -320,7 +301,7 @@ describe('OktaAuth (browser)', function() {
       it('Can pass a "accessToken=false" to skip accessToken logic', function() {
         return auth.signOut({ accessToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(2);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -332,7 +313,7 @@ describe('OktaAuth (browser)', function() {
 
       beforeEach(() => {
         accessToken = { accessToken: 'fake' };
-        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ accessToken });
+        auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ accessToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
       });
@@ -341,7 +322,7 @@ describe('OktaAuth (browser)', function() {
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(3);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(3);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -354,7 +335,7 @@ describe('OktaAuth (browser)', function() {
         global.window.location.href = origin;
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokens).toHaveBeenCalledTimes(3);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(3);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -409,7 +390,7 @@ describe('OktaAuth (browser)', function() {
       let idToken;
       beforeEach(() => {
         idToken = { idToken: 'fake' };
-        auth.tokenManager.getTokens = jest.fn().mockResolvedValue({ idToken });
+        auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ idToken });
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
       });

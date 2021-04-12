@@ -372,14 +372,14 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     return this.token.revoke(refreshToken);
   }
 
-  async getSignOutRedirectUrl(options: SignoutRedirectUrlOptions) {
+  getSignOutRedirectUrl(options: SignoutRedirectUrlOptions) {
     let {
       idToken,
       postLogoutRedirectUri,
       state,
     } = options;
     if (!idToken) {
-      idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
+      idToken = this.tokenManager.getTokensSync().idToken as IDToken;
     }
     if (!idToken) {
       return '';
@@ -417,19 +417,13 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     var refreshToken = options.refreshToken;
     var revokeAccessToken = options.revokeAccessToken !== false;
     var revokeRefreshToken = options.revokeRefreshToken !== false;
-    var idToken = options.idToken;
   
-    if (typeof idToken === 'undefined') {
-      idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
-    }
-  
- 
     if (revokeRefreshToken && typeof refreshToken === 'undefined') {
-      refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
+      refreshToken = this.tokenManager.getTokensSync().refreshToken as RefreshToken;
     }
 
     if (revokeAccessToken && typeof accessToken === 'undefined') {
-      accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
+      accessToken = this.tokenManager.getTokensSync().accessToken as AccessToken;
     }
   
     // Clear all local tokens
@@ -443,7 +437,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
       await this.revokeAccessToken(accessToken);
     }
 
-    const logoutUri = await this.getSignOutRedirectUrl(options);
+    const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });
     // No logoutUri? This can happen if the storage was cleared.
     // Fallback to XHR signOut, then simulate a redirect to the post logout uri
     if (!logoutUri) {
