@@ -9,6 +9,7 @@ export interface IdxApi {
 }
 
 // Values used to resolve remediations
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RemediationValues {}
 
 export interface AuthenticationRemediationValues extends RemediationValues {
@@ -21,7 +22,7 @@ export interface AuthenticationRemediationValues extends RemediationValues {
 }
 
 export interface RegistrationRemediationValues extends RemediationValues {
-  authenticators: [string];
+  authenticators: string[];
   firstName?: string;
   lastName?: string;
   email?: string;
@@ -51,7 +52,7 @@ export interface IntrospectOptions extends AcceptsInteractionHandle {
   stateHandle?: string;
 }
 
-export interface CancelOptions extends IntrospectOptions {}
+export type CancelOptions = IntrospectOptions;
 
 export interface InteractOptions extends AcceptsInteractionHandle {
   state?: string;
@@ -74,7 +75,7 @@ export interface IdxOptions extends
 
 export interface RunOptions {
   flow: RemediatorFlow;
-  needInteraction: boolean
+  needInteraction: boolean;
 }
 
 export interface AuthenticationOptions extends 
@@ -100,7 +101,7 @@ export interface IdxRemediation {
     type: string;
     value: {
       type: string;
-    }
+    };
   };
 }
 
