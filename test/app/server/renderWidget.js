@@ -9,7 +9,7 @@ module.exports = function widgetMiddleware(req, res) {
   const issuer = query.issuer;
   const clientId = query.clientId;
   const redirectUri = query.redirectUri;
-  const scopes = query.scopes.split(',');
+  const scopes = query.scopes !== undefined ? query.scopes.split(',') : [];
   const responseType = query.responseType;
   const useInteractionCodeFlow = query.useInteractionCodeFlow;
   const clientSecret = query.clientSecret;
