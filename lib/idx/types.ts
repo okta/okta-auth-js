@@ -5,6 +5,7 @@ export interface IdxApi {
   authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
   register: (options: RegistrationOptions) => Promise<AuthTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxResponse>;
+  interact: (options?: InteractOptions) => Promise<InteractResponse>;
 }
 
 // Values used to resolve remediations

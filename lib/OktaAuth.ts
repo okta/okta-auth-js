@@ -98,7 +98,8 @@ import { buildOptions } from './options';
 import { 
   authenticate,
   cancel,
-  register
+  register,
+  interact,
 } from './idx';
 
 const Emitter = require('tiny-emitter');
@@ -239,7 +240,8 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     this.idx = {
       authenticate: authenticate.bind(null, this),
       register: register.bind(null, this),
-      cancel: cancel.bind(null, this)
+      cancel: cancel.bind(null, this),
+      interact: interact.bind(null, this),
     };
 
     // Fingerprint API
