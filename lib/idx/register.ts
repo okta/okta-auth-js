@@ -6,7 +6,7 @@ import {
 } from '../types';
 import { run } from './run';
 
-export async function registration(
+export async function register(
   authClient: OktaAuth, options: RegistrationOptions
 ): Promise<AuthTransaction> {
   return run(authClient, { 

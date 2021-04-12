@@ -3,7 +3,7 @@ import { IdxTransactionMeta } from '../types/Transaction';
 
 export interface IdxApi {
   authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
-  registration: (options: RegistrationOptions) => Promise<AuthTransaction>;
+  register: (options: RegistrationOptions) => Promise<AuthTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxResponse>;
 }
 
@@ -95,7 +95,12 @@ export interface IdxRemeditionValue {
 export interface IdxRemediation {
   name: string;
   value: IdxRemeditionValue[];
-  relatesTo: any; // TODO: add type
+  relatesTo: {
+    type: string;
+    value: {
+      type: string;
+    }
+  };
 }
 
 export interface IdxMessage {

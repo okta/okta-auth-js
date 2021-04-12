@@ -98,7 +98,7 @@ import { buildOptions } from './options';
 import { 
   authenticate,
   cancel,
-  registration
+  register
 } from './idx';
 
 const Emitter = require('tiny-emitter');
@@ -238,7 +238,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     // IDX
     this.idx = {
       authenticate: authenticate.bind(null, this),
-      registration: registration.bind(null, this),
+      register: register.bind(null, this),
       cancel: cancel.bind(null, this)
     };
 
