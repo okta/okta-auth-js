@@ -68,6 +68,11 @@ const samples = [
     template: 'express-web',
     specs: ['web-app']
   },
+  {
+    name: 'express-direct-auth',
+    template: 'express-direct-auth',
+    specs: ['web-app']
+  },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {
     throw new Error('sample "name" is required');

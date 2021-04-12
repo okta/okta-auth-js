@@ -1,0 +1,30 @@
+{
+  "name": "express-direct-auth",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "start": "concurrently --kill-others \"yarn start:web-server\" \"yarn start:resource-server\"",
+    "dev": "concurrently --kill-others \"yarn dev:web-server\" \"yarn dev:resource-server\"",
+    "start:web-server": "node ./web-server/server.js",
+    "dev:web-server": "nodemon ./web-server/server.js",
+    "start:resource-server": "node ./resource-server/server.js",
+    "dev:resource-server": "nodemon ./resource-server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "mustache-express": "^1.3.0",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.6.1",
+    "@okta/jwt-verifier": "^2.1.0",
+    "@okta/okta-auth-js": "*"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "concurrently": "^6.0.1"
+  }
+}

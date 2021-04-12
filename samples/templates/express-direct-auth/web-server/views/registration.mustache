@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+    <div id="registration" class="ui center aligned relaxed grid">
+      <div class="row">
+        <div class="ui header">
+          <h2>Self Service Registration</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>errors}}
+      </div>
+
+      <div class="row">
+        <form class="ui large form" action="/signup" method="POST">
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                First Name
+              </div>
+              <input type="text" name="firstName" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Last Name
+              </div>
+              <input type="text" name="lastName" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Email
+              </div>
+              <input type="email" name="email" />
+            </div>
+          </div>
+          <button class="ui fluid large primary submit button" type="submit">
+            Sign Up
+          </button>
+        </form>
+      </div>
+
+      <div class="ui row grid">
+        <div class="ui messages row">
+          Already have an account? &nbsp; <a href="/login">Sign In</a>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>
