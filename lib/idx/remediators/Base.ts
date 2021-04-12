@@ -1,6 +1,7 @@
 /* eslint-disable complexity */
-import { RemediationValues, IdxRemediation, IdxToRemediationValueMap } from '../types';
-import { getAllValues, getRequiredValues } from '../util';
+import { AuthApiError } from '../../errors';
+import { RemediationValues, IdxRemediation, IdxToRemediationValueMap, IdxResponse } from '../types';
+import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 export default class Base {
   remediation: IdxRemediation;
@@ -12,6 +13,7 @@ export default class Base {
     this.values = values;
   }
 
+  // Override this method to provide custom check
   canRemediate() {
     if (!this.map) {
       return false;
@@ -39,13 +41,21 @@ export default class Base {
       return res;
     }
 
+    // Map value by "map${Property}" function in each subClass
+    if (typeof this[`map${titleCase(key)}`] === 'function') {
+      return this[`map${titleCase(key)}`](
+        this.remediation.value.find(({name}) => name === key)
+      );
+    }
+
+    // Handle general primitive types
     const entry = this.map[key];
     if (!entry) {
       return;
     }
 
     if (typeof entry === 'string') {
-      return this.formatValue(entry);
+      return this.values[entry];
     }
 
     if (!Array.isArray(entry) || entry.length === 0) {
@@ -54,7 +64,7 @@ export default class Base {
 
     // find the first aliased property that returns a truthy value
     for (let i = 0; i < entry.length; i++) {
-      let val = this.formatValue(entry[i]);
+      let val = this.values[entry[i]];
       if (val) {
         return val;
       }
@@ -74,8 +84,18 @@ export default class Base {
     });
   }
 
-  // only handles primitive types
-  formatValue(key: string) {
-    return this.values[key];
+  // Override this method to extract error message from remediation form fields
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+  getErrorMessages(errorRemediation: IdxResponse) {
+    return [];
+  }
+
+  createApiError(err) {
+    const errorRemediation = err.remediation.value.find(({ name }) => name === this.remediation.name);
+    const errors = this.getErrorMessages(errorRemediation);
+    return new AuthApiError({
+      errorSummary: errors.join('. '),
+      errorCauses: errors
+    });
   }
 }
