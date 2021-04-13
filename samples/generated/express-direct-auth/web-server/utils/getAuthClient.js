@@ -9,7 +9,6 @@ module.exports = function getAuthClient(req, options = {}) {
       try {
         val = JSON.parse(req.session[key]);
       } catch (err) {
-        console.log(`Failed to parse stored value for ${key}, value: ${req.session[key]}`);
         val = null;
       }
       return val;
