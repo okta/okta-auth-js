@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAuthClient, uniqueId } = require('../utils');
+const { getAuthClient } = require('../utils');
 
 const router = express.Router();
 
@@ -12,23 +12,15 @@ router.get('/signup', (_, res) => {
 router.post('/signup', async (req, res) => {
   try {
     const { firstName, lastName, email } = req.body;
-    const transactionId = uniqueId();
-    const authClient = getAuthClient({ 
-      storageManager: {
-        transaction: {
-          storageKey: `transaction-${transactionId}`
-        }
-      }
-    });
+    const authClient = getAuthClient(req);
     // Start registration
-    const { stateHandle } = await authClient.idx.registration({ 
+    const { stateHandle } = await authClient.idx.register({ 
       firstName, 
       lastName, 
       email,
       authenticators,
     });
-    // Persist transactionId and stateHandle to session
-    req.session.transactionId = transactionId;
+    // Persist stateHandle to session
     req.session.stateHandle = stateHandle;
     // Proceed to email authenticator page
     res.redirect('/signup/enroll-email-authenticator');
@@ -41,28 +33,25 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-router.get('/signup/enroll-email-authenticator', (req, res) => {
-  const { stateHandle } = req.session;
-  if (stateHandle) {
-    res.render(`enroll-${authenticators[0]}-authenticator`);
-  } else {
-    res.redirect('/signup');
-  }
+// Handle get request for each authenticator enroll page
+authenticators.forEach(authenticator => {
+  router.get(`/signup/enroll-${authenticator}-authenticator`, (req, res) => {
+    const { stateHandle } = req.session;
+    if (stateHandle) {
+      res.render(`enroll-${authenticator}-authenticator`);
+    } else {
+      res.redirect('/signup');
+    }
+  });
 });
 
 router.post('/signup/enroll-email-authenticator', async (req, res) => {
   try {
     const { emailVerificationCode } = req.body;
-    const { stateHandle, transactionId } = req.session;
-    const authClient = getAuthClient({
-      storageManager: {
-        transaction: {
-          storageKey: `transaction-${transactionId}`
-        }
-      }
-    });
+    const { stateHandle } = req.session;
+    const authClient = getAuthClient(req);
     // Continue registration
-    const authTransaction = await authClient.idx.registration({ 
+    const authTransaction = await authClient.idx.register({ 
       emailVerificationCode, 
       authenticators,
       stateHandle 
@@ -80,15 +69,6 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
   }
 });
 
-router.get('/signup/enroll-password-authenticator', (req, res) => {
-  const { stateHandle } = req.session;
-  if (stateHandle) {
-    res.render(`enroll-${authenticators[1]}-authenticator`);
-  } else {
-    res.redirect('/signup');
-  }
-});
-
 router.post('/signup/enroll-password-authenticator', async (req, res) => {
   const { password, confirmPassword } = req.body;
   if (password !== confirmPassword) {
@@ -99,16 +79,10 @@ router.post('/signup/enroll-password-authenticator', async (req, res) => {
   }
 
   try {
-    const { stateHandle, transactionId } = req.session;
-    const authClient = getAuthClient({
-      storageManager: {
-        transaction: {
-          storageKey: `transaction-${transactionId}`
-        }
-      }
-    });
+    const { stateHandle } = req.session;
+    const authClient = getAuthClient(req);
     // Continue registration
-    const { tokens } = await authClient.idx.registration({ 
+    const { tokens } = await authClient.idx.register({ 
       password, 
       authenticators,
       stateHandle 

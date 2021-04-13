@@ -12,14 +12,12 @@ router.post('/login', async (req, res) => {
 
   try {
     // Get tokens and userInfo
-    const authClient = getAuthClient();
+    const authClient = getAuthClient(req);
     const { data: 
       { tokens: { tokens } } 
     } = await authClient.idx.authenticate({ username, password });
-    const { accessToken, idToken } = tokens;
-    const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
-    // Persist userContext in session
-    req.session.userContext = JSON.stringify({ userinfo, tokens });
+    // Save tokens to storage (req.session)
+    authClient.tokenManager.setTokens(tokens);
     // Redirect back to home page
     res.redirect('/');
   } catch (err) {
