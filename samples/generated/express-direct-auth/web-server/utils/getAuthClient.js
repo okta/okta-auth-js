@@ -1,5 +1,4 @@
 const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
-// const uniqueId = require('./uniqueId');
 
 const sampleConfig = require('../../config').webServer;
 
