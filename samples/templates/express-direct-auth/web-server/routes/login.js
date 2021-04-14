@@ -17,6 +17,12 @@ const renderLoginWithWidget = (req, res) => {
         interactionHandle, 
         meta: { codeChallenge, codeChallengeMethod } 
       } = idxRes;
+      if (!interactionHandle) {
+        return res.render('login-with-widget', {
+          hasError: true,
+          errors: ['Missing required congifuration "interactionHandle" to initial the widget.'],
+        });
+      }
       const widgetConfig = JSON.stringify({
         baseUrl: sampleConfig.oidc.issuer.split('/oauth2')[0],
         clientId: sampleConfig.oidc.clientId,
