@@ -50,7 +50,8 @@ module.exports = function widgetMiddleware(req, res) {
                 scopes: ${JSON.stringify(scopes)},
                 interactionHandle: "${interactionHandle}",
                 codeChallenge: "${codeChallenge}",
-                codeChallengeMethod: "${codeChallengeMethod}"
+                codeChallengeMethod: "${codeChallengeMethod}",
+                useInteractionCodeFlow: true
               });
             </script>
           </body>
