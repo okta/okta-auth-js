@@ -2,18 +2,31 @@ import { AuthTransaction } from '../tx';
 import { IdxTransactionMeta } from '../types/Transaction';
 
 export interface IdxApi {
-  authenticate: (options: AuthorizeOptions) => Promise<AuthTransaction>;
+  authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
+  register: (options: RegistrationOptions) => Promise<AuthTransaction>;
+  cancel: (options?: CancelOptions) => Promise<IdxResponse>;
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
 }
 
 // Values used to resolve remediations
-export interface RemediationValues {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface RemediationValues {}
+
+export interface AuthenticationRemediationValues extends RemediationValues {
   credentials?: {
     passcode?: string;
   };
 
-  // Needed for V1 compatability
   username?: string;
+  password?: string;
+}
+
+export interface RegistrationRemediationValues extends RemediationValues {
+  authenticators: string[];
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  emailVerificationCode?: string;
   password?: string;
 }
 
@@ -25,9 +38,11 @@ export interface Remediator {
   getData: () => unknown;
 }
 
-export interface SupportsCodeFlow {
-  useInteractionCodeFlow?: boolean;
+export enum RemediatorFlow {
+  Authenticate,
+  Registration
 }
+
 
 export interface AcceptsInteractionHandle {
   interactionHandle?: string;
@@ -36,6 +51,8 @@ export interface AcceptsInteractionHandle {
 export interface IntrospectOptions extends AcceptsInteractionHandle {
   stateHandle?: string;
 }
+
+export type CancelOptions = IntrospectOptions;
 
 export interface InteractOptions extends AcceptsInteractionHandle {
   state?: string;
@@ -50,12 +67,25 @@ export interface InteractResponse {
   meta?: IdxTransactionMeta;
 }
 
-
-export interface AuthorizeOptions extends
+export interface IdxOptions extends
   RemediationValues,
   InteractOptions,
-  SupportsCodeFlow,
   AcceptsInteractionHandle {
+}
+
+export interface RunOptions {
+  flow: RemediatorFlow;
+  needInteraction: boolean;
+}
+
+export interface AuthenticationOptions extends 
+  IdxOptions,
+  AuthenticationRemediationValues {
+}
+
+export interface RegistrationOptions extends 
+  IdxOptions, 
+  RegistrationRemediationValues {
 }
 
 // TODO: remove when idx-js provides type information
@@ -67,6 +97,12 @@ export interface IdxRemeditionValue {
 export interface IdxRemediation {
   name: string;
   value: IdxRemeditionValue[];
+  relatesTo: {
+    type: string;
+    value: {
+      type: string;
+    };
+  };
 }
 
 export interface IdxMessage {
@@ -82,6 +118,7 @@ export interface IdxMessages {
 // JSON response from the server
 export interface RawIdxResponse {
   version: string;
+  stateHandle: string;
   remediation?: IdxRemediation[];
   messages?: IdxMessages;
 }

@@ -40,7 +40,8 @@ import {
   SigninAPI,
   PkceAPI,
   SigninOptions,
-  IdxApi
+  IdxApi,
+  SignoutRedirectUrlOptions
 } from './types';
 import {
   transactionStatus,
@@ -94,7 +95,12 @@ import { AuthStateManager } from './AuthStateManager';
 import StorageManager from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
-import { authenticate, interact } from './idx';
+import { 
+  authenticate,
+  cancel,
+  register,
+  interact,
+} from './idx';
 
 const Emitter = require('tiny-emitter');
 
@@ -233,7 +239,9 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     // IDX
     this.idx = {
       authenticate: authenticate.bind(null, this),
-      interact: interact.bind(null, this)
+      register: register.bind(null, this),
+      cancel: cancel.bind(null, this),
+      interact: interact.bind(null, this),
     };
 
     // Fingerprint API
@@ -246,6 +254,15 @@ class OktaAuth implements SigninAPI, SignoutAPI {
 
     // AuthStateManager
     this.authStateManager = new AuthStateManager(this);
+  }
+
+  start() {
+    this.tokenManager.start();
+    this.authStateManager.updateAuthState();
+  }
+
+  stop() {
+    this.tokenManager.stop();
   }
 
   // ES6 module users can use named exports to access all symbols
@@ -331,7 +348,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   async revokeAccessToken(accessToken?: AccessToken): Promise<object> {
     if (!accessToken) {
       accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
-      const accessTokenKey = this.tokenManager._getStorageKeyByType('accessToken');
+      const accessTokenKey = this.tokenManager.getStorageKeyByType('accessToken');
       this.tokenManager.remove(accessTokenKey);
     }
     // Access token may have been removed. In this case, we will silently succeed.
@@ -345,7 +362,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   async revokeRefreshToken(refreshToken?: RefreshToken): Promise<object> {
     if (!refreshToken) {
       refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
-      const refreshTokenKey = this.tokenManager._getStorageKeyByType('refreshToken');
+      const refreshTokenKey = this.tokenManager.getStorageKeyByType('refreshToken');
       this.tokenManager.remove(refreshTokenKey);
     }
     // Refresh token may have been removed. In this case, we will silently succeed.
@@ -353,6 +370,36 @@ class OktaAuth implements SigninAPI, SignoutAPI {
       return Promise.resolve(null);
     }
     return this.token.revoke(refreshToken);
+  }
+
+  getSignOutRedirectUrl(options: SignoutRedirectUrlOptions) {
+    let {
+      idToken,
+      postLogoutRedirectUri,
+      state,
+    } = options;
+    if (!idToken) {
+      idToken = this.tokenManager.getTokensSync().idToken as IDToken;
+    }
+    if (!idToken) {
+      return '';
+    }
+    if (!postLogoutRedirectUri) {
+      postLogoutRedirectUri = this.options.postLogoutRedirectUri;
+    }
+
+    const logoutUrl = getOAuthUrls(this).logoutUrl;
+    const idTokenHint = idToken.idToken; // a string
+    let logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint);
+    if (postLogoutRedirectUri) {
+      logoutUri += '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
+    } 
+    // State allows option parameters to be passed to logout redirect uri
+    if (state) {
+      logoutUri += '&state=' + encodeURIComponent(state);
+    }
+
+    return logoutUri;
   }
 
   // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
@@ -370,21 +417,13 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     var refreshToken = options.refreshToken;
     var revokeAccessToken = options.revokeAccessToken !== false;
     var revokeRefreshToken = options.revokeRefreshToken !== false;
-    var idToken = options.idToken;
   
-    var logoutUrl = getOAuthUrls(this).logoutUrl;
-  
-    if (typeof idToken === 'undefined') {
-      idToken = (await this.tokenManager.getTokens()).idToken as IDToken;
-    }
-  
- 
     if (revokeRefreshToken && typeof refreshToken === 'undefined') {
-      refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
+      refreshToken = this.tokenManager.getTokensSync().refreshToken as RefreshToken;
     }
 
     if (revokeAccessToken && typeof accessToken === 'undefined') {
-      accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
+      accessToken = this.tokenManager.getTokensSync().accessToken as AccessToken;
     }
   
     // Clear all local tokens
@@ -398,9 +437,10 @@ class OktaAuth implements SigninAPI, SignoutAPI {
       await this.revokeAccessToken(accessToken);
     }
 
-    // No idToken? This can happen if the storage was cleared.
+    const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });
+    // No logoutUri? This can happen if the storage was cleared.
     // Fallback to XHR signOut, then simulate a redirect to the post logout uri
-    if (!idToken) {
+    if (!logoutUri) {
       return this.closeSession() // can throw if the user cannot be signed out
       .then(function() {
         if (postLogoutRedirectUri === currentUri) {
@@ -409,20 +449,10 @@ class OktaAuth implements SigninAPI, SignoutAPI {
           window.location.assign(postLogoutRedirectUri);
         }
       });
+    } else {
+      // Flow ends with logout redirect
+      window.location.assign(logoutUri);
     }
-  
-    // logout redirect using the idToken.
-    var state = options.state;
-    var idTokenHint = idToken.idToken; // a string
-    var logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint) +
-      '&post_logout_redirect_uri=' + encodeURIComponent(postLogoutRedirectUri);
-  
-    // State allows option parameters to be passed to logout redirect uri
-    if (state) {
-      logoutUri += '&state=' + encodeURIComponent(state);
-    }
-    
-    window.location.assign(logoutUri);
   }
 
   webfinger(opts): Promise<object> {

@@ -17,7 +17,7 @@ import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
 import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
-import { AuthorizeOptions } from '../idx/types';
+import { AuthenticationOptions } from '../idx/types';
 
 export interface OktaAuth {
   options: OktaAuthOptions;
@@ -149,7 +149,7 @@ export interface TokenAPI extends BaseTokenAPI {
   revoke(token: RevocableToken): Promise<object>;
   renew(token: Token): Promise<Token>;
   renewTokens(): Promise<Tokens>;
-  renewTokensWithRefresh(refreshTokenObject: RefreshToken): Promise<Tokens>;
+  renewTokensWithRefresh(tokenParams: TokenParams, refreshTokenObject: RefreshToken): Promise<Tokens>;
   verify(token: IDToken, params?: object): Promise<IDToken>;
   isLoginRedirect(): boolean;
 }
@@ -178,11 +178,17 @@ export interface FeaturesAPI {
   isIE11OrLess(): boolean;
 }
 
-export interface SigninOptions extends AuthorizeOptions {
-  // Only used in Authn V1
-  relayState?: string;
-  context?: string;
-  sendFingerprint?: boolean;
+export interface SupportsCodeFlow {
+  useInteractionCodeFlow?: boolean;
+}
+
+export interface SigninOptions extends 
+  SupportsCodeFlow,
+  AuthenticationOptions {
+    // Only used in Authn V1
+    relayState?: string;
+    context?: string;
+    sendFingerprint?: boolean;
 }
 
 export interface SigninWithRedirectOptions extends SigninOptions {
@@ -200,13 +206,16 @@ export interface SigninAPI {
   signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction>;
 }
 
-export interface SignoutOptions {
+export interface SignoutRedirectUrlOptions {
   postLogoutRedirectUri?: string;
+  idToken?: IDToken;
+  state?: string;
+}
+
+export interface SignoutOptions extends SignoutRedirectUrlOptions {
   accessToken?: AccessToken;
   revokeAccessToken?: boolean;
   revokeRefreshToken?: boolean;
-  idToken?: IDToken;
-  state?: string;
   refreshToken?: RefreshToken;
 }
 

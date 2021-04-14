@@ -16,8 +16,10 @@
     "gulp-compile-handlebars": "^0.6.1",
     "gulp-handlebars": "^5.0.2",
     "handlebars": "^4.7.6",
+    "merge-stream": "^2.0.0",
     "shelljs": "0.8.3",
     "through2": "^4.0.2",
     "yargs": "^16.0.3"
-  }
+  },
+  "dependencies": {}
 }

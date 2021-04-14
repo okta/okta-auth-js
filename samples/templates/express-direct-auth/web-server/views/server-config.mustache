@@ -1,0 +1,34 @@
+<div class="column seven wide sample-col right floated">
+  <h3>Server Configuration</h3>
+  <p>This server has been configured with the following settings:</p>
+  <table class="ui table compact collapsing">
+    <thead>
+      <tr>
+        <th>Setting</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Issuer</td>
+        <td>{{oidcConfig.issuer}}</td>
+      </tr>
+      <tr>
+        <td>Client ID</td>
+        <td>{{oidcConfig.clientId}}</td>
+      </tr>
+      <tr>
+        <td>Client Secret</td>
+        <td>{{oidcConfig.clientSecret}}</td>
+      </tr>
+      <tr>
+        <td>AppBaseUrl</td>
+        <td>{{oidcConfig.appBaseUrl}}</td>
+      </tr>
+      <tr>
+        <td>Requested Scope</td>
+        <td>{{oidcConfig.scope}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

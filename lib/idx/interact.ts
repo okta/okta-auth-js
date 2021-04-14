@@ -20,7 +20,7 @@ import { IDX_API_VERSION } from '../constants';
 import { getTransactionMeta, saveTransactionMeta } from './transactionMeta';
 
 // Begin or resume a transaction. Returns an interaction handle
-export async function interact (authClient: OktaAuth, options?: InteractOptions): Promise<InteractResponse> {
+export async function interact (authClient: OktaAuth, options: InteractOptions = {}): Promise<InteractResponse> {
 
   let meta = await getTransactionMeta(authClient);
 

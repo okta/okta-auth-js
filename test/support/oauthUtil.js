@@ -185,6 +185,10 @@ oauthUtil.setup = function(opts) {
   // Mock the well-known and keys request
   oauthUtil.loadWellKnownAndKeysCache(authClient);
 
+  if (opts.autoRenew) {
+    authClient.tokenManager.start();
+  }
+
   if (opts.tokenManagerAddKeys) {
     for (var key in opts.tokenManagerAddKeys) {
       if (!Object.prototype.hasOwnProperty.call(opts.tokenManagerAddKeys, key)) {
@@ -211,7 +215,7 @@ oauthUtil.setup = function(opts) {
       promise = authClient.token.getWithPopup(opts.getWithPopupArgs);
     }
   } else if (opts.tokenManagerRenewArgs) {
-    promise = authClient.tokenManager.renew.apply(this, opts.tokenManagerRenewArgs);
+    promise = authClient.tokenManager.renew.apply(authClient.tokenManager, opts.tokenManagerRenewArgs);
   } else if (opts.tokenRenewArgs) {
     promise = authClient.token.renew.apply(this, opts.tokenRenewArgs);
   } else if (opts.tokenRenewTokensArgs) {
@@ -228,7 +232,7 @@ oauthUtil.setup = function(opts) {
           tokenTypesTobeRenewed.splice(index, 1);
         }
         if (!tokenTypesTobeRenewed.length) {
-          authClient.tokenManager._clearExpireEventTimeoutAll();
+          authClient.tokenManager.clearExpireEventTimeoutAll();
           resolve();
         } 
       });
@@ -271,6 +275,9 @@ oauthUtil.setup = function(opts) {
     .finally(function() {
       if (authClient && authClient._tokenQueue) {
         expect(authClient._tokenQueue.queue.length).toBe(0);
+      }
+      if (authClient && authClient.tokenManager) {
+        authClient.tokenManager.stop();
       }
     });
 };
