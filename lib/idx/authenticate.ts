@@ -11,7 +11,7 @@ export async function authenticate(
 ): Promise<AuthTransaction> {
   return run(authClient, { 
     ...options, 
-    flow: RemediatorFlow.Authenticate,
+    flow: RemediatorFlow.Authentication,
     needInteraction: false 
   });
 }

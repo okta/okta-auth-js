@@ -27,22 +27,34 @@ router.post('/signup', async (req, res) => {
   } catch (err) {
     const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
     res.render('registration', {
-      hasError: errors && errors.length,
+      hasError: true,
       errors, 
     });
   }
 });
 
-// Handle get request for each authenticator enroll page
-authenticators.forEach(authenticator => {
-  router.get(`/signup/enroll-${authenticator}-authenticator`, (req, res) => {
-    const { stateHandle } = req.session;
-    if (stateHandle) {
-      res.render(`enroll-${authenticator}-authenticator`);
-    } else {
-      res.redirect('/signup');
-    }
-  });
+router.get(`/signup/enroll-email-authenticator`, (req, res) => {
+  const { stateHandle } = req.session;
+  if (stateHandle) {
+    res.render(`email-authenticator`, {
+      title: 'Enroll email authenticator',
+      action: '/signup/enroll-email-authenticator',
+    });
+  } else {
+    res.redirect('/signup');
+  }
+});
+
+router.get(`/signup/enroll-password-authenticator`, (req, res) => {
+  const { stateHandle } = req.session;
+  if (stateHandle) {
+    res.render('enroll-or-reset-password-authenticator', {
+      title: 'Set up password',
+      action: '/signup/enroll-password-authenticator',
+    });
+  } else {
+    res.redirect('/signup');
+  }
 });
 
 router.post('/signup/enroll-email-authenticator', async (req, res) => {
@@ -59,11 +71,15 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
     // Persist stateHandle to session
     req.session.stateHandle = authTransaction.stateHandle;
     // Proceed to password authenticator page
-    res.redirect('/signup/enroll-password-authenticator');
+    res.redirect('/signup/enroll-or-reset-password-authenticator', {
+      title: 'Set up password',
+      action: '/signup/enroll-password-authenticator',
+    });
   } catch (err) {
     const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
-    res.render(`enroll-${authenticators[0]}-authenticator`, {
-      hasError: errors && errors.length,
+    res.render(`enroll-email-authenticator`, {
+      title: 'Enroll email authenticator',
+      hasError: true,
       errors, 
     });
   }
@@ -72,7 +88,7 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
 router.post('/signup/enroll-password-authenticator', async (req, res) => {
   const { password, confirmPassword } = req.body;
   if (password !== confirmPassword) {
-    return res.render(`enroll-${authenticators[1]}-authenticator`, {
+    return res.render('enroll-or-reset-password-authenticator', {
       hasError: true,
       errors: ['Password not match']
     });
@@ -87,17 +103,15 @@ router.post('/signup/enroll-password-authenticator', async (req, res) => {
       authenticators,
       stateHandle 
     });
-    // Get userInfo with tokens
-    const { tokens: { accessToken, idToken } } = tokens;
-    const userinfo = await authClient.token.getUserInfo(accessToken, idToken);
-    // Persist userContext in session
-    req.session.userContext = JSON.stringify({ userinfo, tokens: { accessToken, idToken } });
+    // Save tokens to storage (req.session)
+    authClient.tokenManager.setTokens(tokens);
     // Redirect back to home page
     res.redirect('/');
   } catch (err) {
     const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
-    res.render(`enroll-${authenticators[1]}-authenticator`, {
-      hasError: errors && errors.length,
+    res.render(`enroll-or-reset-password-authenticator`, {
+      title: 'Set up password',
+      hasError: true,
       errors, 
     });
   }

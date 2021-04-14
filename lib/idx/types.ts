@@ -6,6 +6,7 @@ export interface IdxApi {
   register: (options: RegistrationOptions) => Promise<AuthTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxResponse>;
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
+  recoverPassword: (options: PasswordRecoveryOptions) => Promise<AuthTransaction>;
 }
 
 // Values used to resolve remediations
@@ -30,6 +31,13 @@ export interface RegistrationRemediationValues extends RemediationValues {
   password?: string;
 }
 
+export interface PasswordRecoveryRemediationValues extends RemediationValues {
+  authenticators: string[];
+  identifier?: string;
+  emailVerificationCode?: string;
+  password?: string;
+}
+
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[] | string | boolean>;
 
@@ -39,8 +47,9 @@ export interface Remediator {
 }
 
 export enum RemediatorFlow {
-  Authenticate,
-  Registration
+  Authentication,
+  Registration,
+  PasswordRecovery
 }
 
 
@@ -76,6 +85,7 @@ export interface IdxOptions extends
 export interface RunOptions {
   flow: RemediatorFlow;
   needInteraction: boolean;
+  actionPath?: string;
 }
 
 export interface AuthenticationOptions extends 
@@ -86,6 +96,11 @@ export interface AuthenticationOptions extends
 export interface RegistrationOptions extends 
   IdxOptions, 
   RegistrationRemediationValues {
+}
+
+export interface PasswordRecoveryOptions extends
+  IdxOptions, 
+  PasswordRecoveryRemediationValues {
 }
 
 // TODO: remove when idx-js provides type information
@@ -133,4 +148,5 @@ export interface IdxResponse {
   neededToProceed: IdxRemediation[];
   rawIdxState: RawIdxResponse;
   interactionCode?: string;
+  actions: Function[];
 }

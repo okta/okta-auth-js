@@ -11,23 +11,30 @@ import {
   isErrorResponse, 
   getIdxRemediation 
 } from './util';
-import Identify from './remediators/Identify';
-import ChallengeAuthenticator from './remediators/ChallengeAuthenticator';
-import SelectEnrollProfile from './remediators/SelectEnrollProfile';
-import EnrollProfile from './remediators/EnrollProfile';
-import SelectAuthenticatorEnroll from './remediators/SelectAuthenticatorEnroll';
-import EnrollAuthenticator from './remediators/EnrollAuthenticator';
+import {
+  Identify,
+  EnrollOrChallengeAuthenticator,
+  SelectEnrollProfile,
+  EnrollProfile,
+  SelectAuthenticator,
+} from './remediators';
 
 const REMEDIATORS = {
-  [RemediatorFlow.Authenticate]: {
+  [RemediatorFlow.Authentication]: {
     'identify': Identify,
-    'challenge-authenticator': ChallengeAuthenticator,
+    'challenge-authenticator': EnrollOrChallengeAuthenticator,
   },
   [RemediatorFlow.Registration]: {
     'select-enroll-profile': SelectEnrollProfile,
     'enroll-profile': EnrollProfile,
-    'select-authenticator-enroll': SelectAuthenticatorEnroll,
-    'enroll-authenticator': EnrollAuthenticator,
+    'select-authenticator-enroll': SelectAuthenticator,
+    'enroll-authenticator': EnrollOrChallengeAuthenticator,
+  },
+  [RemediatorFlow.PasswordRecovery]: {
+    'identify-recovery': Identify,
+    'select-authenticator-authenticate': SelectAuthenticator,
+    'challenge-authenticator': EnrollOrChallengeAuthenticator,
+    'reset-authenticator': EnrollOrChallengeAuthenticator,
   },
   // add more
 };

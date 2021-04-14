@@ -7,8 +7,12 @@
     <div id="registration" class="ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
-          <h2>Set up password</h2>
+          <h2>{{title}}</h2>
         </div>
+      </div>
+
+      <div class="row">
+        <p>Please check your email and enter the code below</p>
       </div>
 
       <div class="row">
@@ -16,31 +20,23 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="/signup/enroll-password-authenticator" method="POST">
+        <form class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
-                Enter password
+                Enter Code
               </div>
-              <input type="password" name="password" />
-            </div>
-          </div>
-          <div class="field">
-            <div class="ui labeled input">
-              <div class="ui label">
-                Re-enter password
-              </div>
-              <input type="password" name="confirmPassword" />
+              <input type="text" name="emailVerificationCode" />
             </div>
           </div>
           <button class="ui fluid large primary submit button" type="submit">
-            Next
+            Verify
           </button>
         </form>
       </div>
 
       {{>cancel}}
-      
+
     </div>
   </body>
 </html>

@@ -1,7 +1,7 @@
 import Base from './Base';
 import { RegistrationRemediationValues } from '../types';
 
-export default class EnrollAuthenticator extends Base {
+export default class EnrollOrChallengeAuthenticator extends Base {
   values: RegistrationRemediationValues;
 
   map = {

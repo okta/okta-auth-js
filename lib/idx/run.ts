@@ -11,10 +11,16 @@ import {
 
 // TODO: throw unsupported flow error
 export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
-  const { needInteraction, flow } = options;
+  const { needInteraction, flow, actionPath } = options;
 
   // Start/resume the flow
   let { idxResponse, stateHandle } = await interact(authClient, options);
+
+  // Call action if provided
+  if (actionPath && typeof idxResponse.actions[actionPath] === 'function') {
+    idxResponse = await idxResponse.actions[actionPath]();
+  }
+
   const values: RemediationValues = { ...options, stateHandle };
 
   // Can we handle the remediations?
