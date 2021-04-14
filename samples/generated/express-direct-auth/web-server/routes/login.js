@@ -13,6 +13,7 @@ const renderLoginWithWidget = (req, res) => {
   authClient.idx.interact()
     .then(idxRes => {
       const { 
+        state,
         interactionHandle, 
         meta: { codeChallenge, codeChallengeMethod } 
       } = idxRes;
@@ -25,11 +26,13 @@ const renderLoginWithWidget = (req, res) => {
           scopes: sampleConfig.oidc.scope.split(' '),
         },
         useInteractionCodeFlow: true,
+        state,
         interactionHandle,
         codeChallenge,
         codeChallengeMethod,
       });
       res.render('login-with-widget', {
+        siwVersion: '5.5.2',
         widgetConfig,
       });
     })
