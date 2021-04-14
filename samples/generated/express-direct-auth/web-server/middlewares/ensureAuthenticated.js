@@ -1,5 +1,12 @@
+const { getAuthClient } = require('../utils');
+
 module.exports = function ensureAuthenticated(req, res, next) {
-  if (req.userContext && req.userContext.userinfo) {
+  const authClient = getAuthClient(req);
+  const { idToken, accessToken } = authClient.tokenManager.getTokensSync();
+  if (idToken 
+      && !authClient.tokenManager.hasExpired(idToken) 
+      && accessToken
+      && !authClient.tokenManager.hasExpired(accessToken)) {
     next();
   } else {
     res.redirect('/login');

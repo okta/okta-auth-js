@@ -35,13 +35,14 @@
           {{/isLoggedIn}}
 
           {{^isLoggedIn}}
-            <form method="get" action="/login">
-              <button id="signin-button" class="ui primary button" type="submit">Sign In</button>
-            </form>
-            <p>Don't have an account?</p>
-            <form method="get" action="/signup">
-              <button id="signup-button" class="ui secondary button" type="submit">Sign Up</button>
-            </form>
+            <h3>Available flows in the sample:</h3>
+            <div>
+            <ul>
+              <li><a href="/login">Password factor</a></li>
+              <li><a href="/signup">Self service registration</a></li>
+              <li><a href="/login?widget=1">Self hosted widget</a></li>
+            </ul>
+            </div>
           {{/isLoggedIn}}
         </div>
       </div>
