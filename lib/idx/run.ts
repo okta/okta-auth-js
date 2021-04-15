@@ -24,13 +24,16 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
   const values: RemediationValues = { ...options, stateHandle };
 
   // Can we handle the remediations?
-  idxResponse = await remediate(idxResponse, flow, values);
+  const { 
+    idxResponse: idxRespFromRemediation, 
+    nextStep 
+  } = await remediate(idxResponse, flow, values);
 
   // Did we get an interaction code?
+  const { interactionCode } = idxRespFromRemediation;
   let status = needInteraction ? 'PENDING' : 'FAILED';
   let tokens;
-  if (idxResponse.interactionCode) {
-    const { interactionCode } = idxResponse;
+  if (interactionCode) {
     const meta = authClient.transactionManager.load() as IdxTransactionMeta;
     const {
       codeVerifier,
@@ -55,10 +58,12 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
     authClient.transactionManager.clear();
   }
 
+  // TODO: return error
   const authTransaction = new AuthTransaction(authClient, {
-    stateHandle: idxResponse.rawIdxState.stateHandle,
-    tokens,
-    status
+    stateHandle: idxRespFromRemediation.rawIdxState.stateHandle,
+    tokens: tokens ? tokens.tokens : null,
+    status,
+    nextStep: nextStep,
   });
   return authTransaction;
 }

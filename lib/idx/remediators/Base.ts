@@ -84,6 +84,10 @@ export default class Base {
     });
   }
 
+  getNextStep() {
+    return { name: this.remediation.name };
+  }
+
   // Override this method to extract error message from remediation form fields
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   getErrorMessages(errorRemediation: IdxResponse) {

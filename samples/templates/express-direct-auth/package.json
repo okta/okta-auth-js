@@ -10,7 +10,7 @@
     "start": "concurrently --kill-others \"yarn start:web-server\" \"yarn start:resource-server\"",
     "dev": "concurrently --kill-others \"yarn dev:web-server\" \"yarn dev:resource-server\"",
     "start:web-server": "node ./web-server/server.js",
-    "dev:web-server": "nodemon ./web-server/server.js",
+    "dev:web-server": "nodemon ./web-server/server.js --watch ../../../build/cjs",
     "start:resource-server": "node ./resource-server/server.js",
     "dev:resource-server": "nodemon ./resource-server/server.js"
   },

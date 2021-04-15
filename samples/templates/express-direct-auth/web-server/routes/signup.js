@@ -5,6 +5,37 @@ const router = express.Router();
 
 const authenticators = ['email', 'password']; // ordered authenticators
 
+const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
+  const { 
+    stateHandle, 
+    tokens, 
+    data: { nextStep } 
+  } = authTransaction;
+
+  const next = () => {
+    if (nextStep.name === 'enroll-authenticator') {
+      res.redirect(`/signup/enroll-${nextStep.type}-authenticator`);
+    } else {
+      throw { errorCauses: ['Unhandlable next step.'] };
+    }
+  };
+  const done = () => {
+    // Save tokens to storage (req.session)
+    authClient.tokenManager.setTokens(tokens);
+    // Redirect back to home page
+    res.redirect('/');
+  };
+
+  // Done if tokens are available
+  if (tokens) {
+    return done();
+  }
+  // Persist stateHandle to session
+  req.session.stateHandle = stateHandle;
+  // Proceed to next step
+  next(nextStep, res);
+};
+
 router.get('/signup', (_, res) => {
   res.render('registration');
 });
@@ -13,17 +44,13 @@ router.post('/signup', async (req, res) => {
   try {
     const { firstName, lastName, email } = req.body;
     const authClient = getAuthClient(req);
-    // Start registration
-    const { stateHandle } = await authClient.idx.register({ 
+    const authTransaction = await authClient.idx.register({ 
       firstName, 
       lastName, 
       email,
       authenticators,
     });
-    // Persist stateHandle to session
-    req.session.stateHandle = stateHandle;
-    // Proceed to email authenticator page
-    res.redirect('/signup/enroll-email-authenticator');
+    handleAuthTransaction(req, res, { authClient, authTransaction });
   } catch (err) {
     const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
     res.render('registration', {
@@ -45,6 +72,27 @@ router.get(`/signup/enroll-email-authenticator`, (req, res) => {
   }
 });
 
+router.post('/signup/enroll-email-authenticator', async (req, res) => {
+  try {
+    const { emailVerificationCode } = req.body;
+    const { stateHandle } = req.session;
+    const authClient = getAuthClient(req);
+    const authTransaction = await authClient.idx.register({ 
+      emailVerificationCode, 
+      authenticators,
+      stateHandle 
+    });
+    handleAuthTransaction(req, res, { authTransaction, authTransaction });
+  } catch (err) {
+    const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
+    res.render('email-authenticator', {
+      title: 'Enroll email authenticator',
+      hasError: true,
+      errors, 
+    });
+  }
+});
+
 router.get(`/signup/enroll-password-authenticator`, (req, res) => {
   const { stateHandle } = req.session;
   if (stateHandle) {
@@ -54,34 +102,6 @@ router.get(`/signup/enroll-password-authenticator`, (req, res) => {
     });
   } else {
     res.redirect('/signup');
-  }
-});
-
-router.post('/signup/enroll-email-authenticator', async (req, res) => {
-  try {
-    const { emailVerificationCode } = req.body;
-    const { stateHandle } = req.session;
-    const authClient = getAuthClient(req);
-    // Continue registration
-    const authTransaction = await authClient.idx.register({ 
-      emailVerificationCode, 
-      authenticators,
-      stateHandle 
-    });
-    // Persist stateHandle to session
-    req.session.stateHandle = authTransaction.stateHandle;
-    // Proceed to password authenticator page
-    res.redirect('/signup/enroll-or-reset-password-authenticator', {
-      title: 'Set up password',
-      action: '/signup/enroll-password-authenticator',
-    });
-  } catch (err) {
-    const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
-    res.render(`enroll-email-authenticator`, {
-      title: 'Enroll email authenticator',
-      hasError: true,
-      errors, 
-    });
   }
 });
 
@@ -97,16 +117,12 @@ router.post('/signup/enroll-password-authenticator', async (req, res) => {
   try {
     const { stateHandle } = req.session;
     const authClient = getAuthClient(req);
-    // Continue registration
-    const { tokens } = await authClient.idx.register({ 
+    const authTransaction = await authClient.idx.register({ 
       password, 
       authenticators,
       stateHandle 
     });
-    // Save tokens to storage (req.session)
-    authClient.tokenManager.setTokens(tokens);
-    // Redirect back to home page
-    res.redirect('/');
+    handleAuthTransaction(req, res, { authTransaction, authTransaction });
   } catch (err) {
     const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
     res.render(`enroll-or-reset-password-authenticator`, {

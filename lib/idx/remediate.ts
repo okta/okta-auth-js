@@ -46,6 +46,7 @@ export async function remediate(
   values: RemediationValues
 ) {
   const { neededToProceed } = idxResponse;
+  // TODO: idxRemediation may be unfound due to policy setting, handle error here
   const idxRemediation = getIdxRemediation(REMEDIATORS[flow], neededToProceed);
   const name = idxRemediation.name;
   const T = REMEDIATORS[flow][name];
@@ -57,7 +58,10 @@ export async function remediate(
 
   // Recursive loop breaker
   if (!remediator.canRemediate()) {
-    return idxResponse;
+    return { 
+      idxResponse,
+      nextStep: remediator.getNextStep(),
+    };
   }
 
   const data = remediator.getData();
@@ -67,7 +71,7 @@ export async function remediate(
       throw createApiError(idxResponse.rawIdxState);
     }
     if (idxResponse.interactionCode) {
-      return idxResponse;
+      return { idxResponse };
     }
     return remediate(idxResponse, flow, values); // recursive call
   } catch (e) {

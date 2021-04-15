@@ -24,6 +24,13 @@ export default class EnrollOrChallengeAuthenticator extends Base {
     };
   }
 
+  getNextStep() {
+    return {
+      name: this.remediation.name,
+      type: this.remediation.relatesTo.value.type,
+    };
+  }
+
   getErrorMessages(errorRemediation) {
     return errorRemediation.value[0].form.value.reduce((errors, field) => {
       if (field.messages) {
