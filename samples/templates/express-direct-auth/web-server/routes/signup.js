@@ -7,7 +7,7 @@ const authenticators = ['email', 'password']; // ordered authenticators
 
 const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
   const { 
-    stateHandle, 
+    interactionHandle, 
     tokens, 
     data: { nextStep } 
   } = authTransaction;
@@ -16,7 +16,7 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
     if (nextStep.name === 'enroll-authenticator') {
       res.redirect(`/signup/enroll-${nextStep.type}-authenticator`);
     } else {
-      throw { errorCauses: ['Unhandlable next step.'] };
+      throw { errorCauses: ['Unable to handle next step.'] };
     }
   };
   const done = () => {
@@ -30,8 +30,8 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
   if (tokens) {
     return done();
   }
-  // Persist stateHandle to session
-  req.session.stateHandle = stateHandle;
+  // Persist interactionHandle to session
+  req.session.interactionHandle = interactionHandle;
   // Proceed to next step
   next(nextStep, res);
 };
@@ -61,8 +61,8 @@ router.post('/signup', async (req, res) => {
 });
 
 router.get(`/signup/enroll-email-authenticator`, (req, res) => {
-  const { stateHandle } = req.session;
-  if (stateHandle) {
+  const { interactionHandle } = req.session;
+  if (interactionHandle) {
     res.render(`email-authenticator`, {
       title: 'Enroll email authenticator',
       action: '/signup/enroll-email-authenticator',
@@ -75,14 +75,14 @@ router.get(`/signup/enroll-email-authenticator`, (req, res) => {
 router.post('/signup/enroll-email-authenticator', async (req, res) => {
   try {
     const { emailVerificationCode } = req.body;
-    const { stateHandle } = req.session;
+    const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
       emailVerificationCode, 
       authenticators,
-      stateHandle 
+      interactionHandle 
     });
-    handleAuthTransaction(req, res, { authTransaction, authTransaction });
+    handleAuthTransaction(req, res, { authClient, authTransaction });
   } catch (err) {
     const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
     res.render('email-authenticator', {
@@ -94,8 +94,8 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
 });
 
 router.get(`/signup/enroll-password-authenticator`, (req, res) => {
-  const { stateHandle } = req.session;
-  if (stateHandle) {
+  const { interactionHandle } = req.session;
+  if (interactionHandle) {
     res.render('enroll-or-reset-password-authenticator', {
       title: 'Set up password',
       action: '/signup/enroll-password-authenticator',
@@ -115,12 +115,12 @@ router.post('/signup/enroll-password-authenticator', async (req, res) => {
   }
 
   try {
-    const { stateHandle } = req.session;
+    const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
       password, 
       authenticators,
-      stateHandle 
+      interactionHandle 
     });
     handleAuthTransaction(req, res, { authTransaction, authTransaction });
   } catch (err) {

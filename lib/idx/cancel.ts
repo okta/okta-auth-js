@@ -11,11 +11,11 @@
  */
 
 import { OktaAuth, CancelOptions } from '../types';
-import { introspect } from './introspect';
+import { interact } from './interact';
 
 export async function cancel (authClient: OktaAuth, options: CancelOptions) {
-  return introspect(authClient, options)
-    .then(idxResponse => {
+  return interact(authClient, options)
+    .then(({ idxResponse }) => {
       return idxResponse.actions.cancel();
     })
     .finally(() => {
