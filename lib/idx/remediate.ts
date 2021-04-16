@@ -3,53 +3,26 @@
 import { 
   IdxResponse, 
   isRawIdxResponse, 
+  RemediationFlow, 
   RemediationValues,
-  RemediatorFlow
 } from '../types';
 import { 
   createApiError, 
   isErrorResponse, 
   getIdxRemediation 
 } from './util';
-import {
-  Identify,
-  EnrollOrChallengeAuthenticator,
-  SelectEnrollProfile,
-  EnrollProfile,
-  SelectAuthenticator,
-} from './remediators';
-
-const REMEDIATORS = {
-  [RemediatorFlow.Authentication]: {
-    'identify': Identify,
-    'challenge-authenticator': EnrollOrChallengeAuthenticator,
-  },
-  [RemediatorFlow.Registration]: {
-    'select-enroll-profile': SelectEnrollProfile,
-    'enroll-profile': EnrollProfile,
-    'select-authenticator-enroll': SelectAuthenticator,
-    'enroll-authenticator': EnrollOrChallengeAuthenticator,
-  },
-  [RemediatorFlow.PasswordRecovery]: {
-    'identify-recovery': Identify,
-    'select-authenticator-authenticate': SelectAuthenticator,
-    'challenge-authenticator': EnrollOrChallengeAuthenticator,
-    'reset-authenticator': EnrollOrChallengeAuthenticator,
-  },
-  // add more
-};
 
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
   idxResponse: IdxResponse,
-  flow: RemediatorFlow,
+  flow: RemediationFlow,
   values: RemediationValues
 ) {
   const { neededToProceed } = idxResponse;
   // TODO: idxRemediation may be unfound due to policy setting, handle error here
-  const idxRemediation = getIdxRemediation(REMEDIATORS[flow], neededToProceed);
+  const idxRemediation = getIdxRemediation(flow, neededToProceed);
   const name = idxRemediation.name;
-  const T = REMEDIATORS[flow][name];
+  const T = flow[name];
   if (!T) {
     // No remediator is registered. bail!
     return idxResponse;

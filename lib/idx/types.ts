@@ -1,5 +1,6 @@
 import { AuthTransaction } from '../tx';
 import { IdxTransactionMeta } from '../types/Transaction';
+import { Base as Remeditor } from './remediators';
 
 export interface IdxApi {
   authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
@@ -46,12 +47,7 @@ export interface Remediator {
   getData: () => unknown;
 }
 
-export enum RemediatorFlow {
-  Authentication,
-  Registration,
-  PasswordRecovery
-}
-
+export type RemediationFlow = Record<string, typeof Remeditor>;
 
 export interface AcceptsInteractionHandle {
   interactionHandle?: string;
@@ -83,7 +79,7 @@ export interface IdxOptions extends
 }
 
 export interface RunOptions {
-  flow: RemediatorFlow;
+  flow: RemediationFlow;
   needInteraction: boolean;
   actionPath?: string;
 }

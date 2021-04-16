@@ -2,16 +2,22 @@ import { AuthTransaction } from '../tx';
 import { 
   OktaAuth, 
   AuthenticationOptions,
-  RemediatorFlow
+  RemediationFlow
 } from '../types';
 import { run } from './run';
+import { Identify, EnrollOrChallengeAuthenticator } from './remediators';
+
+const flow: RemediationFlow = {
+  'identify': Identify,
+  'challenge-authenticator': EnrollOrChallengeAuthenticator,
+};
 
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions
 ): Promise<AuthTransaction> {
   return run(authClient, { 
     ...options, 
-    flow: RemediatorFlow.Authentication,
+    flow,
     needInteraction: false 
   });
 }

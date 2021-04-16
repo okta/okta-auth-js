@@ -1,3 +1,4 @@
+export { default as Base } from './Base';
 export { default as EnrollOrChallengeAuthenticator } from './EnrollOrChallengeAuthenticator';
 export { default as EnrollProfile } from './EnrollProfile';
 export { default as Identify } from './Identify';

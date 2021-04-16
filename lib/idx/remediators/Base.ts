@@ -27,7 +27,7 @@ export default class Base {
   }
 
   // returns an object for the entire remediation form, or just a part
-  getData(key: string) {
+  getData(key?: string) {
     if (!this.map) {
       return {};
     }
