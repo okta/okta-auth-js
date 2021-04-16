@@ -10,6 +10,7 @@ import {
 } from '../types';
 
 // TODO: throw unsupported flow error
+// TODO: clear transaction meta when unhandlable error is thrown
 export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
   const { needInteraction, flow, actionPath } = options;
 
@@ -57,9 +58,6 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
       ignoreSignature
     }, urls);
     status = 'SUCCESS';
-
-    // Clear transaction meta after getting the tokens
-    authClient.transactionManager.clear();
   }
 
   // TODO: return error
