@@ -1,10 +1,10 @@
 const sampleName = process.env.SAMPLE_NAME;
 const issuer = process.env.ISSUER;
-const clientId = process.env.CLIENT_ID;
+const clientId = process.env.SPA_CLIENT_ID || process.env.CLIENT_ID;
 const username = process.env.USERNAME;
 const password = process.env.PASSWORD;
-const webClientId = process.env.WEB_CLIENT_ID;
-const clientSecret = process.env.WEB_CLIENT_SECRET;
+const webClientId = process.env.WEB_CLIENT_ID || process.env.CLIENT_ID;
+const clientSecret = process.env.WEB_CLIENT_SECRET || process.env.CLIENT_SECRET;
 
 const samplesConfig = require('../../config');
 const sampleConfig = samplesConfig.getSampleConfig(sampleName);

@@ -50,6 +50,7 @@ function authenticationRequired(req, res, next) {
 }
 
 const app = express();
+module.exports = app;
 
 /**
  * For local testing only!  Enables CORS for all domains

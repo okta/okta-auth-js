@@ -42,6 +42,26 @@
       "autoAttachChildProcesses": true,
       "program": "${workspaceRoot}/node_modules/@wdio/cli/bin/wdio.js",
       "console": "integratedTerminal"
-  }
+    },
+
+    {
+      "name": "sample: express direct auth (web server)",
+      "type": "node",
+      "request": "launch",
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}/samples/generated/express-direct-auth",
+      "program": "web-server/server.js"
+    },
+
+    {
+      "name": "sample: express direct auth (resource server)",
+      "type": "node",
+      "request": "launch",
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}/samples/generated/express-direct-auth",
+      "program": "resource-server/server.js"
+    }
   ]
 }

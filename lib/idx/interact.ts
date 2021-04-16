@@ -49,7 +49,8 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
     state = meta.state;
     scopes = meta.scopes;
   }
-
+  meta = Object.assign(meta, { state, scopes }); // save back to meta
+  
   return idx.start({
     // if interactionHandle is undefined here, idx will bootstrap a new interactionHandle
     interactionHandle,

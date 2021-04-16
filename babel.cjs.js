@@ -1,5 +1,6 @@
 const sdkVersion = require('./package.json').version;
 module.exports = {
+  sourceMaps: true,
   'presets': [
     '@babel/typescript',
     [

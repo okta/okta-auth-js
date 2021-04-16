@@ -7,12 +7,8 @@ export async function startAuthTransaction(
   options: InteractOptions
 ): Promise<AuthTransaction> {
   const {
-    interactionHandle,
     meta,
   } = await interact(authClient, options);
-  const authTransaction = new AuthTransaction(authClient, {
-    interactionHandle,
-    meta
-  });
+  const authTransaction = new AuthTransaction(authClient, meta);
   return authTransaction;
 }

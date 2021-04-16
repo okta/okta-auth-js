@@ -1,14 +1,37 @@
-const { AuthSdkError, AuthApiError } = require('@okta/okta-auth-js');
+function isIdxError(error) {
+  if (!error || typeof error !== 'object') {
+    return;
+  }
+
+  if (!error.error || typeof error.error !== 'object') {
+    return;
+  }
+
+  error = error.error;
+  return typeof error.error === 'string';
+}
+
+function formatIdxError(error) {
+  error = error.error;
+  const code = error.error;
+  const details = error.error_description || '';
+  return `${code}: ${details}`;
+}
 
 module.exports = function renderError(res, { template, title, error }) {
-  let errors = [];
-  if (error instanceof AuthSdkError) {
-    errors = ['Internal Error'];
-  } else if (error instanceof AuthApiError){
-    errors = [...error.errorCauses];
-  } else {
+  let errors;
+  if (Array.isArray(error.errorCauses)) {
+    errors = error.errorCauses;
+  } else if (typeof error === 'string') {
+    errors = [error];
+  } else if (error && error.message) {
     errors = [error.message];
+  } else if (isIdxError(error)) {
+    errors = [formatIdxError(error)];
+  } else {
+    errors = [];
   }
+
   res.render(template, {
     title,
     hasError: true,
