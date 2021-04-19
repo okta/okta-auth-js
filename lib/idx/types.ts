@@ -8,6 +8,7 @@ export interface IdxApi {
   cancel: (options?: CancelOptions) => Promise<IdxResponse>;
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   recoverPassword: (options: PasswordRecoveryOptions) => Promise<AuthTransaction>;
+  handleInteractionCodeRedirect: (url: string) => Promise<void>; 
 }
 
 // Values used to resolve remediations
@@ -104,6 +105,10 @@ export interface IdxRemeditionValue {
   name: string;
   type?: string;
   required?: boolean;
+  value?: string;
+  form: {
+    value: IdxRemeditionValue[];
+  };
 }
 export interface IdxRemediation {
   name: string;
@@ -144,5 +149,5 @@ export interface IdxResponse {
   neededToProceed: IdxRemediation[];
   rawIdxState: RawIdxResponse;
   interactionCode?: string;
-  actions: Function[];
+  actions: Record<string, Function>;
 }

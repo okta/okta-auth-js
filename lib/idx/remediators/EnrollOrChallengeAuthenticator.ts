@@ -1,15 +1,17 @@
 import Base from './Base';
-import { RegistrationRemediationValues } from '../types';
 
 export default class EnrollOrChallengeAuthenticator extends Base {
-  values: RegistrationRemediationValues;
+  values: any; // TODO: add proper type
 
   map = {
-    'credentials': ['credentials', 'password', 'emailVerificationCode']
+    'credentials': ['credentials', 'password', 'emailVerificationCode', 'verificationCode']
   };
 
   canRemediate() {
     if (this.values.emailVerificationCode && this.remediation.relatesTo.value.type === 'email') {
+      return true;
+    }
+    if (this.values.verificationCode && this.remediation.relatesTo.value.type === 'phone') {
       return true;
     }
     if (this.values.password && this.remediation.relatesTo.value.type === 'password') {
@@ -20,7 +22,9 @@ export default class EnrollOrChallengeAuthenticator extends Base {
 
   mapCredentials() {
     return { 
-      passcode: this.values.emailVerificationCode || this.values.password 
+      passcode: this.values.emailVerificationCode 
+        || this.values.verificationCode 
+        || this.values.password
     };
   }
 

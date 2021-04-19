@@ -101,6 +101,7 @@ import {
   register,
   interact,
   recoverPassword,
+  handleInteractionCodeRedirect,
 } from './idx';
 
 const Emitter = require('tiny-emitter');
@@ -244,6 +245,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
       cancel: cancel.bind(null, this),
       interact: interact.bind(null, this),
       recoverPassword: recoverPassword.bind(null, this),
+      handleInteractionCodeRedirect: handleInteractionCodeRedirect.bind(null, this),
     };
 
     // Fingerprint API

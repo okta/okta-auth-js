@@ -9,12 +9,14 @@ import {
   Identify,
   SelectAuthenticator,
   EnrollOrChallengeAuthenticator,
+  AuthenticatorVerificationData,
 } from './remediators';
 
 const flow: RemediationFlow = {
   'identify-recovery': Identify,
   'select-authenticator-authenticate': SelectAuthenticator,
   'challenge-authenticator': EnrollOrChallengeAuthenticator,
+  'authenticator-verification-data': AuthenticatorVerificationData,
   'reset-authenticator': EnrollOrChallengeAuthenticator,
 };
 

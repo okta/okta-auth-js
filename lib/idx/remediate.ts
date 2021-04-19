@@ -31,10 +31,8 @@ export async function remediate(
 
   // Recursive loop breaker
   if (!remediator.canRemediate()) {
-    return { 
-      idxResponse,
-      nextStep: remediator.getNextStep(),
-    };
+    const nextStep = remediator.getNextStep();
+    return { idxResponse, nextStep };
   }
 
   const data = remediator.getData();

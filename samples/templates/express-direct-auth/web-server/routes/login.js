@@ -85,15 +85,11 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/login/callback', async (req, res) => {
-  const { interaction_code: interactionCode } = req.query;
+  const url = req.protocol + '://' + req.get('host') + req.originalUrl;
   try {
     // Exchange code for tokens
     const authClient = getAuthClient(req);
-    const meta = authClient.transactionManager.load();
-    const { codeVerifier } = meta;
-    const { tokens } = await authClient.token.exchangeCodeForTokens({ interactionCode, codeVerifier });
-    // Save tokens to storage (req.session)
-    authClient.tokenManager.setTokens(tokens);
+    await authClient.idx.handleInteractionCodeRedirect(url);
     // Redirect back to home page
     res.redirect('/');
   } catch (err) {
