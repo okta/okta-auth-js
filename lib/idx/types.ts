@@ -6,7 +6,7 @@ export interface IdxApi {
   authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
   register: (options: RegistrationOptions) => Promise<AuthTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxResponse>;
-  interact: (options?: InteractOptions) => Promise<InteractResponse>;
+  startAuthTransaction: (options?: InteractOptions) => Promise<AuthTransaction>;
   recoverPassword: (options: PasswordRecoveryOptions) => Promise<AuthTransaction>;
   handleInteractionCodeRedirect: (url: string) => Promise<void>; 
 }

@@ -10,13 +10,18 @@ const renderLogin = (req, res) => {
 
 const renderLoginWithWidget = (req, res) => {
   const authClient = getAuthClient(req);
-  authClient.idx.interact()
-    .then(idxRes => {
-      const { 
-        state,
-        interactionHandle, 
-        meta: { codeChallenge, codeChallengeMethod } 
-      } = idxRes;
+  authClient.idx.startAuthTransaction()
+    .then(authTransaction => {
+      const {
+        data: {
+          interactionHandle,
+          meta: {
+            codeChallenge, 
+            codeChallengeMethod, 
+            state,
+          }
+        }
+      } = authTransaction;
       if (!interactionHandle) {
         return res.render('login-with-widget', {
           hasError: true,
