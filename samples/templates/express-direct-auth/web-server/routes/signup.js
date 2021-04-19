@@ -119,7 +119,7 @@ router.post('/signup/enroll-password-authenticator', async (req, res) => {
       authenticators,
       interactionHandle 
     });
-    handleAuthTransaction(req, res, { authTransaction, authTransaction });
+    handleAuthTransaction(req, res, { authClient, authTransaction });
   } catch (error) {
     renderError(res, {
       template: 'enroll-or-reset-password-authenticator',

@@ -19,7 +19,7 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
     } else if (nextStep.name === 'reset-authenticator') {
       res.redirect('/recover-password/reset');
     } else {
-      throw { errorCauses: ['Unable to handle next step.'] };
+      throw new Error('Unable to handle next step');
     }
   };
   const done = () => {

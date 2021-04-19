@@ -12,7 +12,9 @@ export async function handleInteractionCodeRedirect(
   } = authClient.transactionManager.load() as IdxTransactionMeta;
   const { 
     searchParams
-  } = new URL(url);
+  // URL API has been added to the polyfill
+  // eslint-disable-next-line compat/compat
+  } = new URL(url); 
   const state = searchParams.get('state');
   const interactionCode = searchParams.get('interaction_code');
 
