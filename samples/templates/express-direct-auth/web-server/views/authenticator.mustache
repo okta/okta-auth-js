@@ -4,10 +4,10 @@
     {{>head}}
   </head>
   <body id="samples">
-    <div id="registration" class="ui center aligned relaxed grid">
+    <div class="ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
-          <h2>Enroll email authenticator</h2>
+          <h2>{{title}}</h2>
         </div>
       </div>
 
@@ -20,13 +20,13 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="/signup/enroll-email-authenticator" method="POST">
+        <form class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
                 Enter Code
               </div>
-              <input type="text" name="emailVerificationCode" />
+              <input type="text" name="verificationCode" />
             </div>
           </div>
           <button class="ui fluid large primary submit button" type="submit">

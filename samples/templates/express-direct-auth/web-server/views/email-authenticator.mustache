@@ -4,11 +4,15 @@
     {{>head}}
   </head>
   <body id="samples">
-    <div id="recover-password" class="ui center aligned relaxed grid">
+    <div id="registration" class="ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
-          <h2>Recover password</h2>
+          <h2>{{title}}</h2>
         </div>
+      </div>
+
+      <div class="row">
+        <p>Please check your email and enter the code below</p>
       </div>
 
       <div class="row">
@@ -16,26 +20,22 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="/recover-password" method="POST">
+        <form class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
-                Username or Email
+                Enter Code
               </div>
-              <input type="text" name="identifier" />
+              <input type="text" name="emailVerificationCode" />
             </div>
           </div>
           <button class="ui fluid large primary submit button" type="submit">
-            Next
+            Verify
           </button>
         </form>
       </div>
 
-      <div class="ui row grid">
-        <div class="ui messages row">
-          <a href="/login">Back to Sign In</a>
-        </div>
-      </div>
+      {{>cancel}}
 
     </div>
   </body>

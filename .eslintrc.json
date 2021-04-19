@@ -123,6 +123,7 @@
     "semi": 2,
     "strict": 0,
     "wrap-iife": [2, "any"],
+    "no-throw-literal": 2,
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/camelcase": 0,

@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { AuthSdkError } from '../errors';
 import { atob, btoa } from './webcrypto';
 
 // converts a string to base64 (url/filename safe variant)
@@ -40,7 +41,7 @@ export function base64UrlToString(b64u) {
       b64 += '=';
       break;
     default:
-      throw 'Not a valid Base64Url';
+      throw new AuthSdkError('Not a valid Base64Url');
   }
   var utf8 = atob(b64);
   try {

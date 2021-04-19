@@ -27,19 +27,19 @@ oauthUtil.mockStateAndNonce = function() {
 
 oauthUtil.mockLocalStorageError = function() {
   jest.spyOn(storageUtil, 'getLocalStorage').mockImplementation(function() {
-    throw 'This function is not supported on this system.';
+    throw new Error('This function is not supported on this system.');
   });
 };
 
 oauthUtil.mockStorageSetItemError = function() {
   jest.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(function() {
-    throw 'This function is not supported on this system.';
+    throw new Error('This function is not supported on this system.');
   });
 };
 
 oauthUtil.mockSessionStorageError = function() {
   jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(function() {
-    throw 'This function is not supported on this system.';
+    throw new Error('This function is not supported on this system.');
   });
 };
 
@@ -540,7 +540,7 @@ oauthUtil.setupSimultaneousPostMessage = function() {
             state: oauthUtil.mockedState2
           };
         } else {
-          throw 'Unrecognized state: ' + state;
+          throw new Error('Unrecognized state: ' + state);
         }
         fn({
           data: data,
