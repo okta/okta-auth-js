@@ -1,11 +1,14 @@
 import { AuthTransaction } from '../tx';
 import { IdxTransactionMeta } from '../types/Transaction';
+import { Base as Remeditor } from './remediators';
 
 export interface IdxApi {
   authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
   register: (options: RegistrationOptions) => Promise<AuthTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxResponse>;
-  interact: (options?: InteractOptions) => Promise<InteractResponse>;
+  startAuthTransaction: (options?: InteractOptions) => Promise<AuthTransaction>;
+  recoverPassword: (options: PasswordRecoveryOptions) => Promise<AuthTransaction>;
+  handleInteractionCodeRedirect: (url: string) => Promise<void>; 
 }
 
 // Values used to resolve remediations
@@ -30,6 +33,13 @@ export interface RegistrationRemediationValues extends RemediationValues {
   password?: string;
 }
 
+export interface PasswordRecoveryRemediationValues extends RemediationValues {
+  authenticators: string[];
+  identifier?: string;
+  emailVerificationCode?: string;
+  password?: string;
+}
+
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[] | string | boolean>;
 
@@ -38,11 +48,7 @@ export interface Remediator {
   getData: () => unknown;
 }
 
-export enum RemediatorFlow {
-  Authenticate,
-  Registration
-}
-
+export type RemediationFlow = Record<string, typeof Remeditor>;
 
 export interface AcceptsInteractionHandle {
   interactionHandle?: string;
@@ -74,8 +80,9 @@ export interface IdxOptions extends
 }
 
 export interface RunOptions {
-  flow: RemediatorFlow;
+  flow: RemediationFlow;
   needInteraction: boolean;
+  actionPath?: string;
 }
 
 export interface AuthenticationOptions extends 
@@ -88,11 +95,20 @@ export interface RegistrationOptions extends
   RegistrationRemediationValues {
 }
 
+export interface PasswordRecoveryOptions extends
+  IdxOptions, 
+  PasswordRecoveryRemediationValues {
+}
+
 // TODO: remove when idx-js provides type information
 export interface IdxRemeditionValue {
   name: string;
   type?: string;
   required?: boolean;
+  value?: string;
+  form: {
+    value: IdxRemeditionValue[];
+  };
 }
 export interface IdxRemediation {
   name: string;
@@ -133,4 +149,5 @@ export interface IdxResponse {
   neededToProceed: IdxRemediation[];
   rawIdxState: RawIdxResponse;
   interactionCode?: string;
+  actions: Record<string, Function>;
 }

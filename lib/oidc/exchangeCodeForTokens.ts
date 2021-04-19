@@ -65,5 +65,8 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
           response.code = authorizationCode;
           return response;
         });
+    })
+    .finally(() => {
+      sdk.transactionManager.clear();
     });
 }

@@ -27,7 +27,7 @@ export default class Base {
   }
 
   // returns an object for the entire remediation form, or just a part
-  getData(key: string) {
+  getData(key?: string) {
     if (!this.map) {
       return {};
     }
@@ -82,6 +82,10 @@ export default class Base {
     return !!(this.map[key] as string[]).find((alias) => {
       return this.values[alias]; 
     });
+  }
+
+  getNextStep() {
+    return { name: this.remediation.name };
   }
 
   // Override this method to extract error message from remediation form fields
