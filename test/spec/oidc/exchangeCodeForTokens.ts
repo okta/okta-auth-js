@@ -10,6 +10,9 @@ function mockOktaAuth(): OktaAuth {
   return {
     options: {
       issuer: 'http://fake'
+    },
+    transactionManager: {
+      clear: jest.fn()
     }
   } as unknown as OktaAuth;
 }
