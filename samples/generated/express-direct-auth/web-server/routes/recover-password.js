@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAuthClient } = require('../utils');
+const { getAuthClient, renderError } = require('../utils');
 
 const router = express.Router();
 
@@ -53,11 +53,10 @@ router.post('/recover-password', async (req, res) => {
       authenticators: [authenticator],
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });
-  } catch (err) {
-    const errors = err.errorCauses || [];
-    res.render('recover-password', {
-      hasError: true,
-      errors, 
+  } catch (error) {
+    renderError(res, {
+      template: 'recover-password',
+      error,
     });
   }
 });
@@ -79,18 +78,16 @@ router.post('/recover-password/challenge-email-authenticator', async (req, res) 
     const { emailVerificationCode } = req.body;
     const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
-    // Continue password recovery
     const authTransaction = await authClient.idx.recoverPassword({ 
       emailVerificationCode, 
-      interactionHandle 
+      interactionHandle, // continue with interactionHandle
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });
-  } catch (err) {
-    const errors = err.errorCauses || [];
-    res.render('email-authenticator', {
+  } catch (error) {
+    renderError(res, {
+      template: 'email-authenticator',
       title: 'Challenge email authenticator',
-      hasError: true,
-      errors, 
+      error,
     });
   }
 });
@@ -112,18 +109,16 @@ router.post('/recover-password/challenge-phone-authenticator', async (req, res) 
     const { verificationCode } = req.body;
     const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
-    // Continue password recovery
     const authTransaction = await authClient.idx.recoverPassword({ 
       verificationCode, 
-      interactionHandle 
+      interactionHandle, // continue with interactionHandle
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });
-  } catch (err) {
-    const errors = err.errorCauses || [];
-    res.render('authenticator', {
+  } catch (error) {
+    renderError(res, {
+      template: 'authenticator',
       title: 'Challenge phone authenticator',
-      hasError: true,
-      errors, 
+      error,
     });
   }
 });
@@ -136,30 +131,24 @@ router.get('/recover-password/reset', (req, res) => {
 });
 
 router.post('/recover-password/reset', async (req, res) => {
-  const { password, confirmPassword } = req.body;
-  if (password !== confirmPassword) {
-    return res.render('enroll-or-reset-password-authenticator', {
-      title: 'Reset password',
-      hasError: true,
-      errors: ['Password not match']
-    });
-  }
-
   try {
+    const { password, confirmPassword } = req.body;
+    if (password !== confirmPassword) {
+      throw new Error('Password not match');
+    }
+
     const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
-    // Continue registration
     const authTransaction = await authClient.idx.recoverPassword({ 
       password, 
-      interactionHandle 
+      interactionHandle, // continue with interactionHandle
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });
-  } catch (err) {
-    const errors = err.errorCauses || [];
-    res.render(`enroll-or-reset-password-authenticator`, {
+  } catch (error) {
+    renderError(res, {
+      template: 'enroll-or-reset-password-authenticator',
       title: 'Reset password',
-      hasError: true,
-      errors, 
+      error,
     });
   }
 });

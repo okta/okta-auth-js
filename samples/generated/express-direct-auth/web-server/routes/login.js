@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAuthClient } = require('../utils');
+const { getAuthClient, renderError } = require('../utils');
 const sampleConfig = require('../../config').webServer;
 
 const router = express.Router();
@@ -22,12 +22,13 @@ const renderLoginWithWidget = (req, res) => {
           }
         }
       } = authTransaction;
+
       if (!interactionHandle) {
-        return res.render('login-with-widget', {
-          hasError: true,
-          errors: ['Missing required congifuration "interactionHandle" to initial the widget.'],
-        });
+        throw new Error(
+          'Missing required congifuration "interactionHandle" to initial the widget'
+        );
       }
+
       const widgetConfig = JSON.stringify({
         baseUrl: sampleConfig.oidc.issuer.split('/oauth2')[0],
         clientId: sampleConfig.oidc.clientId,
@@ -47,11 +48,10 @@ const renderLoginWithWidget = (req, res) => {
         widgetConfig,
       });
     })
-    .catch(err => {
-      console.log('Failed to render widget, error: ', err);
-      res.render('login-with-widget', {
-        hasError: true,
-        errors: ['Failed to render widget']
+    .catch(error => {
+      renderError(res, {
+        template: 'login-with-widget',
+        error,
       });
     });
 };
@@ -66,9 +66,8 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
   try {
+    const { username, password } = req.body;
     // Get tokens and userInfo
     const authClient = getAuthClient(req);
     const { 
@@ -78,13 +77,10 @@ router.post('/login', async (req, res) => {
     authClient.tokenManager.setTokens(tokens);
     // Redirect back to home page
     res.redirect('/');
-  } catch (err) {
-    console.log('/login error: ', err);
-
-    const errors = err.errorCauses ? err.errorCauses : ['Authentication failed'];
-    res.render('login', { 
-      hasError: errors && errors.length,
-      errors 
+  } catch (error) {
+    renderError(res, {
+      template: 'login',
+      error,
     });
   }
 });

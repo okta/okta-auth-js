@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAuthClient } = require('../utils');
+const { getAuthClient, renderError } = require('../utils');
 
 const router = express.Router();
 
@@ -9,14 +9,16 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
   const { 
     interactionHandle, 
     tokens, 
-    data: { nextStep } 
+    data: { 
+      nextStep,
+    },
   } = authTransaction;
 
   const next = () => {
     if (nextStep.name === 'enroll-authenticator') {
       res.redirect(`/signup/enroll-${nextStep.type}-authenticator`);
     } else {
-      throw { errorCauses: ['Unable to handle next step.'] };
+      throw new Error('Unable to handle next step');
     }
   };
   const done = () => {
@@ -51,11 +53,10 @@ router.post('/signup', async (req, res) => {
       authenticators,
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });
-  } catch (err) {
-    const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
-    res.render('registration', {
-      hasError: true,
-      errors, 
+  } catch (error) {
+    renderError(res, {
+      template: 'registration',
+      error,
     });
   }
 });
@@ -83,12 +84,11 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
       interactionHandle 
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });
-  } catch (err) {
-    const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
-    res.render('email-authenticator', {
+  } catch (error) {
+    renderError(res, {
+      template: 'email-authenticator',
       title: 'Enroll email authenticator',
-      hasError: true,
-      errors, 
+      error,
     });
   }
 });
@@ -106,15 +106,12 @@ router.get(`/signup/enroll-password-authenticator`, (req, res) => {
 });
 
 router.post('/signup/enroll-password-authenticator', async (req, res) => {
-  const { password, confirmPassword } = req.body;
-  if (password !== confirmPassword) {
-    return res.render('enroll-or-reset-password-authenticator', {
-      hasError: true,
-      errors: ['Password not match']
-    });
-  }
-
   try {
+    const { password, confirmPassword } = req.body;
+    if (password !== confirmPassword) {
+      throw new Error('Password not match');
+    }
+
     const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
@@ -123,12 +120,11 @@ router.post('/signup/enroll-password-authenticator', async (req, res) => {
       interactionHandle 
     });
     handleAuthTransaction(req, res, { authTransaction, authTransaction });
-  } catch (err) {
-    const errors = err.errorCauses ? err.errorCauses : ['Registration failed'];
-    res.render(`enroll-or-reset-password-authenticator`, {
+  } catch (error) {
+    renderError(res, {
+      template: 'enroll-or-reset-password-authenticator',
       title: 'Set up password',
-      hasError: true,
-      errors, 
+      error,
     });
   }
 });
