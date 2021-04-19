@@ -249,6 +249,7 @@
 - [#706](https://github.com/okta/okta-auth-js/pull/706) calling `isAuthenticated` will renew expired tokens when `autoRenew` is true
 
 ## 4.9.0
+## 4.9.0 
 
 ### Bug Fixes
 
