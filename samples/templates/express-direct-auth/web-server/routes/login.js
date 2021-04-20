@@ -71,7 +71,9 @@ router.post('/login', async (req, res) => {
     // Get tokens and userInfo
     const authClient = getAuthClient(req);
     const { 
-      data: { tokens } 
+      data: { 
+        tokens 
+      }
     } = await authClient.idx.authenticate({ username, password });
     // Save tokens to storage (req.session)
     authClient.tokenManager.setTokens(tokens);

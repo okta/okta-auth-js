@@ -376,7 +376,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     return this.token.revoke(refreshToken);
   }
 
-  getSignOutRedirectUrl(options: SignoutRedirectUrlOptions) {
+  getSignOutRedirectUrl(options: SignoutRedirectUrlOptions = {}) {
     let {
       idToken,
       postLogoutRedirectUri,
