@@ -4,14 +4,11 @@ export default class EnrollOrChallengeAuthenticator extends Base {
   values: any; // TODO: add proper type
 
   map = {
-    'credentials': ['credentials', 'password', 'emailVerificationCode', 'verificationCode']
+    'credentials': ['credentials', 'password', 'verificationCode']
   };
 
   canRemediate() {
-    if (this.values.emailVerificationCode && this.remediation.relatesTo.value.type === 'email') {
-      return true;
-    }
-    if (this.values.verificationCode && this.remediation.relatesTo.value.type === 'phone') {
+    if (this.values.verificationCode && ['email', 'phone'].includes(this.remediation.relatesTo.value.type)) {
       return true;
     }
     if (this.values.password && this.remediation.relatesTo.value.type === 'password') {
@@ -22,9 +19,7 @@ export default class EnrollOrChallengeAuthenticator extends Base {
 
   mapCredentials() {
     return { 
-      passcode: this.values.emailVerificationCode 
-        || this.values.verificationCode 
-        || this.values.password
+      passcode: this.values.verificationCode || this.values.password
     };
   }
 

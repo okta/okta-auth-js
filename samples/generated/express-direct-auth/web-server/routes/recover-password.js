@@ -75,11 +75,11 @@ router.get(`/recover-password/challenge-email-authenticator`, (req, res) => {
 
 router.post('/recover-password/challenge-email-authenticator', async (req, res) => {
   try {
-    const { emailVerificationCode } = req.body;
+    const { verificationCode } = req.body;
     const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.recoverPassword({ 
-      emailVerificationCode, 
+      verificationCode, 
       interactionHandle, // continue with interactionHandle
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });

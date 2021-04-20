@@ -29,14 +29,14 @@ export interface RegistrationRemediationValues extends RemediationValues {
   firstName?: string;
   lastName?: string;
   email?: string;
-  emailVerificationCode?: string;
+  verificationCode?: string;
   password?: string;
 }
 
 export interface PasswordRecoveryRemediationValues extends RemediationValues {
   authenticators: string[];
   identifier?: string;
-  emailVerificationCode?: string;
+  verificationCode?: string;
   password?: string;
 }
 
