@@ -35,7 +35,7 @@ const renderLoginWithWidget = (req, res) => {
         redirectUri: sampleConfig.oidc.redirectUri,
         authParams: {
           issuer: sampleConfig.oidc.issuer,
-          scopes: sampleConfig.oidc.scope.split(' '),
+          scopes: sampleConfig.oidc.scopes,
         },
         useInteractionCodeFlow: true,
         state,
