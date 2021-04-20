@@ -50,6 +50,14 @@ export interface Remediator {
 
 export type RemediationFlow = Record<string, typeof Remeditor>;
 
+export interface RemediationResponse {
+  idxResponse: IdxResponse;
+  nextStep?: {
+    name: string;
+    type?: string;
+  }
+}
+
 export interface AcceptsInteractionHandle {
   interactionHandle?: string;
 }
@@ -150,4 +158,7 @@ export interface IdxResponse {
   rawIdxState: RawIdxResponse;
   interactionCode?: string;
   actions: Record<string, Function>;
+  toPersist: {
+    interactionHandle?: string;
+  }
 }

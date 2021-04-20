@@ -9,6 +9,7 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
       nextStep,
       interactionHandle,
       tokens,
+      error,
     }
   } = authTransaction;
 
@@ -32,6 +33,10 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
   // Done if tokens are available
   if (tokens) {
     return done();
+  }
+  // Throw error if exist in authTransaction
+  if (error) {
+    throw error;
   }
   // Persist interactionHandle to session
   req.session.interactionHandle = interactionHandle;

@@ -72,9 +72,13 @@ router.post('/login', async (req, res) => {
     const authClient = getAuthClient(req);
     const { 
       data: { 
-        tokens 
-      }
+        tokens, 
+        error,
+      },
     } = await authClient.idx.authenticate({ username, password });
+    if (error) {
+      throw error;
+    }
     // Save tokens to storage (req.session)
     authClient.tokenManager.setTokens(tokens);
     // Redirect back to home page
