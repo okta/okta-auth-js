@@ -15,7 +15,7 @@ module.exports = {
       clientSecret: CLIENT_SECRET,
       issuer: ISSUER,
       appBaseUrl: 'http://localhost:8080',
-      scope: 'openid profile email',
+      scopes: ['openid', 'profile', 'email'],
       redirectUri: 'http://localhost:8080/login/callback',
       postLogoutRedirectUri: 'http://localhost:8080',
       testing: {
