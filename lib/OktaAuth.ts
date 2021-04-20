@@ -430,6 +430,10 @@ class OktaAuth implements SigninAPI, SignoutAPI {
       accessToken = this.tokenManager.getTokensSync().accessToken as AccessToken;
     }
   
+    if (!options.idToken) {
+      options.idToken = this.tokenManager.getTokensSync().idToken as IDToken;
+    }
+
     // Clear all local tokens
     this.tokenManager.clear();
 

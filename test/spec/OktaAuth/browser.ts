@@ -322,7 +322,7 @@ describe('OktaAuth (browser)', function() {
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(3);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
@@ -335,7 +335,7 @@ describe('OktaAuth (browser)', function() {
         global.window.location.href = origin;
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(3);
+            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();

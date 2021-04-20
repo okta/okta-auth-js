@@ -41,7 +41,8 @@ This library uses semantic versioning and follows Okta's [library version policy
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
-| `4.x`     | :heavy_check_mark: Stable        |
+| `5.x`     | :heavy_check_mark: Stable        |
+| `4.x`     | :warning: Retiring on 2022-01-30 |
 | `3.x`     | :warning: Retiring on 2021-05-30 |
 | `2.x`     | :x: Retired                      |
 | `1.x`     | :x: Retired                      |
@@ -55,6 +56,8 @@ If you run into problems using the SDK, you can:
 
 * Ask questions on the [Okta Developer Forums][devforum]
 * Post [issues][github-issues] here on GitHub (for code errors)
+
+Users migrating from version 4.x of this SDK should see [Migrating from 4.x](#migrating-from-previous-versions) to learn what changes are necessary.
 
 ### Browser compatibility / polyfill
 
@@ -2710,6 +2713,10 @@ We have implemented a small SPA app, located at `./test/app/` which is used inte
 ## Migrating from previous versions
 
 The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the original PR.
+
+### From 4.x to 5.x
+
+* Token auto renew requires [running OktaAuth as a service](#running-as-a-service). To start the service, call [start()](#start).
 
 ### From 3.x to 4.x
 
