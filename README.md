@@ -678,11 +678,11 @@ var config = {
 
 #### `tokenManager`
 
-If `cookie` storage is specified, it possible specify whether or not a session cookie is used by the tokenManager. This will automatically be configured if `sessionStorage` is specified and you fall back to `cookie` storage. If sessionCookie is not specified it will create a cookie with an expiry date of `2200-01-01T00:00:00.000Z`
+If `cookie` storage is specified, it is possible to specify whether or not a session cookie is used by the cookie storage. This will automatically be configured if `sessionStorage` is specified and you fall back to `cookie` storage. If sessionCookie is not specified it will create a cookie with an expiry date of `2200-01-01T00:00:00.000Z`
 
 ```javascript
 var config = {
-  tokenManager: {
+  cookies: {
     sessionCookie: true
   }
 }

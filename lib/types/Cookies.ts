@@ -13,6 +13,7 @@
 export interface CookieOptions {
   path?: string;
   secure?: boolean;
+  sessionCookie?: boolean;
   sameSite?: string | boolean;
   expires?: Date;
 }

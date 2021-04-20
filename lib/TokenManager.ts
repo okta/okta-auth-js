@@ -87,6 +87,7 @@ export class TokenManager {
   const { storageType, storageTypes } = sdk.storageManager.getOptionsForSection('token');
   const storageManagerStorage = storageType || storageTypes && storageTypes[0];
   options = Object.assign({}, DEFAULT_OPTIONS, removeNils({storage: storageManagerStorage}), removeNils(options));
+
     if (isIE11OrLess()) {
       options._storageEventDelay = options._storageEventDelay || 1000;
     }

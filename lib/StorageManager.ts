@@ -44,6 +44,10 @@ export default class StorageManager {
 
     let { storageType, storageTypes } = options;
 
+    if(storageType === 'sessionStorage') {
+      options.sessionCookie = true;
+    }
+
     // Maintain compatibility. Automatically fallback. May change in next major version. OKTA-362589
     if (storageType && storageTypes) {
       const idx = storageTypes.indexOf(storageType);
@@ -52,7 +56,7 @@ export default class StorageManager {
         storageType = null;
       }
     }
-    
+
     if (!storageType) {
       storageType = this.storageUtil.findStorageType(storageTypes);
     }
