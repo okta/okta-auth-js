@@ -82,7 +82,7 @@ export interface IdxOptions extends
 export interface RunOptions {
   flow: RemediationFlow;
   needInteraction: boolean;
-  actionPath?: string;
+  action?: string;
 }
 
 export interface AuthenticationOptions extends 

@@ -12,14 +12,14 @@ import {
 // TODO: throw unsupported flow error
 // TODO: clear transaction meta when unhandlable error is thrown
 export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
-  const { needInteraction, flow, actionPath } = options;
+  const { needInteraction, flow, action } = options;
 
   // Start/resume the flow
   let { idxResponse, stateHandle } = await interact(authClient, options);
 
   // Call action if provided
-  if (actionPath && typeof idxResponse.actions[actionPath] === 'function') {
-    idxResponse = await idxResponse.actions[actionPath]();
+  if (action && typeof idxResponse.actions[action] === 'function') {
+    idxResponse = await idxResponse.actions[action]();
   }
 
   const values: RemediationValues = { ...options, stateHandle };

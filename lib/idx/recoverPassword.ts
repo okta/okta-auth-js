@@ -27,6 +27,6 @@ export async function recoverPassword(
     ...options, 
     flow,
     needInteraction: true,
-    actionPath: 'currentAuthenticator-recover',
+    action: 'currentAuthenticator-recover',
   });
 }
