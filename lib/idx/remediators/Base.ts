@@ -1,9 +1,18 @@
 /* eslint-disable complexity */
 import { AuthApiError } from '../../errors';
-import { RemediationValues, IdxRemediation, IdxToRemediationValueMap, IdxResponse } from '../types';
+import { 
+  IdxRemediation, 
+  IdxToRemediationValueMap, 
+  IdxResponse, 
+  NextStep,
+} from '../types';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
-export default class Base {
+export interface RemediationValues {
+  stateHandle?: string;
+}
+
+export class Base {
   remediation: IdxRemediation;
   values: RemediationValues;
   map?: IdxToRemediationValueMap;
@@ -14,7 +23,7 @@ export default class Base {
   }
 
   // Override this method to provide custom check
-  canRemediate() {
+  canRemediate(): boolean {
     if (!this.map) {
       return false;
     }
@@ -84,13 +93,13 @@ export default class Base {
     });
   }
 
-  getNextStep() {
+  getNextStep(): NextStep {
     return { name: this.remediation.name };
   }
 
   // Override this method to extract error message from remediation form fields
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  getErrorMessages(errorRemediation: IdxResponse) {
+  getErrorMessages(errorRemediation: IdxResponse): string[] {
     return [];
   }
 

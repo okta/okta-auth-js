@@ -1,16 +1,27 @@
 import { AuthTransaction } from '../tx';
 import { 
-  OktaAuth, 
-  AuthenticationOptions,
-  RemediationFlow
+  OktaAuth,
+  IdxOptions,
+  RemediationFlow,
 } from '../types';
 import { run } from './run';
-import { Identify, EnrollOrChallengeAuthenticator } from './remediators';
+import { 
+  Identify,
+  IdentifyValues,
+  EnrollOrChallengeAuthenticator,
+  EnrollOrChallengeAuthenticatorValues,
+} from './remediators';
 
 const flow: RemediationFlow = {
   'identify': Identify,
   'challenge-authenticator': EnrollOrChallengeAuthenticator,
 };
+
+export interface AuthenticationOptions extends 
+  IdxOptions,
+  IdentifyValues,
+  EnrollOrChallengeAuthenticatorValues {
+}
 
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions

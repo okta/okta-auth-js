@@ -40,7 +40,7 @@ import {
   SigninAPI,
   PkceAPI,
   SigninOptions,
-  IdxApi,
+  IdxAPI,
   SignoutRedirectUrlOptions
 } from './types';
 import {
@@ -111,7 +111,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   storageManager: StorageManager;
   transactionManager: TransactionManager;
   tx: TransactionAPI;
-  idx: IdxApi;
+  idx: IdxAPI;
   userAgent: string;
   session: SessionAPI;
   pkce: PkceAPI;

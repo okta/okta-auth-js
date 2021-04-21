@@ -1,11 +1,15 @@
-import Base from './Base';
-import { RegistrationRemediationValues } from '../types';
+import { Base, RemediationValues } from './Base';
+import { IdxRemeditionValue } from '../types';
 
-export default class SelectAuthenticator extends Base {
-  values: RegistrationRemediationValues;
+export interface SelectAuthenticatorValues extends RemediationValues {
+  authenticators: string[];
+}
+
+export class SelectAuthenticator extends Base {
+  values: SelectAuthenticatorValues;
   map = {};
 
-  mapAuthenticator(remediationValue: any) {
+  mapAuthenticator(remediationValue: IdxRemeditionValue) {
     const { authenticators } = this.values;
     let selectedOption;
     for (let authenticator of authenticators) {

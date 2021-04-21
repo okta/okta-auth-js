@@ -4,10 +4,16 @@ import { remediate } from './remediate';
 import { 
   OktaAuth,
   IdxOptions,
-  RunOptions,
   IdxTransactionMeta,
-  RemediationValues
+  RemediationValues,
+  RemediationFlow,
 } from '../types';
+
+export interface RunOptions {
+  flow: RemediationFlow;
+  needInteraction: boolean;
+  action?: string;
+}
 
 export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
   const { needInteraction, flow, action } = options;

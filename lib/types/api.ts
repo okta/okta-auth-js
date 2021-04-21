@@ -17,7 +17,14 @@ import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
 import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
-import { AuthenticationOptions } from '../idx/types';
+import { 
+  AuthenticationOptions, 
+  RegistrationOptions as IdxRegistrationOptions,
+  PasswordRecoveryOptions,
+  IdxResponse, 
+  CancelOptions,
+  InteractOptions,
+} from '../idx/types';
 
 export interface OktaAuth {
   options: OktaAuthOptions;
@@ -237,4 +244,13 @@ export interface PkceAPI {
   DEFAULT_CODE_CHALLENGE_METHOD: string;
   generateVerifier(prefix: string): string;
   computeChallenge(str: string): PromiseLike<any>;
+}
+
+export interface IdxAPI {
+  authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
+  register: (options: IdxRegistrationOptions) => Promise<AuthTransaction>;
+  cancel: (options?: CancelOptions) => Promise<IdxResponse>;
+  startAuthTransaction: (options?: InteractOptions) => Promise<AuthTransaction>;
+  recoverPassword: (options: PasswordRecoveryOptions) => Promise<AuthTransaction>;
+  handleInteractionCodeRedirect: (url: string) => Promise<void>; 
 }
