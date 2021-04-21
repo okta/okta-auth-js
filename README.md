@@ -668,7 +668,7 @@ const storageProvider = {
 }
 
 var config = {
-  storage: {
+  storageManager: {
     token: {
       storageProvider: storageProvider
     }
