@@ -1,47 +1,23 @@
 const express = require('express');
-const { getAuthClient, renderError } = require('../utils');
+const { IdxStatus } = require('@okta/okta-auth-js');
+const { 
+  getAuthClient, 
+  renderError, 
+  handleAuthTransaction, 
+} = require('../utils');
 
 const router = express.Router();
 
-const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
-  const {  
-    data: { 
-      nextStep,
-      interactionHandle,
-      tokens,
-      error,
-    }
-  } = authTransaction;
-
-  const next = () => {
-    if (nextStep.name === 'challenge-authenticator' 
-        || nextStep.name === 'authenticator-verification-data') {
-      res.redirect(`/recover-password/challenge-${nextStep.type}-authenticator`);
-    } else if (nextStep.name === 'reset-authenticator') {
-      res.redirect('/recover-password/reset');
-    } else {
-      throw new Error('Unable to handle next step');
-    }
-  };
-  const done = () => {
-    // Save tokens to storage (req.session)
-    authClient.tokenManager.setTokens(tokens);
-    // Redirect back to home page
-    res.redirect('/');
-  };
-
-  // Done if tokens are available
-  if (tokens) {
-    return done();
+const next = (nextStep, res) => {
+  const { name, type } = nextStep;
+  if (name === 'challenge-authenticator' 
+      || name === 'authenticator-verification-data') {
+    res.redirect(`/recover-password/challenge-${type}-authenticator`);
+  } else if (name === 'reset-authenticator') {
+    res.redirect('/recover-password/reset');
+  } else {
+    throw new Error('Unable to handle next step');
   }
-  // Throw error if exist in authTransaction
-  if (error) {
-    throw error;
-  }
-  // Persist interactionHandle to session
-  req.session.interactionHandle = interactionHandle;
-  // Proceed to next step
-  next(nextStep, res);
 };
 
 router.get('/recover-password', (req, res) => {
@@ -57,7 +33,7 @@ router.post('/recover-password', async (req, res) => {
       identifier,
       authenticators: [authenticator],
     });
-    handleAuthTransaction(req, res, { authClient, authTransaction });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
       template: 'recover-password',
@@ -67,8 +43,8 @@ router.post('/recover-password', async (req, res) => {
 });
 
 router.get(`/recover-password/challenge-email-authenticator`, (req, res) => {
-  const { interactionHandle } = req.session;
-  if (interactionHandle) {
+  const { status } = req.session;
+  if (status === IdxStatus.PENDING) {
     res.render('email-authenticator', {
       title: 'Challenge email authenticator',
       action: '/recover-password/challenge-email-authenticator',
@@ -81,13 +57,9 @@ router.get(`/recover-password/challenge-email-authenticator`, (req, res) => {
 router.post('/recover-password/challenge-email-authenticator', async (req, res) => {
   try {
     const { verificationCode } = req.body;
-    const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
-    const authTransaction = await authClient.idx.recoverPassword({ 
-      verificationCode, 
-      interactionHandle, // continue with interactionHandle
-    });
-    handleAuthTransaction(req, res, { authClient, authTransaction });
+    const authTransaction = await authClient.idx.recoverPassword({ verificationCode });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
       template: 'email-authenticator',
@@ -98,8 +70,8 @@ router.post('/recover-password/challenge-email-authenticator', async (req, res) 
 });
 
 router.get(`/recover-password/challenge-phone-authenticator`, (req, res) => {
-  const { interactionHandle } = req.session;
-  if (interactionHandle) {
+  const { status } = req.session;
+  if (status === IdxStatus.PENDING) {
     res.render('authenticator', {
       title: 'Challenge phone authenticator',
       action: '/recover-password/challenge-phone-authenticator',
@@ -112,13 +84,9 @@ router.get(`/recover-password/challenge-phone-authenticator`, (req, res) => {
 router.post('/recover-password/challenge-phone-authenticator', async (req, res) => {
   try {
     const { verificationCode } = req.body;
-    const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
-    const authTransaction = await authClient.idx.recoverPassword({ 
-      verificationCode, 
-      interactionHandle, // continue with interactionHandle
-    });
-    handleAuthTransaction(req, res, { authClient, authTransaction });
+    const authTransaction = await authClient.idx.recoverPassword({ verificationCode });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
       template: 'authenticator',
@@ -142,13 +110,9 @@ router.post('/recover-password/reset', async (req, res) => {
       throw new Error('Password not match');
     }
 
-    const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
-    const authTransaction = await authClient.idx.recoverPassword({ 
-      password, 
-      interactionHandle, // continue with interactionHandle
-    });
-    handleAuthTransaction(req, res, { authClient, authTransaction });
+    const authTransaction = await authClient.idx.recoverPassword({ password });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
       template: 'enroll-or-reset-password-authenticator',

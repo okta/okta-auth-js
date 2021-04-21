@@ -7,6 +7,7 @@ import {
   IdxTransactionMeta,
   RemediationValues,
   RemediationFlow,
+  IdxStatus,
 } from '../types';
 
 export interface RunOptions {
@@ -21,7 +22,7 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
   let nextStep;
   let interactionHandle;
   let error;
-  let status;
+  let status: IdxStatus;
 
   try {
     // Start/resume the flow
@@ -45,7 +46,7 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
     nextStep = nextStepFromResp;
 
     // Did we get an interaction code?
-    status = needInteraction ? 'PENDING' : 'FAILED';
+    status = needInteraction ? IdxStatus.PENDING : IdxStatus.FAILED;
     if (interactionCode) {
       const meta = authClient.transactionManager.load() as IdxTransactionMeta;
       const {
@@ -65,11 +66,11 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
         scopes,
         ignoreSignature
       }, urls);
-      status = 'SUCCESS';
+      status = IdxStatus.SUCCESS;
     }
   } catch (err) {
     error = err;
-    status = 'FAILED';
+    status = IdxStatus.FAILED;
     // Clear transaction meta when error is not handlable
     // TODO: probably need to handle error differently based on it's idx top level error or form error
     authClient.transactionManager.clear();

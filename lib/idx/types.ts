@@ -47,6 +47,12 @@ export interface IdxOptions extends
   AcceptsInteractionHandle {
 }
 
+export enum IdxStatus {
+  SUCCESS,
+  PENDING,
+  FAILED,
+}
+
 // TODO: remove when idx-js provides type information
 export interface IdxRemeditionValue {
   name: string;
