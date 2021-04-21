@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1.0
+
+### Features
+
+- [#694](https://github.com/okta/okta-auth-js/pull/694) Adds `cookies.sessionCookie` option
+
 ## 5.0.0
 
 ### Breaking Changes
