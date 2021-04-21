@@ -95,7 +95,7 @@ export class TokenManager {
 
     const storageOptions: StorageOptions = removeNils({
       storageKey: options.storageKey,
-      secure: options.secure
+      secure: options.secure,
     });
     if (typeof options.storage === 'object') {
       // A custom storage provider must implement getItem(key) and setItem(key, val)

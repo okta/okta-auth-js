@@ -2,6 +2,10 @@
 
 ## 5.0.0
 
+### Features
+
+- [#694](https://github.com/okta/okta-auth-js/pull/694) Adds `cookies.sessionCookie` option
+
 ### Breaking Changes
 
 - [#689](https://github.com/okta/okta-auth-js/pull/689) New methods `start` and `stop` are added to control `OktaAuth` as a service. TokenManager options `autoRenew`, and  `autoRemove` will only take effect after calling `start`.

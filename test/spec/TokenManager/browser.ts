@@ -31,15 +31,19 @@ describe('TokenManager (browser)', function() {
   };
 
   function createAuth(options) {
-    options = options || {};
-    options.tokenManager = options.tokenManager || {};
+    options = Object.assign({}, options);
+    options.tokenManager = Object.assign({}, options.tokenManager);
+    options.cookies = Object.assign({}, options.cookies);
+    options.storageManager = Object.assign({}, options.storageManager);
     jest.spyOn(SdkClock, 'create').mockReturnValue(new SdkClock(options.localClockOffset));
     return new OktaAuth({
+      cookies: options.cookies,
       pkce: false,
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect',
       storageUtil: options.storageUtil,
+      storageManager: options.storageManager,
       tokenManager: {
         expireEarlySeconds: options.tokenManager.expireEarlySeconds || 0,
         storage: options.tokenManager.storage,
@@ -79,6 +83,40 @@ describe('TokenManager (browser)', function() {
       setupSync();
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
       oauthUtil.expectTokenStorageToEqual(localStorage, {
+        'test-idToken': tokens.standardIdTokenParsed
+      });
+    });
+    it('honors StorageManager configuration', function () {
+      setupSync({
+        storageManager: {
+          token: {
+            storageTypes: ['cookie'],
+            useMultipleCookies: true,
+          }
+        }
+      });
+      var setCookieMock = util.mockSetCookie();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      expect(setCookieMock).toHaveBeenCalledWith(
+        'okta-token-storage_test-idToken',
+        JSON.stringify(tokens.standardIdTokenParsed),
+        '2200-01-01T00:00:00.000Z',
+        secureCookieSettings
+      );
+    });
+    it('favors token.storage configuration over storageManager.token', function () {
+      setupSync({
+        storageManager: {
+          token: {
+            storageTypes: ['cookie'],
+          }
+        },
+        tokenManager: {
+          storage: 'sessionStorage',
+        }
+      });
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      oauthUtil.expectTokenStorageToEqual(sessionStorage, {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
@@ -148,7 +186,7 @@ describe('TokenManager (browser)', function() {
       expect(setCookieMock).toHaveBeenCalledWith(
         'okta-token-storage_test-idToken',
         JSON.stringify(tokens.standardIdTokenParsed),
-        '2200-01-01T00:00:00.000Z',
+        null,
         secureCookieSettings
       );
     });
@@ -960,6 +998,43 @@ describe('TokenManager (browser)', function() {
         client.tokenManager.clear();
         expect(deleteCookieMock).toHaveBeenCalledTimes(2);
       });
+    });
+  });
+
+  describe('sessionCookie', function() {
+    it('Uses a fixed date by default', function() {
+      setupSync({
+        tokenManager: {
+          storage: 'cookie'
+        }
+      });
+      var setCookieMock = util.mockSetCookie();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      expect(setCookieMock).toHaveBeenCalledWith(
+        'okta-token-storage_test-idToken',
+        JSON.stringify(tokens.standardIdTokenParsed),
+        '2200-01-01T00:00:00.000Z',
+        secureCookieSettings
+      );
+    });
+
+    it('Uses a session cookie when set', function() {
+      setupSync({
+        cookies: {
+          sessionCookie: true
+        },
+        tokenManager: {
+          storage: 'cookie',
+        }
+      });
+      var setCookieMock = util.mockSetCookie();
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      expect(setCookieMock).toHaveBeenCalledWith(
+        'okta-token-storage_test-idToken',
+        JSON.stringify(tokens.standardIdTokenParsed),
+        null,
+        secureCookieSettings
+      );
     });
   });
 });
