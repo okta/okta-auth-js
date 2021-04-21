@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
-import { AuthSdkError } from 'lib/errors';
+import { AuthSdkError } from '../errors';
 import { 
   IdxResponse, 
   isRawIdxResponse, 

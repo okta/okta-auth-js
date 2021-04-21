@@ -8,7 +8,6 @@ import {
   IdxTransactionMeta,
   RemediationValues
 } from '../types';
-import { AuthSdkError } from 'lib/errors';
 
 export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
   const { needInteraction, flow, action } = options;
@@ -21,6 +20,7 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
   try {
     // Start/resume the flow
     let { idxResponse, stateHandle } = await interact(authClient, options);
+    interactionHandle = idxResponse.toPersist.interactionHandle;
 
     // Call action if provided
     if (action && typeof idxResponse.actions[action] === 'function') {
@@ -33,13 +33,9 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
     const { 
       idxResponse: { 
         interactionCode,
-        toPersist: {
-          interactionHandle: interactionHandleFromResp,
-        },
       }, 
       nextStep: nextStepFromResp
     } = await remediate(idxResponse, flow, values);
-    interactionHandle = interactionHandleFromResp;
     nextStep = nextStepFromResp;
 
     // Did we get an interaction code?
@@ -66,13 +62,11 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
       status = 'SUCCESS';
     }
   } catch (err) {
-    status = 'FAILED';
     error = err;
-    if (error instanceof AuthSdkError) {
-      // AuthApiError can be resolved by client side retry
-      // Clear transaction meta when error is not handlable (AuthSdkError)
-      authClient.transactionManager.clear();
-    }
+    status = 'FAILED';
+    // Clear transaction meta when error is not handlable
+    // TODO: probably need to handle error differently based on it's idx top level error or form error
+    authClient.transactionManager.clear();
   }
   
   const authTransaction = new AuthTransaction(authClient, {
