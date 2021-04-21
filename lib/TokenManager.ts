@@ -84,10 +84,7 @@ export class TokenManager {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }
 
-  const { storageType, storageTypes } = sdk.storageManager.getOptionsForSection('token');
-  const storageManagerStorage = storageType || storageTypes && storageTypes[0];
-  options = Object.assign({}, DEFAULT_OPTIONS, removeNils({storage: storageManagerStorage}), removeNils(options));
-
+    options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
     if (isIE11OrLess()) {
       options._storageEventDelay = options._storageEventDelay || 1000;
     }

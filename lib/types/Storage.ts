@@ -51,7 +51,6 @@ export interface TransactionStorage extends StorageProvider {
 }
 
 export interface StorageOptions extends CookieOptions {
-  sessionCookie?: boolean;
   storageType?: StorageType;
   storageTypes?: StorageType[];
   storageProvider?: SimpleStorage;

@@ -18,7 +18,8 @@ describe('cross tabs communication', () => {
       storageManager: {
         getTokenStorage: jest.fn().mockReturnValue({
           getStorage: jest.fn().mockReturnValue({})
-        })
+        }),
+        getOptionsForSection: jest.fn().mockReturnValue({})
       },
       emitter
     };
