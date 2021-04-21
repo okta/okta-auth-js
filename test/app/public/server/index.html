@@ -24,6 +24,18 @@
         <hr/>
         <a id="widget-link" href="/login">Use Sign-In Widget</a>
       </div>
+      <div id="form_register" class="box">
+        <strong>Register</strong>
+        <hr/>
+        <form method="POST" action="/register">
+          <input id="r_config" type="hidden" name="config"/>
+          <label for="r_firstName">First name:</label><input name="firstName" id="r_firstName" placeholder="firstName" type="text"/><br/>
+          <label for="r_lastName">Last name:</label><input name="lastName" id="r_lastName" placeholder="lastName" type="text"/><br/>
+          <label for="r_email">Email:</label><input name="email" id="r_email" placeholder="email" type="email"/><br/>
+          <label for="r_password">Password:</label><input name="password" id="r_password" placeholder="password" type="password"/><br/>
+          <input id="r_submitBtn" type="submit"/>
+        </form>
+      </div>
       <div id="results">
         <div class="box">
           <span>Issuer:</span>&nbsp;
@@ -37,8 +49,20 @@
           <div id="status"></div>
         </div>
         <div class="box">
+          <strong>Login</strong><br/>
+          <div id="login" style="color: green"></div>
+        </div>
+        <div class="box">
           <strong>Session Token</strong><br/>
           <div id="sessionToken" style="color: green"></div>
+        </div>
+        <div class="box">
+          <strong>Access Token</strong><br/>
+          <div id="accessToken" style="color: green"></div>
+        </div>
+        <div class="box">
+          <strong>Id Token</strong><br/>
+          <div id="idToken" style="color: green"></div>
         </div>
         <div class="box">
           <strong>Error</strong><br/>
@@ -51,15 +75,23 @@
       // config
       var config = window.getConfig();
       document.getElementById('config').value = JSON.stringify(config);
+      document.getElementById('r_config').value = JSON.stringify(config);
 
       // form elements
-      ['username', 'password'].forEach(function(param) {
+      [
+        'username', 'password',
+        'r_firstName', 'r_lastName', 'r_email', 'r_password'
+      ].forEach(function(param) {
         var value = query.get(param);
         if (!value) return;
         document.getElementById(param).value = value;
       });
       // display elements
-      ['issuer', 'useInteractionCodeFlow', 'status', 'sessionToken', 'error'].forEach(function(param) {
+      [
+        'issuer', 'useInteractionCodeFlow', 
+        'status', 'sessionToken', 'error', 'login', 
+        'accessToken', 'idToken'
+      ].forEach(function(param) {
         var value = query.get(param);
         if (!value) return;
         document.getElementById(param).innerText = value;

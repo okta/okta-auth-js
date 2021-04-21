@@ -10,6 +10,7 @@ import {
   EnrollProfile,
   SelectAuthenticator,
   EnrollOrChallengeAuthenticator,
+  Skip
 } from './remediators';
 
 const flow: RemediationFlow = {
@@ -17,6 +18,7 @@ const flow: RemediationFlow = {
   'enroll-profile': EnrollProfile,
   'select-authenticator-enroll': SelectAuthenticator,
   'enroll-authenticator': EnrollOrChallengeAuthenticator,
+  'skip': Skip,
 };
 
 export async function register(

@@ -35,6 +35,23 @@ export function findRemediationByName(idxRemediation: IdxRemediation, name: stri
   });
 }
 
+// Return first match idxRemediation in allowed remediators for flow with authenticators
+export function getIdxRemediationWithAuthenticators(remediators, idxRemediations, requestedAuthenticators) {
+  return idxRemediations.find(idxRemediation => {
+    let ok = Object.keys(remediators).includes(idxRemediation.name);
+    if (ok) {
+      const authenticator = idxRemediation.value.find(v => v.name == "authenticator");
+      if (authenticator) {
+        const availableAuthenticators = authenticator.options.map(o => o.relatesTo.type);
+        const proceedableAuthenticators = availableAuthenticators.filter(a => requestedAuthenticators.includes(a));
+        if (!proceedableAuthenticators.length)
+          ok = false;
+      }
+    }
+    return ok;
+  });
+}
+
 // Return first match idxRemediation in allowed remediators
 export function getIdxRemediation(remediators, idxRemediations) {
   return idxRemediations.find(idxRemediation => Object.keys(remediators).includes(idxRemediation.name));

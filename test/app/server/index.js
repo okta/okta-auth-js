@@ -3,6 +3,7 @@
 require('@okta/env'); // update environment variables from testenv file
 
 const loginMiddleware = require('./loginMiddleware');
+const registerMiddleware = require('./registerMiddleware');
 const callbackMiddleware = require('./callbackMiddleware');
 const renderWidget = require('./renderWidget');
 
@@ -31,6 +32,7 @@ app.use(express.urlencoded());
 
 app.post('/login', loginMiddleware);
 app.get('/login', renderWidget);
+app.post('/register', registerMiddleware);
 app.get('/authorization-code/callback', callbackMiddleware);
 
 const port = config.devServer.port;

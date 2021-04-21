@@ -59,6 +59,10 @@ body {
   overflow-wrap: break-word;
 }
 
+.box input[type=text] {
+  width: auto;
+}
+
 input[type=text] {
   width: 600px;
 }

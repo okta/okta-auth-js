@@ -20,6 +20,7 @@ module.exports = function loginMiddleware(req, res) {
   let status = '';
   let sessionToken = '';
   let error = '';
+  let login = '';
   
   const authClient = getAuthClient({
     // Each transaction needs unique storage, there may be several clients
@@ -42,6 +43,7 @@ module.exports = function loginMiddleware(req, res) {
     console.log('TRANSACTION', JSON.stringify(transaction.data, null, 2));
     status = transaction.status;
     sessionToken = transaction.sessionToken;
+    login = transaction.user.profile.login;
   })
   .catch(function(err) {
     error = err;
@@ -51,6 +53,7 @@ module.exports = function loginMiddleware(req, res) {
     const qs = toQueryString(Object.assign({}, config, {
       status,
       sessionToken,
+      login,
       error: JSON.stringify(error, null, 2)
     }));
     console.log('Reloading the page. STATUS=', status);

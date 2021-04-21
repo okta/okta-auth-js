@@ -5,11 +5,13 @@ import {
   isRawIdxResponse, 
   RemediationFlow, 
   RemediationValues,
+  RemediationValuesWithAuthenticators
 } from '../types';
 import { 
   createApiError, 
   isErrorResponse, 
-  getIdxRemediation 
+  getIdxRemediation,
+  getIdxRemediationWithAuthenticators
 } from './util';
 
 // This function is called recursively until it reaches success or cannot be remediated
@@ -20,7 +22,14 @@ export async function remediate(
 ) {
   const { neededToProceed } = idxResponse;
   // TODO: idxRemediation may be unfound due to policy setting, handle error here
-  const idxRemediation = getIdxRemediation(flow, neededToProceed);
+  let idxRemediation;
+  const authenticators = (values as RemediationValuesWithAuthenticators).authenticators;
+  if (authenticators) {
+    idxRemediation = getIdxRemediationWithAuthenticators(flow, neededToProceed, authenticators);
+  } else {
+    idxRemediation = getIdxRemediation(flow, neededToProceed);
+  }
+  
   const name = idxRemediation.name;
   const T = flow[name];
   if (!T) {
