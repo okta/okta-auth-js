@@ -99,7 +99,7 @@ class TestServer {
       const err = JSON.parse(txt);
       assert(err.name === errorName);
       if (errorSummary) {
-        assert(err.errorSummary === errorSummary);
+        assert(err.errorSummary.indexOf(errorSummary) != -1);
       }
     });
     await this.idToken.then(el => el.getText()).then(txt => {

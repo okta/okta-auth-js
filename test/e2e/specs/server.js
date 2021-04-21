@@ -69,10 +69,7 @@ if (process.env.ORG_OIE_ENABLED) {
       await TestServer.issuer.then(el => el.setValue(ISSUER));
 
       await TestServer.submitRegister();
-      await TestServer.assertRegisterFailure(
-        '\'First name\' is a required property. ' + 
-        '\'Last name\' is a required property. ' + 
-        '\'Email\' must be in the form of an email address');
+      await TestServer.assertRegisterFailure('\'Email\' must be in the form of an email address');
     });
 
   });

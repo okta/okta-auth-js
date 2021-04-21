@@ -48,7 +48,7 @@ module.exports = async function registerMiddleware(req, res) {
     });
 
     // Continue registration
-    ({ status, tokens: { tokens: { accessToken, idToken } } } = await authClient.idx.register({
+    ({ status, tokens: { accessToken, idToken } } = await authClient.idx.register({
       password, 
       authenticators,
       stateHandle 
