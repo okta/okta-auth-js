@@ -36,42 +36,44 @@ describe('Server-side login', () => {
 
 });
 
-describe('Server-side registration', () => {
+if (process.env.ORG_OIE_ENABLED) {
+  describe('Server-side registration', () => {
 
-  beforeEach(async () => {
-    await TestServer.open();
+    beforeEach(async () => {
+      await TestServer.open();
+    });
+
+    it('can register with password authenticator and receive tokens', async () => {
+      await TestServer.issuer.then(el => el.setValue(ISSUER));
+      await TestServer.rFirstName.then(el => el.setValue(firstName));
+      await TestServer.rLastName.then(el => el.setValue(lastName));
+      await TestServer.rEmail.then(el => el.setValue(email));
+      await TestServer.rPassword.then(el => el.setValue(password));
+
+      await TestServer.submitRegister();
+      await TestServer.assertRegisterSuccess(email);
+    });
+
+    it('will throw error for already registered user', async () => {
+      await TestServer.issuer.then(el => el.setValue(ISSUER));
+      await TestServer.rFirstName.then(el => el.setValue(firstName));
+      await TestServer.rLastName.then(el => el.setValue(lastName));
+      await TestServer.rEmail.then(el => el.setValue(email));
+      await TestServer.rPassword.then(el => el.setValue(password));
+
+      await TestServer.submitRegister();
+      await TestServer.assertRegisterFailure('A user with this Email already exists');
+    });
+
+    it('will throw error for bad registration data', async () => {
+      await TestServer.issuer.then(el => el.setValue(ISSUER));
+
+      await TestServer.submitRegister();
+      await TestServer.assertRegisterFailure(
+        '\'First name\' is a required property. ' + 
+        '\'Last name\' is a required property. ' + 
+        '\'Email\' must be in the form of an email address');
+    });
+
   });
-
-  it('can register with password authenticator and receive tokens', async () => {
-    await TestServer.issuer.then(el => el.setValue(ISSUER));
-    await TestServer.rFirstName.then(el => el.setValue(firstName));
-    await TestServer.rLastName.then(el => el.setValue(lastName));
-    await TestServer.rEmail.then(el => el.setValue(email));
-    await TestServer.rPassword.then(el => el.setValue(password));
-
-    await TestServer.submitRegister();
-    await TestServer.assertRegisterSuccess(email);
-  });
-
-  it('will throw error for already registered user', async () => {
-    await TestServer.issuer.then(el => el.setValue(ISSUER));
-    await TestServer.rFirstName.then(el => el.setValue(firstName));
-    await TestServer.rLastName.then(el => el.setValue(lastName));
-    await TestServer.rEmail.then(el => el.setValue(email));
-    await TestServer.rPassword.then(el => el.setValue(password));
-
-    await TestServer.submitRegister();
-    await TestServer.assertRegisterFailure('A user with this Email already exists');
-  });
-
-  it('will throw error for bad registration data', async () => {
-    await TestServer.issuer.then(el => el.setValue(ISSUER));
-
-    await TestServer.submitRegister();
-    await TestServer.assertRegisterFailure(
-      '\'First name\' is a required property. ' + 
-      '\'Last name\' is a required property. ' + 
-      '\'Email\' must be in the form of an email address');
-  });
-
-});
+}
