@@ -1,8 +1,12 @@
-import Base from './Base';
-import { AuthenticationRemediationValues } from '../types';
+import { Base, RemediationValues } from './Base';
 
-export default class Identify extends Base {
-  values: AuthenticationRemediationValues;
+export interface IdentifyValues extends RemediationValues {
+  username?: string;
+  password?: string;
+}
+
+export class Identify extends Base {
+  values: IdentifyValues;
 
   map = {
     'identifier': ['identifier', 'username'],

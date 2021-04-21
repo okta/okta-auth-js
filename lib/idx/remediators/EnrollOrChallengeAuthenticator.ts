@@ -1,20 +1,24 @@
-import Base from './Base';
+import { Base, RemediationValues } from './Base';
 
-export default class EnrollOrChallengeAuthenticator extends Base {
-  values: any; // TODO: add proper type
+export interface EnrollOrChallengeAuthenticatorValues extends RemediationValues {
+  verificationCode?: string;
+  password?: string;
+}
+
+export class EnrollOrChallengeAuthenticator extends Base {
+  values: EnrollOrChallengeAuthenticatorValues;
 
   map = {
-    'credentials': ['credentials', 'password', 'emailVerificationCode', 'verificationCode']
+    'credentials': ['password', 'verificationCode']
   };
 
   canRemediate() {
-    if (this.values.emailVerificationCode && this.remediation.relatesTo.value.type === 'email') {
+    if (this.values.verificationCode 
+        && ['email', 'phone'].includes(this.remediation.relatesTo.value.type)) {
       return true;
     }
-    if (this.values.verificationCode && this.remediation.relatesTo.value.type === 'phone') {
-      return true;
-    }
-    if (this.values.password && this.remediation.relatesTo.value.type === 'password') {
+    if (this.values.password 
+        && this.remediation.relatesTo.value.type === 'password') {
       return true;
     }
     return false;
@@ -22,9 +26,7 @@ export default class EnrollOrChallengeAuthenticator extends Base {
 
   mapCredentials() {
     return { 
-      passcode: this.values.emailVerificationCode 
-        || this.values.verificationCode 
-        || this.values.password
+      passcode: this.values.verificationCode || this.values.password
     };
   }
 

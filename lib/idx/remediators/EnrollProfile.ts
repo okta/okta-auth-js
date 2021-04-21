@@ -1,11 +1,16 @@
-import Base from './Base';
-import { RegistrationRemediationValues } from '../types';
+import { Base, RemediationValues } from './Base';
 
-export default class EnrollProfile extends Base {
-  values: RegistrationRemediationValues;
+export interface EnrollProfileValues extends RemediationValues {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}
+
+export class EnrollProfile extends Base {
+  values: EnrollProfileValues;
 
   map = {
-    'userProfile': ['userProfile', 'firstName', 'lastName', 'email']
+    'userProfile': ['firstName', 'lastName', 'email']
   };
 
   mapUserProfile() {

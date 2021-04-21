@@ -1,10 +1,12 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
+import { AuthSdkError } from '../errors';
 import { 
   IdxResponse, 
   isRawIdxResponse, 
   RemediationFlow, 
   RemediationValues,
+  RemediationResponse,
 } from '../types';
 import { 
   createApiError, 
@@ -17,19 +19,25 @@ export async function remediate(
   idxResponse: IdxResponse,
   flow: RemediationFlow,
   values: RemediationValues
-) {
+): Promise<RemediationResponse> {
   const { neededToProceed } = idxResponse;
-  // TODO: idxRemediation may be unfound due to policy setting, handle error here
   const idxRemediation = getIdxRemediation(flow, neededToProceed);
+  if (!idxRemediation) {
+    throw new AuthSdkError('No remediation in the idxResponse can be match current flow');
+  }
   const name = idxRemediation.name;
   const T = flow[name];
   if (!T) {
-    // No remediator is registered. bail!
-    return idxResponse;
+    throw new AuthSdkError('No remediator is registered');
   }
+
   const remediator = new T(idxRemediation, values);
 
   // Recursive loop breaker
+  // TODO: there should be three states to handle:
+  // 1. can remediate
+  // 2. cannot remediate due to need user interaction
+  // 3. cannot remediate due to unsupported inputs or policies
   if (!remediator.canRemediate()) {
     const nextStep = remediator.getNextStep();
     return { idxResponse, nextStep };

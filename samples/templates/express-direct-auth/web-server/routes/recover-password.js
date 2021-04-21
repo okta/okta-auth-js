@@ -9,6 +9,7 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
       nextStep,
       interactionHandle,
       tokens,
+      error,
     }
   } = authTransaction;
 
@@ -32,6 +33,10 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
   // Done if tokens are available
   if (tokens) {
     return done();
+  }
+  // Throw error if exist in authTransaction
+  if (error) {
+    throw error;
   }
   // Persist interactionHandle to session
   req.session.interactionHandle = interactionHandle;
@@ -75,11 +80,11 @@ router.get(`/recover-password/challenge-email-authenticator`, (req, res) => {
 
 router.post('/recover-password/challenge-email-authenticator', async (req, res) => {
   try {
-    const { emailVerificationCode } = req.body;
+    const { verificationCode } = req.body;
     const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.recoverPassword({ 
-      emailVerificationCode, 
+      verificationCode, 
       interactionHandle, // continue with interactionHandle
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });

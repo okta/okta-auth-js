@@ -1,7 +1,11 @@
-import Base from './Base';
+import { Base, RemediationValues } from './Base';
 
-export default class AuthenticatorVerificationData extends Base {
-  values: any; // TODO: add proper type
+export interface AuthenticatorVerificationDataValues extends RemediationValues {
+  authenticators: string[];
+}
+
+export class AuthenticatorVerificationData extends Base {
+  values: AuthenticatorVerificationDataValues;
 
   map = {
     'authenticator': ['authenticator']

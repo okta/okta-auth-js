@@ -7,10 +7,10 @@ const authenticators = ['email', 'password']; // ordered authenticators
 
 const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
   const { 
-    interactionHandle, 
-    tokens, 
     data: { 
+      tokens, 
       nextStep,
+      interactionHandle, 
     },
   } = authTransaction;
 
@@ -33,7 +33,9 @@ const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
     return done();
   }
   // Persist interactionHandle to session
-  req.session.interactionHandle = interactionHandle;
+  if (interactionHandle) {
+    req.session.interactionHandle = interactionHandle;
+  }
   // Proceed to next step
   next(nextStep, res);
 };
@@ -75,13 +77,13 @@ router.get(`/signup/enroll-email-authenticator`, (req, res) => {
 
 router.post('/signup/enroll-email-authenticator', async (req, res) => {
   try {
-    const { emailVerificationCode } = req.body;
+    const { verificationCode } = req.body;
     const { interactionHandle } = req.session;
     const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
-      emailVerificationCode, 
+      verificationCode, 
       authenticators,
-      interactionHandle 
+      interactionHandle, // continue with interactionHandle
     });
     handleAuthTransaction(req, res, { authClient, authTransaction });
   } catch (error) {

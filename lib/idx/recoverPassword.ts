@@ -1,15 +1,19 @@
 import { AuthTransaction } from '../tx';
 import { 
   OktaAuth, 
-  PasswordRecoveryOptions,
+  IdxOptions, 
   RemediationFlow,
 } from '../types';
 import { run } from './run';
 import {
   Identify,
+  IdentifyValues,
   SelectAuthenticator,
+  SelectAuthenticatorValues,
   EnrollOrChallengeAuthenticator,
+  EnrollOrChallengeAuthenticatorValues,
   AuthenticatorVerificationData,
+  AuthenticatorVerificationDataValues,
 } from './remediators';
 
 const flow: RemediationFlow = {
@@ -20,6 +24,14 @@ const flow: RemediationFlow = {
   'reset-authenticator': EnrollOrChallengeAuthenticator,
 };
 
+export interface PasswordRecoveryOptions extends 
+  IdxOptions, 
+  IdentifyValues,
+  SelectAuthenticatorValues,
+  EnrollOrChallengeAuthenticatorValues,
+  AuthenticatorVerificationDataValues {
+}
+
 export async function recoverPassword(
   authClient: OktaAuth, options: PasswordRecoveryOptions
 ): Promise<AuthTransaction> {
@@ -27,6 +39,6 @@ export async function recoverPassword(
     ...options, 
     flow,
     needInteraction: true,
-    actionPath: 'currentAuthenticator-recover',
+    action: 'currentAuthenticator-recover',
   });
 }
