@@ -64,7 +64,7 @@ describe('Server-side registration', () => {
     await TestServer.assertRegisterFailure('A user with this Email already exists');
   });
 
-  it('will throw error for bad regustration data', async () => {
+  it('will throw error for bad registration data', async () => {
     await TestServer.issuer.then(el => el.setValue(ISSUER));
 
     await TestServer.submitRegister();
