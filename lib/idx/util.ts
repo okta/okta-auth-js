@@ -40,12 +40,13 @@ export function getIdxRemediationWithAuthenticators(remediators, idxRemediations
   return idxRemediations.find(idxRemediation => {
     let ok = Object.keys(remediators).includes(idxRemediation.name);
     if (ok) {
-      const authenticator = idxRemediation.value.find(v => v.name == "authenticator");
+      const authenticator = idxRemediation.value.find(v => v.name == 'authenticator');
       if (authenticator) {
         const availableAuthenticators = authenticator.options.map(o => o.relatesTo.type);
         const proceedableAuthenticators = availableAuthenticators.filter(a => requestedAuthenticators.includes(a));
-        if (!proceedableAuthenticators.length)
+        if (!proceedableAuthenticators.length) {
           ok = false;
+        }
       }
     }
     return ok;

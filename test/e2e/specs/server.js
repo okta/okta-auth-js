@@ -44,10 +44,10 @@ describe('Server-side registration', () => {
 
   it('can register with password authenticator and receive tokens', async () => {
     await TestServer.issuer.then(el => el.setValue(ISSUER));
-    await TestServer.r_firstName.then(el => el.setValue(firstName));
-    await TestServer.r_lastName.then(el => el.setValue(lastName));
-    await TestServer.r_email.then(el => el.setValue(email));
-    await TestServer.r_password.then(el => el.setValue(password));
+    await TestServer.rFirstName.then(el => el.setValue(firstName));
+    await TestServer.rLastName.then(el => el.setValue(lastName));
+    await TestServer.rEmail.then(el => el.setValue(email));
+    await TestServer.rPassword.then(el => el.setValue(password));
 
     await TestServer.submitRegister();
     await TestServer.assertRegisterSuccess(email);
@@ -55,10 +55,10 @@ describe('Server-side registration', () => {
 
   it('will throw error for already registered user', async () => {
     await TestServer.issuer.then(el => el.setValue(ISSUER));
-    await TestServer.r_firstName.then(el => el.setValue(firstName));
-    await TestServer.r_lastName.then(el => el.setValue(lastName));
-    await TestServer.r_email.then(el => el.setValue(email));
-    await TestServer.r_password.then(el => el.setValue(password));
+    await TestServer.rFirstName.then(el => el.setValue(firstName));
+    await TestServer.rLastName.then(el => el.setValue(lastName));
+    await TestServer.rEmail.then(el => el.setValue(email));
+    await TestServer.rPassword.then(el => el.setValue(password));
 
     await TestServer.submitRegister();
     await TestServer.assertRegisterFailure('A user with this Email already exists');
@@ -68,7 +68,10 @@ describe('Server-side registration', () => {
     await TestServer.issuer.then(el => el.setValue(ISSUER));
 
     await TestServer.submitRegister();
-    await TestServer.assertRegisterFailure("'First name' is a required property. 'Last name' is a required property. 'Email' must be in the form of an email address");
+    await TestServer.assertRegisterFailure(
+      '\'First name\' is a required property. ' + 
+      '\'Last name\' is a required property. ' + 
+      '\'Email\' must be in the form of an email address');
   });
 
 });

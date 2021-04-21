@@ -13,11 +13,11 @@ class TestServer {
   get submitBtn() { return $('#submitBtn'); }
 
   // register form
-  get r_firstName() { return $('#r_firstName'); }
-  get r_lastName() { return $('#r_lastName'); }
-  get r_email() { return $('#r_email'); }
-  get r_password() { return $('#r_password'); }
-  get r_submitBtn() { return $('#r_submitBtn'); }
+  get rFirstName() { return $('#r_firstName'); }
+  get rLastName() { return $('#r_lastName'); }
+  get rEmail() { return $('#r_email'); }
+  get rPassword() { return $('#r_password'); }
+  get rSubmitBtn() { return $('#r_submitBtn'); }
 
   // results
   get status() { return $('#status'); }
