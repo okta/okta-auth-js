@@ -42,7 +42,7 @@ class TestServer {
   }
 
   async submitRegister() {
-    await this.r_submitBtn.then(el => el.click());
+    await this.rSubmitBtn.then(el => el.click());
   }
 
   async assertLoginSuccess() {
