@@ -12,7 +12,7 @@ const next = (nextStep, res) => {
     return true;
   }
   return false;
-}
+};
 
 const renderLogin = (req, res) => {
   res.render('login');
