@@ -10,17 +10,21 @@ import {
   IdentifyValues,
   EnrollOrChallengeAuthenticator,
   EnrollOrChallengeAuthenticatorValues,
+  ReEnrollAuthenticator,
+  ReEnrollAuthenticatorValues,
 } from './remediators';
 
 const flow: RemediationFlow = {
   'identify': Identify,
   'challenge-authenticator': EnrollOrChallengeAuthenticator,
+  'reenroll-authenticator': ReEnrollAuthenticator,
 };
 
 export interface AuthenticationOptions extends 
   IdxOptions,
   IdentifyValues,
-  EnrollOrChallengeAuthenticatorValues {
+  EnrollOrChallengeAuthenticatorValues,
+  ReEnrollAuthenticatorValues {
 }
 
 export async function authenticate(
@@ -29,6 +33,5 @@ export async function authenticate(
   return run(authClient, { 
     ...options, 
     flow,
-    needInteraction: false 
   });
 }

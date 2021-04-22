@@ -14,9 +14,9 @@ const next = (nextStep, res) => {
   const { name, type } = nextStep;
   if (name === 'enroll-authenticator') {
     res.redirect(`/signup/enroll-${type}-authenticator`);
-  } else {
-    throw new Error('Unable to handle next step');
+    return true;
   }
+  return false;
 };
 
 router.get('/signup', (_, res) => {
@@ -24,9 +24,9 @@ router.get('/signup', (_, res) => {
 });
 
 router.post('/signup', async (req, res) => {
+  const { firstName, lastName, email } = req.body;
+  const authClient = getAuthClient(req);
   try {
-    const { firstName, lastName, email } = req.body;
-    const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
       firstName, 
       lastName, 
@@ -45,7 +45,7 @@ router.post('/signup', async (req, res) => {
 router.get(`/signup/enroll-email-authenticator`, (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
-    res.render(`email-authenticator`, {
+    res.render('email-authenticator', {
       title: 'Enroll email authenticator',
       action: '/signup/enroll-email-authenticator',
     });
@@ -55,9 +55,9 @@ router.get(`/signup/enroll-email-authenticator`, (req, res) => {
 });
 
 router.post('/signup/enroll-email-authenticator', async (req, res) => {
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
   try {
-    const { verificationCode } = req.body;
-    const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
       verificationCode, 
       authenticators,
@@ -85,13 +85,13 @@ router.get(`/signup/enroll-password-authenticator`, (req, res) => {
 });
 
 router.post('/signup/enroll-password-authenticator', async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  const authClient = getAuthClient(req);
   try {
-    const { password, confirmPassword } = req.body;
     if (password !== confirmPassword) {
       throw new Error('Password not match');
     }
 
-    const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
       password, 
       authenticators,

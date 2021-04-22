@@ -12,12 +12,11 @@ import {
 
 export interface RunOptions {
   flow: RemediationFlow;
-  needInteraction: boolean;
   action?: string;
 }
 
 export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
-  const { needInteraction, flow, action } = options;
+  const { flow, action } = options;
   let tokens;
   let nextStep;
   let interactionHandle;
@@ -46,7 +45,7 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
     nextStep = nextStepFromResp;
 
     // Did we get an interaction code?
-    status = needInteraction ? IdxStatus.PENDING : IdxStatus.FAILED;
+    status = IdxStatus.PENDING;
     if (interactionCode) {
       const meta = authClient.transactionManager.load() as IdxTransactionMeta;
       const {

@@ -33,6 +33,9 @@ module.exports = function handleAuthTransaction({
   }
   // Proceed to next step
   if (typeof next === 'function') {
-    next(nextStep, res);
+    const supportNextStep = next(nextStep, res);
+    if (!supportNextStep) {
+      throw new Error('Unable to handle next step');
+    }
   }
 };

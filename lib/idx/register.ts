@@ -37,6 +37,5 @@ export async function register(
   return run(authClient, { 
     ...options, 
     flow,
-    needInteraction: true 
   });
 }

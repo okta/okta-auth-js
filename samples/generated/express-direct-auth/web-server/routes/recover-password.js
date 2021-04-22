@@ -13,11 +13,12 @@ const next = (nextStep, res) => {
   if (name === 'challenge-authenticator' 
       || name === 'authenticator-verification-data') {
     res.redirect(`/recover-password/challenge-${type}-authenticator`);
+    return true;
   } else if (name === 'reset-authenticator') {
     res.redirect('/recover-password/reset');
-  } else {
-    throw new Error('Unable to handle next step');
+    return true;
   }
+  return false;
 };
 
 router.get('/recover-password', (req, res) => {
