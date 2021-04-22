@@ -20,8 +20,9 @@ export default class SelectAuthenticator extends Base {
         break;
       }
     }
-    if (!selectedOption)
+    if (!selectedOption) {
       return null;
+    }
     return {
       id: selectedOption.value.form.value.find(({ name }) => name === 'id').value
     };
