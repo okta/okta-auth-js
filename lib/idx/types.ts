@@ -16,10 +16,6 @@ export type NextStep = {
   name: string;
   type?: string;
 }
-export interface RemediationResponse {
-  idxResponse: IdxResponse;
-  nextStep?: NextStep;
-}
 
 export interface AcceptsInteractionHandle {
   interactionHandle?: string;

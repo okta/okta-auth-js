@@ -103,7 +103,7 @@ export class Base {
     return [];
   }
 
-  createApiError(err) {
+  createFormError(err) {
     const errorRemediation = err.remediation.value.find(({ name }) => name === this.remediation.name);
     const errors = this.getErrorMessages(errorRemediation);
     return new AuthApiError({

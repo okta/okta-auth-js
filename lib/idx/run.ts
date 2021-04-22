@@ -39,10 +39,14 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
     const { 
       idxResponse: { 
         interactionCode,
-      }, 
-      nextStep: nextStepFromResp
+      } = {}, 
+      nextStep: nextStepFromResp,
+      formError,
     } = await remediate(idxResponse, flow, values);
+
+    // Track nextStep and formError
     nextStep = nextStepFromResp;
+    error = formError;
 
     // Did we get an interaction code?
     status = IdxStatus.PENDING;
@@ -71,7 +75,6 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
     error = err;
     status = IdxStatus.FAILED;
     // Clear transaction meta when error is not handlable
-    // TODO: probably need to handle error differently based on it's idx top level error or form error
     authClient.transactionManager.clear();
   }
   

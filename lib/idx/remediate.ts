@@ -6,13 +6,20 @@ import {
   isRawIdxResponse, 
   RemediationFlow, 
   RemediationValues,
-  RemediationResponse,
+  APIError,
+  NextStep,
 } from '../types';
 import { 
   createApiError, 
   isErrorResponse, 
   getIdxRemediation 
 } from './util';
+
+interface RemediationResponse {
+  idxResponse?: IdxResponse;
+  nextStep?: NextStep;
+  formError?: APIError;
+}
 
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
@@ -54,13 +61,19 @@ export async function remediate(
     }
     return remediate(idxResponse, flow, values); // recursive call
   } catch (e) {
+    // Thrown error terminates the interaction with idx
     if (isRawIdxResponse(e)) { // idx responses are sometimes thrown, these will be "raw"
       if (e.messages) {
+        // Error in the root level of the response is not handlable, throw it
         throw createApiError(e);
       } else {
-        throw remediator.createApiError(e);
+        // Form error is handlable with client side retry, return it
+        const nextStep = remediator.getNextStep();
+        const formError = remediator.createFormError(e);
+        return { nextStep, formError };
       }
     }
+    // throw unknown error
     throw e;
   }
 }
