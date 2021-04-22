@@ -10,7 +10,7 @@ const router = express.Router();
 
 const authenticators = ['email', 'password']; // ordered authenticators
 
-const next = (nextStep, res) => {
+const next = ({ nextStep, res }) => {
   const { name, type } = nextStep;
   if (name === 'enroll-authenticator') {
     res.redirect(`/signup/enroll-${type}-authenticator`);

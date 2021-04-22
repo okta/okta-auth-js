@@ -41,10 +41,10 @@ export async function remediate(
   const remediator = new T(idxRemediation, values);
 
   // Recursive loop breaker
-  // TODO: there should be three states to handle:
-  // 1. can remediate
-  // 2. cannot remediate due to need user interaction
-  // 3. cannot remediate due to unsupported inputs or policies
+  // Three states are handled here:
+  // 1. can remediate -> the engine keep running remediation with provided data
+  // 2. cannot remediate due to need user interaction -> return nextStep data back to client
+  // 3. cannot remediate due to unsupported inputs or policies -> throw error
   if (!remediator.canRemediate()) {
     const nextStep = remediator.getNextStep();
     return { idxResponse, nextStep };

@@ -1,4 +1,4 @@
-/* eslint-disable max-statements */
+/* eslint-disable max-statements, max-depth */
 import { AuthTransaction } from '../tx';
 import { interact } from './interact';
 import { remediate } from './remediate';
@@ -13,11 +13,11 @@ import {
 
 export interface RunOptions {
   flow: RemediationFlow;
-  action?: string;
+  actions?: string[];
 }
 
 export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
-  const { flow, action } = options;
+  const { flow, actions } = options;
   let tokens;
   let nextStep;
   let interactionHandle;
@@ -29,9 +29,14 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
     let { idxResponse, stateHandle } = await interact(authClient, options);
     interactionHandle = idxResponse.toPersist.interactionHandle;
 
-    // Call action if provided
-    if (action && typeof idxResponse.actions[action] === 'function') {
-      idxResponse = await idxResponse.actions[action]();
+    // Call first available option
+    if (actions) {
+      for (let action of actions) {
+        if (typeof idxResponse.actions[action] === 'function') {
+          idxResponse = await idxResponse.actions[action]();
+          break;
+        }
+      }
     }
 
     const values: RemediationValues = { ...options, stateHandle };

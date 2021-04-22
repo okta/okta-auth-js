@@ -24,6 +24,14 @@ a:link, a:visited, a:active {
   font-size: 15px;
 }
 
+#samples .ui.header {
+  margin-top: 30px;
+}
+
+#samples form {
+  max-width: 400px;
+}
+
 /* Menu ***********************************************************************/
 
 .menu button {
@@ -150,16 +158,4 @@ ol.ui.list li {
 
 .profile .ui.table th {
   text-align: center;
-}
-
-/* Sign In Page ***************************************************************/
-
-#sign-in,
-#registration {
-  margin: 30px auto;
-}
-
-#sign-in,
-#registration form {
-  max-width: 400px;
 }

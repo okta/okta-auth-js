@@ -5,7 +5,7 @@ const sampleConfig = require('../../config').webServer;
 
 const router = express.Router();
 
-const next = (nextStep, res) => {
+const next = ({ nextStep, res }) => {
   const { name } = nextStep;
   if (name === 'reenroll-authenticator') {
     res.redirect('/login/change-password');

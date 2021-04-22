@@ -62,6 +62,7 @@ export interface IdxRemeditionValue {
 }
 export interface IdxRemediation {
   name: string;
+  label?: string;
   value: IdxRemeditionValue[];
   relatesTo: {
     type: string;

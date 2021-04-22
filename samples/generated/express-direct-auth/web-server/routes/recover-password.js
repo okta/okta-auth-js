@@ -8,9 +8,13 @@ const {
 
 const router = express.Router();
 
-const next = (nextStep, res) => {
-  const { name, type } = nextStep;
-  if (name === 'challenge-authenticator' 
+const next = ({ req, res, nextStep }) => {
+  const { name, type, authenticators } = nextStep;
+  if (name === 'select-authenticator-authenticate') {
+    req.session.authenticators = authenticators;
+    res.redirect('/recover-password/select-authenticator');
+    return true;
+  } else if (name === 'challenge-authenticator' 
       || name === 'authenticator-verification-data') {
     res.redirect(`/recover-password/challenge-${type}-authenticator`);
     return true;
@@ -26,13 +30,13 @@ router.get('/recover-password', (req, res) => {
 });
 
 router.post('/recover-password', async (req, res) => {
-  const { authenticator = 'email' } = req.query;
+  const { authenticator } = req.query;
   const { identifier } = req.body;
+  const authClient = getAuthClient(req);
   try {
-    const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.recoverPassword({
       identifier,
-      authenticators: [authenticator],
+      authenticators: authenticator ? [authenticator] : [],
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
@@ -43,7 +47,35 @@ router.post('/recover-password', async (req, res) => {
   }
 });
 
-router.get(`/recover-password/challenge-email-authenticator`, (req, res) => {
+router.get('/recover-password/select-authenticator', (req, res) => {
+  const { status, authenticators } = req.session;
+  if (status === IdxStatus.PENDING) {
+    res.render('select-authenticator', {
+      authenticators,
+      action: '/recover-password/select-authenticator',
+    });
+  } else {
+    res.redirect('/recover-password');
+  }
+});
+
+router.post('/recover-password/select-authenticator', async (req, res) => {
+  const { authenticator } = req.body;
+  const authClient = getAuthClient(req);
+  try {
+    const authTransaction = await authClient.idx.recoverPassword({
+      authenticators: [authenticator],
+    });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
+  } catch (error) {
+    renderError(res, {
+      template: 'select-authenticator',
+      error,
+    });
+  }
+});
+
+router.get('/recover-password/challenge-email-authenticator', (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
     res.render('email-authenticator', {
