@@ -5,6 +5,11 @@ export default class SelectAuthenticator extends Base {
   values: RegistrationRemediationValues;
   map = {};
 
+  getRequiredValues() {
+    // authenticator is required to proceed
+    return super.getRequiredValues().concat(this.remediation.value.map(v => v.name).filter(n => n == 'authenticator'));
+  }
+
   mapAuthenticator(remediationValue: any) {
     const { authenticators } = this.values;
     let selectedOption;
@@ -15,6 +20,8 @@ export default class SelectAuthenticator extends Base {
         break;
       }
     }
+    if (!selectedOption)
+      return null;
     return {
       id: selectedOption.value.form.value.find(({ name }) => name === 'id').value
     };

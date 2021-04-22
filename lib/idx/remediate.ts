@@ -4,14 +4,12 @@ import {
   IdxResponse, 
   isRawIdxResponse, 
   RemediationFlow, 
-  RemediationValues,
-  RemediationValuesWithAuthenticators
+  RemediationValues
 } from '../types';
 import { 
   createApiError, 
   isErrorResponse, 
-  getIdxRemediation,
-  getIdxRemediationWithAuthenticators
+  getIdxRemediation
 } from './util';
 
 // This function is called recursively until it reaches success or cannot be remediated
@@ -22,26 +20,27 @@ export async function remediate(
 ) {
   const { neededToProceed } = idxResponse;
   // TODO: idxRemediation may be unfound due to policy setting, handle error here
-  let idxRemediation;
-  const authenticators = (values as RemediationValuesWithAuthenticators).authenticators;
-  if (authenticators) {
-    idxRemediation = getIdxRemediationWithAuthenticators(flow, neededToProceed, authenticators);
-  } else {
-    idxRemediation = getIdxRemediation(flow, neededToProceed);
-  }
+  let idxRemediation = getIdxRemediation(flow, neededToProceed);
   
-  const name = idxRemediation.name;
-  const T = flow[name];
+  let name = idxRemediation.name;
+  let T = flow[name];
   if (!T) {
     // No remediator is registered. bail!
     return idxResponse;
   }
-  const remediator = new T(idxRemediation, values);
+  let remediator = new T(idxRemediation, values);
 
   // Recursive loop breaker
   if (!remediator.canRemediate()) {
-    const nextStep = remediator.getNextStep();
-    return { idxResponse, nextStep };
+    if (neededToProceed.find(n => n.name == 'skip')) {
+      idxRemediation = getIdxRemediation(flow, neededToProceed.filter(r => r.name == 'skip'));
+      name = 'skip';
+      T = flow[name];
+      remediator = new T(idxRemediation, values);
+    } else {
+      const nextStep = remediator.getNextStep();
+      return { idxResponse, nextStep };
+    }
   }
 
   const data = remediator.getData();

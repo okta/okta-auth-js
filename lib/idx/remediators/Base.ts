@@ -13,12 +13,16 @@ export default class Base {
     this.values = values;
   }
 
+  getRequiredValues() {
+    return getRequiredValues(this.remediation);
+  }
+
   // Override this method to provide custom check
   canRemediate() {
     if (!this.map) {
       return false;
     }
-    const required = getRequiredValues(this.remediation);
+    const required = this.getRequiredValues();
     const needed = required.find((key) => !this.hasData(key));
     if (needed) {
       return false; // missing data for a required field
@@ -75,6 +79,13 @@ export default class Base {
     key: string // idx name
   ): boolean 
   {
+    // Map value by "map${Property}" function in each subClass
+    if (typeof this[`map${titleCase(key)}`] === 'function') {
+      return !!this[`map${titleCase(key)}`](
+        this.remediation.value.find(({name}) => name === key)
+      );
+    }
+
     // no attempt to format, we want simple true/false
     if (!this.map || !this.map[key] || !Array.isArray(this.map[key])) {
       return !!this.values[key];

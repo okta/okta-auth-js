@@ -24,11 +24,8 @@ export interface AuthenticationRemediationValues extends RemediationValues {
   password?: string;
 }
 
-export interface RemediationValuesWithAuthenticators {
+export interface RegistrationRemediationValues extends RemediationValues {
   authenticators: string[];
-}
-
-export interface RegistrationRemediationValues extends RemediationValuesWithAuthenticators {
   firstName?: string;
   lastName?: string;
   email?: string;
@@ -36,7 +33,8 @@ export interface RegistrationRemediationValues extends RemediationValuesWithAuth
   password?: string;
 }
 
-export interface PasswordRecoveryRemediationValues extends RemediationValuesWithAuthenticators {
+export interface PasswordRecoveryRemediationValues extends RemediationValues {
+  authenticators: string[];
   identifier?: string;
   emailVerificationCode?: string;
   password?: string;
