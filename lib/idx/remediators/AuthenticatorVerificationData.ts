@@ -1,7 +1,7 @@
 import { Base, RemediationValues } from './Base';
 
 export interface AuthenticatorVerificationDataValues extends RemediationValues {
-  authenticators: string[];
+  authenticators?: string[];
 }
 
 export class AuthenticatorVerificationData extends Base {

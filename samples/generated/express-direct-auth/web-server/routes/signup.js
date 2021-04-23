@@ -45,7 +45,7 @@ router.post('/signup', async (req, res) => {
 router.get(`/signup/enroll-email-authenticator`, (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
-    res.render('email-authenticator', {
+    res.render('authenticator', {
       title: 'Enroll email authenticator',
       action: '/signup/enroll-email-authenticator',
     });
@@ -65,7 +65,7 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
-      template: 'email-authenticator',
+      template: 'authenticator',
       title: 'Enroll email authenticator',
       error,
     });

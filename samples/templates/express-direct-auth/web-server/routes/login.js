@@ -1,13 +1,28 @@
 const express = require('express');
 const { IdxStatus } = require('@okta/okta-auth-js');
-const { getAuthClient, renderError, handleAuthTransaction } = require('../utils');
+const { 
+  getAuthClient, 
+  renderError, 
+  handleAuthTransaction, 
+} = require('../utils');
+const { 
+  generateSelectAuthenticator, 
+  generateChallengeAuthenticator,
+} = require('../routeUtils');
 const sampleConfig = require('../../config').webServer;
 
 const router = express.Router();
 
 const next = ({ nextStep, res }) => {
-  const { name } = nextStep;
-  if (name === 'reenroll-authenticator') {
+  const { name, type } = nextStep;
+  if (name === 'select-authenticator-authenticate') {
+    req.session.authenticators = authenticators;
+    res.redirect('/login/select-authenticator');
+    return true;
+  } else if (name === 'challenge-authenticator') {
+    res.redirect(`/login/challenge-${type}-authenticator`);
+    return true;
+  } else if (name === 'reenroll-authenticator') {
     res.redirect('/login/change-password');
     return true;
   }
@@ -79,7 +94,11 @@ router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const authClient = getAuthClient(req);
   try {
-    const authTransaction = await authClient.idx.authenticate({ username, password });
+    const authTransaction = await authClient.idx.authenticate({ 
+      username, 
+      password,
+      authenticators: ['email'],
+    });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
@@ -130,5 +149,7 @@ router.get('/login/callback', async (req, res) => {
   }
 });
 
+generateSelectAuthenticator({ flow: 'login', next, router });
+generateChallengeAuthenticator({ flow: 'login', type: 'email', next, router });
 
 module.exports = router;

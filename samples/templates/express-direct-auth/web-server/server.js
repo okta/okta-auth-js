@@ -41,4 +41,14 @@ app.use(userContext);
 
 app.use(require('./routes'));
 
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+
+  // Clear transaction meta
+  const authClient = getAuthClient(req);
+  authClient.transactionManager.clear();
+
+  res.status(500).send('Internal Error!');
+});
+
 app.listen(port, () => console.log(`App started on port ${port}`));

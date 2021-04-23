@@ -2,10 +2,6 @@ import { Base, RemediationValues } from './Base';
 import { IdxRemediation, IdxRemeditionValue } from '../types';
 import { AuthSdkError } from '../../errors';
 
-export interface SelectAuthenticatorValues extends RemediationValues {
-  authenticators: string[];
-}
-
 // Find matched authenticator in provided order
 function findMatchedOption(authenticators, options) {
   let option;
@@ -17,6 +13,10 @@ function findMatchedOption(authenticators, options) {
     }
   }
   return option;
+}
+
+export interface SelectAuthenticatorValues extends RemediationValues {
+  authenticators?: string[];
 }
 
 export class SelectAuthenticator extends Base {
