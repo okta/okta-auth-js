@@ -95,13 +95,16 @@ const renderLoginWithIDP = async (req, res) => {
 
 router.get('/login', (req, res) => {
   const { widget, idp } = req.query;
+  
   if (widget) {
-    renderLoginWithWidget(req, res);
-  } else if (idp) {
-    renderLoginWithIDP(req, res);
-  } else {
-    renderTemplate(req, res, 'login');
+    return renderLoginWithWidget(req, res);
   }
+  
+  if (idp) {
+    return renderLoginWithIDP(req, res);
+  }
+
+  renderLogin();
 });
 
 router.post('/login', async (req, res) => {
