@@ -77,26 +77,18 @@ const renderLoginWithWidget = (req, res) => {
     });
 };
 
-const renderLoginWithIDP = (req, res) => {
+const renderLoginWithIDP = async (req, res) => {
   const authClient = getAuthClient(req);
   try {
-    const { 
-      data: { 
-        tokens, 
-        error,
-      },
-    } = await authClient.idx.authenticate(); // Policy must be configured to return a `redirect-idp` remediation
-    if (error) {
-      throw error;
+    const tx = await authClient.idx.authenticate({ state: req.transactionId });
+    if (!tx.data.nextStep || tx.data.nextStep.name !== 'redirect-idp') {
+      throw new Error('Okta Signon policy must be configured to use an Identity Provider');
     }
-    // Save tokens to storage (req.session)
-    authClient.tokenManager.setTokens(tokens);
-    // Redirect back to home page
-    res.redirect('/');
+    renderTemplate(req, res, 'login-with-idp', tx.data.nextStep);
   } catch (error) {
     authClient.transactionManager.clear();
     req.setLastError(error.message);
-    res.redirect('/login');
+    renderTemplate(req, res, 'login-with-idp');
   }
 
 };

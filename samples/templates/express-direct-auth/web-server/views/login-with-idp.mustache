@@ -8,7 +8,7 @@
     <div id="sign-in" class="ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
-          <h2>Sign In</h2>
+          <h2>Sign In using an external IDP</h2>
         </div>
       </div>
 
@@ -17,8 +17,9 @@
       </div>
 
       <div class="row">
-
-
+        {{#idp}}
+          <a href="{{href}}">{{idp.name}}</a>
+        {{/idp}}
       </div>
 
     </div>

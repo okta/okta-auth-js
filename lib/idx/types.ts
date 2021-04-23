@@ -49,6 +49,11 @@ export enum IdxStatus {
   FAILED,
 }
 
+export interface IdpConfig {
+  id: string;
+  name: string;
+}
+
 // TODO: remove when idx-js provides type information
 export interface IdxRemeditionValue {
   name: string;
@@ -70,6 +75,10 @@ export interface IdxRemediation {
       type: string;
     };
   };
+  idp?: IdpConfig;
+  href?: string;
+  method?: string;
+  type?: string;
 }
 
 export interface IdxMessage {
