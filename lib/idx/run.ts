@@ -1,3 +1,4 @@
+/* eslint-disable max-statements, max-depth */
 import { AuthTransaction } from '../tx';
 import { interact } from './interact';
 import { remediate } from './remediate';
@@ -7,30 +8,35 @@ import {
   IdxTransactionMeta,
   RemediationValues,
   RemediationFlow,
+  IdxStatus,
 } from '../types';
 
 export interface RunOptions {
   flow: RemediationFlow;
-  needInteraction: boolean;
-  action?: string;
+  actions?: string[];
 }
 
 export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
-  const { needInteraction, flow, action } = options;
+  const { flow, actions } = options;
   let tokens;
   let nextStep;
   let interactionHandle;
   let error;
-  let status;
+  let status: IdxStatus;
 
   try {
     // Start/resume the flow
     let { idxResponse, stateHandle } = await interact(authClient, options);
     interactionHandle = idxResponse.toPersist.interactionHandle;
 
-    // Call action if provided
-    if (action && typeof idxResponse.actions[action] === 'function') {
-      idxResponse = await idxResponse.actions[action]();
+    // Call first available option
+    if (actions) {
+      for (let action of actions) {
+        if (typeof idxResponse.actions[action] === 'function') {
+          idxResponse = await idxResponse.actions[action]();
+          break;
+        }
+      }
     }
 
     const values: RemediationValues = { ...options, stateHandle };
@@ -39,13 +45,17 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
     const { 
       idxResponse: { 
         interactionCode,
-      }, 
-      nextStep: nextStepFromResp
+      } = {}, 
+      nextStep: nextStepFromResp,
+      formError,
     } = await remediate(idxResponse, flow, values);
+
+    // Track nextStep and formError
     nextStep = nextStepFromResp;
+    error = formError;
 
     // Did we get an interaction code?
-    status = needInteraction ? 'PENDING' : 'FAILED';
+    status = IdxStatus.PENDING;
     if (interactionCode) {
       const meta = authClient.transactionManager.load() as IdxTransactionMeta;
       const {
@@ -65,13 +75,12 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
         scopes,
         ignoreSignature
       }, urls);
-      status = 'SUCCESS';
+      status = IdxStatus.SUCCESS;
     }
   } catch (err) {
     error = err;
-    status = 'FAILED';
+    status = IdxStatus.FAILED;
     // Clear transaction meta when error is not handlable
-    // TODO: probably need to handle error differently based on it's idx top level error or form error
     authClient.transactionManager.clear();
   }
   

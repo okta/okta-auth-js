@@ -38,7 +38,9 @@ export async function recoverPassword(
   return run(authClient, { 
     ...options, 
     flow,
-    needInteraction: true,
-    action: 'currentAuthenticator-recover',
+    actions: [
+      'currentAuthenticator-recover', 
+      'currentAuthenticatorEnrollment-recover'
+    ],
   });
 }

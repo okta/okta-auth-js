@@ -16,10 +16,6 @@ export type NextStep = {
   name: string;
   type?: string;
 }
-export interface RemediationResponse {
-  idxResponse: IdxResponse;
-  nextStep?: NextStep;
-}
 
 export interface AcceptsInteractionHandle {
   interactionHandle?: string;
@@ -47,6 +43,12 @@ export interface IdxOptions extends
   AcceptsInteractionHandle {
 }
 
+export enum IdxStatus {
+  SUCCESS,
+  PENDING,
+  FAILED,
+}
+
 // TODO: remove when idx-js provides type information
 export interface IdxRemeditionValue {
   name: string;
@@ -60,6 +62,7 @@ export interface IdxRemeditionValue {
 }
 export interface IdxRemediation {
   name: string;
+  label?: string;
   value: IdxRemeditionValue[];
   relatesTo: {
     type: string;

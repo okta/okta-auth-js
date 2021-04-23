@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { AuthTransaction, OktaAuth } from '@okta/okta-auth-js';
+import { AuthTransaction, OktaAuth, IdxStatus } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
 const authClient = new OktaAuth({});
@@ -21,7 +21,7 @@ const authClient = new OktaAuth({});
 
   expectType<boolean>(await authClient.tx.exists());
   expectType<object>(await authClient.tx.status());
-  expectType<string>(tx.status);
+  expectType<string | IdxStatus>(tx.status);
 
   // Manage transaction
   expectType<AuthTransaction>(await authClient.tx.resume());

@@ -4,7 +4,7 @@
     {{>head}}
   </head>
   <body id="samples">
-    <div id="sign-in" class="ui center aligned relaxed grid">
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
           <h2>Sign In</h2>
@@ -22,7 +22,7 @@
               <div class="ui label">
                 Username
               </div>
-              <input type="text" name="username" />
+              <input type="text" name="username" required />
             </div>
           </div>
           <div class="field">
@@ -30,7 +30,7 @@
               <div class="ui label">
                 Password
               </div>
-              <input type="password" name="password" />
+              <input type="password" name="password" required />
             </div>
           </div>
           <button class="ui fluid large primary submit button" type="submit">

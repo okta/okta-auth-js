@@ -6,6 +6,7 @@ const session = require('express-session');
 const mustacheExpress = require('mustache-express');
 const path = require('path');
 const { userContext } = require('./middlewares');
+const { getAuthClient } = require('./utils');
 
 const templateDir = path.join(__dirname, '', 'views');
 const frontendDir = path.join(__dirname, '', 'assets');
@@ -40,5 +41,16 @@ app.set('views', templateDir);
 app.use(userContext);
 
 app.use(require('./routes'));
+
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+
+  // Clear transaction meta
+  const authClient = getAuthClient(req);
+  authClient.transactionManager.clear();
+
+  res.status(500).send('Internal Error!');
+});
 
 app.listen(port, () => console.log(`App started on port ${port}`));

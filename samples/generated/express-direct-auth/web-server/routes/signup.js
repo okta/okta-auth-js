@@ -1,43 +1,22 @@
 const express = require('express');
-const { getAuthClient, renderError } = require('../utils');
+const { IdxStatus } = require('@okta/okta-auth-js');
+const { 
+  getAuthClient, 
+  renderError, 
+  handleAuthTransaction,
+} = require('../utils');
 
 const router = express.Router();
 
 const authenticators = ['email', 'password']; // ordered authenticators
 
-const handleAuthTransaction = (req, res, { authClient, authTransaction }) => {
-  const { 
-    data: { 
-      tokens, 
-      nextStep,
-      interactionHandle, 
-    },
-  } = authTransaction;
-
-  const next = () => {
-    if (nextStep.name === 'enroll-authenticator') {
-      res.redirect(`/signup/enroll-${nextStep.type}-authenticator`);
-    } else {
-      throw new Error('Unable to handle next step');
-    }
-  };
-  const done = () => {
-    // Save tokens to storage (req.session)
-    authClient.tokenManager.setTokens(tokens);
-    // Redirect back to home page
-    res.redirect('/');
-  };
-
-  // Done if tokens are available
-  if (tokens) {
-    return done();
+const next = ({ nextStep, res }) => {
+  const { name, type } = nextStep;
+  if (name === 'enroll-authenticator') {
+    res.redirect(`/signup/enroll-${type}-authenticator`);
+    return true;
   }
-  // Persist interactionHandle to session
-  if (interactionHandle) {
-    req.session.interactionHandle = interactionHandle;
-  }
-  // Proceed to next step
-  next(nextStep, res);
+  return false;
 };
 
 router.get('/signup', (_, res) => {
@@ -45,16 +24,16 @@ router.get('/signup', (_, res) => {
 });
 
 router.post('/signup', async (req, res) => {
+  const { firstName, lastName, email } = req.body;
+  const authClient = getAuthClient(req);
   try {
-    const { firstName, lastName, email } = req.body;
-    const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
       firstName, 
       lastName, 
       email,
       authenticators,
     });
-    handleAuthTransaction(req, res, { authClient, authTransaction });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
       template: 'registration',
@@ -64,9 +43,9 @@ router.post('/signup', async (req, res) => {
 });
 
 router.get(`/signup/enroll-email-authenticator`, (req, res) => {
-  const { interactionHandle } = req.session;
-  if (interactionHandle) {
-    res.render(`email-authenticator`, {
+  const { status } = req.session;
+  if (status === IdxStatus.PENDING) {
+    res.render('authenticator', {
       title: 'Enroll email authenticator',
       action: '/signup/enroll-email-authenticator',
     });
@@ -76,19 +55,17 @@ router.get(`/signup/enroll-email-authenticator`, (req, res) => {
 });
 
 router.post('/signup/enroll-email-authenticator', async (req, res) => {
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
   try {
-    const { verificationCode } = req.body;
-    const { interactionHandle } = req.session;
-    const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
       verificationCode, 
       authenticators,
-      interactionHandle, // continue with interactionHandle
     });
-    handleAuthTransaction(req, res, { authClient, authTransaction });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
-      template: 'email-authenticator',
+      template: 'authenticator',
       title: 'Enroll email authenticator',
       error,
     });
@@ -96,8 +73,8 @@ router.post('/signup/enroll-email-authenticator', async (req, res) => {
 });
 
 router.get(`/signup/enroll-password-authenticator`, (req, res) => {
-  const { interactionHandle } = req.session;
-  if (interactionHandle) {
+  const { status } = req.session;
+  if (status === IdxStatus.PENDING) {
     res.render('enroll-or-reset-password-authenticator', {
       title: 'Set up password',
       action: '/signup/enroll-password-authenticator',
@@ -108,20 +85,18 @@ router.get(`/signup/enroll-password-authenticator`, (req, res) => {
 });
 
 router.post('/signup/enroll-password-authenticator', async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  const authClient = getAuthClient(req);
   try {
-    const { password, confirmPassword } = req.body;
     if (password !== confirmPassword) {
       throw new Error('Password not match');
     }
 
-    const { interactionHandle } = req.session;
-    const authClient = getAuthClient(req);
     const authTransaction = await authClient.idx.register({ 
       password, 
       authenticators,
-      interactionHandle 
     });
-    handleAuthTransaction(req, res, { authClient, authTransaction });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
       template: 'enroll-or-reset-password-authenticator',

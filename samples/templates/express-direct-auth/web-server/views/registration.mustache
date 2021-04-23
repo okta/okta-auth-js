@@ -4,7 +4,7 @@
     {{>head}}
   </head>
   <body id="samples">
-    <div id="registration" class="ui center aligned relaxed grid">
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
           <h2>Self Service Registration</h2>
@@ -22,7 +22,7 @@
               <div class="ui label">
                 First Name
               </div>
-              <input type="text" name="firstName" />
+              <input type="text" name="firstName" required />
             </div>
           </div>
           <div class="field">
@@ -30,7 +30,7 @@
               <div class="ui label">
                 Last Name
               </div>
-              <input type="text" name="lastName" />
+              <input type="text" name="lastName" required />
             </div>
           </div>
           <div class="field">
@@ -38,7 +38,7 @@
               <div class="ui label">
                 Email
               </div>
-              <input type="email" name="email" />
+              <input type="email" name="email" required />
             </div>
           </div>
           <button class="ui fluid large primary submit button" type="submit">

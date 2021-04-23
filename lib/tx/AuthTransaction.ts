@@ -18,6 +18,7 @@ import { TransactionState } from './TransactionState';
 import { addStateToken } from './util';
 import { getPollFn } from './poll';
 import { postToTransaction } from './api';
+import { IdxStatus } from '../idx/types';
 
 interface PostToTransactionParams {
   autoPush?: boolean;
@@ -67,7 +68,7 @@ export class AuthTransaction implements TransactionState, AuthTransactionFunctio
   data: TransactionState;
   stateToken?: string;
   sessionToken?: string;
-  status: string;
+  status: string | IdxStatus;
   user?: Record<string, any>;
   factor?: Record<string, any>;
   factors?: Array<Record<string, any> >;
