@@ -34,6 +34,6 @@ const generateChallengeAuthenticator = ({ flow, type, next, router }) => {
       });
     }
   });  
-}
+};
 
 module.exports = generateChallengeAuthenticator;

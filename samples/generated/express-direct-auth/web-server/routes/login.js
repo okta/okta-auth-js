@@ -13,8 +13,8 @@ const sampleConfig = require('../../config').webServer;
 
 const router = express.Router();
 
-const next = ({ nextStep, res }) => {
-  const { name, type } = nextStep;
+const next = ({ nextStep, req, res }) => {
+  const { name, type, authenticators } = nextStep;
   if (name === 'select-authenticator-authenticate') {
     req.session.authenticators = authenticators;
     res.redirect('/login/select-authenticator');

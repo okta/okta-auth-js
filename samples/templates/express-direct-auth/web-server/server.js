@@ -6,6 +6,7 @@ const session = require('express-session');
 const mustacheExpress = require('mustache-express');
 const path = require('path');
 const { userContext } = require('./middlewares');
+const { getAuthClient } = require('./utils');
 
 const templateDir = path.join(__dirname, '', 'views');
 const frontendDir = path.join(__dirname, '', 'assets');
@@ -41,6 +42,7 @@ app.use(userContext);
 
 app.use(require('./routes'));
 
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 app.use(function(err, req, res, next) {
   console.error(err.stack);
 
