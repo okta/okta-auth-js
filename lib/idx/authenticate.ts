@@ -14,6 +14,7 @@ import {
   EnrollOrChallengeAuthenticatorValues,
   ReEnrollAuthenticator,
   ReEnrollAuthenticatorValues,
+  RedirectIdp
 } from './remediators';
 
 const flow: RemediationFlow = {
@@ -21,6 +22,7 @@ const flow: RemediationFlow = {
   'select-authenticator-authenticate': SelectAuthenticator,
   'challenge-authenticator': EnrollOrChallengeAuthenticator,
   'reenroll-authenticator': ReEnrollAuthenticator,
+  'redirect-idp': RedirectIdp
 };
 
 export interface AuthenticationOptions extends 

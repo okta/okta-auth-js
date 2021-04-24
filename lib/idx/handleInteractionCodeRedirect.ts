@@ -1,4 +1,4 @@
-import { AuthSdkError } from '../errors';
+import { AuthSdkError, OAuthError } from '../errors';
 import { OktaAuth } from '..';
 import {IdxTransactionMeta} from '../types';
 
@@ -6,10 +6,15 @@ export async function handleInteractionCodeRedirect(
   authClient: OktaAuth, 
   url: string
 ): Promise<void> {
+  const meta = authClient.transactionManager.load() as IdxTransactionMeta;
+  if (!meta) {
+    throw new Error('No transaction data was found in storage');
+  }
+
   const { 
     codeVerifier,
     state: savedState 
-  } = authClient.transactionManager.load() as IdxTransactionMeta;
+  } = meta;
   const { 
     searchParams
   // URL API has been added to the polyfill
@@ -21,7 +26,7 @@ export async function handleInteractionCodeRedirect(
   // Error handling
   const error = searchParams.get('error');
   if (error) {
-    throw new AuthSdkError(error);
+    throw new OAuthError(error, searchParams.get('error_description'));
   }
   if (state !== savedState) {
     throw new AuthSdkError('State in redirect uri does not match with transaction state');

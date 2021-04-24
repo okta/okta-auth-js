@@ -1,8 +1,9 @@
 const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
-
 const sampleConfig = require('../../config').webServer;
 
 module.exports = function getAuthClient(req, options = {}) {
+  const { transactionId } = req; // set by authTransaction middleware
+
   const storageProvider = {
     getItem: function(key) {
       let val;
@@ -30,6 +31,7 @@ module.exports = function getAuthClient(req, options = {}) {
           storageProvider
         },
         transaction: {
+          storageKey: `transaction-${transactionId}`, // unique storage per transaction
           storageProvider
         }
       },

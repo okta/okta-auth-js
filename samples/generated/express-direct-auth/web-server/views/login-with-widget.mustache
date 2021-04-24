@@ -8,22 +8,26 @@
     <link href="https://global.oktacdn.com/okta-signin-widget/{{siwVersion}}/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
   </head>
   <body id="samples">
+    {{>menu}}
+  
+    <div id="content" class="ui padded relaxed">
 
-    {{>errors}}
+      {{>errors}}
 
-    <div id="okta-signin-widget-container"></div>
+      <div id="okta-signin-widget-container"></div>
 
-    <script type="text/javascript">
-      const widgetConfig = {{{widgetConfig}}};
-      const signIn = new OktaSignIn({
-        el: '#okta-signin-widget-container',
-        ...widgetConfig
-      });
-      signIn.showSignInAndRedirect()
-        .catch(err => {
-          console.log('Error happen in showSignInAndRedirect: ', err);
+      <script type="text/javascript">
+        const widgetConfig = {{{widgetConfig}}};
+        const signIn = new OktaSignIn({
+          el: '#okta-signin-widget-container',
+          ...widgetConfig
         });
-    </script>
+        signIn.showSignInAndRedirect()
+          .catch(err => {
+            console.log('Error happen in showSignInAndRedirect: ', err);
+          });
+      </script>
 
+    </div>
   </body>
 </html>

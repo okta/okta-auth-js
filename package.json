@@ -39,7 +39,7 @@
     "build": "node scripts/build.js",
     "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js -p",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
-    "build:cjs": "cross-env babel lib -d build/cjs --config-file ./babel.cjs.js --extensions \".ts\",\".js\"",
+    "build:cjs": "cross-env babel lib -d build/cjs --config-file ./babel.cjs.js --extensions \".ts\",\".js\" --source-maps",
     "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
     "generate:samples": "yarn --cwd samples build && yarn install --ignore-scripts",
     "dev:samples": "yarn --cwd samples dev",
