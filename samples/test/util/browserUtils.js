@@ -11,7 +11,7 @@ async function waitForPopup(openPopupPromise) {
   await browser.waitUntil(async () => {
     handles = await browser.getWindowHandles();
     return handles.length > existingHandlesCount;
-  });
+  }), 5000, 'wait for popup';
   await browser.switchToWindow(handles[handles.length - 1]);
 
   // Close popup
@@ -25,7 +25,10 @@ async function waitForPopup(openPopupPromise) {
   await browser.switchToWindow(handles[existingHandlesCount - 1]);
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export {
-  waitForPopup,
+  waitForPopup, sleep
 };
