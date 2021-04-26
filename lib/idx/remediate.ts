@@ -32,7 +32,7 @@ export async function remediate(
 
   // Recursive loop breaker
   if (!remediator.canRemediate()) {
-    if (neededToProceed.find(n => n.name == 'skip')) {
+    if (remediator.canSkip() && neededToProceed.find(n => n.name == 'skip')) {
       idxRemediation = getIdxRemediation(flow, neededToProceed.filter(r => r.name == 'skip'));
       name = 'skip';
       T = flow[name];

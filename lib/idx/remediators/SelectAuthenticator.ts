@@ -10,6 +10,10 @@ export default class SelectAuthenticator extends Base {
     return super.getRequiredValues().concat(this.remediation.value.map(v => v.name).filter(n => n == 'authenticator'));
   }
 
+  canSkip() {
+    return true;
+  }
+
   mapAuthenticator(remediationValue: any) {
     const { authenticators } = this.values;
     let selectedOption;

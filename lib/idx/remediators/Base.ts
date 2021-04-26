@@ -17,6 +17,10 @@ export default class Base {
     return getRequiredValues(this.remediation);
   }
 
+  canSkip() {
+    return false;
+  }
+
   // Override this method to provide custom check
   canRemediate() {
     if (!this.map) {
