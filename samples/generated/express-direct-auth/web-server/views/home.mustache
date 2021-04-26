@@ -38,11 +38,11 @@
             <h3>Available flows in the sample:</h3>
             <div>
             <ul>
-              <li><a href="/login">Login using a username and password</a></li>
-              <li><a href="/login?idp=1">Login using an external identity provider</a></li>
-              <li><a href="/signup">Self service registration</a></li>
-              <li><a href="/login?widget=1">Self hosted widget</a></li>
-              <li><a href="/recover-password">Password Recovery</a></li>
+              <li><a id="password-factor-login-link" href="/login">Login using a username and password</a></li>
+              <li><a id="idp-login-link" href="/login?idp=1">Login using an external identity provider</a></li>
+              <li><a id="self-service-registration-link" href="/signup">Self service registration</a></li>
+              <li><a id="self-hosted-widget-login-link" href="/login?widget=1">Self hosted widget</a></li>
+              <li><a id="recover-password-link" href="/recover-password">Password Recovery</a></li>
             </ul>
             </div>
           {{/isLoggedIn}}
