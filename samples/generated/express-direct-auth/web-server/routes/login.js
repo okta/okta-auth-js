@@ -104,7 +104,7 @@ router.get('/login', (req, res) => {
     return renderLoginWithIDP(req, res);
   }
 
-  renderLogin();
+  renderLogin(req, res);
 });
 
 router.post('/login', async (req, res) => {

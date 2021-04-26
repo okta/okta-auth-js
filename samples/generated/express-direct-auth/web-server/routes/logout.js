@@ -8,7 +8,7 @@ router.post('/logout', async (req, res) => {
     const authClient = getAuthClient(req);
     // Get okta signout redirect url
     // Call this method before revoke tokens as revocation clears tokens in storage
-    const signoutRedirectUrl = authClient.getSignOutRedirectUrl();
+    const signoutRedirectUrl = authClient.getSignOutRedirectUrl({});
     // Revoke tokens
     await authClient.revokeRefreshToken();
     await authClient.revokeAccessToken();
