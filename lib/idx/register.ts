@@ -14,6 +14,7 @@ import {
   SelectAuthenticatorValues,
   EnrollOrChallengeAuthenticator,
   EnrollOrChallengeAuthenticatorValues,
+  Skip,
 } from './remediators';
 
 const flow: RemediationFlow = {
@@ -21,6 +22,7 @@ const flow: RemediationFlow = {
   'enroll-profile': EnrollProfile,
   'select-authenticator-enroll': SelectAuthenticator,
   'enroll-authenticator': EnrollOrChallengeAuthenticator,
+  'skip': Skip,
 };
 
 export interface RegistrationOptions extends 

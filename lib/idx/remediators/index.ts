@@ -7,3 +7,4 @@ export * from './RedirectIdp';
 export * from './SelectAuthenticator';
 export * from './SelectEnrollProfile';
 export * from './AuthenticatorVerificationData';
+export * from './Skip';

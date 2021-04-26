@@ -49,6 +49,15 @@ export class SelectAuthenticator extends Base {
     throw new AuthSdkError('Provided authenticators are not supported, please check your org configuration');
   }
 
+  getRequiredValues() {
+    // authenticator is required to proceed
+    return [...super.getRequiredValues(), 'authenticator'];
+  }
+
+  canSkip() {
+    return true;
+  }
+
   getNextStep() {
     const authenticators = this.remediationValue.options.map(option => {
       const { 

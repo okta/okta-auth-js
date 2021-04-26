@@ -27,12 +27,20 @@ export class Base {
     if (!this.map) {
       return false;
     }
-    const required = getRequiredValues(this.remediation);
+    const required = this.getRequiredValues();
     const needed = required.find((key) => !this.hasData(key));
     if (needed) {
       return false; // missing data for a required field
     }
     return true; // all required fields have available data
+  }
+
+  canSkip(): boolean {
+    return false;
+  }
+
+  getRequiredValues() {
+    return getRequiredValues(this.remediation);
   }
 
   // returns an object for the entire remediation form, or just a part
@@ -84,6 +92,13 @@ export class Base {
     key: string // idx name
   ): boolean 
   {
+    // Map value by "map${Property}" function in each subClass
+    if (typeof this[`map${titleCase(key)}`] === 'function') {
+      return !!this[`map${titleCase(key)}`](
+        this.remediation.value.find(({name}) => name === key)
+      );
+    }
+
     // no attempt to format, we want simple true/false
     if (!this.map || !this.map[key] || !Array.isArray(this.map[key])) {
       return !!this.values[key];
