@@ -69,13 +69,13 @@ class DirectAuthWebApp {
     await sleep(1000);
   }
 
-  async clickButtonToNavigateTo(destinationPath) {
+  async clickButtonToNavigateTo(button, destinationPath) {
     await browser.waitUntil(async () => {
       const currentPath = await browser.execute(() => window.location.pathname);
       const isOnDestinationPage = currentPath === destinationPath;
       if (!isOnDestinationPage) {
         console.log('not on ' + destinationPath);
-        await browser.url(destinationPath);
+        await (await button).click();
       }
       return isOnDestinationPage;
     }, 5000);
