@@ -13,7 +13,7 @@ class DirectAuthWebApp {
 
 
   async startFlow(flowId) {
-    await (await $(`#${flowId} a`)).click();
+    await (await $(`#${flowId}`)).click();
   }
 
   async open(queryObj) {
@@ -40,10 +40,10 @@ class DirectAuthWebApp {
 
   async clickButtonToNavigateTo(button, destinationPath) {
     await browser.waitUntil(async () => {
+      // eslint-disable-next-line no-undef
       const currentPath = await browser.execute(() => window.location.pathname);
       const isOnDestinationPage = currentPath === destinationPath;
       if (!isOnDestinationPage) {
-        console.log('not on ' + destinationPath);
         await (await button).click();
       }
       return isOnDestinationPage;

@@ -6,7 +6,7 @@ import DirectAuthWebApp from '../../pageobjects/DirectAuthWebApp';
 describe('password factor authentication', () => {
   it('succeedes with valid credentials provided', async () => {
     await startApp(DirectAuthWebApp);
-    await DirectAuthWebApp.startFlow('password-factor');
+    await DirectAuthWebApp.startFlow('password-factor-login-link');
     await loginDirect(DirectAuthWebApp);
     await DirectAuthWebApp.viewProfilePage();
 
@@ -16,7 +16,7 @@ describe('password factor authentication', () => {
 
   it('displays an error message for bad credentials', async () => {
     await startApp(DirectAuthWebApp);
-    await DirectAuthWebApp.startFlow('password-factor');
+    await DirectAuthWebApp.startFlow('password-factor-login-link');
     await loginDirect(DirectAuthWebApp, {
       username: 'btables',
       password: '`1=true'

@@ -11,6 +11,8 @@ async function loginRedirect(App) {
 async function loginDirect(App, options) {
   options = options || {};
   const config = getConfig();
+  await (await App.username).isEnabled();
+  await (await App.username).isClickable();
   await App.username.then(el => el.setValue(options.username || config.username));
   await App.password.then(el => el.setValue(options.password || config.password));
   await App.loginDirect();
