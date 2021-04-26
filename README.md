@@ -2576,7 +2576,6 @@ authClient.tokenManager.off('renewed', myRenewedCallback);
 
 The emitted `AuthState` object includes:
 
-* `isPending`: true in the time after page load (first render) but before the asynchronous methods to see if the tokenManager is aware of a current authentication.
 * `isAuthenticated`: true if the user is considered authenticated. Normally this is true if both an idToken and an accessToken are present in the tokenManager, but this behavior can be overridden if you passed a [transformAuthState](#transformauthstate) callback in the [configuration](#configuration-reference).
 * `accessToken`: the JWT accessToken for the currently authenticated user (if provided by the scopes).
 * `idToken`: the JWT idToken for the currently authenticated user (if provided by the scopes).

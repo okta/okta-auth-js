@@ -138,7 +138,7 @@ describe('AuthStateManager', () => {
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
           expect(handler).toHaveBeenCalledWith({
-            isPending: false,
+
             isAuthenticated: true,
             idToken: 'fakeIdToken0',
             accessToken: 'fakeAccessToken0'
@@ -160,7 +160,6 @@ describe('AuthStateManager', () => {
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(1);
           expect(handler).toHaveBeenCalledWith({
-            isPending: false,
             isAuthenticated: true,
             idToken: 'fakeIdToken1',
             accessToken: 'fakeAccessToken1'
@@ -184,13 +183,11 @@ describe('AuthStateManager', () => {
         setTimeout(() => {
           expect(handler).toHaveBeenCalledTimes(2);
           expect(handler).toHaveBeenCalledWith({
-            isPending: false,
             isAuthenticated: true,
             idToken: 'fakeIdToken0',
             accessToken: 'fakeAccessToken0'
           });
           expect(handler).toHaveBeenCalledWith({
-            isPending: false,
             isAuthenticated: true,
             idToken: 'fakeIdToken1',
             accessToken: 'fakeAccessToken1'
@@ -205,7 +202,6 @@ describe('AuthStateManager', () => {
         accessToken: 'fakeAccessToken0',
         idToken: 'fakeIdToken0',
         isAuthenticated: false,
-        isPending: false,
       };
       sdkMock.options.transformAuthState = jest.fn().mockResolvedValue(fakeAuthState);
       expect.assertions(3);
