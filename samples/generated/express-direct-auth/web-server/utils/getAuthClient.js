@@ -37,6 +37,7 @@ module.exports = function getAuthClient(req, options = {}) {
       },
       ...options
     });
+    
   } catch(e) {
     console.error('Caught exception in OktaAuth constructor: ', e);
   }

@@ -32,6 +32,11 @@ a:link, a:visited, a:active {
   max-width: 400px;
 }
 
+#samples .okta-sign-in-form {
+  padding-left: 15rem;
+  padding-top: 0;
+}
+
 /* Menu ***********************************************************************/
 
 .menu button {
