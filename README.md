@@ -2591,7 +2591,7 @@ authClient.authStateManager.subscribe((authState) => {
 
 #### `authStateManager.getAuthState()`
 
-Gets latest evaluated `authState` from the `authStateManager`. The `authState` (a unique new object) is re-evaluated when `authStateManager.updateAuthState()` is called.
+Gets latest evaluated `authState` from the `authStateManager`. The `authState` (a unique new object) is re-evaluated when `authStateManager.updateAuthState()` is called. If `updateAuthState` has not been called, or it has not finished calculating an initial state, `getAuthState` will return `null`.
 
 #### `authStateManager.updateAuthState()`
 
@@ -2725,7 +2725,9 @@ The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the 
 
 ### From 4.x to 5.x
 
-* Token auto renew requires [running OktaAuth as a service](#running-as-a-service). To start the service, call [start()](#start).
+* Token auto renew requires [running OktaAuth as a service](#running-as-a-service). To start the service, call [start()](#start). `start` will also call [updateAuthState](#authstatemanagerupdateauthstate) to set an initial [AuthState](#authstatemanager)
+* [getAuthState](#authstatemanagergetauthstate) will return `null` until an [AuthState](#authstatemanager) has been calculated.
+* `isPending` has been removed from [AuthState](#authstatemanager).
 
 ### From 3.x to 4.x
 

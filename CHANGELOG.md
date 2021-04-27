@@ -13,6 +13,7 @@
 - [#540](https://github.com/okta/okta-auth-js/pull/540) Locks `tokenManager.expireEarlySeconds` option with the default value (30s) for non-dev environment
 - [#677](https://github.com/okta/okta-auth-js/pull/677) Http requests will not send cookies by default
 - [#678](https://github.com/okta/okta-auth-js/pull/678) Default value for `originalUri` is null.
+- [#706](https://github.com/okta/okta-auth-js/pull/706) Removes `isPending` from `AuthState`
 
 ### Other
 
