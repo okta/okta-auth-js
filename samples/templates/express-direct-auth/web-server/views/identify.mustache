@@ -4,14 +4,13 @@
     {{>head}}
   </head>
   <body id="samples">
-
+      
     {{>menu}}
-
+    
     <div class="okta-sign-in-form ui center aligned relaxed grid">
-
       <div class="row">
         <div class="ui header">
-          <h2>Sign In</h2>
+          <h2>Identify</h2>
         </div>
       </div>
 
@@ -20,36 +19,19 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="/login" method="POST">
+        <form class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
-                Username
+                Username or Email
               </div>
               <input type="text" name="username" required />
             </div>
           </div>
-          <div class="field">
-            <div class="ui labeled input">
-              <div class="ui label">
-                Password
-              </div>
-              <input type="password" name="password" required />
-            </div>
-          </div>
           <button class="ui fluid large primary submit button" type="submit">
-            Sign In
+            Next
           </button>
         </form>
-      </div>
-
-      <div class="ui row grid">
-        <div class="ui messages row">
-          Don't have an account? &nbsp; <a href="/signup">Sign Up</a>
-        </div>
-        <div class="ui messages row">
-          Forgot password? &nbsp; <a href="/recover-password">Recover password</a>
-        </div>
       </div>
 
     </div>

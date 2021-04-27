@@ -4,6 +4,9 @@
     {{>head}}
   </head>
   <body id="samples">
+  
+    {{>menu}}
+
     <div class="okta-sign-in-form ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
@@ -26,7 +29,9 @@
               <div class="ui label">
                 Enter Code
               </div>
-              <input type="text" name="verificationCode" required />
+              {{#input}}
+                <input type="{{type}}" name="{{name}}" required />
+              {{/input}}
             </div>
           </div>
           <button class="ui fluid large primary submit button" type="submit">

@@ -6,20 +6,24 @@ const {
   handleAuthTransaction, 
 } = require('../utils');
 
-const generateSelectAuthenticator = ({ flow, next, router }) => {
-  router.get(`/${flow}/select-authenticator`, (req, res) => {
+const template = 'select-authenticator';
+
+const generateSelectAuthenticator = ({ 
+  path, action, entryPath, next, router 
+}) => {
+  router.get(path, (req, res) => {
     const { status, authenticators } = req.session;
     if (status === IdxStatus.PENDING) {
-      res.render('select-authenticator', {
+      res.render(template, {
         authenticators,
-        action: `/${flow}/select-authenticator`,
+        action,
       });
     } else {
-      res.redirect(`/${flow}`);
+      res.redirect(entryPath);
     }
   });
   
-  router.post(`/${flow}/select-authenticator`, async (req, res) => {
+  router.post(path, async (req, res) => {
     const { authenticator } = req.body;
     const authClient = getAuthClient(req);
     try {
@@ -30,7 +34,7 @@ const generateSelectAuthenticator = ({ flow, next, router }) => {
       handleAuthTransaction({ req, res, next, authClient, authTransaction });
     } catch (error) {
       renderError(res, {
-        template: 'select-authenticator',
+        template,
         error,
       });
     }

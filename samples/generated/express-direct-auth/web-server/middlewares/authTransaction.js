@@ -5,15 +5,20 @@ function uniqueId() {
 }
 
 module.exports = function authTransaction(req, res, next) {
-  let transactionId;
-  if (req.query.transactionId) {
-    transactionId = req.query.transactionId;
-  } else if (req.query.state) {
-    transactionId = req.query.state;
-  } else {
-    transactionId = uniqueId();
-  }
-  req.transactionId = transactionId;
+  const { 
+    transactionId: transactionIdFromQuery, 
+    state: stateFromQuery, 
+  } = req.query;
+  const { 
+    transactionId: transactionIdFromSession,
+    state: stateFromSession,
+  } = req.session;
+  
+  req.transactionId = transactionIdFromQuery 
+    || stateFromQuery 
+    || transactionIdFromSession 
+    || stateFromSession
+    || uniqueId();
 
   next();
 };

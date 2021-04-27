@@ -37,6 +37,9 @@ module.exports = function getAuthClient(req, options = {}) {
       },
       ...options
     });
+    
+    // Persist transactionId in session
+    req.session.transactionId = transactionId;
   } catch(e) {
     console.error('Caught exception in OktaAuth constructor: ', e);
   }

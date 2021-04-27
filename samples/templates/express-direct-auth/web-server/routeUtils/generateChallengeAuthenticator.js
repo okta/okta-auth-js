@@ -6,20 +6,24 @@ const {
   handleAuthTransaction, 
 } = require('../utils');
 
-const generateChallengeAuthenticator = ({ flow, type, next, router }) => {
-  router.get(`/${flow}/challenge-authenticator/${type}`, (req, res) => {
+const template = 'authenticator';
+
+const generateChallengeAuthenticator = ({ 
+  path, action, entryPath, type, next, router 
+}) => {
+  router.get(path, (req, res) => {
     const { status } = req.session;
     if (status === IdxStatus.PENDING) {
-      res.render('authenticator', {
+      res.render(template, {
         title: `Challenge ${type} authenticator`,
-        action: `/${flow}/challenge-authenticator/${type}`,
+        action,
       });
     } else {
-      res.redirect('/recover-password');
+      res.redirect(entryPath);
     }
   });
   
-  router.post(`/${flow}/challenge-authenticator/${type}`, async (req, res) => {
+  router.post(path, async (req, res) => {
     const { verificationCode } = req.body;
     const authClient = getAuthClient(req);
     try {
@@ -28,7 +32,7 @@ const generateChallengeAuthenticator = ({ flow, type, next, router }) => {
       handleAuthTransaction({ req, res, next, authClient, authTransaction });
     } catch (error) {
       renderError(res, {
-        template: 'authenticator',
+        template,
         title: `Challenge ${type} authenticator`,
         error,
       });
