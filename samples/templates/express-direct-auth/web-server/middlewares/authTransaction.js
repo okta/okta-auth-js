@@ -5,20 +5,8 @@ function uniqueId() {
 }
 
 module.exports = function authTransaction(req, res, next) {
-  const { 
-    transactionId: transactionIdFromQuery, 
-    state: stateFromQuery, 
-  } = req.query;
-  const { 
-    transactionId: transactionIdFromSession,
-    state: stateFromSession,
-  } = req.session;
-  
-  req.transactionId = transactionIdFromQuery 
-    || stateFromQuery 
-    || transactionIdFromSession 
-    || stateFromSession
-    || uniqueId();
+  const { transactionId, state } = req.query;
+  req.transactionId = transactionId || state || uniqueId();
 
   next();
 };

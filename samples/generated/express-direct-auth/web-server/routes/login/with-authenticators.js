@@ -5,6 +5,8 @@ const {
   handleAuthTransaction,
   renderTemplate,
   renderError,
+  redirect,
+  getFormActionPath,
 } = require('../../utils');
 
 const router = express.Router();
@@ -13,10 +15,10 @@ const next = ({ nextStep, req, res }) => {
   const { name, type, authenticators } = nextStep;
   if (name === 'select-authenticator-authenticate') {
     req.session.authenticators = authenticators;
-    res.redirect('/login/with-authenticators/select-authenticator');
+    redirect({ req, res, path: '/login/with-authenticators/select-authenticator' });
     return true;
   } else if (name === 'challenge-authenticator') {
-    res.redirect(`/login/with-authenticators/challenge-authenticator/${type}`);
+    redirect({ req, res, path: `/login/with-authenticators/challenge-authenticator/${type}` });
     return true;
   }
   return false;
@@ -24,11 +26,13 @@ const next = ({ nextStep, req, res }) => {
 
 router.get('/with-authenticators', (req, res) => {
   const { authenticator } = req.query;
-  res.render('identify', {
-    action: authenticator 
+  const action = getFormActionPath(
+    req, 
+    authenticator 
       ? `/login/with-authenticators?authenticator=${authenticator}` 
-      : '/login/with-authenticators'
-  });
+      : `/login/with-authenticators`
+  );
+  res.render('identify', { action });
 });
 
 router.post('/with-authenticators', async (req, res) => {
@@ -51,12 +55,13 @@ router.post('/with-authenticators', async (req, res) => {
 router.get('/with-authenticators/select-authenticator', (req, res) => {
   const { status, authenticators } = req.session;
   if (status === IdxStatus.PENDING) {
+    const action = getFormActionPath(req, '/login/with-authenticators/select-authenticator');
     res.render('select-authenticator', {
       authenticators,
-      action: '/login/with-authenticators/select-authenticator',
+      action,
     });
   } else {
-    res.redirect('/login/with-authenticators');
+    redirect({ req, res, path: '/login/with-authenticators' });
   }
 });
 
@@ -80,16 +85,17 @@ router.post('/with-authenticators/select-authenticator', async (req, res) => {
 router.get(`/with-authenticators/challenge-authenticator/email`, (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
+    const action = getFormActionPath(req, '/login/with-authenticators/challenge-authenticator/email');
     res.render('authenticator', {
       title: `Challenge email authenticator`,
       input: {
         type: 'text',
         name: 'verificationCode',
       },
-      action: `/login/with-authenticators/challenge-authenticator/email`,
+      action,
     });
   } else {
-    res.redirect('/login/with-authenticators/');
+    redirect({ req, res, path: '/login/with-authenticators' });
   }
 });
 
@@ -112,16 +118,17 @@ router.post(`/with-authenticators/challenge-authenticator/email`, async (req, re
 router.get(`/with-authenticators/challenge-authenticator/password`, (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
+    const action = getFormActionPath(req, '/login/with-authenticators/challenge-authenticator/password');
     res.render('authenticator', {
       title: `Challenge password authenticator`,
       input: {
         type: 'password',
         name: 'password',
       },
-      action: `/login/with-authenticators/challenge-authenticator/password`,
+      action,
     });
   } else {
-    res.redirect('/login/with-authenticators/');
+    redirect({ req, res, path: '/login/with-authenticators' });
   }
 });
 

@@ -4,21 +4,24 @@ const {
   getAuthClient, 
   handleAuthTransaction,
   renderTemplate,
+  redirect,
+  getFormActionPath,
 } = require('../../utils');
 
 const router = express.Router();
 
-const next = ({ nextStep, res }) => {
+const next = ({ nextStep, req, res }) => {
   const { name } = nextStep;
   if (name === 'reenroll-authenticator') {
-    res.redirect('/login/change-password');
+    redirect({ req, res, path: '/login/change-password' });
     return true;
   }
   return false;
 };
 
 router.get('/primary', (req, res) => {
-  res.render('login-primary');
+  const action = getFormActionPath(req, '/login/primary');
+  res.render('login-primary', { action });
 });
 
 router.post('/primary', async (req, res) => {
@@ -40,12 +43,13 @@ router.post('/primary', async (req, res) => {
 router.get('/change-password', (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
+    const action = getFormActionPath(req, '/login/change-password');
     res.render('enroll-or-reset-password-authenticator', {
       title: 'Change password',
-      action: '/login/change-password',
+      action,
     });
   } else {
-    res.redirect('/login/primary');
+    redirect({ req, res, path: '/login/primary' });
   }
 });
 
