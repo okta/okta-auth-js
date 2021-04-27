@@ -4,7 +4,6 @@ import Emitter from 'tiny-emitter';
 import { AuthStateManager, INITIAL_AUTH_STATE } from '../../lib/AuthStateManager';
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import waitFor from '@okta/test.support/waitFor';
 
 function createAuth() {
   return new OktaAuth({

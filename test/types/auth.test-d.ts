@@ -104,7 +104,6 @@ const authorizeOptions2: TokenParams = {
 
   // User
   expectType<boolean>(await authClient.isAuthenticated());
-  expectType<boolean>(await authClient.isAuthenticated(10));
   expectType<UserClaims>(await authClient.getUser());
 
   // Redirect

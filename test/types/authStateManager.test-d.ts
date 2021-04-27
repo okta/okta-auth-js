@@ -36,6 +36,5 @@ const authClient = new OktaAuth({});
   expectType<IDToken>(authState.idToken);
   expectType<RefreshToken>(authState.refreshToken);
   expectType<boolean>(authState.isAuthenticated);
-  expectType<boolean>(authState.isPending);
   expectType<string>(authState.error.message);
 })();
