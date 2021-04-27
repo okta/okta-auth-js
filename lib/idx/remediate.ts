@@ -40,6 +40,9 @@ export async function remediate(
 
   let remediator = new T(idxRemediation, values);
 
+  const skipRemediation = neededToProceed.find(r => r.name == 'skip');
+  remediator.setCanSkip(!!skipRemediation);
+  
   // Recursive loop breaker
   // Four states are handled here:
   // 1. can remediate -> the engine keep running remediation with provided data
@@ -48,8 +51,8 @@ export async function remediate(
   // 4. cannot remediate due to unsupported inputs or policies -> throw error
   if (!remediator.canRemediate()) {
     const nextStep = remediator.getNextStep();
-    if (remediator.canSkip() && neededToProceed.find(n => n.name == 'skip')) {
-      idxRemediation = getIdxRemediation(flow, neededToProceed.filter(r => r.name == 'skip'));
+    if (remediator.canSkip()) {
+      idxRemediation = skipRemediation;
       name = 'skip';
       T = flow[name];
       remediator = new T(idxRemediation, values);

@@ -16,10 +16,12 @@ export class Base {
   remediation: IdxRemediation;
   values: RemediationValues;
   map?: IdxToRemediationValueMap;
+  _canSkip: boolean;
 
   constructor(remediation: IdxRemediation, values: RemediationValues) {
     this.remediation = remediation;
     this.values = values;
+    this._canSkip = false;
   }
 
   // Override this method to provide custom check
@@ -35,8 +37,16 @@ export class Base {
     return true; // all required fields have available data
   }
 
-  canSkip(): boolean {
+  isSkipable() {
     return false;
+  }
+
+  canSkip() {
+    return this.isSkipable() && this._canSkip;
+  }
+
+  setCanSkip(value: boolean) {
+    this._canSkip = value;
   }
 
   getRequiredValues() {
