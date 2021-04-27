@@ -8,7 +8,7 @@
 
 ### Breaking Changes
 
-- [#689](https://github.com/okta/okta-auth-js/pull/689) New methods `start` and `stop` are added to control `OktaAuth` as a service. TokenManager options `autoRenew`, and  `autoRemove` will only take effect after calling `start`.
+- [#689](https://github.com/okta/okta-auth-js/pull/689) New methods `start` and `stop` are added to control `OktaAuth` as a service.
 - [#515](https://github.com/okta/okta-auth-js/pull/515) Removes `token.value` field
 - [#540](https://github.com/okta/okta-auth-js/pull/540) Locks `tokenManager.expireEarlySeconds` option with the default value (30s) for non-dev environment
 - [#677](https://github.com/okta/okta-auth-js/pull/677) Http requests will not send cookies by default
@@ -17,7 +17,8 @@
 ### Other
 
 - [#675](https://github.com/okta/okta-auth-js/pull/675) Removes warning when calling `updateAuthState` when there are no subscribers
-  
+- [#706](https://github.com/okta/okta-auth-js/pull/706) calling `isAuthenticated` will renew expired tokens when `autoRenew` is true
+
 ## 4.9.0
 
 ### Bug Fixes
