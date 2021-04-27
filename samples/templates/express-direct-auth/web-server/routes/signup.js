@@ -10,10 +10,10 @@ const router = express.Router();
 
 const authenticators = ['email', 'password']; // ordered authenticators
 
-const next = ({ nextStep, res }) => {
+const next = ({ nextStep, res, req }) => {
   const { name, type } = nextStep;
   if (name === 'enroll-authenticator') {
-    res.redirect(`/signup/enroll-${type}-authenticator`);
+    res.redirect(`/signup/enroll-${type}-authenticator?transactionId=${req.transactionId}`);
     return true;
   }
   return false;
@@ -47,7 +47,7 @@ router.get(`/signup/enroll-email-authenticator`, (req, res) => {
   if (status === IdxStatus.PENDING) {
     res.render('authenticator', {
       title: 'Enroll email authenticator',
-      action: '/signup/enroll-email-authenticator',
+      action: `/signup/enroll-email-authenticator?transactionId=${req.transactionId}`,
     });
   } else {
     res.redirect('/signup');
@@ -77,7 +77,7 @@ router.get(`/signup/enroll-password-authenticator`, (req, res) => {
   if (status === IdxStatus.PENDING) {
     res.render('enroll-or-reset-password-authenticator', {
       title: 'Set up password',
-      action: '/signup/enroll-password-authenticator',
+      action: `/signup/enroll-password-authenticator?transactionId=${req.transactionId}`,
     });
   } else {
     res.redirect('/signup');
