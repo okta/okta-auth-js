@@ -7,7 +7,7 @@ import {
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import {postToTransaction} from '../../../lib/tx';
-import { APIError } from '../../../lib/types';
+import { APIError, isAccessToken, isIDToken } from '../../../lib/types';
 
 describe('OktaAuth (api)', function() {
   let auth;
@@ -162,105 +162,112 @@ describe('OktaAuth (api)', function() {
   });
 
   describe('isAuthenticated', () => {
-    beforeEach(() => {
-      jest.useFakeTimers();
-    });
-    afterEach(() => {
-      jest.useRealTimers();
+
+    it('returns true if accessToken and idToken exist and are not expired', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: { fake: true },
+        idToken: { fake: true }
+      });
+      jest.spyOn(auth.tokenManager, 'hasExpired').mockReturnValue(false);
+      const res = await auth.isAuthenticated();
+      expect(res).toBe(true);
+      expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+      expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
     });
 
-    it('should return from authState if not in isPending state', async () => {
-      let retVal;
-      // expect true
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isAuthenticated: true,
-        isPending: false
+    it('returns false if accessToken does not exist', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: null,
+        idToken: { fake: true }
       });
-      retVal = await auth.isAuthenticated();
-      expect(retVal).toBe(true);
-      // expect false
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isAuthenticated: false,
-        isPending: false
-      });
-      retVal = await auth.isAuthenticated();
-      expect(retVal).toBe(false);
+      jest.spyOn(auth.tokenManager, 'hasExpired').mockReturnValue(false);
+      const res = await auth.isAuthenticated();
+      expect(res).toBe(false);
+      expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+      expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(1);
     });
 
-    it('should return based on next emitted non-pending authState', async () => {
-      let retVal;
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isAuthenticated: false,
-        isPending: true
+    it('returns false if idToken does not exist', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: { fake: true },
+        idToken: null
       });
-      auth.tokenManager.getTokens = jest.fn().mockResolvedValue({
-        accessToken: 'fake access token',
-        idToken: 'fake id token'
-      });
-      retVal = await auth.isAuthenticated();
-      expect(retVal).toBe(true);
-      expect(auth.emitter.e.authStateChange).toBe(undefined);
+      jest.spyOn(auth.tokenManager, 'hasExpired').mockReturnValue(false);
+      const res = await auth.isAuthenticated();
+      expect(res).toBe(false);
+      expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+      expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(1);
     });
 
-    it('should timeout and return false no non-pending state is emitted', async () => {
-      expect.assertions(2);
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isAuthenticated: false,
-        isPending: true
+    it('returns false if accessToken is expired', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: { accessToken: true },
+        idToken: { idToken: true }
       });
-      auth.authStateManager.updateAuthState = jest.fn();
-      return new Promise(resolve => {
-        auth.isAuthenticated().then(isAuthenticated => {
-          expect(isAuthenticated).toBe(false);
-          expect(auth.emitter.e.authStateChange).toBe(undefined);
-          resolve(undefined);
-        });
-        jest.runAllTimers();
+      jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
+        return isAccessToken(token) ? true : false;
       });
+      const res = await auth.isAuthenticated();
+      expect(res).toBe(false);
+      expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+      expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
     });
+
+    it('returns false if idToken is expired', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: { accessToken: true },
+        idToken: { idToken: true }
+      });
+      jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
+        return isIDToken(token) ? true : false;
+      });
+      const res = await auth.isAuthenticated();
+      expect(res).toBe(false);
+      expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+      expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
+    });
+
   });
 
   describe('getUser', () => {
-    it('should call token.getUserInfo with tokens from authState', () => {
-      auth.token = {
-        getUserInfo: jest.fn().mockResolvedValue(undefined)
-      };
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+    it('should call token.getUserInfo with tokens from tokenManager', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
         idToken: tokens.standardIdTokenParsed,
         accessToken: tokens.standardAccessTokenParsed
       });
-      auth.getUser();
+      jest.spyOn(auth.token, 'getUserInfo').mockReturnValue(undefined);
+      await auth.getUser();
       expect(auth.token.getUserInfo).toHaveBeenCalledWith(tokens.standardAccessTokenParsed, tokens.standardIdTokenParsed);
     });
   });
 
   describe('getIdToken', () => {
-    it('retrieves token from authStateManager', () => {
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+    it('retrieves token from tokenManager', () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
         idToken: tokens.standardIdTokenParsed
       });
       const retVal = auth.getIdToken();
       expect(retVal).toBe(tokens.standardIdToken);
     });
 
-    it('should return undefined if no idToken in authState', () => {
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({});
+    it('should return undefined if no idToken in tokenManager', () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({});
       const retVal = auth.getIdToken();
       expect(retVal).toBe(undefined);
     });
   });
 
   describe('getAccessToken', () => {
-    it('retrieves token from authStateManager', () => {
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({
+    it('retrieves token from tokenManager', () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
         accessToken: tokens.standardAccessTokenParsed
       });
       const retVal = auth.getAccessToken();
       expect(retVal).toBe(tokens.standardAccessToken);
     });
 
-    it('should return undefined if no accessToken in authState', async () => {
-      auth.authStateManager.getAuthState = jest.fn().mockReturnValue({});
+    it('should return undefined if no accessToken in tokenManager', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({});
       const retVal = auth.getAccessToken();
       expect(retVal).toBe(undefined);
     });

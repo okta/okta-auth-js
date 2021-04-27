@@ -2576,7 +2576,6 @@ authClient.tokenManager.off('renewed', myRenewedCallback);
 
 The emitted `AuthState` object includes:
 
-* `isPending`: true in the time after page load (first render) but before the asynchronous methods to see if the tokenManager is aware of a current authentication.
 * `isAuthenticated`: true if the user is considered authenticated. Normally this is true if both an idToken and an accessToken are present in the tokenManager, but this behavior can be overridden if you passed a [transformAuthState](#transformauthstate) callback in the [configuration](#configuration-reference).
 * `accessToken`: the JWT accessToken for the currently authenticated user (if provided by the scopes).
 * `idToken`: the JWT idToken for the currently authenticated user (if provided by the scopes).
@@ -2592,7 +2591,7 @@ authClient.authStateManager.subscribe((authState) => {
 
 #### `authStateManager.getAuthState()`
 
-Gets latest evaluated `authState` from the `authStateManager`. The `authState` (a unique new object) is re-evaluated when `authStateManager.updateAuthState()` is called.
+Gets latest evaluated `authState` from the `authStateManager`. The `authState` (a unique new object) is re-evaluated when `authStateManager.updateAuthState()` is called. If `updateAuthState` has not been called, or it has not finished calculating an initial state, `getAuthState` will return `null`.
 
 #### `authStateManager.updateAuthState()`
 
@@ -2726,7 +2725,9 @@ The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the 
 
 ### From 4.x to 5.x
 
-* Token auto renew requires [running OktaAuth as a service](#running-as-a-service). To start the service, call [start()](#start).
+* Token auto renew requires [running OktaAuth as a service](#running-as-a-service). To start the service, call [start()](#start). `start` will also call [updateAuthState](#authstatemanagerupdateauthstate) to set an initial [AuthState](#authstatemanager)
+* [getAuthState](#authstatemanagergetauthstate) will return `null` until an [AuthState](#authstatemanager) has been calculated.
+* `isPending` has been removed from [AuthState](#authstatemanager).
 
 ### From 3.x to 4.x
 

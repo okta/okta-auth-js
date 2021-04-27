@@ -477,50 +477,51 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   // Common Methods from downstream SDKs
   //
 
-  async isAuthenticated(timeout?: number): Promise<boolean> {
-    const authState = this.authStateManager.getAuthState();
-    if (!authState.isPending) {
-      return Promise.resolve(authState.isAuthenticated);
+  // Returns true if both accessToken and idToken are not expired
+  // If `autoRenew` option is set, will attempt to renew expired tokens before returning.
+  async isAuthenticated(): Promise<boolean> {
+
+    let { accessToken, idToken } = this.tokenManager.getTokensSync();
+    const { autoRenew, autoRemove } = this.options.tokenManager || {};
+
+    if (accessToken && this.tokenManager.hasExpired(accessToken)) {
+      accessToken = null;
+      if (autoRenew) {
+        accessToken = await this.tokenManager.renew('accessToken') as AccessToken;
+      } else if (autoRemove) {
+        this.tokenManager.remove('accessToken');
+      }
     }
 
-    let clear, handler, timeoutId;
-    return new Promise(resolve => {
-      clear = () => {
-        this.authStateManager.unsubscribe(handler);
-        clearTimeout(timeoutId);
-      };
-      handler = ({isAuthenticated, isPending}) => {
-        if (!isPending) {
-          resolve(isAuthenticated);
-          clear();
-        }
-      };
-      timeoutId = setTimeout(() => {
-        resolve(false);
-        clear();
-      }, timeout || 60 * 1000);
-      this.authStateManager.subscribe(handler);
-      this.authStateManager.updateAuthState();
-    });
+    if (idToken && this.tokenManager.hasExpired(idToken)) {
+      idToken = null;
+      if (autoRenew) {
+        idToken = await this.tokenManager.renew('idToken') as IDToken;
+      } else if (autoRemove) {
+        this.tokenManager.remove('idToken');
+      }
+    }
+
+    return !!(accessToken && idToken);
   }
 
   async getUser(): Promise<UserClaims> {
-    const { idToken, accessToken } = this.authStateManager.getAuthState();
+    const { idToken, accessToken } = this.tokenManager.getTokensSync();
     return this.token.getUserInfo(accessToken, idToken);
   }
 
   getIdToken(): string | undefined {
-    const { idToken } = this.authStateManager.getAuthState();
+    const { idToken } = this.tokenManager.getTokensSync();
     return idToken ? idToken.idToken : undefined;
   }
 
   getAccessToken(): string | undefined {
-    const { accessToken } = this.authStateManager.getAuthState();
+    const { accessToken } = this.tokenManager.getTokensSync();
     return accessToken ? accessToken.accessToken : undefined;
   }
 
   getRefreshToken(): string | undefined {
-    const { refreshToken } = this.authStateManager.getAuthState();
+    const { refreshToken } = this.tokenManager.getTokensSync();
     return refreshToken ? refreshToken.refreshToken : undefined;
   }
 
@@ -553,11 +554,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   }
 
   async handleLoginRedirect(tokens?: Tokens): Promise<void> {
-    const handleRedirect = async ({ isPending }) => {
-      if (isPending) {
-        return;
-      }
-
+    const handleRedirect = async () => {
       // Unsubscribe listener
       this.authStateManager.unsubscribe(handleRedirect);
 

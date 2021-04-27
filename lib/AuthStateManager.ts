@@ -5,13 +5,7 @@ import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
 const PCancelable = require('p-cancelable');
 
-export const DEFAULT_AUTH_STATE = { 
-  isPending: true,
-  isAuthenticated: false,
-  idToken: null,
-  accessToken: null,
-  refreshToken: null,
-};
+export const INITIAL_AUTH_STATE = null;
 const DEFAULT_PENDING = {
   updateAuthStatePromise: null,
   canceledTimes: 0
@@ -21,8 +15,12 @@ const MAX_PROMISE_CANCEL_TIMES = 10;
 
 // only compare first level of authState
 const isSameAuthState = (prevState: AuthState, state: AuthState) => {
-  return prevState.isPending === state.isPending 
-    && prevState.isAuthenticated === state.isAuthenticated 
+  // initial state is null
+  if (!prevState) {
+    return false;
+  }
+
+  return prevState.isAuthenticated === state.isAuthenticated 
     && JSON.stringify(prevState.idToken) === JSON.stringify(state.idToken)
     && JSON.stringify(prevState.accessToken) === JSON.stringify(state.accessToken)
     && prevState.error === state.error;
@@ -45,7 +43,7 @@ export class AuthStateManager {
 
     this._sdk = sdk;
     this._pending = { ...DEFAULT_PENDING };
-    this._authState = { ...DEFAULT_AUTH_STATE };
+    this._authState = INITIAL_AUTH_STATE;
     this._logOptions = {};
 
     // Listen on tokenManager events to start updateState process
@@ -71,7 +69,6 @@ export class AuthStateManager {
 
   updateAuthState(): void {
     const { transformAuthState, devMode } = this._sdk.options;
-    const { autoRenew, autoRemove } = this._sdk.tokenManager.getOptions();
 
     const log = (status) => {
       const { event, key, token } = this._logOptions;
@@ -94,8 +91,6 @@ export class AuthStateManager {
       this._sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
       devMode && log('emitted');
     };
-
-    const shouldEvaluateIsPending = () => !!(autoRenew || autoRemove);
 
     if (this._pending.updateAuthStatePromise) {
       if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {
@@ -128,31 +123,19 @@ export class AuthStateManager {
         resolve();
       };
 
-      this._sdk.tokenManager.getTokens()
-        .then(({ accessToken, idToken, refreshToken }) => {
+      this._sdk.isAuthenticated()
+        .then(isAuthenticated => {
           if (cancelablePromise.isCanceled) {
             resolve();
             return;
           }
 
-          // evaluate isPending if any token is expired
-          // then wait for next renewed event to evaluate a new state with valid tokens
-          // isPending state should only apply to token driven evaluation
-          let isPending = false;
-          if (accessToken && this._sdk.tokenManager.hasExpired(accessToken)) {
-            accessToken = null;
-            isPending = shouldEvaluateIsPending();
-          }
-          if (idToken && this._sdk.tokenManager.hasExpired(idToken)) {
-            idToken = null;
-            isPending = shouldEvaluateIsPending();
-          }
+          const { accessToken, idToken, refreshToken } = this._sdk.tokenManager.getTokensSync();
           const authState = {
             accessToken,
             idToken,
             refreshToken,
-            isPending,
-            isAuthenticated: !!(accessToken && idToken)
+            isAuthenticated
           };
           const promise: Promise<AuthState> = transformAuthState
             ? transformAuthState(this._sdk, authState)
@@ -165,7 +148,6 @@ export class AuthStateManager {
               idToken, 
               refreshToken,
               isAuthenticated: false, 
-              isPending: false,
               error
             }));
         });
