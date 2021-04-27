@@ -52,12 +52,7 @@ export class SelectAuthenticator extends Base {
     // Terminate idx interaction if provided authenticators are not supported
     throw new AuthSdkError('Provided authenticators are not supported, please check your org configuration');
   }
-
-  getRequiredValues() {
-    // authenticator is required to proceed
-    return [...super.getRequiredValues(), 'authenticator'];
-  }
-
+  
   isSkipable() {
     return true;
   }
