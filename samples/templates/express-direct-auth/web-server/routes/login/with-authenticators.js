@@ -4,6 +4,7 @@ const {
   getAuthClient, 
   handleAuthTransaction,
   renderTemplate,
+  renderError,
 } = require('../../utils');
 
 const router = express.Router();
@@ -69,7 +70,7 @@ router.post('/with-authenticators/select-authenticator', async (req, res) => {
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
-      template,
+      template: 'select-authenticator',
       error,
     });
   }
@@ -100,7 +101,7 @@ router.post(`/with-authenticators/challenge-authenticator/email`, async (req, re
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
-      template,
+      template: 'authenticator',
       title: `Challenge email authenticator`,
       error,
     });
@@ -132,7 +133,7 @@ router.post(`/with-authenticators/challenge-authenticator/password`, async (req,
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     renderError(res, {
-      template,
+      template: 'authenticator',
       title: `Challenge password authenticator`,
       error,
     });

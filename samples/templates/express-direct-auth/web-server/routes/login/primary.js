@@ -1,4 +1,5 @@
 const express = require('express');
+const { IdxStatus } = require('@okta/okta-auth-js');
 const { 
   getAuthClient, 
   handleAuthTransaction,
@@ -7,7 +8,7 @@ const {
 
 const router = express.Router();
 
-const next = ({ nextStep, req, res }) => {
+const next = ({ nextStep, res }) => {
   const { name } = nextStep;
   if (name === 'reenroll-authenticator') {
     res.redirect('/login/change-password');
