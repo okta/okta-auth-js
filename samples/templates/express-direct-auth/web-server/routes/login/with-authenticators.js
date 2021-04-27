@@ -22,17 +22,22 @@ const next = ({ nextStep, req, res }) => {
 };
 
 router.get('/with-authenticators', (req, res) => {
+  const { authenticator } = req.query;
   res.render('identify', {
-    action: '/login/with-authenticators'
+    action: authenticator 
+      ? `/login/with-authenticators?authenticator=${authenticator}` 
+      : '/login/with-authenticators'
   });
 });
 
 router.post('/with-authenticators', async (req, res) => {
+  const { authenticator } = req.query;
   const { username } = req.body;
   const authClient = getAuthClient(req);
   try {
     const authTransaction = await authClient.idx.authenticate({ 
       username,
+      authenticators: authenticator ? [authenticator] : [],
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {

@@ -4,10 +4,6 @@ const {
   renderError, 
   handleAuthTransaction, 
 } = require('../utils');
-const { 
-  generateSelectAuthenticator, 
-  generateChallengeAuthenticator, 
-} = require('../routeUtils');
 
 const router = express.Router();
 
@@ -84,20 +80,20 @@ router.post('/recover-password/reset', async (req, res) => {
   }
 });
 
-generateSelectAuthenticator({ 
-  path: '/recover-password/select-authenticator', 
-  entryPath: '/recover-password',
-  next, 
-  router,
-});
-['email', 'phone'].forEach(type => 
-  generateChallengeAuthenticator({ 
-    path: `/recover-password/challenge-authenticator/${type}`,
-    entryPath: '/recover-password',
-    type, 
-    next, 
-    router, 
-  }));
+// generateSelectAuthenticator({ 
+//   path: '/recover-password/select-authenticator', 
+//   entryPath: '/recover-password',
+//   next, 
+//   router,
+// });
+// ['email', 'phone'].forEach(type => 
+//   generateChallengeAuthenticator({ 
+//     path: `/recover-password/challenge-authenticator/${type}`,
+//     entryPath: '/recover-password',
+//     type, 
+//     next, 
+//     router, 
+//   }));
 
 
 module.exports = router;

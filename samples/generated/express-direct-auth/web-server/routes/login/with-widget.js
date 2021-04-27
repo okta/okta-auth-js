@@ -1,6 +1,5 @@
 const express = require('express');
 const { 
-  getAuthClient,
   getAuthTransaction,
   renderTemplate,
 } = require('../../utils');
