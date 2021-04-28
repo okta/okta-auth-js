@@ -35,7 +35,8 @@ router.post('/primary', async (req, res) => {
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     req.setLastError(error.message);
-    renderTemplate(req, res, 'login-primary');
+    const action = getFormActionPath(req, '/login/primary');
+    renderTemplate(req, res, 'login-primary', { action });
   }
 });
 
@@ -60,12 +61,16 @@ router.post('/change-password', async (req, res) => {
     const authTransaction = await authClient.idx.authenticate({ newPassword });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
+    const action = getFormActionPath(req, '/login/change-password');
     req.setLastError(error.message);
     renderTemplate(
       req, 
       res, 
       'enroll-or-reset-password-authenticator', 
-      { title: 'Change password' }
+      { 
+        title: 'Change password',
+        action,
+      }
     );
   }
 });

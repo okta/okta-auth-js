@@ -24,6 +24,8 @@ export class SelectAuthenticator extends Base {
   remediationValue: IdxRemeditionValue;
   matchedOption: IdxRemediation;
   
+  selectedAuthenticator: string;
+  
   map = {
     authenticator: null // value here does not matter, fall to the custom map function
   }
@@ -67,8 +69,15 @@ export class SelectAuthenticator extends Base {
     const { authenticators } = this.values;
     const { options } = remediationValue;
     const selectedOption = findMatchedOption(authenticators, options);
+    this.selectedAuthenticator = selectedOption?.relatesTo.type;
     return {
       id: selectedOption?.value.form.value.find(({ name }) => name === 'id').value
     };
+  }
+
+  getValues(): SelectAuthenticatorValues {
+    const authenticators = this.values.authenticators
+      .filter(authenticator => authenticator !== this.selectedAuthenticator);
+    return { authenticators };
   }
 }
