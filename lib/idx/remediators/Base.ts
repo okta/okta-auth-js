@@ -111,4 +111,9 @@ export class Base {
       errorCauses: errors
     });
   }
+
+  // Prepare values for the next remediation
+  getValues() {
+    return this.values;
+  }
 }

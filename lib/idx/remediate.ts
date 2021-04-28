@@ -25,9 +25,21 @@ interface RemediationResponse {
 export async function remediate(
   idxResponse: IdxResponse,
   flow: RemediationFlow,
-  values: RemediationValues
+  values: RemediationValues,
+  actions: string[]
 ): Promise<RemediationResponse> {
   const { neededToProceed } = idxResponse;
+  
+  // Try actions in idxResponse first
+  if (actions) {
+    for (let action of actions) {
+      if (typeof idxResponse.actions[action] === 'function') {
+        idxResponse = await idxResponse.actions[action]();
+        return remediate(idxResponse, flow, values, actions); // recursive call
+      }
+    }
+  }
+
   const idxRemediation = getIdxRemediation(flow, neededToProceed);
   if (!idxRemediation) {
     throw new AuthSdkError('No remediation in the idxResponse can be match current flow');
@@ -59,7 +71,10 @@ export async function remediate(
     if (idxResponse.interactionCode) {
       return { idxResponse };
     }
-    return remediate(idxResponse, flow, values); // recursive call
+    // We may want to trim the values bag for the next remediation
+    // Let the remeditor decide what the values should be (default to current values)
+    values = remediator.getValues();
+    return remediate(idxResponse, flow, values, actions); // recursive call
   } catch (e) {
     // Thrown error terminates the interaction with idx
     if (isRawIdxResponse(e)) { // idx responses are sometimes thrown, these will be "raw"

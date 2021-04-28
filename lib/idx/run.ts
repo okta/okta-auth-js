@@ -9,6 +9,7 @@ import {
   RemediationValues,
   RemediationFlow,
   IdxStatus,
+  InteractResponse,
 } from '../types';
 
 export interface RunOptions {
@@ -16,28 +17,26 @@ export interface RunOptions {
   actions?: string[];
 }
 
-export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions) {
+export async function run(
+  authClient: OktaAuth, 
+  options: RunOptions & IdxOptions, 
+  interactResponse?: InteractResponse
+) {
   const { flow, actions } = options;
   let tokens;
   let nextStep;
-  let interactionHandle;
   let error;
   let status: IdxStatus;
 
   try {
     // Start/resume the flow
-    let { idxResponse, stateHandle } = await interact(authClient, options);
-    interactionHandle = idxResponse.toPersist.interactionHandle;
-
-    // Call first available option
-    if (actions) {
-      for (let action of actions) {
-        if (typeof idxResponse.actions[action] === 'function') {
-          idxResponse = await idxResponse.actions[action]();
-          break;
-        }
-      }
+    let idxResponse;
+    let stateHandle;
+    if (interactResponse) {
+      interactResponse = await interact(authClient, options);
     }
+    idxResponse = interactResponse.idxResponse;
+    stateHandle = interactResponse.stateHandle; 
 
     const values: RemediationValues = { ...options, stateHandle };
 
@@ -48,7 +47,7 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
       } = {}, 
       nextStep: nextStepFromResp,
       formError,
-    } = await remediate(idxResponse, flow, values);
+    } = await remediate(idxResponse, flow, values, actions);
 
     // Track nextStep and formError
     nextStep = nextStepFromResp;
@@ -85,7 +84,6 @@ export async function run(authClient: OktaAuth, options: RunOptions & IdxOptions
   }
   
   const authTransaction = new AuthTransaction(authClient, {
-    interactionHandle,
     tokens: tokens ? tokens.tokens : null,
     status,
     nextStep,

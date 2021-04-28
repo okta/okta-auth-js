@@ -104,16 +104,17 @@ function main() {
 }
 
 function startApp() {
-  // Calculate initial auth state and fire change event for listeners
-  authClient.authStateManager.updateAuthState();
+  // Calculates initial auth state and fires change event for listeners
+  // Also starts the token auto-renew service
+  authClient.start();
 }
 
 function renderApp() {
   const authState = authClient.authStateManager.getAuthState();
   document.getElementById('authState').innerText = stringify(authState);
 
-  // If auth state is "pending", render in the loading state
-  if (authState.isPending) {
+  // Setting auth state is an asynchronous operation. If authState is not available yet, render in the loading state
+  if (!authState) {
     return renderLoading();
   }
 
@@ -279,7 +280,7 @@ function submitSigninForm() {
 }
 
 function shouldRedirectToGetTokens(authState) {
-  if (authState.isAuthenticated || authState.isPending) {
+  if (authState.isAuthenticated) {
     return false;
   }
 
