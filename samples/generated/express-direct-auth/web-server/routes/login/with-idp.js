@@ -6,7 +6,7 @@ const {
 
 const router = express.Router();
 
-router.get('/idp', async (req, res) => {
+router.get('/with-idp', async (req, res) => {
   const authClient = getAuthClient(req);
   try {
     const tx = await authClient.idx.authenticate({ state: req.transactionId });

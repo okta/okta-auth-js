@@ -139,9 +139,15 @@ router.post(`/with-authenticators/challenge-authenticator/password`, async (req,
     const authTransaction = await authClient.idx.authenticate({ password });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
+    const action = getFormActionPath(req, '/login/with-authenticators/challenge-authenticator/password');
     renderError(res, {
       template: 'authenticator',
       title: `Challenge password authenticator`,
+      input: {
+        type: 'password',
+        name: 'password',
+      },
+      action,
       error,
     });
   }

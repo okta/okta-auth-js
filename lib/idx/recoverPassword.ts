@@ -3,7 +3,6 @@ import {
   OktaAuth, 
   IdxOptions, 
   RemediationFlow,
-  IdxStatus,
 } from '../types';
 import { run } from './run';
 import {
@@ -16,7 +15,6 @@ import {
   AuthenticatorVerificationData,
   AuthenticatorVerificationDataValues,
 } from './remediators';
-import { interact } from './interact';
 
 const flow: RemediationFlow = {
   'identify': Identify,
@@ -38,46 +36,15 @@ export interface PasswordRecoveryOptions extends
 export async function recoverPassword(
   authClient: OktaAuth, options: PasswordRecoveryOptions
 ): Promise<AuthTransaction> {
-  let error;
-  let status;
-
-  try {
-    const interactResponse = await interact(authClient, options);
-    const idxResponse = interactResponse.idxResponse;
-    const shouldIdentify = idxResponse.neededToProceed.some(({ name }) => name === 'identify') 
-      && !Object.keys(idxResponse.actions).includes('currentAuthenticator-recover');
-    if (shouldIdentify) {
-      options = { 
-        ...options, 
-        // When set any factor as primary factor in policy
-        // Select password authenticator first to start the recovery password flow
-        authenticators: ['password', ...(options.authenticators || [])]
-      };
+  return run(
+    authClient, 
+    { 
+      ...options,
+      flow,
+      actions: [
+        'currentAuthenticator-recover', 
+        'currentAuthenticatorEnrollment-recover'
+      ],
     }
-
-    return run(
-      authClient, 
-      { 
-        ...options,
-        flow,
-        actions: [
-          'currentAuthenticator-recover', 
-          'currentAuthenticatorEnrollment-recover'
-        ],
-      },
-      interactResponse,
-    );
-
-  } catch (err) {
-    error = err;
-    status = IdxStatus.FAILED;
-    // Clear transaction meta when error is not handlable
-    authClient.transactionManager.clear();
-  }
-
-  const authTransaction = new AuthTransaction(authClient, {
-    status,
-    error,
-  });
-  return authTransaction;
+  );
 }
