@@ -5,7 +5,6 @@ const {
   handleAuthTransaction,
   renderTemplate,
   redirect,
-  getFormActionPath,
 } = require('../../utils');
 
 const router = express.Router();
@@ -19,10 +18,13 @@ const next = ({ nextStep, req, res }) => {
   return false;
 };
 
-router.get('/primary', (req, res) => {
-  const action = getFormActionPath(req, '/login/primary');
-  res.render('login-primary', { action });
-});
+const renderLoginForm = (req, res) => {
+  renderTemplate(req, res, 'login-primary', { 
+    action: '/login/primary'
+  });
+};
+
+router.get('/primary', renderLoginForm);
 
 router.post('/primary', async (req, res) => {
   const { username, password } = req.body;
@@ -34,21 +36,23 @@ router.post('/primary', async (req, res) => {
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    req.setLastError(error.message);
-    const action = getFormActionPath(req, '/login/primary');
-    renderTemplate(req, res, 'login-primary', { action });
+    req.setLastError(error);
+    renderLoginForm(req, res);
   }
 });
 
 // Routes to handle expired password
+const renderChangePassword = (req, res) => {
+  renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
+    title: 'Change password',
+    action: '/login/change-password',
+  });
+};
+
 router.get('/change-password', (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
-    const action = getFormActionPath(req, '/login/change-password');
-    res.render('enroll-or-reset-password-authenticator', {
-      title: 'Change password',
-      action,
-    });
+    renderChangePassword(req, res);
   } else {
     redirect({ req, res, path: '/login/primary' });
   }
@@ -61,17 +65,8 @@ router.post('/change-password', async (req, res) => {
     const authTransaction = await authClient.idx.authenticate({ newPassword });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    const action = getFormActionPath(req, '/login/change-password');
-    req.setLastError(error.message);
-    renderTemplate(
-      req, 
-      res, 
-      'enroll-or-reset-password-authenticator', 
-      { 
-        title: 'Change password',
-        action,
-      }
-    );
+    req.setLastError(error);
+    renderChangePassword(req, res);
   }
 });
 

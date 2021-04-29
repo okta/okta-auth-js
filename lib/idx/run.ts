@@ -9,7 +9,6 @@ import {
   RemediationValues,
   RemediationFlow,
   IdxStatus,
-  InteractResponse,
 } from '../types';
 
 export interface RunOptions {
@@ -19,8 +18,7 @@ export interface RunOptions {
 
 export async function run(
   authClient: OktaAuth, 
-  options: RunOptions & IdxOptions, 
-  interactResponse?: InteractResponse
+  options: RunOptions & IdxOptions,
 ) {
   const { flow, actions } = options;
   let tokens;
@@ -30,13 +28,7 @@ export async function run(
 
   try {
     // Start/resume the flow
-    let idxResponse;
-    let stateHandle;
-    if (interactResponse) {
-      interactResponse = await interact(authClient, options);
-    }
-    idxResponse = interactResponse.idxResponse;
-    stateHandle = interactResponse.stateHandle; 
+    let { idxResponse, stateHandle } = await interact(authClient, options); 
 
     const values: RemediationValues = { ...options, stateHandle };
 

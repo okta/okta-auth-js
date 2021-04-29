@@ -6,7 +6,7 @@ const {
 
 const router = express.Router();
 
-router.get('/idp', async (req, res) => {
+router.get('/with-idp', async (req, res) => {
   const authClient = getAuthClient(req);
   try {
     const tx = await authClient.idx.authenticate({ state: req.transactionId });
@@ -16,7 +16,7 @@ router.get('/idp', async (req, res) => {
     renderTemplate(req, res, 'login-with-idp', tx.data.nextStep);
   } catch (error) {
     authClient.transactionManager.clear();
-    req.setLastError(error.message);
+    req.setLastError(error);
     renderTemplate(req, res, 'login-with-idp');
   }
 });

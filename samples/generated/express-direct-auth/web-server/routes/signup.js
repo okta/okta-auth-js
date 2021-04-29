@@ -1,27 +1,37 @@
 const express = require('express');
 const { IdxStatus } = require('@okta/okta-auth-js');
 const { 
-  getAuthClient, 
-  renderError, 
+  getAuthClient,
   handleAuthTransaction,
+  redirect,
+  renderTemplate,
 } = require('../utils');
 
 const router = express.Router();
 
-const authenticators = ['email', 'password']; // ordered authenticators
-
-const next = ({ nextStep, res }) => {
-  const { name, type } = nextStep;
-  if (name === 'enroll-authenticator') {
-    res.redirect(`/signup/enroll-${type}-authenticator`);
+const next = ({ nextStep, req, res }) => {
+  const { name, type, authenticators, canSkip } = nextStep;
+  // Always reset canSkip to false before redirect
+  req.session.canSkip = false;
+  if (name === 'select-authenticator-enroll') {
+    req.session.canSkip = canSkip;
+    req.session.authenticators = authenticators;
+    redirect({ req, res, path: '/signup/select-authenticator' });
+    return true;
+  } else if (name === 'enroll-authenticator') {
+    redirect({ req, res, path: `/signup/enroll-authenticator/${type}` });
     return true;
   }
   return false;
 };
 
-router.get('/signup', (_, res) => {
-  res.render('registration');
-});
+const renderEnrollProfile = (req, res) => {
+  renderTemplate(req, res, 'enroll-profile', {
+    action: '/signup'
+  });
+};
+
+router.get('/signup', renderEnrollProfile);
 
 router.post('/signup', async (req, res) => {
   const { firstName, lastName, email } = req.body;
@@ -31,60 +41,99 @@ router.post('/signup', async (req, res) => {
       firstName, 
       lastName, 
       email,
-      authenticators,
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    renderError(res, {
-      template: 'registration',
-      error,
-    });
+    req.setLastError(error);
+    renderEnrollProfile(req, res);
   }
 });
 
-router.get(`/signup/enroll-email-authenticator`, (req, res) => {
+// Handle select-authenticator
+const renderSelectAuthenticator = (req, res) => {
+  const { authenticators } = req.session;
+  renderTemplate(req, res, 'select-authenticator', {
+    authenticators,
+    action: '/signup/select-authenticator',
+  });
+};
+
+router.get('/signup/select-authenticator', (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
-    res.render('authenticator', {
-      title: 'Enroll email authenticator',
-      action: '/signup/enroll-email-authenticator',
-    });
+    renderSelectAuthenticator(req, res);
   } else {
-    res.redirect('/signup');
+    redirect({ req, res, path: '/signup' });
   }
 });
 
-router.post('/signup/enroll-email-authenticator', async (req, res) => {
+router.post('/signup/select-authenticator', async (req, res) => {
+  const { authenticator } = req.body;
+  const authClient = getAuthClient(req);
+  try {
+    const authTransaction = await authClient.idx.register({
+      authenticators: [authenticator],
+    });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
+  } catch (error) {
+    req.setLastError(error);
+    renderSelectAuthenticator(req, res);
+  }
+});
+
+// Handle enroll authenticator -- email
+const renderEnrollEmailAuthenticator = (req, res) => {
+  renderTemplate(req, res, 'authenticator', {
+    title: 'Enroll email authenticator',
+    action: '/signup/enroll-authenticator/email',
+    input: {
+      type: 'text',
+      name: 'verificationCode',
+    }
+  });
+};
+
+router.get(`/signup/enroll-authenticator/email`, (req, res) => {
+  const { status } = req.session;
+  if (status === IdxStatus.PENDING) {
+    renderEnrollEmailAuthenticator(req, res);
+  } else {
+    redirect({ req, res, path: '/signup' });
+  }
+});
+
+router.post('/signup/enroll-authenticator/email', async (req, res) => {
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
   try {
     const authTransaction = await authClient.idx.register({ 
-      verificationCode, 
-      authenticators,
+      verificationCode,
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    renderError(res, {
-      template: 'authenticator',
-      title: 'Enroll email authenticator',
-      error,
-    });
+    req.setLastError(error);
+    renderEnrollEmailAuthenticator(req, res);
   }
 });
 
-router.get(`/signup/enroll-password-authenticator`, (req, res) => {
+// Handle enroll authenticator -- password
+const renderEnrollPasswordAuthenticator = (req, res) => {
+  renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
+    title: 'Set up password',
+    action: '/signup/enroll-authenticator/password',
+  });
+};
+
+router.get(`/signup/enroll-authenticator/password`, (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
-    res.render('enroll-or-reset-password-authenticator', {
-      title: 'Set up password',
-      action: '/signup/enroll-password-authenticator',
-    });
+    renderEnrollPasswordAuthenticator(req, res);
   } else {
-    res.redirect('/signup');
+    redirect({ req, res, path: '/signup' });
   }
 });
 
-router.post('/signup/enroll-password-authenticator', async (req, res) => {
+router.post('/signup/enroll-authenticator/password', async (req, res) => {
   const { password, confirmPassword } = req.body;
   const authClient = getAuthClient(req);
   try {
@@ -93,16 +142,12 @@ router.post('/signup/enroll-password-authenticator', async (req, res) => {
     }
 
     const authTransaction = await authClient.idx.register({ 
-      password, 
-      authenticators,
+      password,
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    renderError(res, {
-      template: 'enroll-or-reset-password-authenticator',
-      title: 'Set up password',
-      error,
-    });
+    req.setLastError(error);
+    renderEnrollPasswordAuthenticator(req, res);
   }
 });
 

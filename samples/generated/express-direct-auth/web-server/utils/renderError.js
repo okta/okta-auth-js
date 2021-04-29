@@ -18,7 +18,9 @@ function formatIdxError(error) {
   return `${code}: ${details}`;
 }
 
-module.exports = function renderError(res, { template, title, error }) {
+module.exports = function renderError(res, {
+  template, error, ...restOptions 
+}) {
   let errors;
   if (Array.isArray(error.errorCauses)) {
     errors = error.errorCauses;
@@ -33,8 +35,8 @@ module.exports = function renderError(res, { template, title, error }) {
   }
 
   res.render(template, {
-    title,
     hasError: true,
-    errors, 
+    errors,
+    ...restOptions,
   });
 };

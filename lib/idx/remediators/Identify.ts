@@ -9,7 +9,7 @@ export class Identify extends Base {
   values: IdentifyValues;
 
   map = {
-    'identifier': ['identifier', 'username'],
+    'identifier': ['identifier', 'username', 'email'],
     'credentials': ['credentials', 'password']
   };
 
