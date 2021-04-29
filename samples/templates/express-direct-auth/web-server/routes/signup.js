@@ -1,11 +1,10 @@
 const express = require('express');
 const { IdxStatus } = require('@okta/okta-auth-js');
 const { 
-  getAuthClient, 
-  renderError, 
+  getAuthClient,
   handleAuthTransaction,
   redirect,
-  getFormActionPath,
+  renderTemplate,
 } = require('../utils');
 
 const router = express.Router();
@@ -26,10 +25,13 @@ const next = ({ nextStep, req, res }) => {
   return false;
 };
 
-router.get('/signup', (req, res) => {
-  const action = getFormActionPath(req, '/signup');
-  res.render('enroll-profile', { action });
-});
+const renderEnrollProfile = (req, res) => {
+  renderTemplate(req, res, 'enroll-profile', {
+    action: '/signup'
+  });
+};
+
+router.get('/signup', renderEnrollProfile);
 
 router.post('/signup', async (req, res) => {
   const { firstName, lastName, email } = req.body;
@@ -42,27 +44,24 @@ router.post('/signup', async (req, res) => {
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    const action = getFormActionPath(req, '/signup');
-    renderError(res, {
-      template: 'enroll-profile',
-      action,
-      error,
-    });
+    req.setLastError(error);
+    renderEnrollProfile(req, res);
   }
 });
 
 // Handle select-authenticator
+const renderSelectAuthenticator = (req, res) => {
+  const { authenticators } = req.session;
+  renderTemplate(req, res, 'select-authenticator', {
+    authenticators,
+    action: '/signup/select-authenticator',
+  });
+};
+
 router.get('/signup/select-authenticator', (req, res) => {
-  const { status, authenticators, canSkip } = req.session;
+  const { status } = req.session;
   if (status === IdxStatus.PENDING) {
-    const action = getFormActionPath(req, '/signup/select-authenticator');
-    const skipAction = getFormActionPath(req, '/signup/select-authenticator/skip');
-    res.render('select-authenticator', {
-      authenticators,
-      action,
-      skipAction,
-      canSkip,
-    });
+    renderSelectAuthenticator(req, res);
   } else {
     redirect({ req, res, path: '/signup' });
   }
@@ -77,30 +76,29 @@ router.post('/signup/select-authenticator', async (req, res) => {
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    const action = getFormActionPath(req, '/signup/select-authenticator');
-    renderError(res, {
-      template: 'select-authenticator',
-      action,
-      error,
-    });
+    req.setLastError(error);
+    renderSelectAuthenticator(req, res);
   }
 });
 
 // Handle enroll authenticator -- email
+const renderEnrollEmailAuthenticator = (req, res) => {
+  renderTemplate(req, res, 'authenticator', {
+    title: 'Enroll email authenticator',
+    action: '/signup/enroll-authenticator/email',
+    input: {
+      type: 'text',
+      name: 'verificationCode',
+    }
+  });
+};
+
 router.get(`/signup/enroll-authenticator/email`, (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
-    const action = getFormActionPath(req, '/signup/enroll-authenticator/email');
-    res.render('authenticator', {
-      title: 'Enroll email authenticator',
-      action,
-      input: {
-        type: 'text',
-        name: 'verificationCode',
-      }
-    });
+    renderEnrollEmailAuthenticator(req, res);
   } else {
-    res.redirect('/signup');
+    redirect({ req, res, path: '/signup' });
   }
 });
 
@@ -113,31 +111,25 @@ router.post('/signup/enroll-authenticator/email', async (req, res) => {
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    const action = getFormActionPath(req, '/signup/enroll-authenticator/email');
-    renderError(res, {
-      template: 'authenticator',
-      title: 'Enroll email authenticator',
-      action,
-      input: {
-        type: 'text',
-        name: 'verificationCode',
-      },
-      error,
-    });
+    req.setLastError(error);
+    renderEnrollEmailAuthenticator(req, res);
   }
 });
 
 // Handle enroll authenticator -- password
+const renderEnrollPasswordAuthenticator = (req, res) => {
+  renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
+    title: 'Set up password',
+    action: '/signup/enroll-authenticator/password',
+  });
+};
+
 router.get(`/signup/enroll-authenticator/password`, (req, res) => {
   const { status } = req.session;
   if (status === IdxStatus.PENDING) {
-    const action = getFormActionPath(req, '/signup/enroll-authenticator/password');
-    res.render('enroll-or-reset-password-authenticator', {
-      title: 'Set up password',
-      action,
-    });
+    renderEnrollPasswordAuthenticator(req, res);
   } else {
-    res.redirect('/signup');
+    redirect({ req, res, path: '/signup' });
   }
 });
 
@@ -154,13 +146,8 @@ router.post('/signup/enroll-authenticator/password', async (req, res) => {
     });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
-    const action = getFormActionPath(req, '/signup/enroll-authenticator/password');
-    renderError(res, {
-      template: 'enroll-or-reset-password-authenticator',
-      title: 'Set up password',
-      action,
-      error,
-    });
+    req.setLastError(error);
+    renderEnrollPasswordAuthenticator(req, res);
   }
 });
 

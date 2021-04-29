@@ -16,7 +16,7 @@ router.get('/with-idp', async (req, res) => {
     renderTemplate(req, res, 'login-with-idp', tx.data.nextStep);
   } catch (error) {
     authClient.transactionManager.clear();
-    req.setLastError(error.message);
+    req.setLastError(error);
     renderTemplate(req, res, 'login-with-idp');
   }
 });
