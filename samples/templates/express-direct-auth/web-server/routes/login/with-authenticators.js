@@ -47,7 +47,13 @@ router.post('/with-authenticators', async (req, res) => {
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     req.setLastError(error.message);
-    renderTemplate(req, res, 'identify');
+    const action = getFormActionPath(
+      req, 
+      authenticator 
+        ? `/login/with-authenticators?authenticator=${authenticator}` 
+        : `/login/with-authenticators`
+    );
+    renderTemplate(req, res, 'identify', { action });
   }
 });
 
