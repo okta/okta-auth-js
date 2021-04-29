@@ -79,7 +79,7 @@ router.post('/signup/select-authenticator', async (req, res) => {
   } catch (error) {
     const action = getFormActionPath(req, '/signup/select-authenticator');
     renderError(res, {
-      template,
+      template: 'select-authenticator',
       action,
       error,
     });

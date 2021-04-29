@@ -9,7 +9,6 @@ import {
   RemediationValues,
   RemediationFlow,
   IdxStatus,
-  InteractResponse,
 } from '../types';
 
 export interface RunOptions {
