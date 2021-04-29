@@ -23,12 +23,12 @@
 {{/if}}
 {{#if signinForm}}
 <!-- flow: form -->
-<div id="flow-form" style="display: none">
+<div id="login-form" style="display: none">
   <label for="username">Username</label>
   <input id="username" name="username" type="email"><br/>
   <label for="password">Password</label>
   <input id="password" name="password" type="password"><br/>
-  <a href="/" id="login-direct" onclick="_submitSigninForm(event)">Signin</a>
+  <a href="/" id="submit-login-form" onclick="_submitSigninForm(event)">Signin</a>
 </div>
 {{/if}}
 <!-- authenticated -->
@@ -37,7 +37,7 @@
   <a id="logout-redirect" href=#" onclick="_logout(event)">Logout</a>&nbsp;|&nbsp;
   <a id="renew-token" href="#" onclick="_renewToken(event)">Renew Access Token</a>&nbsp;|&nbsp;
   <!-- tests for a valid Okta SSO session -->
-  <a id="get-user-info" href="/" onclick="_getUserInfo(event)">Get user info</a>
+  <a id="profile-button" href="/" onclick="_getUserInfo(event)">Get user info</a>
   <hr/>
   <b>User Info</b><div id="userInfo"></div><hr/>
   <b>Access Token</b><div id="accessToken"></div><hr/>

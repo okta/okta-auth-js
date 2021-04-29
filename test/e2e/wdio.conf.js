@@ -4,7 +4,6 @@ require('regenerator-runtime'); // Allows use of async/await
 
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
-const LOCAL = process.env.LOCAL;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 const ORG_OIE_ENABLED = process.env.ORG_OIE_ENABLED;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
@@ -30,17 +29,12 @@ if (CI) {
     ]);
 }
 
-let drivers = undefined;
-
-if (LOCAL) {
-  // Local developers may need to set driver version explicitly
-  // check for more recent versions of chrome driver here:
-  // https://chromedriver.storage.googleapis.com/index.html
-  const CHROMEDRIVER_VERSION = '89.0.4389.23';
-  drivers = {
-    chrome: { version: CHROMEDRIVER_VERSION }
-  };
-}
+// driver version must match installed chrome version
+// https://chromedriver.storage.googleapis.com/index.html
+const CHROMEDRIVER_VERSION = '89.0.4389.23';
+const drivers = {
+  chrome: { version: CHROMEDRIVER_VERSION }
+};
 
 exports.config = {
     jasmineNodeOpts: {

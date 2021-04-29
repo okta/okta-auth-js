@@ -3,7 +3,7 @@
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
 setup_service java 1.8.222
-setup_service google-chrome-stable 85.0.4183.102-1
+setup_service google-chrome-stable 89.0.4389.72-1
 
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
@@ -25,6 +25,7 @@ fi
 export CLIENT_ID=0oapmwm72082GXal14x6
 export REFRESH_TOKEN=true
 
+# Run the tests
 if ! yarn test:e2e; then
   echo "Refresh token e2e tests failed! Exiting..."
   exit ${TEST_FAILURE}
@@ -34,6 +35,7 @@ fi
 export CLIENT_ID=0oa1xyzajgPFGWlLP4x7
 unset REFRESH_TOKEN
 
+# Run the tests
 if ! yarn test:e2e; then
   echo "e2e tests failed! Exiting..."
   exit ${TEST_FAILURE}

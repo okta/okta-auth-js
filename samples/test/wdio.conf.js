@@ -5,15 +5,11 @@ require('regenerator-runtime'); // Allows use of async/await
 const getSampleSpecs = require('./util/configUtils').getSampleSpecs;
 const specs = getSampleSpecs();
 
-let config = {
-  specs
-};
-
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const LOG = process.env.LOG;
-const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
-const logLevel = LOG || 'warn';
+const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 30000;
+const logLevel = (LOG || 'warn');
 const chromeOptions = {
     args: []
 };
@@ -30,12 +26,14 @@ if (CI) {
     ]);
 }
 
-Object.assign(config, {
-    jasmineNodeOpts: {
-        defaultTimeoutInterval,
-        stopSpecOnExpectationFailure: true
-    },
+// driver version must match installed chrome version
+// https://chromedriver.storage.googleapis.com/index.html
+const CHROMEDRIVER_VERSION = '89.0.4389.23';
+const drivers = {
+  chrome: { version: CHROMEDRIVER_VERSION }
+};
 
+module.exports.config = {
 
     //
     // ====================
@@ -57,9 +55,8 @@ Object.assign(config, {
     // NPM script (see https://docs.npmjs.com/cli/run-script) then the current working
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
-    // specs: [
-    //     './specs/**/*.js'
-    // ],
+    specs,
+
     // Patterns to exclude.
     exclude: [
         // 'path/to/excluded/files'
@@ -146,7 +143,16 @@ Object.assign(config, {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: ['chromedriver'],
+    services: [
+      ['selenium-standalone', {
+        installArgs: {
+          drivers
+        },
+        args: {
+          drivers
+        }
+      }]
+    ],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks.html
@@ -161,14 +167,22 @@ Object.assign(config, {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter.html
-    reporters: ['spec'],
+    reporters: [
+      'spec',
+      ['junit', {
+          outputDir: '../../build2/reports/e2e',
+          outputFileFormat: function() { // optional
+              return 'junit-results.xml';
+          }
+      }]
+  ],
 
     //
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: defaultTimeoutInterval
     },
     //
     // =====
@@ -288,6 +302,4 @@ Object.assign(config, {
     */
     //onReload: function(oldSessionId, newSessionId) {
     //}
-});
-
-module.exports.config = config;
+};

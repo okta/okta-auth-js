@@ -7,7 +7,7 @@ const webClientId = process.env.WEB_CLIENT_ID || process.env.CLIENT_ID;
 const clientSecret = process.env.WEB_CLIENT_SECRET || process.env.CLIENT_SECRET;
 
 const samplesConfig = require('../../config');
-const sampleConfig = samplesConfig.getSampleConfig(sampleName);
+const sampleConfig = sampleName ? samplesConfig.getSampleConfig(sampleName) : {};
 
 const config = {
   sampleName,
@@ -38,4 +38,11 @@ function getSampleSpecs() {
   return specs;
 }
 
-export { getConfig, updateConfig, getSampleConfig, getSampleSpecs };
+function getSampleFeatures() {
+  const specs = (sampleConfig.features || []).map(feature => {
+    return `features/${feature}.feature`;
+  });
+  return specs;
+}
+
+export { getConfig, updateConfig, getSampleConfig, getSampleSpecs, getSampleFeatures };

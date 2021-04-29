@@ -52,7 +52,17 @@ class SpaApp {
 
   async logoutRedirect() {
     await this.logoutRedirectBtn.then(el => el.click());
-    await this.waitForConfigForm();
+    await this.waitForError('Click "Edit Config" and set the `issuer` and `clientId`');
+  }
+
+  async waitForError(str) {
+    return browser.waitUntil(async () => {
+      return this.error.then(el => {
+        return el.getText();
+      }).then(txt => {
+        return txt === str;
+      });
+    }, 5000, `wait for error: "${str}"`);
   }
 
   async waitForConfigForm() {

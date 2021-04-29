@@ -30,8 +30,8 @@ export FB_USERNAME=ycfjikukbl_1613767309@tfbnw.net
 get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 
 # Run the tests
-if ! yarn test:e2e; then
-  echo "OIE e2e tests failed! Exiting..."
+if ! yarn test:samples; then
+  echo "tests failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
 

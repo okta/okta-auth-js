@@ -1,3 +1,4 @@
+/* global atob */
 import { base64ToBase64Url, stringToBase64Url, base64UrlToString } from '../../../lib/crypto/base64';
 
 describe('base64', function() {

@@ -9,7 +9,7 @@ const uuid = require('uuid');
 const https = require('https');
 const btoa = require('btoa');
 
-const redirectUrl = `http://localhost:8080/authorization-code/callback`;
+const redirectUrl = `http://localhost:8080/login/callback`;
 
 // converts a string to base64 (url/filename safe variant)
 function stringToBase64Url(str) {
@@ -90,7 +90,7 @@ app.post('/login', function(req, res) {
 });
 
 // Handle OIDC callback. The request query will contain a code and state
-app.get('/authorization-code/callback', function(req, res) {
+app.get('/login/callback', function(req, res) {
   // also known as "authorization_code"
   const code = req.query.code;
 

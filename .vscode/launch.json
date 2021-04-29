@@ -34,7 +34,7 @@
     },
 
     {
-      "name": "E2E Current file",
+      "name": "test/e2e spec",
       "type": "node",
       "request": "launch",
       "args": ["wdio.conf.js", "--spec", "${file}"],
@@ -62,6 +62,20 @@
       "console": "integratedTerminal",
       "cwd": "${workspaceRoot}/samples/generated/express-direct-auth",
       "program": "resource-server/server.js"
+    },
+
+    {
+      "name": "samples/e2e spec",
+      "type": "node",
+      "request": "launch",
+      "args": ["wdio.conf.js", "--spec", "${file}"],
+      "cwd": "${workspaceFolder}/samples/test",
+      "autoAttachChildProcesses": true,
+      "program": "${workspaceRoot}/node_modules/@wdio/cli/bin/wdio.js",
+      "console": "integratedTerminal",
+      "env": {
+        "DEBUG": "1"
+      }
     }
   ]
 }

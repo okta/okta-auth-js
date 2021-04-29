@@ -5,8 +5,13 @@
   "license": "Apache-2.0",
   "scripts": {
     "lint": "eslint .",
-    "start:runner": "wdio run wdio.conf.js",
-    "start": "node ./runner"
+    "wdio": "wdio run wdio.conf.js",
+    "test:specs": "node ./runner",
+    "start": "scripts/run.sh"
+  },
+  "engines": {
+    "node": ">=11.0",
+    "yarn": "^1.7.0"
   },
   "dependencies": {
     "@babel/register": "^7.8.2",
@@ -20,9 +25,8 @@
     "@wdio/mocha-framework": "^6.4.0",
     "@wdio/sauce-service": "^6.4.0",
     "@wdio/spec-reporter": "^5.15.1",
-    "chromedriver": "^87.0.0",
+    "ts-node": "^9.1.1",
     "wait-on": "^3.3.0",
-    "wdio-chromedriver-service": "^6.0.3",
     "webpack": "^3.0.0"
   }
 }

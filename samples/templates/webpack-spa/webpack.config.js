@@ -8,6 +8,12 @@ const babelOptions = {
   sourceType: 'unambiguous'
 };
 
+// preserves query parameters
+function redirectToOrigin(req, res, next) {
+  req.url = '/';
+  next();
+}
+
 module.exports = {
   mode: 'development',
   entry: './src/index.js',
@@ -23,10 +29,9 @@ module.exports = {
     ],
     port: PORT,
     before: function(app) {
-      app.get('{{ redirectPath }}', function(req, res, next) {
-        req.url = '/';
-        next();
-      });
+      app.get('{{ redirectPath }}', redirectToOrigin);
+      app.get('/login', redirectToOrigin);
+      app.get('/profile', redirectToOrigin);
     }
   },
   devtool: 'source-map',
