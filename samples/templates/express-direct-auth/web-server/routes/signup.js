@@ -171,7 +171,7 @@ router.post('/signup/enroll-authenticator/password', async (req, res) => {
 const renderEnrollPhoneAuthenticatorEnrollmentData = (req, res) => {
   renderTemplate(req, res, 'phone-enrollment-data', {
     action: '/signup/enroll-authenticator/phone/enrollment-data'
-  })
+  });
 };
 
 router.get('/signup/enroll-authenticator/phone/enrollment-data', (req, res) => {
@@ -206,7 +206,7 @@ const renderEnrollPhoneAuthenticator = (req, res) => {
       type: 'text',
       name: 'verificationCode',
     }
-  })
+  });
 };
 
 router.get('/signup/enroll-authenticator/phone', (req, res) => {
