@@ -3,6 +3,7 @@
 import { AuthSdkError } from '../errors';
 import { Base as Remeditor } from './remediators';
 import { RunOptions } from './run';
+import LoopMonitor from './RemediationLoopMonitor';
 import { 
   IdxResponse, 
   isRawIdxResponse, 
@@ -67,6 +68,7 @@ export function getRemeditor(
 export async function remediate(
   idxResponse: IdxResponse,
   values: RemediationValues,
+  loopMonitor: LoopMonitor,
   options: RunOptions
 ): Promise<RemediationResponse> {
   const { neededToProceed } = idxResponse;
@@ -77,7 +79,7 @@ export async function remediate(
     for (let action of actions) {
       if (typeof idxResponse.actions[action] === 'function') {
         idxResponse = await idxResponse.actions[action]();
-        return remediate(idxResponse, values, options); // recursive call
+        return remediate(idxResponse, values, loopMonitor, options); // recursive call
       }
     }
   }
@@ -88,6 +90,10 @@ export async function remediate(
     throw new AuthSdkError(
       'No remediation can match current flow, check policy settings in your org'
     );
+  }
+
+  if (loopMonitor.shouldBreak(remediator)) {
+    throw new AuthSdkError('Remediation run into loop, break!!!');
   }
 
   // Recursive loop breaker
@@ -114,7 +120,7 @@ export async function remediate(
     // We may want to trim the values bag for the next remediation
     // Let the remeditor decide what the values should be (default to current values)
     values = remediator.getValues();
-    return remediate(idxResponse, values, options); // recursive call
+    return remediate(idxResponse, values, loopMonitor, options); // recursive call
   } catch (e) {
     // Thrown error terminates the interaction with idx
     if (isRawIdxResponse(e)) { // idx responses are sometimes thrown, these will be "raw"

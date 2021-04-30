@@ -2,6 +2,7 @@
 import { AuthTransaction } from '../tx';
 import { interact } from './interact';
 import { remediate } from './remediate';
+import LoopMonitor from './RemediationLoopMonitor';
 import { 
   OktaAuth,
   IdxOptions,
@@ -39,7 +40,7 @@ export async function run(
       } = {}, 
       nextStep: nextStepFromResp,
       formError,
-    } = await remediate(idxResponse, values, options);
+    } = await remediate(idxResponse, values, new LoopMonitor(), options);
 
     // Track nextStep and formError
     nextStep = nextStepFromResp;
