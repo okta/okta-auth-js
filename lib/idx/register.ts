@@ -14,13 +14,19 @@ import {
   SelectAuthenticatorValues,
   EnrollOrChallengeAuthenticator,
   EnrollOrChallengeAuthenticatorValues,
+  AuthenticatorEnrollmentData,
+  AuthenticatorEnrollmentDataValues,
+  Skip,
+  SkipValues,
 } from './remediators';
 
 const flow: RemediationFlow = {
   'select-enroll-profile': SelectEnrollProfile,
   'enroll-profile': EnrollProfile,
+  'authenticator-enrollment-data': AuthenticatorEnrollmentData,
   'select-authenticator-enroll': SelectAuthenticator,
   'enroll-authenticator': EnrollOrChallengeAuthenticator,
+  'skip': Skip,
 };
 
 export interface RegistrationOptions extends 
@@ -28,7 +34,9 @@ export interface RegistrationOptions extends
   SelectEnrollProfileValues,
   EnrollProfileValues,
   SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticatorValues {
+  EnrollOrChallengeAuthenticatorValues,
+  AuthenticatorEnrollmentDataValues,
+  SkipValues {
 }
 
 export async function register(
@@ -37,5 +45,11 @@ export async function register(
   return run(authClient, { 
     ...options, 
     flow,
+    allowedNextSteps: [
+      'enroll-profile',
+      'authenticator-enrollment-data',
+      'select-authenticator-enroll',
+      'enroll-authenticator'
+    ]
   });
 }

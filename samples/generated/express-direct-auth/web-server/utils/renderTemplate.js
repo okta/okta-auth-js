@@ -1,10 +1,11 @@
 const renderError = require('./renderError');
 const getFormActionPath = require('./getFormActionPath');
 
-module.exports = function renderTemplate(req, res, template, options) {
+module.exports = function renderTemplate(req, res, template, options = {}) {
   options = { 
     ...options, 
-    action: getFormActionPath(req, options.action) 
+    action: getFormActionPath(req, options.action),
+    skipAction: getFormActionPath(req, options.skipAction),
   };
   const error = req.getLastError();
   if (error) {

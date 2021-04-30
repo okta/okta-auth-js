@@ -15,6 +15,7 @@ export type IdxToRemediationValueMap = Record<string, string[] | string | boolea
 export type NextStep = {
   name: string;
   type?: string;
+  canSkip?: boolean;
 }
 
 export interface AcceptsInteractionHandle {

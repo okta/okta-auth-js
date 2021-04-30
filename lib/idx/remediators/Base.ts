@@ -22,6 +22,10 @@ export class Base {
     this.values = values;
   }
 
+  getName(): string {
+    return this.remediation.name;
+  }
+
   // Override this method to provide custom check
   canRemediate(): boolean {
     if (!this.map) {

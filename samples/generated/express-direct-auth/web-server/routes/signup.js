@@ -51,10 +51,12 @@ router.post('/signup', async (req, res) => {
 
 // Handle select-authenticator
 const renderSelectAuthenticator = (req, res) => {
-  const { authenticators } = req.session;
+  const { authenticators, canSkip } = req.session;
   renderTemplate(req, res, 'select-authenticator', {
     authenticators,
     action: '/signup/select-authenticator',
+    canSkip,
+    skipAction: '/signup/select-authenticator/skip',
   });
 };
 
@@ -74,6 +76,17 @@ router.post('/signup/select-authenticator', async (req, res) => {
     const authTransaction = await authClient.idx.register({
       authenticators: [authenticator],
     });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
+  } catch (error) {
+    req.setLastError(error);
+    renderSelectAuthenticator(req, res);
+  }
+});
+
+router.post('/signup/select-authenticator/skip', async (req, res) => {
+  const authClient = getAuthClient(req);
+  try {
+    const authTransaction = await authClient.idx.register({ skip: true });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     req.setLastError(error);

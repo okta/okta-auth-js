@@ -39,5 +39,11 @@ export async function authenticate(
   return run(authClient, { 
     ...options, 
     flow,
+    allowedNextSteps: [
+      'select-authenticator-authenticate',
+      'challenge-authenticator',
+      'reenroll-authenticator',
+      'redirect-idp',
+    ]
   });
 }

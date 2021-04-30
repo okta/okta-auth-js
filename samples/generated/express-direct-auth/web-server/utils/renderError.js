@@ -22,7 +22,7 @@ module.exports = function renderError(res, {
   template, error, ...restOptions 
 }) {
   let errors;
-  if (Array.isArray(error.errorCauses)) {
+  if (Array.isArray(error.errorCauses) && error.errorCauses.length) {
     errors = error.errorCauses;
   } else if (typeof error === 'string') {
     errors = [error];

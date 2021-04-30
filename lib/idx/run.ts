@@ -13,6 +13,7 @@ import {
 
 export interface RunOptions {
   flow: RemediationFlow;
+  allowedNextSteps: string[];
   actions?: string[];
 }
 
@@ -20,7 +21,6 @@ export async function run(
   authClient: OktaAuth, 
   options: RunOptions & IdxOptions,
 ) {
-  const { flow, actions } = options;
   let tokens;
   let nextStep;
   let error;
@@ -39,7 +39,7 @@ export async function run(
       } = {}, 
       nextStep: nextStepFromResp,
       formError,
-    } = await remediate(idxResponse, flow, values, actions);
+    } = await remediate(idxResponse, values, options);
 
     // Track nextStep and formError
     nextStep = nextStepFromResp;
