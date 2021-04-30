@@ -33,6 +33,14 @@
         </form>
       </div>
 
+      {{#canSkip}}
+        <form class="ui form" action="{{skipAction}}" method="POST">
+          <button class="ui fluid submit button" type="submit">
+            Skip
+          </button>
+        </form>
+      {{/canSkip}}
+
       {{>cancel}}
 
     </div>

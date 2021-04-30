@@ -21,6 +21,9 @@ const next = ({ nextStep, req, res }) => {
   } else if (name === 'enroll-authenticator') {
     redirect({ req, res, path: `/signup/enroll-authenticator/${type}` });
     return true;
+  } else if (name === 'authenticator-enrollment-data') {
+    redirect({ req, res, path: `/signup/enroll-authenticator/${type}/enrollment-data` });
+    return true;
   }
   return false;
 };
@@ -51,10 +54,12 @@ router.post('/signup', async (req, res) => {
 
 // Handle select-authenticator
 const renderSelectAuthenticator = (req, res) => {
-  const { authenticators } = req.session;
+  const { authenticators, canSkip } = req.session;
   renderTemplate(req, res, 'select-authenticator', {
     authenticators,
     action: '/signup/select-authenticator',
+    canSkip,
+    skipAction: '/signup/select-authenticator/skip',
   });
 };
 
@@ -74,6 +79,17 @@ router.post('/signup/select-authenticator', async (req, res) => {
     const authTransaction = await authClient.idx.register({
       authenticators: [authenticator],
     });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
+  } catch (error) {
+    req.setLastError(error);
+    renderSelectAuthenticator(req, res);
+  }
+});
+
+router.post('/signup/select-authenticator/skip', async (req, res) => {
+  const authClient = getAuthClient(req);
+  try {
+    const authTransaction = await authClient.idx.register({ skip: true });
     handleAuthTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     req.setLastError(error);
@@ -148,6 +164,71 @@ router.post('/signup/enroll-authenticator/password', async (req, res) => {
   } catch (error) {
     req.setLastError(error);
     renderEnrollPasswordAuthenticator(req, res);
+  }
+});
+
+// Handle enroll authenticator - phone (sms)
+const renderEnrollPhoneAuthenticatorEnrollmentData = (req, res) => {
+  renderTemplate(req, res, 'phone-enrollment-data', {
+    action: '/signup/enroll-authenticator/phone/enrollment-data'
+  });
+};
+
+router.get('/signup/enroll-authenticator/phone/enrollment-data', (req, res) => {
+  const { status } = req.session;
+  if (status === IdxStatus.PENDING) {
+    renderEnrollPhoneAuthenticatorEnrollmentData(req, res);
+  } else {
+    redirect({ req, res, path: '/signup' });
+  }
+});
+
+router.post('/signup/enroll-authenticator/phone/enrollment-data', async (req, res) => {
+  const { phoneNumber } = req.body;
+  const authClient = getAuthClient(req);
+  try {
+    const authTransaction = await authClient.idx.register({ 
+      authenticators: ['phone'],
+      phoneNumber,
+    });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
+  } catch (error) {
+    req.setLastError(error);
+    renderEnrollPhoneAuthenticatorEnrollmentData(req, res);
+  }
+});
+
+const renderEnrollPhoneAuthenticator = (req, res) => {
+  renderTemplate(req, res, 'authenticator', {
+    title: 'Enroll phone authenticator',
+    action: '/signup/enroll-authenticator/phone',
+    input: {
+      type: 'text',
+      name: 'verificationCode',
+    }
+  });
+};
+
+router.get('/signup/enroll-authenticator/phone', (req, res) => {
+  const { status } = req.session;
+  if (status === IdxStatus.PENDING) {
+    renderEnrollPhoneAuthenticator(req, res);
+  } else {
+    redirect({ req, res, path: '/signup' });
+  }
+});
+
+router.post('/signup/enroll-authenticator/phone', async (req, res) => {
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
+  try {
+    const authTransaction = await authClient.idx.register({ 
+      verificationCode,
+    });
+    handleAuthTransaction({ req, res, next, authClient, authTransaction });
+  } catch (error) {
+    req.setLastError(error);
+    renderEnrollPhoneAuthenticator(req, res);
   }
 });
 

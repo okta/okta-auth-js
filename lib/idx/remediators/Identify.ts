@@ -13,6 +13,11 @@ export class Identify extends Base {
     'credentials': ['credentials', 'password']
   };
 
+  canRemediate() {
+    const { identifier } = this.getData();
+    return !!identifier;
+  }
+
   mapCredentials() {
     return { passcode: this.values.password };
   }

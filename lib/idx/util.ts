@@ -51,3 +51,7 @@ export function isErrorResponse(idxResponse: IdxResponse) {
 export function titleCase(str: string) {
   return str.charAt(0).toUpperCase() + str.substring(1);
 }
+
+export function canSkip(idxResponse: IdxResponse) {
+  return idxResponse.neededToProceed.some(({ name }) => name === 'skip');
+}

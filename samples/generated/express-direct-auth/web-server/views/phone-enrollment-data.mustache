@@ -4,13 +4,13 @@
     {{>head}}
   </head>
   <body id="samples">
-    
+  
     {{>menu}}
 
     <div class="okta-sign-in-form ui center aligned relaxed grid">
       <div class="row">
         <div class="ui header">
-          <h2>Select authenticator</h2>
+          <h2>Enroll phone authenticator</h2>
         </div>
       </div>
 
@@ -21,25 +21,18 @@
       <div class="row">
         <form class="ui large form" action="{{action}}" method="POST">
           <div class="field">
-            <select class="ui selection dropdown" name="authenticator">
-              {{#authenticators}}
-                <option value="{{value}}">{{label}}</option>
-              {{/authenticators}}
-            </select>
+            <div class="ui labeled input">
+              <div class="ui label">
+                Phone number
+              </div>
+              <input type="text" name="phoneNumber" required />
+            </div>
           </div>
           <button class="ui fluid large primary submit button" type="submit">
-            Select
+            Next
           </button>
         </form>
       </div>
-
-      {{#canSkip}}
-        <form class="ui form" action="{{skipAction}}" method="POST">
-          <button class="ui fluid submit button" type="submit">
-            Skip
-          </button>
-        </form>
-      {{/canSkip}}
 
       {{>cancel}}
 

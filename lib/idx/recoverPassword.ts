@@ -45,6 +45,12 @@ export async function recoverPassword(
         'currentAuthenticator-recover', 
         'currentAuthenticatorEnrollment-recover'
       ],
+      allowedNextSteps: [
+        'select-authenticator-authenticate',
+        'challenge-authenticator',
+        'authenticator-verification-data',
+        'reset-authenticator',
+      ],
     }
   );
 }

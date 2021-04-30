@@ -35,7 +35,9 @@ module.exports = function handleAuthTransaction({
   if (typeof next === 'function') {
     const supportNextStep = next({ req, res, nextStep });
     if (!supportNextStep) {
-      throw new Error('Unable to handle next step');
+      throw new Error(
+        'Oops! The sample app cannot support the policy configuration in your org'
+      );
     }
   }
 };
