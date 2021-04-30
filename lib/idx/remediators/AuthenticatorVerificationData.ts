@@ -28,4 +28,8 @@ export class AuthenticatorVerificationData extends Base {
       methodType: 'sms',
     };
   }
+
+  getValues(): AuthenticatorVerificationDataValues {
+    return {};
+  }
 }

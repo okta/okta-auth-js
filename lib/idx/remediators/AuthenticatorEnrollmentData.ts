@@ -34,4 +34,8 @@ export class AuthenticatorEnrollmentData extends Base {
       type: this.remediation.relatesTo.value.type,
     };
   }
+
+  getValues(): AuthenticatorEnrollmentDataValues {
+    return {};
+  }
 }
