@@ -9,6 +9,7 @@ const router = express.Router();
 
 const next = ({ nextStep, req, res }) => {
   renderTemplate(req, res, 'login-with-idp', nextStep);
+  return true;
 };
 
 router.get('/with-idp', async (req, res) => {
