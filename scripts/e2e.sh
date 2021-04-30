@@ -15,12 +15,6 @@ get_secret prod/okta-sdk-vars/password PASSWORD
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
-# build is required to run E2E tests
-if ! yarn build; then
-  echo "build failed! Exiting..."
-  exit ${TEST_FAILURE}
-fi
-
 # This client has refresh token enabled
 export CLIENT_ID=0oapmwm72082GXal14x6
 export REFRESH_TOKEN=true

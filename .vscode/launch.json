@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "okta-auth-js (browser)",
+      "name": "jest (jsdom)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
@@ -21,7 +21,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "okta-auth-js (server)",
+      "name": "jest (node)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
@@ -42,6 +42,16 @@
       "autoAttachChildProcesses": true,
       "program": "${workspaceRoot}/node_modules/@wdio/cli/bin/wdio.js",
       "console": "integratedTerminal"
+    },
+
+    {
+      "name": "sample: express web (with oidc)",
+      "type": "node",
+      "request": "launch",
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}/samples/generated/express-web-with-oidc",
+      "program": "server.js"
     },
 
     {

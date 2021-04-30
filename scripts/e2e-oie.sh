@@ -16,11 +16,6 @@ export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 export ORG_OIE_ENABLED=true
 
-# build is required to run E2E tests
-if ! yarn build; then
-  echo "build failed! Exiting..."
-  exit ${TEST_FAILURE}
-fi
 
 # This client has refresh token enabled
 export CLIENT_ID=0oa3n0cgbfiNvI6Aa0g7

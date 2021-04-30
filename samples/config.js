@@ -30,7 +30,7 @@ const spaDefaults = Object.assign({
 }, defaults);
 
 const webDefaults = Object.assign({
-  redirectPath: '/login/callback',
+  redirectPath: '/authorization-code/callback',
   oidc: true
 }, defaults);
 

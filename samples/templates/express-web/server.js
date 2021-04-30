@@ -1,7 +1,9 @@
 // @ts-nocheck
 /* eslint-disable no-console */
 
-const OktaAuthJS = require('@okta/okta-auth-js').OktaAuth;
+const OktaAuthJS = require('@okta/okta-auth-js');
+const OktaAuth = OktaAuthJS.OktaAuth;
+const exchangeCodeForTokens = OktaAuthJS.exchangeCodeForTokens;
 
 const express = require('express');
 const querystring = require('querystring');
@@ -33,13 +35,13 @@ app.post('/login', function(req, res) {
   const issuer = req.body.issuer;
   const username = req.body.username;
   const password = req.body.password;
-  let status = '';
-  let sessionToken = '';
-  let error = '';
   let authClient;
+  let status;
+  let error;
+  let sessionToken;
 
   try {
-    authClient = new OktaAuthJS({
+    authClient = new OktaAuth({
       issuer
     });
   } catch(e) {
@@ -52,8 +54,8 @@ app.post('/login', function(req, res) {
   })
   .then(function(transaction) {
     status = transaction.status;
-    sessionToken = transaction.sessionToken;
     error = transaction.error;
+    sessionToken = transaction.sessionToken;
 
     {{#if oidc}}
     const clientId = req.body.clientId;

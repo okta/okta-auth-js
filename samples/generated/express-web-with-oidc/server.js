@@ -1,7 +1,9 @@
 // @ts-nocheck
 /* eslint-disable no-console */
 
-const OktaAuthJS = require('@okta/okta-auth-js').OktaAuth;
+const OktaAuthJS = require('@okta/okta-auth-js');
+const OktaAuth = OktaAuthJS.OktaAuth;
+const exchangeCodeForTokens = OktaAuthJS.exchangeCodeForTokens;
 
 const express = require('express');
 const querystring = require('querystring');
@@ -9,7 +11,7 @@ const uuid = require('uuid');
 const https = require('https');
 const btoa = require('btoa');
 
-const redirectUrl = `http://localhost:8080/login/callback`;
+const redirectUrl = `http://localhost:8080/authorization-code/callback`;
 
 // converts a string to base64 (url/filename safe variant)
 function stringToBase64Url(str) {
@@ -31,13 +33,13 @@ app.post('/login', function(req, res) {
   const issuer = req.body.issuer;
   const username = req.body.username;
   const password = req.body.password;
-  let status = '';
-  let sessionToken = '';
-  let error = '';
   let authClient;
+  let status;
+  let error;
+  let sessionToken;
 
   try {
-    authClient = new OktaAuthJS({
+    authClient = new OktaAuth({
       issuer
     });
   } catch(e) {
@@ -50,8 +52,8 @@ app.post('/login', function(req, res) {
   })
   .then(function(transaction) {
     status = transaction.status;
-    sessionToken = transaction.sessionToken;
     error = transaction.error;
+    sessionToken = transaction.sessionToken;
 
     const clientId = req.body.clientId;
     const clientSecret = req.body.clientSecret;
@@ -90,7 +92,7 @@ app.post('/login', function(req, res) {
 });
 
 // Handle OIDC callback. The request query will contain a code and state
-app.get('/login/callback', function(req, res) {
+app.get('/authorization-code/callback', function(req, res) {
   // also known as "authorization_code"
   const code = req.query.code;
 
