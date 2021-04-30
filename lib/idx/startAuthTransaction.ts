@@ -6,9 +6,10 @@ export async function startAuthTransaction(
   authClient: OktaAuth, 
   options: InteractOptions
 ): Promise<AuthTransaction> {
-  const {
-    meta,
-  } = await interact(authClient, options);
-  const authTransaction = new AuthTransaction(authClient, meta);
+  const { idxResponse, meta } = await interact(authClient, options);
+  const idps = idxResponse.neededToProceed
+    .filter(({ name }) => name === 'redirect-idp')
+    .map(({ type, idp }) => ({ type, id: idp.id }));
+  const authTransaction = new AuthTransaction(authClient, { ...meta, idps });
   return authTransaction;
 }

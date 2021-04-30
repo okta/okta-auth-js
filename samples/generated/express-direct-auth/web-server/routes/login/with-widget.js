@@ -16,6 +16,7 @@ router.get('/with-widget', (req, res) => {
         codeChallenge, 
         codeChallengeMethod, 
         state,
+        idps,
       } = authTransaction.data;
 
       if (!interactionHandle) {
@@ -35,6 +36,7 @@ router.get('/with-widget', (req, res) => {
         },
         useInteractionCodeFlow: true,
         state,
+        idps,
         interactionHandle,
         codeChallenge,
         codeChallengeMethod,
