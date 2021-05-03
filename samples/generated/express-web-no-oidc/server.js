@@ -3,7 +3,6 @@
 
 const OktaAuthJS = require('@okta/okta-auth-js');
 const OktaAuth = OktaAuthJS.OktaAuth;
-const exchangeCodeForTokens = OktaAuthJS.exchangeCodeForTokens;
 
 const express = require('express');
 const querystring = require('querystring');
