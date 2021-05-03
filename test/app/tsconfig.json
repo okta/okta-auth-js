@@ -12,7 +12,8 @@
     "paths": {
       "@okta/okta-auth-js": ["../../build"],
       "@okta/okta-auth-js/polyfill": ["../../build/polyfill"]
-    }
+    },
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts",
