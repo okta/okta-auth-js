@@ -71,7 +71,7 @@ const samples = [
   {
     name: 'express-direct-auth',
     template: 'express-direct-auth',
-    specs: ['web-app']
+    specs: []
   },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {
