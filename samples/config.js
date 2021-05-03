@@ -1,7 +1,7 @@
 const path = require('path');
 
 // All samples use the same widget version, whether CDN or NPM
-const SIW_VERSION = '5.5.2';
+const SIW_VERSION = '5.6.0';
 
 const AUTH_JS_DIR = path.dirname(require.resolve('@okta/okta-auth-js'));
 const AUTH_JS_VERSION = require(path.resolve(AUTH_JS_DIR, '..', '..', 'package.json')).version;
@@ -71,7 +71,7 @@ const samples = [
   {
     name: 'express-direct-auth',
     template: 'express-direct-auth',
-    specs: ['web-app']
+    specs: []
   },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {

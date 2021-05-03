@@ -151,7 +151,7 @@ export async function renderWidget(config: Config, authClient?: OktaAuth): Promi
   widgetConfig.authParams.state = state; // Must set authParams in constructor: OKTA-361428
 
   if (forceRedirect) {
-    renderOptions.mode = 'remediation'; // since version 5.0
+    renderOptions.redirect = 'always'; // since version 5.0
     widgetConfig.authParams.display = 'page'; // version < 5.0
   } else {
     widgetConfig.authParams.display = 'none'; // version < 5.0

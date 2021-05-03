@@ -44,12 +44,6 @@ function stringify(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-// load config from the URL params
-loadConfig();
-
-// start all the things
-main();
-
 function main() {
   // Configuration is loaded from URL query params. Make sure the links contain the full config
   document.getElementById('home-link').setAttribute('href', config.appUri);
@@ -63,7 +57,7 @@ function main() {
   var hasValidConfig = !!(config.issuer && config.clientId);
   if (!hasValidConfig) {
     showError('Click "Edit Config" and set the `issuer` and `clientId`');
-    return;
+    return renderUnauthenticated();
   }
 
   // Config is valid
@@ -133,17 +127,48 @@ function renderLoading() {
 }
 
 function renderAuthenticated(authState) {
+  document.body.classList.add('auth');
+  document.body.classList.remove('unauth');
   document.getElementById('auth').style.display = 'block';
   document.getElementById('accessToken').innerText = stringify(authState.accessToken);
-  document.getElementById('userInfo').innerText = stringify(userInfo || authState.userInfo);
+  renderUserInfo(authState);
+}
+
+function renderUserInfo(authState) {
+  const obj = userInfo || authState.userInfo;
+  const attributes = Object.keys(obj);
+  const rows = attributes.map((key) => {
+    return `
+      <tr>
+        <td>${key}</td>
+        <td id="claim-${key}">${obj[key]}</td>
+      </tr>
+    `;
+  });
+  const table = `
+    <table class="ui table compact collapsing">
+      <thead>
+        <tr>
+          <th>Claim</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.join('')}
+      </tbody>
+    </table>
+  `;
+  document.getElementById('userInfo').innerHTML = table;
 }
 
 function renderUnauthenticated() {
   // The user is not authenticated, the app will begin an auth flow.
+  document.body.classList.add('unauth');
+  document.body.classList.remove('auth');
   document.getElementById('auth').style.display = 'none';
 
   // The `handleLoginRedirect` may have failed. An error or remediation should be shown.
-  if (authClient.token.isLoginRedirect()) {
+  if (!authClient || authClient.token.isLoginRedirect()) {
     return;
   }
 
@@ -266,7 +291,7 @@ function showSigninWidget() {
 
 {{#if signinForm}}
 function showSigninForm() {
-  document.getElementById('flow-form').style.display = 'block';
+  document.getElementById('login-form').style.display = 'block';
 }
 
 function submitSigninForm() {
@@ -534,3 +559,12 @@ function onFormData(event) {
   const newUri = window.location.origin + '/' + query;
   window.location.replace(newUri);
 }
+
+// Wait for DOM content to be loaded before starting the app
+document.addEventListener('DOMContentLoaded', () => {
+  // load config from the URL params
+  loadConfig();
+
+  // start all the things
+  main();
+});

@@ -15,7 +15,7 @@ const config = getConfig();
 
 describe('spa-app: ' + sampleConfig.name, () => {
 
-  it('can login using redirect', async () => {
+  it.only('can login using redirect', async () => {
     await startApp(SpaApp, { requireUserSession: true });
     await loginRedirect(SpaApp);
     await SpaApp.assertUserInfo();

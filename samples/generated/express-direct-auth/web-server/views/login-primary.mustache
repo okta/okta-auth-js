@@ -20,13 +20,13 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="{{action}}" method="POST">
+        <form id="login-form" class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
                 Username
               </div>
-              <input type="text" name="username" required />
+              <input id="username" type="text" name="username" required />
             </div>
           </div>
           <div class="field">
@@ -34,10 +34,10 @@
               <div class="ui label">
                 Password
               </div>
-              <input type="password" name="password" required />
+              <input id="password" type="password" name="password" required />
             </div>
           </div>
-          <button class="ui fluid large primary submit button" type="submit">
+          <button id="submit-login-form" class="ui fluid large primary submit button" type="submit">
             Sign In
           </button>
         </form>

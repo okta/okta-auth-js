@@ -32,3 +32,9 @@ fi
 
 # Revert the original change
 sed -i "s#${OKTA_REGISTRY}#${YARN_REGISTRY}#" yarn.lock
+
+# Build
+if ! yarn build; then
+  echo "build failed! Exiting..."
+  exit ${TEST_FAILURE}
+fi

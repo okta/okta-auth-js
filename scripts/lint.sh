@@ -5,9 +5,6 @@ source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 export TEST_SUITE_TYPE="checkstyle"
 export TEST_RESULT_FILE_DIR="${REPO}/build2"
 
-# build modules and samples
-yarn build
-
 if ! yarn tsd; then
   echo "tsd failed! Exiting..."
   exit ${TEST_FAILURE}

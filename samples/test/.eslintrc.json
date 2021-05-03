@@ -1,7 +1,9 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:jasmine/recommended"
+    "plugin:jasmine/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   "globals": {
     "$": "readonly",
@@ -13,11 +15,22 @@
     "sourceType": "module",
     "ecmaVersion": 2020
   },
-  "plugins": ["jasmine"],
+  "plugins": [
+    "jasmine",
+    "@typescript-eslint"
+  ],
   "env": {
     "jasmine": true
   },
   "rules": {
+    "prefer-const": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "node/no-missing-import": ["error", {
+      "tryExtensions": [".js", ".ts"]
+    }],
+    "new-cap": 0,
     "jsdoc/newline-after-description": 0,
     "jsdoc/check-types": 0,
     "jsdoc/valid-types": 0,
