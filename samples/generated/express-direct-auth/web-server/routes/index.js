@@ -5,6 +5,7 @@ const recoverPassword = require('./recover-password');
 const cancel = require('./cancel');
 const home = require('./home');
 const protected = require('./protected');
+const terminal = require('./terminal');
 
 module.exports = [
   login,
@@ -14,4 +15,5 @@ module.exports = [
   cancel,
   home,
   protected,
+  terminal,
 ];

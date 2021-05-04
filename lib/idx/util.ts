@@ -40,14 +40,6 @@ export function getIdxRemediation(remediators, idxRemediations) {
   return idxRemediations.find(idxRemediation => Object.keys(remediators).includes(idxRemediation.name));
 }
 
-export function isErrorResponse(idxResponse: IdxResponse) {
-  const rawIdxState = idxResponse.rawIdxState;
-  if (rawIdxState.messages && rawIdxState.messages.value && rawIdxState.messages.value.length > 0) {
-    return true;
-  }
-  return false;
-}
-
 export function titleCase(str: string) {
   return str.charAt(0).toUpperCase() + str.substring(1);
 }

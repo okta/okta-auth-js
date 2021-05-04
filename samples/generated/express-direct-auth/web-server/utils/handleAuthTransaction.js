@@ -8,6 +8,7 @@ module.exports = function handleAuthTransaction({
   const {  
     data: { 
       nextStep = {},
+      terminal,
       tokens,
       status,
       error,
@@ -30,6 +31,11 @@ module.exports = function handleAuthTransaction({
   // Throw error if exist in authTransaction
   if (error) {
     throw error;
+  }
+  // If terminal exist, redirect to terminal view
+  if (terminal) {
+    req.setTerminalMessages(terminal.messages);
+    return res.redirect('/terminal');
   }
   // Proceed to next step
   if (typeof next === 'function') {
