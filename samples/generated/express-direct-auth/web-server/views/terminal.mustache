@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+  
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div class="ui header">
+          <h2>Terminal</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="ui message">
+          <ul class="list">
+            {{#messages}}
+              <li>{{.}}</li>
+            {{/messages}}
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </body>
+</html>

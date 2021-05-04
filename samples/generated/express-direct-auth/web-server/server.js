@@ -6,7 +6,12 @@ const session = require('express-session');
 const mustacheExpress = require('mustache-express');
 const path = require('path');
 const { getAuthClient } = require('./utils');
-const { userContext, lastError, authTransaction } = require('./middlewares');
+const { 
+  userContext, 
+  lastError, 
+  authTransaction,
+  terminalMessages, 
+} = require('./middlewares');
 
 const templateDir = path.join(__dirname, '', 'views');
 const frontendDir = path.join(__dirname, '', 'assets');
@@ -23,6 +28,7 @@ app.use(session({
   saveUninitialized: false
 }));
 app.use(lastError);
+app.use(terminalMessages);
 app.use(authTransaction);
 
 // Provide the configuration to the view layer because we show it on the homepage

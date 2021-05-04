@@ -14,8 +14,7 @@ import {
   IdxRemediation,
 } from '../types';
 import { 
-  createApiError, 
-  isErrorResponse,
+  createApiError,
   canSkip as canSkipFn,
 } from './util';
 
@@ -24,6 +23,9 @@ interface RemediationResponse {
   nextStep?: NextStep;
   canSkip?: boolean;
   formError?: APIError;
+  terminal?: {
+    messages: string[];
+  };
 }
 
 // Return first match idxRemediation in allowed remediators
@@ -62,6 +64,16 @@ export function getRemeditor(
   }
 
   return null;
+}
+
+export function isTerminalResponse(idxResponse: IdxResponse) {
+  const { neededToProceed, interactionCode } = idxResponse;
+  return !neededToProceed.length && !interactionCode;
+}
+
+export function getTerminalMessages(idxResponse: IdxResponse) {
+  const { rawIdxState } = idxResponse;
+  return rawIdxState.messages.value.map(({ message }) => message);
 }
 
 // This function is called recursively until it reaches success or cannot be remediated
@@ -111,12 +123,18 @@ export async function remediate(
   const data = remediator.getData();
   try {
     idxResponse = await idxResponse.proceed(name, data);
-    if (isErrorResponse(idxResponse)) {
-      throw createApiError(idxResponse.rawIdxState);
-    }
+    
+    // Successfully get interaction code
     if (idxResponse.interactionCode) {
       return { idxResponse };
     }
+
+    // Reach to terminal state
+    if (isTerminalResponse(idxResponse)) {
+      const messages = getTerminalMessages(idxResponse);
+      return { terminal: { messages } };
+    }
+    
     // We may want to trim the values bag for the next remediation
     // Let the remeditor decide what the values should be (default to current values)
     values = remediator.getValues();
