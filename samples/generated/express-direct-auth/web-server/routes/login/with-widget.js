@@ -40,7 +40,7 @@ router.get('/with-widget', (req, res) => {
         codeChallengeMethod,
       };
       renderTemplate(req, res, 'login-with-widget', {
-        siwVersion: '5.6.0',
+        siwVersion: '5.5.4',
         widgetConfig: JSON.stringify(widgetConfig),
       });
     })

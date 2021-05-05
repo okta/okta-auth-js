@@ -25,12 +25,14 @@ router.get('/login/callback', async (req, res) => {
     // Redirect back to home page
     res.redirect('/');
   } catch (err) {
-    if (authClient.isInteractionRequiredError(err) !== true) {
-      console.log('Failed to handle interaction code callback, error: ', err);
-      req.setLastError(err);
+    if (authClient.isInteractionRequiredError(err) === true) {
+      const { state } = req.query;
+      res.redirect('/login/with-widget?state=' + state);
+      return;
     }
 
     // TODO: show error message in home page
+    req.setLastError(err);
     res.redirect('/');
   }
 });
