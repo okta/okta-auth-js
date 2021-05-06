@@ -14,6 +14,7 @@
 // transition, etc. Most router changes should happen in LoginRouter (which is
 // responsible for adding new routes)
 
+/* eslint-disable complexity */
 import idx from '@okta/okta-idx-js';
 import { InteractOptions, OktaAuth, InteractResponse } from '../types';
 import { IDX_API_VERSION } from '../constants';
