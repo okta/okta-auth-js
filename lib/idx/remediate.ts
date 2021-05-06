@@ -1,5 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
+import idx from '@okta/okta-idx-js';
 import { AuthSdkError } from '../errors';
 import { Base as Remeditor } from './remediators';
 import { RunOptions } from './run';
@@ -66,12 +67,16 @@ export function getRemeditor(
   return null;
 }
 
-export function isTerminalResponse(idxResponse: IdxResponse) {
+function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
   return !neededToProceed.length && !interactionCode;
 }
 
 export function getTerminalMessages(idxResponse: IdxResponse) {
+  if (!isTerminalResponse(idxResponse)) {
+    return null;
+  }
+
   const { rawIdxState } = idxResponse;
   return rawIdxState.messages.value.map(({ message }) => message);
 }
@@ -130,9 +135,9 @@ export async function remediate(
     }
 
     // Reach to terminal state
-    if (isTerminalResponse(idxResponse)) {
-      const messages = getTerminalMessages(idxResponse);
-      return { terminal: { messages } };
+    const terminalMessages = getTerminalMessages(idxResponse);
+    if (terminalMessages) {
+      return { terminal: { messages: terminalMessages } };
     }
     
     // We may want to trim the values bag for the next remediation
@@ -140,19 +145,23 @@ export async function remediate(
     values = remediator.getValues();
     return remediate(idxResponse, values, loopMonitor, options); // recursive call
   } catch (e) {
-    // Thrown error terminates the interaction with idx
-    if (isRawIdxResponse(e)) { // idx responses are sometimes thrown, these will be "raw"
-      if (e.messages) {
-        // Error in the root level of the response is not handlable, throw it
-        throw createApiError(e);
+    // Handle form error
+    if (isRawIdxResponse(e)) {
+      const idxState = idx.makeIdxState(e);
+      const terminalMessages = getTerminalMessages(idxState);
+      if (terminalMessages) {
+        return { terminal: { messages: terminalMessages } };
       } else {
-        // Form error is handlable with client side retry, return it
+        // Treat both global errors and field errors as form error
         const nextStep = remediator.getNextStep();
-        const formError = remediator.createFormError(e);
+        const formError = e.messages 
+          ? createApiError(e) 
+          : remediator.createFormError(e);
         return { nextStep, formError };
       }
     }
-    // throw unknown error
+    
+    // Thrown error terminates the interaction with idx
     throw e;
   }
 }

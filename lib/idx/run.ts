@@ -28,6 +28,8 @@ export async function run(
   let error;
   let status: IdxStatus;
 
+  let shouldTerminate = false;
+
   try {
     // Start/resume the flow
     let { idxResponse, stateHandle } = await interact(authClient, options); 
@@ -48,6 +50,9 @@ export async function run(
     nextStep = nextStepFromResp;
     terminal = terminalFromResp;
     error = formError;
+
+    // Track should terminate
+    shouldTerminate = shouldTerminate || !!terminal;
 
     // Did we get an interaction code?
     status = IdxStatus.PENDING;
@@ -75,7 +80,10 @@ export async function run(
   } catch (err) {
     error = err;
     status = IdxStatus.FAILED;
-    // Clear transaction meta when error is not handlable
+    shouldTerminate = true;
+  }
+
+  if (shouldTerminate) {
     authClient.transactionManager.clear();
   }
   

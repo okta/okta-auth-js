@@ -39,10 +39,7 @@ export interface InteractResponse {
   meta?: IdxTransactionMeta;
 }
 
-export interface IdxOptions extends
-  InteractOptions,
-  AcceptsInteractionHandle {
-}
+export type IdxOptions = InteractOptions;
 
 export enum IdxStatus {
   SUCCESS,

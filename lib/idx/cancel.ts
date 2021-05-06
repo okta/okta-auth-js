@@ -10,10 +10,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuth, InteractOptions } from '../types';
+import { OktaAuth, IdxOptions } from '../types';
 import { interact } from './interact';
 
-export type CancelOptions = InteractOptions;
+export type CancelOptions = IdxOptions;
 
 export async function cancel (authClient: OktaAuth, options: CancelOptions) {
   return interact(authClient, options)

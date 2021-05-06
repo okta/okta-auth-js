@@ -1,10 +1,10 @@
 import { AuthTransaction } from '../tx';
 import { interact } from './interact';
-import { OktaAuth, InteractOptions } from '../types';
+import { OktaAuth, IdxOptions } from '../types';
 
 export async function startAuthTransaction(
   authClient: OktaAuth, 
-  options: InteractOptions
+  options: IdxOptions
 ): Promise<AuthTransaction> {
   const {
     meta,
