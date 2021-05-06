@@ -3,6 +3,7 @@ import {
   PKCE_STORAGE_NAME,
   TOKEN_STORAGE_NAME,
   TRANSACTION_STORAGE_NAME,
+  RESPONSE_STORAGE_NAME,
   CACHE_STORAGE_NAME,
   REDIRECT_OAUTH_PARAMS_NAME
 } from './constants';
@@ -13,10 +14,13 @@ import {
   PKCEStorage,
   CookieOptions,
   TransactionStorage,
+  ResponseStorage,
   StorageManagerOptions,
   SimpleStorage
 } from './types';
 import SavedObject from './SavedObject';
+import { isBrowser } from './features';
+import { warn } from './util';
 
 export default class StorageManager {
   storageManagerOptions: StorageManagerOptions;
@@ -68,6 +72,34 @@ export default class StorageManager {
     options = this.getOptionsForSection('transaction', options);
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || TRANSACTION_STORAGE_NAME;
+    return new SavedObject(storage, storageKey);
+  }
+
+  // intermediate idxResponse
+  // store for optimazation purpose
+  getResponseStorage(options?: StorageOptions): ResponseStorage {
+    options = this.getOptionsForSection('response', options);
+
+    let storage;
+    if (options.storageProvider) {
+      storage = options.storageProvider;
+    } else {
+      const storageType = isBrowser() ? 'memory' : null;
+      try {
+        storage = this.storageUtil.getStorageByType(storageType, options);
+      } catch (e) {
+        // it's ok to miss response storage
+        warn(
+          'No response storage found, you may want to provide custom implementation to optimize the network traffic'
+        );
+      }
+    }
+
+    if (!storage) {
+      return null;
+    }
+
+    const storageKey = options.storageKey || RESPONSE_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
   }
 

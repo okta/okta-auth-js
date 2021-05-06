@@ -33,6 +33,10 @@ module.exports = function getAuthClient(req, options = {}) {
         transaction: {
           storageKey: `transaction-${transactionId}`, // unique storage per transaction
           storageProvider
+        },
+        response: {
+          storageKey: `response-${transactionId}`, // unique storage per transaction
+          storageProvider
         }
       },
       ...options

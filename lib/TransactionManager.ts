@@ -10,7 +10,9 @@ import {
   OAuthTransactionMeta,
   TransactionMetaOptions,
   TransactionManagerOptions,
-  CookieStorage
+  CookieStorage,
+  RawIdxResponse,
+  isRawIdxResponse,
 } from './types';
 import { warn } from './util';
 
@@ -32,8 +34,11 @@ export default class TransactionManager {
   }
 
   clear(options: TransactionMetaOptions = {}) {
-    let storage: StorageProvider = this.storageManager.getTransactionStorage();
-    storage.clearStorage();
+    const transactionStorage: StorageProvider = this.storageManager.getTransactionStorage();
+    transactionStorage.clearStorage();
+
+    const responseStorage: StorageProvider = this.storageManager.getResponseStorage();
+    responseStorage?.clearStorage();
 
     if (!this.legacyWidgetSupport) {
       return;
@@ -239,5 +244,25 @@ export default class TransactionManager {
 
     // Something is there but we don't recognize it
     // throw new AuthSdkError('Unable to parse the ' + REDIRECT_OAUTH_PARAMS_NAME + ' value from storage');
+  }
+
+  saveIdxResponse(idxResponse: RawIdxResponse): void {
+    const storage: StorageProvider = this.storageManager.getResponseStorage();
+    if (!storage) {
+      return;
+    }
+    storage.setStorage(idxResponse);
+  }
+
+  loadIdxResponse(): RawIdxResponse {
+    const storage: StorageProvider = this.storageManager.getResponseStorage();
+    if (!storage) {
+      return null;
+    }
+    const idxResponse = storage.getStorage();
+    if (!isRawIdxResponse(idxResponse)) {
+      return null;
+    }
+    return idxResponse;
   }
 }

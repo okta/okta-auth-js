@@ -50,41 +50,46 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
     scopes = meta.scopes;
   }
   meta = Object.assign(meta, { state, scopes }); // save back to meta
+
+  let idxResponse;
+  const existingRawIdxResponse = authClient.transactionManager.loadIdxResponse();
+  if (existingRawIdxResponse) {
+    idxResponse = idx.makeIdxState(existingRawIdxResponse);
+  } else {
+    idxResponse = await idx.start({
+      // if interactionHandle is undefined here, idx will bootstrap a new interactionHandle
+      interactionHandle,
+      version,
   
-  return idx.start({
-    // if interactionHandle is undefined here, idx will bootstrap a new interactionHandle
-    interactionHandle,
-    version,
-
-    // OAuth
-    clientId, 
-    issuer,
-    scopes,
-    state,
-    redirectUri,
-
-    // PKCE
-    codeVerifier,
-    codeChallenge,
-    codeChallengeMethod
-  })
-    .then(idxResponse => {
-      // If this is a new transaction an interactionHandle was returned
-      if (!interactionHandle && idxResponse.toPersist.interactionHandle) {
-        meta = Object.assign({}, meta, {
-          interactionHandle: idxResponse.toPersist.interactionHandle
-        });
-      }
-
-      // Save transaction meta so it can be resumed
-      saveTransactionMeta(authClient, meta);
-
-      return {
-        idxResponse,
-        interactionHandle: meta.interactionHandle,
-        meta,
-        stateHandle: idxResponse.context.stateHandle,
-        state
-      };
+      // OAuth
+      clientId, 
+      issuer,
+      scopes,
+      state,
+      redirectUri,
+  
+      // PKCE
+      codeVerifier,
+      codeChallenge,
+      codeChallengeMethod
     });
+
+    // If this is a new transaction an interactionHandle was returned
+    if (!interactionHandle && idxResponse.toPersist.interactionHandle) {
+      meta = Object.assign({}, meta, {
+        interactionHandle: idxResponse.toPersist.interactionHandle
+      });
+    }
+
+    // Save transaction meta so it can be resumed
+    saveTransactionMeta(authClient, meta);
+  }
+
+  return {
+    idxResponse,
+    interactionHandle: meta.interactionHandle,
+    meta,
+    stateHandle: idxResponse.context.stateHandle,
+    state
+  };
 }

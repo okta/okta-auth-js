@@ -12,6 +12,7 @@
 
 import { TransactionMeta } from './Transaction';
 import { Cookies, CookieOptions } from './Cookies';
+import { RawIdxResponse } from '../idx/types';
 
 // for V1 authn interface: tx.resume()
 export interface TxStorage {
@@ -48,6 +49,11 @@ export interface PKCEStorage extends StorageProvider {
 export interface TransactionStorage extends StorageProvider {
   setStorage(obj: TransactionMeta): void;
   getStorage(): TransactionMeta;
+}
+
+export interface ResponseStorage extends StorageProvider {
+  setStorage(obj: RawIdxResponse): void;
+  getStorage(): RawIdxResponse;
 }
 
 export interface StorageOptions extends CookieOptions {

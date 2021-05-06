@@ -38,9 +38,7 @@ export async function run(
 
     // Can we handle the remediations?
     const { 
-      idxResponse: { 
-        interactionCode,
-      } = {}, 
+      idxResponse: idxResponseFromResp, 
       nextStep: nextStepFromResp,
       formError,
       terminal: terminalFromResp,
@@ -50,12 +48,15 @@ export async function run(
     nextStep = nextStepFromResp;
     terminal = terminalFromResp;
     error = formError;
-
-    // Track should terminate
     shouldTerminate = shouldTerminate || !!terminal;
+
+    if (nextStep && idxResponseFromResp) {
+      authClient.transactionManager.saveIdxResponse(idxResponseFromResp.rawIdxState);
+    }
 
     // Did we get an interaction code?
     status = IdxStatus.PENDING;
+    const { interactionCode } = idxResponseFromResp || {};
     if (interactionCode) {
       const meta = authClient.transactionManager.load() as IdxTransactionMeta;
       const {
