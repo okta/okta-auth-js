@@ -47,21 +47,22 @@
         <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
         <label for="clientId">Client ID (SPA App)
         </label><input id="clientId" name="clientId" type="text" /><br/>
-      
+
         <label for="flow">Authentication Flow</label>
         <select id="flow" name="flow" onchange="_onChangeFlow(event)">
           <option value="redirect">Redirect to Okta</option>
           <option value="widget">Okta Signin Widget (self-hosted)</option>
           <option value="form">Custom form (username/passsword)</option>
+          <option value="hybrid">Hybrid form (username/passsword) + MFA Signin Widget</option>
           <!-- Other login flows can be added -->
         </select><br/>
-      
+
         <label for="scopes">Scopes</label><input id="scopes" name="scopes" type="text" /><br/>
-        
+
         <label for="requireUserSession">Require Okta SSO session</label><br/>
         <input id="requireUserSession-on" name="requireUserSession" type="radio" value="true"/>ON<br/>
         <input id="requireUserSession-off" name="requireUserSession" type="radio" value="false"/>OFF<br/>
-      
+
         <label for="storage">Token storage</label>
         <select id="storage" name="storage">
           <option value="localStorage">localStorage</option>
@@ -69,14 +70,14 @@
           <option value="cookie">cookie</option>
           <option value="memory">memory</option>
         </select><br/>
-      
+
         <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label><br/>
         <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
         <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
-        
+
         <label style="display: none" for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
         <input style="display: none" id="idps" name="idps" type="text" /><br/>
-      
+
         <hr/>
         <input id="login-submit" type="submit" value="Update Config"/>
       </form>
