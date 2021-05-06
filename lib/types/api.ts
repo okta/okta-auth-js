@@ -23,7 +23,7 @@ import {
   PasswordRecoveryOptions,
   IdxResponse, 
   CancelOptions,
-  InteractOptions,
+  IdxOptions,
 } from '../idx/types';
 
 export interface OktaAuth {
@@ -249,8 +249,9 @@ export interface PkceAPI {
 export interface IdxAPI {
   authenticate: (options: AuthenticationOptions) => Promise<AuthTransaction>;
   register: (options: IdxRegistrationOptions) => Promise<AuthTransaction>;
+  // TODO: resolve AuthTransaction instead of IdxResponse
   cancel: (options?: CancelOptions) => Promise<IdxResponse>;
-  startAuthTransaction: (options?: InteractOptions) => Promise<AuthTransaction>;
+  startAuthTransaction: (options?: IdxOptions) => Promise<AuthTransaction>;
   recoverPassword: (options: PasswordRecoveryOptions) => Promise<AuthTransaction>;
   handleInteractionCodeRedirect: (url: string) => Promise<void>; 
 }

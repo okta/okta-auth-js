@@ -40,8 +40,7 @@ export interface InteractResponse {
 }
 
 export interface IdxOptions extends
-  InteractOptions,
-  AcceptsInteractionHandle {
+  InteractOptions {
 }
 
 export enum IdxStatus {

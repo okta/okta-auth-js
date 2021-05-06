@@ -3,12 +3,19 @@ import { APIError, IdxRemediation, IdxResponse } from '../types';
 
 export function createApiError(res): APIError {
   let allErrors = [];
+  let errorCode;
 
   if (res.messages && Array.isArray(res.messages.value)) {
     allErrors = res.messages.value.map(o => o.message);
+    errorCode = res.messages.value.reduce((acc, curr) => {
+      return acc 
+        ? acc + ',' + curr.i18n.key 
+        : curr.i18n.key;
+    }, '');
   }
 
   return new AuthApiError({
+    errorCode,
     errorSummary: allErrors.join('. '),
     errorCauses: allErrors
   });
