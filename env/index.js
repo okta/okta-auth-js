@@ -12,8 +12,6 @@ const TESTENV_YAML = path.resolve(ROOT_DIR, 'testenv.yml');
 
 if (fs.existsSync(TESTENV)) {
   setEnvironmentVarsFromTestEnv();
-} else if (fs.existsSync(TESTENV_YAML)) {
-  setEnvironmentVarsFromTestEnvYaml('default');
 }
 
 function setEnvironmentVars(envConfig) {
