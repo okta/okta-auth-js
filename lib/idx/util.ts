@@ -9,8 +9,8 @@ export function createApiError(res): APIError {
     allErrors = res.messages.value.map(o => o.message);
     errorCode = res.messages.value.reduce((acc, curr) => {
       return acc 
-        ? acc + ',' + curr.i18n.key 
-        : curr.i18n.key;
+        ? acc + ',' + curr.i18n?.key 
+        : curr.i18n?.key;
     }, '');
   }
 
