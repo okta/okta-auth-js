@@ -1,4 +1,4 @@
-require('@okta/env'); // update environment variables from testenv file
+require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 
 const path = require('path');
 const webpack = require('webpack');

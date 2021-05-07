@@ -6,6 +6,7 @@ build2
 test/SpecRunner.html
 npm-debug.log
 testenv
+testenv.yml
 junit.xml
 yarn-error.*
 coverage

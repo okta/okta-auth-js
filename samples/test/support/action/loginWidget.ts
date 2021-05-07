@@ -1,0 +1,27 @@
+import { OktaSignInV1, OktaSignInOIE } from  '../selectors';
+import { getConfig } from '../../util/configUtils';
+import waitForDisplayed from '../wait/waitForDisplayed';
+import setInputField from './setInputField';
+import clickElement from './clickElement';
+
+export default async (
+  options: Record<string, string> = {}
+) => {
+  const OktaSignIn = process.env.ORG_OIE_ENABLED ? OktaSignInOIE : OktaSignInV1;
+  await waitForDisplayed(OktaSignIn.signinSubmitBtn);
+
+  const config = getConfig();
+  const username = options.username || config.username;
+  if (!username) {
+    throw new Error('USERNAME was not set');
+  }
+  const password = options.password || config.password;
+  if (!password) {
+    throw new Error('PASSWORD was not set');
+  }
+
+  await setInputField('set', username, OktaSignIn.signinUsername);
+  await setInputField('set', password, OktaSignIn.signinPassword);
+  await clickElement('click', 'selector', OktaSignIn.signinSubmitBtn);
+};
+

@@ -1,4 +1,4 @@
-require('@okta/env'); // Read environment variables from "testenv"
+require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 require('@babel/register'); // Allows use of import module syntax
 require('regenerator-runtime'); // Allows use of async/await
 
@@ -9,7 +9,7 @@ const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const LOG = process.env.LOG;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 30000;
-const logLevel = (LOG || 'warn');
+const logLevel = (LOG || 'warn') as WebDriver.WebDriverLogTypes;
 const chromeOptions = {
     args: []
 };
@@ -33,7 +33,7 @@ const drivers = {
   chrome: { version: CHROMEDRIVER_VERSION }
 };
 
-module.exports.config = {
+export const config: WebdriverIO.Config = {
 
     //
     // ====================

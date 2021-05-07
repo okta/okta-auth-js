@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-require('@okta/env'); // update environment variables from testenv file
+require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 
 const loginMiddleware = require('./loginMiddleware');
 const callbackMiddleware = require('./callbackMiddleware');

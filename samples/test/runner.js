@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
-require('@okta/env');
+
+require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 
 const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
@@ -37,9 +38,11 @@ function runWithConfig(sampleConfig) {
     ]
   }).then(() => {
     // 2. run webdriver based on if sauce is needed or not
-    let wdioConfig = 'wdio.conf.js';
+    let wdioConfig = 'wdio.conf.ts';
     if (process.env.RUN_SAUCE_TESTS) {
       wdioConfig = 'sauce.wdio.conf.js';
+    } else if (process.env.RUN_CUCUMBER_TESTS) {
+      wdioConfig = 'cucumber.wdio.conf.ts';
     }
 
     let opts = process.argv.slice(2); // pass extra arguments through

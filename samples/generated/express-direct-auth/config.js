@@ -1,4 +1,4 @@
-require('@okta/env');
+require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 
 const { 
   CLIENT_ID,

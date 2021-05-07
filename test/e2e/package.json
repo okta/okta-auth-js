@@ -18,6 +18,7 @@
   "devDependencies": {
     "@babel/plugin-transform-async-to-generator": "^7.5.0",
     "@wdio/cli": "^6.6.0",
+    "@wdio/junit-reporter": "^6.7.0",
     "@wdio/local-runner": "^6.6.0",
     "@wdio/mocha-framework": "^6.6.0",
     "@wdio/sauce-service": "^6.6.0",
