@@ -22,6 +22,9 @@ get_secret prod/okta-sdk-vars/password PASSWORD
 get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 get_secret prod/okta-sdk-vars/client_secret CLIENT_SECRET
 
+# Pull testenv.yml file
+aws s3 --quiet --region us-east-1 cp s3://ci-secret-stash/prod/okta-sdk-vars/testenv.yml $OKTA_HOME/$REPO/testenv.yml
+
 # Run the tests
 if ! yarn test:samples; then
   echo "tests failed! Exiting..."
