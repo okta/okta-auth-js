@@ -14,14 +14,8 @@ const express = require('express');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 var cors = require('cors');
 
-const { port, oidc, assertClaims } = require('../config.js').resourceServer;
-
-const oktaJwtVerifier = new OktaJwtVerifier({
-  clientId: oidc.clientId,
-  issuer: oidc.issuer,
-  assertClaims: assertClaims,
-  testing: oidc.testing
-});
+const getConfig = require('../config.js');
+const { port } = getConfig().resourceServer;
 
 /**
  * A simple middleware that asserts valid access tokens and sends 401 responses
@@ -38,7 +32,16 @@ function authenticationRequired(req, res, next) {
   }
   
   const accessToken = match[1];
+  const { oidc, assertClaims } = getConfig().resourceServer;
   const audience = assertClaims.aud;
+
+  const oktaJwtVerifier = new OktaJwtVerifier({
+    clientId: oidc.clientId,
+    issuer: oidc.issuer,
+    assertClaims: assertClaims,
+    testing: oidc.testing
+  });
+
   return oktaJwtVerifier.verifyAccessToken(accessToken, audience)
     .then((jwt) => {
       req.jwt = jwt;
