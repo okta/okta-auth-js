@@ -36,6 +36,17 @@ export interface AuthenticationOptions extends
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions
 ): Promise<AuthTransaction> {
+  options = options || {};
+
+  // Select password authenticator if password is provided
+  const { password, authenticators = [] } = options;
+  if (password && !authenticators.includes('password')) {
+    options = {
+      ...options,
+      authenticators: ['password', ...authenticators]
+    };
+  }
+
   return run(authClient, { 
     ...options, 
     flow,

@@ -41,9 +41,11 @@ module.exports = function handleAuthTransaction({
   if (typeof next === 'function') {
     const supportNextStep = next({ req, res, nextStep });
     if (!supportNextStep) {
-      throw new Error(
-        'Oops! The sample app cannot support the policy configuration in your org'
-      );
+      req.setTerminalMessages([
+        `Oops! The current flow cannot support the policy configuration in your org, 
+        try other flows in the sample or change your app/org configuration.`
+      ]);
+      return res.redirect('/terminal');
     }
   }
 };

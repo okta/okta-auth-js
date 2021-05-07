@@ -78,6 +78,6 @@ export class SelectAuthenticator extends Base {
   getValues(): SelectAuthenticatorValues {
     const authenticators = this.values.authenticators
       .filter(authenticator => authenticator !== this.selectedAuthenticator);
-    return { authenticators };
+    return { ...this.values, authenticators };
   }
 }
