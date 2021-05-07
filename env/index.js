@@ -35,6 +35,7 @@ function setEnvironmentVarsFromTestEnvYaml(name) {
 
   const doc = yaml.load(fs.readFileSync(TESTENV_YAML));
   if (doc[name]) {
+    console.log(`Loading environment variables from testenv.yml: "${name}"`);
     setEnvironmentVars(doc[name]);
   } else {
     throw new Error(`cannot load test environment by name: "${name}". Make sure this entry exists in "testenv.yml".`);
