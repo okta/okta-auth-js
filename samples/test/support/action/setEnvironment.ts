@@ -4,7 +4,15 @@
  */
 
 const env = require('@okta/env');
+import waitForDisplayed from '../wait/waitForDisplayed';
+import Home from '../selectors/Home';
+import startApp from './startApp';
 
-export default (envName: string) => {
+export default async (envName: string) => {
+  // update variables for runner process
   env.setEnvironmentVarsFromTestEnvYaml(envName);
+
+  // update variables for server process
+  await startApp('/', { testenv: envName });
+  await waitForDisplayed(Home.serverConfig, false);
 };

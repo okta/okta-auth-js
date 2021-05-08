@@ -11,6 +11,7 @@ const {
   lastError, 
   authTransaction,
   terminalMessages, 
+  testEnv
 } = require('./middlewares');
 
 const templateDir = path.join(__dirname, '', 'views');
@@ -23,6 +24,7 @@ const app = express();
 module.exports = app;
 
 app.use(express.urlencoded({ extended: true }));
+app.use(testEnv);
 app.use(session({ 
   secret: 'this-should-be-very-random', 
   resave: true, 

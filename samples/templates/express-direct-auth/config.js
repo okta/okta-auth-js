@@ -8,7 +8,6 @@ module.exports = function () {
     OKTA_TESTING_DISABLEHTTPSCHECK = false,
   } = process.env;
 
-  console.log(`Loaded config for issuer "${ISSUER}" and clientId "${CLIENT_ID}"`);
   return {
     webServer: {
       port: 8080,

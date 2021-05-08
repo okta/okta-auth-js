@@ -51,13 +51,13 @@ const samples = [
     name: 'static-spa',
     template: 'static-spa',
     specs: ['spa-app'],
-    features: ['basic-auth']
+    features: []
   },
   {
     name: 'webpack-spa',
     template: 'webpack-spa',
     specs: ['spa-app'],
-    features: ['basic-auth']
+    features: []
   },
   {
     name: 'express-web-no-oidc',

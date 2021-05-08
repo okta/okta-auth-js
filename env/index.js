@@ -28,12 +28,27 @@ function setEnvironmentVarsFromTestEnv() {
   setEnvironmentVars(envConfig);
 }
 
-function setEnvironmentVarsFromTestEnvYaml(name) {
+function loadTestEnvYaml() {
   if (!fs.existsSync(TESTENV_YAML)) {
     return;
   }
 
-  const doc = yaml.load(fs.readFileSync(TESTENV_YAML));
+  return yaml.load(fs.readFileSync(TESTENV_YAML));
+}
+
+function getTestEnvironmentNames() {
+  const doc = loadTestEnvYaml();
+  if (!doc) {
+    return;
+  }
+  return Object.keys(doc);
+}
+
+function setEnvironmentVarsFromTestEnvYaml(name) {
+  const doc = loadTestEnvYaml();
+  if (!doc) {
+    return;
+  }
   if (doc[name]) {
     console.log(`Loading environment variables from testenv.yml: "${name}"`);
     setEnvironmentVars(doc[name]);
@@ -45,5 +60,6 @@ function setEnvironmentVarsFromTestEnvYaml(name) {
 module.exports = {
   setEnvironmentVars,
   setEnvironmentVarsFromTestEnv,
-  setEnvironmentVarsFromTestEnvYaml
+  setEnvironmentVarsFromTestEnvYaml,
+  getTestEnvironmentNames
 };
