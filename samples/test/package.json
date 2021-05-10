@@ -5,9 +5,12 @@
   "license": "Apache-2.0",
   "scripts": {
     "lint": "eslint .",
-    "wdio": "wdio run wdio.conf.js",
+    "start": "scripts/run.sh",
+    "wdio": "wdio run wdio.conf.ts",
+    "cucumber": "wdio run cucumber.wdio.conf.ts",
+    "start:cucumber": "RUN_CUCUMBER_TESTS=1 yarn start",
     "test:specs": "node ./runner",
-    "start": "scripts/run.sh"
+    "test:features": "RUN_CUCUMBER_TESTS=1 yarn node ./runner"
   },
   "engines": {
     "node": ">=11.0",
@@ -20,13 +23,18 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-async-to-generator": "^7.5.0",
-    "@wdio/cli": "^6.4.0",
-    "@wdio/local-runner": "^6.4.0",
-    "@wdio/mocha-framework": "^6.4.0",
-    "@wdio/sauce-service": "^6.4.0",
-    "@wdio/spec-reporter": "^5.15.1",
+    "@cucumber/cucumber": "^7.2.1",
+    "@wdio/cli": "^7.5.1",
+    "@wdio/cucumber-framework": "^7.5.3",
+    "@wdio/junit-reporter": "^7.5.7",
+    "@wdio/local-runner": "^7.5.1",
+    "@wdio/mocha-framework": "^7.4.6",
+    "@wdio/sauce-service": "^7.5.1",
+    "@wdio/selenium-standalone-service": "^7.5.3",
+    "@wdio/spec-reporter": "^7.4.3",
     "ts-node": "^9.1.1",
     "wait-on": "^3.3.0",
+    "webdriverio": "^7.5.1",
     "webpack": "^3.0.0"
   }
 }

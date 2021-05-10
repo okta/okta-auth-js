@@ -1,4 +1,4 @@
-require('@okta/env'); // Read environment variables from "testenv"
+require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 require('@babel/register'); // Allows use of import module syntax
 require('regenerator-runtime'); // Allows use of async/await
 

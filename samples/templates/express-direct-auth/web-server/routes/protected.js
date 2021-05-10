@@ -2,7 +2,7 @@ const express = require('express');
 const fetch = require('node-fetch');
 const { ensureAuthenticated } = require('../middlewares');
 
-const sampleConfig = require('../../config').webServer;
+const getConfig = require('../../config');
 
 const router = express.Router();
 
@@ -27,7 +27,8 @@ router.get('/api/messages',
         accessToken: { accessToken } 
       } 
     } = req.userContext;
-    fetch(sampleConfig.resourceServer.messagesUrl, {
+    const { messagesUrl } = getConfig().webServer.resourceServer;
+    fetch(messagesUrl, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

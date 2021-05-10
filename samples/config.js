@@ -50,12 +50,14 @@ const samples = [
   {
     name: 'static-spa',
     template: 'static-spa',
-    specs: ['spa-app']
+    specs: ['spa-app'],
+    features: []
   },
   {
     name: 'webpack-spa',
     template: 'webpack-spa',
     specs: ['spa-app'],
+    features: []
   },
   {
     name: 'express-web-no-oidc',
@@ -71,7 +73,8 @@ const samples = [
   {
     name: 'express-direct-auth',
     template: 'express-direct-auth',
-    specs: []
+    specs: [],
+    features: ['basic-auth']
   },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {

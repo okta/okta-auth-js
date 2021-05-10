@@ -1,4 +1,7 @@
 #!/bin/bash -x
 
 # Test specs/*
-yarn test:specs --logLevel debug
+yarn test:specs
+
+# Test features/*
+yarn test:features

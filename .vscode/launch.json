@@ -37,11 +37,31 @@
       "name": "test/e2e spec",
       "type": "node",
       "request": "launch",
-      "args": ["wdio.conf.js", "--spec", "${file}"],
+      "args": ["wdio.conf.ts", "--spec", "${file}"],
       "cwd": "${workspaceFolder}/test/e2e",
       "autoAttachChildProcesses": true,
-      "program": "${workspaceRoot}/node_modules/@wdio/cli/bin/wdio.js",
+      "program": "${workspaceRoot}/test/e2e/node_modules/@wdio/cli/bin/wdio.js",
       "console": "integratedTerminal"
+    },
+
+    {
+      "name": "sample: static SPA",
+      "type": "node",
+      "request": "launch",
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}/samples/generated/static-spa",
+      "program": "server.js"
+    },
+
+    {
+      "name": "sample: webpack SPA",
+      "type": "node",
+      "request": "launch",
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}/samples/generated/webpack-spa",
+      "program": "server.js"
     },
 
     {
@@ -75,13 +95,29 @@
     },
 
     {
-      "name": "samples/e2e spec",
+      "name": "sample: test spec",
       "type": "node",
       "request": "launch",
-      "args": ["wdio.conf.js", "--spec", "${file}"],
+      "args": ["wdio.conf.ts", "--spec", "${file}"],
       "cwd": "${workspaceFolder}/samples/test",
       "autoAttachChildProcesses": true,
-      "program": "${workspaceRoot}/node_modules/@wdio/cli/bin/wdio.js",
+      "program": "${workspaceRoot}/samples/test/node_modules/@wdio/cli/bin/wdio.js",
+      "console": "integratedTerminal",
+      "env": {
+        "DEBUG": "1",
+        "SAMPLE_NAME": "static-spa",
+        "ORG_OIE_ENABLED": null
+      }
+    },
+
+    {
+      "name": "sample: test feature",
+      "type": "node",
+      "request": "launch",
+      "args": ["cucumber.wdio.conf.ts", "--spec", "${file}"],
+      "cwd": "${workspaceFolder}/samples/test",
+      "autoAttachChildProcesses": true,
+      "program": "${workspaceRoot}/samples/test/node_modules/@wdio/cli/bin/wdio.js",
       "console": "integratedTerminal",
       "env": {
         "DEBUG": "1"

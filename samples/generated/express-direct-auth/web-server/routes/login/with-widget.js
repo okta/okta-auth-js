@@ -4,7 +4,7 @@ const {
   renderTemplate,
 } = require('../../utils');
 
-const sampleConfig = require('../../../config').webServer;
+const getConfig = require('../../../config');
 
 const router = express.Router();
 
@@ -25,13 +25,14 @@ router.get('/with-widget', (req, res) => {
       }
 
       console.log('renderLoginWithWidget: using interaction handle: ', interactionHandle);
+      const { clientId, redirectUri, issuer, scopes } = getConfig().webServer.oidc;
       const widgetConfig = {
-        baseUrl: sampleConfig.oidc.issuer.split('/oauth2')[0],
-        clientId: sampleConfig.oidc.clientId,
-        redirectUri: sampleConfig.oidc.redirectUri,
+        baseUrl: issuer.split('/oauth2')[0],
+        clientId: clientId,
+        redirectUri: redirectUri,
         authParams: {
-          issuer: sampleConfig.oidc.issuer,
-          scopes: sampleConfig.oidc.scopes,
+          issuer: issuer,
+          scopes: scopes,
         },
         useInteractionCodeFlow: true,
         state,

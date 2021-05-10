@@ -11,17 +11,20 @@ const {
   lastError, 
   authTransaction,
   terminalMessages, 
+  testEnv
 } = require('./middlewares');
 
 const templateDir = path.join(__dirname, '', 'views');
 const frontendDir = path.join(__dirname, '', 'assets');
 
-const { oidc, port } = require('../config.js').webServer;
+const getConfig = require('../config.js');
+const { port } = getConfig().webServer;
 
 const app = express();
 module.exports = app;
 
 app.use(express.urlencoded({ extended: true }));
+app.use(testEnv);
 app.use(session({ 
   secret: 'this-should-be-very-random', 
   resave: true, 
@@ -32,15 +35,20 @@ app.use(terminalMessages);
 app.use(authTransaction);
 
 // Provide the configuration to the view layer because we show it on the homepage
-const displayConfig = Object.assign(
-  {},
-  oidc,
-  {
-    clientSecret: '****' + oidc.clientSecret.substr(oidc.clientSecret.length - 4, 4)
-  }
-);
+app.use((req, res, next) => {
+  const { oidc } = getConfig().webServer;
+  const displayConfig = Object.assign(
+    {},
+    oidc,
+    {
+      clientSecret: '****' + oidc.clientSecret.substr(oidc.clientSecret.length - 4, 4)
+    }
+  );
+  
+  app.locals.oidcConfig = displayConfig;
+  next();
+});
 
-app.locals.oidcConfig = displayConfig;
 
 // This server uses mustache templates located in views/ and css assets in assets/
 app.use('/assets', express.static(frontendDir));

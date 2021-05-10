@@ -1,19 +1,29 @@
 import assert from 'assert';
 import toQueryString from '../util/toQueryString';
+import {
+  LoginForm,
+  Nav,
+  Unauth,
+  UserHome,
+  UserProfile
+} from  '../support/selectors';
+import waitForDisplayed from '../support/wait/waitForDisplayed';
+import clickElement from '../support/action/clickElement';
+import checkEqualsText from '../support/check/checkEqualsText';
 
 /* eslint-disable max-len */
 class SpaApp {
 
   // Authenticated landing
   get logoutRedirectBtn() { return $('#logout-redirect'); }
-  get getUserInfoBtn() { return $('#get-user-info'); }
+  get getUserInfoBtn() { return $(UserHome.profileButton); }
   get userInfo() { return $('#userInfo'); }
 
   // Unauthenticated landing
-  get loginRedirectBtn() { return $('#login-redirect'); }
-  get username() { return $('#username'); }
-  get password() { return $('#password'); }
-  get signinFormSubmit() { return $('#login-direct'); }
+  get loginRedirectBtn() { return $(Unauth.loginRedirect); }
+  get username() { return $(LoginForm.username); }
+  get password() { return $(LoginForm.password); }
+  get signinFormSubmit() { return $(LoginForm.submit); }
 
   // Form
   get configForm() { return $('#config-form'); }
@@ -26,24 +36,24 @@ class SpaApp {
   get idToken() { return $('#idToken'); }
   get error() { return $('#error'); }
 
-  async open(queryObj) {
+  async open(queryObj: Record<string, string>) {
     await browser.url(toQueryString(queryObj));
-    await this.waitForNoConfigForm();
   }
 
   async loginRedirect() {
     await this.waitForLoginBtn();
-    await this.loginRedirectBtn.then(el => el.click());
+    const el = await this.loginRedirectBtn;
+    el.click();
   }
 
   async getUserInfo() {
-    await browser.waitUntil(async () => this.getUserInfoBtn.then(el => el.isDisplayed()));
-    await this.getUserInfoBtn.then(el => el.click());
+    await waitForDisplayed(UserHome.profileButton, false);
+    await clickElement('click', 'selector', UserHome.profileButton);
   }
 
   async returnHome() {
-    await browser.waitUntil(async () => this.returnHomeBtn.then(el => el.isDisplayed()));
-    await this.returnHomeBtn.then(el => el.click());
+    await waitForDisplayed(Nav.returnHome, false);
+    await clickElement('click', 'selector', Nav.returnHome);
   }
 
   async loginDirect() {
@@ -74,21 +84,15 @@ class SpaApp {
   }
 
   async waitForLoginBtn() {
-    return browser.waitUntil(async () => this.loginRedirectBtn.then(el => el.isDisplayed()), 5000, 'wait for login button');
+    return browser.waitUntil(async () => this.loginRedirectBtn, 5000, 'wait for login button');
   }
 
   async waitForLogoutBtn() {
     return browser.waitUntil(async () => this.logoutRedirectBtn.then(el => el.isDisplayed()), 15000, 'wait for logout button');
   }
 
-  async waitForUserInfo(ignoreNull) {
-    return browser.waitUntil(async () => {
-      return this.userInfo.then(el => {
-        return el.getText();
-      }).then(txt => {
-        return txt && (ignoreNull ? txt !== 'null' : true);
-      });
-    }, 5000, 'wait for user info');
+  async waitForUserInfo() {
+    await waitForDisplayed(UserProfile.email, false);
   }
 
   async assertLoggedIn() {
@@ -102,10 +106,8 @@ class SpaApp {
   }
 
   async assertUserInfo() {
-    await this.waitForUserInfo(true);
-    await this.userInfo.then(el => el.getText()).then(txt => {
-      assert(txt.indexOf('email') > 0);
-    });
+    await waitForDisplayed(UserProfile.email, false);
+    await checkEqualsText('element', UserProfile.email, false, process.env.USERNAME as string);
   }
 
   async assertNoUserInfo() {
