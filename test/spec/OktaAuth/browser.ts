@@ -505,16 +505,9 @@ describe('OktaAuth (browser)', function() {
         accessToken: tokens.standardAccessTokenParsed,
         idToken: tokens.standardIdTokenParsed
       });
-      return new Promise(resolve => {
-        // wait for the next emitted authState
-        setTimeout(() => {
-          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
-          expect(auth.getOriginalUri).toHaveBeenCalled();
-          expect(auth.removeOriginalUri).toHaveBeenCalled();
-          expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
-          resolve(undefined);    
-        }, 100);
-      });
+      expect(auth.getOriginalUri).toHaveBeenCalled();
+      expect(auth.removeOriginalUri).toHaveBeenCalled();
+      expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
     });
 
     it('should get tokens from the callback url when under login redirect flow', async () => {
@@ -526,16 +519,9 @@ describe('OktaAuth (browser)', function() {
       });
       auth.isLoginRedirect = jest.fn().mockReturnValue(true);
       await auth.handleLoginRedirect();
-      return new Promise(resolve => {
-        // wait for the next emitted authState
-        setTimeout(() => {
-          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
-          expect(auth.getOriginalUri).toHaveBeenCalled();
-          expect(auth.removeOriginalUri).toHaveBeenCalled();
-          expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
-          resolve(undefined);    
-        }, 100);
-      });
+      expect(auth.getOriginalUri).toHaveBeenCalled();
+      expect(auth.removeOriginalUri).toHaveBeenCalled();
+      expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
     });
 
     it('should use options.restoreOriginalUri if provided', async () => {
@@ -548,32 +534,38 @@ describe('OktaAuth (browser)', function() {
       });
       auth.isLoginRedirect = jest.fn().mockReturnValue(true);
       await auth.handleLoginRedirect();
-      return new Promise(resolve => {
-        // wait for the next emitted authState
-        setTimeout(() => {
-          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
-          expect(auth.getOriginalUri).toHaveBeenCalled();
-          expect(auth.removeOriginalUri).toHaveBeenCalled();
-          expect(auth.options.restoreOriginalUri).toHaveBeenCalledWith(auth, '/fakeuri');
-          expect(window.location.replace).not.toHaveBeenCalled();
-          resolve(undefined);    
-        }, 100);
-      });
+      expect(auth.getOriginalUri).toHaveBeenCalled();
+      expect(auth.removeOriginalUri).toHaveBeenCalled();
+      expect(auth.options.restoreOriginalUri).toHaveBeenCalledWith(auth, '/fakeuri');
+      expect(window.location.replace).not.toHaveBeenCalled();
     });
 
-    it('should unsubscribe authState listener if neither tokens are provided, nor under login redirect flow', async () => {
+    it('should be a no-op if neither tokens are provided, nor under login redirect flow', async () => {
       auth.isLoginRedirect = jest.fn().mockReturnValue(false);
       await auth.handleLoginRedirect();
-      return new Promise(resolve => {
-        // wait for the next emitted authState
-        setTimeout(() => {
-          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
-          expect(auth.getOriginalUri).not.toHaveBeenCalled();
-          expect(auth.removeOriginalUri).not.toHaveBeenCalled();
-          expect(window.location.replace).not.toHaveBeenCalled();
-          resolve(undefined);    
-        }, 100);
+      expect(auth.getOriginalUri).not.toHaveBeenCalled();
+      expect(auth.removeOriginalUri).not.toHaveBeenCalled();
+      expect(window.location.replace).not.toHaveBeenCalled();
+    });
+
+    it('will not redirect if parseFromUrl throws an error', async () => {
+      const error = new Error('mock error');
+      auth.token.parseFromUrl = jest.fn().mockImplementation(async () => {
+        throw error;
       });
+      auth.isLoginRedirect = jest.fn().mockReturnValue(true);
+      let errorThrown = false;
+      try {
+        await auth.handleLoginRedirect();
+      } catch (e) {
+        expect(e).toBe(error);
+        errorThrown = true;
+      }
+      expect(errorThrown).toBe(true);
+      await auth.authStateManager.updateAuthState();
+      expect(auth.getOriginalUri).not.toHaveBeenCalled();
+      expect(auth.removeOriginalUri).not.toHaveBeenCalled();
+      expect(window.location.replace).not.toHaveBeenCalled();
     });
   });
 

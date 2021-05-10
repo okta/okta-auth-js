@@ -67,7 +67,7 @@ export class AuthStateManager {
     return this._authState;
   }
 
-  updateAuthState(): void {
+  async updateAuthState(): Promise<AuthState> {
     const { transformAuthState, devMode } = this._sdk.options;
 
     const log = (status) => {
@@ -92,12 +92,22 @@ export class AuthStateManager {
       devMode && log('emitted');
     };
 
+    const finalPromise = (origPromise) => {       
+      return this._pending.updateAuthStatePromise.then(() => {
+        const curPromise = this._pending.updateAuthStatePromise;
+        if (curPromise && curPromise !== origPromise) {
+          return finalPromise(curPromise);
+        }
+        return this.getAuthState();
+      });
+    };
+
     if (this._pending.updateAuthStatePromise) {
       if (this._pending.canceledTimes >= MAX_PROMISE_CANCEL_TIMES) {
         // stop canceling then starting a new promise
         // let existing promise finish to prevent running into loops
         devMode && log('terminated');
-        return;
+        return finalPromise(this._pending.updateAuthStatePromise);
       } else {
         this._pending.updateAuthStatePromise.cancel();
       }
@@ -117,10 +127,12 @@ export class AuthStateManager {
           resolve();
           return;
         }
-        // emit event and clear pending states
-        emitAuthStateChange(authState); 
-        this._pending = { ...DEFAULT_PENDING };
+        // emit event and resolve promise 
+        emitAuthStateChange(authState);
         resolve();
+
+        // clear pending states after resolve
+        this._pending = { ...DEFAULT_PENDING };
       };
 
       this._sdk.isAuthenticated()
@@ -154,6 +166,8 @@ export class AuthStateManager {
     });
     /* eslint-enable complexity */
     this._pending.updateAuthStatePromise = cancelablePromise;
+
+    return finalPromise(cancelablePromise);
   }
 
   subscribe(handler): void {
