@@ -37,8 +37,8 @@ export default class TransactionManager {
     const transactionStorage: StorageProvider = this.storageManager.getTransactionStorage();
     transactionStorage.clearStorage();
 
-    const responseStorage: StorageProvider = this.storageManager.getResponseStorage();
-    responseStorage?.clearStorage();
+    const idxStateStorage: StorageProvider = this.storageManager.getIdxResponseStorage();
+    idxStateStorage?.clearStorage();
 
     if (!this.legacyWidgetSupport) {
       return;
@@ -247,7 +247,7 @@ export default class TransactionManager {
   }
 
   saveIdxResponse(idxResponse: RawIdxResponse): void {
-    const storage: StorageProvider = this.storageManager.getResponseStorage();
+    const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
     if (!storage) {
       return;
     }
@@ -255,7 +255,7 @@ export default class TransactionManager {
   }
 
   loadIdxResponse(): RawIdxResponse {
-    const storage: StorageProvider = this.storageManager.getResponseStorage();
+    const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
     if (!storage) {
       return null;
     }

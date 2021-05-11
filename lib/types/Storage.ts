@@ -51,7 +51,7 @@ export interface TransactionStorage extends StorageProvider {
   getStorage(): TransactionMeta;
 }
 
-export interface ResponseStorage extends StorageProvider {
+export interface IdxResponseStorage extends StorageProvider {
   setStorage(obj: RawIdxResponse): void;
   getStorage(): RawIdxResponse;
 }

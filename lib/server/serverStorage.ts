@@ -13,6 +13,7 @@
 
 import { SimpleStorage, StorageType, StorageUtil, Cookies } from '../types';
 import { AuthSdkError } from '../errors';
+import { warn } from '../util';
 const NodeCache = require('node-cache'); // commonJS module cannot be imported without esModuleInterop
 const sharedStorage = new NodeCache(); // this is a SHARED memory storage to support a stateless http server
 
@@ -69,11 +70,14 @@ class ServerStorage implements StorageUtil {
     let storageProvider = null;
     switch (storageType) {
       case 'memory':
+        warn(`
+          Memory storage can only support simple single user use case on server side,
+          please provide custom storage provider if advanced scenarios need to be supported.
+        `);
         storageProvider = this.getStorage();
         break;
       default:
         throw new AuthSdkError(`Unrecognized storage option: ${storageType}`);
-        break;
     }
     return storageProvider;
   }

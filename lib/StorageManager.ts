@@ -3,7 +3,7 @@ import {
   PKCE_STORAGE_NAME,
   TOKEN_STORAGE_NAME,
   TRANSACTION_STORAGE_NAME,
-  RESPONSE_STORAGE_NAME,
+  IDX_RESPONSE_STORAGE_NAME,
   CACHE_STORAGE_NAME,
   REDIRECT_OAUTH_PARAMS_NAME
 } from './constants';
@@ -14,13 +14,14 @@ import {
   PKCEStorage,
   CookieOptions,
   TransactionStorage,
-  ResponseStorage,
+  IdxResponseStorage,
   StorageManagerOptions,
   SimpleStorage
 } from './types';
 import SavedObject from './SavedObject';
 import { isBrowser } from './features';
 import { warn } from './util';
+import { AuthSdkError } from './errors';
 
 export default class StorageManager {
   storageManagerOptions: StorageManagerOptions;
@@ -76,22 +77,49 @@ export default class StorageManager {
   }
 
   // intermediate idxResponse
-  // store for optimazation purpose
-  getResponseStorage(options?: StorageOptions): ResponseStorage {
-    options = this.getOptionsForSection('response', options);
-
+  // store for network traffic optimazation purpose
+  getIdxResponseStorage(options?: StorageOptions): IdxResponseStorage {
     let storage;
-    if (options.storageProvider) {
-      storage = options.storageProvider;
-    } else {
-      const storageType = isBrowser() ? 'memory' : null;
+    if (isBrowser()) {
+      // on browser side only use memory storage 
       try {
-        storage = this.storageUtil.getStorageByType(storageType, options);
+        storage = this.storageUtil.getStorageByType('memory', options);
       } catch (e) {
         // it's ok to miss response storage
-        warn(
-          'No response storage found, you may want to provide custom implementation to optimize the network traffic'
-        );
+        warn(`
+          No response storage found, 
+          you may want to provide custom implementation for intermediate idx responses to optimize the network traffic
+        `);
+      }
+    } else {
+      // on server side re-use transaction custom storage
+      const transactionStorage = this.getTransactionStorage(options);
+      if (transactionStorage) {
+        storage = {
+          getItem: (key) => {
+            const transaction = transactionStorage.getStorage();
+            if (transaction && transaction[key]) {
+              return transaction[key];
+            }
+            return null;
+          },
+          setItem: (key, val) => {
+            const transaction = transactionStorage.getStorage();
+            if (!transaction) {
+              throw new AuthSdkError('Transaction has been cleared, failed to save idxState');
+            }
+            transaction[key] = val;
+            transactionStorage.setStorage(transaction);
+          },
+          removeItem: (key) => {
+            const transaction = transactionStorage.getStorage();
+            if (!transaction) {
+              return;
+            }
+            delete transaction[key];
+            transactionStorage.setStorage(transaction);
+          }
+        };
       }
     }
 
@@ -99,8 +127,7 @@ export default class StorageManager {
       return null;
     }
 
-    const storageKey = options.storageKey || RESPONSE_STORAGE_NAME;
-    return new SavedObject(storage, storageKey);
+    return new SavedObject(storage, IDX_RESPONSE_STORAGE_NAME);
   }
 
   // access_token, id_token, refresh_token

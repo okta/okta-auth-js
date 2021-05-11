@@ -24,6 +24,7 @@ describe('TransactionManager', () => {
     storageManager = {
       storageUtil: {},
       getTransactionStorage: jest.fn().mockReturnValue(mockStorage),
+      getIdxResponseStorage: jest.fn().mockReturnValue(mockStorage),
       getLegacyPKCEStorage: jest.fn().mockReturnValue(mockStorage),
       getLegacyOAuthParamsStorage: jest.fn().mockReturnValue(mockStorage)
     };
