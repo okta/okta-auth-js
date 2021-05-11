@@ -863,6 +863,34 @@ describe('Browser', function() {
         }, 100);
       });
     });
+
+    it('will not redirect if parseFromUrl throws an error', async () => {
+      const error = new Error('mock error');
+      auth.token.parseFromUrl = jest.fn().mockImplementation(async () => {
+        throw error;
+      });
+      auth.isLoginRedirect = jest.fn().mockReturnValue(true);
+      let errorThrown = false;
+      try {
+        await auth.handleLoginRedirect();
+      } catch (e) {
+        expect(e).toBe(error);
+        errorThrown = true;
+      }
+      expect(errorThrown).toBe(true);
+      await auth.authStateManager.updateAuthState(); // this will call subscribe handler if still listening
+
+      return new Promise(resolve => {
+        // wait for the next emitted authState
+        setTimeout(() => {
+          expect(auth.authStateManager.unsubscribe).toHaveBeenCalled();
+          expect(auth.getOriginalUri).not.toHaveBeenCalled();
+          expect(auth.removeOriginalUri).not.toHaveBeenCalled();
+          expect(window.location.replace).not.toHaveBeenCalled();
+          resolve(undefined);    
+        }, 100);
+      });
+    });
   });
 
   describe('isPKCE', () => {
