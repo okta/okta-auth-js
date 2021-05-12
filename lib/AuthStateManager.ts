@@ -148,12 +148,18 @@ export class AuthStateManager {
           // isPending state should only apply to token driven evaluation
           let isPending = false;
           if (accessToken && this._sdk.tokenManager.hasExpired(accessToken)) {
-            accessToken = null;
             isPending = shouldEvaluateIsPending();
+            // if autoRenew is pending, continue to use the expired token while renew is in process
+            if (!isPending) {
+              accessToken = null;
+            }
           }
           if (idToken && this._sdk.tokenManager.hasExpired(idToken)) {
-            idToken = null;
             isPending = shouldEvaluateIsPending();
+            // if autoRenew is pending, continue to use the expired token while renew is in process
+            if (!isPending) {
+              idToken = null;
+            }
           }
           const authState = {
             accessToken,

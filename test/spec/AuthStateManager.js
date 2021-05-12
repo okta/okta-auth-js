@@ -215,7 +215,7 @@ describe('AuthStateManager', () => {
       });
     });
 
-    it('should evaluate expired token as null with isPending state as true', () => {
+    it('should return expired token and evaluate isAuthenticated to true when isPending state is true', () => {
       expect.assertions(2);
       sdkMock.tokenManager.hasExpired = jest.fn()
         .mockReturnValueOnce(false)
@@ -230,8 +230,8 @@ describe('AuthStateManager', () => {
           expect(handler).toHaveBeenCalledTimes(1);
           expect(handler).toHaveBeenCalledWith({
             accessToken: 'fakeAccessToken0',
-            idToken: null,
-            isAuthenticated: false,
+            idToken: 'fakeIdToken0',
+            isAuthenticated: true,
             isPending: true,
           });
           resolve();

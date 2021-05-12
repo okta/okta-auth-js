@@ -6,6 +6,8 @@
 
 - [#731](https://github.com/okta/okta-auth-js/pull/731) Fixes issue with `handleLoginRedirect` where a redirect could occur after an exception was thrown.
   
+- [#735](https://github.com/okta/okta-auth-js/pull/735) Fixes a bug in `updateAuthState` that could cause `isAuthenticated` to become false during token renew.
+
 ## 4.9.0
 
 ### Bug Fixes
