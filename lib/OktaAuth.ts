@@ -578,7 +578,12 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     if (tokens) {
       this.tokenManager.setTokens(tokens);
     } else if (this.isLoginRedirect()) {
-      await this.storeTokensFromRedirect();
+      try {
+        await this.storeTokensFromRedirect();
+      } catch (e) {
+        this.authStateManager.unsubscribe(handleRedirect);
+        throw e;
+      }
     } else {
       this.authStateManager.unsubscribe(handleRedirect);
     }
