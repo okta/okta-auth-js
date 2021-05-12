@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.0.1
+
+### Bug Fixes
+
+- [#730](https://github.com/okta/okta-auth-js/pull/730) Fixes issue with `handleLoginRedirect` where a redirect could occur after an exception is thrown.
+
+### Other
+
+- [#730](https://github.com/okta/okta-auth-js/pull/730) `updateAuthState` returns a Promise.
+
 ## 5.0.0
 
 ### Features
