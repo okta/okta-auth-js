@@ -1,10 +1,9 @@
 /* eslint-disable complexity */
-import { AuthApiError } from '../../errors';
 import { 
   IdxRemediation, 
   IdxToRemediationValueMap, 
-  IdxResponse, 
   NextStep,
+  IdxMessage,
 } from '../types';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
@@ -17,7 +16,7 @@ export class Base {
   values: RemediationValues;
   map?: IdxToRemediationValueMap;
 
-  constructor(remediation: IdxRemediation, values: RemediationValues) {
+  constructor(remediation: IdxRemediation, values?: RemediationValues) {
     this.remediation = remediation;
     this.values = values;
   }
@@ -101,19 +100,9 @@ export class Base {
     return { name: this.remediation.name };
   }
 
-  // Override this method to extract error message from remediation form fields
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  getErrorMessages(errorRemediation: IdxResponse): string[] {
+  getMessages(): IdxMessage[] {
+    // TODO: return field level messages
     return [];
-  }
-
-  createFormError(err) {
-    const errorRemediation = err.remediation.value.find(({ name }) => name === this.remediation.name);
-    const errors = this.getErrorMessages(errorRemediation);
-    return new AuthApiError({
-      errorSummary: errors.join('. '),
-      errorCauses: errors
-    });
   }
 
   // Prepare values for the next remediation

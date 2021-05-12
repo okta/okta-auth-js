@@ -10,23 +10,18 @@ import {
   isRawIdxResponse, 
   RemediationFlow, 
   RemediationValues,
-  APIError,
   NextStep,
   IdxRemediation,
+  IdxMessage,
 } from '../types';
-import { 
-  createApiError,
-  canSkip as canSkipFn,
-} from './util';
+import { canSkip as canSkipFn } from './util';
 
 interface RemediationResponse {
   idxResponse?: IdxResponse;
   nextStep?: NextStep;
   canSkip?: boolean;
-  formError?: APIError;
-  terminal?: {
-    messages: string[];
-  };
+  messages?: IdxMessage[];
+  terminal?: boolean;
 }
 
 // Return first match idxRemediation in allowed remediators
@@ -56,15 +51,16 @@ export function getRemediator(
     }
   }
 
-  // Return first remediatorCandidate in the allowed nextSteps
-  for (let remediatorCandidate of remediatorCandidates) {
+  const res = remediatorCandidates.filter(remediatorCandidate => {
     const name = remediatorCandidate.getName();
-    if (allowedNextSteps.includes(name)) {
-      return remediatorCandidate;
-    }
+    return allowedNextSteps.includes(name);
+  });
+  
+  if (res.length > 1) {
+    throw new AuthSdkError('More than one remediation can match the current input');
   }
 
-  return null;
+  return res[0];
 }
 
 function isTerminalResponse(idxResponse: IdxResponse) {
@@ -72,13 +68,28 @@ function isTerminalResponse(idxResponse: IdxResponse) {
   return !neededToProceed.length && !interactionCode;
 }
 
-export function getTerminalMessages(idxResponse: IdxResponse) {
-  if (!isTerminalResponse(idxResponse)) {
-    return null;
+export function getIdxMessages(
+  idxResponse: IdxResponse, flow: RemediationFlow
+): IdxMessage[] {
+  let messages = [];
+  const { rawIdxState, neededToProceed } = idxResponse;
+
+  // Handle global messages
+  const globalMessages = rawIdxState.messages.value.map(message => message);
+  messages = [...messages, ...globalMessages];
+
+  // Handle field messages for current flow
+  for (let remediation of neededToProceed) {
+    const T = flow[remediation.name];
+    if (!T) {
+      continue;
+    }
+    const remediator = new T(remediation);
+    const fieldMessages = remediator.getMessages();
+    messages = [...messages, ...fieldMessages];
   }
 
-  const { rawIdxState } = idxResponse;
-  return rawIdxState.messages.value.map(({ message }) => message);
+  return messages;
 }
 
 // This function is called recursively until it reaches success or cannot be remediated
@@ -135,9 +146,16 @@ export async function remediate(
     }
 
     // Reach to terminal state
-    const terminalMessages = getTerminalMessages(idxResponse);
-    if (terminalMessages) {
-      return { terminal: { messages: terminalMessages } };
+    const terminal = isTerminalResponse(idxResponse);
+    const messages = getIdxMessages(idxResponse, flow);
+    if (terminal) {
+      return { terminal, messages };
+    }
+
+    // Handle idx message in nextStep
+    if (messages.length) {
+      const nextStep = remediator.getNextStep();
+      return { nextStep, messages };
     }
     
     // We may want to trim the values bag for the next remediation
@@ -145,19 +163,16 @@ export async function remediate(
     values = remediator.getValues();
     return remediate(idxResponse, values, loopMonitor, options); // recursive call
   } catch (e) {
-    // Handle form error
+    // Handle idx messages
     if (isRawIdxResponse(e)) {
       const idxState = idx.makeIdxState(e);
-      const terminalMessages = getTerminalMessages(idxState);
-      if (terminalMessages) {
-        return { terminal: { messages: terminalMessages } };
+      const terminal = isTerminalResponse(idxState);
+      const messages = getIdxMessages(idxState, flow);
+      if (terminal) {
+        return { terminal, messages };
       } else {
-        // Treat both global errors and field errors as form error
         const nextStep = remediator.getNextStep();
-        const formError = e.messages 
-          ? createApiError(e) 
-          : remediator.createFormError(e);
-        return { nextStep, formError };
+        return { nextStep, messages };
       }
     }
     

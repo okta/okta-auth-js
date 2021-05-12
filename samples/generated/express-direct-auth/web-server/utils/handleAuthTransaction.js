@@ -4,11 +4,13 @@ module.exports = function handleAuthTransaction({
   next, 
   authClient, 
   authTransaction,
+  proceed,
 }) {
   const {  
     data: { 
-      nextStep = {},
+      nextStep,
       terminal,
+      messages,
       tokens,
       status,
       error,
@@ -30,22 +32,25 @@ module.exports = function handleAuthTransaction({
   }
   // Throw error if exist in authTransaction
   if (error) {
-    throw error;
+    authClient.transactionManager.clear();
+    next(error);
+    return;
+  }
+  if (messages.length) {
+    req.setIdxMessages(messages);
   }
   // If terminal exist, redirect to terminal view
   if (terminal) {
-    req.setTerminalMessages(terminal.messages);
     return res.redirect('/terminal');
   }
   // Proceed to next step
-  if (typeof next === 'function') {
-    const supportNextStep = next({ req, res, nextStep });
+  if (typeof proceed === 'function') {
+    const supportNextStep = proceed({ req, res, nextStep });
     if (!supportNextStep) {
-      req.setTerminalMessages([
-        `Oops! The current flow cannot support the policy configuration in your org, 
-        try other flows in the sample or change your app/org configuration.`
-      ]);
-      return res.redirect('/terminal');
+      next(new Error(`
+        Oops! The current flow cannot support the policy configuration in your org, 
+        try other flows in the sample or change your app/org configuration.
+      `));
     }
   }
 };

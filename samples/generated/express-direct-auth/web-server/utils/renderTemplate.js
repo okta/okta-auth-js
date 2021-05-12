@@ -1,4 +1,4 @@
-const renderError = require('./renderError');
+const renderMessages = require('./renderMessages');
 const getFormActionPath = require('./getFormActionPath');
 
 module.exports = function renderTemplate(req, res, template, options = {}) {
@@ -7,12 +7,12 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     action: getFormActionPath(req, options.action),
     skipAction: getFormActionPath(req, options.skipAction),
   };
-  const error = req.getLastError();
-  if (error) {
-    req.clearLastError();
-    renderError(res, {
+  const messages = req.getIdxMessages();
+  req.clearIdxMessages();
+  if (messages && messages.length) {
+    renderMessages(res, {
       template,
-      error,
+      messages,
       ...options,
     });
     return;

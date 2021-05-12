@@ -53,20 +53,20 @@ export interface IdpConfig {
 }
 
 // TODO: remove when idx-js provides type information
-export interface IdxRemeditionValue {
+export interface IdxRemediationValue {
   name: string;
   type?: string;
   required?: boolean;
   value?: string;
   form?: {
-    value: IdxRemeditionValue[];
+    value: IdxRemediationValue[];
   };
   options?: IdxRemediation[];
 }
 export interface IdxRemediation {
   name: string;
   label?: string;
-  value: IdxRemeditionValue[];
+  value: IdxRemediationValue[];
   relatesTo: {
     type: string;
     value: {
@@ -82,6 +82,9 @@ export interface IdxRemediation {
 export interface IdxMessage {
   message: string;
   class: string;
+  i18n: {
+    key: string;
+  };
 }
 
 export interface IdxMessages {

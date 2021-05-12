@@ -5,12 +5,11 @@ const express = require('express');
 const session = require('express-session');
 const mustacheExpress = require('mustache-express');
 const path = require('path');
-const { getAuthClient } = require('./utils');
 const { 
   userContext, 
   lastError, 
   authTransaction,
-  terminalMessages, 
+  idxMessages, 
   testEnv
 } = require('./middlewares');
 
@@ -31,7 +30,7 @@ app.use(session({
   saveUninitialized: false
 }));
 app.use(lastError);
-app.use(terminalMessages);
+app.use(idxMessages);
 app.use(authTransaction);
 
 // Provide the configuration to the view layer because we show it on the homepage
@@ -64,11 +63,22 @@ app.use(require('./routes'));
 app.use(function(err, req, res, next) {
   console.error(err.stack);
 
-  // Clear transaction meta
-  const authClient = getAuthClient(req);
-  authClient.transactionManager.clear();
+  let errors;
+  if (Array.isArray(err.errorCauses) && err.errorCauses.length) {
+    // handle error from SDK
+    errors = err.errorCauses;
+  } else if (typeof err === 'string') {
+    errors = [err];
+  } else if (err && err.message) {
+    errors = [err.message];
+  } else {
+    errors = ['Internal Error!'];
+  }
 
-  res.status(500).send('Internal Error!');
+  res.status(500).render('error', { 
+    hasError: true,
+    errors 
+  });
 });
 
 app.listen(port, () => console.log(`App started on port ${port}`));

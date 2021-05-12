@@ -1,5 +1,5 @@
 const express = require('express');
-const primary = require('./primary');
+const basic = require('./basic');
 const withWidget = require('./with-widget');
 const withIdp = require('./with-idp');
 const withAuthenticators = require('./with-authenticators');
@@ -10,7 +10,7 @@ const {
 const router = express.Router();
 
 router.use('/login', [
-  primary,
+  basic,
   withWidget,
   withIdp,
   withAuthenticators,

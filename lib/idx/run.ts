@@ -24,7 +24,7 @@ export async function run(
 ) {
   let tokens;
   let nextStep;
-  let terminal;
+  let messages;
   let error;
   let status: IdxStatus;
 
@@ -42,14 +42,13 @@ export async function run(
         interactionCode,
       } = {}, 
       nextStep: nextStepFromResp,
-      formError,
-      terminal: terminalFromResp,
+      terminal,
+      messages: messagesFromResp,
     } = await remediate(idxResponse, values, new LoopMonitor(), options);
 
     // Track fields from remediation response
     nextStep = nextStepFromResp;
-    terminal = terminalFromResp;
-    error = formError;
+    messages = messagesFromResp;
 
     // Track should terminate
     shouldTerminate = shouldTerminate || !!terminal;
@@ -91,7 +90,8 @@ export async function run(
     tokens: tokens ? tokens.tokens : null,
     status,
     nextStep,
-    terminal,
+    terminal: shouldTerminate,
+    messages,
     error,
   });
   return authTransaction;
