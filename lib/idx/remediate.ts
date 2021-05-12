@@ -2,7 +2,7 @@
 /* eslint-disable complexity */
 import idx from '@okta/okta-idx-js';
 import { AuthSdkError } from '../errors';
-import { Base as Remeditor } from './remediators';
+import { Base as Remediator } from './remediators';
 import { RunOptions } from './run';
 import LoopMonitor from './RemediationLoopMonitor';
 import { 
@@ -30,12 +30,12 @@ interface RemediationResponse {
 }
 
 // Return first match idxRemediation in allowed remediators
-export function getRemeditor(
+export function getRemediator(
   flow: RemediationFlow, 
   allowedNextSteps: string[],
   idxRemediations: IdxRemediation[],
   values: RemediationValues,
-): Remeditor {
+): Remediator {
   let remediator;
   const remediatorCandidates = [];
   for (let remediation of idxRemediations) {
@@ -101,7 +101,7 @@ export async function remediate(
     }
   }
 
-  const remediator = getRemeditor(flow, allowedNextSteps, neededToProceed, values);
+  const remediator = getRemediator(flow, allowedNextSteps, neededToProceed, values);
   
   if (!remediator) {
     throw new AuthSdkError(
@@ -141,7 +141,7 @@ export async function remediate(
     }
     
     // We may want to trim the values bag for the next remediation
-    // Let the remeditor decide what the values should be (default to current values)
+    // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValues();
     return remediate(idxResponse, values, loopMonitor, options); // recursive call
   } catch (e) {
