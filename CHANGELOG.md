@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.9.1
+
+### Bug Fixes
+
+- [#731](https://github.com/okta/okta-auth-js/pull/731) Fixes issue with `handleLoginRedirect` where a redirect could occur after an exception was thrown.
+  
 ## 4.9.0
 
 ### Bug Fixes
