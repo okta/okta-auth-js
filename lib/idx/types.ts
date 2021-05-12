@@ -1,5 +1,5 @@
 import { IdxTransactionMeta } from '../types/Transaction';
-import { Base as Remeditor } from './remediators';
+import { Base as Remediator } from './remediators';
 
 export { RemediationValues } from './remediators';
 export { AuthenticationOptions } from './authenticate';
@@ -7,7 +7,7 @@ export { RegistrationOptions } from './register';
 export { PasswordRecoveryOptions } from './recoverPassword';
 export { CancelOptions } from './cancel';
 
-export type RemediationFlow = Record<string, typeof Remeditor>;
+export type RemediationFlow = Record<string, typeof Remediator>;
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[] | string | boolean>;

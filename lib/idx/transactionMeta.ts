@@ -14,6 +14,11 @@ import { OktaAuth, IdxTransactionMeta } from '../types';
 import { warn } from '../util';
 import { getOAuthUrls } from '../oidc';
 
+// Calculate new values
+export async function createTransactionMeta(authClient: OktaAuth) {
+  return authClient.token.prepareTokenParams();
+}
+
 export async function getTransactionMeta (authClient: OktaAuth): Promise<IdxTransactionMeta> {
   // Load existing transaction meta from storage
   if (authClient.transactionManager.exists()) {
