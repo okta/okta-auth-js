@@ -41,7 +41,7 @@ import {
   PkceAPI,
   SigninOptions,
   IdxAPI,
-  SignoutRedirectUrlOptions
+  SignoutRedirectUrlOptions,
 } from './types';
 import {
   transactionStatus,
@@ -554,33 +554,28 @@ class OktaAuth implements SigninAPI, SignoutAPI {
   }
 
   async handleLoginRedirect(tokens?: Tokens): Promise<void> {
-    const handleRedirect = async () => {
-      // Unsubscribe listener
-      this.authStateManager.unsubscribe(handleRedirect);
-
-      // Get and clear originalUri from storage
-      const originalUri = this.getOriginalUri();
-      this.removeOriginalUri();
-
-      // Redirect to originalUri
-      const { restoreOriginalUri } = this.options;
-      if (restoreOriginalUri) {
-        await restoreOriginalUri(this, originalUri);
-      } else {
-        window.location.replace(originalUri);
-      }
-    };
-
-    // Handle redirect after authState is updated 
-    this.authStateManager.subscribe(handleRedirect);
-
     // Store tokens and update AuthState by the emitted events
     if (tokens) {
       this.tokenManager.setTokens(tokens);
     } else if (this.isLoginRedirect()) {
       await this.storeTokensFromRedirect();
     } else {
-      this.authStateManager.unsubscribe(handleRedirect);
+      return; // nothing to do
+    }
+    
+    // ensure auth state has been updated
+    await this.authStateManager.updateAuthState();
+
+    // Get and clear originalUri from storage
+    const originalUri = this.getOriginalUri();
+    this.removeOriginalUri();
+
+    // Redirect to originalUri
+    const { restoreOriginalUri } = this.options;
+    if (restoreOriginalUri) {
+      await restoreOriginalUri(this, originalUri);
+    } else {
+      window.location.replace(originalUri);
     }
   }
 

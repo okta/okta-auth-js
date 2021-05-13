@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "jest (jsdom)",
+      "name": "jest (browser, jsdom)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
@@ -21,7 +21,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "jest (node)",
+      "name": "jest (server, node)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
