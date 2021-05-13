@@ -1,33 +1,31 @@
 const express = require('express');
-const { IdxStatus } = require('@okta/okta-auth-js');
 const { 
   getAuthClient, 
   handleAuthTransaction,
   renderTemplate,
+  renderPage,
   redirect,
 } = require('../utils');
 
 const router = express.Router();
 
+const BASE_PATH = '/multifactor-login';
+
 const proceed = ({ nextStep, req, res }) => {
   const { name, type, authenticators } = nextStep;
   switch (name) {
     case 'identify':
-      redirect({ req, res, path: '/multifactor-login' });
+      redirect({ req, res, path: BASE_PATH });
       return true;
     case 'select-authenticator-authenticate':
       req.session.authenticators = authenticators;
       redirect({ 
-        req, 
-        res, 
-        path: '/multifactor-login/select-authenticator' 
+        req, res, path: `${BASE_PATH}/select-authenticator` 
       });
       return true;
     case 'challenge-authenticator':
       redirect({ 
-        req, 
-        res, 
-        path: `/multifactor-login/challenge-authenticator/${type}` 
+        req, res, path: `${BASE_PATH}/challenge-authenticator/${type}` 
       });
       return true;
     default:
@@ -35,6 +33,7 @@ const proceed = ({ nextStep, req, res }) => {
   }
 };
 
+// entry route
 router.get('/multifactor-login', (req, res) => {
   const { authenticator } = req.query;
   renderTemplate(req, res, 'identify', { 
@@ -57,15 +56,14 @@ router.post('/multifactor-login', async (req, res, next) => {
 
 // Handle select-authenticator
 router.get('/multifactor-login/select-authenticator', (req, res) => {
-  const { status, authenticators } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'select-authenticator', {
+  const { authenticators } = req.session;
+  renderPage({ 
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'select-authenticator', {
       authenticators,
       action: '/multifactor-login/select-authenticator',
-    });
-  } else {
-    redirect({ req, res, path: '/multifactor-login' });
-  }
+    })
+  });
 });
 
 router.post('/multifactor-login/select-authenticator', async (req, res, next) => {
@@ -79,19 +77,17 @@ router.post('/multifactor-login/select-authenticator', async (req, res, next) =>
 
 // Handle email authenticator
 router.get('/multifactor-login/challenge-authenticator/email', (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'authenticator', {
       title: 'Challenge email authenticator',
       input: {
         type: 'text',
         name: 'verificationCode',
       },
       action: '/multifactor-login/challenge-authenticator/email',
-    });
-  } else {
-    redirect({ req, res, path: '/multifactor-login' });
-  }
+    })
+  });
 });
 
 router.post('/multifactor-login/challenge-authenticator/email', async (req, res, next) => {
@@ -103,19 +99,17 @@ router.post('/multifactor-login/challenge-authenticator/email', async (req, res,
 
 // Handle password authenticator
 router.get('/multifactor-login/challenge-authenticator/password', (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'authenticator', {
       title: 'Challenge password authenticator',
       input: {
         type: 'password',
         name: 'password',
       },
       action: '/multifactor-login/challenge-authenticator/password',
-    });
-  } else {
-    redirect({ req, res, path: '/multifactor-login' });
-  }
+    })
+  });
 });
 
 router.post('/multifactor-login/challenge-authenticator/password', async (req, res, next) => {

@@ -5,9 +5,12 @@ const {
   handleAuthTransaction,
   redirect,
   renderTemplate,
+  renderPage,
 } = require('../utils');
 
 const router = express.Router();
+
+const BASE_PATH = '/signup';
 
 const proceed = ({ nextStep, req, res }) => {
   const { name, type, authenticators, canSkip } = nextStep;
@@ -18,19 +21,20 @@ const proceed = ({ nextStep, req, res }) => {
     case 'select-authenticator-enroll':
       req.session.canSkip = canSkip;
       req.session.authenticators = authenticators;
-      redirect({ req, res, path: '/signup/select-authenticator' });
+      redirect({ req, res, path: `${BASE_PATH}/select-authenticator` });
       return true;
     case 'enroll-authenticator':
-      redirect({ req, res, path: `/signup/enroll-authenticator/${type}` });
+      redirect({ req, res, path: `${BASE_PATH}/enroll-authenticator/${type}` });
       return true;
     case 'authenticator-enrollment-data':
-      redirect({ req, res, path: `/signup/enroll-authenticator/${type}/enrollment-data` });
+      redirect({ req, res, path: `${BASE_PATH}/enroll-authenticator/${type}/enrollment-data` });
       return true;
     default:
       return false;
   }
 };
 
+// entry route
 router.get('/signup', (req, res) => {
   renderTemplate(req, res, 'enroll-profile', {
     action: '/signup'
@@ -50,19 +54,16 @@ router.post('/signup', async (req, res) => {
 
 // Handle select-authenticator
 router.get('/signup/select-authenticator', (req, res) => {
-  const { status } = req.session;
   const { authenticators, canSkip } = req.session;
-  
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'select-authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'select-authenticator', {
       authenticators,
       action: '/signup/select-authenticator',
       canSkip,
       skipAction: '/signup/select-authenticator/skip',
-    });
-  } else {
-    redirect({ req, res, path: '/signup' });
-  }
+    })
+  });
 });
 
 router.post('/signup/select-authenticator', async (req, res, next) => {
@@ -82,19 +83,17 @@ router.post('/signup/select-authenticator/skip', async (req, res, next) => {
 
 // Handle enroll authenticator -- email
 router.get(`/signup/enroll-authenticator/email`, (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'authenticator', {
       title: 'Enroll email authenticator',
       action: '/signup/enroll-authenticator/email',
       input: {
         type: 'text',
         name: 'verificationCode',
       }
-    });
-  } else {
-    redirect({ req, res, path: '/signup' });
-  }
+    })
+  });
 });
 
 router.post('/signup/enroll-authenticator/email', async (req, res, next) => {
@@ -108,15 +107,13 @@ router.post('/signup/enroll-authenticator/email', async (req, res, next) => {
 
 // Handle enroll authenticator -- password
 router.get(`/signup/enroll-authenticator/password`, (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
       title: 'Set up password',
       action: '/signup/enroll-authenticator/password',
-    });
-  } else {
-    redirect({ req, res, path: '/signup' });
-  }
+    })
+  });
 });
 
 router.post('/signup/enroll-authenticator/password', async (req, res, next) => {
@@ -136,14 +133,12 @@ router.post('/signup/enroll-authenticator/password', async (req, res, next) => {
 
 // Handle enroll authenticator - phone (sms)
 router.get('/signup/enroll-authenticator/phone/enrollment-data', (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'phone-enrollment-data', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'phone-enrollment-data', {
       action: '/signup/enroll-authenticator/phone/enrollment-data'
-    });
-  } else {
-    redirect({ req, res, path: '/signup' });
-  }
+    })
+  });
 });
 
 router.post('/signup/enroll-authenticator/phone/enrollment-data', async (req, res, next) => {
@@ -157,19 +152,17 @@ router.post('/signup/enroll-authenticator/phone/enrollment-data', async (req, re
 });
 
 router.get('/signup/enroll-authenticator/phone', (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'authenticator', {
       title: 'Enroll phone authenticator',
       action: '/signup/enroll-authenticator/phone',
       input: {
         type: 'text',
         name: 'verificationCode',
       }
-    });
-  } else {
-    redirect({ req, res, path: '/signup' });
-  }
+    })
+  });
 });
 
 router.post('/signup/enroll-authenticator/phone', async (req, res, next) => {

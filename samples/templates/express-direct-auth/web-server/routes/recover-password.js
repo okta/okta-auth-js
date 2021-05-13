@@ -5,29 +5,33 @@ const {
   handleAuthTransaction,
   redirect,
   renderTemplate,
+  renderPage,
 } = require('../utils');
 
 const router = express.Router();
+
+const BASE_PATH = '/recover-password';
 
 const proceed = ({ req, res, nextStep }) => {
   const { name, type, authenticators } = nextStep;
   switch (name) {
     case 'select-authenticator-authenticate':
       req.session.authenticators = authenticators;
-      redirect({ req, res, path: '/recover-password/select-authenticator' });
+      redirect({ req, res, path: `${BASE_PATH}/select-authenticator` });
       return true;
     case 'challenge-authenticator':
     case 'authenticator-verification-data':
-      redirect({ req, res, path: `/recover-password/challenge-authenticator/${type}` });
+      redirect({ req, res, path: `${BASE_PATH}/challenge-authenticator/${type}` });
       return true;
     case 'reset-authenticator':
-      redirect({ req, res, path: '/recover-password/reset' });
+      redirect({ req, res, path: `${BASE_PATH}/reset` });
       return true;
     default:
       return false;
   }
 };
 
+// entry route
 router.get('/recover-password', (req, res) => {
   const { authenticator } = req.query;
   renderTemplate(req, res, 'recover-password', {
@@ -50,15 +54,13 @@ router.post('/recover-password', async (req, res, next) => {
 
 // Handle reset password
 router.get('/recover-password/reset', (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
       title: 'Reset password',
       action: '/recover-password/reset'
-    });
-  } else {
-    redirect({ req, res, path: '/recover-password' });
-  }
+    })
+  });
 });
 
 router.post('/recover-password/reset', async (req, res, next) => {
@@ -76,15 +78,14 @@ router.post('/recover-password/reset', async (req, res, next) => {
 
 // Handle select-authenticator
 router.get('/recover-password/select-authenticator', (req, res) => {
-  const { status, authenticators } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'select-authenticator', {
+  const { authenticators } = req.session;
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'select-authenticator', {
       authenticators,
       action: '/recover-password/select-authenticator',
-    });
-  } else {
-    redirect({ req, res, path: '/recover-password' });
-  }
+    })
+  });
 });
 
 router.post('/recover-password/select-authenticator', async (req, res, next) => {
@@ -98,19 +99,17 @@ router.post('/recover-password/select-authenticator', async (req, res, next) => 
 
 // Handle email authenticator
 router.get(`/recover-password/challenge-authenticator/email`, (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'authenticator', {
       title: `Challenge email authenticator`,
       input: {
         type: 'text',
         name: 'verificationCode',
       },
       action: '/recover-password/challenge-authenticator/email',
-    });
-  } else {
-    redirect({ req, res, path: '/recover-password' });
-  }
+    })
+  });
 });
 
 router.post(`/recover-password/challenge-authenticator/email`, async (req, res, next) => {
@@ -122,19 +121,17 @@ router.post(`/recover-password/challenge-authenticator/email`, async (req, res, 
 
 // Handle phone (sms) authenticator
 router.get(`/recover-password/challenge-authenticator/phone`, (req, res) => {
-  const { status } = req.session;
-  if (status === IdxStatus.PENDING) {
-    renderTemplate(req, res, 'authenticator', {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'authenticator', {
       title: `Challenge phone authenticator`,
       input: {
         type: 'text',
         name: 'verificationCode',
       },
       action: '/recover-password/challenge-authenticator/phone',
-    });
-  } else {
-    redirect({ req, res, path: '/recover-password' });
-  }
+    })
+  });
 });
 
 router.post(`/recover-password/challenge-authenticator/phone`, async (req, res, next) => {
