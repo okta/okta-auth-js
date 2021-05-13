@@ -1,3 +1,6 @@
+/* eslint-disable complexity */
+const { IdxStatus } = require('@okta/okta-auth-js');
+
 module.exports = function handleAuthTransaction({ 
   req,
   res, 
@@ -9,7 +12,6 @@ module.exports = function handleAuthTransaction({
   const {  
     data: { 
       nextStep,
-      terminal,
       messages,
       tokens,
       status,
@@ -17,40 +19,34 @@ module.exports = function handleAuthTransaction({
     }
   } = authTransaction;
 
-  const done = () => {
-    // Save tokens to storage (req.session)
-    authClient.tokenManager.setTokens(tokens);
-    // Redirect back to home page
-    res.redirect('/');
-  };
-
-  // Persist status to session
+  // Persist states to session
   req.session.status = status;
-  // Done if tokens are available
-  if (tokens) {
-    return done();
-  }
-  // Throw error if exist in authTransaction
-  if (error) {
-    authClient.transactionManager.clear();
-    next(error);
-    return;
-  }
   if (messages && messages.length) {
     req.setIdxMessages(messages);
   }
-  // If terminal exist, redirect to terminal view
-  if (terminal) {
-    return res.redirect('/terminal');
-  }
-  // Proceed to next step
-  if (typeof proceed === 'function') {
-    const supportNextStep = proceed({ req, res, nextStep });
-    if (!supportNextStep) {
-      next(new Error(`
-        Oops! The current flow cannot support the policy configuration in your org, 
-        try other flows in the sample or change your app/org configuration.
-      `));
-    }
+
+  switch (status) {
+    case IdxStatus.PENDING:
+      // Proceed to next step
+      if (!proceed({ req, res, nextStep })) {
+        next(new Error(`
+          Oops! The current flow cannot support the policy configuration in your org, 
+          try other flows in the sample or change your app/org configuration.
+        `));
+      }
+      return;
+    case IdxStatus.SUCCESS:
+      // Save tokens to storage (req.session)
+      authClient.tokenManager.setTokens(tokens);
+      // Redirect back to home page
+      res.redirect('/');
+      return;
+    case IdxStatus.FAILURE:
+      authClient.transactionManager.clear();
+      next(error);
+      return;
+    case IdxStatus.TERMINAL:
+      res.redirect('/terminal');
+      return;
   }
 };

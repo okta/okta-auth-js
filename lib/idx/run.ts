@@ -1,5 +1,4 @@
-/* eslint-disable max-statements, max-depth */
-import { AuthTransaction } from '../tx';
+/* eslint-disable max-statements */
 import { interact } from './interact';
 import { remediate } from './remediate';
 import LoopMonitor from './RemediationLoopMonitor';
@@ -10,6 +9,7 @@ import {
   RemediationValues,
   RemediationFlow,
   IdxStatus,
+  IdxTransaction,
 } from '../types';
 
 export interface RunOptions {
@@ -21,13 +21,12 @@ export interface RunOptions {
 export async function run(
   authClient: OktaAuth, 
   options: RunOptions & IdxOptions,
-) {
+): Promise<IdxTransaction> {
   let tokens;
   let nextStep;
   let messages;
   let error;
-  let status: IdxStatus;
-
+  let status = IdxStatus.PENDING;
   let shouldTerminate = false;
 
   try {
@@ -50,12 +49,11 @@ export async function run(
     nextStep = nextStepFromResp;
     messages = messagesFromResp;
 
-    // Track should terminate
-    shouldTerminate = shouldTerminate || !!terminal;
-
-    // Did we get an interaction code?
-    status = IdxStatus.PENDING;
-    if (interactionCode) {
+    if (terminal) {
+      status = IdxStatus.TERMINAL;
+      shouldTerminate = true;
+    } else if (interactionCode) { 
+      // Did we get an interaction code?
       const meta = authClient.transactionManager.load() as IdxTransactionMeta;
       const {
         codeVerifier,
@@ -74,11 +72,13 @@ export async function run(
         scopes,
         ignoreSignature
       }, urls);
+
       status = IdxStatus.SUCCESS;
+      shouldTerminate = true;
     }
   } catch (err) {
     error = err;
-    status = IdxStatus.FAILED;
+    status = IdxStatus.FAILURE;
     shouldTerminate = true;
   }
 
@@ -86,13 +86,11 @@ export async function run(
     authClient.transactionManager.clear();
   }
   
-  const authTransaction = new AuthTransaction(authClient, {
+  return {
     tokens: tokens ? tokens.tokens : null,
     status,
     nextStep,
-    terminal: shouldTerminate,
     messages,
     error,
-  });
-  return authTransaction;
+  };
 }

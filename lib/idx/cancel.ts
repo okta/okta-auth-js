@@ -15,6 +15,7 @@ import { interact } from './interact';
 
 export type CancelOptions = IdxOptions;
 
+// TODO: call run to resolve IdxTransaction
 export async function cancel (authClient: OktaAuth, options: CancelOptions) {
   return interact(authClient, options)
     .then(({ idxResponse }) => {

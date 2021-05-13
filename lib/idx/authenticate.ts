@@ -1,7 +1,7 @@
-import { AuthTransaction } from '../tx';
 import { 
   OktaAuth,
   IdxOptions,
+  IdxTransaction,
   RemediationFlow,
 } from '../types';
 import { run } from './run';
@@ -35,7 +35,7 @@ export interface AuthenticationOptions extends
 
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions
-): Promise<AuthTransaction> {
+): Promise<IdxTransaction> {
   options = options || {};
 
   // Select password authenticator if password is provided
