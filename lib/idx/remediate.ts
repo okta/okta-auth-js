@@ -75,8 +75,10 @@ export function getIdxMessages(
   const { rawIdxState, neededToProceed } = idxResponse;
 
   // Handle global messages
-  const globalMessages = rawIdxState.messages.value.map(message => message);
-  messages = [...messages, ...globalMessages];
+  const globalMessages = rawIdxState.messages?.value.map(message => message);
+  if (globalMessages) {
+    messages = [...messages, ...globalMessages];
+  }
 
   // Handle field messages for current flow
   for (let remediation of neededToProceed) {

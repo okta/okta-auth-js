@@ -36,7 +36,7 @@ module.exports = function handleAuthTransaction({
     next(error);
     return;
   }
-  if (messages.length) {
+  if (messages && messages.length) {
     req.setIdxMessages(messages);
   }
   // If terminal exist, redirect to terminal view
