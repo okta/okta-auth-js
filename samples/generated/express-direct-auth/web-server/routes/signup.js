@@ -1,5 +1,4 @@
 const express = require('express');
-const { IdxStatus } = require('@okta/okta-auth-js');
 const { 
   getAuthClient,
   handleAuthTransaction,
@@ -11,6 +10,7 @@ const {
 const router = express.Router();
 
 const BASE_PATH = '/signup';
+const SUPPORTED_AUTHENTICATORS = ['email', 'password', 'phone'];
 
 const proceed = ({ nextStep, req, res }) => {
   const { name, type, authenticators, canSkip } = nextStep;
@@ -24,9 +24,15 @@ const proceed = ({ nextStep, req, res }) => {
       redirect({ req, res, path: `${BASE_PATH}/select-authenticator` });
       return true;
     case 'enroll-authenticator':
+      if (!SUPPORTED_AUTHENTICATORS.includes(type)) {
+        return false;
+      }
       redirect({ req, res, path: `${BASE_PATH}/enroll-authenticator/${type}` });
       return true;
     case 'authenticator-enrollment-data':
+      if (!SUPPORTED_AUTHENTICATORS.includes(type)) {
+        return false;
+      }
       redirect({ req, res, path: `${BASE_PATH}/enroll-authenticator/${type}/enrollment-data` });
       return true;
     default:

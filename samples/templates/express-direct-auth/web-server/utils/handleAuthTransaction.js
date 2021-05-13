@@ -10,13 +10,11 @@ module.exports = function handleAuthTransaction({
   proceed,
 }) {
   const {  
-    data: { 
-      nextStep,
-      messages,
-      tokens,
-      status,
-      error,
-    }
+    nextStep,
+    messages,
+    tokens,
+    status,
+    error,
   } = authTransaction;
 
   // Persist states to session

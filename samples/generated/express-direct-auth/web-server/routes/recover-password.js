@@ -1,5 +1,4 @@
 const express = require('express');
-const { IdxStatus } = require('@okta/okta-auth-js');
 const { 
   getAuthClient,
   handleAuthTransaction,
@@ -11,9 +10,12 @@ const {
 const router = express.Router();
 
 const BASE_PATH = '/recover-password';
+const SUPPORTED_AUTHENTICATORS = ['email', 'phone'];
+
 
 const proceed = ({ req, res, nextStep }) => {
   const { name, type, authenticators } = nextStep;
+
   switch (name) {
     case 'select-authenticator-authenticate':
       req.session.authenticators = authenticators;
@@ -21,6 +23,9 @@ const proceed = ({ req, res, nextStep }) => {
       return true;
     case 'challenge-authenticator':
     case 'authenticator-verification-data':
+      if (!SUPPORTED_AUTHENTICATORS.includes(type)) {
+        return false;
+      }
       redirect({ req, res, path: `${BASE_PATH}/challenge-authenticator/${type}` });
       return true;
     case 'reset-authenticator':

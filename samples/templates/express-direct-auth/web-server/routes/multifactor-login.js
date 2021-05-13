@@ -10,9 +10,11 @@ const {
 const router = express.Router();
 
 const BASE_PATH = '/multifactor-login';
+const SUPPORTED_AUTHENTICATORS = ['email', 'password'];
 
 const proceed = ({ nextStep, req, res }) => {
   const { name, type, authenticators } = nextStep;
+
   switch (name) {
     case 'identify':
       redirect({ req, res, path: BASE_PATH });
@@ -24,6 +26,9 @@ const proceed = ({ nextStep, req, res }) => {
       });
       return true;
     case 'challenge-authenticator':
+      if (!SUPPORTED_AUTHENTICATORS.includes(type)) {
+        return false;
+      }    
       redirect({ 
         req, res, path: `${BASE_PATH}/challenge-authenticator/${type}` 
       });
