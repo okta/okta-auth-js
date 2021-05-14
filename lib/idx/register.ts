@@ -1,6 +1,6 @@
-import { AuthTransaction } from '../tx';
 import { 
   IdxOptions, 
+  IdxTransaction, 
   OktaAuth, 
   RemediationFlow, 
 } from '../types';
@@ -41,7 +41,7 @@ export interface RegistrationOptions extends
 
 export async function register(
   authClient: OktaAuth, options: RegistrationOptions
-): Promise<AuthTransaction> {
+): Promise<IdxTransaction> {
   return run(authClient, { 
     ...options, 
     flow,

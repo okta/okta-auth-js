@@ -1,5 +1,5 @@
 import { Base, RemediationValues } from './Base';
-import { IdxRemediation, IdxRemeditionValue } from '../types';
+import { IdxRemediation, IdxRemediationValue } from '../types';
 import { AuthSdkError } from '../../errors';
 
 // Find matched authenticator in provided order
@@ -21,7 +21,7 @@ export interface SelectAuthenticatorValues extends RemediationValues {
 
 export class SelectAuthenticator extends Base {
   values: SelectAuthenticatorValues;
-  remediationValue: IdxRemeditionValue;
+  remediationValue: IdxRemediationValue;
   matchedOption: IdxRemediation;
   
   selectedAuthenticator: string;
@@ -65,7 +65,7 @@ export class SelectAuthenticator extends Base {
     };
   }
 
-  mapAuthenticator(remediationValue: IdxRemeditionValue) {
+  mapAuthenticator(remediationValue: IdxRemediationValue) {
     const { authenticators } = this.values;
     const { options } = remediationValue;
     const selectedOption = findMatchedOption(authenticators, options);

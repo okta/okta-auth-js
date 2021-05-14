@@ -1,7 +1,7 @@
-import { AuthTransaction } from '../tx';
 import { 
   OktaAuth, 
   IdxOptions, 
+  IdxTransaction,
   RemediationFlow,
 } from '../types';
 import { run } from './run';
@@ -35,7 +35,7 @@ export interface PasswordRecoveryOptions extends
 
 export async function recoverPassword(
   authClient: OktaAuth, options: PasswordRecoveryOptions
-): Promise<AuthTransaction> {
+): Promise<IdxTransaction> {
   return run(
     authClient, 
     { 

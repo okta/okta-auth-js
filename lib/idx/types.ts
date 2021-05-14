@@ -1,5 +1,6 @@
 import { IdxTransactionMeta } from '../types/Transaction';
 import { Base as Remediator } from './remediators';
+import { APIError, Tokens } from '../types';
 
 export { RemediationValues } from './remediators';
 export { AuthenticationOptions } from './authenticate';
@@ -12,10 +13,26 @@ export type RemediationFlow = Record<string, typeof Remediator>;
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[] | string | boolean>;
 
+export enum IdxStatus {
+  SUCCESS,
+  PENDING,
+  FAILURE,
+  TERMINAL,
+}
+
 export type NextStep = {
   name: string;
   type?: string;
   canSkip?: boolean;
+}
+
+export interface IdxTransaction {
+  status: IdxStatus;
+  tokens?: Tokens;
+  nextStep?: NextStep;
+  messages?: IdxMessage[];
+  error?: APIError;
+  meta?: IdxTransactionMeta;
 }
 
 export interface AcceptsInteractionHandle {
@@ -41,32 +58,26 @@ export interface InteractResponse {
 
 export type IdxOptions = InteractOptions;
 
-export enum IdxStatus {
-  SUCCESS,
-  PENDING,
-  FAILED,
-}
-
 export interface IdpConfig {
   id: string;
   name: string;
 }
 
 // TODO: remove when idx-js provides type information
-export interface IdxRemeditionValue {
+export interface IdxRemediationValue {
   name: string;
   type?: string;
   required?: boolean;
   value?: string;
   form?: {
-    value: IdxRemeditionValue[];
+    value: IdxRemediationValue[];
   };
   options?: IdxRemediation[];
 }
 export interface IdxRemediation {
   name: string;
   label?: string;
-  value: IdxRemeditionValue[];
+  value: IdxRemediationValue[];
   relatesTo: {
     type: string;
     value: {
@@ -82,6 +93,9 @@ export interface IdxRemediation {
 export interface IdxMessage {
   message: string;
   class: string;
+  i18n: {
+    key: string;
+  };
 }
 
 export interface IdxMessages {

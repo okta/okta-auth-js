@@ -100,9 +100,9 @@ import {
   cancel,
   register,
   recoverPassword,
+  startTransaction,
   handleInteractionCodeRedirect,
 } from './idx';
-import { startAuthTransaction } from './idx/startAuthTransaction';
 
 const Emitter = require('tiny-emitter');
 
@@ -245,7 +245,7 @@ class OktaAuth implements SigninAPI, SignoutAPI {
       cancel: cancel.bind(null, this),
       recoverPassword: recoverPassword.bind(null, this),
       handleInteractionCodeRedirect: handleInteractionCodeRedirect.bind(null, this),
-      startAuthTransaction: startAuthTransaction.bind(null, this),
+      startTransaction: startTransaction.bind(null, this),
     };
 
     // Fingerprint API
@@ -281,12 +281,8 @@ class OktaAuth implements SigninAPI, SignoutAPI {
     return isInteractionRequiredError(error);
   }
 
-  async signIn(opts: SigninOptions = { useInteractionCodeFlow: true }): Promise<AuthTransaction> {
-    const useInteractionCodeFlow = opts.useInteractionCodeFlow || this.options.useInteractionCodeFlow;
-    if (useInteractionCodeFlow) {
-      return authenticate(this, opts);
-    }
-
+  async signIn(opts: SigninOptions): Promise<AuthTransaction> {
+    // TODO: support interaction code flow
     // Authn V1 flow
     return this.signInWithCredentials(opts as SigninWithCredentialsOptions);
   }

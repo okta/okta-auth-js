@@ -25,7 +25,8 @@ describe('idx/authenticate', () => {
           name: 'identifier',
           label: 'Username'
         }]
-      }]
+      }],
+      rawIdxState: {}
     };
     const challengePasswordResponse = {
       proceed: () => Promise.resolve(successResponse),
@@ -39,7 +40,8 @@ describe('idx/authenticate', () => {
             type: 'password'
           }
         }
-      }]
+      }],
+      rawIdxState: {}
     };
     const interactResponse = {
       idxResponse: identifyResponse,
@@ -88,10 +90,6 @@ describe('idx/authenticate', () => {
     const { authClient, tokenResponse } = testContext;
     const res = await authenticate(authClient, { username: 'fake' });
     expect(res).toEqual({
-      'data': {
-        'status': 0,
-        'tokens': tokenResponse.tokens,
-      },
       'status': 0,
       'tokens': tokenResponse.tokens,
     });
@@ -109,10 +107,6 @@ describe('idx/authenticate', () => {
       const { authClient, identifyResponse, challengePasswordResponse, tokenResponse } = testContext;
       const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
       expect(res).toEqual({
-        'data': {
-          'status': 0,
-          'tokens': tokenResponse.tokens,
-        },
         'status': 0,
         'tokens': tokenResponse.tokens,
       });

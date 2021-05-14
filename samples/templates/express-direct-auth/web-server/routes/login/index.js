@@ -1,8 +1,6 @@
 const express = require('express');
-const primary = require('./primary');
 const withWidget = require('./with-widget');
 const withIdp = require('./with-idp');
-const withAuthenticators = require('./with-authenticators');
 const { 
   getAuthClient,
 } = require('../../utils');
@@ -10,10 +8,8 @@ const {
 const router = express.Router();
 
 router.use('/login', [
-  primary,
   withWidget,
   withIdp,
-  withAuthenticators,
 ]);
 
 router.get('/login/callback', async (req, res) => {
