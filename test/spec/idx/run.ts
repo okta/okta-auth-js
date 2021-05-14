@@ -1,5 +1,4 @@
 import { run } from '../../../lib/idx/run';
-import { AuthTransaction } from '../../../lib/tx';
 import LoopMonitor from '../../../lib/idx/RemediationLoopMonitor';
 
 jest.mock('../../../lib/idx/interact', () => {
@@ -32,7 +31,7 @@ describe('idx/run', () => {
     const remediateResponse = {
       idxResponse: {},
       nextStep: 'remediate-nextStep',
-      formError: undefined,
+      messages: undefined,
       terminal: false
     };
     jest.spyOn(mocked.remediate, 'remediate').mockImplementation(() => remediateResponse);
@@ -80,17 +79,9 @@ describe('idx/run', () => {
   it('returns transaction', async () => {
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
-    expect(res instanceof AuthTransaction).toBe(true);
     expect(res).toEqual({
-      'data': {
-        'nextStep': 'remediate-nextStep',
-        'status': 1,
-        'terminal': false,
-        'tokens': null,
-      },
       'nextStep': 'remediate-nextStep',
       'status': 1,
-      'terminal': false,
       'tokens': null,
     });
   });
@@ -109,23 +100,14 @@ describe('idx/run', () => {
     expect(mocked.remediate.remediate).toHaveBeenCalledWith(idxResponse, values, expect.any(LoopMonitor), options);
   });
 
-  it('returns form error in transaction', async () => {
-    testContext.remediateResponse.formError = 'remediate-formError';
+  it('returns messages in transaction', async () => {
+    testContext.remediateResponse.messages = ['remediate-message-1'];
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
-    expect(res instanceof AuthTransaction).toBe(true);
     expect(res).toEqual({
-      'data': {
-        'error': 'remediate-formError',
-        'nextStep': 'remediate-nextStep',
-        'status': 1,
-        'terminal': false,
-        'tokens': null,
-      },
-      'error': 'remediate-formError',
+      'messages': ['remediate-message-1'],
       'nextStep': 'remediate-nextStep',
       'status': 1,
-      'terminal': false,
       'tokens': null,
     });
   });
@@ -140,17 +122,9 @@ describe('idx/run', () => {
       jest.spyOn(authClient.transactionManager, 'clear');
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
-      expect(res instanceof AuthTransaction).toBe(true);
       expect(res).toEqual({
-        'data': {
-          'nextStep': 'remediate-nextStep',
-          'status': 1,
-          'terminal': false,
-          'tokens': null,
-        },
         'nextStep': 'remediate-nextStep',
         'status': 1,
-        'terminal': false,
         'tokens': null,
       });
     });
@@ -166,17 +140,9 @@ describe('idx/run', () => {
       jest.spyOn(authClient.transactionManager, 'clear');
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
-      expect(res instanceof AuthTransaction).toBe(true);
       expect(res).toEqual({
-        'data': {
-          'nextStep': 'remediate-nextStep',
-          'status': 1,
-          'terminal': true,
-          'tokens': null,
-        },
         'nextStep': 'remediate-nextStep',
-        'status': 1,
-        'terminal': true,
+        'status': 3,
         'tokens': null,
       });
     });
@@ -197,7 +163,7 @@ describe('idx/run', () => {
 
       const res = await run(authClient, options);
       expect(authClient.transactionManager.load).toHaveBeenCalledWith();
-      expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
+      expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         'clientId': 'meta-clientId',
         'codeVerifier': 'meta-code',
@@ -212,17 +178,9 @@ describe('idx/run', () => {
         'authorizeUrl': 'meta-authorizeUrl'
       });
 
-      expect(res instanceof AuthTransaction).toBe(true);
       expect(res).toEqual({
-        'data': {
-         'nextStep': 'remediate-nextStep',
-         'status': 0,
-         'terminal': false,
-         'tokens': tokenResponse.tokens,
-       },
        'nextStep': 'remediate-nextStep',
        'status': 0,
-       'terminal': false,
        'tokens': tokenResponse.tokens,
       });
     });
@@ -254,19 +212,10 @@ describe('idx/run', () => {
         'authorizeUrl': 'meta-authorizeUrl'
       });
 
-      expect(res instanceof AuthTransaction).toBe(true);
       expect(res).toEqual({
-        'data': {
-          error,
-         'nextStep': 'remediate-nextStep',
-         'status': 2,
-         'terminal': false,
-         'tokens': null,
-       },
-       'error': {},
+       error,
        'nextStep': 'remediate-nextStep',
        'status': 2,
-       'terminal': false,
        'tokens': null,
       });
     });

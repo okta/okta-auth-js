@@ -47,7 +47,7 @@ router.get('/signup', (req, res) => {
   });
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', async (req, res, next) => {
   const { firstName, lastName, email } = req.body;
   const authClient = getAuthClient(req);
   const authTransaction = await authClient.idx.register({ 
