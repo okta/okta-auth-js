@@ -19,6 +19,7 @@ import {
   Skip,
   SkipValues,
 } from './remediators';
+import { RegistrationFlowMonitor } from './flowMonitors';
 
 const flow: RemediationFlow = {
   'select-enroll-profile': SelectEnrollProfile,
@@ -42,14 +43,10 @@ export interface RegistrationOptions extends
 export async function register(
   authClient: OktaAuth, options: RegistrationOptions
 ): Promise<IdxTransaction> {
+  const flowMonitor = new RegistrationFlowMonitor();
   return run(authClient, { 
     ...options, 
     flow,
-    allowedNextSteps: [
-      'enroll-profile',
-      'authenticator-enrollment-data',
-      'select-authenticator-enroll',
-      'enroll-authenticator'
-    ]
+    flowMonitor,
   });
 }

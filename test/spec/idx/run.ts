@@ -1,5 +1,4 @@
 import { run } from '../../../lib/idx/run';
-import LoopMonitor from '../../../lib/idx/RemediationLoopMonitor';
 
 jest.mock('../../../lib/idx/interact', () => {
   return {
@@ -63,7 +62,6 @@ describe('idx/run', () => {
       flow: {
         'fake': true
       },
-      allowedNextSteps: [],
       actions: []
     };
     testContext = {
@@ -97,7 +95,7 @@ describe('idx/run', () => {
     const { idxResponse, stateHandle } = interactResponse;
     const values = { ...options, stateHandle };
     await run(authClient, options);
-    expect(mocked.remediate.remediate).toHaveBeenCalledWith(idxResponse, values, expect.any(LoopMonitor), options);
+    expect(mocked.remediate.remediate).toHaveBeenCalledWith(idxResponse, values, options);
   });
 
   it('returns messages in transaction', async () => {

@@ -18,6 +18,7 @@ import {
   AuthenticatorEnrollmentData,
   AuthenticatorEnrollmentDataValues
 } from './remediators';
+import { FlowMonitor } from './flowMonitors';
 
 const flow: RemediationFlow = {
   'identify': Identify,
@@ -52,16 +53,11 @@ export async function authenticate(
     };
   }
 
+  const flowMonitor = new FlowMonitor();
+
   return run(authClient, { 
     ...options, 
     flow,
-    allowedNextSteps: [
-      'select-authenticator-authenticate',
-      'authenticator-enrollment-data',
-      'challenge-authenticator',
-      'enroll-authenticator',
-      'reenroll-authenticator',
-      'redirect-idp',
-    ]
+    flowMonitor,
   });
 }

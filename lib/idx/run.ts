@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import { interact } from './interact';
 import { remediate } from './remediate';
-import LoopMonitor from './RemediationLoopMonitor';
+import { FlowMonitor } from './flowMonitors';
 import { 
   OktaAuth,
   IdxOptions,
@@ -14,8 +14,8 @@ import {
 
 export interface RunOptions {
   flow: RemediationFlow;
-  allowedNextSteps: string[];
   actions?: string[];
+  flowMonitor: FlowMonitor;
 }
 
 export async function run(
@@ -43,7 +43,7 @@ export async function run(
       nextStep: nextStepFromResp,
       terminal,
       messages: messagesFromResp,
-    } = await remediate(idxResponse, values, new LoopMonitor(), options);
+    } = await remediate(idxResponse, values, options);
 
     // Track fields from remediation response
     nextStep = nextStepFromResp;

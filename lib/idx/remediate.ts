@@ -4,7 +4,6 @@ import idx from '@okta/okta-idx-js';
 import { AuthSdkError } from '../errors';
 import { Base as Remediator } from './remediators';
 import { RunOptions } from './run';
-import LoopMonitor from './RemediationLoopMonitor';
 import { 
   IdxResponse, 
   isRawIdxResponse, 
@@ -26,11 +25,12 @@ interface RemediationResponse {
 
 // Return first match idxRemediation in allowed remediators
 export function getRemediator(
-  flow: RemediationFlow, 
-  allowedNextSteps: string[],
   idxRemediations: IdxRemediation[],
   values: RemediationValues,
+  options: RunOptions,
 ): Remediator {
+  const { flow, flowMonitor } = options;
+
   let remediator;
   const remediatorCandidates = [];
   for (let remediation of idxRemediations) {
@@ -44,23 +44,18 @@ export function getRemediator(
     if (remediator.canRemediate()) {
       // found the remediator
       return remediator;
-    } else {
+    } else if (flowMonitor.isRemediatorCandidate(remediator)) {
       // remediator cannot handle the current values
       // maybe return for next step
       remediatorCandidates.push(remediator);
     }
   }
-
-  const res = remediatorCandidates.filter(remediatorCandidate => {
-    const name = remediatorCandidate.getName();
-    return allowedNextSteps.includes(name);
-  });
   
-  if (res.length > 1) {
+  if (remediatorCandidates.length > 1) {
     throw new AuthSdkError('More than one remediation can match the current input');
   }
 
-  return res[0];
+  return remediatorCandidates[0];
 }
 
 function isTerminalResponse(idxResponse: IdxResponse) {
@@ -98,23 +93,22 @@ export function getIdxMessages(
 export async function remediate(
   idxResponse: IdxResponse,
   values: RemediationValues,
-  loopMonitor: LoopMonitor,
   options: RunOptions
 ): Promise<RemediationResponse> {
   const { neededToProceed } = idxResponse;
-  const { actions, flow, allowedNextSteps } = options;
+  const { actions, flow, flowMonitor } = options;
   
   // Try actions in idxResponse first
   if (actions) {
     for (let action of actions) {
       if (typeof idxResponse.actions[action] === 'function') {
         idxResponse = await idxResponse.actions[action]();
-        return remediate(idxResponse, values, loopMonitor, options); // recursive call
+        return remediate(idxResponse, values, options); // recursive call
       }
     }
   }
 
-  const remediator = getRemediator(flow, allowedNextSteps, neededToProceed, values);
+  const remediator = getRemediator(neededToProceed, values, options);
   
   if (!remediator) {
     throw new AuthSdkError(
@@ -122,7 +116,7 @@ export async function remediate(
     );
   }
 
-  if (loopMonitor.shouldBreak(remediator)) {
+  if (flowMonitor.shouldBreak(remediator)) {
     throw new AuthSdkError('Remediation run into loop, break!!!');
   }
 
@@ -163,7 +157,7 @@ export async function remediate(
     // We may want to trim the values bag for the next remediation
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValues();
-    return remediate(idxResponse, values, loopMonitor, options); // recursive call
+    return remediate(idxResponse, values, options); // recursive call
   } catch (e) {
     // Handle idx messages
     if (isRawIdxResponse(e)) {

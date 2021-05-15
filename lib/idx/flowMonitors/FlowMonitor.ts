@@ -1,6 +1,6 @@
-import { Base as Remediator } from './remediators';
+import { Base as Remediator } from '../remediators';
 
-export default class RemediationLoopMonitor {
+export class FlowMonitor {
   previousRemediator: Remediator;
 
   shouldBreak(remediator: Remediator): boolean {
@@ -15,5 +15,13 @@ export default class RemediationLoopMonitor {
 
     this.previousRemediator = remediator;
     return false;
+  }
+
+  isRemediatorCandidate(remediator: Remediator): boolean {
+    const remediatorName = remediator.getName();
+    if (remediatorName === 'skip') {
+      return false;
+    }
+    return true;
   }
 }

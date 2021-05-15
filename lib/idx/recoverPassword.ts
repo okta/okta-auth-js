@@ -15,6 +15,7 @@ import {
   AuthenticatorVerificationData,
   AuthenticatorVerificationDataValues,
 } from './remediators';
+import { FlowMonitor } from './flowMonitors';
 
 const flow: RemediationFlow = {
   'identify': Identify,
@@ -36,20 +37,16 @@ export interface PasswordRecoveryOptions extends
 export async function recoverPassword(
   authClient: OktaAuth, options: PasswordRecoveryOptions
 ): Promise<IdxTransaction> {
+  const flowMonitor = new FlowMonitor();
   return run(
     authClient, 
     { 
       ...options,
       flow,
+      flowMonitor,
       actions: [
         'currentAuthenticator-recover', 
         'currentAuthenticatorEnrollment-recover'
-      ],
-      allowedNextSteps: [
-        'select-authenticator-authenticate',
-        'challenge-authenticator',
-        'authenticator-verification-data',
-        'reset-authenticator',
       ],
     }
   );

@@ -55,7 +55,7 @@ router.post('/signup', async (req, res, next) => {
     lastName, 
     email,
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction });
+  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 // Handle select-authenticator
@@ -134,7 +134,7 @@ router.post('/signup/enroll-authenticator/password', async (req, res, next) => {
   const authTransaction = await authClient.idx.register({ 
     password,
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction });
+  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 // Handle enroll authenticator - phone (sms)
