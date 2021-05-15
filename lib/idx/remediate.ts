@@ -52,7 +52,13 @@ export function getRemediator(
   }
   
   if (remediatorCandidates.length > 1) {
-    throw new AuthSdkError('More than one remediation can match the current input');
+    const remediationNames = remediatorCandidates.reduce((acc, curr) => {
+      const name = curr.getName();
+      return acc ? `${acc}, ${name}` : name;
+    }, '');
+    throw new AuthSdkError(`
+      More than one remediation can match the current input, remediations: ${remediationNames}
+    `);
   }
 
   return remediatorCandidates[0];

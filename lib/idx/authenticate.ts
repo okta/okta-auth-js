@@ -18,7 +18,7 @@ import {
   AuthenticatorEnrollmentData,
   AuthenticatorEnrollmentDataValues
 } from './remediators';
-import { FlowMonitor } from './flowMonitors';
+import { AuthenticationFlowMonitor } from './flowMonitors';
 
 const flow: RemediationFlow = {
   'identify': Identify,
@@ -53,8 +53,7 @@ export async function authenticate(
     };
   }
 
-  const flowMonitor = new FlowMonitor();
-
+  const flowMonitor = new AuthenticationFlowMonitor();
   return run(authClient, { 
     ...options, 
     flow,

@@ -100,9 +100,14 @@ export class Base {
     return { name: this.remediation.name };
   }
 
+  // Override this method to grab messages per remediation
   getMessages(): IdxMessage[] {
-    // TODO: return field level messages
-    return [];
+    return this.remediation.value[0]?.form?.value.reduce((messages, field) => {
+      if (field.messages) {
+        messages = [...messages, ...field.messages.value];
+      }
+      return messages;
+    }, []);
   }
 
   // Prepare values for the next remediation

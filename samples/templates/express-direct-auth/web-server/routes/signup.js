@@ -18,6 +18,9 @@ const proceed = ({ nextStep, req, res }) => {
   req.session.canSkip = false;
 
   switch (name) {
+    case 'enroll-profile':
+      redirect({ req, res, path: `${BASE_PATH}` });
+      return true;
     case 'select-authenticator-enroll':
       req.session.canSkip = canSkip;
       req.session.authenticators = authenticators;
