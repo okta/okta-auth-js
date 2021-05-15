@@ -1,27 +1,23 @@
 /* eslint-disable complexity */
 const { IdxStatus } = require('@okta/okta-auth-js');
 
-module.exports = function handleAuthTransaction({ 
+module.exports = function handleTransaction({ 
   req,
   res, 
   next, 
   authClient, 
-  authTransaction,
+  transaction,
   proceed,
 }) {
   const {  
     nextStep,
-    messages,
     tokens,
     status,
     error,
-  } = authTransaction;
+  } = transaction;
 
   // Persist states to session
-  req.session.status = status;
-  if (messages && messages.length) {
-    req.setIdxMessages(messages);
-  }
+  req.setIdxStates(transaction);
 
   switch (status) {
     case IdxStatus.PENDING:

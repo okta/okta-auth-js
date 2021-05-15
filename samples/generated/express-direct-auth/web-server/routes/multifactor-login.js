@@ -1,7 +1,7 @@
 const express = require('express');
 const { 
   getAuthClient, 
-  handleAuthTransaction,
+  handleTransaction,
   renderTemplate,
   renderPage,
   redirect,
@@ -56,7 +56,7 @@ router.post('/multifactor-login', async (req, res, next) => {
     username,
     authenticators: authenticator ? [authenticator] : [],
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 // Handle select-authenticator
@@ -77,7 +77,7 @@ router.post('/multifactor-login/select-authenticator', async (req, res, next) =>
   const authTransaction = await authClient.idx.authenticate({
     authenticators: [authenticator],
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 // Handle email authenticator
@@ -99,7 +99,7 @@ router.post('/multifactor-login/challenge-authenticator/email', async (req, res,
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
   const authTransaction = await authClient.idx.authenticate({ verificationCode });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });  
 
 // Handle password authenticator
@@ -121,7 +121,7 @@ router.post('/multifactor-login/challenge-authenticator/password', async (req, r
   const { password } = req.body;
   const authClient = getAuthClient(req);
   const authTransaction = await authClient.idx.authenticate({ password });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 module.exports = router;

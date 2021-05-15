@@ -1,7 +1,7 @@
 const express = require('express');
 const { 
   getAuthClient,
-  handleAuthTransaction,
+  handleTransaction,
   redirect,
   renderTemplate,
   renderPage,
@@ -58,7 +58,7 @@ router.post('/signup', async (req, res, next) => {
     lastName, 
     email,
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 // Handle select-authenticator
@@ -81,13 +81,13 @@ router.post('/signup/select-authenticator', async (req, res, next) => {
   const authTransaction = await authClient.idx.register({
     authenticators: [authenticator],
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 router.post('/signup/select-authenticator/skip', async (req, res, next) => {
   const authClient = getAuthClient(req);
   const authTransaction = await authClient.idx.register({ skip: true });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 // Handle enroll authenticator -- email
@@ -111,7 +111,7 @@ router.post('/signup/enroll-authenticator/email', async (req, res, next) => {
   const authTransaction = await authClient.idx.register({ 
     verificationCode,
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 // Handle enroll authenticator -- password
@@ -137,7 +137,7 @@ router.post('/signup/enroll-authenticator/password', async (req, res, next) => {
   const authTransaction = await authClient.idx.register({ 
     password,
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 // Handle enroll authenticator - phone (sms)
@@ -157,7 +157,7 @@ router.post('/signup/enroll-authenticator/phone/enrollment-data', async (req, re
     authenticators: ['phone'],
     phoneNumber,
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 router.get('/signup/enroll-authenticator/phone', (req, res) => {
@@ -180,7 +180,7 @@ router.post('/signup/enroll-authenticator/phone', async (req, res, next) => {
   const authTransaction = await authClient.idx.register({ 
     verificationCode,
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require('express');
 const { 
   getAuthClient, 
-  handleAuthTransaction,
+  handleTransaction,
   renderTemplate,
   redirect,
 } = require('../utils');
@@ -32,7 +32,7 @@ router.post('/basic-login', async (req, res, next) => {
     username, 
     password,
   });
-  handleAuthTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
 });
 
 module.exports = router;

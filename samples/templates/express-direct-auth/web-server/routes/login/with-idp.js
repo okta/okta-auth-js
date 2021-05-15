@@ -1,7 +1,7 @@
 const express = require('express');
 const { 
   getAuthClient,
-  handleAuthTransaction,
+  handleTransaction,
   renderTemplate,
 } = require('../../utils');
 
@@ -16,7 +16,7 @@ router.get('/with-idp', async (req, res) => {
   const authClient = getAuthClient(req);
   try {
     const authTransaction = await authClient.idx.authenticate({ state: req.transactionId });
-    handleAuthTransaction({ req, res, next, authClient, authTransaction });
+    handleTransaction({ req, res, next, authClient, authTransaction });
   } catch (error) {
     authClient.transactionManager.clear();
     req.setLastError(error);

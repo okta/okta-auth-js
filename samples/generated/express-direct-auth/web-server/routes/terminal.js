@@ -4,10 +4,10 @@ const { renderTemplate, getAuthClient } = require('../utils');
 const router = express.Router();
 
 router.get('/terminal', (req, res) => {
-  const idxMessages = req.getIdxMessages();
-  req.clearIdxMessages();
+  const idxStates = req.getIdxStates();
+  req.clearIdxStates();
 
-  const messages = idxMessages.reduce((acc, curr) => {
+  const messages = idxStates.messages.reduce((acc, curr) => {
     acc.push(curr.message);
     return acc;
   }, []);
