@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+    {{>menu}}
+    
+    <div id="sign-in" class="ui center aligned relaxed grid">
+      <div class="row">
+        <div class="ui header">
+          <h2>Sign In using an external IDP</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      <div class="row">
+        {{#idp}}
+          <a href="{{href}}">{{idp.name}}</a>
+        {{/idp}}
+      </div>
+
+    </div>
+  </body>
+</html>

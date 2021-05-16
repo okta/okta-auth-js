@@ -1,0 +1,10 @@
+{{#hasError}}
+  <div class="ui negative message">
+    <div class="header">Errors:</div>
+    <ul class="list">
+      {{#errors}}
+        <li>{{.}}</li>
+      {{/errors}}
+    </ul>
+  </div>
+{{/hasError}}

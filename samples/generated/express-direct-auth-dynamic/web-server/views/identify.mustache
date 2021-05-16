@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+      
+    {{>menu}}
+    
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div class="ui header">
+          <h2>Identify</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      <div class="row">
+        <form class="ui large form" action="{{action}}" method="POST">
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Username or Email
+              </div>
+              <input type="text" name="username" required />
+            </div>
+          </div>
+          <button class="ui fluid large primary submit button" type="submit">
+            Next
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </body>
+</html>
