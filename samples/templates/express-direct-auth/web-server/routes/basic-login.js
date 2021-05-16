@@ -28,11 +28,11 @@ router.get('/basic-login', (req, res) => {
 router.post('/basic-login', async (req, res, next) => {
   const { username, password } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.authenticate({ 
+  const transaction = await authClient.idx.authenticate({ 
     username, 
     password,
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 module.exports = router;

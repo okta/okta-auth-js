@@ -1,4 +1,5 @@
-import { Base as Remediator } from '../remediators';
+import { Remediator } from '../remediators';
+import { IdxRemediation } from '../types';
 
 export class FlowMonitor {
   previousRemediator: Remediator;
@@ -17,7 +18,8 @@ export class FlowMonitor {
     return false;
   }
 
-  isRemediatorCandidate(remediator: Remediator): boolean {
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+  isRemediatorCandidate(remediator: Remediator, remediations?: IdxRemediation[]): boolean {
     const remediatorName = remediator.getName();
     if (remediatorName === 'skip') {
       return false;

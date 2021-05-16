@@ -7,7 +7,6 @@ import {
 import { run } from './run';
 import { 
   SelectEnrollProfile,
-  SelectEnrollProfileValues,
   EnrollProfile,
   EnrollProfileValues,
   SelectAuthenticator,
@@ -30,15 +29,12 @@ const flow: RemediationFlow = {
   'skip': Skip,
 };
 
-export interface RegistrationOptions extends 
-  IdxOptions,
-  SelectEnrollProfileValues,
-  EnrollProfileValues,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticatorValues,
-  AuthenticatorEnrollmentDataValues,
-  SkipValues {
-}
+export type RegistrationOptions = IdxOptions 
+  & EnrollProfileValues 
+  & SelectAuthenticatorValues 
+  & EnrollOrChallengeAuthenticatorValues 
+  & AuthenticatorEnrollmentDataValues 
+  & SkipValues;
 
 export async function register(
   authClient: OktaAuth, options: RegistrationOptions

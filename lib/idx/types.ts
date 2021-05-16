@@ -1,5 +1,5 @@
 import { IdxTransactionMeta } from '../types/Transaction';
-import { Base as Remediator } from './remediators';
+import { Remediator } from './remediators';
 import { APIError, Tokens } from '../types';
 
 export { RemediationValues } from './remediators';
@@ -11,7 +11,7 @@ export { CancelOptions } from './cancel';
 export type RemediationFlow = Record<string, typeof Remediator>;
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
-export type IdxToRemediationValueMap = Record<string, string[] | string | boolean>;
+export type IdxToRemediationValueMap = Record<string, string[]>;
 
 export enum IdxStatus {
   SUCCESS,
@@ -20,10 +20,16 @@ export enum IdxStatus {
   TERMINAL,
 }
 
+type Input = {
+  name: string;
+  required?: boolean;
+}
+
 export type NextStep = {
   name: string;
   type?: string;
   canSkip?: boolean;
+  inputs?: Input[];
 }
 
 export interface IdxTransaction {

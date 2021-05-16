@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+import { AuthSdkError } from '../../errors';
 import { 
   IdxRemediation, 
   IdxToRemediationValueMap, 
@@ -9,11 +10,12 @@ import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 export interface RemediationValues {
   stateHandle?: string;
+  authenticators?: string[];
 }
 
-export class Base {
+export class Remediator {
   remediation: IdxRemediation;
-  values: RemediationValues;
+  values?: RemediationValues;
   map?: IdxToRemediationValueMap;
 
   constructor(remediation: IdxRemediation, values?: RemediationValues) {
@@ -66,14 +68,6 @@ export class Base {
       return;
     }
 
-    if (typeof entry === 'string') {
-      return this.values[entry];
-    }
-
-    if (!Array.isArray(entry) || entry.length === 0) {
-      return this.values[key]; // return value unformatted
-    }
-
     // find the first aliased property that returns a truthy value
     for (let i = 0; i < entry.length; i++) {
       let val = this.values[entry[i]];
@@ -97,11 +91,53 @@ export class Base {
   }
 
   getNextStep(): NextStep {
-    return { name: this.remediation.name };
+    const inputs = this.getInputs();
+    return { name: this.remediation.name, inputs };
+  }
+
+  // Get inputs for the next step
+  getInputs() {
+    // TODO: implement
+    if (!this.map) {
+      return [];
+    }
+
+    return Object.keys(this.map).reduce((inputs, key) => {
+      const inputFromRemediation = this.remediation.value.find(item => item.name === key);
+      if (!inputFromRemediation) {
+        return inputs;
+      }
+
+      let input;
+      const aliases = this.map[key];
+      const { type } = inputFromRemediation;
+      if (typeof this[`getInput${titleCase(key)}`] === 'function') {
+        input = this[`getInput${titleCase(key)}`](inputFromRemediation);
+      } else if (type !== 'object') {
+        // handle general primitive types
+        let name;
+        if (aliases.length === 1) {
+          name = aliases[0];
+        } else {
+          // try find key from values
+          name = aliases.find(name => Object.keys(this.values).includes(name));
+        }
+        if (name) {
+          input = { ...inputFromRemediation, name };
+        }
+      } 
+
+      if (!input) {
+        throw new AuthSdkError('Missing custom getInput method in Remediator');
+      }
+
+      inputs.push(input);
+      return inputs;
+    }, []);
   }
 
   // Override this method to grab messages per remediation
-  getMessages(): IdxMessage[] {
+  getMessages(): IdxMessage[] | undefined {
     return this.remediation.value[0]?.form?.value.reduce((messages, field) => {
       if (field.messages) {
         messages = [...messages, ...field.messages.value];

@@ -1,10 +1,10 @@
-import { Base, RemediationValues } from './Base';
+import { Remediator, RemediationValues } from './Remediator';
 
 export interface AuthenticatorVerificationDataValues extends RemediationValues {
   authenticators?: string[];
 }
 
-export class AuthenticatorVerificationData extends Base {
+export class AuthenticatorVerificationData extends Remediator {
   values: AuthenticatorVerificationDataValues;
 
   map = {

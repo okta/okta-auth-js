@@ -2,7 +2,7 @@
 /* eslint-disable complexity */
 import idx from '@okta/okta-idx-js';
 import { AuthSdkError } from '../errors';
-import { Base as Remediator } from './remediators';
+import { Remediator } from './remediators';
 import { RunOptions } from './run';
 import { 
   IdxResponse, 
@@ -44,7 +44,7 @@ export function getRemediator(
     if (remediator.canRemediate()) {
       // found the remediator
       return remediator;
-    } else if (flowMonitor.isRemediatorCandidate(remediator)) {
+    } else if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations)) {
       // remediator cannot handle the current values
       // maybe return for next step
       remediatorCandidates.push(remediator);
@@ -89,7 +89,9 @@ export function getIdxMessages(
     }
     const remediator = new T(remediation);
     const fieldMessages = remediator.getMessages();
-    messages = [...messages, ...fieldMessages];
+    if (fieldMessages) {
+      messages = [...messages, ...fieldMessages];
+    }
   }
 
   return messages;

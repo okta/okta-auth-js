@@ -1,4 +1,4 @@
-export * from './Base';
+export * from './Remediator';
 export * from './EnrollOrChallengeAuthenticator';
 export * from './EnrollProfile';
 export * from './Identify';

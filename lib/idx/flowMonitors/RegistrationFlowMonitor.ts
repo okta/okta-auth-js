@@ -1,4 +1,4 @@
-import { Base as Remediator } from '../remediators';
+import { Remediator } from '../remediators';
 import { FlowMonitor } from './FlowMonitor';
 
 export class RegistrationFlowMonitor extends FlowMonitor {

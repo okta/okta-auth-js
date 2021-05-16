@@ -52,11 +52,11 @@ router.post('/multifactor-login', async (req, res, next) => {
   const { authenticator } = req.query;
   const { username } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.authenticate({ 
+  const transaction = await authClient.idx.authenticate({ 
     username,
     authenticators: authenticator ? [authenticator] : [],
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 // Handle select-authenticator
@@ -74,10 +74,10 @@ router.get('/multifactor-login/select-authenticator', (req, res) => {
 router.post('/multifactor-login/select-authenticator', async (req, res, next) => {
   const { authenticator } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.authenticate({
+  const transaction = await authClient.idx.authenticate({
     authenticators: [authenticator],
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 // Handle email authenticator
@@ -98,8 +98,8 @@ router.get('/multifactor-login/challenge-authenticator/email', (req, res) => {
 router.post('/multifactor-login/challenge-authenticator/email', async (req, res, next) => {
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.authenticate({ verificationCode });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  const transaction = await authClient.idx.authenticate({ verificationCode });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });  
 
 // Handle password authenticator
@@ -120,8 +120,8 @@ router.get('/multifactor-login/challenge-authenticator/password', (req, res) => 
 router.post('/multifactor-login/challenge-authenticator/password', async (req, res, next) => {
   const { password } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.authenticate({ password });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  const transaction = await authClient.idx.authenticate({ password });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 module.exports = router;

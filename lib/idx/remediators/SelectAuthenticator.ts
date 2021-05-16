@@ -1,4 +1,4 @@
-import { Base, RemediationValues } from './Base';
+import { Remediator, RemediationValues } from './Remediator';
 import { IdxRemediation, IdxRemediationValue } from '../types';
 import { AuthSdkError } from '../../errors';
 
@@ -19,7 +19,7 @@ export interface SelectAuthenticatorValues extends RemediationValues {
   authenticators?: string[];
 }
 
-export class SelectAuthenticator extends Base {
+export class SelectAuthenticator extends Remediator {
   values: SelectAuthenticatorValues;
   remediationValue: IdxRemediationValue;
   matchedOption: IdxRemediation;
@@ -27,7 +27,7 @@ export class SelectAuthenticator extends Base {
   selectedAuthenticator: string;
   
   map = {
-    authenticator: null // value here does not matter, fall to the custom map function
+    authenticator: []
   }
 
   constructor(remediation: IdxRemediation, values: RemediationValues) {
@@ -52,6 +52,7 @@ export class SelectAuthenticator extends Base {
   }
 
   getNextStep() {
+    const common = super.getNextStep();
     const authenticators = this.remediationValue.options.map(option => {
       const { 
         label, 
@@ -60,7 +61,7 @@ export class SelectAuthenticator extends Base {
       return { label, value: type };
     });
     return {
-      name: this.remediation.name,
+      ...common,
       authenticators,
     };
   }

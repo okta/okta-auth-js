@@ -1,24 +1,28 @@
-import { Base, RemediationValues } from './Base';
+import { Remediator, RemediationValues } from './Remediator';
 
 export interface EnrollOrChallengeAuthenticatorValues extends RemediationValues {
   verificationCode?: string;
   password?: string;
 }
 
-export class EnrollOrChallengeAuthenticator extends Base {
+export class EnrollOrChallengeAuthenticator extends Remediator {
   values: EnrollOrChallengeAuthenticatorValues;
 
   map = {
-    'credentials': ['password', 'verificationCode']
+    'credentials': []
   };
 
+  private getChallengeType() {
+    return this.remediation.relatesTo.value.type;
+  }
+
   canRemediate() {
+    const challengeType = this.getChallengeType();
     if (this.values.verificationCode 
-        && ['email', 'phone'].includes(this.remediation.relatesTo.value.type)) {
+        && ['email', 'phone'].includes(challengeType)) {
       return true;
     }
-    if (this.values.password 
-        && this.remediation.relatesTo.value.type === 'password') {
+    if (this.values.password && challengeType === 'password') {
       return true;
     }
     return false;
@@ -30,10 +34,27 @@ export class EnrollOrChallengeAuthenticator extends Base {
     };
   }
 
-  getNextStep() {
+  getInputCredentials(input) {
+    const challengeType = this.getChallengeType();
+    const name = challengeType === 'password' ? 'password' : 'verificationCode';
     return {
-      name: this.remediation.name,
+      ...input.form.value[0],
+      name,
+      required: input.required
+    };
+  }
+
+  getNextStep() {
+    const common = super.getNextStep();
+    return {
+      ...common,
       type: this.remediation.relatesTo.value.type,
     };
+  }
+
+  getValues() {
+    const authenticators = this.values.authenticators
+      .filter(authenticator => authenticator !== this.remediation.relatesTo.value.type);
+    return { ...this.values, authenticators };
   }
 }

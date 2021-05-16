@@ -53,12 +53,12 @@ router.get('/signup', (req, res) => {
 router.post('/signup', async (req, res, next) => {
   const { firstName, lastName, email } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.register({ 
+  const transaction = await authClient.idx.register({ 
     firstName, 
     lastName, 
     email,
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 // Handle select-authenticator
@@ -78,16 +78,16 @@ router.get('/signup/select-authenticator', (req, res) => {
 router.post('/signup/select-authenticator', async (req, res, next) => {
   const { authenticator } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.register({
+  const transaction = await authClient.idx.register({
     authenticators: [authenticator],
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 router.post('/signup/select-authenticator/skip', async (req, res, next) => {
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.register({ skip: true });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  const transaction = await authClient.idx.register({ skip: true });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 // Handle enroll authenticator -- email
@@ -108,10 +108,10 @@ router.get(`/signup/enroll-authenticator/email`, (req, res) => {
 router.post('/signup/enroll-authenticator/email', async (req, res, next) => {
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.register({ 
+  const transaction = await authClient.idx.register({ 
     verificationCode,
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 // Handle enroll authenticator -- password
@@ -134,10 +134,10 @@ router.post('/signup/enroll-authenticator/password', async (req, res, next) => {
     return;
   }
 
-  const authTransaction = await authClient.idx.register({ 
+  const transaction = await authClient.idx.register({ 
     password,
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 // Handle enroll authenticator - phone (sms)
@@ -153,11 +153,11 @@ router.get('/signup/enroll-authenticator/phone/enrollment-data', (req, res) => {
 router.post('/signup/enroll-authenticator/phone/enrollment-data', async (req, res, next) => {
   const { phoneNumber } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.register({ 
+  const transaction = await authClient.idx.register({ 
     authenticators: ['phone'],
     phoneNumber,
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 router.get('/signup/enroll-authenticator/phone', (req, res) => {
@@ -177,10 +177,10 @@ router.get('/signup/enroll-authenticator/phone', (req, res) => {
 router.post('/signup/enroll-authenticator/phone', async (req, res, next) => {
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const authTransaction = await authClient.idx.register({ 
+  const transaction = await authClient.idx.register({ 
     verificationCode,
   });
-  handleTransaction({ req, res, next, authClient, authTransaction, proceed });
+  handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
 
 module.exports = router;

@@ -1,6 +1,6 @@
-import { Base } from './Base';
+import { Remediator } from './Remediator';
 
-export class RedirectIdp extends Base {
+export class RedirectIdp extends Remediator {
 
   canRemediate() {
     return false;

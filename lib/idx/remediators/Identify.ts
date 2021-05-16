@@ -1,16 +1,16 @@
-import { Base, RemediationValues } from './Base';
+import { Remediator, RemediationValues } from './Remediator';
 
 export interface IdentifyValues extends RemediationValues {
   username?: string;
   password?: string;
 }
 
-export class Identify extends Base {
+export class Identify extends Remediator {
   values: IdentifyValues;
 
   map = {
-    'identifier': ['identifier', 'username', 'email'],
-    'credentials': ['credentials', 'password']
+    'identifier': ['username'],
+    'credentials': []
   };
 
   canRemediate() {
@@ -20,5 +20,13 @@ export class Identify extends Base {
 
   mapCredentials() {
     return { passcode: this.values.password };
+  }
+
+  getInputCredentials(input) {
+    return {
+      ...input.form.value[0],
+      name: 'password',
+      required: input.required
+    };
   }
 }

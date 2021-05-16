@@ -26,13 +26,11 @@ const flow: RemediationFlow = {
   'reset-authenticator': EnrollOrChallengeAuthenticator,
 };
 
-export interface PasswordRecoveryOptions extends 
-  IdxOptions, 
-  IdentifyValues,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticatorValues,
-  AuthenticatorVerificationDataValues {
-}
+export type PasswordRecoveryOptions = IdxOptions 
+  & IdentifyValues 
+  & SelectAuthenticatorValues 
+  & EnrollOrChallengeAuthenticatorValues 
+  & AuthenticatorVerificationDataValues;
 
 export async function recoverPassword(
   authClient: OktaAuth, options: PasswordRecoveryOptions

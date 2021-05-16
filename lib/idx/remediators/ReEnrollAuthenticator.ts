@@ -1,14 +1,14 @@
-import { Base, RemediationValues } from './Base';
+import { Remediator, RemediationValues } from './Remediator';
 
 export interface ReEnrollAuthenticatorValues extends RemediationValues {
   newPassword?: string;
 }
 
-export class ReEnrollAuthenticator extends Base {
+export class ReEnrollAuthenticator extends Remediator {
   values: ReEnrollAuthenticatorValues;
 
   map = {
-    'credentials': ['newPassword']
+    'credentials': []
   };
 
   mapCredentials() {
@@ -18,18 +18,10 @@ export class ReEnrollAuthenticator extends Base {
   }
 
   getNextStep() {
+    const common = super.getNextStep();
     return {
-      name: this.remediation.name,
+      ...common,
       type: this.remediation.relatesTo.value.type,
     };
-  }
-
-  getErrorMessages(errorRemediation) {
-    return errorRemediation.value[0].form.value.reduce((errors, field) => {
-      if (field.messages) {
-        errors.push(field.messages.value[0].message);
-      }
-      return errors;
-    }, []);
   }
 }

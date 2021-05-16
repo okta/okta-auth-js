@@ -30,14 +30,11 @@ const flow: RemediationFlow = {
   'redirect-idp': RedirectIdp
 };
 
-export interface AuthenticationOptions extends 
-  IdxOptions,
-  IdentifyValues,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticatorValues,
-  ReEnrollAuthenticatorValues,
-  AuthenticatorEnrollmentDataValues {
-}
+export type AuthenticationOptions = IdxOptions 
+  & IdentifyValues 
+  & SelectAuthenticatorValues 
+  & EnrollOrChallengeAuthenticatorValues 
+  & ReEnrollAuthenticatorValues;
 
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions
