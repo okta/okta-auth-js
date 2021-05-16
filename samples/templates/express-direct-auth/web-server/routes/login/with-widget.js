@@ -47,7 +47,7 @@ router.get('/with-widget', (req, res) => {
     })
     .catch(error => {
       req.setLastError(error);
-      renderTemplate(req, res, 'terminal-error');
+      renderTemplate(req, res, 'terminal');
     });
 });
 

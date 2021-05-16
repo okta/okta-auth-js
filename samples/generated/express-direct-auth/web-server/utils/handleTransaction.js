@@ -33,7 +33,7 @@ module.exports = function handleTransaction({
       // Save tokens to storage (req.session)
       authClient.tokenManager.setTokens(tokens);
       // Redirect back to home page
-      res.redirect('/');
+      res.redirect('/profile');
       return;
     case IdxStatus.FAILURE:
       authClient.transactionManager.clear();
