@@ -403,7 +403,7 @@ export class TokenManager {
         return freshToken;
       })
       .catch(err => {
-        if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
+        if (['OAuthError', 'AuthSdkError', 'AuthApiError'].includes(err.name)) {
           // remove expired token in storage
           const tokenStorage = this.storage.getStorage();
           const currentToken = tokenStorage[key];
