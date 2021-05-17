@@ -21,13 +21,20 @@
 
       {{#redirect}}
         <div class="row">
-          {{entry}} -> {{redirect}}
+          Your org's policy configuration cannot support the selected flow ({{entry}}), <br/>
+          you have been redirected to {{redirect}} that can match your org's policies.
         </div>
       {{/redirect}}
 
+      {{#codePath}}
+        <div class="row">
+          Code path: {{codePath}} (TODO: use GH link)
+        </div>
+      {{/codePath}}
+
       {{#showLoginForm}}
         <div class="row">
-          <form id="login-form" class="ui large form" action="{{action}}" method="POST">
+          <form id="login-form" class="ui large form" action="{{loginAction}}" method="POST">
             {{#loginInputs}}
               <div class="field">
                 <div class="ui labeled input">
