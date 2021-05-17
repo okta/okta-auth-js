@@ -2,8 +2,8 @@ const express = require('express');
 const { 
   getAuthClient, 
   handleTransaction,
-  renderTemplate,
   redirect,
+  renderEntryPage,
 } = require('../utils');
 
 const router = express.Router();
@@ -19,11 +19,7 @@ const proceed = ({ nextStep, req, res }) => {
   }
 };
 
-router.get('/basic-login', (req, res) => {
-  renderTemplate(req, res, 'basic-login', { 
-    action: '/basic-login'
-  });
-});
+router.get('/basic-login', renderEntryPage);
 
 router.post('/basic-login', async (req, res, next) => {
   const { username, password } = req.body;

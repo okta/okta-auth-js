@@ -14,6 +14,8 @@ export interface RemediationValues {
 }
 
 export class Remediator {
+  static remediationName: string;
+
   remediation: IdxRemediation;
   values?: RemediationValues;
   map?: IdxToRemediationValueMap;

@@ -10,6 +10,7 @@ const {
   lastError, 
   authTransaction,
   idxStates, 
+  flows,
   testEnv
 } = require('./middlewares');
 
@@ -31,6 +32,7 @@ app.use(session({
 }));
 app.use(lastError);
 app.use(idxStates);
+app.use(flows);
 app.use(authTransaction);
 
 // Provide the configuration to the view layer because we show it on the homepage

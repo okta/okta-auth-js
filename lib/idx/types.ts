@@ -32,6 +32,12 @@ export type NextStep = {
   inputs?: Input[];
 }
 
+export enum IdxFeature {
+  PASSWORD_RECOVERY,
+  REGISTRATION,
+  SOCIAL_IDP,
+}
+
 export interface IdxTransaction {
   status: IdxStatus;
   tokens?: Tokens;
@@ -39,6 +45,8 @@ export interface IdxTransaction {
   messages?: IdxMessage[];
   error?: APIError;
   meta?: IdxTransactionMeta;
+  enabledFeatures?: IdxFeature[];
+  availableSteps?: NextStep[];
 }
 
 export interface AcceptsInteractionHandle {

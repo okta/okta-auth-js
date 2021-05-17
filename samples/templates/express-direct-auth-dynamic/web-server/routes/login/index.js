@@ -1,6 +1,6 @@
 const express = require('express');
 const withWidget = require('./with-widget');
-const withIdp = require('./with-idp');
+const withIdp = require('../social-idp');
 const { 
   getAuthClient,
 } = require('../../utils');

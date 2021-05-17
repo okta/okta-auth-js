@@ -1,6 +1,7 @@
 import { Remediator } from './Remediator';
 
 export class RedirectIdp extends Remediator {
+  static remediationName = 'redirect-idp';
 
   canRemediate() {
     return false;

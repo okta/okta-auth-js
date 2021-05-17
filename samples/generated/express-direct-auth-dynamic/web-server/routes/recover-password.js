@@ -5,6 +5,7 @@ const {
   redirect,
   renderTemplate,
   renderPage,
+  renderEntryPage
 } = require('../utils');
 
 const router = express.Router();
@@ -36,15 +37,7 @@ const proceed = ({ req, res, nextStep }) => {
   }
 };
 
-// entry route
-router.get('/recover-password', (req, res) => {
-  const { authenticator } = req.query;
-  renderTemplate(req, res, 'recover-password', {
-    action: authenticator 
-      ? `/recover-password?authenticator=${authenticator}` 
-      : '/recover-password'
-  });
-});
+router.get('/recover-password', renderEntryPage);
 
 router.post('/recover-password', async (req, res, next) => {
   const { authenticator } = req.query;

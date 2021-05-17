@@ -1,16 +1,17 @@
 const express = require('express');
-const withWidget = require('./with-widget');
-const withIdp = require('../social-idp');
-const { 
-  getAuthClient,
-} = require('../../utils');
+const {
+  renderTemplate,
+  renderEntryPage,
+} = require('../utils');
 
 const router = express.Router();
 
-router.use('/login', [
-  withWidget,
-  withIdp,
-]);
+const proceed = ({ nextStep, req, res }) => {
+  renderTemplate(req, res, 'login-with-idp', nextStep);
+  return true;
+};
+
+router.get('/social-idp', renderEntryPage);
 
 router.get('/login/callback', async (req, res) => {
   const url = req.protocol + '://' + req.get('host') + req.originalUrl;
@@ -32,6 +33,5 @@ router.get('/login/callback', async (req, res) => {
     res.redirect('/');
   }
 });
-
 
 module.exports = router;

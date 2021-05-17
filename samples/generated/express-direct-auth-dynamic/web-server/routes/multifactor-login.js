@@ -5,6 +5,7 @@ const {
   renderTemplate,
   renderPage,
   redirect,
+  renderEntryPage,
 } = require('../utils');
 
 const router = express.Router();
@@ -39,14 +40,7 @@ const proceed = ({ nextStep, req, res }) => {
 };
 
 // entry route
-router.get('/multifactor-login', (req, res) => {
-  const { authenticator } = req.query;
-  renderTemplate(req, res, 'identify', { 
-    action: authenticator 
-      ? `/multifactor-login?authenticator=${authenticator}` 
-      : `/multifactor-login`
-  });
-});
+router.get('/multifactor-login', renderEntryPage);
 
 router.post('/multifactor-login', async (req, res, next) => {
   const { authenticator } = req.query;

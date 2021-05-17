@@ -7,6 +7,8 @@ export interface EnrollProfileValues extends RemediationValues {
 }
 
 export class EnrollProfile extends Remediator {
+  static remediationName = 'enroll-profile';
+
   values: EnrollProfileValues;
 
   map = {

@@ -6,6 +6,8 @@ export interface IdentifyValues extends RemediationValues {
 }
 
 export class Identify extends Remediator {
+  static remediationName = 'identify';
+
   values: IdentifyValues;
 
   map = {

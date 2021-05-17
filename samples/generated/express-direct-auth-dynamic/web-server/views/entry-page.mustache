@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+
+      <div class="row">
+        <div class="ui header">
+          <h2>{{title}}</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      {{#redirect}}
+        <div class="row">
+          {{entry}} -> {{redirect}}
+        </div>
+      {{/redirect}}
+
+      {{#showLoginForm}}
+        <div class="row">
+          <form id="login-form" class="ui large form" action="{{action}}" method="POST">
+            {{#loginInputs}}
+              <div class="field">
+                <div class="ui labeled input">
+                  <div class="ui label">
+                    {{label}}
+                  </div>
+                  <input id="{{name}}" type="{{type}}" name="{{name}}" />
+                </div>
+              </div>  
+            {{/loginInputs}}
+            <button id="submit-login-form" class="ui fluid large primary submit button" type="submit">
+              Sign In
+            </button>
+          </form>
+        </div>
+      {{/showLoginForm}}
+
+      <div class="ui row grid">
+        {{#canRegister}}
+          <div class="ui messages row">
+            Don't have an account? &nbsp; <a href="/signup">Sign Up</a>
+          </div>
+        {{/canRegister}}
+        {{#canRecoverPassword}}
+          <div class="ui messages row">
+            Forgot password? &nbsp; <a href="/recover-password">Recover password</a>
+          </div>
+        {{/canRecoverPassword}}
+        {{#idps}}
+          <a href={{href}}>{{name}}</a>
+        {{/idps}}
+      </div>
+
+    </div>
+  </body>
+</html>

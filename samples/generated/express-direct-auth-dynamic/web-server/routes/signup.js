@@ -5,6 +5,7 @@ const {
   redirect,
   renderTemplate,
   renderPage,
+  renderEntryPage,
 } = require('../utils');
 
 const router = express.Router();
@@ -44,11 +45,7 @@ const proceed = ({ nextStep, req, res }) => {
 };
 
 // entry route
-router.get('/signup', (req, res) => {
-  renderTemplate(req, res, 'enroll-profile', {
-    action: '/signup'
-  });
-});
+router.get('/signup', renderEntryPage);
 
 router.post('/signup', async (req, res, next) => {
   const { firstName, lastName, email } = req.body;
