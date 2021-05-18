@@ -1,4 +1,4 @@
-import { Remediator, RemediationValues } from './Remediator';
+import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface AuthenticatorEnrollmentDataValues extends RemediationValues {
   authenticators?: string[];
@@ -6,6 +6,8 @@ export interface AuthenticatorEnrollmentDataValues extends RemediationValues {
 }
 
 export class AuthenticatorEnrollmentData extends Remediator {
+  static remediationName = 'authenticator-enrollment-data';
+
   values: AuthenticatorEnrollmentDataValues;
 
   map = {

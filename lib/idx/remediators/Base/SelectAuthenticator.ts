@@ -1,6 +1,6 @@
 import { Remediator, RemediationValues } from './Remediator';
-import { IdxRemediation, IdxRemediationValue } from '../types';
-import { AuthSdkError } from '../../errors';
+import { IdxRemediation, IdxRemediationValue } from '../../types/idx-js';
+import { AuthSdkError } from '../../../errors';
 
 // Find matched authenticator in provided order
 function findMatchedOption(authenticators, options) {
@@ -19,6 +19,7 @@ export interface SelectAuthenticatorValues extends RemediationValues {
   authenticators?: string[];
 }
 
+// Base class - DO NOT expose static remediationName
 export class SelectAuthenticator extends Remediator {
   values: SelectAuthenticatorValues;
   remediationValue: IdxRemediationValue;

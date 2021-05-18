@@ -2,17 +2,16 @@ import {
   IdxOptions, 
   IdxTransaction, 
   OktaAuth, 
-  RemediationFlow, 
 } from '../types';
-import { run } from './run';
+import { run, RemediationFlow } from './run';
 import { 
   SelectEnrollProfile,
   EnrollProfile,
   EnrollProfileValues,
-  SelectAuthenticator,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticator,
-  EnrollOrChallengeAuthenticatorValues,
+  SelectAuthenticatorEnroll,
+  SelectAuthenticatorEnrollValues,
+  EnrollAuthenticator,
+  EnrollAuthenticatorValues,
   AuthenticatorEnrollmentData,
   AuthenticatorEnrollmentDataValues,
   Skip,
@@ -24,15 +23,15 @@ const flow: RemediationFlow = {
   'select-enroll-profile': SelectEnrollProfile,
   'enroll-profile': EnrollProfile,
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
-  'select-authenticator-enroll': SelectAuthenticator,
-  'enroll-authenticator': EnrollOrChallengeAuthenticator,
+  'select-authenticator-enroll': SelectAuthenticatorEnroll,
+  'enroll-authenticator': EnrollAuthenticator,
   'skip': Skip,
 };
 
 export type RegistrationOptions = IdxOptions 
   & EnrollProfileValues 
-  & SelectAuthenticatorValues 
-  & EnrollOrChallengeAuthenticatorValues 
+  & SelectAuthenticatorEnrollValues 
+  & EnrollAuthenticatorValues 
   & AuthenticatorEnrollmentDataValues 
   & SkipValues;
 

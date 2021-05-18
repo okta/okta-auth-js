@@ -1,12 +1,15 @@
 import { Remediator, RemediationValues } from './Remediator';
 
-export interface EnrollOrChallengeAuthenticatorValues extends RemediationValues {
+export interface VerifyAuthenticatorValues extends RemediationValues {
   verificationCode?: string;
   password?: string;
 }
 
-export class EnrollOrChallengeAuthenticator extends Remediator {
-  values: EnrollOrChallengeAuthenticatorValues;
+// Base class - DO NOT expose static remediationName
+export class VerifyAuthenticator extends Remediator {
+  static remediationName = 'challenge-authenticator';
+
+  values: VerifyAuthenticatorValues;
 
   map = {
     'credentials': []

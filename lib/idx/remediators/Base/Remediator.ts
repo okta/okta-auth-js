@@ -1,18 +1,18 @@
 /* eslint-disable complexity */
-import { AuthSdkError } from '../../errors';
-import { 
-  IdxRemediation, 
-  IdxToRemediationValueMap, 
-  NextStep,
-  IdxMessage,
-} from '../types';
+import { AuthSdkError } from '../../../errors';
+import { NextStep, IdxMessage } from '../../types';
+import { IdxRemediation } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
+
+// A map from IDX data values (server spec) to RemediationValues (client spec)
+export type IdxToRemediationValueMap = Record<string, string[]>;
 
 export interface RemediationValues {
   stateHandle?: string;
   authenticators?: string[];
 }
 
+// Base class - DO NOT expose static remediationName
 export class Remediator {
   static remediationName: string;
 

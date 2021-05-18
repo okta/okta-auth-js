@@ -1,6 +1,6 @@
 import { Remediator } from '../remediators';
 import { FlowMonitor } from './FlowMonitor';
-import { IdxRemediation } from '../types';
+import { IdxRemediation } from '../types/idx-js';
 
 export class AuthenticationFlowMonitor extends FlowMonitor {
   isRemediatorCandidate(remediator: Remediator, remediations?: IdxRemediation[]) {

@@ -1,4 +1,4 @@
-import { Remediator, RemediationValues } from './Remediator';
+import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface EnrollProfileValues extends RemediationValues {
   firstName?: string;

@@ -15,9 +15,24 @@
 // responsible for adding new routes)
 
 import idx from '@okta/okta-idx-js';
-import { InteractOptions, OktaAuth, InteractResponse } from '../types';
-import { IDX_API_VERSION } from '../constants';
+import { OktaAuth, IdxTransactionMeta } from '../types';
+import { IdxResponse } from './types/idx-js';
+import { AcceptsInteractionHandle } from './types/AcceptsInteractionHandle';
 import { getTransactionMeta, saveTransactionMeta } from './transactionMeta';
+import { IDX_API_VERSION } from '../constants';
+
+export interface InteractOptions extends AcceptsInteractionHandle {
+  state?: string;
+  scopes?: string[];
+}
+
+export interface InteractResponse {
+  state?: string;
+  stateHandle?: string;
+  interactionHandle?: string;
+  idxResponse?: IdxResponse;
+  meta?: IdxTransactionMeta;
+}
 
 // Begin or resume a transaction. Returns an interaction handle
 export async function interact (authClient: OktaAuth, options: InteractOptions = {}): Promise<InteractResponse> {

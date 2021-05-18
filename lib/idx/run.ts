@@ -7,20 +7,18 @@ import {
   OktaAuth,
   IdxOptions,
   IdxTransactionMeta,
-  RemediationValues,
-  RemediationFlow,
   IdxStatus,
   IdxTransaction,
   IdxFeature,
-  IdxResponse,
-  IdxRemediation,
   NextStep,
 } from '../types';
+import { IdxResponse, IdxRemediation } from './types/idx-js';
 
+export type RemediationFlow = Record<string, typeof remediators.Remediator>;
 export interface RunOptions {
   flow?: RemediationFlow;
   actions?: string[];
-  flowMonitor: FlowMonitor;
+  flowMonitor?: FlowMonitor;
 }
 
 function getMeta(meta) {
@@ -50,7 +48,10 @@ function getAvailableSteps(remediations: IdxRemediation[]): NextStep[] {
   const res = [];
 
   const remediatorMap = Object.values(remediators).reduce((map, remediatorClass) => {
-    map[remediatorClass.remediationName] = remediatorClass;
+    // Only add concrete subclasses to the map
+    if (remediatorClass.remediationName) {
+      map[remediatorClass.remediationName] = remediatorClass;
+    }
     return map;
   }, {});
 
@@ -77,7 +78,7 @@ export async function run(
   let enabledFeatures;
   let availableSteps;
   let status = IdxStatus.PENDING;
-  let shouldTerminate = false;
+  let shouldClearTransaction = false;
 
   try {
     // Start/resume the flow
@@ -87,13 +88,13 @@ export async function run(
       meta: metaFromResp,
     } = await interact(authClient, options); 
 
-    if (!options.flow) {
+    if (!options.flow && !options.actions) {
       // handle start transaction
       meta = getMeta(metaFromResp);
       enabledFeatures = getEnabledFeatures(idxResponse);
       availableSteps = getAvailableSteps(idxResponse.neededToProceed);
     } else {
-      const values: RemediationValues = { ...options, stateHandle };
+      const values: remediators.RemediationValues = { ...options, stateHandle };
 
       // Can we handle the remediations?
       const { 
@@ -102,6 +103,7 @@ export async function run(
         } = {}, 
         nextStep: nextStepFromResp,
         terminal,
+        canceled,
         messages: messagesFromResp,
       } = await remediate(idxResponse, values, options);
 
@@ -111,7 +113,10 @@ export async function run(
 
       if (terminal) {
         status = IdxStatus.TERMINAL;
-        shouldTerminate = true;
+        shouldClearTransaction = true;
+      } if (canceled) {
+        status = IdxStatus.CANCELED;
+        shouldClearTransaction = true;
       } else if (interactionCode) { 
         // Did we get an interaction code?
         const meta = authClient.transactionManager.load() as IdxTransactionMeta;
@@ -134,16 +139,16 @@ export async function run(
         }, urls);
 
         status = IdxStatus.SUCCESS;
-        shouldTerminate = true;
+        shouldClearTransaction = true;
       }
     }
   } catch (err) {
     error = err;
     status = IdxStatus.FAILURE;
-    shouldTerminate = true;
+    shouldClearTransaction = true;
   }
 
-  if (shouldTerminate) {
+  if (shouldClearTransaction) {
     authClient.transactionManager.clear();
   }
   

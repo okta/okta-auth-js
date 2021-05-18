@@ -1,10 +1,12 @@
-import { Remediator, RemediationValues } from './Remediator';
+import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface ReEnrollAuthenticatorValues extends RemediationValues {
   newPassword?: string;
 }
 
 export class ReEnrollAuthenticator extends Remediator {
+  static remediationName = 'reenroll-authenticator';
+
   values: ReEnrollAuthenticatorValues;
 
   map = {

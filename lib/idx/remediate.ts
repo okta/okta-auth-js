@@ -2,18 +2,14 @@
 /* eslint-disable complexity */
 import idx from '@okta/okta-idx-js';
 import { AuthSdkError } from '../errors';
-import { Remediator } from './remediators';
-import { RunOptions } from './run';
+import { Remediator, RemediationValues } from './remediators';
+import { RunOptions, RemediationFlow } from './run';
+import { NextStep, IdxMessage } from './types';
 import { 
   IdxResponse, 
   isRawIdxResponse, 
-  RemediationFlow, 
-  RemediationValues,
-  NextStep,
-  IdxRemediation,
-  IdxMessage,
-} from '../types';
-import { canSkip as canSkipFn } from './util';
+  IdxRemediation, 
+} from './types/idx-js';
 
 interface RemediationResponse {
   idxResponse?: IdxResponse;
@@ -21,8 +17,8 @@ interface RemediationResponse {
   canSkip?: boolean;
   messages?: IdxMessage[];
   terminal?: boolean;
+  canceled?: boolean;
 }
-
 // Return first match idxRemediation in allowed remediators
 export function getRemediator(
   idxRemediations: IdxRemediation[],
@@ -69,6 +65,10 @@ function isTerminalResponse(idxResponse: IdxResponse) {
   return !neededToProceed.length && !interactionCode;
 }
 
+function canSkipFn(idxResponse: IdxResponse) {
+  return idxResponse.neededToProceed.some(({ name }) => name === 'skip');
+}
+
 export function getIdxMessages(
   idxResponse: IdxResponse, flow: RemediationFlow
 ): IdxMessage[] {
@@ -111,6 +111,9 @@ export async function remediate(
     for (let action of actions) {
       if (typeof idxResponse.actions[action] === 'function') {
         idxResponse = await idxResponse.actions[action]();
+        if (action === 'cancel') {
+          return { canceled: true };
+        }
         return remediate(idxResponse, values, options); // recursive call
       }
     }

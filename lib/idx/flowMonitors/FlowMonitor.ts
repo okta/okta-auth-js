@@ -1,5 +1,5 @@
 import { Remediator } from '../remediators';
-import { IdxRemediation } from '../types';
+import { IdxRemediation } from '../types/idx-js';
 
 export class FlowMonitor {
   previousRemediator: Remediator;

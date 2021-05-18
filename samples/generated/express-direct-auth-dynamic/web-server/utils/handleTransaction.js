@@ -42,5 +42,8 @@ module.exports = function handleTransaction({
     case IdxStatus.TERMINAL:
       res.redirect('/terminal');
       return;
+    case IdxStatus.CANCELED:
+      res.redirect('/');
+      return;
   }
 };

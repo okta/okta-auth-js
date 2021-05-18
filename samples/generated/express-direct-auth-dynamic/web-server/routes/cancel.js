@@ -1,14 +1,12 @@
 const express = require('express');
-const { getAuthClient } = require('../utils');
+const { getAuthClient, handleTransaction } = require('../utils');
 
 const router = express.Router();
 
-router.post('/cancel', async (req, res) => {
+router.post('/cancel', async (req, res, next) => {
   const authClient = getAuthClient(req);
-  await authClient.idx.cancel();
-    
-  // Redirect back to home page
-  res.redirect('/');
+  const transaction = await authClient.idx.cancel();
+  handleTransaction({ req, res, next, authClient, transaction });
 });
 
 module.exports = router;

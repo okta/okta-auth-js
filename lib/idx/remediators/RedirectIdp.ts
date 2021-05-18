@@ -1,4 +1,4 @@
-import { Remediator } from './Remediator';
+import { Remediator } from './Base/Remediator';
 
 export class RedirectIdp extends Remediator {
   static remediationName = 'redirect-idp';

@@ -1,10 +1,12 @@
-import { Remediator, RemediationValues } from './Remediator';
+import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface AuthenticatorVerificationDataValues extends RemediationValues {
   authenticators?: string[];
 }
 
 export class AuthenticatorVerificationData extends Remediator {
+  static remediationName = 'authenticator-verification-data';
+
   values: AuthenticatorVerificationDataValues;
 
   map = {

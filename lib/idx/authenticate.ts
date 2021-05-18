@@ -2,16 +2,15 @@ import {
   OktaAuth,
   IdxOptions,
   IdxTransaction,
-  RemediationFlow,
 } from '../types';
-import { run } from './run';
+import { run, RemediationFlow } from './run';
 import { 
   Identify,
   IdentifyValues,
-  SelectAuthenticator,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticator,
-  EnrollOrChallengeAuthenticatorValues,
+  SelectAuthenticatorAuthenticate,
+  SelectAuthenticatorAuthenticateValues,
+  ChallengeAuthenticator,
+  ChallengeAuthenticatorValues,
   ReEnrollAuthenticator,
   ReEnrollAuthenticatorValues,
   RedirectIdp,
@@ -22,18 +21,16 @@ import { AuthenticationFlowMonitor } from './flowMonitors';
 
 const flow: RemediationFlow = {
   'identify': Identify,
-  'select-authenticator-authenticate': SelectAuthenticator,
-  'authenticator-enrollment-data': AuthenticatorEnrollmentData,
-  'challenge-authenticator': EnrollOrChallengeAuthenticator,
-  'enroll-authenticator': EnrollOrChallengeAuthenticator,
+  'select-authenticator-authenticate': SelectAuthenticatorAuthenticate,
+  'challenge-authenticator': ChallengeAuthenticator,
   'reenroll-authenticator': ReEnrollAuthenticator,
   'redirect-idp': RedirectIdp
 };
 
 export type AuthenticationOptions = IdxOptions 
   & IdentifyValues 
-  & SelectAuthenticatorValues 
-  & EnrollOrChallengeAuthenticatorValues 
+  & SelectAuthenticatorAuthenticateValues 
+  & ChallengeAuthenticatorValues 
   & ReEnrollAuthenticatorValues;
 
 export async function authenticate(

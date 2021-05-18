@@ -21,7 +21,6 @@ import {
   AuthenticationOptions, 
   RegistrationOptions as IdxRegistrationOptions,
   PasswordRecoveryOptions,
-  IdxResponse, 
   CancelOptions,
   IdxOptions,
   IdxTransaction,
@@ -250,8 +249,7 @@ export interface PkceAPI {
 export interface IdxAPI {
   authenticate: (options: AuthenticationOptions) => Promise<IdxTransaction>;
   register: (options: IdxRegistrationOptions) => Promise<IdxTransaction>;
-  // TODO: resolve IdxTransaction instead of IdxResponse
-  cancel: (options?: CancelOptions) => Promise<IdxResponse>;
+  cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
   startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;
   recoverPassword: (options: PasswordRecoveryOptions) => Promise<IdxTransaction>;
   handleInteractionCodeRedirect: (url: string) => Promise<void>; 
