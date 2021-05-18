@@ -1,3 +1,4 @@
+/* eslint-disable jasmine/no-disabled-tests */
 import { authenticate } from '../../../lib/idx/authenticate';
 import { IdxStatus } from '../../../lib/idx/types';
 
@@ -131,8 +132,6 @@ describe('idx/authenticate', () => {
       });
 
       xit('can authenticate, passing username and password on demand', async () => {
-        const { authClient } = testContext;
-        const res = await authenticate(authClient, {});
         // TODO
       });
 
@@ -182,8 +181,6 @@ describe('idx/authenticate', () => {
       });
 
       xit('can authenticate, passing username and password on demand', async () => {
-        const { authClient } = testContext;
-        const res = await authenticate(authClient, {});
         // TODO
       });
 
