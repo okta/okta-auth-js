@@ -1,5 +1,5 @@
 import { Factory } from 'fishery';
-import { IdxAuthenticator } from '../../../lib/idx/types';
+import { IdxAuthenticator } from '../../../../lib/idx/types';
 import {
   PasswordAuthenticatorMethodFactory,
   PushAuthenticatorMethodFactory,

@@ -1,5 +1,5 @@
 import { Factory } from 'fishery';
-import { IdxAuthenticatorMethod } from '../../../lib/idx/types';
+import { IdxAuthenticatorMethod } from '../../../../lib/idx/types';
 
 export const IdxAuthenticatorMethodFactory = Factory.define<IdxAuthenticatorMethod>(() => {
   return {

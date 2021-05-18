@@ -75,9 +75,14 @@ export interface IdxAuthenticator {
   type: string;
 }
 
-export interface IdxFormOption {
-  value: string;
+export interface IdxForm {
+  value: IdxRemediationValue[];
+}
+
+export interface IdxOption {
+  value: string | { form: IdxForm };
   label: string;
+  relatesTo?: IdxAuthenticator;
 }
 export interface IdxRemediationValue {
   name: string;
@@ -86,10 +91,8 @@ export interface IdxRemediationValue {
   secret?: boolean;
   value?: string;
   label?: string;
-  form?: {
-    value: IdxRemediationValue[];
-  };
-  options?: (IdxRemediation | IdxFormOption)[];
+  form?: IdxForm;
+  options?: IdxOption[];
 }
 export interface IdxRemediation {
   name: string;
