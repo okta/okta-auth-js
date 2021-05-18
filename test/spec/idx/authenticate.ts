@@ -1,4 +1,9 @@
 import { authenticate } from '../../../lib/idx/authenticate';
+import {
+  SuccessResponseFactory,
+  IdentifyResponseFactory,
+  VerifyPasswordResponseFactory
+} from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/interact', () => {
   return {
@@ -13,39 +18,20 @@ const mocked = {
 describe('idx/authenticate', () => {
  let testContext;
   beforeEach(() => {
-    const successResponse = {
-      interactionCode: 'idx-interactionCode',
-      neededToProceed: []
-    };
-    const identifyResponse =  {
+    const interactionCode = 'test-interactionCode';
+    const stateHandle = 'test-stateHandle';
+    const successResponse = SuccessResponseFactory.build({
+      interactionCode
+    });
+    const identifyResponse =  IdentifyResponseFactory.build({
       proceed: () => Promise.resolve(successResponse),
-      neededToProceed: [{
-        name: 'identify',
-        value:[{
-          name: 'identifier',
-          label: 'Username'
-        }]
-      }],
-      rawIdxState: {}
-    };
-    const challengePasswordResponse = {
-      proceed: () => Promise.resolve(successResponse),
-      neededToProceed: [{
-        name: 'challenge-authenticator',
-        value: [{
-          name: 'credentials'
-        }],
-        relatesTo: {
-          value: {
-            type: 'password'
-          }
-        }
-      }],
-      rawIdxState: {}
-    };
+    });
+    const verifyPasswordResponse = VerifyPasswordResponseFactory.build({
+      proceed: () => Promise.resolve(successResponse)
+    });
     const interactResponse = {
       idxResponse: identifyResponse,
-      stateHandle: 'idx-stateHandle'
+      stateHandle 
     };
 
     jest.spyOn(mocked.interact, 'interact').mockImplementation(() => testContext.interactResponse);
@@ -76,10 +62,11 @@ describe('idx/authenticate', () => {
     jest.spyOn(authClient.token, 'exchangeCodeForTokens');
 
     testContext = {
+      interactionCode,
       interactResponse,
       successResponse,
       identifyResponse,
-      challengePasswordResponse,
+      verifyPasswordResponse,
       tokenResponse,
       transactionMeta,
       authClient
@@ -97,26 +84,26 @@ describe('idx/authenticate', () => {
 
   describe('basic authentication', () => {
     beforeEach(() => {
-      const { identifyResponse, challengePasswordResponse } = testContext;
-      identifyResponse.proceed = () => Promise.resolve(challengePasswordResponse);
+      const { identifyResponse, verifyPasswordResponse } = testContext;
+      identifyResponse.proceed = () => Promise.resolve(verifyPasswordResponse);
       jest.spyOn(identifyResponse, 'proceed');
-      jest.spyOn(challengePasswordResponse, 'proceed');
+      jest.spyOn(verifyPasswordResponse, 'proceed');
     });
 
     it('can authenticate, passing username and password', async () => {
-      const { authClient, identifyResponse, challengePasswordResponse, tokenResponse } = testContext;
+      const { authClient, identifyResponse, verifyPasswordResponse, tokenResponse, interactionCode } = testContext;
       const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
       expect(res).toEqual({
         'status': 0,
         'tokens': tokenResponse.tokens,
       });
       expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
-      expect(challengePasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' }});
+      expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' }});
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         clientId: 'meta-clientId',
         codeVerifier: 'meta-code',
         ignoreSignature: true,
-        interactionCode: 'idx-interactionCode',
+        interactionCode,
         redirectUri: 'meta-redirectUri',
         scopes: ['meta']
       }, {

@@ -64,25 +64,40 @@ export interface IdpConfig {
 }
 
 // TODO: remove when idx-js provides type information
+export interface IdxAuthenticatorMethod {
+  type: string;
+}
+export interface IdxAuthenticator {
+  displayName: string;
+  id: string;
+  key: string;
+  methods: IdxAuthenticatorMethod[];
+  type: string;
+}
+
+export interface IdxFormOption {
+  value: string;
+  label: string;
+}
 export interface IdxRemediationValue {
   name: string;
   type?: string;
   required?: boolean;
+  secret?: boolean;
   value?: string;
+  label?: string;
   form?: {
     value: IdxRemediationValue[];
   };
-  options?: IdxRemediation[];
+  options?: (IdxRemediation | IdxFormOption)[];
 }
 export interface IdxRemediation {
   name: string;
   label?: string;
   value: IdxRemediationValue[];
-  relatesTo: {
-    type: string;
-    value: {
-      type: string;
-    };
+  relatesTo?: {
+    type?: string;
+    value: IdxAuthenticator;
   };
   idp?: IdpConfig;
   href?: string;

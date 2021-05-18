@@ -8,6 +8,7 @@
     "expect": "readonly"
   },
   "rules": {
+    "max-len": 0,
     "node/no-extraneous-import": ["error", {
       "allowModules": [
         "@okta/okta-auth-js"
