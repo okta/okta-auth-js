@@ -9,3 +9,4 @@ testenv
 junit.xml
 yarn-error.*
 coverage
+testenv.yml
