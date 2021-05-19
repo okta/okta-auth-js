@@ -14,13 +14,17 @@ import {
   EnrollOrChallengeAuthenticatorValues,
   ReEnrollAuthenticator,
   ReEnrollAuthenticatorValues,
-  RedirectIdp
+  RedirectIdp,
+  AuthenticatorEnrollmentData,
+  AuthenticatorEnrollmentDataValues
 } from './remediators';
 
 const flow: RemediationFlow = {
   'identify': Identify,
   'select-authenticator-authenticate': SelectAuthenticator,
+  'authenticator-enrollment-data': AuthenticatorEnrollmentData,
   'challenge-authenticator': EnrollOrChallengeAuthenticator,
+  'enroll-authenticator': EnrollOrChallengeAuthenticator,
   'reenroll-authenticator': ReEnrollAuthenticator,
   'redirect-idp': RedirectIdp
 };
@@ -30,7 +34,8 @@ export interface AuthenticationOptions extends
   IdentifyValues,
   SelectAuthenticatorValues,
   EnrollOrChallengeAuthenticatorValues,
-  ReEnrollAuthenticatorValues {
+  ReEnrollAuthenticatorValues,
+  AuthenticatorEnrollmentDataValues {
 }
 
 export async function authenticate(
@@ -52,7 +57,9 @@ export async function authenticate(
     flow,
     allowedNextSteps: [
       'select-authenticator-authenticate',
+      'authenticator-enrollment-data',
       'challenge-authenticator',
+      'enroll-authenticator',
       'reenroll-authenticator',
       'redirect-idp',
     ]
