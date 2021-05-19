@@ -12,7 +12,7 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { urlParamsToObject } from './util';
+import { isInteractionRequiredError, urlParamsToObject } from './util';
 import { ParseFromUrlOptions, TokenResponse, CustomUrls, TransactionMeta } from '../types';
 import { isString } from '../util';
 import { handleOAuthResponse } from './handleOAuthResponse';
@@ -79,8 +79,15 @@ export function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promis
         responseMode === 'query' ? removeSearch(sdk) : removeHash(sdk);
       }
       return handleOAuthResponse(sdk, oauthParams, res, urls)
-        .finally(() => {
+        .catch(err => {
+          if (!isInteractionRequiredError(err)) {
+            sdk.transactionManager.clear();
+          }
+          throw err;
+        })
+        .then(res => {
           sdk.transactionManager.clear();
+          return res;
         });
     });
 }
