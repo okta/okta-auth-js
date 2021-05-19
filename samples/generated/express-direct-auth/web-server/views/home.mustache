@@ -11,29 +11,56 @@
       <div id="doc" class="column eight wide">
         <div class="doc-overview text container">
 
-          <h2 class="ui dividing header" data-se="overview-doc-header">
-            Welcome to the Okta Samples for ExpressJS
-          </h2>
+          {{^isLoggedIn}}
+            <h2 class="ui dividing header" data-se="overview-doc-header">
+              Welcome to the Okta Samples for ExpressJS
+            </h2>
 
-          <p>
-            Congrats on starting this sample application in ExpressJS! This sample will demonstrate how to build views that facilitate some common authentication flows:
-          </p>
-          <ul>
-            <li>Sign In</li>
-            <li>Sign Up</li>
-            <li>Password Recovery</li>
-            <li>Logout</li>
-          </ul>
+            <p>
+              Congrats on starting this sample application in ExpressJS! This sample will demonstrate how to build views that facilitate some common authentication flows:
+            </p>
+            <ul>
+              <li>Sign In</li>
+              <li>Sign Up</li>
+              <li>Password Recovery</li>
+              <li>Logout</li>
+            </ul>
 
-          <p>
-            To learn more about enabling advanced authentication use cases in this application, check out <a href="/todo">this guide</a>. 
-            To get started, click a button below.
-          </p>
+            <p>
+              To learn more about enabling advanced authentication use cases in this application, check out <a href="/todo">this guide</a>. 
+              To get started, click a button below.
+            </p>
 
-          <div class="row">
-            <button class="ui primary basic button" onclick="location.href='/register'">Register</button>
-            <button class="ui primary basic button" onclick="location.href='/login'">Login</button>
-          </div>
+            <div class="row">
+              <button class="ui primary basic button" onclick="location.href='/register'">Register</button>
+              <button class="ui primary basic button" onclick="location.href='/login'">Login</button>
+            </div>
+          {{/isLoggedIn}}
+
+          {{#isLoggedIn}}
+            <h2 class="ui dividing header" data-se="overview-doc-header">
+              Welcome, {{userinfo.name}}
+            </h2>
+
+            <p>You have successfully logged in!</p>
+
+            <table class="ui table compact collapsing">
+              <thead>
+                <tr>
+                  <th>Claim</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#attributes}}
+                  <tr>
+                    <td>{{0}}</td>
+                    <td id="claim-{{0}}">{{1}}</td>
+                  </tr>
+                {{/attributes}}
+              </tbody>
+            </table>
+          {{/isLoggedIn}}
 
         </div>
       </div>
