@@ -38,18 +38,28 @@
             </div>
           </div>
           <button id="submit-login-form" class="ui fluid large primary submit button" type="submit">
-            Sign In
+            LOGIN
           </button>
         </form>
       </div>
 
       <div class="ui row grid">
         <div class="ui messages row">
-          Don't have an account? &nbsp; <a href="/signup">Sign Up</a>
+          <a href="/recover-password">Forgot your password?</a>
         </div>
+
+        {{#hasIdps}}
+          <div class="ui row">
+            {{#idps}}
+              <a href={{href}}>{{name}}</a>
+            {{/idps}}
+          </div>
+        {{/hasIdps}}
+
         <div class="ui messages row">
-          Forgot password? &nbsp; <a href="/recover-password">Recover password</a>
+          <a href="/signup">Sign Up</a>
         </div>
+        
       </div>
 
     </div>

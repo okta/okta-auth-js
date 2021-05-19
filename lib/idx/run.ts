@@ -1,4 +1,4 @@
-/* eslint-disable max-statements */
+/* eslint-disable max-statements, complexity */
 import { interact } from './interact';
 import { remediate } from './remediate';
 import { FlowMonitor } from './flowMonitors';

@@ -1,5 +1,4 @@
-/* eslint-disable max-statements */
-/* eslint-disable complexity */
+/* eslint-disable max-statements, max-depth, complexity */
 import idx from '@okta/okta-idx-js';
 import { AuthSdkError } from '../errors';
 import { Remediator, RemediationValues } from './remediators';
@@ -122,13 +121,16 @@ export async function remediate(
   const remediator = getRemediator(neededToProceed, values, options);
   
   if (!remediator) {
-    throw new AuthSdkError(
-      'No remediation can match current flow, check policy settings in your org'
-    );
+    throw new AuthSdkError(`
+      No remediation can match current flow, check policy settings in your org.
+      Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
+    `);
   }
 
   if (flowMonitor.shouldBreak(remediator)) {
-    throw new AuthSdkError('Remediation run into loop, break!!!');
+    throw new AuthSdkError(`
+      Remediation run into loop, break!!! remediation: ${remediator.getName()}
+    `);
   }
 
   // Recursive loop breaker

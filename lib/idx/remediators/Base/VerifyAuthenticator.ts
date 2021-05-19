@@ -43,6 +43,7 @@ export class VerifyAuthenticator extends Remediator {
     return {
       ...input.form.value[0],
       name,
+      type: 'string',
       required: input.required
     };
   }
@@ -57,7 +58,7 @@ export class VerifyAuthenticator extends Remediator {
 
   getValues() {
     const authenticators = this.values.authenticators
-      .filter(authenticator => authenticator !== this.remediation.relatesTo.value.type);
+      ?.filter(authenticator => authenticator !== this.remediation.relatesTo.value.type);
     return { ...this.values, authenticators };
   }
 }

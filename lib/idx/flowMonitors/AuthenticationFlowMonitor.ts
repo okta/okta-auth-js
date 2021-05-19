@@ -17,6 +17,14 @@ export class AuthenticationFlowMonitor extends FlowMonitor {
       return false;
     }
 
+    if (remediatorName === 'select-authenticator-enroll' 
+      && [
+          'select-authenticator-enroll', 
+          'authenticator-enrollment-data'
+        ].includes(prevRemediatorName)) {
+      return false;
+    }
+
     return super.isRemediatorCandidate(remediator);
   }
 }

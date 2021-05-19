@@ -99,7 +99,6 @@ export class Remediator {
 
   // Get inputs for the next step
   getInputs() {
-    // TODO: implement
     if (!this.map) {
       return [];
     }
@@ -130,7 +129,7 @@ export class Remediator {
       } 
 
       if (!input) {
-        throw new AuthSdkError('Missing custom getInput method in Remediator');
+        throw new AuthSdkError(`Missing custom getInput method in Remediator: ${this.getName()}`);
       }
 
       inputs.push(input);

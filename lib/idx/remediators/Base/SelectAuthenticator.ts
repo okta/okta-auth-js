@@ -77,6 +77,14 @@ export class SelectAuthenticator extends Remediator {
     };
   }
 
+  getInputAuthenticator() {
+    // TODO: return inputs to indicate methodType
+    return {
+      name: 'authenticators',
+      type: 'string[]',
+    };
+  }
+
   getValues(): SelectAuthenticatorValues {
     const authenticators = this.values.authenticators
       .filter(authenticator => authenticator !== this.selectedAuthenticator);

@@ -7,8 +7,8 @@ export class RegistrationFlowMonitor extends FlowMonitor {
     const remediatorName = remediator.getName();
     if (remediatorName === 'select-authenticator-enroll' 
       && [
-        'select-authenticator-enroll', 
-        'authenticator-enrollment-data'
+          'select-authenticator-enroll', 
+          'authenticator-enrollment-data'
         ].includes(prevRemediatorName)) {
       return false;
     }
