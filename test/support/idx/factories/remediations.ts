@@ -1,5 +1,5 @@
 import { Factory } from 'fishery';
-import { IdxRemediation, IdxAuthenticator, IdxForm } from '../../../../lib/idx/types';
+import { IdxRemediation, IdxAuthenticator, IdxForm } from '../../../../lib/idx/types/idx-js';
 import {
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory

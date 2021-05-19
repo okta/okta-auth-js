@@ -15,7 +15,7 @@ import {
   ReEnrollAuthenticatorValues,
   RedirectIdp,
   AuthenticatorEnrollmentData,
-  AuthenticatorEnrollmentDataValues
+  AuthenticatorEnrollmentDataValues,
   SelectAuthenticatorEnroll,
   SelectAuthenticatorEnrollValues,
   EnrollAuthenticator,

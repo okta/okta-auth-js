@@ -35,13 +35,14 @@ export interface IdxRemediationValue {
   label?: string;
   form?: IdxForm;
   options?: IdxOption[];
+  messages?: IdxMessages;
 }
 
 export interface IdxRemediation {
   name: string;
   label?: string;
   value: IdxRemediationValue[];
-  relatesTo: {
+  relatesTo?: {
     type?: string;
     value: IdxAuthenticator;
   };

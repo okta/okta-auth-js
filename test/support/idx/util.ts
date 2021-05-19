@@ -1,4 +1,4 @@
-import { IdxResponse } from '../../../lib/idx/types';
+import { IdxResponse } from '../../../lib/idx/types/idx-js';
 
 export function chainResponses(responses: IdxResponse[]) {
   for (let i = 0; i < responses.length; i++) {
