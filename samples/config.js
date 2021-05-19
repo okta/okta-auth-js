@@ -80,7 +80,7 @@ const samples = [
     name: 'express-direct-auth-dynamic',
     template: 'express-direct-auth-dynamic',
     specs: [],
-    features: ['basic-auth']
+    features: []
   },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {
