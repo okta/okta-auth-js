@@ -4,6 +4,7 @@ import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import http from '../../../lib/http';
+import { isInteractionRequiredError } from '../../../lib/oidc';
 
 describe('token.parseFromUrl', function() {
   function mockPKCE(response) {
@@ -436,6 +437,7 @@ describe('token.parseFromUrl', function() {
     };
     return oauthUtil.setupParseUrl({
       willFail: true,
+      shouldClearTransaction: false,
       hashMock: '',
       oauthParams: JSON.stringify({
         responseType: ['id_token', 'token'],
@@ -469,6 +471,7 @@ describe('token.parseFromUrl', function() {
 
     return oauthUtil.setupParseUrl({
       willFail: true,
+      shouldClearTransaction: false,
       hashMock: '#access_token=' + tokens.standardAccessToken +
                 '&id_token=' + tokens.standardIdToken +
                 '&expires_in=3600' +
@@ -648,7 +651,41 @@ describe('token.parseFromUrl', function() {
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
     });
-
   });
+
+  describe('interaction code flow', () => {
+    it('Does not clear storage when "error" param is "interaction_required"', () => {
+      const error = {
+        name: 'OAuthError',
+        message: 'fake_description',
+        errorCode: 'interaction_required',
+        errorSummary: 'fake_description',
+        errorId: 'INTERNAL',
+        errorCauses: []
+      };
+      return oauthUtil.setupParseUrl({
+        willFail: true,
+        shouldClearTransaction: false,
+        hashMock: '#error=interaction_required&error_description=fake_description',
+        oauthParams: JSON.stringify({
+          responseType: ['id_token', 'token'],
+          state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          scopes: ['openid', 'email'],
+          urls: {
+            issuer: 'https://auth-js-test.okta.com',
+            tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+            authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+            userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+          }
+        })
+      })
+      .catch(function(e) {
+        util.expectErrorToEqual(e, error);
+        expect(isInteractionRequiredError(e)).toBe(true);
+      });
+    });
+  });
+
 
 });

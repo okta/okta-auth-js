@@ -493,6 +493,8 @@ oauthUtil.setupParseUrl = function(opts) {
   jest.spyOn(storageUtil, 'browserHasSessionStorage')
     .mockImplementation(() => !!opts.hasSessionStorage);
   
+  jest.spyOn(client.transactionManager, 'clear');
+
   return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {
       var expectedResp = opts.expectedResp;
@@ -510,6 +512,13 @@ oauthUtil.setupParseUrl = function(opts) {
         expect(replaceStateSpy).toHaveBeenCalledWith(null, 'Test', '/test/path#test=true');
       } else {
         expect(replaceStateSpy).toHaveBeenCalledWith(null, 'Test', '/test/path?test=true');
+      }
+    })
+    .finally(() => {
+      if (opts.shouldClearTransaction === false) {
+        expect(client.transactionManager.clear).not.toHaveBeenCalled();
+      } else {
+        expect(client.transactionManager.clear).toHaveBeenCalled();
       }
     });
 };
