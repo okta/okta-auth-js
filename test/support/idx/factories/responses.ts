@@ -25,7 +25,8 @@ export const IdxResponseFactory = Factory.define<IdxResponse, MockedIdxResponseT
       stateHandle: transientParams.stateHandle,
     },
     actions: {},
-    toPersist: {}
+    toPersist: {},
+    context: {}
   };
 });
 
