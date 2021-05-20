@@ -53,7 +53,7 @@ function runWithConfig(sampleConfig) {
 
     let returnCode = 1;
     runner.on('exit', function (code) {
-      console.log('Test runner exited with code: ' + code);
+      console.log('Test runner exited with code: ', code);
       returnCode = code;
       server.kill();
     });
@@ -62,10 +62,13 @@ function runWithConfig(sampleConfig) {
       throw err;
     });
     server.on('exit', function(code) {
-      console.log('Server exited with code: ' + code);
+      console.log('Server exited with code: ', code);
       // eslint-disable-next-line no-process-exit
       process.exit(returnCode);
     });
+    process.on('exit', function() {
+      console.log('Process exited with code: ', returnCode);
+    })
   });
 }
 

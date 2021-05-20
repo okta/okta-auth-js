@@ -46,30 +46,29 @@ const templateDefaults = {
   }, webDefaults)
 };
 
-// TODO: enable specs for spa/web apps after figuring out how to properly map org/policy to specs
 const samples = [
   {
     name: 'static-spa',
     template: 'static-spa',
-    // specs: ['spa-app'],
+    specs: ['spa-app'],
     features: []
   },
   {
     name: 'webpack-spa',
     template: 'webpack-spa',
-    // specs: ['spa-app'],
+    specs: ['spa-app'],
     features: []
   },
   {
     name: 'express-web-no-oidc',
     template: 'express-web',
-    // specs: ['web-app'],
+    specs: ['web-app'],
     oidc: false
   },
   {
     name: 'express-web-with-oidc',
     template: 'express-web',
-    // specs: ['web-app']
+    specs: ['web-app']
   },
   {
     name: 'express-direct-auth',
