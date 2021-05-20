@@ -6,6 +6,30 @@
 
 - [#730](https://github.com/okta/okta-auth-js/pull/730) `updateAuthState` returns a Promise.
 
+## 5.0.2
+
+### Bug Fixes
+
+- [#742](https://github.com/okta/okta-auth-js/pull/742) Fixes an issue where storage was being incorrectly cleared after an IDP redirect
+
+## 5.0.1
+
+### Bug Fixes
+
+- [#731](https://github.com/okta/okta-auth-js/pull/731) Fixes issue with `handleLoginRedirect` where a redirect could occur after an exception was thrown.
+
+## 4.9.2
+
+### Bug Fixes
+
+- [#742](https://github.com/okta/okta-auth-js/pull/742) Fixes an issue where storage was being incorrectly cleared after an IDP redirect
+
+## 4.9.1
+
+### Bug Fixes
+
+- [#731](https://github.com/okta/okta-auth-js/pull/731) Fixes issue with `handleLoginRedirect` where a redirect could occur after an exception was thrown.
+  
 ## 5.0.0
 
 ### Features
