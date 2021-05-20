@@ -1,23 +1,22 @@
 const login = require('./login');
-const basicLogin = require('./basic-login');
-const multifactorLogin = require('./multifactor-login');
 const logout = require('./logout');
-const signup = require('./signup');
+const register = require('./register');
 const recoverPassword = require('./recover-password');
+const authenticator = require('./authenticator');
 const cancel = require('./cancel');
 const home = require('./home');
-const protected = require('./protected');
 const terminal = require('./terminal');
 
 module.exports = [
-  basicLogin,
-  multifactorLogin,
+  // idx routes
   login,
   logout,
-  signup,
+  register,
   recoverPassword,
+  authenticator,
   cancel,
+
+  // general routes
   home,
-  protected,
   terminal,
 ];

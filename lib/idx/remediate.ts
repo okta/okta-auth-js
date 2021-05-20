@@ -1,20 +1,14 @@
-/* eslint-disable max-statements */
-/* eslint-disable complexity */
+/* eslint-disable max-statements, max-depth, complexity */
 import idx from '@okta/okta-idx-js';
 import { AuthSdkError } from '../errors';
-import { Base as Remediator } from './remediators';
-import { RunOptions } from './run';
-import LoopMonitor from './RemediationLoopMonitor';
+import { Remediator, RemediationValues } from './remediators';
+import { RunOptions, RemediationFlow } from './run';
+import { NextStep, IdxMessage } from './types';
 import { 
   IdxResponse, 
   isRawIdxResponse, 
-  RemediationFlow, 
-  RemediationValues,
-  NextStep,
-  IdxRemediation,
-  IdxMessage,
-} from '../types';
-import { canSkip as canSkipFn } from './util';
+  IdxRemediation, 
+} from './types/idx-js';
 
 interface RemediationResponse {
   idxResponse?: IdxResponse;
@@ -22,15 +16,16 @@ interface RemediationResponse {
   canSkip?: boolean;
   messages?: IdxMessage[];
   terminal?: boolean;
+  canceled?: boolean;
 }
-
 // Return first match idxRemediation in allowed remediators
 export function getRemediator(
-  flow: RemediationFlow, 
-  allowedNextSteps: string[],
   idxRemediations: IdxRemediation[],
   values: RemediationValues,
+  options: RunOptions,
 ): Remediator {
+  const { flow, flowMonitor } = options;
+
   let remediator;
   const remediatorCandidates = [];
   for (let remediation of idxRemediations) {
@@ -44,28 +39,33 @@ export function getRemediator(
     if (remediator.canRemediate()) {
       // found the remediator
       return remediator;
-    } else {
+    } else if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations)) {
       // remediator cannot handle the current values
       // maybe return for next step
       remediatorCandidates.push(remediator);
     }
   }
-
-  const res = remediatorCandidates.filter(remediatorCandidate => {
-    const name = remediatorCandidate.getName();
-    return allowedNextSteps.includes(name);
-  });
   
-  if (res.length > 1) {
-    throw new AuthSdkError('More than one remediation can match the current input');
+  if (remediatorCandidates.length > 1) {
+    const remediationNames = remediatorCandidates.reduce((acc, curr) => {
+      const name = curr.getName();
+      return acc ? `${acc}, ${name}` : name;
+    }, '');
+    throw new AuthSdkError(`
+      More than one remediation can match the current input, remediations: ${remediationNames}
+    `);
   }
 
-  return res[0];
+  return remediatorCandidates[0];
 }
 
 function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
   return !neededToProceed.length && !interactionCode;
+}
+
+function canSkipFn(idxResponse: IdxResponse) {
+  return idxResponse.neededToProceed.some(({ name }) => name === 'skip');
 }
 
 export function getIdxMessages(
@@ -88,7 +88,9 @@ export function getIdxMessages(
     }
     const remediator = new T(remediation);
     const fieldMessages = remediator.getMessages();
-    messages = [...messages, ...fieldMessages];
+    if (fieldMessages) {
+      messages = [...messages, ...fieldMessages];
+    }
   }
 
   return messages;
@@ -98,32 +100,37 @@ export function getIdxMessages(
 export async function remediate(
   idxResponse: IdxResponse,
   values: RemediationValues,
-  loopMonitor: LoopMonitor,
   options: RunOptions
 ): Promise<RemediationResponse> {
   const { neededToProceed } = idxResponse;
-  const { actions, flow, allowedNextSteps } = options;
+  const { actions, flow, flowMonitor } = options;
   
   // Try actions in idxResponse first
   if (actions) {
     for (let action of actions) {
       if (typeof idxResponse.actions[action] === 'function') {
         idxResponse = await idxResponse.actions[action]();
-        return remediate(idxResponse, values, loopMonitor, options); // recursive call
+        if (action === 'cancel') {
+          return { canceled: true };
+        }
+        return remediate(idxResponse, values, options); // recursive call
       }
     }
   }
 
-  const remediator = getRemediator(flow, allowedNextSteps, neededToProceed, values);
+  const remediator = getRemediator(neededToProceed, values, options);
   
   if (!remediator) {
-    throw new AuthSdkError(
-      'No remediation can match current flow, check policy settings in your org'
-    );
+    throw new AuthSdkError(`
+      No remediation can match current flow, check policy settings in your org.
+      Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
+    `);
   }
 
-  if (loopMonitor.shouldBreak(remediator)) {
-    throw new AuthSdkError('Remediation run into loop, break!!!');
+  if (flowMonitor.shouldBreak(remediator)) {
+    throw new AuthSdkError(`
+      Remediation run into loop, break!!! remediation: ${remediator.getName()}
+    `);
   }
 
   // Recursive loop breaker
@@ -163,7 +170,7 @@ export async function remediate(
     // We may want to trim the values bag for the next remediation
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValues();
-    return remediate(idxResponse, values, loopMonitor, options); // recursive call
+    return remediate(idxResponse, values, options); // recursive call
   } catch (e) {
     // Handle idx messages
     if (isRawIdxResponse(e)) {

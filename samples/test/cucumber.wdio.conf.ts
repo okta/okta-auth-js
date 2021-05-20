@@ -218,7 +218,15 @@ export const config: WebdriverIO.Config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter.html
-    reporters: ['spec'],
+    reporters: [
+      'spec',
+      ['junit', {
+          outputDir: '../../build2/reports/e2e',
+          outputFileFormat: function() { // optional
+              return 'junit-results.xml';
+          }
+      }]
+    ],
 
     //
     // =====

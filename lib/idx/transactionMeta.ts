@@ -19,7 +19,17 @@ export async function createTransactionMeta(authClient: OktaAuth) {
   return authClient.token.prepareTokenParams();
 }
 
-export async function getTransactionMeta (authClient: OktaAuth): Promise<IdxTransactionMeta> {
+export function transactionMetaExist(authClient: OktaAuth): boolean {
+  if (authClient.transactionManager.exists()) {
+    const existing = authClient.transactionManager.load() as IdxTransactionMeta;
+    if (isTransactionMetaValid(authClient, existing) && existing.interactionHandle) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export async function getTransactionMeta(authClient: OktaAuth): Promise<IdxTransactionMeta> {
   // Load existing transaction meta from storage
   if (authClient.transactionManager.exists()) {
     const existing = authClient.transactionManager.load();

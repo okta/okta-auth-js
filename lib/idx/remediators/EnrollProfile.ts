@@ -1,4 +1,4 @@
-import { Base, RemediationValues } from './Base';
+import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface EnrollProfileValues extends RemediationValues {
   firstName?: string;
@@ -6,11 +6,13 @@ export interface EnrollProfileValues extends RemediationValues {
   email?: string;
 }
 
-export class EnrollProfile extends Base {
+export class EnrollProfile extends Remediator {
+  static remediationName = 'enroll-profile';
+
   values: EnrollProfileValues;
 
   map = {
-    'userProfile': ['firstName', 'lastName', 'email']
+    'userProfile': []
   };
 
   mapUserProfile() {

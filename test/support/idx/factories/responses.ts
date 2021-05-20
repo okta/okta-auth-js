@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { Factory } from 'fishery';
-import { IdxResponse } from '../../../../lib/idx/types';
+import { IdxResponse } from '../../../../lib/idx/types/idx-js';
 import {
   IdentifyRemediationFactory,
   IdentifyWithPasswordRemediationFactory,

@@ -40,4 +40,3 @@ If running from the workspace directory, add the `--cwd` option: `yarn --cwd sam
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
 | `yarn start`          | Starts the app server |
-

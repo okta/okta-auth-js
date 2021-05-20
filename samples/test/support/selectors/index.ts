@@ -4,7 +4,6 @@ import OktaSignInV1 from './OktaSignInV1';
 import OktaSignInOIE from './OktaSignInOIE';
 import Unauth from './Unauth';
 import UserHome from './UserHome';
-import UserProfile from './UserProfile';
 
 export {
   LoginForm,
@@ -13,5 +12,4 @@ export {
   OktaSignInOIE,
   Unauth,
   UserHome,
-  UserProfile
 };

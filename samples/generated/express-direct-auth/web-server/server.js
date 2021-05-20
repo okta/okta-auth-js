@@ -9,7 +9,7 @@ const {
   userContext, 
   lastError, 
   authTransaction,
-  idxMessages, 
+  idxStates, 
   testEnv
 } = require('./middlewares');
 
@@ -30,7 +30,7 @@ app.use(session({
   saveUninitialized: false
 }));
 app.use(lastError);
-app.use(idxMessages);
+app.use(idxStates);
 app.use(authTransaction);
 
 // Provide the configuration to the view layer because we show it on the homepage

@@ -11,8 +11,13 @@
  */
 
 import idx from '@okta/okta-idx-js';
-import { OktaAuth, IntrospectOptions } from '../types';
+import { OktaAuth } from '../types';
+import { AcceptsInteractionHandle } from './types/AcceptsInteractionHandle';
 import { IDX_API_VERSION } from '../constants';
+
+interface IntrospectOptions extends AcceptsInteractionHandle {
+  stateHandle?: string;
+}
 
 export async function introspect (authClient: OktaAuth, options: IntrospectOptions) {
   const domain = authClient.options.issuer.split('/oauth2')[0];

@@ -1,22 +1,22 @@
 const express = require('express');
 const { 
   getAuthClient,
-  handleAuthTransaction,
+  handleTransaction,
   renderTemplate,
 } = require('../../utils');
 
 const router = express.Router();
 
-const next = ({ nextStep, req, res }) => {
+const proceed = ({ nextStep, req, res }) => {
   renderTemplate(req, res, 'login-with-idp', nextStep);
   return true;
 };
 
-router.get('/with-idp', async (req, res) => {
+router.get('/with-idp', async (req, res, next) => {
   const authClient = getAuthClient(req);
   try {
-    const authTransaction = await authClient.idx.authenticate({ state: req.transactionId });
-    handleAuthTransaction({ req, res, next, authClient, authTransaction });
+    const transaction = await authClient.idx.authenticate({ state: req.transactionId });
+    handleTransaction({ req, res, next, authClient, transaction, proceed });
   } catch (error) {
     authClient.transactionManager.clear();
     req.setLastError(error);

@@ -1,10 +1,12 @@
-import { Base, RemediationValues } from './Base';
+import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface SkipValues extends RemediationValues {
   skip?: boolean;
 }
 
-export class Skip extends Base {
+export class Skip extends Remediator {
+  static remediationName = 'skip';
+
   values: SkipValues;
 
   canRemediate() {

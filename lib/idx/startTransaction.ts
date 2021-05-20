@@ -1,13 +1,10 @@
-import { interact } from './interact';
-import { OktaAuth, IdxOptions, IdxTransaction, IdxStatus } from '../types';
+import { run } from './run';
+import { OktaAuth, IdxOptions, IdxTransaction } from '../types';
 
+// This method only resolves { status: IdxStatus.PENDING } if transaction has already started
 export async function startTransaction(
   authClient: OktaAuth, 
-  options: IdxOptions
+  options: IdxOptions = {}
 ): Promise<IdxTransaction> {
-  // TODO: call run to return IdxTransaction
-  const {
-    meta,
-  } = await interact(authClient, options);
-  return { status: IdxStatus.PENDING, meta };
+  return run(authClient, options);
 }

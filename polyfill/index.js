@@ -1,5 +1,6 @@
 // Polyfills objects needed to support IE 11+
 require('core-js/features/object/assign');
+require('core-js/features/object/values');
 require('core-js/es/promise');
 require('core-js/es/typed-array/uint8-array');
 require('core-js/features/array/from');

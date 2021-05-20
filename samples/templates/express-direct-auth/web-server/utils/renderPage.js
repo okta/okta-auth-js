@@ -2,7 +2,7 @@ const { IdxStatus } = require('@okta/okta-auth-js');
 const redirect = require('./redirect');
 
 module.exports = function renderPage({ req, res, render, basePath }) {
-  const { status } = req.session;
+  const { status } = req.getIdxStates();
   if (status === IdxStatus.PENDING) {
     render();
   } else {

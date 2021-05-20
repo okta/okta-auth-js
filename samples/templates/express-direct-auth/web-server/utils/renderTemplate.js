@@ -7,8 +7,8 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     action: getFormActionPath(req, options.action),
     skipAction: getFormActionPath(req, options.skipAction),
   };
-  const messages = req.getIdxMessages();
-  req.clearIdxMessages();
+  const { messages } = req.getIdxStates() || {};
+  req.clearIdxStates();
   if (messages && messages.length) {
     renderMessages(res, {
       template,

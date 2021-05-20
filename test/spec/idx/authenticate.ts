@@ -254,7 +254,14 @@ describe('idx/authenticate', () => {
       expect(res.nextStep).toEqual({
         canSkip: false,
         name: 'enroll-authenticator',
-        type: 'phone'
+        type: 'phone',
+        inputs: [{
+          _testSeq: 4,
+          label: 'Enter code',
+          name: 'verificationCode',
+          required: true,
+          type: 'string',
+        }]
       });
       expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
       expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' }});

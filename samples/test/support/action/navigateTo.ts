@@ -11,7 +11,7 @@ export default async (
   let selector;
   switch (formName) {
     case 'Login with Username and Password': {
-        url = '/basic-login';
+        url = '/login';
         selector = LoginForm.password;
         queryParams = { flow: 'form' };
         break;

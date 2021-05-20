@@ -1,55 +1,61 @@
-import { 
-  IdxOptions, 
-  IdxTransaction, 
-  OktaAuth, 
-  RemediationFlow, 
-} from '../types';
-import { run } from './run';
+import { run, RemediationFlow } from './run';
+import { transactionMetaExist } from './transactionMeta';
+import { startTransaction } from './startTransaction';
 import { 
   SelectEnrollProfile,
-  SelectEnrollProfileValues,
   EnrollProfile,
   EnrollProfileValues,
-  SelectAuthenticator,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticator,
-  EnrollOrChallengeAuthenticatorValues,
+  SelectAuthenticatorEnroll,
+  SelectAuthenticatorEnrollValues,
+  EnrollAuthenticator,
+  EnrollAuthenticatorValues,
   AuthenticatorEnrollmentData,
   AuthenticatorEnrollmentDataValues,
   Skip,
   SkipValues,
 } from './remediators';
+import { RegistrationFlowMonitor } from './flowMonitors';
+import { AuthSdkError } from '../errors';
+import { 
+  IdxOptions, 
+  IdxTransaction, 
+  OktaAuth, 
+  IdxFeature,
+  IdxStatus,
+} from '../types';
 
 const flow: RemediationFlow = {
   'select-enroll-profile': SelectEnrollProfile,
   'enroll-profile': EnrollProfile,
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
-  'select-authenticator-enroll': SelectAuthenticator,
-  'enroll-authenticator': EnrollOrChallengeAuthenticator,
+  'select-authenticator-enroll': SelectAuthenticatorEnroll,
+  'enroll-authenticator': EnrollAuthenticator,
   'skip': Skip,
 };
 
-export interface RegistrationOptions extends 
-  IdxOptions,
-  SelectEnrollProfileValues,
-  EnrollProfileValues,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticatorValues,
-  AuthenticatorEnrollmentDataValues,
-  SkipValues {
-}
+export type RegistrationOptions = IdxOptions 
+  & EnrollProfileValues 
+  & SelectAuthenticatorEnrollValues 
+  & EnrollAuthenticatorValues 
+  & AuthenticatorEnrollmentDataValues 
+  & SkipValues;
 
 export async function register(
   authClient: OktaAuth, options: RegistrationOptions
 ): Promise<IdxTransaction> {
+  // Only check at the beginning of the transaction
+  if (!transactionMetaExist(authClient)) {
+    const { enabledFeatures } = await startTransaction(authClient, options);
+    if (enabledFeatures && !enabledFeatures.includes(IdxFeature.REGISTRATION)) {
+      const error = new AuthSdkError('Registration is not supported based on your current org configuration.');
+      return { status: IdxStatus.FAILURE, error };
+    }
+  }
+  
+  const flowMonitor = new RegistrationFlowMonitor();
   return run(authClient, { 
     ...options, 
     flow,
-    allowedNextSteps: [
-      'enroll-profile',
-      'authenticator-enrollment-data',
-      'select-authenticator-enroll',
-      'enroll-authenticator'
-    ]
+    flowMonitor,
   });
 }

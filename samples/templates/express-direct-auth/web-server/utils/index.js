@@ -1,7 +1,7 @@
 const getAuthClient = require('./getAuthClient');
 const getAuthTransaction = require('./getAuthTransaction');
 const renderMessages = require('./renderMessages');
-const handleAuthTransaction = require('./handleAuthTransaction');
+const handleTransaction = require('./handleTransaction');
 const renderTemplate = require('./renderTemplate');
 const renderPage = require('./renderPage');
 const redirect = require('./redirect');
@@ -11,7 +11,7 @@ module.exports = {
   getAuthClient,
   getAuthTransaction,
   renderMessages,
-  handleAuthTransaction,
+  handleTransaction,
   renderTemplate,
   renderPage,
   redirect,

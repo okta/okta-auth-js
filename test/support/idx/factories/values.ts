@@ -1,5 +1,5 @@
 import { Factory } from 'fishery';
-import { IdxRemediationValue } from '../../../../lib/idx/types';
+import { IdxRemediationValue } from '../../../../lib/idx/types/idx-js';
 import { PasswordFormFactory } from './forms';
 
 interface MockedIdxValue extends IdxRemediationValue {

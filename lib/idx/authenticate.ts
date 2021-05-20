@@ -2,41 +2,46 @@ import {
   OktaAuth,
   IdxOptions,
   IdxTransaction,
-  RemediationFlow,
 } from '../types';
-import { run } from './run';
+import { run, RemediationFlow } from './run';
 import { 
   Identify,
   IdentifyValues,
-  SelectAuthenticator,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticator,
-  EnrollOrChallengeAuthenticatorValues,
+  SelectAuthenticatorAuthenticate,
+  SelectAuthenticatorAuthenticateValues,
+  ChallengeAuthenticator,
+  ChallengeAuthenticatorValues,
   ReEnrollAuthenticator,
   ReEnrollAuthenticatorValues,
   RedirectIdp,
   AuthenticatorEnrollmentData,
-  AuthenticatorEnrollmentDataValues
+  AuthenticatorEnrollmentDataValues,
+  SelectAuthenticatorEnroll,
+  SelectAuthenticatorEnrollValues,
+  EnrollAuthenticator,
+  EnrollAuthenticatorValues,
 } from './remediators';
+import { AuthenticationFlowMonitor } from './flowMonitors';
 
 const flow: RemediationFlow = {
   'identify': Identify,
-  'select-authenticator-authenticate': SelectAuthenticator,
+  'select-authenticator-authenticate': SelectAuthenticatorAuthenticate,
+  'select-authenticator-enroll': SelectAuthenticatorEnroll,
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
-  'challenge-authenticator': EnrollOrChallengeAuthenticator,
-  'enroll-authenticator': EnrollOrChallengeAuthenticator,
+  'enroll-authenticator': EnrollAuthenticator,
+  'challenge-authenticator': ChallengeAuthenticator,
   'reenroll-authenticator': ReEnrollAuthenticator,
   'redirect-idp': RedirectIdp
 };
 
-export interface AuthenticationOptions extends 
-  IdxOptions,
-  IdentifyValues,
-  SelectAuthenticatorValues,
-  EnrollOrChallengeAuthenticatorValues,
-  ReEnrollAuthenticatorValues,
-  AuthenticatorEnrollmentDataValues {
-}
+export type AuthenticationOptions = IdxOptions 
+  & IdentifyValues 
+  & SelectAuthenticatorAuthenticateValues 
+  & SelectAuthenticatorEnrollValues
+  & ChallengeAuthenticatorValues 
+  & ReEnrollAuthenticatorValues
+  & AuthenticatorEnrollmentDataValues
+  & EnrollAuthenticatorValues;
 
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions
@@ -52,16 +57,10 @@ export async function authenticate(
     };
   }
 
+  const flowMonitor = new AuthenticationFlowMonitor();
   return run(authClient, { 
     ...options, 
     flow,
-    allowedNextSteps: [
-      'select-authenticator-authenticate',
-      'authenticator-enrollment-data',
-      'challenge-authenticator',
-      'enroll-authenticator',
-      'reenroll-authenticator',
-      'redirect-idp',
-    ]
+    flowMonitor,
   });
 }

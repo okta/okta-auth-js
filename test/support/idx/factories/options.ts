@@ -1,5 +1,5 @@
 import { Factory } from 'fishery';
-import { IdxOption, IdxAuthenticator } from '../../../../lib/idx/types';
+import { IdxOption, IdxAuthenticator } from '../../../../lib/idx/types/idx-js';
 import {
   EmailAuthenticatorFactory,
   OktaVerifyAuthenticatorFactory,

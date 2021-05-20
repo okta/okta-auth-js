@@ -1,11 +1,13 @@
-import { Base, RemediationValues } from './Base';
+import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface AuthenticatorEnrollmentDataValues extends RemediationValues {
   authenticators?: string[];
   phoneNumber?: string;
 }
 
-export class AuthenticatorEnrollmentData extends Base {
+export class AuthenticatorEnrollmentData extends Remediator {
+  static remediationName = 'authenticator-enrollment-data';
+
   values: AuthenticatorEnrollmentDataValues;
 
   map = {
@@ -29,8 +31,9 @@ export class AuthenticatorEnrollmentData extends Base {
   }
 
   getNextStep() {
+    const common = super.getNextStep();
     return {
-      name: this.remediation.name,
+      ...common,
       type: this.remediation.relatesTo.value.type,
     };
   }

@@ -1,5 +1,5 @@
 import { Factory } from 'fishery';
-import { IdxForm } from '../../../../lib/idx/types';
+import { IdxForm } from '../../../../lib/idx/types/idx-js';
 
 import {
   IdxValueFactory,
