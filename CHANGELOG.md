@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.9.2
+
+- [#742](https://github.com/okta/okta-auth-js/pull/742) Fixes an issue where storage was being incorrectly cleared after an IDP redirect
+
 ## 4.9.1
 
 ### Bug Fixes
