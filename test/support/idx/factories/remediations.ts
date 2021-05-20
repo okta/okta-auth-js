@@ -18,16 +18,12 @@ import {
 } from './values';
 
 interface MockedIdxRemediation extends IdxRemediation {
-  _testSeq: number;
   _authenticator?: IdxAuthenticator;
   _form?: IdxForm;
 }
 
-export const IdxRemediationFactory = Factory.define<MockedIdxRemediation>(({
-  sequence
-}) => {
+export const IdxRemediationFactory = Factory.define<MockedIdxRemediation>(() => {
   return {
-    _testSeq: sequence,
     name: 'unknown-remediation',
     value: []
   };
