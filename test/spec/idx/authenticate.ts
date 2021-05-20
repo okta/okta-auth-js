@@ -11,7 +11,8 @@ import {
   SelectAuthenticatorResponseFactory,
   IdxResponseFactory,
   PhoneAuthenticatorEnrollmentDataRemediationFactory,
-  EnrollPhoneAuthenticatorRemediationFactory
+  EnrollPhoneAuthenticatorRemediationFactory,
+  IdxErrorAccessDeniedFactory
 } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/interact', () => {
@@ -90,7 +91,7 @@ describe('idx/authenticate', () => {
 
     describe('identifier first', () => {
       beforeEach(() => {
-        const { stateHandle, successResponse } = testContext;
+        const { successResponse } = testContext;
         const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
         const identifyResponse =  IdentifyResponseFactory.build();
         chainResponses([
@@ -98,10 +99,6 @@ describe('idx/authenticate', () => {
           verifyPasswordResponse,
           successResponse
         ]);
-        jest.spyOn(mocked.interact, 'interact').mockResolvedValue({
-          idxResponse: identifyResponse,
-          stateHandle 
-        });
         jest.spyOn(identifyResponse, 'proceed');
         jest.spyOn(verifyPasswordResponse, 'proceed');
         Object.assign(testContext, {
@@ -111,7 +108,11 @@ describe('idx/authenticate', () => {
       });
 
       it('can authenticate, passing username and password up front', async () => {
-        const { authClient, identifyResponse, verifyPasswordResponse, tokenResponse, interactionCode } = testContext;
+        const { authClient, stateHandle, identifyResponse, verifyPasswordResponse, tokenResponse, interactionCode } = testContext;
+        jest.spyOn(mocked.interact, 'interact').mockResolvedValue({
+          idxResponse: identifyResponse,
+          stateHandle 
+        });
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
         expect(res).toEqual({
           'status': 0,
@@ -131,8 +132,68 @@ describe('idx/authenticate', () => {
         });
       });
 
-      xit('can authenticate, passing username and password on demand', async () => {
-        // TODO
+      it('can authenticate, passing username and password on demand', async () => {
+        const { authClient, stateHandle, identifyResponse, verifyPasswordResponse, tokenResponse, interactionCode } = testContext;
+        jest.spyOn(mocked.interact, 'interact')
+          .mockResolvedValueOnce({
+            idxResponse: identifyResponse,
+            stateHandle 
+          })
+          .mockResolvedValueOnce({
+            idxResponse: identifyResponse,
+            stateHandle 
+          })
+          .mockResolvedValueOnce({
+            idxResponse: verifyPasswordResponse,
+            stateHandle 
+          });
+
+        // First call: returns identify response
+        let res = await authenticate(authClient, {});
+        expect(res.status).toBe(IdxStatus.PENDING);
+        expect(res.nextStep).toEqual({
+          canSkip: false,
+          name: 'identify',
+          inputs: [{
+            name: 'username',
+            label: 'Username'
+          }]
+        });
+
+        // Second call: proceeds with identify response
+        res = await authenticate(authClient, { username: 'myuser'});
+        expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'myuser' });
+        expect(res.status).toBe(IdxStatus.PENDING);
+        expect(res.nextStep).toEqual({
+          canSkip: false,
+          name: 'challenge-authenticator',
+          type: 'password',
+          inputs: [{
+            name: 'password',
+            label: 'Password',
+            required: true,
+            secret: true,
+            type: 'string'
+          }]
+        });
+
+        // Third call: proceeds with verify password
+        res = await authenticate(authClient, { password: 'mypass'});
+        expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'mypass' }});
+        expect(res).toEqual({
+          'status': IdxStatus.SUCCESS,
+          'tokens': tokenResponse.tokens,
+        });
+        expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
+          clientId: 'meta-clientId',
+          codeVerifier: 'meta-code',
+          ignoreSignature: true,
+          interactionCode,
+          redirectUri: 'meta-redirectUri',
+          scopes: ['meta']
+        }, {
+          authorizeUrl: 'meta-authorizeUrl'
+        });
       });
 
     });
@@ -180,17 +241,83 @@ describe('idx/authenticate', () => {
         });
       });
 
-      xit('can authenticate, passing username and password on demand', async () => {
-        // TODO
+      it('can authenticate, passing username and password on demand', async () => {
+        const { authClient, identifyResponse, tokenResponse, interactionCode } = testContext;
+    
+        // First call: returns identify response
+        let res = await authenticate(authClient, {});
+        expect(res.status).toBe(IdxStatus.PENDING);
+        expect(res.nextStep).toEqual({
+          canSkip: false,
+          name: 'identify',
+          inputs: [{
+            name: 'username',
+            label: 'Username'
+          }, {
+            name: 'password',
+            label: 'Password',
+            required: true,
+            secret: true
+          }]
+        });
+
+        // Second call: proceeds with identify response
+        res = await authenticate(authClient, { username: 'myuser', password: 'mypass'});
+        expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', {
+          identifier: 'myuser',
+          credentials: {
+            passcode: 'mypass'
+          }
+        });
+        expect(res).toEqual({
+          'status': IdxStatus.SUCCESS,
+          'tokens': tokenResponse.tokens,
+        });
+        expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
+          clientId: 'meta-clientId',
+          codeVerifier: 'meta-code',
+          ignoreSignature: true,
+          interactionCode,
+          redirectUri: 'meta-redirectUri',
+          scopes: ['meta']
+        }, {
+          authorizeUrl: 'meta-authorizeUrl'
+        });
       });
 
     });
 
+    describe('error handling', () => {
+
+      it('returns raw IDX error when invalid username is provided', async () => {
+        const { stateHandle, authClient } = testContext;
+        const errorResponse = IdxErrorAccessDeniedFactory.build();
+        const identifyResponse =  IdentifyResponseFactory.build();
+        identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+        jest.spyOn(mocked.interact, 'interact').mockResolvedValue({
+          idxResponse: identifyResponse,
+          stateHandle
+        });
+
+        const res = await authenticate(authClient, { username: 'obviously-wrong' });
+        expect(res.status).toBe(IdxStatus.TERMINAL);
+        expect(res.nextStep).toBe(undefined);
+        expect(res.error).toBe(undefined); // TODO: is this expected?
+        expect(res.messages).toEqual([{
+          class: 'ERROR',
+          i18n: {
+            key: 'security.access_denied'
+          },
+          message: 'You do not have permission to perform the requested action.'
+        }]);
+      });
+
+    });
   });
 
   describe('mfa authentication', () => {
     beforeEach(() => {
-      const { stateHandle, successResponse } = testContext;
+      const { successResponse } = testContext;
 
       const identifyResponse =  IdentifyResponseFactory.build();
       const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
@@ -215,10 +342,6 @@ describe('idx/authenticate', () => {
         successResponse
       ]);
 
-      jest.spyOn(mocked.interact, 'interact').mockResolvedValue({
-        idxResponse: identifyResponse,
-        stateHandle 
-      });
       jest.spyOn(identifyResponse, 'proceed');
       jest.spyOn(verifyPasswordResponse, 'proceed');
       jest.spyOn(selectAuthenticatorResponse, 'proceed');
@@ -237,11 +360,16 @@ describe('idx/authenticate', () => {
     it('can authenticate, passing username, password, phone number, and authenticators up front', async () => {
       const {
         authClient,
+        stateHandle,
         identifyResponse,
         selectAuthenticatorResponse,
         verifyPasswordResponse,
         phoneEnrollmentDataResponse
       } = testContext;
+      jest.spyOn(mocked.interact, 'interact').mockResolvedValue({
+        idxResponse: identifyResponse,
+        stateHandle 
+      });
       const res = await authenticate(authClient, {
         username: 'fakeuser',
         password: 'fakepass',
@@ -256,7 +384,6 @@ describe('idx/authenticate', () => {
         name: 'enroll-authenticator',
         type: 'phone',
         inputs: [{
-          _testSeq: 4,
           label: 'Enter code',
           name: 'verificationCode',
           required: true,
@@ -282,8 +409,147 @@ describe('idx/authenticate', () => {
       // TODO: proceed using code and verify that enrollPhoneResponse is called correctly
     });
 
-    xit('can authenticate, providing username, password, phoneNumber and code on demand', () => {
-      // TODO
+    it('can authenticate, providing username, password, phoneNumber and code on demand', async () => {
+      const {
+        authClient,
+        stateHandle,
+        identifyResponse,
+        selectAuthenticatorResponse,
+        verifyPasswordResponse,
+        phoneEnrollmentDataResponse
+      } = testContext;
+
+      jest.spyOn(mocked.interact, 'interact')
+        .mockResolvedValueOnce({
+          idxResponse: identifyResponse,
+          stateHandle 
+        })
+        .mockResolvedValueOnce({
+          idxResponse: identifyResponse,
+          stateHandle 
+        })
+        .mockResolvedValueOnce({
+          idxResponse: verifyPasswordResponse,
+          stateHandle 
+        })
+        .mockResolvedValueOnce({
+          idxResponse: selectAuthenticatorResponse,
+          stateHandle 
+        })
+        .mockResolvedValueOnce({
+          idxResponse: phoneEnrollmentDataResponse,
+          stateHandle 
+        });
+
+      // First call: returns identify response
+      let res = await authenticate(authClient, {});
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        canSkip: false,
+        name: 'identify',
+        inputs: [{
+          name: 'username',
+          label: 'Username'
+        }]
+      });
+
+      // Second call: proceeds with identify response
+      res = await authenticate(authClient, { username: 'myuser'});
+      expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'myuser' });
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        canSkip: false,
+        name: 'challenge-authenticator',
+        type: 'password',
+        inputs: [{
+          name: 'password',
+          label: 'Password',
+          required: true,
+          secret: true,
+          type: 'string'
+        }]
+      });
+
+      // Third call: proceeds with verify password
+      res = await authenticate(authClient, { password: 'mypass'});
+      expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'mypass' }});
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        canSkip: false,
+        name: 'select-authenticator-authenticate',
+        inputs: [{
+          name: 'authenticators',
+          type: 'string[]',
+        }],
+        authenticators: [{
+          label: 'Okta Verify',
+          value: 'app'
+        }, {
+          label: 'Phone',
+          value: 'phone'
+        }, {
+          label: 'Email',
+          value: 'email'
+        }]
+      });
+
+      // Fourth call: select authenticator
+      res = await authenticate(authClient, { authenticators: ['phone'] });
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' }});
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        canSkip: false,
+        name: 'authenticator-enrollment-data',
+        type: 'phone',
+        inputs: [{
+          label: 'Phone',
+          name: 'authenticator',
+          form: {
+            value: [{
+              name: 'id',
+              required: true,
+              value: 'id-phone'
+            }, {
+              name: 'methodType',
+              options: [{
+                label: 'SMS',
+                value: 'sms'
+              }, {
+                label: 'Voice call',
+                value: 'voice'
+              }],
+              required: true
+            }, {
+              name: 'phoneNumber',
+              required: true
+            }]
+          }
+        }]
+      });
+
+      // Fifth call: send phone number
+      res = await authenticate(authClient, { phoneNumber: '(555) 555-5555', authenticators: ['phone'] });
+      expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
+        authenticator: {
+          id: 'id-phone',
+          methodType: 'sms', // TODO: user should be able to specify methodType
+          phoneNumber: '(555) 555-5555'
+        }
+      });
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        canSkip: false,
+        name: 'enroll-authenticator',
+        type: 'phone',
+        inputs: [{
+          label: 'Enter code',
+          name: 'verificationCode',
+          required: true,
+          type: 'string',
+        }]
+      });
+
+      // TODO: proceed using code and verify that enrollPhoneResponse is called correctly
     });
 
   });

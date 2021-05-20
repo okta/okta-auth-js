@@ -69,6 +69,8 @@ export interface IdxMessages {
 export interface RawIdxResponse {
   version: string;
   stateHandle: string;
+  intent?: string;
+  expiresAt?: string;
   remediation?: IdxRemediation[];
   messages?: IdxMessages;
 }

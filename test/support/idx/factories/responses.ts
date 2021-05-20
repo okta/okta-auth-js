@@ -8,23 +8,16 @@ import {
   VerifyPasswordRemediationFactory
 } from './remediations';
 
-interface MockedIdxResponse extends IdxResponse {
-  _testSeq: number;
-
-}
-
 interface MockedIdxResponseTransientParams {
-  nextResponse?: MockedIdxResponse;
+  nextResponse?: IdxResponse;
   idxVersion?: string;
   stateHandle?: string;
 }
 
-export const IdxResponseFactory = Factory.define<MockedIdxResponse, MockedIdxResponseTransientParams>(({
-  sequence,
+export const IdxResponseFactory = Factory.define<IdxResponse, MockedIdxResponseTransientParams>(({
   transientParams
 }) => {
   return {
-    _testSeq: sequence,
     proceed: () => Promise.resolve(transientParams.nextResponse),
     neededToProceed: [],
     rawIdxState: {

@@ -4,22 +4,13 @@ const { renderTemplate, getAuthClient } = require('../utils');
 const router = express.Router();
 
 router.get('/terminal', (req, res) => {
-  const idxStates = req.getIdxStates();
-  req.clearIdxStates();
-
-  const messages = idxStates.messages.reduce((acc, curr) => {
-    acc.push(curr.message);
-    return acc;
-  }, []);
 
   // Clear transaction meta at app layer when reach to terminal state
   const authClient = getAuthClient(req);
   authClient.transactionManager.clear();
 
-  // Render
-  renderTemplate(req, res, 'terminal', {
-    messages
-  });
+  // If there are any error messages, these are handled within `renderTemplate`
+  renderTemplate(req, res, 'terminal', {});
 });
 
 module.exports = router;

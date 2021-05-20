@@ -2,16 +2,8 @@ import { Factory } from 'fishery';
 import { IdxRemediationValue } from '../../../../lib/idx/types/idx-js';
 import { PasswordFormFactory } from './forms';
 
-interface MockedIdxValue extends IdxRemediationValue {
-  _testSeq: number;
-
-}
-
-export const IdxValueFactory = Factory.define<MockedIdxValue>(({
-  sequence
-}) => {
+export const IdxValueFactory = Factory.define<IdxRemediationValue>(() => {
   return {
-    _testSeq: sequence,
     name: 'unknown-name'
   };
 });
