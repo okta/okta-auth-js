@@ -76,6 +76,12 @@ const samples = [
     specs: [],
     features: ['basic-auth']
   },
+  {
+    name: 'express-embedded-widget',
+    template: 'express-embedded-widget',
+    specs: [],
+    features: []
+  },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {
     throw new Error('sample "name" is required');

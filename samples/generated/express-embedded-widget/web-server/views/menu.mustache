@@ -1,0 +1,14 @@
+<div class="ui inverted left fixed vertical menu">
+  <a id="item-overview" class="item" href="/">Home</a>
+  <div id="section-authorization-code" class="item">
+    <div class="menu">
+      {{#isLoggedIn}}
+        <form method="POST" action="/logout">
+          <button id="logout-button" data-se="logout" class="item">
+            Logout
+          </button>
+        </form>
+      {{/isLoggedIn}}
+    </div>
+  </div>
+</div>
