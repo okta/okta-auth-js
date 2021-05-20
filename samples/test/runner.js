@@ -68,7 +68,7 @@ function runWithConfig(sampleConfig) {
     });
     process.on('exit', function() {
       console.log('Process exited with code: ', returnCode);
-    })
+    });
   });
 }
 
