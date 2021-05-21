@@ -1,23 +1,48 @@
 import { Factory } from 'fishery';
-import { RawIdxResponse } from '../../../../lib/idx/types/idx-js';
+import { RawIdxResponse, IdxMessage, IdxMessages } from '../../../../lib/idx/types/idx-js';
 
-export const IdxErrorFactory = Factory.define<RawIdxResponse>(() => {
+export const RawIdxErrorFactory = Factory.define<RawIdxResponse>(() => {
   return {
     version: '1.0.0',
     stateHandle: 'unknown-stateHandle'
   };
 });
 
-export const IdxErrorAccessDeniedFactory = IdxErrorFactory.params({
-  intent: 'LOGIN',
-  messages: {
+export const IdxErrorMessageFactory = Factory.define<IdxMessage>(() => {
+  return {
+    class: 'ERROR',
+    i18n: {
+      key: 'unknown'
+    },
+    message: 'Default error message'
+  };
+});
+
+export const IdxErrorMessagesFactory = Factory.define<IdxMessages>(() => {
+  return {
     type: 'array',
-    value: [{
-      class: 'ERROR',
-      i18n: {
-        key: 'security.access_denied'
-      },
-      message: 'You do not have permission to perform the requested action.'
-    }]
-  }
+    value: null
+  };
+});
+
+export const IdxErrorAccessDeniedFactory = RawIdxErrorFactory.params({
+  messages: IdxErrorMessagesFactory.build({
+    value: [
+      IdxErrorMessageFactory.build({
+        i18n: { key: 'security.access_denied' },
+        message: 'You do not have permission to perform the requested action.'
+      })
+    ]
+  })
+});
+
+export const IdxErrorIncorrectPassword = RawIdxErrorFactory.params({
+  messages: IdxErrorMessagesFactory.build({
+    value: [
+      IdxErrorMessageFactory.build({
+        i18n: { key: 'incorrectPassword' },
+        message: 'Password is incorrect'
+      })
+    ]
+  })
 });

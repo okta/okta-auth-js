@@ -61,7 +61,7 @@ export interface IdxMessage {
 }
 
 export interface IdxMessages {
-  type: string; // "array"
+  type: 'array';
   value: IdxMessage[];
 }
 
