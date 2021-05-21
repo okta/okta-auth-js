@@ -33,8 +33,12 @@ export class Identify extends Remediator {
   }
 
   getValues() {
-    // remove "password" from authenticator array when remediation is finished
-    const authenticators = this.values.authenticators?.filter(authenticator => authenticator !== 'password');
-    return { ...this.values, authenticators };
+    if (this.remediation.value.some(({ name }) => name === 'credentials')) {
+      // remove "password" from authenticator array when remediation is finished
+      const authenticators = this.values.authenticators?.filter(authenticator => authenticator !== 'password');
+      return { ...this.values, authenticators };
+    }
+    
+    return super.getValues();
   }
 }
