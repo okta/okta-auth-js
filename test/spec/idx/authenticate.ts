@@ -12,7 +12,8 @@ import {
   PhoneAuthenticatorEnrollmentDataRemediationFactory,
   EnrollPhoneAuthenticatorRemediationFactory,
   IdxErrorAccessDeniedFactory,
-  IdxErrorIncorrectPassword
+  IdxErrorIncorrectPassword,
+  IdxErrorUserNotAssignedFactory
 } from '@okta/test.support/idx';
 
 jest.mock('@okta/okta-idx-js', () => {
@@ -98,6 +99,70 @@ describe('idx/authenticate', () => {
       'status': 0,
       'tokens': tokenResponse.tokens,
     });
+  });
+
+  describe('error handling', () => {
+
+    it('returns raw IDX error when invalid username is provided', async () => {
+      const { authClient } = testContext;
+      const errorResponse = IdxErrorAccessDeniedFactory.build();
+      const identifyResponse =  IdentifyResponseFactory.build();
+      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+
+      const res = await authenticate(authClient, { username: 'obviously-wrong' });
+      expect(res.status).toBe(IdxStatus.TERMINAL);
+      expect(res.nextStep).toBe(undefined);
+      expect(res.error).toBe(undefined); // TODO: is this expected?
+      expect(res.messages).toEqual([{
+        class: 'ERROR',
+        i18n: {
+          key: 'security.access_denied'
+        },
+        message: 'You do not have permission to perform the requested action.'
+      }]);
+    });
+
+    it('returns raw IDX error when invalid password is provided', async () => {
+      const { authClient } = testContext;
+      const errorResponse = IdxErrorIncorrectPassword.build();
+      const identifyResponse =  IdentifyResponseFactory.build();
+      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+
+      const res = await authenticate(authClient, { username: 'myuser', password: 'invalid-password' });
+      expect(res.status).toBe(IdxStatus.TERMINAL);
+      expect(res.nextStep).toBe(undefined);
+      expect(res.error).toBe(undefined); // TODO: is this expected?
+      expect(res.messages).toEqual([{
+        class: 'ERROR',
+        i18n: {
+          key: 'incorrectPassword'
+        },
+        message: 'Password is incorrect'
+      }]);
+    });
+
+    it('returns raw IDX error when user is not assigned to the application', async () => {
+      const { authClient } = testContext;
+      const errorResponse = IdxErrorUserNotAssignedFactory.build();
+      const identifyResponse =  IdentifyResponseFactory.build();
+      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+
+      const res = await authenticate(authClient, { username: 'myuser' });
+      expect(res.status).toBe(IdxStatus.TERMINAL);
+      expect(res.nextStep).toBe(undefined);
+      expect(res.error).toBe(undefined); // TODO: is this expected?
+      expect(res.messages).toEqual([{
+        class: 'ERROR',
+        i18n: {
+          key: 'unknown' // this error does not have an i18n key
+        },
+        message: 'User is not assigned to this application'
+      }]);
+    });
+
   });
 
   describe('basic authentication', () => {
@@ -285,49 +350,6 @@ describe('idx/authenticate', () => {
 
     });
 
-    describe('error handling', () => {
-
-      it('returns raw IDX error when invalid username is provided', async () => {
-        const { authClient } = testContext;
-        const errorResponse = IdxErrorAccessDeniedFactory.build();
-        const identifyResponse =  IdentifyResponseFactory.build();
-        identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
-        jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
-
-        const res = await authenticate(authClient, { username: 'obviously-wrong' });
-        expect(res.status).toBe(IdxStatus.TERMINAL);
-        expect(res.nextStep).toBe(undefined);
-        expect(res.error).toBe(undefined); // TODO: is this expected?
-        expect(res.messages).toEqual([{
-          class: 'ERROR',
-          i18n: {
-            key: 'security.access_denied'
-          },
-          message: 'You do not have permission to perform the requested action.'
-        }]);
-      });
-
-      it('returns raw IDX error when invalid password is provided', async () => {
-        const { authClient } = testContext;
-        const errorResponse = IdxErrorIncorrectPassword.build();
-        const identifyResponse =  IdentifyResponseFactory.build();
-        identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
-        jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
-
-        const res = await authenticate(authClient, { username: 'myuser', password: 'invalid-password' });
-        expect(res.status).toBe(IdxStatus.TERMINAL);
-        expect(res.nextStep).toBe(undefined);
-        expect(res.error).toBe(undefined); // TODO: is this expected?
-        expect(res.messages).toEqual([{
-          class: 'ERROR',
-          i18n: {
-            key: 'incorrectPassword'
-          },
-          message: 'Password is incorrect'
-        }]);
-      });
-
-    });
   });
 
   describe('mfa authentication', () => {
