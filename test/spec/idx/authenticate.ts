@@ -13,7 +13,8 @@ import {
   EnrollPhoneAuthenticatorRemediationFactory,
   IdxErrorAccessDeniedFactory,
   IdxErrorIncorrectPassword,
-  IdxErrorUserNotAssignedFactory
+  IdxErrorUserNotAssignedFactory,
+  IdxErrorAuthenticationFailedFactory
 } from '@okta/test.support/idx';
 
 jest.mock('@okta/okta-idx-js', () => {
@@ -160,6 +161,26 @@ describe('idx/authenticate', () => {
           key: 'unknown' // this error does not have an i18n key
         },
         message: 'User is not assigned to this application'
+      }]);
+    });
+
+    it('returns raw IDX error when user account is locked or suspeneded', async () => {
+      const { authClient } = testContext;
+      const errorResponse = IdxErrorAuthenticationFailedFactory.build();
+      const identifyResponse =  IdentifyResponseFactory.build();
+      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+
+      const res = await authenticate(authClient, { username: 'myuser' });
+      expect(res.status).toBe(IdxStatus.TERMINAL);
+      expect(res.nextStep).toBe(undefined);
+      expect(res.error).toBe(undefined); // TODO: is this expected?
+      expect(res.messages).toEqual([{
+        class: 'ERROR',
+        i18n: {
+          key: 'errors.E0000004'
+        },
+        message: 'Authentication failed'
       }]);
     });
 
