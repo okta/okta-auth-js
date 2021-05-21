@@ -32,15 +32,17 @@ const proceed = ({ nextStep, req, res }) => {
     // authenticator authenticate
     case 'select-authenticator-authenticate':
       req.session.authenticators = authenticators;
-      redirect({ 
-        req, res, path: '/select-authenticator'
-      });
+      redirect({ req, res, path: '/select-authenticator' });
       return true;
     case 'challenge-authenticator':
       redirect({ 
         req, 
         res, 
-        path: type === 'password' ? '/login' : `/challenge-authenticator/${type}` 
+        {{#if dynamic}}
+        path: `/challenge-authenticator/${type}`,
+        {{else}}
+        path: type === 'password' ? '/login' : `/challenge-authenticator/${type}`,
+        {{/if}}
       });
       return true;
     case 'authenticator-verification-data':

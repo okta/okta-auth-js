@@ -11,7 +11,7 @@
 
       <div class="row">
         <div class="ui header">
-          <h2>Login with Username and Password</h2>
+          <h2>Dynamic login</h2>
         </div>
       </div>
 
@@ -38,18 +38,33 @@
             </div>
           </div>
           <button id="submit-login-form" class="ui fluid large primary submit button" type="submit">
-            Sign In
+            LOGIN
           </button>
         </form>
       </div>
 
       <div class="ui row grid">
-        <div class="ui messages row">
-          Don't have an account? &nbsp; <a href="/signup">Sign Up</a>
-        </div>
-        <div class="ui messages row">
-          Forgot password? &nbsp; <a href="/recover-password">Recover password</a>
-        </div>
+        {{#hasIdps}}
+          <div class="ui row">
+            {{#idps}}
+              <button onclick="location.href='{{href}}'" class="ui {{class}} button">
+                {{name}}
+              </button>
+            {{/idps}}
+          </div>
+        {{/hasIdps}}
+
+        {{#canRecoverPassword}}
+          <div class="ui messages row">
+            <a href="/recover-password">Forgot your password?</a>
+          </div>
+        {{/canRecoverPassword}}
+
+        {{#canRegister}}
+          <div class="ui messages row">
+            <a href="/signup">Sign Up</a>
+          </div>
+        {{/canRegister}}
       </div>
 
     </div>

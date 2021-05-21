@@ -34,72 +34,80 @@ const webDefaults = Object.assign({
   oidc: true
 }, defaults);
 
-const templateDefaults = {
-  'static-spa': Object.assign({
-    webpack: false
-  }, spaDefaults),
-  'webpack-spa': Object.assign({
-    webpack: true
-  }, spaDefaults),
-  'express-web': Object.assign({
-    express: true
-  }, webDefaults)
+const getSamples = (arg = {}) => {
+  const templateDefaults = {
+    'static-spa': Object.assign({
+      webpack: false
+    }, spaDefaults),
+    'webpack-spa': Object.assign({
+      webpack: true
+    }, spaDefaults),
+    'express-web': Object.assign({
+      express: true
+    }, webDefaults),
+    'express-direct-auth': Object.assign({
+      express: true,
+      dynamic: !!arg.dynamic
+    }, webDefaults)
+  };
+
+  return [
+    {
+      name: 'static-spa',
+      template: 'static-spa',
+      specs: ['spa-app'],
+      features: []
+    },
+    {
+      name: 'webpack-spa',
+      template: 'webpack-spa',
+      specs: ['spa-app'],
+      features: []
+    },
+    {
+      name: 'express-web-no-oidc',
+      template: 'express-web',
+      specs: ['web-app'],
+      oidc: false
+    },
+    {
+      name: 'express-web-with-oidc',
+      template: 'express-web',
+      specs: ['web-app']
+    },
+    {
+      name: 'express-direct-auth',
+      template: 'express-direct-auth',
+      specs: [],
+      features: ['basic-auth']
+    },
+    {
+      name: 'express-embedded-widget',
+      template: 'express-embedded-widget',
+      specs: [],
+      features: []
+    },
+  ].map(function(sampleConfig) {
+    if (!sampleConfig.name) {
+      throw new Error('sample "name" is required');
+    }
+    if (!sampleConfig.template) {
+      throw new Error('sample "template" is required');
+    }
+    const mergedConfig = Object.assign({}, templateDefaults[sampleConfig.template], sampleConfig);
+    return mergedConfig;
+  });
 };
 
-const samples = [
-  {
-    name: 'static-spa',
-    template: 'static-spa',
-    specs: ['spa-app'],
-    features: []
-  },
-  {
-    name: 'webpack-spa',
-    template: 'webpack-spa',
-    specs: ['spa-app'],
-    features: []
-  },
-  {
-    name: 'express-web-no-oidc',
-    template: 'express-web',
-    specs: ['web-app'],
-    oidc: false
-  },
-  {
-    name: 'express-web-with-oidc',
-    template: 'express-web',
-    specs: ['web-app']
-  },
-  {
-    name: 'express-direct-auth',
-    template: 'express-direct-auth',
-    specs: [],
-    features: ['basic-auth']
-  },
-  {
-    name: 'express-embedded-widget',
-    template: 'express-embedded-widget',
-    specs: [],
-    features: []
-  },
-].map(function(sampleConfig) {
-  if (!sampleConfig.name) {
-    throw new Error('sample "name" is required');
-  }
-  if (!sampleConfig.template) {
-    throw new Error('sample "template" is required');
-  }
-  const mergedConfig = Object.assign({}, templateDefaults[sampleConfig.template], sampleConfig);
-  return mergedConfig;
-});
-
-function getSampleConfig(sampleName) {
+function getSampleConfig(sampleName, arg) {
+  const samples = getSamples(arg);
   const configEntries = samples.filter(val => val.name === sampleName);
   const sampleConfig = configEntries.length ? configEntries[0] : null;
   return sampleConfig;
 }
 
 function getSampleNames() {
+  const samples = getSamples();
   return samples.map(sample => sample.name);
 }
 

@@ -42,6 +42,29 @@ router.post('/select-authenticator/skip', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+// Handle password authenticator
+router.get('/challenge-authenticator/password', (req, res) => {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'authenticator', {
+      title: 'Challenge password authenticator',
+      input: {
+        type: 'password',
+        name: 'password',
+      },
+      action: '/challenge-authenticator/password',
+    })
+  });
+});
+
+router.post('/challenge-authenticator/password', async (req, res, next) => {
+  const { idxMethod } = req.session;
+  const { password } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx[idxMethod]({ password });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
 // Handle challenge email authenticator
 router.get('/challenge-authenticator/email', (req, res) => {
   renderPage({
