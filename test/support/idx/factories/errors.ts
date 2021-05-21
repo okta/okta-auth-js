@@ -8,21 +8,21 @@ export const RawIdxErrorFactory = Factory.define<RawIdxResponse>(() => {
   };
 });
 
-export const IdxErrorMessageFactory = Factory.define<IdxMessage>(({ params }) => {
+export const IdxErrorMessageFactory = Factory.define<IdxMessage>(() => {
   return {
     class: 'ERROR',
     i18n: {
       key: 'unknown'
     },
     message: 'Default error message'
-  }
+  };
 });
 
 export const IdxErrorMessagesFactory = Factory.define<IdxMessages>(() => {
   return {
     type: 'array',
     value: null
-  }
+  };
 });
 
 export const IdxErrorAccessDeniedFactory = RawIdxErrorFactory.params({
