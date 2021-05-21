@@ -14,7 +14,7 @@ const getIdpSemanticClass = (type) => {
     default: 
     return '';
   }
-}
+};
 
 // entry route
 router.get('/login', async (req, res) => {
@@ -61,7 +61,9 @@ router.get('/login/callback', async (req, res, next) => {
     res.redirect('/');
   } catch (err) {
     if (authClient.isInteractionRequiredError(err) === true) {
-      const error = new Error('Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.');
+      const error = new Error(
+        'Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.'
+      );
       next(error);
       return;
     }
