@@ -46,3 +46,13 @@ export const IdxErrorIncorrectPassword = RawIdxErrorFactory.params({
     ]
   })
 });
+
+export const IdxErrorUserNotAssignedFactory = RawIdxErrorFactory.params({
+  messages: IdxErrorMessagesFactory.build({
+    value: [
+      IdxErrorMessageFactory.build({
+        message: 'User is not assigned to this application'
+      })
+    ]
+  })
+});
