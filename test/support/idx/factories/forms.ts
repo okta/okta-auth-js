@@ -5,7 +5,10 @@ import {
   IdxValueFactory,
   IdValueFactory,
   PhoneMethodTypeValueFactory,
-  PhoneNumberValueFactory
+  PhoneNumberValueFactory,
+  FirstNameValueFactory,
+  LastNameValueFactory,
+  EmailValueFactory
 } from './values';
 
 export const IdxFormFactory = Factory.define<IdxForm>(() => {
@@ -24,6 +27,15 @@ export const PasswordFormFactory = IdxFormFactory.params({
   }]
 });
 
+export const EmailAuthenticatorFormFactory = IdxFormFactory.params({
+  value: [
+    IdValueFactory.build({
+      value: 'id-email'
+    })
+  ]
+});
+
+
 export const PhoneAuthenticatorFormFactory = IdxFormFactory.params({
   value: [
     IdValueFactory.build({
@@ -40,5 +52,13 @@ export const VerifySmsFormFactory = IdxFormFactory.params({
       label: 'Enter code',
       name: 'passcode'
     })
+  ]
+});
+
+export const UserProfileFormFactory = IdxFormFactory.params({
+  value: [
+    FirstNameValueFactory.build(),
+    LastNameValueFactory.build(),
+    EmailValueFactory.build()
   ]
 });

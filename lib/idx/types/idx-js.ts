@@ -36,6 +36,8 @@ export interface IdxRemediationValue {
   form?: IdxForm;
   options?: IdxOption[];
   messages?: IdxMessages;
+  minLength?: number;
+  maxLength?: number;
 }
 
 export interface IdxRemediation {

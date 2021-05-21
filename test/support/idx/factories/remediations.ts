@@ -1,10 +1,11 @@
 import { Factory } from 'fishery';
 import { IdxRemediation, IdxAuthenticator, IdxForm } from '../../../../lib/idx/types/idx-js';
 import {
+  EmailAuthenticatorFactory,
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory
 } from './authenticators';
-import { PhoneAuthenticatorFormFactory, VerifySmsFormFactory } from './forms';
+import { EmailAuthenticatorFormFactory, PhoneAuthenticatorFormFactory, UserProfileFormFactory, VerifySmsFormFactory } from './forms';
 import {
   EmailAuthenticatorOptionFactory,
   OktaVerifyAuthenticatorOptionFactory,
@@ -15,6 +16,7 @@ import {
   PasswordValueFactory,
   AuthenticatorValueFactory,
   CredentialsValueFactory,
+  IdxValueFactory,
 } from './values';
 
 interface MockedIdxRemediation extends IdxRemediation {
@@ -91,6 +93,18 @@ export const EnrollAuthenticatorRemediationFactory = IdxRemediationFactory.param
   name: 'enroll-authenticator'
 });
 
+export const EnrollEmailAuthenticatorRemediationFactory = EnrollAuthenticatorRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: EmailAuthenticatorFactory.build()
+  },
+  value: [
+    CredentialsValueFactory.build({
+      form: EmailAuthenticatorFormFactory.build()
+    })
+  ]
+});
+
 export const EnrollPhoneAuthenticatorRemediationFactory = EnrollAuthenticatorRemediationFactory.params({
   relatesTo: {
     type: 'object',
@@ -103,3 +117,16 @@ export const EnrollPhoneAuthenticatorRemediationFactory = EnrollAuthenticatorRem
   ]
 });
 
+export const EnrollProfileRemediationFactory = IdxRemediationFactory.params({
+  name: 'enroll-profile',
+  value: [
+    IdxValueFactory.build({
+      name: 'userProfile',
+      form: UserProfileFormFactory.build()
+    })
+  ]
+});
+
+export const SelectEnrollProfileRemediationFactory = IdxRemediationFactory.params({
+  name: 'select-enroll-profile'
+});
