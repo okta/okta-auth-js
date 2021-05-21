@@ -1,4 +1,3 @@
-/* eslint-disable jasmine/no-disabled-tests */
 import { authenticate } from '../../../lib/idx/authenticate';
 import { IdxStatus } from '../../../lib/idx/types';
 

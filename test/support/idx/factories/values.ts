@@ -48,3 +48,27 @@ export const PhoneNumberValueFactory = IdxValueFactory.params({
   name: 'phoneNumber',
   required: true,
 });
+
+
+export const FirstNameValueFactory = IdxValueFactory.params({
+  'name': 'firstName',
+  'label': 'First name',
+  'required': true,
+  'minLength': 1,
+  'maxLength': 50
+});
+
+export const LastNameValueFactory = IdxValueFactory.params({
+  'name': 'lastName',
+  'label': 'Last name',
+  'required': true,
+  'minLength': 1,
+  'maxLength': 50
+});
+
+
+export const EmailValueFactory = IdxValueFactory.params({
+  'name': 'email',
+  'label': 'Email',
+  'required': true
+});

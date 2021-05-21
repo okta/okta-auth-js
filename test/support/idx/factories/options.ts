@@ -6,7 +6,7 @@ import {
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory
 } from './authenticators';
-import { IdxFormFactory, PhoneAuthenticatorFormFactory } from './forms';
+import { IdxFormFactory, PhoneAuthenticatorFormFactory, EmailAuthenticatorFormFactory } from './forms';
 
 interface MockedIdxOption extends IdxOption {
   _authenticator?: IdxAuthenticator;
@@ -54,5 +54,8 @@ export const PhoneAuthenticatorOptionFactory = AuthenticatorOptionFactory.params
 });
 
 export const EmailAuthenticatorOptionFactory = AuthenticatorOptionFactory.params({
-  _authenticator: EmailAuthenticatorFactory.build()
+  _authenticator: EmailAuthenticatorFactory.build(),
+  value: {
+    form: EmailAuthenticatorFormFactory.build()
+  }
 });
