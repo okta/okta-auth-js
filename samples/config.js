@@ -34,7 +34,7 @@ const webDefaults = Object.assign({
   oidc: true
 }, defaults);
 
-const getSamples = (arg = {}) => {
+const getSamples = () => {
   const templateDefaults = {
     'static-spa': Object.assign({
       webpack: false
@@ -98,8 +98,8 @@ const getSamples = (arg = {}) => {
   });
 };
 
-function getSampleConfig(sampleName, arg) {
-  const samples = getSamples(arg);
+function getSampleConfig(sampleName) {
+  const samples = getSamples();
   const configEntries = samples.filter(val => val.name === sampleName);
   const sampleConfig = configEntries.length ? configEntries[0] : null;
   return sampleConfig;

@@ -35,6 +35,7 @@ const proceed = ({ nextStep, req, res }) => {
       redirect({ req, res, path: '/select-authenticator' });
       return true;
     case 'challenge-authenticator':
+      // eslint-disable-next-line no-case-declarations
       let path;
       if (process.env.APP_MODE === 'dynamic') {
         path = `/challenge-authenticator/${type}`;

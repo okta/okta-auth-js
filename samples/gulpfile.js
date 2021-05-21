@@ -6,30 +6,6 @@ const clean = require('gulp-clean');
 const shell = require('shelljs');
 const merge = require('merge-stream');
 
-// fetch command line arguments
-const arg = (argList => {
-  let arg = {}, a, opt, thisOpt, curOpt;
-  for (a = 0; a < argList.length; a++) {
-    thisOpt = argList[a].trim();
-    opt = thisOpt.replace(/^-+/, '');
-
-    if (opt === thisOpt) {
-      // argument value
-      if (curOpt) {
-        arg[curOpt] = opt;
-      }
-      curOpt = null;
-    }
-    else {
-      // argument name
-      curOpt = opt;
-      arg[curOpt] = true;
-    }
-  }
-
-  return arg;
-})(process.argv);
-
 const config = require('./config');
 
 const SRC_DIR = 'templates';
@@ -87,7 +63,7 @@ function generateSampleTaskFactory(options) {
 }
 
 const generateSampleTasks = config.getSampleNames().map(function(sampleName) {
-  const sampleConfig = config.getSampleConfig(sampleName, arg);
+  const sampleConfig = config.getSampleConfig(sampleName);
   const taskFn = generateSampleTaskFactory(sampleConfig);
   task(sampleName, series(registerPartials, taskFn));
   return taskFn;
@@ -103,7 +79,7 @@ const defaultTask = series(
 function watchSamples() {
   watch([`${PARTIALS_DIR}/**/*`, `config.js`], defaultTask);
   config.getSampleNames().map(function(sampleName) {
-    const sampleConfig = config.getSampleConfig(sampleName, arg);
+    const sampleConfig = config.getSampleConfig(sampleName);
     const { template } = sampleConfig;
     const task = generateSampleTaskFactory(sampleConfig);
     watch(`${SRC_DIR}/${template}/**/*`, task);
