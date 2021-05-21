@@ -13,7 +13,8 @@ import {
   EnrollPhoneAuthenticatorRemediationFactory,
   IdxErrorAccessDeniedFactory,
   IdxErrorIncorrectPassword,
-  IdxErrorUserNotAssignedFactory
+  IdxErrorUserNotAssignedFactory,
+  IdxErrorAuthenticationFailedFactory
 } from '@okta/test.support/idx';
 
 jest.mock('@okta/okta-idx-js', () => {
@@ -87,23 +88,27 @@ describe('idx/authenticate', () => {
   });
   
   it('returns an auth transaction', async () => {
-    const { authClient, successResponse, tokenResponse } = testContext;
+    const { authClient } = testContext;
     const identifyResponse =  IdentifyResponseFactory.build();
-    chainResponses([
-      identifyResponse,
-      successResponse
-    ]);
     jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
-    const res = await authenticate(authClient, { username: 'fake' });
+    const res = await authenticate(authClient, {});
     expect(res).toEqual({
-      'status': 0,
-      'tokens': tokenResponse.tokens,
+      status: IdxStatus.PENDING,
+      tokens: null,
+      nextStep: {
+        canSkip: false,
+        name: 'identify',
+        inputs: [{
+          name: 'username',
+          label: 'Username'
+        }]
+      }
     });
   });
 
   describe('error handling', () => {
 
-    it('returns raw IDX error when invalid username is provided', async () => {
+    it('returns terminal error when invalid username is provided', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxErrorAccessDeniedFactory.build();
       const identifyResponse =  IdentifyResponseFactory.build();
@@ -123,7 +128,7 @@ describe('idx/authenticate', () => {
       }]);
     });
 
-    it('returns raw IDX error when invalid password is provided', async () => {
+    it('returns terminal error when invalid password is provided', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxErrorIncorrectPassword.build();
       const identifyResponse =  IdentifyResponseFactory.build();
@@ -143,7 +148,7 @@ describe('idx/authenticate', () => {
       }]);
     });
 
-    it('returns raw IDX error when user is not assigned to the application', async () => {
+    it('returns terminal error when user account is deactivated or is not assigned to the application', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxErrorUserNotAssignedFactory.build();
       const identifyResponse =  IdentifyResponseFactory.build();
@@ -160,6 +165,26 @@ describe('idx/authenticate', () => {
           key: 'unknown' // this error does not have an i18n key
         },
         message: 'User is not assigned to this application'
+      }]);
+    });
+
+    it('returns terminal error when user account is locked or suspeneded', async () => {
+      const { authClient } = testContext;
+      const errorResponse = IdxErrorAuthenticationFailedFactory.build();
+      const identifyResponse =  IdentifyResponseFactory.build();
+      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+
+      const res = await authenticate(authClient, { username: 'myuser' });
+      expect(res.status).toBe(IdxStatus.TERMINAL);
+      expect(res.nextStep).toBe(undefined);
+      expect(res.error).toBe(undefined); // TODO: is this expected?
+      expect(res.messages).toEqual([{
+        class: 'ERROR',
+        i18n: {
+          key: 'errors.E0000004'
+        },
+        message: 'Authentication failed'
       }]);
     });
 

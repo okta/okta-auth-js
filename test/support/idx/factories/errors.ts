@@ -56,3 +56,14 @@ export const IdxErrorUserNotAssignedFactory = RawIdxErrorFactory.params({
     ]
   })
 });
+
+export const IdxErrorAuthenticationFailedFactory = RawIdxErrorFactory.params({
+  messages: IdxErrorMessagesFactory.build({
+    value: [
+      IdxErrorMessageFactory.build({
+        i18n: { key: 'errors.E0000004' },
+        message: 'Authentication failed'
+      })
+    ]
+  })
+});
