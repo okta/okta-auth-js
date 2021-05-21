@@ -88,23 +88,27 @@ describe('idx/authenticate', () => {
   });
   
   it('returns an auth transaction', async () => {
-    const { authClient, successResponse, tokenResponse } = testContext;
+    const { authClient } = testContext;
     const identifyResponse =  IdentifyResponseFactory.build();
-    chainResponses([
-      identifyResponse,
-      successResponse
-    ]);
     jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
-    const res = await authenticate(authClient, { username: 'fake' });
+    const res = await authenticate(authClient, {});
     expect(res).toEqual({
-      'status': 0,
-      'tokens': tokenResponse.tokens,
+      status: IdxStatus.PENDING,
+      tokens: null,
+      nextStep: {
+        canSkip: false,
+        name: 'identify',
+        inputs: [{
+          name: 'username',
+          label: 'Username'
+        }]
+      }
     });
   });
 
   describe('error handling', () => {
 
-    it('returns raw IDX error when invalid username is provided', async () => {
+    it('returns terminal error when invalid username is provided', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxErrorAccessDeniedFactory.build();
       const identifyResponse =  IdentifyResponseFactory.build();
@@ -124,7 +128,7 @@ describe('idx/authenticate', () => {
       }]);
     });
 
-    it('returns raw IDX error when invalid password is provided', async () => {
+    it('returns terminal error when invalid password is provided', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxErrorIncorrectPassword.build();
       const identifyResponse =  IdentifyResponseFactory.build();
@@ -144,7 +148,7 @@ describe('idx/authenticate', () => {
       }]);
     });
 
-    it('returns raw IDX error when user is not assigned to the application', async () => {
+    it('returns terminal error when user account is deactivated or is not assigned to the application', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxErrorUserNotAssignedFactory.build();
       const identifyResponse =  IdentifyResponseFactory.build();
@@ -164,7 +168,7 @@ describe('idx/authenticate', () => {
       }]);
     });
 
-    it('returns raw IDX error when user account is locked or suspeneded', async () => {
+    it('returns terminal error when user account is locked or suspeneded', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxErrorAuthenticationFailedFactory.build();
       const identifyResponse =  IdentifyResponseFactory.build();
