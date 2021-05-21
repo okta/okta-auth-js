@@ -44,22 +44,23 @@
       </div>
 
       <div class="ui row grid">
-        <div class="ui messages row">
-          <a href="/recover-password">Forgot your password?</a>
-        </div>
-
         {{#hasIdps}}
           <div class="ui row">
             {{#idps}}
-              <a href={{href}}>{{name}}</a>
+              <button onclick="location.href='{{href}}'" class="ui {{class}} button">
+                {{name}}
+              </button>
             {{/idps}}
           </div>
         {{/hasIdps}}
 
         <div class="ui messages row">
+          <a href="/recover-password">Forgot your password?</a>
+        </div>
+
+        <div class="ui messages row">
           <a href="/signup">Sign Up</a>
         </div>
-        
       </div>
 
     </div>
