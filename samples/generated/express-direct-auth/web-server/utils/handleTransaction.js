@@ -35,11 +35,13 @@ const proceed = ({ nextStep, req, res }) => {
       redirect({ req, res, path: '/select-authenticator' });
       return true;
     case 'challenge-authenticator':
-      redirect({ 
-        req, 
-        res, 
-        path: type === 'password' ? '/login' : `/challenge-authenticator/${type}`,
-      });
+      let path;
+      if (process.env.APP_MODE === 'dynamic') {
+        path = `/challenge-authenticator/${type}`;
+      } else {
+        path = type === 'password' ? '/login' : `/challenge-authenticator/${type}`; 
+      }
+      redirect({ req, res, path });
       return true;
     case 'authenticator-verification-data':
       redirect({ req, res, path: `/challenge-authenticator/${type}` });

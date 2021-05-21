@@ -1,4 +1,5 @@
 const express = require('express');
+const { IdxFeature } = require('@okta/okta-auth-js');
 const { 
   getAuthClient, 
   handleTransaction,
@@ -7,6 +8,28 @@ const {
 } = require('../utils');
 
 const router = express.Router();
+
+const renderDynamicLoginPage = async (req, res) => {
+  const authClient = getAuthClient(req);
+  const { availableSteps, enabledFeatures } = await authClient.idx.startTransaction({ state: req.transactionId });
+
+  // Prepare params for page render
+  const idps = availableSteps 
+    ? availableSteps
+      .filter(({ name }) => name === 'redirect-idp')
+      .map(({ href, idp: { name }, type }) => ({ name, href, class: getIdpSemanticClass(type) })) 
+    : [];
+  const showLoginForm = availableSteps.some(({ name }) => name === 'identify');
+  
+  renderTemplate(req, res, 'dynamic-login', { 
+    action: '/login',
+    showLoginForm,
+    canRegister: enabledFeatures.includes(IdxFeature.REGISTRATION),
+    canRecoverPassword: enabledFeatures.includes(IdxFeature.PASSWORD_RECOVERY),
+    hasIdps: !!idps.length,
+    idps,
+  });
+};
 
 const renderStaticLoginPage = async (req, res) => {
   // Delete the idp related render logic if you only want the username and password form
@@ -29,7 +52,11 @@ const renderStaticLoginPage = async (req, res) => {
 router.get('/login', (req, res) => {
   req.session.idxMethod = 'authenticate';
 
-  renderStaticLoginPage(req, res);
+  if (process.env.APP_MODE === 'dynamic') {
+    renderDynamicLoginPage(req, res); 
+  } else {
+    renderStaticLoginPage(req, res);
+  }
 });
 
 router.post('/login', async (req, res, next) => {
@@ -52,9 +79,14 @@ router.get('/login/callback', async (req, res, next) => {
     res.redirect('/');
   } catch (err) {
     if (authClient.isInteractionRequiredError(err) === true) {
-      next(new Error(
-        'Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.'
-      ));
+      if (process.env.APP_MODE) {
+        const transaction = await authClient.idx.authenticate({ state: req.transactionId });
+        handleTransaction({ req, res, next, authClient, transaction });
+      } else {
+        next(new Error(
+          'Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.'
+        ));
+      }
       return;
     }
 

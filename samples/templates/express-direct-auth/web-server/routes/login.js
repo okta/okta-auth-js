@@ -1,7 +1,5 @@
 const express = require('express');
-{{#if dynamic}}
 const { IdxFeature } = require('@okta/okta-auth-js');
-{{/if}}
 const { 
   getAuthClient, 
   handleTransaction,
@@ -11,7 +9,6 @@ const {
 
 const router = express.Router();
 
-{{#if dynamic}}
 const renderDynamicLoginPage = async (req, res) => {
   const authClient = getAuthClient(req);
   const { availableSteps, enabledFeatures } = await authClient.idx.startTransaction({ state: req.transactionId });
@@ -33,7 +30,7 @@ const renderDynamicLoginPage = async (req, res) => {
     idps,
   });
 };
-{{else}}
+
 const renderStaticLoginPage = async (req, res) => {
   // Delete the idp related render logic if you only want the username and password form
   const authClient = getAuthClient(req);
@@ -50,17 +47,16 @@ const renderStaticLoginPage = async (req, res) => {
     idps,
   });
 };
-{{/if}}
 
 // entry route
 router.get('/login', (req, res) => {
   req.session.idxMethod = 'authenticate';
 
-  {{#if dynamic}}
-  renderDynamicLoginPage(req, res);
-  {{else}}
-  renderStaticLoginPage(req, res);
-  {{/if}}
+  if (process.env.APP_MODE === 'dynamic') {
+    renderDynamicLoginPage(req, res); 
+  } else {
+    renderStaticLoginPage(req, res);
+  }
 });
 
 router.post('/login', async (req, res, next) => {
@@ -83,14 +79,14 @@ router.get('/login/callback', async (req, res, next) => {
     res.redirect('/');
   } catch (err) {
     if (authClient.isInteractionRequiredError(err) === true) {
-      {{#if dynamic}}
-      const transaction = await authClient.idx.authenticate({ state: req.transactionId });
-      handleTransaction({ req, res, next, authClient, transaction });
-      {{else}}
-      next(new Error(
-        'Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.'
-      ));
-      {{/if}}
+      if (process.env.APP_MODE) {
+        const transaction = await authClient.idx.authenticate({ state: req.transactionId });
+        handleTransaction({ req, res, next, authClient, transaction });
+      } else {
+        next(new Error(
+          'Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.'
+        ));
+      }
       return;
     }
 

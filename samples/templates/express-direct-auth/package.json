@@ -7,8 +7,12 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "node ./web-server/server.js",
-    "dev": "nodemon ./web-server/server.js --watch ../../../build/cjs"
+    "start": "npm run start:static",
+    "dev": "npm run dev:static",
+    "start:static": "node ./web-server/server.js",
+    "dev:static": "nodemon ./web-server/server.js --watch ../../../build/cjs",
+    "start:dynamic": "APP_MODE=dynamic node ./web-server/server.js",
+    "dev:dynamic": "APP_MODE=dynamic nodemon ./web-server/server.js --watch ../../../build/cjs"
   },
   "dependencies": {
     "express": "^4.17.1",

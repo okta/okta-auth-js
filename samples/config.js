@@ -47,7 +47,6 @@ const getSamples = (arg = {}) => {
     }, webDefaults),
     'express-direct-auth': Object.assign({
       express: true,
-      dynamic: !!arg.dynamic
     }, webDefaults)
   };
 
