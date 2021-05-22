@@ -72,3 +72,9 @@ export const EmailValueFactory = IdxValueFactory.params({
   'label': 'Email',
   'required': true
 });
+
+export const NewPasswordValueFactory = IdxValueFactory.params({
+  'name': 'passcode',
+  'label': 'New password',
+  'secret': true
+});

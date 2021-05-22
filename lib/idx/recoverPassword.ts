@@ -11,6 +11,8 @@ import {
   AuthenticatorVerificationDataValues,
   ResetAuthenticator,
   ResetAuthenticatorValues,
+  ReEnrollAuthenticator,
+  ReEnrollAuthenticatorValues,
 } from './remediators';
 import { FlowMonitor } from './flowMonitors';
 import { startTransaction } from './startTransaction';
@@ -30,6 +32,7 @@ const flow: RemediationFlow = {
   'challenge-authenticator': ChallengeAuthenticator,
   'authenticator-verification-data': AuthenticatorVerificationData,
   'reset-authenticator': ResetAuthenticator,
+  'reenroll-authenticator': ReEnrollAuthenticator,
 };
 
 export type PasswordRecoveryOptions = IdxOptions 
@@ -37,7 +40,8 @@ export type PasswordRecoveryOptions = IdxOptions
   & SelectAuthenticatorAuthenticateValues 
   & ChallengeAuthenticatorValues 
   & ResetAuthenticatorValues
-  & AuthenticatorVerificationDataValues;
+  & AuthenticatorVerificationDataValues
+  & ReEnrollAuthenticatorValues;
 
 export async function recoverPassword(
   authClient: OktaAuth, options: PasswordRecoveryOptions

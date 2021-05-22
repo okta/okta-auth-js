@@ -9,6 +9,10 @@ export interface IdxAuthenticator {
   key: string;
   methods: IdxAuthenticatorMethod[];
   type: string;
+  settings?: {
+    complexity?: unknown;
+    age?: unknown;
+  };
 }
 
 export interface IdxForm {
@@ -81,13 +85,18 @@ export function isRawIdxResponse(obj: any): obj is RawIdxResponse {
   return obj && obj.version;
 }
 
+
+export interface IdxActions {
+  [key: string]: Function;
+}
+
 // Object returned from idx-js
 export interface IdxResponse {
   proceed: (remediationName: string, params: unknown) => Promise<IdxResponse>;
   neededToProceed: IdxRemediation[];
   rawIdxState: RawIdxResponse;
   interactionCode?: string;
-  actions: Record<string, Function>;
+  actions: IdxActions;
   toPersist: {
     interactionHandle?: string;
   };

@@ -67,3 +67,14 @@ export const IdxErrorAuthenticationFailedFactory = RawIdxErrorFactory.params({
     ]
   })
 });
+
+export const IdxErrorResetPasswordNotAllowedFactory = RawIdxErrorFactory.params({
+  messages: IdxErrorMessagesFactory.build({
+    value: [
+      IdxErrorMessageFactory.build({
+        message: 'Reset password is not allowed at this time. Please contact support for assistance.'
+      })
+    ]
+  })
+});
+

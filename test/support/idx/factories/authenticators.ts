@@ -36,7 +36,22 @@ export const PasswordAuthenticatorFactory = IdxAuthenticatorFactory.params({
   key: 'okta_password',
   methods: [
     PasswordAuthenticatorMethodFactory.build()
-  ]
+  ],
+  settings: {
+    complexity: {
+      minLength: 8,
+      minLowerCase: 0,
+      minUpperCase: 0,
+      minNumber: 0,
+      minSymbol: 0,
+      excludeUsername: true,
+      excludeAttributes: []
+    },
+    age: {
+      minAgeMinutes: 0,
+      historyCount: 4
+    }
+  }
 });
 
 export const OktaVerifyAuthenticatorFactory = IdxAuthenticatorFactory.params({
