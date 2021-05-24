@@ -2,6 +2,7 @@ import setInputField from './setInputField';
 import LoginForm from '../selectors/LoginForm';
 import { getConfig } from '../../util/configUtils';
 
+/* eslint complexity:[0,8] */
 export default async (
   credName: string
 ) => {
