@@ -30,6 +30,13 @@ router.post('/recover-password', async (req, res, next) => {
     username,
     authenticators: authenticator ? [authenticator] : [],
   });
+  const { messages } = transaction;
+  if (messages && messages.length) {
+    // show the message on the form
+    req.setIdxStates(transaction);
+    res.redirect('/recover-password');
+    return;
+  }
   handleTransaction({ req, res, next, authClient, transaction });
 });
 

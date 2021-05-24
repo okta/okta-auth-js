@@ -63,6 +63,7 @@ export interface IdxMessage {
   class: string;
   i18n: {
     key: string;
+    params?: unknown[];
   };
 }
 

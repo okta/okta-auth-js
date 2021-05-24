@@ -12,7 +12,10 @@ import {
   ReEnrollPasswordAuthenticatorRemediationFactory,
   AuthenticatorVerificationDataRemediationFactory,
   SelectAuthenticatorRemediationFactory,
-  IdxErrorResetPasswordNotAllowedFactory
+  IdxErrorResetPasswordNotAllowedFactory,
+  RawIdxErrorFactory,
+  IdxErrorMessagesFactory,
+  IdxErrorNoAccountWithUsernameFactory
 } from '@okta/test.support/idx';
 
 jest.mock('@okta/okta-idx-js', () => {
@@ -175,6 +178,57 @@ describe('idx/recoverPassword', () => {
     });
   });
 
+  it('returns a pending status with error message if a bad username was submitted', async () => {
+    const {
+      authClient,
+      identifyResponse,
+      identifyRecoveryResponse,
+    } = testContext;
+    
+    const username = 'incorrect@wrong.com';
+
+    // messages appear in the "rawIdxState"
+    const rawIdxState = RawIdxErrorFactory.build({
+      messages: IdxErrorMessagesFactory.build({
+        value: [
+          IdxErrorNoAccountWithUsernameFactory.build({}, {
+            transient: {
+              username
+            }
+          })
+        ]
+      })
+    });
+    const errorResponse = Object.assign({}, identifyRecoveryResponse, { rawIdxState });
+
+    jest.spyOn(identifyRecoveryResponse, 'proceed').mockResolvedValueOnce(errorResponse);
+    jest.spyOn(mocked.idx, 'start')
+      .mockResolvedValueOnce(identifyResponse);
+
+    const res = await recoverPassword(authClient, { username });
+    expect(res).toEqual({
+      status: IdxStatus.PENDING,
+      tokens: null,
+      error: undefined, // TOOD: is this expected?
+      nextStep: {
+        name: 'identify-recovery',
+        inputs: [{
+          name: 'username',
+          label: 'Username'
+        }],
+        canSkip: undefined // TODO: is this expected?
+      },
+      messages: [{
+        class: 'INFO',
+        i18n: {
+          key: 'idx.unknown.user',
+          params: []
+        },
+        message: 'There is no account with the Username incorrect@wrong.com.'
+      }]
+    });
+  });
+
   it('can proceed using username up front', async () => {
     const {
       authClient,
@@ -231,7 +285,7 @@ describe('idx/recoverPassword', () => {
 
     jest.spyOn(identifyRecoveryResponse, 'proceed');
     jest.spyOn(reEnrollAuthenticatorResponse, 'proceed');
-    
+
     const res = await recoverPassword(authClient, { username: 'myname', newPassword: 'newpass' });
     expect(identifyRecoveryResponse.proceed).toHaveBeenCalledWith('identify-recovery', { identifier: 'myname' });
     expect(reEnrollAuthenticatorResponse.proceed).toHaveBeenCalledWith('reenroll-authenticator', {
