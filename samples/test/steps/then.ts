@@ -2,6 +2,7 @@
 import { Then } from '@cucumber/cucumber';
 
 import checkProfile from '../support/check/checkProfile';
+import checkFormMessage from '../support/check/checkFormMessage';
 
 Then(
   /^User can verify their profile data$/,
@@ -11,6 +12,11 @@ Then(
 Then(
   /^a page loads with all of Mary's Profile information$/,
   checkProfile
+);
+
+Then(
+  /^she should see a message on the Login form "(?<message>.+?)"$/,
+  checkFormMessage
 );
 
 // import checkClass from '../support/check/checkClass';

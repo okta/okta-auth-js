@@ -9,6 +9,11 @@ export default async (
   let selector = null;
   let value;
   switch (credName) {
+    case 'incorrect username': {
+      selector = LoginForm.username;
+      value = 'Mory';
+      break;
+    }
     case 'username': {
       selector = LoginForm.username;
       value = value || config.username;
