@@ -84,12 +84,18 @@ export class Remediator {
   ): boolean 
   {
     // no attempt to format, we want simple true/false
-    if (!this.map || !this.map[key] || !Array.isArray(this.map[key])) {
-      return !!this.values[key];
+    const data = this.getData(key);
+    if (typeof data === 'object') {
+      return !!Object.keys(data).find(key => !!data[key]);
     }
-    return !!(this.map[key] as string[]).find((alias) => {
-      return this.values[alias]; 
-    });
+    return !!data;
+    // 
+    // if (!this.map || !this.map[key] || !Array.isArray(this.map[key])) {
+    //   return !!this.values[key];
+    // }
+    // return !!(this.map[key] as string[]).find((alias) => {
+    //   return this.values[alias]; 
+    // });
   }
 
   getNextStep(): NextStep {

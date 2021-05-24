@@ -17,6 +17,7 @@ import {
   AuthenticatorValueFactory,
   CredentialsValueFactory,
   IdxValueFactory,
+  NewPasswordValueFactory,
 } from './values';
 
 interface MockedIdxRemediation extends IdxRemediation {
@@ -130,3 +131,209 @@ export const EnrollProfileRemediationFactory = IdxRemediationFactory.params({
 export const SelectEnrollProfileRemediationFactory = IdxRemediationFactory.params({
   name: 'select-enroll-profile'
 });
+
+export const IdentifyRecoveryRemediationFactory = IdxRemediationFactory.params({
+  name: 'identify-recovery',
+  value: [
+    UsernameValueFactory.build()
+  ]
+});
+
+export const ReEnrollAuthenticatorRemediationFactory = IdxRemediationFactory.params({
+  name: 'reenroll-authenticator',
+});
+
+export const ReEnrollPasswordAuthenticatorRemediationFactory = ReEnrollAuthenticatorRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: PasswordAuthenticatorFactory.build()
+  },
+  value: [
+    CredentialsValueFactory.build({
+      form: {
+        value: [
+          NewPasswordValueFactory.build()
+        ]
+      }
+    })
+  ]
+});
+
+export const AuthenticatorVerificationDataRemediationFactory = IdxRemediationFactory.params({
+  name: 'authenticator-verification-data',
+});
+
+
+// [
+//   {
+//       "rel": [
+//           "create-form"
+//       ],
+//       "name": "authenticator-verification-data",
+//       "relatesTo": {
+//           "type": "object",
+//           "value": {
+//               "profile": {
+//                   "phoneNumber": "+1 XXX-XXX-0044"
+//               },
+//               "resend": {
+//                   "rel": [
+//                       "create-form"
+//                   ],
+//                   "name": "resend",
+//                   "href": "https://dev-64717063.okta.com/idp/idx/challenge/resend",
+//                   "method": "POST",
+//                   "produces": "application/ion+json; okta-version=1.0.0",
+//                   "value": [
+//                       {
+//                           "name": "stateHandle",
+//                           "required": true,
+//                           "value": "02UdoGJuNYHKV-QFw1k3eMTZL0GTcm3tI-0aKWK2OD",
+//                           "visible": false,
+//                           "mutable": false
+//                       }
+//                   ],
+//                   "accepts": "application/json; okta-version=1.0.0"
+//               },
+//               "type": "phone",
+//               "key": "phone_number",
+//               "id": "paeskx9tr1ltAytas5d6",
+//               "displayName": "Phone",
+//               "methods": [
+//                   {
+//                       "type": "sms"
+//                   },
+//                   {
+//                       "type": "voice"
+//                   }
+//               ]
+//           }
+//       },
+//       "href": "https://dev-64717063.okta.com/idp/idx/challenge",
+//       "method": "POST",
+//       "produces": "application/ion+json; okta-version=1.0.0",
+//       "value": [
+//           {
+//               "name": "authenticator",
+//               "label": "Phone",
+//               "form": {
+//                   "value": [
+//                       {
+//                           "name": "id",
+//                           "required": true,
+//                           "value": "autl0dnf8xY0xTY855d6",
+//                           "mutable": false
+//                       },
+//                       {
+//                           "name": "methodType",
+//                           "type": "string",
+//                           "required": true,
+//                           "options": [
+//                               {
+//                                   "label": "SMS",
+//                                   "value": "sms"
+//                               },
+//                               {
+//                                   "label": "Voice call",
+//                                   "value": "voice"
+//                               }
+//                           ]
+//                       },
+//                       {
+//                           "name": "enrollmentId",
+//                           "required": true,
+//                           "value": "paeskx9tr1ltAytas5d6",
+//                           "mutable": false
+//                       }
+//                   ]
+//               }
+//           },
+//           {
+//               "name": "stateHandle",
+//               "required": true,
+//               "value": "02UdoGJuNYHKV-QFw1k3eMTZL0GTcm3tI-0aKWK2OD",
+//               "visible": false,
+//               "mutable": false
+//           }
+//       ],
+//       "accepts": "application/json; okta-version=1.0.0"
+//   },
+//   {
+//       "rel": [
+//           "create-form"
+//       ],
+//       "name": "select-authenticator-authenticate",
+//       "href": "https://dev-64717063.okta.com/idp/idx/challenge",
+//       "method": "POST",
+//       "produces": "application/ion+json; okta-version=1.0.0",
+//       "value": [
+//           {
+//               "name": "authenticator",
+//               "type": "object",
+//               "options": [
+//                   {
+//                       "label": "Phone",
+//                       "value": {
+//                           "form": {
+//                               "value": [
+//                                   {
+//                                       "name": "id",
+//                                       "required": true,
+//                                       "value": "autl0dnf8xY0xTY855d6",
+//                                       "mutable": false
+//                                   },
+//                                   {
+//                                       "name": "methodType",
+//                                       "type": "string",
+//                                       "required": false,
+//                                       "options": [
+//                                           {
+//                                               "label": "SMS",
+//                                               "value": "sms"
+//                                           },
+//                                           {
+//                                               "label": "Voice call",
+//                                               "value": "voice"
+//                                           }
+//                                       ]
+//                                   },
+//                                   {
+//                                       "name": "enrollmentId",
+//                                       "required": true,
+//                                       "value": "paeskx9tr1ltAytas5d6",
+//                                       "mutable": false
+//                                   }
+//                               ]
+//                           }
+//                       },
+//                       "relatesTo": {
+//                           "profile": {
+//                               "phoneNumber": "+1 XXX-XXX-0044"
+//                           },
+//                           "type": "phone",
+//                           "key": "phone_number",
+//                           "id": "paeskx9tr1ltAytas5d6",
+//                           "displayName": "Phone",
+//                           "methods": [
+//                               {
+//                                   "type": "sms"
+//                               },
+//                               {
+//                                   "type": "voice"
+//                               }
+//                           ]
+//                       }
+//                   }
+//               ]
+//           },
+//           {
+//               "name": "stateHandle",
+//               "required": true,
+//               "value": "02UdoGJuNYHKV-QFw1k3eMTZL0GTcm3tI-0aKWK2OD",
+//               "visible": false,
+//               "mutable": false
+//           }
+//       ],
+//       "accepts": "application/json; okta-version=1.0.0"
+//   }
+// ]
