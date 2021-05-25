@@ -1,4 +1,3 @@
-import checkEqualsText from './checkEqualsText';
 import waitForDisplayed from '../wait/waitForDisplayed';
 
 import Home from '../selectors/Home';
