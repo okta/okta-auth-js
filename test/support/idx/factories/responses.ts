@@ -1,14 +1,20 @@
 /* eslint-disable max-len */
 import { Factory } from 'fishery';
-import { IdxResponse } from '../../../../lib/idx/types/idx-js';
+import { IdxResponse, RawIdxResponse } from '../../../../lib/idx/types/idx-js';
 import {
   IdentifyRemediationFactory,
   IdentifyWithPasswordRemediationFactory,
-  SelectAuthenticatorRemediationFactory,
   VerifyPasswordRemediationFactory,
   SelectEnrollProfileRemediationFactory,
   RedirectIdpRemediationFactory,
 } from './remediations';
+
+export const RawIdxResponseFactory = Factory.define<RawIdxResponse>(() => {
+  return {
+    version: '1.0.0',
+    stateHandle: 'unknown-stateHandle'
+  };
+});
 
 interface MockedIdxResponseTransientParams {
   nextResponse?: IdxResponse;
@@ -22,18 +28,14 @@ export const IdxResponseFactory = Factory.define<IdxResponse, MockedIdxResponseT
   return {
     proceed: () => Promise.resolve(transientParams.nextResponse),
     neededToProceed: [],
-    rawIdxState: {
+    rawIdxState: RawIdxResponseFactory.build({
       version: transientParams.idxVersion,
       stateHandle: transientParams.stateHandle,
-    },
+    }),
     actions: {},
     toPersist: {},
     context: {}
   };
-});
-
-export const SuccessResponseFactory = IdxResponseFactory.params({
-  interactionCode: 'idx-interactionCode'
 });
 
 export const IdentifyResponseFactory = IdxResponseFactory.params({
@@ -52,13 +54,7 @@ export const VerifyPasswordResponseFactory = IdxResponseFactory.params({
   neededToProceed: [
     VerifyPasswordRemediationFactory.build()
   ]
-});
-
-export const SelectAuthenticatorResponseFactory = IdxResponseFactory.params({
-  neededToProceed: [
-    SelectAuthenticatorRemediationFactory.build()
-  ]
-});
+})
 
 export const PasswordRecoveryEnabledResponseFactory = IdxResponseFactory.params({
   actions: { 

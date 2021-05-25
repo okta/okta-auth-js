@@ -12,6 +12,7 @@
       "args": [
         "--runInBand",
         "--no-cache",
+        "--collectCoverage=false",
         "--config=jest.browser.js",
         "${relativeFile}"
       ],
@@ -26,6 +27,7 @@
       "args": [
         "--runInBand",
         "--no-cache",
+        "--collectCoverage=false",
         "--config=jest.server.js",
         "${relativeFile}"
       ],
