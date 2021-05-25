@@ -3,6 +3,7 @@ import { Then } from '@cucumber/cucumber';
 
 import checkProfile from '../support/check/checkProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
+import checkGuest from '../support/check/checkGuest';
 
 Then(
   /^User can verify their profile data$/,
@@ -17,6 +18,11 @@ Then(
 Then(
   /^she should see a message on the Login form "(?<message>.+?)"$/,
   checkFormMessage
+  );
+  
+Then(
+  /^the Root Page shows links to the Entry Points$/,
+  checkGuest
 );
 
 // import checkClass from '../support/check/checkClass';
