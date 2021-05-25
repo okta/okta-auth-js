@@ -124,7 +124,7 @@ export interface ParseFromUrlOptions {
   responseMode?: string;
 }
 
-export type ParseFromUrlFunction = () => Promise<TokenResponse>;
+export type ParseFromUrlFunction = (options?: string | ParseFromUrlOptions) => Promise<TokenResponse>;
 
 export interface ParseFromUrlInterface extends ParseFromUrlFunction {
   _getDocument: () => Document;
