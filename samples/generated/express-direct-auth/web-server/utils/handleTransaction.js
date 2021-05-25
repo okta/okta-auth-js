@@ -24,6 +24,11 @@ const proceed = ({ nextStep, req, res }) => {
       redirect({ req, res, path: '/login' });
       return true;
 
+    // recover password
+    case 'identify-recovery':
+      redirect({ req, res, path: '/recover-password' })
+      return true;
+      
     // registration
     case 'enroll-profile':
       redirect({ req, res, path: '/register' });
