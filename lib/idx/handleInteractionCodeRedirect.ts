@@ -8,7 +8,7 @@ export async function handleInteractionCodeRedirect(
 ): Promise<void> {
   const meta = authClient.transactionManager.load() as IdxTransactionMeta;
   if (!meta) {
-    throw new Error('No transaction data was found in storage');
+    throw new AuthSdkError('No transaction data was found in storage');
   }
 
   const { 

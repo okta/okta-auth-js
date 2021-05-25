@@ -5,7 +5,9 @@ import {
   IdentifyRemediationFactory,
   IdentifyWithPasswordRemediationFactory,
   SelectAuthenticatorRemediationFactory,
-  VerifyPasswordRemediationFactory
+  VerifyPasswordRemediationFactory,
+  SelectEnrollProfileRemediationFactory,
+  RedirectIdpRemediationFactory,
 } from './remediations';
 
 interface MockedIdxResponseTransientParams {
@@ -55,5 +57,30 @@ export const VerifyPasswordResponseFactory = IdxResponseFactory.params({
 export const SelectAuthenticatorResponseFactory = IdxResponseFactory.params({
   neededToProceed: [
     SelectAuthenticatorRemediationFactory.build()
+  ]
+});
+
+export const PasswordRecoveryEnabledResponseFactory = IdxResponseFactory.params({
+  actions: { 
+    'currentAuthenticator-recover': (() => {}) as Function
+  }
+});
+
+export const RegistrationEnabledResponseFactory = IdxResponseFactory.params({
+  neededToProceed: [
+    SelectEnrollProfileRemediationFactory.build()
+  ]
+});
+
+export const SocialIDPEnabledResponseFactory = IdxResponseFactory.params({
+  neededToProceed: [
+    RedirectIdpRemediationFactory.build()
+  ]
+});
+
+export const AvailableStepsResponseFactory = IdxResponseFactory.params({
+  neededToProceed: [
+    IdentifyRemediationFactory.build(),
+    SelectEnrollProfileRemediationFactory.build()
   ]
 });
