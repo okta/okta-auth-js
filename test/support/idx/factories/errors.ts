@@ -8,6 +8,8 @@ export const RawIdxErrorFactory = Factory.define<RawIdxResponse>(() => {
   };
 });
 
+
+
 export const IdxErrorMessageFactory = Factory.define<IdxMessage>(() => {
   return {
     class: 'ERROR',
@@ -15,6 +17,23 @@ export const IdxErrorMessageFactory = Factory.define<IdxMessage>(() => {
       key: 'unknown'
     },
     message: 'Default error message'
+  };
+});
+
+interface IdxErrorNoAccountWithUsernameTransientParams {
+  username?: string;
+}
+
+export const IdxErrorNoAccountWithUsernameFactory = Factory.define<IdxMessage, IdxErrorNoAccountWithUsernameTransientParams>(({
+  transientParams
+}) => {
+  return {
+    message: `There is no account with the Username ${transientParams.username}.`,
+    i18n: {
+        key: 'idx.unknown.user',
+        params: []
+    },
+    class: 'INFO'
   };
 });
 
@@ -77,4 +96,3 @@ export const IdxErrorResetPasswordNotAllowedFactory = RawIdxErrorFactory.params(
     ]
   })
 });
-

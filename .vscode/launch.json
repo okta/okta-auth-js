@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "jest (browser, jsdom)",
+      "name": "sdk: unit test (browser, jsdom)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
@@ -21,7 +21,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "jest (server, node)",
+      "name": "sdk: unit test (server, node)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
         "--runInBand",
@@ -34,7 +34,7 @@
     },
 
     {
-      "name": "test/e2e spec",
+      "name": "sdk: e2e spec",
       "type": "node",
       "request": "launch",
       "args": ["wdio.conf.ts", "--spec", "${file}"],
