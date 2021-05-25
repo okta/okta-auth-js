@@ -163,6 +163,10 @@ export const AuthenticatorVerificationDataRemediationFactory = IdxRemediationFac
   name: 'authenticator-verification-data',
 });
 
+export const RedirectIdpRemediationFactory = IdxRemediationFactory.params({
+  name: 'redirect-idp',
+});
+
 
 // [
 //   {
