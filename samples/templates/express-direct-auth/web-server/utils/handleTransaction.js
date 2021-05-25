@@ -26,7 +26,7 @@ const proceed = ({ nextStep, req, res }) => {
 
     // recover password
     case 'identify-recovery':
-      redirect({ req, res, path: '/recover-password' })
+      redirect({ req, res, path: '/recover-password' });
       return true;
       
     // registration
