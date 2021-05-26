@@ -114,7 +114,7 @@ describe('idx/authenticate', () => {
 
   describe('error handling', () => {
 
-    describe('SSR is not enabled', () => {
+    describe('Profile enrollment is not enabled', () => {
       it('returns pending error "you do not have permission" when invalid username is provided', async () => {
         const { authClient } = testContext;
         const rawIdxState = RawIdxResponseFactory.build({
@@ -150,7 +150,7 @@ describe('idx/authenticate', () => {
       });
     });
 
-    describe('SSR is enabled', () => {
+    describe('Profile enrollment is enabled', () => {
       it('returns pending error "No account with username" when invalid username is provided', async () => {
         const { authClient } = testContext;
         const username = 'obviously-wrong';
