@@ -54,7 +54,7 @@ export const VerifyPasswordResponseFactory = IdxResponseFactory.params({
   neededToProceed: [
     VerifyPasswordRemediationFactory.build()
   ]
-})
+});
 
 export const PasswordRecoveryEnabledResponseFactory = IdxResponseFactory.params({
   actions: { 
