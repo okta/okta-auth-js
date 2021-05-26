@@ -23,6 +23,23 @@ export function generateNonce() {
   return genRandomString(64);
 }
 
+function getIssuer(sdk: OktaAuth, options: CustomUrls = {}) {
+  const issuer = removeTrailingSlash(options.issuer) || sdk.options.issuer;
+  return issuer;
+}
+
+export function getOAuthBaseUrl(sdk: OktaAuth, options: CustomUrls = {}) {
+  const issuer = getIssuer(sdk, options);
+  const baseUrl = issuer.indexOf('/oauth2') > 0 ? issuer : issuer + '/oauth2';
+  return baseUrl;
+}
+
+export function getOAuthDomain(sdk: OktaAuth, options: CustomUrls = {}) {
+  const issuer = getIssuer(sdk, options);
+  const domain = issuer.split('/oauth2')[0];
+  return domain;
+}
+
 export function getOAuthUrls(sdk: OktaAuth, options?: CustomUrls) {
   if (arguments.length > 2) {
     throw new AuthSdkError('As of version 3.0, "getOAuthUrls" takes only a single set of options');
@@ -31,13 +48,13 @@ export function getOAuthUrls(sdk: OktaAuth, options?: CustomUrls) {
 
   // Get user-supplied arguments
   var authorizeUrl = removeTrailingSlash(options.authorizeUrl) || sdk.options.authorizeUrl;
-  var issuer = removeTrailingSlash(options.issuer) || sdk.options.issuer;
+  var issuer = getIssuer(sdk, options);
   var userinfoUrl = removeTrailingSlash(options.userinfoUrl) || sdk.options.userinfoUrl;
   var tokenUrl = removeTrailingSlash(options.tokenUrl) || sdk.options.tokenUrl;
   var logoutUrl = removeTrailingSlash(options.logoutUrl) || sdk.options.logoutUrl;
   var revokeUrl = removeTrailingSlash(options.revokeUrl) || sdk.options.revokeUrl;
 
-  var baseUrl = issuer.indexOf('/oauth2') > 0 ? issuer : issuer + '/oauth2';
+  var baseUrl = getOAuthBaseUrl(sdk, options);
 
   authorizeUrl = authorizeUrl || baseUrl + '/v1/authorize';
   userinfoUrl = userinfoUrl || baseUrl + '/v1/userinfo';

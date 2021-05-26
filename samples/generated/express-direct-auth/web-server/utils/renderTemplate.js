@@ -6,6 +6,7 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     ...options, 
     action: getFormActionPath(req, options.action),
     skipAction: getFormActionPath(req, options.skipAction),
+    cancelAction: getFormActionPath(req, '/cancel')
   };
   const { messages } = req.getIdxStates() || {};
   req.clearIdxStates();

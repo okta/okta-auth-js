@@ -22,22 +22,37 @@ import {
   EmailAuthenticatorOptionFactory
 } from '@okta/test.support/idx';
 
-jest.mock('@okta/okta-idx-js', () => {
-  const { makeIdxState } = jest.requireActual('@okta/okta-idx-js').default;
+// jest.mock('@okta/okta-idx-js', () => {
+//   const { makeIdxState } = jest.requireActual('@okta/okta-idx-js').default;
+//   return {
+//     interact: () => Promise.reject(new Error('introspect should be mocked')),
+//     makeIdxState
+//   };
+// });
+
+jest.mock('../../../lib/idx/interact', () => {
   return {
-    start: () => Promise.reject(new Error('start should be mocked')),
-    makeIdxState
+    interact: () => Promise.reject(new Error('interact should be mocked'))
+  };
+});
+
+
+jest.mock('../../../lib/idx/introspect', () => {
+  return {
+    introspect: () => Promise.reject(new Error('introspect should be mocked'))
   };
 });
 
 const mocked = {
   idx: require('@okta/okta-idx-js'),
+  interact: require('../../../lib/idx/interact'),
+  introspect: require('../../../lib/idx/introspect')
 };
 
 describe('idx/recoverPassword', () => {
  let testContext;
   beforeEach(() => {
-    const issuer = 'test-issuer';
+    const issuer = 'https://test-issuer';
     const clientId = 'test-clientId';
     const redirectUri = 'test-redirectUri';
     const transactionMeta = {
@@ -64,6 +79,8 @@ describe('idx/recoverPassword', () => {
         save: () => {}
       }
     };
+
+    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ meta: transactionMeta });
 
     const identifyRecoveryResponse = IdxResponseFactory.build({
       neededToProceed: [
@@ -119,7 +136,7 @@ describe('idx/recoverPassword', () => {
   
   it('throws an error if password recovery is not supported', async () => {
     const { authClient, transactionMeta } = testContext;
-    jest.spyOn(mocked.idx, 'start').mockResolvedValue(IdentifyResponseFactory.build({
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(IdentifyResponseFactory.build({
       actions: {
         // does not contain "currentAuthenticator-recover"
       }
@@ -139,7 +156,7 @@ describe('idx/recoverPassword', () => {
 
   it('returns a transaction', async () => {
     const { authClient, identifyResponse } = testContext;
-    jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     const res = await recoverPassword(authClient, {});
     expect(res).toEqual({
       status: IdxStatus.PENDING,
@@ -159,7 +176,7 @@ describe('idx/recoverPassword', () => {
 
   it('invokes the "currentAuthenticator-recover" action', async () => {
     const { authClient, identifyResponse } = testContext;
-    jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     jest.spyOn(identifyResponse.actions, 'currentAuthenticator-recover');
     await recoverPassword(authClient, {});
     expect(identifyResponse.actions['currentAuthenticator-recover']).toHaveBeenCalled();
@@ -180,7 +197,7 @@ describe('idx/recoverPassword', () => {
       })
     });
     jest.spyOn(identifyRecoveryResponse, 'proceed').mockRejectedValue(idxError);
-    jest.spyOn(mocked.idx, 'start')
+    jest.spyOn(mocked.introspect, 'introspect')
       .mockResolvedValueOnce(identifyResponse);
 
     const res = await recoverPassword(authClient, { username: 'myname' });
@@ -222,7 +239,7 @@ describe('idx/recoverPassword', () => {
     const errorResponse = Object.assign({}, identifyRecoveryResponse, { rawIdxState });
 
     jest.spyOn(identifyRecoveryResponse, 'proceed').mockResolvedValueOnce(errorResponse);
-    jest.spyOn(mocked.idx, 'start')
+    jest.spyOn(mocked.introspect, 'introspect')
       .mockResolvedValueOnce(identifyResponse);
 
     const res = await recoverPassword(authClient, { username });
@@ -261,7 +278,7 @@ describe('idx/recoverPassword', () => {
       identifyRecoveryResponse,
       reEnrollAuthenticatorResponse
     ]);
-    jest.spyOn(mocked.idx, 'start')
+    jest.spyOn(mocked.introspect, 'introspect')
       .mockResolvedValueOnce(identifyResponse)
       .mockResolvedValueOnce(identifyRecoveryResponse);
 
@@ -298,7 +315,7 @@ describe('idx/recoverPassword', () => {
       reEnrollAuthenticatorResponse,
       verificationDataResponse
     ]);
-    jest.spyOn(mocked.idx, 'start')
+    jest.spyOn(mocked.introspect, 'introspect')
       .mockResolvedValueOnce(identifyResponse)
       .mockResolvedValueOnce(identifyRecoveryResponse)
       .mockResolvedValueOnce(reEnrollAuthenticatorResponse);
@@ -338,7 +355,7 @@ describe('idx/recoverPassword', () => {
       reEnrollAuthenticatorResponse,
       verificationDataResponse
     ]);
-    jest.spyOn(mocked.idx, 'start')
+    jest.spyOn(mocked.introspect, 'introspect')
       .mockResolvedValueOnce(identifyResponse)
       .mockResolvedValueOnce(identifyRecoveryResponse)
       .mockResolvedValueOnce(reEnrollAuthenticatorResponse);

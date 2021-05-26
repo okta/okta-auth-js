@@ -26,7 +26,8 @@ module.exports = {
     '<rootDir>/test/support/jest/jest.setup.js'
   ],
   'testMatch': [
-    '**/test/spec/**/*.{js,ts}'
+    // '**/test/spec/**/*.{js,ts}'
+    '**/test/spec/idx/recoverPassword.{js,ts}'
   ],
   'roots': [
     'test/spec'

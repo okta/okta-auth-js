@@ -13,6 +13,7 @@
 import idx from '@okta/okta-idx-js';
 import { OktaAuth } from '../types';
 import { AcceptsInteractionHandle } from './types/AcceptsInteractionHandle';
+import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
 
 interface IntrospectOptions extends AcceptsInteractionHandle {
@@ -20,7 +21,8 @@ interface IntrospectOptions extends AcceptsInteractionHandle {
 }
 
 export async function introspect (authClient: OktaAuth, options: IntrospectOptions) {
-  const domain = authClient.options.issuer.split('/oauth2')[0];
   const version = IDX_API_VERSION;
-  return idx.start({ domain, version, ...options });
+  const domain = getOAuthDomain(authClient);
+  const rawIdxResponse = await idx.introspect({ domain, version, ...options });
+  return idx.makeIdxState(rawIdxResponse);
 }

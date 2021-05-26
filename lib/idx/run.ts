@@ -1,12 +1,12 @@
 /* eslint-disable max-statements, complexity */
 import { interact } from './interact';
+import { introspect } from './introspect';
 import { remediate } from './remediate';
 import { FlowMonitor } from './flowMonitors';
 import * as remediators from './remediators';
 import { 
   OktaAuth,
   IdxOptions,
-  IdxTransactionMeta,
   IdxStatus,
   IdxTransaction,
   IdxFeature,
@@ -19,10 +19,6 @@ export interface RunOptions {
   flow?: RemediationFlow;
   actions?: string[];
   flowMonitor?: FlowMonitor;
-}
-
-function getMeta(meta) {
-  return meta;
 }
 
 function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
@@ -82,19 +78,21 @@ export async function run(
 
   try {
     // Start/resume the flow
-    let { 
-      idxResponse, 
-      stateHandle, 
-      meta: metaFromResp,
-    } = await interact(authClient, options); 
+    const { interactionHandle, meta: metaFromResp } = await interact(authClient, options); 
+    meta = metaFromResp;
+
+    // Introspect to get idx response
+    const idxResponse = await introspect(authClient, { interactionHandle });
 
     if (!options.flow && !options.actions) {
       // handle start transaction
-      meta = getMeta(metaFromResp);
       enabledFeatures = getEnabledFeatures(idxResponse);
       availableSteps = getAvailableSteps(idxResponse.neededToProceed);
     } else {
-      const values: remediators.RemediationValues = { ...options, stateHandle };
+      const values: remediators.RemediationValues = { 
+        ...options, 
+        stateHandle: idxResponse.stateHandle 
+      };
 
       // Can we handle the remediations?
       const { 
@@ -118,25 +116,10 @@ export async function run(
         status = IdxStatus.CANCELED;
         shouldClearTransaction = true;
       } else if (interactionCode) { 
-        // Did we get an interaction code?
-        const meta = authClient.transactionManager.load() as IdxTransactionMeta;
-        const {
-          codeVerifier,
-          clientId,
-          redirectUri,
-          scopes,
-          urls,
-          ignoreSignature
-        } = meta;
-
         tokens = await authClient.token.exchangeCodeForTokens({
           interactionCode,
-          codeVerifier,
-          clientId,
-          redirectUri,
-          scopes,
-          ignoreSignature
-        }, urls);
+          ...meta,
+        }, meta.urls);
 
         status = IdxStatus.SUCCESS;
         shouldClearTransaction = true;

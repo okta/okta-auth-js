@@ -2126,6 +2126,15 @@
     webcrypto-shim "^0.1.5"
     xhr2 "0.1.3"
 
+"@okta/okta-idx-js@0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.17.0.tgz#16eafd18970d9bc3729b5bdae3c26d4e62e98a1f"
+  integrity sha512-sFGlSXS1xkRx14BkEBYeluCgm/FCrQjgUqfuLTou7afXJvqeFuPOgppE08LQIsBfhITuCM5tUWFO8sQKtjmTPw==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@babel/runtime-corejs3" "^7.12.5"
+    jsonpath "^1.0.2"
+
 "@okta/okta-idx-js@^0.16.0":
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.16.0.tgz#1f7412dc0adf3eb45486be3a7ef4696d0e2b0e2e"
