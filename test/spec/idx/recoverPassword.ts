@@ -11,11 +11,15 @@ import {
   chainResponses,
   ReEnrollPasswordAuthenticatorRemediationFactory,
   AuthenticatorVerificationDataRemediationFactory,
-  SelectAuthenticatorRemediationFactory,
+  SelectAuthenticatorAuthenticateRemediationFactory,
   IdxErrorResetPasswordNotAllowedFactory,
-  RawIdxErrorFactory,
-  IdxErrorMessagesFactory,
-  IdxErrorNoAccountWithUsernameFactory
+  RawIdxResponseFactory,
+  IdxMessagesFactory,
+  IdxErrorNoAccountWithUsernameFactory,
+  AuthenticatorValueFactory,
+  OktaVerifyAuthenticatorOptionFactory,
+  PhoneAuthenticatorOptionFactory,
+  EmailAuthenticatorOptionFactory
 } from '@okta/test.support/idx';
 
 jest.mock('@okta/okta-idx-js', () => {
@@ -76,7 +80,17 @@ describe('idx/recoverPassword', () => {
     const verificationDataResponse = IdxResponseFactory.build({
       neededToProceed: [
         AuthenticatorVerificationDataRemediationFactory.build(),
-        SelectAuthenticatorRemediationFactory.build()
+        SelectAuthenticatorAuthenticateRemediationFactory.build({
+          value: [
+            AuthenticatorValueFactory.build({
+              options: [
+                OktaVerifyAuthenticatorOptionFactory.build(),
+                PhoneAuthenticatorOptionFactory.build(),
+                EmailAuthenticatorOptionFactory.build(),
+              ]
+            })
+          ]
+        })
       ]
     });
 
@@ -158,7 +172,13 @@ describe('idx/recoverPassword', () => {
       identifyRecoveryResponse,
     } = testContext;
     
-    const idxError = IdxErrorResetPasswordNotAllowedFactory.build();
+    const idxError = RawIdxResponseFactory.build({
+      messages: IdxMessagesFactory.build({
+        value: [
+          IdxErrorResetPasswordNotAllowedFactory.build()
+        ]
+      })
+    });
     jest.spyOn(identifyRecoveryResponse, 'proceed').mockRejectedValue(idxError);
     jest.spyOn(mocked.idx, 'start')
       .mockResolvedValueOnce(identifyResponse);
@@ -171,7 +191,7 @@ describe('idx/recoverPassword', () => {
       messages: [{
         class: 'ERROR',
         i18n: {
-          key: 'unknown' // this error does not have a key
+          key: undefined // this error does not have a key
         },
         message: 'Reset password is not allowed at this time. Please contact support for assistance.'
       }]
@@ -188,8 +208,8 @@ describe('idx/recoverPassword', () => {
     const username = 'incorrect@wrong.com';
 
     // messages appear in the "rawIdxState"
-    const rawIdxState = RawIdxErrorFactory.build({
-      messages: IdxErrorMessagesFactory.build({
+    const rawIdxState = RawIdxResponseFactory.build({
+      messages: IdxMessagesFactory.build({
         value: [
           IdxErrorNoAccountWithUsernameFactory.build({}, {
             transient: {

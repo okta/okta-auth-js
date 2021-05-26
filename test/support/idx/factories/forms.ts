@@ -27,6 +27,14 @@ export const PasswordFormFactory = IdxFormFactory.params({
   }]
 });
 
+export const PasswordAuthenticatorFormFactory = IdxFormFactory.params({
+  value: [
+    IdValueFactory.build({
+      value: 'id-password'
+    })
+  ]
+});
+
 export const EmailAuthenticatorFormFactory = IdxFormFactory.params({
   value: [
     IdValueFactory.build({

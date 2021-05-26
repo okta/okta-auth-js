@@ -44,9 +44,6 @@ export class Remediator {
 
   // returns an object for the entire remediation form, or just a part
   getData(key?: string) {
-    if (!this.map) {
-      return {};
-    }
 
     if (!key) {
       let allValues = getAllValues(this.remediation);
@@ -64,10 +61,14 @@ export class Remediator {
       );
     }
 
+    if (!this.map) {
+      return this.values[key];
+    }
+
     // Handle general primitive types
     const entry = this.map[key];
     if (!entry) {
-      return;
+      return this.values[key];
     }
 
     // find the first aliased property that returns a truthy value
@@ -84,18 +85,13 @@ export class Remediator {
   ): boolean 
   {
     // no attempt to format, we want simple true/false
+
+    // First see if the remediation has a mapping for this vale
     const data = this.getData(key);
     if (typeof data === 'object') {
       return !!Object.keys(data).find(key => !!data[key]);
     }
     return !!data;
-    // 
-    // if (!this.map || !this.map[key] || !Array.isArray(this.map[key])) {
-    //   return !!this.values[key];
-    // }
-    // return !!(this.map[key] as string[]).find((alias) => {
-    //   return this.values[alias]; 
-    // });
   }
 
   getNextStep(): NextStep {
@@ -135,7 +131,7 @@ export class Remediator {
       } 
 
       if (!input) {
-        throw new AuthSdkError(`Missing custom getInput method in Remediator: ${this.getName()}`);
+        throw new AuthSdkError(`Missing custom getInput${titleCase(key)} method in Remediator: ${this.getName()}`);
       }
 
       inputs.push(input);

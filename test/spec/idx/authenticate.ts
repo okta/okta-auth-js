@@ -3,19 +3,25 @@ import { IdxStatus } from '../../../lib/idx/types';
 
 import {
   chainResponses,
-  SuccessResponseFactory,
   IdentifyResponseFactory,
   IdentifyWithPasswordResponseFactory,
   VerifyPasswordResponseFactory,
-  SelectAuthenticatorResponseFactory,
   IdxResponseFactory,
   PhoneAuthenticatorEnrollmentDataRemediationFactory,
   EnrollPhoneAuthenticatorRemediationFactory,
   IdxErrorAccessDeniedFactory,
   IdxErrorIncorrectPassword,
   IdxErrorUserNotAssignedFactory,
-  IdxErrorAuthenticationFailedFactory
+  IdxErrorAuthenticationFailedFactory,
+  RawIdxResponseFactory,
+  IdxErrorNoAccountWithUsernameFactory,
+  SelectAuthenticatorAuthenticateRemediationFactory,
+  AuthenticatorValueFactory,
+  PhoneAuthenticatorOptionFactory,
+  EmailAuthenticatorOptionFactory,
+  OktaVerifyAuthenticatorOptionFactory
 } from '@okta/test.support/idx';
+import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
 jest.mock('@okta/okta-idx-js', () => {
   const { makeIdxState } = jest.requireActual('@okta/okta-idx-js').default;
@@ -34,7 +40,7 @@ describe('idx/authenticate', () => {
   beforeEach(() => {
     const interactionCode = 'test-interactionCode';
     const stateHandle = 'test-stateHandle';
-    const successResponse = SuccessResponseFactory.build({
+    const successResponse = IdxResponseFactory.build({
       interactionCode
     });
 
@@ -108,29 +114,92 @@ describe('idx/authenticate', () => {
 
   describe('error handling', () => {
 
-    it('returns terminal error when invalid username is provided', async () => {
-      const { authClient } = testContext;
-      const errorResponse = IdxErrorAccessDeniedFactory.build();
-      const identifyResponse =  IdentifyResponseFactory.build();
-      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
-      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+    describe('Profile enrollment is not enabled', () => {
+      it('returns pending error "you do not have permission" when invalid username is provided', async () => {
+        const { authClient } = testContext;
+        const rawIdxState = RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorAccessDeniedFactory.build()
+            ]
+          })
+        });
+        const identifyResponse =  IdentifyResponseFactory.build();
+        const errorResponse = Object.assign({}, identifyResponse, { rawIdxState });
+        identifyResponse.proceed = jest.fn().mockResolvedValueOnce(errorResponse);
+        jest.spyOn(mocked.idx, 'start').mockResolvedValueOnce(identifyResponse);
 
-      const res = await authenticate(authClient, { username: 'obviously-wrong' });
-      expect(res.status).toBe(IdxStatus.TERMINAL);
-      expect(res.nextStep).toBe(undefined);
-      expect(res.error).toBe(undefined); // TODO: is this expected?
-      expect(res.messages).toEqual([{
-        class: 'ERROR',
-        i18n: {
-          key: 'security.access_denied'
-        },
-        message: 'You do not have permission to perform the requested action.'
-      }]);
+        const res = await authenticate(authClient, { username: 'obviously-wrong' });
+        expect(res.status).toBe(IdxStatus.PENDING);
+        expect(res.nextStep).toEqual({
+          canSkip: undefined,
+          name: 'identify',
+          inputs: [{
+            name: 'username',
+            label: 'Username'
+          }]
+        });
+        expect(res.error).toBe(undefined); // TODO: is this expected?
+        expect(res.messages).toEqual([{
+          class: 'ERROR',
+          i18n: {
+            key: 'security.access_denied'
+          },
+          message: 'You do not have permission to perform the requested action.'
+        }]);
+      });
+    });
+
+    describe('Profile enrollment is enabled', () => {
+      it('returns pending error "No account with username" when invalid username is provided', async () => {
+        const { authClient } = testContext;
+        const username = 'obviously-wrong';
+        const rawIdxState = RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorNoAccountWithUsernameFactory.build({}, {
+                transient: { username }
+              })
+            ]
+          })
+        });
+        const identifyResponse =  IdentifyResponseFactory.build();
+        const errorResponse = Object.assign({}, identifyResponse, { rawIdxState });
+        identifyResponse.proceed = jest.fn().mockResolvedValueOnce(errorResponse);
+        jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+
+        const res = await authenticate(authClient, { username });
+        expect(res.status).toBe(IdxStatus.PENDING);
+        expect(res.nextStep).toEqual({
+          canSkip: undefined, // TODO: is this expected?
+          name: 'identify',
+          inputs: [{
+            name: 'username',
+            label: 'Username'
+          }]
+        });
+        expect(res.error).toBe(undefined); // TODO: is this expected?
+        expect(res.messages).toEqual([{
+          class: 'INFO',
+          i18n: {
+            key: 'idx.unknown.user',
+            params: []
+          },
+          message: 'There is no account with the Username obviously-wrong.'
+        }]);
+      });
     });
 
     it('returns terminal error when invalid password is provided', async () => {
       const { authClient } = testContext;
-      const errorResponse = IdxErrorIncorrectPassword.build();
+      const errorResponse = RawIdxResponseFactory.build({
+        messages: IdxMessagesFactory.build({
+          value: [
+            IdxErrorIncorrectPassword.build()
+          ]
+        })
+      });
+
       const identifyResponse =  IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
       jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
@@ -150,7 +219,13 @@ describe('idx/authenticate', () => {
 
     it('returns terminal error when user account is deactivated or is not assigned to the application', async () => {
       const { authClient } = testContext;
-      const errorResponse = IdxErrorUserNotAssignedFactory.build();
+      const errorResponse = RawIdxResponseFactory.build({
+        messages: IdxMessagesFactory.build({
+          value: [
+            IdxErrorUserNotAssignedFactory.build()
+          ]
+        })
+      });
       const identifyResponse =  IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
       jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
@@ -162,7 +237,7 @@ describe('idx/authenticate', () => {
       expect(res.messages).toEqual([{
         class: 'ERROR',
         i18n: {
-          key: 'unknown' // this error does not have an i18n key
+          key: undefined // this error does not have an i18n key
         },
         message: 'User is not assigned to this application'
       }]);
@@ -170,7 +245,13 @@ describe('idx/authenticate', () => {
 
     it('returns terminal error when user account is locked or suspeneded', async () => {
       const { authClient } = testContext;
-      const errorResponse = IdxErrorAuthenticationFailedFactory.build();
+      const errorResponse = RawIdxResponseFactory.build({
+        messages: IdxMessagesFactory.build({
+          value: [
+            IdxErrorAuthenticationFailedFactory.build()
+          ]
+        })
+      });
       const identifyResponse =  IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
       jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
@@ -383,7 +464,21 @@ describe('idx/authenticate', () => {
 
       const identifyResponse =  IdentifyResponseFactory.build();
       const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
-      const selectAuthenticatorResponse = SelectAuthenticatorResponseFactory.build();
+      const selectAuthenticatorResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          SelectAuthenticatorAuthenticateRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  OktaVerifyAuthenticatorOptionFactory.build(),
+                  PhoneAuthenticatorOptionFactory.build(),
+                  EmailAuthenticatorOptionFactory.build(),
+                ]
+              })
+            ]
+          })
+        ]
+      });
       const phoneEnrollmentDataResponse = IdxResponseFactory.build({
         neededToProceed: [
           PhoneAuthenticatorEnrollmentDataRemediationFactory.build()
@@ -436,17 +531,20 @@ describe('idx/authenticate', () => {
           'phone'
         ]
       });
-      expect(res.status).toBe(IdxStatus.PENDING);
-      expect(res.nextStep).toEqual({
-        canSkip: false,
-        name: 'enroll-authenticator',
-        type: 'phone',
-        inputs: [{
-          label: 'Enter code',
-          name: 'verificationCode',
-          required: true,
-          type: 'string',
-        }]
+      expect(res).toEqual({
+        status: IdxStatus.PENDING,
+        tokens: null,
+        nextStep: {
+          canSkip: false,
+          name: 'enroll-authenticator',
+          type: 'phone',
+          inputs: [{
+            label: 'Enter code',
+            name: 'verificationCode',
+            required: true,
+            type: 'string',
+          }]
+        }
       });
       expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
       expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' }});

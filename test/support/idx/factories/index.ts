@@ -1,6 +1,7 @@
 export * from './authenticators';
 export * from './errors';
 export * from './forms';
+export * from './messages';
 export * from './methods';
 export * from './options';
 export * from './remediations';

@@ -24,6 +24,12 @@ export class EnrollProfile extends Remediator {
     };
   }
 
+  getInputUserProfile(input) {
+    return {
+      ...input.form.value[0],
+    };
+  }
+
   getErrorMessages(errorRemediation) {
     return errorRemediation.value[0].form.value.reduce((errors, field) => {
       if (field.messages) {
