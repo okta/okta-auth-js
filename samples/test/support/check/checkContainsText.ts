@@ -1,4 +1,5 @@
 import type { Selector } from 'webdriverio';
+import waitForDisplayed from '../wait/waitForDisplayed';
 
 /**
  * Check if the given elements contains text
@@ -8,7 +9,7 @@ import type { Selector } from 'webdriverio';
  *                                  the given text or not
  * @param  {String}   expectedText  The text to check against
  */
-export default (
+export default async (
     elementType: 'element' | 'button',
     selector: Selector,
     falseCase: ' not',
@@ -22,7 +23,7 @@ export default (
 
     if (
         ['button', 'container'].includes(elementType)
-        || $(selector).getAttribute('value') === null
+        || (await $(selector)).getAttribute('value') === null
     ) {
         command = 'getText';
     }
@@ -38,14 +39,12 @@ export default (
      * @type {String}
      */
     let stringExpectedText = expectedText;
-
     /**
      * The text of the element
      * @type {String}
      */
-    const elem = $(selector);
-    elem.waitForDisplayed();
-    const text = elem[command]();
+    await waitForDisplayed(selector);
+    const text = (await $(selector))[command]();
 
     if (typeof expectedText === 'undefined') {
         stringExpectedText = falseCase;

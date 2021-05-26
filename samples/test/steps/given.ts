@@ -1,4 +1,7 @@
+const env = require('@okta/env');
+
 import { Given } from '@cucumber/cucumber';
+
 
 // import checkContainsAnyText from '../support/check/checkContainsAnyText';
 // import checkIsEmpty from '../support/check/checkIsEmpty';
@@ -33,6 +36,19 @@ Given(
   /^([^/s]+) navigates to (.*)$/,
   navigateTo
 );
+
+Given(
+  /^the Sample App is assigned to a "Certain" group$/,
+  () => {console.log('noope');}
+);
+
+Given(
+  /^([^/s]+) is not a member of the "Certain" group$/,
+  (_) => {
+    env.setEnvironmentVarsFromTestEnvYaml('unassignedUser');
+  }
+);
+
 
 // Given(
 //     /^I open the (url|site) "([^"]*)?"$/,

@@ -10,6 +10,7 @@ export default async (
   let queryParams;
   let selector;
   switch (formName) {
+    case 'the Basic Login View':
     case 'Login with Username and Password': {
         url = '/login';
         selector = LoginForm.password;

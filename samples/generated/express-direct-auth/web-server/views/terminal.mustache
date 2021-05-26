@@ -2,6 +2,31 @@
 <html>
   <head>
     {{>head}}
+    <script type="text/javascript">
+
+    const intervalId = setInterval(function () {
+      let timerCountElement = document.getElementById('redirect-timer');
+
+      let secondsRemaining = parseInt(timerCountElement.textContent);
+      --secondsRemaining;
+      timerCountElement.textContent = secondsRemaining;
+    }, 1000);
+    const timeoutId = setTimeout(function () {
+      clearInterval(intervalId);
+      window.location.assign('/login');
+    }, 5000);
+    function cancelRedirect(event) {
+      event.preventDefault();
+      clearInterval(intervalId);
+      clearTimeout(timeoutId);
+      document.getElementById("redirect-notice").remove();
+      document.getElementById("redirect-cancel").remove();
+      document.getElementById("redirect-instructions").textContent = "Click 'Restart login' to navigate to /login immediately."
+    };
+
+    </script>
+
+
   </head>
   <body id="samples">
   
@@ -14,10 +39,22 @@
         </div>
       </div>
 
-      <div class="row">
+      <div id="messages-container" class="row">
         {{>formMessages}}
       </div>
+
+      <div class="row ui center aligned grid">
+        <div class="row" id="redirect-notice">You will be redirected to /login in &nbsp;<span id="redirect-timer"> 5 </span>&nbsp; seconds.</div>
+        <div class="row" id="redirect-instructions">Click 'Cancel' to stay on this page or click 'Restart login' to navigate to /login immediately.</div>
+        <div class="ui messages row">
+          <a href="" id="redirect-cancel" onclick="cancelRedirect()">Cancel</a>
+        </div>
+        <div class="ui messages row">
+          <a href="/login">Restart login</a>
+        </div>
+      </div>
     </div>
+   
     
   </body>
 </html>

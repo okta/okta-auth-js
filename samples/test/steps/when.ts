@@ -1,5 +1,6 @@
 import { When } from '@cucumber/cucumber';
 
+import checkIsEmpty from '../support/check/checkIsEmpty';
 // import clearInputField from '../support/action/clearInputField';
 // import clickElement from '../support/action/clickElement';
 // import closeLastOpenedWindow from '../support/action/closeLastOpenedWindow';
@@ -19,6 +20,27 @@ import { When } from '@cucumber/cucumber';
 
 import enterCredential from '../support/action/enterCredential';
 import submitForm from '../support/action/submitForm';
+import waitForDisplayed from '../support/wait/waitForDisplayed';
+import checkContainsText from '../support/check/checkContainsText';
+
+When(
+  /^([^\s]+) sees the message "User is not assigned to this application"$/,
+  async (_) => {
+    await waitForDisplayed('#messages-container');
+    await checkContainsText(
+      'element', '#messages-container', ' not', 'You do not have permission to perform the requested action.');
+  }
+);
+
+When(
+  /^should see the login form again with blank fields$/,
+  async () => {
+    await waitForDisplayed('#username');
+    await checkIsEmpty('element', '#username', ' not');
+    await checkIsEmpty('element', '#password', ' not');
+  }
+);
+
 
 When(
   /^User enters (username|password) into the form$/,
