@@ -47,7 +47,7 @@ export interface IdxRemediationValue {
 export interface IdxRemediation {
   name: string;
   label?: string;
-  value: IdxRemediationValue[];
+  value?: IdxRemediationValue[];
   relatesTo?: {
     type?: string;
     value: IdxAuthenticator;
