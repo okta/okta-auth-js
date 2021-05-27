@@ -1,4 +1,3 @@
-import { IdxResponse } from '../../lib/idx/types/idx-js';
 import SavedObject from '../../lib/SavedObject';
 import StorageManager from '../../lib/StorageManager';
 import { 
@@ -295,9 +294,9 @@ describe('StorageManager', () => {
         };
         const storageManager = setup(options);
         const res: IdxResponseStorage = storageManager.getIdxResponseStorage();
-        expect(typeof (res as SavedObject).storageProvider.getItem === 'function').toBeTruthy();
-        expect(typeof (res as SavedObject).storageProvider.setItem === 'function').toBeTruthy();
-        expect(typeof (res as SavedObject).storageProvider.removeItem === 'function').toBeTruthy();
+        expect(typeof (res as SavedObject).storageProvider.getItem).toBe('function');
+        expect(typeof (res as SavedObject).storageProvider.setItem).toBe('function');
+        expect(typeof (res as SavedObject).storageProvider.removeItem).toBe('function');
         expect((res as SavedObject).storageName).toBe('okta-idx-response-storage');
       });
 

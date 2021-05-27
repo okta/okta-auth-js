@@ -330,10 +330,8 @@ describe('TransactionManager', () => {
 
   describe('loadIdxResponse', () => {
     let getStorage;
-    let meta;
     beforeEach(() => {
       createInstance();
-      meta = {};
     });
     it('loads from idxResponse storage', () => {
       const rawIdxResponse = RawIdxResponseFactory.build();

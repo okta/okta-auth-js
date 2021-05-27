@@ -11,7 +11,7 @@ jest.mock('@okta/okta-idx-js', () => {
 jest.mock('../../../lib/oidc', () => {
   return {
     getOAuthDomain: () => {}
-  }
+  };
 });
 
 const mocked = {
