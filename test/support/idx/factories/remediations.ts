@@ -184,6 +184,19 @@ export const AuthenticatorVerificationDataRemediationFactory = IdxRemediationFac
   name: 'authenticator-verification-data',
 });
 
+export const PasswordAuthenticatorVerificationDataRemediationFactory = AuthenticatorVerificationDataRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: PasswordAuthenticatorFactory.build()
+  },
+  value: [
+    AuthenticatorValueFactory.build({
+      label: 'Password',
+      form: PasswordFormFactory.build()
+    })
+  ]
+});
+
 export const PhoneAuthenticatorVerificationDataRemediationFactory = AuthenticatorVerificationDataRemediationFactory.params({
   relatesTo: {
     type: 'object',
