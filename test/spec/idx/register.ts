@@ -32,16 +32,9 @@ import {
   IdxErrorEnrollmentInvalidPhoneFactory
 } from '@okta/test.support/idx';
 
-jest.mock('@okta/okta-idx-js', () => {
-  const { makeIdxState } = jest.requireActual('@okta/okta-idx-js').default;
-  return {
-    start: () => Promise.reject(new Error('idx.start should be mocked')),
-    makeIdxState
-  };
-});
-
 const mocked = {
-  idx: require('@okta/okta-idx-js'),
+  interact: require('../../../lib/idx/interact'),
+  introspect: require('../../../lib/idx/introspect'),
 };
 
 describe('idx/register', () => {
@@ -83,6 +76,11 @@ describe('idx/register', () => {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       }
     };
+    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 
+      meta: transactionMeta,
+      interactionHandle: 'meta-interactionHandle',
+      state: transactionMeta.state
+    });
 
     const successWithInteractionCodeResponse = IdxResponseFactory.build({
       interactionCode
@@ -209,7 +207,7 @@ describe('idx/register', () => {
         // does not contain select-enroll-profile
       ]
     });
-    jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     const res = await register(authClient, {});
     expect(res.status).toBe(IdxStatus.FAILURE);
     expect(res.error).toBeInstanceOf(AuthSdkError);
@@ -231,7 +229,7 @@ describe('idx/register', () => {
       ]);
       jest.spyOn(identifyResponse, 'proceed');
       jest.spyOn(enrollProfileResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(identifyResponse);
 
       let res = await register(authClient, {
@@ -287,7 +285,7 @@ describe('idx/register', () => {
       ]);
       jest.spyOn(selectPasswordResponse, 'proceed');
       jest.spyOn(enrollPasswordResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(selectPasswordResponse);
   
       const password = 'my-password';
@@ -341,7 +339,7 @@ describe('idx/register', () => {
       ]);
       jest.spyOn(selectPasswordResponse, 'proceed');
       jest.spyOn(enrollPasswordResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValue(selectPasswordResponse);
   
       const password = 'my-password';
@@ -408,7 +406,7 @@ describe('idx/register', () => {
         enrollEmailAuthenticatorResponse
       ]);
       jest.spyOn(selectAuthenticatorResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(selectAuthenticatorResponse);
 
       let res = await register(authClient, {
@@ -450,7 +448,7 @@ describe('idx/register', () => {
         enrollEmailAuthenticatorResponse
       ]);
       jest.spyOn(selectAuthenticatorResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValue(selectAuthenticatorResponse);
 
       let res = await register(authClient, {});
@@ -513,7 +511,7 @@ describe('idx/register', () => {
         selectPhoneResponse
       ]);
       jest.spyOn(enrollEmailAuthenticatorResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValue(enrollEmailAuthenticatorResponse);
 
       let res = await register(authClient, {});
@@ -598,7 +596,7 @@ describe('idx/register', () => {
       ]);
       jest.spyOn(identifyResponse, 'proceed');
       jest.spyOn(enrollProfileResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(identifyResponse);
 
       let res = await register(authClient, {
@@ -669,7 +667,7 @@ describe('idx/register', () => {
       jest.spyOn(selectPhoneResponse, 'proceed');
       jest.spyOn(phoneEnrollmentDataResponse, 'proceed');
       jest.spyOn(enrollPhoneAuthenticatorResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(selectPhoneResponse)
         .mockResolvedValueOnce(enrollPhoneAuthenticatorResponse);
 
@@ -749,7 +747,7 @@ describe('idx/register', () => {
       jest.spyOn(selectPhoneResponse, 'proceed');
       jest.spyOn(phoneEnrollmentDataResponse, 'proceed');
       jest.spyOn(enrollPhoneAuthenticatorResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(selectPhoneResponse)
         .mockResolvedValueOnce(phoneEnrollmentDataResponse)
         .mockResolvedValueOnce(enrollPhoneAuthenticatorResponse);
@@ -858,7 +856,7 @@ describe('idx/register', () => {
       ]);
 
       jest.spyOn(enrollPhoneAuthenticatorResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValue(enrollPhoneAuthenticatorResponse);
 
       jest.spyOn(authClient.token, 'exchangeCodeForTokens');
@@ -920,7 +918,7 @@ describe('idx/register', () => {
       });
 
       jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockRejectedValue(errorResponse);
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(phoneEnrollmentDataResponse);
 
       const phoneNumber = 'obviously-not-valid';
@@ -965,7 +963,7 @@ describe('idx/register', () => {
         successWithInteractionCodeResponse
       ]);
       jest.spyOn(selectPhoneResponse, 'proceed');
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(selectPhoneResponse);
       jest.spyOn(authClient.token, 'exchangeCodeForTokens');
 

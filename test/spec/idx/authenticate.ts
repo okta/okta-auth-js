@@ -166,7 +166,7 @@ describe('idx/authenticate', () => {
         const identifyResponse =  IdentifyResponseFactory.build();
         const errorResponse = Object.assign({}, identifyResponse, { rawIdxState });
         identifyResponse.proceed = jest.fn().mockResolvedValueOnce(errorResponse);
-        jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
         const res = await authenticate(authClient, { username });
         expect(res.status).toBe(IdxStatus.PENDING);
