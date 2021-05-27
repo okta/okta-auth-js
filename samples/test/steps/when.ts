@@ -1,7 +1,7 @@
 import { When } from '@cucumber/cucumber';
 
 // import clearInputField from '../support/action/clearInputField';
-// import clickElement from '../support/action/clickElement';
+import clickElement from '../support/action/clickElement';
 // import closeLastOpenedWindow from '../support/action/closeLastOpenedWindow';
 // import deleteCookies from '../support/action/deleteCookies';
 // import dragElement from '../support/action/dragElement';
@@ -38,6 +38,11 @@ When(
 When(
   /^she submits the Login form$/,
   submitForm
+);
+
+When(
+  /^she clicks on the "Forgot Password Link"$/,
+  clickElement.bind(null, 'click', 'link', '/recover-password')
 );
 
 // When(
