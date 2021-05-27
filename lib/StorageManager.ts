@@ -25,10 +25,8 @@ import { AuthSdkError } from './errors';
 
 function logServerSideMemoryStorageWarning(options: StorageOptions) {
   if (!isBrowser() && !options.storageProvider && !options.storageProvider) {
-    warn(`
-      Memory storage can only support simple single user use case on server side,
-      please provide custom storageProvider or storageKey if advanced scenarios need to be supported.
-    `);
+    // eslint-disable-next-line max-len
+    warn('Memory storage can only support simple single user use case on server side, please provide custom storageProvider or storageKey if advanced scenarios need to be supported.');
   }
 }
 
@@ -96,10 +94,8 @@ export default class StorageManager {
         storage = this.storageUtil.getStorageByType('memory', options);
       } catch (e) {
         // it's ok to miss response storage
-        warn(`
-          No response storage found, 
-          you may want to provide custom implementation for intermediate idx responses to optimize the network traffic
-        `);
+        // eslint-disable-next-line max-len
+        warn('No response storage found, you may want to provide custom implementation for intermediate idx responses to optimize the network traffic');
       }
     } else {
       // on server side re-use transaction custom storage

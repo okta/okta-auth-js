@@ -102,6 +102,14 @@ describe('idx/run', () => {
     expect(mocked.remediate.remediate).toHaveBeenCalledWith(idxResponse, values, options);
   });
 
+  it('saves idxResponse when nextStep is avaiable', async () => {
+    const { authClient, options, idxResponse, remediateResponse } = testContext;
+    remediateResponse.nextStep = 'has-next-step';
+    jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+    await run(authClient, options);
+    expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith(idxResponse.rawIdxState);
+  });
+
   it('returns messages in transaction', async () => {
     testContext.remediateResponse.messages = ['remediate-message-1'];
     const { authClient, options } = testContext;

@@ -1,4 +1,5 @@
 import TransactionManager from '../../lib/TransactionManager';
+import { RawIdxResponseFactory } from '@okta/test.support/idx';
 
 describe('TransactionManager', () => {
   let transactionManager;
@@ -46,6 +47,14 @@ describe('TransactionManager', () => {
       transactionManager.clear();
       expect(clearStorage).toHaveBeenCalledWith();
     });
+    it('clears idxResponse storage', () => {
+      const clearStorage = jest.fn();
+      jest.spyOn(storageManager, 'getIdxResponseStorage').mockReturnValue({
+        clearStorage
+      });
+      transactionManager.clear();
+      expect(clearStorage).toHaveBeenCalledWith();
+    });
     // This is for compatibility with older versions of the signin widget. OKTA-304806
     it('pkce: clears legacy PKCE meta', () => {
       const clearStorage = jest.fn();
@@ -80,6 +89,7 @@ describe('TransactionManager', () => {
       expect(setStorage).toHaveBeenCalledWith(meta);
     });
   });
+
   describe('load', () => {
     let meta;
     beforeEach(() => {
@@ -298,6 +308,51 @@ describe('TransactionManager', () => {
         };
         expect(fn).toThrowError('Unable to retrieve OAuth redirect params from storage');
       });
+    });
+  });
+
+  describe('saveIdxResponse', () => {
+    let setStorage;
+    let meta;
+    beforeEach(() => {
+      createInstance();
+      setStorage = jest.fn();
+      meta = {};
+    });
+    it('saves to idxResponse storage', () => {
+      jest.spyOn(storageManager, 'getIdxResponseStorage').mockReturnValue({
+        setStorage
+      });
+      transactionManager.saveIdxResponse(meta);
+      expect(setStorage).toHaveBeenCalledWith(meta);
+    });
+  });
+
+  describe('loadIdxResponse', () => {
+    let getStorage;
+    let meta;
+    beforeEach(() => {
+      createInstance();
+      meta = {};
+    });
+    it('loads from idxResponse storage', () => {
+      const rawIdxResponse = RawIdxResponseFactory.build();
+      getStorage = jest.fn().mockReturnValue(rawIdxResponse);
+      jest.spyOn(storageManager, 'getIdxResponseStorage').mockReturnValue({
+        getStorage
+      });
+      const res = transactionManager.loadIdxResponse();
+      expect(getStorage).toHaveBeenCalled();
+      expect(res).toEqual(rawIdxResponse);
+    });
+    it('returns null if idxResponse is not valid', () => {
+      getStorage = jest.fn().mockReturnValue({});
+      jest.spyOn(storageManager, 'getIdxResponseStorage').mockReturnValue({
+        getStorage
+      });
+      const res = transactionManager.loadIdxResponse();
+      expect(getStorage).toHaveBeenCalled();
+      expect(res).toBeNull();
     });
   });
 
