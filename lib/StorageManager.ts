@@ -86,6 +86,7 @@ export default class StorageManager {
 
   // intermediate idxResponse
   // store for network traffic optimazation purpose
+  // TODO: revisit in auth-js 6.0 epic JIRA: OKTA-399791
   getIdxResponseStorage(options?: StorageOptions): IdxResponseStorage {
     let storage;
     if (isBrowser()) {
