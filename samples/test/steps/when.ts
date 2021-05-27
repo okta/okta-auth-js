@@ -19,6 +19,7 @@ import { When } from '@cucumber/cucumber';
 
 import enterCredential from '../support/action/enterCredential';
 import submitForm from '../support/action/submitForm';
+import clickLogout from '../support/action/clickLogout';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -38,6 +39,11 @@ When(
 When(
   /^she submits the Login form$/,
   submitForm
+);
+
+When(
+  /^Mary clicks the logout button$/,
+  clickLogout
 );
 
 // When(

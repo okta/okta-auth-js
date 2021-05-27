@@ -2,6 +2,7 @@
 import { Then } from '@cucumber/cucumber';
 
 import checkProfile from '../support/check/checkProfile';
+import checkCookieExists from '../support/check/checkCookieExists';
 import checkFormMessage from '../support/check/checkFormMessage';
 
 Then(
@@ -12,6 +13,11 @@ Then(
 Then(
   /^a page loads with all of Mary's Profile information$/,
   checkProfile
+);
+
+Then(
+  /^her access token is revoked$/,
+  () => checkCookieExists('access_token', false)
 );
 
 Then(
