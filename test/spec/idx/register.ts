@@ -29,7 +29,8 @@ import {
   EmailValueFactory,
   IdxErrorInvalidLoginEmailFactory,
   IdxErrorDoesNotMatchPattern,
-  IdxErrorEnrollmentInvalidPhoneFactory
+  IdxErrorEnrollmentInvalidPhoneFactory,
+  SelectAuthenticatorAuthenticateRemediationFactory
 } from '@okta/test.support/idx';
 
 const mocked = {
@@ -902,8 +903,7 @@ describe('idx/register', () => {
       });
     });
 
-    // TODO: should this be a terminal error?
-    it('returns a terminal error if an invalid phone number was entered', async () => {
+    it('returns a PENDING error if an invalid phone number was entered', async () => {
       const {
         authClient,
         phoneEnrollmentDataResponse,
@@ -914,7 +914,21 @@ describe('idx/register', () => {
           value: [
             IdxErrorEnrollmentInvalidPhoneFactory.build()
           ]
-        })
+        }),
+        remediation: {
+          type: 'array',
+          value: [
+            SelectAuthenticatorAuthenticateRemediationFactory.build({
+              value: [
+                AuthenticatorValueFactory.build({
+                  options: [
+                    PhoneAuthenticatorOptionFactory.build(),
+                  ]
+                })
+              ]
+            })
+          ]
+        }
       });
 
       jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockRejectedValue(errorResponse);
@@ -931,7 +945,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
-        status: IdxStatus.TERMINAL,
+        status: IdxStatus.PENDING,
         tokens: null,
         messages: [{
           class: 'ERROR',
@@ -939,10 +953,36 @@ describe('idx/register', () => {
             key: undefined // this error does not have an i18n key
           },
           message: 'Unable to initiate factor enrollment: Invalid Phone Number.'
+        }],
+        nextStep: {
+          canSkip: undefined, // TODO: is this expected?
+          name: 'authenticator-enrollment-data',
+          type: 'phone',
+          inputs: [{
+            label: 'Phone',
+            name: 'authenticator',
+            form: {
+              value: [{
+                name: 'id',
+                required: true,
+                value: 'id-phone'
+              }, {
+                name: 'methodType',
+                options: [{
+                  label: 'SMS',
+                  value: 'sms'
+                }, {
+                  label: 'Voice call',
+                  value: 'voice'
+                }],
+                required: true
+              }, {
+                name: 'phoneNumber',
+                required: true
+              }]
+            }
+          }]
         }
-
-        ],
-        nextStep: undefined
       });
 
     });

@@ -5,7 +5,7 @@ import {
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory
 } from './authenticators';
-import { EmailAuthenticatorFormFactory, PasswordFormFactory, PhoneAuthenticatorFormFactory, UserProfileFormFactory, VerifySmsFormFactory } from './forms';
+import { EmailAuthenticatorFormFactory, PasswordFormFactory, PhoneAuthenticatorFormFactory, UserProfileFormFactory, VerifyEmailFormFactory, VerifySmsFormFactory } from './forms';
 
 import {
   UsernameValueFactory,
@@ -42,7 +42,25 @@ export const IdentifyWithPasswordRemediationFactory = IdentifyRemediationFactory
   ]
 });
 
-export const VerifyPasswordRemediationFactory = IdentifyRemediationFactory.params({
+export const ChallengeAuthenticatorRemediationFactory = IdentifyRemediationFactory.params({
+  name: 'challenge-authenticator',
+});
+
+
+export const VerifyEmailRemediationFactory = ChallengeAuthenticatorRemediationFactory.params({
+  name: 'challenge-authenticator',
+  value: [
+    CredentialsValueFactory.build({
+      form: VerifyEmailFormFactory.build()
+    })
+  ],
+  relatesTo: {
+    value: EmailAuthenticatorFactory.build()
+  }
+});
+
+
+export const VerifyPasswordRemediationFactory = ChallengeAuthenticatorRemediationFactory.params({
   name: 'challenge-authenticator',
   value: [
     PasswordValueFactory.build()
@@ -164,6 +182,19 @@ export const ReEnrollPasswordAuthenticatorRemediationFactory = ReEnrollAuthentic
 
 export const AuthenticatorVerificationDataRemediationFactory = IdxRemediationFactory.params({
   name: 'authenticator-verification-data',
+});
+
+export const PhoneAuthenticatorVerificationDataRemediationFactory = AuthenticatorVerificationDataRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: PhoneAuthenticatorFactory.build()
+  },
+  value: [
+    AuthenticatorValueFactory.build({
+      label: 'Phone',
+      form: PhoneAuthenticatorFormFactory.build()
+    })
+  ]
 });
 
 export const RedirectIdpRemediationFactory = IdxRemediationFactory.params({

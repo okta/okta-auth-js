@@ -19,7 +19,14 @@ import {
   AuthenticatorValueFactory,
   PhoneAuthenticatorOptionFactory,
   EmailAuthenticatorOptionFactory,
-  OktaVerifyAuthenticatorOptionFactory
+  SelectAuthenticatorEnrollRemediationFactory,
+  ChallengeAuthenticatorRemediationFactory,
+  CredentialsValueFactory,
+  PasscodeValueFactory,
+  IdxErrorPasscodeInvalidFactory,
+  IdxErrorEnrollmentInvalidPhoneFactory,
+  PhoneAuthenticatorVerificationDataRemediationFactory,
+  VerifyEmailRemediationFactory
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -459,237 +466,559 @@ describe('idx/authenticate', () => {
   });
 
   describe('mfa authentication', () => {
-    beforeEach(() => {
-      const { successResponse } = testContext;
+  
+    describe('phone', () => {
 
-      const identifyResponse =  IdentifyResponseFactory.build();
-      const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
-      const selectAuthenticatorResponse = IdxResponseFactory.build({
-        neededToProceed: [
-          SelectAuthenticatorAuthenticateRemediationFactory.build({
-            value: [
-              AuthenticatorValueFactory.build({
-                options: [
-                  OktaVerifyAuthenticatorOptionFactory.build(),
-                  PhoneAuthenticatorOptionFactory.build(),
-                  EmailAuthenticatorOptionFactory.build(),
+     
+      describe('verification', () => {
+      
+        beforeEach(() => {
+          const selectAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              SelectAuthenticatorAuthenticateRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      PhoneAuthenticatorOptionFactory.build(),
+                    ]
+                  })
                 ]
               })
             ]
-          })
-        ]
-      });
-      const phoneEnrollmentDataResponse = IdxResponseFactory.build({
-        neededToProceed: [
-          PhoneAuthenticatorEnrollmentDataRemediationFactory.build()
-        ]
-      });
-      const enrollPhoneResponse = IdxResponseFactory.build({
-        neededToProceed: [
-          EnrollPhoneAuthenticatorRemediationFactory.build()
-        ]
-      });
+          });
+          const phoneVerificationDataResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              PhoneAuthenticatorVerificationDataRemediationFactory.build()
+            ]
+          });
+          const verifyPhoneResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              EnrollPhoneAuthenticatorRemediationFactory.build()
+            ]
+          });
+          const errorInvalidCodeResponse = RawIdxResponseFactory.build({
+            remediation: {
+              value: [
+                ChallengeAuthenticatorRemediationFactory.build({
+                  value: [
+                    CredentialsValueFactory.build({
+                      form: {
+                        value: [
+                          PasscodeValueFactory.build({
+                            messages: IdxMessagesFactory.build({
+                              value: [
+                                IdxErrorPasscodeInvalidFactory.build()
+                              ]
+                            })
+                          })
+                        ]
+                      }
+                    })
+                  ]
+                })
+              ]
+            }
+          });
+          Object.assign(testContext, {
+            selectAuthenticatorResponse,
+            phoneVerificationDataResponse,
+            verifyPhoneResponse,
+            errorInvalidCodeResponse
+          });
+        });
 
-      chainResponses([
-        identifyResponse,
-        verifyPasswordResponse,
-        selectAuthenticatorResponse,
-        phoneEnrollmentDataResponse,
-        enrollPhoneResponse,
-        successResponse
-      ]);
+        it('can auto-select the phone authenticator', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            phoneVerificationDataResponse
+          } = testContext;
+          chainResponses([
+            selectAuthenticatorResponse,
+            phoneVerificationDataResponse
+          ]);
+          jest.spyOn(selectAuthenticatorResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+          const res = await authenticate(authClient, {
+            authenticators: ['phone'] // will remediate select authenticator
+          });
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' }});
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            tokens: null,
+            nextStep: {
+              canSkip: false,
+              name: 'authenticator-verification-data',
+              type: 'phone',
+              inputs: [{
+                label: 'Phone',
+                name: 'authenticator',
+                form: {
+                  value: [{
+                    name: 'id',
+                    required: true,
+                    value: 'id-phone'
+                  }, {
+                    name: 'methodType',
+                    options: [{
+                      label: 'SMS',
+                      value: 'sms'
+                    }, {
+                      label: 'Voice call',
+                      value: 'voice'
+                    }],
+                    required: true
+                  }, {
+                    name: 'phoneNumber',
+                    required: true
+                  }]
+                }
+              }]
+            }
+          });
 
-      jest.spyOn(identifyResponse, 'proceed');
-      jest.spyOn(verifyPasswordResponse, 'proceed');
-      jest.spyOn(selectAuthenticatorResponse, 'proceed');
-      jest.spyOn(phoneEnrollmentDataResponse, 'proceed');
-      jest.spyOn(enrollPhoneResponse, 'proceed');
+        });
 
-      Object.assign(testContext, {
-        identifyResponse,
-        verifyPasswordResponse,
-        selectAuthenticatorResponse,
-        phoneEnrollmentDataResponse,
-        enrollPhoneResponse
-      });
-    });
+        it('can verify phone authenticator using a code', async () => {
+          const {
+            authClient,
+            verifyPhoneResponse,
+            successResponse
+          } = testContext;
+          chainResponses([
+            verifyPhoneResponse,
+            successResponse
+          ]);
+          jest.spyOn(verifyPhoneResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyPhoneResponse);
+          const verificationCode = 'test-code';
+          const res = await authenticate(authClient, {
+            verificationCode
+          });
+          expect(verifyPhoneResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
+            credentials: {
+              passcode: 'test-code'
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.SUCCESS,
+            tokens: {
+              fakeToken: true
+            }
+          });
+        });
 
-    it('can authenticate, passing username, password, phone number, and authenticators up front', async () => {
-      const {
-        authClient,
-        identifyResponse,
-        selectAuthenticatorResponse,
-        verifyPasswordResponse,
-        phoneEnrollmentDataResponse
-      } = testContext;
-      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
-      const res = await authenticate(authClient, {
-        username: 'fakeuser',
-        password: 'fakepass',
-        phoneNumber: '(555) 555-5555',
-        authenticators: [
-          'phone'
-        ]
-      });
-      expect(res).toEqual({
-        status: IdxStatus.PENDING,
-        tokens: null,
-        nextStep: {
-          canSkip: false,
-          name: 'enroll-authenticator',
-          type: 'phone',
-          inputs: [{
-            label: 'Enter code',
-            name: 'verificationCode',
-            required: true,
-            type: 'string',
-          }]
-        }
-      });
-      expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
-      expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' }});
-
-      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', {
-        authenticator: {
-          id: 'id-phone'
-        }
-      });
-      expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
-        authenticator: {
-          id: 'id-phone',
-          methodType: 'sms',
-          phoneNumber: '(555) 555-5555'
-        }
-      });
-
-      // TODO: proceed using code and verify that enrollPhoneResponse is called correctly
-    });
-
-    it('can authenticate, providing username, password, phoneNumber and code on demand', async () => {
-      const {
-        authClient,
-        identifyResponse,
-        selectAuthenticatorResponse,
-        verifyPasswordResponse,
-        phoneEnrollmentDataResponse
-      } = testContext;
-
-      jest.spyOn(mocked.introspect, 'introspect')
-        .mockResolvedValueOnce(identifyResponse)
-        .mockResolvedValueOnce(identifyResponse)
-        .mockResolvedValueOnce(verifyPasswordResponse)
-        .mockResolvedValueOnce(selectAuthenticatorResponse)
-        .mockResolvedValueOnce(phoneEnrollmentDataResponse);
-
-      // First call: returns identify response
-      let res = await authenticate(authClient, {});
-      expect(res.status).toBe(IdxStatus.PENDING);
-      expect(res.nextStep).toEqual({
-        canSkip: false,
-        name: 'identify',
-        inputs: [{
-          name: 'username',
-          label: 'Username'
-        }]
-      });
-
-      // Second call: proceeds with identify response
-      res = await authenticate(authClient, { username: 'myuser'});
-      expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'myuser' });
-      expect(res.status).toBe(IdxStatus.PENDING);
-      expect(res.nextStep).toEqual({
-        canSkip: false,
-        name: 'challenge-authenticator',
-        type: 'password',
-        inputs: [{
-          name: 'password',
-          label: 'Password',
-          required: true,
-          secret: true,
-          type: 'string'
-        }]
-      });
-
-      // Third call: proceeds with verify password
-      res = await authenticate(authClient, { password: 'mypass'});
-      expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'mypass' }});
-      expect(res.status).toBe(IdxStatus.PENDING);
-      expect(res.nextStep).toEqual({
-        canSkip: false,
-        name: 'select-authenticator-authenticate',
-        inputs: [{
-          name: 'authenticators',
-          type: 'string[]',
-        }],
-        authenticators: [{
-          label: 'Okta Verify',
-          value: 'app'
-        }, {
-          label: 'Phone',
-          value: 'phone'
-        }, {
-          label: 'Email',
-          value: 'email'
-        }]
-      });
-
-      // Fourth call: select authenticator
-      res = await authenticate(authClient, { authenticators: ['phone'] });
-      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' }});
-      expect(res.status).toBe(IdxStatus.PENDING);
-      expect(res.nextStep).toEqual({
-        canSkip: false,
-        name: 'authenticator-enrollment-data',
-        type: 'phone',
-        inputs: [{
-          label: 'Phone',
-          name: 'authenticator',
-          form: {
-            value: [{
-              name: 'id',
-              required: true,
-              value: 'id-phone'
-            }, {
-              name: 'methodType',
-              options: [{
-                label: 'SMS',
-                value: 'sms'
-              }, {
-                label: 'Voice call',
-                value: 'voice'
+        it('returns a PENDING error if an invalid code is provided', async () => {
+          const {
+            authClient,
+            verifyPhoneResponse,
+            errorInvalidCodeResponse
+          } = testContext;
+          jest.spyOn(verifyPhoneResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyPhoneResponse);
+          const verificationCode = 'invalid-test-code';
+          const res = await authenticate(authClient, {
+            verificationCode
+          });
+          expect(verifyPhoneResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
+            credentials: {
+              passcode: 'invalid-test-code'
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            tokens: null,
+            messages: [{
+              class: 'ERROR',
+              i18n: {
+                key: 'api.authn.error.PASSCODE_INVALID',
+                params: []
+              },
+              message: 'Invalid code. Try again.'
+            }],
+            nextStep: {
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
               }],
-              required: true
-            }, {
-              name: 'phoneNumber',
-              required: true
+              name: 'enroll-authenticator',
+              type: 'phone'
+            }
+          });
+        });
+      });
+
+      describe('enrollment', () => {
+        beforeEach(() => {
+          const selectAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              SelectAuthenticatorEnrollRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      PhoneAuthenticatorOptionFactory.build(),
+                    ]
+                  })
+                ]
+              })
+            ]
+          });
+          const phoneEnrollmentDataResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              PhoneAuthenticatorEnrollmentDataRemediationFactory.build()
+            ]
+          });
+          const enrollPhoneResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              EnrollPhoneAuthenticatorRemediationFactory.build()
+            ]
+          });
+          const errorInvalidPhoneResponse = RawIdxResponseFactory.build({
+            messages: IdxMessagesFactory.build({
+              value: [
+                IdxErrorEnrollmentInvalidPhoneFactory.build()
+              ]
+            }),
+            remediation: {
+              type: 'array',
+              value: [
+                SelectAuthenticatorEnrollRemediationFactory.build({
+                  value: [
+                    AuthenticatorValueFactory.build({
+                      options: [
+                        PhoneAuthenticatorOptionFactory.build(),
+                      ]
+                    })
+                  ]
+                })
+              ]
+            }
+          });
+
+          Object.assign(testContext, {
+            selectAuthenticatorResponse,
+            phoneEnrollmentDataResponse,
+            enrollPhoneResponse,
+            errorInvalidPhoneResponse
+          });
+        });
+
+        it('can provide phone number up front', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            phoneEnrollmentDataResponse,
+            enrollPhoneResponse
+          } = testContext;
+
+          chainResponses([
+            selectAuthenticatorResponse,
+            phoneEnrollmentDataResponse,
+            enrollPhoneResponse
+          ]);
+          jest.spyOn(selectAuthenticatorResponse, 'proceed');
+          jest.spyOn(phoneEnrollmentDataResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+
+          const res = await authenticate(authClient, {
+            phoneNumber: '(555) 555-5555',
+            authenticators: [
+              'phone'
+            ]
+          });
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+            authenticator: {
+              id: 'id-phone'
+            }
+          });
+          expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
+            authenticator: {
+              id: 'id-phone',
+              methodType: 'sms',
+              phoneNumber: '(555) 555-5555'
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            tokens: null,
+            nextStep: {
+              canSkip: false,
+              name: 'enroll-authenticator',
+              type: 'phone',
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
+              }]
+            }
+          });
+        });
+
+        it('can provide phoneNumber on demand', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            phoneEnrollmentDataResponse,
+            enrollPhoneResponse
+          } = testContext;
+          chainResponses([
+            selectAuthenticatorResponse,
+            phoneEnrollmentDataResponse,
+            enrollPhoneResponse
+          ]);
+          jest.spyOn(selectAuthenticatorResponse, 'proceed');
+          jest.spyOn(phoneEnrollmentDataResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect')
+            .mockResolvedValueOnce(selectAuthenticatorResponse)
+            .mockResolvedValueOnce(phoneEnrollmentDataResponse);
+
+          let res = await authenticate(authClient, { authenticators: ['phone'] });
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', { authenticator: { id: 'id-phone' }});
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            tokens: null,
+            nextStep: {
+              canSkip: false,
+              name: 'authenticator-enrollment-data',
+              type: 'phone',
+              inputs: [{
+                label: 'Phone',
+                name: 'authenticator',
+                form: {
+                  value: [{
+                    name: 'id',
+                    required: true,
+                    value: 'id-phone'
+                  }, {
+                    name: 'methodType',
+                    options: [{
+                      label: 'SMS',
+                      value: 'sms'
+                    }, {
+                      label: 'Voice call',
+                      value: 'voice'
+                    }],
+                    required: true
+                  }, {
+                    name: 'phoneNumber',
+                    required: true
+                  }]
+                }
+              }]
+            }
+          });
+
+          res = await authenticate(authClient, { phoneNumber: '(555) 555-5555', authenticators: ['phone'] });
+          expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
+            authenticator: {
+              id: 'id-phone',
+              methodType: 'sms', // TODO: user should be able to specify methodType
+              phoneNumber: '(555) 555-5555'
+            }
+          });
+          expect(res.status).toBe(IdxStatus.PENDING);
+          expect(res.nextStep).toEqual({
+            canSkip: false,
+            name: 'enroll-authenticator',
+            type: 'phone',
+            inputs: [{
+              label: 'Enter code',
+              name: 'verificationCode',
+              required: true,
+              type: 'string',
             }]
-          }
-        }]
+          });
+        });
+
+        it('returns a PENDING error if an invalid phone number was entered', async () => {
+          const {
+            authClient,
+            phoneEnrollmentDataResponse,
+            errorInvalidPhoneResponse
+          } = testContext;
+
+          jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockRejectedValue(errorInvalidPhoneResponse);
+          jest.spyOn(mocked.introspect, 'introspect')
+            .mockResolvedValueOnce(phoneEnrollmentDataResponse);
+
+          const phoneNumber = 'obviously-not-valid';
+          let res = await authenticate(authClient, { phoneNumber, authenticators: ['phone'] });
+          expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
+            authenticator: {
+              id: 'id-phone',
+              methodType: 'sms', // TODO: user should be able to specify methodType
+              phoneNumber
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            tokens: null,
+            messages: [{
+              class: 'ERROR',
+              i18n: {
+                key: undefined // this error does not have an i18n key
+              },
+              message: 'Unable to initiate factor enrollment: Invalid Phone Number.'
+            }],
+            nextStep: {
+              canSkip: undefined, // TODO: is this expected?
+              name: 'authenticator-enrollment-data',
+              type: 'phone',
+              inputs: [{
+                label: 'Phone',
+                name: 'authenticator',
+                form: {
+                  value: [{
+                    name: 'id',
+                    required: true,
+                    value: 'id-phone'
+                  }, {
+                    name: 'methodType',
+                    options: [{
+                      label: 'SMS',
+                      value: 'sms'
+                    }, {
+                      label: 'Voice call',
+                      value: 'voice'
+                    }],
+                    required: true
+                  }, {
+                    name: 'phoneNumber',
+                    required: true
+                  }]
+                }
+              }]
+            }
+          });
+
+        });
+      });
+      
+    });
+
+    describe('email', () => {
+
+      describe('verification', () => {
+        beforeEach(() => {
+          const selectAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              SelectAuthenticatorAuthenticateRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      EmailAuthenticatorOptionFactory.build(),
+                    ]
+                  })
+                ]
+              })
+            ]
+          });
+          const verifyEmailResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              VerifyEmailRemediationFactory.build()
+            ]
+          });
+          const errorInvalidCodeResponse = RawIdxResponseFactory.build({
+            remediation: {
+              value: [
+                ChallengeAuthenticatorRemediationFactory.build({
+                  value: [
+                    CredentialsValueFactory.build({
+                      form: {
+                        value: [
+                          PasscodeValueFactory.build({
+                            messages: IdxMessagesFactory.build({
+                              value: [
+                                IdxErrorPasscodeInvalidFactory.build()
+                              ]
+                            })
+                          })
+                        ]
+                      }
+                    })
+                  ]
+                })
+              ]
+            }
+          });
+          Object.assign(testContext, {
+            selectAuthenticatorResponse,
+            verifyEmailResponse,
+            errorInvalidCodeResponse
+          });
+        });
+
+        it('can verify email authenticator using a code', async () => {
+          const {
+            authClient,
+            verifyEmailResponse,
+            successResponse
+          } = testContext;
+
+          jest.spyOn(verifyEmailResponse, 'proceed').mockResolvedValue(successResponse);
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyEmailResponse);
+          const verificationCode = 'test-code';
+          const res = await authenticate(authClient, {
+            verificationCode
+          });
+          expect(verifyEmailResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', {
+            credentials: {
+              passcode: 'test-code'
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.SUCCESS,
+            tokens: {
+              fakeToken: true
+            }
+          });
+        });
+
+        it('returns a PENDING error if an invalid code is provided', async () => {
+          const {
+            authClient,
+            verifyEmailResponse,
+            errorInvalidCodeResponse
+          } = testContext;
+          jest.spyOn(verifyEmailResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyEmailResponse);
+          const verificationCode = 'invalid-test-code';
+          const res = await authenticate(authClient, {
+            verificationCode
+          });
+          expect(verifyEmailResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', {
+            credentials: {
+              passcode: 'invalid-test-code'
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            tokens: null,
+            messages: [{
+              class: 'ERROR',
+              i18n: {
+                key: 'api.authn.error.PASSCODE_INVALID',
+                params: []
+              },
+              message: 'Invalid code. Try again.'
+            }],
+            nextStep: {
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
+              }],
+              name: 'challenge-authenticator',
+              type: 'email'
+            }
+          });
+        });
       });
 
-      // Fifth call: send phone number
-      res = await authenticate(authClient, { phoneNumber: '(555) 555-5555', authenticators: ['phone'] });
-      expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
-        authenticator: {
-          id: 'id-phone',
-          methodType: 'sms', // TODO: user should be able to specify methodType
-          phoneNumber: '(555) 555-5555'
-        }
-      });
-      expect(res.status).toBe(IdxStatus.PENDING);
-      expect(res.nextStep).toEqual({
-        canSkip: false,
-        name: 'enroll-authenticator',
-        type: 'phone',
-        inputs: [{
-          label: 'Enter code',
-          name: 'verificationCode',
-          required: true,
-          type: 'string',
-        }]
-      });
-
-      // TODO: proceed using code and verify that enrollPhoneResponse is called correctly
     });
 
   });
