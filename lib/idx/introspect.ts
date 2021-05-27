@@ -12,18 +12,27 @@
 
 import idx from '@okta/okta-idx-js';
 import { OktaAuth } from '../types';
-import { AcceptsInteractionHandle } from './types/AcceptsInteractionHandle';
-import { IdxResponse } from './types/idx-js';
+import { IdxResponse, RawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
 
-interface IntrospectOptions extends AcceptsInteractionHandle {
+interface IntrospectOptions {
+  interactionHandle: string;
   stateHandle?: string;
 }
 
 export async function introspect (authClient: OktaAuth, options: IntrospectOptions): Promise<IdxResponse> {
-  const version = IDX_API_VERSION;
-  const domain = getOAuthDomain(authClient);
-  const rawIdxResponse = await idx.introspect({ domain, version, ...options });
+  let rawIdxResponse: RawIdxResponse;
+  
+  // try load from storage first
+  rawIdxResponse = authClient.transactionManager.loadIdxResponse();
+  
+  // call idx.introspect if no existing idx response available in storage
+  if (!rawIdxResponse) {
+    const version = IDX_API_VERSION;
+    const domain = getOAuthDomain(authClient);
+    rawIdxResponse = await idx.introspect({ domain, version, ...options });
+  }
+
   return idx.makeIdxState(rawIdxResponse);
 }

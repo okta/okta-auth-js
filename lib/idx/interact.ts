@@ -12,11 +12,10 @@
 
 import idx from '@okta/okta-idx-js';
 import { OktaAuth, IdxTransactionMeta } from '../types';
-import { AcceptsInteractionHandle } from './types/AcceptsInteractionHandle';
 import { getTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';
 
-export interface InteractOptions extends AcceptsInteractionHandle {
+export interface InteractOptions {
   state?: string;
   scopes?: string[];
 }

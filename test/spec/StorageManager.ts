@@ -1,6 +1,32 @@
 import SavedObject from '../../lib/SavedObject';
 import StorageManager from '../../lib/StorageManager';
-import { CookieOptions, StorageManagerOptions, StorageOptions, StorageProvider, StorageType, StorageUtil, TransactionStorage } from '../../lib/types';
+import { 
+  CookieOptions, 
+  StorageManagerOptions, 
+  StorageOptions, 
+  StorageProvider, 
+  StorageType, 
+  StorageUtil, 
+  TransactionStorage,
+  IdxResponseStorage,
+} from '../../lib/types';
+
+jest.mock('../../lib/util', () => {
+  return {
+    warn: () => {}
+  };
+});
+
+jest.mock('../../lib/features', () => {
+  return {
+    isBrowser: () => {}
+  };
+});
+
+const mocked = {
+  util: require('../../lib/util'),
+  features: require('../../lib/features')
+};
 
 describe('StorageManager', () => {
 
@@ -215,7 +241,74 @@ describe('StorageManager', () => {
       });
       expect((res as SavedObject).storageName).toBe('foo');
     });
+
+    it('logs warning on server side when neither custom storageKey nor storageProvider is provided', () => {
+      jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(false);
+      jest.spyOn(mocked.util, 'warn');
+      const storageManager = setup();
+      storageManager.getTransactionStorage();
+      expect(mocked.util.warn).toHaveBeenCalledWith('Memory storage can only support simple single user use case on server side, please provide custom storageProvider or storageKey if advanced scenarios need to be supported.');
+    });
+
   }); 
+
+  describe('getIdxResponseStorage', () => {
+    describe('browser', () => {
+      beforeEach(() => {
+        jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(true);
+      });
+
+      it('always use memory storage on browser side', () => {
+        const storageManager = setup();
+        const options = {};
+        const res: IdxResponseStorage = storageManager.getIdxResponseStorage(options);
+        expect(storageManager.storageUtil.getStorageByType).toHaveBeenCalledWith('memory', options);
+        expect((res as SavedObject).storageName).toBe('okta-idx-response-storage');
+      });
+
+      it('logs warning if memory storage is not available', () => {
+        jest.spyOn(mocked.util, 'warn');
+        const storageUtil = {
+          getStorageByType: jest.fn().mockImplementation(() => { 
+            throw new Error('error'); 
+          })
+        } as unknown as StorageUtil;
+        const storageManager = setup({}, {}, storageUtil);
+        storageManager.getIdxResponseStorage();
+        expect(mocked.util.warn).toHaveBeenCalledWith('No response storage found, you may want to provide custom implementation for intermediate idx responses to optimize the network traffic');
+      });
+
+    });
+
+    describe('server', () => {
+      beforeEach(() => {
+        jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(false);
+      });
+
+      it('returns custom storage based on transaction storage', () => {
+        const storageProvider = {} as unknown as StorageProvider;
+        const options: StorageManagerOptions = {
+          transaction: {
+            storageProvider
+          }
+        };
+        const storageManager = setup(options);
+        const res: IdxResponseStorage = storageManager.getIdxResponseStorage();
+        expect(typeof (res as SavedObject).storageProvider.getItem).toBe('function');
+        expect(typeof (res as SavedObject).storageProvider.setItem).toBe('function');
+        expect(typeof (res as SavedObject).storageProvider.removeItem).toBe('function');
+        expect((res as SavedObject).storageName).toBe('okta-idx-response-storage');
+      });
+
+      it('returns null if transaction storage is not available', () => {
+        const options: StorageManagerOptions = {};
+        const storageManager = setup(options);
+        storageManager.getTransactionStorage = jest.fn().mockReturnValue(null);
+        const res: IdxResponseStorage = storageManager.getIdxResponseStorage();
+        expect(res).toBeNull();
+      });
+    });
+  });
 
   describe('getTokenStorage', () => {
     it('options are loaded from the "token" section of the storageManager config', () => {
@@ -244,6 +337,14 @@ describe('StorageManager', () => {
         storageKey: 'foo'
       });
       expect((res as SavedObject).storageName).toBe('foo');
+    });
+
+    it('logs warning on server side when neither custom storageKey nor storageProvider is provided', () => {
+      jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(false);
+      jest.spyOn(mocked.util, 'warn');
+      const storageManager = setup();
+      storageManager.getTransactionStorage();
+      expect(mocked.util.warn).toHaveBeenCalledWith('Memory storage can only support simple single user use case on server side, please provide custom storageProvider or storageKey if advanced scenarios need to be supported.');
     });
   }); 
 
