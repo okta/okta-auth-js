@@ -7,5 +7,5 @@ Feature: Root page for Direct Auth Demo Application
         And navigates to the Root View
       When Mary clicks the logout button
       Then her access token is revoked
-        # And her app session is destroyed
-        # And she is redirected back to the Root View
+        And her app session is destroyed
+        And she is redirected back to the Root View

@@ -2,7 +2,9 @@
 import { Then } from '@cucumber/cucumber';
 
 import checkProfile from '../support/check/checkProfile';
-import checkCookieExists from '../support/check/checkCookieExists';
+import checkTokenExists from '../support/check/checkTokenExists';
+import checkCookieContent from '../support/check/checkCookieContent';
+import checkURLPath from '../support/check/checkURLPath';
 import checkFormMessage from '../support/check/checkFormMessage';
 
 Then(
@@ -17,12 +19,22 @@ Then(
 
 Then(
   /^her access token is revoked$/,
-  () => checkCookieExists('access_token', false)
+  () => checkTokenExists('accessToken', true)
 );
 
 Then(
   /^she should see a message on the Login form "(?<message>.+?)"$/,
   checkFormMessage
+);
+
+Then(
+  /^her app session is destroyed$/,
+  () => checkCookieContent('has-app-session', false, 'false')
+);
+
+Then(
+  /^she is redirected back to the Root View$/,
+  () => checkURLPath(false, '/')
 );
 
 // import checkClass from '../support/check/checkClass';

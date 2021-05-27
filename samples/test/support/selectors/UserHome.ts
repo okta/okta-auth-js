@@ -1,5 +1,5 @@
 class UserHome {
-  get logoutRedirect() { return '#logout-redirect'; }
+  get logoutRedirect() { return '#logout-button'; }
   get email() { return '#claim-email'; }
 
 }
