@@ -23,6 +23,7 @@ import { Given } from '@cucumber/cucumber';
 
 import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
+import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
 
 Given(
   /^an APP Sign On Policy (.*)$/,
@@ -32,6 +33,11 @@ Given(
 Given(
   /^([^/s]+) navigates to (.*)$/,
   navigateTo
+);
+
+Given(
+  /^([^/s]+) has an authenticated session$/,
+  navigateToLoginAndAuthenticate
 );
 
 // Given(

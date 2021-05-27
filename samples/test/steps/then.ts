@@ -3,6 +3,7 @@ import { Then } from '@cucumber/cucumber';
 
 import checkProfile from '../support/check/checkProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
+import isVisible from '../support/check/isVisible';
 
 Then(
   /^User can verify their profile data$/,
@@ -17,6 +18,16 @@ Then(
 Then(
   /^she should see a message on the Login form "(?<message>.+?)"$/,
   checkFormMessage
+);
+
+Then(
+  /table with the claims from the \/userinfo response$/,
+  checkProfile
+);
+
+Then(
+  /Mary sees a (.*) button$/,
+  isVisible
 );
 
 // import checkClass from '../support/check/checkClass';
