@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+  
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div class="ui header">
+          <h2>{{title}}</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      <div class="row">
+        <form id="verify-form" class="ui large form" action="{{action}}" method="POST">
+          <button id="submit-verify-form" class="ui fluid large primary submit button" type="submit">
+            Send code via SMS
+          </button>
+        </form>
+      </div>
+
+    </div>
+    
+  </body>
+</html>

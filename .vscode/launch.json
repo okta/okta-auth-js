@@ -97,6 +97,16 @@
     },
 
     {
+      "name": "sample: express embedded widget",
+      "type": "node",
+      "request": "launch",
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}/samples/generated/express-embedded-widget",
+      "program": "web-server/server.js"
+    },
+
+    {
       "name": "sample: test spec",
       "type": "node",
       "request": "launch",
