@@ -25,7 +25,7 @@ router.get('/recover-password', (req, res) => {
 router.post('/recover-password', async (req, res, next) => {
   const { authenticator } = req.query;
   const { username } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.recoverPassword({
     username,
     authenticators: authenticator ? [authenticator] : [],
@@ -52,7 +52,7 @@ router.post('/reset-password', async (req, res, next) => {
     return;
   }
 
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.recoverPassword({ password });
   handleTransaction({ req, res, next, authClient, transaction });
 });

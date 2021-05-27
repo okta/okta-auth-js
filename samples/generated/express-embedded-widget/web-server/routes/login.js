@@ -9,7 +9,7 @@ const getConfig = require('../../config');
 const router = express.Router();
 
 router.get('/login', (req, res, next) => {
-  getAuthTransaction(req)
+  getAuthTransaction(req, res)
     .then(({ meta }) => {
       const {
         interactionHandle,
@@ -47,7 +47,7 @@ router.get('/login', (req, res, next) => {
     })
     .catch((error) => {
       // Clear transaction
-      const authClient = getAuthClient(req);
+      const authClient = getAuthClient(req, res);
       authClient.transactionManager.clear();
 
       // Delegate error to global error handler
@@ -57,7 +57,7 @@ router.get('/login', (req, res, next) => {
 
 router.get('/login/callback', async (req, res, next) => {
   const url = req.protocol + '://' + req.get('host') + req.originalUrl;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   try {
     // Exchange code for tokens
     await authClient.idx.handleInteractionCodeRedirect(url);

@@ -10,7 +10,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/flow', async (req, res) => {
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.startTransaction();
   req.setIdxStates(transaction);
 

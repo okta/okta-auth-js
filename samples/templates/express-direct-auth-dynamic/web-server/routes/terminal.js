@@ -13,7 +13,7 @@ router.get('/terminal', (req, res) => {
   }, []);
 
   // Clear transaction meta at app layer when reach to terminal state
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   authClient.transactionManager.clear();
 
   // Render

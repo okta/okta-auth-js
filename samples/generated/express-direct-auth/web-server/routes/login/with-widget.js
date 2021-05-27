@@ -9,7 +9,7 @@ const getConfig = require('../../../config');
 const router = express.Router();
 
 router.get('/with-widget', (req, res) => {
-  getAuthTransaction(req)
+  getAuthTransaction(req, res)
     .then(authTransaction => {
       const {
         interactionHandle,

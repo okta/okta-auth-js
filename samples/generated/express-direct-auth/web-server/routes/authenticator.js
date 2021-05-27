@@ -28,7 +28,7 @@ router.get('/select-authenticator', (req, res) => {
 router.post('/select-authenticator', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { authenticator } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx[idxMethod]({
     authenticators: [authenticator],
   });
@@ -37,7 +37,7 @@ router.post('/select-authenticator', async (req, res, next) => {
 
 router.post('/select-authenticator/skip', async (req, res, next) => {
   const { idxMethod } = req.session;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx[idxMethod]({ skip: true });
   handleTransaction({ req, res, next, authClient, transaction });
 });
@@ -60,7 +60,7 @@ router.get('/challenge-authenticator/email', (req, res) => {
 router.post('/challenge-authenticator/email', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { verificationCode } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx[idxMethod]({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });  
@@ -83,7 +83,7 @@ router.get('/enroll-authenticator/email', (req, res) => {
 router.post('/enroll-authenticator/email', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { verificationCode } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx[idxMethod]({ 
     verificationCode,
   });
@@ -104,7 +104,7 @@ router.get('/enroll-authenticator/password', (req, res) => {
 router.post('/enroll-authenticator/password', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { password, confirmPassword } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   if (password !== confirmPassword) {
     // TODO: handle validation in middleware
     next(new Error('Password not match'));
@@ -170,7 +170,7 @@ router.get('/enroll-authenticator/phone/enrollment-data', (req, res) => {
 router.post('/enroll-authenticator/phone/enrollment-data', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { phoneNumber } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx[idxMethod]({ 
     authenticators: ['phone'],
     phoneNumber,
@@ -195,7 +195,7 @@ router.get('/enroll-authenticator/phone', (req, res) => {
 router.post('/enroll-authenticator/phone', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { verificationCode } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx[idxMethod]({ 
     verificationCode,
   });

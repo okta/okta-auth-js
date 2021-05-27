@@ -42,7 +42,7 @@ router.get('/recover-password', renderEntryPage);
 router.post('/recover-password', async (req, res, next) => {
   const { authenticator } = req.query;
   const { identifier } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.recoverPassword({
     identifier,
     authenticators: authenticator ? [authenticator] : [],
@@ -69,7 +69,7 @@ router.post('/recover-password/reset', async (req, res, next) => {
     return;
   }
 
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.recoverPassword({ password });
   handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
@@ -88,7 +88,7 @@ router.get('/recover-password/select-authenticator', (req, res) => {
 
 router.post('/recover-password/select-authenticator', async (req, res, next) => {
   const { authenticator } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.recoverPassword({
     authenticators: [authenticator],
   });
@@ -112,7 +112,7 @@ router.get(`/recover-password/challenge-authenticator/email`, (req, res) => {
 
 router.post(`/recover-password/challenge-authenticator/email`, async (req, res, next) => {
   const { verificationCode } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.recoverPassword({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
@@ -134,7 +134,7 @@ router.get(`/recover-password/challenge-authenticator/phone`, (req, res) => {
 
 router.post(`/recover-password/challenge-authenticator/phone`, async (req, res, next) => {
   const { verificationCode } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.recoverPassword({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction, proceed });
 });

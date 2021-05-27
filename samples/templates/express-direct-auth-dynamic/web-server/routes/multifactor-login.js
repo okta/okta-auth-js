@@ -45,7 +45,7 @@ router.get('/multifactor-login', renderEntryPage);
 router.post('/multifactor-login', async (req, res, next) => {
   const { authenticator } = req.query;
   const { username } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.authenticate({ 
     username,
     authenticators: authenticator ? [authenticator] : [],
@@ -67,7 +67,7 @@ router.get('/multifactor-login/select-authenticator', (req, res) => {
 
 router.post('/multifactor-login/select-authenticator', async (req, res, next) => {
   const { authenticator } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.authenticate({
     authenticators: [authenticator],
   });
@@ -91,7 +91,7 @@ router.get('/multifactor-login/challenge-authenticator/email', (req, res) => {
 
 router.post('/multifactor-login/challenge-authenticator/email', async (req, res, next) => {
   const { verificationCode } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.authenticate({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction, proceed });
 });  
@@ -113,7 +113,7 @@ router.get('/multifactor-login/challenge-authenticator/password', (req, res) => 
 
 router.post('/multifactor-login/challenge-authenticator/password', async (req, res, next) => {
   const { password } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.authenticate({ password });
   handleTransaction({ req, res, next, authClient, transaction, proceed });
 });
