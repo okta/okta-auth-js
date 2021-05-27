@@ -2,6 +2,10 @@
 import { Then } from '@cucumber/cucumber';
 
 import checkProfile from '../support/check/checkProfile';
+//import isDisplayed from '../support/check/isDisplayed';
+import isVisible from '../support/check/isVisible';
+// import Unauth from '../support/selectors/Unauth';
+import UserHome from '../support/selectors/UserHome';
 
 Then(
   /^User can verify their profile data$/,
@@ -11,6 +15,16 @@ Then(
 Then(
   /^a page loads with all of Mary's Profile information$/,
   checkProfile
+);
+
+Then(
+  /table with the claims from the \/userinfo response$/,
+  checkProfile
+);
+
+Then(
+  /Mary sees a (.*) button$/,
+  isVisible
 );
 
 // import checkClass from '../support/check/checkClass';
