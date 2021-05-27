@@ -1,6 +1,5 @@
 import { Remediator, RemediationValues } from './Remediator';
 import { IdxRemediation, IdxRemediationValue } from '../../types/idx-js';
-import { AuthSdkError } from '../../../errors';
 
 // Find matched authenticator in provided order
 function findMatchedOption(authenticators, options) {
@@ -48,8 +47,8 @@ export class SelectAuthenticator extends Remediator {
     if (matchedOption) {
       return true;
     }
-    // Terminate idx interaction if provided authenticators are not supported
-    throw new AuthSdkError('Provided authenticators are not supported, please check your org configuration');
+    
+    return false;
   }
 
   getNextStep() {

@@ -31,4 +31,14 @@ export class Identify extends Remediator {
       required: input.required
     };
   }
+
+  getValues() {
+    if (this.remediation.value.some(({ name }) => name === 'credentials')) {
+      // remove "password" from authenticator array when remediation is finished
+      const authenticators = this.values.authenticators?.filter(authenticator => authenticator !== 'password');
+      return { ...this.values, authenticators };
+    }
+
+    return super.getValues();
+  }
 }

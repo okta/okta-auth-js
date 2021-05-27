@@ -1,18 +1,15 @@
-import { Remediator, RemediationValues } from './Base/Remediator';
+import { RemediationValues } from './Base/Remediator';
+import { AuthenticatorData } from './Base/AuthenticatorData';
 
 export interface AuthenticatorEnrollmentDataValues extends RemediationValues {
   authenticators?: string[];
   phoneNumber?: string;
 }
 
-export class AuthenticatorEnrollmentData extends Remediator {
+export class AuthenticatorEnrollmentData extends AuthenticatorData {
   static remediationName = 'authenticator-enrollment-data';
 
   values: AuthenticatorEnrollmentDataValues;
-
-  map = {
-    'authenticator': ['authenticator']
-  };
 
   canRemediate() {
     return this.remediation.value.some(({ name }) => name === 'authenticator') 
@@ -27,14 +24,6 @@ export class AuthenticatorEnrollmentData extends Remediator {
         .find(({ name }) => name === 'id').value,
       methodType: 'sms',
       phoneNumber: this.values.phoneNumber,
-    };
-  }
-
-  getNextStep() {
-    const common = super.getNextStep();
-    return {
-      ...common,
-      type: this.remediation.relatesTo.value.type,
     };
   }
 

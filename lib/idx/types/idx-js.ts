@@ -78,7 +78,10 @@ export interface RawIdxResponse {
   stateHandle: string;
   intent?: string;
   expiresAt?: string;
-  remediation?: IdxRemediation[];
+  remediation?: {
+    type: 'array';
+    value: IdxRemediation[];
+  };
   messages?: IdxMessages;
 }
 
