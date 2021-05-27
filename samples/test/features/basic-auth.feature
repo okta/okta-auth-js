@@ -18,3 +18,10 @@ Feature: Direct Auth Basic Login with Password Factor
     #   And User enters password into the form
     #   And User submits the form
     #   Then User can verify their profile data
+
+    Scenario: Mary doesn't know her username
+      Given Mary navigates to Login with Username and Password
+      When she fills in her incorrect username
+      And she fills in her password
+      And she submits the Login form
+      Then she should see a message on the Login form "There is no account with the Username Mory."

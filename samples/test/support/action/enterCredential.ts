@@ -2,6 +2,7 @@ import setInputField from './setInputField';
 import LoginForm from '../selectors/LoginForm';
 import { getConfig } from '../../util/configUtils';
 
+/* eslint complexity:[0,8] */
 export default async (
   credName: string
 ) => {
@@ -9,6 +10,11 @@ export default async (
   let selector = null;
   let value;
   switch (credName) {
+    case 'incorrect username': {
+      selector = LoginForm.username;
+      value = 'Mory';
+      break;
+    }
     case 'username': {
       selector = LoginForm.username;
       value = value || config.username;

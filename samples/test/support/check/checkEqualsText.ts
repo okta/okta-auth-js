@@ -55,8 +55,8 @@ export default async (
     const text = await el[command]();
 
     if (boolFalseCase) {
-        expect(parsedExpectedText).not.toBe(text);
+        expect(text).not.toBe(parsedExpectedText);
     } else {
-        expect(parsedExpectedText).toBe(text);
+        expect(text).toBe(parsedExpectedText);
     }
 };

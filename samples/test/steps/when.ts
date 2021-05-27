@@ -26,7 +26,7 @@ When(
 );
 
 When(
-  /^she fills in her (username|correct password)$/,
+  /^she fills in her (incorrect username|username|password|correct password)$/,
   enterCredential
 );
 
