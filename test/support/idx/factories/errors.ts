@@ -69,3 +69,8 @@ export const IdxErrorDoesNotMatchPattern = IdxErrorMessageFactory.params({
   i18n: { key: 'registration.error.doesNotMatchPattern' },
   message: 'Provided value for property \'Email\' does not match required pattern'
 });
+
+export const IdxErrorPasscodeInvalidFactory = IdxErrorMessageFactory.params({
+  i18n: { key: 'api.authn.error.PASSCODE_INVALID', params: [] },
+  message: 'Invalid code. Try again.'
+});

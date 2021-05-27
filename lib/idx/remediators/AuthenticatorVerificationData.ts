@@ -1,22 +1,21 @@
-import { Remediator, RemediationValues } from './Base/Remediator';
+import { RemediationValues } from './Base/Remediator';
+import { AuthenticatorData } from './Base/AuthenticatorData';
 
 export interface AuthenticatorVerificationDataValues extends RemediationValues {
   authenticators?: string[];
 }
 
-export class AuthenticatorVerificationData extends Remediator {
+export class AuthenticatorVerificationData extends AuthenticatorData {
   static remediationName = 'authenticator-verification-data';
 
   values: AuthenticatorVerificationDataValues;
 
-  map = {
-    'authenticator': ['authenticator']
-  };
-
   canRemediate() {
-    // TODO: check if authenticator exist in values
-    return this.remediation.value
-      .some(({ name }) => name === 'authenticator');
+    if (this.remediation.value.some(({ name }) => name === 'authenticator')) {
+      const authenticatorType = this.remediation.relatesTo.value.type;
+      return !!this.values.authenticators?.find(authenticator => authenticator === authenticatorType);
+    }
+    return false;
   }
 
   mapAuthenticator() {
@@ -30,6 +29,7 @@ export class AuthenticatorVerificationData extends Remediator {
       methodType: 'sms',
     };
   }
+
 
   getValues(): AuthenticatorVerificationDataValues {
     return {};

@@ -2,13 +2,13 @@ import { Factory } from 'fishery';
 import { IdxForm } from '../../../../lib/idx/types/idx-js';
 
 import {
-  IdxValueFactory,
   IdValueFactory,
   PhoneMethodTypeValueFactory,
   PhoneNumberValueFactory,
   FirstNameValueFactory,
   LastNameValueFactory,
-  EmailValueFactory
+  EmailValueFactory,
+  PasscodeValueFactory
 } from './values';
 
 export const IdxFormFactory = Factory.define<IdxForm>(() => {
@@ -56,10 +56,13 @@ export const PhoneAuthenticatorFormFactory = IdxFormFactory.params({
 
 export const VerifySmsFormFactory = IdxFormFactory.params({
   value: [
-    IdxValueFactory.build({
-      label: 'Enter code',
-      name: 'passcode'
-    })
+    PasscodeValueFactory.build()
+  ]
+});
+
+export const VerifyEmailFormFactory = IdxFormFactory.params({
+  value: [
+    PasscodeValueFactory.build()
   ]
 });
 

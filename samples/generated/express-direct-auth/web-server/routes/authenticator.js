@@ -117,7 +117,47 @@ router.post('/enroll-authenticator/password', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-// Handle enroll authenticator - phone (sms)
+// Handle phone authenticator
+router.get('/verify-authenticator/phone', (req, res) => {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'verify-phone', {
+      title: 'Verify using phone authenticator',
+      action: '/verify-authenticator/phone',
+    })
+  });
+});
+
+router.post('/verify-authenticator/phone', async (req, res, next) => {
+  const { idxMethod } = req.session;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx[idxMethod]({ authenticators: ['phone'] });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+router.get('/challenge-authenticator/phone', (req, res) => {
+  renderPage({
+    req, res, basePath: BASE_PATH,
+    render: () => renderTemplate(req, res, 'authenticator', {
+      title: 'Challenge phone authenticator',
+      input: {
+        type: 'text',
+        name: 'verificationCode',
+      },
+      action: '/challenge-authenticator/phone',
+    })
+  });
+});
+
+router.post('/challenge-authenticator/phone', async (req, res, next) => {
+  const { idxMethod } = req.session;
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx[idxMethod]({ verificationCode });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+
 router.get('/enroll-authenticator/phone/enrollment-data', (req, res) => {
   renderPage({
     req, res, basePath: BASE_PATH,

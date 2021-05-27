@@ -49,7 +49,7 @@ const proceed = ({ nextStep, req, res }) => {
       });
       return true;
     case 'authenticator-verification-data':
-      redirect({ req, res, path: `/challenge-authenticator/${type}` });
+      redirect({ req, res, path: `/verify-authenticator/${type}` });
       return true;
 
     // authenticator enrollment

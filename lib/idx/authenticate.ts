@@ -20,6 +20,7 @@ import {
   SelectAuthenticatorEnrollValues,
   EnrollAuthenticator,
   EnrollAuthenticatorValues,
+  AuthenticatorVerificationData,
 } from './remediators';
 import { AuthenticationFlowMonitor } from './flowMonitors';
 
@@ -28,6 +29,7 @@ const flow: RemediationFlow = {
   'select-authenticator-authenticate': SelectAuthenticatorAuthenticate,
   'select-authenticator-enroll': SelectAuthenticatorEnroll,
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
+  'authenticator-verification-data': AuthenticatorVerificationData,
   'enroll-authenticator': EnrollAuthenticator,
   'challenge-authenticator': ChallengeAuthenticator,
   'reenroll-authenticator': ReEnrollAuthenticator,

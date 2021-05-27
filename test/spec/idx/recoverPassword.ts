@@ -10,7 +10,6 @@ import {
   IdentifyRecoveryRemediationFactory,
   chainResponses,
   ReEnrollPasswordAuthenticatorRemediationFactory,
-  AuthenticatorVerificationDataRemediationFactory,
   SelectAuthenticatorAuthenticateRemediationFactory,
   IdxErrorResetPasswordNotAllowedFactory,
   RawIdxResponseFactory,
@@ -19,7 +18,8 @@ import {
   AuthenticatorValueFactory,
   OktaVerifyAuthenticatorOptionFactory,
   PhoneAuthenticatorOptionFactory,
-  EmailAuthenticatorOptionFactory
+  EmailAuthenticatorOptionFactory,
+  PasswordAuthenticatorVerificationDataRemediationFactory
 } from '@okta/test.support/idx';
 
 const mocked = {
@@ -78,7 +78,7 @@ describe('idx/recoverPassword', () => {
 
     const verificationDataResponse = IdxResponseFactory.build({
       neededToProceed: [
-        AuthenticatorVerificationDataRemediationFactory.build(),
+        PasswordAuthenticatorVerificationDataRemediationFactory.build(),
         SelectAuthenticatorAuthenticateRemediationFactory.build({
           value: [
             AuthenticatorValueFactory.build({
@@ -317,7 +317,18 @@ describe('idx/recoverPassword', () => {
       tokens: null,
       nextStep: {
         name: 'authenticator-verification-data',
-        inputs: [],
+        type: 'password',
+        inputs: [{
+          form: {
+            value: [{
+              label: 'Password',
+              name: 'passcode',
+              secret: true
+            }]
+          },
+          label: 'Password',
+          name: 'authenticator'
+        }],
         canSkip: false
       }
     });
@@ -391,7 +402,18 @@ describe('idx/recoverPassword', () => {
       tokens: null,
       nextStep: {
         name: 'authenticator-verification-data',
-        inputs: [],
+        type: 'password',
+        inputs: [{
+          form: {
+            value: [{
+              label: 'Password',
+              name: 'passcode',
+              secret: true
+            }]
+          },
+          label: 'Password',
+          name: 'authenticator'
+        }],
         canSkip: false
       }
     });
