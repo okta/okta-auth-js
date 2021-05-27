@@ -3,7 +3,11 @@ import { Then } from '@cucumber/cucumber';
 
 import checkProfile from '../support/check/checkProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
+<<<<<<< HEAD
 import checkGuest from '../support/check/checkGuest';
+=======
+import isVisible from '../support/check/isVisible';
+>>>>>>> ad4a712... Add Scenario 0.1.2, OKTA-397816
 
 Then(
   /^User can verify their profile data$/,
@@ -23,6 +27,16 @@ Then(
 Then(
   /^the Root Page shows links to the Entry Points$/,
   checkGuest
+);
+
+Then(
+  /table with the claims from the \/userinfo response$/,
+  checkProfile
+);
+
+Then(
+  /Mary sees a (.*) button$/,
+  isVisible
 );
 
 // import checkClass from '../support/check/checkClass';
