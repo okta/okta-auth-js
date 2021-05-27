@@ -1,40 +1,16 @@
 import { run } from '../../../lib/idx/run';
-
-jest.mock('../../../lib/idx/interact', () => {
-  return {
-    interact: () => {}
-  };
-});
-
-jest.mock('../../../lib/idx/remediate', () => {
-  return {
-    remediate: () => {}
-  };
-});
-
+import { IdxStatus } from '../../../lib/idx/types';
+import { IdxResponseFactory } from '@okta/test.support/idx';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
+  introspect: require('../../../lib/idx/introspect'),
   remediate: require('../../../lib/idx/remediate')
 };
 
 describe('idx/run', () => {
   let testContext;
   beforeEach(() => {
-    const interactResponse = {
-      idxResponse: {},
-      stateHandle: 'idx-stateHandle'
-    };
-    jest.spyOn(mocked.interact, 'interact').mockImplementation(() => interactResponse);
-
-    const remediateResponse = {
-      idxResponse: {},
-      nextStep: 'remediate-nextStep',
-      messages: undefined,
-      terminal: false
-    };
-    jest.spyOn(mocked.remediate, 'remediate').mockImplementation(() => remediateResponse);
-
     const transactionMeta = {
       state: 'meta-state',
       codeVerifier: 'meta-code',
@@ -44,6 +20,23 @@ describe('idx/run', () => {
       urls: { authorizeUrl: 'meta-authorizeUrl' },
       ignoreSignature: true
     };
+    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 
+      meta: transactionMeta,
+      interactionHandle: 'meta-interactionHandle',
+      state: transactionMeta.state
+    });
+
+    const idxResponse = IdxResponseFactory.build();
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
+
+    const remediateResponse = {
+      idxResponse,
+      nextStep: 'remediate-nextStep',
+      messages: undefined,
+      terminal: false
+    };
+    jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue(remediateResponse);
+
     const tokenResponse = {
       tokens: {
         fakeToken: true
@@ -65,7 +58,7 @@ describe('idx/run', () => {
       actions: []
     };
     testContext = {
-      interactResponse,
+      idxResponse,
       remediateResponse,
       tokenResponse,
       transactionMeta,
@@ -78,9 +71,9 @@ describe('idx/run', () => {
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
     expect(res).toEqual({
-      'nextStep': 'remediate-nextStep',
-      'status': 1,
-      'tokens': null,
+      status: IdxStatus.PENDING,
+      nextStep: 'remediate-nextStep',
+      tokens: null,
     });
   });
 
@@ -90,10 +83,20 @@ describe('idx/run', () => {
     expect(mocked.interact.interact).toHaveBeenCalledWith(authClient, options);
   });
 
-  it('calls remediaate, passing options and values through', async () => {
-    const { authClient, options, interactResponse } = testContext;
-    const { idxResponse, stateHandle } = interactResponse;
-    const values = { ...options, stateHandle };
+  it('calls introspect with interactionHandle', async () => {
+    const { authClient, options } = testContext;
+    await run(authClient, options);
+    expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, { 
+      interactionHandle: 'meta-interactionHandle'
+    });
+  });
+
+  it('calls remediate, passing options and values through', async () => {
+    const { authClient, options, idxResponse } = testContext;
+    const values = { 
+      ...options, 
+      stateHandle: idxResponse.rawIdxState.stateHandle 
+    };
     await run(authClient, options);
     expect(mocked.remediate.remediate).toHaveBeenCalledWith(idxResponse, values, options);
   });
@@ -160,7 +163,6 @@ describe('idx/run', () => {
 
 
       const res = await run(authClient, options);
-      expect(authClient.transactionManager.load).toHaveBeenCalledWith();
       expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         'clientId': 'meta-clientId',
@@ -194,7 +196,6 @@ describe('idx/run', () => {
       });
 
       const res = await run(authClient, options);
-      expect(authClient.transactionManager.load).toHaveBeenCalledWith();
       expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         'clientId': 'meta-clientId',

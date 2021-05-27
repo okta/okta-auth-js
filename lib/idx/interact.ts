@@ -10,16 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-// BaseLoginRouter contains the more complicated router logic - rendering/
-// transition, etc. Most router changes should happen in LoginRouter (which is
-// responsible for adding new routes)
-
 import idx from '@okta/okta-idx-js';
 import { OktaAuth, IdxTransactionMeta } from '../types';
-import { IdxResponse } from './types/idx-js';
 import { AcceptsInteractionHandle } from './types/AcceptsInteractionHandle';
 import { getTransactionMeta, saveTransactionMeta } from './transactionMeta';
-import { IDX_API_VERSION } from '../constants';
+import { getOAuthBaseUrl } from '../oidc';
 
 export interface InteractOptions extends AcceptsInteractionHandle {
   state?: string;
@@ -28,78 +23,54 @@ export interface InteractOptions extends AcceptsInteractionHandle {
 
 export interface InteractResponse {
   state?: string;
-  stateHandle?: string;
-  interactionHandle?: string;
-  idxResponse?: IdxResponse;
-  meta?: IdxTransactionMeta;
+  interactionHandle: string;
+  meta: IdxTransactionMeta;
+}
+
+function getResponse(meta: IdxTransactionMeta): InteractResponse {
+  return {
+    meta,
+    interactionHandle: meta.interactionHandle,
+    state: meta.state
+  };
 }
 
 // Begin or resume a transaction. Returns an interaction handle
 export async function interact (authClient: OktaAuth, options: InteractOptions = {}): Promise<InteractResponse> {
+  const meta = await getTransactionMeta(authClient);
 
-  let meta = await getTransactionMeta(authClient);
+  // Saved transaction, return meta
+  if (meta.interactionHandle) {
+    return getResponse(meta);
+  }
 
   // These properties are always loaded from meta (or calculated fresh)
-  const {
-    interactionHandle,
-    codeVerifier,
-    codeChallenge,
-    codeChallengeMethod
-  } = meta;
+  const { codeChallenge, codeChallengeMethod } = meta;
 
   // These properties are defined by global configuration
-  const { issuer, clientId, redirectUri } = authClient.options;
-  const version = IDX_API_VERSION;
+  const { clientId, redirectUri } = authClient.options;
 
   // These properties can be set in options, but also have a default value in global configuration.
-  let state = options.state || authClient.options.state;
-  let scopes = options.scopes || authClient.options.scopes;
+  const state = options.state || authClient.options.state || meta.state;
+  const scopes = options.scopes || authClient.options.scopes || meta.scopes;
 
-  if (!interactionHandle) {
-    // new transaction: prefer configured values
-    state = state || meta.state;
-    scopes = scopes || meta.scopes;
-  } else {
-    // saved transaction: use only saved values
-    state = meta.state;
-    scopes = meta.scopes;
-  }
-  meta = Object.assign(meta, { state, scopes }); // save back to meta
-  
-  return idx.start({
-    // if interactionHandle is undefined here, idx will bootstrap a new interactionHandle
-    interactionHandle,
-    version,
-
+  const baseUrl = getOAuthBaseUrl(authClient);
+  return idx.interact({
     // OAuth
     clientId, 
-    issuer,
+    baseUrl,
     scopes,
     state,
     redirectUri,
 
     // PKCE
-    codeVerifier,
     codeChallenge,
     codeChallengeMethod
-  })
-    .then(idxResponse => {
-      // If this is a new transaction an interactionHandle was returned
-      if (!interactionHandle && idxResponse.toPersist.interactionHandle) {
-        meta = Object.assign({}, meta, {
-          interactionHandle: idxResponse.toPersist.interactionHandle
-        });
-      }
+  }).then(interactionHandle => {
+    const newMeta = { ...meta, interactionHandle, state, scopes };
+    // Save transaction meta so it can be resumed
+    saveTransactionMeta(authClient, newMeta);
 
-      // Save transaction meta so it can be resumed
-      saveTransactionMeta(authClient, meta);
-
-      return {
-        idxResponse,
-        interactionHandle: meta.interactionHandle,
-        meta,
-        stateHandle: idxResponse.context.stateHandle,
-        state
-      };
-    });
+    return getResponse(newMeta);
+  });
 }

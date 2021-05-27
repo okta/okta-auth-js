@@ -23,16 +23,9 @@ import {
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
-jest.mock('@okta/okta-idx-js', () => {
-  const { makeIdxState } = jest.requireActual('@okta/okta-idx-js').default;
-  return {
-    start: () => {},
-    makeIdxState
-  };
-});
-
 const mocked = {
-  idx: require('@okta/okta-idx-js'),
+  interact: require('../../../lib/idx/interact'),
+  introspect: require('../../../lib/idx/introspect'),
 };
 
 describe('idx/authenticate', () => {
@@ -55,7 +48,8 @@ describe('idx/authenticate', () => {
       codeVerifier: 'meta-code',
       scopes: ['meta'],
       urls: { authorizeUrl: 'meta-authorizeUrl' },
-      ignoreSignature: true
+      ignoreSignature: true,
+      interactionHandle: 'meta-interactionHandle',
     };
     const tokenResponse = {
       tokens: {
@@ -78,6 +72,12 @@ describe('idx/authenticate', () => {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       }
     };
+    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 
+      meta: transactionMeta,
+      interactionHandle: transactionMeta.interactionHandle,
+      state: transactionMeta.state
+    });
+
     jest.spyOn(authClient.token, 'exchangeCodeForTokens');
 
     testContext = {
@@ -96,7 +96,7 @@ describe('idx/authenticate', () => {
   it('returns an auth transaction', async () => {
     const { authClient } = testContext;
     const identifyResponse =  IdentifyResponseFactory.build();
-    jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     const res = await authenticate(authClient, {});
     expect(res).toEqual({
       status: IdxStatus.PENDING,
@@ -127,7 +127,7 @@ describe('idx/authenticate', () => {
         const identifyResponse =  IdentifyResponseFactory.build();
         const errorResponse = Object.assign({}, identifyResponse, { rawIdxState });
         identifyResponse.proceed = jest.fn().mockResolvedValueOnce(errorResponse);
-        jest.spyOn(mocked.idx, 'start').mockResolvedValueOnce(identifyResponse);
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(identifyResponse);
 
         const res = await authenticate(authClient, { username: 'obviously-wrong' });
         expect(res.status).toBe(IdxStatus.PENDING);
@@ -166,7 +166,7 @@ describe('idx/authenticate', () => {
         const identifyResponse =  IdentifyResponseFactory.build();
         const errorResponse = Object.assign({}, identifyResponse, { rawIdxState });
         identifyResponse.proceed = jest.fn().mockResolvedValueOnce(errorResponse);
-        jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
         const res = await authenticate(authClient, { username });
         expect(res.status).toBe(IdxStatus.PENDING);
@@ -202,7 +202,7 @@ describe('idx/authenticate', () => {
 
       const identifyResponse =  IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
-      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
       const res = await authenticate(authClient, { username: 'myuser', password: 'invalid-password' });
       expect(res.status).toBe(IdxStatus.TERMINAL);
@@ -228,7 +228,7 @@ describe('idx/authenticate', () => {
       });
       const identifyResponse =  IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
-      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
       const res = await authenticate(authClient, { username: 'myuser' });
       expect(res.status).toBe(IdxStatus.TERMINAL);
@@ -254,7 +254,7 @@ describe('idx/authenticate', () => {
       });
       const identifyResponse =  IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
-      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
       const res = await authenticate(authClient, { username: 'myuser' });
       expect(res.status).toBe(IdxStatus.TERMINAL);
@@ -293,7 +293,7 @@ describe('idx/authenticate', () => {
 
       it('can authenticate, passing username and password up front', async () => {
         const { authClient, identifyResponse, verifyPasswordResponse, tokenResponse, interactionCode } = testContext;
-        jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
         expect(res).toEqual({
           'status': 0,
@@ -315,7 +315,7 @@ describe('idx/authenticate', () => {
 
       it('can authenticate, passing username and password on demand', async () => {
         const { authClient, identifyResponse, verifyPasswordResponse, tokenResponse, interactionCode } = testContext;
-        jest.spyOn(mocked.idx, 'start')
+        jest.spyOn(mocked.introspect, 'introspect')
           .mockResolvedValueOnce(identifyResponse)
           .mockResolvedValueOnce(identifyResponse)
           .mockResolvedValueOnce(verifyPasswordResponse);
@@ -378,7 +378,7 @@ describe('idx/authenticate', () => {
           identifyResponse,
           successResponse
         ]);
-        jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
         jest.spyOn(identifyResponse, 'proceed');
         Object.assign(testContext, {
           identifyResponse,
@@ -522,7 +522,7 @@ describe('idx/authenticate', () => {
         verifyPasswordResponse,
         phoneEnrollmentDataResponse
       } = testContext;
-      jest.spyOn(mocked.idx, 'start').mockResolvedValue(identifyResponse);
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
       const res = await authenticate(authClient, {
         username: 'fakeuser',
         password: 'fakepass',
@@ -574,7 +574,7 @@ describe('idx/authenticate', () => {
         phoneEnrollmentDataResponse
       } = testContext;
 
-      jest.spyOn(mocked.idx, 'start')
+      jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(identifyResponse)
         .mockResolvedValueOnce(identifyResponse)
         .mockResolvedValueOnce(verifyPasswordResponse)
