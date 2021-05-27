@@ -96,9 +96,7 @@ export async function run(
 
       // Can we handle the remediations?
       const { 
-        idxResponse: { 
-          interactionCode,
-        } = {}, 
+        idxResponse: idxResponseFromResp, 
         nextStep: nextStepFromResp,
         terminal,
         canceled,
@@ -109,13 +107,18 @@ export async function run(
       nextStep = nextStepFromResp;
       messages = messagesFromResp;
 
+      // Save intermediate idx response in storage to reduce introspect call
+      if (nextStep && idxResponseFromResp) {
+        authClient.transactionManager.saveIdxResponse(idxResponseFromResp.rawIdxState);
+      }
+
       if (terminal) {
         status = IdxStatus.TERMINAL;
         shouldClearTransaction = true;
       } if (canceled) {
         status = IdxStatus.CANCELED;
         shouldClearTransaction = true;
-      } else if (interactionCode) { 
+      } else if (idxResponseFromResp?.interactionCode) { 
         const {
           clientId,
           codeVerifier,
@@ -125,7 +128,7 @@ export async function run(
           scopes,
         } = metaFromResp;
         tokens = await authClient.token.exchangeCodeForTokens({
-          interactionCode,
+          interactionCode: idxResponseFromResp.interactionCode,
           clientId,
           codeVerifier,
           ignoreSignature,

@@ -45,7 +45,8 @@ describe('idx/run', () => {
     const authClient = {
       transactionManager: {
         load: () => transactionMeta,
-        clear: () => {}
+        clear: () => {},
+        saveIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)

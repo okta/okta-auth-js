@@ -54,7 +54,8 @@ describe('idx/recoverPassword', () => {
         exists: () => true,
         load: () => transactionMeta,
         clear: () => {},
-        save: () => {}
+        save: () => {},
+        saveIdxResponse: () => {}
       }
     };
 

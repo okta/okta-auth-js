@@ -73,7 +73,8 @@ describe('idx/authenticate', () => {
         exists: () => true,
         load: () => transactionMeta,
         clear: () => {},
-        save: () => {}
+        save: () => {},
+        saveIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)

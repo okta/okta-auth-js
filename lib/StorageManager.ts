@@ -3,6 +3,7 @@ import {
   PKCE_STORAGE_NAME,
   TOKEN_STORAGE_NAME,
   TRANSACTION_STORAGE_NAME,
+  IDX_RESPONSE_STORAGE_NAME,
   CACHE_STORAGE_NAME,
   REDIRECT_OAUTH_PARAMS_NAME
 } from './constants';
@@ -13,10 +14,23 @@ import {
   PKCEStorage,
   CookieOptions,
   TransactionStorage,
+  IdxResponseStorage,
   StorageManagerOptions,
   SimpleStorage
 } from './types';
 import SavedObject from './SavedObject';
+import { isBrowser } from './features';
+import { warn } from './util';
+import { AuthSdkError } from './errors';
+
+function logServerSideMemoryStorageWarning(options: StorageOptions) {
+  if (!isBrowser() && !options.storageProvider && !options.storageProvider) {
+    warn(`
+      Memory storage can only support simple single user use case on server side,
+      please provide custom storageProvider or storageKey if advanced scenarios need to be supported.
+    `);
+  }
+}
 
 export default class StorageManager {
   storageManagerOptions: StorageManagerOptions;
@@ -66,14 +80,70 @@ export default class StorageManager {
   // stateToken, interactionHandle
   getTransactionStorage(options?: StorageOptions): TransactionStorage {
     options = this.getOptionsForSection('transaction', options);
+    logServerSideMemoryStorageWarning(options);
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || TRANSACTION_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
   }
 
+  // intermediate idxResponse
+  // store for network traffic optimazation purpose
+  getIdxResponseStorage(options?: StorageOptions): IdxResponseStorage {
+    let storage;
+    if (isBrowser()) {
+      // on browser side only use memory storage 
+      try {
+        storage = this.storageUtil.getStorageByType('memory', options);
+      } catch (e) {
+        // it's ok to miss response storage
+        warn(`
+          No response storage found, 
+          you may want to provide custom implementation for intermediate idx responses to optimize the network traffic
+        `);
+      }
+    } else {
+      // on server side re-use transaction custom storage
+      const transactionStorage = this.getTransactionStorage(options);
+      if (transactionStorage) {
+        storage = {
+          getItem: (key) => {
+            const transaction = transactionStorage.getStorage();
+            if (transaction && transaction[key]) {
+              return transaction[key];
+            }
+            return null;
+          },
+          setItem: (key, val) => {
+            const transaction = transactionStorage.getStorage();
+            if (!transaction) {
+              throw new AuthSdkError('Transaction has been cleared, failed to save idxState');
+            }
+            transaction[key] = val;
+            transactionStorage.setStorage(transaction);
+          },
+          removeItem: (key) => {
+            const transaction = transactionStorage.getStorage();
+            if (!transaction) {
+              return;
+            }
+            delete transaction[key];
+            transactionStorage.setStorage(transaction);
+          }
+        };
+      }
+    }
+
+    if (!storage) {
+      return null;
+    }
+
+    return new SavedObject(storage, IDX_RESPONSE_STORAGE_NAME);
+  }
+
   // access_token, id_token, refresh_token
   getTokenStorage(options?: StorageOptions): StorageProvider {
     options = this.getOptionsForSection('token', options);
+    logServerSideMemoryStorageWarning(options);
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || TOKEN_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
