@@ -2,20 +2,20 @@ import { startTransaction } from '../../../lib/idx/startTransaction';
 import { IdxFeature, IdxStatus } from '../../../lib/idx/types';
 
 import { 
-  PasswordRecoveryEnabledResponseFactory,
-  RegistrationEnabledResponseFactory,
-  SocialIDPEnabledResponseFactory,
-  AvailableStepsResponseFactory,
+  IdxResponseFactory,
+  SelectEnrollProfileRemediationFactory,
+  RedirectIdpRemediationFactory,
+  IdentifyRemediationFactory
 } from '@okta/test.support/idx';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
+  introspect: require('../../../lib/idx/introspect'),
   remediate: require('../../../lib/idx/remediate')
 };
 
 describe('idx/startTransaction', () => {
   let testContext;
-  let interactResponse;
 
   beforeEach(() => {
     const stateHandle = 'test-stateHandle';
@@ -31,7 +31,7 @@ describe('idx/startTransaction', () => {
       codeVerifier: 'meta-code',
       scopes: ['meta'],
       urls: { authorizeUrl: 'meta-authorizeUrl' },
-      ignoreSignature: true
+      ignoreSignature: true,
     };
     const authClient = {
       options: {
@@ -47,16 +47,14 @@ describe('idx/startTransaction', () => {
       },
     };
 
-    interactResponse = {
-      idxResponse: {
-        actions: {},
-        neededToProceed: []
-      },
+    const idxResponse = IdxResponseFactory.build();
+    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({
       meta: transactionMeta,
-      stateHandle: 'idx-stateHandle'
-    };
-    jest.spyOn(mocked.interact, 'interact').mockImplementation(() => Promise.resolve(interactResponse));
-    jest.spyOn(mocked.remediate, 'remediate').mockImplementation(() => {});
+      interactionHandle: 'meta-interactionHandle',
+      state: transactionMeta.state
+    });
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
+    jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue({});
 
     testContext = {
       issuer,
@@ -68,10 +66,13 @@ describe('idx/startTransaction', () => {
     };
   });
 
-  it('calls only interact', async () => {
+  it('calls interact, introspect, but not remediate', async () => {
     const { authClient } = testContext;
     await startTransaction(authClient);
     expect(mocked.interact.interact).toHaveBeenCalledWith(authClient, {});
+    expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, { 
+      interactionHandle: 'meta-interactionHandle' 
+    });
     expect(mocked.remediate.remediate).not.toHaveBeenCalled();
   });
 
@@ -81,41 +82,50 @@ describe('idx/startTransaction', () => {
     expect(res.status).toEqual(IdxStatus.PENDING);
   });
 
-  it('has password-recovery feature enabled with PasswordRecoveryEnabledResponseFactory', async () => {
-    interactResponse = {
-      idxResponse: PasswordRecoveryEnabledResponseFactory.build(),
-      stateHandle: 'idx-stateHandle'
-    };
+  it('has password-recovery feature enabled with currentAuthenticator-recover action', async () => {
+    const idxResponse = IdxResponseFactory.build({
+      actions: { 
+        'currentAuthenticator-recover': (() => {}) as Function
+      }
+    });
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
     expect(res.enabledFeatures.includes(IdxFeature.PASSWORD_RECOVERY)).toBeTruthy();
   });
 
   it('has registration feature enabled with RegistrationEnabledResponseFactory', async () => {
-    interactResponse = {
-      idxResponse: RegistrationEnabledResponseFactory.build(),
-      stateHandle: 'idx-stateHandle'
-    };
+    const idxResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        SelectEnrollProfileRemediationFactory.build()
+      ]
+    });
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
     expect(res.enabledFeatures.includes(IdxFeature.REGISTRATION)).toBeTruthy();
   });
 
   it('has social idp feature enabled with SocialIDPEnabledResponseFactory', async () => {
-    interactResponse = {
-      idxResponse: SocialIDPEnabledResponseFactory.build(),
-      stateHandle: 'idx-stateHandle'
-    };
+    const idxResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        RedirectIdpRemediationFactory.build()
+      ]
+    });
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
     expect(res.enabledFeatures.includes(IdxFeature.SOCIAL_IDP)).toBeTruthy();
   });
 
   it('maps remediations to availableSteps', async () => {
-    interactResponse = {
-      idxResponse: AvailableStepsResponseFactory.build(),
-      stateHandle: 'idx-stateHandle'
-    };
+    const idxResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        IdentifyRemediationFactory.build(),
+        SelectEnrollProfileRemediationFactory.build()
+      ]
+    });
+    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
     expect(res.availableSteps).toEqual([

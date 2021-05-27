@@ -79,19 +79,19 @@ export async function run(
   try {
     // Start/resume the flow
     const { interactionHandle, meta: metaFromResp } = await interact(authClient, options); 
-    meta = metaFromResp;
 
     // Introspect to get idx response
     const idxResponse = await introspect(authClient, { interactionHandle });
 
     if (!options.flow && !options.actions) {
       // handle start transaction
+      meta = metaFromResp;
       enabledFeatures = getEnabledFeatures(idxResponse);
       availableSteps = getAvailableSteps(idxResponse.neededToProceed);
     } else {
       const values: remediators.RemediationValues = { 
         ...options, 
-        stateHandle: idxResponse.stateHandle 
+        stateHandle: idxResponse.rawIdxState.stateHandle 
       };
 
       // Can we handle the remediations?
@@ -116,10 +116,22 @@ export async function run(
         status = IdxStatus.CANCELED;
         shouldClearTransaction = true;
       } else if (interactionCode) { 
+        const {
+          clientId,
+          codeVerifier,
+          ignoreSignature,
+          redirectUri,
+          urls,
+          scopes,
+        } = metaFromResp;
         tokens = await authClient.token.exchangeCodeForTokens({
           interactionCode,
-          ...meta,
-        }, meta.urls);
+          clientId,
+          codeVerifier,
+          ignoreSignature,
+          redirectUri,
+          scopes
+        }, urls);
 
         status = IdxStatus.SUCCESS;
         shouldClearTransaction = true;

@@ -22,29 +22,7 @@ import {
   EmailAuthenticatorOptionFactory
 } from '@okta/test.support/idx';
 
-// jest.mock('@okta/okta-idx-js', () => {
-//   const { makeIdxState } = jest.requireActual('@okta/okta-idx-js').default;
-//   return {
-//     interact: () => Promise.reject(new Error('introspect should be mocked')),
-//     makeIdxState
-//   };
-// });
-
-jest.mock('../../../lib/idx/interact', () => {
-  return {
-    interact: () => Promise.reject(new Error('interact should be mocked'))
-  };
-});
-
-
-jest.mock('../../../lib/idx/introspect', () => {
-  return {
-    introspect: () => Promise.reject(new Error('introspect should be mocked'))
-  };
-});
-
 const mocked = {
-  idx: require('@okta/okta-idx-js'),
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect')
 };
@@ -80,7 +58,11 @@ describe('idx/recoverPassword', () => {
       }
     };
 
-    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ meta: transactionMeta });
+    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 
+      meta: transactionMeta,
+      interactionHandle: transactionMeta.interactionHandle,
+      state: transactionMeta.state
+    });
 
     const identifyRecoveryResponse = IdxResponseFactory.build({
       neededToProceed: [

@@ -5,8 +5,6 @@ import {
   IdentifyRemediationFactory,
   IdentifyWithPasswordRemediationFactory,
   VerifyPasswordRemediationFactory,
-  SelectEnrollProfileRemediationFactory,
-  RedirectIdpRemediationFactory,
 } from './remediations';
 
 export const RawIdxResponseFactory = Factory.define<RawIdxResponse>(() => {
@@ -53,30 +51,5 @@ export const IdentifyWithPasswordResponseFactory = IdentifyResponseFactory.param
 export const VerifyPasswordResponseFactory = IdxResponseFactory.params({
   neededToProceed: [
     VerifyPasswordRemediationFactory.build()
-  ]
-});
-
-export const PasswordRecoveryEnabledResponseFactory = IdxResponseFactory.params({
-  actions: { 
-    'currentAuthenticator-recover': (() => {}) as Function
-  }
-});
-
-export const RegistrationEnabledResponseFactory = IdxResponseFactory.params({
-  neededToProceed: [
-    SelectEnrollProfileRemediationFactory.build()
-  ]
-});
-
-export const SocialIDPEnabledResponseFactory = IdxResponseFactory.params({
-  neededToProceed: [
-    RedirectIdpRemediationFactory.build()
-  ]
-});
-
-export const AvailableStepsResponseFactory = IdxResponseFactory.params({
-  neededToProceed: [
-    IdentifyRemediationFactory.build(),
-    SelectEnrollProfileRemediationFactory.build()
   ]
 });
