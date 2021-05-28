@@ -15,7 +15,7 @@ router.get('/social-idp', renderEntryPage);
 
 router.get('/login/callback', async (req, res) => {
   const url = req.protocol + '://' + req.get('host') + req.originalUrl;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   try {
     // Exchange code for tokens
     await authClient.idx.handleInteractionCodeRedirect(url);

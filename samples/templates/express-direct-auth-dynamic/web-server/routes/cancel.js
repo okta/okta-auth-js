@@ -4,7 +4,7 @@ const { getAuthClient, handleTransaction } = require('../utils');
 const router = express.Router();
 
 router.post('/cancel', async (req, res, next) => {
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.cancel();
   handleTransaction({ req, res, next, authClient, transaction });
 });

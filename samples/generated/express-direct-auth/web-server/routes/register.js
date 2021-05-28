@@ -19,7 +19,7 @@ router.get('/register', (req, res) => {
 
 router.post('/register', async (req, res, next) => {
   const { firstName, lastName, email } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.register({ 
     firstName, 
     lastName, 

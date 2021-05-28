@@ -23,7 +23,7 @@ router.get('/basic-login', renderEntryPage);
 
 router.post('/basic-login', async (req, res, next) => {
   const { username, password } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.authenticate({ 
     username, 
     password,

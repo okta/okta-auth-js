@@ -21,7 +21,7 @@ router.get('/login', async (req, res) => {
   req.session.idxMethod = 'authenticate';
 
   // Delete the idp related render logic if you only want the username and password form
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const { availableSteps } = await authClient.idx.startTransaction({ state: req.transactionId });
   const idps = availableSteps 
     ? availableSteps
@@ -42,7 +42,7 @@ router.get('/login', async (req, res) => {
 router.post('/login', async (req, res, next) => {
   const { authenticator } = req.query;
   const { username, password } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx.authenticate({ 
     username,
     password,
@@ -53,7 +53,7 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/login/callback', async (req, res, next) => {
   const url = req.protocol + '://' + req.get('host') + req.originalUrl;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   try {
     // Exchange code for tokens
     await authClient.idx.handleInteractionCodeRedirect(url);
