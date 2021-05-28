@@ -26,7 +26,7 @@ When(
 );
 
 When(
-  /^she fills in her (incorrect username|username|password|correct password)$/,
+  /^she fills in her (incorrect username|correct username|username|incorrect password|password|correct password)$/,
   enterCredential
 );
 
@@ -36,7 +36,7 @@ When(
 );
 
 When(
-  /^she submits the Login form$/,
+  /^she submits the Login form(?: with blank fields)?$/,
   submitForm
 );
 
