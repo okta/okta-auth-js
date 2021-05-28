@@ -5,13 +5,15 @@ import type { Selector } from 'webdriverio';
  * @param  {String}   selector   Element selector
  * @param  {String}   falseCase Check for a visible or a hidden element
  */
-export default (selector: Selector, falseCase: boolean) => {
+export default async (selector: Selector, falseCase: boolean) => {
     /**
      * Visible state of the give element
      * @type {String}
      */
-    const isDisplayed = $(selector).isDisplayed();
-
+ 
+    //const isDisplayed = $(selector).isDisplayed();
+    const isDisplayed = await (await $(selector)).isDisplayed();
+    
     if (falseCase) {
         expect(isDisplayed).not.toEqual(
             true,
