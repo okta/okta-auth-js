@@ -4,7 +4,7 @@ import { Then } from '@cucumber/cucumber';
 import checkProfile from '../support/check/checkProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
-import isVisible from '../support/check/isVisible';
+import checkButton from '../support/check/checkButton';
 
 Then(
   /^User can verify their profile data$/,
@@ -32,8 +32,8 @@ Then(
 );
 
 Then(
-  /Mary sees a (.*) button$/,
-  isVisible
+  /sees a (.*) button$/,
+  checkButton
 );
 
 // import checkClass from '../support/check/checkClass';

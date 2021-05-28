@@ -11,7 +11,6 @@ export default async (selector: Selector, falseCase: boolean) => {
      * @type {String}
      */
  
-    //const isDisplayed = $(selector).isDisplayed();
     const isDisplayed = await (await $(selector)).isDisplayed();
     
     if (falseCase) {
