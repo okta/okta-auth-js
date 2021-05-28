@@ -1,5 +1,6 @@
 import waitForDisplayed from '../wait/waitForDisplayed';
 import LoginForm from '../selectors/LoginForm';
+import Home from '../selectors/Home';
 import startApp from './startApp';
 
 export default async (
@@ -15,6 +16,13 @@ export default async (
         selector = LoginForm.password;
         queryParams = { flow: 'form' };
         break;
+    }
+
+    case 'the Root View': {
+      url = '/';
+      selector = Home.serverConfig;
+      queryParams = { flow: 'form' };
+      break;
     }
 
     default: {

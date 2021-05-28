@@ -74,7 +74,7 @@ const samples = [
     name: 'express-direct-auth',
     template: 'express-direct-auth',
     specs: [],
-    features: ['basic-auth']
+    features: ['basic-auth', 'root-page']
   },
   {
     name: 'express-embedded-widget',
