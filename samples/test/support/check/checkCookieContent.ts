@@ -5,7 +5,7 @@
  *                                  or not
  * @param  {String}   expectedValue The value to check against
  */
-export default (
+export default async (
     name: string,
     falseCase: boolean,
     expectedValue: string
@@ -14,7 +14,15 @@ export default (
      * The cookie retrieved from the browser object
      * @type {Object}
      */
-    const cookie = browser.getCookies(name)[0];
+    const cookies = await browser.getCookies(name);
+
+    expect(cookies).not.toHaveLength(
+        0,
+        // @ts-expect-error
+        `Expected cookie "${name}" to exists but it does not`
+    );
+    const cookie = cookies[0];
+
     expect(cookie.name).toBe(
         name,
         // @ts-expect-error

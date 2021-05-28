@@ -3,6 +3,9 @@ import { Then } from '@cucumber/cucumber';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 
 import checkProfile from '../support/check/checkProfile';
+import checkTokenExists from '../support/check/checkTokenExists';
+import checkCookieContent from '../support/check/checkCookieContent';
+import checkURLPath from '../support/check/checkURLPath';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
 
@@ -17,9 +20,19 @@ Then(
 );
 
 Then(
-  /^she should see (?:a message on the Login form|the message) "(?<message>.+?)"$/,
+  /^her access token is revoked$/,
+  () => checkTokenExists('accessToken', true)
+);
+
+Then(
+  /^she should see a message on the Login form "(?<message>.+?)"$/,
   checkFormMessage
-  );
+);
+
+Then(
+  /^her access token is revoked$/,
+  () => checkTokenExists('accessToken', true)
+);
   
 Then(
   /^the Root Page shows links to the Entry Points$/,
@@ -29,6 +42,16 @@ Then(
 Then(
   /^she is redirected to the ([\s\w]+)$/,
   checkIsOnPage
+);
+
+Then(
+  /^her app session is destroyed$/,
+  () => checkCookieContent('has-app-session', false, 'false')
+);
+
+Then(
+  /^she is redirected back to the Root View$/,
+  () => checkURLPath(false, '/')
 );
 
 // import checkClass from '../support/check/checkClass';
