@@ -130,7 +130,7 @@ router.get('/verify-authenticator/phone', (req, res) => {
 
 router.post('/verify-authenticator/phone', async (req, res, next) => {
   const { idxMethod } = req.session;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx[idxMethod]({ authenticators: ['phone'] });
   handleTransaction({ req, res, next, authClient, transaction });
 });
@@ -152,7 +152,7 @@ router.get('/challenge-authenticator/phone', (req, res) => {
 router.post('/challenge-authenticator/phone', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { verificationCode } = req.body;
-  const authClient = getAuthClient(req);
+  const authClient = getAuthClient(req, res);
   const transaction = await authClient.idx[idxMethod]({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });
