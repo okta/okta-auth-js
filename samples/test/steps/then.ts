@@ -36,6 +36,16 @@ Then(
   isVisible
 );
 
+Then(
+  /table with the claims from the \/userinfo response$/,
+  checkProfile
+);
+
+Then(
+  /Mary sees a (.*) button$/,
+  isVisible
+);
+
 // import checkClass from '../support/check/checkClass';
 // import checkContainsAnyText from '../support/check/checkContainsAnyText';
 // import checkIsEmpty from '../support/check/checkIsEmpty';
