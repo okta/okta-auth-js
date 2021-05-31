@@ -22,7 +22,7 @@ router.get('/login', async (req, res) => {
 
   // Delete the idp related render logic if you only want the username and password form
   const authClient = getAuthClient(req);
-  const { availableSteps } = await authClient.idx.startTransaction();
+  const { availableSteps } = await authClient.idx.startTransaction({ state: req.transactionId });
   const idps = availableSteps 
     ? availableSteps
       .filter(({ name }) => name === 'redirect-idp')
