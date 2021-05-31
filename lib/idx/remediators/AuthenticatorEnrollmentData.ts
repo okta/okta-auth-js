@@ -1,33 +1,42 @@
-import { RemediationValues } from './Base/Remediator';
-import { AuthenticatorData } from './Base/AuthenticatorData';
+import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
+import { getAuthenticatorFromRemediation } from './util';
+import { Authenticator } from '../types';
 
-export interface AuthenticatorEnrollmentDataValues extends RemediationValues {
-  authenticators?: string[];
+export type AuthenticatorEnrollmentDataValues =  AuthenticatorDataValues & {
   phoneNumber?: string;
 }
-
 export class AuthenticatorEnrollmentData extends AuthenticatorData {
   static remediationName = 'authenticator-enrollment-data';
 
   values: AuthenticatorEnrollmentDataValues;
 
   canRemediate() {
-    return this.remediation.value.some(({ name }) => name === 'authenticator') 
-      && !!this.values.phoneNumber;
+    const authenticator = this.getAuthenticatorFromValues();
+    return !!(authenticator && authenticator.methodType && authenticator.phoneNumber);
   }
 
   mapAuthenticator() {
-    const authenticatorVal = this.remediation.value
-      .find(({ name }) => name === 'authenticator').form.value;
+    const authenticatorFromValues = this.getAuthenticatorFromValues();
+    const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
     return { 
-      id: authenticatorVal
+      id: authenticatorFromRemediation.form.value
         .find(({ name }) => name === 'id').value,
-      methodType: 'sms',
-      phoneNumber: this.values.phoneNumber,
+      methodType: authenticatorFromValues.methodType,
+      phoneNumber: authenticatorFromValues.phoneNumber,
     };
   }
 
-  getValues(): AuthenticatorEnrollmentDataValues {
-    return {};
+  getInputAuthenticator() {
+    return [
+      { name: 'methodType', type: 'string' },
+      { name: 'phoneNumber', type: 'string' },
+    ];
   }
+
+  protected generateAuthenticatorFromValues(): Authenticator {
+    const type = this.getRelatesToType();
+    const { methodType, phoneNumber } = this.values;
+    return { type, methodType, phoneNumber };
+  }
+
 }

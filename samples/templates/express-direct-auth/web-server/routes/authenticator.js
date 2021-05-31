@@ -13,11 +13,11 @@ const BASE_PATH = '';
 
 // Handle select-authenticator
 router.get('/select-authenticator', (req, res) => {
-  const { authenticators, canSkip } = req.session;
+  const { nextStep: { options, canSkip } } = req.getIdxStates();
   renderPage({ 
     req, res, basePath: BASE_PATH,
     render: () => renderTemplate(req, res, 'select-authenticator', {
-      authenticators,
+      options,
       action: '/select-authenticator',
       canSkip,
       skipAction: '/select-authenticator/skip'
@@ -29,9 +29,7 @@ router.post('/select-authenticator', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { authenticator } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({
-    authenticators: [authenticator],
-  });
+  const transaction = await authClient.idx[idxMethod]({ authenticator });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -84,9 +82,7 @@ router.post('/enroll-authenticator/email', async (req, res, next) => {
   const { idxMethod } = req.session;
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ 
-    verificationCode,
-  });
+  const transaction = await authClient.idx[idxMethod]({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -111,27 +107,28 @@ router.post('/enroll-authenticator/password', async (req, res, next) => {
     return;
   }
 
-  const transaction = await authClient.idx[idxMethod]({ 
-    password,
-  });
+  const transaction = await authClient.idx[idxMethod]({ password });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
 // Handle phone authenticator
 router.get('/verify-authenticator/phone', (req, res) => {
+  const { nextStep: { options } } = req.getIdxStates();
   renderPage({
     req, res, basePath: BASE_PATH,
     render: () => renderTemplate(req, res, 'verify-phone', {
       title: 'Verify using phone authenticator',
       action: '/verify-authenticator/phone',
+      options,
     })
   });
 });
 
 router.post('/verify-authenticator/phone', async (req, res, next) => {
   const { idxMethod } = req.session;
+  const { methodType } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ authenticators: ['phone'] });
+  const transaction = await authClient.idx[idxMethod]({ methodType });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -159,20 +156,22 @@ router.post('/challenge-authenticator/phone', async (req, res, next) => {
 
 
 router.get('/enroll-authenticator/phone/enrollment-data', (req, res) => {
+  const { nextStep: { options } } = req.getIdxStates();
   renderPage({
     req, res, basePath: BASE_PATH,
     render: () => renderTemplate(req, res, 'phone-enrollment-data', {
-      action: '/enroll-authenticator/phone/enrollment-data'
+      action: '/enroll-authenticator/phone/enrollment-data',
+      options,
     })
   });
 });
 
 router.post('/enroll-authenticator/phone/enrollment-data', async (req, res, next) => {
   const { idxMethod } = req.session;
-  const { phoneNumber } = req.body;
+  const { phoneNumber, methodType } = req.body;
   const authClient = getAuthClient(req);
   const transaction = await authClient.idx[idxMethod]({ 
-    authenticators: ['phone'],
+    methodType,
     phoneNumber,
   });
   handleTransaction({ req, res, next, authClient, transaction });

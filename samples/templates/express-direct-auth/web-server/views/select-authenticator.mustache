@@ -22,9 +22,9 @@
         <form class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <select class="ui selection dropdown" name="authenticator">
-              {{#authenticators}}
+              {{#options}}
                 <option value="{{value}}">{{label}}</option>
-              {{/authenticators}}
+              {{/options}}
             </select>
           </div>
           <button class="ui fluid large primary submit button" type="submit">

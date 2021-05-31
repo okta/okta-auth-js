@@ -1,9 +1,6 @@
-import { RemediationValues } from './Base/Remediator';
-import { AuthenticatorData } from './Base/AuthenticatorData';
+import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 
-export interface AuthenticatorVerificationDataValues extends RemediationValues {
-  authenticators?: string[];
-}
+export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 
 export class AuthenticatorVerificationData extends AuthenticatorData {
   static remediationName = 'authenticator-verification-data';
@@ -11,27 +8,24 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
   values: AuthenticatorVerificationDataValues;
 
   canRemediate() {
-    if (this.remediation.value.some(({ name }) => name === 'authenticator')) {
-      const authenticatorType = this.remediation.relatesTo.value.type;
-      return !!this.values.authenticators?.find(authenticator => authenticator === authenticatorType);
-    }
-    return false;
+    const authenticator = this.getAuthenticatorFromValues();
+    return !!(authenticator && authenticator.methodType);
   }
 
   mapAuthenticator() {
-    const authenticatorVal = this.remediation.value
-      .find(({ name }) => name === 'authenticator').form.value;
+    const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
+    const authenticatorFromValues = this.getAuthenticatorFromValues();
     return { 
-      id: authenticatorVal
+      id: authenticatorFromRemediation.form.value
         .find(({ name }) => name === 'id').value,
-      enrollmentId: authenticatorVal
+      enrollmentId: authenticatorFromRemediation.form.value
         .find(({ name }) => name === 'enrollmentId').value,
-      methodType: 'sms',
+      methodType: authenticatorFromValues.methodType,
     };
   }
 
-
-  getValues(): AuthenticatorVerificationDataValues {
-    return {};
+  getInputAuthenticator() {
+    return { name: 'methodType', type: 'string' };
   }
+
 }

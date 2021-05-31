@@ -36,26 +36,26 @@ export function getRemediator(
       
     const T = flow[remediation.name];
     remediator = new T(remediation, values);
-    if (remediator.canRemediate()) {
-      // found the remediator
-      return remediator;
-    } else if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations)) {
+    if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations)) {
+      if (remediator.canRemediate()) {
+        // found the remediator
+        return remediator;
+      }
       // remediator cannot handle the current values
       // maybe return for next step
-      remediatorCandidates.push(remediator);
+      remediatorCandidates.push(remediator);  
     }
   }
   
-  // TODO: why is it a problem to have multiple remediations?
-  // if (remediatorCandidates.length > 1) {
-  //   const remediationNames = remediatorCandidates.reduce((acc, curr) => {
-  //     const name = curr.getName();
-  //     return acc ? `${acc}, ${name}` : name;
-  //   }, '');
-  //   throw new AuthSdkError(`
-  //     More than one remediation can match the current input, remediations: ${remediationNames}
-  //   `);
-  // }
+  if (remediatorCandidates.length > 1) {
+    const remediationNames = remediatorCandidates.reduce((acc, curr) => {
+      const name = curr.getName();
+      return acc ? `${acc}, ${name}` : name;
+    }, '');
+    throw new AuthSdkError(`
+      More than one remediation can match the current input, remediations: ${remediationNames}
+    `);
+  }
 
   return remediatorCandidates[0];
 }
@@ -170,7 +170,7 @@ export async function remediate(
     
     // We may want to trim the values bag for the next remediation
     // Let the remediator decide what the values should be (default to current values)
-    values = remediator.getValues();
+    values = remediator.getValuesAfterProceed();
     return remediate(idxResponse, values, options); // recursive call
   } catch (e) {
     // Handle idx messages

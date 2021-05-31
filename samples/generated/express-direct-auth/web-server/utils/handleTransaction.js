@@ -5,7 +5,7 @@ const redirect = require('./redirect');
 const SUPPORTED_AUTHENTICATORS = ['email', 'password', 'phone'];
 
 const proceed = ({ nextStep, req, res }) => {
-  const { name, type, authenticators, canSkip } = nextStep;
+  const { name, type } = nextStep;
 
   // Always reset canSkip to false before redirect
   req.session.canSkip = false;
@@ -36,7 +36,6 @@ const proceed = ({ nextStep, req, res }) => {
 
     // authenticator authenticate
     case 'select-authenticator-authenticate':
-      req.session.authenticators = authenticators;
       redirect({ 
         req, res, path: '/select-authenticator'
       });
@@ -54,8 +53,6 @@ const proceed = ({ nextStep, req, res }) => {
 
     // authenticator enrollment
     case 'select-authenticator-enroll':
-      req.session.canSkip = canSkip;
-      req.session.authenticators = authenticators;
       redirect({ req, res, path: '/select-authenticator' });
       return true;
     case 'enroll-authenticator':
