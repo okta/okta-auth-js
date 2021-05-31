@@ -32,9 +32,9 @@ Feature: Direct Auth Basic Login with Password Factor
       Then she should see a message on the Login form "There is no account with the Username Mory."
   
     Scenario: Mary doesn't know her password
-	    Given Mary navigates to Login with Username and Password
+	    Given Mary navigates to the Basic Login View
 	    When she fills in her correct username
 	    And she fills in her incorrect password
 	    And she submits the Login form with blank fields
-      Then she should see a message on the Login form "Authentication failed"
+      Then she should see the message "Authentication failed"
   
