@@ -7,9 +7,6 @@ const SUPPORTED_AUTHENTICATORS = ['email', 'password', 'phone'];
 const proceed = ({ nextStep, req, res }) => {
   const { name, type } = nextStep;
 
-  // Always reset canSkip to false before redirect
-  req.session.canSkip = false;
-
   // Stop if unsupported types detected
   if (type && !SUPPORTED_AUTHENTICATORS.includes(type)) {
     throw new Error(`
@@ -86,7 +83,8 @@ module.exports = function handleTransaction({
   } = transaction;
 
   // Persist states to session
-  req.setIdxStates(transaction);
+  const flowStates = req.getFlowStates();
+  req.setFlowStates({ ...flowStates, idx: transaction });
 
   switch (status) {
     case IdxStatus.PENDING:

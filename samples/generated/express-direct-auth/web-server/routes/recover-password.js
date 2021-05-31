@@ -8,11 +8,12 @@ const {
 
 const router = express.Router();
 
-const BASE_PATH = '/recover-password';
-
 // entry route
 router.get('/recover-password', (req, res) => {
-  req.session.idxMethod = 'recoverPassword';
+  req.setFlowStates({
+    entry: '/recover-password',
+    idxMethod: 'recoverPassword'
+  });
 
   renderTemplate(req, res, 'recover-password', {
     action: '/recover-password'
@@ -29,7 +30,7 @@ router.post('/recover-password', async (req, res, next) => {
 // Handle reset password
 router.get('/reset-password', (req, res) => {
   renderPage({
-    req, res, basePath: BASE_PATH,
+    req, res,
     render: () => renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
       title: 'Reset password',
       action: '/reset-password'

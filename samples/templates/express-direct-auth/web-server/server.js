@@ -7,9 +7,8 @@ const mustacheExpress = require('mustache-express');
 const path = require('path');
 const { 
   userContext, 
-  lastError, 
   authTransaction,
-  idxStates, 
+  flowStates,
   testEnv
 } = require('./middlewares');
 
@@ -29,8 +28,7 @@ app.use(session({
   resave: true, 
   saveUninitialized: false
 }));
-app.use(lastError);
-app.use(idxStates);
+app.use(flowStates);
 app.use(authTransaction);
 
 // Provide the configuration to the view layer because we show it on the homepage

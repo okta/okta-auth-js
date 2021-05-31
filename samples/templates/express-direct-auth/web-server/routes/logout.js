@@ -13,7 +13,7 @@ router.post('/logout', async (req, res) => {
     await authClient.revokeRefreshToken();
     await authClient.revokeAccessToken();
     // Clear local session
-    req.session.destroy();
+    delete req.session[req.transactionId];
     // Clear okta session with logout redirect
     res.redirect(signoutRedirectUrl);
   } catch (err) {
