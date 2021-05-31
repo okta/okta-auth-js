@@ -14,22 +14,15 @@ const BASE_PATH = '/recover-password';
 router.get('/recover-password', (req, res) => {
   req.session.idxMethod = 'recoverPassword';
 
-  const { authenticator } = req.query;
   renderTemplate(req, res, 'recover-password', {
-    action: authenticator 
-      ? `/recover-password?authenticator=${authenticator}` 
-      : '/recover-password'
+    action: '/recover-password'
   });
 });
 
 router.post('/recover-password', async (req, res, next) => {
-  const { authenticator } = req.query;
   const { username } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.recoverPassword({
-    username,
-    authenticators: authenticator ? [authenticator] : [],
-  });
+  const transaction = await authClient.idx.recoverPassword({ username });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 

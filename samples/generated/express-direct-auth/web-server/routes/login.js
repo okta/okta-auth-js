@@ -29,24 +29,19 @@ router.get('/login', async (req, res) => {
       .map(({ href, idp: { name }, type }) => ({ name, href, class: getIdpSemanticClass(type) })) 
     : [];
 
-  const { authenticator } = req.query;
   renderTemplate(req, res, 'login', { 
-    action: authenticator 
-      ? `/login?authenticator=${authenticator}` 
-      : `/login`,
+    action: '/login',
     hasIdps: !!idps.length,
     idps,
   });
 });
 
 router.post('/login', async (req, res, next) => {
-  const { authenticator } = req.query;
   const { username, password } = req.body;
   const authClient = getAuthClient(req);
   const transaction = await authClient.idx.authenticate({ 
     username,
     password,
-    authenticators: authenticator ? [authenticator] : [],
   });
   handleTransaction({ req, res, next, authClient, transaction });
 });
