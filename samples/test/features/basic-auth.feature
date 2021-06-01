@@ -12,6 +12,11 @@ Feature: Direct Auth Basic Login with Password Factor
       And she submits the Login form
       Then a page loads with all of Mary's Profile information
 
+    Scenario: Mary clicks on the "Forgot Password Link"
+      Given Mary navigates to the Basic Login View
+      When she clicks on the "Forgot Password Link"
+      Then she is redirected to the Self Service Password Reset View
+
     # Scenario: Authenticate with Username and Password
     #   Given Password login form is displayed 
     #   When User enters username into the form

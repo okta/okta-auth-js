@@ -17,7 +17,7 @@ export default async (
      * Element to perform the action on
      * @type {String}
      */
-    const selector2 = (type === 'link') ? `=${selector}` : selector;
+    const selector2 = (type === 'link') ? `[href="${selector}"]` : selector;
 
     /**
      * The method to call on the browser object
