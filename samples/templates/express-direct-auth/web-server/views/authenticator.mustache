@@ -9,7 +9,7 @@
 
     <div class="okta-sign-in-form ui center aligned relaxed grid">
       <div class="row">
-        <div class="ui header">
+        <div id="page-title-header" class="ui header">
           <h2>{{title}}</h2>
         </div>
       </div>
@@ -19,18 +19,18 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="{{action}}" method="POST">
+        <form id="challenge-authenticator-form" class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
                 Enter Code
               </div>
               {{#input}}
-                <input type="{{type}}" name="{{name}}" required />
+                <input id="authenticator-code-input" type="{{type}}" name="{{name}}" required />
               {{/input}}
             </div>
           </div>
-          <button class="ui fluid large primary submit button" type="submit">
+          <button id="submit-button" class="ui fluid large primary submit button" type="submit">
             Verify
           </button>
         </form>

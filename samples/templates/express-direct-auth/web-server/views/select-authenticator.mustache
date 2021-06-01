@@ -19,15 +19,15 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="{{action}}" method="POST">
+        <form id="select-authenticator-form" class="ui large form" action="{{action}}" method="POST">
           <div class="field">
-            <select class="ui selection dropdown" name="authenticator">
+            <select id="authenticator-options" class="ui selection dropdown" name="authenticator">
               {{#authenticators}}
                 <option value="{{value}}">{{label}}</option>
               {{/authenticators}}
             </select>
           </div>
-          <button class="ui fluid large primary submit button" type="submit">
+          <button id="submit-button" class="ui fluid large primary submit button" type="submit">
             Select
           </button>
         </form>
