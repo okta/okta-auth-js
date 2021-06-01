@@ -1,9 +1,9 @@
-import PasswordReset from '../selectors/PasswordReset';
+import PasswordRecover from '../selectors/PasswordRecover';
 import waitForDisplayed from '../wait/waitForDisplayed';
 
 /**
  * Check if browser has navigated to expected page
- * @param  {String}   pageTitle       Expected page title
+ * @param  {String}   pageName       Expected page title
  */
 export default async (pageName: string) => {
 
@@ -11,7 +11,7 @@ export default async (pageName: string) => {
   let pageTitle;
   switch (pageName) {
     case 'Self Service Password Reset View': {
-      selector = PasswordReset.pageTitle;
+      selector = PasswordRecover.pageTitle;
       pageTitle = 'Recover password';
       break;
     }
