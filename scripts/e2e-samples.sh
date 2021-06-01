@@ -10,11 +10,12 @@ export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
-# Pull testenv.yml file that contains the following config
-# ISSUER, CLIENT_ID, CLIENT_SECRET, USERNAME, PASSWORD
-# ISSUER set - https://dev-65117836.okta.com/oauth2/default
-# CLIENT_ID set - 0oapf9aieOZEdU0Nl5d6
+# Configuration
+export ISSUER=https://dev-65117836.okta.com/oauth2/default
+export USERNAME=mary@acme.com
+get_secret prod/okta-sdk-vars/password PASSWORD
 
+# Pull testenv.yml file
 aws s3 --quiet --region us-east-1 cp s3://ci-secret-stash/prod/okta-sdk-vars/testenv.yml $OKTA_HOME/$REPO/testenv.yml
 #get_secret prod/okta-sdk-vars/testenv.yml TESTENV_YML
 #echo $TESTENV_YML > $OKTA_HOME/$REPO/testenv.yml

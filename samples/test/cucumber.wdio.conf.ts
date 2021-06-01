@@ -29,6 +29,7 @@ if (CI) {
 
 // driver version must match installed chrome version
 // https://chromedriver.storage.googleapis.com/index.html
+// const CHROMEDRIVER_VERSION = '91.0.4472.19'; // For local testing
 const CHROMEDRIVER_VERSION = '89.0.4389.23';
 const drivers = {
   chrome: { version: CHROMEDRIVER_VERSION }
