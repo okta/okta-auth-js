@@ -3,7 +3,7 @@ import isDisplayed from './isDisplayed';
 
 /**
  * Check if the given element is (not) visible
- * @param  {String}  Object name as defined in bdd steps
+ * @param  {String}  objectName as defined in bdd steps
  */
 export default async(objectName: string) => {
     /**
@@ -15,7 +15,7 @@ export default async(objectName: string) => {
             await isDisplayed(UserHome.logoutButton, false);
             break;
         }
-        
+
         default: {
             throw new Error(`Unknown object "${objectName}"`);
         }
