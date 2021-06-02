@@ -27,7 +27,7 @@ class A18nClient {
   async getEmailCode(profileId: string) {
     let response = await this._getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as unknown as Record<string, string>;
     if (!response.content) {
-      browser.waitUntil(() => new Promise(resolve => setTimeout(resolve.bind(this, true), 2000)));
+      await browser.waitUntil(() => new Promise(resolve => setTimeout(resolve.bind(this, true), 5000)));
       response = await this._getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as unknown as Record<string, string>;
     }
     let match = response.content.match(/Enter a code instead: (?<code>\d+)/);

@@ -1,5 +1,5 @@
 import { Client} from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../../util/configUtils';
+import { getConfig } from '../../util/configUtils';
 import a18nClient from './a18nClient';
 
 const config = getConfig();

@@ -1,6 +1,6 @@
 import { Client, Group, User } from '@okta/okta-sdk-nodejs';
 import { v4 as uuidv4 } from 'uuid';
-import { getConfig } from '../../../util';
+import { getConfig } from '../../util';
 import a18nClient, {A18nProfile} from './a18nClient';
 
 const config = getConfig();

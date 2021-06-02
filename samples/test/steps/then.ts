@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import { Then } from '@cucumber/cucumber';
-import checkIsOnPage from '../support/check/checkIsOnPage';
 
 import checkProfile from '../support/check/checkProfile';
 import checkNoProfile from '../support/check/checkNoProfile';
@@ -8,6 +7,8 @@ import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
 import checkButton from '../support/check/checkButton';
 import checkURLPath from '../support/check/checkURLPath';
+import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
+import checkIsOnPage from '../support/check/checkIsOnPage';
 
 Then(
   /^User can verify their profile data$/,
@@ -45,19 +46,15 @@ Then(
 );
 
 Then(
-  /^she is redirected back to the Root View$/,
-  () => checkURLPath(false, '/')
+  /^she sees a page to input her code$/,
+    selectEmailAuthenticator
 );
 
 Then(
-  /^Mary sees login, registration buttons$/,
-  checkGuest
+  /^she sees a page to set her password$/,
+  checkIsOnPage.bind(null, 'Reset Password')
 );
 
-Then(
-  /^she sees that claims from \/userinfo are disappeared$/,
-  checkNoProfile
-);
 
 // import checkClass from '../support/check/checkClass';
 // import checkContainsAnyText from '../support/check/checkContainsAnyText';

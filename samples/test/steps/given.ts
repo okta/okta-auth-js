@@ -24,10 +24,28 @@ import { Given } from '@cucumber/cucumber';
 import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
+import createUser from '../support/management-api/createUser';
+import createAndStoreUserInContext from '../support/action/live-user/createAndStoreUserInContext';
+
 
 Given(
   /^an APP Sign On Policy (.*)$/,
   setEnvironment
+);
+
+Given(
+  /^an org with an ORG Policy that defines Authenticators with Password and Email as required$/,
+  () => console.log('do nothing - policy should be preconfigured')
+);
+
+Given(
+  /^a user named "([^/w]+)"$/,
+  createAndStoreUserInContext
+);
+
+Given(
+  /^Mary is a user with a verified email and a set password$/,
+  () => console.log('currently done in previous step')
 );
 
 Given(

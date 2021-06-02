@@ -61,6 +61,8 @@ const cucumberOpts: WebdriverIO.CucumberOpts = {
   profile: [],
   // <string[]> (file/dir) require files before executing features
   require: [
+      './steps/before.ts',
+      './steps/after.ts',
       './steps/given.ts',
       './steps/then.ts',
       './steps/when.ts',
