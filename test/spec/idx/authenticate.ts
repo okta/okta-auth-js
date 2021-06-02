@@ -543,7 +543,7 @@ describe('idx/authenticate', () => {
               name: 'authenticator-verification-data',
               type: 'phone',
               inputs: [
-                { name: 'methodType', type: 'string' }
+                { name: 'methodType', type: 'string', required: true }
               ],
               options: [
                 { label: 'SMS', value: 'sms' },
