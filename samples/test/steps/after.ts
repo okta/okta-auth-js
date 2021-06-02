@@ -1,4 +1,4 @@
 import { After } from '@cucumber/cucumber';
-import deleteTestGroup from '../support/management-api/deleteTestGroup';
+import deleteUser from '../support/management-api/deleteUser';
 
-After(deleteTestGroup);
+After(deleteUser);
