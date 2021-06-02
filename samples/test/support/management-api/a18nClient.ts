@@ -1,10 +1,9 @@
 
 import fetch from 'cross-fetch';
+import waitForOneSecond from '../wait/waitForOneSecond';
 
 const PROFILE_URL = 'https://api.a18n.help/v1/profile';
 const LATEST_EMAIL_URL = `https://api.a18n.help/v1/profile/:profileId/email/latest`;
-
-
 
 export declare interface A18nProfile {
   profileId: string;
@@ -24,16 +23,19 @@ class A18nClient {
   }
 
   async getEmailCode(profileId: string) {
-    let response = await this._getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as unknown as Record<string, string>;
-    if (!response.content) {
-      await browser.waitUntil(() => new Promise(resolve => setTimeout(resolve.bind(this, true), 5000)));
-      response = await this._getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as unknown as Record<string, string>;
+    let retryAttemptsRemaining = 5;
+    let response;
+    while (!response?.content && retryAttemptsRemaining > 0) {
+      await waitForOneSecond();
+      response = await this._getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as Record<string, string>;
+      --retryAttemptsRemaining;
     }
-    let match = response.content.match(/Enter a code instead: (?<code>\d+)/);
-    if (match && match.groups) {
-      return match.groups.code;
+
+    const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/);
+    if (!match) {
+      throw new Error('Unable to retrieve code from email.');
     }
-    throw new Error('Unable to retrieve code from email.');
+    return match?.groups?.code;
   }
 
   async createProfile(): Promise<A18nProfile> {
@@ -42,8 +44,7 @@ class A18nClient {
   }
 
   async deleteProfile(profileId: string): Promise<string> {
-    const response = await this._deleteOnProtectedURL(`${PROFILE_URL}/${profileId}`) as unknown as Record<string, string>;
-    return response.code;
+    return await this._deleteOnProtectedURL(`${PROFILE_URL}/${profileId}`);
   }
 
   async _deleteOnProtectedURL(url: string): Promise<string|never>{
@@ -80,7 +81,7 @@ class A18nClient {
     }
   }
 
-  async _getOnURL(url: string, includeApiToken=false): Promise<Response|never> {
+  async _getOnURL(url: string, includeApiToken=false): Promise<Record<string, unknown>|never> {
     try {
       const response =  await fetch(url, {
         method: 'GET',
