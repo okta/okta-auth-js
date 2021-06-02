@@ -24,6 +24,7 @@ function getSampleFeatures() {
 
 function getConfig() {
   const issuer = process.env.ISSUER;
+  const orgUrl = issuer.indexOf('/oauth2') > 0 ? issuer.substring(0, issuer.indexOf('/oauth2')) : issuer;
   const clientId = process.env.SPA_CLIENT_ID || process.env.CLIENT_ID;
   const username = process.env.USERNAME;
   const password = process.env.PASSWORD;
@@ -38,6 +39,7 @@ function getConfig() {
     sampleName,
     sampleConfig,
     issuer,
+    orgUrl,
     clientId: sampleConfig.express ? webClientId : clientId,
     username,
     password,
