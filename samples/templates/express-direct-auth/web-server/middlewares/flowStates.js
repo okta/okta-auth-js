@@ -8,10 +8,9 @@ module.exports = function flowStates(req, res, next) {
   };
   
   req.setFlowStates = (states) => {
-    if (!req.session[key]) {
-      req.session[key] = {};
-    }
-    req.session[key].flowStates = states;
+    const existingStates = req.getFlowStates();
+    req.session[key] = req.session[key] || {};
+    req.session[key].flowStates = { ...existingStates, ...states };
   };
   
   req.clearFlowStates = () => {

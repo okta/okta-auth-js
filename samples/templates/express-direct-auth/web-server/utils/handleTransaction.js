@@ -83,8 +83,7 @@ module.exports = function handleTransaction({
   } = transaction;
 
   // Persist states to session
-  const flowStates = req.getFlowStates();
-  req.setFlowStates({ ...flowStates, idx: transaction });
+  req.setFlowStates({ idx: transaction });
 
   switch (status) {
     case IdxStatus.PENDING:
