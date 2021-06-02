@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { Then } from '@cucumber/cucumber';
+import checkIsOnPage from '../support/check/checkIsOnPage';
 
 import checkProfile from '../support/check/checkProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
@@ -34,6 +35,11 @@ Then(
 Then(
   /sees a (.*) button$/,
   checkButton
+);
+
+Then(
+  /^she is redirected to the ([\s\w]+)$/,
+  checkIsOnPage
 );
 
 // import checkClass from '../support/check/checkClass';
