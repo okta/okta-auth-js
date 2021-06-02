@@ -6,15 +6,16 @@ import checkProfile from '../support/check/checkProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
 import checkButton from '../support/check/checkButton';
+import checkURLPath from '../support/check/checkURLPath';
 
 Then(
   /^User can verify their profile data$/,
-  checkProfile
+  () => checkProfile()
 );
 
 Then(
   /^a page loads with all of Mary's Profile information$/,
-  checkProfile
+  () => checkProfile()
 );
 
 Then(
@@ -40,6 +41,21 @@ Then(
 Then(
   /^she is redirected to the ([\s\w]+)$/,
   checkIsOnPage
+);
+
+Then(
+  /^she is redirected back to the Root View$/,
+  () => checkURLPath(false, '/')
+);
+
+Then(
+  /^Mary sees login, registration buttons$/,
+  checkGuest
+);
+
+Then(
+  /^she sees that claims from \/userinfo are disappeared$/,
+  () => checkProfile(true)
 );
 
 // import checkClass from '../support/check/checkClass';

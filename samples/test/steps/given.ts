@@ -24,6 +24,7 @@ import { Given } from '@cucumber/cucumber';
 import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
+import hasAuthSession from '../support/action/hasAuthSession';
 
 Given(
   /^an APP Sign On Policy (.*)$/,
@@ -38,6 +39,11 @@ Given(
 Given(
   /^([^/s]+) has an authenticated session$/,
   navigateToLoginAndAuthenticate
+);
+
+Given(
+  /^Mary has an authentcation session$/,
+  hasAuthSession
 );
 
 // Given(
