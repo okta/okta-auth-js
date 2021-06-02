@@ -29,7 +29,7 @@ if (CI) {
 
 // driver version must match installed chrome version
 // https://chromedriver.storage.googleapis.com/index.html
-const CHROMEDRIVER_VERSION = '89.0.4389.23';
+const CHROMEDRIVER_VERSION = '91.0.4472.19';
 const drivers = {
   chrome: { version: CHROMEDRIVER_VERSION }
 };
@@ -60,6 +60,8 @@ const cucumberOpts: WebdriverIO.CucumberOpts = {
   profile: [],
   // <string[]> (file/dir) require files before executing features
   require: [
+      './steps/before.ts',
+      './steps/after.ts',
       './steps/given.ts',
       './steps/then.ts',
       './steps/when.ts',

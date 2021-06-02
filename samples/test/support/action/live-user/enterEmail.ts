@@ -1,6 +1,6 @@
 import setInputField from '../setInputField';
-import PasswordReset from '../../selectors/PasswordReset';
+import PasswordRecover from '../../selectors/PasswordRecover';
 
 export default async function() {
-  await setInputField('set', this.user.profile.email, PasswordReset.username);
+  await setInputField('set', this.user.profile.email, PasswordRecover.username);
 }

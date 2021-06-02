@@ -8,7 +8,7 @@ import { Selector } from 'webdriverio';
  * @param  {String}   selectionValue Value to select by
  * @param  {String}   selector     Element selector
  */
-export default (
+export default async (
     selectionType: 'name' | 'value' | 'text',
     selectionValue: string,
     selector: Selector
@@ -49,5 +49,5 @@ export default (
         }
     }
 
-    $(selector)[command](...commandArguments as string[]);
+    (await $(selector))[command](...commandArguments as string[]);
 };

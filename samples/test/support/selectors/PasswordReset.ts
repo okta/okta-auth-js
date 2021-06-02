@@ -1,6 +1,8 @@
 class PasswordReset {
-  get username() {return '#recover-password-form #username';}
-  get submit() {return '#recover-password-form #submit-button';}
+  get pageTitle() { return '#page-title-header'; }
+  get password() { return '#password-reset-form #password'; }
+  get confirmPassword() { return '#password-reset-form #confirm-password'; }
+  get submit() {return '#password-reset-form #submit-button';}
 }
 
 export default new PasswordReset();

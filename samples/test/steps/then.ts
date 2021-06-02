@@ -1,10 +1,12 @@
 /* eslint-disable max-len */
 import { Then } from '@cucumber/cucumber';
-import checkIsOnPage from '../support/check/checkIsOnPage';
 
 import checkProfile from '../support/check/checkProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
+import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
+import checkIsOnPage from '../support/check/checkIsOnPage';
+import { check } from 'yargs';
 
 Then(
   /^User can verify their profile data$/,
@@ -30,6 +32,17 @@ Then(
   /^she is redirected to the ([\s\w]+)$/,
   checkIsOnPage
 );
+
+Then(
+  /^she sees a page to input her code$/,
+    selectEmailAuthenticator
+);
+
+Then(
+  /^she sees a page to set her password$/,
+  checkIsOnPage.bind(null, 'Reset Password')
+);
+
 
 // import checkClass from '../support/check/checkClass';
 // import checkContainsAnyText from '../support/check/checkContainsAnyText';

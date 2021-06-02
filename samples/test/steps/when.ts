@@ -2,6 +2,7 @@ import { When } from '@cucumber/cucumber';
 
 // import clearInputField from '../support/action/clearInputField';
 import clickElement from '../support/action/clickElement';
+import confirmValidPassword from '../support/action/confirmValidPassword';
 // import closeLastOpenedWindow from '../support/action/closeLastOpenedWindow';
 // import deleteCookies from '../support/action/deleteCookies';
 // import dragElement from '../support/action/dragElement';
@@ -18,7 +19,12 @@ import clickElement from '../support/action/clickElement';
 // import setPromptText from '../support/action/setPromptText';
 
 import enterCredential from '../support/action/enterCredential';
+import enterValidPassword from '../support/action/enterValidPassword';
+import enterCorrectCode from '../support/action/live-user/enterCorrectCode';
+import enterLiveUserEmail from '../support/action/live-user/enterEmail';
+import submitAnyForm from '../support/action/submitAnyForm';
 import submitForm from '../support/action/submitForm';
+import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -28,6 +34,11 @@ When(
 When(
   /^she fills in her (incorrect username|username|password|correct password)$/,
   enterCredential
+);
+
+When(
+  /^she inputs her correct Email$/,
+  enterLiveUserEmail
 );
 
 When(
@@ -43,6 +54,31 @@ When(
 When(
   /^she clicks on the "Forgot Password Link"$/,
   clickElement.bind(null, 'click', 'link', '/recover-password')
+);
+
+When(
+  /^she submits the recovery form$/,
+  submitPasswordRecoverForm
+);
+
+When(
+  /^she fills in the correct code$/,
+  enterCorrectCode
+);
+
+When(
+  /^she submits the form$/,
+  submitAnyForm
+);
+
+When(
+  /^she fills a password that fits within the password policy$/,
+  enterValidPassword
+);
+
+When(
+  /^she confirms that password$/,
+  confirmValidPassword
 );
 
 // When(
