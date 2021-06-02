@@ -34,8 +34,8 @@ Given(
 );
 
 Given(
-  /^an org with an ORG Policy that defines Authenticators with Password and Email as required$/,
-  () => console.log('do nothing - policy should be preconfigured')
+  /^an org with (.*)$/,
+  setEnvironment
 );
 
 Given(

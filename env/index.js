@@ -50,11 +50,15 @@ function setEnvironmentVarsFromTestEnvYaml(name) {
   if (!doc) {
     return;
   }
+
+  if (doc.default) {
+    console.log(`Loading environment variables from testenv.yml: "default"`);
+    setEnvironmentVars(doc.default);
+  }
+
   if (doc[name]) {
     console.log(`Loading environment variables from testenv.yml: "${name}"`);
     setEnvironmentVars(doc[name]);
-  } else {
-    throw new Error(`cannot load test environment by name: "${name}". Make sure this entry exists in "testenv.yml".`);
   }
 }
 
