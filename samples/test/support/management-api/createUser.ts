@@ -10,9 +10,8 @@ const oktaClient = new Client({
 });
 
 export default async (firstName: string): Promise<[User, A18nProfile]> => {
-  //const userLogin = `${firstName}.mc${firstName}face+${Math.random()}@email.ghostinspector.com`;
-  const a18NProfile = (await a18nClient.createProfile());
-  const userLogin = a18NProfile.emailAddress;
+  const a18nProfile = await a18nClient.createProfile();
+  const userLogin = a18nProfile.emailAddress;
   const user = await oktaClient.createUser({
     profile: {
       firstName: firstName,
@@ -26,22 +25,20 @@ export default async (firstName: string): Promise<[User, A18nProfile]> => {
   }, {
     activate: true
   });
-  const applicationId = '0oammbvb30MDqZZq75d6';
-  let testGroup;
-  await oktaClient.listGroups().each(group => {
-    if(group.profile.name === 'Test Group') {
-      testGroup = group;
-    }
-  });
+
+  // TODO: create test group and attach password recovery policy during test run
+  const {value: testGroup} = await oktaClient.listGroups({
+    q: 'E2E Test Group'
+  }).next();
+
   if (testGroup === undefined) {
-    throw new Error('Group "Test Group" is not found');
+    throw new Error('Group "E2E Test Group" is not found');
   }
 
-  await oktaClient.assignUserToApplication(applicationId, {
+  await oktaClient.assignUserToApplication(config.clientId as string, {
     id: user.id
   });
-  // TODO: create and attach password recovery policy during test run
-  await oktaClient.addUserToGroup('00gtonn7cJvcwaZbp5d6', user.id);
-  // await oktaClient.addUserToGroup((testGroup as Group).id, user.id);
-  return [user, a18NProfile];
+
+  await oktaClient.addUserToGroup((testGroup as Group).id, user.id);
+  return [user, a18nProfile];
 };
