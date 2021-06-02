@@ -14,7 +14,7 @@ import {
   ReEnrollAuthenticator,
   ReEnrollAuthenticatorValues,
 } from './remediators';
-import { FlowMonitor } from './flowMonitors';
+import { PasswordRecoveryFlowMonitor } from './flowMonitors';
 import { startTransaction } from './startTransaction';
 import { AuthSdkError } from '../errors';
 import { 
@@ -55,7 +55,7 @@ export async function recoverPassword(
     }
   }
 
-  const flowMonitor = new FlowMonitor();
+  const flowMonitor = new PasswordRecoveryFlowMonitor();
   return run(
     authClient, 
     { 

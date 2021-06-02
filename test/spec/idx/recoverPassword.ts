@@ -143,16 +143,15 @@ describe('idx/recoverPassword', () => {
     const res = await recoverPassword(authClient, {});
     expect(res).toEqual({
       status: IdxStatus.PENDING,
-      tokens: null,
       nextStep: {
-      'name': 'identify-recovery',
-      'inputs': [
-        {
-          'name': 'username',
-          'label': 'Username'
-        }
-      ],
-      'canSkip': false
+        name: 'identify-recovery',
+        inputs: [
+          {
+            'name': 'username',
+            'label': 'Username'
+          }
+        ],
+        canSkip: false
       }
     });
   });
@@ -186,8 +185,6 @@ describe('idx/recoverPassword', () => {
     const res = await recoverPassword(authClient, { username: 'myname' });
     expect(res).toEqual({
       status: IdxStatus.TERMINAL,
-      tokens: null,
-      error: undefined, // TOOD: is this expected?
       messages: [{
         class: 'ERROR',
         i18n: {
@@ -228,15 +225,13 @@ describe('idx/recoverPassword', () => {
     const res = await recoverPassword(authClient, { username });
     expect(res).toEqual({
       status: IdxStatus.PENDING,
-      tokens: null,
-      error: undefined, // TOOD: is this expected?
       nextStep: {
         name: 'identify-recovery',
+        canSkip: false,
         inputs: [{
           name: 'username',
           label: 'Username'
         }],
-        canSkip: undefined // TODO: is this expected?
       },
       messages: [{
         class: 'INFO',
@@ -268,7 +263,6 @@ describe('idx/recoverPassword', () => {
     const res = await recoverPassword(authClient, { username: 'myname' });
     expect(res).toEqual({
       status: IdxStatus.PENDING,
-      tokens: null,
       nextStep: {
         name: 'reenroll-authenticator',
         type: 'password',
@@ -307,28 +301,23 @@ describe('idx/recoverPassword', () => {
     jest.spyOn(reEnrollAuthenticatorResponse, 'proceed');
 
     const res = await recoverPassword(authClient, { username: 'myname', newPassword: 'newpass' });
-    expect(identifyRecoveryResponse.proceed).toHaveBeenCalledWith('identify-recovery', { identifier: 'myname' });
-    expect(reEnrollAuthenticatorResponse.proceed).toHaveBeenCalledWith('reenroll-authenticator', {
-      credentials: {
-        passcode: 'newpass'
-      }
-    });
+    expect(identifyRecoveryResponse.proceed)
+      .toHaveBeenCalledWith('identify-recovery', { identifier: 'myname' });
+    expect(reEnrollAuthenticatorResponse.proceed)
+      .toHaveBeenCalledWith('reenroll-authenticator', {
+        credentials: {
+          passcode: 'newpass'
+        }
+      });
     expect(res).toEqual({
       status: IdxStatus.PENDING,
-      tokens: null,
       nextStep: {
         name: 'authenticator-verification-data',
         type: 'password',
         inputs: [{
-          form: {
-            value: [{
-              label: 'Password',
-              name: 'passcode',
-              secret: true
-            }]
-          },
           label: 'Password',
-          name: 'authenticator'
+          name: 'passcode',
+          secret: true
         }],
         canSkip: false
       }
@@ -358,7 +347,6 @@ describe('idx/recoverPassword', () => {
     let res = await recoverPassword(authClient, {});
     expect(res).toEqual({
       status: IdxStatus.PENDING,
-      tokens: null,
       nextStep: {
         name: 'identify-recovery',
         inputs: [{
@@ -375,7 +363,6 @@ describe('idx/recoverPassword', () => {
     expect(identifyRecoveryResponse.proceed).toHaveBeenCalledWith('identify-recovery', { identifier: 'myname' });
     expect(res).toEqual({
       status: IdxStatus.PENDING,
-      tokens: null,
       nextStep: {
         name: 'reenroll-authenticator',
         type: 'password',
@@ -400,20 +387,13 @@ describe('idx/recoverPassword', () => {
     });
     expect(res).toEqual({
       status: IdxStatus.PENDING,
-      tokens: null,
       nextStep: {
         name: 'authenticator-verification-data',
         type: 'password',
         inputs: [{
-          form: {
-            value: [{
-              label: 'Password',
-              name: 'passcode',
-              secret: true
-            }]
-          },
           label: 'Password',
-          name: 'authenticator'
+          name: 'passcode',
+          secret: true
         }],
         canSkip: false
       }

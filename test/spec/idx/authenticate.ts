@@ -108,7 +108,6 @@ describe('idx/authenticate', () => {
     const res = await authenticate(authClient, {});
     expect(res).toEqual({
       status: IdxStatus.PENDING,
-      tokens: null,
       nextStep: {
         canSkip: false,
         name: 'identify',
@@ -140,14 +139,13 @@ describe('idx/authenticate', () => {
         const res = await authenticate(authClient, { username: 'obviously-wrong' });
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-          canSkip: undefined,
           name: 'identify',
+          canSkip: false,
           inputs: [{
             name: 'username',
             label: 'Username'
           }]
         });
-        expect(res.error).toBe(undefined); // TODO: is this expected?
         expect(res.messages).toEqual([{
           class: 'ERROR',
           i18n: {
@@ -179,14 +177,13 @@ describe('idx/authenticate', () => {
         const res = await authenticate(authClient, { username });
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-          canSkip: undefined, // TODO: is this expected?
           name: 'identify',
+          canSkip: false,
           inputs: [{
             name: 'username',
             label: 'Username'
           }]
         });
-        expect(res.error).toBe(undefined); // TODO: is this expected?
         expect(res.messages).toEqual([{
           class: 'INFO',
           i18n: {
@@ -214,8 +211,6 @@ describe('idx/authenticate', () => {
 
       const res = await authenticate(authClient, { username: 'myuser', password: 'invalid-password' });
       expect(res.status).toBe(IdxStatus.TERMINAL);
-      expect(res.nextStep).toBe(undefined);
-      expect(res.error).toBe(undefined); // TODO: is this expected?
       expect(res.messages).toEqual([{
         class: 'ERROR',
         i18n: {
@@ -240,8 +235,6 @@ describe('idx/authenticate', () => {
 
       const res = await authenticate(authClient, { username: 'myuser' });
       expect(res.status).toBe(IdxStatus.TERMINAL);
-      expect(res.nextStep).toBe(undefined);
-      expect(res.error).toBe(undefined); // TODO: is this expected?
       expect(res.messages).toEqual([{
         class: 'ERROR',
         i18n: {
@@ -267,7 +260,6 @@ describe('idx/authenticate', () => {
       const res = await authenticate(authClient, { username: 'myuser' });
       expect(res.status).toBe(IdxStatus.TERMINAL);
       expect(res.nextStep).toBe(undefined);
-      expect(res.error).toBe(undefined); // TODO: is this expected?
       expect(res.messages).toEqual([{
         class: 'ERROR',
         i18n: {
@@ -546,38 +538,19 @@ describe('idx/authenticate', () => {
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' }});
           expect(res).toEqual({
             status: IdxStatus.PENDING,
-            tokens: null,
             nextStep: {
               canSkip: false,
               name: 'authenticator-verification-data',
               type: 'phone',
-              inputs: [{
-                label: 'Phone',
-                name: 'authenticator',
-                form: {
-                  value: [{
-                    name: 'id',
-                    required: true,
-                    value: 'id-phone'
-                  }, {
-                    name: 'methodType',
-                    options: [{
-                      label: 'SMS',
-                      value: 'sms'
-                    }, {
-                      label: 'Voice call',
-                      value: 'voice'
-                    }],
-                    required: true
-                  }, {
-                    name: 'phoneNumber',
-                    required: true
-                  }]
-                }
-              }]
+              inputs: [
+                { name: 'methodType', type: 'string' }
+              ],
+              options: [
+                { label: 'SMS', value: 'sms' },
+                { label: 'Voice call', value: 'voice' },
+              ]
             }
           });
-
         });
 
         it('can verify phone authenticator using a code', async () => {
@@ -628,7 +601,6 @@ describe('idx/authenticate', () => {
           });
           expect(res).toEqual({
             status: IdxStatus.PENDING,
-            tokens: null,
             messages: [{
               class: 'ERROR',
               i18n: {
@@ -638,6 +610,7 @@ describe('idx/authenticate', () => {
               message: 'Invalid code. Try again.'
             }],
             nextStep: {
+              canSkip: false,
               inputs: [{
                 label: 'Enter code',
                 name: 'verificationCode',
@@ -706,7 +679,7 @@ describe('idx/authenticate', () => {
           });
         });
 
-        it('can provide phone number up front', async () => {
+        it('can provide phoneNumber and methodType up front', async () => {
           const {
             authClient,
             selectAuthenticatorResponse,
@@ -724,10 +697,11 @@ describe('idx/authenticate', () => {
           jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
 
           const res = await authenticate(authClient, {
-            phoneNumber: '(555) 555-5555',
-            authenticators: [
-              'phone'
-            ]
+            authenticators: [{
+              type: 'phone',
+              methodType: 'sms',
+              phoneNumber: '(555) 555-5555',
+            }]
           });
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
             authenticator: {
@@ -743,7 +717,6 @@ describe('idx/authenticate', () => {
           });
           expect(res).toEqual({
             status: IdxStatus.PENDING,
-            tokens: null,
             nextStep: {
               canSkip: false,
               name: 'enroll-authenticator',
@@ -758,7 +731,7 @@ describe('idx/authenticate', () => {
           });
         });
 
-        it('can provide phoneNumber on demand', async () => {
+        it('can provide phoneNumber and methodType on demand', async () => {
           const {
             authClient,
             selectAuthenticatorResponse,
@@ -776,47 +749,35 @@ describe('idx/authenticate', () => {
             .mockResolvedValueOnce(selectAuthenticatorResponse)
             .mockResolvedValueOnce(phoneEnrollmentDataResponse);
 
-          let res = await authenticate(authClient, { authenticators: ['phone'] });
-          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', { authenticator: { id: 'id-phone' }});
+          let res = await authenticate(authClient, { authenticator: 'phone' });
+          expect(selectAuthenticatorResponse.proceed)
+            .toHaveBeenCalledWith('select-authenticator-enroll', { 
+              authenticator: { id: 'id-phone' }
+            });
           expect(res).toEqual({
             status: IdxStatus.PENDING,
-            tokens: null,
             nextStep: {
               canSkip: false,
               name: 'authenticator-enrollment-data',
               type: 'phone',
-              inputs: [{
-                label: 'Phone',
-                name: 'authenticator',
-                form: {
-                  value: [{
-                    name: 'id',
-                    required: true,
-                    value: 'id-phone'
-                  }, {
-                    name: 'methodType',
-                    options: [{
-                      label: 'SMS',
-                      value: 'sms'
-                    }, {
-                      label: 'Voice call',
-                      value: 'voice'
-                    }],
-                    required: true
-                  }, {
-                    name: 'phoneNumber',
-                    required: true
-                  }]
-                }
-              }]
+              inputs: [
+                { name: 'methodType', type: 'string', required: true },
+                { name: 'phoneNumber', type: 'string', required: true },
+              ],
+              options: [
+                { label: 'SMS', value: 'sms' },
+                { label: 'Voice call', value: 'voice' },
+              ],
             }
           });
 
-          res = await authenticate(authClient, { phoneNumber: '(555) 555-5555', authenticators: ['phone'] });
+          res = await authenticate(authClient, { 
+            phoneNumber: '(555) 555-5555', methodType: 'sms' 
+          });
           expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
             authenticator: {
               id: 'id-phone',
-              methodType: 'sms', // TODO: user should be able to specify methodType
+              methodType: 'sms',
               phoneNumber: '(555) 555-5555'
             }
           });
@@ -846,17 +807,16 @@ describe('idx/authenticate', () => {
             .mockResolvedValueOnce(phoneEnrollmentDataResponse);
 
           const phoneNumber = 'obviously-not-valid';
-          let res = await authenticate(authClient, { phoneNumber, authenticators: ['phone'] });
+          let res = await authenticate(authClient, { phoneNumber, methodType: 'sms' });
           expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
             authenticator: {
               id: 'id-phone',
-              methodType: 'sms', // TODO: user should be able to specify methodType
+              methodType: 'sms',
               phoneNumber
             }
           });
           expect(res).toEqual({
             status: IdxStatus.PENDING,
-            tokens: null,
             messages: [{
               class: 'ERROR',
               i18n: {
@@ -865,33 +825,17 @@ describe('idx/authenticate', () => {
               message: 'Unable to initiate factor enrollment: Invalid Phone Number.'
             }],
             nextStep: {
-              canSkip: undefined, // TODO: is this expected?
               name: 'authenticator-enrollment-data',
+              canSkip: false,
               type: 'phone',
-              inputs: [{
-                label: 'Phone',
-                name: 'authenticator',
-                form: {
-                  value: [{
-                    name: 'id',
-                    required: true,
-                    value: 'id-phone'
-                  }, {
-                    name: 'methodType',
-                    options: [{
-                      label: 'SMS',
-                      value: 'sms'
-                    }, {
-                      label: 'Voice call',
-                      value: 'voice'
-                    }],
-                    required: true
-                  }, {
-                    name: 'phoneNumber',
-                    required: true
-                  }]
-                }
-              }]
+              inputs: [
+                { name: 'methodType', type: 'string', required: true },
+                { name: 'phoneNumber', type: 'string', required: true },
+              ],
+              options: [
+                { label: 'SMS', value: 'sms' }, 
+                { label: 'Voice call', value: 'voice' }
+              ],
             }
           });
 
@@ -997,7 +941,6 @@ describe('idx/authenticate', () => {
           });
           expect(res).toEqual({
             status: IdxStatus.PENDING,
-            tokens: null,
             messages: [{
               class: 'ERROR',
               i18n: {
@@ -1007,6 +950,7 @@ describe('idx/authenticate', () => {
               message: 'Invalid code. Try again.'
             }],
             nextStep: {
+              canSkip: false,
               inputs: [{
                 label: 'Enter code',
                 name: 'verificationCode',

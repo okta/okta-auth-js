@@ -1,8 +1,7 @@
-import { Remediator } from '../remediators';
 import { FlowMonitor } from './FlowMonitor';
 
 export class RegistrationFlowMonitor extends FlowMonitor {
-  isRemediatorCandidate(remediator: Remediator) {
+  isRemediatorCandidate(remediator, remediations?, values?) {
     const prevRemediatorName = this.previousRemediator?.getName();
     const remediatorName = remediator.getName();
     if (remediatorName === 'select-authenticator-enroll' 
@@ -13,6 +12,6 @@ export class RegistrationFlowMonitor extends FlowMonitor {
       return false;
     }
 
-    return super.isRemediatorCandidate(remediator);
+    return super.isRemediatorCandidate(remediator, remediations, values);
   }
 }

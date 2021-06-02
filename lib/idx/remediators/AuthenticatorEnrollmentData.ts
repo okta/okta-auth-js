@@ -28,15 +28,21 @@ export class AuthenticatorEnrollmentData extends AuthenticatorData {
 
   getInputAuthenticator() {
     return [
-      { name: 'methodType', type: 'string' },
-      { name: 'phoneNumber', type: 'string' },
+      { name: 'methodType', type: 'string', required: true },
+      { name: 'phoneNumber', type: 'string', required: true },
     ];
   }
 
-  protected generateAuthenticatorFromValues(): Authenticator {
-    const type = this.getRelatesToType();
-    const { methodType, phoneNumber } = this.values;
-    return { type, methodType, phoneNumber };
+  protected mapAuthenticatorFromValues(authenticator?: Authenticator): Authenticator {
+    // get mapped authenticator from base class
+    authenticator = super.mapAuthenticatorFromValues(authenticator);
+
+    // add phoneNumber to authenticator if it exists in values
+    const { phoneNumber } = this.values;
+    return { 
+      ...authenticator, 
+      ...(phoneNumber && { phoneNumber }) 
+    };
   }
 
 }

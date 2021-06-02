@@ -27,7 +27,7 @@ export class AuthenticatorData extends Remediator {
       // map
       this.values.authenticators = authenticators.map(authenticator => {
         if (authenticatorType === authenticator.type) {
-          return this.generateAuthenticatorFromValues();
+          return this.mapAuthenticatorFromValues(authenticator);
         }
         return authenticator;
       });
@@ -35,7 +35,7 @@ export class AuthenticatorData extends Remediator {
       // add
       this.values.authenticators = [
         ...authenticators, 
-        this.generateAuthenticatorFromValues()
+        this.mapAuthenticatorFromValues()
       ] as Authenticator[];
     }
   }
@@ -43,7 +43,10 @@ export class AuthenticatorData extends Remediator {
   getNextStep() {
     const common = super.getNextStep();
     const options = this.getMethodTypes();
-    return { ...common, options };
+    return { 
+      ...common, 
+      ...(options && { options }) 
+    };
   }
 
   // Grab authenticator from authenticators list
@@ -58,11 +61,15 @@ export class AuthenticatorData extends Remediator {
     return authenticator;
   }
 
-  // Generate authenticator from user inputs
-  protected generateAuthenticatorFromValues(): Authenticator {
+  protected mapAuthenticatorFromValues(authenticator?: Authenticator): Authenticator {
+    // add methodType to authenticator if it exists in values
     const type = this.getRelatesToType();
     const { methodType } = this.values;
-    return { type, methodType };
+    return { 
+      type, 
+      ...(authenticator && authenticator),
+      ...(methodType && { methodType }) 
+    };
   }
 
   protected getAuthenticatorFromRemediation(): IdxRemediationValue {
@@ -73,6 +80,6 @@ export class AuthenticatorData extends Remediator {
 
   private getMethodTypes(): IdxOption[] {
     const authenticator: IdxRemediationValue = this.getAuthenticatorFromRemediation();
-    return authenticator.form.value.find(({ name }) => name === 'methodType').options;
+    return authenticator.form.value.find(({ name }) => name === 'methodType')?.options;
   }
 }

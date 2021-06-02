@@ -143,7 +143,11 @@ export class Remediator {
         throw new AuthSdkError(`Missing custom getInput${titleCase(key)} method in Remediator: ${this.getName()}`);
       }
 
-      inputs.push(input);
+      if (Array.isArray(input)) {
+        input.forEach(i => inputs.push(i));
+      } else {
+        inputs.push(input);
+      }
       return inputs;
     }, []);
   }

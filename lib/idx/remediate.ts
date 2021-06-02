@@ -13,7 +13,6 @@ import {
 interface RemediationResponse {
   idxResponse?: IdxResponse;
   nextStep?: NextStep;
-  canSkip?: boolean;
   messages?: IdxMessage[];
   terminal?: boolean;
   canceled?: boolean;
@@ -36,7 +35,7 @@ export function getRemediator(
       
     const T = flow[remediation.name];
     remediator = new T(remediation, values);
-    if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations)) {
+    if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations, values)) {
       if (remediator.canRemediate()) {
         // found the remediator
         return remediator;
@@ -69,7 +68,7 @@ function canSkipFn(idxResponse: IdxResponse) {
   return idxResponse.neededToProceed.some(({ name }) => name === 'skip');
 }
 
-export function getIdxMessages(
+function getIdxMessages(
   idxResponse: IdxResponse, flow: RemediationFlow
 ): IdxMessage[] {
   let messages = [];
@@ -95,6 +94,14 @@ export function getIdxMessages(
   }
 
   return messages;
+}
+
+function getNextStep(
+  remediator: Remediator, idxResponse: IdxResponse
+): NextStep {
+  const nextStep = remediator.getNextStep();
+  const canSkip = canSkipFn(idxResponse);
+  return { ...nextStep, canSkip };
 }
 
 // This function is called recursively until it reaches success or cannot be remediated
@@ -137,12 +144,8 @@ export async function remediate(
   // Recursive loop breaker
   // Return next step to the caller
   if (!remediator.canRemediate()) {
-    const nextStep = remediator.getNextStep();
-    const canSkip = canSkipFn(idxResponse);
-    return { 
-      idxResponse, 
-      nextStep: { ...nextStep, canSkip },
-    };
+    const nextStep = getNextStep(remediator, idxResponse);
+    return { idxResponse, nextStep };
   }
 
   const name = remediator.getName();
@@ -164,7 +167,7 @@ export async function remediate(
 
     // Handle idx message in nextStep
     if (messages.length) {
-      const nextStep = remediator.getNextStep();
+      const nextStep = getNextStep(remediator, idxResponse);
       return { nextStep, messages };
     }
     
@@ -181,7 +184,7 @@ export async function remediate(
       if (terminal) {
         return { terminal, messages };
       } else {
-        const nextStep = remediator.getNextStep();
+        const nextStep = getNextStep(remediator, idxState);
         return { nextStep, messages };
       }
     }

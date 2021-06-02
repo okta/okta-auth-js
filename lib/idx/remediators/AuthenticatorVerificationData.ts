@@ -25,7 +25,15 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
   }
 
   getInputAuthenticator() {
-    return { name: 'methodType', type: 'string' };
+    const authenticator = this.getAuthenticatorFromRemediation();
+    const methodType = authenticator.form.value.find(({ name }) => name === 'methodType');
+    // if has methodType in form, let user select the methodType
+    if (methodType && methodType.options) {
+      return { name: 'methodType', type: 'string' };
+    }
+    // no methodType, then return form values
+    const inputs = [...authenticator.form.value];
+    return inputs;
   }
 
 }
