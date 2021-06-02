@@ -13,10 +13,6 @@ export class ReEnrollAuthenticator extends Remediator {
     'credentials': []
   };
 
-  private getChallengeType() {
-    return this.remediation.relatesTo.value.type;
-  }
-
   mapCredentials() {
     return { 
       passcode: this.values.newPassword,
@@ -24,7 +20,7 @@ export class ReEnrollAuthenticator extends Remediator {
   }
 
   getInputCredentials(input) {
-    const challengeType = this.getChallengeType();
+    const challengeType = this.getRelatesToType();
     const name = challengeType === 'password' ? 'newPassword' : 'verificationCode';
     return {
       ...input.form.value[0],
@@ -32,11 +28,4 @@ export class ReEnrollAuthenticator extends Remediator {
     };
   }
 
-  getNextStep() {
-    const common = super.getNextStep();
-    return {
-      ...common,
-      type: this.remediation.relatesTo.value.type,
-    };
-  }
 }

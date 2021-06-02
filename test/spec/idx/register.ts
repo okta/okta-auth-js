@@ -33,6 +33,12 @@ import {
   SelectAuthenticatorAuthenticateRemediationFactory
 } from '@okta/test.support/idx';
 
+jest.mock('../../../lib/idx/introspect', () => {
+  return {
+    introspect: () => {}
+  };
+});
+
 const mocked = {
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect'),
@@ -72,7 +78,8 @@ describe('idx/register', () => {
         load: () => transactionMeta,
         clear: () => {},
         save: () => {},
-        saveIdxResponse: () => {}
+        saveIdxResponse: () => {},
+        loadIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
@@ -249,15 +256,14 @@ describe('idx/register', () => {
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
-            name: 'authenticators',
-            type: 'string[]',
+            name: 'authenticator',
+            type: 'string',
           }],
-          authenticators: [{
+          options: [{
             label: 'Password',
             value: 'password'
           }]
@@ -307,15 +313,14 @@ describe('idx/register', () => {
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
-            name: 'authenticators',
-            type: 'string[]',
+            name: 'authenticator',
+            type: 'string',
           }],
-          authenticators: [{
+          options: [{
             label: 'Phone',
             value: 'phone'
           }, {
@@ -348,15 +353,14 @@ describe('idx/register', () => {
       let res = await register(authClient, {});
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
-            name: 'authenticators',
-            type: 'string[]',
+            name: 'authenticator',
+            type: 'string',
           }],
-          authenticators: [{
+          options: [{
             label: 'Password',
             value: 'password'
           }]
@@ -375,15 +379,14 @@ describe('idx/register', () => {
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
-            name: 'authenticators',
-            type: 'string[]',
+            name: 'authenticator',
+            type: 'string',
           }],
-          authenticators: [{
+          options: [{
             label: 'Phone',
             value: 'phone'
           }, {
@@ -423,7 +426,6 @@ describe('idx/register', () => {
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'enroll-authenticator',
@@ -456,15 +458,14 @@ describe('idx/register', () => {
       let res = await register(authClient, {});
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
-            name: 'authenticators',
-            type: 'string[]',
+            name: 'authenticator',
+            type: 'string',
           }],
-          authenticators: [{
+          options: [{
             label: 'Phone',
             value: 'phone'
           }, {
@@ -486,7 +487,6 @@ describe('idx/register', () => {
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'enroll-authenticator',
@@ -519,7 +519,6 @@ describe('idx/register', () => {
       let res = await register(authClient, {});
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'enroll-authenticator',
@@ -535,7 +534,7 @@ describe('idx/register', () => {
 
       // Verify email
       const verificationCode = 'test-code';
-      res = await register(authClient, { verificationCode, authenticators: ['email'] });
+      res = await register(authClient, { verificationCode });
       expect(enrollEmailAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
         credentials: {
           passcode: 'test-code'
@@ -543,15 +542,14 @@ describe('idx/register', () => {
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: true,
           name: 'select-authenticator-enroll',
           inputs: [{
-            name: 'authenticators',
-            type: 'string[]',
+            name: 'authenticator',
+            type: 'string',
           }],
-          authenticators: [{
+          options: [{
             label: 'Phone',
             value: 'phone'
           }]
@@ -616,7 +614,6 @@ describe('idx/register', () => {
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         messages: [{
           class: 'ERROR',
           i18n: {
@@ -632,8 +629,8 @@ describe('idx/register', () => {
           message: 'Provided value for property \'Email\' does not match required pattern'
         }],
         nextStep: {
-          canSkip: undefined, // TODO: is this expected?
           name: 'enroll-profile',
+          canSkip: false,
           inputs: [{
             label: 'First name',
             maxLength: 50,
@@ -641,15 +638,25 @@ describe('idx/register', () => {
             name: 'firstName',
             required: true
           },
-          // TODO: where are the other inputs?
-          ]
+          {
+            label: 'Last name',
+            maxLength: 50,
+            minLength: 1,
+            name: 'lastName',
+            required: true,
+          },
+          {
+            label: 'Email',
+            name: 'email',
+            required: true,
+          }]
         }
       });
     });
   });
 
   describe('phone', () => {
-    it('can set up a phone up front', async () => {
+    it('can set up a phone and methodType up front', async () => {
       const {
         authClient,
         tokenResponse,
@@ -678,7 +685,13 @@ describe('idx/register', () => {
       const verificationCode = 'test-code';
 
       // Enroll in phone authenticator
-      let res = await register(authClient, { phoneNumber: '(555) 555-5555', authenticators: ['phone'] });
+      let res = await register(authClient, { 
+        authenticators: [{
+          type: 'phone',
+          methodType: 'sms',
+          phoneNumber: '(555) 555-5555'
+        }]
+      });
       expect(selectPhoneResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
         authenticator: {
           id: 'id-phone'
@@ -687,13 +700,12 @@ describe('idx/register', () => {
       expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
         authenticator: {
           id: 'id-phone',
-          methodType: 'sms', // TODO: user should be able to specify methodType
+          methodType: 'sms',
           phoneNumber: '(555) 555-5555'
         }
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'enroll-authenticator',
@@ -707,15 +719,15 @@ describe('idx/register', () => {
         }
       });
 
-      res = await register(authClient, { verificationCode, authenticators: ['phone'] });
+      res = await register(authClient, { verificationCode });
       expect(enrollPhoneAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
         credentials: {
           passcode: 'test-code'
         }
       });
       expect(res).toEqual({
-        'status': IdxStatus.SUCCESS,
-        'tokens': tokenResponse.tokens,
+        status: IdxStatus.SUCCESS,
+        tokens: tokenResponse.tokens,
       });
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         clientId: 'test-clientId',
@@ -758,7 +770,7 @@ describe('idx/register', () => {
 
       const verificationCode = 'test-code';
 
-      let res = await register(authClient, { authenticators: ['phone'] });
+      let res = await register(authClient, { authenticator: 'phone' });
       expect(selectPhoneResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
         authenticator: {
           id: 'id-phone'
@@ -766,49 +778,35 @@ describe('idx/register', () => {
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'authenticator-enrollment-data',
           type: 'phone',
-          inputs: [{
-            label: 'Phone',
-            name: 'authenticator',
-            form: {
-              value: [{
-                name: 'id',
-                required: true,
-                value: 'id-phone'
-              }, {
-                name: 'methodType',
-                options: [{
-                  label: 'SMS',
-                  value: 'sms'
-                }, {
-                  label: 'Voice call',
-                  value: 'voice'
-                }],
-                required: true
-              }, {
-                name: 'phoneNumber',
-                required: true
-              }]
-            }
-          }]
+          inputs: [
+            { name: 'methodType', type: 'string', required: true },
+            { name: 'phoneNumber', type: 'string', required: true },
+          ],
+          options: [
+            { label: 'SMS', value: 'sms' },
+            { label: 'Voice call', value: 'voice' },
+          ]
         }
       });
 
-      res = await register(authClient, { phoneNumber: '(555) 555-5555', authenticators: ['phone'] });
-      expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
-        authenticator: {
-          id: 'id-phone',
-          methodType: 'sms', // TODO: user should be able to specify methodType
-          phoneNumber: '(555) 555-5555'
-        }
+      res = await register(authClient, { 
+        phoneNumber: '(555) 555-5555', 
+        methodType: 'sms' 
       });
+      expect(phoneEnrollmentDataResponse.proceed)
+        .toHaveBeenCalledWith('authenticator-enrollment-data', {
+          authenticator: {
+            id: 'id-phone',
+            methodType: 'sms',
+            phoneNumber: '(555) 555-5555'
+          }
+        });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'enroll-authenticator',
@@ -822,15 +820,16 @@ describe('idx/register', () => {
         }
       });
 
-      res = await register(authClient, { verificationCode, authenticators: ['phone'] });
-      expect(enrollPhoneAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
-        credentials: {
-          passcode: 'test-code'
-        }
-      });
+      res = await register(authClient, { verificationCode });
+      expect(enrollPhoneAuthenticatorResponse.proceed)
+        .toHaveBeenCalledWith('enroll-authenticator', {
+          credentials: {
+            passcode: 'test-code'
+          }
+        });
       expect(res).toEqual({
-        'status': IdxStatus.SUCCESS,
-        'tokens': tokenResponse.tokens,
+        status: IdxStatus.SUCCESS,
+        tokens: tokenResponse.tokens,
       });
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         clientId: 'test-clientId',
@@ -868,7 +867,6 @@ describe('idx/register', () => {
       let res = await register(authClient, {});
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         nextStep: {
           canSkip: false,
           name: 'enroll-authenticator',
@@ -882,7 +880,7 @@ describe('idx/register', () => {
         }
       });
 
-      res = await register(authClient, { verificationCode, authenticators: ['phone'] });
+      res = await register(authClient, { verificationCode });
       expect(enrollPhoneAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
         credentials: {
           passcode: 'test-code'
@@ -937,17 +935,21 @@ describe('idx/register', () => {
         .mockResolvedValueOnce(phoneEnrollmentDataResponse);
 
       const phoneNumber = 'obviously-not-valid';
-      let res = await register(authClient, { phoneNumber, authenticators: ['phone'] });
+      let res = await register(authClient, { authenticators: [{
+          type: 'phone',
+          methodType: 'sms',
+          phoneNumber
+        }] 
+      });
       expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
         authenticator: {
           id: 'id-phone',
-          methodType: 'sms', // TODO: user should be able to specify methodType
+          methodType: 'sms',
           phoneNumber
         }
       });
       expect(res).toEqual({
         status: IdxStatus.PENDING,
-        tokens: null,
         messages: [{
           class: 'ERROR',
           i18n: {
@@ -956,33 +958,17 @@ describe('idx/register', () => {
           message: 'Unable to initiate factor enrollment: Invalid Phone Number.'
         }],
         nextStep: {
-          canSkip: undefined, // TODO: is this expected?
           name: 'authenticator-enrollment-data',
+          canSkip: false,
           type: 'phone',
-          inputs: [{
-            label: 'Phone',
-            name: 'authenticator',
-            form: {
-              value: [{
-                name: 'id',
-                required: true,
-                value: 'id-phone'
-              }, {
-                name: 'methodType',
-                options: [{
-                  label: 'SMS',
-                  value: 'sms'
-                }, {
-                  label: 'Voice call',
-                  value: 'voice'
-                }],
-                required: true
-              }, {
-                name: 'phoneNumber',
-                required: true
-              }]
-            }
-          }]
+          inputs: [
+            { name: 'methodType', type: 'string', required: true },
+            { name: 'phoneNumber', type: 'string', required: true }
+          ],
+          options: [
+            { label: 'SMS', value: 'sms' },
+            { label: 'Voice call', value: 'voice' },
+          ]
         }
       });
 
@@ -1005,14 +991,32 @@ describe('idx/register', () => {
       ]);
       jest.spyOn(selectPhoneResponse, 'proceed');
       jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectPhoneResponse)
         .mockResolvedValueOnce(selectPhoneResponse);
       jest.spyOn(authClient.token, 'exchangeCodeForTokens');
 
-      const res = await register(authClient, { skip: true });
+      let res = await register(authClient, {});
+      expect(res).toEqual({
+        nextStep: {
+          canSkip: true,
+          inputs: [
+            {
+              name: 'authenticator',
+              type: 'string',
+            },
+          ],
+          name: 'select-authenticator-enroll',
+          options: [
+            { label: 'Phone', value: 'phone' }
+          ],
+        },
+        status: IdxStatus.PENDING,
+      });
+      res = await register(authClient, { skip: true });
       expect(selectPhoneResponse.proceed).toHaveBeenCalledWith('skip', {});
       expect(res).toEqual({
-        'status': IdxStatus.SUCCESS,
-        'tokens': tokenResponse.tokens,
+        status: IdxStatus.SUCCESS,
+        tokens: tokenResponse.tokens,
       });
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         clientId: 'test-clientId',

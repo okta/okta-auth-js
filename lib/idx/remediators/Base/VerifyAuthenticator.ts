@@ -15,12 +15,8 @@ export class VerifyAuthenticator extends Remediator {
     'credentials': []
   };
 
-  private getChallengeType() {
-    return this.remediation.relatesTo.value.type;
-  }
-
   canRemediate() {
-    const challengeType = this.getChallengeType();
+    const challengeType = this.getRelatesToType();
     if (this.values.verificationCode 
         && ['email', 'phone'].includes(challengeType)) {
       return true;
@@ -38,7 +34,7 @@ export class VerifyAuthenticator extends Remediator {
   }
 
   getInputCredentials(input) {
-    const challengeType = this.getChallengeType();
+    const challengeType = this.getRelatesToType();
     const name = challengeType === 'password' ? 'password' : 'verificationCode';
     return {
       ...input.form.value[0],
@@ -48,17 +44,4 @@ export class VerifyAuthenticator extends Remediator {
     };
   }
 
-  getNextStep() {
-    const common = super.getNextStep();
-    return {
-      ...common,
-      type: this.remediation.relatesTo.value.type,
-    };
-  }
-
-  getValues() {
-    const authenticators = this.values.authenticators
-      ?.filter(authenticator => authenticator !== this.remediation.relatesTo.value.type);
-    return { ...this.values, authenticators };
-  }
 }

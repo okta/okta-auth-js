@@ -20,13 +20,22 @@
 
       <div class="row">
         <form id="verify-form" class="ui large form" action="{{action}}" method="POST">
-          <button id="submit-verify-form" class="ui fluid large primary submit button" type="submit">
-            Send code via SMS
+          <div class="field">
+            <div class="default text">Please choose the method for this factor</div>
+            <select class="ui selection dropdown" name="methodType">
+              {{#options}}
+                <option value="{{value}}">{{label}}</option>
+              {{/options}}
+            </select>
+          </div>
+          <button class="ui fluid large primary submit button" type="submit">
+            Next
           </button>
         </form>
       </div>
 
+      {{>cancel}}
+
     </div>
-    
   </body>
 </html>

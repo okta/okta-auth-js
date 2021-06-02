@@ -9,8 +9,10 @@ const router = express.Router();
 
 // entry route
 router.get('/register', (req, res) => {
-  // TODO: encode flow in state
-  req.session.idxMethod = 'register';
+  req.setFlowStates({
+    entry: '/register',
+    idxMethod: 'register'
+  });
 
   renderTemplate(req, res, 'enroll-profile', {
     action: '/register'

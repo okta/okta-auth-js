@@ -1,4 +1,4 @@
-import { Remediator } from '../remediators';
+import { Remediator, RemediationValues, SkipValues } from '../remediators';
 import { IdxRemediation } from '../types/idx-js';
 
 export class FlowMonitor {
@@ -18,10 +18,15 @@ export class FlowMonitor {
     return false;
   }
 
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  isRemediatorCandidate(remediator: Remediator, remediations?: IdxRemediation[]): boolean {
+  isRemediatorCandidate(
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    remediator: Remediator, remediations?: IdxRemediation[], values?: RemediationValues & SkipValues
+  ): boolean {
     const remediatorName = remediator.getName();
-    if (remediatorName === 'skip') {
+    if (!values.skip && remediatorName === 'skip') {
+      return false;
+    }
+    if (values.skip && remediatorName !== 'skip') {
       return false;
     }
     return true;
