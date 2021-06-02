@@ -104,6 +104,26 @@ function getNextStep(
   return { ...nextStep, canSkip };
 }
 
+function handleIdxError(e, flow, remediator?) {
+  // Handle idx messages
+  if (isRawIdxResponse(e)) {
+    const idxState = idx.makeIdxState(e);
+    const terminal = isTerminalResponse(idxState);
+    const messages = getIdxMessages(idxState, flow);
+    if (terminal) {
+      return { terminal, messages };
+    } else {
+      const nextStep = remediator && getNextStep(remediator, idxState);
+      return { 
+        messages, 
+        ...(nextStep && { nextStep }) 
+      };
+    }
+  }
+  // Thrown error terminates the interaction with idx
+  throw e;
+}
+
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
   idxResponse: IdxResponse,
@@ -117,7 +137,11 @@ export async function remediate(
   if (actions) {
     for (let action of actions) {
       if (typeof idxResponse.actions[action] === 'function') {
-        idxResponse = await idxResponse.actions[action]();
+        try {
+          idxResponse = await idxResponse.actions[action]();
+        } catch (e) {
+          return handleIdxError(e, flow);
+        }
         if (action === 'cancel') {
           return { canceled: true };
         }
@@ -125,7 +149,7 @@ export async function remediate(
       }
     }
   }
-
+  
   const remediator = getRemediator(neededToProceed, values, options);
   
   if (!remediator) {
@@ -176,20 +200,6 @@ export async function remediate(
     values = remediator.getValuesAfterProceed();
     return remediate(idxResponse, values, options); // recursive call
   } catch (e) {
-    // Handle idx messages
-    if (isRawIdxResponse(e)) {
-      const idxState = idx.makeIdxState(e);
-      const terminal = isTerminalResponse(idxState);
-      const messages = getIdxMessages(idxState, flow);
-      if (terminal) {
-        return { terminal, messages };
-      } else {
-        const nextStep = getNextStep(remediator, idxState);
-        return { nextStep, messages };
-      }
-    }
-    
-    // Thrown error terminates the interaction with idx
-    throw e;
+    return handleIdxError(e, flow, remediator);
   }
 }

@@ -110,7 +110,7 @@ module.exports = function handleTransaction({
       next(error);
       return;
     case IdxStatus.TERMINAL:
-      res.redirect('/terminal');
+      redirect({ req, res, path: '/terminal' });
       return;
     case IdxStatus.CANCELED:
       res.redirect('/');
