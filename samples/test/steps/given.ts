@@ -40,7 +40,8 @@ Given(
 
 Given(
   /^a user named "([^/w]+)"$/,
-  _ => ({}) // no-op
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  (  _: any) => ({}) // no-op
 );
 
 Given(

@@ -1,5 +1,6 @@
 /* global $$ */
 import { Selector } from 'webdriverio';
+import waitForDisplayed from '../wait/waitForDisplayed';
 
 /**
  * Check if the given element exists in the DOM one or more times
@@ -17,6 +18,8 @@ export default async (
      * The number of elements found in the DOM
      * @type {Int}
      */
+
+    await waitForDisplayed(selector);
     const nrOfElements = await $$(selector);
 
     if (falseCase === true) {

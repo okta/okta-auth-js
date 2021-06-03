@@ -11,13 +11,10 @@ export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 export ISSUER=https://oie-widget-tests.sigmanetcorp.us/oauth2/default
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
-get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY
-get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
 
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 export ORG_OIE_ENABLED=true
-
 
 # This client has refresh token enabled
 export CLIENT_ID=0oa3n0cgbfiNvI6Aa0g7
