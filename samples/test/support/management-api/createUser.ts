@@ -15,6 +15,10 @@ export default async (firstName: string, assignToGroup: string = 'Basic Auth Web
   let user;
   try {
     a18nProfile = await a18nClient.createProfile();
+    if (!a18nProfile.profileId) {
+      throw new Error(`a18n profile was not created: ${a18nProfile}`);
+    }
+
     user = await oktaClient.createUser({
       profile: {
         firstName: firstName,
@@ -34,8 +38,7 @@ export default async (firstName: string, assignToGroup: string = 'Basic Auth Web
       q: assignToGroup
     }).next();
 
-    if (testGroup === undefined) {
-      a18nClient.deleteProfile(a18nProfile.profileId);
+    if (!testGroup) {
       throw new Error(`Group "${assignToGroup}" is not found`);
     }
 
