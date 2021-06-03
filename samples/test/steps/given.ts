@@ -40,12 +40,12 @@ Given(
 
 Given(
   /^a user named "([^/w]+)"$/,
-  createAndStoreUserInContext
+  _ => ({}) // no-op
 );
 
 Given(
-  /^Mary is a user with a verified email and a set password$/,
-  () => console.log('currently done in previous step')
+  /^([^/s]+) is a user with a verified email and a set password$/,
+  createAndStoreUserInContext
 );
 
 Given(
