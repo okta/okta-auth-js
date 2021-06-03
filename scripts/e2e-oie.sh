@@ -11,6 +11,8 @@ export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 export ISSUER=https://oie-widget-tests.sigmanetcorp.us/oauth2/default
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
+get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY
+get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
 
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
