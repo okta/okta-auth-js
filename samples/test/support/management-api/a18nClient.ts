@@ -27,7 +27,7 @@ class A18nClient {
     let response;
     while (!response?.content && retryAttemptsRemaining > 0) {
       await waitForOneSecond();
-      response = await this._getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as Record<string, string>;
+      response = await this.getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as Record<string, string>;
       --retryAttemptsRemaining;
     }
 
@@ -39,15 +39,15 @@ class A18nClient {
   }
 
   async createProfile(): Promise<A18nProfile|never> {
-    const profile = await this._postToURL(PROFILE_URL, {}, true) as unknown as A18nProfile;
+    const profile = await this.postToURL(PROFILE_URL, {}, true) as unknown as A18nProfile;
     return profile;
   }
 
   async deleteProfile(profileId: string): Promise<string> {
-    return await this._deleteOnProtectedURL(`${PROFILE_URL}/${profileId}`);
+    return await this.deleteOnProtectedURL(`${PROFILE_URL}/${profileId}`);
   }
 
-  async _deleteOnProtectedURL(url: string): Promise<string|never>{
+  private async deleteOnProtectedURL(url: string): Promise<string|never>{
     try {
       const response =  await fetch(url, {
         method: 'DELETE',
@@ -63,7 +63,7 @@ class A18nClient {
     }
   }
 
-  async _postToURL(
+  private async postToURL(
     url: string, body?: Record<string, unknown>, includeApiToken=false): Promise<Record<string, unknown>|never>{
     try {
    
@@ -81,7 +81,7 @@ class A18nClient {
     }
   }
 
-  async _getOnURL(url: string, includeApiToken=false): Promise<Record<string, unknown>|never> {
+  private async getOnURL(url: string, includeApiToken=false): Promise<Record<string, unknown>|never> {
     try {
       const response =  await fetch(url, {
         method: 'GET',
