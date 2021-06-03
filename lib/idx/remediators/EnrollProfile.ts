@@ -25,9 +25,7 @@ export class EnrollProfile extends Remediator {
   }
 
   getInputUserProfile(input) {
-    return {
-      ...input.form.value[0],
-    };
+    return [...input.form.value];
   }
 
   getErrorMessages(errorRemediation) {

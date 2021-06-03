@@ -18,7 +18,7 @@ Then(
 );
 
 Then(
-  /^she should see a message on the Login form "(?<message>.+?)"$/,
+  /^she should see (?:a message on the Login form|the message) "(?<message>.+?)"$/,
   checkFormMessage
   );
 

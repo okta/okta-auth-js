@@ -15,7 +15,13 @@ export default async (
       value = 'Mory';
       break;
     }
-    case 'username': {
+    case 'incorrect password': {
+      selector = LoginForm.password;
+      value = '!wrong!';
+      break;
+    }
+    case 'username':
+    case 'correct username': {
       selector = LoginForm.username;
       value = value || config.username;
       break;

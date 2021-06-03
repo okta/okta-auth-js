@@ -74,7 +74,6 @@ describe('idx/run', () => {
     expect(res).toEqual({
       status: IdxStatus.PENDING,
       nextStep: 'remediate-nextStep',
-      tokens: null,
     });
   });
 
@@ -115,10 +114,9 @@ describe('idx/run', () => {
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
     expect(res).toEqual({
-      'messages': ['remediate-message-1'],
-      'nextStep': 'remediate-nextStep',
-      'status': 1,
-      'tokens': null,
+      messages: ['remediate-message-1'],
+      nextStep: 'remediate-nextStep',
+      status: IdxStatus.PENDING,
     });
   });
 
@@ -133,9 +131,8 @@ describe('idx/run', () => {
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
       expect(res).toEqual({
-        'nextStep': 'remediate-nextStep',
-        'status': 1,
-        'tokens': null,
+        nextStep: 'remediate-nextStep',
+        status: IdxStatus.PENDING,
       });
     });
   });
@@ -151,9 +148,8 @@ describe('idx/run', () => {
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
       expect(res).toEqual({
-        'nextStep': 'remediate-nextStep',
-        'status': 3,
-        'tokens': null,
+        nextStep: 'remediate-nextStep',
+        status: IdxStatus.TERMINAL,
       });
     });
   });
@@ -188,9 +184,9 @@ describe('idx/run', () => {
       });
 
       expect(res).toEqual({
-       'nextStep': 'remediate-nextStep',
-       'status': 0,
-       'tokens': tokenResponse.tokens,
+       nextStep: 'remediate-nextStep',
+       status: IdxStatus.SUCCESS,
+       tokens: tokenResponse.tokens,
       });
     });
 
@@ -222,9 +218,8 @@ describe('idx/run', () => {
 
       expect(res).toEqual({
        error,
-       'nextStep': 'remediate-nextStep',
-       'status': 2,
-       'tokens': null,
+       nextStep: 'remediate-nextStep',
+       status: IdxStatus.FAILURE,
       });
     });
   });

@@ -48,17 +48,6 @@ export type AuthenticationOptions = IdxOptions
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions
 ): Promise<IdxTransaction> {
-  options = options || {};
-
-  // Select password authenticator if password is provided
-  const { password, authenticators = [] } = options;
-  if (password && !authenticators.includes('password')) {
-    options = {
-      ...options,
-      authenticators: ['password', ...authenticators]
-    };
-  }
-
   const flowMonitor = new AuthenticationFlowMonitor();
   return run(authClient, { 
     ...options, 

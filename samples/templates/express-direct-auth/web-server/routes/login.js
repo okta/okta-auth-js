@@ -18,7 +18,10 @@ const getIdpSemanticClass = (type) => {
 
 // entry route
 router.get('/login', async (req, res) => {
-  req.session.idxMethod = 'authenticate';
+  req.setFlowStates({
+    entry: '/login',
+    idxMethod: 'authenticate'
+  });
 
   // Delete the idp related render logic if you only want the username and password form
   const authClient = getAuthClient(req);
@@ -29,24 +32,19 @@ router.get('/login', async (req, res) => {
       .map(({ href, idp: { name }, type }) => ({ name, href, class: getIdpSemanticClass(type) })) 
     : [];
 
-  const { authenticator } = req.query;
   renderTemplate(req, res, 'login', { 
-    action: authenticator 
-      ? `/login?authenticator=${authenticator}` 
-      : `/login`,
+    action: '/login',
     hasIdps: !!idps.length,
     idps,
   });
 });
 
 router.post('/login', async (req, res, next) => {
-  const { authenticator } = req.query;
   const { username, password } = req.body;
   const authClient = getAuthClient(req);
   const transaction = await authClient.idx.authenticate({ 
     username,
     password,
-    authenticators: authenticator ? [authenticator] : [],
   });
   handleTransaction({ req, res, next, authClient, transaction });
 });

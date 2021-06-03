@@ -5,10 +5,7 @@ const redirect = require('./redirect');
 const SUPPORTED_AUTHENTICATORS = ['email', 'password', 'phone'];
 
 const proceed = ({ nextStep, req, res }) => {
-  const { name, type, authenticators, canSkip } = nextStep;
-
-  // Always reset canSkip to false before redirect
-  req.session.canSkip = false;
+  const { name, type } = nextStep;
 
   // Stop if unsupported types detected
   if (type && !SUPPORTED_AUTHENTICATORS.includes(type)) {
@@ -36,7 +33,6 @@ const proceed = ({ nextStep, req, res }) => {
 
     // authenticator authenticate
     case 'select-authenticator-authenticate':
-      req.session.authenticators = authenticators;
       redirect({ 
         req, res, path: '/select-authenticator'
       });
@@ -54,8 +50,6 @@ const proceed = ({ nextStep, req, res }) => {
 
     // authenticator enrollment
     case 'select-authenticator-enroll':
-      req.session.canSkip = canSkip;
-      req.session.authenticators = authenticators;
       redirect({ req, res, path: '/select-authenticator' });
       return true;
     case 'enroll-authenticator':
@@ -89,7 +83,7 @@ module.exports = function handleTransaction({
   } = transaction;
 
   // Persist states to session
-  req.setIdxStates(transaction);
+  req.setFlowStates({ idx: transaction });
 
   switch (status) {
     case IdxStatus.PENDING:
@@ -115,7 +109,7 @@ module.exports = function handleTransaction({
       next(error);
       return;
     case IdxStatus.TERMINAL:
-      res.redirect('/terminal');
+      redirect({ req, res, path: '/terminal' });
       return;
     case IdxStatus.CANCELED:
       res.redirect('/');

@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
-import { NextStep, IdxMessage } from '../../types';
+import { NextStep, IdxMessage, Authenticator } from '../../types';
 import { IdxRemediation } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
@@ -9,7 +9,7 @@ export type IdxToRemediationValueMap = Record<string, string[]>;
 
 export interface RemediationValues {
   stateHandle?: string;
-  authenticators?: string[];
+  authenticators?: Authenticator[] | string[];
 }
 
 // Base class - DO NOT expose static remediationName
@@ -17,12 +17,19 @@ export class Remediator {
   static remediationName: string;
 
   remediation: IdxRemediation;
-  values?: RemediationValues;
+  values: RemediationValues;
   map?: IdxToRemediationValueMap;
 
-  constructor(remediation: IdxRemediation, values?: RemediationValues) {
-    this.remediation = remediation;
+  constructor(remediation: IdxRemediation, values: RemediationValues = {}) {
+    // map authenticators to Authenticator[] type
+    values.authenticators = (values.authenticators?.map(authenticator => {
+      return typeof authenticator === 'string' 
+        ? { type: authenticator } : authenticator;
+    }) || []) as Authenticator[];
+    
+    // assign fields to the instance
     this.values = values;
+    this.remediation = remediation;
   }
 
   getName(): string {
@@ -95,12 +102,14 @@ export class Remediator {
   }
 
   getNextStep(): NextStep {
+    const name = this.getName();
+    const type = this.getRelatesToType();
     const inputs = this.getInputs();
-    return { name: this.remediation.name, inputs };
+    return { name, inputs, ...(type && { type }) };
   }
 
   // Get inputs for the next step
-  getInputs() {
+  private getInputs() {
     if (!this.map) {
       return [];
     }
@@ -134,7 +143,11 @@ export class Remediator {
         throw new AuthSdkError(`Missing custom getInput${titleCase(key)} method in Remediator: ${this.getName()}`);
       }
 
-      inputs.push(input);
+      if (Array.isArray(input)) {
+        input.forEach(i => inputs.push(i));
+      } else {
+        inputs.push(input);
+      }
       return inputs;
     }, []);
   }
@@ -153,7 +166,16 @@ export class Remediator {
   }
 
   // Prepare values for the next remediation
-  getValues() {
-    return this.values;
+  // In general, remove finished authenticator from list
+  getValuesAfterProceed() {
+    const authenticatorType = this.getRelatesToType();
+    const authenticators = (this.values.authenticators as Authenticator[])
+      ?.filter(authenticator => authenticator.type !== authenticatorType);
+    return { ...this.values, authenticators };
   }
+
+  protected getRelatesToType() {
+    return this.remediation.relatesTo?.value.type;
+  }
+
 }

@@ -1,7 +1,7 @@
 import { InteractOptions } from '../interact';
 import { APIError, Tokens } from '../../types';
 import { IdxTransactionMeta } from '../../types/Transaction';
-import { IdxMessage } from './idx-js';
+import { IdxMessage, IdxOption } from './idx-js';
 
 export { IdxMessage } from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
@@ -27,6 +27,7 @@ export type NextStep = {
   type?: string;
   canSkip?: boolean;
   inputs?: Input[];
+  options?: IdxOption[];
 }
 
 export enum IdxFeature {
@@ -47,3 +48,9 @@ export interface IdxTransaction {
 }
 
 export type IdxOptions = InteractOptions;
+
+export type Authenticator = {
+  type: string;
+  methodType?: string;
+  phoneNumber?: string;
+};

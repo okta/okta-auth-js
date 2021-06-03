@@ -152,12 +152,12 @@ export async function run(
   
   return {
     status,
-    meta,
-    enabledFeatures,
-    availableSteps,
-    tokens: tokens ? tokens.tokens : null,
-    nextStep,
-    messages,
-    error,
+    ...(meta && { meta }),
+    ...(enabledFeatures && { enabledFeatures }),
+    ...(availableSteps && { availableSteps }),
+    ...(tokens && { tokens: tokens.tokens }),
+    ...(nextStep && { nextStep }),
+    ...(messages && { messages }),
+    ...(error && { error }),
   };
 }
