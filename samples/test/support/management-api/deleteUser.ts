@@ -1,12 +1,13 @@
 
-import a18nClient from './a18nClient';
+import { User } from '@okta/okta-sdk-nodejs';
+import a18nClient, { A18nProfile } from './a18nClient';
 
-export default async function(): Promise<void> {
-  if (this.user) {
-    await this.user.deactivate();
-    await this.user.delete();
+export default async function(user: User | undefined, a18nProfile: A18nProfile | undefined): Promise<void> {
+  if (user) {
+    await user.deactivate();
+    await user.delete();
   }
-  if (this.a18nProfile) {
-    await a18nClient.deleteProfile(this.a18nProfile.profileId);
+  if (a18nProfile) {
+    await a18nClient.deleteProfile(a18nProfile.profileId);
   }
 }

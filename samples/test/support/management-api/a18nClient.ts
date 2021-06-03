@@ -38,7 +38,7 @@ class A18nClient {
     return match?.groups?.code;
   }
 
-  async createProfile(): Promise<A18nProfile> {
+  async createProfile(): Promise<A18nProfile|never> {
     const profile = await this._postToURL(PROFILE_URL, {}, true) as unknown as A18nProfile;
     return profile;
   }

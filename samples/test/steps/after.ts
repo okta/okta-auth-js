@@ -1,4 +1,4 @@
 import { After } from '@cucumber/cucumber';
-import deleteUser from '../support/management-api/deleteUser';
+import deleteContextUser from '../support/action/live-user/deleteContextUser';
 
-After(deleteUser);
+After(deleteContextUser);
