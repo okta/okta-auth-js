@@ -5,6 +5,7 @@ import checkIsOnPage from '../support/check/checkIsOnPage';
 import checkProfile from '../support/check/checkProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
+import checkButton from '../support/check/checkButton';
 
 Then(
   /^User can verify their profile data$/,
@@ -20,10 +21,20 @@ Then(
   /^she should see (?:a message on the Login form|the message) "(?<message>.+?)"$/,
   checkFormMessage
   );
-  
+
 Then(
   /^the Root Page shows links to the Entry Points$/,
   checkGuest
+);
+
+Then(
+  /table with the claims from the \/userinfo response$/,
+  checkProfile
+);
+
+Then(
+  /sees a (.*) button$/,
+  checkButton
 );
 
 Then(
