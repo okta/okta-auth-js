@@ -19,6 +19,7 @@ import clickElement from '../support/action/clickElement';
 
 import enterCredential from '../support/action/enterCredential';
 import submitForm from '../support/action/submitForm';
+import clickLogout from '../support/action/clickLogout';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -43,6 +44,11 @@ When(
 When(
   /^she clicks on the "Forgot Password Link"$/,
   clickElement.bind(null, 'click', 'link', '/recover-password')
+);
+
+When(
+  /^Mary clicks the logout button$/,
+  clickLogout
 );
 
 // When(

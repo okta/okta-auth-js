@@ -11,3 +11,11 @@ Feature: Root page for Direct Auth Demo Application
       When Mary navigates to the Root View
       Then Mary sees a table with the claims from the /userinfo response
       And Mary sees a logout button
+
+    Scenario: Mary logs out of the app
+      Given Mary has an authenticated session
+        And Mary navigates to the Root View
+      When Mary clicks the logout button
+      Then she is redirected back to the Root View
+        And Mary sees login, registration buttons
+        And she sees that claims from /userinfo are disappeared
