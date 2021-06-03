@@ -13,7 +13,7 @@ Feature: Root page for Direct Auth Demo Application
       And Mary sees a logout button
 
     Scenario: Mary logs out of the app
-      Given Mary has an authentcation session
+      Given Mary has an authenticated session
         And Mary navigates to the Root View
       When Mary clicks the logout button
       Then she is redirected back to the Root View
