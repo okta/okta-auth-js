@@ -1,10 +1,11 @@
+import crypto = require('crypto');
+
 import { Client, Group, User } from '@okta/okta-sdk-nodejs';
-import { v4 as uuidv4 } from 'uuid';
 import { getConfig } from '../../util';
 import a18nClient, {A18nProfile} from './a18nClient';
 import deleteUser from './deleteUser';
 
-export default async (firstName: string, assignToGroup: string = 'Basic Auth Web'): Promise<[User, A18nProfile]> => {
+export default async (firstName: string, assignToGroup = 'Basic Auth Web'): Promise<(User |A18nProfile)[]> => {
   const config = getConfig();
   const oktaClient = new Client({
     orgUrl: config.orgUrl,
@@ -27,7 +28,7 @@ export default async (firstName: string, assignToGroup: string = 'Basic Auth Web
         login: a18nProfile.emailAddress
       },
       credentials: {
-        password : { value: uuidv4() }
+        password : { value: crypto.randomBytes(16).toString('hex') }
       }
     }, {
       activate: true

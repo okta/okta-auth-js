@@ -5,7 +5,7 @@ import PasswordReset from '../selectors/PasswordReset';
 
 /**
  * Check if browser has navigated to expected page
- * @param  {String}   pageTitle       Expected page title
+ * @param  {String}   pageName       Expected page title
  */
 export default async (pageName?: string) => {
 
