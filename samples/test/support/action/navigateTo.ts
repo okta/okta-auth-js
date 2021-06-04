@@ -10,6 +10,7 @@ export default async (
   let url = '/';
   let queryParams;
   let selector;
+  let isNotDisplayed = false;
   switch (formName) {
     case 'the Basic Login View':
     case 'Login with Username and Password': {
@@ -26,11 +27,18 @@ export default async (
       break;
     }
 
+    case 'the Self Service Password Reset View': {
+      url = '/recover-password';
+      selector = 'a[href="/recover-password"]';
+      isNotDisplayed = true;
+      break;
+    }
+
     default: {
         throw new Error(`Unknown form "${formName}"`);
     }
   }
 
   await startApp(url, queryParams);
-  await waitForDisplayed(selector, false);
+  await waitForDisplayed(selector, isNotDisplayed);
 };

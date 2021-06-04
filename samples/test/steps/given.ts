@@ -24,10 +24,28 @@ import { Given } from '@cucumber/cucumber';
 import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
+import createAndStoreUserInContext from '../support/action/live-user/createAndStoreUserInContext';
+
 
 Given(
   /^an APP Sign On Policy (.*)$/,
   setEnvironment
+);
+
+Given(
+  /^an org with (.*)$/,
+  setEnvironment
+);
+
+Given(
+  /^a user named "([^/w]+)"$/,
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  (  _: any) => ({}) // no-op
+);
+
+Given(
+  /^([^/s]+) is a user with a verified email and a set password$/,
+  createAndStoreUserInContext
 );
 
 Given(

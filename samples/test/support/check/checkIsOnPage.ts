@@ -1,11 +1,13 @@
 import PasswordRecover from '../selectors/PasswordRecover';
+import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
 import waitForDisplayed from '../wait/waitForDisplayed';
+import PasswordReset from '../selectors/PasswordReset';
 
 /**
  * Check if browser has navigated to expected page
  * @param  {String}   pageName       Expected page title
  */
-export default async (pageName: string) => {
+export default async (pageName?: string) => {
 
   let selector;
   let pageTitle;
@@ -15,7 +17,21 @@ export default async (pageName: string) => {
       pageTitle = 'Recover password';
       break;
     }
-
+    case 'Enter Code': {
+      selector = ChallengeAuthenticator.pageTitle;
+      pageTitle = 'Challenge email authenticator';
+      break;
+    }
+    case 'Reset Password': {
+      selector = PasswordReset.pageTitle;
+      pageTitle = 'Reset password';
+      break;
+    }
+    case 'Root Page': {
+      selector = '#claim-email_verified';
+      pageTitle = 'true';
+      break;
+    }
     default: {
         throw new Error(`Unknown form "${pageTitle}"`);
     }

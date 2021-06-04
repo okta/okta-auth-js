@@ -16,7 +16,6 @@ export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 export ORG_OIE_ENABLED=true
 
-
 # This client has refresh token enabled
 export CLIENT_ID=0oa3n0cgbfiNvI6Aa0g7
 export REFRESH_TOKEN=true
