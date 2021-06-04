@@ -17,3 +17,10 @@ Background:
     And she confirms that password
     And she submits the form
     Then she is redirected to the Root Page
+
+  Scenario: Mary tries to reset a password with the wrong email
+    Given Mary navigates to the Self Service Password Reset View
+    When she inputs an Email that doesn't exist
+    And she submits the form
+    Then she should see the message "There is no account with the Username test_with_really_invalid_email@invalidemail.com."
+    
