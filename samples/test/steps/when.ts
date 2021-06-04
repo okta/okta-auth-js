@@ -26,6 +26,8 @@ import submitAnyForm from '../support/action/submitAnyForm';
 import submitForm from '../support/action/submitForm';
 import clickLogout from '../support/action/clickLogout';
 import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
+import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
+import enterIncorrectCode from '../support/action/enterIncorrectCode';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -58,6 +60,11 @@ When(
 );
 
 When(
+  /^she clicks Login$/,
+  submitForm
+);
+
+When(
   /^she clicks on the "Forgot Password Link"$/,
   clickElement.bind(null, 'click', 'link', '/recover-password')
 );
@@ -85,6 +92,16 @@ When(
 When(
   /^she confirms that password$/,
   confirmValidPassword
+);
+  
+When(
+  /^She has selected Email from the list of factors$/,
+  selectEmailAuthenticator
+);
+
+When(
+  /^She inputs the incorrect code from the email$/,
+  enterIncorrectCode
 );
 
 // When(

@@ -34,6 +34,10 @@ Given(
 
 Given(
   /^an org with (.*)$/,
+);
+
+Given(
+  /^a SPA, WEB APP or MOBILE Policy (.*)$/,
   setEnvironment
 );
 
@@ -56,6 +60,11 @@ Given(
 Given(
   /^([^/s]+) has an authenticated session$/,
   navigateToLoginAndAuthenticate
+);
+
+Given(
+  /^a User named "([^/s]+)" created in the admin interface with a Password only$/,
+  _ => ({}) // todo: createAndStoreUserInContext
 );
 
 // Given(

@@ -4,7 +4,7 @@ import clickElement from './clickElement';
 import selectOption from './selectOption';
 
 export default async () => {
-  await selectOption('value', 'email', '#authenticator-options');
+  await selectOption('value', 'email', SelectAuthenticator.options);
   await clickElement('click', 'selector', SelectAuthenticator.submit);
   await checkIsOnPage('Enter Code');
 };
