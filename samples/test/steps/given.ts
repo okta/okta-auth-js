@@ -50,7 +50,10 @@ Given(
 
 Given(
   /^([^/s]+) is a user with a verified email and a set password$/,
-  createAndStoreUserInContext
+  async function(firstName: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await createAndStoreUserInContext.call(this, firstName);
+  }
 );
 
 Given(
