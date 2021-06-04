@@ -34,6 +34,7 @@ Given(
 
 Given(
   /^an org with (.*)$/,
+  setEnvironment
 );
 
 Given(
@@ -64,7 +65,7 @@ Given(
 
 Given(
   /^a User named "([^/s]+)" created in the admin interface with a Password only$/,
-  _ => ({}) // todo: createAndStoreUserInContext
+  createAndStoreUserInContext.bind(null, 'MFA Required')
 );
 
 // Given(

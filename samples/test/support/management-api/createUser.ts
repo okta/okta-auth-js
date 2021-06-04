@@ -5,7 +5,7 @@ import { getConfig } from '../../util';
 import a18nClient, {A18nProfile} from './a18nClient';
 import deleteUser from './deleteUser';
 
-export default async (firstName: string, assignToGroup = 'Basic Auth Web'): Promise<(User |A18nProfile)[]> => {
+export default async (firstName: string, assignToGroup: string = 'Basic Auth Web'): Promise<(User |A18nProfile)[]> => {
   const config = getConfig();
   const oktaClient = new Client({
     orgUrl: config.orgUrl,
