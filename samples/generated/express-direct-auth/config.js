@@ -12,9 +12,9 @@ module.exports = function () {
     webServer: {
       port: 8080,
       oidc: {
-        clientId: CLIENT_ID || '',
-        clientSecret: CLIENT_SECRET || '',
-        issuer: ISSUER || '',
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET,
+        issuer: ISSUER,
         appBaseUrl: 'http://localhost:8080',
         scopes: ['openid', 'profile', 'email'],
         redirectUri: 'http://localhost:8080/login/callback',
