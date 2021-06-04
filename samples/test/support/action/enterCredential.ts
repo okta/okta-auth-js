@@ -3,12 +3,13 @@ import LoginForm from '../selectors/LoginForm';
 import { getConfig } from '../../util/configUtils';
 
 /* eslint complexity:[0,8] */
-export default async (
+export default async function (
   credName: string
-) => {
+) {
   const config = getConfig();
   let selector = null;
   let value;
+  const isLiveProfile = !!this.user;
   switch (credName) {
     case 'incorrect username': {
       selector = LoginForm.username;
@@ -23,13 +24,13 @@ export default async (
     case 'username':
     case 'correct username': {
       selector = LoginForm.username;
-      value = value || config.username;
+      value = isLiveProfile && this.user.profile.email || config.username;
       break;
     }
     case 'password':
     case 'correct password': {
       selector = LoginForm.password;
-      value = value || config.password;
+      value = isLiveProfile && this.user.credentials.password.value || config.password;
       break;
     }
     default: {

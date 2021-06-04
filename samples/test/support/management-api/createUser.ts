@@ -20,6 +20,8 @@ export default async (firstName: string, assignToGroup = 'Basic Auth Web'): Prom
       throw new Error(`a18n profile was not created: ${JSON.stringify(a18nProfile)}`);
     }
 
+    const password = crypto.randomBytes(16).toString('hex');
+
     user = await oktaClient.createUser({
       profile: {
         firstName: firstName,
@@ -28,11 +30,12 @@ export default async (firstName: string, assignToGroup = 'Basic Auth Web'): Prom
         login: a18nProfile.emailAddress
       },
       credentials: {
-        password : { value: crypto.randomBytes(16).toString('hex') }
+        password : { value: password }
       }
     }, {
       activate: true
     });
+    user.credentials.password.value = password;
 
     // TODO: create test group and attach password recovery policy during test run when API supports it
     const {value: testGroup} = await oktaClient.listGroups({
