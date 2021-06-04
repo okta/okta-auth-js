@@ -50,7 +50,7 @@ Given(
 
 Given(
   /^([^/s]+) is a user with a verified email and a set password$/,
-  createAndStoreUserInContext.bind(null, undefined) // default group
+  createAndStoreUserInContext
 );
 
 Given(
@@ -65,7 +65,10 @@ Given(
 
 Given(
   /^a User named "([^/s]+)" created in the admin interface with a Password only$/,
-  createAndStoreUserInContext.bind(null, 'MFA Required')
+  async function(firstName: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await createAndStoreUserInContext.call(this, firstName, 'MFA Required');
+  }
 );
 
 // Given(
