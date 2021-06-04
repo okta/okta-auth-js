@@ -59,6 +59,16 @@ Then(
   /^she sees that claims from \/userinfo are disappeared$/,
   checkNoProfile
 );
+  
+Then(
+  /^She sees a list of factors$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
+  /^the sample shows an error message "(?<message>.+?)" on the Sample App$/,
+  checkFormMessage
+);
 
 Then(
   /^she sees a page to input her code$/,

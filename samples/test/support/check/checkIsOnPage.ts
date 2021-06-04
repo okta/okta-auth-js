@@ -1,4 +1,5 @@
 import PasswordRecover from '../selectors/PasswordRecover';
+import SelectAuthenticator from '../selectors/SelectAuthenticator';
 import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import PasswordReset from '../selectors/PasswordReset';
@@ -15,6 +16,11 @@ export default async (pageName?: string) => {
     case 'Self Service Password Reset View': {
       selector = PasswordRecover.pageTitle;
       pageTitle = 'Recover password';
+      break;
+    }
+    case 'Select authenticator': {
+      selector = SelectAuthenticator.pageTitle;
+      pageTitle = 'Select authenticator';
       break;
     }
     case 'Enter Code': {

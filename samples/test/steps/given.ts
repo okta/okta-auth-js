@@ -38,6 +38,11 @@ Given(
 );
 
 Given(
+  /^a SPA, WEB APP or MOBILE Policy (.*)$/,
+  setEnvironment
+);
+
+Given(
   /^a user named "([^/w]+)"$/,
   /* eslint-disable @typescript-eslint/no-unused-vars */
   (  _: any) => ({}) // no-op
@@ -45,7 +50,10 @@ Given(
 
 Given(
   /^([^/s]+) is a user with a verified email and a set password$/,
-  createAndStoreUserInContext
+  async function(firstName: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await createAndStoreUserInContext.call(this, firstName);
+  }
 );
 
 Given(
@@ -56,6 +64,14 @@ Given(
 Given(
   /^([^/s]+) has an authenticated session$/,
   navigateToLoginAndAuthenticate
+);
+
+Given(
+  /^a User named "([^/s]+)" created in the admin interface with a Password only$/,
+  async function(firstName: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await createAndStoreUserInContext.call(this, firstName, 'MFA Required');
+  }
 );
 
 // Given(
