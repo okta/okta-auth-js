@@ -19,7 +19,10 @@ export default async (
      * @type {Int}
      */
 
-    await waitForDisplayed(selector);
+    if (falseCase !== true) {
+        await waitForDisplayed(selector);
+    }
+    
     const nrOfElements = await $$(selector);
 
     if (falseCase === true) {
