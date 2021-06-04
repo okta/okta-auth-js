@@ -50,7 +50,7 @@ Given(
 
 Given(
   /^([^/s]+) is a user with a verified email and a set password$/,
-  createAndStoreUserInContext
+  createAndStoreUserInContext.bind(null, undefined) // default group
 );
 
 Given(
