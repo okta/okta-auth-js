@@ -17,7 +17,7 @@ export default async (firstName: string, assignToGroup = 'Basic Auth Web'): Prom
   try {
     a18nProfile = await a18nClient.createProfile();
     if (!a18nProfile.profileId) {
-      throw new Error(`a18n profile was not created: ${a18nProfile}`);
+      throw new Error(`a18n profile was not created: ${JSON.stringify(a18nProfile)}`);
     }
 
     user = await oktaClient.createUser({
