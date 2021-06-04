@@ -838,6 +838,7 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
   * [session.exists](#sessionexists)
   * [session.get](#sessionget)
   * [session.refresh](#sessionrefresh)
+* [idx](#idx)
 * [token](#token)
   * [token.getWithoutPrompt](#tokengetwithoutpromptoptions)
   * [token.getWithPopup](#tokengetwithpopupoptions)
@@ -2124,120 +2125,7 @@ authClient.session.refresh()
 
 ### `idx`
 
-> :grey_exclamation: The use of this module requires usage of the Okta Identity Engine. This functionality is in general availability but is being gradually rolled out to customers. If you want to request to gain access to the Okta Identity Engine, please reach out to your account manager. If you do not have an account manager, please reach out to oie@okta.com for more information.
-
-This module is built to communicate with Okta as an OAuth 2.0 + OpenID Connect provider. It works with [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/) to authenticate and register users.
-
-To see this library working in a sample, check out our [Embedded auth with SDKs](https://github.com/okta/okta-auth-js/tree/master/samples/generated/express-direct-auth) sample.
-
-#### Usage
-
-This module provides convenience methods to support popular scenarios to communicate with [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/). You can work with these methods with `Up-Front` and `On-Demand` approaches, normally a mix of both approaches will be needed when user inputs are required in the middle of the flow (e.g. multiple factors auth). Below are the general explaination of these two approaches, more code examples will be provided with the specific methods.
-
-**Up-Front approach**: you can provide a param bag based on your app's policy configuration and user inputs to drive the methods to communicate with [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/).
-
-**On-Demand approach**: you can provide minimum or even no param to call the methods, and the methods can drive you through the flow by indicating the `nextStep` and required `inputs`.
-
-##### Response
-
-Most methods in this module resolve [IdxTransaction](https://github.com/okta/okta-auth-js/blob/master/lib/idx/types/index.ts) as the response. With [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/)'s dynamic nature, it's very important to understand how to follow the response to proceed to the next step.
-
-**Flow related fields**:
-
-* `status`: This field indicates the status of the current flow.
-  * `IdxStatus.SUCCESS`: This status indicates the flow is end with successfully get tokens.
-  * `IdxStatus.PENDING`: This status indicates the flow is still in progress, check `nextStep` and `messages` (intermediate form errors) fields in the response to proceed.
-  * `IdxStatus.FAILURE`: This status indicates error happens in SDK level, check `error` field in the response for error handling.
-  * `IdxStatus.TERMINAL`: This status indicates the flow runs into a `terminal` state, check `messages` field to handle it.
-  * `IdxStatus.CANCELED`: This status indicates the flow is canceled. It's normally the response status of `idx.cancel`.
-* `nextStep?`: This field contains information to proceed with the next step. It's avaiable when in `IdxStatus.PENDING` status.
-  * `name`: The identifier of the next step.
-  * `type?`: The type of the authenticator that the step belongs to.
-  * `canSkip?`: This field indicates if the step is skippable or not.
-  * `inputs?`: params for the next step.
-
-    ```javascript
-    // get "inputs" from the response
-    // inputs: [{ name: 'username', label: 'Username' }]
-    const { nextStep: { inputs } } = await authClient.idx.authenticate();
-    // gather user inputs (this call should happen in a separated request)
-    const transaction = await authClient.idx.authenticate({ username: 'from user input' });
-    ```
-
-  * `options?`: This field is available in response when the input is a selection. It can also provide information for how to build UI for the next step.
-* `tokens?`: It's available with `IdxStatus.SUCCESS` status. Provides tokens set based on [scopes](https://github.com/okta/okta-auth-js#scopes) configuration.
-* `messages?`: It passes back messages from [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/). `Form message` and `Terminal message` both come to this field.
-* `error?`: It's avaialbe with `IdxStatus.FAILURE` status when the SDK run into unhandlable state.
-
-**Start Transaction related fields**:
-
-* `meta?`: It provides transaction meta (pkce meta, interactionHandle, etc.).
-* `enabledFeatures?`: It indicates what features are available based on the app / org policy configuration.
-* `availableSteps?`: It provides information for avaiable next steps.
-  
-##### `idx.authenticate`
-
-The convenience method for `authentication` flow.
-
-Example Two factors auth with email authenticator):
-
-**Up-Front**:
-
-```javascript
-// status will be resolved as IdxStatus.PENDING
-const { status, nextStep } = await authClient.idx.authenticate({ 
-  username: 'xxx',
-  password: 'xxx',
-  authenticators: ['email']
-});
-// gather verification code from email (this call should happen in a separated request)
-const { status, tokens } = await authClient.idx.authenticate({ verificationCode: 'xxx' });
-// handle tokens ...
-```
-
-**On-Demand**:
-
-```javascript
-// status will be resolved as IdxStatus.PENDING
-// inputs: [{ name: 'username', ... }, { name: 'password', ... }]
-const { status, nextStep: { inputs } } = await authClient.idx.authenticate();
-// gather user inputs (this call should happen in a separated request)
-// inputs: [{ name: 'authenticator', ... }]
-// options: [{ name: 'email', ... }, ...]
-const { status, nextStep: { inputs, options } } = await authClient.idx.authenticate({ 
-  username: 'xxx', 
-  password: 'xxx'
-});
-// select authenticator (this call should happen in a separated request)
-const { status, nextStep: { inputs, options } } = await authClient.idx.authenticate({ authenticator: 'email' });
-// gather verification code from email (this call should happen in a separated request)
-const { status, tokens } = await authClient.idx.authenticate({ verificationCode: 'xxx' });
-// handle tokens ...
-```
-
-##### `idx.register`
-
-The convenience method for `self service registration` flow.
-
-// TODO
-
-##### `idx.recoverPassword`
-
-The convenience method for `self service password recovery` flow.
-
-// TODO
-
-##### `idx.startTransaction`
-
-// TODO
-
-##### `idx.cancel`
-
-// TODO
-
-##### `idx.handleInteractionCodeRedirect`
-
-// TODO
+See detail in [IDX README](docs/idx.md)
 
 ### `token`
 
@@ -2779,6 +2667,7 @@ Since the Node library can be used only for the Authentication flow, it implemen
   * [MFA_REQUIRED](#mfa_required)
   * [MFA_CHALLENGE](#mfa_challenge)
   * [SUCCESS](#success)
+* [idx](#idx)
 
 The main difference is that the Node library does **not** have a `session.setCookieAndRedirect` function, so you will have to redirect by yourself (for example using `res.redirect('https://www.yoursuccesspage.com')`).
 
