@@ -41,4 +41,4 @@ export default async function (
     throw new Error(`No value set for credential "${credName}"`);
   }
   await setInputField('set', value, selector);
-};
+}
