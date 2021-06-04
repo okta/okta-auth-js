@@ -15,24 +15,9 @@ export default async (selector: Selector, falseCase: any = false) => {
     const ms = 10000;
 
     const el = await $(selector);
-
-    let body = null;
-    try {
-        await browser.waitUntil(async () => {
-            const isDisplayed = await el.isDisplayed();
-            const isOk = falseCase ? !isDisplayed : isDisplayed;
-            if (!isOk) {
-                body = await (await $('body')).getHTML();
-            }
-            return isOk;
-        }, {
-            timeout: ms,
-        });
-    } catch (err) {
-        console.error(`element ${selector} still not displayed after ${ms}ms`);
-        console.log('Body for debug: ', body);
-        throw err;
-    }
-
+    await el.waitForDisplayed({
+        timeout: ms,
+        reverse: Boolean(falseCase),
+    });
     return el;
 };
