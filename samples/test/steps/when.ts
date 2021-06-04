@@ -25,6 +25,7 @@ import enterLiveUserEmail from '../support/action/live-user/enterEmail';
 import submitAnyForm from '../support/action/submitAnyForm';
 import submitForm from '../support/action/submitForm';
 import clickLogout from '../support/action/clickLogout';
+import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -44,6 +45,11 @@ When(
 When(
   /^User submits the form$/,
   submitForm
+);
+
+When(
+  /^Mary clicks the logout button$/,
+  clickLogout
 );
 
 When(

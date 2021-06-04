@@ -24,7 +24,6 @@ import { Given } from '@cucumber/cucumber';
 import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
-import createUser from '../support/management-api/createUser';
 import createAndStoreUserInContext from '../support/action/live-user/createAndStoreUserInContext';
 
 

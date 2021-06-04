@@ -46,6 +46,21 @@ Then(
 );
 
 Then(
+  /^she is redirected back to the Root View$/,
+  () => checkURLPath(false, '/')
+);
+
+Then(
+  /^Mary sees login, registration buttons$/,
+  checkGuest
+);
+
+Then(
+  /^she sees that claims from \/userinfo are disappeared$/,
+  checkNoProfile
+);
+
+Then(
   /^she sees a page to input her code$/,
     selectEmailAuthenticator
 );
