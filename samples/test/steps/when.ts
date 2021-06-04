@@ -28,6 +28,7 @@ import clickLogout from '../support/action/clickLogout';
 import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
 import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
 import enterIncorrectCode from '../support/action/enterIncorrectCode';
+import inputInvalidEmail from '../support/action/inputInvalidEmail';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -93,7 +94,7 @@ When(
   /^she confirms that password$/,
   confirmValidPassword
 );
-  
+
 When(
   /^She has selected Email from the list of factors$/,
   selectEmailAuthenticator
@@ -104,6 +105,10 @@ When(
   enterIncorrectCode
 );
 
+When (
+  /^she inputs an Email that doesn't exist$/,
+  inputInvalidEmail
+);
 // When(
 //     /^I (click|doubleclick) on the (link|button|element) "([^"]*)?"$/,
 //     clickElement
