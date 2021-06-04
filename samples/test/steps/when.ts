@@ -26,6 +26,7 @@ import submitAnyForm from '../support/action/submitAnyForm';
 import submitForm from '../support/action/submitForm';
 import clickLogout from '../support/action/clickLogout';
 import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
+import inputInvalidEmail from '../support/action/inputInvalidEmail';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -87,6 +88,10 @@ When(
   confirmValidPassword
 );
 
+When (
+  /^she inputs an Email that doesn't exist$/,
+  inputInvalidEmail
+);
 // When(
 //     /^I (click|doubleclick) on the (link|button|element) "([^"]*)?"$/,
 //     clickElement
