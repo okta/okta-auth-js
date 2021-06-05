@@ -838,6 +838,7 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
   * [session.exists](#sessionexists)
   * [session.get](#sessionget)
   * [session.refresh](#sessionrefresh)
+* [idx](#idx)
 * [token](#token)
   * [token.getWithoutPrompt](#tokengetwithoutpromptoptions)
   * [token.getWithPopup](#tokengetwithpopupoptions)
@@ -2122,6 +2123,10 @@ authClient.session.refresh()
 });
 ```
 
+### `idx`
+
+See detail in [IDX README](docs/idx.md)
+
 ### `token`
 
 #### Authorize options
@@ -2662,6 +2667,7 @@ Since the Node library can be used only for the Authentication flow, it implemen
   * [MFA_REQUIRED](#mfa_required)
   * [MFA_CHALLENGE](#mfa_challenge)
   * [SUCCESS](#success)
+* [idx](#idx)
 
 The main difference is that the Node library does **not** have a `session.setCookieAndRedirect` function, so you will have to redirect by yourself (for example using `res.redirect('https://www.yoursuccesspage.com')`).
 
