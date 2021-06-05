@@ -1,3 +1,7 @@
+[Okta's Identity Engine]: https://developer.okta.com/docs/concepts/ie-intro/
+[Okta Sign-In Widget]: https://github.com/okta/okta-signin-widget
+[Embedded auth with SDKs]: https://github.com/okta/okta-auth-js/tree/master/samples/generated/express-direct-auth
+
 # IDX
 
 - [Introduction](#introduction)
@@ -18,9 +22,9 @@
 
 > :grey_exclamation: The use of this module requires usage of the Okta Identity Engine. This functionality is in general availability but is being gradually rolled out to customers. If you want to request to gain access to the Okta Identity Engine, please reach out to your account manager. If you do not have an account manager, please reach out to oie@okta.com for more information.
 
-This module is built to communicate with Okta as an OAuth 2.0 + OpenID Connect provider. It works with [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/) to authenticate and register users.
+This module is built to communicate with Okta as an OAuth 2.0 + OpenID Connect provider. It works with [Okta's Identity Engine][] to authenticate and register users.
 
-To see this library working in a sample, check out our [Embedded auth with SDKs](https://github.com/okta/okta-auth-js/tree/master/samples/generated/express-direct-auth) sample.
+To see this library working in a sample, check out our [Embedded auth with SDKs][] sample.
 
 ## Installation
 
@@ -28,7 +32,7 @@ See detail in [Using the npm module](../README.md#using-the-npm-module).
 
 ## Usage
 
-This module provides convenience methods to support popular scenarios to communicate with [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/).
+This module provides convenience methods to support popular scenarios to communicate with [Okta's Identity Engine][].
 
 ### Concepts
 
@@ -38,29 +42,29 @@ You can work with these methods with `Up-Front` and `On-Demand` approaches, norm
 
 ##### Up-Front approach
 
-You can provide a param bag based on your app's policy configuration and user inputs to drive the methods to communicate with [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/).
+You can provide parameters based on your app's policy configuration and user inputs to drive the methods to communicate with [Okta's Identity Engine][].
 
 ##### On-Demand approach
 
-You can provide minimum or even no param to call the methods, and the methods can drive you through the flow by indicating the `nextStep` and required `inputs`.
+You can provide minimum or even no parameters to call the methods, and the methods can provide direction for the flow by indicating the `nextStep` and required `inputs`.
 
 #### Response
 
-Most methods in this module resolve [IdxTransaction](https://github.com/okta/okta-auth-js/blob/master/lib/idx/types/index.ts) as the response. With [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/)'s dynamic nature, it's very important to understand how to follow the response to proceed to the next step.
+Most methods in this module resolve [IdxTransaction](https://github.com/okta/okta-auth-js/blob/master/lib/idx/types/index.ts) as the response. With [Okta's Identity Engine][]'s dynamic nature, it's very important to understand how to follow the response to proceed to the next step.
 
 ##### Flow related fields
 
 - `status`: This field indicates the status of the current flow.
-  - `IdxStatus.SUCCESS`: This status indicates the flow is end with successfully get tokens.
+  - `IdxStatus.SUCCESS`: This status indicates the flow has ended successfully with tokens.
   - `IdxStatus.PENDING`: This status indicates the flow is still in progress, check `nextStep` and `messages` (intermediate form errors) fields in the response to proceed.
-  - `IdxStatus.FAILURE`: This status indicates error happens in SDK level, check `error` field in the response for error handling.
-  - `IdxStatus.TERMINAL`: This status indicates the flow runs into a `terminal` state, check `messages` field to handle it.
-  - `IdxStatus.CANCELED`: This status indicates the flow is canceled. It's normally the response status of `idx.cancel`.
+  - `IdxStatus.FAILURE`: This status indicates error has happened in SDK level, check `error` field in the response for error handling.
+  - `IdxStatus.TERMINAL`: This status indicates the flow has run into a `terminal` state, check `messages` field to handle it.
+  - `IdxStatus.CANCELED`: This status indicates the flow has been canceled. It's normally the response status of `idx.cancel`.
 - `nextStep?`: This field contains information to proceed with the next step. It's avaiable when in `IdxStatus.PENDING` status.
   - `name`: The identifier of the next step.
   - `type?`: The type of the authenticator that the step belongs to.
   - `canSkip?`: This field indicates if the step is skippable or not.
-  - `inputs?`: params for the next step.
+  - `inputs?`: parameters for the next step.
 
     ```javascript
     // get "inputs" from the response
@@ -71,8 +75,8 @@ Most methods in this module resolve [IdxTransaction](https://github.com/okta/okt
     ```
 
   - `options?`: This field is available in response when the input is a selection. It can also provide information for how to build UI for the next step.
-- `tokens?`: It's available with `IdxStatus.SUCCESS` status. Provides tokens set based on [scopes](https://github.com/okta/okta-auth-js#scopes) configuration.
-- `messages?`: It passes back messages from [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/). `Form message` and `Terminal message` both come to this field.
+- `tokens?`: It's available with `IdxStatus.SUCCESS` status. Provides tokens set based on [scopes](../README.md#scopes) configuration.
+- `messages?`: It passes back messages from [Okta's Identity Engine][]. `Form message` and `Terminal message` both come to this field.
 - `error?`: It's avaialbe with `IdxStatus.FAILURE` status when the SDK run into unhandlable state.
 
 ##### Start Transaction related fields
@@ -279,7 +283,7 @@ Resolves [Start Transaction related fields](#start-transaction-related-fields).
 
 Popular use cases:
 
-- Provides `meta` for [Okta Sign-In Widget](https://github.com/okta/okta-signin-widget) integration.
+- Provides `meta` for [Okta Sign-In Widget][] integration.
 - Provides `enabledFeatures` and `availableSteps` for dynamic UI rendering.
 
 #### `idx.cancel`
@@ -292,7 +296,7 @@ await authClient.idx.cancel();
 
 #### `idx.handleInteractionCodeRedirect`
 
-Handles `interaction_code` from [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/)'s callback url. It exchanges the code for tokens and saves them in storage.
+Handles `interaction_code` from [Okta's Identity Engine][]'s callback url. It exchanges the code for tokens and saves them in storage.
 
 ```javascript
 try {
