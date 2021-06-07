@@ -35,6 +35,13 @@ Given(
 );
 
 Given(
+  /^an APP$/,
+  async function() {
+    return await setEnvironment('default');
+  }
+);
+
+Given(
   /^an APP Sign On Policy (.*)$/,
   setEnvironment
 );
