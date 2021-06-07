@@ -109,6 +109,7 @@ When (
   /^she inputs an Email that doesn't exist$/,
   inputInvalidEmail
 );
+
 // When(
 //     /^I (click|doubleclick) on the (link|button|element) "([^"]*)?"$/,
 //     clickElement
