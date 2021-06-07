@@ -15,7 +15,7 @@ export default async (firstName: string, assignToGroup = 'Basic Auth Web'): Prom
   let a18nProfile;
   let user;
   try {
-    a18nProfile = await a18nClient.createProfile();
+    a18nProfile = await a18nClient.createProfile(config.orgName);
     if (!a18nProfile.profileId) {
       throw new Error(`a18n profile was not created: ${JSON.stringify(a18nProfile)}`);
     }
