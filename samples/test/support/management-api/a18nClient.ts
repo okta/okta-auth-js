@@ -1,5 +1,6 @@
 
 import fetch from 'cross-fetch';
+import { getConfig } from '../../util/configUtils';
 import waitForOneSecond from '../wait/waitForOneSecond';
 
 const PROFILE_URL = 'https://api.a18n.help/v1/profile';
@@ -10,13 +11,16 @@ export declare interface A18nProfile {
   phoneNumber: string;
   emailAddress: string;
   url: string;
+  displayName?: string;
+  errorDescription?: string;
 }
 
 class A18nClient {
-  apiKey: string;
+  apiKey: string | undefined;
 
   constructor() {
-    this.apiKey = process.env.A18N_API_KEY || '';
+    const { a18nAPIKey } = getConfig();
+    this.apiKey = a18nAPIKey ;
     if (!this.apiKey) {
       throw new Error('A18N_API_KEY env variable is not defined');
     }

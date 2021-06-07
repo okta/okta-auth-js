@@ -16,8 +16,8 @@ export default async (firstName: string, assignToGroup = 'Basic Auth Web'): Prom
   let user;
   try {
     a18nProfile = await a18nClient.createProfile(config.orgName);
-    if (!a18nProfile.profileId) {
-      throw new Error(`a18n profile was not created: ${JSON.stringify(a18nProfile)}`);
+    if (a18nProfile.errorDescription) {
+      throw new Error(`a18n profile was not created: ${JSON.stringify(a18nProfile.errorDescription)}`);
     }
 
     const password = crypto.randomBytes(16).toString('hex');
