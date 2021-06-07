@@ -54,36 +54,60 @@ Most methods in this module resolve [IdxTransaction](https://github.com/okta/okt
 
 ##### Flow related fields
 
-- `status`: This field indicates the status of the current flow.
-  - `IdxStatus.SUCCESS`: This status indicates the flow has ended successfully with tokens.
-  - `IdxStatus.PENDING`: This status indicates the flow is still in progress, check `nextStep` and `messages` (intermediate form errors) fields in the response to proceed.
-  - `IdxStatus.FAILURE`: This status indicates error has happened in SDK level, check `error` field in the response for error handling.
-  - `IdxStatus.TERMINAL`: This status indicates the flow has run into a `terminal` state, check `messages` field to handle it.
-  - `IdxStatus.CANCELED`: This status indicates the flow has been canceled. It's normally the response status of `idx.cancel`.
-- `nextStep?`: This field contains information to proceed with the next step. It's avaiable when in `IdxStatus.PENDING` status.
-  - `name`: The identifier of the next step.
-  - `type?`: The type of the authenticator that the step belongs to.
-  - `canSkip?`: This field indicates if the step is skippable or not.
-  - `inputs?`: parameters for the next step.
+###### `status`
 
-    ```javascript
-    // get "inputs" from the response
-    // inputs: [{ name: 'username', label: 'Username' }]
-    const { nextStep: { inputs } } = await authClient.idx.authenticate();
-    // gather user inputs (this call should happen in a separated request)
-    const transaction = await authClient.idx.authenticate({ username: 'from user input' });
-    ```
+This field indicates the status of the current flow.
 
-  - `options?`: This field is available in response when the input is a selection. It can also provide information for how to build UI for the next step.
-- `tokens?`: It's available with `IdxStatus.SUCCESS` status. Provides tokens set based on [scopes](../README.md#scopes) configuration.
-- `messages?`: It passes back messages from [Okta's Identity Engine][]. `Form message` and `Terminal message` both come to this field.
-- `error?`: It's avaialbe with `IdxStatus.FAILURE` status when the SDK run into unhandlable state.
+- `IdxStatus.SUCCESS`: This status indicates the flow has ended successfully with tokens.
+- `IdxStatus.PENDING`: This status indicates the flow is still in progress, check `nextStep` and `messages` (intermediate form errors) fields in the response to proceed.
+- `IdxStatus.FAILURE`: This status indicates error has happened in SDK level, check `error` field in the response for error handling.
+- `IdxStatus.TERMINAL`: This status indicates the flow has run into a `terminal` state, check `messages` field to handle it.
+- `IdxStatus.CANCELED`: This status indicates the flow has been canceled. It's normally the response status of `idx.cancel`.
+
+###### `nextStep?`
+
+This field contains information to proceed with the next step. It's avaiable when in `IdxStatus.PENDING` status.
+
+- `name`: The identifier of the next step.
+- `type?`: The type of the authenticator that the step belongs to.
+- `canSkip?`: This field indicates if the step is skippable or not.
+- `inputs?`: parameters for the next step.
+
+  ```javascript
+  // get "inputs" from the response
+  // inputs: [{ name: 'username', label: 'Username' }]
+  const { nextStep: { inputs } } = await authClient.idx.authenticate();
+  // gather user inputs (this call should happen in a separated request)
+  const transaction = await authClient.idx.authenticate({ username: 'from user input' });
+  ```
+
+- `options?`: This field is available in response when the input is a selection. It can also provide information for how to build UI for the next step.
+
+###### `tokens?`
+
+It's available with `IdxStatus.SUCCESS` status. Provides tokens set based on [scopes](../README.md#scopes) configuration.
+
+###### `messages?`
+
+It passes back messages from [Okta's Identity Engine][]. `Form message` and `Terminal message` both come to this field.
+
+###### `error?`
+
+It's avaialbe with `IdxStatus.FAILURE` status when the SDK run into unhandlable state.
 
 ##### Start Transaction related fields
 
-- `meta?`: It provides transaction meta (pkce meta, interactionHandle, etc.).
-- `enabledFeatures?`: It indicates what features are available based on the app / org policy configuration.
-- `availableSteps?`: It provides information for avaiable next steps.
+###### `meta?`
+
+It provides transaction meta (pkce meta, interactionHandle, etc.).
+
+###### `enabledFeatures?`
+
+It indicates what features are available based on the app / org policy configuration.
+
+###### `availableSteps?`
+
+It provides information for avaiable next steps.
   
 ### API Reference
 
