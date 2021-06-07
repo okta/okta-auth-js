@@ -5,6 +5,7 @@
 ### Features
 
 - [#730](https://github.com/okta/okta-auth-js/pull/730) `updateAuthState` returns a Promise.
+- Adds `idx` module. See details in [IDX README.md](./docs/idx.md)
 
 ## 5.0.2
 
