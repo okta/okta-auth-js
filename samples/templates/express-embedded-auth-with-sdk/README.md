@@ -17,7 +17,7 @@ These Examples are:
 4. Sign In/Sign Up with Social Identity Providers
 5. Sign In with Multifactor Authentication using Email or Phone
 
-For information and guides on how to build your app with this sample, please take a look at the [ExpressJS guides for Embedded Authentication][]
+{{! For information and guides on how to build your app with this sample, please take a look at the [ExpressJS guides for Embedded Authentication][] }}
 
 ## Installation & Running The App
 
@@ -31,7 +31,7 @@ If running from the workspace directory, add the `--cwd` option: `yarn --cwd sam
 | --------------------- | ------------------------------ |
 | `yarn start`          | Starts the app server |
 
-To see some examples for use cases using this sample application, please take a look at the [ExpressJS guides for Embedded Authentication][]
+{{! To see some examples for use cases using this sample application, please take a look at the [ExpressJS guides for Embedded Authentication][] }}
 
 ## Implementation Details
 

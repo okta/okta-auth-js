@@ -10,7 +10,7 @@ to request to gain access to the Okta Identity Engine, please reach out to your 
 
 This Sample Application will show you the best practices for integrating Authentication by embedding the [Okta Sign In Widget][] into your application. The [Okta Sign In Widget][] is powered by [Okta's Identity Engine][] and will adjust your user experience based on policies. Once integrated, you will be able to utilize all the features of Okta's Sign In Widget in your application.
 
-For information and guides on how to build your app with this sample, please take a look at the [ExpressJS guides for Embedded Authentication][]
+{{! For information and guides on how to build your app with this sample, please take a look at the [ExpressJS guides for Embedded Authentication][] }}
 
 ## Installation & Running The App
 
@@ -24,7 +24,7 @@ If running from the workspace directory, add the `--cwd` option: `yarn --cwd sam
 | --------------------- | ------------------------------ |
 | `yarn start`          | Starts the app server |
 
-To see some examples for use cases using this sample application, please take a look at the [ExpressJS guides for Embedded Authentication][]
+{{! To see some examples for use cases using this sample application, please take a look at the [ExpressJS guides for Embedded Authentication][] }}
 
 ## Implementation Details
 

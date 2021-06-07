@@ -1,5 +1,5 @@
 {
-  "name": "express-embedded-widget",
+  "name": "express-embedded-auth-with-sdk",
   "private": true,
   "version": "1.0.0",
   "main": "index.js",
