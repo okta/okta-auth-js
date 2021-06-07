@@ -71,8 +71,8 @@ const samples = [
     specs: ['web-app']
   },
   {
-    name: 'express-direct-auth',
-    template: 'express-direct-auth',
+    name: 'express-embedded-auth-with-sdk',
+    template: 'express-embedded-auth-with-sdk',
     specs: [],
     features: [
       'basic-auth', 
@@ -82,8 +82,8 @@ const samples = [
     ]
   },
   {
-    name: 'express-embedded-widget',
-    template: 'express-embedded-widget',
+    name: 'express-embedded-sign-in-widget',
+    template: 'express-embedded-sign-in-widget',
     specs: [],
     features: []
   },
