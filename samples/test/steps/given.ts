@@ -26,6 +26,7 @@ import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
 import createContextUserAndCredentials from '../support/action/live-user/createContextUserAndCredentials';
 import createContextCredentials from '../support/action/live-user/createContextCredentials';
+import ActionContext from '../support/context';
 
 Given(
   /^a Profile Enrollment policy defined assigning new users to the Everyone Group (.*)$/,
@@ -55,8 +56,7 @@ Given(
 
 Given(
   /^([^/s]+) is a user with a verified email and a set password$/,
-  async function(firstName: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function(this: ActionContext, firstName: string) {
     await createContextUserAndCredentials.call(this, firstName);
   }
 );
@@ -73,9 +73,20 @@ Given(
 
 Given(
   /^a User named "([^/s]+)" created in the admin interface with a Password only$/,
-  async function(firstName: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await createContextUserAndCredentials.call(this, firstName, 'MFA Required');
+  async function(this: ActionContext, firstName: string) {
+    await createContextUserAndCredentials.call(this, firstName, ['MFA Required']);
+  }
+);
+
+Given(
+  /^an Authenticator Enrollment Policy that has PHONE as optional and EMAIL as required for the Everyone Group$/,
+  () => ({}) // no-op
+);
+
+Given(
+  /^a User named "([^/s]+)" created that HAS NOT yet enrolled in the SMS factor$/,
+  async function(this: ActionContext, firstName: string) {
+    await createContextUserAndCredentials.call(this, firstName, ['Phone Enrollment Required', 'MFA Required']);
   }
 );
 

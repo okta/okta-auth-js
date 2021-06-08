@@ -1,9 +1,11 @@
 import setInputField from './setInputField';
 import LoginForm from '../selectors/LoginForm';
 import { getConfig } from '../../util/configUtils';
+import ActionContext from '../context';
 
 /* eslint complexity:[0,8] */
 export default async function (
+  this: ActionContext,
   credName: string
 ) {
   const config = getConfig();

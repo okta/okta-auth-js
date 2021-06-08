@@ -56,6 +56,7 @@ export default async (pageName?: string) => {
       pageTitle = 'Enroll email authenticator';
       break;
     }
+
     default: {
         throw new Error(`Unknown form "${pageTitle}"`);
     }

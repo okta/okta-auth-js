@@ -1,7 +1,8 @@
 import Registration from '../../selectors/Registration';
 import setInputField from '../setInputField';
+import ActionContext from '../../context';
 
-export default async function (fieldName: string) {
+export default async function (this: ActionContext, fieldName: string) {
   let value, selector;
   switch (fieldName) {
     case 'First Name':
