@@ -11,4 +11,4 @@ export default async function (
         username: this.credentials?.emailAddress,
         password: this.credentials?.password
     });
-};
+}
