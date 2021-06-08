@@ -36,6 +36,7 @@ import enterCorrectSMSCode from '../support/action/live-user/enterCorrectSMSCode
 import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/live-user/enterCorrectPhoneNumber';
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
+import skipForm from '../support/action/skipForm';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -195,6 +196,11 @@ When(
 When(
   /^She inputs the incorrect code from the SMS$/,
   enterIncorrectCode
+);
+
+When(
+  /^she selects "Skip" (.*)$/,
+  skipForm
 );
 
 // When(
