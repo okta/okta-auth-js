@@ -18,13 +18,13 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="{{action}}" method="POST">
+        <form id="registration-form" class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
                 First Name
               </div>
-              <input type="text" name="firstName" />
+              <input id="firstName" type="text" name="firstName" />
             </div>
           </div>
           <div class="field">
@@ -32,7 +32,7 @@
               <div class="ui label">
                 Last Name
               </div>
-              <input type="text" name="lastName" />
+              <input id="lastName" type="text" name="lastName" />
             </div>
           </div>
           <div class="field">
@@ -40,10 +40,10 @@
               <div class="ui label">
                 Email
               </div>
-              <input type="text" name="email" />
+              <input id="email" type="text" name="email" />
             </div>
           </div>
-          <button class="ui fluid large primary submit button" type="submit">
+          <button id="submit-button" class="ui fluid large primary submit button" type="submit">
             REGISTER
           </button>
         </form>
