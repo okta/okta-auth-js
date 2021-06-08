@@ -24,6 +24,11 @@ Then(
 );
 
 Then(
+  /^an application session is created$/,
+  checkProfile
+);
+
+Then(
   /^she should see (?:a message on the Login form|the message) "(?<message>.+?)"$/,
   checkFormMessage
   );
@@ -107,6 +112,11 @@ Then(
 Then(
   /^she sees the set new password form$/,
   checkIsOnPage.bind(null, 'Set up Password')
+);
+
+Then(
+  /^the screen changes to receive an input for a code$/,
+  checkIsOnPage.bind(null, 'Enroll Factor: Enter SMS Code')
 );
 
 Then(

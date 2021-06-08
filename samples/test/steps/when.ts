@@ -31,6 +31,9 @@ import enterIncorrectCode from '../support/action/enterIncorrectCode';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
 import enterRegistrationField from '../support/action/live-user/enterRegistrationField';
 import selectPasswordAuthenticator from '../support/action/selectPasswordAuthenticator';
+import selectPhoneAuthenticator from '../support/action/selectPhoneAuthenticator';
+import enterCorrectSMSCode from '../support/action/live-user/enterCorrectSMSCode';
+import enterCorrectPhoneNumber from '../support/action/live-user/enterCorrectPhoneNumber';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -98,6 +101,26 @@ When(
 );
 
 When(
+  /^She inputs a valid phone number$/,
+  enterCorrectPhoneNumber
+);
+
+When(
+  /^She selects "Receive a Code"$/,
+  submitAnyForm
+);
+
+When(
+  /^She selects "Verify"$/,
+  submitAnyForm
+);
+
+When(
+  /^She inputs the correct code from her SMS$/,
+  enterCorrectSMSCode
+);
+
+When(
   /^she submits the form$/,
   submitAnyForm
 );
@@ -123,13 +146,13 @@ When(
 );
 
 When(
-  /^she chooses password factor option$/,
-  selectPasswordAuthenticator
+  /^She selects Phone from the list$/,
+  selectPhoneAuthenticator
 );
 
 When(
-  /^She selects Phone from the list$/,
-  selectEmailAuthenticator
+  /^she chooses password factor option$/,
+  selectPasswordAuthenticator
 );
 
 When(

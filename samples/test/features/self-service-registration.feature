@@ -26,11 +26,11 @@ Background:
   When she inputs the correct code from her email
     And she submits the form
   Then she sees a list of factors to register
-  # When She selects Phone from the list
-  #And She inputs a valid phone number
-  #And She selects "Receive a Code"
-  #Then the screen changes to receive an input for a code
-  #When She inputs the correct code from her SMS
-  #And She selects "Verify"
-  #Then she is redirected to the Root View
-    #And an application session is created
+  When She selects Phone from the list
+  And She inputs a valid phone number
+  And She selects "Receive a Code"
+  Then the screen changes to receive an input for a code
+  When She inputs the correct code from her SMS
+  And She selects "Verify"
+  Then she is redirected to the Root View
+   And an application session is created

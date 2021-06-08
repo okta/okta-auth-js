@@ -9,7 +9,7 @@
 
     <div class="okta-sign-in-form ui center aligned relaxed grid">
       <div class="row">
-        <div class="ui header">
+        <div id="page-title-header" class="ui header">
           <h2>Enroll phone authenticator</h2>
         </div>
       </div>
@@ -19,10 +19,10 @@
       </div>
 
       <div class="row">
-        <form class="ui large form" action="{{action}}" method="POST">
+        <form id="enroll-phone-authenticator-form" class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="default text">Please choose the method for this factor</div>
-            <select class="ui selection dropdown" name="methodType">
+            <select id="phone-authenticator-method-options" class="ui selection dropdown" name="methodType">
               {{#options}}
                 <option value="{{value}}">{{label}}</option>
               {{/options}}
@@ -33,10 +33,10 @@
               <div class="ui label">
                 Phone number
               </div>
-              <input type="text" name="phoneNumber" />
+              <input id="phoneNumber" type="text" name="phoneNumber" />
             </div>
           </div>
-          <button class="ui fluid large primary submit button" type="submit">
+          <button id="submit-button" class="ui fluid large primary submit button" type="submit">
             Next
           </button>
         </form>

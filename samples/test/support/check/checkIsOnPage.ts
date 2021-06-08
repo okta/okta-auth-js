@@ -28,12 +28,18 @@ export default async (pageName?: string) => {
       pageTitle = 'Challenge email authenticator';
       break;
     }
+    case 'Enroll Factor: Enter SMS Code': {
+      selector = ChallengeAuthenticator.pageTitle;
+      pageTitle = 'Enroll phone authenticator';
+      break;
+    }
     case 'Reset Password': {
       selector = PasswordReset.pageTitle;
       pageTitle = 'Reset password';
       break;
     }
-    case 'Root Page': {
+    case 'Root Page':
+    case 'Root View': {
       selector = '#claim-email_verified';
       pageTitle = 'true';
       break;

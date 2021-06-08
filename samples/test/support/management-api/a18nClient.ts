@@ -5,6 +5,7 @@ import waitForOneSecond from '../wait/waitForOneSecond';
 
 const PROFILE_URL = 'https://api.a18n.help/v1/profile';
 const LATEST_EMAIL_URL = `https://api.a18n.help/v1/profile/:profileId/email/latest`;
+const LATEST_SMS_URL = `https://api.a18n.help/v1/profile/:profileId/sms/latest`;
 
 export declare interface A18nProfile {
   profileId: string;
@@ -39,6 +40,22 @@ class A18nClient {
       response?.content?.match(/enter this code: <b>(?<code>\d+)<\/b>/);
     if (!match) {
       throw new Error('Unable to retrieve code from email.');
+    }
+    return match?.groups?.code;
+  }
+
+  async getSMSCode(profileId: string) {
+    let retryAttemptsRemaining = 5;
+    let response;
+    while (!response?.content && retryAttemptsRemaining > 0) {
+      await waitForOneSecond();
+      response = await this.getOnURL(LATEST_SMS_URL.replace(':profileId', profileId)) as Record<string, string>;
+      --retryAttemptsRemaining;
+    }
+
+    const match = response?.content?.match(/Your verification code is (?<code>\d+)/);
+    if (!match) {
+      throw new Error('Unable to retrieve code from SMS.');
     }
     return match?.groups?.code;
   }
