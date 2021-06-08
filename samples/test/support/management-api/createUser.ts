@@ -1,5 +1,3 @@
-import crypto = require('crypto');
-
 import { Client, Group, User } from '@okta/okta-sdk-nodejs';
 import { getConfig } from '../../util';
 import deleteUser from './deleteUser';
@@ -14,8 +12,6 @@ export default async (credentials: UserCredentials, assignToGroup = 'Basic Auth 
 
   let user;
   try {
-    const password = crypto.randomBytes(16).toString('hex');
-
     user = await oktaClient.createUser({
       profile: {
         firstName: credentials.firstName,
@@ -24,7 +20,7 @@ export default async (credentials: UserCredentials, assignToGroup = 'Basic Auth 
         login: credentials.emailAddress
       },
       credentials: {
-        password : { value: password }
+        password : { value: credentials.password }
       }
     }, {
       activate: true

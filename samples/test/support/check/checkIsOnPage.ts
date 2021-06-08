@@ -38,6 +38,16 @@ export default async (pageName?: string) => {
       pageTitle = 'true';
       break;
     }
+    case 'Set up Password': {
+      selector = PasswordReset.pageTitle;
+      pageTitle = 'Set up password';
+      break;
+    }
+    case 'Enroll email authenticator': {
+      selector = ChallengeAuthenticator.pageTitle;
+      pageTitle = 'Enroll email authenticator';
+      break;
+    }
     default: {
         throw new Error(`Unknown form "${pageTitle}"`);
     }

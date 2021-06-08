@@ -29,6 +29,8 @@ import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverFo
 import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
 import enterIncorrectCode from '../support/action/enterIncorrectCode';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
+import enterRegistrationField from '../support/action/live-user/enterRegistrationField';
+import selectPasswordAuthenticator from '../support/action/selectPasswordAuthenticator';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -43,6 +45,16 @@ When(
 When(
   /^she inputs her correct Email$/,
   enterLiveUserEmail
+);
+
+When(
+  /^she fills out her (First Name|Last Name|Email)$/,
+  enterRegistrationField
+);
+
+When(
+  /^she submits the registration form$/,
+  submitAnyForm
 );
 
 When(
@@ -81,6 +93,11 @@ When(
 );
 
 When(
+  /^she inputs the correct code from her email$/,
+  enterCorrectCode
+);
+
+When(
   /^she submits the form$/,
   submitAnyForm
 );
@@ -97,6 +114,21 @@ When(
   
 When(
   /^She has selected Email from the list of factors$/,
+  selectEmailAuthenticator
+);
+
+When(
+  /^she selects Email$/,
+  selectEmailAuthenticator
+);
+
+When(
+  /^she chooses password factor option$/,
+  selectPasswordAuthenticator
+);
+
+When(
+  /^She selects Phone from the list$/,
   selectEmailAuthenticator
 );
 

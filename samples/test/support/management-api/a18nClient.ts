@@ -35,7 +35,8 @@ class A18nClient {
       --retryAttemptsRemaining;
     }
 
-    const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/);
+    const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/) ||
+      response?.content?.match(/enter this code: <b>(?<code>\d+)<\/b>/);
     if (!match) {
       throw new Error('Unable to retrieve code from email.');
     }

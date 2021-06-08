@@ -9,6 +9,9 @@ import checkButton from '../support/check/checkButton';
 import checkURLPath from '../support/check/checkURLPath';
 import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
 import checkIsOnPage from '../support/check/checkIsOnPage';
+import enterValidPassword from '../support/action/live-user/enterValidPassword';
+import confirmValidPassword from '../support/action/live-user/confirmValidPassword';
+import submitAnyForm from '../support/action/submitAnyForm';
 
 Then(
   /^User can verify their profile data$/,
@@ -66,18 +69,59 @@ Then(
 );
 
 Then(
+  /^she sees a list of available factors to setup$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
+  /^she sees a list of factors to register$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
+  /^she sees the Select Authenticator page with password as the only option$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
   /^the sample shows an error message "(?<message>.+?)" on the Sample App$/,
   checkFormMessage
 );
 
+// TODO: add explicit spec step instead for password reset scenario
 Then(
   /^she sees a page to input her code$/,
     selectEmailAuthenticator
 );
 
 Then(
+  /^she sees a page to input a code for email authenticator enrollment$/,
+  checkIsOnPage.bind(null, 'Enroll email authenticator')
+);
+
+Then(
   /^she sees a page to set her password$/,
   checkIsOnPage.bind(null, 'Reset Password')
+);
+
+Then(
+  /^she sees the set new password form$/,
+  checkIsOnPage.bind(null, 'Set up Password')
+);
+
+Then(
+  /^she fills out her Password$/,
+  enterValidPassword
+);
+
+Then(
+  /^she confirms her Password$/,
+  confirmValidPassword
+);
+
+Then(
+  /^she submits the set new password form$/,
+  submitAnyForm
 );
 
 
