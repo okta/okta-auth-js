@@ -11,6 +11,7 @@ const config = require('./config');
 const SRC_DIR = 'templates';
 const BUILD_DIR = 'generated';
 const PARTIALS_DIR = `${SRC_DIR}/partials`;
+const OKTA_ENV_DIR = '../env/index.js';
 
 function cleanTask() {
   return src(`${BUILD_DIR}`, { read: false, allowEmpty: true })
@@ -58,7 +59,9 @@ function generateSampleTaskFactory(options) {
       .pipe(dest(outDir));
     const copyViewTemplates = src(viewTemplatesDir, { dot: true })
       .pipe(dest(outDir));
-    return merge(generateWithoutViewTemplates, copyViewTemplates);
+    const copyEnvModule = src(OKTA_ENV_DIR, { dot: true })
+      .pipe(dest(`${outDir}/okta-env`));
+    return merge(generateWithoutViewTemplates, copyViewTemplates, copyEnvModule);
    };
 }
 

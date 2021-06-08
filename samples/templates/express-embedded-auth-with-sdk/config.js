@@ -1,4 +1,5 @@
-require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
+const env = require('./env')();
+env.setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 
 module.exports = function () {
   const { 
