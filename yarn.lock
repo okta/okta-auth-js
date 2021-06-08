@@ -2206,7 +2206,7 @@
   dependencies:
     tslib "^2.0.0"
 
-"@peculiar/webcrypto@^1.1.4", "@peculiar/webcrypto@^1.1.6":
+"@peculiar/webcrypto@1.1.6", "@peculiar/webcrypto@^1.1.4":
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/@peculiar/webcrypto/-/webcrypto-1.1.6.tgz#484bb58be07149e19e873861b585b0d5e4f83b7b"
   integrity sha512-xcTjouis4Y117mcsJslWAGypwhxtXslkVdRp7e3tHwtuw0/xCp1te8RuMMv/ia5TsvxomcyX/T+qTbRZGLLvyA==
