@@ -34,6 +34,13 @@ export default async (
       break;
     }
 
+    case 'the Self Service Registration View': {
+      url = '/register';
+      selector = 'a[href="/register"]';
+      isNotDisplayed = true;
+      break;
+    }
+
     default: {
         throw new Error(`Unknown form "${formName}"`);
     }

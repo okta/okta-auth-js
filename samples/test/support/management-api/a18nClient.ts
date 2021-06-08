@@ -43,9 +43,15 @@ class A18nClient {
   }
 
   async createProfile(profileName?: string): Promise<A18nProfile|never> {
+    const { orgName } = getConfig();
     const profile = await this.postToURL(PROFILE_URL, {
-      displayName: profileName
+      displayName: profileName || orgName
     }, true) as unknown as A18nProfile;
+
+    if (profile.errorDescription) {
+      throw new Error(`a18n profile was not created: ${JSON.stringify(profile.errorDescription)}`);
+    }
+
     return profile;
   }
 
@@ -58,7 +64,7 @@ class A18nClient {
       const response =  await fetch(url, {
         method: 'DELETE',
         headers: {
-          'x-api-key': this.apiKey
+          'x-api-key': this.apiKey as string
         },
         
       });
@@ -76,7 +82,7 @@ class A18nClient {
       const response =  await fetch(url, {
         method: 'POST',
         headers: includeApiToken ? {
-          'x-api-key': this.apiKey
+          'x-api-key': this.apiKey as string
         } : {},
         body: JSON.stringify(body) || '',
       });
@@ -92,7 +98,7 @@ class A18nClient {
       const response =  await fetch(url, {
         method: 'GET',
         headers: includeApiToken ? {
-          'x-api-key': this.apiKey
+          'x-api-key': this.apiKey as string
         } : {},
       });
       return await response.json();
