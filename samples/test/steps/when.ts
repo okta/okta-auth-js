@@ -34,6 +34,7 @@ import selectPasswordAuthenticator from '../support/action/selectPasswordAuthent
 import selectPhoneAuthenticator from '../support/action/selectPhoneAuthenticator';
 import enterCorrectSMSCode from '../support/action/live-user/enterCorrectSMSCode';
 import enterCorrectPhoneNumber from '../support/action/live-user/enterCorrectPhoneNumber';
+import skipForm from '../support/action/skipForm';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -163,6 +164,11 @@ When(
 When (
   /^she inputs an Email that doesn't exist$/,
   inputInvalidEmail
+);
+
+When(
+  /^she selects "Skip" (.*)$/,
+  skipForm
 );
 // When(
 //     /^I (click|doubleclick) on the (link|button|element) "([^"]*)?"$/,
