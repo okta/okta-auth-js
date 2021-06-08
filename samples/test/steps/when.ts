@@ -35,6 +35,7 @@ import selectPhoneAuthenticator from '../support/action/selectPhoneAuthenticator
 import enterCorrectSMSCode from '../support/action/live-user/enterCorrectSMSCode';
 import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/live-user/enterCorrectPhoneNumber';
+import selectVerifyBySms from '../support/action/selectVerifyBySms';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -184,6 +185,16 @@ When(
 When(
   /^She inputs the correct code from the SMS$/,
   enterCorrectSMSCode
+);
+
+When(
+  /^She selects SMS from the list of methods$/,
+  selectVerifyBySms
+);
+
+When(
+  /^She inputs the incorrect code from the SMS$/,
+  enterIncorrectCode
 );
 
 // When(

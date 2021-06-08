@@ -26,6 +26,7 @@ import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
 import createContextUserAndCredentials from '../support/action/live-user/createContextUserAndCredentials';
 import createContextCredentials from '../support/action/live-user/createContextCredentials';
+import activateContextUserSms from '../support/action/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
 
 Given(
@@ -89,6 +90,12 @@ Given(
     await createContextUserAndCredentials.call(this, firstName, ['Phone Enrollment Required', 'MFA Required']);
   }
 );
+
+Given(
+  /^Mary has enrolled in the SMS factor$/,
+  activateContextUserSms
+);
+
 
 // Given(
 //     /^I open the (url|site) "([^"]*)?"$/,
