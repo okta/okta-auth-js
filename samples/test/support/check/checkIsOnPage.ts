@@ -8,8 +8,10 @@ import PasswordReset from '../selectors/PasswordReset';
  * Check if browser has navigated to expected page
  * @param  {String}   pageName       Expected page title
  */
-export default async (pageName?: string) => {
 
+/* eslint-disable complexity */
+/* eslint-disable max-statements */
+export default async (pageName?: string) => {
   let selector;
   let pageTitle;
   switch (pageName) {
