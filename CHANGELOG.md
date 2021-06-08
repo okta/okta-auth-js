@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.3
+
+- [#807](https://github.com/okta/okta-auth-js/pull/807) Fixes CommonJS bundle missing crypto modules issue
+
 ## 5.0.2
 
 ### Bug Fixes
