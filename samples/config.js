@@ -78,7 +78,8 @@ const samples = [
       'basic-auth', 
       'root-page', 
       'self-service-password-recovery', 
-      'mfa-password-and-email'
+      'self-service-registration',
+      'mfa-password-and-email',
     ]
   },
   {
