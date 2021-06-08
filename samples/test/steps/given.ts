@@ -24,8 +24,14 @@ import { Given } from '@cucumber/cucumber';
 import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
-import createAndStoreUserInContext from '../support/action/live-user/createAndStoreUserInContext';
+import createContextUserAndCredentials from '../support/action/live-user/createContextUserAndCredentials';
+import createContextCredentials from '../support/action/live-user/createContextCredentials';
 
+Given(
+  /^a Profile Enrollment policy defined assigning new users to the Everyone Group (.*)$/,
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  (  _: any) => ({}) // no-op - self-enrollment is preconfigured for the org
+);
 
 Given(
   /^an APP Sign On Policy (.*)$/,
@@ -44,15 +50,14 @@ Given(
 
 Given(
   /^a user named "([^/w]+)"$/,
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  (  _: any) => ({}) // no-op
+  createContextCredentials
 );
 
 Given(
   /^([^/s]+) is a user with a verified email and a set password$/,
   async function(firstName: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await createAndStoreUserInContext.call(this, firstName);
+    await createContextUserAndCredentials.call(this, firstName);
   }
 );
 
@@ -70,7 +75,7 @@ Given(
   /^a User named "([^/s]+)" created in the admin interface with a Password only$/,
   async function(firstName: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await createAndStoreUserInContext.call(this, firstName, 'MFA Required');
+    await createContextUserAndCredentials.call(this, firstName, 'MFA Required');
   }
 );
 

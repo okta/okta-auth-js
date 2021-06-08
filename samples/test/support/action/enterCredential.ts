@@ -9,7 +9,7 @@ export default async function (
   const config = getConfig();
   let selector = null;
   let value;
-  const isLiveProfile = !!this.user;
+  const isLiveProfile = !!this.credentials;
   switch (credName) {
     case 'incorrect username': {
       selector = LoginForm.username;
@@ -24,13 +24,13 @@ export default async function (
     case 'username':
     case 'correct username': {
       selector = LoginForm.username;
-      value = isLiveProfile && this.user.profile.email || config.username;
+      value = isLiveProfile && this.credentials.emailAddress || config.username;
       break;
     }
     case 'password':
     case 'correct password': {
       selector = LoginForm.password;
-      value = isLiveProfile && this.user.credentials.password.value || config.password;
+      value = isLiveProfile && this.credentials.password || config.password;
       break;
     }
     default: {

@@ -1,5 +1,5 @@
 import { After } from '@cucumber/cucumber';
-import deleteContextUser from '../support/action/live-user/deleteContextUser';
+import deleteUserAndCredentials from '../support/action/live-user/deleteUserAndCredentials';
 
-After(deleteContextUser);
+After(deleteUserAndCredentials);
 After(() => browser.deleteCookies());

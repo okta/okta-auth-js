@@ -8,8 +8,10 @@ import PasswordReset from '../selectors/PasswordReset';
  * Check if browser has navigated to expected page
  * @param  {String}   pageName       Expected page title
  */
-export default async (pageName?: string) => {
 
+/* eslint-disable complexity */
+/* eslint-disable max-statements */
+export default async (pageName?: string) => {
   let selector;
   let pageTitle;
   switch (pageName) {
@@ -28,14 +30,30 @@ export default async (pageName?: string) => {
       pageTitle = 'Challenge email authenticator';
       break;
     }
+    case 'Enroll Factor: Enter SMS Code': {
+      selector = ChallengeAuthenticator.pageTitle;
+      pageTitle = 'Enroll phone authenticator';
+      break;
+    }
     case 'Reset Password': {
       selector = PasswordReset.pageTitle;
       pageTitle = 'Reset password';
       break;
     }
-    case 'Root Page': {
+    case 'Root Page':
+    case 'Root View': {
       selector = '#claim-email_verified';
       pageTitle = 'true';
+      break;
+    }
+    case 'Set up Password': {
+      selector = PasswordReset.pageTitle;
+      pageTitle = 'Set up password';
+      break;
+    }
+    case 'Enroll email authenticator': {
+      selector = ChallengeAuthenticator.pageTitle;
+      pageTitle = 'Enroll email authenticator';
       break;
     }
     default: {
