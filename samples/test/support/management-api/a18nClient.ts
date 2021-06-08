@@ -63,7 +63,7 @@ class A18nClient {
   async createProfile(profileName?: string): Promise<A18nProfile|never> {
     const { orgName } = getConfig();
     const profile = await this.postToURL(PROFILE_URL, {
-      displayName: profileName || `${orgName}-local`
+      displayName: profileName || `${orgName}`
     }, true) as unknown as A18nProfile;
 
     if (profile.errorDescription) {

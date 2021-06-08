@@ -25,7 +25,6 @@ export default async (credentials: UserCredentials, assignToGroup = 'Basic Auth 
     }, {
       activate: true
     });
-    user.credentials.password.value = password;
 
     // TODO: create test group and attach password recovery policy during test run when API supports it
     const {value: testGroup} = await oktaClient.listGroups({
