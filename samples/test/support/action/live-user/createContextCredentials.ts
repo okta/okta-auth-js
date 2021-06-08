@@ -1,5 +1,5 @@
-import a18nClient from '../../management-api/a18nClient';
+import createCredentials from '../../management-api/createCredentials';
 
-export default async function (): Promise<void> {
-   this.a18nProfile = await a18nClient.createProfile();
+export default async function (firstName: string): Promise<void> {
+  this.credentials = await createCredentials(firstName, this.featureName);
 }

@@ -1,10 +1,10 @@
-import a18nClient from '../../management-api/a18nClient';
+import createCredentials from '../../management-api/createCredentials';
 import createUser from '../../management-api/createUser';
 
 export default async function (firstName: string, assignToGroup?: string): Promise<void> {
-  const a18nProfile = this.a18nProfile || await a18nClient.createProfile();
-  this.a18nProfile = a18nProfile;
+  const credentials = this.credentials || await createCredentials(firstName, this.featureName);
+  this.credentials = credentials;
 
-  const user = await createUser(firstName, a18nProfile, assignToGroup);
+  const user = await createUser(credentials, assignToGroup);
   this.user = user;
 }

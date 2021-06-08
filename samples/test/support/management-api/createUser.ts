@@ -2,10 +2,10 @@ import crypto = require('crypto');
 
 import { Client, Group, User } from '@okta/okta-sdk-nodejs';
 import { getConfig } from '../../util';
-import {A18nProfile} from './a18nClient';
 import deleteUser from './deleteUser';
+import { UserCredentials } from './createCredentials';
 
-export default async (firstName: string, credentials: A18nProfile, assignToGroup = 'Basic Auth Web'): Promise<User> => {
+export default async (credentials: UserCredentials, assignToGroup = 'Basic Auth Web'): Promise<User> => {
   const config = getConfig();
   const oktaClient = new Client({
     orgUrl: config.orgUrl,
@@ -18,8 +18,8 @@ export default async (firstName: string, credentials: A18nProfile, assignToGroup
 
     user = await oktaClient.createUser({
       profile: {
-        firstName: firstName,
-        lastName: `Mc${firstName}face`,
+        firstName: credentials.firstName,
+        lastName: credentials.lastName,
         email: credentials.emailAddress,
         login: credentials.emailAddress
       },

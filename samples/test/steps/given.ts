@@ -25,7 +25,13 @@ import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
 import createContextUserAndCredentials from '../support/action/live-user/createContextUserAndCredentials';
+import createContextCredentials from '../support/action/live-user/createContextCredentials';
 
+Given(
+  /^a Profile Enrollment policy defined assigning new users to the Everyone Group (.*)$/,
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  (  _: any) => ({}) // no-op - self-enrollment is preconfigured for the org
+);
 
 Given(
   /^an APP Sign On Policy (.*)$/,
@@ -44,8 +50,7 @@ Given(
 
 Given(
   /^a user named "([^/w]+)"$/,
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  (  _: any) => ({}) // no-op
+  createContextCredentials
 );
 
 Given(
