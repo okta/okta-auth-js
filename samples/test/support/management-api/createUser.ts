@@ -29,7 +29,7 @@ export default async (credentials: UserCredentials, assignToGroups = ['Basic Aut
     await oktaClient.assignUserToApplication(config.clientId as string, {
       id: user.id
     });
-
+    
     for (const groupName of assignToGroups) {
       // TODO: create test group and attach password recovery policy during test run when API supports it
       const {value: testGroup} = await oktaClient.listGroups({
