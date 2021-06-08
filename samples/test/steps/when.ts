@@ -33,10 +33,16 @@ import enterRegistrationField from '../support/action/live-user/enterRegistratio
 import selectPasswordAuthenticator from '../support/action/selectPasswordAuthenticator';
 import selectPhoneAuthenticator from '../support/action/selectPhoneAuthenticator';
 import enterCorrectSMSCode from '../support/action/live-user/enterCorrectSMSCode';
+import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/live-user/enterCorrectPhoneNumber';
 
 When(
   /^User enters (username|password) into the form$/,
+  enterCredential
+);
+
+When(
+  /^she has inserted her (username|password)$/,
   enterCredential
 );
 
@@ -58,6 +64,11 @@ When(
 When(
   /^she submits the registration form$/,
   submitAnyForm
+);
+
+When(
+  /^her (password) is correct$/,
+  enterCredential
 );
 
 When(
@@ -164,6 +175,17 @@ When (
   /^she inputs an Email that doesn't exist$/,
   inputInvalidEmail
 );
+
+When(
+  /^She selects SMS from the list$/,
+  selectSmsAuthenticator
+);
+
+When(
+  /^She inputs the correct code from the SMS$/,
+  enterCorrectSMSCode
+);
+
 // When(
 //     /^I (click|doubleclick) on the (link|button|element) "([^"]*)?"$/,
 //     clickElement

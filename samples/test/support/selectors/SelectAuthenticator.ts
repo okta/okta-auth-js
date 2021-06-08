@@ -4,4 +4,4 @@ class SelectAuthenticator {
   get submit() { return '#select-authenticator-form #submit-button';}
 }
 
-export default new SelectAuthenticator();
+export default new SelectAuthenticator(); 

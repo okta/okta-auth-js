@@ -96,7 +96,7 @@ Then(
 // TODO: add explicit spec step instead for password reset scenario
 Then(
   /^she sees a page to input her code$/,
-    selectEmailAuthenticator
+  selectEmailAuthenticator
 );
 
 Then(
@@ -112,6 +112,11 @@ Then(
 Then(
   /^she sees the set new password form$/,
   checkIsOnPage.bind(null, 'Set up Password')
+);
+
+Then(
+  /^she is presented with a list of factors$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
 );
 
 Then(

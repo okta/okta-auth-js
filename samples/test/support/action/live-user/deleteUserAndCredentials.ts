@@ -2,8 +2,9 @@
 import a18nClient from '../../management-api/a18nClient';
 import deleteSelfEnrolledUser from '../../management-api/deleteSelfEnrolledUser';
 import deleteUser from '../../management-api/deleteUser';
+import ActionContext from '../../context';
 
-export default async function(): Promise<void> {
+export default async function(this: ActionContext): Promise<void> {
   if (this.credentials) {
     if (!this.user) {
       await deleteSelfEnrolledUser(this.credentials.emailAddress);

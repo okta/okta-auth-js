@@ -38,10 +38,11 @@ class A18nClient {
 
     const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/) ||
       response?.content?.match(/enter this code: <b>(?<code>\d+)<\/b>/);
-    if (!match) {
+    const code = match?.groups?.code;
+    if (!code) {
       throw new Error('Unable to retrieve code from email.');
     }
-    return match?.groups?.code;
+    return code;
   }
 
   async getSMSCode(profileId: string) {
@@ -54,10 +55,11 @@ class A18nClient {
     }
 
     const match = response?.content?.match(/Your verification code is (?<code>\d+)/);
-    if (!match) {
+    const code = match?.groups?.code;
+    if (!code) {
       throw new Error('Unable to retrieve code from SMS.');
     }
-    return match?.groups?.code;
+    return code;
   }
 
   async createProfile(profileName?: string): Promise<A18nProfile|never> {
