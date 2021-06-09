@@ -13,6 +13,10 @@ import enterValidPassword from '../support/action/live-user/enterValidPassword';
 import confirmValidPassword from '../support/action/live-user/confirmValidPassword';
 import submitAnyForm from '../support/action/submitAnyForm';
 import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
+import checkProfileEmail from '../support/check/checkProfileEmail';
+import { UserHome } from '../support/selectors';
+import isDisplayed from '../support/check/isDisplayed';
+import checkProfileName from '../support/check/checkProfileName';
 
 Then(
   /^User can verify their profile data$/,
@@ -163,7 +167,7 @@ Then(
 Then(
   /^she sees a table with her profile info$/,
   async function() {
-    await isDisplayed(UserHome.profileTable);
+    await isDisplayed(UserHome.profileTable, false);
   }
 );
 
