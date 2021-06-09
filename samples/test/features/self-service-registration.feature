@@ -59,3 +59,12 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And She selects "Verify"
   Then she is redirected to the Root View
    And an application session is created
+
+Scenario: Mary signs up with an invalid Email
+  Given Mary navigates to the Self Service Registration View
+  When she fills out her First Name
+  And she fills out her Last Name
+  And she fills out her Email with an invalid email format
+  And she submits the registration form
+  Then she sees an error message "'Email' must be in the form of an email address"
+  And she sees an error message "Provided value for property 'Email' does not match required pattern"

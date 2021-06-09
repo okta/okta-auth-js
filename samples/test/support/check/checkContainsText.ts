@@ -8,10 +8,10 @@ import type { Selector } from 'webdriverio';
  *                                  the given text or not
  * @param  {String}   expectedText  The text to check against
  */
-export default (
+export default async (
     elementType: 'element' | 'button',
     selector: Selector,
-    falseCase: ' not',
+    falseCase: '' | ' not',
     expectedText: string
 ) => {
     /**
@@ -43,9 +43,9 @@ export default (
      * The text of the element
      * @type {String}
      */
-    const elem = $(selector);
+    const elem = await $(selector);
     elem.waitForDisplayed();
-    const text = elem[command]();
+    const text = await elem[command]();
 
     if (typeof expectedText === 'undefined') {
         stringExpectedText = falseCase;

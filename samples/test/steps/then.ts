@@ -12,10 +12,7 @@ import checkIsOnPage from '../support/check/checkIsOnPage';
 import enterValidPassword from '../support/action/live-user/enterValidPassword';
 import confirmValidPassword from '../support/action/live-user/confirmValidPassword';
 import submitAnyForm from '../support/action/submitAnyForm';
-import isDisplayed from '../support/check/isDisplayed';
-import { UserHome } from '../support/selectors';
-import checkProfileEmail from '../support/check/checkProfileEmail';
-import checkProfileName from '../support/check/checkProfileName';
+import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
 
 Then(
   /^User can verify their profile data$/,
@@ -178,6 +175,11 @@ Then(
 Then(
   /^the cell for the value of "name" is shown and contains her first name and last name$/,
   checkProfileName
+);
+
+Then(
+  /^she sees an error message "(?<message>.+?)"$/,
+  checkFormContainsMessage
 );
 
 // import checkClass from '../support/check/checkClass';
