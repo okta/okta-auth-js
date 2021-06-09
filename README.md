@@ -76,7 +76,7 @@ Compatibility with IE 11 / Edge can be accomplished by adding polyfill/shims for
 
 This module provides an entrypoint that implements all required polyfills.
 
-If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.polyfill.js` file in a `<script>` tag. It should be loaded before any other scripts which depend on the polyfill.  
+If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.polyfill.js` file in a `<script>` tag. It should be loaded before any other scripts which depend on the polyfill.
 
 If you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import import or require `@okta/okta-auth-js/polyfill` at or near the beginning of your application's code:
 
@@ -163,7 +163,7 @@ yarn add @okta/okta-auth-js
 npm install --save @okta/okta-auth-js
 ```
 
-If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.min.js` file in a `<script>` tag.  
+If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.min.js` file in a `<script>` tag.
 
 The built library bundle is also available on our global CDN. Include the following script in your HTML file to load before your application script:
 
@@ -2249,7 +2249,7 @@ authClient.token.getWithRedirect({
 
 Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect. Values are parsed from either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode).
 
-If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint. 
+If an authorization code is present, it will be exchanged for token(s) by posting to the `tokenUrl` endpoint.
 > **Note:** Authorization code has a lifetime of one minute and can only be used once.
 
 The ID token will be [verified and validated](https://github.com/okta/okta-auth-js#tokenverifyidtokenobject) before available for use.
@@ -2781,4 +2781,4 @@ const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 
 ## Contributing
 
-We're happy to accept contributions and PRs! Please see the [contribution guide](contributing.md) to understand how to structure a contribution.
+We're happy to accept contributions and PRs! Please see the [contribution guide](CONTRIBUTING.md) to understand how to structure a contribution.
