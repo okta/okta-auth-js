@@ -4,7 +4,7 @@
     {{>head}}
   </head>
   <body id="samples">
-    
+
     {{>menu}}
 
     <div class="okta-sign-in-form ui center aligned relaxed grid">
@@ -35,7 +35,7 @@
 
       {{#canSkip}}
         <form class="ui form" action="{{skipAction}}" method="POST">
-          <button class="ui fluid submit button" type="submit">
+          <button id="skip-button" class="ui fluid submit button" type="submit">
             Skip
           </button>
         </form>
