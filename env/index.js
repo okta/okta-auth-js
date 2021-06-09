@@ -51,19 +51,15 @@ function setEnvironmentVarsFromTestEnvYaml(name) {
     return;
   }
 
-  if (doc[name]) {
-    console.log(`Loading environment variables from testenv.yml: "${name}"`);
-    setEnvironmentVars(doc[name]);
-    return;
-  }
-
   if (doc.default) {
     console.log(`Loading environment variables from testenv.yml: "default"`);
     setEnvironmentVars(doc.default);
-    return;
   }
 
-  console.warn(`Missing environment variables from testenv.yml for ${name}`);
+  if (doc[name]) {
+    console.log(`Loading environment variables from testenv.yml: "${name}"`);
+    setEnvironmentVars(doc[name]);
+  }
 }
 
 module.exports = {
