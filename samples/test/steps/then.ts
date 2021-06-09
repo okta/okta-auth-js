@@ -173,12 +173,12 @@ Then(
 Then(
   /^the cell for the value of "email" is shown and contains her email$/,
   checkProfileEmail
-)
+);
 
 Then(
   /^the cell for the value of "name" is shown and contains her first name and last name$/,
   checkProfileName
-)
+);
 
 // import checkClass from '../support/check/checkClass';
 // import checkContainsAnyText from '../support/check/checkContainsAnyText';
