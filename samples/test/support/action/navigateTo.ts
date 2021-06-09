@@ -1,5 +1,6 @@
 import waitForDisplayed from '../wait/waitForDisplayed';
 import LoginForm from '../selectors/LoginForm';
+import OktaSignInOIE from '../selectors/OktaSignInOIE';
 import Home from '../selectors/Home';
 import startApp from './startApp';
 
@@ -38,6 +39,13 @@ export default async (
       url = '/register';
       selector = 'a[href="/register"]';
       isNotDisplayed = true;
+      break;
+    }
+
+    case 'the Embedded Widget View': {
+      url = '/login';
+      selector = OktaSignInOIE.signinUsername;
+      queryParams = { flow: 'widget' };
       break;
     }
 

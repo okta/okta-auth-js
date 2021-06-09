@@ -75,12 +75,12 @@ const samples = [
     template: 'express-embedded-auth-with-sdk',
     specs: [],
     features: [
-      'root-page', 
-      'basic-auth', 
-      'self-service-password-recovery', 
-      'self-service-registration',
-      'mfa-password-and-email',
-      'mfa-password-and-sms'
+      // 'root-page', 
+      // 'basic-auth', 
+      // 'self-service-password-recovery', 
+      // 'self-service-registration',
+      // 'mfa-password-and-email',
+      // 'mfa-password-and-sms'
     ],
     useEnv: true
   },
@@ -88,7 +88,7 @@ const samples = [
     name: 'express-embedded-sign-in-widget',
     template: 'express-embedded-sign-in-widget',
     specs: [],
-    features: [],
+    features: ['embedded-widget-basic-auth'],
     useEnv: true
   },
 ].map(function(sampleConfig) {

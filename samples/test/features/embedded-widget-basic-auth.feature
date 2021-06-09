@@ -1,0 +1,16 @@
+Feature: Basic Login with Embedded Sign In Widget
+
+  Background:
+    Given a SPA, WEB APP or MOBILE Policy that defines Password as required
+    #AND the list of Authenticators contains Email and Password
+    #AND a User named "Mary" exists, and this user has already setup email and password factors
+
+  Scenario: Mary logs in with a Password
+	  Given Mary navigates to the Embedded Widget View
+	  When she fills in her correct username
+	    And she fills in her correct password
+	    And she submits the Login form
+    Then she is redirected to the Root View
+      And she sees a table with her profile info
+      #And the cell for the value of "email" is shown and contains her email
+      #And the cell for the value of "name" is shown and contains her first name and last name

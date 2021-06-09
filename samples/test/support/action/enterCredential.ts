@@ -1,5 +1,5 @@
 import setInputField from './setInputField';
-import LoginForm from '../selectors/LoginForm';
+import getLoginForm from '../lib/getLoginForm';
 import { getConfig } from '../../util/configUtils';
 import ActionContext from '../context';
 
@@ -12,26 +12,27 @@ export default async function (
   let selector = null;
   let value;
   const isLiveProfile = !!this.credentials;
+  const loginForm = getLoginForm(this.featureName);
   switch (credName) {
     case 'incorrect username': {
-      selector = LoginForm.username;
+      selector = loginForm.username;
       value = 'Mory';
       break;
     }
     case 'incorrect password': {
-      selector = LoginForm.password;
+      selector = loginForm.password;
       value = '!wrong!';
       break;
     }
     case 'username':
     case 'correct username': {
-      selector = LoginForm.username;
+      selector = loginForm.username;
       value = isLiveProfile && this.credentials.emailAddress || config.username;
       break;
     }
     case 'password':
     case 'correct password': {
-      selector = LoginForm.password;
+      selector = loginForm.password;
       value = isLiveProfile && this.credentials.password || config.password;
       break;
     }
