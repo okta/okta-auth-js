@@ -160,6 +160,11 @@ Then(
 );
 
 Then(
+  /^she should see an error message "(?<message>.+?)"$/,
+  checkFormMessage
+);
+
+Then(
   /^she sees a field to re-enter another code$/,
   checkIsOnPage.bind(null, 'Challenge phone authenticator')
 );
