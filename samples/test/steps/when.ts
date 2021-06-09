@@ -38,6 +38,7 @@ import enterCorrectPhoneNumber from '../support/action/live-user/enterCorrectPho
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
 import skipForm from '../support/action/skipForm';
 import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
+import enterIncorrectPhoneNumberFormat from '../support/action/enterIncorrectPhoneNumberFormat';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -145,6 +146,11 @@ When(
 );
 
 When(
+  /^submits the enrollment form$/,
+  submitAnyForm
+);
+
+When(
   /^she fills a password that fits within the password policy$/,
   enterValidPassword
 );
@@ -207,6 +213,11 @@ When(
 When(
   /^she selects "Skip" .*$/,
   skipForm
+);
+
+When(
+  /^she inputs an invalid phone number$/,
+  enterIncorrectPhoneNumberFormat
 );
 
 // When(
