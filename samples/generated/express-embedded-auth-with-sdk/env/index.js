@@ -7,6 +7,8 @@ module.exports = function () {
       // try local env module
       oktaEnv = require('./okta-env');
     }
+
+    throw err;
   }
   
   return oktaEnv;
