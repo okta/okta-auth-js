@@ -37,6 +37,7 @@ import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/live-user/enterCorrectPhoneNumber';
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
 import skipForm from '../support/action/skipForm';
+import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -61,6 +62,11 @@ When(
 When(
   /^she fills out her (First Name|Last Name|Email)$/,
   enterRegistrationField
+);
+
+When(
+  /^she fills out her Email with an invalid email format$/,
+  inputInvalidEmailFormat
 );
 
 When(
