@@ -7,7 +7,7 @@ export declare interface UserCredentials extends A18nProfile {
   password: string;
 }
 
-export default async function (firstName: string, featureName: string = ''): Promise<UserCredentials> {
+export default async function (firstName: string, featureName = ''): Promise<UserCredentials> {
   featureName = featureName.substring(0, 32);
   const a18nProfile = await a18nClient.createProfile();
 
