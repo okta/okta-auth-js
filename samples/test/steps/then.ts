@@ -12,6 +12,10 @@ import checkIsOnPage from '../support/check/checkIsOnPage';
 import enterValidPassword from '../support/action/live-user/enterValidPassword';
 import confirmValidPassword from '../support/action/live-user/confirmValidPassword';
 import submitAnyForm from '../support/action/submitAnyForm';
+import isDisplayed from '../support/check/isDisplayed';
+import { UserHome } from '../support/selectors';
+import checkProfileEmail from '../support/check/checkProfileEmail';
+import checkProfileName from '../support/check/checkProfileName';
 
 Then(
   /^User can verify their profile data$/,
@@ -159,6 +163,22 @@ Then(
   checkIsOnPage.bind(null, 'Challenge phone authenticator')
 );
 
+Then(
+  /^she sees a table with her profile info$/,
+  async function() {
+    await isDisplayed(UserHome.profileTable);
+  }
+);
+
+Then(
+  /^the cell for the value of "email" is shown and contains her email$/,
+  checkProfileEmail
+);
+
+Then(
+  /^the cell for the value of "name" is shown and contains her first name and last name$/,
+  checkProfileName
+);
 
 // import checkClass from '../support/check/checkClass';
 // import checkContainsAnyText from '../support/check/checkContainsAnyText';
