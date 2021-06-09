@@ -4,56 +4,50 @@ import OktaSignInOIE from '../selectors/OktaSignInOIE';
 import Home from '../selectors/Home';
 import startApp from './startApp';
 
-export default async (
-  userName: string,
-  formName: string
-) => {
+function getContext(formName: string) {
   let url = '/';
   let queryParams;
   let selector;
   let isNotDisplayed = false;
   switch (formName) {
     case 'the Basic Login View':
-    case 'Login with Username and Password': {
-        url = '/login';
-        selector = LoginForm.password;
-        queryParams = { flow: 'form' };
-        break;
-    }
-
-    case 'the Root View': {
+    case 'Login with Username and Password':
+      url = '/login';
+      selector = LoginForm.password;
+      queryParams = { flow: 'form' };
+      break;
+    case 'the Root View': 
       url = '/';
       selector = Home.serverConfig;
       queryParams = { flow: 'form' };
-      break;
-    }
-
-    case 'the Self Service Password Reset View': {
+      break;  
+    case 'the Self Service Password Reset View':
       url = '/recover-password';
       selector = 'a[href="/recover-password"]';
       isNotDisplayed = true;
       break;
-    }
-
-    case 'the Self Service Registration View': {
+    case 'the Self Service Registration View':
       url = '/register';
       selector = 'a[href="/register"]';
       isNotDisplayed = true;
       break;
-    }
-
-    case 'the Embedded Widget View': {
+    case 'the Embedded Widget View':
       url = '/login';
       selector = OktaSignInOIE.signinUsername;
       queryParams = { flow: 'widget' };
       break;
-    }
-
-    default: {
-        throw new Error(`Unknown form "${formName}"`);
-    }
+    default:
+      throw new Error(`Unknown form "${formName}"`);
   }
 
+  return { url, selector, queryParams, isNotDisplayed };
+}
+
+export default async (
+  userName: string,
+  formName: string
+) => {
+  const { url, queryParams, selector, isNotDisplayed } = getContext(formName);
   await startApp(url, queryParams);
   await waitForDisplayed(selector, isNotDisplayed);
 };
