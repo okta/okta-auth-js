@@ -75,12 +75,12 @@ const samples = [
     template: 'express-embedded-auth-with-sdk',
     specs: [],
     features: [
-      // 'root-page', 
-      // 'basic-auth', 
-      // 'self-service-password-recovery', 
-      // 'self-service-registration',
-      // 'mfa-password-and-email',
-      // 'mfa-password-and-sms'
+      'root-page', 
+      'basic-auth', 
+      'self-service-password-recovery', 
+      'self-service-registration',
+      'mfa-password-and-email',
+      'mfa-password-and-sms'
     ],
     useEnv: true
   },
