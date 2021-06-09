@@ -81,13 +81,15 @@ const samples = [
       'self-service-registration',
       'mfa-password-and-email',
       'mfa-password-and-sms'
-    ]
+    ],
+    useEnv: true
   },
   {
     name: 'express-embedded-sign-in-widget',
     template: 'express-embedded-sign-in-widget',
     specs: [],
-    features: []
+    features: [],
+    useEnv: true
   },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {

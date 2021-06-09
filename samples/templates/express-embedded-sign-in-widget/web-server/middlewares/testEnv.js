@@ -1,4 +1,4 @@
-const env = require('@okta/env');
+const env = require('../../env')();
 
 module.exports = function testEnv(req, res, next) {
   const { testenv } = req.query;

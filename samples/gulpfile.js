@@ -3,6 +3,7 @@ const through = require('through2');
 const Handlebars = require('handlebars');
 const handlebars = require('gulp-compile-handlebars');
 const clean = require('gulp-clean');
+const rename = require('gulp-rename');
 const shell = require('shelljs');
 const merge = require('merge-stream');
 
@@ -11,6 +12,7 @@ const config = require('./config');
 const SRC_DIR = 'templates';
 const BUILD_DIR = 'generated';
 const PARTIALS_DIR = `${SRC_DIR}/partials`;
+const OKTA_ENV_SCRIPT_PATH = '../env/index.js';
 
 function cleanTask() {
   return src(`${BUILD_DIR}`, { read: false, allowEmpty: true })
@@ -35,7 +37,7 @@ function registerPartials() {
 
 function generateSampleTaskFactory(options) {
   return function generateSample() {
-    const { name, template, subDir } = options;
+    const { name, template, subDir, useEnv } = options;
     const inDir = `${SRC_DIR}/${template}/**/*`;
     const viewTemplatesDir = `${SRC_DIR}/${template}/**/views/*`;
     const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${name}`;
@@ -58,7 +60,14 @@ function generateSampleTaskFactory(options) {
       .pipe(dest(outDir));
     const copyViewTemplates = src(viewTemplatesDir, { dot: true })
       .pipe(dest(outDir));
-    return merge(generateWithoutViewTemplates, copyViewTemplates);
+    const merged = merge(generateWithoutViewTemplates, copyViewTemplates);
+    if (useEnv) {
+      const copyEnvModule = src(OKTA_ENV_SCRIPT_PATH, { dot: true })
+        .pipe(rename('okta-env.js'))
+        .pipe(dest(`${outDir}/env/`));
+      merged.add(copyEnvModule);
+    }
+    return merged;
    };
 }
 
