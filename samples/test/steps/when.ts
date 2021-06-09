@@ -199,7 +199,7 @@ When(
 );
 
 When(
-  /^she selects "Skip" (.*)$/,
+  /^she selects "Skip" .*$/,
   skipForm
 );
 
