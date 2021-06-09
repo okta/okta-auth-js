@@ -63,7 +63,7 @@ function setEnvironmentVarsFromTestEnvYaml(name) {
     return;
   }
 
-  throw new Error(`Missing environment variables from testenv.yml for ${name}`);  
+  console.warn(`Missing environment variables from testenv.yml for ${name}`);
 }
 
 module.exports = {
