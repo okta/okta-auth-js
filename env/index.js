@@ -16,7 +16,9 @@ if (fs.existsSync(TESTENV)) {
 
 function setEnvironmentVars(envConfig) {
   Object.keys(envConfig).forEach((k) => {
-    console.log(envConfig[k]);
+    if (process.env[k] !== envConfig[k]) {
+      console.log(`Setting a new value for environment variable "${k}"`);
+    }
     process.env[k] = envConfig[k];
   });  
 }
