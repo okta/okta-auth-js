@@ -211,6 +211,11 @@ When(
 );
 
 When(
+  /^She inputs a invalid phone number$/,
+  enterIncorrectPhoneNumberFormat
+);
+
+When(
   /^she selects "Skip" .*$/,
   skipForm
 );

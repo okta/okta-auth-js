@@ -34,3 +34,15 @@ Feature: Multi-Factor Authentication with Password and SMS
     When She inputs the incorrect code from the SMS
     Then the sample show as error message "Invalid code. Try again." on the SMS Challenge page
       And she sees a field to re-enter another code
+  
+  Scenario: Enroll with Invalid Phone Number
+    Given Mary navigates to the Basic Login View
+      And she has inserted her username
+      And she has inserted her password
+      And her password is correct
+    When she clicks Login
+    Then she is presented with an option to select SMS to enroll
+    When She selects SMS from the list
+      And She inputs a invalid phone number
+      And She selects "Receive a Code"
+    Then she should see a message "Unable to initiate factor enrollment: Invalid Phone Number."
