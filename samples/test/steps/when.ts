@@ -225,6 +225,16 @@ When(
   enterIncorrectPhoneNumberFormat
 );
 
+When(
+  /^She selects Email from the list$/,
+  selectEmailAuthenticator
+);
+
+When(
+  /^She inputs the correct code from the Email$/,
+  enterCorrectCode
+);
+
 // When(
 //     /^I (click|doubleclick) on the (link|button|element) "([^"]*)?"$/,
 //     clickElement
