@@ -34,9 +34,9 @@ Then(
 );
 
 Then(
-  /^she should see (?:a message on the Login form|the message) "(?<message>.+?)"$/,
+  /^she should see (?:a message on the Login form|the message|a message) "(?<message>.+?)"$/,
   checkFormMessage
-  );
+);
 
 Then(
   /^the Root Page shows links to the Entry Points$/,
@@ -189,6 +189,11 @@ Then(
 Then(
   /^she sees an error message "(?<message>.+?)"$/,
   checkFormContainsMessage
+);
+
+Then(
+  /^she is presented with an option to select SMS to enroll$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
 );
 
 // import checkClass from '../support/check/checkClass';
