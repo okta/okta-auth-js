@@ -150,6 +150,11 @@ Then(
 );
 
 Then(
+  /^she is presented with an option to select Email to verify$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
   /^the screen changes to receive an input for a code to verify$/,
   checkIsOnPage.bind(null, 'Challenge phone authenticator')
 );
@@ -194,6 +199,11 @@ Then(
 Then(
   /^she is presented with an option to select SMS to enroll$/,
   checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
+  /^the screen changes to receive an input for a Email code$/,
+  checkIsOnPage.bind(null, 'Enter Code')
 );
 
 // import checkClass from '../support/check/checkClass';
