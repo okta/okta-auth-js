@@ -34,6 +34,11 @@ Then(
 );
 
 Then(
+  /^she sees a table with her profile info$/,
+  checkProfile
+);
+
+Then(
   /^she should see (?:a message on the Login form|the message) "(?<message>.+?)"$/,
   checkFormMessage
   );

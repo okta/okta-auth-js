@@ -5,7 +5,7 @@ const submit = `${loginForm} #submit-login-form`;
 const formMessages = `#form-messages li`;
 const formMessage = `${formMessages}:first-child`;
 
-class LoginForm {
+export class LoginForm {
   get username() { return username; }
   get password() { return password; }
   get submit() { return submit; }
