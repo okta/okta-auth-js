@@ -11,7 +11,9 @@ export default async function(this: ActionContext): Promise<void> {
     }
     await a18nClient.deleteProfile(this.credentials.profileId);
   }
-  if (this.user) {
+
+  // do not delete users which were not created during test run
+  if (this.user && this.credentials) {
     await deleteUser(this.user);
   }
 }

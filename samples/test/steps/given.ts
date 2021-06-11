@@ -28,6 +28,7 @@ import createContextUserAndCredentials from '../support/action/live-user/createC
 import createContextCredentials from '../support/action/live-user/createContextCredentials';
 import activateContextUserSms from '../support/action/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
+import fetchUserIntoContext from '../support/action/live-user/fetchUserIntoContext';
 
 Given(
   /^a Profile Enrollment policy defined assigning new users to the Everyone Group (.*)$/,
@@ -55,6 +56,11 @@ Given(
 Given(
   /^a SPA, WEB APP or MOBILE Policy (.*)$/,
   setEnvironment
+);
+
+Given(
+  /^a User named "Mary" exists, and this user has already setup email and password factors/,
+  fetchUserIntoContext
 );
 
 Given(

@@ -1,7 +1,6 @@
 /* eslint-disable max-len */
 import { Then } from '@cucumber/cucumber';
 
-import checkProfile from '../support/check/checkProfile';
 import checkNoProfile from '../support/check/checkNoProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
@@ -13,10 +12,11 @@ import enterValidPassword from '../support/action/live-user/enterValidPassword';
 import confirmValidPassword from '../support/action/live-user/confirmValidPassword';
 import submitAnyForm from '../support/action/submitAnyForm';
 import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
-import checkProfileEmail from '../support/check/checkProfileEmail';
 import { UserHome } from '../support/selectors';
 import isDisplayed from '../support/check/isDisplayed';
-import checkProfileName from '../support/check/checkProfileName';
+import checkProfileName from '../support/check/live-user/checkProfileName';
+import checkProfile from '../support/check/live-user/checkProfile';
+import checkProfileEmail from '../support/check/live-user/checkProfileEmail';
 
 Then(
   /^User can verify their profile data$/,

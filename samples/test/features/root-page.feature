@@ -2,7 +2,7 @@ Feature: Root page for Direct Auth Demo Application
 
   Background:
 	  Given an APP Sign On Policy that defines Password as required and the only factor for login
-    And Mary is a user with a verified email and a set password
+    And a User named "Mary" exists, and this user has already setup email and password factors
 
   Scenario: Mary visits the Root View WITHOUT an authentcation session (no tokens)
     Given Mary navigates to the Root View
