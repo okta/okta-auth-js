@@ -58,6 +58,13 @@ Given(
 );
 
 Given(
+  /^a User named "([^/w]+)" exists, and this user has already setup email and password factors$/,
+  async function(this: ActionContext, firstName: string) {
+    await createContextUserAndCredentials.call(this, firstName);
+  }
+);
+
+Given(
   /^a user named "([^/w]+)"$/,
   createContextCredentials
 );
