@@ -57,7 +57,7 @@ app.use(userContext);
 
 app.use(require('./routes'));
 
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars, complexity
 app.use(function(err, req, res, next) {
   console.error(err.stack);
 
@@ -69,6 +69,8 @@ app.use(function(err, req, res, next) {
     errors = [err];
   } else if (err && err.message) {
     errors = [err.message];
+  } else if (err && err.error_description) {
+    errors = [err.error_description];
   } else {
     errors = ['Internal Error!'];
   }
@@ -77,6 +79,11 @@ app.use(function(err, req, res, next) {
     hasError: true,
     errors 
   });
+});
+
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+app.use(function (req, res, next) {
+  res.status(404).send('404');
 });
 
 app.listen(port, () => console.log(`App started on port ${port}`));
