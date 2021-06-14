@@ -45,9 +45,9 @@
 
       <div class="ui row grid">
         {{#hasIdps}}
-          <div class="ui row">
+          <div id="idp-buttons" class="ui row">
             {{#idps}}
-              <button onclick="location.href='{{href}}'" class="ui {{class}} button">
+              <button id="{{id}}" onclick="location.href='{{href}}'" class="ui {{class}} button">
                 {{name}}
               </button>
             {{/idps}}

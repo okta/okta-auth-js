@@ -34,7 +34,7 @@ Then(
 );
 
 Then(
-  /^she should see (?:a message on the Login form|the message|a message) "(?<message>.+?)"$/,
+  /^she should see (?:a message on the Login form|the message|a message|an error message) "(?<message>.+?)"$/,
   checkFormMessage
 );
 
@@ -161,11 +161,6 @@ Then(
 
 Then(
   /^the sample show as error message "(?<message>.+?)" on the SMS Challenge page$/,
-  checkFormMessage
-);
-
-Then(
-  /^she should see an error message "(?<message>.+?)"$/,
   checkFormMessage
 );
 

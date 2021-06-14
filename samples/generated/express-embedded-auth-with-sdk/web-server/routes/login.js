@@ -29,7 +29,7 @@ router.get('/login', async (req, res) => {
   const idps = availableSteps 
     ? availableSteps
       .filter(({ name }) => name === 'redirect-idp')
-      .map(({ href, idp: { name }, type }) => ({ name, href, class: getIdpSemanticClass(type) })) 
+      .map(({ href, idp: { name }, type }) => ({ name, href, class: getIdpSemanticClass(type), id: type.toLowerCase() })) 
     : [];
 
   renderTemplate(req, res, 'login', { 
