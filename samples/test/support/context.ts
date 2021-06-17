@@ -5,6 +5,7 @@ interface ActionContext {
   credentials: UserCredentials;
   user: User;
   featureName: string;
+  userName?: string;
 }
 
 export default ActionContext;

@@ -89,7 +89,10 @@ const samples = [
     name: 'express-embedded-sign-in-widget',
     template: 'express-embedded-sign-in-widget',
     specs: [],
-    features: ['embedded-widget-basic-auth'],
+    features: [
+      'embedded-widget-basic-auth',
+      'social-idp-with-widget'
+    ],
     useEnv: true
   },
 ].map(function(sampleConfig) {

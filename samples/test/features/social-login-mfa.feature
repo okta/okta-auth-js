@@ -14,3 +14,10 @@ Feature: Direct Auth Social Login with MFA
     And logs in to Facebook
     # And the remediation returns "MFA_REQUIRED"
     Then she should see an error message "Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed." 
+  
+Scenario: Mary Logs in with Social IDP
+    Given Mary navigates to the Login View
+    When she clicks the "Login with Facebook" button
+      And logs in to Facebook
+    Then she is redirected to the Root View
+      And an application session is created

@@ -182,7 +182,7 @@ export const config: WebdriverIO.Config = {
     baseUrl: 'http://localhost:8080',
     //
     // Default timeout for all waitFor* commands.
-    waitforTimeout: 10000,
+    waitforTimeout: 15000,
     //
     // Default timeout in milliseconds for request
     // if Selenium Grid doesn't send response

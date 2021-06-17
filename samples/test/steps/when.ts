@@ -39,8 +39,13 @@ import selectVerifyBySms from '../support/action/selectVerifyBySms';
 import skipForm from '../support/action/skipForm';
 import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
 import enterIncorrectPhoneNumberFormat from '../support/action/enterIncorrectPhoneNumberFormat';
+import clickLoginWithGoogle from '../support/action/clickLoginWithGoogle';
+import clickLoginWithGoogleInWidget from '../support/action/clickLoginWithGoogleInWidget';
 import clickFacebookButton from '../support/action/clickFacebookButton';
+import clickLoginWithFacebookInWidget from '../support/action/clickLoginWithFacebookInWidget';
+import loginToGoogle from '../support/action/loginToGoogle';
 import signInIntoFacebook from '../support/action/signInIntoFacebook';
+import ActionContext from '../support/context';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -103,13 +108,37 @@ When(
 );
 
 When(
+  /^she clicks the "Login with Google" button in the embedded Sign In Widget$/,
+  clickLoginWithGoogleInWidget
+);
+
+When(
+  /^she clicks the "Login with Facebook" button in the embedded Sign In Widget$/,
+  clickLoginWithFacebookInWidget
+);
+
+When(
+  /^she clicks the "Login with Google" button$/,
+  clickLoginWithGoogle
+);
+
+When(
   /^she clicks the "Login with Facebook" button$/,
   clickFacebookButton
 );
 
 When(
+  /^logs in to Google$/,
+  async function(this: ActionContext) {
+    await loginToGoogle.call(this);
+  }
+);
+
+When(
   /^logs in to Facebook$/,
-  signInIntoFacebook
+  async function(this: ActionContext) {
+    await signInIntoFacebook.call(this);
+  }
 );
 
 When(

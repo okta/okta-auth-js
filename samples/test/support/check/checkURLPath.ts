@@ -10,7 +10,11 @@ export default async (falseCase: boolean, expectedPath: string) => {
      * @type {String}
      */
     let currentUrl = await browser.getUrl();
-    currentUrl = currentUrl.replace(/http(s?):\/\//, '');
+    currentUrl = currentUrl
+        .replace(/http(s?):\/\//, '')
+        // Clean URL suffix after social login
+        .replace(/#(.*?)/, '')
+        .replace(/\/_=_$/, '/');
 
     /**
      * The base URL of the current browser window

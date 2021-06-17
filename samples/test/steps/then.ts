@@ -54,13 +54,13 @@ Then(
 );
 
 Then(
-  /^she is redirected to the ([\s\w]+)$/,
-  checkIsOnPage
+  /^she is redirected back to the (?:Root View|Sample App)$/,
+  () => checkURLPath(false, '/')
 );
 
 Then(
-  /^she is redirected back to the Root View$/,
-  () => checkURLPath(false, '/')
+  /^she is redirected to the ([\s\w]+)$/,
+  checkIsOnPage
 );
 
 Then(
