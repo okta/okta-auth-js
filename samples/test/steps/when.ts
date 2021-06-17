@@ -39,6 +39,8 @@ import selectVerifyBySms from '../support/action/selectVerifyBySms';
 import skipForm from '../support/action/skipForm';
 import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
 import enterIncorrectPhoneNumberFormat from '../support/action/enterIncorrectPhoneNumberFormat';
+import clickFacebookButton from '../support/action/clickFacebookButton';
+import signInIntoFacebook from '../support/action/signInIntoFacebook';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -98,6 +100,16 @@ When(
 When(
   /^she clicks Login$/,
   submitForm
+);
+
+When(
+  /^she clicks the "Login with Facebook" button$/,
+  clickFacebookButton
+);
+
+When(
+  /^logs in to Facebook$/,
+  signInIntoFacebook
 );
 
 When(

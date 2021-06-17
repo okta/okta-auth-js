@@ -33,6 +33,8 @@ function getConfig() {
   const clientSecret = process.env.WEB_CLIENT_SECRET || process.env.CLIENT_SECRET;
   const a18nAPIKey = process.env.A18N_API_KEY;
   const oktaAPIKey = process.env.OKTA_API_KEY;
+  const fbUsername = process.env.FB_USERNAME;
+  const fbPassword = process.env.FB_PASSWORD;
 
   const sampleName = process.env.SAMPLE_NAME;
   const sampleConfig = getSampleConfig();
@@ -45,6 +47,8 @@ function getConfig() {
     clientId: sampleConfig.express ? webClientId : clientId,
     username,
     password,
+    fbUsername,
+    fbPassword,
     clientSecret,
     a18nAPIKey,
     oktaAPIKey,

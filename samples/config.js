@@ -80,7 +80,8 @@ const samples = [
       'self-service-password-recovery', 
       'self-service-registration',
       'mfa-password-and-email',
-      'mfa-password-and-sms'
+      'mfa-password-and-sms',
+      'social-login-mfa',
     ],
     useEnv: true
   },

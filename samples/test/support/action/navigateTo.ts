@@ -4,6 +4,7 @@ import OktaSignInOIE from '../selectors/OktaSignInOIE';
 import Home from '../selectors/Home';
 import startApp from './startApp';
 
+// eslint-disable-next-line complexity
 function getContext(formName: string) {
   let url = '/';
   let queryParams;
@@ -12,6 +13,7 @@ function getContext(formName: string) {
   switch (formName) {
     case 'the Basic Login View':
     case 'Login with Username and Password':
+    case 'Basic Social Login View':
       url = '/login';
       selector = LoginForm.password;
       queryParams = { flow: 'form' };
