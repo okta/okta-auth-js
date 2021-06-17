@@ -25,7 +25,29 @@ async function waitForPopup(openPopupPromise) {
   await browser.switchToWindow(handles[existingHandlesCount - 1]);
 }
 
+async function getCurrentUrl(removeHash = false) {
+    /**
+     * The URL of the current browser window
+     * @type {String}
+     */
+    let currentUrl = await browser.getUrl();
+    currentUrl = currentUrl.replace(/http(s?):\/\//, '');
+    if (removeHash) {
+        currentUrl = currentUrl.replace(/#(.*?)$/, '');
+    }
+
+    /**
+     * The base URL of the current browser window
+     * @type {Object}
+     */
+    const domain = `${currentUrl.split('/')[0]}`;
+
+    currentUrl = currentUrl.replace(domain, '');
+
+    return currentUrl;
+}
 
 export {
   waitForPopup,
+  getCurrentUrl
 };

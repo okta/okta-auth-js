@@ -1,3 +1,5 @@
+import { getCurrentUrl } from '../../util';
+
 /**
  * Check if the current URL path matches the given path
  * @param  {Boolean}  falseCase    Whether to check if the path matches the
@@ -6,23 +8,7 @@
  * @param  {Boolean}  removeHash Whether to strip hash before check
  */
 export default async (falseCase: boolean, expectedPath: string, removeHash = false) => {
-    /**
-     * The URL of the current browser window
-     * @type {String}
-     */
-    let currentUrl = await browser.getUrl();
-    currentUrl = currentUrl.replace(/http(s?):\/\//, '');
-    if (removeHash) {
-        currentUrl = currentUrl.replace(/#(.*?)$/, '');
-    }
-
-    /**
-     * The base URL of the current browser window
-     * @type {Object}
-     */
-    const domain = `${currentUrl.split('/')[0]}`;
-
-    currentUrl = currentUrl.replace(domain, '');
+    const currentUrl = await getCurrentUrl(removeHash);
 
     if (falseCase) {
         expect(currentUrl)

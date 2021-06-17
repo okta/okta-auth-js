@@ -4,7 +4,6 @@ import waitForDisplayed from '../wait/waitForDisplayed';
 import setInputField from './setInputField';
 import clickElement from './clickElement';
 import ActionContext from '../context';
-import Home from '../selectors/Home';
 
 export default async function(
   this: ActionContext
@@ -19,7 +18,4 @@ export default async function(
   await setInputField('set', fbUsername as string, FacebookSignIn.username);
   await setInputField('set', fbPassword as string, FacebookSignIn.password);
   await clickElement('click', 'selector', FacebookSignIn.submit);
-
-  // wait for redirect
-  await waitForDisplayed(Home.serverConfig, false);
 }
