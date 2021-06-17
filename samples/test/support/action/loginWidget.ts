@@ -1,4 +1,3 @@
-import { OktaSignInV1, OktaSignInOIE } from  '../selectors';
 import { getConfig } from '../../util/configUtils';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import setInputField from './setInputField';
@@ -25,4 +24,3 @@ export default async (
   await setInputField('set', password, OktaSignIn.signinPassword);
   await clickElement('click', 'selector', OktaSignIn.signinSubmitBtn);
 };
-
