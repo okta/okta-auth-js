@@ -1,5 +1,5 @@
 import { getConfig } from '../../util';
-import FacebookSignIn from  '../selectors/FacebookSignIn';
+import FacebookSignIn from '../selectors/FacebookSignIn';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import setInputField from './setInputField';
 import clickElement from './clickElement';
