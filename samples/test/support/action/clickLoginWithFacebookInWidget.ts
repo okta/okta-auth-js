@@ -1,7 +1,7 @@
 import clickElement from './clickElement';
-import { OktaSignInV1, OktaSignInOIE } from  '../selectors';
+import { getOktaSignInForm } from  '../../util';
 
 export default async () => {
-  const OktaSignIn = process.env.ORG_OIE_ENABLED ? OktaSignInOIE : OktaSignInV1;
+  const OktaSignIn = getOktaSignInForm();
   await clickElement('click', 'selector', OktaSignIn.signinWithFacebookBtn);
 };
