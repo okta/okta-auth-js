@@ -55,7 +55,7 @@ Then(
 
 Then(
   /^she is redirected back to the (?:Root View|Sample App)$/,
-  () => checkURLPath(false, '/')
+  () => checkURLPath(false, '/', true)
 );
 
 Then(
