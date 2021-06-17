@@ -18,12 +18,4 @@ export default async function(
   await setInputField('set', fbUsername as string, FacebookSignIn.username);
   await setInputField('set', fbPassword as string, FacebookSignIn.password);
   await clickElement('click', 'selector', FacebookSignIn.submit);
-
-  // allow application
-  try {
-    await waitForDisplayed(FacebookSignIn.continue, false, 5000);
-    await clickElement('click', 'selector', FacebookSignIn.continue);
-  } catch (err) {
-    // facebook user has already allowed application
-  }
 }
