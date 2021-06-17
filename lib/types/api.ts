@@ -17,6 +17,8 @@ import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
 import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
+import { TokenManager } from '../TokenManager';
+
 import { 
   AuthenticationOptions, 
   RegistrationOptions as IdxRegistrationOptions,
@@ -33,6 +35,7 @@ export interface OktaAuth {
 
   storageManager: StorageManager;
   transactionManager: TransactionManager;
+  tokenManager: TokenManager;
 
   // Browser only
   features?: FeaturesAPI;

@@ -11,7 +11,8 @@
  *
  */
 import { removeNils, warn, clone } from './util';
-import AuthSdkError from './errors/AuthSdkError';
+import { AuthSdkError } from './errors';
+import { isRefreshTokenError, validateToken  } from './oidc/util';
 import { isLocalhost, isIE11OrLess } from './features';
 import { TOKEN_STORAGE_NAME } from './constants';
 import SdkClock from './clock';
@@ -220,6 +221,9 @@ export class TokenManager {
         continue;
       }
       var token = tokenStorage[key];
+      if (isRefreshToken(token)) {
+        continue;
+      }
       this.setExpireEventTimeout(key, token);
     }
   }
@@ -230,17 +234,9 @@ export class TokenManager {
     this.setExpireEventTimeoutAll();
   }
   
-  validateToken(token: Token) {
-    if (!isIDToken(token) && !isAccessToken(token) && !isRefreshToken(token)) {
-      throw new AuthSdkError(
-        'Token must be an Object with scopes, expiresAt, and one of: an idToken, accessToken, or refreshToken property'
-        );
-    }
-  }
-  
   add(key, token: Token) {
     var tokenStorage = this.storage.getStorage();
-    this.validateToken(token);
+    validateToken(token);
     tokenStorage[key] = token;
     this.storage.setStorage(tokenStorage);
     this.emitAdded(key, token);
@@ -310,10 +306,13 @@ export class TokenManager {
     };
   
     if (idToken) {
-      this.validateToken(idToken);
+      validateToken(idToken, 'idToken');
     }
     if (accessToken) {
-      this.validateToken(accessToken);
+      validateToken(accessToken, 'accessToken');
+    }
+    if (refreshToken) {
+      validateToken(refreshToken, 'refreshToken');
     }
     const idTokenKey = this.getStorageKeyByType('idToken') || ID_TOKEN_STORAGE_KEY;
     const accessTokenKey = this.getStorageKeyByType('accessToken') || ACCESS_TOKEN_STORAGE_KEY;
@@ -347,6 +346,13 @@ export class TokenManager {
   }
   /* eslint-enable max-params */
   
+  removeAll() {
+    const tokenStorage = this.storage.getStorage();
+    Object.keys(tokenStorage).forEach(key => {
+      this.remove(key);
+    });
+  }
+
   remove(key) {
     // Clear any listener for this token
     this.clearExpireEventTimeout(key);
@@ -359,19 +365,15 @@ export class TokenManager {
     this.emitRemoved(key, removedToken);
   }
   
+  // TODO: these methods are redundant and can be removed in the next major version
   async renewToken(token) {
-    const tokens = this.getTokensSync();
-    let freshTokens;
-    if (tokens.refreshToken) {
-      freshTokens = await this.sdk.token.renewTokensWithRefresh({
-        scopes: token.scopes,
-      }, tokens.refreshToken);
-      // Multiple tokens may have come back. Return only the token which was requested.
-      return isIDToken(token) ? freshTokens.idToken : freshTokens.accessToken;
-    }
     return this.sdk.token.renew(token);
   }
+  validateToken(token: Token) {
+    return validateToken(token);
+  }
   
+
   renew(key): Promise<Token> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
     var existingPromise = this.state.renewPromise[key];
@@ -393,7 +395,7 @@ export class TokenManager {
   
     // A refresh token means a replace instead of renewal
     // Store the renew promise state, to avoid renewing again
-    this.state.renewPromise[key] = this.renewToken(token)
+    this.state.renewPromise[key] = this.sdk.token.renew(token)
       .then(freshToken => {
         // store and emit events for freshToken
         const oldTokenStorage = this.storage.getStorage();
@@ -403,20 +405,10 @@ export class TokenManager {
         return freshToken;
       })
       .catch(err => {
-        if (err.name === 'OAuthError' || err.name === 'AuthSdkError') {
-          // remove expired token in storage
-          const tokenStorage = this.storage.getStorage();
-          const currentToken = tokenStorage[key];
-          if (currentToken && this.hasExpired(currentToken)) {
-            delete tokenStorage[key];
-            this.clearExpireEventTimeout(key);
-            this.storage.setStorage(tokenStorage);
-            this.emitRemoved(key, currentToken);
-          } else {
-            // token have been removed from other tabs
-            // still trigger removed event for downstream listeners
-            this.emitRemoved(key);
-          }
+        // If renew fails, remove token and emit error
+        if (isRefreshTokenError(err) || err.name === 'OAuthError' || err.name === 'AuthSdkError') {
+          // remove token from storage
+          this.remove(key);
           
           err.tokenKey = key;
           this.emitError(err);

@@ -49,7 +49,9 @@ export class TokenService {
           const error = new AuthSdkError('Too many token renew requests');
           this.tokenManager.emitError(error);
         } else {
-          this.tokenManager.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
+          this.tokenManager.renew(key).catch(err => {
+            console.error('caught error from token renew: ', err);
+          }); // Renew errors will emit an "error" event 
         }
       } else if (this.options.autoRemove) {
         this.tokenManager.remove(key);

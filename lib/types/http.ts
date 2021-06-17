@@ -50,5 +50,7 @@ export interface HttpResponse {
   responseText: string;
   status: number;
   responseType?: string;
-  responseJSON?: object;
+  responseJSON?: {
+    [propName: string]: any;
+  };
 }

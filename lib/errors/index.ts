@@ -16,7 +16,12 @@ import AuthPollStopError from './AuthPollStopError';
 import AuthSdkError from './AuthSdkError';
 import OAuthError from './OAuthError';
 
+function isAuthApiError(obj: any): obj is AuthApiError {
+  return (obj instanceof AuthApiError);
+}
+
 export {
+  isAuthApiError,
   AuthApiError,
   AuthPollStopError,
   AuthSdkError,

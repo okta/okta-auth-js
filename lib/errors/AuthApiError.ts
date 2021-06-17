@@ -11,17 +11,16 @@
  */
 
 import CustomError from './CustomError';
-import { APIError } from '../types';
-
+import { APIError, HttpResponse } from '../types';
 export default class AuthApiError extends CustomError implements APIError {
   errorSummary: string;
   errorCode?: string;
   errorLink?: string;
   errorId?: string;
   errorCauses?: string[];
-  xhr?: XMLHttpRequest;
+  xhr?: HttpResponse;
 
-  constructor(err: APIError, xhr?: XMLHttpRequest) {
+  constructor(err: APIError, xhr?: HttpResponse) {
     const message = err.errorSummary;
     super(message);
 
