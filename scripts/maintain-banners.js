@@ -3,6 +3,7 @@ const globby = require('globby');
 const path = require('path');
 
 const bannerSourcePath = path.join(__dirname, 'license-template');
+// eslint-disable-next-line max-len
 const files = globby.sync(path.join(__dirname, '..','{lib/**/*.{js,ts},polyfill/**/*.{js,ts},test/**/*.{js,ts},samples/**/*.{js,ts},build/dist/*.js}'));
 const bannerSource = fs.readFileSync(bannerSourcePath).toString();
 const copyrightRegex = /(Copyright \(c\) )([0-9]+)-?([0-9]+)?/;
