@@ -1,6 +1,6 @@
 import waitForDisplayed from '../wait/waitForDisplayed';
 import LoginForm from '../selectors/LoginForm';
-import { OktaSignInV1, OktaSignInOIE } from  '../selectors';
+import OktaSignInOIE from '../selectors/OktaSignInOIE';
 import Home from '../selectors/Home';
 import startApp from './startApp';
 
