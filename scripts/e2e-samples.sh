@@ -18,7 +18,7 @@ get_secret prod/okta-sdk-vars/password PASSWORD
 get_secret prod/okta-sdk-vars/client_secret CLIENT_SECRET
 get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY
 get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
-export FB_USERNAME=ycfjikukbl_1613767309@tfbnw.net 
+export FB_USERNAME=js_ekdtypn_user@tfbnw.net
 get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 
 # Pull testenv.yml file
