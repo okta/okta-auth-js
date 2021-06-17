@@ -1,5 +1,5 @@
 import { getConfig } from '../../util';
-import FacebookSignin from  '../selectors/FacebookSignin';
+import FacebookSignIn from  '../selectors/FacebookSignIn';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import setInputField from './setInputField';
 import clickElement from './clickElement';
@@ -14,15 +14,15 @@ export default async function(
   this.userName = fbUsername;
 
   // enter login and password
-  await waitForDisplayed(FacebookSignin.username);
-  await setInputField('set', fbUsername as string, FacebookSignin.username);
-  await setInputField('set', fbPassword as string, FacebookSignin.password);
-  await clickElement('click', 'selector', FacebookSignin.submit);
+  await waitForDisplayed(FacebookSignIn.username);
+  await setInputField('set', fbUsername as string, FacebookSignIn.username);
+  await setInputField('set', fbPassword as string, FacebookSignIn.password);
+  await clickElement('click', 'selector', FacebookSignIn.submit);
 
   // allow application
   try {
-    await waitForDisplayed(FacebookSignin.continue, false, 5000);
-    await clickElement('click', 'selector', FacebookSignin.continue);
+    await waitForDisplayed(FacebookSignIn.continue, false, 5000);
+    await clickElement('click', 'selector', FacebookSignIn.continue);
   } catch (err) {
     // facebook user has already allowed application
   }

@@ -21,9 +21,6 @@ get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
 export FB_USERNAME=js_ekdtypn_user@tfbnw.net
 get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 
-export FB_USERNAME=js_ekdtypn_user@tfbnw.net
-get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
-
 # Pull testenv.yml file
 aws s3 --quiet --region us-east-1 cp s3://ci-secret-stash/prod/okta-sdk-vars/testenv.yml $OKTA_HOME/$REPO/testenv.yml
 #get_secret prod/okta-sdk-vars/testenv.yml TESTENV_YML
