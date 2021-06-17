@@ -3,7 +3,6 @@ import LoginForm from '../selectors/LoginForm';
 import { OktaSignInV1, OktaSignInOIE } from  '../selectors';
 import Home from '../selectors/Home';
 import startApp from './startApp';
-const OktaSignIn = process.env.ORG_OIE_ENABLED ? OktaSignInOIE : OktaSignInV1;
 
 // eslint-disable-next-line complexity
 function getContext(formName: string) {
@@ -42,7 +41,7 @@ function getContext(formName: string) {
       break;
     case 'Login with Social IDP': {
       url = '/login';
-      selector = OktaSignIn.signinWithGoogleBtn;
+      selector = OktaSignInOIE.signinWithFacebookBtn;
       queryParams = { flow: 'widget' };
       break;
     }
