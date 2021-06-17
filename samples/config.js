@@ -82,6 +82,7 @@ const samples = [
       'mfa-password-and-email',
       'mfa-password-and-sms',
       'social-login-mfa',
+      'social-idp'
     ],
     useEnv: true
   },
