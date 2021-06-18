@@ -77,22 +77,22 @@
     },
 
     {
-      "name": "sample: express direct auth (web server)",
+      "name": "sample: express-embedded-auth-with-sdk (web server)",
       "type": "node",
       "request": "launch",
       "autoAttachChildProcesses": true,
       "console": "integratedTerminal",
-      "cwd": "${workspaceRoot}/samples/generated/express-direct-auth",
+      "cwd": "${workspaceRoot}/samples/generated/express-embedded-auth-with-sdk",
       "program": "web-server/server.js"
     },
 
     {
-      "name": "sample: express direct auth (resource server)",
+      "name": "sample: express-embedded-auth-with-sdk (resource server)",
       "type": "node",
       "request": "launch",
       "autoAttachChildProcesses": true,
       "console": "integratedTerminal",
-      "cwd": "${workspaceRoot}/samples/generated/express-direct-auth",
+      "cwd": "${workspaceRoot}/samples/generated/express-embedded-auth-with-sdk",
       "program": "resource-server/server.js"
     },
 
