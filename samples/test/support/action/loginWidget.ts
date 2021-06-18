@@ -1,13 +1,13 @@
-import { OktaSignInV1, OktaSignInOIE } from  '../selectors';
 import { getConfig } from '../../util/configUtils';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import setInputField from './setInputField';
 import clickElement from './clickElement';
+import { getOktaSignInForm } from  '../../util';
 
 export default async (
   options: Record<string, string> = {}
 ) => {
-  const OktaSignIn = process.env.ORG_OIE_ENABLED ? OktaSignInOIE : OktaSignInV1;
+  const OktaSignIn = getOktaSignInForm();
   await waitForDisplayed(OktaSignIn.signinSubmitBtn);
 
   const config = getConfig();
@@ -24,4 +24,3 @@ export default async (
   await setInputField('set', password, OktaSignIn.signinPassword);
   await clickElement('click', 'selector', OktaSignIn.signinSubmitBtn);
 };
-

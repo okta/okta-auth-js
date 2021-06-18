@@ -6,7 +6,7 @@ import checkNoProfile from '../support/check/checkNoProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
 import checkButton from '../support/check/checkButton';
-import checkURLPath from '../support/check/checkURLPath';
+import waitForURLPath from '../support/wait/waitForURLPath';
 import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import enterValidPassword from '../support/action/live-user/enterValidPassword';
@@ -54,13 +54,13 @@ Then(
 );
 
 Then(
-  /^she is redirected to the ([\s\w]+)$/,
-  checkIsOnPage
+  /^she is redirected back to the (?:Root View|Sample App)$/,
+  () => waitForURLPath(false, '/', true)
 );
 
 Then(
-  /^she is redirected back to the Root View$/,
-  () => checkURLPath(false, '/')
+  /^she is redirected to the ([\s\w]+)$/,
+  checkIsOnPage
 );
 
 Then(

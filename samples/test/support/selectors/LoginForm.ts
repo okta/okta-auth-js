@@ -7,7 +7,6 @@ const formMessage = `${formMessages}:first-child`;
 const facebookButton = '#idp-buttons #facebook';
 const googleButton = '#idp-buttons #google';
 
-
 export class LoginForm {
   get username() { return username; }
   get password() { return password; }

@@ -40,7 +40,9 @@ import skipForm from '../support/action/skipForm';
 import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
 import enterIncorrectPhoneNumberFormat from '../support/action/enterIncorrectPhoneNumberFormat';
 import clickFacebookButton from '../support/action/clickFacebookButton';
+import clickLoginWithFacebookInWidget from '../support/action/clickLoginWithFacebookInWidget';
 import signInIntoFacebook from '../support/action/signInIntoFacebook';
+import ActionContext from '../support/context';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -103,13 +105,20 @@ When(
 );
 
 When(
+  /^she clicks the "Login with Facebook" button in the embedded Sign In Widget$/,
+  clickLoginWithFacebookInWidget
+);
+
+When(
   /^she clicks the "Login with Facebook" button$/,
   clickFacebookButton
 );
 
 When(
   /^logs in to Facebook$/,
-  signInIntoFacebook
+  async function(this: ActionContext) {
+    await signInIntoFacebook.call(this);
+  }
 );
 
 When(

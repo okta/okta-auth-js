@@ -82,6 +82,7 @@ const samples = [
       'mfa-password-and-email',
       'mfa-password-and-sms',
       'social-login-mfa',
+      'social-idp'
     ],
     useEnv: true
   },
@@ -89,7 +90,10 @@ const samples = [
     name: 'express-embedded-sign-in-widget',
     template: 'express-embedded-sign-in-widget',
     specs: [],
-    features: ['embedded-widget-basic-auth'],
+    features: [
+      'embedded-widget-basic-auth',
+      'social-idp-with-widget'
+    ],
     useEnv: true
   },
 ].map(function(sampleConfig) {

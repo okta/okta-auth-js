@@ -11,6 +11,7 @@ function getContext(formName: string) {
   let selector;
   let isNotDisplayed = false;
   switch (formName) {
+    case 'the Login View':
     case 'the Basic Login View':
     case 'Login with Username and Password':
     case 'Basic Social Login View':
@@ -38,6 +39,12 @@ function getContext(formName: string) {
       selector = OktaSignInOIE.signinUsername;
       queryParams = { flow: 'widget' };
       break;
+    case 'Login with Social IDP': {
+      url = '/login';
+      selector = OktaSignInOIE.signinWithFacebookBtn;
+      queryParams = { flow: 'widget' };
+      break;
+    }
     default:
       throw new Error(`Unknown form "${formName}"`);
   }

@@ -14,3 +14,4 @@ Feature: Direct Auth Social Login with MFA
     And logs in to Facebook
     # And the remediation returns "MFA_REQUIRED"
     Then she should see an error message "Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed." 
+  

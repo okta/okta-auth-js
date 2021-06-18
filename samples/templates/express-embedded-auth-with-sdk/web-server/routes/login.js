@@ -11,6 +11,8 @@ const getIdpSemanticClass = (type) => {
   switch (type) {
     case 'GOOGLE':
       return 'google plus';
+    case 'FACEBOOK':
+      return 'facebook';
     default: 
     return '';
   }
