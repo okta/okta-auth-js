@@ -18,6 +18,7 @@
     "url": "https://github.com/okta/okta-auth-js/issues"
   },
   "scripts": {
+    "banners": "node ./scripts/maintain-banners.js",
     "clean": "yarn clean:build",
     "clean:build": "rimraf build && rimraf build2",
     "dev": "webpack --config webpack.dev.config.js",
