@@ -65,3 +65,8 @@ export function isRefreshToken(obj: any): obj is RefreshToken {
   return obj && obj.refreshToken;
 }
 
+export interface Tokens {
+  accessToken?: AccessToken;
+  idToken?: IDToken;
+  refreshToken?: RefreshToken;
+}

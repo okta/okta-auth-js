@@ -11,13 +11,13 @@
  */
 
 import { AuthTransaction } from '../tx/AuthTransaction';
-import { Token, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
+import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
 import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
-import { TokenManager } from '../TokenManager';
+import { TokenManagerInterface } from './TokenManager';
 
 import { 
   AuthenticationOptions, 
@@ -35,7 +35,7 @@ export interface OktaAuth {
 
   storageManager: StorageManager;
   transactionManager: TransactionManager;
-  tokenManager: TokenManager;
+  tokenManager: TokenManagerInterface;
 
   // Browser only
   features?: FeaturesAPI;
@@ -111,12 +111,6 @@ export interface TokenParams extends CustomUrls {
   sessionToken?: string;
   timeout?: number;
   popupTitle?: string;
-}
-
-export interface Tokens {
-  accessToken?: AccessToken;
-  idToken?: IDToken;
-  refreshToken?: RefreshToken;
 }
 
 export interface TokenResponse {

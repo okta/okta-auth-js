@@ -28,7 +28,10 @@ import {
   StorageOptions,
   StorageType,
   OktaAuth,
-  StorageProvider
+  StorageProvider,
+  TokenManagerErrorEventHandler,
+  TokenManagerEventHandler,
+  TokenManagerInterface
 } from './types';
 import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_KEY } from './constants';
 import { TokenService } from './services/TokenService';
@@ -47,15 +50,7 @@ export const EVENT_RENEWED = 'renewed';
 export const EVENT_ADDED = 'added';
 export const EVENT_REMOVED = 'removed';
 export const EVENT_ERROR = 'error';
-interface TokenError {
-  errorSummary: string;
-  errorCode: string;
-  message: string;
-  name: string;
-  tokenKey: string;
-}
-type TokenErrorEventHandler = (error: TokenError) => void;
-type TokenEventHandler = (key: string, token: Token, oldtoken?: Token) => void;
+
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
   renewPromise: Record<string, Promise<Token>>;
@@ -66,7 +61,7 @@ function defaultState(): TokenManagerState {
     renewPromise: {}
   };
 }
-export class TokenManager {
+export class TokenManager implements TokenManagerInterface {
   private sdk: OktaAuth;
   private clock: SdkClock;
   private emitter: EventEmitter;
@@ -75,8 +70,8 @@ export class TokenManager {
   private options: TokenManagerOptions;
   private service: TokenService;
 
-  on: (event: string, handler: TokenErrorEventHandler | TokenEventHandler, context?: object) => void;
-  off: (event: string, handler?: TokenErrorEventHandler | TokenEventHandler) => void;
+  on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
+  off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
 
   constructor(sdk: OktaAuth, options: TokenManagerOptions = {}) {
     this.sdk = sdk;
