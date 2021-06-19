@@ -341,13 +341,6 @@ export class TokenManager implements TokenManagerInterface {
   }
   /* eslint-enable max-params */
   
-  removeAll() {
-    const tokenStorage = this.storage.getStorage();
-    Object.keys(tokenStorage).forEach(key => {
-      this.remove(key);
-    });
-  }
-
   remove(key) {
     // Clear any listener for this token
     this.clearExpireEventTimeout(key);
