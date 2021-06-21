@@ -14,7 +14,6 @@
 import { TokenResponse } from './../../../build/lib/types/api.d';
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import util from '@okta/test.support/util';
 import * as tokenEndpoint from '../../../lib/oidc/endpoints/token';
 import * as renewTokensWithRefreshTokenModule from '../../../lib/oidc/renewTokensWithRefresh';
 import * as getWithoutPromptModule from '../../../lib/oidc/getWithoutPrompt';
