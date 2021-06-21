@@ -24,7 +24,7 @@ describe('renewTokensWithRefresh', function () {
   let renewTokenSpy;
   let authInstance;
 
-  beforeEach(function () {
+  beforeEach(() => {
     jest.spyOn(getWithoutPromptModule, 'getWithoutPrompt').mockImplementation(function () {
       const tokenResponse: TokenResponse = {
         tokens: {},
@@ -41,15 +41,19 @@ describe('renewTokensWithRefresh', function () {
         'scope': 'openid email',
       });
     });
+    jest.spyOn(Date, 'now').mockImplementation(() => tokens.now);
     renewTokenSpy = jest.spyOn(renewTokensWithRefreshTokenModule, 'renewTokensWithRefresh');
 
-    util.warpToUnixTime(tokens.standardIdToken2Claims.iat);
     authInstance = new OktaAuth({
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
     });
     authInstance.tokenManager.clear();
     oauthUtil.loadWellKnownAndKeysCache(authInstance);
+  });
+
+  afterEach(() => {
+    jest.spyOn(Date, 'now').mockRestore();
   });
 
 

@@ -38,6 +38,7 @@ describe('token.renew', function() {
           'prompt': 'none'
         }
       },
+      time: tokens.time,
       expectedResp: tokens.standardIdTokenParsed
     });
   });
@@ -64,7 +65,7 @@ describe('token.renew', function() {
           'prompt': 'none'
         }
       },
-      time: 1449699929,
+      time: tokens.time,
       postMessageResp: {
         'id_token': tokens.authServerIdToken,
         'state': oauthUtil.mockedState

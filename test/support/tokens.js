@@ -74,10 +74,13 @@ tokens.standardIdTokenClaims = {
   'auth_time': 1449696330
 };
 
+tokens.now = 1449699929000;
+tokens.time = tokens.now / 1000;
+
 tokens.standardIdTokenParsed = {
   idToken: tokens.standardIdToken,
   claims: tokens.standardIdTokenClaims,
-  expiresAt: 1449699930,
+  expiresAt: 1449703529, // assuming time = tokens.time
   scopes: ['openid', 'email'],
   authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
   issuer: 'https://auth-js-test.okta.com',
@@ -122,7 +125,7 @@ tokens.standardIdToken2Claims = {
 tokens.standardIdToken2Parsed = {
   idToken: tokens.standardIdToken2,
   claims: tokens.standardIdToken2Claims,
-  expiresAt: 1449699930,
+  expiresAt: 1449703529, // assuming time = tokens.time
   scopes: ['openid', 'email'],
   authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
   issuer: 'https://auth-js-test.okta.com',
@@ -203,7 +206,7 @@ tokens.authServerIdTokenClaims = {
 tokens.authServerIdTokenParsed = {
   idToken: tokens.authServerIdToken,
   claims: tokens.authServerIdTokenClaims,
-  expiresAt: 1449699930,
+  expiresAt: 1449703529, // assuming time = tokens.time
   scopes: ['openid', 'email'],
   authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
   issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -277,7 +280,7 @@ tokens.standardAccessTokenClaims = {
 tokens.standardAccessTokenParsed = {
   accessToken: tokens.standardAccessToken,
   claims: tokens.standardAccessTokenClaims,
-  expiresAt: 1449703529, // assuming time = 1449699929
+  expiresAt: 1449703529, // assuming time = tokens.time
   scopes: ['openid', 'email'],
   tokenType: 'Bearer',
   authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
@@ -316,7 +319,7 @@ tokens.authServerAccessTokenClaims = {
 tokens.authServerAccessTokenParsed = {
   accessToken: tokens.authServerAccessToken,
   claims: tokens.authServerAccessTokenClaims,
-  expiresAt: 1449703529, // assuming time = 1449699929
+  expiresAt: 1449703529, // assuming time = tokens.time
   scopes: ['openid', 'email'],
   tokenType: 'Bearer',
   authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
@@ -339,7 +342,7 @@ tokens.standardRefreshTokenParsed = {
 tokens.standardRefreshToken2 = 'fUlkhRyaAFvlsEHXzkz0KYnThBEs-j3yRZwXBwbPTUA';
 tokens.standardRefreshToken2Parsed = {
   'refreshToken': 'fUlkhRyaAFvlsEHXzkz0KYnThBEs-j3yRZwXBwbPTUA',
-  'expiresAt': 1449696330,
+  'expiresAt': 1449699929, // assuming time = tokens.time, expires_in = 0
   'scopes': [
     'openid',
     'email',

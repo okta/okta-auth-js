@@ -412,7 +412,7 @@ describe('TokenManager', function() {
     });
 
     it('accounts for local clock offset when emitting "expired"', function() {
-      util.warpToUnixTime(tokens.standardIdTokenClaims.exp);
+      util.warpToUnixTime(tokens.standardIdTokenParsed.expiresAt);
       var localClockOffset = -2000; // local client is 2 seconds fast
       setupSync({
         localClockOffset: localClockOffset
@@ -428,7 +428,7 @@ describe('TokenManager', function() {
   
     it('accounts for "expireEarlySeconds" option when emitting "expired"', function() {
       var expireEarlySeconds = 10;
-      util.warpToUnixTime(tokens.standardIdTokenClaims.exp - (expireEarlySeconds + 1));
+      util.warpToUnixTime(tokens.standardIdTokenParsed.expiresAt - (expireEarlySeconds + 1));
       setupSync({
         tokenManager: {
           expireEarlySeconds: expireEarlySeconds
