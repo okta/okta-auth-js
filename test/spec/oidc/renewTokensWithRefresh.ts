@@ -51,11 +51,6 @@ describe('renewTokensWithRefresh', function () {
     oauthUtil.loadWellKnownAndKeysCache(authInstance);
   });
 
-  afterEach(() => {
-    jest.spyOn(Date, 'now').mockRestore();
-  });
-
-
   it('is called when refresh token is available in browser storage', async function() {
     await authInstance.token.renewTokens();
     expect(renewTokenSpy).not.toHaveBeenCalled();

@@ -113,7 +113,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
         var idTokenObj: IDToken = {
           idToken: idToken,
           claims: idJwt.payload,
-          expiresAt: idJwt.payload.exp - idJwt.payload.iat + now,
+          expiresAt: idJwt.payload.exp - idJwt.payload.iat + now, // adjusting expiresAt to be in local time
           scopes: scopes,
           authorizeUrl: urls.authorizeUrl,
           issuer: urls.issuer,
