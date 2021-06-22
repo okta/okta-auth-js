@@ -14,7 +14,6 @@
 import { TokenResponse } from './../../../build/lib/types/api.d';
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import util from '@okta/test.support/util';
 import * as tokenEndpoint from '../../../lib/oidc/endpoints/token';
 import * as renewTokensWithRefreshTokenModule from '../../../lib/oidc/renewTokensWithRefresh';
 import * as getWithoutPromptModule from '../../../lib/oidc/getWithoutPrompt';
@@ -24,7 +23,7 @@ describe('renewTokensWithRefresh', function () {
   let renewTokenSpy;
   let authInstance;
 
-  beforeEach(function () {
+  beforeEach(() => {
     jest.spyOn(getWithoutPromptModule, 'getWithoutPrompt').mockImplementation(function () {
       const tokenResponse: TokenResponse = {
         tokens: {},
@@ -41,9 +40,9 @@ describe('renewTokensWithRefresh', function () {
         'scope': 'openid email',
       });
     });
+    jest.spyOn(Date, 'now').mockImplementation(() => tokens.now);
     renewTokenSpy = jest.spyOn(renewTokensWithRefreshTokenModule, 'renewTokensWithRefresh');
 
-    util.warpToUnixTime(tokens.standardIdToken2Claims.iat);
     authInstance = new OktaAuth({
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -51,7 +50,6 @@ describe('renewTokensWithRefresh', function () {
     authInstance.tokenManager.clear();
     oauthUtil.loadWellKnownAndKeysCache(authInstance);
   });
-
 
   it('is called when refresh token is available in browser storage', async function() {
     await authInstance.token.renewTokens();

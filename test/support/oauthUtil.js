@@ -241,7 +241,7 @@ oauthUtil.setup = function(opts) {
           const index = tokenTypesTobeRenewed.indexOf('accessToken');
           tokenTypesTobeRenewed.splice(index, 1);
         } else if (isIDToken(freshToken)) {
-          const index = tokenTypesTobeRenewed.indexOf('accessToken');
+          const index = tokenTypesTobeRenewed.indexOf('idToken');
           tokenTypesTobeRenewed.splice(index, 1);
         }
         if (!tokenTypesTobeRenewed.length) {
@@ -281,7 +281,7 @@ oauthUtil.setup = function(opts) {
       if (opts.willFail) {
         throw err;
       } else {
-        console.error(err); // eslint-disable-line
+        console.error(err.message); // eslint-disable-line
         expect('not to be hit').toBe(true);
       }
     })
