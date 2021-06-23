@@ -1,4 +1,5 @@
-import { Token, Tokens } from './Token';
+/* eslint-disable max-len */
+import { Token, Tokens, TokenType } from './Token';
 
 export interface TokenManagerError {
   errorSummary: string;
@@ -16,4 +17,7 @@ export interface TokenManagerInterface {
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
   getTokensSync(): Tokens;
+  setTokens({ accessToken, idToken, refreshToken }: Tokens, accessTokenCb?: Function, idTokenCb?: Function, refreshTokenCb?: Function): void;
+  getStorageKeyByType(type: TokenType): string;
+  add(key: any, token: Token): void;
 }

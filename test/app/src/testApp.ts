@@ -150,7 +150,15 @@ class TestApp {
   }
 
   subscribeToTokenEvents(): void {
-    this.oktaAuth.tokenManager.on('error', this._onTokenError.bind(this));
+    ['expired', 'renewed', 'added', 'removed'].forEach(event => {
+      this.oktaAuth.tokenManager.on(event, (arg1: unknown, arg2?: unknown) => {
+        console.log(`TokenManager::${event}`, arg1, arg2);
+      });
+    });
+    this.oktaAuth.tokenManager.on('error', (err: unknown) => {
+      console.log('TokenManager::error', err);
+      this._onTokenError(err);
+    });
   }
 
   _setContent(content: string): void {
@@ -166,8 +174,8 @@ class TestApp {
     }
   }
 
-  _onTokenError(error: string): void {
-    document.getElementById('token-error').innerText = error;
+  _onTokenError(error: unknown): void {
+    document.getElementById('token-error').innerText = error as string;
   }
 
   async bootstrapCallback(): Promise<void> {
