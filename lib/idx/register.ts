@@ -65,7 +65,7 @@ export async function register(
     }
   }
   
-  const flowMonitor = new RegistrationFlowMonitor();
+  const flowMonitor = new RegistrationFlowMonitor(authClient);
   return run(authClient, { 
     ...options, 
     flow,

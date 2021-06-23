@@ -12,6 +12,7 @@
 
 
 import { FlowMonitor } from './FlowMonitor';
+import { getTransactionMeta } from '../transactionMeta';
 
 export class PasswordRecoveryFlowMonitor extends FlowMonitor {
   isRemediatorCandidate(remediator, remediations?, values?) {
@@ -32,5 +33,14 @@ export class PasswordRecoveryFlowMonitor extends FlowMonitor {
     }
 
     return super.isRemediatorCandidate(remediator, remediations, values);
+  }
+
+  async isFinished() {
+    const { remediations }  = await getTransactionMeta(this.authClient);
+    if (!remediations.includes('reset-authenticator')) {
+      return false;
+    }
+
+    return await super.isFinished();
   }
 }

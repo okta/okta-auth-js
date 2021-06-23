@@ -48,6 +48,7 @@ export interface PKCETransactionMeta extends OAuthTransactionMeta {
 
 export interface IdxTransactionMeta extends PKCETransactionMeta {
   interactionHandle?: string;
+  remediations?: string[];
 }
 
 export type CustomAuthTransactionMeta = Record<string, string | undefined>;
