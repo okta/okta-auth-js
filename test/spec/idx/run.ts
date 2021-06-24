@@ -210,7 +210,7 @@ describe('idx/run', () => {
       const { authClient, options } = testContext; 
       options.flowMonitor = {
         isFinished: jest.fn().mockResolvedValue(false)
-      }
+      };
 
       jest.spyOn(authClient.transactionManager, 'load');
       jest.spyOn(authClient.transactionManager, 'clear');

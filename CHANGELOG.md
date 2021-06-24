@@ -6,6 +6,7 @@
 
 - [#831](https://github.com/okta/okta-auth-js/pull/831) Calculates ID token expiry time based on local clock
 - [#832](https://github.com/okta/okta-auth-js/pull/832) Supports rotating refresh tokens
+- [#838](https://github.com/okta/okta-auth-js/pull/838) `idx.recoverPassword` - checks if flow is supported
 
 ### Bug Fixes
 
