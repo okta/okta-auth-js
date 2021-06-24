@@ -11,6 +11,10 @@
 
 - [#832](https://github.com/okta/okta-auth-js/pull/832) Fixes issues with refresh tokens
 
+### Other
+
+- [](https://github.com/okta/okta-auth-js/pull/839) Moves `tsd` from dependencies to devDependencies
+
 ## 5.1.1
 
 ### Bug Fixes
