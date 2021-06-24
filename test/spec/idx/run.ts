@@ -14,6 +14,7 @@
 import { run } from '../../../lib/idx/run';
 import { IdxStatus } from '../../../lib/idx/types';
 import { IdxResponseFactory } from '@okta/test.support/idx';
+import { AuthSdkError } from '../../../lib/errors';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
@@ -69,7 +70,10 @@ describe('idx/run', () => {
       flow: {
         'fake': true
       },
-      actions: []
+      actions: [],
+      flowMonitor: {
+        isFinished: jest.fn().mockResolvedValue(true)
+      }
     };
     testContext = {
       idxResponse,
@@ -179,7 +183,6 @@ describe('idx/run', () => {
       jest.spyOn(authClient.transactionManager, 'clear');
       jest.spyOn(authClient.token, 'exchangeCodeForTokens');
 
-
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
@@ -201,6 +204,24 @@ describe('idx/run', () => {
        status: IdxStatus.SUCCESS,
        tokens: tokenResponse.tokens,
       });
+    });
+
+    it('catches error when the flow not suppose to be finished', async () => {
+      const { authClient, options } = testContext; 
+      options.flowMonitor = {
+        isFinished: jest.fn().mockResolvedValue(false)
+      }
+
+      jest.spyOn(authClient.transactionManager, 'load');
+      jest.spyOn(authClient.transactionManager, 'clear');
+      jest.spyOn(authClient.token, 'exchangeCodeForTokens');
+
+      const res = await run(authClient, options);
+      expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
+      expect(authClient.token.exchangeCodeForTokens).not.toHaveBeenCalledWith();
+      expect(res.status).toEqual(IdxStatus.FAILURE);
+      expect(res.error instanceof AuthSdkError).toBeTruthy();
+      expect((res.error as AuthSdkError).message).toEqual('Current flow is not supported, check policy settings in your org.');
     });
 
     it('catches errors from exchangeCodeForTokens and clears storage', async () => {
