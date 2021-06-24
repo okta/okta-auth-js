@@ -13,7 +13,7 @@
 
 ### Other
 
-- [](https://github.com/okta/okta-auth-js/pull/839) Moves `tsd` from dependencies to devDependencies
+- [#839](https://github.com/okta/okta-auth-js/pull/839) Moves `tsd` from dependencies to devDependencies
 
 ## 5.1.1
 
