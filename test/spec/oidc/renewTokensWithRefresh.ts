@@ -45,7 +45,7 @@ describe('renewTokensWithRefresh', function () {
     });
     const renewTokenSpy = jest.spyOn(renewTokensWithRefreshTokenModule, 'renewTokensWithRefresh');
 
-    util.warpToUnixTime(tokens.standardIdToken2Claims.iat);
+    util.warpToUnixTime(tokens.time);
     const authInstance = new OktaAuth({
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
