@@ -353,14 +353,14 @@ export class TokenManager implements TokenManagerInterface {
     this.emitRemoved(key, removedToken);
   }
   
-  // TODO: these methods are redundant and can be removed in the next major version
+  // TODO: this methods is redundant and can be removed in the next major version OKTA-407224
   async renewToken(token) {
     return this.sdk.token.renew(token);
   }
+  // TODO: this methods is redundant and can be removed in the next major version OKTA-407224
   validateToken(token: Token) {
     return validateToken(token);
   }
-  
 
   renew(key): Promise<Token> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
