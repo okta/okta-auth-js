@@ -42,7 +42,7 @@ CLIENT_SECRET=456xxx
 
 ### Commands
 
-If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/generated/express-embedded-widget start`
+If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/generated/express-embedded-sign-in-widget start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |

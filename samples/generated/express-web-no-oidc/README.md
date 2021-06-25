@@ -9,7 +9,7 @@ By default the app server runs at `http://localhost:8080`.
 
 ## Commands
 
-If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/express-web-no-oidc start`
+If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/generated/express-web-no-oidc start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
