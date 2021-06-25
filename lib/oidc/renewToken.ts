@@ -11,14 +11,39 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuth, Token, isToken, isAccessToken, AccessToken, IDToken, isIDToken } from '../types';
+import { OktaAuth, Token, Tokens, isAccessToken, AccessToken, IDToken, isIDToken } from '../types';
 import { getWithoutPrompt } from './getWithoutPrompt';
+import { renewTokensWithRefresh } from './renewTokensWithRefresh';
 
-export function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
-  // Note: This is not used when a refresh token is present
-  if (!isToken(token)) {
-    return Promise.reject(new AuthSdkError('Renew must be passed a token with ' +
-      'an array of scopes and an accessToken or idToken'));
+function throwInvalidTokenError() {
+  throw new AuthSdkError(
+    'Renew must be passed a token with an array of scopes and an accessToken or idToken'
+  );
+}
+
+// Multiple tokens may have come back. Return only the token which was requested.
+function getSingleToken(originalToken: Token, tokens: Tokens) {
+  if (isIDToken(originalToken)) {
+    return tokens.idToken;
+  }
+  if (isAccessToken(originalToken)) {
+    return tokens.accessToken;
+  }
+  throwInvalidTokenError();
+}
+
+// If we have a refresh token, renew using that, otherwise getWithoutPrompt
+export async function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
+  if (!isIDToken(token) && !isAccessToken(token)) {
+    throwInvalidTokenError();
+  }
+
+  let tokens = sdk.tokenManager.getTokensSync();
+  if (tokens.refreshToken) {
+    tokens = await renewTokensWithRefresh(sdk, {
+      scopes: token.scopes,
+    }, tokens.refreshToken);
+    return getSingleToken(token, tokens);
   }
 
   var responseType;
@@ -39,8 +64,6 @@ export function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
     issuer
   })
     .then(function (res) {
-      // Multiple tokens may have come back. Return only the token which was requested.
-      var tokens = res.tokens;
-      return isIDToken(token) ? tokens.idToken : tokens.accessToken;
+      return getSingleToken(token, res.tokens);
     });
 }

@@ -10,39 +10,34 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { TokenParams, Tokens, RefreshToken } from '../types';
+import { TokenParams, Tokens } from '../types';
 import { getWithoutPrompt } from './getWithoutPrompt';
 import { renewTokensWithRefresh } from './renewTokensWithRefresh';
 import { getDefaultTokenParams } from './util';
 
-export function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
-  
-  // If we have a refresh token, renew using that, otherwise getWithoutPrompt
+// If we have a refresh token, renew using that, otherwise getWithoutPrompt
+export async function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
+  const tokens = sdk.tokenManager.getTokensSync();
+  if (tokens.refreshToken) {
+    return renewTokensWithRefresh(sdk, options, tokens.refreshToken);
+  }
 
-  // Calling via async as auth-js doesn't yet (as of 4.2) ensure that updateAuthState() was ever called
-  return sdk.tokenManager.getTokens()
-    .then(tokens => tokens.refreshToken as RefreshToken)
-    .then(refreshTokenObject => {
+  // Get tokens using the SSO cookie
+  options = Object.assign({
+    scopes: sdk.options.scopes,
+    authorizeUrl: sdk.options.authorizeUrl,
+    userinfoUrl: sdk.options.userinfoUrl,
+    issuer: sdk.options.issuer
+  }, options);
 
-      if (refreshTokenObject) {
-        return renewTokensWithRefresh(sdk, options, refreshTokenObject);
-      }
+  if (sdk.options.pkce) {
+    options.responseType = 'code';
+  } else {
+    const { responseType } = getDefaultTokenParams(sdk);
+    options.responseType = responseType;
+  }
 
-      options = Object.assign({
-        scopes: sdk.options.scopes,
-        authorizeUrl: sdk.options.authorizeUrl,
-        userinfoUrl: sdk.options.userinfoUrl,
-        issuer: sdk.options.issuer
-      }, options);
-
-      if (sdk.options.pkce) {
-        options.responseType = 'code';
-      } else {
-        const { responseType } = getDefaultTokenParams(sdk);
-        options.responseType = responseType;
-      }
-
-      return getWithoutPrompt(sdk, options)
-        .then(res => res.tokens);
-    });
+  return getWithoutPrompt(sdk, options)
+    .then(res => res.tokens);
+    
 }

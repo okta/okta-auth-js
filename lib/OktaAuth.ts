@@ -20,6 +20,7 @@ import {
 } from './constants';
 import * as constants from './constants';
 import {
+  OktaAuth as SDKInterface,
   OktaAuthOptions, 
   AccessToken, 
   IDToken,
@@ -106,7 +107,7 @@ import {
 
 const Emitter = require('tiny-emitter');
 
-class OktaAuth implements SigninAPI, SignoutAPI {
+class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   options: OktaAuthOptions;
   storageManager: StorageManager;
   transactionManager: TransactionManager;

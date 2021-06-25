@@ -91,4 +91,4 @@ Scenario: Mary signs up for an account with Password, sets up required Email fac
   When She selects Phone from the list
   And she inputs an invalid phone number
   And submits the enrollment form
-  Then she should see an error message "Unable to initiate factor enrollment: Invalid Phone Number."
+  Then she should see an error message "Invalid Phone Number."

@@ -18,42 +18,54 @@ import * as tokenEndpoint from '../../../lib/oidc/endpoints/token';
 import * as renewTokensWithRefreshTokenModule from '../../../lib/oidc/renewTokensWithRefresh';
 import * as getWithoutPromptModule from '../../../lib/oidc/getWithoutPrompt';
 import oauthUtil from '@okta/test.support/oauthUtil';
+import util from '@okta/test.support/util';
 
 describe('renewTokensWithRefresh', function () {
-  let renewTokenSpy;
-  let authInstance;
+  let testContext;
 
-  beforeEach(() => {
+  beforeEach(function () {
+    const getWithoutPromptResponse: TokenResponse = {
+      tokens: {},
+      state: '',
+      code: ''
+    };
     jest.spyOn(getWithoutPromptModule, 'getWithoutPrompt').mockImplementation(function () {
-      const tokenResponse: TokenResponse = {
-        tokens: {},
-        state: '',
-        code: ''
-      };
-      return Promise.resolve(tokenResponse);
+      return Promise.resolve(getWithoutPromptResponse);
     });
-    jest.spyOn(tokenEndpoint, 'postRefreshToken').mockImplementation(function () {
-      return Promise.resolve({
-        'id_token': tokens.standardIdToken,
-        'refresh_token': tokens.standardRefreshToken2,
-        'expires_in': '0',
-        'scope': 'openid email',
-      });
-    });
-    jest.spyOn(Date, 'now').mockImplementation(() => tokens.now);
-    renewTokenSpy = jest.spyOn(renewTokensWithRefreshTokenModule, 'renewTokensWithRefresh');
 
-    authInstance = new OktaAuth({
+    const postRefreshTokenResponse = {
+      'id_token': tokens.standardIdToken,
+      'refresh_token': tokens.standardRefreshToken2,
+      'expires_in': '0',
+      'scope': 'openid email',
+    };
+
+    jest.spyOn(tokenEndpoint, 'postRefreshToken').mockImplementation(function () {
+      return Promise.resolve(postRefreshTokenResponse);
+    });
+    const renewTokenSpy = jest.spyOn(renewTokensWithRefreshTokenModule, 'renewTokensWithRefresh');
+
+    util.warpToUnixTime(tokens.time);
+    const authInstance = new OktaAuth({
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
     });
     authInstance.tokenManager.clear();
     oauthUtil.loadWellKnownAndKeysCache(authInstance);
+
+    testContext = {
+      getWithoutPromptResponse,
+      postRefreshTokenResponse,
+      renewTokenSpy,
+      authInstance
+    };
   });
 
   it('is called when refresh token is available in browser storage', async function() {
+    const { authInstance, renewTokenSpy } = testContext;
     await authInstance.token.renewTokens();
     expect(renewTokenSpy).not.toHaveBeenCalled();
+    expect(getWithoutPromptModule.getWithoutPrompt).toHaveBeenCalled();
 
     authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
     await authInstance.token.renewTokens();
@@ -64,6 +76,7 @@ describe('renewTokensWithRefresh', function () {
   });
 
   it('returns tokens dict', async function() {
+    const { authInstance } = testContext;
     authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
 
     const newTokens = await authInstance.token.renewTokens();
@@ -72,11 +85,61 @@ describe('renewTokensWithRefresh', function () {
   });
 
   it('throws when SDK has no clientId configured', async function() {
-    authInstance = new OktaAuth({
+    const authInstance = new OktaAuth({
       issuer: 'https://auth-js-test.okta.com',
     });
     authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
     await expect(authInstance.token.renewTokens()).rejects.toThrow(
       'A clientId must be specified in the OktaAuth constructor to renew tokens');
+  });
+
+  it('saves refresh token if a different refresh token is returned', async () => {
+    const { authInstance } = testContext;
+    authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
+    let refreshToken = await authInstance.tokenManager.get('refreshToken');
+    expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
+    jest.spyOn(authInstance.tokenManager, 'add');
+    await authInstance.token.renewTokens();
+    expect(authInstance.tokenManager.add).toHaveBeenCalledWith('refreshToken', tokens.standardRefreshToken2Parsed);
+    refreshToken = await authInstance.tokenManager.get('refreshToken');
+    expect(refreshToken).toEqual(tokens.standardRefreshToken2Parsed);
+  });
+
+  it('does not save refresh token if same refresh token is returned', async () => {
+    const { authInstance, postRefreshTokenResponse } = testContext;
+    authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
+    let refreshToken = await authInstance.tokenManager.get('refreshToken');
+    expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
+    postRefreshTokenResponse['refresh_token'] = tokens.standardRefreshToken;
+    jest.spyOn(authInstance.tokenManager, 'add');
+    await authInstance.token.renewTokens();
+    expect(authInstance.tokenManager.add).not.toHaveBeenCalled();
+    refreshToken = await authInstance.tokenManager.get('refreshToken');
+    expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
+  });
+
+  it('does not save refresh token if NO refresh token is returned', async () => {
+    const { authInstance, postRefreshTokenResponse } = testContext;
+    authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
+    let refreshToken = await authInstance.tokenManager.get('refreshToken');
+    expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
+    postRefreshTokenResponse['refresh_token'] = undefined;
+    jest.spyOn(authInstance.tokenManager, 'add');
+    await authInstance.token.renewTokens();
+    expect(authInstance.tokenManager.add).not.toHaveBeenCalled();
+    refreshToken = await authInstance.tokenManager.get('refreshToken');
+    expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
+  });
+
+  it('supports rotating refresh tokens with custom key names', async () => {
+    const { authInstance } = testContext;
+    authInstance.tokenManager.add('refreshToken2', tokens.standardRefreshTokenParsed);
+    let refreshToken = await authInstance.tokenManager.get('refreshToken2');
+    expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
+    jest.spyOn(authInstance.tokenManager, 'add');
+    await authInstance.token.renewTokens();
+    expect(authInstance.tokenManager.add).toHaveBeenCalledWith('refreshToken2', tokens.standardRefreshToken2Parsed);
+    refreshToken = await authInstance.tokenManager.get('refreshToken2');
+    expect(refreshToken).toEqual(tokens.standardRefreshToken2Parsed);
   });
 });

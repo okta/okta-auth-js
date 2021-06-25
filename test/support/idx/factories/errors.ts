@@ -70,7 +70,7 @@ export const IdxErrorResetPasswordNotAllowedFactory = IdxErrorMessageFactory.par
 
 export const IdxErrorEnrollmentInvalidPhoneFactory = IdxErrorMessageFactory.params({
   i18n: undefined, // this error does not have an i18n key
-  message: 'Unable to initiate factor enrollment: Invalid Phone Number.'
+  message: 'Invalid Phone Number.'
 });
 
 export const IdxErrorInvalidLoginEmailFactory = IdxErrorMessageFactory.params({

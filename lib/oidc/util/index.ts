@@ -20,5 +20,7 @@ export * from './oauth';
 import pkce from './pkce';
 export { pkce };
 export * from './prepareTokenParams';
+export * from './refreshToken';
 export * from './urlParams';
 export * from './validateClaims';
+export * from './validateToken';

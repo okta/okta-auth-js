@@ -45,7 +45,7 @@ Feature: Multi-Factor Authentication with Password and SMS
     When She selects SMS from the list
       And She inputs a invalid phone number
       And She selects "Receive a Code"
-    Then she should see a message "Unable to initiate factor enrollment: Invalid Phone Number."
+    Then she should see a message "Invalid Phone Number."
 
   Scenario: 2FA Login with SMS
     Given Mary has enrolled in the SMS factor
