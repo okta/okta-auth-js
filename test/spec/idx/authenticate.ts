@@ -835,7 +835,7 @@ describe('idx/authenticate', () => {
               i18n: {
                 key: undefined // this error does not have an i18n key
               },
-              message: 'Unable to initiate factor enrollment: Invalid Phone Number.'
+              message: 'Invalid Phone Number.'
             }],
             nextStep: {
               name: 'authenticator-enrollment-data',
