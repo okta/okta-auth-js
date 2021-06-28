@@ -8,7 +8,10 @@ var babelOptions = {
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-transform-runtime'
   ],
-  sourceType: 'unambiguous'
+  sourceType: 'unambiguous',
+  // the banners should only be added at the end of the build process
+  // ignore all comments during transpiling
+  shouldPrintComment: () => false 
 };
 
 var babelExclude = /node_modules\/(?!p-cancelable)/;
