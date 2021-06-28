@@ -12,6 +12,7 @@
 
 - [#832](https://github.com/okta/okta-auth-js/pull/832) Fixes issues with refresh tokens
 - [#839](https://github.com/okta/okta-auth-js/pull/839) Fixes `@okta/okta-idx-js` missing core-js dependency.
+- [#844](https://github.com/okta/okta-auth-js/pull/844) Fixes ES module includes `SDK_VERSION` placeholder issue
 
 ### Other
 
