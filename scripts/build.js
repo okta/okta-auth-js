@@ -10,15 +10,16 @@ const BUNDLE_LIB_CMD = 'yarn build:web';
 const BUNDLE_CDN_CMD = 'yarn build:cdn';
 const BUNDLE_POLYFILL_CMD = 'yarn build:polyfill';
 const DIST_DIR = `${BUILD_DIR}/dist`; // will be uploaded to CDN
-const BABEL_CMD = 'yarn build:cjs';
-const TS_CMD = 'yarn tsc';
+const BABEL_ESM = 'yarn build:esm';
+const BABEL_CJS = 'yarn build:cjs';
+const TS_CMD = 'yarn tsc --emitDeclarationOnly';
 
 shell.echo('Start building...');
 
 shell.rm('-Rf', `${BUILD_DIR}/*`);
 shell.mkdir('-p', `${DIST_DIR}`);
 
-// Run typescript to generate ESM module source
+// Generate types
 if (shell.exec(TS_CMD).code !== 0) {
   shell.echo(chalk.red('Error: Typescript compilation failed'));
   shell.exit(1);
@@ -43,9 +44,15 @@ if (shell.exec(BUNDLE_POLYFILL_CMD).code !== 0) {
 }
 shell.echo(chalk.green('Webpack completed'));
 
-// Babelify node/server code
-if (shell.exec(BABEL_CMD).code !== 0) {
-  shell.echo(chalk.red('Error: Babel failed'));
+// Babelify ES module
+if (shell.exec(BABEL_ESM).code !== 0) {
+  shell.echo(chalk.red('Error: Babel esm failed'));
+  shell.exit(1);
+}
+
+// Babelify node/server commonJS code
+if (shell.exec(BABEL_CJS).code !== 0) {
+  shell.echo(chalk.red('Error: Babel cjs failed'));
   shell.exit(1);
 }
 

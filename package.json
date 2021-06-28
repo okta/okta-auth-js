@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "type": "commonjs",
   "main": "build/cjs/index.js",
-  "module": "build/lib/index.js",
+  "module": "build/esm/index.js",
   "browser": "build/dist/okta-auth-js.umd.js",
   "types": "build/lib/index.d.ts",
   "repository": {
@@ -40,6 +40,7 @@
     "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js -p",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
     "build:cjs": "cross-env babel lib -d build/cjs --config-file ./babel.cjs.js --extensions \".ts\",\".js\" --source-maps",
+    "build:esm": "cross-env babel lib -d build/esm --config-file ./babel.esm.js --extensions \".ts\",\".js\" --source-maps",
     "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
     "generate:samples": "yarn --cwd samples build && yarn install --ignore-scripts",
     "dev:samples": "yarn --cwd samples dev",
