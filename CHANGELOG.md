@@ -11,6 +11,14 @@
 ### Bug Fixes
 
 - [#832](https://github.com/okta/okta-auth-js/pull/832) Fixes issues with refresh tokens
+- [#839](https://github.com/okta/okta-auth-js/pull/839) Fixes `@okta/okta-idx-js` missing core-js dependency.
+
+### Other
+
+- [#839](https://github.com/okta/okta-auth-js/pull/839)
+  - Moves `tsd` from dependencies to devDependencies
+  - Reduces bundles size by upgrading `@okta/okta-idx-js` to 0.18.0 (replaced `jsonpath` with `jsonpath-plus`)
+  - Reduces bundles size by removing unnecessary license banner
 
 ## 5.1.1
 
