@@ -4,6 +4,7 @@
 
 ### Features
 
+- [#831](https://github.com/okta/okta-auth-js/pull/831) Calculates ID token expiry time based on local clock
 - [#832](https://github.com/okta/okta-auth-js/pull/832) Supports rotating refresh tokens
 
 ### Bug Fixes
@@ -27,7 +28,7 @@
 
 ### Bug Fixes
 
-- [#808](https://github.com/okta/okta-auth-js/pull/808) Fixes CommonJS bundle missing crypto modules issue
+- [#807](https://github.com/okta/okta-auth-js/pull/808) Fixes CommonJS bundle missing crypto modules issue
 
 ## 5.0.2
 
