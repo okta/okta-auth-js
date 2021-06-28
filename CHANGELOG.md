@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.1
+
+- [#845](https://github.com/okta/okta-auth-js/pull/845) Fixes issue with renewing using refresh tokens
+
 ## 5.2.0
 
 ### Features

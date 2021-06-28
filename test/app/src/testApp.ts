@@ -329,7 +329,8 @@ class TestApp {
 
   async renewTokens(): Promise<void> {
     return this.oktaAuth.token.renewTokens()
-      .then(() => {
+      .then(tokens => {
+        this.oktaAuth.tokenManager.setTokens(tokens);
         this.render();
       });
   }
