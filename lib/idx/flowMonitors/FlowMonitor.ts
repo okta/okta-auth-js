@@ -11,13 +11,21 @@
  */
 
 
+import { OktaAuth } from '../../types';
 import { Remediator, RemediationValues, SkipValues } from '../remediators';
+import { getTransactionMeta, saveTransactionMeta } from '../transactionMeta';
 import { IdxRemediation } from '../types/idx-js';
 
 export class FlowMonitor {
   previousRemediator: Remediator;
+  authClient: OktaAuth;
 
-  shouldBreak(remediator: Remediator): boolean {
+  constructor(authClient) {
+    this.authClient = authClient;
+  }
+
+  // detect in-memory loop
+  loopDetected(remediator: Remediator): boolean {
     if (!this.previousRemediator) {
       this.previousRemediator = remediator;
       return false;
@@ -43,5 +51,19 @@ export class FlowMonitor {
       return false;
     }
     return true;
+  }
+
+  async trackRemediations(name: string) {
+    let meta = await getTransactionMeta(this.authClient);
+    const remediations = meta.remediations || [];
+    meta = { 
+      ...meta, 
+      remediations: [...remediations, name]
+    };
+    saveTransactionMeta(this.authClient, meta);
+  }
+
+  isFinished(): Promise<boolean> {
+    return Promise.resolve(true);
   }
 }

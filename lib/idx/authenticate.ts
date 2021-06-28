@@ -61,7 +61,7 @@ export type AuthenticationOptions = IdxOptions
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions
 ): Promise<IdxTransaction> {
-  const flowMonitor = new AuthenticationFlowMonitor();
+  const flowMonitor = new AuthenticationFlowMonitor(authClient);
   return run(authClient, { 
     ...options, 
     flow,

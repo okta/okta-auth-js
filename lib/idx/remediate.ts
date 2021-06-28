@@ -174,7 +174,7 @@ export async function remediate(
     `);
   }
 
-  if (flowMonitor.shouldBreak(remediator)) {
+  if (flowMonitor.loopDetected(remediator)) {
     throw new AuthSdkError(`
       Remediation run into loop, break!!! remediation: ${remediator.getName()}
     `);
@@ -191,6 +191,9 @@ export async function remediate(
   const data = remediator.getData();
   try {
     idxResponse = await idxResponse.proceed(name, data);
+
+    // Track succeed remediations in the current transaction
+    await flowMonitor.trackRemediations(name);
     
     // Successfully get interaction code
     if (idxResponse.interactionCode) {

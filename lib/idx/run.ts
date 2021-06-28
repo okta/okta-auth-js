@@ -11,12 +11,13 @@
  */
 
 
-/* eslint-disable max-statements, complexity */
+/* eslint-disable max-statements, complexity, max-depth */
 import { interact } from './interact';
 import { introspect } from './introspect';
 import { remediate } from './remediate';
 import { FlowMonitor } from './flowMonitors';
 import * as remediators from './remediators';
+import { AuthSdkError } from '../errors';
 import { 
   OktaAuth,
   IdxOptions,
@@ -132,6 +133,12 @@ export async function run(
         status = IdxStatus.CANCELED;
         shouldClearTransaction = true;
       } else if (idxResponseFromResp?.interactionCode) { 
+        // Flows may end with interactionCode before the key remediation being hit
+        // Double check if flow is finished to mitigate confusion with the wrapper methods
+        if (!(await options.flowMonitor.isFinished())) {
+          throw new AuthSdkError('Current flow is not supported, check policy settings in your org.');
+        }
+
         const {
           clientId,
           codeVerifier,

@@ -54,7 +54,7 @@ export type PasswordRecoveryOptions = IdxOptions
 export async function recoverPassword(
   authClient: OktaAuth, options: PasswordRecoveryOptions
 ): Promise<IdxTransaction> {
-  const flowMonitor = new PasswordRecoveryFlowMonitor();
+  const flowMonitor = new PasswordRecoveryFlowMonitor(authClient);
   return run(
     authClient, 
     { 
