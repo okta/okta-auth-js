@@ -195,6 +195,10 @@ export class TokenManager implements TokenManagerInterface {
   }
   
   setExpireEventTimeout(key, token) {
+    if (isRefreshToken(token)) {
+      return;
+    }
+
     var expireTime = this.getExpireTime(token);
     var expireEventWait = Math.max(expireTime - this.clock.now(), 0) * 1000;
   
@@ -216,9 +220,6 @@ export class TokenManager implements TokenManagerInterface {
         continue;
       }
       var token = tokenStorage[key];
-      if (isRefreshToken(token)) {
-        continue;
-      }
       this.setExpireEventTimeout(key, token);
     }
   }
