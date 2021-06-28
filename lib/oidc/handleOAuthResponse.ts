@@ -99,7 +99,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
       if (refreshToken) {
         tokenDict.refreshToken = {
           refreshToken: refreshToken,
-          expiresAt: Number(expiresIn) + now,
+          expiresAt: Number(expiresIn) + now, // should not be used, this is the accessToken expire time
           scopes: scopes,
           tokenUrl: urls.tokenUrl,
           authorizeUrl: urls.authorizeUrl,
