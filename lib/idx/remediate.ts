@@ -83,6 +83,10 @@ function canSkipFn(idxResponse: IdxResponse) {
   return idxResponse.neededToProceed.some(({ name }) => name === 'skip');
 }
 
+function canResendFn(idxResponse: IdxResponse) {
+  return Object.keys(idxResponse.actions).some(actionName => actionName.includes('resend'));
+}
+
 function getIdxMessages(
   idxResponse: IdxResponse, flow: RemediationFlow
 ): IdxMessage[] {
@@ -116,7 +120,8 @@ function getNextStep(
 ): NextStep {
   const nextStep = remediator.getNextStep();
   const canSkip = canSkipFn(idxResponse);
-  return { ...nextStep, canSkip };
+  const canResend = canResendFn(idxResponse);
+  return { ...nextStep, canSkip, canResend };
 }
 
 function handleIdxError(e, flow, remediator?) {
@@ -139,13 +144,28 @@ function handleIdxError(e, flow, remediator?) {
   throw e;
 }
 
+function getRelatesToAction(idxResponse: IdxResponse, remediationValues: RemediationValues) {
+  const knownActionParameters = ['resend'];
+
+  const mathcingActionParameter =
+    Object.keys(remediationValues).find(valueName => knownActionParameters.includes(valueName));
+  if (mathcingActionParameter) {
+    const hasRelatedAction = idxResponse.neededToProceed.some(remediation => {
+      return remediation.relatesTo?.value && Object.keys(remediation.relatesTo.value).includes(mathcingActionParameter);
+    });
+    return hasRelatedAction && Object.keys(idxResponse.actions).find(actionName => {
+      return actionName.includes(mathcingActionParameter);
+    });
+  }
+}
+
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
   idxResponse: IdxResponse,
   values: RemediationValues,
   options: RunOptions
 ): Promise<RemediationResponse> {
-  const { neededToProceed } = idxResponse;
+  let { neededToProceed } = idxResponse;
   const { actions, flow, flowMonitor } = options;
   
   // Try actions in idxResponse first
@@ -164,7 +184,20 @@ export async function remediate(
       }
     }
   }
-  
+
+  // check if public method parameters match actions in relatesTo object
+  const relatesToAction = getRelatesToAction(idxResponse, values);
+  if (relatesToAction) {
+    if (typeof idxResponse.actions[relatesToAction] === 'function') {
+      try {
+        idxResponse = await idxResponse.actions[relatesToAction]();
+        neededToProceed = idxResponse.neededToProceed; 
+      } catch (e) {
+        return handleIdxError(e, flow);
+      }
+    }
+  }
+
   const remediator = getRemediator(neededToProceed, values, options);
   
   if (!remediator) {

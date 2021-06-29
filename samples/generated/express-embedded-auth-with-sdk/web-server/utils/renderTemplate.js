@@ -19,6 +19,7 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     ...options, 
     action: getFormActionPath(req, options.action),
     skipAction: getFormActionPath(req, options.skipAction),
+    resendAction: getFormActionPath(req, options.resendAction),
     cancelAction: getFormActionPath(req, '/cancel')
   };
   const { idx: { messages } = {} } = req.getFlowStates();
