@@ -16,7 +16,7 @@ Once you have completed the form, edit the app settings by selecting `Interactio
 
 The **issuer** is the URL of the authorization server that will perform authentication.  All Developer Accounts have a "default" authorization server.  The issuer is a combination of your Org URL (found in the upper right of the console home page) and `/oauth2/default`. For example, `https://dev-133337.okta.com/oauth2/default`.
 
-These values must exist as environment variables. They can be exported in the shell, or saved in a file named `testenv`, located in the root directory of this repo. See [dotenv](https://www.npmjs.com/package/dotenv) for more details on this file format.
+These values must exist as environment variables. They can be exported in the shell, or saved in a file named `testenv`, located in the root level of the sample project. See [dotenv](https://www.npmjs.com/package/dotenv) for more details on this file format.
 
 ```ini
 ISSUER=https:///oauth2/default

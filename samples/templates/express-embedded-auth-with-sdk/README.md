@@ -25,7 +25,7 @@ These Examples are:
 
 ### Commands
 
-If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/generated/express-direct-auth start`
+If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/generated/express-embedded-auth-with-sdk start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
