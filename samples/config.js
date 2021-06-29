@@ -11,23 +11,6 @@
  */
 
 
-const path = require('path');
-
-// All samples use the same widget version, whether CDN or NPM
-const SIW_VERSION = '5.7.3';
-
-const AUTH_JS_DIR = path.dirname(require.resolve('@okta/okta-auth-js'));
-const AUTH_JS_VERSION = require(path.resolve(AUTH_JS_DIR, '..', '..', 'package.json')).version;
-
-const versions = {
-  '@okta/okta-auth-js': AUTH_JS_VERSION,
-  '@okta/okta-signin-widget': SIW_VERSION
-};
-
-function getModuleVersion(moduleName) {
-  return versions[moduleName];
-}
-
 const defaults = {
   port: '8080'
 };
@@ -131,7 +114,6 @@ function getSampleNames() {
 }
 
 module.exports = {
-  getModuleVersion,
   getSampleNames,
   getSampleConfig
 };
