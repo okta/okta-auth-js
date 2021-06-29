@@ -64,8 +64,8 @@ function generateSampleTaskFactory(options) {
     });
 
     const hbParams = Object.assign({}, strOptions, {
-      siwVersion: config.getModuleVersion('@okta/okta-signin-widget'),
-      authJSVersion: getPublishedAuthJSVersion()
+      siwVersion: getPublishedModuleVersion('@okta/okta-signin-widget'),
+      authJSVersion: getPublishedModuleVersion('@okta/okta-auth-js')
     });
     console.log(`generating sample: "${name}"`, hbParams);
     const generateWithoutViewTemplates = src([inDir, `!${viewTemplatesDir}`], { dot: true })
@@ -113,20 +113,19 @@ const watchTask = series(
   watchSamples
 );
 
-function getPublishedAuthJSVersion(cb) {
-  const stdout = shell.exec('yarn info @okta/okta-auth-js versions', { silent: true });
-  const arrayStr = stdout.substring(stdout.indexOf('['), stdout.lastIndexOf(']') + 1).replace(/'/g, '"');
-  const versions = JSON.parse(arrayStr);
-  const authJSVersion = versions[versions.length - 1];
-  console.log('Last published okta-auth-js version: ', authJSVersion);
+function getPublishedModuleVersion(module, cb) {
+  const stdout = shell.exec(`yarn info ${module} dist-tags --json`, { silent: true });
+  const distTags = JSON.parse(stdout);
+  const version = distTags.data.latest;
+  console.log(`Last published ${module} version: `, version);
   cb && cb();
-  return authJSVersion;
+  return version;
 }
 
 module.exports = {
   default: defaultTask,
   clean: cleanTask,
   watch: watchTask,
-  getPublishedAuthJSVersion
+  getPublishedModuleVersion
 };
 

@@ -1784,7 +1784,7 @@
     rasha "^1.2.5"
     safe-flat "^2.0.2"
 
-"@okta/okta-signin-widget@^5.5.4", "@okta/okta-signin-widget@^5.6.0":
+"@okta/okta-signin-widget@^5.7.3":
   version "5.7.3"
   resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.7.3.tgz#95548ff1a0f5928cff15512894718fcefef81ddd"
   integrity sha512-L880v/PoFUUerJrZG0fzIQWBI4KMOXbFZ9CvGdzFnajfnQ+fP50TR9+7AajKEfeTWFkSo0JM6RSQ2FMQWgKM9g==
