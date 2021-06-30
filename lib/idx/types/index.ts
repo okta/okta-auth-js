@@ -68,3 +68,7 @@ export type Authenticator = {
   methodType?: string;
   phoneNumber?: string;
 };
+
+export interface ActionParameterValues {
+  resend: boolean;
+}

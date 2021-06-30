@@ -24,7 +24,7 @@ import {
 } from './types/idx-js';
 
 const actionsTriggeredByParameters = {
-  resend: 'currentAuthenticatorEnrollment-resend'
+  resend: 'currentAuthenticatorEnrollment-resend' // assuming only one '-resend' action is present in response
 };
 
 interface RemediationResponse {
@@ -149,10 +149,10 @@ function handleIdxError(e, flow, remediator?) {
 }
 
 function getActionsFromParameters(parameters): string[] {
-  return Object.keys(parameters).map(parameter => actionsTriggeredByParameters[parameter]);
+  return Object.keys(parameters).map(parameter => actionsTriggeredByParameters[parameter]).filter(Boolean);
 }
 
-function removeExecutedActionFromParameters(parameters, action) {
+function removeActionFromParameters(parameters, action) {
   const executedActionParameter = Object.keys(actionsTriggeredByParameters).find(
     parameter => actionsTriggeredByParameters[parameter] === action);
   return Object.keys(parameters).filter(parameter => parameter !== executedActionParameter)
@@ -178,12 +178,12 @@ export async function remediate(
   let valuesWithoutExecutedAction = values;
   
   // Try actions in idxResponse first
-  if (actions) {
+  if (actions?.length > 0) {
     for (let action of actions) {
       if (typeof idxResponse.actions[action] === 'function') {
         try {
           idxResponse = await idxResponse.actions[action]();
-          valuesWithoutExecutedAction = removeExecutedActionFromParameters(values, action);
+          valuesWithoutExecutedAction = removeActionFromParameters(values, action);
         } catch (e) {
           return handleIdxError(e, flow);
         }
