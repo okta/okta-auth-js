@@ -92,7 +92,7 @@ const tokens = {
 
   expectType<TokenResponse>(await authClient.token.exchangeCodeForTokens(authorizeOptions, customUrls));
 
-  const decodedToken = authClient.token.decode('ID_TOKEN_JWT');
+  const decodedToken = await authClient.token.decode('ID_TOKEN_JWT');
   expectType<JWTObject>(decodedToken);
   expectType<UserClaims>(decodedToken.payload);
   expectType<string>(decodedToken.header.alg);
