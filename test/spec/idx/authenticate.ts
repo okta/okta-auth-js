@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
+import { DeepPartial } from 'fishery';
 import { authenticate } from '../../../lib/idx/authenticate';
 import { IdxStatus } from '../../../lib/idx/types';
 
@@ -504,6 +504,11 @@ describe('idx/authenticate', () => {
             ]
           });
           const verifyPhoneResponse = IdxResponseFactory.build({
+            actions: {
+              'currentAuthenticatorEnrollment-resend': (() => Promise.resolve(
+                verifyPhoneResponse
+              )) as DeepPartial<Function>
+            },
             neededToProceed: [
               EnrollPhoneAuthenticatorRemediationFactory.build()
             ]
@@ -600,6 +605,19 @@ describe('idx/authenticate', () => {
               fakeToken: true
             }
           });
+        });
+
+        it('can resend code for phone authenticator', async () => {
+          const {
+            authClient,
+            verifyPhoneResponse,
+          } = testContext;
+
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyPhoneResponse);
+          const res = await authenticate(authClient, {
+            resend: true
+          });
+          expect(res.nextStep.canResend).toBe(true);
         });
 
         it('returns a PENDING error if an invalid code is provided', async () => {
