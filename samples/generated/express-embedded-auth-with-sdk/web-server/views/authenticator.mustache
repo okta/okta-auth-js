@@ -36,8 +36,8 @@
         </form>
       </div>
       {{#canResend}}
-        <form class="ui form" action="{{resendAction}}" method="POST">
-          <button id="skip-button" class="ui fluid submit button" type="submit">
+        <form id="resend-code-form" class="ui form" action="{{resendAction}}" method="POST">
+          <button id="resend-button" class="ui fluid submit button" type="submit">
             Resend
           </button>
         </form>
