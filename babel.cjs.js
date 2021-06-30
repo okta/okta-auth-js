@@ -15,6 +15,7 @@ module.exports = {
     '@babel/plugin-transform-typescript',
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-transform-runtime',
+    'dynamic-import-node',
     ['@babel/plugin-transform-modules-commonjs', {
       'strict': true,
       'noInterop': false

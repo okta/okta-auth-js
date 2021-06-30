@@ -12,8 +12,14 @@
 
 
 /* global atob, btoa, crypto */
-const a = function(str) { return atob(str); };
-const b = function (str) { return btoa(str); };
 const c = typeof crypto === 'undefined' ? null : crypto;
 
-export { a as atob, b as btoa, c as webcrypto };
+export async function getAtob() {
+  return new Promise(resolve => resolve(atob));
+}
+
+export async function getBtoa() {
+  return new Promise(resolve => resolve(btoa));
+}
+
+export { c as webcrypto };

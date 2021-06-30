@@ -42,10 +42,10 @@ describe('crypto', function() {
         });
     });
 
-    it('fails with a bad key', function() {
+    it('fails with a bad key', async function() {
       var idToken = tokens.standardIdToken;
       var key = Object.assign({}, tokens.standardKey, {
-        n: sdkCrypto.stringToBase64Url('bad key value')
+        n: await sdkCrypto.stringToBase64Url('bad key value')
       });
       return sdkCrypto.verifyToken(idToken, key)
         .then(function(res) {

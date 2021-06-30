@@ -17,7 +17,7 @@ import { toQueryString } from '../util';
 import {
   getOAuthUrls,
 } from './util/oauth';
-import { btoa } from '../crypto';
+import { getBtoa } from '../crypto';
 import AuthSdkError from '../errors/AuthSdkError';
 import {
   OktaAuth,
@@ -51,12 +51,14 @@ export function revokeToken(sdk: OktaAuth, token: RevocableToken): Promise<any> 
         token_type_hint: refreshToken ? 'refresh_token' : 'access_token', 
         token: refreshToken || accessToken,
       }).slice(1);
-      var creds = clientSecret ? btoa(`${clientId}:${clientSecret}`) : btoa(clientId);
-      return http.post(sdk, revokeUrl, args, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic ' + creds
-        }
+      return getBtoa().then((btoa) => {
+        var creds = clientSecret ? (btoa as Function)(`${clientId}:${clientSecret}`) : (btoa as Function)(clientId);
+        return http.post(sdk, revokeUrl, args, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + creds
+          }
+        });
       });
     });
 }

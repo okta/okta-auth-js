@@ -41,27 +41,27 @@ describe('base64', function() {
 
   describe('stringToBase64Url', function() {
 
-    it('is a valid & reversible base64 string', function() {
-      var b = stringToBase64Url(LONG_STRING);
+    it('is a valid & reversible base64 string', async function() {
+      var b = await stringToBase64Url(LONG_STRING);
       var str = atob(b);
       expect(str).toBe(LONG_STRING);
     });
 
-    it('does not contain url unsafe characters', function() {
-      var b = stringToBase64Url(LONG_STRING);
+    it('does not contain url unsafe characters', async function() {
+      var b = await stringToBase64Url(LONG_STRING);
       expect(b.indexOf('+')).toBe(-1);
       expect(b.indexOf('/')).toBe(-1);
     });
 
-    it('does not contain base64 padding', function() {
-      var b = stringToBase64Url(LONG_STRING);
+    it('does not contain base64 padding', async function() {
+      var b = await stringToBase64Url(LONG_STRING);
       expect(b.indexOf('=')).toBe(-1);
     });
 
-    it('is reversible', function() {
+    it('is reversible', async function() {
       var orig = LONG_STRING;
-      var b = stringToBase64Url(orig);
-      var str = base64UrlToString(b);
+      var b = await stringToBase64Url(orig);
+      var str = await base64UrlToString(b);
       expect(str).toBe(orig);
     });
   });

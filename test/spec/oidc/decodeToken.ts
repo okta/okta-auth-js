@@ -22,16 +22,16 @@ function setupSync(options?) {
 
 describe('token.decode', function() {
 
-  it('correctly decodes a token', function() {
+  it('correctly decodes a token', async function() {
     var oa = setupSync();
-    var decodedToken = oa.token.decode(tokens.unicodeToken);
+    var decodedToken = await oa.token.decode(tokens.unicodeToken);
     expect(decodedToken).toEqual(tokens.unicodeDecoded);
   });
 
-  it('throws an error for a malformed token', function() {
+  it('throws an error for a malformed token', async function() {
     var oa = setupSync();
     try {
-      oa.token.decode('malformedToken');
+      await oa.token.decode('malformedToken');
       // Should never hit this
       expect(true).toBe(false);
     } catch (e) {
