@@ -17,6 +17,7 @@ import { Authenticator } from '../types';
 
 export type AuthenticatorEnrollmentDataValues =  AuthenticatorDataValues & {
   phoneNumber?: string;
+  resend?: boolean; // resend is not a remediator value - revise when IdxResponse structure is updated
 }
 export class AuthenticatorEnrollmentData extends AuthenticatorData {
   static remediationName = 'authenticator-enrollment-data';

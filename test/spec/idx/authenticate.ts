@@ -122,8 +122,6 @@ describe('idx/authenticate', () => {
     expect(res).toEqual({
       status: IdxStatus.PENDING,
       nextStep: {
-        canSkip: false,
-        canResend: false,
         name: 'identify',
         inputs: [{
           name: 'username',
@@ -154,8 +152,6 @@ describe('idx/authenticate', () => {
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
           name: 'identify',
-          canSkip: false,
-          canResend: false,
           inputs: [{
             name: 'username',
             label: 'Username'
@@ -193,8 +189,6 @@ describe('idx/authenticate', () => {
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
           name: 'identify',
-          canSkip: false,
-          canResend: false,
           inputs: [{
             name: 'username',
             label: 'Username'
@@ -340,8 +334,7 @@ describe('idx/authenticate', () => {
         let res = await authenticate(authClient, {});
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-          canSkip: false,
-          canResend: false,
+
           name: 'identify',
           inputs: [{
             name: 'username',
@@ -354,8 +347,6 @@ describe('idx/authenticate', () => {
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'myuser' });
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-          canSkip: false,
-          canResend: false,
           name: 'challenge-authenticator',
           type: 'password',
           inputs: [{
@@ -435,8 +426,6 @@ describe('idx/authenticate', () => {
         let res = await authenticate(authClient, {});
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-          canSkip: false,
-          canResend: false,
           name: 'identify',
           inputs: [{
             name: 'username',
@@ -564,8 +553,6 @@ describe('idx/authenticate', () => {
           expect(res).toEqual({
             status: IdxStatus.PENDING,
             nextStep: {
-              canSkip: false,
-              canResend: false,
               name: 'authenticator-verification-data',
               type: 'phone',
               inputs: [
@@ -649,8 +636,6 @@ describe('idx/authenticate', () => {
               message: 'Invalid code. Try again.'
             }],
             nextStep: {
-              canSkip: false,
-              canResend: false,
               inputs: [{
                 label: 'Enter code',
                 name: 'verificationCode',
@@ -758,8 +743,6 @@ describe('idx/authenticate', () => {
           expect(res).toEqual({
             status: IdxStatus.PENDING,
             nextStep: {
-              canSkip: false,
-              canResend: false,
               name: 'enroll-authenticator',
               type: 'phone',
               inputs: [{
@@ -798,8 +781,6 @@ describe('idx/authenticate', () => {
           expect(res).toEqual({
             status: IdxStatus.PENDING,
             nextStep: {
-              canSkip: false,
-              canResend: false,
               name: 'authenticator-enrollment-data',
               type: 'phone',
               inputs: [
@@ -825,8 +806,6 @@ describe('idx/authenticate', () => {
           });
           expect(res.status).toBe(IdxStatus.PENDING);
           expect(res.nextStep).toEqual({
-            canSkip: false,
-            canResend: false,
             name: 'enroll-authenticator',
             type: 'phone',
             inputs: [{
@@ -869,8 +848,6 @@ describe('idx/authenticate', () => {
             }],
             nextStep: {
               name: 'authenticator-enrollment-data',
-              canSkip: false,
-              canResend: false,
               type: 'phone',
               inputs: [
                 { name: 'methodType', type: 'string', required: true },
@@ -994,8 +971,6 @@ describe('idx/authenticate', () => {
               message: 'Invalid code. Try again.'
             }],
             nextStep: {
-              canSkip: false,
-              canResend: false,
               inputs: [{
                 label: 'Enter code',
                 name: 'verificationCode',

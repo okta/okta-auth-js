@@ -23,7 +23,7 @@ import {
   IdxRemediation, 
 } from './types/idx-js';
 
-const actionsTriggeredByParameters = {
+const actionsTriggeredByValues = {
   resend: 'currentAuthenticatorEnrollment-resend' // assuming only one '-resend' action is present in response
 };
 
@@ -125,7 +125,11 @@ function getNextStep(
   const nextStep = remediator.getNextStep();
   const canSkip = canSkipFn(idxResponse);
   const canResend = canResendFn(idxResponse);
-  return { ...nextStep, canSkip, canResend };
+  return {
+    ...nextStep,
+    ...(canSkip && {canSkip}),
+    ...(canResend && {canResend}),
+  };
 }
 
 function handleIdxError(e, flow, remediator?) {
@@ -148,16 +152,17 @@ function handleIdxError(e, flow, remediator?) {
   throw e;
 }
 
-function getActionsFromParameters(parameters): string[] {
-  return Object.keys(parameters).map(parameter => actionsTriggeredByParameters[parameter]).filter(Boolean);
+function getActionFromValues(values): string | undefined{
+  const valueName = Object.keys(values).find(valueName => actionsTriggeredByValues[valueName]);
+  return actionsTriggeredByValues[valueName];
 }
 
-function removeActionFromParameters(parameters, action) {
-  const executedActionParameter = Object.keys(actionsTriggeredByParameters).find(
-    parameter => actionsTriggeredByParameters[parameter] === action);
-  return Object.keys(parameters).filter(parameter => parameter !== executedActionParameter)
+function removeActionFromValues(values, action) {
+  const executedActionValue = Object.keys(actionsTriggeredByValues).find(
+    valueName => actionsTriggeredByValues[valueName] === action);
+  return Object.keys(values).filter(valueName => valueName !== executedActionValue)
   .reduce((newValues, valueName) => {
-    newValues[valueName] = parameters[valueName];
+    newValues[valueName] = values[valueName];
     return newValues;
   }, {});
 }
@@ -170,20 +175,19 @@ export async function remediate(
 ): Promise<RemediationResponse> {
   let { neededToProceed } = idxResponse;
   const { flow, flowMonitor } = options;
-
+  const actionFromValues = getActionFromValues(values);
   const actions = [
-    ...options.actions || [] as string[],
-    ...getActionsFromParameters(values) || [] as string[]
+    ...options.actions || [],
+    ...(actionFromValues && [actionFromValues] || []),
   ];
-  let valuesWithoutExecutedAction = values;
-  
+
   // Try actions in idxResponse first
-  if (actions?.length > 0) {
+  if (actions) {
     for (let action of actions) {
+      let valuesWithoutExecutedAction = removeActionFromValues(values, action);
       if (typeof idxResponse.actions[action] === 'function') {
         try {
           idxResponse = await idxResponse.actions[action]();
-          valuesWithoutExecutedAction = removeActionFromParameters(values, action);
         } catch (e) {
           return handleIdxError(e, flow);
         }

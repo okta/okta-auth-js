@@ -15,7 +15,6 @@ import {
   OktaAuth,
   IdxOptions,
   IdxTransaction,
-  ActionParameterValues,
 } from '../types';
 import { run, RemediationFlow } from './run';
 import { 
@@ -60,7 +59,7 @@ export type AuthenticationOptions = IdxOptions
   & EnrollAuthenticatorValues
 
 export async function authenticate(
-  authClient: OktaAuth, options: AuthenticationOptions | ActionParameterValues
+  authClient: OktaAuth, options: AuthenticationOptions
 ): Promise<IdxTransaction> {
   const flowMonitor = new AuthenticationFlowMonitor(authClient);
   return run(authClient, { 
