@@ -169,7 +169,8 @@ describe('idx/recoverPassword', () => {
             'label': 'Username'
           }
         ],
-        canSkip: false
+        canSkip: false,
+        canResend: false
       }
     });
   });
@@ -246,6 +247,7 @@ describe('idx/recoverPassword', () => {
       nextStep: {
         name: 'identify-recovery',
         canSkip: false,
+        canResend: false,
         inputs: [{
           name: 'username',
           label: 'Username'
@@ -291,7 +293,8 @@ describe('idx/recoverPassword', () => {
             secret: true
           }
         ],
-        canSkip: false
+        canSkip: false,
+        canResend: false
       }
     });
   });
@@ -337,7 +340,8 @@ describe('idx/recoverPassword', () => {
           name: 'passcode',
           secret: true
         }],
-        canSkip: false
+        canSkip: false,
+        canResend: false
       }
     });
   });
@@ -371,7 +375,8 @@ describe('idx/recoverPassword', () => {
           name: 'username',
           label: 'Username'
         }],
-        canSkip: false
+        canSkip: false,
+        canResend: false
       }
     });
 
@@ -391,7 +396,8 @@ describe('idx/recoverPassword', () => {
             secret: true
           }
         ],
-        canSkip: false
+        canSkip: false,
+        canResend: false
       }
     });
 
@@ -413,7 +419,8 @@ describe('idx/recoverPassword', () => {
           name: 'passcode',
           secret: true
         }],
-        canSkip: false
+        canSkip: false,
+        canResend: false
       }
     });
   });
