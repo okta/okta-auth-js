@@ -58,10 +58,9 @@ export type AuthenticationOptions = IdxOptions
   & ReEnrollAuthenticatorValues
   & AuthenticatorEnrollmentDataValues
   & EnrollAuthenticatorValues
-  | ActionParameterValues;
 
 export async function authenticate(
-  authClient: OktaAuth, options: AuthenticationOptions
+  authClient: OktaAuth, options: AuthenticationOptions | ActionParameterValues
 ): Promise<IdxTransaction> {
   const flowMonitor = new AuthenticationFlowMonitor(authClient);
   return run(authClient, { 
