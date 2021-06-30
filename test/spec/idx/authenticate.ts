@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { DeepPartial } from 'fishery';
 import { authenticate } from '../../../lib/idx/authenticate';
 import { IdxStatus } from '../../../lib/idx/types';
+import { IdxActions } from './../../../lib/idx/types/idx-js';
 
 import {
   chainResponses,
@@ -503,12 +503,13 @@ describe('idx/authenticate', () => {
               PhoneAuthenticatorVerificationDataRemediationFactory.build()
             ]
           });
+          
           const verifyPhoneResponse = IdxResponseFactory.build({
             actions: {
-              'currentAuthenticatorEnrollment-resend': (() => Promise.resolve(
+              'currentAuthenticatorEnrollment-resend': () => Promise.resolve(
                 verifyPhoneResponse
-              )) as DeepPartial<Function>
-            },
+              )
+            } as IdxActions,
             neededToProceed: [
               EnrollPhoneAuthenticatorRemediationFactory.build()
             ]
