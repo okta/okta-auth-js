@@ -23,6 +23,10 @@ import {
   IdxRemediation, 
 } from './types/idx-js';
 
+const actionsTriggeredByParameters = {
+  resend: 'currentAuthenticatorEnrollment-resend'
+};
+
 interface RemediationResponse {
   idxResponse?: IdxResponse;
   nextStep?: NextStep;
@@ -144,19 +148,18 @@ function handleIdxError(e, flow, remediator?) {
   throw e;
 }
 
-function getRelatesToAction(idxResponse: IdxResponse, remediationValues: RemediationValues) {
-  const knownActionParameters = ['resend'];
+function getActionsFromParameters(parameters): string[] {
+  return Object.keys(parameters).map(parameter => actionsTriggeredByParameters[parameter]);
+}
 
-  const mathcingActionParameter =
-    Object.keys(remediationValues).find(valueName => knownActionParameters.includes(valueName));
-  if (mathcingActionParameter) {
-    const hasRelatedAction = idxResponse.neededToProceed.some(remediation => {
-      return remediation.relatesTo?.value && Object.keys(remediation.relatesTo.value).includes(mathcingActionParameter);
-    });
-    return hasRelatedAction && Object.keys(idxResponse.actions).find(actionName => {
-      return actionName.includes(mathcingActionParameter);
-    });
-  }
+function removeExecutedActionFromParameters(parameters, action) {
+  const executedActionParameter = Object.keys(actionsTriggeredByParameters).find(
+    parameter => actionsTriggeredByParameters[parameter] === action);
+  return Object.keys(parameters).filter(parameter => parameter !== executedActionParameter)
+  .reduce((newValues, valueName) => {
+    newValues[valueName] = parameters[valueName];
+    return newValues;
+  }, {});
 }
 
 // This function is called recursively until it reaches success or cannot be remediated
@@ -166,7 +169,13 @@ export async function remediate(
   options: RunOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed } = idxResponse;
-  const { actions, flow, flowMonitor } = options;
+  const { flow, flowMonitor } = options;
+
+  const actions = [
+    ...options.actions || [] as string[],
+    ...getActionsFromParameters(values) || [] as string[]
+  ];
+  let valuesWithoutExecutedAction = values;
   
   // Try actions in idxResponse first
   if (actions) {
@@ -174,26 +183,14 @@ export async function remediate(
       if (typeof idxResponse.actions[action] === 'function') {
         try {
           idxResponse = await idxResponse.actions[action]();
+          valuesWithoutExecutedAction = removeExecutedActionFromParameters(values, action);
         } catch (e) {
           return handleIdxError(e, flow);
         }
         if (action === 'cancel') {
           return { canceled: true };
         }
-        return remediate(idxResponse, values, options); // recursive call
-      }
-    }
-  }
-
-  // check if public method parameters match actions in relatesTo object
-  const relatesToAction = getRelatesToAction(idxResponse, values);
-  if (relatesToAction) {
-    if (typeof idxResponse.actions[relatesToAction] === 'function') {
-      try {
-        idxResponse = await idxResponse.actions[relatesToAction]();
-        neededToProceed = idxResponse.neededToProceed; 
-      } catch (e) {
-        return handleIdxError(e, flow);
+        return remediate(idxResponse, valuesWithoutExecutedAction, options); // recursive call
       }
     }
   }
