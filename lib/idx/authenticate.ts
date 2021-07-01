@@ -56,7 +56,7 @@ export type AuthenticationOptions = IdxOptions
   & ChallengeAuthenticatorValues 
   & ReEnrollAuthenticatorValues
   & AuthenticatorEnrollmentDataValues
-  & EnrollAuthenticatorValues
+  & EnrollAuthenticatorValues;
 
 export async function authenticate(
   authClient: OktaAuth, options: AuthenticationOptions
