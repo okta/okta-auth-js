@@ -270,7 +270,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
@@ -327,7 +326,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
@@ -367,7 +365,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
@@ -393,7 +390,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
@@ -440,7 +436,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'enroll-authenticator',
           type: 'email',
           inputs: [{
@@ -472,7 +467,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
@@ -501,7 +495,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'enroll-authenticator',
           type: 'email',
           inputs: [{
@@ -533,7 +526,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'enroll-authenticator',
           type: 'email',
           inputs: [{
@@ -643,7 +635,6 @@ describe('idx/register', () => {
         }],
         nextStep: {
           name: 'enroll-profile',
-          canSkip: false,
           inputs: [{
             label: 'First name',
             maxLength: 50,
@@ -720,7 +711,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'enroll-authenticator',
           type: 'phone',
           inputs: [{
@@ -792,7 +782,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'authenticator-enrollment-data',
           type: 'phone',
           inputs: [
@@ -821,7 +810,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'enroll-authenticator',
           type: 'phone',
           inputs: [{
@@ -881,7 +869,6 @@ describe('idx/register', () => {
       expect(res).toEqual({
         status: IdxStatus.PENDING,
         nextStep: {
-          canSkip: false,
           name: 'enroll-authenticator',
           type: 'phone',
           inputs: [{
@@ -972,7 +959,6 @@ describe('idx/register', () => {
         }],
         nextStep: {
           name: 'authenticator-enrollment-data',
-          canSkip: false,
           type: 'phone',
           inputs: [
             { name: 'methodType', type: 'string', required: true },
@@ -1011,7 +997,6 @@ describe('idx/register', () => {
       let res = await register(authClient, {});
       expect(res).toEqual({
         nextStep: {
-          canSkip: true,
           inputs: [
             {
               name: 'authenticator',
@@ -1022,6 +1007,7 @@ describe('idx/register', () => {
           options: [
             { label: 'Phone', value: 'phone' }
           ],
+          canSkip: true,
         },
         status: IdxStatus.PENDING,
       });

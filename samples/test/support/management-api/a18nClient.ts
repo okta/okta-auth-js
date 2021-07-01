@@ -59,7 +59,7 @@ class A18nClient {
   }
 
   async getSMSCode(profileId: string) {
-    let retryAttemptsRemaining = 60; // sms take some time to arrive, set maximum try to 60
+    let retryAttemptsRemaining = 30; // sms take some time to arrive, set maximum try to 30
     let response;
     while (!response?.content && retryAttemptsRemaining > 0) {
       await waitForOneSecond();

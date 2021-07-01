@@ -149,6 +149,9 @@ router.post('/verify-authenticator/phone', async (req, res, next) => {
 });
 
 router.get('/challenge-authenticator/phone', (req, res) => {
+  const { 
+    idx: { nextStep: { canResend } }
+  } = req.getFlowStates();
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'authenticator', {
@@ -158,6 +161,8 @@ router.get('/challenge-authenticator/phone', (req, res) => {
         name: 'verificationCode',
       },
       action: '/challenge-authenticator/phone',
+      canResend,
+      resendAction: '/challenge-authenticator/resend'
     })
   });
 });
@@ -170,6 +175,12 @@ router.post('/challenge-authenticator/phone', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+router.post('/challenge-authenticator/resend', async (req, res, next) => {
+  const { idxMethod } = req.getFlowStates();
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx[idxMethod]({ resend: true });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
 
 router.get('/enroll-authenticator/phone/enrollment-data', (req, res) => {
   const { 

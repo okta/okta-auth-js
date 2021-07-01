@@ -169,7 +169,6 @@ describe('idx/recoverPassword', () => {
             'label': 'Username'
           }
         ],
-        canSkip: false
       }
     });
   });
@@ -245,7 +244,6 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'identify-recovery',
-        canSkip: false,
         inputs: [{
           name: 'username',
           label: 'Username'
@@ -291,7 +289,6 @@ describe('idx/recoverPassword', () => {
             secret: true
           }
         ],
-        canSkip: false
       }
     });
   });
@@ -337,7 +334,6 @@ describe('idx/recoverPassword', () => {
           name: 'passcode',
           secret: true
         }],
-        canSkip: false
       }
     });
   });
@@ -371,7 +367,6 @@ describe('idx/recoverPassword', () => {
           name: 'username',
           label: 'Username'
         }],
-        canSkip: false
       }
     });
 
@@ -391,7 +386,6 @@ describe('idx/recoverPassword', () => {
             secret: true
           }
         ],
-        canSkip: false
       }
     });
 
@@ -413,7 +407,6 @@ describe('idx/recoverPassword', () => {
           name: 'passcode',
           secret: true
         }],
-        canSkip: false
       }
     });
   });

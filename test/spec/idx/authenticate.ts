@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
 import { authenticate } from '../../../lib/idx/authenticate';
 import { IdxStatus } from '../../../lib/idx/types';
+import { IdxActions } from './../../../lib/idx/types/idx-js';
 
 import {
   chainResponses,
@@ -122,7 +122,6 @@ describe('idx/authenticate', () => {
     expect(res).toEqual({
       status: IdxStatus.PENDING,
       nextStep: {
-        canSkip: false,
         name: 'identify',
         inputs: [{
           name: 'username',
@@ -153,7 +152,6 @@ describe('idx/authenticate', () => {
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
           name: 'identify',
-          canSkip: false,
           inputs: [{
             name: 'username',
             label: 'Username'
@@ -191,7 +189,6 @@ describe('idx/authenticate', () => {
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
           name: 'identify',
-          canSkip: false,
           inputs: [{
             name: 'username',
             label: 'Username'
@@ -337,7 +334,7 @@ describe('idx/authenticate', () => {
         let res = await authenticate(authClient, {});
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-          canSkip: false,
+
           name: 'identify',
           inputs: [{
             name: 'username',
@@ -350,7 +347,6 @@ describe('idx/authenticate', () => {
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'myuser' });
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-          canSkip: false,
           name: 'challenge-authenticator',
           type: 'password',
           inputs: [{
@@ -430,7 +426,6 @@ describe('idx/authenticate', () => {
         let res = await authenticate(authClient, {});
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-          canSkip: false,
           name: 'identify',
           inputs: [{
             name: 'username',
@@ -497,7 +492,13 @@ describe('idx/authenticate', () => {
               PhoneAuthenticatorVerificationDataRemediationFactory.build()
             ]
           });
+          
           const verifyPhoneResponse = IdxResponseFactory.build({
+            actions: {
+              'currentAuthenticatorEnrollment-resend': () => Promise.resolve(
+                verifyPhoneResponse
+              )
+            } as IdxActions,
             neededToProceed: [
               EnrollPhoneAuthenticatorRemediationFactory.build()
             ]
@@ -552,7 +553,6 @@ describe('idx/authenticate', () => {
           expect(res).toEqual({
             status: IdxStatus.PENDING,
             nextStep: {
-              canSkip: false,
               name: 'authenticator-verification-data',
               type: 'phone',
               inputs: [
@@ -595,6 +595,19 @@ describe('idx/authenticate', () => {
           });
         });
 
+        it('can resend code for phone authenticator', async () => {
+          const {
+            authClient,
+            verifyPhoneResponse,
+          } = testContext;
+
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyPhoneResponse);
+          const res = await authenticate(authClient, {
+            resend: true
+          });
+          expect(res.nextStep.canResend).toBe(true);
+        });
+
         it('returns a PENDING error if an invalid code is provided', async () => {
           const {
             authClient,
@@ -623,7 +636,6 @@ describe('idx/authenticate', () => {
               message: 'Invalid code. Try again.'
             }],
             nextStep: {
-              canSkip: false,
               inputs: [{
                 label: 'Enter code',
                 name: 'verificationCode',
@@ -731,7 +743,6 @@ describe('idx/authenticate', () => {
           expect(res).toEqual({
             status: IdxStatus.PENDING,
             nextStep: {
-              canSkip: false,
               name: 'enroll-authenticator',
               type: 'phone',
               inputs: [{
@@ -770,7 +781,6 @@ describe('idx/authenticate', () => {
           expect(res).toEqual({
             status: IdxStatus.PENDING,
             nextStep: {
-              canSkip: false,
               name: 'authenticator-enrollment-data',
               type: 'phone',
               inputs: [
@@ -796,7 +806,6 @@ describe('idx/authenticate', () => {
           });
           expect(res.status).toBe(IdxStatus.PENDING);
           expect(res.nextStep).toEqual({
-            canSkip: false,
             name: 'enroll-authenticator',
             type: 'phone',
             inputs: [{
@@ -839,7 +848,6 @@ describe('idx/authenticate', () => {
             }],
             nextStep: {
               name: 'authenticator-enrollment-data',
-              canSkip: false,
               type: 'phone',
               inputs: [
                 { name: 'methodType', type: 'string', required: true },
@@ -963,7 +971,6 @@ describe('idx/authenticate', () => {
               message: 'Invalid code. Try again.'
             }],
             nextStep: {
-              canSkip: false,
               inputs: [{
                 label: 'Enter code',
                 name: 'verificationCode',

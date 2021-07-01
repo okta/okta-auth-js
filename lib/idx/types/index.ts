@@ -39,6 +39,7 @@ export type NextStep = {
   name: string;
   type?: string;
   canSkip?: boolean;
+  canResend?: boolean;
   inputs?: Input[];
   options?: IdxOption[];
 }

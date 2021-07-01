@@ -23,6 +23,10 @@ import {
   IdxRemediation, 
 } from './types/idx-js';
 
+const actionsTriggeredByValues = {
+  resend: 'currentAuthenticatorEnrollment-resend' // assuming only one '-resend' action is present in response
+};
+
 interface RemediationResponse {
   idxResponse?: IdxResponse;
   nextStep?: NextStep;
@@ -83,6 +87,10 @@ function canSkipFn(idxResponse: IdxResponse) {
   return idxResponse.neededToProceed.some(({ name }) => name === 'skip');
 }
 
+function canResendFn(idxResponse: IdxResponse) {
+  return Object.keys(idxResponse.actions).some(actionName => actionName.includes('resend'));
+}
+
 function getIdxMessages(
   idxResponse: IdxResponse, flow: RemediationFlow
 ): IdxMessage[] {
@@ -116,7 +124,12 @@ function getNextStep(
 ): NextStep {
   const nextStep = remediator.getNextStep();
   const canSkip = canSkipFn(idxResponse);
-  return { ...nextStep, canSkip };
+  const canResend = canResendFn(idxResponse);
+  return {
+    ...nextStep,
+    ...(canSkip && {canSkip}),
+    ...(canResend && {canResend}),
+  };
 }
 
 function handleIdxError(e, flow, remediator?) {
@@ -139,18 +152,39 @@ function handleIdxError(e, flow, remediator?) {
   throw e;
 }
 
+function getActionFromValues(values): string | undefined{
+  const valueName = Object.keys(values).find(valueName => actionsTriggeredByValues[valueName]);
+  return actionsTriggeredByValues[valueName];
+}
+
+function removeActionFromValues(values, action) {
+  const executedActionValue = Object.keys(actionsTriggeredByValues).find(
+    valueName => actionsTriggeredByValues[valueName] === action);
+  return Object.keys(values).filter(valueName => valueName !== executedActionValue)
+  .reduce((newValues, valueName) => {
+    newValues[valueName] = values[valueName];
+    return newValues;
+  }, {});
+}
+
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
   idxResponse: IdxResponse,
   values: RemediationValues,
   options: RunOptions
 ): Promise<RemediationResponse> {
-  const { neededToProceed } = idxResponse;
-  const { actions, flow, flowMonitor } = options;
-  
+  let { neededToProceed } = idxResponse;
+  const { flow, flowMonitor } = options;
+  const actionFromValues = getActionFromValues(values);
+  const actions = [
+    ...options.actions || [],
+    ...(actionFromValues && [actionFromValues] || []),
+  ];
+
   // Try actions in idxResponse first
   if (actions) {
     for (let action of actions) {
+      let valuesWithoutExecutedAction = removeActionFromValues(values, action);
       if (typeof idxResponse.actions[action] === 'function') {
         try {
           idxResponse = await idxResponse.actions[action]();
@@ -160,11 +194,11 @@ export async function remediate(
         if (action === 'cancel') {
           return { canceled: true };
         }
-        return remediate(idxResponse, values, options); // recursive call
+        return remediate(idxResponse, valuesWithoutExecutedAction, options); // recursive call
       }
     }
   }
-  
+
   const remediator = getRemediator(neededToProceed, values, options);
   
   if (!remediator) {
