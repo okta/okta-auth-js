@@ -53,19 +53,18 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
       if (scopes.indexOf('openid') !== -1) {
         responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
       }
-      response.state = state;
       const handleResponseOptions: TokenParams = {
         clientId,
         redirectUri,
         scopes,
         responseType,
         ignoreSignature,
-        state,
       };
       return handleOAuthResponse(sdk, handleResponseOptions, response, urls)
         .then((response: TokenResponse) => {
           // For compatibility, "code" is returned in the TokenResponse. OKTA-326091
           response.code = authorizationCode;
+          response.state = state;
           return response;
         });
     })
