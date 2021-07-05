@@ -32,6 +32,7 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
     redirectUri,
     scopes,
     ignoreSignature,
+    state
   } = tokenParams;
 
   var getTokenOptions = {
@@ -52,12 +53,14 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
       if (scopes.indexOf('openid') !== -1) {
         responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
       }
+      response.state = state;
       const handleResponseOptions: TokenParams = {
         clientId,
         redirectUri,
         scopes,
         responseType,
         ignoreSignature,
+        state,
       };
       return handleOAuthResponse(sdk, handleResponseOptions, response, urls)
         .then((response: TokenResponse) => {
