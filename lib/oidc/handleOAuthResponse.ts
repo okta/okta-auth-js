@@ -55,8 +55,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
             authorizationCode: res.code,
             interactionCode: res.interaction_code
           }), urls);
-        })
-
+        });
   }
 
   tokenParams = tokenParams || getDefaultTokenParams(sdk);
