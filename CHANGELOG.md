@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.3.0
+
+### Bug Fixes
+
+- [#852](https://github.com/okta/okta-auth-js/pull/852) Skips non-successful requests cacheing
+
 ## 5.2.0
 
 ### Features

@@ -72,7 +72,7 @@ function fetchRequest(method: string, url: string, args: FetchOptions) {
         return formatResult(status, data);
       })
       .then(result => {
-        if (error) {
+        if (error || result.responseJSON?.error) {
           // Throwing result object since error handling is done in http.js
           throw result;
         }

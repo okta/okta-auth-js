@@ -246,6 +246,31 @@ describe('fetchRequest', function () {
         errorSummary: 'Could not parse server response'
       };
 
+      expect.assertions(1);
+      return fetchRequest(requestMethod, requestUrl, {})
+      .catch(err => {
+        expect(err).toEqual({
+          status: response.status,
+          responseText: JSON.stringify(errorJSON),
+          responseJSON: errorJSON,
+          responseType: 'json'
+        });
+      });
+    });
+
+    it('throws if JSON can not be parsed from successful response', () => {
+      var error = new Error('A fake error, ignore me');
+      response.status = 200;
+      response.ok = true;
+      response.json = function() {
+        return Promise.reject(error);
+      };
+
+      var errorJSON = {
+        error: error,
+        errorSummary: 'Could not parse server response'
+      };
+      expect.assertions(1);
       return fetchRequest(requestMethod, requestUrl, {})
       .catch(err => {
         expect(err).toEqual({
