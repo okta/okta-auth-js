@@ -1784,21 +1784,6 @@
     rasha "^1.2.5"
     safe-flat "^2.0.2"
 
-"@okta/okta-signin-widget@^5.7.3":
-  version "5.7.3"
-  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.7.3.tgz#95548ff1a0f5928cff15512894718fcefef81ddd"
-  integrity sha512-L880v/PoFUUerJrZG0fzIQWBI4KMOXbFZ9CvGdzFnajfnQ+fP50TR9+7AajKEfeTWFkSo0JM6RSQ2FMQWgKM9g==
-  dependencies:
-    "@babel/polyfill" "^7.10.1"
-    "@babel/runtime" "^7.10.3"
-    cross-fetch "^3.0.4"
-    handlebars "^4.5.3"
-    q "1.4.1"
-    u2f-api-polyfill "0.4.3"
-    underscore "1.13.1"
-  optionalDependencies:
-    fsevents "*"
-
 "@okta/okta-signin-widget@^5.8.1":
   version "5.8.1"
   resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.8.1.tgz#00d09729e9ae0a317ac1e869886b61f2704f6bf4"
