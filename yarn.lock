@@ -1799,6 +1799,21 @@
   optionalDependencies:
     fsevents "*"
 
+"@okta/okta-signin-widget@^5.8.1":
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.8.1.tgz#00d09729e9ae0a317ac1e869886b61f2704f6bf4"
+  integrity sha512-0lloxHPKpJJaFuU4o7DqFvC4tJP9GBCO055se3exD7cNMJ5S2HD6WQo621g58o3KJ1Sn0g6/YUcOs3affhk2yw==
+  dependencies:
+    "@babel/polyfill" "^7.10.1"
+    "@babel/runtime" "^7.10.3"
+    cross-fetch "^3.0.4"
+    handlebars "^4.5.3"
+    q "1.4.1"
+    u2f-api-polyfill "0.4.3"
+    underscore "1.13.1"
+  optionalDependencies:
+    fsevents "*"
+
 "@peculiar/asn1-schema@^2.0.27", "@peculiar/asn1-schema@^2.0.32":
   version "2.0.36"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.0.36.tgz#ca7978f43ffa4f35fbb74436c3f983c10a69ac27"
