@@ -6,6 +6,10 @@
 
 - [#852](https://github.com/okta/okta-auth-js/pull/852) Skips non-successful requests cacheing
 
+### Other
+
+- [#853](https://github.com/okta/okta-auth-js/pull/853) Updates `token.parseFromUrl` signature (adds optional parameter)
+
 ## 5.2.0
 
 ### Features
