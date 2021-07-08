@@ -43,6 +43,7 @@
     "build:esm": "cross-env babel lib -d build/esm --config-file ./babel.esm.js --extensions \".ts\",\".js\" --source-maps",
     "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
     "generate:samples": "yarn --cwd samples build && yarn install --ignore-scripts",
+    "generate": "yarn --cwd generator generate && yarn install --ignore-scripts",
     "dev:samples": "yarn --cwd samples dev",
     "prepare": "yarn build",
     "start": "yarn --cwd test/app start --open",
@@ -71,8 +72,8 @@
     "@babel/runtime": "^7.12.5",
     "@okta/okta-idx-js": "0.18.0",
     "@peculiar/webcrypto": "1.1.6",
-    "Base64": "1.1.0",
     "atob": "^2.1.2",
+    "Base64": "1.1.0",
     "btoa": "^1.2.1",
     "core-js": "^3.6.5",
     "cross-fetch": "^3.0.6",
@@ -130,12 +131,14 @@
     "packages": [
       "./",
       "env",
+      "generator",
       "test/app",
       "test/e2e",
       "test/support",
       "samples",
       "samples/test",
-      "samples/generated/*"
+      "samples/generated/*",
+      "generated/**/*"
     ],
     "nohoist": [
       "**/@wdio/**"

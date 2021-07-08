@@ -22,7 +22,9 @@ export function toAbsoluteUrl(url = '', baseUrl) {
   return url[0] === '/' ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
 }
 
-export function toRelativeUrl(url = '', baseUrl) {
+export function toRelativeUrl(url, baseUrl) {
+  url = url || '';
+  
   if (isAbsoluteUrl(url)) {
     url = url.substring(baseUrl.length);
   }

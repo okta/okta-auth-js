@@ -1,0 +1,23 @@
+---
+to: ../generated/<%= dest %>/<%= name %>/.eslintrc.json
+force: true
+---
+{
+  "extends": "airbnb",
+  "root": true,
+  "env": {
+    "browser": true,
+    "jest": true
+  },
+  "parserOptions": { 
+    "ecmaVersion": 2018
+  },
+  "rules": {
+    "strict": "off",
+    "max-len": ["error", 200],
+    "react/prop-types": "off",
+    "react/prefer-stateless-function": [0],
+    "object-curly-newline": ["error", { "consistent": true }],
+    "react/jsx-props-no-spreading": "off"
+  }
+}
