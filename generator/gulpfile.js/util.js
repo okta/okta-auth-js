@@ -29,9 +29,12 @@ const buildEnv = (config) => {
 
 const getActions = generator => {
   const p = path.join(__dirname, '..', `_templates/${generator}`);
-  return fs.readdirSync(p).filter((file) => {
+  const actions = fs.readdirSync(p).filter((file) => {
     return fs.statSync(p + '/' + file).isDirectory();
   });
+  // move "overwrite" action to the end of array
+  actions.push(actions.splice(actions.indexOf('overwrite'), 1)[0]);
+  return actions;
 };
 
 const getAction = (actions, path) => {
