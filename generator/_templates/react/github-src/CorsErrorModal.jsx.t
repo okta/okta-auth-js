@@ -1,6 +1,8 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/CorsErrorModal.jsx
 ---
+<%- include(`${templates}/${generator}/license-banner.t`) %>
+
 import React from 'react';
 import { Modal } from 'semantic-ui-react';
 import config from './config';

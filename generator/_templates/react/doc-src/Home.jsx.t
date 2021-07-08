@@ -1,6 +1,8 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/Home.jsx
 ---
+<%- include(`${templates}/${generator}/license-banner.t`) %>
+
 import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useOktaAuth } from '@okta/okta-react';

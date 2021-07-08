@@ -1,6 +1,8 @@
 ---
 to: ../generated/react/auth-js-no-oidc/src/LoginForm.jsx
 ---
+<%- include(`${templates}/${generator}/license-banner.t`) %>
+
 import React, { useState } from 'react';
 import { useOktaAuth } from '@okta/okta-react';
 

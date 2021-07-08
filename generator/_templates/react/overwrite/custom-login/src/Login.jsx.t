@@ -1,6 +1,8 @@
 ---
 to: ../generated/react/custom-login/src/Login.jsx
 ---
+<%- include(`${templates}/${generator}/license-banner.t`) %>
+
 import React, { useEffect, useRef } from 'react';
 import { useOktaAuth } from '@okta/okta-react';
 import * as OktaSignIn from '@okta/okta-signin-widget';

@@ -1,6 +1,8 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/Login.jsx
 ---
+<%- include(`${templates}/${generator}/license-banner.t`) %>
+
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 <%- name === 'signin-widget'

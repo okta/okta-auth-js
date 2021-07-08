@@ -1,6 +1,8 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/Messages.jsx
 ---
+<%- include(`${templates}/${generator}/license-banner.t`) %>
+
 import { useOktaAuth } from '@okta/okta-react';
 import React, { useState, useEffect } from 'react';
 import { Header, Icon, Message, Table } from 'semantic-ui-react';

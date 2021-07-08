@@ -1,6 +1,8 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/App.css
 ---
+<%- include(`${templates}/${generator}/license-banner.t`) %>
+
 .App {
   text-align: center;
 }
