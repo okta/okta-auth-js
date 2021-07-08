@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/config-overrides.js
-force: true
 ---
 /* eslint-disable import/no-extraneous-dependencies */
 const envModule = require('./env')();

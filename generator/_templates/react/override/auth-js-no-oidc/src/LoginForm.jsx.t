@@ -1,6 +1,5 @@
 ---
 to: ../generated/react/auth-js-no-oidc/src/LoginForm.jsx
-force: true
 ---
 import React, { useState } from 'react';
 import { useOktaAuth } from '@okta/okta-react';

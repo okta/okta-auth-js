@@ -1,6 +1,5 @@
 ---
 to: ../generated/react/signin-widget/src/OktaSignInWidget.jsx
-force: true
 ---
 import React, { useEffect, useRef } from 'react';
 import OktaSignIn from '@okta/okta-signin-widget';

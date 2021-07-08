@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/App.css
-force: true
 ---
 .App {
   text-align: center;

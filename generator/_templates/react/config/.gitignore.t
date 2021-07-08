@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/.gitignore
-force: true
 ---
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 

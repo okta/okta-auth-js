@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/package.json
-force: true
 ---
 {
   "name": "samples-js-react-<%= name %>",

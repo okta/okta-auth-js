@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/Home.jsx
-force: true
 ---
 import React from 'react';
 import { Link, useHistory } from 'react-router-dom';

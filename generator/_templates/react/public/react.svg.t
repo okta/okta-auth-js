@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/public/react.svg
-force: true
 ---
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-11.5 -10.23174 23 20.46348">
   <title>React Logo</title>

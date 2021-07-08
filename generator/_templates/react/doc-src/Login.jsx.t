@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/Login.jsx
-force: true
 ---
 import React from 'react';
 import { Redirect } from 'react-router-dom';

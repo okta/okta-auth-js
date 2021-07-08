@@ -4,9 +4,9 @@
   "description": "Generator for samples, docs and snippets",
   "private": true,
   "scripts": {
-    "gulp": "gulp",
-    "generate": "gulp",
-    "generate:react": "gulp generate:react"
+    "gulp": "HYGEN_OVERWRITE=1 gulp",
+    "generate": "HYGEN_OVERWRITE=1 gulp",
+    "generate:react": "HYGEN_OVERWRITE=1 gulp generate:react"
   },
   "dependencies": {
     "gulp": "^4.0.2",

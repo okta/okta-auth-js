@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/.eslintrc.json
-force: true
 ---
 {
   "extends": "airbnb",

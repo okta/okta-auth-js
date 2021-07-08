@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/Messages.jsx
-force: true
 ---
 import { useOktaAuth } from '@okta/okta-react';
 import React, { useState, useEffect } from 'react';

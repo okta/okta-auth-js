@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/App.test.jsx
-force: true
 ---
 import React from 'react';
 import ReactDOM from 'react-dom';

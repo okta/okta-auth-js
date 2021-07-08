@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/Navbar.jsx
-force: true
 ---
 import { useOktaAuth } from '@okta/okta-react';
 import React from 'react';

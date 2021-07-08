@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/index.js
-force: true
 ---
 import React from 'react';
 import ReactDOM from 'react-dom';

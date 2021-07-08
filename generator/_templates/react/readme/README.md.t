@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/README.md
-force: true
 ---
 # Okta React + <%= h.changeCase.sentence(name) %> Example
 

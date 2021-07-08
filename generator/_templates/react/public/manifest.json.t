@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/public/manifest.json
-force: true
 ---
 {
   "short_name": "React App",

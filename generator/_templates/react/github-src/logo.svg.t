@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/logo.svg
-force: true
 ---
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 841.9 595.3">
     <g fill="#61DAFB">

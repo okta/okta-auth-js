@@ -1,6 +1,5 @@
 ---
 to: ../generated/react/custom-login/src/Login.jsx
-force: true
 ---
 import React, { useEffect, useRef } from 'react';
 import { useOktaAuth } from '@okta/okta-react';

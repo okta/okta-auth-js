@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/public/index.html
-force: true
 ---
 <!DOCTYPE html>
 <html lang="en">

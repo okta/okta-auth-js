@@ -1,6 +1,5 @@
 ---
 to: ../generated/<%= dest %>/<%= name %>/src/CorsErrorModal.jsx
-force: true
 ---
 import React from 'react';
 import { Modal } from 'semantic-ui-react';
