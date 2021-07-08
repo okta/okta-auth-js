@@ -30,6 +30,10 @@ export async function verifyToken(sdk: OktaAuth, token: IDToken, validationParam
 
   var openIdConfig = await getWellKnown(sdk); // using sdk.options.issuer
 
+  if (validationParams.issuer !== openIdConfig.issuer) {
+    validationParams.issuer = openIdConfig.issuer;
+  }
+
   var validationOptions: TokenVerifyParams = {
     issuer: openIdConfig.issuer, // sdk.options.issuer may point to a proxy. Use "real" issuer for validation.
     clientId: sdk.options.clientId,
