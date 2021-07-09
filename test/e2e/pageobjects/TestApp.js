@@ -25,6 +25,7 @@ class TestApp {
   get logoutXHRBtn() { return $('#logout-xhr'); }
   get logoutAppBtn() { return $('#logout-app'); }
   get renewTokenBtn() { return $('#renew-token'); }
+  get renewTokensBtn() { return $('#renew-tokens'); }
   get revokeTokenBtn() { return $('#revoke-token'); }
   get revokeRefreshTokenBtn() { return $('#revoke-refresh-token'); }
   get getTokenBtn() { return $('#get-token'); }
@@ -107,11 +108,19 @@ class TestApp {
     await this.loginDirectBtn.then(el => el.click());
   }
 
+  // renew the accessToken, using refreshToken if available
   async renewToken() {
     const btn = await this.renewTokenBtn;
     await btn.click();
   }
 
+  // renew all tokens, using refreshToken if available
+  async renewTokens() {
+    const btn = await this.renewTokensBtn;
+    await btn.click();
+  }
+
+  // get all tokens using getWithoutPrompt. Requires 3rd-party cookies
   async getToken() {
     return this.getTokenBtn.then(el => el.click());
   }
@@ -261,6 +270,11 @@ class TestApp {
     assert(txt === msg);
   }
 
+  async assertIssuer(issuer) {
+    await this.issuer.then(el => el.getText()).then(txt => {
+      assert(txt === issuer);
+    });
+  }
 }
 
 export default new TestApp();

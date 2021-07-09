@@ -54,7 +54,7 @@ describe('E2E token flows', () => {
     await TestApp.logoutRedirect();
   });
   
-  it('can refresh all tokens', async () => {
+  it('can refresh all tokens using getWithoutPrompt', async () => {
     await loginPopup(flow);
     const prev = {
       idToken: await TestApp.idToken.then(el => el.getText()),
@@ -62,6 +62,28 @@ describe('E2E token flows', () => {
       refreshToken: await TestApp.refreshToken.then(el => el.getText())
     };
     await TestApp.getToken();
+    await browser.waitUntil(async () => {
+      const idToken = await TestApp.idToken.then(el => el.getText());
+      const accessToken = await TestApp.accessToken.then(el => el.getText());
+      const refreshToken = await TestApp.refreshToken.then(el => el.getText());
+      return (
+        idToken !== prev.idToken &&
+        accessToken !== prev.accessToken && 
+        refreshToken !== prev.refreshToken 
+      );
+    }, 10000);
+    await TestApp.assertLoggedIn();
+    await TestApp.logoutRedirect();
+  });
+
+  it('can renew all tokens', async () => {
+    await loginPopup(flow);
+    const prev = {
+      idToken: await TestApp.idToken.then(el => el.getText()),
+      accessToken: await TestApp.accessToken.then(el => el.getText()),
+      refreshToken: await TestApp.refreshToken.then(el => el.getText())
+    };
+    await TestApp.renewTokens();
     await browser.waitUntil(async () => {
       const idToken = await TestApp.idToken.then(el => el.getText());
       const accessToken = await TestApp.accessToken.then(el => el.getText());
