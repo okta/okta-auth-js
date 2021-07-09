@@ -1,5 +1,5 @@
 {
-  "name": "express-embedded-sign-in-widget",
+  "name": "@okta/samples.express.embedded-sign-in-widget",
   "private": true,
   "version": "1.0.0",
   "main": "index.js",

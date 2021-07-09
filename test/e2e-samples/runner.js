@@ -10,9 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-/* eslint-disable no-console */
-const path = require('path');
 const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
 const config = require('@okta/samples/config');
@@ -34,14 +31,13 @@ function runNextTask() {
 }
 
 function runWithConfig(sampleConfig) {
-  const { name } = sampleConfig;
-  const sampleDir = path.join(__dirname, '../..', `samples/generated/${name}`);
+  const { pkgName } = sampleConfig;
   const port = sampleConfig.port || 8080;
 
   // 1. start the sample's web server
   const server = spawn('yarn', [
-    '--cwd',
-    sampleDir,
+    'workspace',
+    pkgName,
     'start'
   ], { stdio: 'inherit' });
 
@@ -96,8 +92,7 @@ if (testName) {
 } else {
   // Run all tests
   tasks = [];
-  config.getSampleNames().map(sampleName => {
-    const sampleConfig = config.getSampleConfig(sampleName);
+  config.getSamplesConfig().map(sampleConfig => {
     if (process.env.RUN_CUCUMBER_TESTS) {
       const features = sampleConfig.features || [];
       if (!features.length) {
