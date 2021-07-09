@@ -2,24 +2,25 @@
 to: ../generated/<%= dest %>/<%= name %>/package.json
 ---
 {
-  "name": "samples-js-react-<%= name %>",
+  "name": "@okta/react-samples.<%= name %>",
   "version": "0.3.0",
   "private": true,
   "dependencies": {
-    "@okta/okta-auth-js": "^5.0.0",
-    "@okta/okta-react": "^6.0.0",
-<% if (name === 'custom-login') { -%>
-    "@okta/okta-signin-widget": "^5.4.0",
+    "@okta/okta-auth-js": "*",
+    "@okta/okta-react": "^<%= oktaReactVersion %>",
+<% if (name === 'custom-login' || name === 'doc-signin-widget') { -%>
+    "@okta/okta-signin-widget": "^<%= siwVersion %>",
 <% } -%>
+<% if (type === 'github') { -%>
     "colors": "^1.4.0",
-    "dotenv": "^8.2.0",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^2.0.3",
+    "text-encoding": "^0.7.0",
+<% } -%>
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^4.0.1",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^2.0.3",
-    "text-encoding": "^0.7.0"
+    "react-scripts": "^4.0.1"
   },
   "scripts": {
     "start": "cross-env PORT=8080 react-app-rewired start",
@@ -39,7 +40,8 @@ to: ../generated/<%= dest %>/<%= name %>/package.json
     "eslint-plugin-react": "^7.20.6",
     "eslint-plugin-react-hooks": "^4.1.1",
     "cross-env": "^7.0.3",
-    "jest-watch-typeahead": "^0.6.4"
+    "jest-watch-typeahead": "^0.6.4",
+    "dotenv": "^8.2.0"
   },
   "browserslist": {
     "production": [

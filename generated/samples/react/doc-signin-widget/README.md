@@ -1,4 +1,4 @@
-# Okta React + Auth js no oidc Example
+# Okta React + Doc signin widget Example
 
 This example shows you how to use the [Okta React Library][] and [React Router](https://github.com/ReactTraining/react-router) to login a user to a React application.  The login is achieved with the [Okta Sign In Widget][], which gives you more control to customize the login experience within your app.
 
@@ -25,10 +25,10 @@ Then install dependencies:
 npm install
 ```
 
-Enter into auth-js-no-oidc directory:
+Enter into doc-signin-widget directory:
 
 ```bash
-cd samples-js-react/auth-js-no-oidc
+cd samples-js-react/doc-signin-widget
 ```
 
 Now you need to gather the following information from the Okta Developer Console:
@@ -55,7 +55,7 @@ npm start
 You could also start the app server from root directory like:
 
 ```bash
-npm run auth-js-no-oidc-server
+npm run doc-signin-widget-server
 ```
 
 Now navigate to http://localhost:8080 in your browser.

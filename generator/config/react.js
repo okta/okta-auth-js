@@ -14,13 +14,13 @@ module.exports = [
     filterPredicate: action => action !== 'doc-src'
   },
   {
-    name: 'signin-widget',
+    name: 'doc-signin-widget',
     dest: 'samples/react',
     type: 'doc',
     filterPredicate: action => action !== 'github-src'
   },
   {
-    name: 'auth-js-no-oidc',
+    name: 'doc-no-oidc',
     dest: 'samples/react',
     type: 'doc',
     filterPredicate: action => action !== 'github-src'

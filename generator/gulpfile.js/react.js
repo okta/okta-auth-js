@@ -6,7 +6,8 @@ const {
   getHygenCommand, 
   buildEnv, 
   getActions, 
-  getAction
+  getAction,
+  getPublishedModuleVersion,
 } = require('./util');
 const { react: samplesConfig } = require('../config');
 
@@ -32,7 +33,15 @@ function buildSamples(action) {
     }
   };
 
-  samplesConfig.forEach(config => buildSample(config, action));
+  samplesConfig
+    .map(config => {
+      return {
+        ...config,
+        siwVersion: getPublishedModuleVersion('@okta/okta-signin-widget'),
+        oktaReactVersion: getPublishedModuleVersion('@okta/okta-react')
+      };
+    })
+    .forEach(config => buildSample(config, action));
 }
 
 function cleanTask() {

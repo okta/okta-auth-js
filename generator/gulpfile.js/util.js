@@ -39,10 +39,20 @@ const getAction = (actions, path) => {
   throw new Error('unknow path', path);
 };
 
+const getPublishedModuleVersion = (module, cb) => {
+  const stdout = shell.exec(`yarn info ${module} dist-tags --json`, { silent: true });
+  const distTags = JSON.parse(stdout);
+  const version = distTags.data.latest;
+  console.log(`Last published ${module} version: `, version);
+  cb && cb();
+  return version;
+};
+
 module.exports = {
   getDestDir,
   getHygenCommand,
   buildEnv,
   getActions,
-  getAction
+  getAction,
+  getPublishedModuleVersion
 };
