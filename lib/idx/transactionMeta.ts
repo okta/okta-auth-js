@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuth, IdxTransactionMeta } from '../types';
+import { OktaAuth, IdxTransactionMeta, TokenParams } from '../types';
 import { warn } from '../util';
 import { getOAuthUrls } from '../oidc';
 
@@ -44,9 +44,9 @@ export async function getTransactionMeta(authClient: OktaAuth): Promise<IdxTrans
   }
 
   // Calculate new values
-  const tokenParams = await authClient.token.prepareTokenParams();
-  const urls = getOAuthUrls(authClient, tokenParams);
-  const issuer = authClient.options.issuer;
+  const tokenParams: TokenParams = await authClient.token.prepareTokenParams();
+  const urls = await getOAuthUrls(authClient);
+  const issuer = authClient.options.issuer; // may differ from urls.issuer which comes from .well-known
   const {
     pkce,
     clientId,

@@ -19,8 +19,8 @@ import { postToTokenEndpoint } from './endpoints/token';
 import { handleOAuthResponse } from './handleOAuthResponse';
 
 // codeVerifier is required. May pass either an authorizationCode or interactionCode
-export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
-  urls = urls || getOAuthUrls(sdk, tokenParams);
+export async function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
+  urls = await getOAuthUrls(sdk, urls);
   // build params using defaults + options
   tokenParams = Object.assign({}, getDefaultTokenParams(sdk), clone(tokenParams));
 

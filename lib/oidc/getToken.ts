@@ -80,119 +80,118 @@ import { handleOAuthResponse } from './handleOAuthResponse';
  * @param {String} [options.popupTitle] Title dispayed in the popup.
  *                                      Defaults to 'External Identity Provider User Authentication'
  */
-export function getToken(sdk: OktaAuth, options: TokenParams) {
+export async function getToken(sdk: OktaAuth, options: TokenParams) {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getToken" takes only a single set of options'));
   }
 
   options = options || {};
 
-  return prepareTokenParams(sdk, options)
-    .then(function (tokenParams: TokenParams) {
+  const tokenParams: TokenParams = await prepareTokenParams(sdk, options);
 
-      // Start overriding any options that don't make sense
-      var sessionTokenOverrides = {
-        prompt: 'none',
-        responseMode: 'okta_post_message',
-        display: null
-      };
+  // Start overriding any options that don't make sense
+  var sessionTokenOverrides = {
+    prompt: 'none',
+    responseMode: 'okta_post_message',
+    display: null
+  };
 
-      var idpOverrides = {
-        display: 'popup'
-      };
+  var idpOverrides = {
+    display: 'popup'
+  };
 
-      if (options.sessionToken) {
-        Object.assign(tokenParams, sessionTokenOverrides);
-      } else if (options.idp) {
-        Object.assign(tokenParams, idpOverrides);
-      }
+  if (options.sessionToken) {
+    Object.assign(tokenParams, sessionTokenOverrides);
+  } else if (options.idp) {
+    Object.assign(tokenParams, idpOverrides);
+  }
 
-      // Use the query params to build the authorize url
-      var requestUrl,
-        endpoint,
-        urls;
+  // Use the query params to build the authorize url
+  var requestUrl,
+    endpoint,
+    urls;
 
-      // Get authorizeUrl and issuer
-      urls = getOAuthUrls(sdk, tokenParams);
-      endpoint = options.codeVerifier ? urls.tokenUrl : urls.authorizeUrl;
-      requestUrl = endpoint + buildAuthorizeParams(tokenParams);
+  // Get authorizeUrl and issuer
+  urls = await getOAuthUrls(sdk);
+  endpoint = options.codeVerifier ? urls.tokenUrl : urls.authorizeUrl;
+  requestUrl = endpoint + buildAuthorizeParams(tokenParams);
 
-      // Determine the flow type
-      var flowType;
-      if (tokenParams.sessionToken || tokenParams.display === null) {
-        flowType = 'IFRAME';
-      } else if (tokenParams.display === 'popup') {
-        flowType = 'POPUP';
-      } else {
-        flowType = 'IMPLICIT';
-      }
+  // Determine the flow type
+  var flowType;
+  if (tokenParams.sessionToken || tokenParams.display === null) {
+    flowType = 'IFRAME';
+  } else if (tokenParams.display === 'popup') {
+    flowType = 'POPUP';
+  } else {
+    flowType = 'IMPLICIT';
+  }
 
-      // Execute the flow type
-      switch (flowType) {
-        case 'IFRAME':
-          var iframePromise = addPostMessageListener(sdk, options.timeout, tokenParams.state);
-          var iframeEl = loadFrame(requestUrl);
-          return iframePromise
-            .then(function (res) {
-              return handleOAuthResponse(sdk, tokenParams, res, urls);
-            })
-            .finally(function () {
-              if (document.body.contains(iframeEl)) {
-                iframeEl.parentElement.removeChild(iframeEl);
-              }
-            });
-
-        case 'POPUP':
-          var oauthPromise; // resolves with OAuth response
-
-          // Add listener on postMessage before window creation, so
-          // postMessage isn't triggered before we're listening
-          if (tokenParams.responseMode === 'okta_post_message') {
-            if (!sdk.features.isPopupPostMessageSupported()) {
-              throw new AuthSdkError('This browser doesn\'t have full postMessage support');
-            }
-            oauthPromise = addPostMessageListener(sdk, options.timeout, tokenParams.state);
+  // Execute the flow type
+  switch (flowType) {
+    case 'IFRAME':
+      var iframePromise = addPostMessageListener(sdk, options.timeout, tokenParams.state);
+      var iframeEl = loadFrame(requestUrl);
+      return iframePromise
+        .then(function (res) {
+          return handleOAuthResponse(sdk, tokenParams, res, urls);
+        })
+        .finally(function () {
+          if (document.body.contains(iframeEl)) {
+            iframeEl.parentElement.removeChild(iframeEl);
           }
+        });
 
-          // Create the window
-          var windowOptions = {
-            popupTitle: options.popupTitle
-          };
-          var windowEl = loadPopup(requestUrl, windowOptions);
+    case 'POPUP':
+      var oauthPromise; // resolves with OAuth response
 
-          // The popup may be closed without receiving an OAuth response. Setup a poller to monitor the window.
-          var popupPromise = new Promise(function (resolve, reject) {
-            var closePoller = setInterval(function () {
-              if (!windowEl || windowEl.closed) {
-                clearInterval(closePoller);
-                reject(new AuthSdkError('Unable to parse OAuth flow response'));
-              }
-            }, 100);
-
-            // Proxy the OAuth promise results
-            oauthPromise
-              .then(function (res) {
-                clearInterval(closePoller);
-                resolve(res);
-              })
-              .catch(function (err) {
-                clearInterval(closePoller);
-                reject(err);
-              });
-          });
-
-          return popupPromise
-            .then(function (res) {
-              return handleOAuthResponse(sdk, tokenParams, res, urls);
-            })
-            .finally(function () {
-              if (windowEl && !windowEl.closed) {
-                windowEl.close();
-              }
-            });
-
-        default:
-          throw new AuthSdkError('The full page redirect flow is not supported');
+      // Add listener on postMessage before window creation, so
+      // postMessage isn't triggered before we're listening
+      if (tokenParams.responseMode === 'okta_post_message') {
+        if (!sdk.features.isPopupPostMessageSupported()) {
+          throw new AuthSdkError('This browser doesn\'t have full postMessage support');
+        }
+        oauthPromise = addPostMessageListener(sdk, options.timeout, tokenParams.state);
       }
-    });
+
+      // Create the window
+      var windowOptions = {
+        popupTitle: options.popupTitle
+      };
+      var windowEl = loadPopup(requestUrl, windowOptions);
+
+      // The popup may be closed without receiving an OAuth response. Setup a poller to monitor the window.
+      var popupPromise = new Promise(function (resolve, reject) {
+        var closePoller = setInterval(function () {
+          if (!windowEl || windowEl.closed) {
+            clearInterval(closePoller);
+            reject(new AuthSdkError('Unable to parse OAuth flow response'));
+          }
+        }, 100);
+
+        // Proxy the OAuth promise results
+        oauthPromise
+          .then(function (res) {
+            clearInterval(closePoller);
+            resolve(res);
+          })
+          .catch(function (err) {
+            clearInterval(closePoller);
+            reject(err);
+          });
+      });
+
+      return popupPromise
+        .then(function (res) {
+          return handleOAuthResponse(sdk, tokenParams, res, urls);
+        })
+        .finally(function () {
+          if (windowEl && !windowEl.closed) {
+            windowEl.close();
+          }
+        });
+
+    default:
+      throw new AuthSdkError('The full page redirect flow is not supported');
+  }
+
 }

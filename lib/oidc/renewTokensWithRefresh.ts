@@ -31,7 +31,7 @@ export async function renewTokensWithRefresh(
     clientId,
   });
   const tokenResponse = await postRefreshToken(sdk, renewTokenParams, refreshTokenObject);
-  const urls = getOAuthUrls(sdk, tokenParams);
+  const urls = await getOAuthUrls(sdk);
   const { tokens } = await handleOAuthResponse(sdk, renewTokenParams, tokenResponse, urls);
 
   // Support rotating refresh tokens

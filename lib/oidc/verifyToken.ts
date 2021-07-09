@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { getWellKnown, getKey } from './endpoints/well-known';
-import { validateClaims } from './util';
+import { getKey } from './endpoints/well-known';
+import { validateClaims, getOAuthUrls } from './util';
 import { AuthSdkError } from '../errors';
 import { IDToken, OktaAuth, TokenVerifyParams } from '../types';
 import { decodeToken } from './decodeToken';
@@ -28,12 +28,12 @@ export async function verifyToken(sdk: OktaAuth, token: IDToken, validationParam
   // Decode the Jwt object (may throw)
   var jwt = decodeToken(token.idToken);
 
-  var openIdConfig = await getWellKnown(sdk); // using sdk.options.issuer
-
+  const { issuer } = await getOAuthUrls(sdk); // sdk.options.issuer may point to a proxy. Use "real" issuer for validation.
+  const { clientId, ignoreSignature } = sdk.options;
   var validationOptions: TokenVerifyParams = {
-    issuer: openIdConfig.issuer, // sdk.options.issuer may point to a proxy. Use "real" issuer for validation.
-    clientId: sdk.options.clientId,
-    ignoreSignature: sdk.options.ignoreSignature
+    issuer,
+    clientId,
+    ignoreSignature
   };
 
   Object.assign(validationOptions, validationParams);

@@ -30,7 +30,7 @@ export async function introspect (authClient: OktaAuth, options: IntrospectOptio
   // call idx.introspect if no existing idx response available in storage
   if (!rawIdxResponse) {
     const version = IDX_API_VERSION;
-    const domain = getOAuthDomain(authClient);
+    const domain = await getOAuthDomain(authClient);
     rawIdxResponse = await idx.introspect({ domain, version, ...options });
   }
 

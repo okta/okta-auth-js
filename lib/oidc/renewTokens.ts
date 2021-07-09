@@ -25,9 +25,9 @@ export async function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
   // Get tokens using the SSO cookie
   options = Object.assign({
     scopes: sdk.options.scopes,
-    authorizeUrl: sdk.options.authorizeUrl,
-    userinfoUrl: sdk.options.userinfoUrl,
-    issuer: sdk.options.issuer
+    // authorizeUrl: sdk.options.authorizeUrl,
+    // userinfoUrl: sdk.options.userinfoUrl,
+    // issuer: sdk.options.issuer
   }, options);
 
   if (sdk.options.pkce) {

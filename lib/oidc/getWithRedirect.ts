@@ -16,49 +16,47 @@ import { clone } from '../util';
 import { getOAuthUrls, prepareTokenParams } from './util';
 import { buildAuthorizeParams } from './endpoints/authorize';
 
-export function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
+export async function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
   }
 
   options = clone(options) || {};
 
-  return prepareTokenParams(sdk, options)
-    .then(function (tokenParams: TokenParams) {
-      const urls = getOAuthUrls(sdk, options);
-      const requestUrl = urls.authorizeUrl + buildAuthorizeParams(tokenParams);
-      const issuer = sdk.options.issuer;
+  const tokenParams: TokenParams = await prepareTokenParams(sdk, options);
+  const urls = await getOAuthUrls(sdk);
+  const requestUrl = urls.authorizeUrl + buildAuthorizeParams(tokenParams);
+  const issuer = sdk.options.issuer; // may differ from urls.issuer
 
-      // Gather the values we want to save in the transaction
-      const {
-        responseType,
-        state,
-        nonce,
-        scopes,
-        clientId,
-        ignoreSignature,
-        redirectUri,
-        codeVerifier,
-        codeChallenge,
-        codeChallengeMethod,
-      } = tokenParams;
+  // Gather the values we want to save in the transaction
+  const {
+    responseType,
+    state,
+    nonce,
+    scopes,
+    clientId,
+    ignoreSignature,
+    redirectUri,
+    codeVerifier,
+    codeChallenge,
+    codeChallengeMethod,
+  } = tokenParams;
 
-      const oauthMeta: TransactionMeta = {
-        issuer,
-        responseType,
-        state,
-        nonce,
-        scopes,
-        clientId,
-        urls,
-        ignoreSignature,
-        redirectUri,
-        codeVerifier,
-        codeChallenge,
-        codeChallengeMethod,
-      };
+  const oauthMeta: TransactionMeta = {
+    issuer,
+    responseType,
+    state,
+    nonce,
+    scopes,
+    clientId,
+    urls,
+    ignoreSignature,
+    redirectUri,
+    codeVerifier,
+    codeChallenge,
+    codeChallengeMethod,
+  };
 
-      sdk.transactionManager.save(oauthMeta, { oauth: true });
-      sdk.token.getWithRedirect._setLocation(requestUrl);
-    });
+  sdk.transactionManager.save(oauthMeta, { oauth: true });
+  sdk.token.getWithRedirect._setLocation(requestUrl);
 }

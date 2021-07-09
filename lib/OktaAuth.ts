@@ -373,7 +373,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     return this.token.revoke(refreshToken);
   }
 
-  getSignOutRedirectUrl(options: SignoutRedirectUrlOptions = {}) {
+  async getSignOutRedirectUrl(options: SignoutRedirectUrlOptions = {}) {
     let {
       idToken,
       postLogoutRedirectUri,
@@ -389,7 +389,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       postLogoutRedirectUri = this.options.postLogoutRedirectUri;
     }
 
-    const logoutUrl = getOAuthUrls(this).logoutUrl;
+    const { logoutUrl } = await getOAuthUrls(this);
     const idTokenHint = idToken.idToken; // a string
     let logoutUri = logoutUrl + '?id_token_hint=' + encodeURIComponent(idTokenHint);
     if (postLogoutRedirectUri) {

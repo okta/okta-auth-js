@@ -53,7 +53,7 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
   const state = options.state || authClient.options.state || meta.state;
   const scopes = options.scopes || authClient.options.scopes || meta.scopes;
 
-  const baseUrl = getOAuthBaseUrl(authClient);
+  const baseUrl = await getOAuthBaseUrl(authClient);
   return idx.interact({
     // OAuth
     clientId, 
