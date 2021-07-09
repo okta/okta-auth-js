@@ -31,7 +31,8 @@ import {
   StorageProvider,
   TokenManagerErrorEventHandler,
   TokenManagerEventHandler,
-  TokenManagerInterface
+  TokenManagerInterface,
+  RefreshToken
 } from './types';
 import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_KEY } from './constants';
 import { TokenService } from './services/TokenService';
@@ -426,6 +427,17 @@ export class TokenManager implements TokenManagerInterface {
     }
     return tokens;
   }
+
+  updateRefreshToken(token: RefreshToken) {
+    const key = this.getStorageKeyByType('refreshToken') || REFRESH_TOKEN_STORAGE_KEY;
+
+    // do not emit any event
+    var tokenStorage = this.storage.getStorage();
+    validateToken(token);
+    tokenStorage[key] = token;
+    this.storage.setStorage(tokenStorage);
+  }
+  
 }
 
 if (isLocalhost()) {
