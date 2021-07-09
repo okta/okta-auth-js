@@ -13,27 +13,27 @@ const actions = getActions('react');
 const samplesConfig = [
   {
     name: 'custom-login',
-    dest: 'react',
+    dest: 'samples/react',
     type: 'github',
     header: 'PKCE Flow w/ Custom Login',
     filterPredicate: action => action !== 'doc-src'
   },
   {
     name: 'okta-hosted-login',
-    dest: 'react',
+    dest: 'samples/react',
     type: 'github',
     header: 'PKCE Flow w/ Okta Hosted Login Page',
     filterPredicate: action => action !== 'doc-src'
   },
   {
     name: 'signin-widget',
-    dest: 'react',
+    dest: 'samples/react',
     type: 'doc',
     filterPredicate: action => action !== 'github-src'
   },
   {
     name: 'auth-js-no-oidc',
-    dest: 'react',
+    dest: 'samples/react',
     type: 'doc',
     filterPredicate: action => action !== 'github-src'
   }
@@ -51,7 +51,7 @@ function buildSamples(action) {
     }
   };
 
-  function buildSample(config, action) {
+  const buildSample = (config, action) => {
     if (action) {
       buildAction(config, action);
     } else {

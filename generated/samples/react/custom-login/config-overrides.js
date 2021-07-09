@@ -1,6 +1,3 @@
----
-to: ../generated/<%= dest %>/<%= name %>/config-overrides.js
----
 /* eslint-disable import/no-extraneous-dependencies */
 const webpack = require('webpack');
 const envModule = require('./env');

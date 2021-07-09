@@ -8,4 +8,4 @@ module.exports = {
   ),
   'generate:react': reactTasks.default,
   'dev:react': reactTasks.dev
-}
+};

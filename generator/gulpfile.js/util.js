@@ -1,7 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { src, dest } = require('gulp');
-const rename = require('gulp-rename');
 const shell = require('shelljs');
 
 const constants = require('./constants');
@@ -20,11 +18,6 @@ const getHygenCommand = (base, config) => {
 const buildEnv = (config) => {
   const command = getHygenCommand(`yarn hygen env new`, config);
   shell.exec(command);
-  const destDir = getDestDir(config);
-  // copy env script from root dir
-  src('../env/index.js', { dot: true })
-    .pipe(rename('okta-env.js'))
-    .pipe(dest(`${destDir}/env/`))
 };
 
 const getActions = generator => {

@@ -1,7 +1,3 @@
----
-to: ../generated/<%= dest %>/<%= name %>/env/index.js
-force: true
----
 /* eslint-disable */
 module.exports = function () {
   let oktaEnv;

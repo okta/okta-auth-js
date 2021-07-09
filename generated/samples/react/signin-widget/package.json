@@ -1,16 +1,10 @@
----
-to: ../generated/<%= dest %>/<%= name %>/package.json
----
 {
-  "name": "samples-js-react-<%= name %>",
+  "name": "samples-js-react-signin-widget",
   "version": "0.3.0",
   "private": true,
   "dependencies": {
     "@okta/okta-auth-js": "^5.0.0",
     "@okta/okta-react": "^6.0.0",
-<% if (name === 'custom-login') { -%>
-    "@okta/okta-signin-widget": "^5.4.0",
-<% } -%>
     "colors": "^1.4.0",
     "dotenv": "^8.2.0",
     "react": "^17.0.1",
