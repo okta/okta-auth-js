@@ -15,6 +15,7 @@
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 
+const createProxyMiddleware = require('./proxyMiddleware');
 const loginMiddleware = require('./loginMiddleware');
 const callbackMiddleware = require('./callbackMiddleware');
 const renderWidget = require('./renderWidget');
@@ -30,10 +31,15 @@ const app = express();
 const config = require('../webpack.config.js');
 const compiler = webpack(config);
 
+// Set a proxy in front of Okta
+const proxyMiddleware = createProxyMiddleware();
+app.use('/oauth2', proxyMiddleware);
+app.use('/app', proxyMiddleware);
+
 // Tell express to use the webpack-dev-middleware and use the webpack.config.js
 // configuration file as a base.
 app.use(webpackDevMiddleware(compiler, {
-  publicPath: config.output.publicPath,
+  publicPath: config.output.publicPath
 }));
 
 app.use(express.static('./public'));

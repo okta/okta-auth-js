@@ -18,6 +18,14 @@ const ISSUER = process.env.ISSUER;
 const issuer = URL.parse(ISSUER);
 const BASE_URL = issuer.protocol + '//' + issuer.host;
 
+function getIssuer() {
+  return ISSUER;
+}
+
+function getBaseUrl() {
+  return BASE_URL;
+}
+
 async function openOktaHome() {
   return browser.newWindow(BASE_URL, 'Okta-hosted page');
 }
@@ -42,6 +50,8 @@ async function switchToLastFocusedWindow() {
 }
 
 export { 
+  getIssuer,
+  getBaseUrl,
   openOktaHome, 
   switchToMainWindow, 
   switchToPopupWindow,

@@ -93,14 +93,14 @@ describe('renewTokensWithRefresh', function () {
       'A clientId must be specified in the OktaAuth constructor to renew tokens');
   });
 
-  it('saves refresh token if a different refresh token is returned', async () => {
+  it('saves refresh token if a different refresh token is returned, but does not trigger "add" event', async () => {
     const { authInstance } = testContext;
     authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
     let refreshToken = await authInstance.tokenManager.get('refreshToken');
     expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
     jest.spyOn(authInstance.tokenManager, 'add');
     await authInstance.token.renewTokens();
-    expect(authInstance.tokenManager.add).toHaveBeenCalledWith('refreshToken', tokens.standardRefreshToken2Parsed);
+    expect(authInstance.tokenManager.add).not.toHaveBeenCalled();
     refreshToken = await authInstance.tokenManager.get('refreshToken');
     expect(refreshToken).toEqual(tokens.standardRefreshToken2Parsed);
   });
@@ -131,14 +131,14 @@ describe('renewTokensWithRefresh', function () {
     expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
   });
 
-  it('supports rotating refresh tokens with custom key names', async () => {
+  it('supports rotating refresh tokens with custom key names (and does not fire "add" event)', async () => {
     const { authInstance } = testContext;
     authInstance.tokenManager.add('refreshToken2', tokens.standardRefreshTokenParsed);
     let refreshToken = await authInstance.tokenManager.get('refreshToken2');
     expect(refreshToken).toEqual(tokens.standardRefreshTokenParsed);
     jest.spyOn(authInstance.tokenManager, 'add');
     await authInstance.token.renewTokens();
-    expect(authInstance.tokenManager.add).toHaveBeenCalledWith('refreshToken2', tokens.standardRefreshToken2Parsed);
+    expect(authInstance.tokenManager.add).not.toHaveBeenCalled();
     refreshToken = await authInstance.tokenManager.get('refreshToken2');
     expect(refreshToken).toEqual(tokens.standardRefreshToken2Parsed);
   });
