@@ -36,6 +36,7 @@
     "jsdoc/valid-types": 0,
     "jsdoc/check-alignment": 0,
     "node/no-unsupported-features/es-syntax": 0,
-    "jasmine/no-suite-dupes": [1, "branch"]
+    "jasmine/no-suite-dupes": [1, "branch"],
+    "node/no-extraneous-require": 0
   }
 }

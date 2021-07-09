@@ -8,6 +8,9 @@
     "generate": "HYGEN_OVERWRITE=1 gulp",
     "generate:react": "HYGEN_OVERWRITE=1 gulp generate:react"
   },
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "dependencies": {
     "gulp": "^4.0.2",
     "hygen": "^6.1.0",

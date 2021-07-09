@@ -10,74 +10,32 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import { Redirect } from 'react-router-dom';
+import OktaSignInWidget from './OktaSignInWidget';
 import { useOktaAuth } from '@okta/okta-react';
-import * as OktaSignIn from '@okta/okta-signin-widget';
-import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
 
-import config from './config';
+const Login = ({ config }) => {
+  const { oktaAuth, authState } = useOktaAuth();
 
-const Login = ({ setCorsErrorModalOpen }) => {
-  const { oktaAuth } = useOktaAuth();
-  const widgetRef = useRef();
+  const onSuccess = (tokens) => {
+    oktaAuth.handleLoginRedirect(tokens);
+  };
 
-  useEffect(() => {
-    if (!widgetRef.current) {
-      return false;
-    }
+  const onError = (err) => {
+    console.log('error logging in', err);
+  };
+  
+  if (!authState) {
+    return <div>Loading...</div>;
+  }
 
-    const { issuer, clientId, redirectUri, scopes, useInteractionCode } = config.oidc;
-    const widget = new OktaSignIn({
-      /**
-       * Note: when using the Sign-In Widget for an OIDC flow, it still
-       * needs to be configured with the base URL for your Okta Org. Here
-       * we derive it from the given issuer for convenience.
-       */
-      baseUrl: issuer.split('/oauth2')[0],
-      clientId,
-      redirectUri,
-      logo: '/react.svg',
-      i18n: {
-        en: {
-          'primaryauth.title': 'Sign in to React & Company',
-        },
-      },
-      authParams: {
-        // To avoid redirect do not set "pkce" or "display" here. OKTA-335945
-        issuer,
-        scopes,
-      },
-      useInteractionCodeFlow: useInteractionCode, // Set to true, if your org is OIE enabled
-    });
-
-    widget.renderEl(
-      { el: widgetRef.current },
-      (res) => {
-        console.log(res);
-        oktaAuth.handleLoginRedirect(res.tokens);
-      },
-      (err) => {
-        throw err;
-      },
-    );
-
-    // Note: Can't distinguish CORS error from other network errors
-    const isCorsError = (err) => (err.name === 'AuthApiError' && !err.statusCode);
-
-    widget.on('afterError', (_context, error) => {
-      if (isCorsError(error)) {
-        setCorsErrorModalOpen(true);
-      }
-    });
-
-    return () => widget.remove();
-  }, [oktaAuth]);
-
-  return (
-    <div>
-      <div ref={widgetRef} />
-    </div>
-  );
+  return authState.isAuthenticated ?
+    <Redirect to={{ pathname: '/' }} /> :
+    <OktaSignInWidget
+      config={config}
+      onSuccess={onSuccess}
+      onError={onError}/>;
 };
 
 export default Login;
