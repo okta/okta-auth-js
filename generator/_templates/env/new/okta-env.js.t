@@ -1,5 +1,5 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/env/okta-env.js
+to: ../generated/<%= dest %>/env/okta-env.js
 ---
 /* eslint-disable */
 <%- include(`${cwd}/../env/index.js`) %>

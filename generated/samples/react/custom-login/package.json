@@ -1,5 +1,5 @@
 {
-  "name": "@okta/react-samples.custom-login",
+  "name": "@okta/samples.react.custom-login",
   "version": "0.3.0",
   "private": true,
   "dependencies": {

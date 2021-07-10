@@ -1,10 +1,11 @@
 {
-  "name": "@okta/react-samples.doc-no-oidc",
+  "name": "@okta/samples.react.doc-no-oidc",
   "version": "0.3.0",
   "private": true,
   "dependencies": {
     "@okta/okta-auth-js": "*",
     "@okta/okta-react": "^6.0.0",
+    "@okta/okta-signin-widget": "^5.8.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",

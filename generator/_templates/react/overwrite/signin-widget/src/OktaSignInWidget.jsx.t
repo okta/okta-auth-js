@@ -1,5 +1,5 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/src/OktaSignInWidget.jsx
+to: ../generated/<%= dest %>/src/OktaSignInWidget.jsx
 ---
 <%- include(`${templates}/${generator}/license-banner.t`) %>
 

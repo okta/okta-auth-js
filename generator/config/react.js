@@ -1,28 +1,34 @@
 module.exports = [
   {
-    name: 'custom-login',
-    dest: 'samples/react',
-    type: 'github',
-    header: 'PKCE Flow w/ Custom Login',
-    filterPredicate: action => action !== 'doc-src'
-  },
-  {
+    pkgName: '@okta/samples.react.okta-hosted-login',
     name: 'okta-hosted-login',
-    dest: 'samples/react',
-    type: 'github',
+    dest: 'samples/react/okta-hosted-login',
+    type: 'github-sample',
+    useSiw: false,
     header: 'PKCE Flow w/ Okta Hosted Login Page',
-    filterPredicate: action => action !== 'doc-src'
+    filterPredicate: action => !action.startsWith('doc-')
   },
   {
-    name: 'doc-signin-widget',
-    dest: 'samples/react',
-    type: 'doc',
-    filterPredicate: action => action !== 'github-src'
+    pkgName: '@okta/samples.react.custom-login',
+    name: 'custom-login',
+    dest: 'samples/react/custom-login',
+    type: 'github-sample',
+    useSiw: true,
+    header: 'PKCE Flow w/ Custom Login',
+    filterPredicate: action => !action.startsWith('doc-')
   },
   {
-    name: 'doc-no-oidc',
-    dest: 'samples/react',
-    type: 'doc',
-    filterPredicate: action => action !== 'github-src'
+    pkgName: '@okta/samples.react.doc-signin-widget',
+    dest: 'samples/react/doc-signin-widget',
+    type: 'doc-sample',
+    useSiw: true,
+    filterPredicate: action => !action.startsWith('github-')
+  },
+  {
+    pkgName: '@okta/samples.react.doc-no-oidc',
+    dest: 'samples/react/doc-no-oidc',
+    type: 'doc-sample',
+    useSiw: false,
+    filterPredicate: action => !action.startsWith('github-')
   }
 ];

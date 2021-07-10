@@ -1,5 +1,5 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/src/App.test.jsx
+to: ../generated/<%= dest %>/src/App.test.jsx
 ---
 <%- include(`${templates}/${generator}/license-banner.t`) %>
 

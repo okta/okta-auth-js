@@ -1,17 +1,17 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/package.json
+to: ../generated/<%= dest %>/package.json
 ---
 {
-  "name": "@okta/react-samples.<%= name %>",
+  "name": "<%= pkgName %>",
   "version": "0.3.0",
   "private": true,
   "dependencies": {
     "@okta/okta-auth-js": "*",
     "@okta/okta-react": "^<%= oktaReactVersion %>",
-<% if (name === 'custom-login' || name === 'doc-signin-widget') { -%>
+<% if (useSiw) { -%>
     "@okta/okta-signin-widget": "^<%= siwVersion %>",
 <% } -%>
-<% if (type === 'github') { -%>
+<% if (type === 'github-sample') { -%>
     "colors": "^1.4.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.0.3",

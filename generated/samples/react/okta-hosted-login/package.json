@@ -1,10 +1,11 @@
 {
-  "name": "@okta/react-samples.okta-hosted-login",
+  "name": "@okta/samples.react.okta-hosted-login",
   "version": "0.3.0",
   "private": true,
   "dependencies": {
     "@okta/okta-auth-js": "*",
     "@okta/okta-react": "^6.0.0",
+    "@okta/okta-signin-widget": "^5.8.2",
     "colors": "^1.4.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.0.3",

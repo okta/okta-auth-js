@@ -1,5 +1,5 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/src/polyfills.js
+to: ../generated/<%= dest %>/src/polyfills.js
 ---
 <%- include(`${templates}/${generator}/license-banner.t`) %>
 

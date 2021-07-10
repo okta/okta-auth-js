@@ -1,5 +1,5 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/src/CorsErrorModal.jsx
+to: ../generated/<%= dest %>/src/CorsErrorModal.jsx
 ---
 <%- include(`${templates}/${generator}/license-banner.t`) %>
 

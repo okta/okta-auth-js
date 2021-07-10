@@ -1,5 +1,5 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/env/index.js
+to: ../generated/<%= dest %>/env/index.js
 force: true
 ---
 /* eslint-disable */

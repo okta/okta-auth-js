@@ -1,5 +1,5 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/.gitignore
+to: ../generated/<%= dest %>/.gitignore
 ---
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 

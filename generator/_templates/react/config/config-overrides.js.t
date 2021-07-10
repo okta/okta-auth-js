@@ -1,5 +1,5 @@
 ---
-to: ../generated/<%= dest %>/<%= name %>/config-overrides.js
+to: ../generated/<%= dest %>/config-overrides.js
 ---
 /* eslint-disable import/no-extraneous-dependencies */
 const webpack = require('webpack');

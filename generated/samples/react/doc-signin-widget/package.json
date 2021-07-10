@@ -1,5 +1,5 @@
 {
-  "name": "@okta/react-samples.doc-signin-widget",
+  "name": "@okta/samples.react.doc-signin-widget",
   "version": "0.3.0",
   "private": true,
   "dependencies": {
