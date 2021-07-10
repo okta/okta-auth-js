@@ -8,7 +8,7 @@ to: ../generated/<%= dest %>/package.json
   "dependencies": {
     "@okta/okta-auth-js": "*",
     "@okta/okta-react": "^<%= oktaReactVersion %>",
-<% if (useSiw) { -%>
+<% if (useSiw === 'true') { -%>
     "@okta/okta-signin-widget": "^<%= siwVersion %>",
 <% } -%>
 <% if (type === 'github-sample') { -%>

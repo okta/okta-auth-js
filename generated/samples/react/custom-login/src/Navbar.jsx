@@ -12,10 +12,11 @@
 
 import { useOktaAuth } from '@okta/okta-react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { Container, Icon, Image, Menu } from 'semantic-ui-react';
 
 const Navbar = ({ setCorsErrorModalOpen }) => {
+  const history = useHistory();
   const { authState, oktaAuth } = useOktaAuth();
 
   // Note: Can't distinguish CORS error from other network errors

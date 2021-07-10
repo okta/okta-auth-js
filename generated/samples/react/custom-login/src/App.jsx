@@ -31,7 +31,7 @@ const App = () => {
   const restoreOriginalUri = async (_oktaAuth, originalUri) => {
     history.replace(toRelativeUrl(originalUri || '/', window.location.origin));
   };
-  
+
   const customAuthHandler = () => {
     // Redirect to the /login page that has a CustomLoginComponent
     history.push('/login');
@@ -40,7 +40,7 @@ const App = () => {
   const onAuthResume = async () => {
     history.push('/login');
   };
-  
+
   const [corsErrorModalOpen, setCorsErrorModalOpen] = React.useState(false);
 
   return (

@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const webpack = require('webpack');
-const envModule = require('./env');
+const envModule = require('./env')();
 
 envModule.setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
 
