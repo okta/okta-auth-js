@@ -56,7 +56,7 @@ const Home = () => {
   return (
     <div>
       <div>
-        <Header as="h1"><%= header %></Header>
+        <Header as="h1">PKCE Flow w/ <%= h.changeCase.title(name) %> Page</Header>
 
         { authState.isAuthenticated && !userInfo
         && <div>Loading user information...</div>}

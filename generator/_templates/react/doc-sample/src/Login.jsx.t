@@ -5,19 +5,19 @@ to: ../generated/<%= dest %>/src/Login.jsx
 
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-<%- name === 'signin-widget'
+<%- useSiw === 'true'
   ? `import OktaSignInWidget from './OktaSignInWidget';`
   : `import LoginForm from './LoginForm';` 
 %>
 import { useOktaAuth } from '@okta/okta-react';
 
-<%- name === 'signin-widget' 
+<%- useSiw === 'true' 
   ? `const Login = ({ config }) => {` 
   : `const Login = () => {` 
 %>
   const { oktaAuth, authState } = useOktaAuth();
 
-  <%- name === 'signin-widget' 
+  <%- useSiw === 'true' 
   ? `const onSuccess = (tokens) => {
     oktaAuth.handleLoginRedirect(tokens);
   };
@@ -33,7 +33,7 @@ import { useOktaAuth } from '@okta/okta-react';
 
   return authState.isAuthenticated ?
     <Redirect to={{ pathname: '/' }} /> :
-    <%- name === 'signin-widget' ?
+    <%- useSiw === 'true' ?
     `<OktaSignInWidget
       config={config}
       onSuccess={onSuccess}

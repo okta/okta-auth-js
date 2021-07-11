@@ -1,5 +1,4 @@
-const { src, series, watch } = require('gulp');
-const clean = require('gulp-clean');
+const { series, watch, parallel } = require('gulp');
 const shell = require('shelljs');
 const constants = require('./constants');
 const { 
@@ -8,68 +7,103 @@ const {
   getActions, 
   getAction,
   getPublishedModuleVersion,
+  install,
+  getCleanTask
 } = require('./util');
 const { react: samplesConfig } = require('../config');
 
-const actions = getActions('react');
+const CONTEXT = 'react';
 
-function buildSamples(action) {
-  const buildAction = (config, action) => {
-    if (config.filterPredicate(action)) {
-      const command = getHygenCommand(`yarn hygen react ${action}`, config);
-      shell.exec(command, code => {
-        if (code !== 0) {
-          throw new Error(`Failed to build templates, action: ${action}, config: ${JSON.stringify(config)}`);
-        }
-      });
+const versions = {
+  siwVersion: getPublishedModuleVersion('@okta/okta-signin-widget'),
+  oktaReactVersion: getPublishedModuleVersion('@okta/okta-react')
+};
+const actions = getActions(CONTEXT);
+
+const getSamplesConfig = () => samplesConfig.map(config => {
+  const parts = config.pkgName.split('.');
+  const name = parts[parts.length - 1];
+  const dest = `samples/${CONTEXT}/${name}`;
+  return { ...config, ...versions, name, dest };
+});
+
+const buildAction = (action, config) => {
+  return new Promise((resolve, reject) => {
+    if (config.excludeAction.test(action)) {
+      resolve();
+      return;
     }
-  };
+    const command = getHygenCommand(`yarn hygen ${CONTEXT} ${action}`, config || {});
+    shell.exec(command, (code, stdout, stderr) => {
+      if (code !== 0) {
+        reject(new Error(stderr));
+      }
+      resolve(stdout);
+    });
+  });
+};
 
-  const buildSample = (config, action) => {
-    if (action) {
-      buildAction(config, action);
-    } else {
-      actions.forEach(action => buildSample(config, action));
-    }
-  };
+const cleanTask = getCleanTask(`${constants.buildDir}/samples/${CONTEXT}`);
 
-  samplesConfig
-    .map(config => {
-      return {
-        ...config,
-        siwVersion: getPublishedModuleVersion('@okta/okta-signin-widget'),
-        oktaReactVersion: getPublishedModuleVersion('@okta/okta-react')
-      };
-    })
-    .forEach(config => buildSample(config, action));
-}
+const getCommonBuildTasks = () => {
+  const tasks = [];
+  // add build env tasks
+  getSamplesConfig().forEach(config => {
+    tasks.push(buildEnv.bind(null, config));
+  });
+  // add common build tasks
+  getSamplesConfig()
+    .forEach(config => {
+      actions
+        .filter(action => action !== constants.actionOverwrite)
+        .forEach(action => tasks.push(buildAction.bind(null, action, config)));
+    });
+  return tasks;
+};
 
-function cleanTask() {
-  return src(`${constants.buildDir}`, { read: false, allowEmpty: true })
-    .pipe(clean({ force: true }));
-}
-
-function buildTask(done) {
-  samplesConfig.forEach(buildEnv);
-  buildSamples();
-  done();
-}
+const getOverwriteBuildTasks = () => {
+  const tasks = [];
+  getSamplesConfig()
+    .forEach(config => tasks.push(buildAction.bind(null, `${constants.actionOverwrite}:${config.name}`, config)));
+  return tasks;
+};
 
 function watchTask() {
-  const watcher = watch('_templates/react/**/*');
+  const watcher = watch(`_templates/${CONTEXT}/**/*`);
   watcher.on('all', (_, path) => {
+    // get action from change path and execute build action
     const action = getAction(actions, path);
     console.info(`\nFile ${path} has been changed, build start ... \n`);
-    buildSamples(action);
+    if (action === constants.actionOverwrite) {
+      getSamplesConfig()
+        .filter(config => path.includes(config.name))
+        .forEach(config => buildAction(`${constants.actionOverwrite}:${config.name}`, config));
+    } else {
+      getSamplesConfig().forEach(config => buildAction(action, config));
+    }
+    
+    // check if yarn install is needed
+    if (path.includes('package.json')) {
+      install();
+    }
   });
 }
 
-const defaultTask = series(cleanTask, buildTask);
+function installTask(done) {
+  install();
+  done();
+}
+
+const defaultTask = series(
+  cleanTask,
+  parallel(...getCommonBuildTasks()),
+  parallel(...getOverwriteBuildTasks()),
+  installTask
+);
 
 module.exports = {
   default: defaultTask,
-  clean: cleanTask,
-  build: buildTask,
+  clean: getCleanTask,
   watch: watchTask,
   dev: series(defaultTask, watchTask)
 };

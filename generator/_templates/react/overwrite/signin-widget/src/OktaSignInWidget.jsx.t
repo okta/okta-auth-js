@@ -3,6 +3,9 @@ to: ../generated/<%= dest %>/src/OktaSignInWidget.jsx
 ---
 <%- include(`${templates}/${generator}/license-banner.t`) %>
 
+<%= action %>
+<%= subaction %>
+
 import React, { useEffect, useRef } from 'react';
 import OktaSignIn from '@okta/okta-signin-widget';
 import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';

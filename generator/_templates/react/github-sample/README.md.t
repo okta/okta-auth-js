@@ -1,7 +1,7 @@
 ---
 to: ../generated/<%= dest %>/README.md
 ---
-# Okta React + <%= h.changeCase.sentence(name) %> Example
+# Okta React + <%= h.changeCase.title(name) %> Example
 
 This example shows you how to use the [Okta React Library][] and [React Router](https://github.com/ReactTraining/react-router) to login a user to a React application.  The login is achieved with the [Okta Sign In Widget][], which gives you more control to customize the login experience within your app.
 
