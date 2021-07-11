@@ -1,8 +1,7 @@
 const react = require('./react');
 
 const testConfig = {
-  port: 8080,
-  features: []
+  port: 8080
 };
 
 const mergeTestConfig = (configs) => {

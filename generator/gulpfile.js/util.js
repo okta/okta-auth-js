@@ -1,12 +1,7 @@
 const fs = require('fs');
-const { src } = require('gulp');
-const clean = require('gulp-clean');
 const path = require('path');
 const shell = require('shelljs');
-
-const constants = require('./constants');
-
-const getDestDir = config => `${constants.buildDir}/${config.dest}/${config.name}`;
+const config = require('../config');
 
 const getHygenCommand = (base, options) => {
   return Object.keys(options).reduce((acc, curr) => {
@@ -15,22 +10,10 @@ const getHygenCommand = (base, options) => {
   }, base);
 };
 
-const buildEnv = (config) => {
-  return new Promise((resolve, reject) => {
-    const command = getHygenCommand(`yarn hygen env new`, config);
-    shell.exec(command, (code, stdout, stderr) => {
-      if (code !== 0) {
-        reject(new Error(stderr));
-      }
-      resolve(stdout);
-    });
-  });
-};
-
-const getActions = generator => {
-  const p = path.join(__dirname, '..', `_templates/${generator}`);
-  return fs.readdirSync(p).filter((file) => {
-    return fs.statSync(p + '/' + file).isDirectory();
+const getActions = framework => {
+  const dir = path.join(__dirname, '..', `_templates/${framework}`);
+  return fs.readdirSync(dir).filter((file) => {
+    return fs.statSync(dir + '/' + file).isDirectory();
   });
 };
 
@@ -56,16 +39,28 @@ const install = () => {
   shell.exec('yarn install --ignore-scripts');
 }
 
-const getCleanTask = dir => () => 
-  src(dir, { read: false, allowEmpty: true }).pipe(clean({ force: true }));
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+const getSamplesConfig = framework => {
+  const versions = {
+    siwVersion: getPublishedModuleVersion('@okta/okta-signin-widget'),
+    [`okta${capitalizeFirstLetter(framework)}Version`]: getPublishedModuleVersion(`@okta/okta-${framework}`)
+  };
+  return config[framework].map(config => {
+    const pkgNameParts = config.pkgName.split('.');
+    const name = pkgNameParts[pkgNameParts.length - 1];
+    const dest = `samples/${framework}/${name}`;
+    return { ...config, ...versions, name, dest };
+  });
+}
 
 module.exports = {
-  getDestDir,
   getHygenCommand,
-  buildEnv,
   getActions,
   getAction,
   getPublishedModuleVersion,
   install,
-  getCleanTask
+  getSamplesConfig
 };
