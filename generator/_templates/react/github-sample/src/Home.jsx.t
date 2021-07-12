@@ -54,7 +54,7 @@ const Home = () => {
   }
 
   return (
-    <div>
+    <div id="home">
       <div>
         <Header as="h1">PKCE Flow w/ <%= h.changeCase.title(name) %> Page</Header>
 

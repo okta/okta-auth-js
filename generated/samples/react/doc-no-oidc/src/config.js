@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-const CLIENT_ID = process.env.CLIENT_ID || '{clientId}';
+const CLIENT_ID = process.env.SPA_CLIENT_ID || process.env.CLIENT_ID || '{clientId}';
 const ISSUER = process.env.ISSUER || 'https://{yourOktaDomain}.com/oauth2/default';
 const REDIRECT_URI = `${window.location.origin}/login/callback`;
 

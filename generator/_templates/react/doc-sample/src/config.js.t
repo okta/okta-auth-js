@@ -3,7 +3,7 @@ to: ../generated/<%= dest %>/src/config.js
 ---
 <%- include(`${templates}/${generator}/license-banner.t`) %>
 
-const CLIENT_ID = process.env.CLIENT_ID || '{clientId}';
+const CLIENT_ID = process.env.SPA_CLIENT_ID || process.env.CLIENT_ID || '{clientId}';
 const ISSUER = process.env.ISSUER || 'https://{yourOktaDomain}.com/oauth2/default';
 const REDIRECT_URI = `${window.location.origin}/login/callback`;
 

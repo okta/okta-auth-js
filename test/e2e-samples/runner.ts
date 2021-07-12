@@ -118,7 +118,7 @@ if (testName) {
   console.log(reactSamplesConfig);
   const tasks = [
     ...config.getSamplesConfig(),
-    // ...reactSamplesConfig
+    ...reactSamplesConfig
   ].map(sampleConfig => {
     if (process.env.RUN_CUCUMBER_TESTS) {
       const features = sampleConfig.features || [];
