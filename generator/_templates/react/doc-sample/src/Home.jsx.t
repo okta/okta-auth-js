@@ -20,7 +20,7 @@ const Home = () => {
     <button onClick={() => {history.push('/login')}}>Login</button>;
 
   return (
-    <div>
+    <div id="home">
       <Link to='/'>Home</Link><br/>
       <Link to='/protected'>Protected</Link><br/>
       {button}
