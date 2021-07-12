@@ -30,6 +30,7 @@ import checkProfileEmail from '../support/check/checkProfileEmail';
 import { UserHome } from '../support/selectors';
 import isDisplayed from '../support/check/isDisplayed';
 import checkProfileName from '../support/check/checkProfileName';
+import checkWelcomeText from '../support/check/checkWelcomeText';
 
 Then(
   /^User can verify their profile data$/,
@@ -187,6 +188,11 @@ Then(
   async function() {
     await isDisplayed(UserHome.profileTable, false);
   }
+);
+
+Then(
+  /^she sees welcome text$/,
+  checkWelcomeText
 );
 
 Then(

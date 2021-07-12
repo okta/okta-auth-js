@@ -12,10 +12,17 @@
 
 
 const samplesConfig = require('@okta/samples/config');
+const { react: reactSamplesConfig } = require('@okta/generator/config');
 
-function getSampleConfig() {
-  const sampleName = process.env.SAMPLE_NAME;
-  const sampleConfig = sampleName ? samplesConfig.getSampleConfigByPkgName(sampleName) : {};
+function getSampleConfig(sampleName) {
+  sampleName = sampleName || process.env.SAMPLE_NAME;
+  let sampleConfig = samplesConfig.getSampleConfigByPkgName(sampleName);
+  if (!sampleConfig) {
+    sampleConfig = reactSamplesConfig.find(config => config.pkgName === sampleName);
+  }
+  if (!samplesConfig) {
+    throw new Error(`Sample ${sampleName} does not exist in config`);
+  }
   return Object.assign({}, sampleConfig);
 }
 

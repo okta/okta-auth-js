@@ -11,20 +11,9 @@
  */
 
 
-import LoginForm from './LoginForm';
-import Nav from './Nav';
-import OktaSignInV1 from './OktaSignInV1';
-import OktaSignInOIE from './OktaSignInOIE';
-import Unauth from './Unauth';
-import UserHome from './UserHome';
-import Home from './Home';
+import { Home } from '../selectors';
+import isDisplayed from './isDisplayed';
 
-export {
-  LoginForm,
-  Nav,
-  OktaSignInV1,
-  OktaSignInOIE,
-  Unauth,
-  UserHome,
-  Home,
+export default async() => {
+  await isDisplayed(Home.welcome, false);
 };

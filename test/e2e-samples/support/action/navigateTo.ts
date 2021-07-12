@@ -34,7 +34,7 @@ function getContext(formName: string) {
       break;
     case 'the Root View': 
       url = '/';
-      selector = Home.serverConfig;
+      selector = Home.container;
       queryParams = { flow: 'form' };
       break;  
     case 'the Self Service Password Reset View':

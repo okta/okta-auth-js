@@ -11,6 +11,7 @@
  */
 
 
+import Home from '../selectors/Home';
 import PasswordRecover from '../selectors/PasswordRecover';
 import SelectAuthenticator from '../selectors/SelectAuthenticator';
 import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
@@ -56,8 +57,7 @@ export default async (pageName?: string) => {
     }
     case 'Root Page':
     case 'Root View': {
-      selector = '#claim-email_verified';
-      pageTitle = 'true';
+      selector = Home.container;
       break;
     }
     case 'Set up Password': {
@@ -86,6 +86,8 @@ export default async (pageName?: string) => {
   }
 
   await waitForDisplayed(selector);
-  const currentPageTitle = await (await $(selector)).getText();
-  expect(currentPageTitle).toEqual(pageTitle);
+  if (pageTitle) {
+    const currentPageTitle = await (await $(selector)).getText();
+    expect(currentPageTitle).toEqual(pageTitle);
+  }
 };

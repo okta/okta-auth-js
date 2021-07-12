@@ -27,5 +27,5 @@ export default async (envName: string) => {
 
   // update variables for server process
   await startApp('/', { testenv: envName });
-  await waitForDisplayed(Home.serverConfig, false);
+  await waitForDisplayed(Home.container, false);
 };

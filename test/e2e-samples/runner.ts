@@ -12,13 +12,15 @@
 
 const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
+const { getSampleConfig } = require('./util/configUtils');
 const config = require('@okta/samples/config');
+const { react: reactSamplesConfig } = require('@okta/generator/config');
 
 require('@okta/env').setEnvironmentVarsFromTestEnv();
 
 const testName = process.env.SAMPLE_NAME;
 
-function runNextTask(tasks) {
+function runNextTask(tasks: any) {
   if (tasks.length === 0) {
     console.log('all runs are complete');
     return;
@@ -29,7 +31,7 @@ function runNextTask(tasks) {
   });
 }
 
-function runWithConfig(sampleConfig) {
+function runWithConfig(sampleConfig: any) {
   const { pkgName } = sampleConfig;
   const port = sampleConfig.port || 8080;
 
@@ -60,16 +62,16 @@ function runWithConfig(sampleConfig) {
     ].concat(opts), { stdio: 'inherit' });
 
     let returnCode = 1;
-    runner.on('exit', function (code) {
+    runner.on('exit', function (code: number) {
       console.log('Test runner exited with code: ', code);
       returnCode = code;
       server.kill();
     });
-    runner.on('error', function (err) {
+    runner.on('error', function (err: Error) {
       server.kill();
       throw err;
     });
-    server.on('exit', function(code) {
+    server.on('exit', function(code: number) {
       console.log('Server exited with code: ', code);
       // eslint-disable-next-line no-process-exit
       process.exit(returnCode);
@@ -80,22 +82,22 @@ function runWithConfig(sampleConfig) {
   });
 }
 
-function taskFn(sampleConfig) {
+function taskFn(sampleConfig: any): Promise<void> {
   return new Promise((resolve) => {
     console.log(`Spawning runner for "${sampleConfig.pkgName}"`);
     let opts = process.argv.slice(2); // pass extra arguments through
-    const runner = spawn('node', [
-      './runner.js'
+    const runner = spawn('ts-node', [
+      './runner.ts'
     ].concat(opts), { 
       stdio: 'inherit',
       env: Object.assign({}, process.env, {
         'SAMPLE_NAME': sampleConfig.pkgName
       })
     });
-    runner.on('error', function (err) {
+    runner.on('error', function (err: Error) {
       throw err;
     });
-    runner.on('exit', function(code) {
+    runner.on('exit', function(code: number) {
       if (code !== 0) {
         console.log('Runner exited with code: ' + code);
         // eslint-disable-next-line no-process-exit
@@ -108,30 +110,30 @@ function taskFn(sampleConfig) {
 
 if (testName) {
   console.log(`Running starting for test "${testName}"`);
-  const sampleConfig = config.getSampleConfigByPkgName(testName);
-  if (!sampleConfig) {
-    throw new Error('Sample "' + testName + '" does not exist in config');
-  }
+  const sampleConfig = getSampleConfig(testName);
   console.log('Starting test with config: ', sampleConfig);
   runWithConfig(sampleConfig);
 } else {
   // Run all tests
-  const tasks = config.getSamplesConfig()
-    .map(sampleConfig => {
-      if (process.env.RUN_CUCUMBER_TESTS) {
-        const features = sampleConfig.features || [];
-        if (!features.length) {
-          return;
-        }
-      } else {
-        const specs = sampleConfig.specs || [];
-        if (!specs.length) {
-          return;
-        }
+  console.log(reactSamplesConfig);
+  const tasks = [
+    ...config.getSamplesConfig(),
+    // ...reactSamplesConfig
+  ].map(sampleConfig => {
+    if (process.env.RUN_CUCUMBER_TESTS) {
+      const features = sampleConfig.features || [];
+      if (!features.length) {
+        return;
       }
-      return taskFn.bind(null, sampleConfig);
-    })
-    .filter(task => typeof task === 'function');
+    } else {
+      const specs = sampleConfig.specs || [];
+      if (!specs.length) {
+        return;
+      }
+    }
+    return taskFn.bind(null, sampleConfig);
+  })
+  .filter(task => typeof task === 'function');
 
   runNextTask(tasks);
 }

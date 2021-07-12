@@ -57,7 +57,7 @@ const Home = () => {
   }
 
   return (
-    <div>
+    <div id="home">
       <div>
         <Header as="h1">PKCE Flow w/ Custom Login Page</Header>
 
@@ -67,7 +67,7 @@ const Home = () => {
         {authState.isAuthenticated && userInfo
         && (
         <div>
-          <p>
+          <p data-se="welcome">
             Welcome, &nbsp;
             {userInfo.name}
             !

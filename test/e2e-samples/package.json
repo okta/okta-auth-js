@@ -9,8 +9,8 @@
     "wdio": "wdio run wdio.conf.ts",
     "cucumber": "wdio run cucumber.wdio.conf.ts",
     "start:cucumber": "RUN_CUCUMBER_TESTS=1 yarn start",
-    "test:specs": "node ./runner",
-    "test:features": "RUN_CUCUMBER_TESTS=1 yarn node ./runner"
+    "test:specs": "ts-node runner.ts",
+    "test:features": "RUN_CUCUMBER_TESTS=1 ts-node runner.ts"
   },
   "engines": {
     "node": ">=11.0",
