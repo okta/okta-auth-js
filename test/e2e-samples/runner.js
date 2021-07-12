@@ -17,16 +17,15 @@ const config = require('@okta/samples/config');
 require('@okta/env').setEnvironmentVarsFromTestEnv();
 
 const testName = process.env.SAMPLE_NAME;
-let tasks;
 
-function runNextTask() {
+function runNextTask(tasks) {
   if (tasks.length === 0) {
     console.log('all runs are complete');
     return;
   }
   const task = tasks.shift();
   task().then(() => {
-    runNextTask();
+    runNextTask(tasks);
   });
 }
 
@@ -81,6 +80,32 @@ function runWithConfig(sampleConfig) {
   });
 }
 
+function taskFn(sampleConfig) {
+  return new Promise((resolve) => {
+    console.log(`Spawning runner for "${sampleConfig.pkgName}"`);
+    let opts = process.argv.slice(2); // pass extra arguments through
+    const runner = spawn('node', [
+      './runner.js'
+    ].concat(opts), { 
+      stdio: 'inherit',
+      env: Object.assign({}, process.env, {
+        'SAMPLE_NAME': sampleConfig.pkgName
+      })
+    });
+    runner.on('error', function (err) {
+      throw err;
+    });
+    runner.on('exit', function(code) {
+      if (code !== 0) {
+        console.log('Runner exited with code: ' + code);
+        // eslint-disable-next-line no-process-exit
+        process.exit(code);
+      }
+      resolve();
+    });
+  });
+}
+
 if (testName) {
   console.log(`Running starting for test "${testName}"`);
   const sampleConfig = config.getSampleConfigByPkgName(testName);
@@ -91,45 +116,22 @@ if (testName) {
   runWithConfig(sampleConfig);
 } else {
   // Run all tests
-  tasks = [];
-  config.getSamplesConfig().map(sampleConfig => {
-    if (process.env.RUN_CUCUMBER_TESTS) {
-      const features = sampleConfig.features || [];
-      if (!features.length) {
-        return;
+  const tasks = config.getSamplesConfig()
+    .map(sampleConfig => {
+      if (process.env.RUN_CUCUMBER_TESTS) {
+        const features = sampleConfig.features || [];
+        if (!features.length) {
+          return;
+        }
+      } else {
+        const specs = sampleConfig.specs || [];
+        if (!specs.length) {
+          return;
+        }
       }
-    } else {
-      const specs = sampleConfig.specs || [];
-      if (!specs.length) {
-        return;
-      }
-    }
-    const task = () => {
-      return new Promise((resolve) => {
-        console.log(`Spawning runner for "${sampleConfig.pkgName}"`);
-        let opts = process.argv.slice(2); // pass extra arguments through
-        const runner = spawn('node', [
-          './runner.js'
-        ].concat(opts), { 
-          stdio: 'inherit',
-          env: Object.assign({}, process.env, {
-            'SAMPLE_NAME': sampleConfig.pkgName
-          })
-        });
-        runner.on('error', function (err) {
-          throw err;
-        });
-        runner.on('exit', function(code) {
-          if (code !== 0) {
-            console.log('Runner exited with code: ' + code);
-            // eslint-disable-next-line no-process-exit
-            process.exit(code);
-          }
-          resolve();
-        });
-      });
-    };
-    tasks.push(task);
-  });
-  runNextTask();
+      return taskFn.bind(null, sampleConfig);
+    })
+    .filter(task => typeof task === 'function');
+
+  runNextTask(tasks);
 }

@@ -37,7 +37,7 @@ const getPublishedModuleVersion = (module, cb) => {
 
 const install = () => {
   shell.exec('yarn install --ignore-scripts');
-}
+};
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -54,7 +54,7 @@ const getSamplesConfig = framework => {
     const dest = `samples/${framework}/${name}`;
     return { ...config, ...versions, name, dest };
   });
-}
+};
 
 module.exports = {
   getHygenCommand,

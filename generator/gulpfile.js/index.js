@@ -18,37 +18,6 @@ const frameworkConfigMap = frameworks.reduce((map, framework) => {
   return map;
 }, {});
 
-const getCleanTask = framework => () => 
-  src(`${BUILD_DIR}/samples/${framework}`, { read: false, allowEmpty: true })
-    .pipe(clean({ force: true }));
-
-const getWatchTask = framework => () => {
-  const samplesConfig = frameworkConfigMap[framework];
-  const watcher = watch(`_templates/${framework}/**/*`);
-  watcher.on('all', (_, path) => {
-    // get action from change path and execute build action
-    const action = getAction(actions, path);
-    console.info(`\nFile ${path} has been changed, build start ... \n`);
-    if (action === ACTION_OVERWRITE) {
-      samplesConfig
-        .filter(config => path.includes(config.name))
-        .forEach(config => buildAction(framework, `${ACTION_OVERWRITE}:${config.name}`, config));
-    } else {
-      samplesConfig.forEach(config => buildAction(framework, action, config));
-    }
-    
-    // check if yarn install is needed
-    if (path.includes('package.json')) {
-      install();
-    }
-  });
-};
-
-const installTask = done => {
-  install();
-  done();
-};
-
 const buildEnv = options => {
   return new Promise((resolve, reject) => {
     const command = getHygenCommand(`yarn hygen env new`, options);
@@ -75,6 +44,38 @@ const buildAction = (generator, action, config) => {
       resolve(stdout);
     });
   });
+};
+
+const getCleanTask = framework => () => 
+  src(`${BUILD_DIR}/samples/${framework}`, { read: false, allowEmpty: true })
+    .pipe(clean({ force: true }));
+
+const getWatchTask = framework => () => {
+  const samplesConfig = frameworkConfigMap[framework];
+  const actions = getActions(framework);
+  const watcher = watch(`_templates/${framework}/**/*`);
+  watcher.on('all', (_, path) => {
+    // get action from change path and execute build action
+    const action = getAction(actions, path);
+    console.info(`\nFile ${path} has been changed, build start ... \n`);
+    if (action === ACTION_OVERWRITE) {
+      samplesConfig
+        .filter(config => path.includes(config.name))
+        .forEach(config => buildAction(framework, `${ACTION_OVERWRITE}:${config.name}`, config));
+    } else {
+      samplesConfig.forEach(config => buildAction(framework, action, config));
+    }
+    
+    // check if yarn install is needed
+    if (path.includes('package.json')) {
+      install();
+    }
+  });
+};
+
+const installTask = done => {
+  install();
+  done();
 };
 
 const getCommonBuildTasks = framework => {
@@ -117,7 +118,7 @@ const getFrameworkTasks = framework => {
       installTask, 
       getWatchTask(framework)
     )
-  }
+  };
 };
 
 const frameworkTasks = frameworks.reduce((tasks, framework) => {
