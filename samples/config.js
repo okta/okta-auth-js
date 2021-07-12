@@ -115,6 +115,10 @@ function getSampleConfig(sampleName) {
   return sampleConfig;
 }
 
+function getSampleConfigByPkgName(pkgName) {
+  return samples.find(config => config.pkgName === pkgName);
+}
+
 function getSampleNames() {
   return samples.map(sample => sample.name);
 }
@@ -126,5 +130,6 @@ function getSamplesConfig() {
 module.exports = {
   getSampleNames,
   getSampleConfig,
+  getSampleConfigByPkgName,
   getSamplesConfig
 };

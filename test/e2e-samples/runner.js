@@ -83,7 +83,7 @@ function runWithConfig(sampleConfig) {
 
 if (testName) {
   console.log(`Running starting for test "${testName}"`);
-  const sampleConfig = config.getSampleConfig(testName);
+  const sampleConfig = config.getSampleConfigByPkgName(testName);
   if (!sampleConfig) {
     throw new Error('Sample "' + testName + '" does not exist in config');
   }
@@ -106,14 +106,14 @@ if (testName) {
     }
     const task = () => {
       return new Promise((resolve) => {
-        console.log(`Spawning runner for "${sampleConfig.name}"`);
+        console.log(`Spawning runner for "${sampleConfig.pkgName}"`);
         let opts = process.argv.slice(2); // pass extra arguments through
         const runner = spawn('node', [
           './runner.js'
         ].concat(opts), { 
           stdio: 'inherit',
           env: Object.assign({}, process.env, {
-            'SAMPLE_NAME': sampleConfig.name
+            'SAMPLE_NAME': sampleConfig.pkgName
           })
         });
         runner.on('error', function (err) {

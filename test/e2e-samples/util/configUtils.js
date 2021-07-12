@@ -11,11 +11,11 @@
  */
 
 
-const samplesConfig = require('../../../samples/config');
+const samplesConfig = require('@okta/samples/config');
 
 function getSampleConfig() {
   const sampleName = process.env.SAMPLE_NAME;
-  const sampleConfig = sampleName ? samplesConfig.getSampleConfig(sampleName) : {};
+  const sampleConfig = sampleName ? samplesConfig.getSampleConfigByPkgName(sampleName) : {};
   return Object.assign({}, sampleConfig);
 }
 
