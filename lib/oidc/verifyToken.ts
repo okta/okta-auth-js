@@ -35,7 +35,7 @@ export async function verifyToken(sdk: OktaAuth, token: IDToken, validationParam
   }
 
   var validationOptions: TokenVerifyParams = {
-    issuer: openIdConfig.issuer, // sdk.options.issuer may point to a proxy. Use "real" issuer for validation.
+    issuer: openIdConfig.issuer,
     clientId: sdk.options.clientId,
     ignoreSignature: sdk.options.ignoreSignature
   };
