@@ -1,4 +1,4 @@
-Feature: Basic Login - okta-hosted-login
+Feature: Basic Login - Federated
 
   Background:
     Given a SPA, WEB APP or MOBILE Policy that defines Password as required and the only factor for login

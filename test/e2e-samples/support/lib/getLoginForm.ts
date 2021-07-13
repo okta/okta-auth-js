@@ -17,6 +17,7 @@ import OktaSignInOIE from '../selectors/OktaSignInOIE';
 const getLoginForm = (featureName: string) => {
   switch (featureName) {
     case 'Basic Login with Embedded Sign In Widget':
+    case 'Basic Login - Federated':
       return OktaSignInOIE;
     default:
       return LoginForm;
