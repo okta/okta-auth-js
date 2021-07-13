@@ -15,6 +15,7 @@ const waitOn = require('wait-on');
 const { getSampleConfig } = require('./util/configUtils');
 const config = require('@okta/samples/config');
 const { react: reactSamplesConfig } = require('@okta/generator/config');
+const argv = require('minimist')(process.argv.slice(2));
 
 require('@okta/env').setEnvironmentVarsFromTestEnv();
 
@@ -115,11 +116,23 @@ if (testName) {
   runWithConfig(sampleConfig);
 } else {
   // Run all tests
-  console.log(reactSamplesConfig);
-  const tasks = [
-    ...config.getSamplesConfig(),
-    ...reactSamplesConfig
-  ].map(sampleConfig => {
+  const mainSamplesConfig = config.getSamplesConfig();
+  let samplesConfig;
+  switch (argv.set) {
+    case 'main':
+      samplesConfig = mainSamplesConfig;
+    case 'react':
+      samplesConfig = reactSamplesConfig;
+      break;
+    default:
+      samplesConfig = [
+        ...mainSamplesConfig,
+        ...reactSamplesConfig
+      ];
+      break;
+  }
+
+  const tasks = samplesConfig.map((sampleConfig: any) => {
     if (process.env.RUN_CUCUMBER_TESTS) {
       const features = sampleConfig.features || [];
       if (!features.length) {
@@ -133,7 +146,7 @@ if (testName) {
     }
     return taskFn.bind(null, sampleConfig);
   })
-  .filter(task => typeof task === 'function');
+  .filter((task: any) => typeof task === 'function');
 
   runNextTask(tasks);
 }
