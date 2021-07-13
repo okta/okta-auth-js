@@ -14,7 +14,7 @@
 const loginForm = '#login-form';
 const username = `${loginForm} #username`;
 const password = `${loginForm} #password`;
-const submit = `${loginForm} input[type=submit]`;
+const submit = `${loginForm} button[type=submit]`;
 const formMessages = `#form-messages li`;
 const formMessage = `${formMessages}:first-child`;
 const facebookButton = '#idp-buttons #facebook';
