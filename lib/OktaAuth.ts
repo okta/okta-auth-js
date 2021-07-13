@@ -481,7 +481,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     let { accessToken, idToken } = this.tokenManager.getTokensSync();
     const { autoRenew, autoRemove } = this.options.tokenManager || {};
 
-    if (accessToken && this.tokenManager.hasExpired(accessToken)) {
+    if (accessToken && this.tokenManager.hasExpired(accessToken, false)) {
       accessToken = null;
       if (autoRenew) {
         accessToken = await this.tokenManager.renew('accessToken') as AccessToken;
@@ -490,7 +490,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       }
     }
 
-    if (idToken && this.tokenManager.hasExpired(idToken)) {
+    if (idToken && this.tokenManager.hasExpired(idToken, false)) {
       idToken = null;
       if (autoRenew) {
         idToken = await this.tokenManager.renew('idToken') as IDToken;

@@ -127,13 +127,15 @@ export class TokenManager implements TokenManagerInterface {
     return clone(this.options);
   }
   
-  getExpireTime(token) {
-    var expireTime = token.expiresAt - this.options.expireEarlySeconds;
+  getExpireTime(token, useExpireEarlyOption = true) {
+    const expireTime = useExpireEarlyOption 
+      ? token.expiresAt - this.options.expireEarlySeconds 
+      : token.expiresAt;
     return expireTime;
   }
   
-  hasExpired(token) {
-    var expireTime = this.getExpireTime(token);
+  hasExpired(token, useExpireEarlyOption = true) {
+    var expireTime = this.getExpireTime(token, useExpireEarlyOption);
     return expireTime <= this.clock.now();
   }
   

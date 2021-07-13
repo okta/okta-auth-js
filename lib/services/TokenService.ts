@@ -29,6 +29,19 @@ function shouldThrottleRenew(renewTimeQueue) {
   return res;
 }
 
+function debounce(fn, timeout){
+  let timer;
+  return (...args) => {
+    if (!timer) {
+      fn.apply(this, args);
+    }
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = undefined;
+    }, timeout);
+  };
+}
+
 export class TokenService {
   private tokenManager: TokenManager;
   private options: TokenManagerOptions;
@@ -55,7 +68,7 @@ export class TokenService {
         this.tokenManager.remove(key);
       }
     };
-    this.tokenManager.on(EVENT_EXPIRED, this.onTokenExpiredHandler);
+    this.tokenManager.on(EVENT_EXPIRED, debounce(this.onTokenExpiredHandler, 500));
 
     this.tokenManager.setExpireEventTimeoutAll();
 
