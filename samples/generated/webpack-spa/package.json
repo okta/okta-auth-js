@@ -1,5 +1,5 @@
 {
-  "name": "webpack-spa",
+  "name": "@okta/samples.webpack-spa",
   "private": true,
   "version": "1.0.0",
   "main": "index.js",

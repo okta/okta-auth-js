@@ -1,13 +1,12 @@
 {
-  "name": "okta-auth-js-samples",
+  "name": "@okta/samples",
   "version": "1.0.0",
   "main": "index.js",
   "license": "Apache-2.0",
   "scripts": {
     "clean": "gulp clean",
     "build": "gulp",
-    "dev": "gulp watch",
-    "test": "yarn --cwd test start"
+    "dev": "gulp watch"
   },
   "devDependencies": {
     "gulp": "^4.0.2",
@@ -19,8 +18,7 @@
     "handlebars": "^4.7.6",
     "merge-stream": "^2.0.0",
     "shelljs": "0.8.3",
-    "through2": "^4.0.2",
-    "yargs": "^16.0.3"
+    "through2": "^4.0.2"
   },
   "dependencies": {}
 }

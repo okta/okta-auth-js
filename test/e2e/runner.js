@@ -17,8 +17,8 @@ const waitOn = require('wait-on');
 
 // 1. start the dev server
 const server = spawn('yarn', [
-  '--cwd',
-  '../app',
+  'workspace',
+  '@okta/test.app',
   'start'
 ], { stdio: 'inherit' });
 
