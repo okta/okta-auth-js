@@ -54,7 +54,7 @@ router.get('/login', (req, res, next) => {
         codeChallengeMethod,
       };
       res.render('login', {
-        siwVersion: '5.8.1',
+        siwVersion: '5.8.2',
         widgetConfig: JSON.stringify(widgetConfig),
       });
     })
