@@ -119,8 +119,6 @@ if (testName) {
   const mainSamplesConfig = config.getSamplesConfig();
   let samplesConfig;
   switch (argv.set) {
-    case 'main':
-      samplesConfig = mainSamplesConfig;
     case 'react':
       samplesConfig = reactSamplesConfig;
       break;
