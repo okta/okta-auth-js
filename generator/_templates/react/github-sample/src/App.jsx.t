@@ -41,7 +41,9 @@ const App = () => {
   return (
     <Security
       oktaAuth={oktaAuth}
+<% if (useSiw === 'true') { -%>
       onAuthRequired={customAuthHandler}
+<% } -%>
       restoreOriginalUri={restoreOriginalUri}
     >
       <Navbar {...{ setCorsErrorModalOpen }} />

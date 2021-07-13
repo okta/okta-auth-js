@@ -18,6 +18,7 @@ import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import PasswordReset from '../selectors/PasswordReset';
 import VerifyPhone from '../selectors/VerifyPhone';
+import { OktaSignInOIE, LoginForm } from '../selectors';
 
 /**
  * Check if browser has navigated to expected page
@@ -80,6 +81,12 @@ export default async (pageName?: string) => {
       pageTitle = 'Challenge phone authenticator';
       break;
     }
+    case 'Okta-hosted login page':
+      selector = OktaSignInOIE.signinForm;
+      break;
+    case 'Login page':
+      selector = LoginForm.username;
+      break;
     default: {
         throw new Error(`Unknown form "${pageTitle}"`);
     }

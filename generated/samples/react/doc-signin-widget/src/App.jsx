@@ -33,15 +33,15 @@ const App = () => {
   };
 
   return (
-    <Security 
+    <Security
       oktaAuth={oktaAuth}
       onAuthRequired={customAuthHandler}
       restoreOriginalUri={restoreOriginalUri}
     >
-      <Route path='/' exact={true} component={Home} />
-      <SecureRoute path='/protected' component={Protected} />
-      <Route path='/login' render={() => <Login />} />
-      <Route path='/login/callback' component={LoginCallback} />
+      <Route path="/" exact component={Home} />
+      <SecureRoute path="/protected" component={Protected} />
+      <Route path="/login" render={() => <Login />} />
+      <Route path="/login/callback" component={LoginCallback} />
     </Security>
   );
 };

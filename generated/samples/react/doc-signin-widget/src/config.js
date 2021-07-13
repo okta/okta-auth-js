@@ -13,6 +13,7 @@
 const CLIENT_ID = process.env.SPA_CLIENT_ID || process.env.CLIENT_ID || '{clientId}';
 const ISSUER = process.env.ISSUER || 'https://{yourOktaDomain}.com/oauth2/default';
 const REDIRECT_URI = `${window.location.origin}/login/callback`;
+const USE_INTERACTION_CODE = process.env.USE_INTERACTION_CODE === 'true';
 
 export default {
   oidc: {
@@ -26,6 +27,7 @@ export default {
     baseUrl: ISSUER.replace('/oauth2/default', ''),
     clientId: CLIENT_ID,
     redirectUri: `${window.location.origin}/login/callback`,
+    useInteractionCodeFlow: USE_INTERACTION_CODE,
     authParams: {
       // If your app is configured to use the Implicit flow
       // instead of the Authorization Code with Proof of Code Key Exchange (PKCE)

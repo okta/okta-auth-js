@@ -26,5 +26,5 @@ Feature: Multi-Factor Authentication with Password and Email
     Then the screen changes to receive an input for a Email code
     When She inputs the correct code from the Email
       And She selects "Verify"
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root View"
       And an application session is created

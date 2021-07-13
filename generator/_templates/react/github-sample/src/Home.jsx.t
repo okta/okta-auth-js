@@ -5,11 +5,15 @@ to: ../generated/<%= dest %>/src/Home.jsx
 
 import { useOktaAuth } from '@okta/okta-react';
 import React, { useState, useEffect } from 'react';
+<% if (useSiw === 'true') { -%>
 import { useHistory } from 'react-router-dom';
+<% } -%>
 import { Button, Header } from 'semantic-ui-react';
 
 const Home = () => {
+<% if (useSiw === 'true') { -%>
   const history = useHistory();
+<% } -%>
   const { authState, oktaAuth } = useOktaAuth();
   const [userInfo, setUserInfo] = useState(null);
 
@@ -64,7 +68,7 @@ const Home = () => {
         {authState.isAuthenticated && userInfo
         && (
         <div>
-          <p>
+          <p id="welcome">
             Welcome, &nbsp;
             {userInfo.name}
             !

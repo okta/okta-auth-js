@@ -37,7 +37,6 @@ const App = () => {
   return (
     <Security
       oktaAuth={oktaAuth}
-      onAuthRequired={customAuthHandler}
       restoreOriginalUri={restoreOriginalUri}
     >
       <Navbar {...{ setCorsErrorModalOpen }} />

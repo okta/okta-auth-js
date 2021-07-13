@@ -23,7 +23,7 @@ module.exports = [
     useSiw: true,
     excludeAction: /^github-/,
     features: [
-      'doc-no-oidc/basic-auth'
+      'doc-signin-widget/basic-auth'
     ]
   },
   {
@@ -32,7 +32,7 @@ module.exports = [
     useSiw: false,
     excludeAction: /^github-/,
     features: [
-      'doc-signin-widget/basic-auth'
+      'doc-no-oidc/basic-auth'
     ]
   }
 ];

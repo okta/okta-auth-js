@@ -1,4 +1,4 @@
-Feature: Basic Login with Embedded Sign In Widget
+Feature: Basic Login - okta-hosted-login
 
   Background:
     Given a SPA, WEB APP or MOBILE Policy that defines Password as required and the only factor for login
@@ -8,9 +8,9 @@ Feature: Basic Login with Embedded Sign In Widget
   Scenario: Mary logs in with a Password
 	  Given Mary navigates to the Root View
     When she clicks the login button
-    Then Browser is redirected to the Okta-hosted login page
+    Then she is redirected to the "Okta-hosted login page"
 	  When she fills in her correct username
 	    And she fills in her correct password
 	    And she submits the Login form
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root View"
       And she sees welcome text

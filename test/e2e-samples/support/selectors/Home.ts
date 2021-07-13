@@ -15,9 +15,10 @@
 class Home {
   get serverConfig() { return '#server-config'; }
   get loginButton() { return '#login-button'; }
+  get logoutButton() { return '#logout-button'; }
   get registerButton() { return '#register-button'; }
   get container() { return '#home'; }
-  get welcome() { return '[data-se="welcome"]'; }
+  get welcome() { return '#welcome'; }
 }
 
 export default new Home();

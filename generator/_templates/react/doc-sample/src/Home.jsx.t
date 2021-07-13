@@ -11,19 +11,29 @@ const Home = () => {
   const { authState, oktaAuth } = useOktaAuth();
   const history = useHistory();
 
+  const handleLogin = () => {
+    history.push('/login');
+  };
+
+  const handleLogout = () => {
+    oktaAuth.signOut();
+  };
+
   if (!authState) {
     return <div>Loading...</div>;
   }
 
-  const button = authState.isAuthenticated ?
-    <button onClick={() => {oktaAuth.signOut()}}>Logout</button> :
-    <button onClick={() => {history.push('/login')}}>Login</button>;
-
   return (
     <div id="home">
-      <Link to='/'>Home</Link><br/>
-      <Link to='/protected'>Protected</Link><br/>
-      {button}
+      <Link to="/">Home</Link>
+      <br />
+      <Link to="/protected">Protected</Link>
+      <br />
+      {
+        authState.isAuthenticated
+          ? <button id="logout-button" type="button" onClick={handleLogout}>Logout</button>
+          : <button id="login-button" type="button" onClick={handleLogin}>Login</button>
+      }
     </div>
   );
 };

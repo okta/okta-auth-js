@@ -18,7 +18,7 @@ Feature: Multi-Factor Authentication with Password and SMS
     Then the screen changes to receive an input for a code
     When She inputs the correct code from the SMS
       And She selects "Verify"
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root View"
       And an application session is created
 
   Scenario: Mary enters a wrong verification code on verify
@@ -60,5 +60,5 @@ Feature: Multi-Factor Authentication with Password and SMS
     Then the screen changes to receive an input for a code to verify
     When She inputs the correct code from the SMS
       And She selects "Verify"
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root View"
       And an application session is created 

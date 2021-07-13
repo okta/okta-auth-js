@@ -17,6 +17,8 @@ to: ../generated/<%= dest %>/.eslintrc.json
     "react/prop-types": "off",
     "react/prefer-stateless-function": [0],
     "object-curly-newline": ["error", { "consistent": true }],
-    "react/jsx-props-no-spreading": "off"
+    "react/jsx-props-no-spreading": "off",
+    "no-trailing-spaces": 0,
+    "no-console": 0
   }
 }

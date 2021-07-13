@@ -67,7 +67,7 @@ const Home = () => {
         {authState.isAuthenticated && userInfo
         && (
         <div>
-          <p>
+          <p id="welcome">
             Welcome, &nbsp;
             {userInfo.name}
             !

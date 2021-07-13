@@ -15,6 +15,7 @@ export ISSUER=https://javascript-idx-sdk.okta.com/oauth2/default
 export USERNAME=mary@acme.com
 export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
 export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
+export USE_INTERACTION_CODE=true
 get_secret prod/okta-sdk-vars/password PASSWORD
 get_secret prod/okta-sdk-vars/client_secret CLIENT_SECRET
 get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY

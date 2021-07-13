@@ -26,7 +26,7 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she submits the form
   Then she sees a list of factors to register
   When she selects "Skip" on SMS
-  Then she is redirected to the Root View
+  Then she is redirected to the "Root View"
   And an application session is created
   And she sees a table with her profile info
   And the cell for the value of "email" is shown and contains her email
@@ -57,7 +57,7 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   Then the screen changes to receive an input for a code
   When She inputs the correct code from her SMS
   And She selects "Verify"
-  Then she is redirected to the Root View
+  Then she is redirected to the "Root View"
    And an application session is created
 
 Scenario: Mary signs up with an invalid Email

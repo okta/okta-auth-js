@@ -11,5 +11,5 @@ Scenario: Mary Logs in with Social IDP
     Given Mary navigates to the Login View
     When she clicks the "Login with Facebook" button
       And logs in to Facebook
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root View"
       And an application session is created

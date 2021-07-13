@@ -11,7 +11,7 @@ Feature: Direct Auth Basic Login with Password Factor
       When she fills in her username
       And she fills in her correct password
       And she submits the Login form
-      Then she is redirected to the Root View
+      Then she is redirected to the "Root View"
         And she sees a table with her profile info
         And the cell for the value of "email" is shown and contains her email
         And the cell for the value of "name" is shown and contains her first name and last name
@@ -19,7 +19,7 @@ Feature: Direct Auth Basic Login with Password Factor
     Scenario: Mary clicks on the "Forgot Password Link"
       Given Mary navigates to the Basic Login View
       When she clicks on the "Forgot Password Link"
-      Then she is redirected to the Self Service Password Reset View
+      Then she is redirected to the "Self Service Password Reset View"
 
     Scenario: Mary doesn't know her username
       Given Mary navigates to Login with Username and Password

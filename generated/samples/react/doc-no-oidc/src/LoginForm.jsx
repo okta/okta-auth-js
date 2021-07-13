@@ -15,7 +15,7 @@ import { useOktaAuth } from '@okta/okta-react';
 
 const LoginForm = () => {
   const { oktaAuth } = useOktaAuth();
-  const [sessionToken, setSessionToken] = useState();
+  const [pending, setPending] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -23,13 +23,12 @@ const LoginForm = () => {
     e.preventDefault();
 
     oktaAuth.signInWithCredentials({ username, password })
-    .then(res => {
-      const sessionToken = res.sessionToken;
-      setSessionToken(sessionToken);
-      // sessionToken is a one-use token, so make sure this is only called once
-      oktaAuth.signInWithRedirect({ sessionToken });
-    })
-    .catch(err => console.log('Found an error', err));
+      .then((res) => {
+        setPending(true);
+        // sessionToken is a one-use token, so make sure this is only called once
+        oktaAuth.signInWithRedirect({ sessionToken: res.sessionToken });
+      })
+      .catch((err) => { console.log(err); });
   };
 
   const handleUsernameChange = (e) => {
@@ -40,28 +39,32 @@ const LoginForm = () => {
     setPassword(e.target.value);
   };
 
-  if (sessionToken) {
+  if (pending) {
     // Hide form while sessionToken is converted into id/access tokens
     return null;
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
+    <form id="login-form" onSubmit={handleSubmit}>
+      <label htmlFor="username">
         Username:
         <input
-          id="username" type="text"
+          id="username"
+          type="text"
           value={username}
-          onChange={handleUsernameChange} />
+          onChange={handleUsernameChange}
+        />
       </label>
-      <label>
+      <label htmlFor="password">
         Password:
         <input
-          id="password" type="password"
+          id="password"
+          type="password"
           value={password}
-          onChange={handlePasswordChange} />
+          onChange={handlePasswordChange}
+        />
       </label>
-      <input id="submit" type="submit" value="Submit" />
+      <input type="submit" value="Submit" />
     </form>
   );
 };

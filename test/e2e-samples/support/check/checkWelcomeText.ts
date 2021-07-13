@@ -12,8 +12,8 @@
 
 
 import { Home } from '../selectors';
-import isDisplayed from './isDisplayed';
+import waitForDisplayed from '../wait/waitForDisplayed';
 
-export default async() => {
-  await isDisplayed(Home.welcome, false);
+export default async () => {
+  await waitForDisplayed(Home.welcome, false);
 };

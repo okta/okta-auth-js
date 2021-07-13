@@ -73,7 +73,7 @@ Then(
 );
 
 Then(
-  /^she is redirected to the ([\s\w]+)$/,
+  'she is redirected to the {string}',
   checkIsOnPage
 );
 

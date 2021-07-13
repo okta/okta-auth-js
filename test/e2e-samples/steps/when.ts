@@ -56,6 +56,7 @@ import clickFacebookButton from '../support/action/clickFacebookButton';
 import clickLoginWithFacebookInWidget from '../support/action/clickLoginWithFacebookInWidget';
 import signInIntoFacebook from '../support/action/signInIntoFacebook';
 import ActionContext from '../support/context';
+import clickLogin from '../support/action/clickLogin';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -115,6 +116,11 @@ When(
 When(
   /^she clicks Login$/,
   submitForm
+);
+
+When(
+  /^she clicks the login button$/,
+  clickLogin
 );
 
 When(

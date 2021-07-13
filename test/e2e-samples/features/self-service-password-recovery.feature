@@ -16,7 +16,7 @@ Background:
     When she fills a password that fits within the password policy
     And she confirms that password
     And she submits the form
-    Then she is redirected to the Root Page
+    Then she is redirected to the "Root View"
 
   Scenario: Mary tries to reset a password with the wrong email
     Given Mary navigates to the Self Service Password Reset View
