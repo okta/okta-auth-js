@@ -11,25 +11,13 @@
  */
 
 
+import { default as debounce } from 'debounce';
 import { AuthSdkError } from './errors';
 import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from '.';
 import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
 const PCancelable = require('p-cancelable');
-
-function debounce(fn, timeout){
-  let timer;
-  return (...args) => {
-    if (!timer) {
-      fn.apply(this, args);
-    }
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      timer = undefined;
-    }, timeout);
-  };
-}
 
 export const INITIAL_AUTH_STATE = null;
 const DEFAULT_PENDING = {
@@ -38,6 +26,7 @@ const DEFAULT_PENDING = {
 };
 const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 const MAX_PROMISE_CANCEL_TIMES = 10;
+const DEBOUNCE_TIMEOUT = 300;
 
 // only compare first level of authState
 const isSameAuthState = (prevState: AuthState, state: AuthState) => {
@@ -78,11 +67,11 @@ export class AuthStateManager {
     sdk.tokenManager.on(EVENT_ADDED, debounce((key, token) => {
       this._setLogOptions({ event: EVENT_ADDED, key, token });
       this.updateAuthState();
-    }, 300));
+    }, DEBOUNCE_TIMEOUT));
     sdk.tokenManager.on(EVENT_REMOVED, debounce((key, token) => {
       this._setLogOptions({ event: EVENT_REMOVED, key, token });
       this.updateAuthState();
-    }, 300));
+    }, DEBOUNCE_TIMEOUT));
   }
 
   _setLogOptions(options) {

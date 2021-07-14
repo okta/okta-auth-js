@@ -31,6 +31,8 @@ function createAuth() {
   });
 }
 
+const wait = (timeout) => new Promise(resolve => setTimeout(resolve, timeout));
+
 describe('AuthStateManager', () => {
   let sdkMock;
 
@@ -57,6 +59,10 @@ describe('AuthStateManager', () => {
     };
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   describe('constructor', () => {
     it('should listen on "added" and "removed" events from TokenManager', () => {
       new AuthStateManager(sdkMock); // eslint-disable-line no-new
@@ -64,39 +70,43 @@ describe('AuthStateManager', () => {
       expect(sdkMock.tokenManager.on).toHaveBeenCalledWith('removed', expect.any(Function));
     });
 
-    it('should call updateAuthState when "added" event emitted', () => {
+    it('should call updateAuthState when "added" event emitted', (done) => {
       const instance = new AuthStateManager(sdkMock);
-      instance.updateAuthState = jest.fn();
+      jest.spyOn(instance, 'updateAuthState');
       instance._setLogOptions = jest.fn();
       sdkMock.emitter.emit('added', 'fakeKey', 'fakeToken', { timestamp: 111 });
-      expect(instance._setLogOptions).toHaveBeenCalledWith({ event: 'added', key: 'fakeKey', token: 'fakeToken' });
-      expect(instance.updateAuthState).toHaveBeenCalled();
+      instance.subscribe(() => {
+        expect(instance._setLogOptions).toHaveBeenCalledWith({ event: 'added', key: 'fakeKey', token: 'fakeToken' });
+        expect(instance.updateAuthState).toHaveBeenCalled();
+        done();
+      });
     });
 
-    it('should call updateAuthState when "removed" event emitted', () => {
+    it('should call updateAuthState when "removed" event emitted', (done) => {
       const instance = new AuthStateManager(sdkMock);
-      instance.updateAuthState = jest.fn();
+      jest.spyOn(instance, 'updateAuthState');
       instance._setLogOptions = jest.fn();
       sdkMock.emitter.emit('removed', 'fakeKey', 'fakeToken', { timestamp: 111 });
-      expect(instance._setLogOptions).toHaveBeenCalledWith({ event: 'removed', key: 'fakeKey', token: 'fakeToken' });
-      expect(instance.updateAuthState).toHaveBeenCalled();
+      instance.subscribe(() => {
+        expect(instance._setLogOptions).toHaveBeenCalledWith({ event: 'removed', key: 'fakeKey', token: 'fakeToken' });
+        expect(instance.updateAuthState).toHaveBeenCalled();
+        done();
+      });
     });
 
-    it('should not call updateAuthState if events is neither "added" nor "removed"', () => {
+    it('should not call updateAuthState if events is neither "added" nor "removed"', (done) => {
       const instance = new AuthStateManager(sdkMock);
-      instance.updateAuthState = jest.fn();
+      jest.spyOn(instance, 'updateAuthState');
+      sdkMock.emitter.on('fakeEvent', () => {
+        expect(instance.updateAuthState).not.toHaveBeenCalled();
+        done();
+      });
       sdkMock.emitter.emit('fakeEvent');
-      expect(instance.updateAuthState).not.toHaveBeenCalled();
     });
 
     it('should throw AuthSdkError if no emitter in sdk', () => {
       delete sdkMock.emitter;
-      try {
-        new AuthStateManager(sdkMock); // eslint-disable-line no-new
-      } catch (err) {
-        expect(err).toBeInstanceOf(AuthSdkError);
-        expect(err.message).toBe('Emitter should be initialized before AuthStateManager');
-      }
+      expect(() => new AuthStateManager(sdkMock)).toThrow(new AuthSdkError('Emitter should be initialized before AuthStateManager'));
     });
 
     it('should initialize authState', () => {
@@ -119,10 +129,9 @@ describe('AuthStateManager', () => {
       if (typeof window === 'undefined') {
         return;
       }
-      it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', () => {
-        jest.useFakeTimers();
+      it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', (done) => {
         const auth = createAuth();
-        auth.authStateManager.updateAuthState = jest.fn();
+        jest.spyOn(auth.authStateManager, 'updateAuthState');
         auth.tokenManager.start(); // uses TokenService / crossTabs
         // simulate localStorage change from other dom context
         window.dispatchEvent(new StorageEvent('storage', {
@@ -130,10 +139,11 @@ describe('AuthStateManager', () => {
           newValue: '{"idToken": "fake_id_token"}',
           oldValue: '{}'
         }));
-        jest.runAllTimers();
-        expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
-        jest.useRealTimers();
-        auth.tokenManager.stop();
+        auth.authStateManager.subscribe(() => {
+          expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
+          auth.tokenManager.stop();
+          done();
+        });
       });
     });
 
@@ -276,11 +286,19 @@ describe('AuthStateManager', () => {
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    it('should only trigger authStateManager.updateAuthState once when call tokenManager.add', () => {
+    it('evaluates authState based on the latest token event', async (done) => {
       const auth = createAuth();
-      auth.authStateManager.updateAuthState = jest.fn();
-      auth.tokenManager.add('idToken', tokens.standardIdTokenParsed);
-      expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
+      jest.spyOn(auth.authStateManager, 'updateAuthState');
+      // add tokens async
+      auth.tokenManager.add('idToken', tokens.standardIdTokenParsed)
+      await wait(100);
+      auth.tokenManager.add('accessToken', tokens.standardAccessTokenParsed);
+      auth.authStateManager.subscribe((authState) => {
+        expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
+        expect(authState.idToken).toEqual(tokens.standardIdTokenParsed);
+        expect(authState.accessToken).toEqual(tokens.standardAccessTokenParsed);
+        done();
+      });
     });
   });
 
