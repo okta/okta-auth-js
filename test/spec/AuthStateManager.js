@@ -290,7 +290,7 @@ describe('AuthStateManager', () => {
       const auth = createAuth();
       jest.spyOn(auth.authStateManager, 'updateAuthState');
       // add tokens async
-      auth.tokenManager.add('idToken', tokens.standardIdTokenParsed)
+      auth.tokenManager.add('idToken', tokens.standardIdTokenParsed);
       await wait(100);
       auth.tokenManager.add('accessToken', tokens.standardAccessTokenParsed);
       auth.authStateManager.subscribe((authState) => {
