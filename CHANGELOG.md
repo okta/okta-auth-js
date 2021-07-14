@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.2.2
+
+### Bug Fixes
+
+- [#860](https://github.com/okta/okta-auth-js/pull/860) Fixes false-positive `authState.isAuthenticated` during auto renew process
+
 ## 5.2.1
 
 - [#845](https://github.com/okta/okta-auth-js/pull/845) Fixes issue with renewing using refresh tokens
