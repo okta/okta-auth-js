@@ -18,6 +18,19 @@ import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
 const PCancelable = require('p-cancelable');
 
+function debounce(fn, timeout){
+  let timer;
+  return (...args) => {
+    if (!timer) {
+      fn.apply(this, args);
+    }
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = undefined;
+    }, timeout);
+  };
+}
+
 export const INITIAL_AUTH_STATE = null;
 const DEFAULT_PENDING = {
   updateAuthStatePromise: null,
@@ -62,14 +75,14 @@ export class AuthStateManager {
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process
     // Only listen on "added" event to update auth state
-    sdk.tokenManager.on(EVENT_ADDED, (key, token) => {
+    sdk.tokenManager.on(EVENT_ADDED, debounce((key, token) => {
       this._setLogOptions({ event: EVENT_ADDED, key, token });
       this.updateAuthState();
-    });
-    sdk.tokenManager.on(EVENT_REMOVED, (key, token) => {
+    }, 300));
+    sdk.tokenManager.on(EVENT_REMOVED, debounce((key, token) => {
       this._setLogOptions({ event: EVENT_REMOVED, key, token });
       this.updateAuthState();
-    });
+    }, 300));
   }
 
   _setLogOptions(options) {
