@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.2
+
+- [#862](https://github.com/okta/okta-auth-js/pull/862) Fixes issue with untranspiled `class` keyword
+
 ## 5.2.1
 
 - [#845](https://github.com/okta/okta-auth-js/pull/845) Fixes issue with renewing using refresh tokens
