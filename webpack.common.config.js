@@ -14,7 +14,7 @@ var babelOptions = {
   shouldPrintComment: () => false 
 };
 
-var babelExclude = /node_modules\/(?!p-cancelable)/;
+var babelExclude = /node_modules\/(?!p-cancelable|node-cache)/;
 
 module.exports = {
   module: {
