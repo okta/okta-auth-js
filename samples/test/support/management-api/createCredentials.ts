@@ -27,6 +27,6 @@ export default async function (firstName: string, featureName = ''): Promise<Use
   return Object.assign({}, a18nProfile, {
     firstName,
     lastName: featureName || `Mc${firstName}face`,
-    password: crypto.randomBytes(16).toString('hex')
+    password: 'A'+crypto.randomBytes(16).toString('hex')
   });
 }
