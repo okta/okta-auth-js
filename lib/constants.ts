@@ -22,9 +22,9 @@ export const CACHE_STORAGE_NAME = 'okta-cache-storage';
 export const PKCE_STORAGE_NAME = 'okta-pkce-storage';
 export const TRANSACTION_STORAGE_NAME = 'okta-transaction-storage';
 export const IDX_RESPONSE_STORAGE_NAME = 'okta-idx-response-storage';
-export const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
-export const ID_TOKEN_STORAGE_KEY =  'idToken';
-export const REFRESH_TOKEN_STORAGE_KEY =  'refreshToken';
+export const ACCESS_TOKEN_STORAGE_KEY = 'accessToken'; // TODO: remove in the next major version OKTA-407224
+export const ID_TOKEN_STORAGE_KEY =  'idToken'; // TODO: remove in the next major version OKTA-407224
+export const REFRESH_TOKEN_STORAGE_KEY =  'refreshToken'; // TODO: remove in the next major version OKTA-407224
 export const REFERRER_PATH_STORAGE_KEY = 'referrerPath';
 
 // Code verifier: Random URL-safe string with a minimum length of 43 characters.

@@ -15,7 +15,7 @@ import { AuthSdkError } from './errors';
 import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from '.';
 import { getConsole } from './util';
-import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
+import { EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED } from './TokenManager';
 const PCancelable = require('p-cancelable');
 
 export const INITIAL_AUTH_STATE = null;
@@ -36,6 +36,7 @@ const isSameAuthState = (prevState: AuthState, state: AuthState) => {
   return prevState.isAuthenticated === state.isAuthenticated 
     && JSON.stringify(prevState.idToken) === JSON.stringify(state.idToken)
     && JSON.stringify(prevState.accessToken) === JSON.stringify(state.accessToken)
+    && JSON.stringify(prevState.refreshToken) === JSON.stringify(state.refreshToken)
     && prevState.error === state.error;
 };
 
@@ -60,10 +61,12 @@ export class AuthStateManager {
     this._logOptions = {};
 
     // Listen on tokenManager events to start updateState process
-    // "added" event is emitted in both add and renew process
-    // Only listen on "added" event to update auth state
     sdk.tokenManager.on(EVENT_ADDED, (key, token) => {
       this._setLogOptions({ event: EVENT_ADDED, key, token });
+      this.updateAuthState();
+    });
+    sdk.tokenManager.on(EVENT_RENEWED, (key, token) => {
+      this._setLogOptions({ event: EVENT_RENEWED, key, token });
       this.updateAuthState();
     });
     sdk.tokenManager.on(EVENT_REMOVED, (key, token) => {
@@ -83,16 +86,13 @@ export class AuthStateManager {
   async updateAuthState(): Promise<AuthState> {
     const { transformAuthState, devMode } = this._sdk.options;
 
-    const log = (status) => {
-      const { event, key, token } = this._logOptions;
+    const log = ((options) => (status) => {
+      const { event, key, token } = options;
       getConsole().group(`OKTA-AUTH-JS:updateAuthState: Event:${event} Status:${status}`);
       getConsole().log(key, token);
       getConsole().log('Current authState', this._authState);
       getConsole().groupEnd();
-      
-      // clear log options after logging
-      this._logOptions = {};
-    };
+    })(this._logOptions);
 
     const emitAuthStateChange = (authState) => {
       if (isSameAuthState(this._authState, authState)) {
@@ -148,34 +148,27 @@ export class AuthStateManager {
         this._pending = { ...DEFAULT_PENDING };
       };
 
-      this._sdk.isAuthenticated()
-        .then(isAuthenticated => {
-          if (cancelablePromise.isCanceled) {
-            resolve();
-            return;
-          }
+      const { accessToken, idToken, refreshToken } = this._sdk.tokenManager.getLiveTokensSync();
+      const authState = {
+        accessToken,
+        idToken,
+        refreshToken,
+        isAuthenticated: !!(accessToken && idToken)
+      };
+      const promise: Promise<AuthState> = transformAuthState
+        ? transformAuthState(this._sdk, authState)
+        : Promise.resolve(authState);
 
-          const { accessToken, idToken, refreshToken } = this._sdk.tokenManager.getTokensSync();
-          const authState = {
-            accessToken,
-            idToken,
-            refreshToken,
-            isAuthenticated
-          };
-          const promise: Promise<AuthState> = transformAuthState
-            ? transformAuthState(this._sdk, authState)
-            : Promise.resolve(authState);
+      promise
+        .then(authState => emitAndResolve(authState))
+        .catch(error => emitAndResolve({
+          accessToken, 
+          idToken, 
+          refreshToken,
+          isAuthenticated: false, 
+          error
+        }));
 
-          promise
-            .then(authState => emitAndResolve(authState))
-            .catch(error => emitAndResolve({
-              accessToken, 
-              idToken, 
-              refreshToken,
-              isAuthenticated: false, 
-              error
-            }));
-        });
     });
     /* eslint-enable complexity */
     this._pending.updateAuthStatePromise = cancelablePromise;

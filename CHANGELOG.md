@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.3
+
+- [#866](https://github.com/okta/okta-auth-js/pull/866) Fixes authState issue during tokens auto renew
+
 ## 5.2.2
 
 - [#862](https://github.com/okta/okta-auth-js/pull/862) Fixes issue with untranspiled `class` keyword

@@ -32,6 +32,8 @@ function getSingleToken(originalToken: Token, tokens: Tokens) {
   throwInvalidTokenError();
 }
 
+// TODO: 6.0 breaking change - OKTA-412811
+// change the interface to resolve a tokensSet instead of single renewed token
 // If we have a refresh token, renew using that, otherwise getWithoutPrompt
 export async function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
   if (!isIDToken(token) && !isAccessToken(token)) {

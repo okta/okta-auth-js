@@ -41,7 +41,7 @@ describe('AuthStateManager', () => {
       emitter,
       isAuthenticated: () => Promise.resolve(true),
       tokenManager: {
-        getTokensSync: () => {
+        getLiveTokensSync: () => {
           return {
             accessToken: 'fakeAccessToken0',
             idToken: 'fakeIdToken0'
@@ -137,30 +137,52 @@ describe('AuthStateManager', () => {
       });
     });
 
-    it('should emit an authState with isAuthenticated', async () => {
-      jest.spyOn(sdkMock, 'isAuthenticated').mockResolvedValue('fake');
-      expect.assertions(2);
-      const instance = new AuthStateManager(sdkMock);
-      const handler = jest.fn();
-      instance.subscribe(handler);
-      await instance.updateAuthState();
-      expect(handler).toHaveBeenCalledTimes(1);
-      expect(handler).toHaveBeenCalledWith({
-        isAuthenticated: 'fake',
-        idToken: 'fakeIdToken0',
-        accessToken: 'fakeAccessToken0'
+    describe('emit authState based on live tokens', () => {
+      it('emits isAuthenticated as true when both tokens are live', async () => {
+        jest.spyOn(sdkMock.tokenManager, 'getLiveTokensSync').mockReturnValue({
+          accessToken: 'liveFake1',
+          idToken: 'liveFake2'
+        });
+        expect.assertions(2);
+        const instance = new AuthStateManager(sdkMock);
+        const handler = jest.fn();
+        instance.subscribe(handler);
+        await instance.updateAuthState();
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(handler).toHaveBeenCalledWith({
+          isAuthenticated: true,
+          idToken: 'liveFake2',
+          accessToken: 'liveFake1'
+        });
+      });
+      it('emits isAuthenticated as false when one of the tokens is expired', async () => {
+        jest.spyOn(sdkMock.tokenManager, 'getLiveTokensSync').mockReturnValue({
+          accessToken: 'liveFake1',
+          idToken: null
+        });
+        expect.assertions(2);
+        const instance = new AuthStateManager(sdkMock);
+        const handler = jest.fn();
+        instance.subscribe(handler);
+        await instance.updateAuthState();
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(handler).toHaveBeenCalledWith({
+          isAuthenticated: false,
+          idToken: null,
+          accessToken: 'liveFake1'
+        });
       });
     });
 
     it('should emit only latest authState', async () => {
-      jest.spyOn(sdkMock, 'isAuthenticated');
+      jest.spyOn(sdkMock.tokenManager, 'getLiveTokensSync');
       expect.assertions(3);
       const instance = new AuthStateManager(sdkMock);
       const handler = jest.fn();
       instance.subscribe(handler);
       instance.updateAuthState();
       await instance.updateAuthState();
-      expect(sdkMock.isAuthenticated).toHaveBeenCalledTimes(2);
+      expect(sdkMock.tokenManager.getLiveTokensSync).toHaveBeenCalledTimes(2);
       expect(handler).toHaveBeenCalledTimes(1);
       expect(handler).toHaveBeenCalledWith({
         isAuthenticated: true,
@@ -170,7 +192,7 @@ describe('AuthStateManager', () => {
     });
 
     it('should handle both updateAuthState if the previous one has finished before the second one start', async () => {
-      jest.spyOn(sdkMock.tokenManager, 'getTokensSync')
+      jest.spyOn(sdkMock.tokenManager, 'getLiveTokensSync')
         .mockReturnValueOnce({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' })
         .mockReturnValueOnce({ accessToken: 'fakeAccessToken1', idToken: 'fakeIdToken1' });
       expect.assertions(3);
@@ -228,7 +250,7 @@ describe('AuthStateManager', () => {
     });
 
     it('should stop and evaluate at the 10th update if too many updateAuthState happen concurrently', async () => {
-      jest.spyOn(sdkMock, 'isAuthenticated');
+      jest.spyOn(sdkMock.tokenManager, 'getLiveTokensSync');
       expect.assertions(3);
       const instance = new AuthStateManager(sdkMock);
       const handler = jest.fn();
@@ -237,7 +259,7 @@ describe('AuthStateManager', () => {
         instance.updateAuthState();
       }
       await instance.updateAuthState();
-      expect(sdkMock.isAuthenticated).toHaveBeenCalledTimes(11); // 10 times cancelled + 1 time resolved
+      expect(sdkMock.tokenManager.getLiveTokensSync).toHaveBeenCalledTimes(11); // 10 times cancelled + 1 time resolved
       expect(handler).toHaveBeenCalledTimes(1);
       expect(handler).toHaveBeenCalledWith({
         accessToken: 'fakeAccessToken0',
@@ -247,7 +269,7 @@ describe('AuthStateManager', () => {
     });
 
     it('should emit unique authState object', async () => {
-      jest.spyOn(sdkMock.tokenManager, 'getTokensSync')
+      jest.spyOn(sdkMock.tokenManager, 'getLiveTokensSync')
         .mockReturnValueOnce({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' })
         .mockReturnValueOnce({ accessToken: 'fakeAccessToken1', idToken: 'fakeIdToken1' });
       expect.assertions(2);

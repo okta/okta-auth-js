@@ -26,6 +26,11 @@ const mocked = {
 jest.mock('../../../lib/features', () => {
   return mocked.features;
 });
+jest.mock('../../../lib/oidc/verifyToken', () => {
+  return {
+    verifyToken: jest.fn().mockResolvedValue(null)
+  };
+});
 
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
@@ -229,7 +234,7 @@ describe('TokenManager (browser)', function() {
       setupSync({}, true);
     });
 
-    it('allows renewing an idToken, without renewing accessToken', function() {
+    it('renews both accessToken and idToken, and resolves idToken', function() {
       const testInitialIdToken = {
         idToken: 'testInitialToken',
         claims: {'fake': 'claims'},
@@ -253,7 +258,7 @@ describe('TokenManager (browser)', function() {
           queryParams: {
             'client_id': 'NPSfOkH5eZrTy8PMDlvx',
             'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
+            'response_type': 'token id_token',
             'response_mode': 'okta_post_message',
             'state': oauthUtil.mockedState,
             'nonce': oauthUtil.mockedNonce,
@@ -264,6 +269,7 @@ describe('TokenManager (browser)', function() {
         time: 1449699929,
         postMessageResp: {
           'id_token': tokens.standardIdToken,
+          'access_token': tokens.standardAccessToken,
           'expires_in': 3600,
           'token_type': 'Bearer',
           'state': oauthUtil.mockedState
@@ -273,59 +279,7 @@ describe('TokenManager (browser)', function() {
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-idToken': tokens.standardIdTokenParsed,
-          'test-accessToken': testInitialAccessToken
-        });
-      });
-    });
-
-    it('allows renewing an accessToken, without renewing idToken', function() {
-      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
-      var mockTime = expiresAt - 3600;
-      const testInitialIdToken = {
-        idToken: 'testInitialToken',
-        claims: {'fake': 'claims'},
-        expiresAt: 0,
-        scopes: ['openid', 'email']
-      };
-      const testInitialAccessToken = {
-        accessToken: 'testInitialToken',
-        expiresAt: 0,
-        scopes: ['openid', 'email']
-      };
-
-      return oauthUtil.setupFrame({
-        authClient: client,
-        tokenManagerAddKeys: {
-          'idToken': testInitialIdToken,
-          'accessToken': testInitialAccessToken
-        },
-        time: mockTime,
-        tokenManagerRenewArgs: ['accessToken'],
-        postMessageSrc: {
-          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          queryParams: {
-            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-            'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'token',
-            'response_mode': 'okta_post_message',
-            'state': oauthUtil.mockedState,
-            'nonce': oauthUtil.mockedNonce,
-            'scope': 'openid email',
-            'prompt': 'none'
-          }
-        },
-        postMessageResp: {
-          'access_token': tokens.standardAccessToken,
-          'expires_in': 3600,
-          'token_type': 'Bearer',
-          'state': oauthUtil.mockedState
-        },
-        expectedResp: tokens.standardAccessTokenParsed
-      })
-      .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'idToken': testInitialIdToken,
-          'accessToken': tokens.standardAccessTokenParsed
+          'test-accessToken': tokens.standardAccessTokenParsed
         });
       });
     });
@@ -384,6 +338,7 @@ describe('TokenManager (browser)', function() {
         errorCauses: [],
         tokenKey: 'test-idToken'
       };
+      jest.spyOn(client.token, 'renewTokens').mockRejectedValue(error);
 
       return oauthUtil.setupFrame({
         willFail: true,
@@ -407,6 +362,7 @@ describe('TokenManager (browser)', function() {
         },
         postMessageResp: {
           'id_token': tokens.modifiedIdToken,
+          'access_token': tokens.standardAccessToken,
           state: oauthUtil.mockedState
         }
       })
@@ -453,18 +409,23 @@ describe('TokenManager (browser)', function() {
     beforeEach(function() {
       jest.spyOn(mocked.features, 'isLocalhost').mockReturnValue(true);
       tokenManagerAddKeys = {
-        'test-accessToken': {
+        'accessToken': {
           accessToken: 'testInitialToken',
           expiresAt: 0,
           scopes: ['openid', 'email']
-        }
+        },
+        'idToken': {
+          idToken: 'testInitialToken',
+          expiresAt: 0,
+          scopes: ['openid', 'email']
+        },
       };
       postMessageSrc = {
         baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
         queryParams: {
           'client_id': 'NPSfOkH5eZrTy8PMDlvx',
           'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'token',
+          'response_type': 'token id_token',
           'response_mode': 'okta_post_message',
           'state': oauthUtil.mockedState,
           'nonce': oauthUtil.mockedNonce,
@@ -474,6 +435,7 @@ describe('TokenManager (browser)', function() {
       };
       postMessageResp = {
         'access_token': tokens.standardAccessToken,
+        'id_token': tokens.standardIdToken,
         'expires_in': 3600,
         'token_type': 'Bearer',
         'state': oauthUtil.mockedState
@@ -525,13 +487,13 @@ describe('TokenManager (browser)', function() {
       });
     });
 
-    it('automatically renews a token by default', function() {
+    it('automatically renews tokens by default', function() {
       const expiresAt = tokens.standardAccessTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: client,
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'test-accessToken',
+        autoRenewTokenKey: 'accessToken',
         tokenTypesTobeRenewed: ['access_token'],
         time: expiresAt + 1,
         tokenManagerAddKeys,
@@ -540,8 +502,12 @@ describe('TokenManager (browser)', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-accessToken': { 
+          accessToken: { 
             ...tokens.standardAccessTokenParsed, 
+            expiresAt: expiresAt + 1 + 3600
+          },
+          idToken: {
+            ...tokens.standardIdTokenParsed,
             expiresAt: expiresAt + 1 + 3600
           }
         });
@@ -560,7 +526,7 @@ describe('TokenManager (browser)', function() {
         }),
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'test-accessToken',
+        autoRenewTokenKey: 'accessToken',
         tokenTypesTobeRenewed: ['access_token'],
         time: expiresAt - 10, // set local time to 10 seconds until expiration
         tokenManagerAddKeys,
@@ -569,8 +535,12 @@ describe('TokenManager (browser)', function() {
       })
       .then(() => {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-accessToken': { 
+          accessToken: { 
             ...tokens.standardAccessTokenParsed, 
+            expiresAt: expiresAt - 10 + 3600
+          },
+          idToken: { 
+            ...tokens.standardIdTokenParsed, 
             expiresAt: expiresAt - 10 + 3600
           }
         });
@@ -588,7 +558,7 @@ describe('TokenManager (browser)', function() {
         }),
         autoRenew: true,
         fastForwardToTime: true,
-        autoRenewTokenKey: 'test-accessToken',
+        autoRenewTokenKey: 'accessToken',
         tokenTypesTobeRenewed: ['access_token'],
         time: expiresAt - 10, // set local time to 10 seconds until expiration
         tokenManagerAddKeys,
@@ -597,8 +567,12 @@ describe('TokenManager (browser)', function() {
       })
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-accessToken': { 
+          accessToken: { 
             ...tokens.standardAccessTokenParsed, 
+            expiresAt: expiresAt - 10 + 3600
+          },
+          idToken: { 
+            ...tokens.standardIdTokenParsed, 
             expiresAt: expiresAt - 10 + 3600
           }
         });

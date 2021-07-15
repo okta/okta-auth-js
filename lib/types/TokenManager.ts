@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { RefreshToken, Token, Tokens, TokenType } from './Token';
+import { Token, Tokens, TokenType } from './Token';
 
 export interface TokenManagerError {
   errorSummary: string;
@@ -20,5 +20,4 @@ export interface TokenManagerInterface {
   setTokens({ accessToken, idToken, refreshToken }: Tokens, accessTokenCb?: Function, idTokenCb?: Function, refreshTokenCb?: Function): void;
   getStorageKeyByType(type: TokenType): string;
   add(key: any, token: Token): void;
-  updateRefreshToken(token: RefreshToken);
 }

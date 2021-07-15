@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import tokens from '@okta/test.support/tokens';
 import { AuthApiError, AuthSdkError, OAuthError } from '../../../lib/errors';
 import { TokenManager } from '../../../lib/TokenManager';
 
@@ -9,6 +10,12 @@ describe('TokenManager renew', () => {
 
   beforeEach(function() {
     const emitter = new Emitter();
+    const foo = tokens.standardAccessTokenParsed;
+    const bar = tokens.standardIdTokenParsed;
+    const storage = {
+      foo,
+      bar
+    };
     const tokenStorage = {
         getStorage: jest.fn().mockImplementation(() => testContext.storage),
         setStorage: jest.fn().mockImplementation(() => {})
@@ -16,7 +23,8 @@ describe('TokenManager renew', () => {
     const sdkMock = {
       options: {},
       token: {
-        renew: () => Promise.resolve(testContext.freshToken)
+        renewTokens: jest.fn().mockImplementation(() => Promise.resolve(testContext.freshTokens)),
+        renewToken: jest.fn().mockImplementation(() => Promise.resolve(foo))
       },
       storageManager: {
         getTokenStorage: jest.fn().mockReturnValue(tokenStorage),
@@ -25,54 +33,51 @@ describe('TokenManager renew', () => {
     };
 
     const instance = new TokenManager(sdkMock as any);
+    jest.spyOn(instance, 'setTokens');
+    jest.spyOn(instance, 'add');
     jest.spyOn(instance, 'remove').mockImplementation(() => {});
-    jest.spyOn(instance, 'add').mockImplementation(() => {});
     jest.spyOn(instance, 'emitRenewed').mockImplementation(() => {});
     jest.spyOn(instance, 'emitError').mockImplementation(() => {});
-    
-    const foo = {};
-    const bar = {};
-    const storage = {
-      foo,
-      bar
-    };
 
     testContext = {
       sdkMock,
       tokenStorage,
       storage,
       instance,
-      oldToken: foo,
-      freshToken: {
-        idToken: true
-      }
+      oldTokens: {
+        accessToken: foo,
+        idToken: bar
+      },
+      freshTokens: {
+        idToken: Object.assign({}, tokens.standardIdTokenParsed),
+        accessToken: Object.assign({}, tokens.standardAccessTokenParsed)
+      },
     };
     
   });
 
-  it('returns the fresh token', async () => {
+  it('calls token.renewTokens and returns the fresh token', async () => {
     const res = await testContext.instance.renew('foo');
-    expect(res).toBe(testContext.freshToken);
-  });
-
-  it('removes the old token from storage', async () => {
-    await testContext.instance.renew('foo');
-    expect(testContext.instance.remove).toHaveBeenCalledWith('foo');
+    expect(testContext.sdkMock.token.renewTokens).toHaveBeenCalled();
+    expect(testContext.sdkMock.token.renewToken).not.toHaveBeenCalled();
+    expect(res).toBe(testContext.freshTokens.accessToken);
   });
 
   it('adds the new token to storage', async () => {
     await testContext.instance.renew('foo');
-    expect(testContext.instance.add).toHaveBeenCalledWith('foo', testContext.freshToken);
+    expect(testContext.instance.setTokens).toHaveBeenCalledWith(testContext.freshTokens);
+    expect(testContext.instance.add).not.toHaveBeenCalled();
   });
 
-  it('emits a renewed event', async () => {
+  it('emits two renewed events', async () => {
     await testContext.instance.renew('foo');
-    expect(testContext.instance.emitRenewed).toHaveBeenCalledWith('foo', testContext.freshToken, testContext.oldToken);
+    expect(testContext.instance.emitRenewed).toHaveBeenNthCalledWith(1, 'bar', testContext.freshTokens.idToken, testContext.oldTokens.idToken);
+    expect(testContext.instance.emitRenewed).toHaveBeenNthCalledWith(2, 'foo', testContext.freshTokens.accessToken, testContext.oldTokens.accessToken);
   });
 
   describe('error handling', () => {
     beforeEach(() => {
-      jest.spyOn(testContext.sdkMock.token, 'renew').mockImplementation(() => Promise.reject(testContext.error));
+      jest.spyOn(testContext.sdkMock.token, 'renewTokens').mockImplementation(() => Promise.reject(testContext.error));
     });
 
     it('OAuthError', async () => {

@@ -12,7 +12,6 @@ const config = Object.assign({}, baseConfig, {
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     'browserStorage',
     'fingerprint',
-    'renewToken',
     'session',
     'features/browser',
     'OktaAuth/browser',
@@ -22,6 +21,8 @@ const config = Object.assign({}, baseConfig, {
     'oidc/getWithPopup',
     'oidc/getWithRedirect',
     'oidc/getWithoutPrompt',
+    'oidc/renewToken.ts',
+    'oidc/renewTokens.ts',
     'TokenManager/browser',
     'TokenManager/crossTabs'
   ])
