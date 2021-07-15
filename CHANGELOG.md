@@ -3,6 +3,7 @@
 ## 5.2.2
 
 - [#862](https://github.com/okta/okta-auth-js/pull/862) Fixes issue with untranspiled `class` keyword
+- [#858](https://github.com/okta/okta-auth-js/pull/858) Fixes issue with verifying tokens when using a proxied issuer
 
 ## 5.2.1
 
