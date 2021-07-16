@@ -6,7 +6,7 @@ This sample uses a [polyfill](https://github.com/okta/okta-auth-js#browser-compa
 
 ## Commands
 
-If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/webpack-spa start`
+If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/generated/webpack-spa start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
