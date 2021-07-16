@@ -15,6 +15,7 @@ const { src, dest, parallel, series, watch, task } = require('gulp');
 const through = require('through2');
 const Handlebars = require('handlebars');
 const handlebars = require('gulp-compile-handlebars');
+const replace = require('gulp-replace');
 const clean = require('gulp-clean');
 const rename = require('gulp-rename');
 const shell = require('shelljs');
@@ -53,6 +54,7 @@ function generateSampleTaskFactory(options) {
     const { name, template, subDir, useEnv } = options;
     const inDir = `${SRC_DIR}/${template}/**/*`;
     const viewTemplatesDir = `${SRC_DIR}/${template}/**/views/*`;
+    const guidesDir = `${SRC_DIR}/${template}/**/guides/*`;
     const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${name}`;
     const strOptions = {};
     Object.keys(options).forEach(key => {
@@ -68,12 +70,20 @@ function generateSampleTaskFactory(options) {
       authJSVersion: getPublishedModuleVersion('@okta/okta-auth-js')
     });
     console.log(`generating sample: "${name}"`, hbParams);
-    const generateWithoutViewTemplates = src([inDir, `!${viewTemplatesDir}`], { dot: true })
+    const processWithHandlebars = src([inDir, `!${viewTemplatesDir}`, `!${guidesDir}`], { dot: true })
       .pipe(handlebars(hbParams))
       .pipe(dest(outDir));
+
+    const convertGuides = src(`${guidesDir}`, { dot: true })
+      .pipe(replace('-=OKTA_REPLACE_WITH_WIDGET_VERSION=-', '{{ siwVersion }}'))
+      .pipe(replace('https://${yourOktaDomain}', '{{{ baseUrl }}}'))
+      .pipe(replace('{{https://{yourAppRedirectUri} configured in your OIDC app}}', '{{{ redirectUri }}}'))
+      .pipe(replace('${yourClientId}', '{{ clientId }}'))
+      .pipe(dest(outDir));
+
     const copyViewTemplates = src(viewTemplatesDir, { dot: true })
       .pipe(dest(outDir));
-    const merged = merge(generateWithoutViewTemplates, copyViewTemplates);
+    const merged = merge(processWithHandlebars, convertGuides, copyViewTemplates);
     if (useEnv) {
       const copyEnvModule = src(OKTA_ENV_SCRIPT_PATH, { dot: true })
         .pipe(rename('okta-env.js'))
