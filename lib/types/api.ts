@@ -139,7 +139,7 @@ export interface GetWithRedirectAPI extends GetWithRedirectFunction {
 }
 
 export interface BaseTokenAPI {
-  decode(token: string): JWTObject;
+  decode(token: string): Promise<JWTObject>;
   prepareTokenParams(params?: TokenParams): Promise<TokenParams>;
   exchangeCodeForTokens(params: TokenParams, urls?: CustomUrls): Promise<TokenResponse>;
 }

@@ -14,7 +14,7 @@ import { clone } from '../util';
 import { stringToBuffer, base64UrlDecode } from './base64';
 import { webcrypto } from './webcrypto';
 
-export function verifyToken(idToken, key) {
+export async function verifyToken(idToken, key) {
   key = clone(key);
 
   var format = 'jwk';
@@ -31,25 +31,23 @@ export function verifyToken(idToken, key) {
   delete key.use;
 
   // @ts-ignore
-  return webcrypto.subtle.importKey(
+  const cryptoKey = await webcrypto.subtle.importKey(
     format,
     key,
     algo,
     extractable,
     usages
-  )
-  .then(function(cryptoKey) {
-    var jwt = idToken.split('.');
-    var payload = stringToBuffer(jwt[0] + '.' + jwt[1]);
-    var b64Signature = base64UrlDecode(jwt[2]);
-    var signature = stringToBuffer(b64Signature);
+  );
+  var jwt = idToken.split('.');
+  var payload = stringToBuffer(jwt[0] + '.' + jwt[1]);
+  var b64Signature = await base64UrlDecode(jwt[2]);
+  var signature = stringToBuffer(b64Signature);
 
-    return webcrypto.subtle.verify(
-      algo,
-      cryptoKey,
-      signature,
-      payload
-    );
-  });
+  return webcrypto.subtle.verify(
+    algo,
+    cryptoKey,
+    signature,
+    payload
+  );
 }
 

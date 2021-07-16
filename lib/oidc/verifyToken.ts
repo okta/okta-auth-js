@@ -26,7 +26,7 @@ export async function verifyToken(sdk: OktaAuth, token: IDToken, validationParam
   }
 
   // Decode the Jwt object (may throw)
-  var jwt = decodeToken(token.idToken);
+  var jwt = await decodeToken(token.idToken);
 
   var openIdConfig = await getWellKnown(sdk); // using sdk.options.issuer
 

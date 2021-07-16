@@ -14,14 +14,14 @@ import { AuthSdkError } from '../errors';
 import { JWTObject } from '../types';
 import { base64UrlToString } from '../crypto';
 
-export function decodeToken(token: string): JWTObject {
+export async function decodeToken(token: string): Promise<JWTObject> {
   var jwt = token.split('.');
   var decodedToken: JWTObject;
 
   try {
     decodedToken = {
-      header: JSON.parse(base64UrlToString(jwt[0])),
-      payload: JSON.parse(base64UrlToString(jwt[1])),
+      header: JSON.parse(await base64UrlToString(jwt[0])),
+      payload: JSON.parse(await base64UrlToString(jwt[1])),
       signature: jwt[2]
     };
   } catch (e) {

@@ -16,22 +16,25 @@
 // Ponyfill for NodeJS
 // Webpack config excludes this file
 
-let a;
-if (typeof atob !== 'undefined') {
-  a = atob;
-} else {
-  a = require('atob');
+export async function getAtob() {
+  return new Promise(resolve => {
+    if (typeof atob !== 'undefined') {
+      resolve(atob);
+    } else {
+      import('atob').then(atob => resolve(atob.default));
+    }
+  }); 
 }
-export { a as atob };
 
-
-let b;
-if (typeof btoa !== 'undefined') {
-  b = btoa;
-} else {
-  b = require('btoa');
+export async function getBtoa() {
+  return new Promise(resolve => {
+    if (typeof btoa !== 'undefined') {
+      resolve(btoa);
+    } else {
+      import('btoa').then(btoa => resolve(btoa.default));
+    }
+  }); 
 }
-export { b as btoa };
 
 let crypto;
 try {

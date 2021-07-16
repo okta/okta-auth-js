@@ -42,7 +42,7 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
 }
 
 // eslint-disable-next-line max-len
-export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuthResponse, urls: CustomUrls): Promise<TokenResponse> {
+export async function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuthResponse, urls: CustomUrls): Promise<TokenResponse> {
   var pkce = sdk.options.pkce !== false;
 
   // The result contains an authorization_code and PKCE is enabled 
@@ -71,90 +71,81 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
   var clientId = tokenParams.clientId || sdk.options.clientId;
 
   // Handling the result from implicit flow or PKCE token exchange
-  return Promise.resolve()
-    .then(function () {
-      validateResponse(res, tokenParams);
-    }).then(function () {
-      var tokenDict = {} as Tokens;
-      var expiresIn = res.expires_in;
-      var tokenType = res.token_type;
-      var accessToken = res.access_token;
-      var idToken = res.id_token;
-      var refreshToken = res.refresh_token;
-      var now = Math.floor(Date.now()/1000);
+  validateResponse(res, tokenParams);
 
-      if (accessToken) {
-        var accessJwt = sdk.token.decode(accessToken);
-        tokenDict.accessToken = {
-          accessToken: accessToken,
-          claims: accessJwt.payload,
-          expiresAt: Number(expiresIn) + now,
-          tokenType: tokenType,
-          scopes: scopes,
-          authorizeUrl: urls.authorizeUrl,
-          userinfoUrl: urls.userinfoUrl
-        };
-      }
+  var tokenDict = {} as Tokens;
+  var expiresIn = res.expires_in;
+  var tokenType = res.token_type;
+  var accessToken = res.access_token;
+  var idToken = res.id_token;
+  var refreshToken = res.refresh_token;
+  var now = Math.floor(Date.now()/1000);
 
-      if (refreshToken) {
-        tokenDict.refreshToken = {
-          refreshToken: refreshToken,
-          expiresAt: Number(expiresIn) + now,
-          scopes: scopes,
-          tokenUrl: urls.tokenUrl,
-          authorizeUrl: urls.authorizeUrl,
-          issuer: urls.issuer,
-        };
-      }
+  if (accessToken) {
+    var accessJwt = await sdk.token.decode(accessToken);
+    tokenDict.accessToken = {
+      accessToken: accessToken,
+      claims: accessJwt.payload,
+      expiresAt: Number(expiresIn) + now,
+      tokenType: tokenType,
+      scopes: scopes,
+      authorizeUrl: urls.authorizeUrl,
+      userinfoUrl: urls.userinfoUrl
+    };
+  }
 
-      if (idToken) {
-        var idJwt = sdk.token.decode(idToken);
+  if (refreshToken) {
+    tokenDict.refreshToken = {
+      refreshToken: refreshToken,
+      expiresAt: Number(expiresIn) + now,
+      scopes: scopes,
+      tokenUrl: urls.tokenUrl,
+      authorizeUrl: urls.authorizeUrl,
+      issuer: urls.issuer,
+    };
+  }
 
-        var idTokenObj: IDToken = {
-          idToken: idToken,
-          claims: idJwt.payload,
-          expiresAt: idJwt.payload.exp - idJwt.payload.iat + now, // adjusting expiresAt to be in local time
-          scopes: scopes,
-          authorizeUrl: urls.authorizeUrl,
-          issuer: urls.issuer,
-          clientId: clientId
-        };
+  if (idToken) {
+    var idJwt = await sdk.token.decode(idToken);
 
-        var validationParams: TokenVerifyParams = {
-          clientId: clientId,
-          issuer: urls.issuer,
-          nonce: tokenParams.nonce,
-          accessToken: accessToken
-        };
+    var idTokenObj: IDToken = {
+      idToken: idToken,
+      claims: idJwt.payload,
+      expiresAt: idJwt.payload.exp - idJwt.payload.iat + now, // adjusting expiresAt to be in local time
+      scopes: scopes,
+      authorizeUrl: urls.authorizeUrl,
+      issuer: urls.issuer,
+      clientId: clientId
+    };
 
-        if (tokenParams.ignoreSignature !== undefined) {
-          validationParams.ignoreSignature = tokenParams.ignoreSignature;
-        }
+    var validationParams: TokenVerifyParams = {
+      clientId: clientId,
+      issuer: urls.issuer,
+      nonce: tokenParams.nonce,
+      accessToken: accessToken
+    };
 
-        return verifyToken(sdk, idTokenObj, validationParams)
-          .then(function () {
-            tokenDict.idToken = idTokenObj;
-            return tokenDict;
-          });
-      }
+    if (tokenParams.ignoreSignature !== undefined) {
+      validationParams.ignoreSignature = tokenParams.ignoreSignature;
+    }
 
-      return tokenDict;
-    })
-    .then(function (tokenDict): TokenResponse {
-      // Validate received tokens against requested response types 
-      if (responseType.indexOf('token') !== -1 && !tokenDict.accessToken) {
-        // eslint-disable-next-line max-len
-        throw new AuthSdkError('Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.');
-      }
-      if (responseType.indexOf('id_token') !== -1 && !tokenDict.idToken) {
-        // eslint-disable-next-line max-len
-        throw new AuthSdkError('Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.');
-      }
+    await verifyToken(sdk, idTokenObj, validationParams);
+    tokenDict.idToken = idTokenObj;
+  }
 
-      return {
-        tokens: tokenDict,
-        state: res.state,
-        code: res.code
-      };
-    });
+  // Validate received tokens against requested response types 
+  if (responseType.indexOf('token') !== -1 && !tokenDict.accessToken) {
+    // eslint-disable-next-line max-len
+    throw new AuthSdkError('Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.');
+  }
+  if (responseType.indexOf('id_token') !== -1 && !tokenDict.idToken) {
+    // eslint-disable-next-line max-len
+    throw new AuthSdkError('Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.');
+  }
+
+  return {
+    tokens: tokenDict,
+    state: res.state,
+    code: res.code
+  };
 }

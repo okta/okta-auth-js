@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "composite": false,
-    "module": "es6",
-    "target": "es6",
+    "module": "esnext",
+    "target": "es2017",
     "allowJs": true,
     "checkJs": true,
     "moduleResolution": "node",
@@ -17,7 +17,7 @@
     "outDir": "./build",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "rootDir": "./",
     "baseUrl": "./"
