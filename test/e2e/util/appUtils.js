@@ -33,15 +33,16 @@ async function openImplicit(options) {
 }
 
 async function openPKCE(options) {
-  await TestApp.open(Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: true }, options));
+  options = Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: true }, options);
+  await TestApp.open(options);
   await TestApp.pkceOption.then(el => el.isSelected()).then(isSelected => {
     assert(isSelected);
   });
   await TestApp.issuer.then(el => el.getValue()).then(val => {
-    assert(val === ISSUER);
+    assert(val === options.issuer);
   });
   await TestApp.clientId.then(el => el.getValue()).then(val => {
-    assert(val === CLIENT_ID);
+    assert(val === options.clientId);
   });
 }
 

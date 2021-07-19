@@ -39,7 +39,7 @@
       "name": "sdk: e2e spec",
       "type": "node",
       "request": "launch",
-      "args": ["wdio.conf.ts", "--spec", "${file}"],
+      "args": ["wdio.conf.js", "--spec", "${file}"],
       "cwd": "${workspaceFolder}/test/e2e",
       "autoAttachChildProcesses": true,
       "program": "${workspaceRoot}/test/e2e/node_modules/@wdio/cli/bin/wdio.js",

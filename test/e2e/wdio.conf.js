@@ -26,8 +26,18 @@ const browserOptions = {
 };
 
 /* eslint-disable max-len */
-const specs = (REFRESH_TOKEN && !ORG_OIE_ENABLED) ? ['./specs/**/refreshTokens.js', './specs/**/crossTabs.js'] : ['./specs/**/*.js'];
-const excludeSpecs = (REFRESH_TOKEN || ORG_OIE_ENABLED) ? [] : ['./specs/**/refreshTokens.js'];
+const specs = (REFRESH_TOKEN && !ORG_OIE_ENABLED) ? [
+// refresh token on classic
+  './specs/**/refreshTokens.js',
+  './specs/**/crossTabs.js',
+  './specs/**/proxy.js'
+] : [
+// all other cases, classic or OIE (with or w/out refresh token)
+  './specs/**/*.js'
+];
+
+// exclude refreshTokens spec from classic org w/out refresh token flag
+const excludeSpecs = (!REFRESH_TOKEN && !ORG_OIE_ENABLED) ? ['./specs/**/refreshTokens.js'] : [];
 
 if (CI) {
     browserOptions.args = browserOptions.args.concat([
@@ -44,7 +54,7 @@ if (CI) {
 
 // driver version must match installed chrome version
 // https://chromedriver.storage.googleapis.com/index.html
-const CHROMEDRIVER_VERSION = '89.0.4389.23';
+const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '89.0.4389.23';
 const drivers = {
   chrome: { version: CHROMEDRIVER_VERSION }
 };

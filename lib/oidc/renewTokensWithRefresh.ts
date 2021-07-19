@@ -12,7 +12,7 @@
  */
 import { AuthSdkError } from '../errors';
 import { getOAuthUrls } from './util/oauth';
-import { isSameRefreshToken, updateRefreshToken } from './util/refreshToken';
+import { isSameRefreshToken } from './util/refreshToken';
 import { OktaAuth, TokenParams, RefreshToken, Tokens } from '../types';
 import { handleOAuthResponse } from './handleOAuthResponse';
 import { postRefreshToken } from './endpoints/token';
@@ -37,7 +37,7 @@ export async function renewTokensWithRefresh(
   // Support rotating refresh tokens
   const { refreshToken } = tokens;
   if (refreshToken && !isSameRefreshToken(refreshToken, refreshTokenObject)) {
-    updateRefreshToken(sdk, refreshToken);
+    sdk.tokenManager.updateRefreshToken(refreshToken);
   }
 
   return tokens;

@@ -143,20 +143,35 @@ describe('token.verify', function() {
         expect(mocked.validateClaims.mock.calls[0][2].ignoreSignature).toBe(true);
       });
     });
-    it('can override all defaults by passing validationParams', async () => {
+    it('can override ignoreSignature by passing validationParams', async () => {
+      const { issuer, clientId } = tokens.standardIdTokenParsed;
       client = setupSync({
-        issuer: 'http://nope',
-        clientId: 'wrong',
+        issuer,
+        clientId,
         ignoreSignature: false
       });
-      mocked.getWellKnown.mockReturnValue(Promise.resolve({
-        issuer: 'http://also-nope'
-      }));
-      const { issuer, clientId } = tokens.standardIdTokenParsed;
       await client.token.verify(tokens.standardIdTokenParsed, {
+        ignoreSignature: true
+      });
+      expect(mocked.validateClaims.mock.calls[0][2]).toEqual({
         issuer,
         clientId,
         ignoreSignature: true
+      });
+    });
+
+    it('will always use issuer from well-known openid-configuration', async () => {
+      const { clientId, issuer } = tokens.standardIdTokenParsed;
+      client = setupSync({
+        clientId,
+        issuer: 'http://configured-issuer',
+        ignoreSignature: true
+      });
+      mocked.getWellKnown.mockReturnValue(Promise.resolve({
+        issuer
+      }));
+      await client.token.verify(tokens.standardIdTokenParsed, {
+        issuer: 'http://cannot-be-overridden'
       });
       expect(mocked.validateClaims.mock.calls[0][2]).toEqual({
         issuer,
@@ -318,7 +333,9 @@ describe('token.verify', function() {
         'The audience [NPSfOkH5eZrTy8PMDlvx] does not match [invalidAudience]');
     });
     it('invalid issuer', function() {
-      validationParams.issuer = 'http://invalidissuer.example.com';
+      mocked.getWellKnown.mockReturnValue(Promise.resolve({
+        issuer: 'http://invalidissuer.example.com'
+      }));
       return expectError([tokens.standardIdTokenParsed, validationParams],
         'The issuer [https://auth-js-test.okta.com] does not match [http://invalidissuer.example.com]');
     });

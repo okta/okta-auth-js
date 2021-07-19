@@ -56,25 +56,30 @@ oauthUtil.mockSessionStorageError = function() {
   });
 };
 
-oauthUtil.getResponseForUrl = function(url) {
-  if (url.match(/'.*\/oauth2\/.*\/\.well-known\/openid-configuration$/)) {
-    return wellKnownSharedResource.response;
+oauthUtil.getResponseForUrl = function(url, options) {
+  options = Object.assign({
+    wellKnownSharedResource,
+    wellKnown,
+    keys
+  }, options);
+  if (url.match(/.*\/oauth2\/.*\/\.well-known\/openid-configuration$/)) {
+    return options.wellKnownSharedResource.response;
   }
 
   if (url.match(/.*\.well-known\/openid-configuration$/)) {
-    return wellKnown.response;
+    return options.wellKnown.response;
   }
 
   if (url.match(/.*\/v1\/keys$/)) {
-    return keys.response;
+    return options.keys.response;
   }
 };
 
-oauthUtil.loadWellKnownAndKeysCache = function(authClient) {
+oauthUtil.loadWellKnownAndKeysCache = function(authClient, overrideResponses) {
   // mock responses to /.well-known/openid-configuration and /oauth2/v1/keys
   const origMethod = authClient.options.httpRequestClient;
   jest.spyOn(authClient.options, 'httpRequestClient').mockImplementation(async (method, url, options) => {
-    const response = oauthUtil.getResponseForUrl(url);
+    const response = oauthUtil.getResponseForUrl(url, overrideResponses);
     if (response) {
       return {
         responseText: JSON.stringify(response)
@@ -452,7 +457,7 @@ oauthUtil.setupParseUrl = function(opts) {
   }, opts.oktaAuthArgs));
 
   // Mock the well-known and keys request
-  oauthUtil.loadWellKnownAndKeysCache(client);
+  oauthUtil.loadWellKnownAndKeysCache(client, opts.httpCache);
 
   util.warpToUnixTime(getTime(opts.time));
 
