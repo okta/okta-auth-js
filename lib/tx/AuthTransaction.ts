@@ -191,6 +191,7 @@ function link2fn(sdk, res, obj, link, ref) {
   }
 }
 
+// eslint-disable-next-line complexity
 function links2fns(sdk, res, obj, ref) {
   var fns = {} as AuthTransactionFunctions;
   for (var linkName in obj._links) {
@@ -199,7 +200,18 @@ function links2fns(sdk, res, obj, ref) {
     }
 
     var link = obj._links[linkName];
-    
+
+    // replace responses hostname with issuer hostname provided by SDK
+    if (Object.prototype.hasOwnProperty.call(link, 'href')) {
+      var matchProtocolDomainHost = /^.*\/\/[^\/]+:?[0-9]?/i;   // eslint-disable-line no-useless-escape
+      var sdkProvidedissuedDomainHost =link.href.replace(
+        matchProtocolDomainHost,
+        sdk.getIssuerOrigin()
+      );
+      
+      Object.assign(link, { href: sdkProvidedissuedDomainHost });
+    }
+        
     if (linkName === 'next') {
       linkName = link.name;
     }
