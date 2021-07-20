@@ -24,7 +24,7 @@ The following config parameters are accepted in the URL as encoded query paramet
 Example:
 
 ```html
-http://localhost:8080/?issuer=https%3A%2F%2Fabc.oktapreview.com%2Foauth2%2Fdefault&clientId=01234567xcdfgC80h7&pkce=false=openid,email&responseType=id_token,token
+http://localhost:8080/?issuer=https%3A%2F%2Fabc.oktapreview.com%2Foauth2%2Fdefault&clientId=01234567xcdfgC80h7&pkce=false&scopes=openid,email&responseType=id_token,token
 ```
 
 ## Configuring via environment variables
