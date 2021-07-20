@@ -104,8 +104,8 @@ function main() {
     return handleLoginRedirect().then(function() {
       startApp();
     });
-  } 
-  
+  }
+
   // Normal app startup
   startApp();
 }
@@ -195,7 +195,7 @@ function handleLoginRedirect() {
     beginAuthFlow(); // widget will resume transaction
     return Promise.resolve();
   }
-  
+
   // If the URL contains a code, `parseFromUrl` will grab it and exchange the code for tokens
   return authClient.token.parseFromUrl().then(function (res) {
     endAuthFlow(res.tokens); // save tokens
@@ -235,6 +235,7 @@ function beginAuthFlow() {
       showSigninWidget();
       break;
     case 'form':
+    case 'hybrid':
       showSigninForm();
       break;
   }
@@ -260,11 +261,12 @@ function showRedirectButton() {
   document.getElementById('flow-redirect').style.display = 'block';
 }
 
-function showSigninWidget() {
+function showSigninWidget(stateToken) {
     // Create an instance of the signin widget
     var signIn = new OktaSignIn({
       baseUrl: config.issuer.split('/oauth2')[0],
       clientId: config.clientId,
+      stateToken: stateToken,
       redirectUri: config.redirectUri,
       useInteractionCodeFlow: config.useInteractionCodeFlow,
       authParams: {
@@ -278,7 +280,7 @@ function showSigninWidget() {
         return { type, id };
       }).filter(idpToken => idpToken)
     });
-  
+
     signIn.showSignInToGetTokens({
       el: '#signin-widget',
       state: JSON.stringify(config.state)
@@ -291,12 +293,16 @@ function showSigninWidget() {
     .catch(function(error) {
       console.log('login error', error);
     });
-  
+
     document.getElementById('flow-widget').style.display = 'block'; // show login UI
 }
 
 function showSigninForm() {
   document.getElementById('login-form').style.display = 'block';
+}
+
+function hideSigninForm() {
+  document.getElementById('login-form').style.display = 'none';
 }
 
 function submitSigninForm() {
@@ -309,8 +315,13 @@ function submitSigninForm() {
   .then(function(transaction) {
     if (transaction.status === 'SUCCESS') {
       return authClient.session.setCookieAndRedirect(transaction.sessionToken, config.appUri + '&getTokens=true');
+    } else if (transaction.status == 'MFA_REQUIRED' && config.flow == 'hybrid') {
+      // In hybrid flow when MFA is required, will show signin widget skipping username/password first step
+      hideSigninForm();
+      showSigninWidget(transaction.data.stateToken);
+    } else {
+      throw new Error('We cannot handle the ' + transaction.status + ' status');
     }
-    throw new Error('We cannot handle the ' + transaction.status + ' status');
   })
   .catch(function(err) {
     showError(err);
@@ -442,7 +453,7 @@ function loadConfig() {
   // Read all config from the URL
   var url = new URL(window.location.href);
   var redirectUri = window.location.origin + '/login/callback'; // Should also be set in Okta Admin UI
-  
+
   // Params which are not in the state
   var stateParam = url.searchParams.get('state'); // received on login redirect callback
   var error = url.searchParams.get('error'); // received on login redirect callback
@@ -483,7 +494,7 @@ function loadConfig() {
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
     flow = url.searchParams.get('flow') || config.flow;
-    requireUserSession = url.searchParams.get('requireUserSession') ? 
+    requireUserSession = url.searchParams.get('requireUserSession') ?
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
     scopes = url.searchParams.get('scopes') ? url.searchParams.get('scopes').split(' ') : config.scopes;
     useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true' || config.useInteractionCodeFlow;
