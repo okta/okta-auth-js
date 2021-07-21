@@ -149,7 +149,7 @@ export class AuthStateManager {
       };
 
       this._sdk.isAuthenticated()
-        .then(isAuthenticated => {
+        .then(() => {
           if (cancelablePromise.isCanceled) {
             resolve();
             return;
@@ -160,7 +160,7 @@ export class AuthStateManager {
             accessToken,
             idToken,
             refreshToken,
-            isAuthenticated
+            isAuthenticated: !!(accessToken && idToken)
           };
           const promise: Promise<AuthState> = transformAuthState
             ? transformAuthState(this._sdk, authState)

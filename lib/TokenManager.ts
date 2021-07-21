@@ -268,7 +268,7 @@ export class TokenManager implements TokenManagerInterface {
   async getTokens(): Promise<Tokens> {
     return this.getTokensSync();
   }
-  
+
   getStorageKeyByType(type: TokenType): string {
     const tokenStorage = this.storage.getStorage();
     const key = Object.keys(tokenStorage).filter(key => {
