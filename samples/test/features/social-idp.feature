@@ -7,9 +7,16 @@ Background:
     # And a user named "Mary"
     # And Mary does not have an account in the org
 
-Scenario: Mary Logs in with Social IDP
+# Scenario: Mary Logs in with Social IDP
+#    Given Mary navigates to the Login View
+#    When she clicks the "Login with Facebook" button
+#      And logs in to Facebook
+#    Then she is redirected to the Root View
+#      And an application session is created
+
+Scenario: Mary Logs in with Okta OIDC IdP
     Given Mary navigates to the Login View
-    When she clicks the "Login with Facebook" button
-      And logs in to Facebook
+    When she clicks the "Login with Okta OIDC IdP" button
+      And logs in to Okta OIDC IdP
     Then she is redirected to the Root View
       And an application session is created

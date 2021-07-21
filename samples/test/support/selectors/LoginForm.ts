@@ -19,6 +19,7 @@ const formMessages = `#form-messages li`;
 const formMessage = `${formMessages}:first-child`;
 const facebookButton = '#idp-buttons #facebook';
 const googleButton = '#idp-buttons #google';
+const oidcIdPButton = '#idp-buttons #oidc';
 
 export class LoginForm {
   get username() { return username; }
@@ -28,6 +29,7 @@ export class LoginForm {
   get formMessage() { return formMessage; }
   get facebookButton() { return facebookButton; }
   get googleButton() { return googleButton; }
+  get oidcIdPButton() { return oidcIdPButton; }
 }
 
 export default new LoginForm();
