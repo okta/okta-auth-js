@@ -27,7 +27,7 @@ export default async (credentials: UserCredentials, assignToGroups = [userGroup]
 
   let user;
 
-  const userAuthGroup = {
+  const basicAuthGroup = {
     profile: {
       name: userGroup
     }
