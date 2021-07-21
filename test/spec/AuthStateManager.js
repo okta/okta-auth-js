@@ -137,21 +137,6 @@ describe('AuthStateManager', () => {
       });
     });
 
-    it('should emit an authState with isAuthenticated', async () => {
-      jest.spyOn(sdkMock, 'isAuthenticated').mockResolvedValue('fake');
-      expect.assertions(2);
-      const instance = new AuthStateManager(sdkMock);
-      const handler = jest.fn();
-      instance.subscribe(handler);
-      await instance.updateAuthState();
-      expect(handler).toHaveBeenCalledTimes(1);
-      expect(handler).toHaveBeenCalledWith({
-        isAuthenticated: 'fake',
-        idToken: 'fakeIdToken0',
-        accessToken: 'fakeAccessToken0'
-      });
-    });
-
     it('should emit only latest authState', async () => {
       jest.spyOn(sdkMock, 'isAuthenticated');
       expect.assertions(3);

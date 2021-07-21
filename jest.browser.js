@@ -6,6 +6,7 @@ const config = Object.assign({}, baseConfig, {
     USER_AGENT
   }),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
+    '<rootDir>/test/spec/serverStorage.js',
     '<rootDir>/test/spec/features/server'
   ])
 });
