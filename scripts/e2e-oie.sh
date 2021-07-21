@@ -14,7 +14,8 @@ get_secret prod/okta-sdk-vars/password PASSWORD
 
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
-export ORG_OIE_ENABLED=true
+# Remember to set this while running tests locally 
+export ORG_OIE_ENABLED=true 
 
 # This client has refresh token enabled
 export CLIENT_ID=0oa3n0cgbfiNvI6Aa0g7

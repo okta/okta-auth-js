@@ -10,7 +10,10 @@ export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
+
 # Configuration
+# Remember to set this while running tests locally 
+export ORG_OIE_ENABLED=true 
 export ISSUER=https://javascript-idx-sdk.okta.com/oauth2/default
 export USERNAME=mary@acme.com
 export CLIENT_ID=0oav2oxnlYjULp0Cy5d6

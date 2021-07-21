@@ -55,6 +55,9 @@ import enterIncorrectPhoneNumberFormat from '../support/action/enterIncorrectPho
 import clickFacebookButton from '../support/action/clickFacebookButton';
 import clickLoginWithFacebookInWidget from '../support/action/clickLoginWithFacebookInWidget';
 import signInIntoFacebook from '../support/action/signInIntoFacebook';
+import clickLoginWithOktaOIDCIdPInWidget from '../support/action/clickLoginWithOktaOIDCIdPInWidget';
+import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
+import loginWidget from '../support/action/loginWidget';
 import ActionContext from '../support/context';
 
 When(
@@ -131,6 +134,24 @@ When(
   /^logs in to Facebook$/,
   async function(this: ActionContext) {
     await signInIntoFacebook.call(this);
+  }
+);
+
+When(
+  /^she clicks the "Login with Okta OIDC IDP" button in the embedded Sign In Widget$/,
+  clickLoginWithOktaOIDCIdPInWidget
+);
+
+When(
+  /^she clicks the "Login with Okta OIDC IDP" button$/,
+  clickOIDCIdPButton
+);
+
+When(
+  /^logs in to Okta OIDC IDP$/,
+  async function() {
+    // Login to Okta OIDC org with standard username, password (same user exists in OIDC IdP org)
+    await loginWidget();
   }
 );
 
