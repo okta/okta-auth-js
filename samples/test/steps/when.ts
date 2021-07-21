@@ -55,10 +55,10 @@ import enterIncorrectPhoneNumberFormat from '../support/action/enterIncorrectPho
 import clickFacebookButton from '../support/action/clickFacebookButton';
 import clickLoginWithFacebookInWidget from '../support/action/clickLoginWithFacebookInWidget';
 import signInIntoFacebook from '../support/action/signInIntoFacebook';
+import clickLoginWithOktaOIDCIdPInWidget from '../support/action/clickLoginWithOktaOIDCIdPInWidget';
 import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
 import loginWidget from '../support/action/loginWidget';
 import ActionContext from '../support/context';
-import { getConfig } from '../util/configUtils';
 
 When(
   /^User enters (username|password) into the form$/,
@@ -138,15 +138,18 @@ When(
 );
 
 When(
-  /^she clicks the "Login with Okta OIDC IdP" button$/,
+  /^she clicks the "Login with Okta OIDC IDP" button in the embedded Sign In Widget$/,
+  clickLoginWithOktaOIDCIdPInWidget
+);
+
+When(
+  /^she clicks the "Login with Okta OIDC IDP" button$/,
   clickOIDCIdPButton
 );
 
 When(
-  /^logs in to Okta OIDC IdP$/,
+  /^logs in to Okta OIDC IDP$/,
   async function() {
-    const config = getConfig();
-
     // Login to Okta OIDC org with standard username, password (same user exists in OIDC IdP org)
     await loginWidget();
   }

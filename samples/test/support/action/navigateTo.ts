@@ -58,6 +58,12 @@ function getContext(formName: string) {
       queryParams = { flow: 'widget' };
       break;
     }
+    case 'Login with Okta OIDC IDP': {
+      url = '/login';
+      selector = OktaSignInOIE.signinWithOktaOIDCIdPBtn;
+      queryParams = { flow: 'widget' };
+      break;
+    }    
     default:
       throw new Error(`Unknown form "${formName}"`);
   }

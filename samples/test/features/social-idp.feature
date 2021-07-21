@@ -14,9 +14,9 @@ Background:
 #    Then she is redirected to the Root View
 #      And an application session is created
 
-Scenario: Mary Logs in with Okta OIDC IdP
+Scenario: Mary Logs in with Okta OIDC IDP
     Given Mary navigates to the Login View
-    When she clicks the "Login with Okta OIDC IdP" button
-      And logs in to Okta OIDC IdP
+    When she clicks the "Login with Okta OIDC IDP" button
+      And logs in to Okta OIDC IDP
     Then she is redirected to the Root View
       And an application session is created

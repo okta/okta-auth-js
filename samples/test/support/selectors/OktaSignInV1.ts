@@ -19,6 +19,7 @@ class OktaSignInV1 {
   get signinSubmitBtn() { return '#okta-signin-submit'; }
   get signinWithFacebookBtn() { return '[data-se=social-auth-facebook-button]'; }
   get signinWithGoogleBtn() { return '[data-se=social-auth-google-button]'; }
+  get signinWithOktaOIDCIdPBtn() { return '[data-se=social-auth-general-idp-button]'; }
 }
 
 export default new OktaSignInV1();
