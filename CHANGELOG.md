@@ -10,6 +10,12 @@
 
 - [#853](https://github.com/okta/okta-auth-js/pull/853) Updates `token.parseFromUrl` signature (adds optional parameter)
 
+## 5.2.3
+
+### Bug Fixes
+
+- [#873](https://github.com/okta/okta-auth-js/pull/873) Fixes AuthStateManager emitting inconsistence `isAuthenticated` state during active token auto renew by only checking existence of both tokens from storage
+
 ## 5.2.2
 
 - [#862](https://github.com/okta/okta-auth-js/pull/862) Fixes issue with untranspiled `class` keyword
