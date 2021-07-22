@@ -16,7 +16,9 @@ import { getConfig } from '../../util';
 import deleteUser from './deleteUser';
 import { UserCredentials } from './createCredentials';
 
-export default async (credentials: UserCredentials, assignToGroups = ['Basic Auth Web']): Promise<User> => {
+const userGroup = 'Basic Auth Web';
+
+export default async (credentials: UserCredentials, assignToGroups = [userGroup]): Promise<User> => {
   const config = getConfig();
   const oktaClient = new Client({
     orgUrl: config.orgUrl,
@@ -24,6 +26,13 @@ export default async (credentials: UserCredentials, assignToGroups = ['Basic Aut
   });
 
   let user;
+
+  const basicAuthGroup = {
+    profile: {
+      name: userGroup
+    }
+  };
+
   try {
     user = await oktaClient.createUser({
       profile: {
@@ -50,7 +59,7 @@ export default async (credentials: UserCredentials, assignToGroups = ['Basic Aut
       }).next();
 
       if (!testGroup) {
-        throw new Error(`Group "${groupName}" is not found`);
+        testGroup = await oktaClient.createGroup(basicAuthGroup);
       }
 
       await oktaClient.addUserToGroup((testGroup as Group).id, user.id);
