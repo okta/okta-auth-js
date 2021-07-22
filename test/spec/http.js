@@ -11,10 +11,15 @@
  */
 
 
-/* global USER_AGENT, USER_AGENT_HEADER */
+/* global USER_AGENT, USER_AGENT_HEADER, ENV */
 
 import http from '../../lib/http';
-import { OktaAuth, DEFAULT_CACHE_DURATION, AuthApiError, STATE_TOKEN_KEY_NAME } from '@okta/okta-auth-js';
+import { 
+  OktaAuth, 
+  DEFAULT_CACHE_DURATION, 
+  AuthApiError, 
+  STATE_TOKEN_KEY_NAME 
+} from '../../lib';
 
 describe('HTTP Requestor', () => {
   let sdk;
@@ -157,6 +162,29 @@ describe('HTTP Requestor', () => {
             'Content-Type': 'application/json',
             [USER_AGENT_HEADER]: USER_AGENT,
             'Authorization': 'Bearer fake'
+          },
+          withCredentials: false
+        });
+      });
+    });
+    it('can customize okta user agent', () => {
+      createAuthClient();
+      sdk._oktaUserAgent.addEnvironment('fake/x.y');
+      return http.httpRequest(sdk, { url })
+      .then(res => {
+        expect(res).toBe(response1);
+        let expectUserAgent = `${USER_AGENT} fake/x.y`;
+        if (ENV === 'node') {
+          const parts = USER_AGENT.split(' ');
+          parts.splice(1, 0, 'fake/x.y');
+          expectUserAgent = parts.join(' ');
+        }
+        expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+          data: undefined,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            [USER_AGENT_HEADER]: expectUserAgent
           },
           withCredentials: false
         });
