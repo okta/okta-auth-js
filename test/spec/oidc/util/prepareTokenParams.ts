@@ -30,7 +30,7 @@ jest.mock('../../../../lib/features', () => {
 jest.mock('../../../../lib/oidc/endpoints/well-known', () => {
   return mocked.wellKnown;
 });
-import { OktaAuth } from '@okta/okta-auth-js';
+import { OktaAuth } from '../../../../lib';
 import { prepareTokenParams, pkce }  from '../../../../lib/oidc';
 import TransactionManager from '../../../../lib/TransactionManager';
 

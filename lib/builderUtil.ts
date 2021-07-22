@@ -34,31 +34,8 @@ function assertValidConfig(args: OktaAuthOptions) {
     throw new AuthSdkError('Issuer URL passed to constructor contains "-admin" in subdomain. ' +
       'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com})');
   }
-
-  var userAgent = args.userAgent;
-  var userAgentTemplateWithNoPlaceholder = 
-    userAgent && userAgent.template && userAgent.template.indexOf('$OKTA_AUTH_JS') === -1;
-  if (userAgentTemplateWithNoPlaceholder) {
-    throw new AuthSdkError('UserAgentTemplate must include "$OKTA_AUTH_JS" placeholder. ' + 
-      'Required usage: new OktaAuth({userAgentTemplate: "xxx $OKTA_AUTH_JS xxx"})');
-  }
-}
-
-function getUserAgent(args: OktaAuthOptions, sdkValue: string): string {
-  var userAgent = args.userAgent || {};
-
-  if (userAgent.value) {
-    return userAgent.value;
-  }
-
-  if (userAgent.template) {
-    return userAgent.template.replace('$OKTA_AUTH_JS', sdkValue);
-  }
-
-  return sdkValue;
 }
 
 export {
-  assertValidConfig,
-  getUserAgent
+  assertValidConfig
 };
