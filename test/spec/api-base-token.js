@@ -11,7 +11,7 @@
  */
 
 
-/* global USER_AGENT, fetch */
+/* global USER_AGENT, USER_AGENT_HEADER, fetch */
 
 import util from '@okta/test.support/util';
 import { OktaAuth } from '@okta/okta-auth-js';
@@ -113,7 +113,7 @@ describe('base token API', function() {
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/x-www-form-urlencoded',
-              'X-Okta-User-Agent-Extended': USER_AGENT
+              [USER_AGENT_HEADER]: USER_AGENT
             }
           },
           response: 'pkce-token-success',

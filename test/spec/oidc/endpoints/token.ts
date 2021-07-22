@@ -45,7 +45,7 @@ describe('token endpoint', function() {
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/x-www-form-urlencoded',
-              'X-Okta-User-Agent-Extended': global['USER_AGENT']
+              [global['USER_AGENT_HEADER']]: global['USER_AGENT']
             }
           },
           response: 'pkce-token-success',

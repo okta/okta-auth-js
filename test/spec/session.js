@@ -11,7 +11,7 @@
  */
 
 
-/* global window */
+/* global window, USER_AGENT, USER_AGENT_HEADER */
 
 import {
   closeSession,
@@ -344,13 +344,13 @@ describe('session', function() {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'custom okta-auth-js/' + packageJson.version
+            [USER_AGENT_HEADER]: `${USER_AGENT} fake/x.y`
           }
         },
         response: 'session'
       },
       execute: function (test) {
-        test.oa.userAgent = 'custom ' + test.oa.userAgent;
+        test.oa._oktaUserAgent.addEnvironment('fake/x.y');
         return test.oa.session.get();
       },
       expectations: function () {

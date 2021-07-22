@@ -11,7 +11,7 @@
  */
 
 
-/* global USER_AGENT */
+/* global USER_AGENT, USER_AGENT_HEADER */
 
 import http from '../../lib/http';
 import { OktaAuth, DEFAULT_CACHE_DURATION, AuthApiError, STATE_TOKEN_KEY_NAME } from '@okta/okta-auth-js';
@@ -54,7 +54,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': USER_AGENT
+            [USER_AGENT_HEADER]: USER_AGENT
           },
           withCredentials: true
         });
@@ -72,7 +72,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': USER_AGENT
+            [USER_AGENT_HEADER]: USER_AGENT
           },
           withCredentials: false
         });
@@ -92,7 +92,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': USER_AGENT,
+            [USER_AGENT_HEADER]: USER_AGENT,
             'fake': 'value'
           },
           withCredentials: false
@@ -114,7 +114,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': USER_AGENT,
+            [USER_AGENT_HEADER]: USER_AGENT,
             'fake': 'value'
           },
           withCredentials: false
@@ -136,7 +136,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': USER_AGENT
+            [USER_AGENT_HEADER]: USER_AGENT
           },
           withCredentials: false
         });
@@ -155,7 +155,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': USER_AGENT,
+            [USER_AGENT_HEADER]: USER_AGENT,
             'Authorization': 'Bearer fake'
           },
           withCredentials: false

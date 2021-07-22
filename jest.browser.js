@@ -3,7 +3,8 @@ const USER_AGENT = 'okta-auth-js/' + SDK_VERSION;
 const baseConfig = require('./test/support/jest/jest.config');
 const config = Object.assign({}, baseConfig, {
   globals: Object.assign({}, baseConfig.globals, {
-    USER_AGENT
+    USER_AGENT,
+    USER_AGENT_HEADER: 'X-Okta-User-Agent-Extended'
   }),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     '<rootDir>/test/spec/serverStorage.js',
