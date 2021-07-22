@@ -11,7 +11,7 @@
  */
 
 
-/* global window, USER_AGENT, USER_AGENT_HEADER */
+/* global window, USER_AGENT */
 
 import {
   closeSession,
@@ -344,7 +344,7 @@ describe('session', function() {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            [USER_AGENT_HEADER]: `${USER_AGENT} fake/x.y`
+            'X-Okta-User-Agent-Extended': `${USER_AGENT} fake/x.y`
           }
         },
         response: 'session'

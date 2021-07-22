@@ -14,17 +14,12 @@ export class OktaUserAgent {
   }
 
   getHttpHeader() {
-    const header = this.getHeaderName();
     this.maybeAddNodeEnvironment();
-    return { [header]: this.environments.join(' ') };
-  }
-
-  private getHeaderName() {
-    return isBrowser() ? 'X-Okta-User-Agent-Extended' : 'User-Agent';
+    return { 'X-Okta-User-Agent-Extended': this.environments.join(' ') };
   }
 
   private maybeAddNodeEnvironment() {
-    if (isBrowser()) {
+    if (isBrowser() || !process || !process.versions) {
       return;
     }
     const { node: version } = process.versions;

@@ -11,7 +11,7 @@
  */
 
 
-/* global USER_AGENT, USER_AGENT_HEADER, ENV */
+/* global USER_AGENT, ENV */
 
 import http from '../../lib/http';
 import { 
@@ -59,7 +59,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            [USER_AGENT_HEADER]: USER_AGENT
+            'X-Okta-User-Agent-Extended': USER_AGENT
           },
           withCredentials: true
         });
@@ -77,7 +77,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            [USER_AGENT_HEADER]: USER_AGENT
+            'X-Okta-User-Agent-Extended': USER_AGENT
           },
           withCredentials: false
         });
@@ -97,7 +97,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            [USER_AGENT_HEADER]: USER_AGENT,
+            'X-Okta-User-Agent-Extended': USER_AGENT,
             'fake': 'value'
           },
           withCredentials: false
@@ -119,7 +119,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            [USER_AGENT_HEADER]: USER_AGENT,
+            'X-Okta-User-Agent-Extended': USER_AGENT,
             'fake': 'value'
           },
           withCredentials: false
@@ -141,7 +141,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            [USER_AGENT_HEADER]: USER_AGENT
+            'X-Okta-User-Agent-Extended': USER_AGENT
           },
           withCredentials: false
         });
@@ -160,7 +160,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            [USER_AGENT_HEADER]: USER_AGENT,
+            'X-Okta-User-Agent-Extended': USER_AGENT,
             'Authorization': 'Bearer fake'
           },
           withCredentials: false
@@ -184,7 +184,7 @@ describe('HTTP Requestor', () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            [USER_AGENT_HEADER]: expectUserAgent
+            'X-Okta-User-Agent-Extended': expectUserAgent
           },
           withCredentials: false
         });

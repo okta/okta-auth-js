@@ -8,7 +8,6 @@ const config = Object.assign({}, baseConfig, {
   ]),
   globals: Object.assign({}, baseConfig.globals, {
     USER_AGENT,
-    USER_AGENT_HEADER: 'User-Agent',
     ENV: 'node'
   }),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
