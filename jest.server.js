@@ -22,6 +22,8 @@ const config = Object.assign({}, baseConfig, {
     'oidc/getWithPopup',
     'oidc/getWithRedirect',
     'oidc/getWithoutPrompt',
+    'oidc/renewToken.ts',
+    'oidc/renewTokens.ts',
     'TokenManager/browser',
     'TokenManager/crossTabs'
   ])
