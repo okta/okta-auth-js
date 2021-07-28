@@ -7,8 +7,7 @@ const config = Object.assign({}, baseConfig, {
     '<rootDir>/test/support/jest/jest.setup.server.js'
   ]),
   globals: Object.assign({}, baseConfig.globals, {
-    USER_AGENT,
-    ENV: 'node'
+    USER_AGENT
   }),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     'browserStorage',

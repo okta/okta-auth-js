@@ -23,7 +23,6 @@ import {
 import http from '../../lib/http';
 import util from '@okta/test.support/util';
 import _ from 'lodash';
-import packageJson from '../../package.json';
 
 describe('session', function() {
   var sdk;
@@ -372,7 +371,7 @@ describe('session', function() {
             'X-Custom-Header': 'custom',
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'okta-auth-js/' + packageJson.version
+            'X-Okta-User-Agent-Extended': USER_AGENT
           }
         },
         response: 'session'

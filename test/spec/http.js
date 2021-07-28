@@ -11,7 +11,7 @@
  */
 
 
-/* global USER_AGENT, ENV */
+/* global USER_AGENT */
 
 import http from '../../lib/http';
 import { 
@@ -167,26 +167,68 @@ describe('HTTP Requestor', () => {
         });
       });
     });
-    it('can customize okta user agent', () => {
-      createAuthClient();
-      sdk._oktaUserAgent.addEnvironment('fake/x.y');
-      return http.httpRequest(sdk, { url })
-      .then(res => {
-        expect(res).toBe(response1);
-        let expectUserAgent = `${USER_AGENT} fake/x.y`;
-        if (ENV === 'node') {
-          const parts = USER_AGENT.split(' ');
-          parts.splice(1, 0, 'fake/x.y');
-          expectUserAgent = parts.join(' ');
-        }
-        expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
-          data: undefined,
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': expectUserAgent
-          },
-          withCredentials: false
+    describe('customize okta user agent', () => {
+      let sdkVersion;
+      beforeEach(async () => {
+        sdkVersion = (await import('../../package.json')).version;
+        createAuthClient();
+      });
+      describe('browser env', () => {
+        beforeEach(() => {
+          jest.spyOn(sdk.features, 'isBrowser').mockReturnValue(true);
+        });
+        it('can add extra environment', () => {
+          sdk._oktaUserAgent.addEnvironment('fake/x.y');
+          return http.httpRequest(sdk, { url })
+            .then(res => {
+              expect(res).toBe(response1);
+              expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+                data: undefined,
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'X-Okta-User-Agent-Extended': `okta-auth-js/${sdkVersion} fake/x.y`
+                },
+                withCredentials: false
+              });
+            });
+        });
+      });
+      describe('node env', () => {
+        let nodeVersion = process.versions.node;
+        beforeEach(() => {
+          jest.spyOn(sdk.features, 'isBrowser').mockReturnValue(false);
+        });
+        it('should attach node info to the end of Okta UA header', () => {
+          return http.httpRequest(sdk, { url })
+            .then(res => {
+              expect(res).toBe(response1);
+              expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+                data: undefined,
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'X-Okta-User-Agent-Extended': `okta-auth-js/${sdkVersion} nodejs/${nodeVersion}`
+                },
+                withCredentials: false
+              });
+            });
+        });
+        it('can add extra environment', () => {
+          sdk._oktaUserAgent.addEnvironment('fake/x.y');
+          return http.httpRequest(sdk, { url })
+            .then(res => {
+              expect(res).toBe(response1);
+              expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+                data: undefined,
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'X-Okta-User-Agent-Extended': `okta-auth-js/${sdkVersion} fake/x.y nodejs/${nodeVersion}`
+                },
+                withCredentials: false
+              });
+            });
         });
       });
     });
