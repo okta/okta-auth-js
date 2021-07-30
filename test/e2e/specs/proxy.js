@@ -17,6 +17,11 @@ import { loginRedirect } from '../util/loginUtils';
 import { getIssuer, getBaseUrl } from '../util/browserUtils';
 
 describe('E2E through proxy', () => {
+  // Proxy tests are disabled on OIE org, pending a fix for OKTA-416683
+  if (process.env.ORG_OIE_ENABLED) {
+    return;
+  }
+  
   beforeEach(async function bootstrap() {
     const issuer = getIssuer().replace(getBaseUrl(), 'http://localhost:8080');
     await openPKCE({
