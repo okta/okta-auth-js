@@ -48,14 +48,10 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
   // The result contains an authorization_code and PKCE is enabled 
   // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
   if (pkce && (res.code || res.interaction_code)) {
-    return Promise.resolve()
-        .then(function () {
-          validateResponse(res, tokenParams);
-          return exchangeCodeForTokens(sdk, Object.assign({}, tokenParams, {
-            authorizationCode: res.code,
-            interactionCode: res.interaction_code
-          }), urls);
-        });
+    return exchangeCodeForTokens(sdk, Object.assign({}, tokenParams, {
+      authorizationCode: res.code,
+      interactionCode: res.interaction_code
+    }), urls);
   }
 
   tokenParams = tokenParams || getDefaultTokenParams(sdk);
