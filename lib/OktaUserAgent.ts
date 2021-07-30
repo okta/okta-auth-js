@@ -18,6 +18,10 @@ export class OktaUserAgent {
     return { 'X-Okta-User-Agent-Extended': this.environments.join(' ') };
   }
 
+  getVersion() {
+    return SDK_VERSION;
+  }
+
   private maybeAddNodeEnvironment() {
     if (isBrowser() || !process || !process.versions) {
       return;

@@ -51,4 +51,8 @@ describe('OktaUserAgent', () => {
       });
     });
   });
+
+  it('can get sdk version', () => {
+    expect(oktaUserAgent.getVersion()).toBe(sdkVersion);
+  });
 });
