@@ -48,6 +48,7 @@ const config: OktaAuthOptions = {
   userinfoUrl: 'https://{yourOktaDomain}/oauth2/v1/userinfo',
   tokenUrl: 'https://{yourOktaDomain}/oauth2/v1/userinfo',
   ignoreSignature: true,
+  ignoreLifetime: true,
   maxClockSkew: 10,
 
   storageManager: {
