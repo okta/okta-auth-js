@@ -181,6 +181,11 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       this.options.maxClockSkew = args.maxClockSkew;
     }
 
+    // As some end user's devices can have their date 
+    // and time incorrectly set, allow for the disabling
+    // of the jwt liftetime validation
+    this.options.ignoreLifetime = !!args.ignoreLifetime;
+
     this.session = {
       close: closeSession.bind(null, this),
       exists: sessionExists.bind(null, this),

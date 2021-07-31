@@ -54,6 +54,7 @@ describe('OktaAuth (constructor)', () => {
     'headers',
     'devMode',
     'ignoreSignature',
+    'ignoreLifetime',
     'storageUtil',
   ]);
 
@@ -91,6 +92,7 @@ describe('OktaAuth (constructor)', () => {
           };
           break;
         case 'ignoreSignature':
+        case 'ignoreLifetime':
         case 'devMode':
           val = true;
           break;

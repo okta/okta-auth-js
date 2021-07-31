@@ -138,6 +138,23 @@ describe('validateClaims', function () {
     expect(fn).toThrowError('The JWT expired and is no longer valid'); 
   });
 
+  it('will skip jwt expired check if `ignoreLifetime` is true', function() {
+    var now = 10;
+    util.warpToUnixTime(now);
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+      exp: now - 1,
+      iat: now - 2
+    } as unknown as UserClaims;
+    sdk.options.maxClockSkew = 0;
+    sdk.options.ignoreLifetime = true;
+    var fn = function () {
+      validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).not.toThrowError();
+  });
+
   it('throws if issued in the future', function() {
     var now = 10;
     util.warpToUnixTime(now);
@@ -171,6 +188,23 @@ describe('validateClaims', function () {
     expect(fn).not.toThrowError();
     util.warpToUnixTime(now - skew);
     expect(fn).toThrowError('The JWT was issued in the future'); 
+  });
+
+  it('will skip jwt future issue check if `ignoreLifetime` is true', function() {
+    var now = 10;
+    util.warpToUnixTime(now);
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+      exp: now + 2,
+      iat: now + 1
+    } as unknown as UserClaims;
+    sdk.options.maxClockSkew = 0;
+    sdk.options.ignoreLifetime = true;
+    var fn = function () {
+      validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).not.toThrowError();
   });
 
   it('can validate all claims without error', function() {

@@ -44,11 +44,13 @@ export function validateClaims(sdk: OktaAuth, claims: UserClaims, validationPara
     throw new AuthSdkError('The JWT expired before it was issued');
   }
 
-  if ((now - sdk.options.maxClockSkew) > claims.exp) {
-    throw new AuthSdkError('The JWT expired and is no longer valid');
-  }
+  if (!sdk.options.ignoreLifetime) {
+    if ((now - sdk.options.maxClockSkew) > claims.exp) {
+      throw new AuthSdkError('The JWT expired and is no longer valid');
+    }
 
-  if (claims.iat > (now + sdk.options.maxClockSkew)) {
-    throw new AuthSdkError('The JWT was issued in the future');
+    if (claims.iat > (now + sdk.options.maxClockSkew)) {
+      throw new AuthSdkError('The JWT was issued in the future');
+    }
   }
 }
