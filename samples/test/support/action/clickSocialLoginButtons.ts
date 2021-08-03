@@ -15,8 +15,10 @@ import { waitForPopup } from '../../util/browserUtils';
 import clickElement from './clickElement';
 import { getOktaSignInForm } from  '../../util';
 
-export default async () => {
-  const OktaSignIn = getOktaSignInForm();
+export default async (
+  options: Record<string, string | boolean> = {}
+) => {
+  const OktaSignIn = getOktaSignInForm(options.useInteractionCodeFlow as boolean);
   await waitForPopup(() => clickElement('click', 'selector', OktaSignIn.signinWithFacebookBtn));
   await waitForPopup(() => clickElement('click', 'selector', OktaSignIn.signinWithGoogleBtn));
 };

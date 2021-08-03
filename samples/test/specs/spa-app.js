@@ -107,7 +107,9 @@ describe('spa-app: ' + sampleConfig.name, () => {
         useInteractionCodeFlow: false,
         idps: 'Facebook:111 Google:222'
       });
-      await clickSocialLoginButtons();
+      await clickSocialLoginButtons({
+        useInteractionCodeFlow: false
+      });
     });
   }
 });
