@@ -15,7 +15,6 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 # Remember to set this while running tests locally 
 export ORG_OIE_ENABLED=true 
 export USERNAME=mary@acme.com
-export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
 get_secret prod/okta-sdk-vars/password PASSWORD
 get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY
 export FB_USERNAME=js_ekdtypn_user@tfbnw.net
@@ -35,6 +34,7 @@ if [[ "${BACON_TASK}" == true ]]; then
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_e2e_apiKey OKTA_API_KEY
 else
   echo "Running tests against production (ok12) org"
+  export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
   export ISSUER=https://javascript-idx-sdk.okta.com/oauth2/default
   export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
   get_secret prod/okta-sdk-vars/client_secret CLIENT_SECRET
