@@ -12,9 +12,9 @@
 
 
 import {
-  // toQueryString,
+  toQueryString,
   getSampleConfig,
-  // getConfig,
+  getConfig,
 } from '../util';
 import startApp from '../support/action/startApp';
 import checkProfile from '../support/check/checkProfile';
@@ -24,10 +24,10 @@ import loginDirect from '../support/action/loginDirect';
 import loginWidget from '../support/action/loginWidget';
 import loginRedirect from '../support/action/loginRedirect';
 import logoutRedirect from '../support/action/logoutRedirect';
-// import clickSocialLoginButtons from '../support/action/clickSocialLoginButtons';
+import clickSocialLoginButtons from '../support/action/clickSocialLoginButtons';
 
 const sampleConfig = getSampleConfig();
-// const config = getConfig();
+const config = getConfig();
 
 describe('spa-app: ' + sampleConfig.name, () => {
 
@@ -75,7 +75,8 @@ describe('spa-app: ' + sampleConfig.name, () => {
     // it('does not show the widget when receiving error=access_denied on redirect', async () => {
     //   await startApp('/', { flow: 'widget' });
     //   await browser.url(sampleConfig.redirectPath + toQueryString(Object.assign({
-    //     error: 'access_denied'
+    //     error: 'access_denied',
+    //     flow: 'widget'
     //   }, config)));
 
     //   await loginWidget();
@@ -83,20 +84,21 @@ describe('spa-app: ' + sampleConfig.name, () => {
     //   await logoutRedirect();
     // });
 
-    // it('shows the widget when receiving error=interaction_required on redirect', async () => {
-    //   await startApp('/', { flow: 'widget' });
-    //   await browser.url(sampleConfig.redirectPath + toQueryString({
-    //     error: 'interaction_required'
-    //   }));
+    it('shows the widget when receiving error=interaction_required on redirect', async () => {
+      await startApp('/', { flow: 'widget' });
+      await browser.url(sampleConfig.redirectPath + toQueryString(Object.assign({
+        error: 'interaction_required',
+        flow: 'widget'
+      }, config)));
 
-    //   await loginWidget();
-    //   await checkProfile();
-    //   await logoutRedirect();
-    // });
+      await loginWidget();
+      await checkProfile();
+      await logoutRedirect();
+    });
 
-    // it('show social login buttons in self-hosted widget', async () => {
-    //   await startApp('/', { flow: 'widget', idps: 'Facebook:111 Google:222' });
-    //   await clickSocialLoginButtons();
-    // });
+    it('show social login buttons in self-hosted widget', async () => {
+      await startApp('/', { flow: 'widget', idps: 'Facebook:111 Google:222' });
+      await clickSocialLoginButtons();
+    });
   }
 });
