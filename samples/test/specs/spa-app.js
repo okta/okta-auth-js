@@ -24,7 +24,7 @@ import loginDirect from '../support/action/loginDirect';
 import loginWidget from '../support/action/loginWidget';
 import loginRedirect from '../support/action/loginRedirect';
 import logoutRedirect from '../support/action/logoutRedirect';
-import clickSocialLoginButtons from '../support/action/clickSocialLoginButtons';
+// import clickSocialLoginButtons from '../support/action/clickSocialLoginButtons';
 
 const sampleConfig = getSampleConfig();
 const config = getConfig();
