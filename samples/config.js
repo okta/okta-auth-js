@@ -92,6 +92,12 @@ const samples = [
     ],
     useEnv: true
   },
+  {
+    name: 'spa-embedded-sign-in-widget',
+    template: 'spa-embedded-sign-in-widget',
+    redirectPath: '/login/callback',
+    useEnv: true
+  }
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {
     throw new Error('sample "name" is required');

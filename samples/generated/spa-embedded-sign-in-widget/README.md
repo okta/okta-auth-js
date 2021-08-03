@@ -1,0 +1,1 @@
+Contains code from the widget guide located here: https://developer.okta.com/code/javascript/okta_sign-in_widget/
