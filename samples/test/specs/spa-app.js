@@ -85,19 +85,28 @@ describe('spa-app: ' + sampleConfig.name, () => {
     // });
 
     it('shows the widget when receiving error=interaction_required on redirect', async () => {
-      await startApp('/', { flow: 'widget' });
+      await startApp('/', {
+        flow: 'widget',
+        useInteractionCodeFlow: false
+      });
       await browser.url(sampleConfig.redirectPath + toQueryString(Object.assign({
         error: 'interaction_required',
         flow: 'widget'
       }, config)));
 
-      await loginWidget();
+      await loginWidget({
+        useInteractionCodeFlow: false
+      });
       await checkProfile();
       await logoutRedirect();
     });
 
     it('show social login buttons in self-hosted widget', async () => {
-      await startApp('/', { flow: 'widget', idps: 'Facebook:111 Google:222' });
+      await startApp('/', {
+        flow: 'widget',
+        useInteractionCodeFlow: false,
+        idps: 'Facebook:111 Google:222'
+      });
       await clickSocialLoginButtons();
     });
   }
