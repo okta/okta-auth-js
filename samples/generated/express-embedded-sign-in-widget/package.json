@@ -18,7 +18,7 @@
     "js-yaml": "^4.1.0",
     "dotenv": "^10.0.0",
     "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "^5.8.2"
+    "@okta/okta-signin-widget": "^5.9.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.7",
