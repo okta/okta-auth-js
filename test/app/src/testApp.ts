@@ -23,7 +23,8 @@ import {
   TokenParams,
   isInteractionRequired,
   isInteractionRequiredError, isAuthorizationCodeError,
-  IdxStatus
+  IdxStatus,
+  IdxTransaction
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -270,7 +271,7 @@ class TestApp {
 
   async getTokensDirectOIE(username: string, password: string): Promise<Tokens>  {
     let tokens;
-    const idxTransaction = await this.oktaAuth.idx.authenticate({ username, password });
+    const idxTransaction: IdxTransaction = await this.oktaAuth.idx.authenticate({ username, password });
     if (idxTransaction.status === IdxStatus.SUCCESS) {
       tokens = idxTransaction.tokens;
     } else {
@@ -283,7 +284,7 @@ class TestApp {
     let sessionToken;
     let tokens;
     if (username || password) {
-      const v1Transaction = await this.oktaAuth.signIn({username, password});
+      const v1Transaction: AuthTransaction = await this.oktaAuth.signIn({ username, password });
       if (v1Transaction.status === 'SUCCESS') {
         sessionToken = v1Transaction.sessionToken;
       } else {
