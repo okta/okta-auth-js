@@ -18,6 +18,8 @@ import {
 } from '../util';
 import startApp from '../support/action/startApp';
 import checkProfile from '../support/check/checkProfile';
+import checkNoProfile from '../support/check/checkNoProfile';
+import clickProfile from '../support/action/clickProfile';
 import loginDirect from '../support/action/loginDirect';
 import loginWidget from '../support/action/loginWidget';
 import loginRedirect from '../support/action/loginRedirect';
@@ -32,22 +34,23 @@ describe('spa-app: ' + sampleConfig.name, () => {
   it('can login using redirect', async () => {
     await startApp('/', { requireUserSession: true });
     await loginRedirect();
-    await checkProfile({ clickProfileButton: false });
+    await checkProfile();
     await logoutRedirect();
   });
 
   it('can use memory token storage', async () => {
     await startApp('/', { requireUserSession: true, storage: 'memory' });
     await loginRedirect();
-    await checkProfile({ clickProfileButton: false });
+    await checkProfile();
     await logoutRedirect();
   });
 
   it('can get user info', async () => {
     await startApp('/', { requireUserSession: false });
     await loginRedirect();
-    await checkProfile({ clickProfileButton: false, falseCase: true });
-    await checkProfile({ clickProfileButton: true });
+    await checkNoProfile();
+    await clickProfile();
+    await checkProfile();
     await logoutRedirect();
   });
 
@@ -55,7 +58,7 @@ describe('spa-app: ' + sampleConfig.name, () => {
     it('can login directly, calling signin() with username and password', async () => {
       await startApp('/', { flow: 'form', requireUserSession: true });
       await loginDirect();
-      await checkProfile({ clickProfileButton: false });
+      await checkProfile();
       await logoutRedirect();
     });
   }
