@@ -15,6 +15,7 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 # Remember to set this while running tests locally 
 export ORG_OIE_ENABLED=true 
 export USERNAME=mary@acme.com
+export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
 get_secret prod/okta-sdk-vars/password PASSWORD
 get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY
 export FB_USERNAME=js_ekdtypn_user@tfbnw.net

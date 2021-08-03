@@ -13,9 +13,6 @@
 
 const samplesConfig = require('../../config');
 
-// todo
-process.env.SPA_CLIENT_ID = '0oa17suj5x9khaVH75d7';
-
 function getSampleConfig() {
   const sampleName = process.env.SAMPLE_NAME;
   const sampleConfig = sampleName ? samplesConfig.getSampleConfig(sampleName) : {};
