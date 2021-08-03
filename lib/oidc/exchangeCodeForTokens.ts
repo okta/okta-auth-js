@@ -32,6 +32,7 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
     redirectUri,
     scopes,
     ignoreSignature,
+    state
   } = tokenParams;
 
   var getTokenOptions = {
@@ -63,6 +64,7 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
         .then((response: TokenResponse) => {
           // For compatibility, "code" is returned in the TokenResponse. OKTA-326091
           response.code = authorizationCode;
+          response.state = state;
           return response;
         });
     })

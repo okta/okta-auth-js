@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - [#852](https://github.com/okta/okta-auth-js/pull/852) Skips non-successful requests cacheing
+- [#883](https://github.com/okta/okta-auth-js/pull/883) Resolves `state` from `token.parseFromUrl`
 
 ### Other
 

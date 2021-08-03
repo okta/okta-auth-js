@@ -167,7 +167,7 @@ describe('handleOAuthResponse', () => {
 
     describe('Authorization code flow', () => {
       it('calls `exchangeCodeForTokens` if response contains "code"', async () => {
-        const res = await handleOAuthResponse(sdk, undefined, { code: 'blah' }, undefined);
+        const res = await handleOAuthResponse(sdk, {}, { code: 'blah' }, undefined);
         expect(exchangeCodeForTokens).toHaveBeenCalledWith(sdk, {
           authorizationCode: 'blah',
           interactionCode: undefined
@@ -178,7 +178,7 @@ describe('handleOAuthResponse', () => {
 
     describe('Interaction code flow', () => {
       it('calls `exchangeCodeForTokens` if response contains "interaction_code"', async () => {
-        const res = await handleOAuthResponse(sdk, undefined, { 'interaction_code': 'blah' }, undefined);
+        const res = await handleOAuthResponse(sdk, {}, { 'interaction_code': 'blah' }, undefined);
         expect(exchangeCodeForTokens).toHaveBeenCalledWith(sdk, {
           authorizationCode: undefined,
           interactionCode: 'blah'
