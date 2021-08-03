@@ -18,7 +18,7 @@ class UserHome {
   get email() { return '#claim-email'; }
   get logoutButton() { return '#logout-button'; }
 
-  get profileButton() { return '#profile-button' }
+  get profileButton() { return '#profile-button'; }
 }
 
 export default new UserHome();
