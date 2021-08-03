@@ -1758,10 +1758,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@okta/okta-idx-js@0.18.0":
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.18.0.tgz#a419c915a68bcb925da33fe57a651826f681c57a"
-  integrity sha512-r6MZ7SMY/KwKVxDv0CuBR5QS5Iy6NsZCEC/zHqNpgXCd0GcKJPqrAt/xDWkp9oUccZrXI4PauU6zHnFSHLJEag==
+"@okta/okta-idx-js@0.19.0":
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.19.0.tgz#f54a6692e530c481d41fac8f4e6d9d1f07683ff5"
+  integrity sha512-gtgPXIA5w/fQH5rqI1ZjrMhTE+seKSj1Xb5ryzeqW/+1YIo630pzk/JPZ1Svc8yth92uxN9M9wJLTYyUcdzI5w==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@babel/runtime-corejs3" "^7.12.5"

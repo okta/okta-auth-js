@@ -32,9 +32,9 @@ async function openImplicit(options) {
   });
 }
 
-async function openPKCE(options) {
+async function openPKCE(options, openInNewWindow) {
   options = Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: true }, options);
-  await TestApp.open(options);
+  await TestApp.open(options, openInNewWindow);
   await TestApp.pkceOption.then(el => el.isSelected()).then(isSelected => {
     assert(isSelected);
   });

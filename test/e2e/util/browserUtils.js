@@ -18,19 +18,19 @@ const ISSUER = process.env.ISSUER;
 const issuer = URL.parse(ISSUER);
 const BASE_URL = issuer.protocol + '//' + issuer.host;
 
-function getIssuer() {
+export function getIssuer() {
   return ISSUER;
 }
 
-function getBaseUrl() {
+export function getBaseUrl() {
   return BASE_URL;
 }
 
-async function openOktaHome() {
+export async function openOktaHome() {
   return browser.newWindow(BASE_URL, 'Okta-hosted page');
 }
 
-async function switchToPopupWindow(existingHandlesCount) {
+export async function switchToPopupWindow(existingHandlesCount) {
   await browser.waitUntil(async () => {
     const handles = await browser.getWindowHandles();
     return handles.length > existingHandlesCount;
@@ -39,22 +39,22 @@ async function switchToPopupWindow(existingHandlesCount) {
   return browser.switchToWindow(handles[handles.length - 1]);
 }
 
-async function switchToMainWindow() {
+export async function switchToMainWindow() {
   const handles = await browser.getWindowHandles();
   return browser.switchToWindow(handles[0]);
 }
 
-async function switchToLastFocusedWindow() {
+export async function switchToSecondWindow() {
+  const handles = await browser.getWindowHandles();
+  return browser.switchToWindow(handles[1]);
+}
+
+export async function switchToLastFocusedWindow() {
   const handles = await browser.getWindowHandles();
   return browser.switchToWindow(handles[handles.length - 2]);
 }
 
-export { 
-  getIssuer,
-  getBaseUrl,
-  openOktaHome, 
-  switchToMainWindow, 
-  switchToPopupWindow,
-  switchToLastFocusedWindow
-};
-  
+export async function reloadWindow() {
+  const url = await browser.getUrl();
+  await browser.url(url);
+}

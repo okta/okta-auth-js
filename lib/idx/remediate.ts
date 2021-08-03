@@ -173,7 +173,11 @@ export async function remediate(
   values: RemediationValues,
   options: RunOptions
 ): Promise<RemediationResponse> {
-  let { neededToProceed } = idxResponse;
+  let { neededToProceed, interactionCode } = idxResponse;
+  // If the response contains an interaction code, there is no need to remediate
+  if (interactionCode) {
+    return { idxResponse };
+  }
   const { flow, flowMonitor } = options;
   const actionFromValues = getActionFromValues(values);
   const actions = [
