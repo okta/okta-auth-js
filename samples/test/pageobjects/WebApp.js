@@ -75,7 +75,6 @@ class WebApp {
   async assertAccessToken() {
     await this.waitForAccessToken();
     await this.accessToken.then(el => el.getText()).then(txt => {
-      console.log('_______debug_______', txt)
       assert(txt.indexOf('expires_in') > 0);
     });
   }
