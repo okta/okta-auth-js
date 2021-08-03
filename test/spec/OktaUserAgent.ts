@@ -1,9 +1,14 @@
 import { OktaUserAgent } from '../../lib/OktaUserAgent';
 
-let mockIsBrowserReturnValue;
-jest.mock('../../lib/features', () => ({
-  isBrowser: jest.fn().mockImplementation(() => mockIsBrowserReturnValue)
-}));
+jest.mock('../../lib/features', () => {
+  return {
+    isBrowser: () => {}
+  };
+});
+
+const mocked = {
+  features: require('../../lib/features')
+};
 
 describe('OktaUserAgent', () => {
   let oktaUserAgent;
@@ -15,7 +20,7 @@ describe('OktaUserAgent', () => {
 
   describe('browser env', () => {
     beforeEach(() => {
-      mockIsBrowserReturnValue = true;
+      jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(true);
     });
     it('gets okta-auth-js and node info in the Okta UA by default', () => {
       const httpHeader = oktaUserAgent.getHttpHeader();
@@ -35,7 +40,7 @@ describe('OktaUserAgent', () => {
   describe('node env', () => {
     let nodeVersion = process.versions.node;
     beforeEach(() => {
-      mockIsBrowserReturnValue = false;
+      jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(false);
     });
     it('gets okta-auth-js and node info in the Okta UA by default', () => {
       const httpHeader = oktaUserAgent.getHttpHeader();
