@@ -12,7 +12,7 @@
 
 
 /* eslint-disable max-len */
-class OktaLogin {
+class OktaHome {
   get userMenu() { return $('[data-se="user-menu"] > a.link-button');}
   get signOutBtn() { return $('[data-se="user-menu"] a[data-se="logout-link"]'); }
   get popUpCloseButton() { return $('a[data-role="close-button"]'); }
@@ -41,4 +41,4 @@ class OktaLogin {
   }
 }
 
-export default new OktaLogin();
+export default new OktaHome();

@@ -76,8 +76,9 @@ class TestApp {
   // Widget
   get signinWidget() { return $('#widget .primary-auth'); }
   
-  async open(queryObj) {
-    await browser.url(toQueryString(queryObj));
+  async open(queryObj, openInNewWindow) {
+    const qs = toQueryString(queryObj);
+    await openInNewWindow ? browser.newWindow(qs, { windowFeatures: 'noopener=yes' }) : browser.url(qs);
     await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
   }
 
@@ -138,15 +139,17 @@ class TestApp {
   }
 
   async getUserInfo() {
-    await browser.waitUntil(async () => this.getUserInfoBtn.then(el => {
-      // Was facing an issue where click would not work without using browser.pause to add a delay
+    await browser.waitUntil(async () => {
+      const el = await this.getUserInfoBtn;
+
+      // Facing an issue where click sometimes does not work without using browser.pause to add a delay
       // Clicking directly in javascript solves the issue.
       // It may be related to webdriver logic which is to scroll to the element.
       if (el.isDisplayed()) {
-        browser.execute('arguments[0].click();', el);
+        await browser.execute('arguments[0].click();', el);
         return true;
       }
-    }), 5000, 'wait for get user info btn');
+    }, 5000, 'wait for get user info btn');
   }
 
   async returnHome() {

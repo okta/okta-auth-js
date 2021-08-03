@@ -33,7 +33,7 @@ function assertImplicit(url, responseMode) {
   assert(str.indexOf('id_token' > 0));
 }
 
-async function handleCallback(flow, responseMode) {
+export async function handleCallback(flow, responseMode) {
   await TestApp.waitForCallback();
   const url = await browser.getUrl();
   (flow === 'pkce') ? assertPKCE(url, responseMode) : assertImplicit(url, responseMode);
@@ -43,7 +43,7 @@ async function handleCallback(flow, responseMode) {
   return url;
 }
 
-async function loginPopup() {
+export async function loginPopup() {
   const existingHandlesCount = (await browser.getWindowHandles()).length;
   await TestApp.loginPopup();
   await switchToPopupWindow(existingHandlesCount);
@@ -58,20 +58,21 @@ async function loginPopup() {
   await TestApp.assertLoggedIn();
 }
 
-async function loginRedirect(flow, responseMode) {
+export async function loginRedirect(flow, responseMode) {
   await TestApp.loginRedirect();
   await OktaLogin.signin(USERNAME, PASSWORD);
   return handleCallback(flow, responseMode);
 }
 
-async function loginDirect(flow) {
-  await TestApp.username.then(el => el.setValue(USERNAME));
-  await TestApp.password.then(el => el.setValue(PASSWORD));
+export async function loginDirect(setCredentials = true) {
+  if (setCredentials) {
+    await TestApp.username.then(el => el.setValue(USERNAME));
+    await TestApp.password.then(el => el.setValue(PASSWORD));
+  }
   await TestApp.loginDirect();
-  return handleCallback(flow);
 }
 
-async function loginWidget(flow, forceRedirect=false) {
+export async function loginWidget(flow, forceRedirect=false) {
   await TestApp.showLoginWidget();
 
   // OIE widget is only displayed for direct auth with PKCE even with OIE enabled orgs
@@ -88,7 +89,7 @@ async function loginWidget(flow, forceRedirect=false) {
   await TestApp.assertLoggedIn();
 }
 
-async function loginWidgetFacebook(flow, forceRedirect) {
+export async function loginWidgetFacebook(flow, forceRedirect) {
   await TestApp.loginRedirect();
   await OktaLogin.signinFacebook(FB_USERNAME, FB_PASSWORD);
 
@@ -97,5 +98,3 @@ async function loginWidgetFacebook(flow, forceRedirect) {
   }
   await TestApp.assertLoggedIn();
 }
-
-export { loginWidget, loginDirect, loginPopup, loginRedirect, loginWidgetFacebook };

@@ -22,7 +22,9 @@ import {
   AuthTransaction, 
   TokenParams,
   isInteractionRequired,
-  isInteractionRequiredError, isAuthorizationCodeError
+  isInteractionRequiredError, isAuthorizationCodeError,
+  IdxStatus,
+  IdxTransaction
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -247,22 +249,58 @@ class TestApp {
     // Make sure we are starting a fresh transaction
     this.oktaAuth.storageManager.getTransactionStorage().clearStorage();
 
+    // username and password may be empty, in which case SSO login will be attempted
     const username = (document.getElementById('username') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
-    return this.oktaAuth.signIn({username, password})
-    .then((res: AuthTransaction) => {
-      if (res.status === 'SUCCESS') {
-        saveConfigToStorage(this.config);
-        return this.oktaAuth.token.getWithRedirect({
-          sessionToken: res.sessionToken,
-          responseType: this.config.responseType
-        });
+
+    const { useInteractionCodeFlow } = this.config;
+    let tokens;
+    if (useInteractionCodeFlow) {
+      tokens = await this.getTokensDirectOIE(username, password);
+    } else {
+      // V1 flow
+      tokens = await this.getTokensDirectV1(username, password);
+    }
+
+    if (tokens) {
+      this.oktaAuth.tokenManager.setTokens(tokens);
+    }
+
+    await this.render();
+  }
+
+  async getTokensDirectOIE(username: string, password: string): Promise<Tokens>  {
+    let tokens;
+    const idxTransaction: IdxTransaction = await this.oktaAuth.idx.authenticate({ username, password });
+    if (idxTransaction.status === IdxStatus.SUCCESS) {
+      tokens = idxTransaction.tokens;
+    } else {
+      this.renderError(new Error(JSON.stringify(idxTransaction.error)));
+    }
+    return tokens;
+  }
+
+  async getTokensDirectV1(username: string, password: string): Promise<Tokens>  {
+    let sessionToken;
+    let tokens;
+    if (username || password) {
+      const v1Transaction: AuthTransaction = await this.oktaAuth.signIn({ username, password });
+      if (v1Transaction.status === 'SUCCESS') {
+        sessionToken = v1Transaction.sessionToken;
+      } else {
+        this.renderError(new Error(`Transaction returned status: ${v1Transaction.status}`));
       }
-    })
-    .catch((e: Error) => {
-      this.renderError(e);
-      throw e;
+    }
+    // No username or password? try getWithoutPrompt
+    const res = await this.oktaAuth.token.getWithoutPrompt({
+      sessionToken
     });
+    if (res.tokens) {
+      tokens = res.tokens;
+    } else {
+      this.renderError(new Error('Tokens were not returned in response: ' + JSON.stringify(res)));
+    }
+    return tokens;
   }
 
   async loginRedirect(options: TokenParams): Promise<void> {
