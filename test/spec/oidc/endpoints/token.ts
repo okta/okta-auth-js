@@ -10,11 +10,21 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+jest.mock('../../../../lib/http', () => {
+  const actual = jest.requireActual('../../../../lib/http');
+  return {
+    httpRequest: actual.httpRequest,
+    post: actual.post,
+    setRequestHeader: actual.setRequestHeader
+  };
+});
+
+const mocked = {
+  http: require('../../../../lib/http')
+};
 
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
-import http from '../../../../lib/http';
-
 import { postToTokenEndpoint } from '../../../../lib/oidc/endpoints/token';
 import factory from '@okta/test.support/factory';
 
@@ -91,7 +101,7 @@ describe('token endpoint', function() {
     });
 
     it('Does not throw if options are valid', function() {
-      var httpRequst = jest.spyOn(http, 'httpRequest').mockImplementation();
+      var httpRequst = jest.spyOn(mocked.http, 'httpRequest').mockImplementation();
       var urls = {
         tokenUrl: 'http://superfake'
       };

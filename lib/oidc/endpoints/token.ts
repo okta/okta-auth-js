@@ -14,7 +14,7 @@
 import { AuthSdkError } from '../../errors';
 import { CustomUrls, OAuthParams, OAuthResponse, RefreshToken, TokenParams } from '../../types';
 import { removeNils, toQueryString } from '../../util';
-import http from '../../http';
+import { httpRequest } from '../../http';
 
 function validateOptions(options: TokenParams) {
   // Quick validation
@@ -68,7 +68,7 @@ export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls)
     'Content-Type': 'application/x-www-form-urlencoded'
   };
 
-  return http.httpRequest(sdk, {
+  return httpRequest(sdk, {
     url: urls.tokenUrl,
     method: 'POST',
     args: data,
@@ -77,7 +77,7 @@ export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls)
 }
 
 export function postRefreshToken(sdk, options: TokenParams, refreshToken: RefreshToken): Promise<OAuthResponse> {
-  return http.httpRequest(sdk, {
+  return httpRequest(sdk, {
     url: refreshToken.tokenUrl,
     method: 'POST',
     headers: {

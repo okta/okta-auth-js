@@ -11,7 +11,7 @@
  *
  */
 
-import http from '../http';
+import { get } from '../http';
 import { find, omit, toQueryString, clone, isObject } from '../util';
 import AuthSdkError from '../errors/AuthSdkError';
 import { TransactionState } from './TransactionState';
@@ -125,7 +125,7 @@ function link2fn(sdk, res, obj, link, ref) {
 
       case 'GET':
         return function() {
-          return http.get(sdk, link.href, { withCredentials: true });
+          return get(sdk, link.href, { withCredentials: true });
         };
 
       case 'POST':

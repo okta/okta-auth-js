@@ -51,6 +51,11 @@ export interface APIError {
   errorCauses?: string[];
 }
 
+// HTTP API
+export interface HttpAPI {
+  setRequestHeader(name: string, value: string): void;
+}
+
 // Transaction API
 
 export type TransactionExistsFunction = () => boolean;

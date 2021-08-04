@@ -10,13 +10,24 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+jest.mock('../../../lib/http', () => {
+  const actual = jest.requireActual('../../../lib/http');
+  return {
+    httpRequest: actual.httpRequest,
+    get: actual.get,
+    setRequestHeader: actual.setRequestHeader
+  };
+});
+
+const mocked = {
+  http: require('../../../lib/http')
+};
 
 import { OktaAuth } from '@okta/okta-auth-js';
 import TransactionManager from '../../../lib/TransactionManager';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
-import http from '../../../lib/http';
 import { isInteractionRequiredError } from '../../../lib/oidc';
 
 describe('token.parseFromUrl', function() {
@@ -30,7 +41,7 @@ describe('token.parseFromUrl', function() {
       redirectUri
     });
     spyOn(TransactionManager.prototype, 'clear').and.callThrough();
-    spyOn(http, 'httpRequest').and.returnValue(Promise.resolve(response));
+    spyOn(mocked.http, 'httpRequest').and.returnValue(Promise.resolve(response));
   }
 
   it('authorization_code: Will return code', function() {
