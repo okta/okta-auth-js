@@ -1784,15 +1784,16 @@
     rasha "^1.2.5"
     safe-flat "^2.0.2"
 
-"@okta/okta-signin-widget@^5.8.2":
-  version "5.8.2"
-  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.8.2.tgz#3d3cf1ed608b1b96a33fbf4bc9c733b69e9c586c"
-  integrity sha512-8mcxAwxa5sl8hGucAgGzUgjv4/C8vbh8GhYRwBl+okvGLbYnTXcbcdZOj2sibTDsqzuoZzsPMO+J4iOv6rnWww==
+"@okta/okta-signin-widget@^5.9.1":
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.9.1.tgz#0563165791b0dc01e0e2c768c234778ca66bb22c"
+  integrity sha512-NHe5Xa+WV4eGseixPbIFULS9cFhm7QZb4n3evniod5Oe5gEJsyU4w8OhP7B9k3QCIJMSNI3/Q9DB0OCjtgp4nQ==
   dependencies:
     "@babel/polyfill" "^7.10.1"
     "@babel/runtime" "^7.10.3"
     cross-fetch "^3.0.4"
     handlebars "^4.5.3"
+    jquery "^3.6.0"
     q "1.4.1"
     u2f-api-polyfill "0.4.3"
     underscore "1.13.1"
@@ -10019,6 +10020,11 @@ jest@^26.6.3:
     "@jest/core" "^26.6.3"
     import-local "^3.0.2"
     jest-cli "^26.6.3"
+
+jquery@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.0.tgz#c72a09f15c1bdce142f49dbf1170bdf8adac2470"
+  integrity sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==
 
 js-cookie@2.2.1:
   version "2.2.1"
