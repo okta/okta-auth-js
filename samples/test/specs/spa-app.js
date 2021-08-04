@@ -12,20 +12,20 @@
 
 
 import {
-  toQueryString,
   getSampleConfig,
   getConfig,
 } from '../util';
 import startApp from '../support/action/startApp';
 import checkProfile from '../support/check/checkProfile';
 import checkNoProfile from '../support/check/checkNoProfile';
+import checkNoWidget from '../support/check/checkNoWidget';
 import clickProfile from '../support/action/clickProfile';
 import loginDirect from '../support/action/loginDirect';
 import loginWidget from '../support/action/loginWidget';
 import loginRedirect from '../support/action/loginRedirect';
 import logoutRedirect from '../support/action/logoutRedirect';
 import openRedirectUrl from '../support/action/openRedirectUrl';
-import checkSocialLoginButton from '../support/action/checkSocialLoginButton';
+import checkSocialLoginButton from '../support/check/checkSocialLoginButton';
 
 const sampleConfig = getSampleConfig();
 const config = getConfig();
@@ -72,20 +72,17 @@ describe('spa-app: ' + sampleConfig.name, () => {
       await logoutRedirect();
     });
   
-    // TODO: enable this test
-    // it('does not show the widget when receiving error=access_denied on redirect', async () => {
-    //   await startApp('/', {
-    //     flow: 'widget'
-    //   });
-    //   await browser.url(sampleConfig.redirectPath + toQueryString(Object.assign({
-    //     error: 'access_denied',
-    //     flow: 'widget'
-    //   }, config)));
+    it('does not show the widget when receiving error=access_denied on redirect', async () => {
+      await startApp('/', {
+        flow: 'widget'
+      });
+      await openRedirectUrl(sampleConfig.redirectPath, config, {
+        error: 'access_denied',
+        flow: 'widget'
+      });
 
-    //   await loginWidget();
-    //   await checkProfile();
-    //   await logoutRedirect();
-    // });
+      await checkNoWidget();
+    });
 
     it('shows the widget when receiving error=interaction_required on redirect', async () => {
       await startApp('/', {
