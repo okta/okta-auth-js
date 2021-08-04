@@ -15,6 +15,6 @@ import clickElement from './clickElement';
 import UserHome from  '../selectors/UserHome';
 
 export default async () => {
-  let selector = UserHome.logoutRedirect;
+  let selector = UserHome.logoutButton;
   await clickElement('click', 'selector', selector);
 };

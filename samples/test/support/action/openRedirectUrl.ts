@@ -11,12 +11,16 @@
  */
 
 
-import { waitForPopup } from '../../util/browserUtils';
-import clickElement from './clickElement';
-import { getOktaSignInForm } from  '../../util';
+import toQueryString from '../../util/toQueryString';
 
-export default async () => {
-  const OktaSignIn = getOktaSignInForm();
-  await waitForPopup(() => clickElement('click', 'selector', OktaSignIn.signinWithFacebookBtn));
-  await waitForPopup(() => clickElement('click', 'selector', OktaSignIn.signinWithGoogleBtn));
+export default async (
+  redirectPath: string,
+  config: Record<string, string>,
+  queryParams: Record<string, string> = {}
+) => {
+  if (queryParams.flow === 'widget' && process.env.ORG_OIE_ENABLED) {
+    queryParams.useInteractionCodeFlow = 'true';
+  }
+  const url = redirectPath + toQueryString({...queryParams, ...config});
+  await browser.url(url);
 };

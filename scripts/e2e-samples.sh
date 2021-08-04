@@ -34,9 +34,10 @@ if [[ "${BACON_TASK}" == true ]]; then
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_e2e_apiKey OKTA_API_KEY
 else
   echo "Running tests against production (ok12) org"
+  export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
   export ISSUER=https://javascript-idx-sdk.okta.com/oauth2/default
   export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
-  get_secret prod/okta-sdk-vars/client_secret CLIENT_SECRET
+  get_vault_secret_key devex/js-idx-sdk-vars client_secret CLIENT_SECRET
   get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
 fi
 
