@@ -47,7 +47,7 @@
         {{#hasIdps}}
           <div id="idp-buttons" class="ui row">
             {{#idps}}
-              <button id="{{id}}" onclick="handleLoginWithIdp('{{id}}', '{{href}}')" class="ui {{class}} button">
+              <button id="{{id}}" onclick="handleLoginWithIdp(event, '{{href}}')" class="ui {{class}} button">
                 {{name}}
               </button>
             {{/idps}}
@@ -66,8 +66,8 @@
     </div>
 
     <script type="text/javascript">
-      function handleLoginWithIdp(id, href) {
-        var buttonEl = document.querySelector('#' + id);
+      function handleLoginWithIdp(event, href) {
+        var buttonEl = event.currentTarget;
         buttonEl.disabled = true;
         window.location.href = href;
       };
