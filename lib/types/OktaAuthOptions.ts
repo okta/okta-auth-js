@@ -29,11 +29,6 @@ export interface TokenManagerOptions {
   _storageEventDelay?: number;
 }
 
-export interface CustomUserAgent {
-  template?: string;
-  value?: string;
-}
-
 export interface CustomUrls {
   issuer?: string;
   authorizeUrl?: string;
@@ -58,7 +53,6 @@ export interface OktaAuthOptions extends CustomUrls {
   storageUtil?: StorageUtil;
   ajaxRequest?: object;
   httpRequestClient?: HttpRequestClient;
-  userAgent?: CustomUserAgent;
   cookies?: CookieOptions;
   transformErrorXHR?: (xhr: object) => any;
   headers?: object;

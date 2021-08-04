@@ -18,6 +18,7 @@ import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
 import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
 import { TokenManagerInterface } from './TokenManager';
+import { OktaUserAgent } from '../OktaUserAgent';
 
 import { 
   AuthenticationOptions, 
@@ -30,9 +31,9 @@ import {
 
 export interface OktaAuth {
   options: OktaAuthOptions;
-  userAgent: string;
   getIssuerOrigin(): string;
-
+  
+  _oktaUserAgent: OktaUserAgent;
   storageManager: StorageManager;
   transactionManager: TransactionManager;
   tokenManager: TokenManagerInterface;
