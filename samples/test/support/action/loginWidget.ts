@@ -18,17 +18,17 @@ import clickElement from './clickElement';
 import { getOktaSignInForm } from  '../../util';
 
 export default async (
-  options: Record<string, string | boolean> = {}
+  options: Record<string, string> = {}
 ) => {
-  const OktaSignIn = getOktaSignInForm(options.useInteractionCodeFlow as boolean);
+  const OktaSignIn = getOktaSignInForm();
   await waitForDisplayed(OktaSignIn.signinSubmitBtn);
 
   const config = getConfig();
-  const username = options.username as string || config.username;
+  const username = options.username || config.username;
   if (!username) {
     throw new Error('USERNAME was not set');
   }
-  const password = options.password as string || config.password;
+  const password = options.password || config.password;
   if (!password) {
     throw new Error('PASSWORD was not set');
   }

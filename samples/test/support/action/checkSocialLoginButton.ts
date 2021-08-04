@@ -11,14 +11,12 @@
  */
 
 
-import { getAppUrl } from '../../util/appUtils';
+import checkIfElementExists from '../lib/checkIfElementExists';
 
 export default async (
-  url = '/',
-  queryParams: Record<string, string> = {}
+  className: string,
+  idpId: string
 ) => {
-  if (queryParams.flow === 'widget' && process.env.ORG_OIE_ENABLED) {
-    queryParams.useInteractionCodeFlow = 'true';
-  }
-  await browser.url(getAppUrl(url, queryParams));
+  const selector = `.${className}[href*="/sso/idps/${idpId}"]`;
+  await checkIfElementExists(selector);
 };

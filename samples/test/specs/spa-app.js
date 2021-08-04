@@ -24,7 +24,8 @@ import loginDirect from '../support/action/loginDirect';
 import loginWidget from '../support/action/loginWidget';
 import loginRedirect from '../support/action/loginRedirect';
 import logoutRedirect from '../support/action/logoutRedirect';
-// import clickSocialLoginButtons from '../support/action/clickSocialLoginButtons';
+import openRedirectUrl from '../support/action/openRedirectUrl';
+import checkSocialLoginButton from '../support/action/checkSocialLoginButton';
 
 const sampleConfig = getSampleConfig();
 const config = getConfig();
@@ -74,49 +75,39 @@ describe('spa-app: ' + sampleConfig.name, () => {
     // TODO: enable this test
     // it('does not show the widget when receiving error=access_denied on redirect', async () => {
     //   await startApp('/', {
-    //     flow: 'widget',
-    //     useInteractionCodeFlow: false
+    //     flow: 'widget'
     //   });
     //   await browser.url(sampleConfig.redirectPath + toQueryString(Object.assign({
     //     error: 'access_denied',
-    //     flow: 'widget',
-    //     useInteractionCodeFlow: false
+    //     flow: 'widget'
     //   }, config)));
 
-    //   await loginWidget({
-    //     useInteractionCodeFlow: false
-    //   });
+    //   await loginWidget();
     //   await checkProfile();
     //   await logoutRedirect();
     // });
 
     it('shows the widget when receiving error=interaction_required on redirect', async () => {
       await startApp('/', {
-        flow: 'widget',
-        useInteractionCodeFlow: false
+        flow: 'widget'
       });
-      await browser.url(sampleConfig.redirectPath + toQueryString(Object.assign({
+      await openRedirectUrl(sampleConfig.redirectPath, config, {
         error: 'interaction_required',
         flow: 'widget'
-      }, config)));
-
-      await loginWidget({
-        useInteractionCodeFlow: false
       });
+
+      await loginWidget();
       await checkProfile();
       await logoutRedirect();
     });
 
-    // TODO: enable this test
-    // it('show social login buttons in self-hosted widget', async () => {
-    //   await startApp('/', {
-    //     flow: 'widget',
-    //     useInteractionCodeFlow: false,
-    //     idps: 'Facebook:111 Google:222'
-    //   });
-    //   await clickSocialLoginButtons({
-    //     useInteractionCodeFlow: false
-    //   });
-    // });
+    it('show social login buttons in self-hosted widget', async () => {
+      await startApp('/', {
+        flow: 'widget',
+        idps: 'Facebook:111 Google:222'
+      });
+      await checkSocialLoginButton('social-auth-facebook-button', '111');
+      await checkSocialLoginButton('social-auth-google-button', '222');
+    });
   }
 });
