@@ -1,5 +1,5 @@
 {
-  "name": "okta-auth-js-samples-test",
+  "name": "@okta/test.e2e.samples",
   "version": "1.0.0",
   "main": "index.js",
   "license": "Apache-2.0",
@@ -10,7 +10,7 @@
     "cucumber": "wdio run cucumber.wdio.conf.ts",
     "start:cucumber": "RUN_CUCUMBER_TESTS=1 yarn start",
     "test:specs": "node ./runner",
-    "test:features": "RUN_CUCUMBER_TESTS=1 yarn node ./runner"
+    "test:features": "RUN_CUCUMBER_TESTS=1 node ./runner"
   },
   "engines": {
     "node": ">=11.0",

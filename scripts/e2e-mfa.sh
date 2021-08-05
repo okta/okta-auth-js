@@ -9,17 +9,21 @@ export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
-export USERNAME=george@acme.com
+export USERNAME=email-login@email.ghostinspector.com
 get_secret prod/okta-sdk-vars/password PASSWORD
+get_vault_secret_key devex/auth-js-sdk-vars security_question_answer SECURITY_QUESTION_ANSWER
+get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY
 
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
-export CLIENT_ID=0oa1xyzajgPFGWlLP4x7
+# This client has MFA (security question) enabled
+export CLIENT_ID=0oa41zpqqxar7OFl84x7
+export MFA_ENABLED=true
 
 # Run the tests
 if ! yarn test:e2e; then
-  echo "e2e tests failed! Exiting..."
+  echo "MFA e2e tests failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
 

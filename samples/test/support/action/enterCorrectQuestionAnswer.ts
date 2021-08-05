@@ -11,11 +11,13 @@
  */
 
 
-class SelectAuthenticator {
-  get pageTitle() {return '#select-authenticator-page-title-header';}
-  get options() { return '#authenticator-options';  }
-  get submit() { return '#select-authenticator-form button[type=submit]';}
-  get skip() { return '#skip-button'; }
-}
+import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
+import setInputField from './setInputField';
+import ActionContext from '../context';
+import { getConfig } from '../../util/configUtils';
 
-export default new SelectAuthenticator(); 
+export default async function (this: ActionContext) {
+  const config = getConfig();
+  const answer = config.securityQuestionAnswer || '';
+  await setInputField('set', answer, ChallengeAuthenticator.answer);
+}

@@ -14,7 +14,8 @@
 class ChallengeAuthenticator {
   get pageTitle() { return '#page-title-header'; }
   get code() { return '#authenticator-code-input'; }
-  get submit() { return '#challenge-authenticator-form #submit-button'; }
+  get answer() { return '#challenge-authenticator-form input[name=answer]'; }
+  get submit() { return '#challenge-authenticator-form button[type=submit]'; }
   get resend() { return '#resend-code-form #resend-button'; }
 }
 
