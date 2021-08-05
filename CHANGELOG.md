@@ -2,6 +2,11 @@
 
 ## 5.3.0
 
+
+### Features
+
+- [#891](https://github.com/okta/okta-auth-js/pull/891) Adds new method `http.setRequestHeader`
+
 ### Bug Fixes
 
 - [#852](https://github.com/okta/okta-auth-js/pull/852) Skips non-successful requests cacheing
