@@ -310,6 +310,8 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction> {
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {
+      options = options || {};
+      options.withCredentials = true;
       delete opts.sendFingerprint;
       return postToTransaction(this, '/api/v1/authn', opts, options);
     };

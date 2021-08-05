@@ -1,5 +1,5 @@
 {
-  "name": "static-spa",
+  "name": "@okta/samples.static-spa",
   "private": true,
   "version": "1.0.0",
   "main": "index.js",

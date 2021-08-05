@@ -34,14 +34,13 @@ function runNextTask() {
 }
 
 function runWithConfig(sampleConfig) {
-  const { name } = sampleConfig;
-  const sampleDir = `../generated/${name}`;
+  const { pkgName } = sampleConfig;
   const port = sampleConfig.port || 8080;
 
   // 1. start the sample's web server
   const server = spawn('yarn', [
-    '--cwd',
-    sampleDir,
+    'workspace',
+    pkgName,
     'start'
   ], { stdio: 'inherit' });
 
@@ -96,29 +95,32 @@ if (testName) {
 } else {
   // Run all tests
   tasks = [];
-  config.getSampleNames().map(sampleName => {
+  config.getSampleNames()
+  .filter(sampleName => {
     const sampleConfig = config.getSampleConfig(sampleName);
     if (process.env.RUN_CUCUMBER_TESTS) {
       const features = sampleConfig.features || [];
       if (!features.length) {
-        return;
+        return false;
       }
-    } else {
-      const specs = sampleConfig.specs || [];
-      if (!specs.length) {
-        return;
-      }
+    } 
+    const specs = sampleConfig.specs || [];
+    if (!specs.length) {
+      return false;
     }
+    return true;
+  })
+  .map(sampleName => {
     const task = () => {
       return new Promise((resolve) => {
-        console.log(`Spawning runner for "${sampleConfig.name}"`);
+        console.log(`Spawning runner for "${sampleName}"`);
         let opts = process.argv.slice(2); // pass extra arguments through
         const runner = spawn('node', [
           './runner.js'
         ].concat(opts), { 
           stdio: 'inherit',
           env: Object.assign({}, process.env, {
-            'SAMPLE_NAME': sampleConfig.name
+            'SAMPLE_NAME': sampleName
           })
         });
         runner.on('error', function (err) {

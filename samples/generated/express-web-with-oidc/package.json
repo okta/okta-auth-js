@@ -1,5 +1,5 @@
 {
-  "name": "express-web-with-oidc",
+  "name": "@okta/samples.express.web-with-oidc",
   "private": true,
   "version": "1.0.0",
   "main": "index.js",

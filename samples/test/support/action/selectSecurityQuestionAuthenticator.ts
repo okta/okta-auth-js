@@ -11,11 +11,11 @@
  */
 
 
-class SelectAuthenticator {
-  get pageTitle() {return '#select-authenticator-page-title-header';}
-  get options() { return '#authenticator-options';  }
-  get submit() { return '#select-authenticator-form button[type=submit]';}
-  get skip() { return '#skip-button'; }
-}
+import SelectAuthenticator from '../selectors/SelectAuthenticator';
+import clickElement from './clickElement';
+import selectOption from './selectOption';
 
-export default new SelectAuthenticator(); 
+export default async () => {
+  await selectOption('value', 'question', SelectAuthenticator.options);
+  await clickElement('click', 'selector', SelectAuthenticator.submit);
+};

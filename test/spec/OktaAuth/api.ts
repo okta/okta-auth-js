@@ -71,7 +71,7 @@ describe('OktaAuth (api)', function() {
     });
     it('should call "/api/v1/authn" endpoint with default options', async () => {
       await auth.signInWithCredentials(options);
-      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
+      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, { withCredentials: true });
     });
     it('should call fingerprint if has sendFingerprint in options', async () => {
       options.sendFingerprint = true;
@@ -79,7 +79,8 @@ describe('OktaAuth (api)', function() {
       delete options.sendFingerprint;
       expect(auth.fingerprint).toHaveBeenCalled();
       expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, {
-        headers: { 'X-Device-Fingerprint': 'fake fingerprint' }
+        headers: { 'X-Device-Fingerprint': 'fake fingerprint' },
+        withCredentials: true
       });
     });
   });
