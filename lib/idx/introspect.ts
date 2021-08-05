@@ -16,7 +16,7 @@ import { IdxResponse, RawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
 
-interface IntrospectOptions {
+export interface IntrospectOptions {
   interactionHandle: string;
   stateHandle?: string;
 }
