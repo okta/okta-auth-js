@@ -12,9 +12,21 @@
 
 
 /* global btoa */
+jest.mock('../../../lib/http', () => {
+  const actual = jest.requireActual('../../../lib/http');
+  return {
+    httpRequest: actual.httpRequest,
+    post: actual.post,
+    setRequestHeader: actual.setRequestHeader
+  };
+});
+
+const mocked = {
+  http: require('../../../lib/http')
+};
+
 import { OktaAuth, AccessToken } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
-import http from '../../../lib/http';
 
 function setupSync(options?) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);
@@ -60,13 +72,13 @@ describe('token.revoke', function() {
       });
   });
   it('makes a POST to /v1/revoke', function() {
-    spyOn(http, 'post').and.returnValue(Promise.resolve());
+    spyOn(mocked.http, 'post').and.returnValue(Promise.resolve());
     var clientId = 'fake-client-id';
     var oa = setupSync({ clientId: clientId });
     var accessToken = createAccessToken('fake/ &token');
     return oa.token.revoke(accessToken)
       .then(function() {
-        expect(http.post).toHaveBeenCalledWith(oa, 
+        expect(mocked.http.post).toHaveBeenCalledWith(oa, 
           'http://example.okta.com/oauth2/v1/revoke', 
           'token_type_hint=access_token&token=fake%2F%20%26token', {
             headers: {
@@ -78,7 +90,7 @@ describe('token.revoke', function() {
   });
   it('will throw if http.post rejects', function() {
     var testError = new Error('test error');
-    spyOn(http, 'post').and.callFake(function() {
+    spyOn(mocked.http, 'post').and.callFake(function() {
       return Promise.reject(testError);
     });
     var clientId = 'fake-client-id';

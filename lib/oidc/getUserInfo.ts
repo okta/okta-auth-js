@@ -13,7 +13,7 @@
  */
 import { isFunction } from '../util';
 import { AuthSdkError, OAuthError } from '../errors';
-import http from '../http';
+import { httpRequest } from '../http';
 import { AccessToken, IDToken, UserClaims, isAccessToken, isIDToken } from '../types';
 
 export async function getUserInfo(sdk, accessTokenObject: AccessToken, idTokenObject: IDToken): Promise<UserClaims> {
@@ -33,7 +33,7 @@ export async function getUserInfo(sdk, accessTokenObject: AccessToken, idTokenOb
     return Promise.reject(new AuthSdkError('getUserInfo requires an ID token object'));
   }
 
-  return http.httpRequest(sdk, {
+  return httpRequest(sdk, {
     url: accessTokenObject.userinfoUrl,
     method: 'GET',
     accessToken: accessTokenObject.accessToken

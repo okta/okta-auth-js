@@ -12,7 +12,7 @@
  */
 
 /* eslint complexity:[0,8] */
-import http from '../http';
+import { post } from '../http';
 import { toQueryString } from '../util';
 import {
   getOAuthUrls,
@@ -52,7 +52,7 @@ export function revokeToken(sdk: OktaAuth, token: RevocableToken): Promise<any> 
         token: refreshToken || accessToken,
       }).slice(1);
       var creds = clientSecret ? btoa(`${clientId}:${clientSecret}`) : btoa(clientId);
-      return http.post(sdk, revokeUrl, args, {
+      return post(sdk, revokeUrl, args, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Authorization': 'Basic ' + creds

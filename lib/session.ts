@@ -12,7 +12,7 @@
  */
 /* global window */
 import { omit, getLink, toQueryString } from './util';
-import http from './http';
+import { get, post, httpRequest } from './http';
 
 function sessionExists(sdk) {
   return sdk.session.get()
@@ -28,16 +28,16 @@ function sessionExists(sdk) {
 }
 
 function getSession(sdk) { 
-  return http.get(sdk, '/api/v1/sessions/me', { withCredentials: true })
+  return get(sdk, '/api/v1/sessions/me', { withCredentials: true })
   .then(function(session) {
     var res = omit(session, '_links');
 
     res.refresh = function() {
-      return http.post(sdk, getLink(session, 'refresh').href, {}, { withCredentials: true });
+      return post(sdk, getLink(session, 'refresh').href, {}, { withCredentials: true });
     };
 
     res.user = function() {
-      return http.get(sdk, getLink(session, 'user').href, { withCredentials: true });
+      return get(sdk, getLink(session, 'user').href, { withCredentials: true });
     };
 
     return res;
@@ -49,7 +49,7 @@ function getSession(sdk) {
 }
 
 function closeSession(sdk) {
-  return http.httpRequest(sdk, {
+  return httpRequest(sdk, {
     url: sdk.getIssuerOrigin() + '/api/v1/sessions/me',
     method: 'DELETE',
     withCredentials: true
@@ -57,7 +57,7 @@ function closeSession(sdk) {
 }
 
 function refreshSession(sdk) {
-  return http.post(sdk, '/api/v1/sessions/me/lifecycle/refresh', {}, { withCredentials: true });
+  return post(sdk, '/api/v1/sessions/me/lifecycle/refresh', {}, { withCredentials: true });
 }
 
 function setCookieAndRedirect(sdk, sessionToken, redirectUrl) {

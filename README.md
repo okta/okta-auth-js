@@ -866,6 +866,8 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
   * [authStateManager.updateAuthState](#authstatemanagerupdateauthstate)
   * [authStateManager.subscribe](#authstatemanagersubscribehandler)
   * [authStateManager.unsubscribe](#authstatemanagerunsubscribehandler)
+* [http](#http)
+  * [http.setRequestHeader](#httpsetrequestheader)
 
 ------
 
@@ -2644,6 +2646,14 @@ var config = {
 
 var authClient = new OktaAuth(config);
 ```
+
+### `http`
+
+The `http` API allows customization of network requests made by internal HTTP agents.
+
+#### `http.setRequestHeader`
+
+Sets the value for a request header after [configuration options](#configuration-options) have already been processed. Headers can also be customized by setting a `headers` object in the [configuration](#configuration-options) object.
 
 ### Supported APIs
 

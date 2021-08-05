@@ -10,14 +10,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import http from '../../http';
+import { get } from '../../http';
 import { find } from '../../util';
 import { OktaAuth, WellKnownResponse } from '../../types';
 import AuthSdkError from '../../errors/AuthSdkError';
 
 export function getWellKnown(sdk: OktaAuth, issuer?: string): Promise<WellKnownResponse> {
   var authServerUri = (issuer || sdk.options.issuer);
-  return http.get(sdk, authServerUri + '/.well-known/openid-configuration', {
+  return get(sdk, authServerUri + '/.well-known/openid-configuration', {
     cacheResponse: true
   });
 }
@@ -46,7 +46,7 @@ export function getKey(sdk: OktaAuth, issuer: string, kid: string): Promise<stri
     httpCache.clearStorage(jwksUri);
 
     // Pull the latest keys if the key wasn't in the cache
-    return http.get(sdk, jwksUri, {
+    return get(sdk, jwksUri, {
       cacheResponse: true
     })
     .then(function(res) {

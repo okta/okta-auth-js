@@ -43,6 +43,7 @@ import {
   SigninOptions,
   IdxAPI,
   SignoutRedirectUrlOptions,
+  HttpAPI,
 } from './types';
 import {
   transactionStatus,
@@ -88,7 +89,7 @@ import {
   clone
 } from './util';
 import { TokenManager } from './TokenManager';
-import http from './http';
+import { get, setRequestHeader } from './http';
 import PromiseQueue from './PromiseQueue';
 import fingerprint from './browser/fingerprint';
 import { AuthStateManager } from './AuthStateManager';
@@ -103,6 +104,7 @@ import {
   startTransaction,
   handleInteractionCodeRedirect,
 } from './idx';
+import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from './idx/headers';
 import { OktaUserAgent } from './OktaUserAgent';
 
 const Emitter = require('tiny-emitter');
@@ -122,6 +124,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   emitter: typeof Emitter;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
+  http: HttpAPI;
   fingerprint: FingerprintAPI;
   _oktaUserAgent: OktaUserAgent;
   _pending: { handleLogin: boolean };
@@ -245,6 +248,12 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       recoverPassword: recoverPassword.bind(null, this),
       handleInteractionCodeRedirect: handleInteractionCodeRedirect.bind(null, this),
       startTransaction: startTransaction.bind(null, this),
+    };
+    setGlobalRequestInterceptor(createGlobalRequestInterceptor(this)); // to pass custom headers to IDX endpoints
+
+    // HTTP
+    this.http = {
+      setRequestHeader: setRequestHeader.bind(null, this)
     };
 
     // Fingerprint API
@@ -465,7 +474,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
         'Accept': 'application/jrd+json'
       }
     };
-    return http.get(this, url, options);
+    return get(this, url, options);
   }
 
   //

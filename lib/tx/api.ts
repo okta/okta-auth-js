@@ -12,7 +12,7 @@
  */
 
 /* eslint-disable complexity, max-statements */
-import http from '../http';
+import { post } from '../http';
 import AuthSdkError from '../errors/AuthSdkError';
 import { STATE_TOKEN_KEY_NAME } from '../constants';
 import { addStateToken } from './util';
@@ -20,7 +20,7 @@ import { AuthTransaction } from './AuthTransaction';
 
 function transactionStatus(sdk, args) {
   args = addStateToken(sdk, args);
-  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn', args, { withCredentials: true });
+  return post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn', args, { withCredentials: true });
 }
 
 function resumeTransaction(sdk, args) {
@@ -60,7 +60,7 @@ function introspect (sdk, args) {
 function transactionStep(sdk, args) {
   args = addStateToken(sdk, args);
   // v1 pipeline introspect API
-  return http.post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn/introspect', args, { withCredentials: true });
+  return post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn/introspect', args, { withCredentials: true });
 }
 
 function transactionExists(sdk) {
@@ -69,7 +69,7 @@ function transactionExists(sdk) {
 }
 
 function postToTransaction(sdk, url, args, options?) {
-  return http.post(sdk, url, args, options)
+  return post(sdk, url, args, options)
     .then(function(res) {
       return new AuthTransaction(sdk, res);
     });

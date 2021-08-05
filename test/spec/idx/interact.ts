@@ -14,7 +14,9 @@
 import { interact } from '../../../lib/idx/interact';
 
 jest.mock('@okta/okta-idx-js', () => {
+  const actual = jest.requireActual('@okta/okta-idx-js').default;
   return {
+    client: actual.client,
     interact: () => {}
   };
 });

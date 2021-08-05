@@ -11,15 +11,15 @@
  */
 
 
-/* global USER_AGENT */
+declare var USER_AGENT: string; // set in jest config
 
-import http from '../../lib/http';
+import { httpRequest } from '../../../lib/http';
 import { 
   OktaAuth, 
   DEFAULT_CACHE_DURATION, 
   AuthApiError, 
   STATE_TOKEN_KEY_NAME 
-} from '../../lib';
+} from '../../../lib';
 
 describe('HTTP Requestor', () => {
   let sdk;
@@ -37,7 +37,7 @@ describe('HTTP Requestor', () => {
     sdk = null;
     httpRequestClient = null;
   });
-  function createAuthClient(options) {
+  function createAuthClient(options?) {
     httpRequestClient = httpRequestClient || jest.fn().mockReturnValue(Promise.resolve({
       responseText: JSON.stringify(response1)
     }));
@@ -54,7 +54,7 @@ describe('HTTP Requestor', () => {
   describe('withCredentials', () => {
     it('can be enabled', () => {
       createAuthClient();
-      return http.httpRequest(sdk, { url, withCredentials: true })
+      return httpRequest(sdk, { url, withCredentials: true })
       .then(res => {
         expect(res).toBe(response1);
         expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
@@ -72,7 +72,7 @@ describe('HTTP Requestor', () => {
   describe('headers', () => {
     it('sets defaults', () => {
       createAuthClient();
-      return http.httpRequest(sdk, { url })
+      return httpRequest(sdk, { url })
       .then(res => {
         expect(res).toBe(response1);
         expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
@@ -92,7 +92,7 @@ describe('HTTP Requestor', () => {
           'fake': 'value'
         }
       });
-      return http.httpRequest(sdk, { url })
+      return httpRequest(sdk, { url })
       .then(res => {
         expect(res).toBe(response1);
         expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
@@ -109,7 +109,7 @@ describe('HTTP Requestor', () => {
     });
     it('accepts headers on httpRequest', () => {
       createAuthClient();
-      return http.httpRequest(sdk, {
+      return httpRequest(sdk, {
         url, 
         headers: {
           'fake': 'value'
@@ -131,7 +131,7 @@ describe('HTTP Requestor', () => {
     });
     it('removes headers with undefined value', () => {
       createAuthClient();
-      return http.httpRequest(sdk, {
+      return httpRequest(sdk, {
         url, 
         headers: {
           'fake': undefined
@@ -152,7 +152,7 @@ describe('HTTP Requestor', () => {
     });
     it('can set an Authorization header using accessToken', () => {
       createAuthClient();
-      return http.httpRequest(sdk, {
+      return httpRequest(sdk, {
         url, 
         accessToken: 'fake'
       })
@@ -175,7 +175,7 @@ describe('HTTP Requestor', () => {
       jest.spyOn(sdk._oktaUserAgent, 'getHttpHeader').mockImplementation(() => ({
         'X-Okta-User-Agent-Extended': 'okta-auth-js/a.b fake/x.y'
       }));
-      return http.httpRequest(sdk, { url })
+      return httpRequest(sdk, { url })
         .then(res => {
           expect(res).toBe(response1);
           expect(sdk._oktaUserAgent.getHttpHeader).toHaveBeenCalledTimes(1);
@@ -206,7 +206,7 @@ describe('HTTP Requestor', () => {
         expiresAt: Math.floor(Date.now()/1000) + DEFAULT_CACHE_DURATION,
         response: response2
       });
-      return http.httpRequest(sdk, { url, cacheResponse: true })
+      return httpRequest(sdk, { url, cacheResponse: true })
         .then(res => {
           expect(res).toBe(response2);
           expect(httpRequestClient).not.toHaveBeenCalled();
@@ -215,7 +215,7 @@ describe('HTTP Requestor', () => {
     it('will update cache', () => {
       jest.spyOn(httpCache, 'updateStorage');
       jest.spyOn(Date, 'now').mockReturnValue(1000);
-      return http.httpRequest(sdk, { url, cacheResponse: true, method: 'GET' })
+      return httpRequest(sdk, { url, cacheResponse: true, method: 'GET' })
         .then(res => {
           expect(res).toBe(response1);
           expect(httpRequestClient).toHaveBeenCalledWith('GET', url, expect.any(Object));
@@ -232,7 +232,7 @@ describe('HTTP Requestor', () => {
         response: response2
       });
       httpCache.updateStorage.mockClear();
-      return http.httpRequest(sdk, { url, cacheResponse: false, method: 'GET' })
+      return httpRequest(sdk, { url, cacheResponse: false, method: 'GET' })
         .then(res => {
           expect(res).toBe(response1);
           expect(httpRequestClient).toHaveBeenCalledWith('GET', url, expect.any(Object));
@@ -248,7 +248,7 @@ describe('HTTP Requestor', () => {
       const response = { responseText: 'fake error', status: 404 };
       initWithErrorResponse(response);
       createAuthClient();
-      return http.httpRequest(sdk, { url })
+      return httpRequest(sdk, { url })
         .catch(err => {
           expect(err).toBeInstanceOf(AuthApiError);
           expect(err.errorSummary).toBe('Unknown error');
@@ -260,7 +260,7 @@ describe('HTTP Requestor', () => {
       const response = { responseText: JSON.stringify(json), status: 404 };
       initWithErrorResponse(response);
       createAuthClient();
-      return http.httpRequest(sdk, { url })
+      return httpRequest(sdk, { url })
         .catch(err => {
           expect(err).toBeInstanceOf(AuthApiError);
           expect(err.xhr).toEqual(response);
@@ -272,7 +272,7 @@ describe('HTTP Requestor', () => {
       const response = { responseText: JSON.stringify(json), status: 501 };
       initWithErrorResponse(response);
       createAuthClient();
-      return http.httpRequest(sdk, { url })
+      return httpRequest(sdk, { url })
         .catch(err => {
           expect(err).toBeInstanceOf(AuthApiError);
           expect(err.xhr).toEqual(response);
@@ -290,7 +290,7 @@ describe('HTTP Requestor', () => {
       createAuthClient({
         transformErrorXHR
       });
-      return http.httpRequest(sdk, { url })
+      return httpRequest(sdk, { url })
         .catch(err => {
           expect(err).toBeInstanceOf(AuthApiError);
           expect(err.xhr).toEqual({
@@ -307,7 +307,7 @@ describe('HTTP Requestor', () => {
       createAuthClient();
       const storage = sdk.options.storageUtil.storage;
       jest.spyOn(storage, 'delete');
-      return http.httpRequest(sdk, { url })
+      return httpRequest(sdk, { url })
         .catch(err => {
           expect(err).toBeInstanceOf(AuthApiError);
           expect(err.xhr).toEqual(response);

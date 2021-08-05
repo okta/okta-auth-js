@@ -11,7 +11,20 @@
  */
 
 
-/* global window, USER_AGENT */
+/* global window */
+
+jest.mock('../../lib/http', () => {
+  return {
+    get: () => {},
+    post: () => {},
+    httpRequest: () => {},
+    setRequestHeader: () => {}
+  };
+});
+
+const mocked = {
+  http: require('../../lib/http')
+};
 
 import {
   closeSession,
@@ -20,9 +33,6 @@ import {
   refreshSession,
   setCookieAndRedirect
 } from '../../lib/session';
-import http from '../../lib/http';
-import util from '@okta/test.support/util';
-import _ from 'lodash';
 
 describe('session', function() {
   var sdk;
@@ -90,15 +100,15 @@ describe('session', function() {
 
   describe('getSession', function() {
     it('Hits endpoint: /api/v1/sessions/me', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
+      jest.spyOn(mocked.http, 'get').mockReturnValue(Promise.resolve());
       return getSession(sdk)
         .then(function() {
-          expect(http.get).toHaveBeenCalledWith(sdk, '/api/v1/sessions/me', { withCredentials: true });
+          expect(mocked.http.get).toHaveBeenCalledWith(sdk, '/api/v1/sessions/me', { withCredentials: true });
         });
     });
 
     it('XHR error: returns an INACTIVE session object', function() {
-      jest.spyOn(http, 'get').mockImplementation(function() {
+      jest.spyOn(mocked.http, 'get').mockImplementation(function() {
         return Promise.reject(new Error('test error'));
       });
       return getSession(sdk)
@@ -110,7 +120,7 @@ describe('session', function() {
     });
 
     it('Adds a "refresh" method on the session object', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
+      jest.spyOn(mocked.http, 'get').mockReturnValue(Promise.resolve());
       return getSession(sdk)
         .then(function(res) {
           expect(typeof res.refresh).toBe('function');
@@ -118,7 +128,7 @@ describe('session', function() {
     });
 
     it('Adds a "user" method on the session object', function() {
-      jest.spyOn(http, 'get').mockReturnValue(Promise.resolve());
+      jest.spyOn(mocked.http, 'get').mockReturnValue(Promise.resolve());
       return getSession(sdk)
         .then(function(res) {
           expect(typeof res.user).toBe('function');
@@ -132,7 +142,7 @@ describe('session', function() {
           foo: 'bar'
         }
       };
-      jest.spyOn(http, 'get').mockImplementation(function() {
+      jest.spyOn(mocked.http, 'get').mockImplementation(function() {
         return Promise.resolve(sessionObj);
       });
       return getSession(sdk)
@@ -154,14 +164,14 @@ describe('session', function() {
           }
         }
       };
-      jest.spyOn(http, 'post').mockReturnValue(null);
-      jest.spyOn(http, 'get').mockImplementation(function() {
+      jest.spyOn(mocked.http, 'post').mockReturnValue(null);
+      jest.spyOn(mocked.http, 'get').mockImplementation(function() {
         return Promise.resolve(sessionObj);
       });
       return getSession(sdk)
         .then(function(res) {
           res.refresh();
-          expect(http.post).toHaveBeenCalledWith(sdk, href, {}, { withCredentials: true });
+          expect(mocked.http.post).toHaveBeenCalledWith(sdk, href, {}, { withCredentials: true });
         });
     });
 
@@ -174,25 +184,25 @@ describe('session', function() {
           }
         }
       };
-      jest.spyOn(http, 'get').mockImplementation(function() {
+      jest.spyOn(mocked.http, 'get').mockImplementation(function() {
         return Promise.resolve(sessionObj);
       });
       return getSession(sdk)
         .then(function(res) {
-          http.get.mockReset();
-          jest.spyOn(http, 'get').mockReturnValue(null);
+          mocked.http.get.mockReset();
+          jest.spyOn(mocked.http, 'get').mockReturnValue(null);
           res.user();
-          expect(http.get).toHaveBeenCalledWith(sdk, href, { withCredentials: true });
+          expect(mocked.http.get).toHaveBeenCalledWith(sdk, href, { withCredentials: true });
         });
     });
   });
 
   describe('closeSession', function() {
     it('makes a DELETE request to /api/v1/sessions/me', function() {
-      jest.spyOn(http, 'httpRequest').mockReturnValue(Promise.resolve());
+      jest.spyOn(mocked.http, 'httpRequest').mockReturnValue(Promise.resolve());
       return closeSession(sdk)
         .then(function() {
-          expect(http.httpRequest).toHaveBeenCalledWith(sdk, {
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(sdk, {
             url: baseUrl + '/api/v1/sessions/me',
             method: 'DELETE',
             withCredentials: true
@@ -202,7 +212,7 @@ describe('session', function() {
 
     it('will throw if http request rejects', function() {
       var testError = new Error('test error');
-      jest.spyOn(http, 'httpRequest').mockReturnValue(Promise.reject(testError));
+      jest.spyOn(mocked.http, 'httpRequest').mockReturnValue(Promise.reject(testError));
       return closeSession(sdk) // should throw
         .catch(function(e) {
           expect(e).toBe(testError);
@@ -212,15 +222,15 @@ describe('session', function() {
 
   describe('refreshSession', function() {
     it('makes a POST to /api/v1/sessions/me/lifecycle/refresh', function() {
-      jest.spyOn(http, 'post').mockReturnValue(Promise.resolve());
+      jest.spyOn(mocked.http, 'post').mockReturnValue(Promise.resolve());
       return refreshSession(sdk)
         .then(function() {
-          expect(http.post).toHaveBeenCalledWith(sdk,'/api/v1/sessions/me/lifecycle/refresh', {}, { withCredentials: true });
+          expect(mocked.http.post).toHaveBeenCalledWith(sdk,'/api/v1/sessions/me/lifecycle/refresh', {}, { withCredentials: true });
         });
     });
     it('can throw', function() {
       var testError = new Error('test error');
-      jest.spyOn(http, 'post').mockReturnValue(Promise.reject(testError));
+      jest.spyOn(mocked.http, 'post').mockReturnValue(Promise.reject(testError));
       return refreshSession(sdk)
         .catch(function(e) {
           expect(e).toBe(testError);
@@ -257,155 +267,4 @@ describe('session', function() {
     });
   });
 
-  describe('session.close', function () {
-    util.itMakesCorrectRequestResponse({
-      title: 'allows deleting a session',
-      setup: {
-        calls: [
-          {
-            request: {
-              uri: '/api/v1/sessions/me'
-            },
-            response: 'empty'
-          }
-        ]
-      },
-      execute: function (test) {
-        return test.oa.session.close();
-      },
-      expectations: function () {
-        // Assertions of the correct uri and response handling
-        // are implicitly expected when the test runs
-      }
-    });
-  });
-
-  describe('session.get', function () {
-    util.itMakesCorrectRequestResponse({
-      title: 'return ACTIVE session with refresh method on success',
-      setup: {
-        calls: [
-          {
-            request: {
-              uri: '/api/v1/sessions/me'
-            },
-            response: 'session'
-          }
-        ]
-      },
-      execute: function (test) {
-        return test.oa.session.get();
-      },
-      expectations: function (test, res) {
-        expect(res.refresh).toBeDefined();
-        expect(res.user).toBeDefined();
-        expect(_.omit(res, 'refresh', 'user')).toEqual({
-          'id': '000SFn2Do5LSEeE7ETg1JewvQ',
-          'userId': '00uih5GNExguYaK6I0g3',
-          'login': 'administrator1@clouditude.net',
-          'expiresAt': '2016-01-27T03:59:35.000Z',
-          'status': 'ACTIVE',
-          'lastPasswordVerification': '2016-01-27T01:15:39.000Z',
-          'lastFactorVerification': null,
-          'amr': ['pwd'],
-          'idp': {
-            'id': '00oigpTeBgc5cgQh50g3',
-            'type': 'OKTA'
-          },
-          'mfaActive': false
-        });
-      }
-    });
-
-    util.itMakesCorrectRequestResponse({
-      title: 'returns INACTIVE on failure',
-      setup: {
-        request: {
-          uri: '/api/v1/sessions/me'
-        },
-        response: 'error-session-not-found'
-      },
-      execute: function (test) {
-        return test.oa.session.get();
-      },
-      expectations: function (test, res) {
-        expect(res.status).toEqual('INACTIVE');
-      }
-    });
-  });
-
-  describe('modified user agent', function () {
-    util.itMakesCorrectRequestResponse({
-      title: 'should be added to requests headers',
-      setup: {
-        request: {
-          uri: '/api/v1/sessions/me',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': `${USER_AGENT} fake/x.y`
-          }
-        },
-        response: 'session'
-      },
-      execute: function (test) {
-        test.oa._oktaUserAgent.addEnvironment('fake/x.y');
-        return test.oa.session.get();
-      },
-      expectations: function () {
-        // We validate the headers for each request in our ajaxMock
-      }
-    });
-  });
-
-  describe('custom headers', function () {
-    util.itMakesCorrectRequestResponse({
-      title: 'adds custom headers',
-      setup: {
-        headers: {
-          'X-Custom-Header': 'custom'
-        },
-        request: {
-          uri: '/api/v1/sessions/me',
-          headers: {
-            'X-Custom-Header': 'custom',
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': USER_AGENT
-          }
-        },
-        response: 'session'
-      },
-      execute: function (test) {
-        return test.oa.session.get();
-      },
-      expectations: function () {
-        // We validate the headers for each request in our ajaxMock
-      }
-    });
-
-    util.itMakesCorrectRequestResponse({
-      title: 'override headers',
-      setup: {
-        headers: {
-          'X-Okta-User-Agent-Extended': 'another-sdk-version'
-        },
-        request: {
-          uri: '/api/v1/sessions/me',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'X-Okta-User-Agent-Extended': 'another-sdk-version'
-          }
-        },
-        response: 'session'
-      },
-      execute: function (test) {
-        return test.oa.session.get();
-      },
-      expectations: function () {
-        // We validate the headers for each request in our ajaxMock
-      }
-    });
-  });
 });
