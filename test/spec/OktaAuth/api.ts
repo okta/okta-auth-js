@@ -143,12 +143,11 @@ describe('OktaAuth (api)', function() {
   });
 
   describe('closeSession', function() {
-    it('Default options: clears TokenManager, closes session', function() {
+    it('Default options: closes session', function() {
       spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
       spyOn(auth.tokenManager, 'clear');
       return auth.closeSession()
         .then(function() {
-          expect(auth.tokenManager.clear).toHaveBeenCalled();
           expect(auth.session.close).toHaveBeenCalled();
         });
     });

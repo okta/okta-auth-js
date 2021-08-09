@@ -12,7 +12,7 @@
 
 
 /* eslint-disable no-new */
-/* global window */
+/* global window, document */
 
 import { 
   OktaAuth, 
@@ -171,7 +171,8 @@ describe('OktaAuth (browser)', function() {
     let origin;
     let href;
     let encodedOrigin;
-  
+    let body;
+
     beforeEach(function() {
       origin = 'https://somesite.local';
       href = `${origin}/some-route`;
@@ -187,6 +188,15 @@ describe('OktaAuth (browser)', function() {
     describe('with idToken and accessToken', () => {
       let idToken;
       let accessToken;
+
+      beforeEach(() => {
+        body = document.getElementsByTagName('body')[0];
+        jest.spyOn(body, 'appendChild').mockImplementation(function (el: HTMLFrameElement) {
+          if (el.tagName === 'IFRAME') {
+            throw new Error('IFrame failed to load');
+          }
+        });
+      });
 
       function initSpies() {
         auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ accessToken, idToken });
@@ -250,7 +260,7 @@ describe('OktaAuth (browser)', function() {
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${customToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
-  
+
       describe('postLogoutRedirectUri', function() {
         it('can be set by config', function() {
           const postLogoutRedirectUri = 'http://someother';
@@ -318,6 +328,28 @@ describe('OktaAuth (browser)', function() {
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
+      });
+
+      it('Attempts to log out through iframe', async () => {
+        jest.restoreAllMocks();
+
+        let body = document.getElementsByTagName('body')[0];
+        var origAppend = body.appendChild;
+        jest.spyOn(body, 'appendChild').mockImplementation(function (el: HTMLFrameElement) {
+          if (el.tagName === 'IFRAME') {
+            // Remove the src so it doesn't actually load
+            el.src = '';
+            return origAppend.call(this, el);
+          }
+          return origAppend.apply(this, arguments);
+        });
+
+        jest.spyOn(body, 'removeChild');
+
+        await auth.signOut();
+        expect(body.appendChild).toHaveBeenCalled();
+        expect(body.removeChild).toHaveBeenCalled();
+        expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
       });
     });
 
