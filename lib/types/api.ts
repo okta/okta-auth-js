@@ -28,7 +28,9 @@ import {
   IdxOptions,
   IdxTransaction,
 } from '../idx/types';
-
+import { InteractOptions, InteractResponse } from '../idx/interact';
+import { IntrospectOptions } from '../idx/introspect';
+import { IdxResponse } from '../idx/types/idx-js';
 export interface OktaAuth {
   options: OktaAuthOptions;
   getIssuerOrigin(): string;
@@ -250,6 +252,8 @@ export interface PkceAPI {
 }
 
 export interface IdxAPI {
+  interact: (options?: InteractOptions) => Promise<InteractResponse>;
+  introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
   authenticate: (options: AuthenticationOptions) => Promise<IdxTransaction>;
   register: (options: IdxRegistrationOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;

@@ -96,7 +96,9 @@ import { AuthStateManager } from './AuthStateManager';
 import StorageManager from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
-import { 
+import {
+  interact,
+  introspect as introspectV2,
   authenticate,
   cancel,
   register,
@@ -242,6 +244,8 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
 
     // IDX
     this.idx = {
+      interact: interact.bind(null, this),
+      introspect: introspectV2.bind(null, this),
       authenticate: authenticate.bind(null, this),
       register: register.bind(null, this),
       cancel: cancel.bind(null, this),
