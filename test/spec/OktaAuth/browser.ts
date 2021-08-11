@@ -44,6 +44,18 @@ describe('OktaAuth (browser)', function() {
     auth = new OktaAuth({ issuer, pkce: false });
   });
 
+  // TODO: remove in 6.0
+  describe('userAgent', () => {
+    let sdkVersion;
+    beforeEach(async () => {
+      sdkVersion = (await import('../../../package.json')).version;
+    });
+
+    it('initials userAgent field', () => {
+      expect(auth.userAgent).toBe(`okta-auth-js/${sdkVersion}`);
+    });
+  });
+
   describe('options', function() {
     describe('cookies', () => {
 

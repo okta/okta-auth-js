@@ -33,6 +33,7 @@ import { IntrospectOptions } from '../idx/introspect';
 import { IdxResponse } from '../idx/types/idx-js';
 export interface OktaAuth {
   options: OktaAuthOptions;
+  userAgent: string;
   getIssuerOrigin(): string;
   
   _oktaUserAgent: OktaUserAgent;

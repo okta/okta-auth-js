@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 /* SDK_VERSION is defined in webpack config */ 
-/* global window */
+/* global window, SDK_VERSION */
 
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
@@ -88,6 +88,7 @@ import {
   toAbsoluteUrl,
   clone
 } from './util';
+import { getUserAgent } from './builderUtil';
 import { TokenManager } from './TokenManager';
 import { get, setRequestHeader } from './http';
 import PromiseQueue from './PromiseQueue';
@@ -117,6 +118,10 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   transactionManager: TransactionManager;
   tx: TransactionAPI;
   idx: IdxAPI;
+  // keep this field to compatible with released downstream SDK versions
+  // TODO: remove in version 6
+  // JIRA: https://oktainc.atlassian.net/browse/OKTA-419417
+  userAgent: string;
   session: SessionAPI;
   pkce: PkceAPI;
   static features: FeaturesAPI;
@@ -169,6 +174,9 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       this.options = Object.assign(this.options, {
         redirectUri: toAbsoluteUrl(args.redirectUri, window.location.origin), // allow relative URIs
       });
+      this.userAgent = getUserAgent(args, `okta-auth-js/${SDK_VERSION}`);
+    } else {
+      this.userAgent = getUserAgent(args, `okta-auth-js-server/${SDK_VERSION}`);
     }
 
     // Digital clocks will drift over time, so the server
