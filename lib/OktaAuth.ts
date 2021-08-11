@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 /* SDK_VERSION is defined in webpack config */ 
-/* global window */
+/* global window, SDK_VERSION */
 
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 

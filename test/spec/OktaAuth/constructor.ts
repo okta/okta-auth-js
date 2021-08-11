@@ -18,6 +18,7 @@ import {
 
 jest.mock('../../../lib/features', () => {
   return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...jest.requireActual('../../../lib/features') as any,
     isBrowser: () => {}
   };
