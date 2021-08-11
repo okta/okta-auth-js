@@ -118,6 +118,9 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   transactionManager: TransactionManager;
   tx: TransactionAPI;
   idx: IdxAPI;
+  // keep this field to compatible with released downstream SDK versions
+  // TODO: remove in version 6
+  // JIRA: https://oktainc.atlassian.net/browse/OKTA-419417
   userAgent: string;
   session: SessionAPI;
   pkce: PkceAPI;

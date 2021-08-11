@@ -16,6 +16,17 @@ import {
   OktaAuth
 } from '@okta/okta-auth-js';
 
+jest.mock('../../../lib/features', () => {
+  return {
+    ...jest.requireActual('../../../lib/features') as any,
+    isBrowser: () => {}
+  };
+});
+
+const mocked = {
+  features: require('../../../lib/features')
+};
+
 describe('OktaAuth (constructor)', () => {
   const apiUrlOptions = [
     'issuer',
@@ -133,6 +144,22 @@ describe('OktaAuth (constructor)', () => {
       const config = { issuer: 'http://fake' };
       const oa = new OktaAuth(config);
       expect(oa.authStateManager).toBeDefined();
+    });
+  });
+
+  // TODO: remove in 6.0
+  describe('userAgent', () => {
+    let sdkVersion;
+    beforeEach(async () => {
+      sdkVersion = (await import('../../../package.json')).version;
+    });
+
+    // browser env is tested in "./browser.ts"
+    it('initials userAgent field for node env', () => {
+      jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(false);
+      const config = { issuer: 'http://fake' };
+      const oa = new OktaAuth(config);
+      expect(oa.userAgent).toBe(`okta-auth-js-server/${sdkVersion}`);
     });
   });
 
