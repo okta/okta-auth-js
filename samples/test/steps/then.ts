@@ -168,6 +168,11 @@ Then(
 );
 
 Then(
+  /^she is presented with an option to select Security Question to verify$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
   /^the screen changes to receive an input for a code to verify$/,
   checkIsOnPage.bind(null, 'Challenge phone authenticator')
 );
@@ -212,6 +217,11 @@ Then(
 Then(
   /^the screen changes to receive an input for a Email code$/,
   checkIsOnPage.bind(null, 'Enter Code')
+);
+
+Then(
+  /^the screen changes to challenge the Security Question$/,
+  checkIsOnPage.bind(null, 'Challenge Security Question')
 );
 
 // import checkClass from '../support/check/checkClass';

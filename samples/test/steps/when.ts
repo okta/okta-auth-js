@@ -40,6 +40,7 @@ import submitForm from '../support/action/submitForm';
 import clickLogout from '../support/action/clickLogout';
 import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
 import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
+import selectSecurityQuestionAuthenticator from '../support/action/selectSecurityQuestionAuthenticator';
 import enterIncorrectCode from '../support/action/enterIncorrectCode';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
 import enterRegistrationField from '../support/action/live-user/enterRegistrationField';
@@ -58,6 +59,7 @@ import signInIntoFacebook from '../support/action/signInIntoFacebook';
 import clickLoginWithOktaOIDCIdPInWidget from '../support/action/clickLoginWithOktaOIDCIdPInWidget';
 import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
 import loginWidget from '../support/action/loginWidget';
+import enterCorrectQuestionAnswer from '../support/action/enterCorrectQuestionAnswer';
 import ActionContext from '../support/context';
 
 When(
@@ -181,6 +183,11 @@ When(
 );
 
 When(
+  /^She inputs the correct answer for the Question$/,
+  enterCorrectQuestionAnswer
+);
+
+When(
   /^She selects "Receive a Code"$/,
   submitAnyForm
 );
@@ -223,6 +230,11 @@ When(
 When(
   /^she selects Email$/,
   selectEmailAuthenticator
+);
+
+When(
+  /^She selects Security Question from the list$/,
+  selectSecurityQuestionAuthenticator
 );
 
 When(

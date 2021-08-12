@@ -131,6 +131,7 @@
       "./",
       "env",
       "test/app",
+      "test/react-mfa-v1",
       "test/e2e",
       "test/support",
       "samples",

@@ -15,19 +15,7 @@ get_secret prod/okta-sdk-vars/password PASSWORD
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
-# This client has refresh token enabled
-export CLIENT_ID=0oapmwm72082GXal14x6
-export REFRESH_TOKEN=true
-
-# Run the tests
-if ! yarn test:e2e; then
-  echo "Refresh token e2e tests failed! Exiting..."
-  exit ${TEST_FAILURE}
-fi
-
-# This client doesn't have refresh token enabled
 export CLIENT_ID=0oa1xyzajgPFGWlLP4x7
-unset REFRESH_TOKEN
 
 # Run the tests
 if ! yarn test:e2e; then

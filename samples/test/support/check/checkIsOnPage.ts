@@ -80,6 +80,11 @@ export default async (pageName?: string) => {
       pageTitle = 'Challenge phone authenticator';
       break;
     }
+    case 'Challenge Security Question': {
+      selector = ChallengeAuthenticator.pageTitle;
+      pageTitle = 'Challenge Security Question';
+      break;
+    }
     default: {
         throw new Error(`Unknown form "${pageTitle}"`);
     }

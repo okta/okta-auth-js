@@ -11,47 +11,96 @@
  */
 
 
-/* eslint-disable no-console */
+/* eslint-disable no-console, complexity */
+const env = require('@okta/env');
 const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
+const { config, configPredicate } = require('./config');
 
-// 1. start the dev server
-const server = spawn('yarn', [
-  '--cwd',
-  '../app',
-  'start'
-], { stdio: 'inherit' });
+env.setEnvironmentVarsFromTestEnv();
 
-waitOn({
-  resources: [
-    'http-get://localhost:8080'
-  ]
-}).then(() => {
-  // 2. run webdriver based on if sauce is needed or not
-  let wdioConfig = 'wdio.conf.js';
-  if (process.env.RUN_SAUCE_TESTS) {
-    wdioConfig = 'sauce.wdio.conf.js';
+const getTask = (config) => () => {
+  return new Promise(resolve => {
+    // 1. start the dev server
+    const server = spawn('yarn', [
+      'workspace',
+      config.app,
+      'start'
+    ], { stdio: 'inherit' });
+
+    waitOn({
+      resources: [
+        'http-get://localhost:8080'
+      ]
+    }).then(() => {
+      // 2. run webdriver based on if sauce is needed or not
+      let wdioConfig = 'wdio.conf.js';
+      if (process.env.RUN_SAUCE_TESTS) {
+        wdioConfig = 'sauce.wdio.conf.js';
+      }
+
+      let opts = process.argv.slice(2); // pass extra arguments through
+      const runnerArgs = ['wdio', 'run', wdioConfig];
+      (config.spec || []).forEach(spec => {
+        runnerArgs.push('--spec');
+        runnerArgs.push(`./specs/${spec}`);
+      });
+      (config.exclude || []).forEach(spec => {
+        runnerArgs.push('--exclude');
+        runnerArgs.push(`./specs/${spec}`);
+      });
+
+      const runner = spawn(
+        'yarn', 
+        runnerArgs.concat(opts), 
+        { stdio: 'inherit' }
+      );
+
+      let returnCode = 1;
+      runner.on('exit', function (code) {
+        console.log('Test runner exited with code: ' + code);
+        returnCode = code;
+        server.kill();
+      });
+      runner.on('error', function (err) {
+        server.kill();
+        throw err;
+      });
+      server.on('exit', function(code) {
+        console.log('Server exited with code: ' + code);
+        // eslint-disable-next-line no-process-exit
+        process.exit(returnCode);
+      });
+      process.on('exit', function() {
+        console.log('Process exited with code: ', returnCode);
+        resolve();
+      });
+    });
+  }); 
+};
+
+// Run all tests
+const tasks = config
+  .filter(
+    process.env.E2E_CONFIG_INDEX 
+      ? (_, index) => index === +process.env.E2E_CONFIG_INDEX 
+      : configPredicate
+  )
+  .reduce((tasks, config) => {
+    const task = getTask(config);
+    tasks.push(task);
+    return tasks;
+  }, []);
+
+function runNextTask() {
+  if (tasks.length === 0) {
+    console.log('all runs are complete');
+    return;
   }
-
-  let opts = process.argv.slice(2); // pass extra arguments through
-  const runner = spawn('./node_modules/.bin/wdio', [
-    'run',
-    wdioConfig
-  ].concat(opts), { stdio: 'inherit' });
-
-  let returnCode = 1;
-  runner.on('exit', function (code) {
-    console.log('Test runner exited with code: ' + code);
-    returnCode = code;
-    server.kill();
+  const task = tasks.shift();
+  task().then(() => {
+    runNextTask();
   });
-  runner.on('error', function (err) {
-    server.kill();
-    throw err;
-  });
-  server.on('exit', function(code) {
-    console.log('Server exited with code: ' + code);
-    // eslint-disable-next-line no-process-exit
-    process.exit(returnCode);
-  });
-});
+}
+  
+runNextTask();

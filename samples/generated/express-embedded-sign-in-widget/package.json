@@ -1,5 +1,5 @@
 {
-  "name": "express-embedded-sign-in-widget",
+  "name": "@okta/samples.express.embedded-sign-in-widget",
   "private": true,
   "version": "1.0.0",
   "main": "index.js",
@@ -18,7 +18,7 @@
     "js-yaml": "^4.1.0",
     "dotenv": "^10.0.0",
     "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "^5.9.1"
+    "@okta/okta-signin-widget": "^5.9.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.7",
