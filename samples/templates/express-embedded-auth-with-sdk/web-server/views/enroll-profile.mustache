@@ -19,30 +19,16 @@
 
       <div class="row">
         <form id="registration-form" class="ui large form" action="{{action}}" method="POST">
-          <div class="field">
-            <div class="ui labeled input">
-              <div class="ui label">
-                First Name
+          {{#inputs}}
+            <div class="field">
+              <div class="ui labeled input">
+                <div class="ui label">
+                  {{label}}
+                </div>
+                <input id={{name}} type="text" name="{{name}}" />
               </div>
-              <input id="firstName" type="text" name="firstName" />
             </div>
-          </div>
-          <div class="field">
-            <div class="ui labeled input">
-              <div class="ui label">
-                Last Name
-              </div>
-              <input id="lastName" type="text" name="lastName" />
-            </div>
-          </div>
-          <div class="field">
-            <div class="ui labeled input">
-              <div class="ui label">
-                Email
-              </div>
-              <input id="email" type="text" name="email" />
-            </div>
-          </div>
+          {{/inputs}}
           <button id="submit-button" class="ui fluid large primary submit button" type="submit">
             REGISTER
           </button>

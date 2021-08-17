@@ -21,14 +21,19 @@ const {
 const router = express.Router();
 
 // entry route
-router.get('/register', (req, res) => {
+router.get('/register', async (req, res) => {
   req.setFlowStates({
     entry: '/register',
     idxMethod: 'register'
   });
+  const authClient = getAuthClient(req);
+  const {
+    nextStep: { inputs }
+  } = await authClient.idx.register();
 
   renderTemplate(req, res, 'enroll-profile', {
-    action: '/register'
+    action: '/register',
+    inputs
   });
 });
 
