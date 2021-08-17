@@ -31,7 +31,7 @@ WEB_CLIENT_SECRET=sOmeSecretString
 
 ## Commands
 
-If running from the workspace directory, add the `--cwd` option: `yarn --cwd test/e2e start`
+If running from the workspace directory: `yarn workspace @okta/test.e2e.samples start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |

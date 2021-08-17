@@ -16,7 +16,7 @@ yarn start
 or
 
 ```bash
-yarn --cwd samples/generated/sample-name start
+yarn workspace {generatedSamplePkgName} start
 ```
 
 The sample apps have no embedded configuration. All configuration is loaded from URL query parameters and encoded into the `state` param to survive round-trip redirects. If the app is loaded without valid configuration, a form will be shown for the user (you, the developer) to provide the needed values.

@@ -18,7 +18,7 @@ This Sample Application will show you the best practices for integrating Authent
 
 ### Commands
 
-If running from the workspace directory, add the `--cwd` option: `yarn --cwd samples/generated/express-embedded-sign-in-widget start`
+If running from the workspace directory: `yarn workspace {{pkgName}} start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
