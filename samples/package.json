@@ -7,7 +7,7 @@
     "clean": "gulp clean",
     "build": "gulp",
     "dev": "gulp watch",
-    "test": "yarn workspace @okta/test.e2e.samples test"
+    "test": "yarn workspace @okta/test.e2e.samples start"
   },
   "devDependencies": {
     "gulp": "^4.0.2",
