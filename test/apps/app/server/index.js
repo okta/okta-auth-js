@@ -43,7 +43,7 @@ app.use(webpackDevMiddleware(compiler, {
 }));
 
 app.use(express.static('./public'));
-app.use(express.static('../../build/dist'));
+app.use(express.static('../../../build/dist'));
 app.use('/siw', express.static(SIW_DIST));
 
 app.use(express.urlencoded());
