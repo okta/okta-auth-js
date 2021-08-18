@@ -130,7 +130,6 @@
     "packages": [
       "./",
       "env",
-      "test/app",
       "test/apps/*",
       "test/e2e",
       "test/support",
