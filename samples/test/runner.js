@@ -103,10 +103,11 @@ if (testName) {
       if (!features.length) {
         return false;
       }
-    } 
-    const specs = sampleConfig.specs || [];
-    if (!specs.length) {
-      return false;
+    } else {
+      const specs = sampleConfig.specs || [];
+      if (!specs.length) {
+        return false;
+      }
     }
     return true;
   })

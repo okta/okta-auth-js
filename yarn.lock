@@ -2378,10 +2378,10 @@
     rasha "^1.2.5"
     safe-flat "^2.0.2"
 
-"@okta/okta-signin-widget@^5.9.3":
-  version "5.9.3"
-  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.9.3.tgz#c976bdf85177ec96123c81ff64e61d0b0387001e"
-  integrity sha512-5XuEvkRKtRSoQesPaIIofQNjv3yeBsgVQsGzHuLmIawxMANYuBBoSD5Rq32ivyDzQ5/r9NEMYVcZfjWaMkwbtg==
+"@okta/okta-signin-widget@^5.9.4":
+  version "5.9.4"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-5.9.4.tgz#4e5e6f7be4385b1c5094b618eb5185f3d2668fae"
+  integrity sha512-jTbf3hFJsb2PMetNqMknQTB88HjtTFmAnEjmso8S2q13EuY6ZMxII2vaZUjJzEHTLVLsnGy0Qhkn8l/HwwqUJA==
   dependencies:
     "@babel/polyfill" "^7.10.1"
     "@babel/runtime" "^7.10.3"

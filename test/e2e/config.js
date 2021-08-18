@@ -6,7 +6,7 @@ const config = [
   {
     app: '@okta/test.app',
     spec: [
-      '**/*.js'
+      'tokens.js'
     ],
     exclude: [
       'refreshTokens.js',

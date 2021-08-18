@@ -69,8 +69,5 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.ts'],
-    alias: {
-      '@okta/okta-auth-js': path.join(__dirname, '..', '..', 'build')
-    }
   }
 };

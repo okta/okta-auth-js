@@ -9,10 +9,6 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "baseUrl": "./",
-    "paths": {
-      "@okta/okta-auth-js": ["../../build"],
-      "@okta/okta-auth-js/polyfill": ["../../build/polyfill"]
-    },
     "skipLibCheck": true
   },
   "include": [

@@ -11,8 +11,7 @@
  */
 
 
-// eslint-disable-next-line node/no-unpublished-require
-const OktaAuth = require('../../../build/cjs/index').OktaAuth;
+const { OktaAuth } = require('@okta/okta-auth-js');
 
 module.exports = function getAuthClient(options) {
   let authClient;
