@@ -130,7 +130,7 @@
     "packages": [
       "./",
       "env",
-      "test/apps/*",
+      "test/harness-apps/*",
       "test/e2e",
       "test/support",
       "samples",
