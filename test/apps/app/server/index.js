@@ -22,6 +22,7 @@ const renderWidget = require('./renderWidget');
 
 const path = require('path');
 const SIW_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-signin-widget')), '..');
+const AUTH_JS_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js')), '..', 'dist');
 
 const express = require('express');
 const webpack = require('webpack');
@@ -43,7 +44,7 @@ app.use(webpackDevMiddleware(compiler, {
 }));
 
 app.use(express.static('./public'));
-app.use(express.static('../../../build/dist'));
+app.use(express.static(AUTH_JS_DIST));
 app.use('/siw', express.static(SIW_DIST));
 
 app.use(express.urlencoded());
