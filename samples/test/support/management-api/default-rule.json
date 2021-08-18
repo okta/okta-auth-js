@@ -1,0 +1,52 @@
+{
+  "name": "Catch-all Rule",
+  "id": "rul1hqj4ymt0xCbjM5d7",
+  "type": "Okta:ProfileEnrollment",
+  "priority": 99,
+  "conditions": [],
+  "action": "DENY",
+  "requirement": {
+    "preRegistrationInlineHooks": null,
+    "profileAttributes": [
+      {
+        "name": "email",
+        "label": "Email",
+        "required": true
+      }
+    ],
+    "targetGroupIds": null,
+    "unknownUserAction": "REGISTER",
+    "activationRequirements": {
+      "emailVerification": true
+    }
+  },
+  "status": "ACTIVE",
+  "resourceAlternateId": null,
+  "resourceDisplayName": {
+    "value": "Catch-all Rule",
+    "sensitive": false
+  },
+  "resourceId": "rul1hqj4ymt0xCbjM5d7",
+  "resourceType": "Rule",
+  "default": true,
+  "_links": {
+    "self": {
+      "href": "https://dev-65117836.okta.com/api/v1/policies/rst1hqj4ylDCapPXw5d7/rules/rul1hqj4ymt0xCbjM5d7",
+      "hints": {
+        "allow": [
+          "GET",
+          "PUT"
+        ]
+      }
+    },
+    "policy": {
+      "href": "https://dev-65117836.okta.com/api/v1/policies/rst1hqj4ylDCapPXw5d7",
+      "hints": {
+        "allow": [
+          "GET",
+          "PUT"
+        ]
+      }
+    }
+  }
+}

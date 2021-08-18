@@ -18,6 +18,7 @@ interface ActionContext {
   credentials: UserCredentials;
   user: User;
   featureName: string;
+  currentTestCaseId: string;
   userName?: string;
 }
 

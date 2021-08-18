@@ -16,4 +16,5 @@ import ActionContext from '../support/context';
 
 Before(function (this: ActionContext, scenario: any) {
   this.featureName = scenario?.gherkinDocument?.feature?.name;
+  this.currentTestCaseId = `TESTCASEID-${scenario?.testCaseStartedId}`;
 });
