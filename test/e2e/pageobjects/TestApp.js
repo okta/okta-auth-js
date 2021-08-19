@@ -152,6 +152,14 @@ class TestApp {
     }, 5000, 'wait for get user info btn');
   }
 
+  async getIdToken() {
+    return this.idToken.then(el => el.getText()).then(txt => JSON.parse(txt));
+  }
+
+  async getAccessToken() {
+    return this.accessToken.then(el => el.getText()).then(txt => JSON.parse(txt));
+  }
+
   async returnHome() {
     await browser.waitUntil(async () => this.returnHomeBtn.then(el => el.isDisplayed()));
     await this.returnHomeBtn.then(el => el.click());
@@ -216,6 +224,14 @@ class TestApp {
 
   async waitForSigninWidget() {
     return browser.waitUntil(async () => this.signinWidget.then(el => el.isDisplayed()), 5000, 'wait for signin widget');
+  }
+
+  async waitForIdTokenRenew() {
+    const currIdToken = await this.getIdToken();
+    return browser.waitUntil(async () => {
+      const newIdToken = await this.getIdToken();
+      return currIdToken.idToken !== newIdToken.idToken;
+    }, 5000, 'wait for token renew');
   }
 
   async assertCallbackSuccess() {

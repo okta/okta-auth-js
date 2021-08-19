@@ -54,12 +54,12 @@ export const EVENT_ERROR = 'error';
 
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
-  renewPromise: Record<string, Promise<Token>>;
+  renewPromise: Promise<Token>;
 }
 function defaultState(): TokenManagerState {
   return {
     expireTimeouts: {},
-    renewPromise: {}
+    renewPromise: null
   };
 }
 export class TokenManager implements TokenManagerInterface {
@@ -182,7 +182,7 @@ export class TokenManager implements TokenManagerInterface {
     delete this.state.expireTimeouts[key];
   
     // Remove the renew promise (if it exists)
-    delete this.state.renewPromise[key];
+    this.state.renewPromise = null;
   }
   
   clearExpireEventTimeoutAll() {
@@ -280,6 +280,19 @@ export class TokenManager implements TokenManagerInterface {
     return key;
   }
 
+  private getTokenType(token: Token): TokenType {
+    if (isAccessToken(token)) {
+      return 'accessToken';
+    }
+    if (isIDToken(token)) {
+      return 'idToken';
+    }
+    if(isRefreshToken(token)) {
+      return 'refreshToken';
+    }
+    throw new AuthSdkError('Unknown token type');
+  }
+
   // eslint-disable-next-line complexity
   setTokens(
     { accessToken, idToken, refreshToken }: Tokens, 
@@ -366,9 +379,8 @@ export class TokenManager implements TokenManagerInterface {
 
   renew(key): Promise<Token> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
-    var existingPromise = this.state.renewPromise[key];
-    if (existingPromise) {
-      return existingPromise;
+    if (this.state.renewPromise) {
+      return this.state.renewPromise;
     }
   
     try {
@@ -385,14 +397,13 @@ export class TokenManager implements TokenManagerInterface {
   
     // A refresh token means a replace instead of renewal
     // Store the renew promise state, to avoid renewing again
-    this.state.renewPromise[key] = this.sdk.token.renew(token)
-      .then(freshToken => {
-        // store and emit events for freshToken
-        const oldTokenStorage = this.storage.getStorage();
-        this.remove(key);
-        this.add(key, freshToken);
-        this.emitRenewed(key, freshToken, oldTokenStorage[key]);
-        return freshToken;
+    this.state.renewPromise = this.sdk.token.renewTokens()
+      .then(tokens => {
+        this.setTokens(tokens);
+
+        // resolve token based on the key
+        const tokenType = this.getTokenType(token);
+        return tokens[tokenType];
       })
       .catch(err => {
         // If renew fails, remove token and emit error
@@ -407,10 +418,10 @@ export class TokenManager implements TokenManagerInterface {
       })
       .finally(() => {
         // Remove existing promise key
-        delete this.state.renewPromise[key];
+        this.state.renewPromise = null;
       });
   
-    return this.state.renewPromise[key];
+    return this.state.renewPromise;
   }
   
   clear() {

@@ -21,7 +21,13 @@ env.setEnvironmentVarsFromTestEnv();
 
 const getTask = (config) => () => {
   return new Promise(resolve => {
-    // 1. start the dev server
+    // add authClient config to process.env
+    if (config.authClient) {
+      console.log(`Setting a new value for environment variable "AUTH_CLIENT_CONFIG" from E2E config`);
+      process.env.AUTH_CLIENT_CONFIG = JSON.stringify(config.authClient);
+    }
+
+    // start the dev server
     const server = spawn('yarn', [
       'workspace',
       config.app,

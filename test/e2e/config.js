@@ -6,7 +6,7 @@ const config = [
   {
     app: '@okta/test.app',
     spec: [
-      'tokens.js'
+      '**/*.js'
     ],
     exclude: [
       'refreshTokens.js',
@@ -47,7 +47,31 @@ const config = [
     app: '@okta/test.app.react-mfa-v1',
     spec: ['mfa.js'],
     flags: [MFA_ENABLED]
-  }
+  },
+  {
+    app: '@okta/test.app',
+    spec: [
+      'tokenAutoRenew.js'
+    ],
+    flags: [],
+    authClient: {
+      tokenManager: {
+        expireEarlySeconds: 60 * 59 + 59
+      }
+    }
+  },
+  {
+    app: '@okta/test.app',
+    spec: [
+      'tokenAutoRenew.js'
+    ],
+    flags: [REFRESH_TOKEN],
+    authClient: {
+      tokenManager: {
+        expireEarlySeconds: 60 * 59 + 59
+      }
+    }
+  },
 ];
 
 const configPredicate = config => {
