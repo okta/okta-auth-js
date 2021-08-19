@@ -18,7 +18,7 @@ export default async function(policyId: string, appId: string) {
     } as any});
     return policy;
   } catch (err) {
-    console.warn('Unable to create policy-to-app mapping');
+    console.warn('Unable to create policy-to-app mapping.', policyId, appId);
     throw err;
   }
 }

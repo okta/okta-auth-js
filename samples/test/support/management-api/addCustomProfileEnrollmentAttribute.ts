@@ -2,6 +2,7 @@ import { Client, PolicyRule } from '@okta/okta-sdk-nodejs';
 import { getConfig } from '../../util/configUtils';
 
 interface ProfileEnrollmentPolicyRule extends PolicyRule {
+  action: string;
   requirement: Record<string, unknown>;
   _links: Record<string, Record<string, string>>;
 }
@@ -32,6 +33,7 @@ export default async function(policyId: string, profileAttribute: {name: string;
 
     let defaultRule = policyRules.pop() as ProfileEnrollmentPolicyRule;
     addCustomProfileAttribute(defaultRule, profileAttribute);
+    defaultRule.action = 'ALLOW';
 
     const url = defaultRule._links.self.href;
     await oktaClient.http.putJson(url, {body: defaultRule as any});
