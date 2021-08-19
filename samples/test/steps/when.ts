@@ -83,7 +83,7 @@ When(
 );
 
 When(
-  /^she fills out her (First Name|Last Name|Email)$/,
+  /^she fills out (?:her\s)?(First Name|Last Name|Email|another property)$/,
   enterRegistrationField
 );
 

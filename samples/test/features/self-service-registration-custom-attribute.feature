@@ -12,7 +12,7 @@ Feature: Add another Required Attribute to the Profile Enrollment Policy
     When she fills out her First Name
     And she fills out her Last Name
     And she fills out her Email
-    # And she fills out another property
+    And she fills out another property
     And she submits the registration form
     # Then her user is created in the "Staged" state 
     And she sees the Select Authenticator page with password as the only option

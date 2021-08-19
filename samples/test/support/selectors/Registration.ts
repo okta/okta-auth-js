@@ -25,6 +25,9 @@ class RegistrationForm {
   get email() { return email; }
   get submit() { return submit; }
   get formMessage() { return formMessage; }
+
+  getCustomAttribute(customAttributeSelector: string) { return `${registrationForm} #${customAttributeSelector}`}
+
 }
 
 export default new RegistrationForm();
