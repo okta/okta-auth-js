@@ -74,12 +74,7 @@ const getTask = (config) => () => {
       });
       server.on('exit', function(code) {
         console.log('Server exited with code: ' + code);
-        // eslint-disable-next-line no-process-exit
-        process.exit(returnCode);
-      });
-      process.on('exit', function() {
-        console.log('Process exited with code: ', returnCode);
-        resolve();
+        resolve(returnCode);
       });
     });
   }); 
@@ -98,13 +93,22 @@ const tasks = config
     return tasks;
   }, []);
 
+// track process returnCode for each task
+const codes = [];
+
 function runNextTask() {
   if (tasks.length === 0) {
     console.log('all runs are complete');
+    if (codes.reduce((acc, curr) => acc + curr, 0) !== 0) {
+      // exit with error status if any test fails
+      // eslint-disable-next-line no-process-exit
+      process.exit(1);
+    }
     return;
   }
   const task = tasks.shift();
-  task().then(() => {
+  task().then((code) => {
+    codes.push(code);
     runNextTask();
   });
 }

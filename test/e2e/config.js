@@ -10,7 +10,8 @@ const config = [
     ],
     exclude: [
       'refreshTokens.js',
-      'mfa.js'
+      'mfa.js',
+      'tokenAutoRenew.js'
     ],
     flags: []
   },
@@ -20,9 +21,11 @@ const config = [
       '**/*.js'
     ],
     exclude: [
-      'mfa.js'
+      'refreshTokens.js',
+      'mfa.js',
+      'tokenAutoRenew.js'
     ],
-    flags: [ORG_OIE_ENABLED, REFRESH_TOKEN]
+    flags: [ORG_OIE_ENABLED]
   },
   {
     app: '@okta/test.app',
@@ -50,6 +53,7 @@ const config = [
   },
   {
     app: '@okta/test.app',
+    description: 'Test token auto renew with non-prompt approach',
     spec: [
       'tokenAutoRenew.js'
     ],
@@ -62,6 +66,7 @@ const config = [
   },
   {
     app: '@okta/test.app',
+    description: 'Test token auto renew with refresh token approach',
     spec: [
       'tokenAutoRenew.js'
     ],
