@@ -84,6 +84,8 @@ app.use(function(err, req, res, next) {
     errors = [err.message];
   } else if (err && err.error_description) {
     errors = [err.error_description];
+  } else if (err && err.errorSummary) {
+    errors = [err.errorSummary];
   } else {
     errors = ['Internal Error!'];
   }
