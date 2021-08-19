@@ -99,8 +99,8 @@ const codes = [];
 function runNextTask() {
   if (tasks.length === 0) {
     console.log('all runs are complete');
-    if (codes.reduce((acc, curr) => acc + curr, 0) !== 0) {
-      // exit with error status if any test fails
+    if (!codes.length || codes.reduce((acc, curr) => acc + curr, 0) !== 0) {
+      // exit with error status if no finished task or any test fails
       // eslint-disable-next-line no-process-exit
       process.exit(1);
     }
