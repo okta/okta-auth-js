@@ -48,10 +48,11 @@ Given(
   createSSRPolicy
 );
 
+
 Given(
-  /^a Profile Enrollment policy defined assigning new users to the Everyone Group (?!by collecting .* a random property *.) (.*)$/,
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  (  _: any) => ({}) // no-op - self-enrollment is preconfigured for the org
+  // eslint-disable-next-line max-len
+  /^a Profile Enrollment policy defined assigning new users \to the Everyone Group (?!by collecting .* a random property *.) .*$/,
+  () => ({}) // no-op - self-enrollment is preconfigured for the org
 );
 
 Given(
