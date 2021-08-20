@@ -21,6 +21,7 @@ import {
   IdentifyRemediationFactory,
   SelectEnrollProfileRemediationFactory,
   EnrollProfileRemediationFactory,
+  EnrollExtendedProfileRemediationFactory,
   chainResponses,
   SelectAuthenticatorEnrollRemediationFactory,
   EnrollEmailAuthenticatorRemediationFactory,
@@ -131,6 +132,12 @@ describe('idx/register', () => {
       ]
     });
 
+    const enrollExtendedProfileResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollExtendedProfileRemediationFactory.build()
+      ]
+    });
+
     const selectPasswordResponse = IdxResponseFactory.build({
       neededToProceed: [
         SelectAuthenticatorEnrollRemediationFactory.build({
@@ -209,6 +216,7 @@ describe('idx/register', () => {
       successCheckEmailResponse,
       identifyResponse,
       enrollProfileResponse,
+      enrollExtendedProfileResponse,
       selectPasswordResponse,
       enrollPasswordResponse,
       selectAuthenticatorResponse,
@@ -283,9 +291,82 @@ describe('idx/register', () => {
       });
     });
 
-    // eslint-disable-next-line jasmine/no-disabled-tests
-    xit('can register, passing firstName, lastName, and email on demand', async () => {
-      // TODO
+    it('can register, passing firstName, lastName, email and customAttribute on demand', async () => {
+      const {
+        authClient,
+        identifyResponse,
+        enrollExtendedProfileResponse,
+        selectPasswordResponse
+      } = testContext;
+
+      chainResponses([
+        identifyResponse,
+        enrollExtendedProfileResponse,
+      ]);
+
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(identifyResponse);
+      jest.spyOn(identifyResponse, 'proceed');
+      jest.spyOn(enrollExtendedProfileResponse, 'proceed').mockImplementationOnce(() => {
+        return Promise.reject(RawIdxResponseFactory.build({
+          remediation: {
+            type: 'array',
+            value: [
+              EnrollProfileRemediationFactory.build()
+            ]
+          }
+        }));
+      });
+
+      let res = await register(authClient, {});
+      expect(identifyResponse.proceed).toHaveBeenCalledWith('select-enroll-profile', { });
+      expect(enrollExtendedProfileResponse.proceed).toHaveBeenCalledWith('enroll-profile', { userProfile: {}});
+      expect(res).toMatchObject({
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-profile',
+        }
+      });
+
+      const inputs = res.nextStep.inputs.map(({name}) => name);
+      const inputValues = inputs.reduce((formData, inputName, inputIndex) => ({
+        ...formData,
+        [inputName]: `value${inputIndex}`
+      }), {});
+
+      chainResponses([
+        identifyResponse,
+        enrollExtendedProfileResponse,
+        selectPasswordResponse
+      ]);
+
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(identifyResponse);
+      jest.spyOn(identifyResponse, 'proceed');
+      jest.spyOn(enrollExtendedProfileResponse, 'proceed');
+
+      res = await register(authClient, inputValues);
+      expect(identifyResponse.proceed).toHaveBeenCalledWith('select-enroll-profile', { });
+      expect(enrollExtendedProfileResponse.proceed).toHaveBeenCalledWith('enroll-profile', {
+        userProfile: {
+          email: 'value2',
+          firstName: 'value0',
+          lastName: 'value1',
+          customAttribute: 'value3'
+        }
+      });
+      expect(res).toEqual({
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'select-authenticator-enroll',
+          inputs: [{
+            name: 'authenticator',
+            type: 'string',
+          }],
+          options: [{
+            label: 'Password',
+            value: 'password'
+          }]
+        }
+      });
     });
   });
 
