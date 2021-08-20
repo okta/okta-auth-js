@@ -80,6 +80,7 @@ const samples = [
       'basic-auth', 
       'self-service-password-recovery', 
       'self-service-registration',
+      'self-service-registration-custom-attribute',
       'mfa-password-and-email',
       'mfa-password-and-sms',
       'social-login-mfa',

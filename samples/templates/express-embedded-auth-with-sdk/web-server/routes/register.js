@@ -38,13 +38,8 @@ router.get('/register', async (req, res) => {
 });
 
 router.post('/register', async (req, res, next) => {
-  const { firstName, lastName, email } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.register({ 
-    firstName, 
-    lastName, 
-    email,
-  });
+  const transaction = await authClient.idx.register(req.body);
   handleTransaction({ req, res, next, authClient, transaction });
 });
 

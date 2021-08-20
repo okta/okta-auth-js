@@ -36,7 +36,7 @@ export default async function(policyId: string, profileAttribute: {name: string;
     defaultRule.action = 'ALLOW';
 
     const url = defaultRule._links.self.href;
-    await oktaClient.http.putJson(url, {body: defaultRule as any});
+    await oktaClient.http.putJson(url, { body: defaultRule as any });
   } catch (err) {
     console.warn('Unable to update Profile Enrollment policy default rule.');
     throw err;

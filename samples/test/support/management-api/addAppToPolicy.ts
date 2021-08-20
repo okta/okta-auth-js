@@ -12,10 +12,10 @@ export default async function(policyId: string, appId: string) {
   try {
     let policy = await oktaClient.getPolicy(policyId);
     let mappingsUrl = `${config.issuer}/api/v1/policies/${policyId}/mappings?forceCreate=true`;
-    oktaClient.http.postJson(mappingsUrl, { body: {
+    await oktaClient.http.post(mappingsUrl, { body: JSON.stringify({
       resourceId: appId,
       resourceType: 'APP',
-    } as any});
+    })});
     return policy;
   } catch (err) {
     console.warn('Unable to create policy-to-app mapping.', policyId, appId);
