@@ -12,7 +12,7 @@ const withCatch = fn => {
 
 const routerWithCatch = () => {
   const router = express.Router();
-  for (const method of ["get", "post", "put", "delete"]) {
+  for (const method of ['get', 'post', 'put', 'delete']) {
     const original = router[method];
     router[method] = function(path, handler) {
       original.call(this, path, withCatch(handler));
