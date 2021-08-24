@@ -293,21 +293,40 @@ export class TokenManager implements TokenManagerInterface {
     throw new AuthSdkError('Unknown token type');
   }
 
-  setTokens(tokens: Tokens): void {
+  setTokens(
+    tokens: Tokens,
+    // TODO: callbacks can be removed in the next major version OKTA-407224
+    accessTokenCb?: Function, 
+    idTokenCb?: Function,
+    refreshTokenCb?: Function
+  ): void {
+    const handleTokenCallback = (key, token) => {
+      const type = this.getTokenType(token);
+      if (type === 'accessToken') {
+        accessTokenCb && accessTokenCb(key, token);
+      } else if (type === 'idToken') {
+        idTokenCb && idTokenCb(key, token);
+      } else if (type === 'refreshToken') {
+        refreshTokenCb && refreshTokenCb(key, token);
+      }
+    };
     const handleAdded = (key, token) => {
       this.emitAdded(key, token);
       this.setExpireEventTimeout(key, token);
+      handleTokenCallback(key, token);
     };
     const handleRenewed = (key, token, oldToken) => {
       this.emitRenewed(key, token, oldToken);
       this.clearExpireEventTimeout(key);
       this.setExpireEventTimeout(key, token);
+      handleTokenCallback(key, token);
     };
     const handleRemoved = (key, token) => {
       this.clearExpireEventTimeout(key);
       this.emitRemoved(key, token);
+      handleTokenCallback(key, token);
     };
-
+    
     const types: TokenType[] = ['idToken', 'accessToken', 'refreshToken'];
     const existingTokens = this.getTokensSync();
 

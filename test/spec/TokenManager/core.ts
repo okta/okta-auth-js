@@ -757,6 +757,8 @@ describe('TokenManager', function() {
       });
       const addedHandler = jest.fn();
       client.tokenManager.on('added', addedHandler);
+      const renewHandler = jest.fn();
+      client.tokenManager.on('renewed', renewHandler);
       const removedHandler = jest.fn();
       client.tokenManager.on('removed', removedHandler);
       const tokensObj = {};
@@ -764,6 +766,7 @@ describe('TokenManager', function() {
       expect(setItemMock).toHaveBeenCalledTimes(1);
       expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
       expect(addedHandler).not.toHaveBeenCalled();
+      expect(renewHandler).not.toHaveBeenCalled();
       expect(removedHandler).toHaveBeenCalledTimes(2);
     });
 
@@ -786,6 +789,8 @@ describe('TokenManager', function() {
       client.tokenManager.on('added', addedHandler);
       const removedHandler = jest.fn();
       client.tokenManager.on('removed', removedHandler);
+      const renewHandler = jest.fn();
+      client.tokenManager.on('renewed', renewHandler);
       const tokensObj = { 
         idToken: tokens.standardIdToken2Parsed,
       };
@@ -793,6 +798,7 @@ describe('TokenManager', function() {
       expect(setItemMock).toHaveBeenCalledTimes(1);
       expect(setItemMock).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
       expect(addedHandler).toHaveBeenCalledWith('idToken', tokens.standardIdToken2Parsed);
+      expect(renewHandler).toHaveBeenCalledWith('idToken', tokens.standardIdToken2Parsed, tokens.standardIdTokenParsed);
       expect(removedHandler).toHaveBeenCalledWith('accessToken', tokens.standardAccessTokenParsed);
     });
   });
