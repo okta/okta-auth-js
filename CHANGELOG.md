@@ -1,10 +1,14 @@
 # Changelog
 
-## 5.4
+## 5.4.0
 
 ### Features
 
 - [#908](https://github.com/okta/okta-auth-js/pull/908) Enables dynamic attributes for profile enrollment
+- [#906](https://github.com/okta/okta-auth-js/pull/906)
+  - Checks idToken integrity during token auto renew process
+  - Enables emitting `renewed` event for `TokenManager.setTokens` method
+  - Exposes `crypto` util module
 
 ## 5.3.1
 
