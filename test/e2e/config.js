@@ -10,8 +10,7 @@ const config = [
     ],
     exclude: [
       'refreshTokens.js',
-      'mfa.js',
-      'tokenAutoRenew.js'
+      'mfa.js'
     ],
     flags: []
   },
@@ -21,8 +20,7 @@ const config = [
       '**/*.js'
     ],
     exclude: [
-      'mfa.js',
-      'tokenAutoRenew.js'
+      'mfa.js'
     ],
     flags: [ORG_OIE_ENABLED, REFRESH_TOKEN]
   },
