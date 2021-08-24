@@ -243,7 +243,7 @@ class TestApp {
     return browser.waitUntil(async () => {
       const newIdToken = await this.getIdToken();
       return currIdToken.idToken !== newIdToken.idToken && newIdToken.idToken;
-    }, 5000, 'wait for id_token renew');
+    }, 10000, 'wait for id_token renew');
   }
 
   async waitForAccessTokenRenew() {
@@ -251,7 +251,7 @@ class TestApp {
     return browser.waitUntil(async () => {
       const newAccessToken = await this.getAccessToken();
       return currAccessToken.accessToken !== newAccessToken.accessToken && newAccessToken.accessToken;
-    }, 5000, 'wait for access_token renew');
+    }, 10000, 'wait for access_token renew');
   }
 
   async assertCallbackSuccess() {

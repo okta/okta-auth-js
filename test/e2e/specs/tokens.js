@@ -122,7 +122,7 @@ describe('E2E token flows', () => {
 
 describe('Token auto renew', () => {
   const defaultOptions = {
-    expireEarlySeconds: 60 * 59 + 59,
+    expireEarlySeconds: 60 * 59 + 55,
     scopes
   };
 
