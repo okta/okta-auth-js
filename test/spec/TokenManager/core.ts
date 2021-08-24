@@ -284,10 +284,11 @@ describe('TokenManager', function() {
 
       const accessTokenKey = 'test-accessToken';
       const origAccessToken = tokens.standardAccessTokenParsed;
+      const renewedAccessToken = Object.assign({}, origAccessToken);
       client.tokenManager.add(accessTokenKey, origAccessToken);
 
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
-        return Promise.resolve(renewedIdToken);
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
+        return Promise.resolve({ idToken: renewedIdToken, accessToken: renewedAccessToken });
       });
       const addedCallback = jest.fn();
       const renewedCallback = jest.fn();
@@ -305,8 +306,8 @@ describe('TokenManager', function() {
 
     it('multiple overlapping calls will produce a single request and promise', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
-        return Promise.resolve(tokens.standardIdTokenParsed);
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
+        return Promise.resolve({ idToken: tokens.standardIdTokenParsed, accessToken: tokens.standardAccessTokenParsed });
       });
       var p1 = client.tokenManager.renew('test-idToken');
       var p2 = client.tokenManager.renew('test-idToken');
@@ -316,7 +317,7 @@ describe('TokenManager', function() {
 
     it('multiple overlapping calls will produce a single request and promise (failure case)', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
         return Promise.reject(new Error('expected'));
       });
       var p1 = client.tokenManager.renew('test-idToken');
@@ -336,8 +337,8 @@ describe('TokenManager', function() {
 
     it('sequential calls will produce a unique request and promise', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
-        return Promise.resolve(tokens.standardIdTokenParsed);
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
+        return Promise.resolve({ idToken: tokens.standardIdTokenParsed, accessToken: tokens.standardAccessTokenParsed });
       });
       var p1 = client.tokenManager.renew('test-idToken').then(function() {
         var p2 = client.tokenManager.renew('test-idToken');
@@ -349,7 +350,7 @@ describe('TokenManager', function() {
 
     it('sequential calls will produce a unique request and promise (failure case)', function() {
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
-      jest.spyOn(client.token, 'renew').mockImplementation(function() {
+      jest.spyOn(client.token, 'renewTokens').mockImplementation(function() {
         return Promise.reject(new Error('expected'));
       });
       var p1 = client.tokenManager.renew('test-idToken').then(function() {

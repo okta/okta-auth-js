@@ -64,7 +64,8 @@ describe('TokenManager (browser)', function() {
         autoRenew: options.tokenManager.autoRenew || false,
         autoRemove: options.tokenManager.autoRemove || false,
         secure: options.tokenManager.secure // used by cookie storage
-      }
+      },
+      responseType: options.responseType,
     });
   }
 
@@ -229,107 +230,6 @@ describe('TokenManager (browser)', function() {
       setupSync({}, true);
     });
 
-    it('allows renewing an idToken, without renewing accessToken', function() {
-      const testInitialIdToken = {
-        idToken: 'testInitialToken',
-        claims: {'fake': 'claims'},
-        expiresAt: 0,
-        scopes: ['openid', 'email']
-      };
-      const testInitialAccessToken = {
-        accessToken: 'testInitialToken',
-        expiresAt: 0,
-        scopes: ['openid', 'email']
-      };
-      return oauthUtil.setupFrame({
-        authClient: client,
-        tokenManagerAddKeys: {
-          'test-idToken': testInitialIdToken,
-          'test-accessToken': testInitialAccessToken
-        },
-        tokenManagerRenewArgs: ['test-idToken'],
-        postMessageSrc: {
-          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          queryParams: {
-            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-            'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'id_token',
-            'response_mode': 'okta_post_message',
-            'state': oauthUtil.mockedState,
-            'nonce': oauthUtil.mockedNonce,
-            'scope': 'openid email',
-            'prompt': 'none'
-          }
-        },
-        time: 1449699929,
-        postMessageResp: {
-          'id_token': tokens.standardIdToken,
-          'expires_in': 3600,
-          'token_type': 'Bearer',
-          'state': oauthUtil.mockedState
-        },
-        expectedResp: tokens.standardIdTokenParsed
-      })
-      .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed,
-          'test-accessToken': testInitialAccessToken
-        });
-      });
-    });
-
-    it('allows renewing an accessToken, without renewing idToken', function() {
-      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
-      var mockTime = expiresAt - 3600;
-      const testInitialIdToken = {
-        idToken: 'testInitialToken',
-        claims: {'fake': 'claims'},
-        expiresAt: 0,
-        scopes: ['openid', 'email']
-      };
-      const testInitialAccessToken = {
-        accessToken: 'testInitialToken',
-        expiresAt: 0,
-        scopes: ['openid', 'email']
-      };
-
-      return oauthUtil.setupFrame({
-        authClient: client,
-        tokenManagerAddKeys: {
-          'idToken': testInitialIdToken,
-          'accessToken': testInitialAccessToken
-        },
-        time: mockTime,
-        tokenManagerRenewArgs: ['accessToken'],
-        postMessageSrc: {
-          baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          queryParams: {
-            'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-            'redirect_uri': 'https://example.com/redirect',
-            'response_type': 'token',
-            'response_mode': 'okta_post_message',
-            'state': oauthUtil.mockedState,
-            'nonce': oauthUtil.mockedNonce,
-            'scope': 'openid email',
-            'prompt': 'none'
-          }
-        },
-        postMessageResp: {
-          'access_token': tokens.standardAccessToken,
-          'expires_in': 3600,
-          'token_type': 'Bearer',
-          'state': oauthUtil.mockedState
-        },
-        expectedResp: tokens.standardAccessTokenParsed
-      })
-      .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'idToken': testInitialIdToken,
-          'accessToken': tokens.standardAccessTokenParsed
-        });
-      });
-    });
-
     it('throws an errors when a token doesn\'t exist', () => {
       const error = {
         name: 'AuthSdkError',
@@ -479,6 +379,7 @@ describe('TokenManager (browser)', function() {
         'state': oauthUtil.mockedState
       };
       setupSync({
+        responseType: 'token',
         tokenManager: {
           autoRenew: true
         }
@@ -532,7 +433,7 @@ describe('TokenManager (browser)', function() {
         autoRenew: true,
         fastForwardToTime: true,
         autoRenewTokenKey: 'test-accessToken',
-        tokenTypesTobeRenewed: ['access_token'],
+        tokenTypesTobeRenewed: ['accessToken'],
         time: expiresAt + 1,
         tokenManagerAddKeys,
         postMessageSrc,
@@ -545,85 +446,6 @@ describe('TokenManager (browser)', function() {
             expiresAt: expiresAt + 1 + 3600
           }
         });
-      });
-    });
-
-    it('automatically renews a token early when local clock offset is considered', function() {
-      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
-      return oauthUtil.setupFrame({
-        authClient: setupSync({
-          // local clock offset: 10 seconds behind the server
-          localClockOffset: 10000,
-          tokenManager: {
-            autoRenew: true
-          }
-        }),
-        autoRenew: true,
-        fastForwardToTime: true,
-        autoRenewTokenKey: 'test-accessToken',
-        tokenTypesTobeRenewed: ['access_token'],
-        time: expiresAt - 10, // set local time to 10 seconds until expiration
-        tokenManagerAddKeys,
-        postMessageSrc,
-        postMessageResp
-      })
-      .then(() => {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-accessToken': { 
-            ...tokens.standardAccessTokenParsed, 
-            expiresAt: expiresAt - 10 + 3600
-          }
-        });
-      });
-    });
-
-    it('renews a token early when "expireEarlySeconds" option is considered', function() {
-      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
-      return oauthUtil.setupFrame({
-        authClient: setupSync({
-          tokenManager: {
-            autoRenew: true,
-            expireEarlySeconds: 10
-          }
-        }),
-        autoRenew: true,
-        fastForwardToTime: true,
-        autoRenewTokenKey: 'test-accessToken',
-        tokenTypesTobeRenewed: ['access_token'],
-        time: expiresAt - 10, // set local time to 10 seconds until expiration
-        tokenManagerAddKeys,
-        postMessageSrc,
-        postMessageResp
-      })
-      .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-accessToken': { 
-            ...tokens.standardAccessTokenParsed, 
-            expiresAt: expiresAt - 10 + 3600
-          }
-        });
-      });
-    });
-
-    it('does not return the token after tokens were cleared before renew promise was resolved', function() {
-      var expiresAt = tokens.standardAccessTokenParsed.expiresAt;
-      return oauthUtil.setupFrame({
-        authClient: client,
-        autoRenew: true,
-        fastForwardToTime: true,
-        autoRenewTokenKey: 'test-accessToken',
-        tokenTypesTobeRenewed: ['access_token'],
-        time: expiresAt + 1,
-        tokenManagerAddKeys,
-        postMessageSrc,
-        postMessageResp,
-        beforeCompletion: function(authClient) {
-          // Simulate tokens being cleared while the renew request is performed
-          authClient.tokenManager.clear();
-        }
-      })
-      .then(function() {
-        oauthUtil.expectTokenStorageToEqual(localStorage, {});
       });
     });
   });
