@@ -153,11 +153,23 @@ class TestApp {
   }
 
   async getIdToken() {
-    return this.idToken.then(el => el.getText()).then(txt => JSON.parse(txt));
+    return this.idToken.then(el => el.getText()).then(txt => {
+      try {
+        return JSON.parse(txt);
+      } catch (_) {
+        return null;
+      }
+    });
   }
 
   async getAccessToken() {
-    return this.accessToken.then(el => el.getText()).then(txt => JSON.parse(txt));
+    return this.accessToken.then(el => el.getText()).then(txt => {
+      try {
+        return JSON.parse(txt);
+      } catch (_) {
+        return null;
+      }
+    });
   }
 
   async returnHome() {
@@ -230,8 +242,16 @@ class TestApp {
     const currIdToken = await this.getIdToken();
     return browser.waitUntil(async () => {
       const newIdToken = await this.getIdToken();
-      return currIdToken.idToken !== newIdToken.idToken;
-    }, 5000, 'wait for token renew');
+      return currIdToken.idToken !== newIdToken.idToken && newIdToken.idToken;
+    }, 5000, 'wait for id_token renew');
+  }
+
+  async waitForAccessTokenRenew() {
+    const currAccessToken = await this.getAccessToken();
+    return browser.waitUntil(async () => {
+      const newAccessToken = await this.getAccessToken();
+      return currAccessToken.accessToken !== newAccessToken.accessToken && newAccessToken.accessToken;
+    }, 5000, 'wait for access_token renew');
   }
 
   async assertCallbackSuccess() {

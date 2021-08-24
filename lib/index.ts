@@ -22,3 +22,4 @@ export * from './TransactionManager';
 export * from './TokenManager';
 export * from './AuthStateManager';
 export * from './util';
+export * as crypto from './crypto';

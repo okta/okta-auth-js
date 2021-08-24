@@ -32,7 +32,7 @@ module.exports = {
     publicPath: '/'
   },
   plugins: [
-    new webpack.EnvironmentPlugin(['CLIENT_ID', 'ISSUER', 'AUTH_CLIENT_CONFIG']),
+    new webpack.EnvironmentPlugin(['CLIENT_ID', 'ISSUER']),
   ],
   devServer: {
     contentBase: path.join(__dirname, 'public'),

@@ -11,11 +11,12 @@
  */
 
 
+import { crypto } from '@okta/okta-auth-js';
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaHome from '../pageobjects/OktaHome';
 import { flows, openImplicit, openPKCE } from '../util/appUtils';
-import { loginPopup } from '../util/loginUtils';
+import { loginPopup, loginDirect } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 
 
@@ -115,6 +116,71 @@ describe('E2E token flows', () => {
         await browser.refresh();
         await TestApp.waitForLoginBtn(); // assert we are logged out
       });
+    });
+  });
+});
+
+describe('Token auto renew', () => {
+  const defaultOptions = {
+    expireEarlySeconds: 60 * 59 + 59,
+    scopes
+  };
+
+  afterEach(async () => {
+    await TestApp.logoutRedirect();
+    // auto renew tests are highly stateful, reload session after each case
+    await browser.reloadSession();
+  });
+
+  describe('implicit flow', () => {
+    it('only renews accessToken when have "token" in responseType', async () => {
+      await openImplicit({ ...defaultOptions, responseType: 'token' });
+      await loginDirect();
+      await TestApp.startService();
+      await TestApp.subscribeToAuthState();
+      await TestApp.waitForAccessTokenRenew();
+      const idToken = await TestApp.getIdToken();
+      assert(idToken === null);
+    });
+
+    it('only renews idToken when have "id_token" in responseType', async () => {
+      await openImplicit({ ...defaultOptions, responseType: 'id_token' });
+      await loginDirect();
+      await TestApp.startService();
+      await TestApp.subscribeToAuthState();
+      await TestApp.waitForIdTokenRenew();
+      const accessToken = await TestApp.getAccessToken();
+      assert(accessToken === null);
+    });
+
+    it('renews idToken and accessToken when have "token id_token" in responseType', async () => {
+      await openImplicit({ ...defaultOptions, responseType: 'id_token,token' });
+      await loginDirect();
+      await TestApp.startService();
+      await TestApp.subscribeToAuthState();
+      // renews both token together
+      await TestApp.waitForIdTokenRenew();
+      const idToken = await TestApp.getIdToken();
+      const accessToken = await TestApp.getAccessToken();
+      // verify idToken integrity
+      const hash = await crypto.getOidcHash(accessToken.accessToken);
+      assert(hash === idToken.claims.at_hash);
+    });
+  });
+
+  describe('pkce', () => {
+    it('renews idToken and accessToken', async () => {
+      await openPKCE({ ...defaultOptions });
+      await loginDirect();
+      await TestApp.startService();
+      await TestApp.subscribeToAuthState();
+      // renews both token together
+      await TestApp.waitForIdTokenRenew();
+      const idToken = await TestApp.getIdToken();
+      const accessToken = await TestApp.getAccessToken();
+      // verify idToken integrity
+      const hash = await crypto.getOidcHash(accessToken.accessToken);
+      assert(hash === idToken.claims.at_hash);
     });
   });
 });

@@ -50,32 +50,6 @@ const config = [
     spec: ['mfa.js'],
     flags: [MFA_ENABLED]
   },
-  {
-    app: '@okta/test.app',
-    description: 'Test token auto renew with non-prompt approach',
-    spec: [
-      'tokenAutoRenew.js'
-    ],
-    flags: [],
-    authClient: {
-      tokenManager: {
-        expireEarlySeconds: 60 * 59 + 59
-      }
-    }
-  },
-  {
-    app: '@okta/test.app',
-    description: 'Test token auto renew with refresh token approach',
-    spec: [
-      'tokenAutoRenew.js'
-    ],
-    flags: [REFRESH_TOKEN],
-    authClient: {
-      tokenManager: {
-        expireEarlySeconds: 60 * 59 + 59
-      }
-    }
-  },
 ];
 
 const configPredicate = config => {

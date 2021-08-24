@@ -48,6 +48,7 @@ const Form = `
     <option value="cookie">Cookie</option>
     <option value="memory">Memory</option>
   </select><br/>
+  <label for="expireEarlySeconds">ExpireEarlySeconds</label><input id="f_expireEarlySeconds" name="expireEarlySeconds" type="number" /><br/>
   <label for="secure">Secure Cookies</label><br/>
   <input id="f_secureCookies-on" name="secure" type="radio" value="true"/>ON<br/>
   <input id="f_secureCookies-off" name="secure" type="radio" value="false"/>OFF<br/>
@@ -89,6 +90,7 @@ export function updateForm(origConfig: Config): void {
   (document.getElementById('f_clientSecret') as HTMLInputElement).value = config.clientSecret;
   (document.querySelector(`#f_responseMode [value="${config.responseMode || ''}"]`) as HTMLOptionElement).selected = true;
   (document.querySelector(`#f_storage [value="${config.storage || ''}"]`) as HTMLOptionElement).selected = true;
+  (document.getElementById('f_expireEarlySeconds') as HTMLInputElement).value = config.expireEarlySeconds;
   (document.querySelector(`#f_sameSite [value="${config.sameSite || ''}"]`) as HTMLOptionElement).selected = true;
   (document.getElementById('f_siwVersion') as HTMLInputElement).value = config.siwVersion;
   (document.getElementById('f_idps') as HTMLInputElement).value = config.idps;
