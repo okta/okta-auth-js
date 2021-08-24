@@ -34,23 +34,16 @@ export function getDefaultConfig(): Config {
   const CLIENT_ID = process.env.CLIENT_ID;
   const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
 
-  let authClientConfig = {};
-  if (process.env.AUTH_CLIENT_CONFIG) {
-    try {
-      authClientConfig = JSON.parse(process.env.AUTH_CLIENT_CONFIG);
-    } catch (_) {
-      // do nothing
-    }
-  }
-
-  // priority: env vars > e2e config > static default values
-  return Object.assign({
+  return {
     forceRedirect: false,
     siwVersion: DEFAULT_SIW_VERSION,
     siwAuthClient: false,
     idps: '',
     redirectUri: REDIRECT_URI,
     postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
+    issuer: ISSUER,
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
     responseType: ['token', 'id_token'],
     scopes: ['openid', 'email', 'offline_access'],
     defaultScopes: false,
@@ -59,11 +52,7 @@ export function getDefaultConfig(): Config {
       secure: true
     },
     useInteractionCodeFlow: false
-  }, authClientConfig, {
-    issuer: ISSUER,
-    clientId: CLIENT_ID,
-    clientSecret: CLIENT_SECRET
-  });
+  };
 }
 
 // eslint-disable-next-line complexity

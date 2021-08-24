@@ -147,4 +147,23 @@ describe('Token auto renew', () => {
     const hash = await crypto.getOidcHash(accessToken.accessToken);
     assert(hash === idToken.claims.at_hash);
   });
+
+  
+  it('can continuously renew tokens', async () => {
+    await openPKCE({ ...defaultOptions });
+    await loginDirect();
+    await TestApp.startService();
+    await TestApp.subscribeToAuthState();
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    for (const _ of [0, 0]) { // auto renew should be able to happen more than once
+      // renews both token together
+      await TestApp.waitForIdTokenRenew();
+      const idToken = await TestApp.getIdToken();
+      const accessToken = await TestApp.getAccessToken();
+      // verify idToken integrity
+      const hash = await crypto.getOidcHash(accessToken.accessToken);
+      assert(hash === idToken.claims.at_hash);
+    }
+  });
+
 });

@@ -355,9 +355,10 @@ export class TokenManager implements TokenManagerInterface {
       const existingToken = existingTokens[type];
       const storageKey = this.getStorageKeyByType(type) || type;
       if (newToken && existingToken) { // renew
+        // call handleRemoved first, since it clears timers
+        handleRemoved(storageKey, existingToken);
         handleAdded(storageKey, newToken);
         handleRenewed(storageKey, newToken, existingToken);
-        handleRemoved(storageKey, existingToken);
       } else if (newToken) { // add
         handleAdded(storageKey, newToken);
       } else if (existingToken) { //remove
@@ -387,6 +388,7 @@ export class TokenManager implements TokenManagerInterface {
     return validateToken(token);
   }
 
+  // TODO: renew method should take no param, change in the next major version OKTA-407224
   renew(key): Promise<Token> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
     if (this.state.renewPromise) {
@@ -461,6 +463,8 @@ export class TokenManager implements TokenManagerInterface {
   
 }
 
+// TODO: remove this log OKTA-407224
+// setTokens behaves differently with add method, it comes with other side effects like it can remove token
 if (isLocalhost()) {
   (function addWarningsForLocalhost() {
     const { add } = TokenManager.prototype;

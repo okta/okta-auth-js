@@ -152,9 +152,13 @@ describe('Token auto renew', () => {
       const accessToken = await TestApp.getAccessToken();
       assert(accessToken === null);
     });
+  });
 
-    it('renews idToken and accessToken when have "token id_token" in responseType', async () => {
-      await openImplicit({ ...defaultOptions, responseType: 'id_token,token' });
+  flows.forEach(flow => {
+    const openFn = flow === 'pkce' ? openPKCE : openImplicit;
+
+    it(`${flow}: renews idToken and accessToken`, async () => {
+      await openFn({ ...defaultOptions });
       await loginDirect();
       await TestApp.startService();
       await TestApp.subscribeToAuthState();
@@ -166,21 +170,22 @@ describe('Token auto renew', () => {
       const hash = await crypto.getOidcHash(accessToken.accessToken);
       assert(hash === idToken.claims.at_hash);
     });
-  });
 
-  describe('pkce', () => {
-    it('renews idToken and accessToken', async () => {
-      await openPKCE({ ...defaultOptions });
+    it(`${flow} can continuously renew tokens`, async () => {
+      await openFn({ ...defaultOptions });
       await loginDirect();
       await TestApp.startService();
       await TestApp.subscribeToAuthState();
-      // renews both token together
-      await TestApp.waitForIdTokenRenew();
-      const idToken = await TestApp.getIdToken();
-      const accessToken = await TestApp.getAccessToken();
-      // verify idToken integrity
-      const hash = await crypto.getOidcHash(accessToken.accessToken);
-      assert(hash === idToken.claims.at_hash);
+      // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+      for (const _ of [0, 0]) { // auto renew should be able to happen more than once
+        // renews both token together
+        await TestApp.waitForIdTokenRenew();
+        const idToken = await TestApp.getIdToken();
+        const accessToken = await TestApp.getAccessToken();
+        // verify idToken integrity
+        const hash = await crypto.getOidcHash(accessToken.accessToken);
+        assert(hash === idToken.claims.at_hash);
+      }
     });
   });
 });
