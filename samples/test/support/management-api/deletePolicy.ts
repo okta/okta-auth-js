@@ -29,7 +29,9 @@ export default async function (policyNamePrefix: string, policyType: string) {
     }
 
     for (let policy of testPolicies) {
-      await oktaClient.deletePolicy(policy!.id);
+      if (policy) {
+        await oktaClient.deletePolicy(policy.id);
+      }
     }
 
   } catch (e) {
