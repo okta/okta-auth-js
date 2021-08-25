@@ -10,8 +10,9 @@ export default async function(policyId: string, appId: string) {
   });
 
   try {
+    const issuer = config.issuer?.replace('/oauth2/default', '');
     let policy = await oktaClient.getPolicy(policyId);
-    let mappingsUrl = `${config.issuer}/api/v1/policies/${policyId}/mappings?forceCreate=true`;
+    let mappingsUrl = `${issuer}/api/v1/policies/${policyId}/mappings?forceCreate=true`;
     await oktaClient.http.post(mappingsUrl, { body: JSON.stringify({
       resourceId: appId,
       resourceType: 'APP',
