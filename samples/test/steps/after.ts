@@ -14,10 +14,10 @@
 import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
 import deleteUserAndCredentials from '../support/action/live-user/deleteUserAndCredentials';
-// import deleteTestPolicies from '../support/action/org-config/deleteTestPolicies';
+import deleteTestPolicies from '../support/action/org-config/deleteTestPolicies';
 
 After(deleteUserAndCredentials);
-// After(deleteTestPolicies);
+After(deleteTestPolicies);
 
 After(() => browser.deleteCookies());
 
