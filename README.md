@@ -2143,8 +2143,8 @@ The following configuration options can be included in `token.getWithoutPrompt`,
 | `state` | A string that will be passed to `/authorize` endpoint and returned in the OAuth response. The value is used to validate the OAuth response and prevent cross-site request forgery (CSRF). The `state` value passed to [getWithRedirect](#tokengetwithredirectoptions) will be returned along with any requested tokens from [parseFromUrl](#tokenparsefromurloptions). Your app can use this string to perform additional validation and/or pass information from the login page. Defaults to a random string. |
 | `nonce` | Specify a nonce that will be validated in an `id_token`. This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an `id_token`. Defaults to a random string. |
 | `idp` | Identity provider to use if there is no Okta Session. |
-| `idpScope` | A space delimited list of scopes to be provided to the Social Identity Provider when performing [Social Login](social-login) These scopes are used in addition to the scopes already configured on the Identity Provider. |
-| `display` | The display parameter to be passed to the Social Identity Provider when performing [Social Login](social-login). |
+| `idpScope` | A space delimited list of scopes to be provided to the Social Identity Provider when performing [Social Login][social-login] These scopes are used in addition to the scopes already configured on the Identity Provider. |
+| `display` | The display parameter to be passed to the Social Identity Provider when performing [Social Login][social-login]. |
 | `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information. |
 | `maxAge` | Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta. |
 | `loginHint` | A username to prepopulate if prompting for authentication. |
