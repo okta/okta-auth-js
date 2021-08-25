@@ -44,14 +44,13 @@ import ActionContext from '../support/context';
 import createSSRPolicy from '../support/action/org-config/createProfileEnrollmentPolicyWithCustomProfileAttribute';
 
 Given(
-  /^a Profile Enrollment policy defined .*(?=by collecting .* a random property *.)/,
+  /^^a Profile Enrollment policy defined .* (?=by .* and a random property *.).*/,
   createSSRPolicy
 );
 
-
 Given(
   // eslint-disable-next-line max-len
-  /^a Profile Enrollment policy defined assigning new users \to the Everyone Group (?!by collecting .* a random property *.) .*$/,
+  /^^a Profile Enrollment policy defined assigning new users to the Everyone Group and (?!by .* and a random property *.).*/,
   () => ({}) // no-op - self-enrollment is preconfigured for the org
 );
 
