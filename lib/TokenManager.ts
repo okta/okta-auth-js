@@ -34,7 +34,7 @@ import {
   TokenManagerInterface,
   RefreshToken
 } from './types';
-import { ID_TOKEN_STORAGE_KEY, ACCESS_TOKEN_STORAGE_KEY, REFRESH_TOKEN_STORAGE_KEY } from './constants';
+import { REFRESH_TOKEN_STORAGE_KEY } from './constants';
 import { TokenService } from './services/TokenService';
 
 const DEFAULT_OPTIONS = {
@@ -54,12 +54,12 @@ export const EVENT_ERROR = 'error';
 
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
-  renewPromise: Record<string, Promise<Token>>;
+  renewPromise: Promise<Token>;
 }
 function defaultState(): TokenManagerState {
   return {
     expireTimeouts: {},
-    renewPromise: {}
+    renewPromise: null
   };
 }
 export class TokenManager implements TokenManagerInterface {
@@ -182,7 +182,7 @@ export class TokenManager implements TokenManagerInterface {
     delete this.state.expireTimeouts[key];
   
     // Remove the renew promise (if it exists)
-    delete this.state.renewPromise[key];
+    this.state.renewPromise = null;
   }
   
   clearExpireEventTimeoutAll() {
@@ -280,68 +280,92 @@ export class TokenManager implements TokenManagerInterface {
     return key;
   }
 
-  // eslint-disable-next-line complexity
+  private getTokenType(token: Token): TokenType {
+    if (isAccessToken(token)) {
+      return 'accessToken';
+    }
+    if (isIDToken(token)) {
+      return 'idToken';
+    }
+    if(isRefreshToken(token)) {
+      return 'refreshToken';
+    }
+    throw new AuthSdkError('Unknown token type');
+  }
+
   setTokens(
-    { accessToken, idToken, refreshToken }: Tokens, 
+    tokens: Tokens,
+    // TODO: callbacks can be removed in the next major version OKTA-407224
     accessTokenCb?: Function, 
     idTokenCb?: Function,
     refreshTokenCb?: Function
   ): void {
-    const handleAdded = (key, token, tokenCb) => {
+    const handleTokenCallback = (key, token) => {
+      const type = this.getTokenType(token);
+      if (type === 'accessToken') {
+        accessTokenCb && accessTokenCb(key, token);
+      } else if (type === 'idToken') {
+        idTokenCb && idTokenCb(key, token);
+      } else if (type === 'refreshToken') {
+        refreshTokenCb && refreshTokenCb(key, token);
+      }
+    };
+    const handleAdded = (key, token) => {
       this.emitAdded(key, token);
       this.setExpireEventTimeout(key, token);
-      if (tokenCb) {
-        tokenCb(key, token);
-      }
+      handleTokenCallback(key, token);
     };
-    const handleRemoved = (key, token, tokenCb) => {
+    const handleRenewed = (key, token, oldToken) => {
+      this.emitRenewed(key, token, oldToken);
+      this.clearExpireEventTimeout(key);
+      this.setExpireEventTimeout(key, token);
+      handleTokenCallback(key, token);
+    };
+    const handleRemoved = (key, token) => {
       this.clearExpireEventTimeout(key);
       this.emitRemoved(key, token);
-      if (tokenCb) {
-        tokenCb(key, token);
-      }
+      handleTokenCallback(key, token);
     };
-  
-    if (idToken) {
-      validateToken(idToken, 'idToken');
-    }
-    if (accessToken) {
-      validateToken(accessToken, 'accessToken');
-    }
-    if (refreshToken) {
-      validateToken(refreshToken, 'refreshToken');
-    }
-    const idTokenKey = this.getStorageKeyByType('idToken') || ID_TOKEN_STORAGE_KEY;
-    const accessTokenKey = this.getStorageKeyByType('accessToken') || ACCESS_TOKEN_STORAGE_KEY;
-    const refreshTokenKey = this.getStorageKeyByType('refreshToken') || REFRESH_TOKEN_STORAGE_KEY;
+    
+    const types: TokenType[] = ['idToken', 'accessToken', 'refreshToken'];
+    const existingTokens = this.getTokensSync();
+
+    // valid tokens
+    types.forEach((type) => {
+      const token = tokens[type];
+      if (token) {
+        validateToken(token, type);
+      }
+    });
   
     // add token to storage
-    const tokenStorage = { 
-      ...(idToken && { [idTokenKey]: idToken }),
-      ...(accessToken && { [accessTokenKey]: accessToken }),
-      ...(refreshToken && { [refreshTokenKey]: refreshToken })
-    };
-    this.storage.setStorage(tokenStorage);
+    const storage = types.reduce((storage, type) => {
+      const token = tokens[type];
+      if (token) {
+        const storageKey = this.getStorageKeyByType(type) || type;
+        storage[storageKey] = token;
+      }
+      return storage;
+    }, {});
+    this.storage.setStorage(storage);
   
     // emit event and start expiration timer
-    const existingTokens = this.getTokensSync();
-    if (idToken) {
-      handleAdded(idTokenKey, idToken, idTokenCb);
-    } else if (existingTokens.idToken) {
-      handleRemoved(idTokenKey, existingTokens.idToken, idTokenCb);
-    }
-    if (accessToken) {
-      handleAdded(accessTokenKey, accessToken, accessTokenCb);
-    } else if (existingTokens.accessToken) {
-      handleRemoved(accessTokenKey, existingTokens.accessToken, accessTokenCb);
-    }
-    if (refreshToken) {
-      handleAdded(refreshTokenKey, refreshToken, refreshTokenCb);
-    } else if (existingTokens.refreshToken) {
-      handleRemoved(refreshTokenKey, existingTokens.refreshToken, refreshTokenCb);
-    }
+    types.forEach(type => {
+      const newToken = tokens[type];
+      const existingToken = existingTokens[type];
+      const storageKey = this.getStorageKeyByType(type) || type;
+      if (newToken && existingToken) { // renew
+        // call handleRemoved first, since it clears timers
+        handleRemoved(storageKey, existingToken);
+        handleAdded(storageKey, newToken);
+        handleRenewed(storageKey, newToken, existingToken);
+      } else if (newToken) { // add
+        handleAdded(storageKey, newToken);
+      } else if (existingToken) { //remove
+        handleRemoved(storageKey, existingToken);
+      }
+    });
   }
-  /* eslint-enable max-params */
   
   remove(key) {
     // Clear any listener for this token
@@ -364,11 +388,11 @@ export class TokenManager implements TokenManagerInterface {
     return validateToken(token);
   }
 
+  // TODO: renew method should take no param, change in the next major version OKTA-407224
   renew(key): Promise<Token> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
-    var existingPromise = this.state.renewPromise[key];
-    if (existingPromise) {
-      return existingPromise;
+    if (this.state.renewPromise) {
+      return this.state.renewPromise;
     }
   
     try {
@@ -385,14 +409,13 @@ export class TokenManager implements TokenManagerInterface {
   
     // A refresh token means a replace instead of renewal
     // Store the renew promise state, to avoid renewing again
-    this.state.renewPromise[key] = this.sdk.token.renew(token)
-      .then(freshToken => {
-        // store and emit events for freshToken
-        const oldTokenStorage = this.storage.getStorage();
-        this.remove(key);
-        this.add(key, freshToken);
-        this.emitRenewed(key, freshToken, oldTokenStorage[key]);
-        return freshToken;
+    this.state.renewPromise = this.sdk.token.renewTokens()
+      .then(tokens => {
+        this.setTokens(tokens);
+
+        // resolve token based on the key
+        const tokenType = this.getTokenType(token);
+        return tokens[tokenType];
       })
       .catch(err => {
         // If renew fails, remove token and emit error
@@ -407,10 +430,10 @@ export class TokenManager implements TokenManagerInterface {
       })
       .finally(() => {
         // Remove existing promise key
-        delete this.state.renewPromise[key];
+        this.state.renewPromise = null;
       });
   
-    return this.state.renewPromise[key];
+    return this.state.renewPromise;
   }
   
   clear() {
@@ -440,6 +463,8 @@ export class TokenManager implements TokenManagerInterface {
   
 }
 
+// TODO: remove this log OKTA-407224
+// setTokens behaves differently with add method, it comes with other side effects like it can remove token
 if (isLocalhost()) {
   (function addWarningsForLocalhost() {
     const { add } = TokenManager.prototype;

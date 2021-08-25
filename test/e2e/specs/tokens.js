@@ -11,11 +11,12 @@
  */
 
 
+import { crypto } from '@okta/okta-auth-js';
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaHome from '../pageobjects/OktaHome';
 import { flows, openImplicit, openPKCE } from '../util/appUtils';
-import { loginPopup } from '../util/loginUtils';
+import { loginPopup, loginDirect } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 
 
@@ -115,6 +116,76 @@ describe('E2E token flows', () => {
         await browser.refresh();
         await TestApp.waitForLoginBtn(); // assert we are logged out
       });
+    });
+  });
+});
+
+describe('Token auto renew', () => {
+  const defaultOptions = {
+    expireEarlySeconds: 60 * 59 + 55,
+    scopes
+  };
+
+  afterEach(async () => {
+    await TestApp.logoutRedirect();
+    // auto renew tests are highly stateful, reload session after each case
+    await browser.reloadSession();
+  });
+
+  describe('implicit flow', () => {
+    it('allows renewing an accessToken, without renewing idToken', async () => {
+      await openImplicit({ ...defaultOptions, responseType: 'token' });
+      await loginDirect();
+      await TestApp.startService();
+      await TestApp.subscribeToAuthState();
+      await TestApp.waitForAccessTokenRenew();
+      const idToken = await TestApp.getIdToken();
+      assert(idToken === null);
+    });
+
+    it('allows renewing an idToken, without renewing accessToken', async () => {
+      await openImplicit({ ...defaultOptions, responseType: 'id_token' });
+      await loginDirect();
+      await TestApp.startService();
+      await TestApp.subscribeToAuthState();
+      await TestApp.waitForIdTokenRenew();
+      const accessToken = await TestApp.getAccessToken();
+      assert(accessToken === null);
+    });
+  });
+
+  flows.forEach(flow => {
+    const openFn = flow === 'pkce' ? openPKCE : openImplicit;
+
+    it(`${flow}: renews idToken and accessToken`, async () => {
+      await openFn({ ...defaultOptions });
+      await loginDirect();
+      await TestApp.startService();
+      await TestApp.subscribeToAuthState();
+      // renews both token together
+      await TestApp.waitForIdTokenRenew();
+      const idToken = await TestApp.getIdToken();
+      const accessToken = await TestApp.getAccessToken();
+      // verify idToken integrity
+      const hash = await crypto.getOidcHash(accessToken.accessToken);
+      assert(hash === idToken.claims.at_hash);
+    });
+
+    it(`${flow} can continuously renew tokens`, async () => {
+      await openFn({ ...defaultOptions });
+      await loginDirect();
+      await TestApp.startService();
+      await TestApp.subscribeToAuthState();
+      // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+      for (const _ of [0, 0]) { // auto renew should be able to happen more than once
+        // renews both token together
+        await TestApp.waitForIdTokenRenew();
+        const idToken = await TestApp.getIdToken();
+        const accessToken = await TestApp.getAccessToken();
+        // verify idToken integrity
+        const hash = await crypto.getOidcHash(accessToken.accessToken);
+        assert(hash === idToken.claims.at_hash);
+      }
     });
   });
 });

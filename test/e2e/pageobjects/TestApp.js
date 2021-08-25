@@ -152,6 +152,26 @@ class TestApp {
     }, 5000, 'wait for get user info btn');
   }
 
+  async getIdToken() {
+    return this.idToken.then(el => el.getText()).then(txt => {
+      try {
+        return JSON.parse(txt);
+      } catch (_) {
+        return null;
+      }
+    });
+  }
+
+  async getAccessToken() {
+    return this.accessToken.then(el => el.getText()).then(txt => {
+      try {
+        return JSON.parse(txt);
+      } catch (_) {
+        return null;
+      }
+    });
+  }
+
   async returnHome() {
     await browser.waitUntil(async () => this.returnHomeBtn.then(el => el.isDisplayed()));
     await this.returnHomeBtn.then(el => el.click());
@@ -216,6 +236,22 @@ class TestApp {
 
   async waitForSigninWidget() {
     return browser.waitUntil(async () => this.signinWidget.then(el => el.isDisplayed()), 5000, 'wait for signin widget');
+  }
+
+  async waitForIdTokenRenew() {
+    const currIdToken = await this.getIdToken();
+    return browser.waitUntil(async () => {
+      const newIdToken = await this.getIdToken();
+      return currIdToken.idToken !== newIdToken.idToken && newIdToken.idToken;
+    }, 10000, 'wait for id_token renew');
+  }
+
+  async waitForAccessTokenRenew() {
+    const currAccessToken = await this.getAccessToken();
+    return browser.waitUntil(async () => {
+      const newAccessToken = await this.getAccessToken();
+      return currAccessToken.accessToken !== newAccessToken.accessToken && newAccessToken.accessToken;
+    }, 10000, 'wait for access_token renew');
   }
 
   async assertCallbackSuccess() {

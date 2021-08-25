@@ -69,6 +69,7 @@ export function getConfigFromUrl(): Config {
   const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
   const responseMode = url.searchParams.get('responseMode') || undefined;
   const storage = url.searchParams.get('storage') || undefined;
+  const expireEarlySeconds = +url.searchParams.get('expireEarlySeconds') || undefined;
   const secureCookies = url.searchParams.get('secure') !== 'false'; // On by default
   const sameSite = url.searchParams.get('sameSite') || undefined;
   const siwVersion = url.searchParams.get('siwVersion') || DEFAULT_SIW_VERSION;
@@ -98,6 +99,7 @@ export function getConfigFromUrl(): Config {
     },
     tokenManager: {
       storage,
+      expireEarlySeconds
     },
     useInteractionCodeFlow
   };

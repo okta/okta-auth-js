@@ -6,7 +6,7 @@ const config = [
   {
     app: '@okta/test.app',
     spec: [
-      'tokens.js'
+      '**/*.js'
     ],
     exclude: [
       'refreshTokens.js',
@@ -47,7 +47,7 @@ const config = [
     app: '@okta/test.app.react-mfa-v1',
     spec: ['mfa.js'],
     flags: [MFA_ENABLED]
-  }
+  },
 ];
 
 const configPredicate = config => {

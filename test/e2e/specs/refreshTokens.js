@@ -11,11 +11,12 @@
  */
 
 
+import { crypto } from '@okta/okta-auth-js';
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaHome from '../pageobjects/OktaHome';
 import { openPKCE } from '../util/appUtils';
-import { loginPopup } from '../util/loginUtils';
+import { loginPopup, loginDirect } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 
 describe('token revoke', () => {
@@ -120,4 +121,49 @@ describe('E2E token flows', () => {
     await browser.refresh();
     await TestApp.waitForLoginBtn(); // assert we are logged out
   });
+});
+
+describe('Token auto renew', () => {
+  const defaultOptions = {
+    expireEarlySeconds: 60 * 59 + 55
+  };
+
+  afterEach(async () => {
+    await TestApp.logoutRedirect();
+    // auto renew tests are highly stateful, reload session after each case
+    await browser.reloadSession();
+  });
+
+  it('renews idToken and accessToken', async () => {
+    await openPKCE({ ...defaultOptions });
+    await loginDirect();
+    await TestApp.startService();
+    await TestApp.subscribeToAuthState();
+    // renews both token together
+    await TestApp.waitForIdTokenRenew();
+    const idToken = await TestApp.getIdToken();
+    const accessToken = await TestApp.getAccessToken();
+    // verify idToken integrity
+    const hash = await crypto.getOidcHash(accessToken.accessToken);
+    assert(hash === idToken.claims.at_hash);
+  });
+
+  
+  it('can continuously renew tokens', async () => {
+    await openPKCE({ ...defaultOptions });
+    await loginDirect();
+    await TestApp.startService();
+    await TestApp.subscribeToAuthState();
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    for (const _ of [0, 0]) { // auto renew should be able to happen more than once
+      // renews both token together
+      await TestApp.waitForIdTokenRenew();
+      const idToken = await TestApp.getIdToken();
+      const accessToken = await TestApp.getAccessToken();
+      // verify idToken integrity
+      const hash = await crypto.getOidcHash(accessToken.accessToken);
+      assert(hash === idToken.claims.at_hash);
+    }
+  });
+
 });

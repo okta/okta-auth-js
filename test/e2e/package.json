@@ -12,6 +12,7 @@
     "start": "node ./runner"
   },
   "dependencies": {
+    "@okta/okta-auth-js": "*",
     "@babel/register": "^7.8.2",
     "cross-spawn-with-kill": "^1.0.0",
     "regenerator-runtime": "^0.13.3"
