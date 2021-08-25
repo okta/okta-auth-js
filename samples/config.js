@@ -86,7 +86,8 @@ const samples = [
       'social-login-mfa',
       'social-idp'
     ],
-    useEnv: true
+    useEnv: true,
+    express: true,
   },
   {
     name: 'express-embedded-sign-in-widget',
