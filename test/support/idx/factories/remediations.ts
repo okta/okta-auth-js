@@ -18,7 +18,7 @@ import {
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory
 } from './authenticators';
-import { EmailAuthenticatorFormFactory, PasswordFormFactory, PhoneAuthenticatorFormFactory, UserProfileFormFactory, VerifyEmailFormFactory, VerifySmsFormFactory } from './forms';
+import { EmailAuthenticatorFormFactory, ExtendedUserProfileFormFactory, PasswordFormFactory, PhoneAuthenticatorFormFactory, UserProfileFormFactory, VerifyEmailFormFactory, VerifySmsFormFactory } from './forms';
 
 import {
   UsernameValueFactory,
@@ -158,6 +158,16 @@ export const EnrollProfileRemediationFactory = IdxRemediationFactory.params({
     IdxValueFactory.build({
       name: 'userProfile',
       form: UserProfileFormFactory.build()
+    })
+  ]
+});
+
+export const EnrollExtendedProfileRemediationFactory = IdxRemediationFactory.params({
+  name: 'enroll-profile',
+  value: [
+    IdxValueFactory.build({
+      name: 'userProfile',
+      form: ExtendedUserProfileFormFactory.build()
     })
   ]
 });

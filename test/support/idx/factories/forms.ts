@@ -1,3 +1,4 @@
+import { CustomAttributeValueFactory } from './values';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -84,5 +85,14 @@ export const UserProfileFormFactory = IdxFormFactory.params({
     FirstNameValueFactory.build(),
     LastNameValueFactory.build(),
     EmailValueFactory.build()
+  ]
+});
+
+export const ExtendedUserProfileFormFactory = IdxFormFactory.params({
+  value: [
+    FirstNameValueFactory.build(),
+    LastNameValueFactory.build(),
+    EmailValueFactory.build(),
+    CustomAttributeValueFactory.build()
   ]
 });

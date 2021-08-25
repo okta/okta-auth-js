@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.4
+
+### Features
+
+- [#908](https://github.com/okta/okta-auth-js/pull/908) Enables dynamic attributes for profile enrollment
+
 ## 5.3.1
 
 ### Bug Fixes

@@ -28,13 +28,13 @@ export class EnrollProfile extends Remediator {
     'userProfile': []
   };
 
-  mapUserProfile() {
-    const { firstName, lastName, email } = this.values;
-    return {
-      firstName,
-      lastName,
-      email,
-    };
+  mapUserProfile({form: { value: profileAttributes }}) {
+    const attributeNames = profileAttributes.map(({name}) => name);
+    return attributeNames.reduce((attributeValues, attributeName) => (
+      this.values[attributeName] ? {
+      ...attributeValues,
+      [attributeName]: this.values[attributeName]
+    } : attributeValues), {});
   }
 
   getInputUserProfile(input) {
