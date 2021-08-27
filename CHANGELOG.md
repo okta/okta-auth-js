@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.4.1
+
+-[#916](https://github.com/okta/okta-auth-js/pull/916) Removes misleading warning message for TokenManager methods
+
 ## 5.4.0
 
 ### Features
