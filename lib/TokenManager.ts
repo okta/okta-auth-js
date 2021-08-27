@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { removeNils, warn, clone } from './util';
+import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
 import { isRefreshTokenError, validateToken  } from './oidc/util';
 import { isLocalhost, isIE11OrLess } from './features';
@@ -461,22 +461,4 @@ export class TokenManager implements TokenManagerInterface {
     this.storage.setStorage(tokenStorage);
   }
   
-}
-
-// TODO: remove this log OKTA-407224
-// setTokens behaves differently with add method, it comes with other side effects like it can remove token
-if (isLocalhost()) {
-  (function addWarningsForLocalhost() {
-    const { add } = TokenManager.prototype;
-    Object.assign(TokenManager.prototype, {
-      add: function(key, token: Token) {
-        warn(
-          'Use setTokens() instead if you want to add a set of tokens at same time.\n' + 
-          'It prevents current tab from emitting unnecessary StorageEvent,\n' + 
-          'which may cause false-positive authState change cross tabs.'
-        );
-        add.call(this, key, token);
-      }
-    });
-  })();
 }
