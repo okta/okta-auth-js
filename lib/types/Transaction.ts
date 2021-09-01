@@ -15,7 +15,8 @@ import StorageManager from '../StorageManager';
 import { CustomUrls } from './OktaAuthOptions';
 
 export interface TransactionManagerOptions {
-  storageManager: StorageManager;
+  storageManager?: StorageManager;
+  enableSharedStorage?: boolean; // default true
   legacyWidgetSupport?: boolean; // default true
   saveNonceCookie?: boolean; // default true
   saveStateCookie?: boolean; // default true
@@ -26,6 +27,7 @@ export interface TransactionMetaOptions {
   pkce?: boolean;
   oauth?: boolean;
   muteWarning?: boolean;
+  state?: string;
 }
 
 // formerly known as "Redirect OAuth Params"
@@ -39,6 +41,7 @@ export interface OAuthTransactionMeta {
   clientId: string;
   urls: CustomUrls;
   ignoreSignature: boolean;
+  originalUri?: string;
 }
 
 export interface PKCETransactionMeta extends OAuthTransactionMeta {

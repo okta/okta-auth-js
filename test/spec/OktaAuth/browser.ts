@@ -21,6 +21,17 @@ import {
 import tokens from '@okta/test.support/tokens';
 import storageUtil from '../../../lib/browser/browserStorage';
 
+jest.mock('../../../lib/oidc/parseFromUrl', () => {
+  return {
+    parseOAuthResponseFromUrl: async () => { return {}; },
+    parseFromUrl: async () => { return {}; },
+  };
+});
+
+const mocked = {
+  parseFromUrl: require('../../../lib/oidc/parseFromUrl')
+};
+
 describe('OktaAuth (browser)', function() {
   let auth;
   let issuer;
@@ -492,7 +503,7 @@ describe('OktaAuth (browser)', function() {
         removeItem: removeItemMock
       }));
     });
-    it('should get and cleare referrer from storage', () => {
+    it('should get and clear referrer from storage', () => {
       const res = auth.getOriginalUri();
       expect(res).toBe('fakeOriginalUri');
     });
@@ -500,6 +511,21 @@ describe('OktaAuth (browser)', function() {
       getItemMock = jest.fn().mockReturnValue(null);
       const res = auth.getOriginalUri();
       expect(res).toBe(null);
+    });
+    describe('with state', () => {
+      it('returns value from transactionManager', () => {
+        const originalUri = 'http://fake';
+        const meta = {
+          originalUri
+        };
+        jest.spyOn(auth.transactionManager, 'load').mockReturnValue(meta);
+        const res = auth.getOriginalUri('mock-state');
+        expect(res).toBe(originalUri);
+        expect(auth.transactionManager.load).toHaveBeenCalledWith({
+          oauth: true,
+          state: 'mock-state'
+        });
+      });
     });
   });
 
@@ -523,35 +549,101 @@ describe('OktaAuth (browser)', function() {
       jest.spyOn(auth, 'getOriginalUri').mockReturnValue('/fakeuri');
       jest.spyOn(auth, 'removeOriginalUri');
       jest.spyOn(auth.tokenManager, 'hasExpired').mockReturnValue(false);
-    });
 
-    it('should redirect to originalUri when tokens are provided', async () => {
-      await auth.handleLoginRedirect({
-        accessToken: tokens.standardAccessTokenParsed,
-        idToken: tokens.standardIdTokenParsed
+      const parseFromUrl = auth.token.parseFromUrl = jest.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (parseFromUrl as any)._getLocation = jest.fn().mockReturnValue({
+        hash: '#mock-hash',
+        search: '?mock-search'
       });
-      expect(auth.getOriginalUri).toHaveBeenCalled();
-      expect(auth.removeOriginalUri).toHaveBeenCalled();
-      expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
     });
 
-    it('should get tokens from the callback url when under login redirect flow', async () => {
-      auth.token.parseFromUrl = jest.fn().mockResolvedValue({
-        tokens: {
+    describe('tokens are passed', () => {
+      it('should redirect to originalUri', async () => {
+        await auth.handleLoginRedirect({
           accessToken: tokens.standardAccessTokenParsed,
           idToken: tokens.standardIdTokenParsed
-        }
+        });
+        expect(auth.getOriginalUri).toHaveBeenCalledWith();
+        expect(auth.removeOriginalUri).toHaveBeenCalledWith();
+        expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
       });
-      auth.isLoginRedirect = jest.fn().mockReturnValue(true);
-      await auth.handleLoginRedirect();
-      expect(auth.getOriginalUri).toHaveBeenCalled();
-      expect(auth.removeOriginalUri).toHaveBeenCalled();
-      expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
+
+      it('originalUri can be overridden', async () => {
+        await auth.handleLoginRedirect({
+          accessToken: tokens.standardAccessTokenParsed,
+          idToken: tokens.standardIdTokenParsed
+        }, '/overridden');
+        expect(auth.getOriginalUri).not.toHaveBeenCalledWith();
+        expect(auth.removeOriginalUri).toHaveBeenCalledWith();
+        expect(window.location.replace).toHaveBeenCalledWith('/overridden');
+      });
+    });
+
+    describe('no tokens are passed, login redirect flow', () => {
+      beforeEach(() => {
+        jest.spyOn(auth, 'isLoginRedirect').mockReturnValue(true);
+      });
+      it('should get tokens from the callback url', async () => {
+        auth.token.parseFromUrl.mockResolvedValue({
+          tokens: {
+            accessToken: tokens.standardAccessTokenParsed,
+            idToken: tokens.standardIdTokenParsed
+          }
+        });
+
+        await auth.handleLoginRedirect();
+        expect(auth.getOriginalUri).toHaveBeenCalled();
+        expect(auth.removeOriginalUri).toHaveBeenCalled();
+        expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
+      });
+
+      it('originalUri can be overridden', async () => {
+        auth.token.parseFromUrl.mockResolvedValue({
+          tokens: {
+            accessToken: tokens.standardAccessTokenParsed,
+            idToken: tokens.standardIdTokenParsed
+          }
+        });
+        await auth.handleLoginRedirect(null, '/overridden');
+        expect(auth.getOriginalUri).not.toHaveBeenCalledWith();
+        expect(auth.removeOriginalUri).toHaveBeenCalledWith();
+        expect(window.location.replace).toHaveBeenCalledWith('/overridden');
+      });
+
+      describe('with state', () => {
+        beforeEach(() => {
+          jest.spyOn(mocked.parseFromUrl, 'parseOAuthResponseFromUrl').mockResolvedValue({
+            state: 'mock-state'
+          });
+          auth.token.parseFromUrl.mockResolvedValue({
+            tokens: {
+              accessToken: tokens.standardAccessTokenParsed,
+              idToken: tokens.standardIdTokenParsed
+            }
+          });
+        });
+        it('passes state to `getOriginalUri`', async () => {
+          jest.spyOn(auth, 'getOriginalUri');
+          await auth.handleLoginRedirect();
+          expect(mocked.parseFromUrl.parseOAuthResponseFromUrl).toHaveBeenCalledWith(auth, {});
+          expect(auth.getOriginalUri).toHaveBeenCalledWith('mock-state');
+          expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
+        });
+        it('can override originalUri', async () => {
+          jest.spyOn(auth, 'getOriginalUri');
+          const originalUri = '/overridden';
+          await auth.handleLoginRedirect(null, originalUri);
+          expect(mocked.parseFromUrl.parseOAuthResponseFromUrl).toHaveBeenCalledWith(auth, {});
+          expect(auth.getOriginalUri).not.toHaveBeenCalled();
+          expect(window.location.replace).toHaveBeenCalledWith('/overridden');
+        });
+      });
     });
 
     it('should use options.restoreOriginalUri if provided', async () => {
       auth.options.restoreOriginalUri = jest.fn();
-      auth.token.parseFromUrl = jest.fn().mockResolvedValue({
+      auth.token.parseFromUrl.mockResolvedValue({
         tokens: {
           accessToken: tokens.standardAccessTokenParsed,
           idToken: tokens.standardIdTokenParsed
@@ -575,7 +667,7 @@ describe('OktaAuth (browser)', function() {
 
     it('will not redirect if parseFromUrl throws an error', async () => {
       const error = new Error('mock error');
-      auth.token.parseFromUrl = jest.fn().mockImplementation(async () => {
+      auth.token.parseFromUrl.mockImplementation(async () => {
         throw error;
       });
       auth.isLoginRedirect = jest.fn().mockReturnValue(true);
@@ -588,10 +680,11 @@ describe('OktaAuth (browser)', function() {
       }
       expect(errorThrown).toBe(true);
       await auth.authStateManager.updateAuthState();
-      expect(auth.getOriginalUri).not.toHaveBeenCalled();
+      expect(auth.getOriginalUri).toHaveBeenCalled();
       expect(auth.removeOriginalUri).not.toHaveBeenCalled();
       expect(window.location.replace).not.toHaveBeenCalled();
     });
+
   });
 
 });

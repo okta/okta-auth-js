@@ -13,7 +13,13 @@
  */
 import { AuthSdkError } from '../errors';
 import { isInteractionRequiredError, urlParamsToObject } from './util';
-import { ParseFromUrlOptions, TokenResponse, CustomUrls, TransactionMeta } from '../types';
+import {
+  ParseFromUrlOptions,
+  TokenResponse,
+  CustomUrls,
+  TransactionMeta,
+  OAuthResponse
+} from '../types';
 import { isString } from '../util';
 import { handleOAuthResponse } from './handleOAuthResponse';
 
@@ -39,19 +45,23 @@ function removeSearch(sdk) {
   }
 }
 
+export function getResponseMode(sdk): 'query' | 'fragment' {
+  // https://openid.net/specs/openid-connect-core-1_0.html#Authentication
+  var defaultResponseMode = sdk.options.pkce ? 'query' : 'fragment';
+  var responseMode = sdk.options.responseMode || defaultResponseMode;
+  return responseMode;
+}
 
-export function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<TokenResponse> {
+export async function parseOAuthResponseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<OAuthResponse> {
   options = options || {};
   if (isString(options)) {
     options = { url: options } as ParseFromUrlOptions;
   } else {
     options = options as ParseFromUrlOptions;
   }
-  // https://openid.net/specs/openid-connect-core-1_0.html#Authentication
-  var defaultResponseMode = sdk.options.pkce ? 'query' : 'fragment';
 
   var url = options.url;
-  var responseMode = options.responseMode || sdk.options.responseMode || defaultResponseMode;
+  var responseMode = options.responseMode || getResponseMode(sdk);
   var nativeLoc = sdk.token.parseFromUrl._getLocation();
   var paramStr;
 
@@ -62,32 +72,55 @@ export function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promis
   }
 
   if (!paramStr) {
-    return Promise.reject(new AuthSdkError('Unable to parse a token from the url'));
+    throw new AuthSdkError('Unable to parse a token from the url');
   }
 
+  return urlParamsToObject(paramStr);
+}
+
+export function cleanOAuthResponseFromUrl(sdk, options: ParseFromUrlOptions) {
+  // Clean hash or search from the url
+  const responseMode = options.responseMode || getResponseMode(sdk);
+  responseMode === 'query' ? removeSearch(sdk) : removeHash(sdk);
+}
+
+export async function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<TokenResponse> {
+  options = options || {};
+  if (isString(options)) {
+    options = { url: options } as ParseFromUrlOptions;
+  } else {
+    options = options as ParseFromUrlOptions;
+  }
+
+  const res: OAuthResponse = await parseOAuthResponseFromUrl(sdk, options);
+  const state = res.state;
   const oauthParams: TransactionMeta = sdk.transactionManager.load({
     oauth: true,
-    pkce: sdk.options.pkce
+    pkce: sdk.options.pkce,
+    state
   });
   const urls: CustomUrls = oauthParams.urls as CustomUrls;
   delete oauthParams.urls;
 
-  return Promise.resolve(urlParamsToObject(paramStr))
-    .then(function (res) {
-      if (!url) {
-        // Clean hash or search from the url
-        responseMode === 'query' ? removeSearch(sdk) : removeHash(sdk);
-      }
-      return handleOAuthResponse(sdk, oauthParams, res, urls)
-        .catch(err => {
-          if (!isInteractionRequiredError(err)) {
-            sdk.transactionManager.clear();
-          }
-          throw err;
-        })
-        .then(res => {
-          sdk.transactionManager.clear();
-          return res;
+  if (!options.url) {
+    // Clean hash or search from the url
+    cleanOAuthResponseFromUrl(sdk, options);
+  }
+
+  return handleOAuthResponse(sdk, oauthParams, res, urls)
+    .catch(err => {
+      if (!isInteractionRequiredError(err)) {
+        sdk.transactionManager.clear({
+          state
         });
+      }
+      throw err;
+    })
+    .then(res => {
+      sdk.transactionManager.clear({
+        state
+      });
+      return res;
     });
+
 }

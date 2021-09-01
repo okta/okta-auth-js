@@ -48,6 +48,9 @@ const Form = `
     <option value="cookie">Cookie</option>
     <option value="memory">Memory</option>
   </select><br/>
+  <label for="enableSharedStorage">Enable shared transaction storage (to continue flow in another tab)</label><br/>
+  <input id="f_enableSharedStorage-on" name="enableSharedStorage" type="radio" value="true"/>YES<br/>
+  <input id="f_enableSharedStorage-off" name="enableSharedStorage" type="radio" value="false"/>NO<br/>
   <label for="expireEarlySeconds">ExpireEarlySeconds</label><input id="f_expireEarlySeconds" name="expireEarlySeconds" type="number" /><br/>
   <label for="secure">Secure Cookies</label><br/>
   <input id="f_secureCookies-on" name="secure" type="radio" value="true"/>ON<br/>
@@ -131,6 +134,12 @@ export function updateForm(origConfig: Config): void {
     (document.getElementById('f_authClient-on') as HTMLInputElement).checked = true;
   } else {
     (document.getElementById('f_authClient-off') as HTMLInputElement).checked = true;
+  }
+
+  if (config.enableSharedStorage) {
+    (document.getElementById('f_enableSharedStorage-on') as HTMLInputElement).checked = true;
+  } else {
+    (document.getElementById('f_enableSharedStorage-off') as HTMLInputElement).checked = true;
   }
 }
 

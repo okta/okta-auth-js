@@ -27,7 +27,12 @@ import {
 } from './types';
 import { RawIdxResponse, isRawIdxResponse } from './idx/types/idx-js';
 import { warn } from './util';
-
+import {
+  clearTransactionFromSharedStorage,
+  loadTransactionFromSharedStorage,
+  pruneSharedStorage,
+  saveTransactionToSharedStorage
+} from './util/sharedStorage';
 export default class TransactionManager {
   options: TransactionManagerOptions;
   storageManager: StorageManager;
@@ -35,6 +40,7 @@ export default class TransactionManager {
   saveNonceCookie: boolean;
   saveStateCookie: boolean;
   saveParamsCookie: boolean;
+  enableSharedStorage: boolean;
 
   constructor(options: TransactionManagerOptions) {
     this.storageManager = options.storageManager;
@@ -42,6 +48,7 @@ export default class TransactionManager {
     this.saveNonceCookie = options.saveNonceCookie === false ? false : true;
     this.saveStateCookie = options.saveStateCookie === false ? false : true;
     this.saveParamsCookie = options.saveParamsCookie === false ? false : true;
+    this.enableSharedStorage = options.enableSharedStorage === false ? false : true;
     this.options = options;
   }
 
@@ -52,6 +59,10 @@ export default class TransactionManager {
     const idxStateStorage: StorageProvider = this.storageManager.getIdxResponseStorage();
     idxStateStorage?.clearStorage();
 
+    if (this.enableSharedStorage && options.state) {
+      clearTransactionFromSharedStorage(this.storageManager, options.state);
+    }
+  
     if (!this.legacyWidgetSupport) {
       return;
     }
@@ -88,6 +99,7 @@ export default class TransactionManager {
       return;
     }
   
+    // Legacy cookie storage
     if (this.saveNonceCookie || this.saveStateCookie || this.saveParamsCookie) {
       const cookieStorage: CookieStorage = this.storageManager.getStorage({ storageType: 'cookie' }) as CookieStorage;
 
@@ -123,6 +135,11 @@ export default class TransactionManager {
         cookieStorage.setItem(REDIRECT_STATE_COOKIE_NAME, meta.state, null);
       }
     }
+
+    // Shared storage allows continuation of transaction in another tab
+    if (this.enableSharedStorage && meta.state) {
+      saveTransactionToSharedStorage(this.storageManager, meta.state, meta);
+    }
   }
 
   exists(options: TransactionMetaOptions = {}): boolean {
@@ -135,9 +152,22 @@ export default class TransactionManager {
   }
 
   // load transaction meta from storage
+  // eslint-disable-next-line complexity,max-statements
   load(options: TransactionMetaOptions = {}): TransactionMeta {
+
+    let meta: TransactionMeta;
+
+    // If state was passed, try loading transaction data from shared storage
+    if (this.enableSharedStorage && options.state) {
+      pruneSharedStorage(this.storageManager); // prune before load
+      meta = loadTransactionFromSharedStorage(this.storageManager, options.state);
+      if (isTransactionMeta(meta)) {
+        return meta;
+      }
+    }
+
     let storage: StorageProvider = this.storageManager.getTransactionStorage();
-    let meta = storage.getStorage();
+    meta = storage.getStorage();
     if (isTransactionMeta(meta)) {
       // if we have meta in the new location, there is no need to go further
       return meta;

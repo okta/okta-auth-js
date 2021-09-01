@@ -35,7 +35,8 @@ export interface OktaAuth {
   options: OktaAuthOptions;
   userAgent: string;
   getIssuerOrigin(): string;
-  
+  getOriginalUri(): string;
+
   _oktaUserAgent: OktaUserAgent;
   storageManager: StorageManager;
   transactionManager: TransactionManager;
