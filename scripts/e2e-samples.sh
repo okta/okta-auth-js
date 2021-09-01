@@ -21,9 +21,14 @@ export FB_USERNAME=js_ekdtypn_user@tfbnw.net
 get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 
 # Pull testenv.yml file
-aws s3 --quiet --region us-east-1 cp s3://ci-secret-stash/prod/okta-sdk-vars/testenv.yml $OKTA_HOME/$REPO/testenv.yml
+# aws s3 --quiet --region us-east-1 cp s3://ci-secret-stash/prod/okta-sdk-vars/testenv.yml $OKTA_HOME/$REPO/testenv.yml
 #get_secret prod/okta-sdk-vars/testenv.yml TESTENV_YML
 #echo $TESTENV_YML > $OKTA_HOME/$REPO/testenv.yml
+
+get_vault_secret_key devex/trex-js-idx-sdk-yml testenv.yml TEST_ENV_YML
+echo $TEST_ENV_YML > $OKTA_HOME/$REPO/testenv.yml
+
+wc -l $OKTA_HOME/$REPO/testenv.yml
 
 # If this script is run as a bacon task, run against trexcloud environment
 if [[ "${BACON_TASK}" == true ]]; then
