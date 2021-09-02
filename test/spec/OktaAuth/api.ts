@@ -258,6 +258,48 @@ describe('OktaAuth (api)', function() {
       expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
     });
 
+    it('can renew expired accessToken and return true if autoRenew=true', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: { accessToken: true },
+        idToken: { idToken: true }
+      });
+      jest.spyOn(auth.tokenManager, 'getOptions').mockReturnValue({
+        autoRenew: true,
+        autoRemove: false,
+      });
+      jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
+        return isAccessToken(token) ? true : false;
+      });
+      jest.spyOn(auth.tokenManager, 'renew').mockImplementation(_tokenType => true);
+      const res = await auth.isAuthenticated();
+      expect(res).toBe(true);
+      expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+      expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
+      expect(auth.tokenManager.renew).toHaveBeenCalledTimes(1);
+      expect(auth.tokenManager.renew).toHaveBeenCalledWith('accessToken');
+    });
+
+    it('can renew expired idToken and return true if autoRenew=true', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: { accessToken: true },
+        idToken: { idToken: true }
+      });
+      jest.spyOn(auth.tokenManager, 'getOptions').mockReturnValue({
+        autoRenew: true,
+        autoRemove: false,
+      });
+      jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
+        return isIDToken(token) ? true : false;
+      });
+      jest.spyOn(auth.tokenManager, 'renew').mockImplementation(_tokenType => true);
+      const res = await auth.isAuthenticated();
+      expect(res).toBe(true);
+      expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+      expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
+      expect(auth.tokenManager.renew).toHaveBeenCalledTimes(1);
+      expect(auth.tokenManager.renew).toHaveBeenCalledWith('idToken');
+    });
+
   });
 
   describe('getUser', () => {
