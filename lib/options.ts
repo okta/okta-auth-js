@@ -145,7 +145,6 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     devMode: !!args.devMode,
     storageManager: args.storageManager,
     cookies: isBrowser() ? getCookieSettings(args, isHTTPS()) : args.cookies,
-    tokenManager: args.tokenManager,
 
     // Give the developer the ability to disable token signature validation.
     ignoreSignature: !!args.ignoreSignature,
