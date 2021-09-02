@@ -298,6 +298,49 @@ describe('OktaAuth (api)', function() {
         expect(auth.tokenManager.renew).toHaveBeenCalledWith('idToken');
       });
     });
+
+    describe('if autoRemove=true', () => {
+      beforeEach(function() {
+        auth = new OktaAuth({ issuer, pkce: false, tokenManager: {
+          autoRenew: false,
+          autoRemove: true,
+        } });
+      });
+
+      it('remove expired accessToken and return false', async () => {
+        jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+          accessToken: { accessToken: true },
+          idToken: { idToken: true }
+        });
+        jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
+          return isAccessToken(token) ? true : false;
+        });
+        jest.spyOn(auth.tokenManager, 'remove').mockReturnValue(undefined);
+        const res = await auth.isAuthenticated();
+        expect(res).toBe(false);
+        expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+        expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
+        expect(auth.tokenManager.remove).toHaveBeenCalledTimes(1);
+        expect(auth.tokenManager.remove).toHaveBeenCalledWith('accessToken');
+      });
+  
+      it('remove expired idToken and return false', async () => {
+        jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+          accessToken: { accessToken: true },
+          idToken: { idToken: true }
+        });
+        jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
+          return isIDToken(token) ? true : false;
+        });
+        jest.spyOn(auth.tokenManager, 'remove').mockReturnValue(undefined);
+        const res = await auth.isAuthenticated();
+        expect(res).toBe(false);
+        expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
+        expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
+        expect(auth.tokenManager.remove).toHaveBeenCalledTimes(1);
+        expect(auth.tokenManager.remove).toHaveBeenCalledWith('idToken');
+      });
+    });
   });
 
   describe('getUser', () => {
