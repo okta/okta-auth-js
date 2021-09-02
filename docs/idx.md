@@ -2,21 +2,35 @@
 [Okta Sign-In Widget]: https://github.com/okta/okta-signin-widget
 [Embedded auth with SDKs]: https://github.com/okta/okta-auth-js/tree/master/samples/generated/express-direct-auth
 
+<!-- omit in toc -->
 # IDX
 
 - [Introduction](#introduction)
+- [Migrating from authn](#migrating-from-authn)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Concepts](#concepts)
     - [Approaches](#approaches)
+      - [Up-Front approach](#up-front-approach)
+      - [On-Demand approach](#on-demand-approach)
     - [Response](#response)
+      - [Flow related fields](#flow-related-fields)
+        - [`status`](#status)
+        - [`nextStep?`](#nextstep)
+        - [`tokens?`](#tokens)
+        - [`messages?`](#messages)
+        - [`error?`](#error)
+      - [Start Transaction related fields](#start-transaction-related-fields)
+        - [`meta?`](#meta)
+        - [`enabledFeatures?`](#enabledfeatures)
+        - [`availableSteps?`](#availablesteps)
   - [API Reference](#api-reference)
-    - [idx.authenticate](#idxauthenticate)
-    - [idx.register](#idxregister)
-    - [idx.recoverPassword](#idxrecoverpassword)
-    - [idx.startTransaction](#idxstarttransaction)
-    - [idx.cancel](#idxcancel)
-    - [idx.handleInteractionCodeRedirect](#idxhandleinteractioncoderedirect)
+    - [`idx.authenticate`](#idxauthenticate)
+    - [`idx.register`](#idxregister)
+    - [`idx.recoverPassword`](#idxrecoverpassword)
+    - [`idx.startTransaction`](#idxstarttransaction)
+    - [`idx.cancel`](#idxcancel)
+    - [`idx.handleInteractionCodeRedirect`](#idxhandleinteractioncoderedirect)
 
 ## Introduction
 
@@ -25,6 +39,10 @@
 This module is built to communicate with Okta as an OAuth 2.0 + OpenID Connect provider. It works with [Okta's Identity Engine][] to authenticate and register users.
 
 To see this library working in a sample, check out our [Embedded auth with SDKs][] sample.
+
+## Migrating from authn
+
+The [IDX API](./idx.md) is built on the [Okta Identity Engine][]. The API allows applications to implement features which were not possible with the older [authn API](./authn.md), such as multi-factor authentication without redirection to Okta. We recommend that all new application deployments use the `IDX` API. Existing applications can migrate from `authn` to `IDX` by following [this guide](./migrate-from-authn-to-idx.md).
 
 ## Installation
 
