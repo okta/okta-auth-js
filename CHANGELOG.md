@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.4.2
+
+### Bug Fixes
+
+- [#927](https://github.com/okta/okta-auth-js/pull/927) Not trigger `authStateManager.updateAuthState` during login redirect in `start` method.
+
 ## 5.4.1
 
 -[#916](https://github.com/okta/okta-auth-js/pull/916) Removes misleading warning message for TokenManager methods

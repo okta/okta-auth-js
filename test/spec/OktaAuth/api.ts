@@ -36,6 +36,9 @@ describe('OktaAuth (api)', function() {
   });
 
   describe('service methods', () => {
+    beforeEach(() => {
+      jest.spyOn(auth.token, 'isLoginRedirect').mockReturnValue(false);
+    });
     afterEach(() => {
       auth.stop();
     });
@@ -50,6 +53,12 @@ describe('OktaAuth (api)', function() {
         jest.spyOn(auth.authStateManager, 'updateAuthState');
         auth.start();
         expect(auth.authStateManager.updateAuthState).toHaveBeenCalled(); 
+      });
+      it('should not update auth state during login redirect', () => {
+        jest.spyOn(auth.authStateManager, 'updateAuthState');
+        jest.spyOn(auth.token, 'isLoginRedirect').mockReturnValue(true);
+        auth.start();
+        expect(auth.authStateManager.updateAuthState).not.toHaveBeenCalled(); 
       });
     });
 
