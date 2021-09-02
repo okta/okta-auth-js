@@ -186,6 +186,13 @@ describe('OktaAuth (api)', function() {
 
   describe('isAuthenticated', () => {
 
+    beforeEach(function() {
+      auth = new OktaAuth({ issuer, pkce: false, tokenManager: {
+        autoRenew: false,
+        autoRemove: false,
+      } });
+    });
+
     it('returns true if accessToken and idToken exist and are not expired', async () => {
       jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
         accessToken: { fake: true },
@@ -227,10 +234,6 @@ describe('OktaAuth (api)', function() {
         accessToken: { accessToken: true },
         idToken: { idToken: true }
       });
-      jest.spyOn(auth.tokenManager, 'getOptions').mockReturnValue({
-        autoRenew: false,
-        autoRemove: false,
-      });
       jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
         return isAccessToken(token) ? true : false;
       });
@@ -244,10 +247,6 @@ describe('OktaAuth (api)', function() {
       jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
         accessToken: { accessToken: true },
         idToken: { idToken: true }
-      });
-      jest.spyOn(auth.tokenManager, 'getOptions').mockReturnValue({
-        autoRenew: false,
-        autoRemove: false,
       });
       jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
         return isIDToken(token) ? true : false;
