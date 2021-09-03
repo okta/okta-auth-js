@@ -53,4 +53,5 @@ export interface HttpResponse {
   responseJSON?: {
     [propName: string]: any;
   };
+  rawResponse: Response;
 }

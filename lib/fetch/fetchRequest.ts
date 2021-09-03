@@ -29,11 +29,12 @@ function readData(response: FetchResponse): Promise<object | string> {
   }
 }
 
-function formatResult(status: number, data: object | string) {
+function formatResult(status: number, data: object | string, response: Response) {
   const isObject = typeof data === 'object';
   const result: HttpResponse = {
     responseText: isObject ? JSON.stringify(data) : data as string,
-    status: status
+    status: status,
+    rawResponse: response
   };
   if (isObject) {
     result.responseType = 'json';
@@ -69,7 +70,7 @@ function fetchRequest(method: string, url: string, args: FetchOptions) {
     var status = response.status;
     return readData(response)
       .then(data => {
-        return formatResult(status, data);
+        return formatResult(status, data, response);
       })
       .then(result => {
         if (error || result.responseJSON?.error) {
