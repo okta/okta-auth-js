@@ -190,7 +190,8 @@ describe('fetchRequest', function () {
           status: response.status,
           responseJSON,
           responseText,
-          responseType: 'json'
+          responseType: 'json',
+          rawResponse: response
         });
       });
     });
@@ -201,7 +202,8 @@ describe('fetchRequest', function () {
       .then(res => {
         expect(res).toEqual({
           status: response.status,
-          responseText
+          responseText,
+          rawResponse: response
         });
       });
     });
@@ -215,7 +217,8 @@ describe('fetchRequest', function () {
           status: response.status,
           responseText,
           responseType: 'json',
-          responseJSON
+          responseJSON,
+          rawResponse: response
         });
       });
     });
@@ -228,7 +231,8 @@ describe('fetchRequest', function () {
       .catch(err => {
         expect(err).toEqual({
           status: response.status,
-          responseText
+          responseText,
+          rawResponse: response
         });
       });
     });
@@ -253,7 +257,8 @@ describe('fetchRequest', function () {
           status: response.status,
           responseText: JSON.stringify(errorJSON),
           responseJSON: errorJSON,
-          responseType: 'json'
+          responseType: 'json',
+          rawResponse: response
         });
       });
     });
@@ -277,7 +282,8 @@ describe('fetchRequest', function () {
           status: response.status,
           responseText: JSON.stringify(errorJSON),
           responseJSON: errorJSON,
-          responseType: 'json'
+          responseType: 'json',
+          rawResponse: response
         });
       });
     });
