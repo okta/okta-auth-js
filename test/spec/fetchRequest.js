@@ -208,6 +208,15 @@ describe('fetchRequest', function () {
       });
     });
 
+    it('Contains raw response that can be used to get response headers', function() {
+      responseHeaders.set('X-Rate-Limit-Limit', '500');
+      return fetchRequest(requestMethod, requestUrl, {})
+      .then(res => {
+        expect(res.rawResponse).toBeDefined();
+        expect(res.rawResponse.headers.get('X-Rate-Limit-Limit')).toEqual('500');
+      });
+    });
+
     it('Throws the response if response.ok is false (JSON)', () => {
       response.status = 401;
       response.ok = false;

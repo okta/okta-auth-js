@@ -177,7 +177,8 @@ describe('TokenManager renew', () => {
         responseText: 'does not matter',
         responseJSON: {
           error: 'invalid_grant'
-        }
+        },
+        rawResponse: null
       });
       try {
         await testContext.instance.renew('idToken');
