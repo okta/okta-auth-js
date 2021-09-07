@@ -271,6 +271,13 @@ function setup(options) {
     });
 }
 
+function cleanRes(res) {
+  delete res.rawResponse;
+  if (res.data) {
+    delete res.data.rawResponse;
+  }
+}
+
 util.itMakesCorrectRequestResponse = function (options) {
   var fn = options.only ? it.only : it,
       title = options.title || 'makes correct request and returns response';
@@ -278,6 +285,7 @@ util.itMakesCorrectRequestResponse = function (options) {
     return setup(options.setup).then(function (test) {
       return options.execute(test)
       .then(function (res) {
+        cleanRes(res);
         if (res.data) {
           test.trans = res;
         }
@@ -298,6 +306,7 @@ util.itErrorsCorrectly = function (options) {
     return setup(options.setup).then(function (test) {
       return options.execute(test)
       .catch(function (err) {
+        cleanRes(err);
         if (options.expectations) {
           options.expectations(test, err);
           test.ajaxMock.done();
