@@ -174,18 +174,26 @@ export async function remediate(
   options: RunOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
+  const { flow, flowMonitor } = options;
+
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
     return { idxResponse };
   }
-  const { flow, flowMonitor } = options;
+
+  // Reach to terminal state
+  const terminal = isTerminalResponse(idxResponse);
+  const messages = getIdxMessages(idxResponse, flow);
+  if (terminal) {
+    return { terminal, messages };
+  }
+  
+  // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values);
   const actions = [
     ...options.actions || [],
     ...(actionFromValues && [actionFromValues] || []),
   ];
-
-  // Try actions in idxResponse first
   if (actions) {
     for (let action of actions) {
       let valuesWithoutExecutedAction = removeActionFromValues(values, action);

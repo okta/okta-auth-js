@@ -254,6 +254,31 @@ describe('idx/authenticate', () => {
       }]);
     });
 
+    it('returns terminal error when user account is not assigned to the application and okta session exists', async () => {
+      const { authClient } = testContext;
+      const errorResponse = RawIdxResponseFactory.build({
+        messages: IdxMessagesFactory.build({
+          value: [
+            IdxErrorUserNotAssignedFactory.build()
+          ]
+        })
+      });
+      const idxResponse = IdxResponseFactory.build({
+        rawIdxState: errorResponse
+      });
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
+
+      const res = await authenticate(authClient, {});
+      expect(res.status).toBe(IdxStatus.TERMINAL);
+      expect(res.messages).toEqual([{
+        class: 'ERROR',
+        i18n: {
+          key: undefined // this error does not have an i18n key
+        },
+        message: 'User is not assigned to this application'
+      }]);
+    });
+
     it('returns terminal error when user account is locked or suspeneded', async () => {
       const { authClient } = testContext;
       const errorResponse = RawIdxResponseFactory.build({
