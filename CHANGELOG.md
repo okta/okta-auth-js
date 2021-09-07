@@ -6,6 +6,7 @@
 
 - [#926](https://github.com/okta/okta-auth-js/pull/926) Fixes incorrect using of `tokenManager` config (options `autoRenew`, `autoRemove`) in `OktaAuth.isAuthenticated`.
 - [#931](https://github.com/okta/okta-auth-js/pull/931) Fixes types compatibility issue with old typescript versions (< 3.8)
+- [#930](https://github.com/okta/okta-auth-js/pull/930) Fixes incorrect error message in idx `AuthTransaction` when user is not assigned.
 
 ## 5.4.2
 
@@ -15,7 +16,7 @@
 
 ## 5.4.1
 
--[#916](https://github.com/okta/okta-auth-js/pull/916) Removes misleading warning message for TokenManager methods
+- [#916](https://github.com/okta/okta-auth-js/pull/916) Removes misleading warning message for TokenManager methods
 
 ## 5.4.0
 
