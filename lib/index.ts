@@ -11,6 +11,8 @@
  *
  */
 
+import * as crypto from './crypto';
+
 export { default as OktaAuth } from './OktaAuth';
 export * from './constants';
 export * from './types';
@@ -22,4 +24,4 @@ export * from './TransactionManager';
 export * from './TokenManager';
 export * from './AuthStateManager';
 export * from './util';
-export * as crypto from './crypto';
+export { crypto };
