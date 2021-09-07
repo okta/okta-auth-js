@@ -272,7 +272,7 @@ describe('OktaAuth (api)', function() {
         jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
           return isAccessToken(token) ? true : false;
         });
-        jest.spyOn(auth.tokenManager, 'renew').mockImplementation(_tokenType => true);
+        jest.spyOn(auth.tokenManager, 'renew').mockReturnValue(true);
         const res = await auth.isAuthenticated();
         expect(res).toBe(true);
         expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
@@ -289,7 +289,7 @@ describe('OktaAuth (api)', function() {
         jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
           return isIDToken(token) ? true : false;
         });
-        jest.spyOn(auth.tokenManager, 'renew').mockImplementation(_tokenType => true);
+        jest.spyOn(auth.tokenManager, 'renew').mockReturnValue(true);
         const res = await auth.isAuthenticated();
         expect(res).toBe(true);
         expect(auth.tokenManager.getTokensSync).toHaveBeenCalled();
