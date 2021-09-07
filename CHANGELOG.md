@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - [#926](https://github.com/okta/okta-auth-js/pull/926) Fixes incorrect using of `tokenManager` config (options `autoRenew`, `autoRemove`) in `OktaAuth.isAuthenticated`.
+- [#931](https://github.com/okta/okta-auth-js/pull/931) Fixes types compatibility issue with old typescript versions (< 3.8)
 
 ## 5.4.2
 
