@@ -502,7 +502,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   async isAuthenticated(): Promise<boolean> {
 
     let { accessToken, idToken } = this.tokenManager.getTokensSync();
-    const { autoRenew, autoRemove } = this.options.tokenManager || {};
+    const { autoRenew, autoRemove } = this.tokenManager.getOptions();
 
     if (accessToken && this.tokenManager.hasExpired(accessToken)) {
       accessToken = null;

@@ -229,7 +229,8 @@ function setup(options) {
         headers: options.headers,
         ignoreSignature: options.bypassCrypto === true,
         tokenManager: {
-          autoRenew: false
+          autoRenew: false,
+          autoRemove: false
         }
       });
 
