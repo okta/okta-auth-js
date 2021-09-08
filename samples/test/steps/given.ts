@@ -41,11 +41,12 @@ import createContextUserAndCredentials from '../support/action/live-user/createC
 import createContextCredentials from '../support/action/live-user/createContextCredentials';
 import activateContextUserSms from '../support/action/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
-import createSSRPolicy from '../support/action/org-config/createProfileEnrollmentPolicyWithCustomProfileAttribute';
+import attachSSRPolicy from '../support/action/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
+
 
 Given(
   /^^a Profile Enrollment policy defined .* (?=by .* and a random property *.).*/,
-  createSSRPolicy
+  attachSSRPolicy
 );
 
 Given(
