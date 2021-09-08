@@ -33,6 +33,14 @@ describe('fetchRequest', function () {
 
   const fetchRequest = require('../../lib/fetch/fetchRequest').default;
 
+  const getResponseHeadersObject = function() {
+    const responseHeadersObject = {};
+    for (const pair of responseHeaders.entries()) {
+      responseHeadersObject[pair[0]] = pair[1];
+    }
+    return responseHeadersObject;
+  };
+
   beforeEach(function() {
     mocked.crossFetch.mockReset();
     mocked.crossFetch.mockImplementation(() => {
@@ -191,7 +199,7 @@ describe('fetchRequest', function () {
           responseJSON,
           responseText,
           responseType: 'json',
-          rawResponse: response
+          responseHeaders: getResponseHeadersObject()
         });
       });
     });
@@ -203,17 +211,18 @@ describe('fetchRequest', function () {
         expect(res).toEqual({
           status: response.status,
           responseText,
-          rawResponse: response
+          responseHeaders: getResponseHeadersObject()
         });
       });
     });
 
-    it('Contains rawResponse that can be used to get response headers', function() {
+    it('Contains responseHeaders', function() {
       responseHeaders.set('X-Rate-Limit-Limit', '500');
       return fetchRequest(requestMethod, requestUrl, {})
       .then(res => {
-        expect(res.rawResponse).toBeDefined();
-        expect(res.rawResponse.headers.get('X-Rate-Limit-Limit')).toEqual('500');
+        expect(res.responseHeaders).toBeDefined();
+        expect(typeof res.responseHeaders).toEqual('object');
+        expect(res.responseHeaders['X-Rate-Limit-Limit']).toEqual('500');
       });
     });
 
@@ -227,7 +236,7 @@ describe('fetchRequest', function () {
           responseText,
           responseType: 'json',
           responseJSON,
-          rawResponse: response
+          responseHeaders: getResponseHeadersObject()
         });
       });
     });
@@ -241,7 +250,7 @@ describe('fetchRequest', function () {
         expect(err).toEqual({
           status: response.status,
           responseText,
-          rawResponse: response
+          responseHeaders: getResponseHeadersObject()
         });
       });
     });
@@ -267,7 +276,7 @@ describe('fetchRequest', function () {
           responseText: JSON.stringify(errorJSON),
           responseJSON: errorJSON,
           responseType: 'json',
-          rawResponse: response
+          responseHeaders: getResponseHeadersObject()
         });
       });
     });
@@ -292,7 +301,7 @@ describe('fetchRequest', function () {
           responseText: JSON.stringify(errorJSON),
           responseJSON: errorJSON,
           responseType: 'json',
-          rawResponse: response
+          responseHeaders: getResponseHeadersObject()
         });
       });
     });

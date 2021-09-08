@@ -33,9 +33,9 @@ describe('FACTOR_ENROLL', function () {
           });
           return factor.questions();
         },
-        expectations: function (test, res) {
+        expectations: function (test, res, resp) {
           expect(test.resReply.status).toEqual(200);
-          expect(test.responseBody).toEqual(res);
+          expect(resp).toEqual(res);
         }
       });
     });

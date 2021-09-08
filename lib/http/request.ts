@@ -63,7 +63,7 @@ export function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any
       if (res && isString(res)) {
         res = JSON.parse(res);
         if (res && typeof res === 'object') {
-          res.rawResponse = resp.rawResponse;
+          res.responseHeaders = resp.responseHeaders;
         }
       }
 
@@ -78,14 +78,9 @@ export function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any
       }
 
       if (res && options.cacheResponse) {
-        let cachedRes = res;
-        if (typeof res === 'object') {
-          cachedRes = {...res};
-          delete cachedRes.rawResponse;
-        }
         httpCache.updateStorage(url, {
           expiresAt: Math.floor(Date.now()/1000) + DEFAULT_CACHE_DURATION,
-          response: cachedRes
+          response: res
         });
       }
 

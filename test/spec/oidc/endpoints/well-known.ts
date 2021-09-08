@@ -31,6 +31,18 @@ import wellKnown from '@okta/test.support/xhr/well-known';
 import keys from '@okta/test.support/xhr/keys';
 import tokens from '@okta/test.support/tokens';
 
+const responseHeaders = {
+  'Content-Type': 'application/json'
+};
+const wellKnownResponse = {
+  ...wellKnown.response,
+  responseHeaders
+};
+const keysResponse = {
+  ...keys.response,
+  responseHeaders
+};
+
 // Expected cookie settings. Cache will use the same settings on HTTP and HTTPS
 var cookieSettings = {
   secure: false,
@@ -61,9 +73,9 @@ describe('getWellKnown', function() {
     execute: function(test) {
       return getWellKnown(test.oa);
     },
-    expectations: function (test, res) {
+    expectations: function (test, res, resp) {
       expect(test.resReply.status).toEqual(200);
-      expect(test.responseBody).toEqual(res);
+      expect(resp).toEqual(res);
     }
   });
   util.itMakesCorrectRequestResponse({
@@ -84,9 +96,9 @@ describe('getWellKnown', function() {
     execute: function(test) {
       return getWellKnown(test.oa);
     },
-    expectations: function (test, res) {
+    expectations: function (test, res, resp) {
       expect(test.resReply.status).toEqual(200);
-      expect(test.responseBody).toEqual(res);
+      expect(resp).toEqual(res);
     }
   });
   util.itMakesCorrectRequestResponse({
@@ -107,9 +119,9 @@ describe('getWellKnown', function() {
     execute: function(test) {
       return getWellKnown(test.oa);
     },
-    expectations: function (test, res) {
+    expectations: function (test, res, resp) {
       expect(test.resReply.status).toEqual(200);
-      expect(test.responseBody).toEqual(res);
+      expect(resp).toEqual(res);
     }
   });
   util.itMakesCorrectRequestResponse({
@@ -129,9 +141,9 @@ describe('getWellKnown', function() {
     execute: function(test) {
       return getWellKnown(test.oa, 'https://auth-js-test.okta.com/oauth2/custom2');
     },
-    expectations: function (test, res) {
+    expectations: function (test, res, resp) {
       expect(test.resReply.status).toEqual(200);
-      expect(test.responseBody).toEqual(res);
+      expect(resp).toEqual(res);
     }
   });
   util.itMakesCorrectRequestResponse({
@@ -160,7 +172,7 @@ describe('getWellKnown', function() {
       expect(cache).toEqual({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         }
       });
     }
@@ -175,7 +187,7 @@ describe('getWellKnown', function() {
       storage.setStorage({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         }
       });
       return getWellKnown(test.oa);
@@ -185,7 +197,7 @@ describe('getWellKnown', function() {
       expect(cache).toEqual({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         }
       });
     }
@@ -209,7 +221,7 @@ describe('getWellKnown', function() {
       storage.setStorage({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         }
       });
       return getWellKnown(test.oa);
@@ -219,7 +231,7 @@ describe('getWellKnown', function() {
       expect(cache).toEqual({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1450086400,
-          response: wellKnown.response
+          response: wellKnownResponse
         }
       });
     }
@@ -256,7 +268,7 @@ describe('getWellKnown', function() {
         expect(cache).toEqual(JSON.stringify({
           'https://auth-js-test.okta.com/.well-known/openid-configuration': {
             expiresAt: 1449786329,
-            response: wellKnown.response
+            response: wellKnownResponse
           }
         }));
       }
@@ -289,7 +301,7 @@ describe('getWellKnown', function() {
           JSON.stringify({
             'https://auth-js-test.okta.com/.well-known/openid-configuration': {
               expiresAt: 1449786329,
-              response: wellKnown.response
+              response: wellKnownResponse
             }
           }),
           '2200-01-01T00:00:00.000Z',
@@ -326,7 +338,7 @@ describe('getWellKnown', function() {
           JSON.stringify({
             'https://auth-js-test.okta.com/.well-known/openid-configuration': {
               expiresAt: 1449786329,
-              response: wellKnown.response
+              response: wellKnownResponse
             }
           }),
           '2200-01-01T00:00:00.000Z',
@@ -371,7 +383,7 @@ describe('getKey', function() {
       storage.setStorage({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         }
       });
       return getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
@@ -382,11 +394,11 @@ describe('getKey', function() {
       expect(cache).toEqual({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         },
         'https://auth-js-test.okta.com/oauth2/v1/keys': {
           expiresAt: 1449786329,
-          response: keys.response
+          response: keysResponse
         }
       });
     }
@@ -412,7 +424,7 @@ describe('getKey', function() {
       storage.setStorage({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         },
         'https://auth-js-test.okta.com/oauth2/v1/keys': {
           expiresAt: 1449786329,
@@ -424,7 +436,8 @@ describe('getKey', function() {
               e: 'AQAB',
               use: 'sig',
               kid: 'modifiedKeyId'
-            }]
+            }],
+            'responseHeaders': responseHeaders
           }
         }
       });
@@ -437,11 +450,11 @@ describe('getKey', function() {
       expect(cache).toEqual({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         },
         'https://auth-js-test.okta.com/oauth2/v1/keys': {
           expiresAt: 1449786329,
-          response: keys.response
+          response: keysResponse
         }
       });
     }
@@ -467,11 +480,11 @@ describe('getKey', function() {
       storage.setStorage({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         },
         'https://auth-js-test.okta.com/oauth2/v1/keys': {
           expiresAt: 1449786329,
-          response: keys.response
+          response: keysResponse
         }
       });
 
@@ -483,11 +496,11 @@ describe('getKey', function() {
       expect(cache).toEqual({
         'https://auth-js-test.okta.com/.well-known/openid-configuration': {
           expiresAt: 1449786329,
-          response: wellKnown.response
+          response: wellKnownResponse
         },
         'https://auth-js-test.okta.com/oauth2/v1/keys': {
           expiresAt: 1449786329,
-          response: keys.response
+          response: keysResponse
         }
       });
     }

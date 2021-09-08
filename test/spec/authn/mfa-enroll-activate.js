@@ -377,8 +377,8 @@ describe('MFA_ENROLL_ACTIVATE', function () {
             return trans.activate();
           });
       },
-      expectations: function (test) {
-        expect(test.trans.data).toEqual(test.responseBody);
+      expectations: function (test, _res, resp) {
+        expect(test.trans.data).toEqual(resp);
       }
     });
   });

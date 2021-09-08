@@ -1350,7 +1350,7 @@ describe('MFA_CHALLENGE', function () {
       expectations: function (test) {
         expect(test.transactionCallbackFn.calls.count()).toBe(2);
         const res = test.transactionCallbackFn.calls.argsFor(0)[0];
-        delete res.rawResponse;
+        delete res.responseHeaders; //todo
         expect(res).toMatchSnapshot();
       },
     });
