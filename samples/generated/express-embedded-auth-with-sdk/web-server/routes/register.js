@@ -21,25 +21,25 @@ const {
 const router = routerWithCatch();
 
 // entry route
-router.get('/register', (req, res) => {
+router.get('/register', async (req, res) => {
   req.setFlowStates({
     entry: '/register',
     idxMethod: 'register'
   });
+  const authClient = getAuthClient(req);
+  const {
+    nextStep: { inputs }
+  } = await authClient.idx.register();
 
   renderTemplate(req, res, 'enroll-profile', {
-    action: '/register'
+    action: '/register',
+    inputs
   });
 });
 
 router.post('/register', async (req, res, next) => {
-  const { firstName, lastName, email } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.register({ 
-    firstName, 
-    lastName, 
-    email,
-  });
+  const transaction = await authClient.idx.register(req.body);
   handleTransaction({ req, res, next, authClient, transaction });
 });
 

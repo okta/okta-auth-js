@@ -41,11 +41,18 @@ import createContextUserAndCredentials from '../support/action/live-user/createC
 import createContextCredentials from '../support/action/live-user/createContextCredentials';
 import activateContextUserSms from '../support/action/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
+import attachSSRPolicy from '../support/action/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
+
 
 Given(
-  /^a Profile Enrollment policy defined assigning new users to the Everyone Group (.*)$/,
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  (  _: any) => ({}) // no-op - self-enrollment is preconfigured for the org
+  /^^a Profile Enrollment policy defined .* (?=by .* and a random property *.).*/,
+  attachSSRPolicy
+);
+
+Given(
+  // eslint-disable-next-line max-len
+  /^^a Profile Enrollment policy defined assigning new users to the Everyone Group and (?!by .* and a random property *.).*/,
+  () => ({}) // no-op - self-enrollment is preconfigured for the org
 );
 
 Given(

@@ -30,6 +30,10 @@ export default async function (this: ActionContext, fieldName: string) {
       value = this.credentials.emailAddress;
       selector = Registration.email;
       break;
+    case 'another property':
+      value = 'random value';
+      selector = Registration.getCustomAttribute('customAttribute');
+      break;
     default: 
       throw new Error(`Unknown credential "${fieldName}"`);
   }
