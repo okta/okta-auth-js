@@ -72,6 +72,7 @@ function generateXHRPair(request, response, uri, responseVars) {
 
     // Import the desired xhr
     var responseXHR = typeof response === 'object' ? response : require('./xhr/' + response);
+    responseXHR = {...responseXHR};
 
     // Change the request uri to include the domain
     if (request) {
@@ -90,14 +91,8 @@ function generateXHRPair(request, response, uri, responseVars) {
     }
 
     // Fill responseHeaders
-    var responseHeaders = {};
-    //todo: wht can be map?
-    if (responseXHR.headers && responseXHR.headers.constructor.name === 'Object') {
-      // Copy from desired xhr if present
-      responseHeaders = responseXHR.headers;
-    }
+    var responseHeaders = responseXHR.headers || {};
     if (!responseHeaders['Content-Type']) {
-      // Set default Content-Type
       responseHeaders['Content-Type'] = 'application/json';
     }
     responseXHR.responseHeaders = responseHeaders;
@@ -158,7 +153,6 @@ function mockAjax(pairs) {
       xhr.json = function() {
         return Promise.resolve(xhr.response);
       };
-      //todo
       xhr.text = function() {
         return Promise.resolve(xhr.responseText);
       };
