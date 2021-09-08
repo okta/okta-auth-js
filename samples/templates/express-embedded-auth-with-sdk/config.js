@@ -20,29 +20,35 @@ module.exports = function () {
     CLIENT_SECRET,
     ISSUER,
     OKTA_TESTING_DISABLEHTTPSCHECK = false,
+    APP_PORT = 8080,
+    APP_BASE_URL = `http://localhost:${APP_PORT}`,
+    REDIRECT_URI = `http://localhost:${APP_PORT}/login/callback`,
+    POST_LOGOUT_REDIRECT_URI = `http://localhost:${APP_PORT}`,
+    RESOURCE_SERVER_PORT = 8000,
+    MESSAGES_URL = `http://localhost:${RESOURCE_SERVER_PORT}/api/messages`
   } = process.env;
 
   return {
     webServer: {
-      port: 8080,
+      port: APP_PORT,
       oidc: {
         clientId: CLIENT_ID || '',
         clientSecret: CLIENT_SECRET || '',
         issuer: ISSUER || '',
-        appBaseUrl: 'http://localhost:8080',
+        appBaseUrl: APP_BASE_URL,
         scopes: ['openid', 'profile', 'email'],
-        redirectUri: 'http://localhost:8080/login/callback',
-        postLogoutRedirectUri: 'http://localhost:8080',
+        redirectUri: REDIRECT_URI,
+        postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
         testing: {
           disableHttpsCheck: OKTA_TESTING_DISABLEHTTPSCHECK
         }
       },
       resourceServer: {
-        messagesUrl: 'http://localhost:8000/api/messages',
+        messagesUrl: MESSAGES_URL,
       },
     },
     resourceServer: {
-      port: 8000,
+      port: RESOURCE_SERVER_PORT,
       oidc: {
         clientId: CLIENT_ID,
         issuer: ISSUER,
