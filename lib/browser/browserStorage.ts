@@ -26,8 +26,6 @@ import { warn } from '../util';
 
 const Cookies = require('js-cookie');
 
-const inMemoryStore = {};
-
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil: BrowserStorageUtil = {
 
@@ -198,13 +196,14 @@ var storageUtil: BrowserStorageUtil = {
   },
 
   // Provides an in-memory solution
+  inMemoryStore: {},
   getInMemoryStorage: function() {
     return {
-      getItem: function(key) {
-        return inMemoryStore[key];
+      getItem: (key) => {
+        return this.inMemoryStore[key];
       },
-      setItem: function(key, value) {
-        inMemoryStore[key] = value;
+      setItem: (key, value) => {
+        this.inMemoryStore[key] = value;
       }
     };
   },
