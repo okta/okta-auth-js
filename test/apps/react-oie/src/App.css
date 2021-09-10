@@ -1,0 +1,11 @@
+.messages {
+  color: red;
+}
+
+form .title {
+  text-transform: capitalize;
+}
+
+input, button {
+  margin: 5px 0;
+}

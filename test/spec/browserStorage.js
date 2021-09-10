@@ -182,10 +182,12 @@ describe('browserStorage', () => {
   describe('getInMemoryStorage', () => {
 
     it('can set and retrieve a value from memory', () => {
-      const storage = browserStorage.getInMemoryStorage();
+      let storage = browserStorage.getInMemoryStorage();
       const key = 'fake-key';
       const val = { fakeValue: true };
       storage.setItem(key, val);
+      // re-get the storage should presever the same stored value
+      storage = browserStorage.getInMemoryStorage();
       expect(storage.getItem(key)).toBe(val);
     });
   });
