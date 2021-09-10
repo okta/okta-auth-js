@@ -27,7 +27,7 @@ describe('token.getUserInfo', function() {
   beforeEach(() => {
     responseXHR = _.cloneDeep(require('@okta/test.support/xhr/userinfo'));
     responseXHR.response.sub = tokens.standardIdTokenParsed.claims.sub;
-    responseXHR.response.responseHeaders = {
+    responseXHR.response.headers = {
       'Content-Type': 'application/json'
     };
   });

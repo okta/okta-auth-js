@@ -31,16 +31,16 @@ import wellKnown from '@okta/test.support/xhr/well-known';
 import keys from '@okta/test.support/xhr/keys';
 import tokens from '@okta/test.support/tokens';
 
-const responseHeaders = {
+const headers = {
   'Content-Type': 'application/json'
 };
 const wellKnownResponse = {
   ...wellKnown.response,
-  responseHeaders
+  headers
 };
 const keysResponse = {
   ...keys.response,
-  responseHeaders
+  headers
 };
 
 // Expected cookie settings. Cache will use the same settings on HTTP and HTTPS
@@ -437,7 +437,7 @@ describe('getKey', function() {
               use: 'sig',
               kid: 'modifiedKeyId'
             }],
-            'responseHeaders': responseHeaders
+            'headers': headers
           }
         }
       });

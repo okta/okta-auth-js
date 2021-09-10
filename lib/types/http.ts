@@ -53,5 +53,5 @@ export interface HttpResponse {
   responseJSON?: {
     [propName: string]: any;
   };
-  responseHeaders: HeadersInit;
+  headers: HeadersInit;
 }

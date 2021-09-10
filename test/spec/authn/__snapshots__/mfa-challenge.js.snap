@@ -76,7 +76,7 @@ Object {
   },
   "expiresAt": "2015-06-10T22:42:40.224Z",
   "factorResult": "WAITING",
-  "responseHeaders": Object {
+  "headers": Object {
     "Content-Type": "application/json",
     "X-Rate-Limit-Limit": 1000,
   },

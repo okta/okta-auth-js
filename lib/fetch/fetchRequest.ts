@@ -31,14 +31,14 @@ function readData(response: FetchResponse): Promise<object | string> {
 
 function formatResult(status: number, data: object | string, response: Response) {
   const isObject = typeof data === 'object';
-  const responseHeaders = {};
+  const headers = {};
   for (const pair of response.headers.entries()) {
-    responseHeaders[pair[0]] = pair[1];
+    headers[pair[0]] = pair[1];
   }
   const result: HttpResponse = {
     responseText: isObject ? JSON.stringify(data) : data as string,
     status: status,
-    responseHeaders
+    headers
   };
   if (isObject) {
     result.responseType = 'json';

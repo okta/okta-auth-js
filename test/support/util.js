@@ -90,12 +90,12 @@ function generateXHRPair(request, response, uri, responseVars) {
       responseXHR.responseText = JSON.stringify(responseXHR.response);
     }
 
-    // Fill responseHeaders
-    var responseHeaders = responseXHR.headers || {};
-    if (!responseHeaders['Content-Type']) {
-      responseHeaders['Content-Type'] = 'application/json';
+    // Fill headers
+    var headers = responseXHR.headers || {};
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
     }
-    responseXHR.responseHeaders = responseHeaders;
+    responseXHR.headers = headers;
 
     resolve({
       request: request,
@@ -148,7 +148,7 @@ function mockAjax(pairs) {
     return new Promise(function(resolve, reject) {
       var xhr = pair.response;
       
-      xhr.headers = new Map(Object.entries(xhr.responseHeaders));
+      xhr.headers = new Map(Object.entries(xhr.headers));
       xhr.ok = xhr.status >= 200 && xhr.status < 300;
       xhr.json = function() {
         return Promise.resolve(xhr.response);
@@ -273,7 +273,7 @@ function setup(options) {
       if (resReply) {
         ret.resReply = resReply;
         ret.responseBody = resReply.response;
-        ret.responseHeaders = resReply.responseHeaders;
+        ret.headers = resReply.headers;
       }
 
       return ret;
@@ -292,7 +292,7 @@ util.itMakesCorrectRequestResponse = function (options) {
           test.trans = res;
           resp = test.responseBody;
           if (resp && typeof resp === 'object') {
-            resp = {...resp, responseHeaders: test.responseHeaders};
+            resp = {...resp, headers: test.headers};
           }
         }
         if (options.expectations) {
