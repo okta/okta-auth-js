@@ -62,6 +62,9 @@ export function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any
       res = resp.responseText;
       if (res && isString(res)) {
         res = JSON.parse(res);
+        if (res && typeof res === 'object' && !res.headers) {
+          res.headers = resp.headers;
+        }
       }
 
       if (saveAuthnState) {

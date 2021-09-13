@@ -87,5 +87,8 @@ module.exports = {
         }
       }]
     }
+  },
+  "headers": {
+    "X-Rate-Limit-Limit": 1000
   }
 };

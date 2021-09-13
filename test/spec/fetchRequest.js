@@ -33,6 +33,14 @@ describe('fetchRequest', function () {
 
   const fetchRequest = require('../../lib/fetch/fetchRequest').default;
 
+  const getResponseHeadersObject = function() {
+    const responseHeadersObject = {};
+    for (const pair of responseHeaders.entries()) {
+      responseHeadersObject[pair[0]] = pair[1];
+    }
+    return responseHeadersObject;
+  };
+
   beforeEach(function() {
     mocked.crossFetch.mockReset();
     mocked.crossFetch.mockImplementation(() => {
@@ -190,7 +198,8 @@ describe('fetchRequest', function () {
           status: response.status,
           responseJSON,
           responseText,
-          responseType: 'json'
+          responseType: 'json',
+          headers: getResponseHeadersObject()
         });
       });
     });
@@ -201,8 +210,19 @@ describe('fetchRequest', function () {
       .then(res => {
         expect(res).toEqual({
           status: response.status,
-          responseText
+          responseText,
+          headers: getResponseHeadersObject()
         });
+      });
+    });
+
+    it('Contains response headers', function() {
+      responseHeaders.set('X-Rate-Limit-Limit', '500');
+      return fetchRequest(requestMethod, requestUrl, {})
+      .then(res => {
+        expect(res.headers).toBeDefined();
+        expect(typeof res.headers).toEqual('object');
+        expect(res.headers['X-Rate-Limit-Limit']).toEqual('500');
       });
     });
 
@@ -215,7 +235,8 @@ describe('fetchRequest', function () {
           status: response.status,
           responseText,
           responseType: 'json',
-          responseJSON
+          responseJSON,
+          headers: getResponseHeadersObject()
         });
       });
     });
@@ -228,7 +249,8 @@ describe('fetchRequest', function () {
       .catch(err => {
         expect(err).toEqual({
           status: response.status,
-          responseText
+          responseText,
+          headers: getResponseHeadersObject()
         });
       });
     });
@@ -253,7 +275,8 @@ describe('fetchRequest', function () {
           status: response.status,
           responseText: JSON.stringify(errorJSON),
           responseJSON: errorJSON,
-          responseType: 'json'
+          responseType: 'json',
+          headers: getResponseHeadersObject()
         });
       });
     });
@@ -277,7 +300,8 @@ describe('fetchRequest', function () {
           status: response.status,
           responseText: JSON.stringify(errorJSON),
           responseJSON: errorJSON,
-          responseType: 'json'
+          responseType: 'json',
+          headers: getResponseHeadersObject()
         });
       });
     });

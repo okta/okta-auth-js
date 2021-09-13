@@ -76,6 +76,10 @@ Object {
   },
   "expiresAt": "2015-06-10T22:42:40.224Z",
   "factorResult": "WAITING",
+  "headers": Object {
+    "Content-Type": "application/json",
+    "X-Rate-Limit-Limit": 1000,
+  },
   "stateToken": "00T4jcVNRzJy5dkWJ4P7c9051dY3FUYY9O2zvbU_vI",
   "status": "MFA_CHALLENGE",
 }

@@ -11,7 +11,8 @@ describe('refreshToken', () => {
         responseText: 'does not matter',
         responseJSON: {
           error: 'invalid_grant'
-        }
+        },
+        headers: {}
       };
       const error = new AuthApiError({
         errorSummary: 'does not matter'
@@ -27,7 +28,8 @@ describe('refreshToken', () => {
       responseText: 'does not matter',
       responseJSON: {
         error: 'something else'
-      }
+      },
+      headers: {}
     };
     const error = new AuthApiError({
       errorSummary: 'does not matter'

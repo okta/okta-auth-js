@@ -72,6 +72,7 @@ function generateXHRPair(request, response, uri, responseVars) {
 
     // Import the desired xhr
     var responseXHR = typeof response === 'object' ? response : require('./xhr/' + response);
+    responseXHR = {...responseXHR};
 
     // Change the request uri to include the domain
     if (request) {
@@ -88,6 +89,13 @@ function generateXHRPair(request, response, uri, responseVars) {
     } else {
       responseXHR.responseText = JSON.stringify(responseXHR.response);
     }
+
+    // Fill headers
+    var headers = responseXHR.headers || {};
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    responseXHR.headers = headers;
 
     resolve({
       request: request,
@@ -139,13 +147,13 @@ function mockAjax(pairs) {
 
     return new Promise(function(resolve, reject) {
       var xhr = pair.response;
-      xhr.headers = xhr.headers || {};
-      xhr.headers['Content-Type'] = 'application/json';
-      xhr.headers.get = function(attr) {
-        return xhr.headers[attr];
-      };
+      
+      xhr.headers = new Map(Object.entries(xhr.headers));
       xhr.ok = xhr.status >= 200 && xhr.status < 300;
       xhr.json = function() {
+        return Promise.resolve(xhr.response);
+      };
+      xhr.text = function() {
         return Promise.resolve(xhr.responseText);
       };
 
@@ -265,6 +273,7 @@ function setup(options) {
       if (resReply) {
         ret.resReply = resReply;
         ret.responseBody = resReply.response;
+        ret.headers = resReply.headers;
       }
 
       return ret;
@@ -278,13 +287,18 @@ util.itMakesCorrectRequestResponse = function (options) {
     return setup(options.setup).then(function (test) {
       return options.execute(test)
       .then(function (res) {
+        var resp = res;
         if (res.data) {
           test.trans = res;
+          resp = test.responseBody;
+          if (resp && typeof resp === 'object') {
+            resp = {...resp, headers: test.headers};
+          }
         }
         if (options.expectations) {
-          options.expectations(test, res);
+          options.expectations(test, res, resp);
         } else if (test.trans) {
-          expect(test.trans.data).toEqual(test.responseBody);
+          expect(test.trans.data).toEqual(resp);
         }
         test.ajaxMock.done();
       });
