@@ -462,6 +462,11 @@ ID token signatures are validated by default when `token.getWithoutPrompt`, `tok
 
 Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
 
+#### `ignoreLifetime`
+
+Token lifetimes are validated using the `maxClockSkew`.
+To override this and disable token lifetime validation, set this value to `true`. 
+
 #### `transformAuthState`
 
 Callback function. When [updateAuthState](#authstatemanagerupdateauthstate) is called a new authState object is produced. Providing a `transformAuthState` function allows you to modify or replace this object before it is stored and emitted. A common use case is to change the meaning of [isAuthenticated](#authstatemanager). By default, `updateAuthState` will set `authState.isAuthenticated` to true if unexpired tokens are available from [tokenManager](#tokenmanager). This logic could be customized to also require a valid Okta SSO session:
