@@ -196,14 +196,14 @@ var storageUtil: BrowserStorageUtil = {
   },
 
   // Provides an in-memory solution
+  inMemoryStore: {},
   getInMemoryStorage: function() {
-    var store = {};
     return {
-      getItem: function(key) {
-        return store[key];
+      getItem: (key) => {
+        return this.inMemoryStore[key];
       },
-      setItem: function(key, value) {
-        store[key] = value;
+      setItem: (key, value) => {
+        this.inMemoryStore[key] = value;
       }
     };
   },

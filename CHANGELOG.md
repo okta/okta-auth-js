@@ -7,6 +7,11 @@
 - [#933](https://github.com/okta/okta-auth-js/pull/933) Adds `ignoreLifetime` option to disable token lifetime validation
 - [#932](https://github.com/okta/okta-auth-js/pull/932) Adds `headers` with response headers to all responses
 
+### Bug Fixes
+
+- [#936](https://github.com/okta/okta-auth-js/pull/936) Fixes getting mutiple memory storages issue in browser environment
+
+
 ## 5.4.3
 
 ### Bug Fixes

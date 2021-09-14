@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { OktaAuth, IdxStatus } from '@okta/okta-auth-js';
 import oidcConfig from './config';
+import './App.css';
 
 const oktaAuth = new OktaAuth(oidcConfig);
 
@@ -20,7 +21,7 @@ const formMetaMapper = ({ name, inputs, options }) => ({
   }
 });
 
-function App() {
+export default function App() {
   const [transaction, setTransaction] = useState(null);
   const [inputValues, setInputValues] = useState({});
 
@@ -44,6 +45,7 @@ function App() {
     setTransaction(null);
 
     const newTransaction = await oktaAuth.idx.authenticate(inputValues);
+    console.log('Transaction:', newTransaction);
     setTransaction(newTransaction);
   };
 
@@ -80,7 +82,10 @@ function App() {
   const { name, inputs, select } = formMetaMapper(nextStep);
   return (
     <form onSubmit={handleSubmit}>
-      <h3>{name}</h3>
+      <div className="messages">
+        { messages && messages.map(message => (<div key={message.i18n.key}>{message.message}</div>)) }
+      </div>
+      <h3 className="title">{name}</h3>
       {inputs && inputs.map(({ label, name, type, required }) => (
         <label key={name}>{label}&nbsp;
           <input name={name} type={type} required={required} onChange={handleChange} />
@@ -99,5 +104,3 @@ function App() {
     </form>
   );
 }
-
-export default App;
