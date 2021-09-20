@@ -330,7 +330,7 @@
     - `autoRemove`
     - `devMode`
 - [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.
-- [#503](https://github.com/okta/okta-auth-js/pull/503) Supports relative uri for [options.redirectUri](README.md#additional-options)
+- [#503](https://github.com/okta/okta-auth-js/pull/503) Supports relative uri for [options.redirectUri](README.md#configuration-options)
 - [#478](https://github.com/okta/okta-auth-js/pull/478) Adds cross tabs communication to sync `AuthState`.
 - [#525](https://github.com/okta/okta-auth-js/pull/525) Adds new methods `hasResponseType`, `isPKCE`, `isAuthorizationCodeFlow`. The option `responseType` is now accepted in the constructor.
 
@@ -469,7 +469,7 @@
 
 ### Features
 
-New [option](README.md#additional-options) `cookies` allows overriding default `secure` and `sameSite` values.
+New [option](README.md#configuration-options) `cookies` allows overriding default `secure` and `sameSite` values.
 
 ### Breaking Changes
 
@@ -489,7 +489,7 @@ New [option](README.md#additional-options) `cookies` allows overriding default `
 
 - [#316](https://github.com/okta/okta-auth-js/pull/316) - Option `issuer` is [required](README.md#configuration-reference). Option `url` has been deprecated and is no longer used.
 
-- [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` [option](README.md#additional-options)  is now `true` by default. `grantType` option is removed.
+- [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` [option](README.md#configuration-options)  is now `true` by default. `grantType` option is removed.
 
 - [#320](https://github.com/okta/okta-auth-js/pull/320) - `getWithRedirect`, `getWithPopup`, and `getWithoutPrompt` previously took 2 sets of option objects as parameters, a set of "oauthOptions" and additional options. These methods now take a single options object which can hold all [available options](README.md#authorize-options). Passing a second options object will cause an exception to be thrown.
 
