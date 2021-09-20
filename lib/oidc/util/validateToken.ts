@@ -1,10 +1,10 @@
 /* eslint-disable complexity */
 
 import { AuthSdkError } from '../../errors';
-import { isAccessToken, isIDToken, isRefreshToken, Token, TokenType } from '../../types';
+import { isAccessToken, isIDToken, isRefreshToken, isDeviceSecret, Token, TokenType } from '../../types';
 
 export function validateToken(token: Token, type?: TokenType) {
-  if (!isIDToken(token) && !isAccessToken(token) && !isRefreshToken(token)) {
+  if (!isIDToken(token) && !isAccessToken(token) && !isRefreshToken(token) && !isDeviceSecret(token)) {
     throw new AuthSdkError(
       'Token must be an Object with scopes, expiresAt, and one of: an idToken, accessToken, or refreshToken property'
     );
@@ -19,5 +19,9 @@ export function validateToken(token: Token, type?: TokenType) {
 
   if (type === 'refreshToken' && !isRefreshToken(token)) {
     throw new AuthSdkError('invalid refreshToken');
+  }
+
+  if (type === 'deviceSecret' && !isDeviceSecret(token)) {
+    throw new AuthSdkError('invalid deviceSecret');
   }
 }

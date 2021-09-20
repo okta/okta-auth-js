@@ -81,6 +81,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
       var accessToken = res.access_token;
       var idToken = res.id_token;
       var refreshToken = res.refresh_token;
+      var deviceSecret = res.device_secret;
       var now = Math.floor(Date.now()/1000);
 
       if (accessToken) {
@@ -106,6 +107,18 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
           tokenUrl: urls.tokenUrl,
           authorizeUrl: urls.authorizeUrl,
           issuer: urls.issuer,
+        };
+      }
+
+      if (deviceSecret) {
+        tokenDict.deviceSecret = {
+          deviceSecret: deviceSecret,
+          // should not be used, this is the accessToken expire time
+          // TODO: remove "expiresAt" in the next major version OKTA-407224
+          expiresAt: Number(expiresIn) + now, 
+          scopes: scopes,
+          authorizeUrl: urls.authorizeUrl,
+          subjectToken: idToken
         };
       }
 

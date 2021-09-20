@@ -17,7 +17,7 @@ export interface TokenManagerInterface {
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
   getTokensSync(): Tokens;
-  setTokens({ accessToken, idToken, refreshToken }: Tokens, accessTokenCb?: Function, idTokenCb?: Function, refreshTokenCb?: Function): void;
+  setTokens({ accessToken, idToken, refreshToken, deviceSecret }: Tokens, accessTokenCb?: Function, idTokenCb?: Function, refreshTokenCb?: Function, deviceSecretCb?: Function): void;
   getStorageKeyByType(type: TokenType): string;
   add(key: any, token: Token): void;
   updateRefreshToken(token: RefreshToken);
