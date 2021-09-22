@@ -12,7 +12,7 @@ export ISSUER=https://samples-javascript.okta.com/oauth2/default
 export USERNAME=email-login@email.ghostinspector.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 get_vault_secret_key devex/auth-js-sdk-vars security_question_answer SECURITY_QUESTION_ANSWER
-get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY
+get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
 
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
