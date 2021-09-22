@@ -44,7 +44,7 @@ test_suites:
     - name: e2e-samples
       script_path: /root/okta/okta-auth-js/scripts
       sort_order: '7'
-      timeout: '10'
+      timeout: '20'
       script_name: e2e-samples
       criteria: MERGE
       queue_name: small
