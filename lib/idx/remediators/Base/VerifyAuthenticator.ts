@@ -20,7 +20,6 @@ export interface VerifyAuthenticatorValues extends RemediationValues {
 
 // Base class - DO NOT expose static remediationName
 export class VerifyAuthenticator extends Remediator {
-  static remediationName = 'challenge-authenticator';
 
   values: VerifyAuthenticatorValues;
 
@@ -29,15 +28,7 @@ export class VerifyAuthenticator extends Remediator {
   };
 
   canRemediate() {
-    const challengeType = this.getRelatesToType();
-    if (this.values.verificationCode 
-        && ['email', 'phone'].includes(challengeType)) {
-      return true;
-    }
-    if (this.values.password && challengeType === 'password') {
-      return true;
-    }
-    return false;
+    return !!(this.values.password || this.values.verificationCode);
   }
 
   mapCredentials() {

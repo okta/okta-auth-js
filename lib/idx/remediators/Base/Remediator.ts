@@ -116,9 +116,15 @@ export class Remediator {
 
   getNextStep(): NextStep {
     const name = this.getName();
-    const type = this.getRelatesToType();
     const inputs = this.getInputs();
-    return { name, inputs, ...(type && { type }) };
+    const type = this.getRelatesToType();
+    const contextualData = this.remediation.relatesTo?.value.contextualData;
+    return { 
+      name, 
+      inputs, 
+      ...(type && { type }),
+      ...(contextualData && { contextualData }),
+    };
   }
 
   // Get inputs for the next step

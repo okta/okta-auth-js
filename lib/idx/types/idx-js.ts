@@ -26,6 +26,7 @@ export interface IdxAuthenticator {
     complexity?: unknown;
     age?: unknown;
   };
+  contextualData?: unknown;
 }
 
 export interface IdxForm {

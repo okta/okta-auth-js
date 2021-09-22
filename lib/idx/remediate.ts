@@ -95,6 +95,10 @@ function getIdxMessages(
   idxResponse: IdxResponse, flow: RemediationFlow
 ): IdxMessage[] {
   let messages = [];
+  if (!flow) {
+    return messages;
+  }
+
   const { rawIdxState, neededToProceed } = idxResponse;
 
   // Handle global messages
