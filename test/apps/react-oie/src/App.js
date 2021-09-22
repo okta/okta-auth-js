@@ -1,36 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { OktaAuth, IdxStatus } from '@okta/okta-auth-js';
 import oidcConfig from './config';
 import './App.css';
 
 const oktaAuth = new OktaAuth(oidcConfig);
 
-const formMetaMapper = ({ name, inputs, options }) => ({
-  name,
-  inputs: !options && inputs.map(({ label, name, type, secret, required }) => {
-    if (secret) {
-      type = 'password';
-    } else if (type === 'string') {
-      type = 'text';
-    }
-    return { label, name, type, required };
-  }),
-  select: options && {
-    name: inputs[0].name,
-    options
-  }
-});
+const formMetaMapper = (nextStep) => {
+  const { inputs, options } = nextStep;
+  return {
+    ...nextStep,
+    inputs: !options && inputs.map(({ label, name, type, secret, required }) => {
+      if (secret) {
+        type = 'password';
+      } else if (type === 'string') {
+        type = 'text';
+      }
+      return { label, name, type, required };
+    }),
+    select: options && {
+      name: inputs[0].name,
+      options
+    },
+  };
+};
 
 export default function App() {
   const [transaction, setTransaction] = useState(null);
+  const [flowMethod, setFlowMethod] = useState('');
   const [inputValues, setInputValues] = useState({});
-
-  useEffect(() => {
-    (async () => {
-      const newTransaction = await oktaAuth.idx.authenticate();
-      setTransaction(newTransaction);
-    })();
-  }, []);
 
   const handleChange = ({ target: { name, value } }) => setInputValues({
     ...inputValues,
@@ -39,13 +36,21 @@ export default function App() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    
-    // reset states
-    setInputValues({});
-    setTransaction(null);
 
-    const newTransaction = await oktaAuth.idx.authenticate(inputValues);
+    const newTransaction = await oktaAuth.idx[flowMethod](inputValues);
     console.log('Transaction:', newTransaction);
+    // reset inputs and set new transaction
+    setInputValues({});
+    setTransaction(newTransaction);
+  };
+
+  const handleSkip = async () => {
+    const newTransaction = await oktaAuth.idx[flowMethod]({ skip: true });
+    setTransaction(newTransaction);
+  };
+
+  const handleCancel = async () => {
+    const newTransaction = await oktaAuth.idx.cancel();
     setTransaction(newTransaction);
   };
 
@@ -53,8 +58,21 @@ export default function App() {
     await oktaAuth.signOut();
   };
 
+  const startIdxFlow = flowMethod => async () => {
+    const newTransaction = await oktaAuth.idx[flowMethod]();
+    setFlowMethod(flowMethod);
+    setTransaction(newTransaction);
+  };
+
   if (!transaction) {
-    return <div>loading...</div>;
+    // initla page
+    return (
+      <div>
+        <button onClick={startIdxFlow('authenticate')}>Login</button>
+        <button onClick={startIdxFlow('recoverPassword')}>Recover Password</button>
+        <button onClick={startIdxFlow('register')}>Registration</button>
+      </div>
+    );
   }
 
   const { status, tokens, nextStep, error, messages } = transaction;
@@ -79,16 +97,31 @@ export default function App() {
     return (<div>{JSON.stringify(messages, null, 4)}</div>);
   }
 
-  const { name, inputs, select } = formMetaMapper(nextStep);
+  if (status === IdxStatus.CANCELED) {
+    return (
+      <>
+        <div>Transaction has been canceled!</div>
+        <button onClick={() => setTransaction(null)}>Restart</button>
+      </>
+    );
+  }
+
+  const { name, inputs, select, contextualData, canSkip } = formMetaMapper(nextStep);
   return (
     <form onSubmit={handleSubmit}>
       <div className="messages">
-        { messages && messages.map(message => (<div key={message.i18n.key}>{message.message}</div>)) }
+        { messages && messages.map(message => (<div key={message.message}>{message.message}</div>)) }
       </div>
       <h3 className="title">{name}</h3>
       {inputs && inputs.map(({ label, name, type, required }) => (
         <label key={name}>{label}&nbsp;
-          <input name={name} type={type} required={required} onChange={handleChange} />
+          <input 
+            name={name} 
+            type={type} 
+            value={inputValues[name] || ''} 
+            required={required} 
+            onChange={handleChange} 
+          />
           <br/>
         </label>
       ))}
@@ -100,7 +133,15 @@ export default function App() {
           ))}
         </select>
       )}
+      {contextualData && (
+        <div>
+          <img src={contextualData.qrcode.href} />
+          <div>{contextualData.sharedSecret}</div>
+        </div>
+      )}
+      {canSkip && <button type="button" onClick={handleSkip}>Skip</button>}
       <button type="submit">Submit</button>
+      <button type="button" onClick={handleCancel}>Cancel</button>
     </form>
   );
 }
