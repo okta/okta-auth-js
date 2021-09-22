@@ -11,9 +11,10 @@
  */
 
 
-const { getAuthClient, routerWithCatch } = require('../utils');
+const express = require('express');
+const { getAuthClient } = require('../utils');
 
-const router = routerWithCatch();
+const router = express.Router();
 
 router.post('/logout', async (req, res) => {
   try {

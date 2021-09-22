@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "^5.9.4"
+    "@okta/okta-signin-widget": "^5.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",

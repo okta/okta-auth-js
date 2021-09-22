@@ -11,9 +11,9 @@
  */
 
 
-const { routerWithCatch } = require('../utils');
+const express = require('express');
 
-const router = routerWithCatch();
+const router = express.Router();
 
 router.get('/', (req, res) => {
   // clear any existing transaction

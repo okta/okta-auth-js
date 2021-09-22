@@ -11,14 +11,14 @@
  */
 
 
+const express = require('express');
 const { 
   getAuthClient,
   handleTransaction,
   renderTemplate,
-  routerWithCatch,
 } = require('../utils');
 
-const router = routerWithCatch();
+const router = express.Router();
 
 // entry route
 router.get('/register', async (req, res) => {
