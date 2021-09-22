@@ -19,7 +19,6 @@ const renderTemplate = require('./renderTemplate');
 const renderPage = require('./renderPage');
 const redirect = require('./redirect');
 const getFormActionPath = require('./getFormActionPath');
-const {withCatch, routerWithCatch} = require('./withCatch');
 
 module.exports = {
   getAuthClient,
@@ -30,6 +29,4 @@ module.exports = {
   renderPage,
   redirect,
   getFormActionPath,
-  withCatch,
-  routerWithCatch,
 };
