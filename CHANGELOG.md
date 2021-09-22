@@ -694,3 +694,4 @@ New [option](README.md#additional-options) `cookies` allows overriding default `
 ### Other
 
 * Renames all `refresh` methods on the `token` and `tokenManager` objects to `renew`.
+
