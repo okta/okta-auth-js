@@ -13,10 +13,10 @@
 import { StorageManagerOptions, StorageUtil } from './Storage';
 import { CookieOptions } from './Cookies';
 import { HttpRequestClient } from './http';
-import { OktaAuth } from './';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
 import { SimpleStorage } from './Storage';
+import OktaAuth from '../OktaAuth';
 
 export interface TokenManagerOptions {
   autoRenew?: boolean;
