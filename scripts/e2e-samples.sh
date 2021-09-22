@@ -16,7 +16,7 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 export ORG_OIE_ENABLED=true 
 export USERNAME=mary@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
-get_secret prod/okta-sdk-vars/a18n_apiKey A18N_API_KEY
+get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
 export FB_USERNAME=js_ekdtypn_user@tfbnw.net
 get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 
