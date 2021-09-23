@@ -231,7 +231,7 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
 });
 
 // Handle Google Authenticator
-router.get('/enroll-authenticator/google_otp', async (req, res, next) => {
+router.get('/enroll-authenticator/google_otp', async (req, res) => {
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'authenticator', {
@@ -254,7 +254,7 @@ router.post('/enroll-authenticator/google_otp', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.get('/challenge-authenticator/google_otp', async (req, res, next) => {
+router.get('/challenge-authenticator/google_otp', async (req, res) => {
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'authenticator', {

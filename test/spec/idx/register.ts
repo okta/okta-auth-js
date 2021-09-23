@@ -499,7 +499,17 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          type: 'email',
+          currentAuthenticator: {
+            displayName: 'Email',
+            id: '9',
+            key: 'okta_email',
+            methods: [
+              {
+                type: 'email',
+              },
+            ],
+            type: 'email',
+          },
           inputs: [{
             name: 'verificationCode',
             required: true,
@@ -558,7 +568,17 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          type: 'email',
+          currentAuthenticator: {
+            displayName: 'Email',
+            id: '9',
+            key: 'okta_email',
+            methods: [
+              {
+                type: 'email',
+              },
+            ],
+            type: 'email',
+          },
           inputs: [{
             name: 'verificationCode',
             required: true,
@@ -589,7 +609,17 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          type: 'email',
+          currentAuthenticator: {
+            displayName: 'Email',
+            id: '9',
+            key: 'okta_email',
+            methods: [
+              {
+                type: 'email',
+              },
+            ],
+            type: 'email',
+          },
           inputs: [{
             name: 'verificationCode',
             required: true,
@@ -774,7 +804,16 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          type: 'phone',
+          currentAuthenticator: {
+            displayName: 'Phone',
+            id: '10',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [{
             label: 'Enter code',
             name: 'verificationCode',
@@ -845,7 +884,16 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'authenticator-enrollment-data',
-          type: 'phone',
+          currentAuthenticator: {
+            displayName: 'Phone',
+            id: '7',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [
             { name: 'methodType', type: 'string', required: true },
             { name: 'phoneNumber', type: 'string', required: true },
@@ -873,7 +921,16 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          type: 'phone',
+          currentAuthenticator: {
+            displayName: 'Phone',
+            id: '10',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [{
             label: 'Enter code',
             name: 'verificationCode',
@@ -932,7 +989,16 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          type: 'phone',
+          currentAuthenticator: {
+            displayName: 'Phone',
+            id: '10',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [{
             label: 'Enter code',
             name: 'verificationCode',
@@ -1021,7 +1087,16 @@ describe('idx/register', () => {
         }],
         nextStep: {
           name: 'authenticator-enrollment-data',
-          type: 'phone',
+          currentAuthenticator: {
+            displayName: 'Phone',
+            id: '7',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [
             { name: 'methodType', type: 'string', required: true },
             { name: 'phoneNumber', type: 'string', required: true }

@@ -49,7 +49,7 @@ const mocked = {
 };
 
 describe('idx/authenticate', () => {
- let testContext;
+  let testContext;
   beforeEach(() => {
     const interactionCode = 'test-interactionCode';
     const stateHandle = 'test-stateHandle';
@@ -85,15 +85,15 @@ describe('idx/authenticate', () => {
       transactionManager: {
         exists: () => true,
         load: () => transactionMeta,
-        clear: () => {},
-        save: () => {},
-        saveIdxResponse: () => {}
+        clear: () => { },
+        save: () => { },
+        saveIdxResponse: () => { }
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       }
     };
-    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 
+    jest.spyOn(mocked.interact, 'interact').mockResolvedValue({
       meta: transactionMeta,
       interactionHandle: transactionMeta.interactionHandle,
       state: transactionMeta.state
@@ -113,10 +113,10 @@ describe('idx/authenticate', () => {
       authClient
     };
   });
-  
+
   it('returns an auth transaction', async () => {
     const { authClient } = testContext;
-    const identifyResponse =  IdentifyResponseFactory.build();
+    const identifyResponse = IdentifyResponseFactory.build();
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     const res = await authenticate(authClient, {});
     expect(res).toEqual({
@@ -143,7 +143,7 @@ describe('idx/authenticate', () => {
             ]
           })
         });
-        const identifyResponse =  IdentifyResponseFactory.build();
+        const identifyResponse = IdentifyResponseFactory.build();
         const errorResponse = Object.assign({}, identifyResponse, { rawIdxState });
         identifyResponse.proceed = jest.fn().mockResolvedValueOnce(errorResponse);
         jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(identifyResponse);
@@ -180,7 +180,7 @@ describe('idx/authenticate', () => {
             ]
           })
         });
-        const identifyResponse =  IdentifyResponseFactory.build();
+        const identifyResponse = IdentifyResponseFactory.build();
         const errorResponse = Object.assign({}, identifyResponse, { rawIdxState });
         identifyResponse.proceed = jest.fn().mockResolvedValueOnce(errorResponse);
         jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
@@ -215,7 +215,7 @@ describe('idx/authenticate', () => {
         })
       });
 
-      const identifyResponse =  IdentifyResponseFactory.build();
+      const identifyResponse = IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
       jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
@@ -239,7 +239,7 @@ describe('idx/authenticate', () => {
           ]
         })
       });
-      const identifyResponse =  IdentifyResponseFactory.build();
+      const identifyResponse = IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
       jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
@@ -288,7 +288,7 @@ describe('idx/authenticate', () => {
           ]
         })
       });
-      const identifyResponse =  IdentifyResponseFactory.build();
+      const identifyResponse = IdentifyResponseFactory.build();
       identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
       jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
@@ -312,7 +312,7 @@ describe('idx/authenticate', () => {
       beforeEach(() => {
         const { successResponse } = testContext;
         const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
-        const identifyResponse =  IdentifyResponseFactory.build();
+        const identifyResponse = IdentifyResponseFactory.build();
         chainResponses([
           identifyResponse,
           verifyPasswordResponse,
@@ -335,7 +335,7 @@ describe('idx/authenticate', () => {
           tokens: tokenResponse.tokens,
         });
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
-        expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' }});
+        expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' } });
         expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
           clientId: 'test-clientId',
           codeVerifier: 'meta-code',
@@ -368,12 +368,37 @@ describe('idx/authenticate', () => {
         });
 
         // Second call: proceeds with identify response
-        res = await authenticate(authClient, { username: 'myuser'});
+        res = await authenticate(authClient, { username: 'myuser' });
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'myuser' });
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
           name: 'challenge-authenticator',
-          type: 'password',
+          currentAuthenticator: {
+            displayName: 'Password',
+            id: '6',
+            key: 'okta_password',
+            methods: [
+              {
+                type: 'password',
+              },
+            ],
+            settings: {
+              age: {
+                historyCount: 4,
+                minAgeMinutes: 0,
+              },
+              complexity: {
+                excludeAttributes: [],
+                excludeUsername: true,
+                minLength: 8,
+                minLowerCase: 0,
+                minNumber: 0,
+                minSymbol: 0,
+                minUpperCase: 0,
+              },
+            },
+            type: 'password',
+          },
           inputs: [{
             name: 'password',
             label: 'Password',
@@ -384,8 +409,8 @@ describe('idx/authenticate', () => {
         });
 
         // Third call: proceeds with verify password
-        res = await authenticate(authClient, { password: 'mypass'});
-        expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'mypass' }});
+        res = await authenticate(authClient, { password: 'mypass' });
+        expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'mypass' } });
         expect(res).toEqual({
           'status': IdxStatus.SUCCESS,
           'tokens': tokenResponse.tokens,
@@ -407,7 +432,7 @@ describe('idx/authenticate', () => {
     describe('identifier with password', () => {
       beforeEach(() => {
         const { successResponse } = testContext;
-        const identifyResponse =  IdentifyWithPasswordResponseFactory.build();
+        const identifyResponse = IdentifyWithPasswordResponseFactory.build();
         chainResponses([
           identifyResponse,
           successResponse
@@ -446,7 +471,7 @@ describe('idx/authenticate', () => {
 
       it('can authenticate, passing username and password on demand', async () => {
         const { authClient, identifyResponse, tokenResponse, interactionCode } = testContext;
-    
+
         // First call: returns identify response
         let res = await authenticate(authClient, {});
         expect(res.status).toBe(IdxStatus.PENDING);
@@ -464,7 +489,7 @@ describe('idx/authenticate', () => {
         });
 
         // Second call: proceeds with identify response
-        res = await authenticate(authClient, { username: 'myuser', password: 'mypass'});
+        res = await authenticate(authClient, { username: 'myuser', password: 'mypass' });
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', {
           identifier: 'myuser',
           credentials: {
@@ -492,12 +517,12 @@ describe('idx/authenticate', () => {
   });
 
   describe('mfa authentication', () => {
-  
+
     describe('phone', () => {
 
-     
+
       describe('verification', () => {
-      
+
         beforeEach(() => {
           const selectAuthenticatorResponse = IdxResponseFactory.build({
             neededToProceed: [
@@ -517,7 +542,7 @@ describe('idx/authenticate', () => {
               PhoneAuthenticatorVerificationDataRemediationFactory.build()
             ]
           });
-          
+
           const verifyPhoneResponse = IdxResponseFactory.build({
             actions: {
               'currentAuthenticatorEnrollment-resend': () => Promise.resolve(
@@ -574,12 +599,21 @@ describe('idx/authenticate', () => {
           const res = await authenticate(authClient, {
             authenticators: [AuthenticatorKey.PHONE_NUMBER] // will remediate select authenticator
           });
-          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' }});
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' } });
           expect(res).toEqual({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'authenticator-verification-data',
-              type: 'phone',
+              currentAuthenticator: {
+                displayName: 'Phone',
+                id: '13',
+                key: 'phone_number',
+                methods: [
+                  { type: 'sms' },
+                  { type: 'voice' }
+                ],
+                type: 'phone',
+              },
               inputs: [
                 { name: 'methodType', type: 'string', required: true }
               ],
@@ -668,7 +702,16 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }],
               name: 'enroll-authenticator',
-              type: 'phone'
+              currentAuthenticator: {
+                displayName: 'Phone',
+                id: '10',
+                key: 'phone_number',
+                methods: [
+                  { type: 'sms' },
+                  { type: 'voice' }
+                ],
+                type: 'phone',
+              },
             }
           });
         });
@@ -769,7 +812,16 @@ describe('idx/authenticate', () => {
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-authenticator',
-              type: 'phone',
+              currentAuthenticator: {
+                displayName: 'Phone',
+                id: '10',
+                key: 'phone_number',
+                methods: [
+                  { type: 'sms' },
+                  { type: 'voice' }
+                ],
+                type: 'phone',
+              },
               inputs: [{
                 label: 'Enter code',
                 name: 'verificationCode',
@@ -800,14 +852,23 @@ describe('idx/authenticate', () => {
 
           let res = await authenticate(authClient, { authenticator: AuthenticatorKey.PHONE_NUMBER });
           expect(selectAuthenticatorResponse.proceed)
-            .toHaveBeenCalledWith('select-authenticator-enroll', { 
+            .toHaveBeenCalledWith('select-authenticator-enroll', {
               authenticator: { id: 'id-phone' }
             });
           expect(res).toEqual({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'authenticator-enrollment-data',
-              type: 'phone',
+              currentAuthenticator: {
+                displayName: 'Phone',
+                id: '7',
+                key: 'phone_number',
+                methods: [
+                  { type: 'sms' },
+                  { type: 'voice' }
+                ],
+                type: 'phone',
+              },
               inputs: [
                 { name: 'methodType', type: 'string', required: true },
                 { name: 'phoneNumber', type: 'string', required: true },
@@ -819,8 +880,8 @@ describe('idx/authenticate', () => {
             }
           });
 
-          res = await authenticate(authClient, { 
-            phoneNumber: '(555) 555-5555', methodType: 'sms' 
+          res = await authenticate(authClient, {
+            phoneNumber: '(555) 555-5555', methodType: 'sms'
           });
           expect(phoneEnrollmentDataResponse.proceed).toHaveBeenCalledWith('authenticator-enrollment-data', {
             authenticator: {
@@ -832,7 +893,20 @@ describe('idx/authenticate', () => {
           expect(res.status).toBe(IdxStatus.PENDING);
           expect(res.nextStep).toEqual({
             name: 'enroll-authenticator',
-            type: 'phone',
+            currentAuthenticator: {
+              displayName: 'Phone',
+              id: '10',
+              key: 'phone_number',
+              methods: [
+                {
+                  type: 'sms',
+                },
+                {
+                  type: 'voice',
+                },
+              ],
+              type: 'phone',
+            },
             inputs: [{
               label: 'Enter code',
               name: 'verificationCode',
@@ -873,13 +947,22 @@ describe('idx/authenticate', () => {
             }],
             nextStep: {
               name: 'authenticator-enrollment-data',
-              type: 'phone',
+              currentAuthenticator: {
+                displayName: 'Phone',
+                id: '7',
+                key: 'phone_number',
+                methods: [
+                  { type: 'sms' },
+                  { type: 'voice' }
+                ],
+                type: 'phone',
+              },
               inputs: [
                 { name: 'methodType', type: 'string', required: true },
                 { name: 'phoneNumber', type: 'string', required: true },
               ],
               options: [
-                { label: 'SMS', value: 'sms' }, 
+                { label: 'SMS', value: 'sms' },
                 { label: 'Voice call', value: 'voice' }
               ],
             }
@@ -887,7 +970,7 @@ describe('idx/authenticate', () => {
 
         });
       });
-      
+
     });
 
     describe('email', () => {
@@ -1003,7 +1086,17 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }],
               name: 'challenge-authenticator',
-              type: 'email'
+              currentAuthenticator: {
+                displayName: 'Email',
+                id: '5',
+                key: 'okta_email',
+                methods: [
+                  {
+                    type: 'email',
+                  },
+                ],
+                type: 'email',
+              },
             }
           });
         });

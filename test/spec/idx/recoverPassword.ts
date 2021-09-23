@@ -281,7 +281,32 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'reenroll-authenticator',
-        type: 'password',
+        currentAuthenticator: {
+          displayName: 'Password',
+          id: '11',
+          key: 'okta_password',
+          methods: [
+            {
+              type: 'password',
+            },
+          ],
+          settings: {
+            age: {
+              historyCount: 4,
+              minAgeMinutes: 0,
+            },
+            complexity: {
+              excludeAttributes: [],
+              excludeUsername: true,
+              minLength: 8,
+              minLowerCase: 0,
+              minNumber: 0,
+              minSymbol: 0,
+              minUpperCase: 0,
+            },
+          },
+          type: 'password',
+        },
         inputs: [
           {
             name: 'newPassword',
@@ -328,7 +353,32 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'authenticator-verification-data',
-        type: 'password',
+        currentAuthenticator: {
+          displayName: 'Password',
+          id: '12',
+          key: 'okta_password',
+          methods: [
+            {
+              type: 'password',
+            },
+          ],
+          settings: {
+            age: {
+              historyCount: 4,
+              minAgeMinutes: 0,
+            },
+            complexity: {
+              excludeAttributes: [],
+              excludeUsername: true,
+              minLength: 8,
+              minLowerCase: 0,
+              minNumber: 0,
+              minSymbol: 0,
+              minUpperCase: 0,
+            },
+          },
+          type: 'password',
+        },
         inputs: [{
           label: 'Password',
           name: 'passcode',
@@ -378,7 +428,32 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'reenroll-authenticator',
-        type: 'password',
+        currentAuthenticator: {
+          displayName: 'Password',
+          id: '11',
+          key: 'okta_password',
+          methods: [
+            {
+              type: 'password',
+            },
+          ],
+          settings: {
+            age: {
+              historyCount: 4,
+              minAgeMinutes: 0,
+            },
+            complexity: {
+              excludeAttributes: [],
+              excludeUsername: true,
+              minLength: 8,
+              minLowerCase: 0,
+              minNumber: 0,
+              minSymbol: 0,
+              minUpperCase: 0,
+            },
+          },
+          type: 'password',
+        },
         inputs: [
           {
             name: 'newPassword',
@@ -401,7 +476,32 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'authenticator-verification-data',
-        type: 'password',
+        currentAuthenticator: {
+          displayName: 'Password',
+          id: '12',
+          key: 'okta_password',
+          methods: [
+            {
+              type: 'password',
+            },
+          ],
+          settings: {
+            age: {
+              historyCount: 4,
+              minAgeMinutes: 0,
+            },
+            complexity: {
+              excludeAttributes: [],
+              excludeUsername: true,
+              minLength: 8,
+              minLowerCase: 0,
+              minNumber: 0,
+              minSymbol: 0,
+              minUpperCase: 0,
+            },
+          },
+          type: 'password',
+        },
         inputs: [{
           label: 'Password',
           name: 'passcode',
