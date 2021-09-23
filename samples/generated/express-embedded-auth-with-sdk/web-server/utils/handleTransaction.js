@@ -12,19 +12,18 @@
 
 
 /* eslint-disable complexity */
-const { IdxStatus } = require('@okta/okta-auth-js');
+const { IdxStatus, AuthenticatorKey } = require('@okta/okta-auth-js');
 const redirect = require('./redirect');
 
-const SUPPORTED_AUTHENTICATORS = ['email', 'password', 'phone'];
-
 const proceed = ({ nextStep, req, res }) => {
-  const { name, type } = nextStep;
+  const { name, currentAuthenticator } = nextStep;
+  const { key, displayName, type } = currentAuthenticator || {};
 
   // Stop if unsupported types detected
-  if (type && !SUPPORTED_AUTHENTICATORS.includes(type)) {
+  if (currentAuthenticator && !Object.values(AuthenticatorKey).includes(key)) {
     throw new Error(`
-      Authenticator: ${type} is not supported in current sample, 
-      please extend the sample by adding handles for ${type} authenticator.
+      Authenticator: ${displayName} is not supported in current sample, 
+      please extend the sample by adding handles for ${displayName} authenticator.
     `);
   }
 
@@ -54,11 +53,11 @@ const proceed = ({ nextStep, req, res }) => {
       redirect({ 
         req, 
         res, 
-        path: type === 'password' ? '/login' : `/challenge-authenticator/${type}` 
+        path: type === 'password' ? '/login' : `/challenge-authenticator/${key}` 
       });
       return true;
     case 'authenticator-verification-data':
-      redirect({ req, res, path: `/verify-authenticator/${type}` });
+      redirect({ req, res, path: `/verify-authenticator/${key}` });
       return true;
 
     // authenticator enrollment
@@ -66,10 +65,10 @@ const proceed = ({ nextStep, req, res }) => {
       redirect({ req, res, path: '/select-authenticator' });
       return true;
     case 'enroll-authenticator':
-      redirect({ req, res, path: `/enroll-authenticator/${type}` });
+      redirect({ req, res, path: `/enroll-authenticator/${key}` });
       return true;
     case 'authenticator-enrollment-data':
-      redirect({ req, res, path: `/enroll-authenticator/${type}/enrollment-data` });
+      redirect({ req, res, path: `/enroll-authenticator/${key}/enrollment-data` });
       return true;
 
     // reset password

@@ -15,14 +15,25 @@ const renderMessages = require('./renderMessages');
 const getFormActionPath = require('./getFormActionPath');
 
 module.exports = function renderTemplate(req, res, template, options = {}) {
+  const { 
+    idx: { 
+      messages,
+      nextStep: {
+        currentAuthenticator: {
+          contextualData
+        } = {}
+      } = {}
+    } = {} 
+  } = req.getFlowStates();
   options = { 
     ...options, 
     action: getFormActionPath(req, options.action),
     skipAction: getFormActionPath(req, options.skipAction),
     resendAction: getFormActionPath(req, options.resendAction),
-    cancelAction: getFormActionPath(req, '/cancel')
+    cancelAction: getFormActionPath(req, '/cancel'),
+    contextualData
   };
-  const { idx: { messages } = {} } = req.getFlowStates();
+  
   if (messages && messages.length) {
     renderMessages(res, {
       template,

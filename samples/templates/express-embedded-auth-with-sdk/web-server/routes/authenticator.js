@@ -54,7 +54,7 @@ router.post('/select-authenticator/skip', async (req, res, next) => {
 });
 
 // Handle challenge email authenticator
-router.get('/challenge-authenticator/email', (req, res) => {
+router.get('/challenge-authenticator/okta_email', (req, res) => {
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'authenticator', {
@@ -63,12 +63,12 @@ router.get('/challenge-authenticator/email', (req, res) => {
         type: 'text',
         name: 'verificationCode',
       },
-      action: '/challenge-authenticator/email',
+      action: '/challenge-authenticator/okta_email',
     })
   });
 });
 
-router.post('/challenge-authenticator/email', async (req, res, next) => {
+router.post('/challenge-authenticator/okta_email', async (req, res, next) => {
   const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
@@ -77,13 +77,13 @@ router.post('/challenge-authenticator/email', async (req, res, next) => {
 });  
 
 // Handle enroll authenticator -- email
-router.get('/enroll-authenticator/email', (req, res) => {
+router.get('/enroll-authenticator/okta_email', (req, res) => {
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'authenticator', {
       req, res,
       title: 'Enroll email authenticator',
-      action: '/enroll-authenticator/email',
+      action: '/enroll-authenticator/okta_email',
       input: {
         type: 'text',
         name: 'verificationCode',
@@ -92,7 +92,7 @@ router.get('/enroll-authenticator/email', (req, res) => {
   });
 });
 
-router.post('/enroll-authenticator/email', async (req, res, next) => {
+router.post('/enroll-authenticator/okta_email', async (req, res, next) => {
   const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
@@ -101,17 +101,17 @@ router.post('/enroll-authenticator/email', async (req, res, next) => {
 });
 
 // Handle enroll authenticator -- password
-router.get('/enroll-authenticator/password', (req, res) => {
+router.get('/enroll-authenticator/okta_password', (req, res) => {
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
       title: 'Set up password',
-      action: '/enroll-authenticator/password',
+      action: '/enroll-authenticator/okta_password',
     })
   });
 });
 
-router.post('/enroll-authenticator/password', async (req, res, next) => {
+router.post('/enroll-authenticator/okta_password', async (req, res, next) => {
   const { idxMethod } = req.getFlowStates();
   const { password, confirmPassword } = req.body;
   const authClient = getAuthClient(req);
@@ -126,7 +126,7 @@ router.post('/enroll-authenticator/password', async (req, res, next) => {
 });
 
 // Handle phone authenticator
-router.get('/verify-authenticator/phone', (req, res) => {
+router.get('/verify-authenticator/phone_number', (req, res) => {
   const { 
     idx: { nextStep: { options } } 
   } = req.getFlowStates();
@@ -134,13 +134,13 @@ router.get('/verify-authenticator/phone', (req, res) => {
     req, res,
     render: () => renderTemplate(req, res, 'verify-phone', {
       title: 'Verify using phone authenticator',
-      action: '/verify-authenticator/phone',
+      action: '/verify-authenticator/phone_number',
       options,
     })
   });
 });
 
-router.post('/verify-authenticator/phone', async (req, res, next) => {
+router.post('/verify-authenticator/phone_number', async (req, res, next) => {
   const { idxMethod } = req.getFlowStates();
   const { methodType } = req.body;
   const authClient = getAuthClient(req);
@@ -148,7 +148,7 @@ router.post('/verify-authenticator/phone', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.get('/challenge-authenticator/phone', (req, res) => {
+router.get('/challenge-authenticator/phone_number', (req, res) => {
   const { 
     idx: { nextStep: { canResend } }
   } = req.getFlowStates();
@@ -160,14 +160,14 @@ router.get('/challenge-authenticator/phone', (req, res) => {
         type: 'text',
         name: 'verificationCode',
       },
-      action: '/challenge-authenticator/phone',
+      action: '/challenge-authenticator/phone_number',
       canResend,
       resendAction: '/challenge-authenticator/resend'
     })
   });
 });
 
-router.post('/challenge-authenticator/phone', async (req, res, next) => {
+router.post('/challenge-authenticator/phone_number', async (req, res, next) => {
   const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
@@ -182,20 +182,20 @@ router.post('/challenge-authenticator/resend', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.get('/enroll-authenticator/phone/enrollment-data', (req, res) => {
+router.get('/enroll-authenticator/phone_number/enrollment-data', (req, res) => {
   const { 
     idx: { nextStep: { options } } 
   } = req.getFlowStates();
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'phone-enrollment-data', {
-      action: '/enroll-authenticator/phone/enrollment-data',
+      action: '/enroll-authenticator/phone_number/enrollment-data',
       options,
     })
   });
 });
 
-router.post('/enroll-authenticator/phone/enrollment-data', async (req, res, next) => {
+router.post('/enroll-authenticator/phone_number/enrollment-data', async (req, res, next) => {
   const { idxMethod } = req.getFlowStates();
   const { phoneNumber, methodType } = req.body;
   const authClient = getAuthClient(req);
@@ -206,7 +206,7 @@ router.post('/enroll-authenticator/phone/enrollment-data', async (req, res, next
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.get('/enroll-authenticator/phone', (req, res) => {
+router.get('/enroll-authenticator/phone_number', (req, res) => {
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'authenticator', {
@@ -220,13 +220,59 @@ router.get('/enroll-authenticator/phone', (req, res) => {
   });
 });
 
-router.post('/enroll-authenticator/phone', async (req, res, next) => {
+router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
   const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
   const transaction = await authClient.idx[idxMethod]({ 
     verificationCode,
   });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+// Handle Google Authenticator
+router.get('/enroll-authenticator/google_otp', async (req, res, next) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator', {
+      req, res,
+      title: 'Enroll Google Authenticator',
+      action: '/enroll-authenticator/google_otp',
+      input: {
+        type: 'text',
+        name: 'verificationCode',
+      }
+    })
+  });
+});
+
+router.post('/enroll-authenticator/google_otp', async (req, res, next) => {
+  const { idxMethod } = req.getFlowStates();
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx[idxMethod]({ verificationCode });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+router.get('/challenge-authenticator/google_otp', async (req, res, next) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator', {
+      title: 'Challenge Google Authenticator',
+      input: {
+        type: 'text',
+        name: 'verificationCode',
+      },
+      action: '/challenge-authenticator/google_otp',
+    })
+  });
+});
+
+router.post('/challenge-authenticator/google_otp', async (req, res, next) => {
+  const { idxMethod } = req.getFlowStates();
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx[idxMethod]({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 

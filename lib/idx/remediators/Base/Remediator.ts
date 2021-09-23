@@ -117,13 +117,11 @@ export class Remediator {
   getNextStep(): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
-    const type = this.getRelatesToType();
-    const contextualData = this.remediation.relatesTo?.value.contextualData;
+    const currentAuthenticator = this.getRelatesTo()?.value;
     return { 
       name, 
       inputs, 
-      ...(type && { type }),
-      ...(contextualData && { contextualData }),
+      ...(currentAuthenticator && { currentAuthenticator }),
     };
   }
 

@@ -14,7 +14,7 @@
 import { InteractOptions } from '../interact';
 import { APIError, Tokens } from '../../types';
 import { IdxTransactionMeta } from '../../types/Transaction';
-import { IdxMessage, IdxOption } from './idx-js';
+import { IdxAuthenticator, IdxMessage, IdxOption } from './idx-js';
 
 export { IdxMessage } from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
@@ -45,7 +45,7 @@ type Input = {
 
 export type NextStep = {
   name: string;
-  type?: string;
+  currentAuthenticator?: IdxAuthenticator;
   canSkip?: boolean;
   canResend?: boolean;
   inputs?: Input[];
