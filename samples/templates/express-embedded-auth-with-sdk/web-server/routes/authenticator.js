@@ -207,15 +207,20 @@ router.post('/enroll-authenticator/phone_number/enrollment-data', async (req, re
 });
 
 router.get('/enroll-authenticator/phone_number', (req, res) => {
+  const { 
+    idx: { nextStep: { canResend } }
+  } = req.getFlowStates();
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'authenticator', {
       title: 'Enroll phone authenticator',
-      action: '/enroll-authenticator/phone',
+      action: '/enroll-authenticator/phone_number',
       input: {
         type: 'text',
         name: 'verificationCode',
-      }
+      },
+      canResend,
+      resendAction: '/challenge-authenticator/resend'
     })
   });
 });

@@ -18,10 +18,14 @@ import clickElement from '../clickElement';
 import ChallengeAuthenticator from '../../selectors/ChallengeAuthenticator';
 
 export default async function (this: ActionContext) {
+  let retryResend = 3;
   let code = await a18nClient.getSMSCode(this.credentials.profileId);
-  if (!code) {
+  while (!code && retryResend-- > 0) {
     await clickElement('click', 'selector', ChallengeAuthenticator.resend);
     code = await a18nClient.getSMSCode(this.credentials.profileId);
+  }
+  if (!code) {
+    throw new Error('Failed to get sms code');
   }
   await setInputField('set', code, ChallengeAuthenticator.code);
 }

@@ -23,10 +23,6 @@ import {
   IdxRemediation, 
 } from './types/idx-js';
 
-const actionsTriggeredByValues = {
-  resend: 'currentAuthenticatorEnrollment-resend' // assuming only one '-resend' action is present in response
-};
-
 interface RemediationResponse {
   idxResponse?: IdxResponse;
   nextStep?: NextStep;
@@ -156,19 +152,15 @@ function handleIdxError(e, flow, remediator?) {
   throw e;
 }
 
-function getActionFromValues(values): string | undefined{
-  const valueName = Object.keys(values).find(valueName => actionsTriggeredByValues[valueName]);
-  return actionsTriggeredByValues[valueName];
+function getActionFromValues(values, idxResponse: IdxResponse): string | undefined {
+  // Currently support resend actions only
+  return Object.keys(idxResponse.actions).find(action => !!values.resend && action.includes('-resend'));
 }
 
 function removeActionFromValues(values, action) {
-  const executedActionValue = Object.keys(actionsTriggeredByValues).find(
-    valueName => actionsTriggeredByValues[valueName] === action);
-  return Object.keys(values).filter(valueName => valueName !== executedActionValue)
-  .reduce((newValues, valueName) => {
-    newValues[valueName] = values[valueName];
-    return newValues;
-  }, {});
+  // Currently support resend actions only
+  values.resend = undefined;
+  return values;
 }
 
 // This function is called recursively until it reaches success or cannot be remediated
@@ -193,7 +185,7 @@ export async function remediate(
   }
   
   // Try actions in idxResponse first
-  const actionFromValues = getActionFromValues(values);
+  const actionFromValues = getActionFromValues(values, idxResponse);
   const actions = [
     ...options.actions || [],
     ...(actionFromValues && [actionFromValues] || []),
