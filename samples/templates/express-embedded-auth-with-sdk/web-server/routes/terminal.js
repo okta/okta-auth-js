@@ -11,10 +11,9 @@
  */
 
 
-const express = require('express');
-const { renderTemplate } = require('../utils');
+const { renderTemplate, routerWithCatch } = require('../utils');
 
-const router = express.Router();
+const router = routerWithCatch();
 
 router.get('/terminal', (req, res) => {
   renderTemplate(req, res, 'terminal');
