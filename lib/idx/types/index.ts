@@ -23,11 +23,19 @@ export { PasswordRecoveryOptions } from '../recoverPassword';
 export { CancelOptions } from '../cancel';
 
 export enum IdxStatus {
-  SUCCESS,
-  PENDING,
-  FAILURE,
-  TERMINAL,
-  CANCELED,
+  SUCCESS = 'SUCCESS',
+  PENDING = 'PENDING',
+  FAILURE = 'FAILURE',
+  TERMINAL = 'TERMINAL',
+  CANCELED = 'CANCELED',
+}
+
+export enum AuthenticatorKey {
+  OKTA_PASSWORD = 'okta_password',
+  OKTA_EMAIL = 'okta_email',
+  OKTA_VERIFIER = 'okta_verifier',
+  PHONE_NUMBER = 'phone_number',
+  GOOGLE_AUTHENTICATOR = 'google_otp',
 }
 
 type Input = {
@@ -64,7 +72,7 @@ export interface IdxTransaction {
 export type IdxOptions = InteractOptions;
 
 export type Authenticator = {
-  type: string;
+  key: string;
   methodType?: string;
   phoneNumber?: string;
 };

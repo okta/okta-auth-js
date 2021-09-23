@@ -11,7 +11,7 @@
  */
 
 import { authenticate } from '../../../lib/idx/authenticate';
-import { IdxStatus } from '../../../lib/idx/types';
+import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { IdxActions } from './../../../lib/idx/types/idx-js';
 
 import {
@@ -331,8 +331,8 @@ describe('idx/authenticate', () => {
         jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
         expect(res).toEqual({
-          'status': 0,
-          'tokens': tokenResponse.tokens,
+          status: IdxStatus.SUCCESS,
+          tokens: tokenResponse.tokens,
         });
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
         expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' }});
@@ -423,8 +423,8 @@ describe('idx/authenticate', () => {
         const { authClient, identifyResponse, tokenResponse, interactionCode } = testContext;
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
         expect(res).toEqual({
-          'status': 0,
-          'tokens': tokenResponse.tokens,
+          status: IdxStatus.SUCCESS,
+          tokens: tokenResponse.tokens,
         });
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', {
           identifier: 'fakeuser',
@@ -572,7 +572,7 @@ describe('idx/authenticate', () => {
           jest.spyOn(selectAuthenticatorResponse, 'proceed');
           jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
           const res = await authenticate(authClient, {
-            authenticators: ['phone'] // will remediate select authenticator
+            authenticators: [AuthenticatorKey.PHONE_NUMBER] // will remediate select authenticator
           });
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' }});
           expect(res).toEqual({
@@ -748,7 +748,7 @@ describe('idx/authenticate', () => {
 
           const res = await authenticate(authClient, {
             authenticators: [{
-              type: 'phone',
+              key: AuthenticatorKey.PHONE_NUMBER,
               methodType: 'sms',
               phoneNumber: '(555) 555-5555',
             }]
@@ -798,7 +798,7 @@ describe('idx/authenticate', () => {
             .mockResolvedValueOnce(selectAuthenticatorResponse)
             .mockResolvedValueOnce(phoneEnrollmentDataResponse);
 
-          let res = await authenticate(authClient, { authenticator: 'phone' });
+          let res = await authenticate(authClient, { authenticator: AuthenticatorKey.PHONE_NUMBER });
           expect(selectAuthenticatorResponse.proceed)
             .toHaveBeenCalledWith('select-authenticator-enroll', { 
               authenticator: { id: 'id-phone' }

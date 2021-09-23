@@ -33,13 +33,13 @@ export class AuthenticatorData extends Remediator {
 
     // Unify authenticator input type
     const { authenticators } = this.values;
-    const authenticatorType = this.getRelatesToType();
+    const authenticatorKey = this.getRelatesTo().value.key;
     const authenticator = (authenticators as Authenticator[])
-        ?.find(authenticator => authenticator.type === authenticatorType);
+        ?.find(authenticator => authenticator.key === authenticatorKey);
     if (authenticator) {
       // map
       this.values.authenticators = authenticators.map(authenticator => {
-        if (authenticatorType === authenticator.type) {
+        if (authenticatorKey === authenticator.type) {
           return this.mapAuthenticatorFromValues(authenticator);
         }
         return authenticator;
@@ -68,18 +68,18 @@ export class AuthenticatorData extends Remediator {
       return null;
     }
 
-    const authenticatorType = this.getRelatesToType();
+    const authenticatorKey = this.getRelatesTo().value.key;
     const authenticator = (this.values.authenticators as Authenticator[])
-      .find(authenticator => authenticator.type === authenticatorType);
+      .find(authenticator => authenticator.key === authenticatorKey);
     return authenticator;
   }
 
   protected mapAuthenticatorFromValues(authenticator?: Authenticator): Authenticator {
     // add methodType to authenticator if it exists in values
-    const type = this.getRelatesToType();
+    const key = this.getRelatesTo().value.key;
     const { methodType } = this.values;
     return { 
-      type, 
+      key, 
       ...(authenticator && authenticator),
       ...(methodType && { methodType }) 
     };

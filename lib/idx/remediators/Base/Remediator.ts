@@ -37,7 +37,7 @@ export class Remediator {
     // map authenticators to Authenticator[] type
     values.authenticators = (values.authenticators?.map(authenticator => {
       return typeof authenticator === 'string' 
-        ? { type: authenticator } : authenticator;
+        ? { key: authenticator } : authenticator;
     }) || []) as Authenticator[];
     
     // assign fields to the instance
@@ -189,12 +189,16 @@ export class Remediator {
   getValuesAfterProceed() {
     const authenticatorType = this.getRelatesToType();
     const authenticators = (this.values.authenticators as Authenticator[])
-      ?.filter(authenticator => authenticator.type !== authenticatorType);
+      ?.filter(authenticator => authenticator.key !== authenticatorType);
     return { ...this.values, authenticators };
   }
 
   protected getRelatesToType() {
     return this.remediation.relatesTo?.value.type;
+  }
+
+  protected getRelatesTo(): IdxRemediation['relatesTo'] {
+    return this.remediation.relatesTo;
   }
 
 }

@@ -28,6 +28,17 @@ export class EnrollProfile extends Remediator {
     'userProfile': []
   };
 
+  canRemediate() {
+    const userProfileFromValues = this.getData().userProfile;
+    const userProfileFromRemediation = this.remediation.value.find(({ name }) => name === 'userProfile');
+    return userProfileFromRemediation.form.value.reduce((canRemediate, curr) => {
+      if (curr.required) {
+        canRemediate = canRemediate && !!userProfileFromValues[curr.name];
+      };
+      return canRemediate;
+    }, true);
+  }
+
   mapUserProfile({form: { value: profileAttributes }}) {
     const attributeNames = profileAttributes.map(({name}) => name);
     return attributeNames.reduce((attributeValues, attributeName) => (
