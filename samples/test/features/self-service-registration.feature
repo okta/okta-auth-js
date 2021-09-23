@@ -32,33 +32,33 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And the cell for the value of "email" is shown and contains her email
   And the cell for the value of "name" is shown and contains her first name and last name
 
-Scenario: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
-  Given Mary navigates to the Self Service Registration View
-  When she fills out her First Name
-  And she fills out her Last Name
-  And she fills out her Email
-  And she submits the registration form
-  Then she sees the Select Authenticator page with password as the only option
-  When she chooses password factor option
-  # And she submits the select authenticator form
-  Then she sees the set new password form
-  And she fills out her Password
-  And she confirms her Password
-  And she submits the set new password form
-  Then she sees a list of available factors to setup
-  When she selects Email
-  Then she sees a page to input a code for email authenticator enrollment
-  When she inputs the correct code from her email
-    And she submits the form
-  Then she sees a list of factors to register
-  When She selects Phone from the list
-  And She inputs a valid phone number
-  And She selects "Receive a Code"
-  Then the screen changes to receive an input for a code
-  When She inputs the correct code from her SMS
-  And She selects "Verify"
-  Then she is redirected to the Root View
-   And an application session is created
+# Scenario: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
+#  Given Mary navigates to the Self Service Registration View
+#  When she fills out her First Name
+#  And she fills out her Last Name
+#  And she fills out her Email
+#  And she submits the registration form
+#  Then she sees the Select Authenticator page with password as the only option
+#  When she chooses password factor option
+#  # And she submits the select authenticator form
+#  Then she sees the set new password form
+#  And she fills out her Password
+#  And she confirms her Password
+#  And she submits the set new password form
+#  Then she sees a list of available factors to setup
+#  When she selects Email
+#  Then she sees a page to input a code for email authenticator enrollment
+#  When she inputs the correct code from her email
+#    And she submits the form
+#  Then she sees a list of factors to register
+#  When She selects Phone from the list
+#  And She inputs a valid phone number
+#  And She selects "Receive a Code"
+#  Then the screen changes to receive an input for a code
+# When She inputs the correct code from her SMS
+#  And She selects "Verify"
+#  Then she is redirected to the Root View
+#   And an application session is created
 
 Scenario: Mary signs up with an invalid Email
   Given Mary navigates to the Self Service Registration View
