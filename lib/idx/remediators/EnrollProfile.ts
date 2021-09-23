@@ -34,7 +34,7 @@ export class EnrollProfile extends Remediator {
     return userProfileFromRemediation.form.value.reduce((canRemediate, curr) => {
       if (curr.required) {
         canRemediate = canRemediate && !!userProfileFromValues[curr.name];
-      };
+      }
       return canRemediate;
     }, true);
   }
