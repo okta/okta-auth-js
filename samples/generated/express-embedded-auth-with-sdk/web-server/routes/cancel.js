@@ -11,10 +11,9 @@
  */
 
 
-const express = require('express');
-const { getAuthClient, handleTransaction } = require('../utils');
+const { getAuthClient, handleTransaction, routerWithCatch } = require('../utils');
 
-const router = express.Router();
+const router = routerWithCatch();
 
 router.post('/cancel', async (req, res, next) => {
   const authClient = getAuthClient(req);

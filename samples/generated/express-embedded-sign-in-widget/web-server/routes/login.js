@@ -11,15 +11,15 @@
  */
 
 
-const express = require('express');
 const { 
   getAuthTransaction,
   getAuthClient,
+  routerWithCatch,
 } = require('../utils');
 
 const getConfig = require('../../config');
 
-const router = express.Router();
+const router = routerWithCatch();
 
 router.get('/login', (req, res, next) => {
   getAuthTransaction(req)
