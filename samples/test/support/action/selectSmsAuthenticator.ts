@@ -17,7 +17,7 @@ import clickElement from './clickElement';
 import selectOption from './selectOption';
 
 export default async () => {
-  await selectOption('value', 'phone', SelectAuthenticator.options);
+  await selectOption('value', 'phone_number', SelectAuthenticator.options);
   await clickElement('click', 'selector', SelectAuthenticator.submit);
   await checkIsOnPage('Enroll Factor: Enter SMS Code');
 };
