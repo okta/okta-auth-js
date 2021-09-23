@@ -40,7 +40,6 @@ module.exports = {
   ],
   'testMatch': [
     '**/test/spec/**/*.{js,ts}'
-    // '**/test/spec/idx/.{js,ts}'
   ],
   'roots': [
     'test/spec'
