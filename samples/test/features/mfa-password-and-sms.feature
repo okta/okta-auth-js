@@ -5,6 +5,7 @@ Feature: Multi-Factor Authentication with Password and SMS
 	    And an Authenticator Enrollment Policy that has PHONE as optional and EMAIL as required for the Everyone Group
 	    And a User named "Mary" created that HAS NOT yet enrolled in the SMS factor
 
+# TODO: https://oktainc.atlassian.net/browse/OKTA-431024
 #  Scenario: Enroll in SMS Factor prompt when authenticating
 #    Given Mary navigates to the Basic Login View
 #      And she has inserted her username
@@ -47,6 +48,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And She selects "Receive a Code"
     Then she should see a message "Invalid Phone Number."
 
+# TODO: https://oktainc.atlassian.net/browse/OKTA-431024
 #  Scenario: 2FA Login with SMS
 #    Given Mary has enrolled in the SMS factor
 #      And Mary navigates to the Basic Login View
