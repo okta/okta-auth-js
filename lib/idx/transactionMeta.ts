@@ -81,7 +81,7 @@ export async function getTransactionMeta(authClient: OktaAuth): Promise<IdxTrans
 }
 
 export function saveTransactionMeta (authClient: OktaAuth, meta) {
-  authClient.transactionManager.save(meta);
+  authClient.transactionManager.save(meta, { muteWarning: true });
 }
 
 export function clearTransactionMeta (authClient: OktaAuth) {

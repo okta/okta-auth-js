@@ -74,7 +74,10 @@ export default class TransactionManager {
 
     let storage: StorageProvider = this.storageManager.getTransactionStorage();
     const obj = storage.getStorage();
-    if (isTransactionMeta(obj)) {
+    // oie process may need to update transaction in the middle of process for tracking purpose
+    // false alarm might be caused 
+    // TODO: revisit for a better solution, https://oktainc.atlassian.net/browse/OKTA-430919
+    if (isTransactionMeta(obj) && !options.muteWarning) {
       // eslint-disable-next-line max-len
       warn('a saved auth transaction exists in storage. This may indicate another auth flow is already in progress.');
     }

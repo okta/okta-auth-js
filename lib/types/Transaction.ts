@@ -25,6 +25,7 @@ export interface TransactionManagerOptions {
 export interface TransactionMetaOptions {
   pkce?: boolean;
   oauth?: boolean;
+  muteWarning?: boolean;
 }
 
 // formerly known as "Redirect OAuth Params"
