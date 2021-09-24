@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.6.0
+
+### Other
+
+- [#947](https://github.com/okta/okta-auth-js/pull/947) TypeScript: Allow custom keys in `AuthState` interface
+- [#947](https://github.com/okta/okta-auth-js/pull/947) TypeScript: Use `OktaAuth` class instead of interface for `transformAuthState`, `restoreOriginalUri`
+
 ## 5.5.0
 
 ### Features
