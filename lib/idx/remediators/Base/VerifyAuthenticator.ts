@@ -38,7 +38,7 @@ export class VerifyAuthenticator extends Remediator {
   }
 
   getInputCredentials(input) {
-    const challengeType = this.getRelatesToType();
+    const challengeType = this.getCurrentAuthenticator().type;
     const name = challengeType === 'password' ? 'password' : 'verificationCode';
     return {
       ...input.form.value[0],
@@ -50,7 +50,7 @@ export class VerifyAuthenticator extends Remediator {
 
   getValuesAfterProceed() {
     let values = super.getValuesAfterProceed() as VerifyAuthenticatorValues;
-    const currentAuthenticator = this.getRelatesTo().value;
+    const currentAuthenticator = this.getCurrentAuthenticator();
     if (currentAuthenticator.type === 'password') {
       delete values.password;
     } else {

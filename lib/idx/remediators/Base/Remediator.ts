@@ -14,7 +14,7 @@
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
 import { NextStep, IdxMessage, Authenticator } from '../../types';
-import { IdxRemediation } from '../../types/idx-js';
+import { IdxAuthenticator, IdxRemediation } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
@@ -117,7 +117,7 @@ export class Remediator {
   getNextStep(): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
-    const currentAuthenticator = this.getRelatesTo()?.value;
+    const currentAuthenticator = this.getCurrentAuthenticator();
     return { 
       name, 
       inputs, 
@@ -185,18 +185,14 @@ export class Remediator {
   // Prepare values for the next remediation
   // In general, remove finished authenticator from list
   getValuesAfterProceed(): unknown {
-    const authenticatorType = this.getRelatesToType();
+    const authenticatorKey = this.getCurrentAuthenticator()?.key;
     const authenticators = (this.values.authenticators as Authenticator[])
-      ?.filter(authenticator => authenticator.key !== authenticatorType);
+      ?.filter(authenticator => authenticator.key !== authenticatorKey);
     return { ...this.values, authenticators };
   }
 
-  protected getRelatesToType() {
-    return this.remediation.relatesTo?.value.type;
-  }
-
-  protected getRelatesTo(): IdxRemediation['relatesTo'] {
-    return this.remediation.relatesTo;
+  protected getCurrentAuthenticator(): IdxAuthenticator | undefined {
+    return this.remediation.relatesTo?.value;
   }
 
 }
