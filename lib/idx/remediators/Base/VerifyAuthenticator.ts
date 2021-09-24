@@ -48,4 +48,15 @@ export class VerifyAuthenticator extends Remediator {
     };
   }
 
+  getValuesAfterProceed() {
+    let values = super.getValuesAfterProceed() as VerifyAuthenticatorValues;
+    const currentAuthenticator = this.getRelatesTo().value;
+    if (currentAuthenticator.type === 'password') {
+      delete values.password;
+    } else {
+      delete values.verificationCode;
+    }
+    return values;
+  }
+
 }

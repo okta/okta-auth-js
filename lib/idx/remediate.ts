@@ -157,7 +157,7 @@ function getActionFromValues(values, idxResponse: IdxResponse): string | undefin
   return Object.keys(idxResponse.actions).find(action => !!values.resend && action.includes('-resend'));
 }
 
-function removeActionFromValues(values, action) {
+function removeActionFromValues(values) {
   // Currently support resend actions only
   values.resend = undefined;
   return values;
@@ -192,7 +192,7 @@ export async function remediate(
   ];
   if (actions) {
     for (let action of actions) {
-      let valuesWithoutExecutedAction = removeActionFromValues(values, action);
+      let valuesWithoutExecutedAction = removeActionFromValues(values);
       if (typeof idxResponse.actions[action] === 'function') {
         try {
           idxResponse = await idxResponse.actions[action]();

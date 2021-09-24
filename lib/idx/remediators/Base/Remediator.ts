@@ -184,7 +184,7 @@ export class Remediator {
 
   // Prepare values for the next remediation
   // In general, remove finished authenticator from list
-  getValuesAfterProceed() {
+  getValuesAfterProceed(): unknown {
     const authenticatorType = this.getRelatesToType();
     const authenticators = (this.values.authenticators as Authenticator[])
       ?.filter(authenticator => authenticator.key !== authenticatorType);
