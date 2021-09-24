@@ -1,4 +1,1 @@
 samples/generated/**/* linguist-generated=true
-lib/**/* linguist-generated=false
-test/**/* linguist-generated=false
-docs/**/* linguist-generated=false
