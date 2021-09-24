@@ -22,7 +22,8 @@ import {
   FirstNameValueFactory,
   LastNameValueFactory,
   EmailValueFactory,
-  PasscodeValueFactory
+  PasscodeValueFactory,
+  OtpMethodTypeValueFactory
 } from './values';
 
 export const IdxFormFactory = Factory.define<IdxForm>(() => {
@@ -57,6 +58,14 @@ export const EmailAuthenticatorFormFactory = IdxFormFactory.params({
   ]
 });
 
+export const GoogleAuthenticatorFormFactory = IdxFormFactory.params({
+  value: [
+    IdValueFactory.build({
+      value: 'id-google-authenticator'
+    }),
+    OtpMethodTypeValueFactory.build()
+  ]
+});
 
 export const PhoneAuthenticatorFormFactory = IdxFormFactory.params({
   value: [
@@ -75,6 +84,12 @@ export const VerifySmsFormFactory = IdxFormFactory.params({
 });
 
 export const VerifyEmailFormFactory = IdxFormFactory.params({
+  value: [
+    PasscodeValueFactory.build()
+  ]
+});
+
+export const VerifyPasscodeFormFactory = IdxFormFactory.params({
   value: [
     PasscodeValueFactory.build()
   ]

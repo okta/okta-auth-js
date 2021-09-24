@@ -43,3 +43,7 @@ export const VoiceAuthenticatorMethodFactory = IdxAuthenticatorMethodFactory.par
 export const EmailAuthenticatorMethodFactory = IdxAuthenticatorMethodFactory.params({
   type: 'email'
 });
+
+export const OtpAuthenticatorMethodFactory = IdxAuthenticatorMethodFactory.params({
+  type: 'otp'
+});

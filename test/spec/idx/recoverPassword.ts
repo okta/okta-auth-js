@@ -283,7 +283,7 @@ describe('idx/recoverPassword', () => {
         name: 'reenroll-authenticator',
         currentAuthenticator: {
           displayName: 'Password',
-          id: '11',
+          id: '14',
           key: 'okta_password',
           methods: [
             {
@@ -355,7 +355,7 @@ describe('idx/recoverPassword', () => {
         name: 'authenticator-verification-data',
         currentAuthenticator: {
           displayName: 'Password',
-          id: '12',
+          id: '15',
           key: 'okta_password',
           methods: [
             {
@@ -430,7 +430,7 @@ describe('idx/recoverPassword', () => {
         name: 'reenroll-authenticator',
         currentAuthenticator: {
           displayName: 'Password',
-          id: '11',
+          id: '14',
           key: 'okta_password',
           methods: [
             {
@@ -478,7 +478,7 @@ describe('idx/recoverPassword', () => {
         name: 'authenticator-verification-data',
         currentAuthenticator: {
           displayName: 'Password',
-          id: '12',
+          id: '15',
           key: 'okta_password',
           methods: [
             {

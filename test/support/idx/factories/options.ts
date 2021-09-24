@@ -17,13 +17,15 @@ import {
   EmailAuthenticatorFactory,
   OktaVerifyAuthenticatorFactory,
   PasswordAuthenticatorFactory,
-  PhoneAuthenticatorFactory
+  PhoneAuthenticatorFactory,
+  GoogleAuthenticatorFactory
 } from './authenticators';
 import {
   IdxFormFactory,
   PhoneAuthenticatorFormFactory,
   EmailAuthenticatorFormFactory,
-  PasswordAuthenticatorFormFactory
+  PasswordAuthenticatorFormFactory,
+  GoogleAuthenticatorFormFactory
 } from './forms';
 
 interface MockedIdxOption extends IdxOption {
@@ -78,5 +80,12 @@ export const EmailAuthenticatorOptionFactory = AuthenticatorOptionFactory.params
   _authenticator: EmailAuthenticatorFactory.build(),
   value: {
     form: EmailAuthenticatorFormFactory.build()
+  }
+});
+
+export const GoogleAuthenticatorOptionFactory = AuthenticatorOptionFactory.params({
+  _authenticator: GoogleAuthenticatorFactory.build(),
+  value: {
+    form: GoogleAuthenticatorFormFactory.build()
   }
 });

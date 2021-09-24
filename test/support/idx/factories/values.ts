@@ -57,6 +57,12 @@ export const PhoneMethodTypeValueFactory = IdxValueFactory.params({
   }]
 });
 
+export const OtpMethodTypeValueFactory = IdxValueFactory.params({
+  name: 'methodType',
+  required: false,
+  value: 'otp'
+});
+
 export const PhoneNumberValueFactory = IdxValueFactory.params({
   name: 'phoneNumber',
   required: true,

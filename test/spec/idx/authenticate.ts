@@ -22,6 +22,7 @@ import {
   IdxResponseFactory,
   PhoneAuthenticatorEnrollmentDataRemediationFactory,
   EnrollPhoneAuthenticatorRemediationFactory,
+  EnrollGoogleAuthenticatorRemediationFactory,
   IdxErrorAccessDeniedFactory,
   IdxErrorIncorrectPassword,
   IdxErrorUserNotAssignedFactory,
@@ -32,14 +33,17 @@ import {
   AuthenticatorValueFactory,
   PhoneAuthenticatorOptionFactory,
   EmailAuthenticatorOptionFactory,
+  GoogleAuthenticatorOptionFactory,
   SelectAuthenticatorEnrollRemediationFactory,
   ChallengeAuthenticatorRemediationFactory,
   CredentialsValueFactory,
   PasscodeValueFactory,
   IdxErrorPasscodeInvalidFactory,
   IdxErrorEnrollmentInvalidPhoneFactory,
+  IdxErrorGoogleAuthenticatorPasscodeInvalidFactory,
   PhoneAuthenticatorVerificationDataRemediationFactory,
-  VerifyEmailRemediationFactory
+  VerifyEmailRemediationFactory,
+  VerifyGoogleAuthenticatorRemediationFactory
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -375,7 +379,7 @@ describe('idx/authenticate', () => {
           name: 'challenge-authenticator',
           currentAuthenticator: {
             displayName: 'Password',
-            id: '6',
+            id: '8',
             key: 'okta_password',
             methods: [
               {
@@ -606,7 +610,7 @@ describe('idx/authenticate', () => {
               name: 'authenticator-verification-data',
               currentAuthenticator: {
                 displayName: 'Phone',
-                id: '13',
+                id: '16',
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -704,7 +708,7 @@ describe('idx/authenticate', () => {
               name: 'enroll-authenticator',
               currentAuthenticator: {
                 displayName: 'Phone',
-                id: '10',
+                id: '12',
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -814,7 +818,7 @@ describe('idx/authenticate', () => {
               name: 'enroll-authenticator',
               currentAuthenticator: {
                 displayName: 'Phone',
-                id: '10',
+                id: '12',
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -861,7 +865,7 @@ describe('idx/authenticate', () => {
               name: 'authenticator-enrollment-data',
               currentAuthenticator: {
                 displayName: 'Phone',
-                id: '7',
+                id: '9',
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -895,7 +899,7 @@ describe('idx/authenticate', () => {
             name: 'enroll-authenticator',
             currentAuthenticator: {
               displayName: 'Phone',
-              id: '10',
+              id: '12',
               key: 'phone_number',
               methods: [
                 {
@@ -949,7 +953,7 @@ describe('idx/authenticate', () => {
               name: 'authenticator-enrollment-data',
               currentAuthenticator: {
                 displayName: 'Phone',
-                id: '7',
+                id: '9',
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -1088,7 +1092,7 @@ describe('idx/authenticate', () => {
               name: 'challenge-authenticator',
               currentAuthenticator: {
                 displayName: 'Email',
-                id: '5',
+                id: '6',
                 key: 'okta_email',
                 methods: [
                   {
@@ -1099,6 +1103,335 @@ describe('idx/authenticate', () => {
               },
             }
           });
+        });
+      });
+
+    });
+
+    describe('google authenticator', () => {
+      let errorInvalidCodeResponse;
+      beforeEach(() => {
+        errorInvalidCodeResponse = RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorGoogleAuthenticatorPasscodeInvalidFactory.build()
+            ]
+          }),
+          remediation: {
+            type: 'array',
+            value: [
+              SelectAuthenticatorEnrollRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      PhoneAuthenticatorOptionFactory.build(),
+                    ]
+                  })
+                ]
+              })
+            ]
+          }
+        });
+      });
+
+      describe('verification', () => {
+        beforeEach(() => {
+          const selectAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              SelectAuthenticatorAuthenticateRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      GoogleAuthenticatorOptionFactory.build(),
+                    ]
+                  })
+                ]
+              })
+            ]
+          });
+          const verifyAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              VerifyGoogleAuthenticatorRemediationFactory.build()
+            ]
+          });
+          Object.assign(testContext, {
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse,
+            errorInvalidCodeResponse
+          });
+        });
+
+        it('can auto-select the google authenticator', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse
+          } = testContext;
+          chainResponses([
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse
+          ]);
+          jest.spyOn(selectAuthenticatorResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+          const res = await authenticate(authClient, {
+            authenticator: AuthenticatorKey.GOOGLE_AUTHENTICATOR // will remediate select authenticator
+          });
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
+            authenticator: { id: 'id-google-authenticator' } 
+          });
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            nextStep: {
+              name: 'challenge-authenticator',
+              currentAuthenticator: {
+                displayName: 'Google Authenticator',
+                id: '7',
+                key: 'google_otp',
+                methods: [
+                  { type: 'otp' }
+                ],
+                type: 'app',
+                contextualData: {
+                  qrcode: {
+                    href: 'data:image/png;base64,fake_encoding==',
+                    method: 'embedded',
+                    type: 'image/png',
+                  },
+                  sharedSecret: 'fake_secret',
+                }
+              },
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
+              }]
+            }
+          });
+        });
+
+        it('can verify google authenticator using a code', async () => {
+          const {
+            authClient,
+            verifyAuthenticatorResponse,
+            successResponse
+          } = testContext;
+          chainResponses([
+            verifyAuthenticatorResponse,
+            successResponse
+          ]);
+          jest.spyOn(verifyAuthenticatorResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
+          const verificationCode = 'test-code';
+          const res = await authenticate(authClient, {
+            verificationCode
+          });
+          expect(verifyAuthenticatorResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', {
+            credentials: {
+              passcode: 'test-code'
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.SUCCESS,
+            tokens: {
+              fakeToken: true
+            }
+          });
+        });
+
+        it('returns a PENDING error if an invalid code is provided', async () => {
+          const {
+            authClient,
+            verifyAuthenticatorResponse,
+            errorInvalidCodeResponse
+          } = testContext;
+          jest.spyOn(verifyAuthenticatorResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
+          const verificationCode = 'invalid-test-code';
+          const res = await authenticate(authClient, {
+            verificationCode
+          });
+          expect(verifyAuthenticatorResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', {
+            credentials: {
+              passcode: 'invalid-test-code'
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            messages: [{
+              class: 'ERROR',
+              i18n: {
+                key: 'authfactor.challenge.soft_token.invalid_passcode'
+              },
+              message: 'Your code doesn\'t match our records. Please try again.'
+            }],
+            nextStep: {
+              name: 'challenge-authenticator',
+              currentAuthenticator: {
+                displayName: 'Google Authenticator',
+                id: '7',
+                key: 'google_otp',
+                methods: [
+                  { type: 'otp' }
+                ],
+                type: 'app',
+                contextualData: {
+                  qrcode: {
+                    href: 'data:image/png;base64,fake_encoding==',
+                    method: 'embedded',
+                    type: 'image/png',
+                  },
+                  sharedSecret: 'fake_secret',
+                }
+              },
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
+              }]
+            }
+          });
+        });
+      });
+
+      describe('enrollment', () => {
+        beforeEach(() => {
+          const selectAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              SelectAuthenticatorEnrollRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      GoogleAuthenticatorOptionFactory.build(),
+                    ]
+                  })
+                ]
+              })
+            ]
+          });
+          const enrollGoogleAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              EnrollGoogleAuthenticatorRemediationFactory.build()
+            ]
+          });
+
+          Object.assign(testContext, {
+            selectAuthenticatorResponse,
+            enrollGoogleAuthenticatorResponse,
+            errorInvalidCodeResponse
+          });
+        });
+
+        it('can select google authenticator', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            enrollGoogleAuthenticatorResponse
+          } = testContext;
+
+          chainResponses([
+            selectAuthenticatorResponse,
+            enrollGoogleAuthenticatorResponse
+          ]);
+          jest.spyOn(selectAuthenticatorResponse, 'proceed');
+          jest.spyOn(enrollGoogleAuthenticatorResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+
+          const res = await authenticate(authClient, {
+            authenticator: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+          });
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+            authenticator: {
+              id: 'id-google-authenticator'
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            nextStep: {
+              name: 'enroll-authenticator',
+              currentAuthenticator: {
+                displayName: 'Google Authenticator',
+                id: '13',
+                key: 'google_otp',
+                methods: [
+                  { type: 'otp' }
+                ],
+                type: 'app',
+                contextualData: {
+                  qrcode: {
+                    href: 'data:image/png;base64,fake_encoding==',
+                    method: 'embedded',
+                    type: 'image/png',
+                  },
+                  sharedSecret: 'fake_secret',
+                }
+              },
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
+              }]
+            }
+          });
+        });
+
+        it('returns a PENDING error if an invalid code was entered', async () => {
+          const {
+            authClient,
+            enrollGoogleAuthenticatorResponse,
+            errorInvalidCodeResponse
+          } = testContext;
+
+          jest.spyOn(enrollGoogleAuthenticatorResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(mocked.introspect, 'introspect')
+            .mockResolvedValueOnce(enrollGoogleAuthenticatorResponse);
+
+          const verificationCode = 'obviously-not-valid';
+          let res = await authenticate(authClient, { verificationCode });
+          expect(enrollGoogleAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
+            credentials: {
+              passcode: verificationCode
+            }
+          });
+          expect(res).toEqual({
+            status: IdxStatus.PENDING,
+            messages: [{
+              class: 'ERROR',
+              i18n: {
+                key: 'authfactor.challenge.soft_token.invalid_passcode'
+              },
+              message: 'Your code doesn\'t match our records. Please try again.'
+            }],
+            nextStep: {
+              name: 'enroll-authenticator',
+              currentAuthenticator: {
+                displayName: 'Google Authenticator',
+                id: '13',
+                key: 'google_otp',
+                methods: [
+                  { type: 'otp' }
+                ],
+                type: 'app',
+                contextualData: {
+                  qrcode: {
+                    href: 'data:image/png;base64,fake_encoding==',
+                    method: 'embedded',
+                    type: 'image/png',
+                  },
+                  sharedSecret: 'fake_secret',
+                }
+              },
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
+              }]
+            }
+          });
+
         });
       });
 
