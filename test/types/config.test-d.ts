@@ -89,6 +89,7 @@ const config: OktaAuthOptions = {
     }
     const user = await oktaAuth.token.getUserInfo();
     authState.isAuthenticated = !!user;
+    authState.user = user;
     return authState;
   },
   restoreOriginalUri: async (oktaAuth, originalUri) => {

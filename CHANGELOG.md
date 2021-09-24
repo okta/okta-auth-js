@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.6.0
+
+### Other
+
+- [#947](https://github.com/okta/okta-auth-js/pull/947) TypeScript: Allow custom keys in `AuthState` interface
+
 ## 5.5.0
 
 ### Features

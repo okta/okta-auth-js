@@ -19,6 +19,8 @@ export interface AuthState {
   refreshToken?: RefreshToken;
   isAuthenticated?: boolean;
   error?: Error;
+  // Custom keys are allowed via transformAuthState()
+  [otherOption: string]: unknown;
 }
 
 export interface AuthStateLogOptions {
