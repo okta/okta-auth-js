@@ -30,8 +30,8 @@ If running from the workspace directory: `yarn workspace {{pkgName}} start`
 
 This sample app follows classic ExpressJS routing structure and uses [mustache-express](https://www.npmjs.com/package/mustache-express) as the view engine. Below is how the specific scenarios map the routes:
 
-* Sign In Widget Integration -> [routers/login.js](./web-server/routes/login.js)
+* Sign In Widget Integration -> [routes/login.js](./web-server/routes/login.js)
 
-* Logout -> [routers/logout.js](./web-server/routes/logout.js)
+* Logout -> [routes/logout.js](./web-server/routes/logout.js)
 
 {{> identity-engine/custom-storage-provider.md }}

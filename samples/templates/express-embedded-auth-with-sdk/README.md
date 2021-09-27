@@ -39,11 +39,11 @@ This sample app follows classic ExpressJS routing structure and uses [mustache-e
 
 * Sign In Flow -> [routes/login.js](./web-server/routes/login.js)
 
-* Self Service Registration -> [routers/register.js](./web-server/routes/register.js)
+* Self Service Registration -> [routes/register.js](./web-server/routes/register.js)
 
 * Self Service Password Recovery ->  [routes/recover-password.js](./web-server/routes/recover-password.js)
 
-* Multifactor -> [routers/authenticators.js](./web-server/routes/authenticators.js)
+* Multifactor -> [routes/authenticators.js](./web-server/routes/authenticators.js)
 
 * Logout -> [routes/logout.js](./web-server/routes/logout.js)
 
