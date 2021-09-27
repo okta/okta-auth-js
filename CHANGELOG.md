@@ -330,7 +330,7 @@
     - `autoRemove`
     - `devMode`
 - [#469](https://github.com/okta/okta-auth-js/pull/469) Adds "rate limiting" logic to token autoRenew process to prevent too many requests be sent out which may cause application rate limit issue.
-- [#503](https://github.com/okta/okta-auth-js/pull/503) Supports relative uri for [options.redirectUri](README.md#additional-options)
+- [#503](https://github.com/okta/okta-auth-js/pull/503) Supports relative uri for [options.redirectUri](README.md#configuration-options)
 - [#478](https://github.com/okta/okta-auth-js/pull/478) Adds cross tabs communication to sync `AuthState`.
 - [#525](https://github.com/okta/okta-auth-js/pull/525) Adds new methods `hasResponseType`, `isPKCE`, `isAuthorizationCodeFlow`. The option `responseType` is now accepted in the constructor.
 
@@ -370,7 +370,7 @@
 
 - [#444](https://github.com/okta/okta-auth-js/pull/444)
   - Implements "active" autoRenew.  Previously tokens would be renewed or removed when calling `tokenManager.get`. Now they will be renewed or removed in the background. If autoRenew is true, tokens will be renewed before expiration. If autoRenew is false, tokens will be removed from storage on expiration.
-  - `onSessionExpired` option has been removed. [TokenManager events](#tokenmanageronevent-callback-context) can be used to detect and handle token renewal errors.
+  - `onSessionExpired` option has been removed. [TokenManager events](README.md#tokenmanageronevent-callback-context) can be used to detect and handle token renewal errors.
   - `tokenManager.get` no longer implements autoRenew functionality (autoRenew is done by a separate process within `TokenManager`). Even with `autoRenew`, it is possible that the token returned from the TokenManager may be expired, since renewal is an asynchronous process. New method `tokenManager.hasExpired` can be used to test the token and avoid this potential race condition.
 
 ## 3.2.6
@@ -469,7 +469,7 @@
 
 ### Features
 
-New [option](README.md#additional-options) `cookies` allows overriding default `secure` and `sameSite` values.
+New [option](README.md#configuration-options) `cookies` allows overriding default `secure` and `sameSite` values.
 
 ### Breaking Changes
 
@@ -489,7 +489,7 @@ New [option](README.md#additional-options) `cookies` allows overriding default `
 
 - [#316](https://github.com/okta/okta-auth-js/pull/316) - Option `issuer` is [required](README.md#configuration-reference). Option `url` has been deprecated and is no longer used.
 
-- [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` [option](README.md#additional-options)  is now `true` by default. `grantType` option is removed.
+- [#317](https://github.com/okta/okta-auth-js/pull/317) - `pkce` [option](README.md#configuration-options)  is now `true` by default. `grantType` option is removed.
 
 - [#320](https://github.com/okta/okta-auth-js/pull/320) - `getWithRedirect`, `getWithPopup`, and `getWithoutPrompt` previously took 2 sets of option objects as parameters, a set of "oauthOptions" and additional options. These methods now take a single options object which can hold all [available options](README.md#authorize-options). Passing a second options object will cause an exception to be thrown.
 

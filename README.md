@@ -428,11 +428,11 @@ Default value is `true` which enables the [PKCE OAuth Flow](#pkce-oauth-20-flow)
 
 #### responseMode
 
-When requesting tokens using [token.getWithRedirect](#tokengetwithredirectoptions) values will be returned as parameters appended to the [redirectUri](#additional-options).
+When requesting tokens using [token.getWithRedirect](#tokengetwithredirectoptions) values will be returned as parameters appended to the [redirectUri](#configuration-options).
 
 In most cases you will not need to set a value for `responseMode`. Defaults are set according to the [OpenID Connect 1.0 specification](https://openid.net/specs/openid-connect-core-1_0.html#Authentication).
 
-* For [PKCE OAuth Flow](#pkce-oauth-20-flow)), the authorization code will be in search query of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#additional-options) option to "fragment".
+* For [PKCE OAuth Flow](#pkce-oauth-20-flow)), the authorization code will be in search query of the URL. Clients using the PKCE flow can opt to instead receive the authorization code in the hash fragment by setting the [responseMode](#configuration-options) option to "fragment".
 
 * For [Implicit OAuth Flow](#implicit-oauth-20-flow)), tokens will be in the hash fragment of the URL. This cannot be changed.
 
@@ -1093,7 +1093,7 @@ if (authClient.isLoginRedirect()) {
 
 > :link: web browser only <br>
 
-Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#additional-options).
+Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options).
 
 ### `tx.resume()`
 
@@ -1273,7 +1273,7 @@ authClient.token.getWithPopup(options)
 > :link: web browser only <br>
 > :hourglass: async
 
-Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#additional-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. Values will be returned in either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode)
+Create token using a redirect. After a successful authentication, the browser will be redirected to the configured [redirectUri](#configuration-options). The authorization code, access, or ID Tokens will be available as parameters appended to this URL. Values will be returned in either the search query or hash fragment portion of the URL depending on the [responseMode](#responsemode)
 
 * `options` - See [Authorize options](#authorize-options)
 
@@ -1318,7 +1318,7 @@ authClient.token.parseFromUrl()
 });
 ```
 
-After reading values, this method will rewrite either the hash fragment or search query portion of the URL (depending on the [responseMode](#responsemode)) so that the code or tokens are no longer present or visible to the user. For this reason, it is recommended to use a dedicated route or path for the [redirectUri](#additional-options) so that this URL rewrite does not interfere with other URL parameters which may be used by your application. A complete login flow will usually save the current URL before calling `getWithRedirect` and restore the URL after saving tokens from `parseFromUrl`.
+After reading values, this method will rewrite either the hash fragment or search query portion of the URL (depending on the [responseMode](#responsemode)) so that the code or tokens are no longer present or visible to the user. For this reason, it is recommended to use a dedicated route or path for the [redirectUri](#configuration-options) so that this URL rewrite does not interfere with other URL parameters which may be used by your application. A complete login flow will usually save the current URL before calling `getWithRedirect` and restore the URL after saving tokens from `parseFromUrl`.
 
 ```javascript
 // On any page while unauthenticated. Begin login flow
