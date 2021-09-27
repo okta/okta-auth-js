@@ -19,7 +19,7 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     idx: { 
       messages,
       nextStep: {
-        currentAuthenticator: {
+        authenticator: {
           contextualData
         } = {}
       } = {}

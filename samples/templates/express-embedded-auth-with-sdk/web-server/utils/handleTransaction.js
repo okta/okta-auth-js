@@ -16,11 +16,11 @@ const { IdxStatus, AuthenticatorKey } = require('@okta/okta-auth-js');
 const redirect = require('./redirect');
 
 const proceed = ({ nextStep, req, res }) => {
-  const { name, currentAuthenticator } = nextStep;
-  const { key, displayName, type } = currentAuthenticator || {};
+  const { name, authenticator } = nextStep;
+  const { key, displayName, type } = authenticator || {};
 
   // Stop if unsupported types detected
-  if (currentAuthenticator && !Object.values(AuthenticatorKey).includes(key)) {
+  if (authenticator && !Object.values(AuthenticatorKey).includes(key)) {
     throw new Error(`
       Authenticator: ${displayName} is not supported in current sample, 
       please extend the sample by adding handles for ${displayName} authenticator.

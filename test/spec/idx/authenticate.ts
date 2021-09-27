@@ -377,7 +377,8 @@ describe('idx/authenticate', () => {
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
           name: 'challenge-authenticator',
-          currentAuthenticator: {
+          type: 'password',
+          authenticator: {
             displayName: 'Password',
             id: '8',
             key: 'okta_password',
@@ -608,7 +609,8 @@ describe('idx/authenticate', () => {
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'authenticator-verification-data',
-              currentAuthenticator: {
+              type: 'phone',
+              authenticator: {
                 displayName: 'Phone',
                 id: '16',
                 key: 'phone_number',
@@ -706,7 +708,8 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }],
               name: 'enroll-authenticator',
-              currentAuthenticator: {
+              type: 'phone',
+              authenticator: {
                 displayName: 'Phone',
                 id: '12',
                 key: 'phone_number',
@@ -816,7 +819,8 @@ describe('idx/authenticate', () => {
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-authenticator',
-              currentAuthenticator: {
+              type: 'phone',
+              authenticator: {
                 displayName: 'Phone',
                 id: '12',
                 key: 'phone_number',
@@ -863,7 +867,8 @@ describe('idx/authenticate', () => {
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'authenticator-enrollment-data',
-              currentAuthenticator: {
+              type: 'phone',
+              authenticator: {
                 displayName: 'Phone',
                 id: '9',
                 key: 'phone_number',
@@ -897,7 +902,8 @@ describe('idx/authenticate', () => {
           expect(res.status).toBe(IdxStatus.PENDING);
           expect(res.nextStep).toEqual({
             name: 'enroll-authenticator',
-            currentAuthenticator: {
+            type: 'phone',
+            authenticator: {
               displayName: 'Phone',
               id: '12',
               key: 'phone_number',
@@ -951,7 +957,8 @@ describe('idx/authenticate', () => {
             }],
             nextStep: {
               name: 'authenticator-enrollment-data',
-              currentAuthenticator: {
+              type: 'phone',
+              authenticator: {
                 displayName: 'Phone',
                 id: '9',
                 key: 'phone_number',
@@ -1090,7 +1097,8 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }],
               name: 'challenge-authenticator',
-              currentAuthenticator: {
+              type: 'email',
+              authenticator: {
                 displayName: 'Email',
                 id: '6',
                 key: 'okta_email',
@@ -1183,7 +1191,8 @@ describe('idx/authenticate', () => {
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'challenge-authenticator',
-              currentAuthenticator: {
+              type: 'app',
+              authenticator: {
                 displayName: 'Google Authenticator',
                 id: '7',
                 key: 'google_otp',
@@ -1267,7 +1276,8 @@ describe('idx/authenticate', () => {
             }],
             nextStep: {
               name: 'challenge-authenticator',
-              currentAuthenticator: {
+              type: 'app',
+              authenticator: {
                 displayName: 'Google Authenticator',
                 id: '7',
                 key: 'google_otp',
@@ -1350,7 +1360,8 @@ describe('idx/authenticate', () => {
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-authenticator',
-              currentAuthenticator: {
+              type: 'app',
+              authenticator: {
                 displayName: 'Google Authenticator',
                 id: '13',
                 key: 'google_otp',
@@ -1406,7 +1417,8 @@ describe('idx/authenticate', () => {
             }],
             nextStep: {
               name: 'enroll-authenticator',
-              currentAuthenticator: {
+              type: 'app',
+              authenticator: {
                 displayName: 'Google Authenticator',
                 id: '13',
                 key: 'google_otp',

@@ -117,11 +117,13 @@ export class Remediator {
   getNextStep(): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
-    const currentAuthenticator = this.getCurrentAuthenticator();
+    const authenticator = this.getAuthenticator();
+    const type = authenticator?.type;
     return { 
       name, 
       inputs, 
-      ...(currentAuthenticator && { currentAuthenticator }),
+      ...(type && { type }),
+      ...(authenticator && { authenticator }),
     };
   }
 
@@ -185,13 +187,13 @@ export class Remediator {
   // Prepare values for the next remediation
   // In general, remove finished authenticator from list
   getValuesAfterProceed(): unknown {
-    const authenticatorKey = this.getCurrentAuthenticator()?.key;
+    const authenticatorKey = this.getAuthenticator()?.key;
     const authenticators = (this.values.authenticators as Authenticator[])
       ?.filter(authenticator => authenticator.key !== authenticatorKey);
     return { ...this.values, authenticators };
   }
 
-  protected getCurrentAuthenticator(): IdxAuthenticator | undefined {
+  protected getAuthenticator(): IdxAuthenticator | undefined {
     return this.remediation.relatesTo?.value;
   }
 

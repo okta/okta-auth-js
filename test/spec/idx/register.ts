@@ -515,7 +515,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'email',
+          authenticator: {
             displayName: 'Email',
             id: '11',
             key: 'okta_email',
@@ -587,7 +588,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'email',
+          authenticator: {
             displayName: 'Email',
             id: '11',
             key: 'okta_email',
@@ -628,7 +630,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'email',
+          authenticator: {
             displayName: 'Email',
             id: '11',
             key: 'okta_email',
@@ -823,7 +826,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'phone',
+          authenticator: {
             displayName: 'Phone',
             id: '12',
             key: 'phone_number',
@@ -903,7 +907,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'authenticator-enrollment-data',
-          currentAuthenticator: {
+          type: 'phone',
+          authenticator: {
             displayName: 'Phone',
             id: '9',
             key: 'phone_number',
@@ -940,7 +945,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'phone',
+          authenticator: {
             displayName: 'Phone',
             id: '12',
             key: 'phone_number',
@@ -1008,7 +1014,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'phone',
+          authenticator: {
             displayName: 'Phone',
             id: '12',
             key: 'phone_number',
@@ -1106,7 +1113,8 @@ describe('idx/register', () => {
         }],
         nextStep: {
           name: 'authenticator-enrollment-data',
-          currentAuthenticator: {
+          type: 'phone',
+          authenticator: {
             displayName: 'Phone',
             id: '9',
             key: 'phone_number',
@@ -1159,7 +1167,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'app',
+          authenticator: {
             displayName: 'Google Authenticator',
             id: '13',
             key: 'google_otp',
@@ -1236,7 +1245,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'app',
+          authenticator: {
             displayName: 'Google Authenticator',
             id: '13',
             key: 'google_otp',
@@ -1283,7 +1293,8 @@ describe('idx/register', () => {
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
-          currentAuthenticator: {
+          type: 'app',
+          authenticator: {
             displayName: 'Google Authenticator',
             id: '13',
             key: 'google_otp',

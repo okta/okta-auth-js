@@ -87,7 +87,8 @@ This field indicates the status of the current flow.
 This field contains information to proceed with the next step. It's avaiable when in `IdxStatus.PENDING` status.
 
 - `name`: The identifier of the next step.
-- `currentAuthenticator?`: The authenticator that the step belongs to.
+- `type?`: The type of the authenticator that the step belongs to.
+- `authenticator?`: The authenticator that the step belongs to.
 - `canSkip?`: This field indicates if the step is skippable or not.
 - `inputs?`: parameters for the next step.
 

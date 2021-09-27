@@ -45,7 +45,7 @@ type Input = {
 
 export type NextStep = {
   name: string;
-  currentAuthenticator?: IdxAuthenticator;
+  authenticator?: IdxAuthenticator;
   canSkip?: boolean;
   canResend?: boolean;
   inputs?: Input[];

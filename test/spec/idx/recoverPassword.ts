@@ -281,7 +281,8 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'reenroll-authenticator',
-        currentAuthenticator: {
+        type: 'password',
+        authenticator: {
           displayName: 'Password',
           id: '14',
           key: 'okta_password',
@@ -353,7 +354,8 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'authenticator-verification-data',
-        currentAuthenticator: {
+        type: 'password',
+        authenticator: {
           displayName: 'Password',
           id: '15',
           key: 'okta_password',
@@ -428,7 +430,8 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'reenroll-authenticator',
-        currentAuthenticator: {
+        type: 'password',
+        authenticator: {
           displayName: 'Password',
           id: '14',
           key: 'okta_password',
@@ -476,7 +479,8 @@ describe('idx/recoverPassword', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'authenticator-verification-data',
-        currentAuthenticator: {
+        type: 'password',
+        authenticator: {
           displayName: 'Password',
           id: '15',
           key: 'okta_password',

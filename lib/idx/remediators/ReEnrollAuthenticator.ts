@@ -33,7 +33,7 @@ export class ReEnrollAuthenticator extends Remediator {
   }
 
   getInputCredentials(input) {
-    const challengeType = this.getCurrentAuthenticator().type;
+    const challengeType = this.getAuthenticator().type;
     const name = challengeType === 'password' ? 'newPassword' : 'verificationCode';
     return {
       ...input.form.value[0],
