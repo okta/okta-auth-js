@@ -118,6 +118,8 @@ export class Remediator {
     const name = this.getName();
     const inputs = this.getInputs();
     const authenticator = this.getAuthenticator();
+    // TODO: remove type field in the next major version change
+    // https://oktainc.atlassian.net/browse/OKTA-431749
     const type = authenticator?.type;
     return { 
       name, 
