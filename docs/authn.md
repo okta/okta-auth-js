@@ -255,7 +255,7 @@ transaction.cancel()
 
 ##### `changePassword(options)`
 
-See [authn API](docs/authn.md#signinwithcredentials).
+See [authn API](https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#signinwithcredentialsoptions).
 
 [Changes](https://developer.okta.com/docs/api/resources/authn#reset-password) a user's password.
 
