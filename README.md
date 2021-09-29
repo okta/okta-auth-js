@@ -512,7 +512,11 @@ const config = {
 
 const oktaAuth = new OktaAuth(config);
 if (oktaAuth.isLoginRedirect()) {
-  oktaAuth.handleLoginRedirect();
+  try {
+    await oktaAuth.handleLoginRedirect();
+  } catch (e) {
+    // log or display error details
+  }
 }
 ```
 
@@ -889,7 +893,11 @@ You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens 
 
 ```javascript
 if (authClient.isLoginRedirect()) {
-  await authClient.handleLoginRedirect();
+  try {
+    await authClient.handleLoginRedirect();
+  } catch (e) {
+    // log or display error details
+  }
 } else if (!await authClient.isAuthenticated()) {
   // Start the browser based oidc flow, then parse tokens from the redirect callback url
   authClient.signInWithRedirect();
@@ -1083,7 +1091,11 @@ Check `window.location` to verify if the app is in OAuth callback state or not. 
 ```javascript
 if (authClient.isLoginRedirect()) {
   // callback flow
-  await authClient.handleLoginRedirect();
+  try {
+    await authClient.handleLoginRedirect();
+  } catch (e) {
+    // log or display error details
+  }
 } else {
   // normal app flow
 }
@@ -1092,8 +1104,11 @@ if (authClient.isLoginRedirect()) {
 ### `handleLoginRedirect(tokens?)`
 
 > :link: web browser only <br>
+> :hourglass: async
 
-Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options).
+Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options).
+
+> **Note:** `handleLoginRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval.
 
 ### `tx.resume()`
 
