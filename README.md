@@ -1658,6 +1658,10 @@ authClient.authStateManager.subscribe((authState) => {
 
 Gets latest evaluated `authState` from the `authStateManager`. The `authState` (a unique new object) is re-evaluated when `authStateManager.updateAuthState()` is called. If `updateAuthState` has not been called, or it has not finished calculating an initial state, `getAuthState` will return `null`.
 
+#### `authStateManager.getPreviousAuthState()`
+
+Gets the previous evaluated `authState` from the `authStateManager`. This state can be used to tell when the new authState is evaluated. For example, the `authState` is evaluated duing app initialization if the `previousAuthState` is `null`, and the `authState` is evaluated during tokens auto renew process if the `previousAuthState` exists.
+
 #### `authStateManager.updateAuthState()`
 
 Produces a unique `authState` object and emits an `authStateChange` event. The [authState](#authstatemanager) object contains tokens from the `tokenManager` and a calculated `isAuthenticated` value. By default, `authState.isAuthenticated` will be true if both `idToken` and `accessToken` are present. This logic can be customized by defining a custom [transformAuthState](#transformauthstate) function.
