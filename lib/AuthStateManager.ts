@@ -45,7 +45,8 @@ export class AuthStateManager {
     updateAuthStatePromise: typeof PCancelable;
     canceledTimes: number; 
   };
-  _authState: AuthState;
+  _authState: AuthState | null;
+  _prevState: AuthState | null;
   _logOptions: AuthStateLogOptions;
   _lastEventTimestamp: number;
 
@@ -76,8 +77,12 @@ export class AuthStateManager {
     this._logOptions = options;
   }
 
-  getAuthState(): AuthState {
+  getAuthState(): AuthState | null {
     return this._authState;
+  }
+
+  getPreviousAuthState(): AuthState | null {
+    return this._prevState;
   }
 
   async updateAuthState(): Promise<AuthState> {
@@ -99,6 +104,7 @@ export class AuthStateManager {
         devMode && log('unchanged'); 
         return;
       }
+      this._prevState = this._authState;
       this._authState = authState;
       // emit new authState object
       this._sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });

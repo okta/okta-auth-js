@@ -39,7 +39,8 @@ module.exports = {
     '<rootDir>/test/support/jest/jest.setup.js'
   ],
   'testMatch': [
-    '**/test/spec/**/*.{js,ts}'
+    // '**/test/spec/**/*.{js,ts}'
+    '**/test/spec/AuthStateManager.{js,ts}'
   ],
   'roots': [
     'test/spec'

@@ -113,6 +113,14 @@ describe('AuthStateManager', () => {
     });
   });
 
+  describe('getPreviousAuthState', () => {
+    it('should return prev authState', () => {
+      const instance = new AuthStateManager(sdkMock);
+      instance._prevAuthState = { fake: true };
+      expect(instance.getPreviousAuthState()).toBe(instance._prevAuthState);
+    });
+  });
+
   describe('updateAuthState', () => {
 
     describe('browser', () => {
@@ -148,6 +156,35 @@ describe('AuthStateManager', () => {
       expect(sdkMock.isAuthenticated).toHaveBeenCalledTimes(2);
       expect(handler).toHaveBeenCalledTimes(1);
       expect(handler).toHaveBeenCalledWith({
+        isAuthenticated: true,
+        idToken: 'fakeIdToken0',
+        accessToken: 'fakeAccessToken0'
+      });
+    });
+
+    it('should track current and prev authStates', async () => {
+      jest.spyOn(sdkMock.tokenManager, 'getTokensSync')
+        .mockReturnValueOnce({ accessToken: 'fakeAccessToken0', idToken: 'fakeIdToken0' })
+        .mockReturnValueOnce({ accessToken: 'fakeAccessToken1', idToken: 'fakeIdToken1' });
+      const instance = new AuthStateManager(sdkMock);
+      const handler = jest.fn();
+      instance.subscribe(handler);
+      // first update
+      await instance.updateAuthState();
+      expect(instance.getAuthState()).toEqual({
+        isAuthenticated: true,
+        idToken: 'fakeIdToken0',
+        accessToken: 'fakeAccessToken0'
+      });
+      expect(instance.getPreviousAuthState()).toEqual(null);
+      // second update
+      await instance.updateAuthState();
+      expect(instance.getAuthState()).toEqual({
+        isAuthenticated: true,
+        idToken: 'fakeIdToken1',
+        accessToken: 'fakeAccessToken1'
+      });
+      expect(instance.getPreviousAuthState()).toEqual({
         isAuthenticated: true,
         idToken: 'fakeIdToken0',
         accessToken: 'fakeAccessToken0'
