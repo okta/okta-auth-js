@@ -20,7 +20,6 @@ export interface VerifyAuthenticatorValues extends RemediationValues {
 
 // Base class - DO NOT expose static remediationName
 export class VerifyAuthenticator extends Remediator {
-  static remediationName = 'challenge-authenticator';
 
   values: VerifyAuthenticatorValues;
 
@@ -29,15 +28,7 @@ export class VerifyAuthenticator extends Remediator {
   };
 
   canRemediate() {
-    const challengeType = this.getRelatesToType();
-    if (this.values.verificationCode 
-        && ['email', 'phone'].includes(challengeType)) {
-      return true;
-    }
-    if (this.values.password && challengeType === 'password') {
-      return true;
-    }
-    return false;
+    return !!(this.values.password || this.values.verificationCode);
   }
 
   mapCredentials() {
@@ -47,7 +38,7 @@ export class VerifyAuthenticator extends Remediator {
   }
 
   getInputCredentials(input) {
-    const challengeType = this.getRelatesToType();
+    const challengeType = this.getAuthenticator().type;
     const name = challengeType === 'password' ? 'password' : 'verificationCode';
     return {
       ...input.form.value[0],
@@ -55,6 +46,17 @@ export class VerifyAuthenticator extends Remediator {
       type: 'string',
       required: input.required
     };
+  }
+
+  getValuesAfterProceed() {
+    let values = super.getValuesAfterProceed() as VerifyAuthenticatorValues;
+    const authenticator = this.getAuthenticator();
+    if (authenticator.type === 'password') {
+      delete values.password;
+    } else {
+      delete values.verificationCode;
+    }
+    return values;
   }
 
 }

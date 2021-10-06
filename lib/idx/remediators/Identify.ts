@@ -12,7 +12,7 @@
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
-import { Authenticator } from '../types';
+import { Authenticator, AuthenticatorKey } from '../types';
 import { IdxRemediation } from '../types/idx-js';
 
 export interface IdentifyValues extends RemediationValues {
@@ -65,7 +65,7 @@ export class Identify extends Remediator {
     // remove "password" from authenticator array when remediation is finished
     if (this.remediation.value.some(({ name }) => name === 'credentials')) {
       const authenticators = (this.values.authenticators as Authenticator[])
-        ?.filter(authenticator => authenticator.type !== 'password');
+        ?.filter(authenticator => authenticator.key !== AuthenticatorKey.OKTA_PASSWORD);
       return { ...this.values, authenticators };
     }
 

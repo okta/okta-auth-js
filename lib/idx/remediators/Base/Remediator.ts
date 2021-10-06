@@ -14,7 +14,7 @@
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
 import { NextStep, IdxMessage, Authenticator } from '../../types';
-import { IdxRemediation } from '../../types/idx-js';
+import { IdxAuthenticator, IdxRemediation } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
@@ -37,7 +37,7 @@ export class Remediator {
     // map authenticators to Authenticator[] type
     values.authenticators = (values.authenticators?.map(authenticator => {
       return typeof authenticator === 'string' 
-        ? { type: authenticator } : authenticator;
+        ? { key: authenticator } : authenticator;
     }) || []) as Authenticator[];
     
     // assign fields to the instance
@@ -116,9 +116,17 @@ export class Remediator {
 
   getNextStep(): NextStep {
     const name = this.getName();
-    const type = this.getRelatesToType();
     const inputs = this.getInputs();
-    return { name, inputs, ...(type && { type }) };
+    const authenticator = this.getAuthenticator();
+    // TODO: remove type field in the next major version change
+    // https://oktainc.atlassian.net/browse/OKTA-431749
+    const type = authenticator?.type;
+    return { 
+      name, 
+      inputs, 
+      ...(type && { type }),
+      ...(authenticator && { authenticator }),
+    };
   }
 
   // Get inputs for the next step
@@ -180,15 +188,15 @@ export class Remediator {
 
   // Prepare values for the next remediation
   // In general, remove finished authenticator from list
-  getValuesAfterProceed() {
-    const authenticatorType = this.getRelatesToType();
+  getValuesAfterProceed(): unknown {
+    const authenticatorKey = this.getAuthenticator()?.key;
     const authenticators = (this.values.authenticators as Authenticator[])
-      ?.filter(authenticator => authenticator.type !== authenticatorType);
+      ?.filter(authenticator => authenticator.key !== authenticatorKey);
     return { ...this.values, authenticators };
   }
 
-  protected getRelatesToType() {
-    return this.remediation.relatesTo?.value.type;
+  protected getAuthenticator(): IdxAuthenticator | undefined {
+    return this.remediation.relatesTo?.value;
   }
 
 }

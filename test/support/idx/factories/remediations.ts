@@ -16,10 +16,19 @@ import { IdxRemediation, IdxAuthenticator, IdxForm } from '../../../../lib/idx/t
 import {
   EmailAuthenticatorFactory,
   PasswordAuthenticatorFactory,
-  PhoneAuthenticatorFactory
+  PhoneAuthenticatorFactory,
+  GoogleAuthenticatorFactory
 } from './authenticators';
-import { EmailAuthenticatorFormFactory, ExtendedUserProfileFormFactory, PasswordFormFactory, PhoneAuthenticatorFormFactory, UserProfileFormFactory, VerifyEmailFormFactory, VerifySmsFormFactory } from './forms';
-
+import { 
+  EmailAuthenticatorFormFactory, 
+  ExtendedUserProfileFormFactory, 
+  PasswordFormFactory, 
+  PhoneAuthenticatorFormFactory, 
+  UserProfileFormFactory, 
+  VerifyEmailFormFactory, 
+  VerifySmsFormFactory,
+  VerifyPasscodeFormFactory
+} from './forms';
 import {
   UsernameValueFactory,
   PasswordValueFactory,
@@ -69,6 +78,18 @@ export const VerifyEmailRemediationFactory = ChallengeAuthenticatorRemediationFa
   ],
   relatesTo: {
     value: EmailAuthenticatorFactory.build()
+  }
+});
+
+export const VerifyGoogleAuthenticatorRemediationFactory = ChallengeAuthenticatorRemediationFactory.params({
+  name: 'challenge-authenticator',
+  value: [
+    CredentialsValueFactory.build({
+      form: VerifyPasscodeFormFactory.build()
+    })
+  ],
+  relatesTo: {
+    value: GoogleAuthenticatorFactory.build()
   }
 });
 
@@ -148,6 +169,18 @@ export const EnrollPhoneAuthenticatorRemediationFactory = EnrollAuthenticatorRem
   value: [
     CredentialsValueFactory.build({
       form: VerifySmsFormFactory.build()
+    })
+  ]
+});
+
+export const EnrollGoogleAuthenticatorRemediationFactory = EnrollAuthenticatorRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: GoogleAuthenticatorFactory.build()
+  },
+  value: [
+    CredentialsValueFactory.build({
+      form: VerifyPasscodeFormFactory.build()
     })
   ]
 });

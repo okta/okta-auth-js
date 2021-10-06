@@ -13,7 +13,7 @@
 
 /* eslint-disable max-statements */
 import { register } from '../../../lib/idx/register';
-import { IdxStatus } from '../../../lib/idx/types';
+import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { AuthSdkError } from '../../../lib/errors';
 
 import {
@@ -44,7 +44,9 @@ import {
   IdxErrorInvalidLoginEmailFactory,
   IdxErrorDoesNotMatchPattern,
   IdxErrorEnrollmentInvalidPhoneFactory,
-  SelectAuthenticatorAuthenticateRemediationFactory
+  SelectAuthenticatorAuthenticateRemediationFactory,
+  EnrollGoogleAuthenticatorRemediationFactory,
+  GoogleAuthenticatorOptionFactory
 } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/introspect', () => {
@@ -165,7 +167,8 @@ describe('idx/register', () => {
             AuthenticatorValueFactory.build({
               options: [
                 PhoneAuthenticatorOptionFactory.build(),
-                EmailAuthenticatorOptionFactory.build()
+                EmailAuthenticatorOptionFactory.build(),
+                GoogleAuthenticatorOptionFactory.build()
               ]
             })
           ]
@@ -206,6 +209,12 @@ describe('idx/register', () => {
       ]
     });
 
+    const enrollGoogleAuthenticatorResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollGoogleAuthenticatorRemediationFactory.build()
+      ]
+    });
+
 
     testContext = {
       authClient,
@@ -223,7 +232,8 @@ describe('idx/register', () => {
       enrollEmailAuthenticatorResponse,
       selectPhoneResponse,
       phoneEnrollmentDataResponse,
-      enrollPhoneAuthenticatorResponse
+      enrollPhoneAuthenticatorResponse,
+      enrollGoogleAuthenticatorResponse
     };
   });
   
@@ -281,11 +291,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            type: 'string',
+            key: 'string',
           }],
           options: [{
             label: 'Password',
-            value: 'password'
+            value: AuthenticatorKey.OKTA_PASSWORD
           }]
         }
       });
@@ -302,24 +312,15 @@ describe('idx/register', () => {
       chainResponses([
         identifyResponse,
         enrollExtendedProfileResponse,
+        selectPasswordResponse,
       ]);
 
       jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(identifyResponse);
       jest.spyOn(identifyResponse, 'proceed');
-      jest.spyOn(enrollExtendedProfileResponse, 'proceed').mockImplementationOnce(() => {
-        return Promise.reject(RawIdxResponseFactory.build({
-          remediation: {
-            type: 'array',
-            value: [
-              EnrollProfileRemediationFactory.build()
-            ]
-          }
-        }));
-      });
-
+      jest.spyOn(enrollExtendedProfileResponse, 'proceed');
+      
       let res = await register(authClient, {});
       expect(identifyResponse.proceed).toHaveBeenCalledWith('select-enroll-profile', { });
-      expect(enrollExtendedProfileResponse.proceed).toHaveBeenCalledWith('enroll-profile', { userProfile: {}});
       expect(res).toMatchObject({
         status: IdxStatus.PENDING,
         nextStep: {
@@ -332,19 +333,9 @@ describe('idx/register', () => {
         ...formData,
         [inputName]: `value${inputIndex}`
       }), {});
-
-      chainResponses([
-        identifyResponse,
-        enrollExtendedProfileResponse,
-        selectPasswordResponse
-      ]);
-
-      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(identifyResponse);
-      jest.spyOn(identifyResponse, 'proceed');
-      jest.spyOn(enrollExtendedProfileResponse, 'proceed');
-
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(enrollExtendedProfileResponse);
+      
       res = await register(authClient, inputValues);
-      expect(identifyResponse.proceed).toHaveBeenCalledWith('select-enroll-profile', { });
       expect(enrollExtendedProfileResponse.proceed).toHaveBeenCalledWith('enroll-profile', {
         userProfile: {
           email: 'value2',
@@ -359,11 +350,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            type: 'string',
+            key: 'string',
           }],
           options: [{
             label: 'Password',
-            value: 'password'
+            value: AuthenticatorKey.OKTA_PASSWORD
           }]
         }
       });
@@ -392,7 +383,7 @@ describe('idx/register', () => {
       const password = 'my-password';
       let res = await register(authClient, {
         password,
-        authenticators: ['password']
+        authenticators: [AuthenticatorKey.OKTA_PASSWORD]
       });
       expect(selectPasswordResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
         authenticator: {
@@ -410,14 +401,17 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            type: 'string',
+            key: 'string',
           }],
           options: [{
             label: 'Phone',
-            value: 'phone'
+            value: AuthenticatorKey.PHONE_NUMBER
           }, {
             label: 'Email',
-            value: 'email'
+            value: AuthenticatorKey.OKTA_EMAIL
+          }, {
+            label: 'Google Authenticator',
+            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
           }]
         }
       });
@@ -449,15 +443,15 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            type: 'string',
+            key: 'string',
           }],
           options: [{
             label: 'Password',
-            value: 'password'
+            value: AuthenticatorKey.OKTA_PASSWORD
           }]
         }
       });
-      res = await register(authClient, { password, authenticators: ['password']});
+      res = await register(authClient, { password, authenticators: [AuthenticatorKey.OKTA_PASSWORD]});
       expect(selectPasswordResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
         authenticator: {
           id: 'id-password'
@@ -474,14 +468,17 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            type: 'string',
+            key: 'string',
           }],
           options: [{
             label: 'Phone',
-            value: 'phone'
+            value: AuthenticatorKey.PHONE_NUMBER
           }, {
             label: 'Email',
-            value: 'email'
+            value: AuthenticatorKey.OKTA_EMAIL
+          }, {
+            label: 'Google Authenticator',
+            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
           }]
         }
       });
@@ -506,7 +503,7 @@ describe('idx/register', () => {
 
       let res = await register(authClient, {
         email: 'boblawbla@bobslawblog.com',
-        authenticators: ['email']
+        authenticators: [AuthenticatorKey.OKTA_EMAIL]
       });
       // Email authenticator is automatically selected
       expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
@@ -519,6 +516,17 @@ describe('idx/register', () => {
         nextStep: {
           name: 'enroll-authenticator',
           type: 'email',
+          authenticator: {
+            displayName: 'Email',
+            id: '11',
+            key: 'okta_email',
+            methods: [
+              {
+                type: 'email',
+              },
+            ],
+            type: 'email',
+          },
           inputs: [{
             name: 'verificationCode',
             required: true,
@@ -551,21 +559,24 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            type: 'string',
+            key: 'string',
           }],
           options: [{
             label: 'Phone',
-            value: 'phone'
+            value: AuthenticatorKey.PHONE_NUMBER
           }, {
             label: 'Email',
-            value: 'email'
+            value: AuthenticatorKey.OKTA_EMAIL
+          }, {
+            label: 'Google Authenticator',
+            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
           }]
         }
       });
 
       res = await register(authClient, {
         email: 'boblawbla@bobslawblog.com',
-        authenticators: ['email']
+        authenticators: [AuthenticatorKey.OKTA_EMAIL]
       });
       // Email authenticator is automatically selected
       expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
@@ -578,6 +589,17 @@ describe('idx/register', () => {
         nextStep: {
           name: 'enroll-authenticator',
           type: 'email',
+          authenticator: {
+            displayName: 'Email',
+            id: '11',
+            key: 'okta_email',
+            methods: [
+              {
+                type: 'email',
+              },
+            ],
+            type: 'email',
+          },
           inputs: [{
             name: 'verificationCode',
             required: true,
@@ -609,6 +631,17 @@ describe('idx/register', () => {
         nextStep: {
           name: 'enroll-authenticator',
           type: 'email',
+          authenticator: {
+            displayName: 'Email',
+            id: '11',
+            key: 'okta_email',
+            methods: [
+              {
+                type: 'email',
+              },
+            ],
+            type: 'email',
+          },
           inputs: [{
             name: 'verificationCode',
             required: true,
@@ -633,11 +666,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            type: 'string',
+            key: 'string',
           }],
           options: [{
             label: 'Phone',
-            value: 'phone'
+            value: AuthenticatorKey.PHONE_NUMBER
           }]
         }
       });
@@ -772,7 +805,7 @@ describe('idx/register', () => {
       // Enroll in phone authenticator
       let res = await register(authClient, { 
         authenticators: [{
-          type: 'phone',
+          key: AuthenticatorKey.PHONE_NUMBER,
           methodType: 'sms',
           phoneNumber: '(555) 555-5555'
         }]
@@ -794,6 +827,16 @@ describe('idx/register', () => {
         nextStep: {
           name: 'enroll-authenticator',
           type: 'phone',
+          authenticator: {
+            displayName: 'Phone',
+            id: '12',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [{
             label: 'Enter code',
             name: 'verificationCode',
@@ -854,7 +897,7 @@ describe('idx/register', () => {
 
       const verificationCode = 'test-code';
 
-      let res = await register(authClient, { authenticator: 'phone' });
+      let res = await register(authClient, { authenticator: AuthenticatorKey.PHONE_NUMBER });
       expect(selectPhoneResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
         authenticator: {
           id: 'id-phone'
@@ -865,6 +908,16 @@ describe('idx/register', () => {
         nextStep: {
           name: 'authenticator-enrollment-data',
           type: 'phone',
+          authenticator: {
+            displayName: 'Phone',
+            id: '9',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [
             { name: 'methodType', type: 'string', required: true },
             { name: 'phoneNumber', type: 'string', required: true },
@@ -893,6 +946,16 @@ describe('idx/register', () => {
         nextStep: {
           name: 'enroll-authenticator',
           type: 'phone',
+          authenticator: {
+            displayName: 'Phone',
+            id: '12',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [{
             label: 'Enter code',
             name: 'verificationCode',
@@ -952,6 +1015,16 @@ describe('idx/register', () => {
         nextStep: {
           name: 'enroll-authenticator',
           type: 'phone',
+          authenticator: {
+            displayName: 'Phone',
+            id: '12',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [{
             label: 'Enter code',
             name: 'verificationCode',
@@ -1017,7 +1090,7 @@ describe('idx/register', () => {
 
       const phoneNumber = 'obviously-not-valid';
       let res = await register(authClient, { authenticators: [{
-          type: 'phone',
+          key: AuthenticatorKey.PHONE_NUMBER,
           methodType: 'sms',
           phoneNumber
         }] 
@@ -1041,6 +1114,16 @@ describe('idx/register', () => {
         nextStep: {
           name: 'authenticator-enrollment-data',
           type: 'phone',
+          authenticator: {
+            displayName: 'Phone',
+            id: '9',
+            key: 'phone_number',
+            methods: [
+              { type: 'sms' },
+              { type: 'voice' }
+            ],
+            type: 'phone',
+          },
           inputs: [
             { name: 'methodType', type: 'string', required: true },
             { name: 'phoneNumber', type: 'string', required: true }
@@ -1053,6 +1136,215 @@ describe('idx/register', () => {
       });
 
     });
+  });
+
+  describe('google authenticator', () => {
+    it('can set an google authenticator up front', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+        enrollGoogleAuthenticatorResponse,
+      } = testContext;
+      
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollGoogleAuthenticatorResponse
+      ]);
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse);
+
+      let res = await register(authClient, {
+        authenticator: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+      });
+      // Google authenticator is automatically selected
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+        authenticator: {
+          id: 'id-google-authenticator'
+        }
+      });
+      expect(res).toEqual({
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'app',
+          authenticator: {
+            displayName: 'Google Authenticator',
+            id: '13',
+            key: 'google_otp',
+            methods: [
+              { type: 'otp' }
+            ],
+            type: 'app',
+            contextualData: {
+              qrcode: {
+                href: 'data:image/png;base64,fake_encoding==',
+                method: 'embedded',
+                type: 'image/png',
+              },
+              sharedSecret: 'fake_secret',
+            }
+          },
+          inputs: [{
+            label: 'Enter code',
+            name: 'verificationCode',
+            required: true,
+            type: 'string',
+          }]
+        }
+      });
+    });
+
+    it('can set an email on demand', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+        enrollGoogleAuthenticatorResponse,
+      } = testContext;
+      
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollGoogleAuthenticatorResponse
+      ]);
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(selectAuthenticatorResponse);
+
+      let res = await register(authClient, {});
+      expect(res).toEqual({
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'select-authenticator-enroll',
+          inputs: [{
+            name: 'authenticator',
+            key: 'string',
+          }],
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }, {
+            label: 'Email',
+            value: AuthenticatorKey.OKTA_EMAIL
+          }, {
+            label: 'Google Authenticator',
+            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+          }]
+        }
+      });
+
+      res = await register(authClient, {
+        authenticators: [AuthenticatorKey.GOOGLE_AUTHENTICATOR]
+      });
+      // Email authenticator is automatically selected
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+        authenticator: {
+          id: 'id-google-authenticator'
+        }
+      });
+      expect(res).toEqual({
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'app',
+          authenticator: {
+            displayName: 'Google Authenticator',
+            id: '13',
+            key: 'google_otp',
+            methods: [
+              { type: 'otp' }
+            ],
+            type: 'app',
+            contextualData: {
+              qrcode: {
+                href: 'data:image/png;base64,fake_encoding==',
+                method: 'embedded',
+                type: 'image/png',
+              },
+              sharedSecret: 'fake_secret',
+            }
+          },
+          inputs: [{
+            label: 'Enter code',
+            name: 'verificationCode',
+            required: true,
+            type: 'string',
+          }]
+        }
+      });
+    });
+
+    it('can verify google authenticator using a code', async () => {
+      const {
+        authClient,
+        enrollGoogleAuthenticatorResponse,
+        selectPhoneResponse,
+      } = testContext;
+      
+      chainResponses([
+        enrollGoogleAuthenticatorResponse,
+        selectPhoneResponse
+      ]);
+      jest.spyOn(enrollGoogleAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(enrollGoogleAuthenticatorResponse);
+
+      let res = await register(authClient, {});
+      expect(res).toEqual({
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'app',
+          authenticator: {
+            displayName: 'Google Authenticator',
+            id: '13',
+            key: 'google_otp',
+            methods: [
+              { type: 'otp' }
+            ],
+            type: 'app',
+            contextualData: {
+              qrcode: {
+                href: 'data:image/png;base64,fake_encoding==',
+                method: 'embedded',
+                type: 'image/png',
+              },
+              sharedSecret: 'fake_secret',
+            }
+          },
+          inputs: [{
+            label: 'Enter code',
+            name: 'verificationCode',
+            required: true,
+            type: 'string',
+          }]
+        }
+      });
+
+      // Verify email
+      const verificationCode = 'test-code';
+      res = await register(authClient, { verificationCode });
+      expect(enrollGoogleAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
+        credentials: {
+          passcode: 'test-code'
+        }
+      });
+      expect(res).toEqual({
+        status: IdxStatus.PENDING,
+        nextStep: {
+          canSkip: true,
+          name: 'select-authenticator-enroll',
+          inputs: [{
+            name: 'authenticator',
+            key: 'string',
+          }],
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }]
+        }
+      });
+    });
+
   });
 
   describe('skip', () => {
@@ -1081,12 +1373,15 @@ describe('idx/register', () => {
           inputs: [
             {
               name: 'authenticator',
-              type: 'string',
+              key: 'string',
             },
           ],
           name: 'select-authenticator-enroll',
           options: [
-            { label: 'Phone', value: 'phone' }
+            { 
+              label: 'Phone', 
+              value: AuthenticatorKey.PHONE_NUMBER 
+            }
           ],
           canSkip: true,
         },

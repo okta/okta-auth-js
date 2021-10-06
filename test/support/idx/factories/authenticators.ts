@@ -19,7 +19,8 @@ import {
   TotpAuthenticatorMethodFactory,
   SmsAuthenticatorMethodFactory,
   VoiceAuthenticatorMethodFactory,
-  EmailAuthenticatorMethodFactory
+  EmailAuthenticatorMethodFactory,
+  OtpAuthenticatorMethodFactory,
 } from './methods';
 
 export const IdxAuthenticatorFactory = Factory.define<IdxAuthenticator>(({
@@ -85,4 +86,21 @@ export const PhoneAuthenticatorFactory = IdxAuthenticatorFactory.params({
     SmsAuthenticatorMethodFactory.build(),
     VoiceAuthenticatorMethodFactory.build()
   ]
+});
+
+export const GoogleAuthenticatorFactory = IdxAuthenticatorFactory.params({
+  displayName: 'Google Authenticator',
+  key: 'google_otp',
+  type: 'app',
+  methods: [
+    OtpAuthenticatorMethodFactory.build()
+  ],
+  contextualData: {
+    qrcode: {
+      href: 'data:image/png;base64,fake_encoding==',
+      method: 'embedded',
+      type: 'image/png'
+    },
+    sharedSecret: 'fake_secret'
+  }
 });

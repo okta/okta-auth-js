@@ -61,17 +61,13 @@ class A18nClient {
   async getSMSCode(profileId: string) {
     let retryAttemptsRemaining = 30; // sms take some time to arrive, set maximum try to 30
     let response;
-    while (!response?.content && retryAttemptsRemaining > 0) {
+    while (!response?.content && retryAttemptsRemaining-- > 0) {
       await waitForOneSecond();
       response = await this.getOnURL(LATEST_SMS_URL.replace(':profileId', profileId)) as Record<string, string>;
-      --retryAttemptsRemaining;
     }
 
     const match = response?.content?.match(/Your verification code is (?<code>\d+)/);
     const code = match?.groups?.code;
-    if (!code) {
-      throw new Error('Unable to retrieve code from SMS.');
-    }
     return code;
   }
 

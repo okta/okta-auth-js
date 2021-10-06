@@ -88,6 +88,7 @@ This field contains information to proceed with the next step. It's avaiable whe
 
 - `name`: The identifier of the next step.
 - `type?`: The type of the authenticator that the step belongs to.
+- `authenticator?`: The authenticator that the step belongs to.
 - `canSkip?`: This field indicates if the step is skippable or not.
 - `inputs?`: parameters for the next step.
 

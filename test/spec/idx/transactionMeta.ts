@@ -177,7 +177,7 @@ describe('idx/transactionMeta', () => {
     it('calls `authClient.transactionManager.save`', () => {
       jest.spyOn(testContext.authClient.transactionManager, 'save');
       saveTransactionMeta(testContext.authClient, testContext.transactionMeta);
-      expect(testContext.authClient.transactionManager.save).toHaveBeenCalledWith(testContext.transactionMeta);
+      expect(testContext.authClient.transactionManager.save).toHaveBeenCalledWith(testContext.transactionMeta, { muteWarning: true });
     });
   });
 

@@ -16,6 +16,6 @@ import clickElement from './clickElement';
 import selectOption from './selectOption';
 
 export default async () => {
-  await selectOption('value', 'email', SelectAuthenticator.options);
+  await selectOption('value', 'okta_email', SelectAuthenticator.options);
   await clickElement('click', 'selector', SelectAuthenticator.submit);
 };

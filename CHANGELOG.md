@@ -7,6 +7,7 @@
 - [#963](https://github.com/okta/okta-auth-js/pull/963)
   - Adds `getPreviousAuthState` method to `AuthStateManager`
   - Allows null type for authState related methods / fields
+- [#948](https://github.com/okta/okta-auth-js/pull/948) Adds `Google Authenticator` support in idx module
 
 ### Other
 

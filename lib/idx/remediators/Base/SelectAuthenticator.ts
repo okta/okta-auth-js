@@ -21,7 +21,7 @@ function findMatchedOption(authenticators, options) {
   let option;
   for (let authenticator of authenticators) {
     option = options
-      .find(({ relatesTo }) => relatesTo.type === authenticator.type);
+      .find(({ relatesTo }) => relatesTo.key === authenticator.key);
     if (option) {
       break;
     }
@@ -48,12 +48,12 @@ export class SelectAuthenticator extends Remediator {
     // Unify authenticator input type
     const { authenticator: selectedAuthenticator, authenticators } = this.values;
     const hasSelectedAuthenticatorInList = authenticators
-        ?.some((authenticator => authenticator.type === selectedAuthenticator));
+        ?.some((authenticator => authenticator.key === selectedAuthenticator));
     if (selectedAuthenticator && !hasSelectedAuthenticatorInList) {
       // add selected authenticator to list
       this.values.authenticators = [
         ...(authenticators || []), 
-        { type: selectedAuthenticator }
+        { key: selectedAuthenticator }
       ] as Authenticator[];
     }
   }
@@ -81,9 +81,9 @@ export class SelectAuthenticator extends Remediator {
     const options = authenticatorFromRemediation.options.map(option => {
       const { 
         label, 
-        relatesTo: { type } 
+        relatesTo: { key } 
       } = option;
-      return { label, value: type };
+      return { label, value: key };
     });
     return { ...common, options };
   }
@@ -98,7 +98,7 @@ export class SelectAuthenticator extends Remediator {
   }
 
   getInputAuthenticator() {
-    return { name: 'authenticator', type: 'string' };
+    return { name: 'authenticator', key: 'string' };
   }
 
 }

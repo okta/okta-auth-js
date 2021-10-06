@@ -87,3 +87,8 @@ export const IdxErrorPasscodeInvalidFactory = IdxErrorMessageFactory.params({
   i18n: { key: 'api.authn.error.PASSCODE_INVALID', params: [] },
   message: 'Invalid code. Try again.'
 });
+
+export const IdxErrorGoogleAuthenticatorPasscodeInvalidFactory = IdxErrorMessageFactory.params({
+  i18n: { key: 'authfactor.challenge.soft_token.invalid_passcode' },
+  message: 'Your code doesn\'t match our records. Please try again.'
+});

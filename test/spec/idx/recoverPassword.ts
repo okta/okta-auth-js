@@ -282,6 +282,32 @@ describe('idx/recoverPassword', () => {
       nextStep: {
         name: 'reenroll-authenticator',
         type: 'password',
+        authenticator: {
+          displayName: 'Password',
+          id: '14',
+          key: 'okta_password',
+          methods: [
+            {
+              type: 'password',
+            },
+          ],
+          settings: {
+            age: {
+              historyCount: 4,
+              minAgeMinutes: 0,
+            },
+            complexity: {
+              excludeAttributes: [],
+              excludeUsername: true,
+              minLength: 8,
+              minLowerCase: 0,
+              minNumber: 0,
+              minSymbol: 0,
+              minUpperCase: 0,
+            },
+          },
+          type: 'password',
+        },
         inputs: [
           {
             name: 'newPassword',
@@ -329,6 +355,32 @@ describe('idx/recoverPassword', () => {
       nextStep: {
         name: 'authenticator-verification-data',
         type: 'password',
+        authenticator: {
+          displayName: 'Password',
+          id: '15',
+          key: 'okta_password',
+          methods: [
+            {
+              type: 'password',
+            },
+          ],
+          settings: {
+            age: {
+              historyCount: 4,
+              minAgeMinutes: 0,
+            },
+            complexity: {
+              excludeAttributes: [],
+              excludeUsername: true,
+              minLength: 8,
+              minLowerCase: 0,
+              minNumber: 0,
+              minSymbol: 0,
+              minUpperCase: 0,
+            },
+          },
+          type: 'password',
+        },
         inputs: [{
           label: 'Password',
           name: 'passcode',
@@ -379,6 +431,32 @@ describe('idx/recoverPassword', () => {
       nextStep: {
         name: 'reenroll-authenticator',
         type: 'password',
+        authenticator: {
+          displayName: 'Password',
+          id: '14',
+          key: 'okta_password',
+          methods: [
+            {
+              type: 'password',
+            },
+          ],
+          settings: {
+            age: {
+              historyCount: 4,
+              minAgeMinutes: 0,
+            },
+            complexity: {
+              excludeAttributes: [],
+              excludeUsername: true,
+              minLength: 8,
+              minLowerCase: 0,
+              minNumber: 0,
+              minSymbol: 0,
+              minUpperCase: 0,
+            },
+          },
+          type: 'password',
+        },
         inputs: [
           {
             name: 'newPassword',
@@ -402,6 +480,32 @@ describe('idx/recoverPassword', () => {
       nextStep: {
         name: 'authenticator-verification-data',
         type: 'password',
+        authenticator: {
+          displayName: 'Password',
+          id: '15',
+          key: 'okta_password',
+          methods: [
+            {
+              type: 'password',
+            },
+          ],
+          settings: {
+            age: {
+              historyCount: 4,
+              minAgeMinutes: 0,
+            },
+            complexity: {
+              excludeAttributes: [],
+              excludeUsername: true,
+              minLength: 8,
+              minLowerCase: 0,
+              minNumber: 0,
+              minSymbol: 0,
+              minUpperCase: 0,
+            },
+          },
+          type: 'password',
+        },
         inputs: [{
           label: 'Password',
           name: 'passcode',

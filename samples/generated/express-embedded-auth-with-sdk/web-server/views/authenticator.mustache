@@ -18,6 +18,24 @@
         {{>formMessages}}
       </div>
 
+      {{#contextualData}}
+        <div class="ui segments">
+          <div class="ui segment">
+            {{#contextualData.qrcode}}
+              <div class="ui fluid image">
+                <img src="{{contextualData.qrcode.href}}" />
+              </div>
+            {{/contextualData.qrcode}}
+          </div>
+          <div class="ui segment">
+            {{#contextualData.sharedSecret}}
+              <div class="ui label">SharedSecret: </div> 
+              <p>{{contextualData.sharedSecret}}</p>
+            {{/contextualData.sharedSecret}}
+          </div>
+        </div>
+      {{/contextualData}}
+
       <div class="row">
         <form id="challenge-authenticator-form" class="ui large form" action="{{action}}" method="POST">
           <div class="field">
