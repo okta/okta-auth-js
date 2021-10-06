@@ -2,6 +2,12 @@
 
 ## 5.6.0
 
+### Features
+
+- [#963](https://github.com/okta/okta-auth-js/pull/963)
+  - Adds `getPreviousAuthState` method to `AuthStateManager`
+  - Allows null type for authState related methods / fields
+
 ### Other
 
 - [#947](https://github.com/okta/okta-auth-js/pull/947) TypeScript: Allow custom keys in `AuthState` interface
