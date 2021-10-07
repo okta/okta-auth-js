@@ -6,6 +6,10 @@
 
 - [#947](https://github.com/okta/okta-auth-js/pull/947) TypeScript: Allow custom keys in `AuthState` interface
 
+### Bug Fixes
+
+- [#967](https://github.com/okta/okta-auth-js/pull/967) Throw error in `parseFromUrl` if can't load transaction meta
+
 ## 5.5.0
 
 ### Features
