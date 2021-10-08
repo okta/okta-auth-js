@@ -27,6 +27,7 @@ export interface Config extends OktaAuthOptions {
   clientSecret: string;
   forceRedirect: boolean;
   useInteractionCodeFlow: boolean; // widget option
+  enableSharedStorage: boolean; // TransactionManager
 }
 
 export function getDefaultConfig(): Config {
@@ -51,7 +52,8 @@ export function getDefaultConfig(): Config {
     cookies: {
       secure: true
     },
-    useInteractionCodeFlow: false
+    useInteractionCodeFlow: false,
+    enableSharedStorage: true
   };
 }
 
@@ -77,12 +79,14 @@ export function getConfigFromUrl(): Config {
   const idps = url.searchParams.get('idps') || '';
   const useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true'; // off by default
   const forceRedirect = url.searchParams.get('forceRedirect') === 'true'; // off by default
+  const enableSharedStorage = url.searchParams.get('enableSharedStorage') !== 'false'; // on by default
 
   return {
     forceRedirect,
     siwVersion,
     siwAuthClient,
     idps,
+    enableSharedStorage,
     redirectUri,
     postLogoutRedirectUri,
     issuer,
@@ -100,6 +104,9 @@ export function getConfigFromUrl(): Config {
     tokenManager: {
       storage,
       expireEarlySeconds
+    },
+    transactionManager: {
+      enableSharedStorage
     },
     useInteractionCodeFlow
   };
@@ -128,8 +135,9 @@ export function flattenConfig(config: Config): any {
   const flat: Record<string, any> = {};
   Object.assign(flat, config.tokenManager);
   Object.assign(flat, config.cookies);
+  Object.assign(flat, config.transactionManager);
   Object.keys(config).forEach(key => {
-    if (key !== 'tokenManager' && key !== 'cookies') {
+    if (key !== 'tokenManager' && key !== 'cookies' && key !== 'transactionManager') {
       (flat as any)[key] = (config as any)[key];
     }
   });

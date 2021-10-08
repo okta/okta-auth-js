@@ -427,7 +427,8 @@ oauthUtil.setupRedirect = function(opts) {
 
   jest.spyOn(storageUtil, 'getSessionStorage')
     .mockImplementation(() => ({
-      setItem: jest.fn()
+      setItem: jest.fn(),
+      getItem: jest.fn()
     }));
   jest.spyOn(storageUtil, 'browserHasSessionStorage')
     .mockImplementation(() => !!opts.hasSessionStorage);

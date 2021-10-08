@@ -16,6 +16,7 @@ import {
   PKCE_STORAGE_NAME,
   TOKEN_STORAGE_NAME,
   TRANSACTION_STORAGE_NAME,
+  SHARED_TRANSACTION_STORAGE_NAME,
   IDX_RESPONSE_STORAGE_NAME,
   CACHE_STORAGE_NAME,
   REDIRECT_OAUTH_PARAMS_NAME
@@ -94,6 +95,14 @@ export default class StorageManager {
     logServerSideMemoryStorageWarning(options);
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || TRANSACTION_STORAGE_NAME;
+    return new SavedObject(storage, storageKey);
+  }
+
+  getSharedTansactionStorage(options?: StorageOptions): TransactionStorage {
+    options = this.getOptionsForSection('shared-transaction', options);
+    logServerSideMemoryStorageWarning(options);
+    const storage = this.getStorage(options);
+    const storageKey = options.storageKey || SHARED_TRANSACTION_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
   }
 

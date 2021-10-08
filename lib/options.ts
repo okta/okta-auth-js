@@ -43,6 +43,11 @@ const BROWSER_STORAGE: StorageManagerOptions = {
       'localStorage',
       'cookie'
     ]
+  },
+  'shared-transaction': {
+    storageTypes: [
+      'localStorage'
+    ]
   }
 };
 
