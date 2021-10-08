@@ -823,7 +823,7 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 * [getAccessToken](#getaccesstoken)
 * [storeTokensFromRedirect](#storetokensfromredirect)
 * [setOriginalUri](#setoriginaluriuri)
-* [getOriginalUri](#getoriginaluri)
+* [getOriginalUri](#getoriginaluristate)
 * [removeOriginalUri](#removeoriginaluri)
 * [isLoginRedirect](#isloginredirect)
 * [handleLoginRedirect](#handleloginredirecttokens)
@@ -889,7 +889,7 @@ See [authn API](docs/authn.md#signinwithcredentials).
 > :link: web browser only <br>
 
 Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a originalUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
-You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getOriginalUri](#getoriginaluri) to clear the intermediate state (the originalUri) after successful authentication.
+You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getOriginalUri](#getoriginaluristate) to clear the intermediate state (the originalUri) after successful authentication.
 
 ```javascript
 if (authClient.isLoginRedirect()) {
@@ -1074,9 +1074,9 @@ Parses tokens from the redirect url and stores them.
 
 Stores the current URL state before a redirect occurs.
 
-### `getOriginalUri()`
+### `getOriginalUri(state?)`
 
-Returns the stored URI string stored by [setOriginal](#setoriginaluriuri).
+Returns the stored URI string stored by [setOriginal](#setoriginaluriuri). An OAuth `state` parameter is optional. If no value is passed for `state`, the URI is retrieved from isolated session storage and will work in a single browser. If a valid OAuth `state` is passed this method can return the URI stored from another browser tab.
 
 ### `removeOriginalUri()`
 
@@ -1101,12 +1101,12 @@ if (authClient.isLoginRedirect()) {
 }
 ```
 
-### `handleLoginRedirect(tokens?)`
+### `handleLoginRedirect(tokens?, originalUri?)`
 
 > :link: web browser only <br>
 > :hourglass: async
 
-Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options).
+Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by passing a value fro `originalUri` to this function in the 2nd parameter.
 
 > **Note:** `handleLoginRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval.
 

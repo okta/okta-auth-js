@@ -52,7 +52,7 @@ export function getResponseMode(sdk): 'query' | 'fragment' {
   return responseMode;
 }
 
-export async function parseOAuthResponseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<OAuthResponse> {
+export function parseOAuthResponseFromUrl(sdk, options: string | ParseFromUrlOptions): OAuthResponse {
   options = options || {};
   if (isString(options)) {
     options = { url: options } as ParseFromUrlOptions;
@@ -92,7 +92,7 @@ export async function parseFromUrl(sdk, options: string | ParseFromUrlOptions): 
     options = options as ParseFromUrlOptions;
   }
 
-  const res: OAuthResponse = await parseOAuthResponseFromUrl(sdk, options);
+  const res: OAuthResponse = parseOAuthResponseFromUrl(sdk, options);
   const state = res.state;
   const oauthParams: TransactionMeta = sdk.transactionManager.load({
     oauth: true,
