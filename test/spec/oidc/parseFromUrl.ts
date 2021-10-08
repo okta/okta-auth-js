@@ -677,6 +677,44 @@ describe('token.parseFromUrl', function() {
     });
   });
 
+  it('throws an error if no transaction meta and legacyWidgetSupport is false', () => {
+    const error = {
+      name: 'AuthSdkError',
+      message: 'Unable to retrieve OAuth redirect params from storage',
+      errorCode: 'INTERNAL',
+      errorSummary: 'Unable to retrieve OAuth redirect params from storage',
+      errorLink: 'INTERNAL',
+      errorId: 'INTERNAL',
+      errorCauses: []
+    };
+    return oauthUtil.setupParseUrl({
+      oktaAuthArgs: {
+        transactionManager: {
+          legacyWidgetSupport: false
+        }
+      },
+      shouldClearTransaction: false,
+      willFail: true,
+      hashMock: '#id_token=' + tokens.standardIdToken +
+                '&state=' + oauthUtil.mockedState,
+      oauthParams: JSON.stringify({
+        responseType: 'id_token',
+        state: oauthUtil.mockedState,
+        nonce: oauthUtil.mockedNonce,
+        scopes: ['openid', 'email'],
+        urls: {
+          issuer: 'https://auth-js-test.okta.com',
+          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
+        }
+      }),
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+  });
+
   describe('interaction code flow', () => {
     it('Does not clear storage when "error" param is "interaction_required"', () => {
       const error = {

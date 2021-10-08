@@ -69,6 +69,9 @@ export function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promis
     oauth: true,
     pkce: sdk.options.pkce
   });
+  if (!oauthParams) {
+    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params from storage'));
+  }
   const urls: CustomUrls = oauthParams.urls as CustomUrls;
   delete oauthParams.urls;
 
