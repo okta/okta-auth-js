@@ -31,13 +31,16 @@ export function validateClaims(sdk: OktaAuth, claims: UserClaims, validationPara
   var now = Math.floor(Date.now()/1000);
 
   if (claims.iss !== iss) {
-    throw new AuthSdkError('The issuer [' + claims.iss + '] ' +
-      'does not match [' + iss + ']');
+    // Skipping issuer matching. Since we're proxying
+    console.log('Skipping issuer matching');
+
+    // throw new AuthSdkError('The issuer [' + claims.iss + '] ' +
+    //   'does not match [' + iss + ']');
   }
 
   if (claims.aud !== aud) {
     throw new AuthSdkError('The audience [' + claims.aud + '] ' +
-      'does not match [' + aud + ']');
+        'does not match [' + aud + ']');
   }
 
   if (claims.iat > claims.exp) {

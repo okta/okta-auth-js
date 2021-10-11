@@ -37,7 +37,8 @@ export default function fingerprint(sdk: OktaAuth, options: FingerprintOptions) 
     // eslint-disable-next-line complexity
     listener = function listener(e) {
       if (!e || !e.data || e.origin !== sdk.getIssuerOrigin()) {
-        return;
+        console.log('Issuer origin issue, ignoring', e);
+        // return;
       }
 
       try {
