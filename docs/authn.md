@@ -4,7 +4,7 @@
 <!-- omit in toc -->
 # Okta Authentication API (authn)
 
-> :warning: The authn API will be deprecated in a future major release. New applications should use the [IDX API](docs/idx.md) instead. Existing applications which use the authn API should [migrate to IDX](#migrating-to-idx).
+> :warning: The authn API will be deprecated in a future major release. New applications should use the [IDX API](./idx.md) instead. Existing applications which use the authn API should [migrate to IDX](#migrating-to-idx).
 
 - [Introduction](#introduction)
 - [Migrating to IDX](#migrating-to-idx)
@@ -255,7 +255,7 @@ transaction.cancel()
 
 ##### `changePassword(options)`
 
-See [authn API](docs/authn.md#signinwithcredentials).
+See [authn API](#api).
 
 [Changes](https://developer.okta.com/docs/api/resources/authn#reset-password) a user's password.
 
