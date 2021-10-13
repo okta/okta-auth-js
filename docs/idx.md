@@ -290,7 +290,7 @@ const {
   nextStep: { 
     inputs // [{ name: 'username', ... }]
   } 
-} = await authClient.idx.register();
+} = await authClient.idx.recoverPassword();
 // gather username from user input (this call should happen in a separated request)
 const { 
   status, // IdxStatus.PENDING
@@ -298,21 +298,21 @@ const {
     inputs, // [{ name: 'authenticator', ... }] 
     options // [{ name: 'email', ... }, ...]
   } 
-} = await authClient.idx.register({ username });
+} = await authClient.idx.recoverPassword({ username });
 // select authenticator (this call should happen in a separated request)
 const { 
   status, // IdxStatus.PENDING
   nextStep: {
     inputs // [{ name: 'verificationCode', ... }]
   } 
-} = await authClient.idx.register({ authenticator: 'email' });
+} = await authClient.idx.recoverPassword({ authenticator: 'email' });
 // gather verification code from email (this call should happen in a separated request)
 const { 
   status, 
   nextStep: {
     inputs // [{ name: 'password', ...}]
   }
-} = await authClient.idx.register({ verificationCode: 'xxx' });
+} = await authClient.idx.recoverPassword({ verificationCode: 'xxx' });
 // gather new password from user input (this call should happen in a separated request)
 const { 
   status, // IdxStatus.SUCCESS 
