@@ -52,7 +52,7 @@ export default function App() {
     if(oktaAuth.isLoginRedirect()) {
       parseFromUrl();
     }
-  }, []);
+  }, [history, setAuthState]);
 
   const handleChange = ({ target: { name, value } }) => setInputValues({
     ...inputValues,
