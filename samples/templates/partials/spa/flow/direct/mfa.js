@@ -1,658 +1,4 @@
-/*!
- * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
- * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
- *
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
- * See the License for the specific language governing permissions and limitations under the License.
- */
-
-
-import '@okta/okta-auth-js/polyfill';
-import { OktaAuth } from '@okta/okta-auth-js';
-import OktaSignIn from '@okta/okta-signin-widget';
-
-// Sample SPA application
-var authClient;
-var appState = {};
-// bind methods called from HTML to prevent navigation
-function bindClick(method, boundArgs) {
-  return function(e) {
-    e.preventDefault();
-    const runtimeArgs = Array.prototype.slice.call(arguments, 1);
-    try {
-      method.apply(null, runtimeArgs.concat(boundArgs));
-    } catch (err) {
-      showError(err);
-    }
-    return false;
-  };
-}
-
-function stringify(obj) {
-  // Convert false/undefined/null into "null"
-  if (!obj) {
-    return 'null';
-  }
-  return JSON.stringify(obj, null, 2);
-}
-// Default config. Properties here match the names of query parameters in the URL
-var config = {
-  issuer: '',
-  clientId: '',
-  scopes: ['openid','email'],
-  storage: 'sessionStorage',
-  requireUserSession: 'true',
-  flow: 'redirect',
-  idps: '',
-  useInteractionCodeFlow: false,
-};
-
-
-/* eslint-disable max-statements,complexity */
-function loadConfig() {
-  // Read all config from the URL
-  var url = new URL(window.location.href);
-  var redirectUri = window.location.origin + '/login/callback'; // Should also be set in Okta Admin UI
-  
-  // Params which are not in the state
-  var stateParam = url.searchParams.get('state'); // received on login redirect callback
-  var error = url.searchParams.get('error'); // received on login redirect callback
-  var showForm = url.searchParams.get('showForm'); // forces config form to show
-  var getTokens = url.searchParams.get('getTokens'); // forces redirect to get tokens
-
-  // Params which are encoded into the state
-  var issuer;
-  var clientId;
-  var appUri;
-  var storage;
-  var flow;
-  var requireUserSession;
-  var scopes;
-  var useInteractionCodeFlow;
-  var idps;
-
-  var state;
-  try {
-    // State will be passed on callback. If state exists in the URL parse it as a JSON object and use those values.
-    state = stateParam ? JSON.parse(stateParam) : null;
-  } catch (e) {
-    console.warn('Could not parse state from the URL.');
-  }
-  if (state) {
-    // Read from state
-    issuer = state.issuer;
-    clientId = state.clientId;
-    storage = state.storage;
-    flow = state.flow;
-    requireUserSession = state.requireUserSession;
-    scopes = state.scopes;
-    useInteractionCodeFlow = state.useInteractionCodeFlow;
-    idps = state.idps;
-  } else {
-    // Read individually named parameters from URL, or use defaults
-    issuer = url.searchParams.get('issuer') || config.issuer;
-    clientId = url.searchParams.get('clientId') || config.clientId;
-    storage = url.searchParams.get('storage') || config.storage;
-    flow = url.searchParams.get('flow') || config.flow;
-    requireUserSession = url.searchParams.get('requireUserSession') ? 
-      url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
-    scopes = url.searchParams.get('scopes') ? url.searchParams.get('scopes').split(' ') : config.scopes;
-    useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true' || config.useInteractionCodeFlow;
-    idps = url.searchParams.get('idps') || config.idps;
-  }
-  // Create a canonical app URI that allows clean reloading with this config
-  appUri = window.location.origin + '/' + '?' + Object.entries({
-    issuer,
-    clientId,
-    storage,
-    requireUserSession,
-    flow,
-    scopes: scopes.join(' '),
-    useInteractionCodeFlow,
-    idps,
-  }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-  // Add all app options to the state, to preserve config across redirects
-  state = {
-    issuer,
-    clientId,
-    storage,
-    requireUserSession,
-    flow,
-    scopes,
-    useInteractionCodeFlow,
-    idps,
-  };
-  var newConfig = {};
-  Object.assign(newConfig, state);
-  Object.assign(newConfig, {
-    // ephemeral options, will not survive a redirect
-    appUri,
-    redirectUri,
-    state,
-    error,
-    showForm,
-    getTokens
-  });
-  Object.assign(config, newConfig);
-  // Render the config to HTML
-  var logConfig = {};
-  var skipKeys = ['state', 'appUri', 'error', 'showForm', 'getTokens']; // internal config
-  Object.keys(config).forEach(function(key) {
-    if (skipKeys.indexOf(key) < 0) {
-      logConfig[key] = config[key];
-    }
-  });
-  document.getElementById('config').innerText = stringify(logConfig);
-}
-
-
-function showForm() {
-  // Set values from config
-  document.getElementById('issuer').value = config.issuer;
-  document.getElementById('clientId').value = config.clientId;
-  document.getElementById('scopes').value = config.scopes.join(' ');
-  document.getElementById('idps').value = config.idps;
-  try {
-    document.querySelector(`#flow [value="${config.flow || ''}"]`).selected = true;
-  } catch (e) { showError(e); }
-  if (config.requireUserSession) {
-    document.getElementById('requireUserSession-on').checked = true;
-  } else {
-    document.getElementById('requireUserSession-off').checked = true;
-  }
-  try {
-    document.querySelector(`#storage [value="${config.storage || ''}"]`).selected = true;
-  } catch (e) { showError(e); }
-
-  if (config.useInteractionCodeFlow) {
-    document.getElementById('useInteractionCodeFlow-on').checked = true;
-  } else {
-    document.getElementById('useInteractionCodeFlow-off').checked = true;
-  }
-  
-  // Show the form
-  document.getElementById('config-form').style.display = 'block'; // show form
-
-  onChangeFlow();
-}
-
-function onChangeFlow() {
-  const flow = document.getElementById('flow').value;
-  const display = flow == 'widget' ? 'inline-block' : 'none';
-  document.getElementById('idps').style.display = display;
-  document.querySelector(`label[for=idps]`).style.display = display;
-}
-window._onChangeFlow = onChangeFlow;
-
-// Keep us in the same tab
-function onSubmitForm(event) {
-  event.preventDefault();
-  // eslint-disable-next-line no-new
-  new FormData(document.getElementById('form')); // will fire formdata event
-}
-window._onSubmitForm = onSubmitForm;
-
-function onFormData(event) {
-  let data = event.formData;
-  let params = {};
-  for (let key of data.keys()) {
-    params[key] = data.get(key);
-  }
-  const query = '?' + Object.entries(params).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-  const newUri = window.location.origin + '/' + query;
-  window.location.replace(newUri);
-}
-window._onFormData = onFormData;
-
-// Wait for DOM content to be loaded before starting the app
-document.addEventListener('DOMContentLoaded', () => {
-  // load config from the URL params
-  loadConfig();
-
-  // start all the things
-  main();
-});
-
-
-function createAuthClient() {
-  // The `OktaAuth` constructor can throw if the config is malformed
-  try {
-    authClient = new OktaAuth({
-      issuer: config.issuer,
-      clientId: config.clientId,
-      redirectUri: config.redirectUri,
-      scopes: config.scopes,
-      tokenManager: {
-        storage: config.storage
-      },
-      transformAuthState
-    });
-  } catch (error) {
-    return showError(error);
-  }
-}
-
-function updateAppState(props) {
-  Object.assign(appState, props);
-  document.getElementById('appState').innerText = stringify(appState);
-}
-
-// Modifies the "authState" object before it is emitted. This is a chance to add custom logic and extra properties.
-function transformAuthState(_authClient, authState) {
-  var promise = Promise.resolve(authState);
-
-  if (authState.accessToken && authState.idToken) {
-    authState.hasTokens = true;
-  }
-
-  // With this option we require the user to have not only valid tokens, but a valid Okta SSO session as well
-  if (config.requireUserSession && authState.hasTokens) {
-    promise = promise.then(function() {
-      return appState.userInfo || authClient.token.getUserInfo();
-    }).then(function(value) {
-      updateAppState({ userInfo: value });
-      authState.isAuthenticated = authState.isAuthenticated && !!appState.userInfo;
-      return authState;
-    });
-  }
-
-  return promise;
-}
-
-function main() {
-  // Configuration is loaded from URL query params. Make sure the links contain the full config
-  document.getElementById('home-link').setAttribute('href', config.appUri);
-  document.getElementById('options-link').setAttribute('href', config.appUri + '&showForm=true');
-
-  if (config.showForm) {
-    showForm();
-    return;
-  }
-
-  var hasValidConfig = !!(config.issuer && config.clientId);
-  if (!hasValidConfig) {
-    showError('Click "Edit Config" and set the `issuer` and `clientId`');
-    return renderUnauthenticated();
-  }
-
-  // Config is valid
-  createAuthClient();
-
-  // Subscribe to authState change event. Logic based on authState is done here.
-  authClient.authStateManager.subscribe(function(authState) {
-    if (!authState.isAuthenticated) {
-      // If not authenticated, reset values related to user session
-      updateAppState({ userInfo: null });
-    }
-
-    // If there is an active session, we can get tokens via a redirect
-    // This allows in-memory token storage without prompting for credentials on each page load
-    if (shouldRedirectToGetTokens(authState)) {
-      return redirectToGetTokens();
-    }
-
-    // Render app based on the new authState
-    renderApp();
-  });
-
-  // During the OIDC auth flow, the app will receive a code passed to the `redirectUri`
-  // This event occurs *in the middle* of an authorization flow
-  // The callback handler logic should happen *before and instead of* any other auth logic
-  // In most apps this callback will be handled by a special route
-  // For SPA apps like this, with no routing or hash-based routing, the callback is handled in the main function
-  // Once the callback is handled, the app can startup normally
-  if (authClient.token.isLoginRedirect()) {
-    return handleLoginRedirect().then(function() {
-      startApp();
-    });
-  } 
-  
-  // Normal app startup
-  startApp();
-}
-
-function startApp() {
-  // Calculates initial auth state and fires change event for listeners
-  // Also starts the token auto-renew service
-  authClient.start();
-}
-
-function renderApp() {
-  const authState = authClient.authStateManager.getAuthState();
-  document.getElementById('authState').innerText = stringify(authState);
-
-  // Setting auth state is an asynchronous operation. If authState is not available yet, render in the loading state
-  if (!authState) {
-    return showLoading();
-  }
-
-  hideLoading();
-  if (authState.isAuthenticated) {
-    return renderAuthenticated(authState);
-  }
-
-  // Default: Unauthenticated state
-  return renderUnauthenticated();
-}
-
-function showLoading() {
-  document.getElementById('loading').style.display = 'block';
-}
-
-function hideLoading() {
-  document.getElementById('loading').style.display = 'none';
-}
-
-function renderAuthenticated(authState) {
-  document.body.classList.add('auth');
-  document.body.classList.remove('unauth');
-  document.getElementById('auth').style.display = 'block';
-  document.getElementById('accessToken').innerText = stringify(authState.accessToken);
-  renderUserInfo(authState);
-}
-
-function renderUserInfo(authState) {
-  const obj = appState.userInfo || authState.userInfo;
-  const attributes = Object.keys(obj);
-  const rows = attributes.map((key) => {
-    return `
-      <tr>
-        <td>${key}</td>
-        <td id="claim-${key}">${obj[key]}</td>
-      </tr>
-    `;
-  });
-  const table = `
-    <table class="ui table compact collapsing">
-      <thead>
-        <tr>
-          <th>Claim</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.join('')}
-      </tbody>
-    </table>
-  `;
-  document.getElementById('userInfo').innerHTML = table;
-}
-
-function renderUnauthenticated() {
-  // The user is not authenticated, the app will begin an auth flow.
-  document.body.classList.add('unauth');
-  document.body.classList.remove('auth');
-  document.getElementById('auth').style.display = 'none';
-
-  // The `handleLoginRedirect` may have failed. An error or remediation should be shown.
-  if (!authClient || authClient.token.isLoginRedirect()) {
-    return;
-  }
-
-  // Unauthenticated state, begin an auth flow
-  return beginAuthFlow();
-}
-
-function handleLoginRedirect() {
-  if (authClient.isInteractionRequired()) {
-    beginAuthFlow(); // widget will resume transaction
-    return Promise.resolve();
-  }
-  
-  // If the URL contains a code, `parseFromUrl` will grab it and exchange the code for tokens
-  return authClient.token.parseFromUrl().then(function (res) {
-    endAuthFlow(res.tokens); // save tokens
-  }).catch(function(error) {
-    showError(error);
-  });
-}
-
-// called when the "get user info" link is clicked
-function getUserInfo() {
-  return authClient.token.getUserInfo()
-    .then(function(value) {
-      updateAppState({ userInfo: value });
-      renderApp();
-    })
-    .catch(function (error) {
-      // This is expected when Okta SSO does not exist
-      showError(error);
-    });
-}
-window._getUserInfo = bindClick(getUserInfo);
-
-// called when the "renew token" link is clicked
-function renewToken() {
-  // when the token is written to storage, the authState will change and we will re-render.
-  return authClient.tokenManager.renew('accessToken')
-    .catch(function(error) {
-      showError(error);
-    });
-}
-window._renewToken = bindClick(renewToken);
-
-function beginAuthFlow() {
-  switch (config.flow) {
-    case 'redirect':
-      showRedirectButton();
-      break;
-    case 'widget':
-      showSigninWidget();
-      break;
-    case 'form':
-      showSigninForm();
-      break;
-  }
-}
-
-function endAuthFlow(tokens) {
-  // parseFromUrl clears location.search. There may also be a leftover "error" param from the auth flow.
-  // Replace state with the canonical app uri so the page can be reloaded cleanly.
-  history.replaceState(null, '', config.appUri);
-
-  // Store tokens. This will update the auth state and we will re-render
-  authClient.tokenManager.setTokens(tokens);
-}
-
-function showRedirectButton() {
-  document.getElementById('flow-redirect').style.display = 'block';
-}
-
-function logout(e) {
-  e.preventDefault();
-  appState = {};
-  authClient.signOut();
-}
-window._logout = logout;
-
-
-function showError(error) {
-  console.error(error);
-  const containerElem = document.getElementById('error');
-  containerElem.style.display = 'block';
-  var node = document.createElement('DIV');
-  node.innerText = error.message || typeof error === 'string' ? error : JSON.stringify(error, null, 2);
-  containerElem.appendChild(node);
-}
-
-function clearError() {
-  const containerElem = document.getElementById('error');
-  containerElem.innerHTML = '';
-  containerElem.style.display = 'none';
-}
-
-function returnHome() {
-  window.location.href = config.appUri;
-}
-window._returnHome = bindClick(returnHome);
-
-function shouldRedirectToGetTokens(authState) {
-  if (authState.isAuthenticated) {
-    return false;
-  }
-
-  // Special handling for memory-based token storage.
-  // There will be a redirect on each page load to acquire fresh tokens.
-  if (config.storage === 'memory' || config.getTokens) {
-
-    // Callback from Okta triggered by `redirectToGetTokens`
-    // If the callback has errored, it means there is no Okta session and we should begin a new auth flow
-    // This condition breaks a potential infinite rediret loop
-    if (config.error === 'login_required') {
-      return false;
-    }
-
-    // Call Okta to get tokens. Okta will redirect back to this app
-    // The callback is handled by `handleLoginRedirect` which will call `renderApp` again
-    return true;
-  }
-}
-
-function redirectToGetTokens(additionalParams) {
-  // If an Okta SSO exists, the redirect will return a code which can be exchanged for tokens
-  // If a session does not exist, it will return with "error=login_required"
-  authClient.token.getWithRedirect(Object.assign({
-    state: JSON.stringify(config.state),
-    prompt: 'none' // do not show Okta hosted login page, instead redirect back with error
-  }, additionalParams));
-}
-
-function redirectToLogin(additionalParams) {
-  // Redirect to Okta and show the signin widget if there is no active session
-  authClient.token.getWithRedirect(Object.assign({
-    state: JSON.stringify(config.state),
-  }, additionalParams));
-}
-window._loginRedirect = bindClick(redirectToLogin);
-function showSigninWidget() {
-  // Create an instance of the signin widget
-  var signIn = new OktaSignIn({
-    baseUrl: config.issuer.split('/oauth2')[0],
-    clientId: config.clientId,
-    redirectUri: config.redirectUri,
-    useInteractionCodeFlow: config.useInteractionCodeFlow,
-    authParams: {
-      issuer: config.issuer
-    },
-    idps: config.idps.split(/\s+/).map(idpToken => {
-      const [type, id] = idpToken.split(/:/);
-      if (!type || !id) {
-         return null;
-      }
-      return { type, id };
-    }).filter(idpToken => idpToken)
-  });
-
-  signIn.showSignIn({
-    el: '#signin-widget',
-    state: JSON.stringify(config.state)
-  })
-  .then(function(response) {
-    document.getElementById('flow-widget').style.display = 'none';
-    signIn.remove();
-    endAuthFlow(response.tokens);
-  })
-  .catch(function(error) {
-    console.log('login error', error);
-  });
-
-  document.getElementById('flow-widget').style.display = 'block'; // show login UI
-}
-function resumeTransaction() {
-  if (!config.useInteractionCodeFlow) {
-    // Authn
-    if (authClient.tx.exists()) {
-      return authClient.tx.resume()
-        .then(handleTransaction)
-        .catch(showError);
-    }
-    return;
-  }
-
-  if (authClient.transactionManager.exists()) {
-    return authClient.idx.authenticate()
-      .then(handleTransaction)
-      .catch(showError);
-  }
-}
-
-function showSigninForm() {
-  // Is there an existing transaction we can resume?
-  if (resumeTransaction()) {
-    return;
-  }
-
-  document.getElementById('login-form').style.display = 'block';
-}
-
-function hideSigninForm() {
-  document.getElementById('login-form').style.display = 'none';
-}
-
-function submitSigninForm() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  if (!config.useInteractionCodeFlow) {
-    // Authn
-    authClient.signIn({ username, password })
-      .then(handleTransaction)
-      .catch(showError);
-  }
-
-  return authClient.idx.authenticate({ username, password })
-    .then(handleTransaction)
-    .catch(showError);
-
-}
-window._submitSigninForm = bindClick(submitSigninForm);
-
-function handleTransaction(transaction) {
-  if (!config.useInteractionCodeFlow) {
-    // Authn
-    return handleTransactionAuthn(transaction);
-  }
-
-  switch (transaction.status) {
-    case 'PENDING':
-      hideSigninForm();
-      updateAppState({ transaction });
-      showMfa();
-      break;
-    case 'FAILURE':
-      showError(transaction.error);
-      break;
-    case 'SUCCESS':
-      hideSigninForm();
-      endAuthFlow(transaction.tokens);
-      break;
-    default:
-      throw new Error('TODO: add handling for ' + transaction.status + ' status');
-  }
-}
-
-function handleTransactionAuthn(transaction) {
-  switch (transaction.status) {
-    case 'SUCCESS':
-      authClient.session.setCookieAndRedirect(transaction.sessionToken, config.appUri + '&getTokens=true');
-      break;
-    case 'MFA_ENROLL':
-    case 'MFA_REQUIRED':
-    case 'MFA_ENROLL_ACTIVATE':
-    case 'MFA_CHALLENGE':
-      hideSigninForm();
-      updateAppState({ transaction });
-      showMfa();
-      return;
-    default:
-      throw new Error('TODO: add handling for ' + transaction.status + ' status');
-  }
-}
-
+{{#if authn}}
 // MFA https://github.com/okta/okta-auth-js/blob/master/docs/authn.md
 function factorName(factor) {
   let name = `${factor.provider}: ${factor.factorType}`; // generic factor name
@@ -671,6 +17,7 @@ function factorName(factor) {
   }
   return name;
 }
+{{/if}}
 
 function resetMfa() {
   appState = {};
@@ -683,17 +30,21 @@ function hideMfa() {
   document.querySelector('#mfa .header').innerHTML = '';
   hideSubmitMfa();
   hideMfaEnroll();
+  {{#if authn}}
   hideMfaEnrollActivate();
   hideMfaRequired();
+  {{/if}}
   hideMfaChallenge();
   hideAuthenticatorVerificationData();
 }
 
 function showMfa() {
   document.getElementById('mfa').style.display = 'block';
+  {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     return showMfaAuthn();
   }
+  {{/if}}
 
   const transaction = appState.transaction;
   if (transaction.status === 'PENDING') {
@@ -718,6 +69,7 @@ function showMfa() {
   }
 }
 
+{{#if authn}}
 function showMfaAuthn() {
   const transaction = appState.transaction;
   if (transaction.status === 'MFA_ENROLL') {
@@ -734,6 +86,7 @@ function showMfaAuthn() {
   }
   throw new Error(`TODO: handle transaction status ${appState.transaction.status}`);
 }
+{{/if}}
 
 // cancel - terminates the auth flow.
 function showCancelMfa() {
@@ -745,10 +98,12 @@ function hideCancelMfa() {
 }
 function cancelMfa() {
   hideMfa();
+  {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     // https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#cancel
     return appState.transaction.cancel().finally(resetMfa);
   }
+  {{/if}}
 
   authClient.transactionManager.clear();
   resetMfa();
@@ -765,6 +120,7 @@ function hidePrevMfa() {
 }
 function prevMfa() {
   hideMfa();
+  {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     // End current factor enrollment and return to MFA_ENROLL.
     // https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#prev
@@ -772,6 +128,7 @@ function prevMfa() {
       .then(handleTransaction)
       .catch(showError);
   }
+  {{/if}}
 
   // TODO: is there a way to go back a step in IDX?
   authClient.transactionManager.clear();
@@ -787,9 +144,11 @@ function hideSubmitMfa() {
   document.getElementById('mfa-submit').style.display = 'none';
 }
 function submitMfa() {
+  {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     return submitMfaAuthn();
   }
+  {{/if}}
 
   const nextStep = appState.transaction.nextStep;
   if (nextStep.name === 'authenticator-enrollment-data') {
@@ -805,6 +164,7 @@ function submitMfa() {
 }
 window._submitMfa = bindClick(submitMfa);
 
+{{#if authn}}
 function submitMfaAuthn() {
   const transaction = appState.transaction;
   if (transaction.status === 'MFA_ENROLL') {
@@ -821,6 +181,7 @@ function submitMfaAuthn() {
   }
   throw new Error(`TODO: handle submit for transaction status: ${transaction.status}`);
 }
+{{/if}}
 
 function hideMfaEnroll() {
   document.getElementById('mfa-enroll').style.display = 'none';
@@ -837,10 +198,12 @@ function showMfaEnroll() {
 
 function listMfaFactors() {
   const transaction = appState.transaction;
+  {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     // Authn
     return transaction.factors.map(factor => factorName(factor));
   }
+  {{/if}}
 
   // IDX
   return transaction.nextStep.options.map(option => option.label);
@@ -871,9 +234,11 @@ function hideMfaEnrollFactors() {
 
 function enrollMfaFactor(index) {
   hideMfaEnrollFactors();
+  {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     return enrollMfaFactorAuthn(index);
   }
+  {{/if}}
 
   const authenticator = appState.transaction.nextStep.options[index].value;
   hideMfa();
@@ -883,6 +248,7 @@ function enrollMfaFactor(index) {
 }
 window._enrollMfaFactor = bindClick(enrollMfaFactor);
 
+{{#if authn}}
 // MFA_ENROLL https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_enroll
 function enrollMfaFactorAuthn(index) {
   const factor = appState.transaction.factors[index];
@@ -923,6 +289,7 @@ function submitEnroll() {
 
   throw new Error(`TODO: add support for enrolling in factorType: ${factor.factorType}`);
 }
+{{/if}}
 
 // Factor: Security Question
 function hideEnrollQuestion() {
@@ -944,6 +311,7 @@ function showEnrollQuestion() {
   });
 }
 
+{{#if authn}}
 function enrollQuestion() {
   hideMfa();
   const question = document.querySelector('#mfa-enroll-question select[name=questions]').value;
@@ -958,6 +326,7 @@ function enrollQuestion() {
     .then(handleTransaction)
     .catch(showError);
 }
+{{/if}}
 
 // Factor: Phone/SMS
 function hideEnrollPhone() {
@@ -970,6 +339,7 @@ function showEnrollPhone() {
   document.getElementById('mfa-enroll-phone').style.display = 'block';
 }
 
+{{#if authn}}
 function enrollPhone() {
   hideMfa();
   const phoneNumber = document.querySelector('#mfa-enroll-phone input[name=phone]').value;
@@ -983,7 +353,9 @@ function enrollPhone() {
     .then(handleTransaction)
     .catch(showError);
 }
+{{/if}}
 
+{{#if authn}}
 // MFA_ENROLL_ACTIVATE https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_enroll_activate
 function showMfaEnrollActivate() {
   document.getElementById('mfa-enroll-activate').style.display = 'block';
@@ -1069,7 +441,9 @@ function submitActivateOktaVerify() {
     .then(handleTransaction)
     .catch(showError);
 }
+{{/if}}
 
+{{#if authn}}
 // MFA_REQUIRED https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_required
 function showMfaRequired() {
   document.getElementById('mfa-required').style.display = 'block';
@@ -1156,6 +530,7 @@ function verifyQuestion() {
     .catch(showError);
 }
 window._verifyQuestion = bindClick(verifyQuestion);
+{{/if}}
 
 // MFA_CHALLENGE https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_challenge
 function showMfaChallenge() {
@@ -1163,9 +538,11 @@ function showMfaChallenge() {
   document.querySelector('#mfa .header').innerText = 'MFA challenge';
   showPrevMfa();
 
+  {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     return showMfaChallengeAuthn();
   }
+  {{/if}}
 
   const authenticator = appState.transaction.nextStep.authenticator;
   
@@ -1175,6 +552,7 @@ function showMfaChallenge() {
   }
 }
 
+{{#if authn}}
 function showMfaChallengeAuthn() {
   const factor = appState.transaction.factor;
 
@@ -1190,6 +568,7 @@ function showMfaChallengeAuthn() {
 
   throw new Error(`TODO: handle MFA_CHALLENGE for factorType ${factor.factorType}`);
 }
+{{/if}}
 
 function hideMfaChallenge() {
   document.getElementById('mfa-challenge').style.display = 'none';
@@ -1197,6 +576,7 @@ function hideMfaChallenge() {
   hideChallengePhone();
 }
 
+{{#if authn}}
 function submitChallenge() {
   const factor = appState.transaction.factor;
 
@@ -1212,6 +592,7 @@ function submitChallenge() {
 
   throw new Error(`TODO: handle submit MFA_CHALLENGE for factorType ${factor.factorType}`);
 }
+{{/if}}
 
 function showChallengeOktaVerify() {
   document.getElementById('mfa-challenge-okta-verify').style.display = 'block';
@@ -1223,6 +604,7 @@ function hideChallengeOktaVerify() {
   document.getElementById('mfa-challenge-okta-verify').style.display = 'none';
 }
 
+{{#if authn}}
 function submitChallengeOktaVerify() {
   hideMfa();
   const passCode = document.querySelector('#mfa-challenge-okta-verify input[name=passcode]').value;
@@ -1230,6 +612,7 @@ function submitChallengeOktaVerify() {
     .then(handleTransaction)
     .catch(showError);
 }
+{{/if}}
 
 function showChallengePhone() {
   document.getElementById('mfa-challenge-phone').style.display = 'block';
@@ -1245,12 +628,14 @@ function submitChallengePhone() {
   hideMfa();
   const passCode = document.querySelector('#mfa-challenge-phone input[name=passcode]').value;
 
+  {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     // Authn
     return appState.transaction.verify({ passCode })
       .then(handleTransaction)
       .catch(showError);
   }
+  {{/if}}
 
   // IDX
   authClient.idx.authenticate({ verificationCode: passCode })

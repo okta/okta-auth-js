@@ -19,6 +19,7 @@ const clean = require('gulp-clean');
 const rename = require('gulp-rename');
 const shell = require('shelljs');
 const merge = require('merge-stream');
+const path = require('path');
 
 const config = require('./config');
 
@@ -28,7 +29,8 @@ const PARTIALS_DIR = `${SRC_DIR}/partials`;
 const OKTA_ENV_SCRIPT_PATH = '../env/index.js';
 
 function cleanTask() {
-  return src(`${BUILD_DIR}`, { read: false, allowEmpty: true })
+  const dirs = config.getSampleNames().map(name => path.join(BUILD_DIR, name));
+  return src(dirs, { read: false, allowEmpty: true })
     .pipe(clean({ force: true }));
 }
 
