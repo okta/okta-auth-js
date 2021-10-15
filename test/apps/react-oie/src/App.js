@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import { OktaAuth, IdxStatus } from '@okta/okta-auth-js';
 import oidcConfig from './config';
 import './App.css';
@@ -25,9 +26,33 @@ const formMetaMapper = (nextStep) => {
 };
 
 export default function App() {
+  const history = useHistory();
+  const flowMethodRef = useRef('');
   const [transaction, setTransaction] = useState(null);
-  const [flowMethod, setFlowMethod] = useState('');
   const [inputValues, setInputValues] = useState({});
+  const [authState, setAuthState] = useState(null);
+
+  useEffect(() => {
+    const parseFromUrl = async () => {
+      try {
+        await oktaAuth.idx.handleInteractionCodeRedirect(window.location.href);
+        history.push('/');
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const updateAuthState = authState => {
+      setAuthState(authState)
+    };
+
+    oktaAuth.authStateManager.subscribe(updateAuthState);
+    oktaAuth.start();
+
+    if(oktaAuth.isLoginRedirect()) {
+      parseFromUrl();
+    }
+  }, []);
 
   const handleChange = ({ target: { name, value } }) => setInputValues({
     ...inputValues,
@@ -37,15 +62,19 @@ export default function App() {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    const newTransaction = await oktaAuth.idx[flowMethod](inputValues);
+    const newTransaction = await oktaAuth.idx[flowMethodRef.current](inputValues);
     console.log('Transaction:', newTransaction);
-    // reset inputs and set new transaction
+
     setInputValues({});
-    setTransaction(newTransaction);
+    if (newTransaction.status === IdxStatus.SUCCESS) {
+      oktaAuth.tokenManager.setTokens(newTransaction.tokens);
+    } else {
+      setTransaction(newTransaction);
+    }
   };
 
   const handleSkip = async () => {
-    const newTransaction = await oktaAuth.idx[flowMethod]({ skip: true });
+    const newTransaction = await oktaAuth.idx[flowMethodRef.current]({ skip: true });
     setTransaction(newTransaction);
   };
 
@@ -59,10 +88,28 @@ export default function App() {
   };
 
   const startIdxFlow = flowMethod => async () => {
-    const newTransaction = await oktaAuth.idx[flowMethod]();
-    setFlowMethod(flowMethod);
+    const newTransaction = flowMethod === 'idp' 
+      ? await oktaAuth.idx.startTransaction() 
+      : await oktaAuth.idx[flowMethod]();
+    flowMethodRef.current = flowMethod;
     setTransaction(newTransaction);
   };
+
+  if (!authState) {
+    return null;
+  }
+
+  if (authState?.idToken) {
+    return (
+      <>
+        <button onClick={handleLogoutOut}>Logout</button>
+        <div>
+          <h3>ID Token</h3>
+          <pre>{JSON.stringify(authState.idToken, undefined, 2)}</pre>
+        </div>
+      </>
+    );
+  }
 
   if (!transaction) {
     // initla page
@@ -71,22 +118,21 @@ export default function App() {
         <button onClick={startIdxFlow('authenticate')}>Login</button>
         <button onClick={startIdxFlow('recoverPassword')}>Recover Password</button>
         <button onClick={startIdxFlow('register')}>Registration</button>
+        <button onClick={startIdxFlow('idp')}>IDP</button>
       </div>
     );
   }
 
-  const { status, tokens, nextStep, error, messages } = transaction;
-  
-  if (status === IdxStatus.SUCCESS) {
+  const { status, nextStep, error, messages, availableSteps } = transaction;
+
+  const idpMeta = availableSteps?.find(step => step.name === 'redirect-idp');
+  if (idpMeta) {
     return (
-      <>
-        <button onClick={handleLogoutOut}>Logout</button>
-        <div>
-          <h3>ID Token</h3>
-          <pre>{JSON.stringify(tokens.idToken, undefined, 2)}</pre>
-        </div>
-      </>
-    );
+      <div>
+        <div>Type: {idpMeta.type}</div>
+        <a href={idpMeta.href}>Login With Google</a>
+      </div>
+    )
   }
 
   if (status === IdxStatus.FAILURE) {
