@@ -600,7 +600,7 @@ function submitSigninForm() {
 
   if (!config.useInteractionCodeFlow) {
     // Authn
-    authClient.signIn({ username, password })
+    return authClient.signIn({ username, password })
       .then(handleTransaction)
       .catch(showError);
   }
@@ -713,27 +713,34 @@ function showMfa() {
       case 'challenge-authenticator':
         showMfaChallenge();
         break;
+      case 'select-authenticator-authenticate':
+        showMfaRequired();
+        break;
       default:
-        throw new Error(`TODO: handle nextStep: ${nextStep.name}`);
+        throw new Error(`TODO: showMfa: handle nextStep: ${nextStep.name}`);
     }
   }
 }
 
 function showMfaAuthn() {
   const transaction = appState.transaction;
+  // MFA_ENROLL https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_enroll
   if (transaction.status === 'MFA_ENROLL') {
     return showMfaEnrollFactors();
   }
+  // MFA_ENROLL_ACTIVATE https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_enroll_activate
   if (transaction.status === 'MFA_ENROLL_ACTIVATE') {
     return showMfaEnrollActivate();
   }
+    // MFA_REQUIRED https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_required
   if (transaction.status === 'MFA_REQUIRED') {
     return showMfaRequired();
   }
+  // MFA_CHALLENGE https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_challenge
   if (transaction.status === 'MFA_CHALLENGE') {
     return showMfaChallenge();
   }
-  throw new Error(`TODO: handle transaction status ${appState.transaction.status}`);
+  throw new Error(`TODO: showMfaAuthn: handle transaction status ${appState.transaction.status}`);
 }
 
 // cancel - terminates the auth flow.
@@ -802,7 +809,7 @@ function submitMfa() {
   if (nextStep.name === 'challenge-authenticator' || nextStep.name === 'enroll-authenticator') {
     return submitChallengeAuthenticator();
   }
-  throw new Error(`TODO: handle submit for nextStep: ${nextStep.name}`);
+  throw new Error(`TODO: submitMfa: handle submit for nextStep: ${nextStep.name}`);
 }
 window._submitMfa = bindClick(submitMfa);
 
@@ -815,25 +822,12 @@ function submitMfaAuthn() {
     return submitEnrollActivate();
   }
   if (transaction.status === 'MFA_REQUIRED') {
-    return submitVerify();
+    return submitMfaRequired();
   }
   if (transaction.status === 'MFA_CHALLENGE') {
     return submitChallenge();
   }
-  throw new Error(`TODO: handle submit for transaction status: ${transaction.status}`);
-}
-
-function hideMfaEnroll() {
-  document.getElementById('mfa-enroll').style.display = 'none';
-  hideMfaEnrollFactors();
-  hideEnrollQuestion();
-  hideEnrollPhone();
-}
-
-function showMfaEnroll() {
-  document.getElementById('mfa-enroll').style.display = 'block';
-  showCancelMfa();
-  document.querySelector('#mfa .header').innerText = 'Enroll in an MFA factor';
+  throw new Error(`TODO: submitMfaAuthn: handle submit for transaction status: ${transaction.status}`);
 }
 
 function listMfaFactors() {
@@ -847,6 +841,20 @@ function listMfaFactors() {
   return transaction.nextStep.options.map(option => option.label);
 }
 
+// Show a list of MFA factors. The user can pick a factor to enroll in.
+function hideMfaEnroll() {
+  document.getElementById('mfa-enroll').style.display = 'none';
+  hideMfaEnrollFactors();
+  hideEnrollQuestion();
+  hideEnrollPhone();
+}
+
+function showMfaEnroll() {
+  document.getElementById('mfa-enroll').style.display = 'block';
+  showCancelMfa();
+  document.querySelector('#mfa .header').innerText = 'Enroll in an MFA factor';
+}
+
 function showMfaEnrollFactors() {
   showMfaEnroll();
   const containerElement = document.getElementById('mfa-enroll-factors');
@@ -858,7 +866,7 @@ function showMfaEnrollFactors() {
     el.setAttribute('class', `factor panel`);
     el.innerHTML = `
       <span>${name}</span>
-      <a href="#" onclick="_enrollMfaFactor(event, ${index})">Enroll</a>
+      <a href="#" onclick="_selectMfaFactorForEnrollment(event, ${index})">Enroll</a>
     `;
     containerElement.appendChild(el);
   });
@@ -870,31 +878,28 @@ function hideMfaEnrollFactors() {
   containerElement.innerHTML = '';
 }
 
-function enrollMfaFactor(index) {
-  hideMfaEnrollFactors();
+function selectMfaFactorForEnrollment(index) {
+  hideMfaEnroll();
+  // Authn
   if (!config.useInteractionCodeFlow) {
-    return enrollMfaFactorAuthn(index);
+    return selectMfaFactorForEnrollmentAuthn(index);
   }
 
+  // IDX
   const authenticator = appState.transaction.nextStep.options[index].value;
-  hideMfa();
   authClient.idx.authenticate({ authenticator })
     .then(handleTransaction)
     .catch(showError);
 }
-window._enrollMfaFactor = bindClick(enrollMfaFactor);
+window._selectMfaFactorForEnrollment = bindClick(selectMfaFactorForEnrollment);
 
-// MFA_ENROLL https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_enroll
-function enrollMfaFactorAuthn(index) {
+function selectMfaFactorForEnrollmentAuthn(index) {
   const factor = appState.transaction.factors[index];
   updateAppState({ factor });
 
   // Security Question
   if (factor.provider === 'OKTA' && factor.factorType === 'question') {
-    return factor.questions().then(function(questions) {
-      updateAppState({ questions });
-      showEnrollQuestion();
-    });
+    return selectQuestionForEnrollmentAuthn();
   }
 
   // Phone/SMS
@@ -903,7 +908,6 @@ function enrollMfaFactorAuthn(index) {
   }
 
   // Default logic - this may not work for all factor types
-  hideMfa();
   factor.enroll()
     .then(handleTransaction)
     .catch(showError);
@@ -925,67 +929,26 @@ function submitEnroll() {
   throw new Error(`TODO: add support for enrolling in factorType: ${factor.factorType}`);
 }
 
-// Factor: Security Question
-function hideEnrollQuestion() {
-  document.getElementById('mfa-enroll-question').style.display = 'none';
-  document.querySelector('#mfa-enroll-question select[name=questions]').innerHTML = '';
+// authenticator-enrollment-data (IDX)
+function showAuthenticatorEnrollmentData() {
+  const authenticator = appState.transaction.nextStep.authenticator;
+  if (authenticator.type === 'phone') {
+    showMfaEnroll();
+    showEnrollPhone(); // enter phone number
+    showAuthenticatorVerificationData(); // select methodType
+    return;
+  }
+  throw new Error(`TODO: handle authenticator-enrollmentt-data for authenticator type ${authenticator.type}`);
 }
 
-function showEnrollQuestion() {
-  showSubmitMfa();
-  document.querySelector('#mfa .header').innerText = 'Security Question';
-  document.getElementById('mfa-enroll-question').style.display = 'block';
-  const questions = appState.questions;
-  const selectElem = document.querySelector('#mfa-enroll-question select[name=questions]');
-  questions.forEach(function(question) {
-    const el = document.createElement('option');
-    el.setAttribute('value', question.question);
-    el.innerText = question.questionText;
-    selectElem.appendChild(el);
-  });
+function submitAuthenticatorEnrollmentData() {
+  const authenticator = appState.transaction.nextStep.authenticator;
+  if (authenticator.type === 'phone') {
+    return submitAuthenticatorEnrollmentDataPhone();
+  }
+  throw new Error(`TODO: handle submit authenticator-enrollment-data for authenticator type ${authenticator.type}`);
 }
-
-function enrollQuestion() {
-  hideMfa();
-  const question = document.querySelector('#mfa-enroll-question select[name=questions]').value;
-  const answer = document.querySelector('#mfa-enroll-question input[name=answer]').value;
-  const factor = appState.factor;
-  factor.enroll({
-    profile: {
-      question,
-      answer
-    }
-  })
-    .then(handleTransaction)
-    .catch(showError);
-}
-
-// Factor: Phone/SMS
-function hideEnrollPhone() {
-  document.getElementById('mfa-enroll-phone').style.display = 'none';
-}
-
-function showEnrollPhone() {
-  showSubmitMfa();
-  document.querySelector('#mfa .header').innerText = 'Phone/SMS';
-  document.getElementById('mfa-enroll-phone').style.display = 'block';
-}
-
-function enrollPhone() {
-  hideMfa();
-  const phoneNumber = document.querySelector('#mfa-enroll-phone input[name=phone]').value;
-  const factor = appState.factor;
-  factor.enroll({
-    profile: {
-      phoneNumber,
-      updatePhone: true
-    }
-  })
-    .then(handleTransaction)
-    .catch(showError);
-}
-
-// MFA_ENROLL_ACTIVATE https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_enroll_activate
+// After an MFA factor has been selected for enrollment, there may be additional steps to activate the factor
 function showMfaEnrollActivate() {
   document.getElementById('mfa-enroll-activate').style.display = 'block';
   document.querySelector('#mfa .header').innerText = 'Activate an MFA factor';
@@ -1027,23 +990,7 @@ function submitEnrollActivate() {
   throw new Error(`TODO: handle submit enroll activate for factorType ${factor.factorType}`);
 }
 
-function hideActivatePhone() {
-  document.getElementById('mfa-enroll-activate-phone').style.display = 'none';
-}
 
-function showActivatePhone() {
-  showSubmitMfa();
-  document.querySelector('#mfa .header').innerText = 'Phone/SMS';
-  document.getElementById('mfa-enroll-activate-phone').style.display = 'block';
-}
-
-function submitActivatePhone() {
-  hideMfa();
-  const passCode = document.querySelector('#mfa-enroll-activate-phone input[name=passcode]').value;
-  appState.transaction.activate({ passCode })
-    .then(handleTransaction)
-    .catch(showError);
-}
 
 function hideActivateOktaVerify() {
   document.getElementById('mfa-enroll-activate-okta-verify').style.display = 'none';
@@ -1067,223 +1014,6 @@ function submitActivateOktaVerify() {
   hideMfa();
   const passCode = document.querySelector('#mfa-enroll-activate-okta-verify input[name=passcode]').value;
   appState.transaction.activate({ passCode })
-    .then(handleTransaction)
-    .catch(showError);
-}
-
-// MFA_REQUIRED https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_required
-function showMfaRequired() {
-  document.getElementById('mfa-required').style.display = 'block';
-  document.querySelector('#mfa .header').innerText = 'MFA is required';
-  showCancelMfa();
-  showMfaRequiredFactors();
-}
-
-function hideMfaRequired() {
-  document.getElementById('mfa-required').style.display = 'none';
-  hideMfaRequiredFactors();
-  hideVerifyQuestion();
-}
-
-function showMfaRequiredFactors() {
-  const containerElement = document.getElementById('mfa-required-factors');
-  containerElement.style.display = 'block';
-  const factors = appState.transaction.factors;
-  factors.forEach(function(factor, index) {
-    const el = document.createElement('div');
-    el.setAttribute('id', `verify-factor-${index}`);
-    el.setAttribute('class', `factor factor-${factor.factorType}`);
-    const name = factorName(factor);
-    el.innerHTML = `
-      <span>${name}</span>
-      <a href="#" onclick="_verifyMfaFactor(event, ${index})">Verify</a>
-    `;
-    containerElement.appendChild(el);
-  });
-}
-
-function hideMfaRequiredFactors() {
-  const containerElement = document.getElementById('mfa-required-factors');
-  containerElement.style.display = 'none';
-  containerElement.innerHTML = '';
-}
-
-function verifyMfaFactor(index) {
-  hideMfaRequiredFactors();
-  const factor = appState.transaction.factors[index];
-  updateAppState({ factor });
-  // Security Question
-  if (factor.provider === 'OKTA' && factor.factorType === 'question') {
-    return showVerifyQuestion();
-  }
-
-  // Default logic - this may not work for all factors
-  hideMfa();
-  factor.verify()
-    .then(handleTransaction)
-    .catch(showError);
-}
-window._verifyMfaFactor = bindClick(verifyMfaFactor);
-
-function submitVerify() {
-  const factor = appState.factor;
-
-  // Security Question
-  if (factor.provider === 'OKTA' && factor.factorType === 'question') {
-    return verifyQuestion();
-  }
-
-  throw new Error(`TODO: add support for verifying factorType: ${factor.factorType}`);
-}
-
-function showVerifyQuestion() {
-  document.getElementById('mfa-verify-question').style.display = 'block';
-  document.querySelector('#mfa .header').innerText = 'Security Question';
-  const questionText = appState.factor.profile.questionText;
-  document.querySelector('#mfa-verify-question .question').innerText = questionText;
-}
-
-function hideVerifyQuestion() {
-  document.getElementById('mfa-verify-question').style.display = 'none';
-}
-
-function verifyQuestion() {
-  hideMfa();
-  const answer = document.querySelector('#mfa-verify-question input[name=answer]').value;
-  appState.factor.verify({
-    answer
-  })
-    .then(handleTransaction)
-    .catch(showError);
-}
-window._verifyQuestion = bindClick(verifyQuestion);
-
-// MFA_CHALLENGE https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#mfa_challenge
-function showMfaChallenge() {
-  document.getElementById('mfa-challenge').style.display = 'block';
-  document.querySelector('#mfa .header').innerText = 'MFA challenge';
-  showPrevMfa();
-
-  if (!config.useInteractionCodeFlow) {
-    return showMfaChallengeAuthn();
-  }
-
-  const authenticator = appState.transaction.nextStep.authenticator;
-  
-  // Phone/SMS
-  if (authenticator.type === 'phone') {
-    return showChallengePhone();
-  }
-}
-
-function showMfaChallengeAuthn() {
-  const factor = appState.transaction.factor;
-
-  // Okta Verify
-  if (factor.provider === 'OKTA' && factor.factorType === 'token:software:totp') {
-    return showChallengeOktaVerify();
-  }
-
-  // Phone/SMS
-  if (factor.provider === 'OKTA' && (factor.factorType === 'sms' || factor.factorType === 'call')) {
-    return showChallengePhone();
-  }
-
-  throw new Error(`TODO: handle MFA_CHALLENGE for factorType ${factor.factorType}`);
-}
-
-function hideMfaChallenge() {
-  document.getElementById('mfa-challenge').style.display = 'none';
-  hideChallengeOktaVerify();
-  hideChallengePhone();
-}
-
-function submitChallenge() {
-  const factor = appState.transaction.factor;
-
-  // Okta Verify
-  if (factor.provider === 'OKTA' && factor.factorType === 'token:software:totp') {
-    return submitChallengeOktaVerify();
-  }
-
-  // Phone/SMS
-  if (factor.provider === 'OKTA' && (factor.factorType === 'sms' || factor.factorType === 'call')) {
-    return submitChallengePhone();
-  }
-
-  throw new Error(`TODO: handle submit MFA_CHALLENGE for factorType ${factor.factorType}`);
-}
-
-function showChallengeOktaVerify() {
-  document.getElementById('mfa-challenge-okta-verify').style.display = 'block';
-  document.querySelector('#mfa .header').innerText = 'Okta Verify';
-  showSubmitMfa();
-}
-
-function hideChallengeOktaVerify() {
-  document.getElementById('mfa-challenge-okta-verify').style.display = 'none';
-}
-
-function submitChallengeOktaVerify() {
-  hideMfa();
-  const passCode = document.querySelector('#mfa-challenge-okta-verify input[name=passcode]').value;
-  appState.transaction.verify({ passCode })
-    .then(handleTransaction)
-    .catch(showError);
-}
-
-function showChallengePhone() {
-  document.getElementById('mfa-challenge-phone').style.display = 'block';
-  document.querySelector('#mfa .header').innerText = 'Phone/SMS';
-  showSubmitMfa();
-}
-
-function hideChallengePhone() {
-  document.getElementById('mfa-challenge-phone').style.display = 'none';
-}
-
-function submitChallengePhone() {
-  hideMfa();
-  const passCode = document.querySelector('#mfa-challenge-phone input[name=passcode]').value;
-
-  if (!config.useInteractionCodeFlow) {
-    // Authn
-    return appState.transaction.verify({ passCode })
-      .then(handleTransaction)
-      .catch(showError);
-  }
-
-  // IDX
-  authClient.idx.authenticate({ verificationCode: passCode })
-    .then(handleTransaction)
-    .catch(showError);
-}
-
-// authenticator-enrollment-data (IDX)
-function showAuthenticatorEnrollmentData() {
-  const authenticator = appState.transaction.nextStep.authenticator;
-  if (authenticator.type === 'phone') {
-    showMfaEnroll();
-    showEnrollPhone(); // enter phone number
-    showAuthenticatorVerificationData(); // choose methodType
-    return;
-  }
-  throw new Error(`TODO: handle authenticator-enrollmentt-data for authenticator type ${authenticator.type}`);
-}
-
-function submitAuthenticatorEnrollmentData() {
-  const authenticator = appState.transaction.nextStep.authenticator;
-  if (authenticator.type === 'phone') {
-    return submitAuthenticatorEnrollmentDataPhone();
-  }
-  throw new Error(`TODO: handle submit authenticator-enrollment-data for authenticator type ${authenticator.type}`);
-}
-
-function submitAuthenticatorEnrollmentDataPhone() {
-  hideMfa();
-  const methodType = document.querySelector('#authenticator-verification-data-phone select[name=methodType]').value;
-  const phoneNumber = document.querySelector('#mfa-enroll-phone input[name=phone]').value;
-  authClient.idx.authenticate({ methodType, phoneNumber })
     .then(handleTransaction)
     .catch(showError);
 }
@@ -1339,12 +1069,337 @@ function submitAuthenticatorVerificationDataPhone() {
     .then(handleTransaction)
     .catch(showError);
 }
+// Show a list of enrolled MFA factors. The user can select which factor they want to use for verification.
+function showMfaRequired() {
+  document.getElementById('mfa-required').style.display = 'block';
+  document.querySelector('#mfa .header').innerText = 'MFA is required';
+  showCancelMfa();
+  showMfaRequiredFactors();
+}
 
-// challenge-authenticator
+function hideMfaRequired() {
+  document.getElementById('mfa-required').style.display = 'none';
+  hideMfaRequiredFactors();
+}
+
+function showMfaRequiredFactors() {
+  const containerElement = document.getElementById('mfa-required-factors');
+  containerElement.style.display = 'block';
+  const names = listMfaFactors();
+  names.forEach(function(name, index) {
+    const el = document.createElement('div');
+    el.setAttribute('id', `verify-factor-${index}`);
+    el.setAttribute('class', `factor`);
+    el.innerHTML = `
+      <span>${name}</span>
+      <a href="#" onclick="_selectMfaFactorForVerification(event, ${index})">Verify</a>
+    `;
+    containerElement.appendChild(el);
+  });
+}
+
+function hideMfaRequiredFactors() {
+  const containerElement = document.getElementById('mfa-required-factors');
+  containerElement.style.display = 'none';
+  containerElement.innerHTML = '';
+}
+
+function selectMfaFactorForVerification(index) {
+  hideMfaRequired();
+  // Authn
+  if (!config.useInteractionCodeFlow) {
+    return selectMfaFactorForVerificationAuthn(index);
+  }
+
+  // IDX
+  const authenticator = appState.transaction.nextStep.options[index].value;
+  authClient.idx.authenticate({ authenticator })
+    .then(handleTransaction)
+    .catch(showError);
+}
+window._selectMfaFactorForVerification = bindClick(selectMfaFactorForVerification);
+
+function selectMfaFactorForVerificationAuthn(index) {
+  const factor = appState.transaction.factors[index];
+  updateAppState({ factor });
+  showMfaChallenge(); // transition to MFA_CHALLENGE state
+}
+
+function submitMfaRequired() {
+  // Presumably, user has selected an MFA factor and the appropriate challenge view is showing.
+  return submitChallenge();
+}
+// Prompts the user to enter a value to satisfy an MFA factor challenge
+function showMfaChallenge() {
+  document.getElementById('mfa-challenge').style.display = 'block';
+  document.querySelector('#mfa .header').innerText = 'MFA challenge';
+  showPrevMfa();
+
+  // Authn
+  if (!config.useInteractionCodeFlow) {
+    return showMfaChallengeAuthn();
+  }
+
+  const authenticator = appState.transaction.nextStep.authenticator;
+  
+  // Phone/SMS
+  if (authenticator.type === 'phone') {
+    return showChallengePhone();
+  }
+
+  // Security Question
+  if (authenticator.type === 'security_question') {
+    return showChallengeQuestion();
+  }
+}
+
+function showMfaChallengeAuthn() {
+  const factor = appState.factor;
+
+  // Okta Verify
+  if (factor.provider === 'OKTA' && factor.factorType === 'token:software:totp') {
+    return showChallengeOktaVerify();
+  }
+
+  // Phone/SMS
+  if (factor.provider === 'OKTA' && (factor.factorType === 'sms' || factor.factorType === 'call')) {
+    return showChallengePhone();
+  }
+
+  // Security Question
+  if (factor.provider === 'OKTA' && factor.factorType === 'question') {
+    return showChallengeQuestion();
+  }
+
+  throw new Error(`TODO: handle MFA_CHALLENGE for factorType ${factor.factorType}`);
+}
+
+function hideMfaChallenge() {
+  document.getElementById('mfa-challenge').style.display = 'none';
+  hideChallengeOktaVerify();
+  hideChallengePhone();
+  hideChallengeQuestion();
+}
+
+function submitChallenge() {
+  const factor = appState.factor;
+
+  // Okta Verify
+  if (factor.provider === 'OKTA' && factor.factorType === 'token:software:totp') {
+    return submitChallengeOktaVerify();
+  }
+
+  // Phone/SMS
+  if (factor.provider === 'OKTA' && (factor.factorType === 'sms' || factor.factorType === 'call')) {
+    return submitChallengePhone();
+  }
+
+  // Security Question
+  if (factor.provider === 'OKTA' && factor.factorType === 'question') {
+    return submitChallengeQuestion();
+  }
+
+  throw new Error(`TODO: handle submit MFA_CHALLENGE for factorType ${factor.factorType}`);
+}
+
+
+// challenge-authenticator (IDX)
 function submitChallengeAuthenticator() {
   const authenticator = appState.transaction.nextStep.authenticator;
+  
+  // Phone/SMS
   if (authenticator.type === 'phone') {
     return submitChallengePhone();
   }
+
+  // Security Question
+  if (authenticator.type === 'security_question') {
+    return submitChallengeQuestion();
+  }
+
   throw new Error(`TODO: handle submit challenge-authenticator for authenticator type ${authenticator.type}`);
+}
+// TODO
+function showChallengeOktaVerify() {
+  document.getElementById('mfa-challenge-okta-verify').style.display = 'block';
+  document.querySelector('#mfa .header').innerText = 'Okta Verify';
+  showSubmitMfa();
+}
+
+function hideChallengeOktaVerify() {
+  document.getElementById('mfa-challenge-okta-verify').style.display = 'none';
+}
+
+function submitChallengeOktaVerify() {
+  hideMfa();
+  const passCode = document.querySelector('#mfa-challenge-okta-verify input[name=passcode]').value;
+  appState.transaction.verify({ passCode })
+    .then(handleTransaction)
+    .catch(showError);
+}
+// Enroll factor: Phone/SMS
+function hideEnrollPhone() {
+  document.getElementById('mfa-enroll-phone').style.display = 'none';
+}
+
+function showEnrollPhone() {
+  showMfaEnroll();
+  showSubmitMfa();
+  document.querySelector('#mfa .header').innerText = 'Phone/SMS';
+  document.getElementById('mfa-enroll-phone').style.display = 'block';
+}
+
+function enrollPhone() {
+  hideMfa();
+  const phoneNumber = document.querySelector('#mfa-enroll-phone input[name=phone]').value;
+  const factor = appState.factor;
+  factor.enroll({
+    profile: {
+      phoneNumber,
+      updatePhone: true
+    }
+  })
+    .then(handleTransaction)
+    .catch(showError);
+}
+
+
+// Phone: MFA_ENROLL_ACTIVATE
+function hideActivatePhone() {
+  document.getElementById('mfa-enroll-activate-phone').style.display = 'none';
+}
+
+function showActivatePhone() {
+  showSubmitMfa();
+  document.querySelector('#mfa .header').innerText = 'Phone/SMS';
+  document.getElementById('mfa-enroll-activate-phone').style.display = 'block';
+}
+
+function submitActivatePhone() {
+  hideMfa();
+  const passCode = document.querySelector('#mfa-enroll-activate-phone input[name=passcode]').value;
+  appState.transaction.activate({ passCode })
+    .then(handleTransaction)
+    .catch(showError);
+}
+
+function showChallengePhone() {
+  document.getElementById('mfa-challenge-phone').style.display = 'block';
+  document.querySelector('#mfa .header').innerText = 'Phone/SMS';
+  showSubmitMfa();
+}
+
+function hideChallengePhone() {
+  document.getElementById('mfa-challenge-phone').style.display = 'none';
+}
+
+function submitChallengePhone() {
+  hideMfa();
+  const passCode = document.querySelector('#mfa-challenge-phone input[name=passcode]').value;
+
+  if (!config.useInteractionCodeFlow) {
+    // Authn
+    return appState.transaction.verify({ passCode })
+      .then(handleTransaction)
+      .catch(showError);
+  }
+
+  // IDX
+  authClient.idx.authenticate({ verificationCode: passCode })
+    .then(handleTransaction)
+    .catch(showError);
+}
+
+// IDX
+function submitAuthenticatorEnrollmentDataPhone() {
+  hideMfa();
+  const methodType = document.querySelector('#authenticator-verification-data-phone select[name=methodType]').value;
+  const phoneNumber = document.querySelector('#mfa-enroll-phone input[name=phone]').value;
+  authClient.idx.authenticate({ methodType, phoneNumber })
+    .then(handleTransaction)
+    .catch(showError);
+}// Factor: Security Question
+
+function selectQuestionForEnrollmentAuthn() {
+  const factor = appState.factor;
+  return factor.questions().then(function(questions) {
+    updateAppState({ questions });
+    showEnrollQuestion();
+  });
+}
+
+function hideEnrollQuestion() {
+  document.getElementById('mfa-enroll-question').style.display = 'none';
+  document.querySelector('#mfa-enroll-question select[name=questions]').innerHTML = '';
+}
+
+function showEnrollQuestion() {
+  showMfaEnroll();
+  showSubmitMfa();
+  document.querySelector('#mfa .header').innerText = 'Security Question';
+  document.getElementById('mfa-enroll-question').style.display = 'block';
+  const questions = appState.questions;
+  const selectElem = document.querySelector('#mfa-enroll-question select[name=questions]');
+  questions.forEach(function(question) {
+    const el = document.createElement('option');
+    el.setAttribute('value', question.question);
+    el.innerText = question.questionText;
+    selectElem.appendChild(el);
+  });
+}
+
+function enrollQuestion() {
+  const question = document.querySelector('#mfa-enroll-question select[name=questions]').value;
+  const answer = document.querySelector('#mfa-enroll-question input[name=answer]').value;
+  const factor = appState.factor;
+  hideMfa();
+  factor.enroll({
+    profile: {
+      question,
+      answer
+    }
+  })
+    .then(handleTransaction)
+    .catch(showError);
+}
+
+function getVerifyQuestionText() {
+    // Authn
+    if (!config.useInteractionCodeFlow) {
+      return appState.factor.profile.questionText;
+    }
+  // IDX
+  return appState.transaction.nextStep.authenticator.profile.question;
+}
+
+function showChallengeQuestion() {
+  showSubmitMfa();
+  document.getElementById('mfa-challenge-question').style.display = 'block';
+  document.querySelector('#mfa .header').innerText = 'Security Question';
+  const questionText = getVerifyQuestionText();
+  document.querySelector('#mfa-challenge-question .question').innerText = questionText;
+}
+
+function hideChallengeQuestion() {
+  document.getElementById('mfa-challenge-question').style.display = 'none';
+}
+
+function submitChallengeQuestion() {
+  hideMfa();
+  const answer = document.querySelector('#mfa-challenge-question input[name=answer]').value;
+
+  // Authn
+  if (!config.useInteractionCodeFlow) {
+    return appState.factor.verify({
+      answer
+    })
+      .then(handleTransaction)
+      .catch(showError);
+  }
+
+  // IDX
+  const questionKey = appState.transaction.nextStep.authenticator.profile.questionKey;
+  authClient.idx.authenticate({ credentials: { questionKey, answer } })
+    .then(handleTransaction)
+    .catch(showError);
 }

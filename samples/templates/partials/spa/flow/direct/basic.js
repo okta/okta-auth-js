@@ -38,7 +38,7 @@ function submitSigninForm() {
   {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     // Authn
-    authClient.signIn({ username, password })
+    return authClient.signIn({ username, password })
       .then(handleTransaction)
       .catch(showError);
   }
