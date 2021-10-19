@@ -6,6 +6,7 @@ var config = {
   storage: '{{ storage }}',
   requireUserSession: '{{ requireUserSession }}',
   flow: '{{ flow }}',
+  startService: false,
   {{#if signinWidget}}
   idps: '',
   {{/if}}
@@ -35,6 +36,7 @@ function loadConfig() {
   var appUri;
   var storage;
   var flow;
+  var startService;
   var requireUserSession;
   var scopes;
   var useInteractionCodeFlow;
@@ -55,6 +57,7 @@ function loadConfig() {
     clientId = state.clientId;
     storage = state.storage;
     flow = state.flow;
+    startService = state.startService;
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
     useInteractionCodeFlow = state.useInteractionCodeFlow;
@@ -67,6 +70,7 @@ function loadConfig() {
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
     flow = url.searchParams.get('flow') || config.flow;
+    startService = url.searchParams.get('startService') === 'true' || config.startService;
     requireUserSession = url.searchParams.get('requireUserSession') ? 
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
     scopes = url.searchParams.get('scopes') ? url.searchParams.get('scopes').split(' ') : config.scopes;
@@ -82,6 +86,7 @@ function loadConfig() {
     storage,
     requireUserSession,
     flow,
+    startService,
     scopes: scopes.join(' '),
     useInteractionCodeFlow,
     {{#if signinWidget}}
@@ -95,6 +100,7 @@ function loadConfig() {
     storage,
     requireUserSession,
     flow,
+    startService,
     scopes,
     useInteractionCodeFlow,
     {{#if signinWidget}}
@@ -136,6 +142,13 @@ function showForm() {
   try {
     document.querySelector(`#flow [value="${config.flow || ''}"]`).selected = true;
   } catch (e) { showError(e); }
+
+  if (config.startService) {
+    document.getElementById('startService-on').checked = true;
+  } else {
+    document.getElementById('startService-off').checked = true;
+  }
+
   if (config.requireUserSession) {
     document.getElementById('requireUserSession-on').checked = true;
   } else {

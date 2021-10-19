@@ -22,6 +22,11 @@ function showMfaChallenge() {
   if (authenticator.type === 'security_question') {
     return showChallengeQuestion();
   }
+
+  // Email
+  if (authenticator.type === 'email') {
+    return showChallengeEmail();
+  }
 }
 
 {{#if authn}}
@@ -52,6 +57,7 @@ function hideMfaChallenge() {
   hideChallengeOktaVerify();
   hideChallengePhone();
   hideChallengeQuestion();
+  hideChallengeEmail();
 }
 
 {{#if authn}}
@@ -90,6 +96,11 @@ function submitChallengeAuthenticator() {
   // Security Question
   if (authenticator.type === 'security_question') {
     return submitChallengeQuestion();
+  }
+
+  // Email
+  if (authenticator.type === 'email') {
+    return submitChallengeEmail();
   }
 
   throw new Error(`TODO: handle submit challenge-authenticator for authenticator type ${authenticator.type}`);

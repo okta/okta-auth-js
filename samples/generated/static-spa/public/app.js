@@ -48,6 +48,7 @@ var config = {
   storage: 'sessionStorage',
   requireUserSession: 'true',
   flow: 'redirect',
+  startService: false,
   idps: '',
   useInteractionCodeFlow: false,
 };
@@ -71,6 +72,7 @@ function loadConfig() {
   var appUri;
   var storage;
   var flow;
+  var startService;
   var requireUserSession;
   var scopes;
   var useInteractionCodeFlow;
@@ -89,6 +91,7 @@ function loadConfig() {
     clientId = state.clientId;
     storage = state.storage;
     flow = state.flow;
+    startService = state.startService;
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
     useInteractionCodeFlow = state.useInteractionCodeFlow;
@@ -99,6 +102,7 @@ function loadConfig() {
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
     flow = url.searchParams.get('flow') || config.flow;
+    startService = url.searchParams.get('startService') === 'true' || config.startService;
     requireUserSession = url.searchParams.get('requireUserSession') ? 
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
     scopes = url.searchParams.get('scopes') ? url.searchParams.get('scopes').split(' ') : config.scopes;
@@ -112,6 +116,7 @@ function loadConfig() {
     storage,
     requireUserSession,
     flow,
+    startService,
     scopes: scopes.join(' '),
     useInteractionCodeFlow,
     idps,
@@ -123,6 +128,7 @@ function loadConfig() {
     storage,
     requireUserSession,
     flow,
+    startService,
     scopes,
     useInteractionCodeFlow,
     idps,
@@ -160,6 +166,13 @@ function showForm() {
   try {
     document.querySelector(`#flow [value="${config.flow || ''}"]`).selected = true;
   } catch (e) { showError(e); }
+
+  if (config.startService) {
+    document.getElementById('startService-on').checked = true;
+  } else {
+    document.getElementById('startService-off').checked = true;
+  }
+
   if (config.requireUserSession) {
     document.getElementById('requireUserSession-on').checked = true;
   } else {
@@ -232,6 +245,9 @@ function createAuthClient() {
       },
       transformAuthState
     });
+    if (config.startService) {
+      authClient.start();
+    }
   } catch (error) {
     return showError(error);
   }
@@ -575,6 +591,9 @@ function resumeTransaction() {
   }
 
   if (authClient.transactionManager.exists()) {
+    // TODO: we may be in either authenticate or recoverPassword flow
+    // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
+    // Here we assume we are resuming an authenticate flow, but this could be wrong.
     return authClient.idx.authenticate()
       .then(handleTransaction)
       .catch(showError);
@@ -582,6 +601,9 @@ function resumeTransaction() {
 }
 
 function showSigninForm() {
+  hideRecoveryChallenge();
+  hideNewPasswordForm();
+
   // Is there an existing transaction we can resume?
   if (resumeTransaction()) {
     return;
@@ -589,6 +611,7 @@ function showSigninForm() {
 
   document.getElementById('login-form').style.display = 'block';
 }
+window._showSigninForm = bindClick(showSigninForm);
 
 function hideSigninForm() {
   document.getElementById('login-form').style.display = 'none';
@@ -618,6 +641,11 @@ function handleTransaction(transaction) {
     return handleTransactionAuthn(transaction);
   }
 
+  // IDX
+  if (transaction.messages) {
+    showError(transaction.messages);
+  }
+
   switch (transaction.status) {
     case 'PENDING':
       hideSigninForm();
@@ -640,6 +668,10 @@ function handleTransactionAuthn(transaction) {
   switch (transaction.status) {
     case 'SUCCESS':
       authClient.session.setCookieAndRedirect(transaction.sessionToken, config.appUri + '&getTokens=true');
+      break;
+    case 'RECOVERY_CHALLENGE':
+      updateAppState({ transaction });
+      showRecoveryChallenge();
       break;
     case 'MFA_ENROLL':
     case 'MFA_REQUIRED':
@@ -716,10 +748,25 @@ function showMfa() {
       case 'select-authenticator-authenticate':
         showMfaRequired();
         break;
+      case 'reset-authenticator':
+        showResetAuthenticator();
+        break;
       default:
         throw new Error(`TODO: showMfa: handle nextStep: ${nextStep.name}`);
     }
   }
+}
+
+// IDX
+function showResetAuthenticator() {
+  document.querySelector('#mfa .header').innerText = 'Reset Authenticator';
+
+  const authenticator = appState.transaction.nextStep.authenticator;
+  if (authenticator.type === 'password') {
+    return showNewPasswordForm();
+  }
+
+  throw new Error(`TODO: handle reset-authenticator for authenticator: ${authenticator.type}`);
 }
 
 function showMfaAuthn() {
@@ -808,6 +855,9 @@ function submitMfa() {
   }
   if (nextStep.name === 'challenge-authenticator' || nextStep.name === 'enroll-authenticator') {
     return submitChallengeAuthenticator();
+  }
+  if (nextStep.name === 'reset-authenticator') {
+    return submitNewPasswordForm();
   }
   throw new Error(`TODO: submitMfa: handle submit for nextStep: ${nextStep.name}`);
 }
@@ -1112,6 +1162,9 @@ function selectMfaFactorForVerification(index) {
   }
 
   // IDX
+  // TODO: we may be in either authentication or recovery flow
+  // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
+  // Here we are assuming we are doing authentication, but this may cause issues with recovery
   const authenticator = appState.transaction.nextStep.options[index].value;
   authClient.idx.authenticate({ authenticator })
     .then(handleTransaction)
@@ -1151,6 +1204,11 @@ function showMfaChallenge() {
   if (authenticator.type === 'security_question') {
     return showChallengeQuestion();
   }
+
+  // Email
+  if (authenticator.type === 'email') {
+    return showChallengeEmail();
+  }
 }
 
 function showMfaChallengeAuthn() {
@@ -1179,6 +1237,7 @@ function hideMfaChallenge() {
   hideChallengeOktaVerify();
   hideChallengePhone();
   hideChallengeQuestion();
+  hideChallengeEmail();
 }
 
 function submitChallenge() {
@@ -1217,9 +1276,100 @@ function submitChallengeAuthenticator() {
     return submitChallengeQuestion();
   }
 
+  // Email
+  if (authenticator.type === 'email') {
+    return submitChallengeEmail();
+  }
+
   throw new Error(`TODO: handle submit challenge-authenticator for authenticator type ${authenticator.type}`);
 }
-// TODO
+function showRecoverPassword() {
+  // Copy username from login form to recover password form
+  const username = document.querySelector('#login-form input[name=username]').value;
+  document.querySelector('#recover-password-form input[name=recover-username]').value = username;
+
+  hideSigninForm();
+  document.getElementById('recover-password-form').style.display = 'block';
+}
+window._showRecoverPassword = bindClick(showRecoverPassword);
+
+function hideRecoverPassword() {
+  document.querySelector('#recover-password-form input[name=recover-username]').value = '';
+  document.getElementById('recover-password-form').style.display = 'none';
+}
+
+function submitRecoverPasswordForm() {
+  const username = document.querySelector('#recover-password-form input[name=recover-username]').value;
+  hideRecoverPassword();
+  
+  // Authn
+  if (!config.useInteractionCodeFlow) {
+    // Supported factor types are  `SMS`, `EMAIL`, or `CALL`. This must be specified up-front.
+    const factorType = 'email';
+    return authClient.forgotPassword({ username, factorType })
+      .then(handleTransaction)
+      .catch(showError);
+  }
+
+  // IDX
+  // If `authenticator` is not specified up-front, the user will be able to choose from a list
+  const authenticator = 'email'; // TODO: this is not working as expected, list is still shown
+  return authClient.idx.recoverPassword({ username, authenticator })
+    .then(handleTransaction)
+    .catch(showError);
+}
+window._submitRecoverPasswordForm = bindClick(submitRecoverPasswordForm);
+
+function showRecoveryChallenge() {
+  document.getElementById('recovery-challenge').style.display = 'block';
+}
+
+function hideRecoveryChallenge() {
+  document.getElementById('recovery-challenge').style.display = 'none';
+}
+
+function showNewPasswordForm() {
+  document.getElementById('new-password-form').style.display = 'block';
+  showSubmitMfa();
+  showCancelMfa();
+}
+
+function hideNewPasswordForm() {
+  document.getElementById('new-password-form').style.display = 'none';
+  document.querySelector('#new-password-form input[name=new-password').value = '';
+}
+
+function submitNewPasswordForm() {
+  const password = document.querySelector('#new-password-form input[name=new-password').value;
+  hideNewPasswordForm();
+  return authClient.idx.recoverPassword({ password })
+    .then(handleTransaction)
+    .catch(showError);
+
+}
+window._submitNewPasswordForm = bindClick(submitNewPasswordForm);
+function showChallengeEmail() {
+  document.getElementById('mfa-challenge-email').style.display = 'block';
+  showSubmitMfa();
+}
+
+function hideChallengeEmail() {
+  document.getElementById('mfa-challenge-email').style.display = 'none';
+  document.querySelector('#mfa-challenge-email input[name=passcode]').value = '';
+}
+
+function submitChallengeEmail() {
+  const passCode = document.querySelector('#mfa-challenge-email input[name=passcode]').value;
+  hideMfa();
+
+  // IDX
+  // TODO: email can be used for authentication or recovery.
+  // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
+  // Here we are assuming email is being used for recovery. This likely breaks email as authenticator
+  authClient.idx.recoverPassword({ verificationCode: passCode })
+  .then(handleTransaction)
+  .catch(showError);
+}
 function showChallengeOktaVerify() {
   document.getElementById('mfa-challenge-okta-verify').style.display = 'block';
   document.querySelector('#mfa .header').innerText = 'Okta Verify';

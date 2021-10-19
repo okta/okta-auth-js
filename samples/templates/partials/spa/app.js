@@ -27,6 +27,9 @@ function createAuthClient() {
       },
       transformAuthState
     });
+    if (config.startService) {
+      authClient.start();
+    }
   } catch (error) {
     return showError(error);
   }
