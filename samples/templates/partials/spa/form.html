@@ -1,43 +1,61 @@
-<form id="form" target="/" method="GET" onsubmit="_onSubmitForm(event)" onformdata="_onFormData(event)">
-  <label for="issuer">Issuer</label><input id="issuer" name="issuer" type="text" /><br/>
-  <label for="clientId">Client ID (SPA App)
-  </label><input id="clientId" name="clientId" type="text" /><br/>
+<form id="form" class="pure-form pure-form-aligned" target="/" method="GET" onsubmit="_onSubmitForm(event)" onformdata="_onFormData(event)">
+  <div class="pure-control-group">
+    <label for="issuer">Issuer</label>
+    <input id="issuer" name="issuer" type="text" class="pure-input-1-2" />
+  </div>
+  <div class="pure-control-group">
+    <label for="clientId">Client ID (SPA App)</label>
+    <input id="clientId" name="clientId" type="text" class="pure-input-1-2" />
+  </div>
+  <div class="pure-control-group">
+    <label for="flow">Authentication Flow</label>
+    <select id="flow" name="flow" onchange="_onChangeFlow(event)">
+      <option value="redirect">Redirect to Okta (federated)</option>
+      {{#if signinWidget}}
+      <option value="widget">Okta Sign-in Widget (embedded)</option>
+      {{/if}}
+      {{#if signinForm}}
+      <option value="form">Custom form (direct)</option>
+      {{/if}}
+      <!-- Other login flows can be added -->
+    </select>
+  </div>
+  <div class="pure-control-group">
+    <label for="scopes">Scopes</label>
+    <input id="scopes" name="scopes" type="text" class="pure-input-1-2" />
+  </div>
+  <div class="pure-control-group">
+    <label for="requireUserSession">Require Okta SSO session</label>
+    <input id="requireUserSession-on" name="requireUserSession" type="radio" value="true"/> ON 
+    <input id="requireUserSession-off" name="requireUserSession" type="radio" value="false"/> OFF 
+  </div>
+  <div class="pure-control-group">
+    <label for="storage">Token storage</label>
+    <select id="storage" name="storage">
+      <option value="localStorage">localStorage</option>
+      <option value="sessionStorage">sessionStorage</option>
+      <option value="cookie">cookie</option>
+      <option value="memory">memory</option>
+    </select>
+  </div>
 
-  <label for="flow">Authentication Flow</label>
-  <select id="flow" name="flow" onchange="_onChangeFlow(event)">
-    <option value="redirect">Redirect to Okta</option>
-    {{#if signinWidget}}
-    <option value="widget">Okta Signin Widget (self-hosted)</option>
-    {{/if}}
-    {{#if signinForm}}
-    <option value="form">Custom form (username/passsword)</option>
-    {{/if}}
-    <!-- Other login flows can be added -->
-  </select><br/>
-
-  <label for="scopes">Scopes</label><input id="scopes" name="scopes" type="text" /><br/>
-  
-  <label for="requireUserSession">Require Okta SSO session</label><br/>
-  <input id="requireUserSession-on" name="requireUserSession" type="radio" value="true"/>ON<br/>
-  <input id="requireUserSession-off" name="requireUserSession" type="radio" value="false"/>OFF<br/>
-
-  <label for="storage">Token storage</label>
-  <select id="storage" name="storage">
-    <option value="localStorage">localStorage</option>
-    <option value="sessionStorage">sessionStorage</option>
-    <option value="cookie">cookie</option>
-    <option value="memory">memory</option>
-  </select><br/>
-
-  <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label><br/>
-  <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
-  <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
-  
-  {{#if signinWidget}}
-  <label style="display: none" for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
-  <input style="display: none" id="idps" name="idps" type="text" /><br/>
+  {{#if authn}}
+  <div class="pure-control-group">
+    <label for="useInteractionCodeFlow">Use Okta Identity Engine (interaction code flow)</label>
+    <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/> YES
+    <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/> NO
+  </div>
   {{/if}}
 
-  <hr/>
-  <input id="login-submit" type="submit" value="Update Config"/>
+  {{#if signinWidget}}
+  <div class="pure-control-group">
+    <label style="display: none" for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
+    <input style="display: none" id="idps" name="idps" type="text" />
+  </div>
+  {{/if}}
+
+  <div class="pure-controls">
+    <input id="login-submit" type="submit" value="Update Config" class="pure-button pure-button-primary"/>
+    <a href="/" onclick="_returnHome(event)" class="pure-button">Cancel</a>
+  </div>
 </form>

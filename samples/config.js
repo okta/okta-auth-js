@@ -22,6 +22,8 @@ const spaDefaults = Object.assign({
   storage: 'sessionStorage',
   requireUserSession: true,
   signinForm: true,
+  mfa: true,
+  authn: true,
   signinWidget: true
 }, defaults);
 
@@ -118,7 +120,12 @@ function getSampleConfig(sampleName) {
 }
 
 function getSampleNames() {
-  return samples.map(sample => sample.name);
+  return samples.map(sample => sample.name).filter(name => {
+    if (process.env.SAMPLE_NAME) {
+      return name === process.env.SAMPLE_NAME;
+    }
+    return true;
+  });
 }
 
 module.exports = {
