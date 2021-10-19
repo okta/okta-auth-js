@@ -887,6 +887,7 @@ See [authn API](docs/authn.md#signinwithcredentials).
 ### `signInWithRedirect(options)`
 
 > :link: web browser only <br>
+> :hourglass: async
 
 Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a originalUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
 You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getOriginalUri](#getoriginaluristate) to clear the intermediate state (the originalUri) after successful authentication.
