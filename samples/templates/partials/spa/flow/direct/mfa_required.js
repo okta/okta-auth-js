@@ -43,6 +43,9 @@ function selectMfaFactorForVerification(index) {
   {{/if}}
 
   // IDX
+  // TODO: we may be in either authentication or recovery flow
+  // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
+  // Here we are assuming we are doing authentication, but this may cause issues with recovery
   const authenticator = appState.transaction.nextStep.options[index].value;
   authClient.idx.authenticate({ authenticator })
     .then(handleTransaction)

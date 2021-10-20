@@ -66,10 +66,25 @@ function showMfa() {
       case 'select-authenticator-authenticate':
         showMfaRequired();
         break;
+      case 'reset-authenticator':
+        showResetAuthenticator();
+        break;
       default:
         throw new Error(`TODO: showMfa: handle nextStep: ${nextStep.name}`);
     }
   }
+}
+
+// IDX
+function showResetAuthenticator() {
+  document.querySelector('#mfa .header').innerText = 'Reset Authenticator';
+
+  const authenticator = appState.transaction.nextStep.authenticator;
+  if (authenticator.type === 'password') {
+    return showNewPasswordForm();
+  }
+
+  throw new Error(`TODO: handle reset-authenticator for authenticator: ${authenticator.type}`);
 }
 
 {{#if authn}}
@@ -167,6 +182,9 @@ function submitMfa() {
   if (nextStep.name === 'challenge-authenticator' || nextStep.name === 'enroll-authenticator') {
     return submitChallengeAuthenticator();
   }
+  if (nextStep.name === 'reset-authenticator') {
+    return submitNewPasswordForm();
+  }
   throw new Error(`TODO: submitMfa: handle submit for nextStep: ${nextStep.name}`);
 }
 window._submitMfa = bindClick(submitMfa);
@@ -207,6 +225,7 @@ function listMfaFactors() {
 {{> spa/flow/direct/mfa_activate.js }}
 {{> spa/flow/direct/mfa_required.js }}
 {{> spa/flow/direct/mfa_challenge.js }}
+{{> spa/flow/direct/factors/password.js }}
 {{> spa/flow/direct/factors/email.js }}
 {{> spa/flow/direct/factors/okta_verify.js }}
 {{> spa/flow/direct/factors/phone.js }}

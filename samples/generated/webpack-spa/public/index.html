@@ -115,7 +115,11 @@
                 <option value="memory">memory</option>
               </select>
             </div>
-          
+            <div class="pure-control-group">
+              <label for="startService">Start service for active auto-renew & cross-tab storage sync</label>
+              <input id="startService-on" name="startService" type="radio" value="true"/> YES 
+              <input id="startService-off" name="startService" type="radio" value="false"/> NO 
+            </div>
             <div class="pure-control-group">
               <label for="useInteractionCodeFlow">Use Okta Identity Engine (interaction code flow)</label>
               <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/> YES
@@ -146,42 +150,57 @@
         <div id="login-form" style="display: none" class="panel pure-form pure-form-aligned">
           <div class="pure-control-group">
             <label for="username">Username</label>
-            <input id="username" name="username" type="email">
+            <input id="username" name="username" type="email" autocomplete="username">
           </div>
           <div class="pure-control-group">
             <label for="password">Password</label>
-            <input id="password" name="password" type="password">
+            <input id="password" name="password" type="password" autocomplete="password">
           </div>
           <div class="pure-controls">
+            <p><a href="/" id="recover-password-link" onclick="_showRecoverPassword(event)">Forgot your password?</a></p>
             <a href="/" id="submit-login-form" onclick="_submitSigninForm(event)" class="pure-button pure-button-primary">Signin</a>
           </div>
+        </div>
+        <div id="recover-password-form" style="display: none" class="panel pure-form pure-form-aligned">
+          <div class="pure-control-group">
+            <label for="recover-username">Enter username:</label>
+            <input id="recover-username" name="recover-username" type="email">
+          </div>
+          <div class="pure-controls">
+            <a href="/" id="submit-recover-password-form" onclick="_submitRecoverPasswordForm(event)" class="pure-button pure-button-primary">Submit</a>
+          </div>
+          <p><a href="/" onclick="_showSigninForm(event)">Back to sign-in</a></p>
+        </div>
+        <div id="recovery-challenge" style="display: none" class="panel">
+          <p>An email has been sent to your account with instructions on how to reset your password.</p>
+          <p><a href="/" onclick="_showSigninForm(event)">Back to sign-in</a></p>
         </div>
         <div id="mfa" style="display:none" class="panel pure-form-stacked">
           <div class="header">
             <!-- title is set dynamically -->
           </div>
-    
+        
           <div id="mfa-enroll" style="display: none">
-    
+        
             <div id="mfa-enroll-factors" style="display:none">
               <!-- factors are dynamically inserted here -->
             </div>
-    
+        
             <div id="mfa-enroll-question" style="display: none">
               <label for="questions">Choose a question:</label>
               <select name="questions">
                 <!-- questions are dynamically inserted here -->
               </select>
               <label for="answer">Answer:</label>
-              <input name="answer" type="text" class="pure-u-1-1" />
+              <input name="answer" type="text" class="pure-u-1-1" autocomplete="off"/>
             </div>
-    
+        
             <div id="mfa-enroll-phone" style="display: none">
               <label for="phone">Enter your phone number:<label>
               <input name="phone" type="text" class="pure-u-1-1" />
               <p>Include the country code, like: <b>+1-555-415-1337</b></p>
             </div>
-    
+        
           </div>
           
           <div id="mfa-enroll-activate" style="display: none">
@@ -198,16 +217,10 @@
               <input name="passcode" type="text" autocomplete="off"/>
             </div>
           </div>
-    
+        
           <div id="mfa-required" style="display:none">
             <div id="mfa-required-factors" style="display: none">
               <!-- factors are dynamically inserted here -->
-            </div>
-    
-            <div id="mfa-verify-question" style="display: none">
-              <b class="question"><!-- questionText is set dynamically --></b><br/>
-              <label for="answer">Answer:</label><br/>
-              <input name="answer" type="text" /><br/>
             </div>
           </div>
           
@@ -216,14 +229,25 @@
               <label for="passcode">Enter the code from the Okta Verify app:</label>
               <input name="passcode" type="text" autocomplete="off"/>
             </div>
-    
+        
             <div id="mfa-challenge-phone" style="display: none">
               <label for="passcode">Enter the code:</label>
               <input name="passcode" type="text" autocomplete="off"/>
             </div>
-    
+        
+            <div id="mfa-challenge-question" style="display: none">
+              <p><b class="question"><!-- questionText is set dynamically --></b></p>
+              <label for="answer">Answer:</label><br/>
+              <input name="answer" type="text" autocomplete="off" /><br/>
+            </div>
+        
+            <div id="mfa-challenge-email" style="display: none">
+              <label for="passcode">Enter the code:</label>
+              <input name="passcode" type="text" autocomplete="off"/>
+            </div>
+        
           </div>
-    
+        
           <div id="authenticator-verification-data" style="display: none">
             <div id="authenticator-verification-data-phone" style="display: none">
               <label for="methodType">Select a method type:</label>
@@ -232,14 +256,18 @@
               </select>
             </div>
           </div>
-          
+        
+          <div id="new-password-form" style="display: none">
+            <label for="new-password">Enter new password:</label>
+            <input id="new-password" name="new-password" type="password">
+          </div>
+        
           <div class="footer pure-controls">
             <a id="mfa-prev" href="/" onclick="_prevMfa(event)" class="pure-button">Go Back</a>
             <a id="mfa-cancel" href="/" onclick="_cancelMfa(event)" class="pure-button">Cancel</a>
             <a id="mfa-submit" href="/" style="display: none" onclick="_submitMfa(event)" class="pure-button pure-button-primary">Submit</a>
           </div>
         </div>
-    
         <!-- authenticated -->
         <div id="auth" style="display: none" class="panel">
           <div class="header">Welcome back</div>

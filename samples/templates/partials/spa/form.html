@@ -38,7 +38,11 @@
       <option value="memory">memory</option>
     </select>
   </div>
-
+  <div class="pure-control-group">
+    <label for="startService">Start service for active auto-renew & cross-tab storage sync</label>
+    <input id="startService-on" name="startService" type="radio" value="true"/> YES 
+    <input id="startService-off" name="startService" type="radio" value="false"/> NO 
+  </div>
   {{#if authn}}
   <div class="pure-control-group">
     <label for="useInteractionCodeFlow">Use Okta Identity Engine (interaction code flow)</label>

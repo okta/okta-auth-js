@@ -34,15 +34,30 @@
     <div id="login-form" style="display: none" class="panel pure-form pure-form-aligned">
       <div class="pure-control-group">
         <label for="username">Username</label>
-        <input id="username" name="username" type="email">
+        <input id="username" name="username" type="email" autocomplete="username">
       </div>
       <div class="pure-control-group">
         <label for="password">Password</label>
-        <input id="password" name="password" type="password">
+        <input id="password" name="password" type="password" autocomplete="password">
       </div>
       <div class="pure-controls">
+        <p><a href="/" id="recover-password-link" onclick="_showRecoverPassword(event)">Forgot your password?</a></p>
         <a href="/" id="submit-login-form" onclick="_submitSigninForm(event)" class="pure-button pure-button-primary">Signin</a>
       </div>
+    </div>
+    <div id="recover-password-form" style="display: none" class="panel pure-form pure-form-aligned">
+      <div class="pure-control-group">
+        <label for="recover-username">Enter username:</label>
+        <input id="recover-username" name="recover-username" type="email">
+      </div>
+      <div class="pure-controls">
+        <a href="/" id="submit-recover-password-form" onclick="_submitRecoverPasswordForm(event)" class="pure-button pure-button-primary">Submit</a>
+      </div>
+      <p><a href="/" onclick="_showSigninForm(event)">Back to sign-in</a></p>
+    </div>
+    <div id="recovery-challenge" style="display: none" class="panel">
+      <p>An email has been sent to your account with instructions on how to reset your password.</p>
+      <p><a href="/" onclick="_showSigninForm(event)">Back to sign-in</a></p>
     </div>
     {{#if mfa}}
     {{> spa/mfa.html }}

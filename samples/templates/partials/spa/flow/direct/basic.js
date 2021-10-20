@@ -12,6 +12,9 @@ function resumeTransaction() {
   {{/if}}
 
   if (authClient.transactionManager.exists()) {
+    // TODO: we may be in either authenticate or recoverPassword flow
+    // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
+    // Here we assume we are resuming an authenticate flow, but this could be wrong.
     return authClient.idx.authenticate()
       .then(handleTransaction)
       .catch(showError);
@@ -19,6 +22,9 @@ function resumeTransaction() {
 }
 
 function showSigninForm() {
+  hideRecoveryChallenge();
+  hideNewPasswordForm();
+
   // Is there an existing transaction we can resume?
   if (resumeTransaction()) {
     return;
@@ -26,6 +32,7 @@ function showSigninForm() {
 
   document.getElementById('login-form').style.display = 'block';
 }
+window._showSigninForm = bindClick(showSigninForm);
 
 function hideSigninForm() {
   document.getElementById('login-form').style.display = 'none';
@@ -59,6 +66,11 @@ function handleTransaction(transaction) {
   }
   {{/if}}
 
+  // IDX
+  if (transaction.messages) {
+    showError(transaction.messages);
+  }
+
   switch (transaction.status) {
     {{#if mfa}}
     case 'PENDING':
@@ -83,6 +95,10 @@ function handleTransactionAuthn(transaction) {
   switch (transaction.status) {
     case 'SUCCESS':
       authClient.session.setCookieAndRedirect(transaction.sessionToken, config.appUri + '&getTokens=true');
+      break;
+    case 'RECOVERY_CHALLENGE':
+      updateAppState({ transaction });
+      showRecoveryChallenge();
       break;
   {{#if mfa}}
     case 'MFA_ENROLL':

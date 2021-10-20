@@ -68,6 +68,11 @@
       <input name="answer" type="text" autocomplete="off" /><br/>
     </div>
 
+    <div id="mfa-challenge-email" style="display: none">
+      <label for="passcode">Enter the code:</label>
+      <input name="passcode" type="text" autocomplete="off"/>
+    </div>
+
   </div>
 
   <div id="authenticator-verification-data" style="display: none">
@@ -77,6 +82,11 @@
         <!-- methodTypes are dynamically inserted here -->
       </select>
     </div>
+  </div>
+
+  <div id="new-password-form" style="display: none">
+    <label for="new-password">Enter new password:</label>
+    <input id="new-password" name="new-password" type="password">
   </div>
 
   <div class="footer pure-controls">
