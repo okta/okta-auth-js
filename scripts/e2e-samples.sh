@@ -29,7 +29,8 @@ aws s3 --quiet --region us-east-1 cp s3://ci-secret-stash/prod/okta-sdk-vars/tes
 if [[ "${BACON_TASK}" == true ]]; then
   echo "Running tests against trexcloud org"
   export ISSUER=https://javascript-idx-sdk.trexcloud.com/oauth2/default
-  export CLIENT_ID=0oa3r92jj01DWBeWC0g7
+  export CLIENT_ID=0oa3r1keeeFFb7VMG0g7
+  export SPA_CLIENT_ID=0oa3r92jj01DWBeWC0g7
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_client_secret CLIENT_SECRET
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_e2e_apiKey OKTA_API_KEY
 else
