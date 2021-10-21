@@ -256,10 +256,10 @@ export interface PkceAPI {
 export interface IdxAPI {
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
-  authenticate: (options: AuthenticationOptions) => Promise<IdxTransaction>;
-  register: (options: IdxRegistrationOptions) => Promise<IdxTransaction>;
+  authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;
+  register: (options?: IdxRegistrationOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
   startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;
-  recoverPassword: (options: PasswordRecoveryOptions) => Promise<IdxTransaction>;
+  recoverPassword: (options?: PasswordRecoveryOptions) => Promise<IdxTransaction>;
   handleInteractionCodeRedirect: (url: string) => Promise<void>; 
 }
