@@ -154,40 +154,54 @@ export default function App() {
 
   const { name, inputs, select, contextualData, canSkip } = formMetaMapper(nextStep);
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="messages">
-        { messages && messages.map(message => (<div key={message.message}>{message.message}</div>)) }
-      </div>
-      <h3 className="title">{name}</h3>
-      {inputs && inputs.map(({ label, name, type, required }) => (
-        <label key={name}>{label}&nbsp;
-          <input 
-            name={name} 
-            type={type} 
-            value={inputValues[name] || ''} 
-            required={required} 
-            onChange={handleChange} 
-          />
-          <br/>
-        </label>
-      ))}
-      {select && (
-        <select name={select.name} onChange={handleChange}>
-          <option value="">---</option>
-          {select.options.map(({ label, value }) => (
-            <option key={value}  value={value}>{label}</option>
+    <div className="pure-g">
+      <div class="pure-u-1-3"></div>
+      <div class="pure-u-1-3">
+        <form onSubmit={handleSubmit}>
+          <div className="messages">
+            { messages && messages.map(message => (<div key={message.message}>{message.message}</div>)) }
+          </div>
+          <h3 className="title">{name}</h3>
+          {inputs && inputs.map(({ label, name, type, required }) => (
+            <fieldset key={name} className="ods-fieldset">
+              <div className="ods-fieldset-flex">
+                <input 
+                  className="ods-text-input"
+                  name={name} 
+                  type={type} 
+                  value={inputValues[name] || ''} 
+                  required={required} 
+                  onChange={handleChange} 
+                />
+                <label className="ods-label" htmlFor={name}>{label}</label>
+              </div>
+            </fieldset>
           ))}
-        </select>
-      )}
-      {contextualData && (
-        <div>
-          <img src={contextualData.qrcode.href} />
-          <div>{contextualData.sharedSecret}</div>
-        </div>
-      )}
-      {canSkip && <button type="button" onClick={handleSkip}>Skip</button>}
-      <button type="submit">Submit</button>
-      <button type="button" onClick={handleCancel}>Cancel</button>
-    </form>
+          {select && (
+            <fieldset className="ods-fieldset">
+                <div className="ods-fieldset-flex">
+                  <select className="ods-select" name={select.name} onChange={handleChange}>
+                    <option></option>
+                    {select.options.map(({ label, value }) => (
+                      <option key={value}  value={value}>{label}</option>
+                    ))}
+                  </select>
+                  <label className="ods-label" htmlFor={select.name}>{select.name}</label>
+                </div>
+            </fieldset>
+          )}
+          {contextualData && (
+            <div>
+              <img src={contextualData.qrcode.href} />
+              <div>{contextualData.sharedSecret}</div>
+            </div>
+          )}
+          {canSkip && <button type="button" onClick={handleSkip}>Skip</button>}
+          <button className="ods-button" type="submit">Submit</button>
+          <button className="ods-button is-ods-button-secondary" type="button" onClick={handleCancel}>Cancel</button>
+        </form>
+      </div>
+      <div class="pure-u-1-3"></div>
+    </div>
   );
 }

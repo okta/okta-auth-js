@@ -1,0 +1,3563 @@
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/**
+ * Simple string replacement
+ */
+/**
+ * Retrieves map keys from nested maps.
+ */
+/**
+ * Retrieves and encodes icons for use in CSS
+ * Works down to IE9
+ *
+ * Refs:
+ * https://css-tricks.com/creating-a-maintainable-icon-system-with-sass/
+ * https://codepen.io/chriscoyier/pen/ZQgvyG/
+ * https://codepen.io/tigt/post/optimizing-svgs-in-data-uris
+ * https://codepen.io/jakob-e/pen/doMoML
+ */
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/* stylelint-disable color-no-hex  */
+/**
+ * Retrieves color variants from variation map.
+ * color: cv(action, light); // color: #96bafa;
+ */
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/* stylelint-disable liberty/use-logical-spec */
+/* stylelint-enable liberty/use-logical-spec */
+/* stylelint-disable no-descending-specificity */
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+* {
+  box-sizing: border-box;
+}
+*::before, *::after {
+  box-sizing: inherit;
+}
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin-block: 0;
+  margin-inline: 0;
+  padding-block: 0;
+  padding-inline: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+button,
+input {
+  font: inherit;
+  font-size: 100%;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+blockquote::before, blockquote::after,
+q::before,
+q::after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.u-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-icon {
+  position: relative;
+  inset-block-start: -0.05em;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+.ods-rtl .ods-icon {
+  order: 1;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+html {
+  font-size: 100%;
+}
+
+body {
+  color: #1d1d21;
+  font-family: "Public Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", "Noto Sans Arabic", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5;
+  font-feature-settings: "lnum", "pnum";
+  text-decoration-skip-ink: all;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+a {
+  color: #1662dd;
+  text-decoration: none;
+  /* stylelint-disable selector-no-qualifying-type */
+  /* stylelint-enable */
+}
+a:hover {
+  color: #1662dd;
+  text-decoration: underline;
+}
+a:visited {
+  color: #1662dd;
+}
+a[target=_blank]:not([href^="mailto:"])::after {
+  content: "";
+  display: inline-block;
+  position: relative;
+  inset-block-start: -0.1em;
+  width: 1em;
+  height: 1em;
+  margin-inline-start: 0.2em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 14 14'%3E%3Cdefs/%3E%3Cpath fill='%231662dd' fill-rule='evenodd' d='M1.375 4.75c0-.76.616-1.375 1.375-1.375H5a.625.625 0 110 1.25H2.75a.125.125 0 00-.125.125v6.5c0 .069.056.125.125.125h6.5a.125.125 0 00.125-.125V9a.625.625 0 111.25 0v2.25c0 .76-.616 1.375-1.375 1.375h-6.5c-.76 0-1.375-.616-1.375-1.375v-6.5z' clip-rule='evenodd'/%3E%3Cpath fill='%231662dd' fill-rule='evenodd' d='M7.375 2c0-.345.28-.625.625-.625h4c.345 0 .625.28.625.625v4a.625.625 0 11-1.25 0V3.509L5.442 9.442a.625.625 0 11-.884-.884l5.933-5.933H8A.625.625 0 017.375 2z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+
+.ods-link--has-icon {
+  display: inline-grid;
+  grid-auto-columns: minmax(min-content, max-content);
+  grid-auto-flow: column;
+  grid-gap: 0.375rem;
+  align-items: center;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+abbr {
+  border-block-end: 1px dashed #00297a;
+  text-decoration: none;
+}
+
+address {
+  max-width: 32em;
+  margin-block-start: 0;
+  margin-block-end: 1.5em;
+  margin-inline: 0;
+}
+address:last-child {
+  margin-block-end: 0;
+}
+
+em {
+  font-style: italic;
+}
+em > em {
+  text-decoration: underline;
+}
+
+strong {
+  font-weight: 600;
+}
+strong > strong {
+  text-decoration: underline;
+}
+
+sup {
+  font-size: 0.7578561127rem;
+  line-height: 1;
+  vertical-align: super;
+}
+
+sub {
+  font-size: 0.7578561127rem;
+  line-height: 1;
+  vertical-align: sub;
+}
+
+blockquote {
+  max-width: 32em;
+  margin-block-start: 0;
+  margin-block-end: 1.5em;
+  margin-inline: 0;
+  padding-block: 0;
+  padding-inline-end: 0;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 3px solid #d7d7dc;
+}
+blockquote:last-child {
+  margin-block-end: 0;
+}
+
+p {
+  max-width: 32em;
+  margin-block-start: 0;
+  margin-block-end: 1.5em;
+  margin-inline: 0;
+}
+details p {
+  font-size: 1rem;
+}
+p:last-child {
+  margin-block-end: 0;
+}
+
+pre {
+  margin-block-start: 0;
+  margin-block-end: 1.5em;
+  margin-inline: 0;
+  font-family: "Inconsolata", "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "Courier", monospace;
+  white-space: pre-wrap;
+  tab-size: 2;
+}
+pre:last-child {
+  margin-block-end: 0;
+}
+
+cite {
+  font-style: italic;
+}
+
+del {
+  display: inline-block;
+  background: #f88c90;
+}
+
+del::before,
+del::after {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+del::before {
+  content: attr(data-a11y-start);
+}
+
+del::after {
+  content: attr(data-a11y-end);
+}
+
+dfn {
+  font-style: italic;
+}
+
+figure:not([class]) {
+  display: grid;
+  grid-gap: 0.75rem;
+  grid-template-columns: minmax(min-content, max-content);
+  justify-content: center;
+  justify-items: center;
+}
+figure:not([class]) figcaption:not([class]) {
+  color: #6e6e78;
+  font-size: 1rem;
+}
+
+ins {
+  display: inline-block;
+  background: #e5faf3;
+}
+
+ins::before,
+ins::after {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+ins::before {
+  content: attr(data-a11y-start);
+}
+
+ins::after {
+  content: attr(data-a11y-end);
+}
+
+kbd {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: inline-block;
+  padding-block: 0;
+  padding-inline: 0.375rem;
+  border: 1px solid #d7d7dc;
+  background: #f5f5f6;
+  box-shadow: 0 2px 0 #f5f5f6, 0 3px 0 #d7d7dc;
+  font-weight: 400;
+  line-height: 1.3;
+}
+@supports not (border-end-end-radius: 1px) {
+  kbd {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] kbd {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+
+mark {
+  background: #faf5dc;
+}
+
+q {
+  quotes: '"' '"' "'" "'";
+}
+q::before {
+  content: open-quote;
+}
+q::after {
+  content: close-quote;
+}
+
+s {
+  text-decoration: line-through;
+}
+
+samp {
+  padding-block: 0;
+  padding-inline: 0.5ch;
+  background-color: #f5f5f6;
+  box-shadow: 0 1px 0 #d7d7dc;
+  font-family: "Inconsolata", "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "Courier", monospace;
+  font-size: 1rem;
+}
+samp kbd {
+  background: #ffffff;
+}
+
+small {
+  font-size: 0.8705493166rem;
+}
+
+details {
+  font-size: 1rem;
+}
+
+summary {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  font-size: 1.1487rem;
+  font-weight: 600;
+  cursor: default;
+}
+@supports not (border-end-end-radius: 1px) {
+  summary {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] summary {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+summary:focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #a7b5ec;
+}
+
+hr {
+  margin-block: 0.75rem;
+  margin-inline: 0;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #d7d7dc;
+}
+
+code {
+  font-family: "Inconsolata", "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "Courier", monospace;
+}
+
+var {
+  font-style: italic;
+  font-weight: 600;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+ol:not([class]),
+ul:not([class]) {
+  max-width: 32em;
+  margin-block-start: 0;
+  margin-block-end: 1.5em;
+  margin-inline: 0;
+  padding-block: 0;
+  padding-inline-start: 1.5rem;
+  padding-inline-end: 0;
+  list-style-position: outside;
+}
+ol:not([class]) li:last-child,
+ul:not([class]) li:last-child {
+  margin-block-end: 0;
+}
+ol:not([class]):last-child,
+ul:not([class]):last-child {
+  margin-block-end: 0;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+ul:not([class]) {
+  list-style-type: disc;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+ol:not([class]) {
+  list-style-type: decimal;
+}
+
+dl:not([class]) {
+  display: grid;
+  grid-gap: 0.375rem 1.5rem;
+  grid-template-columns: repeat(2, minmax(min-content, max-content));
+  max-width: 32em;
+  margin-block-start: 0;
+  margin-block-end: 1.5em;
+  margin-inline: 0;
+  padding-block: 0;
+  padding-inline: 0;
+}
+dl:not([class]):last-child {
+  margin-block-end: 0;
+}
+dl:not([class]) dt {
+  grid-column: 1/1;
+  font-weight: 600;
+}
+dl:not([class]) dd {
+  grid-column: 2/2;
+  font-weight: 400;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.ods-title {
+  margin-block-start: 0;
+  margin-block-end: 0.375em;
+  margin-inline: 0;
+  color: #1d1d21;
+  font-weight: 600;
+}
+
+h1,
+.is-ods-title-1,
+h2,
+.is-ods-title-2,
+h3,
+.is-ods-title-3 {
+  line-height: 1.3;
+}
+
+h4,
+.is-ods-title-4,
+h5,
+.is-ods-title-5,
+h6,
+.is-ods-title-6 {
+  line-height: 1.5;
+}
+
+h1,
+.is-ods-title-1 {
+  font-size: 2.0000143206rem;
+}
+
+h2,
+.is-ods-title-2 {
+  font-size: 1.7411111rem;
+}
+
+h3,
+.is-ods-title-3 {
+  font-size: 1.5157230783rem;
+}
+
+h4,
+.is-ods-title-4 {
+  font-size: 1.31951169rem;
+}
+
+h5,
+.is-ods-title-5 {
+  font-size: 1.1487rem;
+}
+
+h6,
+.is-ods-title-6 {
+  font-size: 1rem;
+}
+
+.legalese {
+  color: #6e6e78;
+  font-size: 0.8705493166rem;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-banner {
+  display: grid;
+  position: relative;
+  grid-template-areas: "icon title content actions";
+  grid-template-columns: repeat(4, minmax(min-content, max-content));
+  grid-template-rows: 1fr;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-block: 0.75rem;
+  padding-inline: 1.5rem;
+  background-color: #a7b5ec;
+}
+.ods-banner.is-ods-banner-dismissed {
+  display: none;
+}
+.ods-banner a {
+  text-decoration: underline;
+}
+
+.is-ods-banner-dismissable {
+  padding-block: 0.75rem;
+  padding-inline-start: 1.5rem;
+  padding-inline-end: 3rem;
+}
+
+.ods-banner--icon {
+  grid-area: icon;
+  margin-inline-end: 0.75rem;
+  font-size: 1.1487rem;
+  line-height: 1;
+}
+
+.ods-banner--title {
+  grid-area: title;
+  margin-block-end: 0;
+  margin-inline-end: 0.375rem;
+  font-size: 1rem;
+}
+
+.ods-banner--content {
+  grid-area: content;
+  max-width: 100%;
+  margin-block-end: 0;
+  margin-inline-end: 1.5rem;
+}
+
+.ods-banner--actions {
+  display: flex;
+  grid-area: actions;
+  justify-content: end;
+}
+
+.ods-banner--dismiss {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 1.5rem;
+  margin-inline-start: 1.5rem;
+  transform: translateY(-50%);
+}
+
+.is-ods-banner-info {
+  background-color: #a7b5ec;
+  color: #1d1d21;
+}
+.is-ods-banner-info .ods-banner--title {
+  color: #1d1d21;
+}
+.is-ods-banner-info a {
+  color: #1d1d21;
+}
+
+.is-ods-banner-success {
+  background-color: #84d2b1;
+  color: #1d1d21;
+}
+.is-ods-banner-success .ods-banner--title {
+  color: #1d1d21;
+}
+.is-ods-banner-success a {
+  color: #1d1d21;
+}
+
+.is-ods-banner-caution {
+  background-color: #f9dc77;
+  color: #1d1d21;
+}
+.is-ods-banner-caution .ods-banner--title {
+  color: #1d1d21;
+}
+.is-ods-banner-caution a {
+  color: #1d1d21;
+}
+
+.is-ods-banner-danger {
+  background-color: #f88c90;
+  color: #1d1d21;
+}
+.is-ods-banner-danger .ods-banner--title {
+  color: #1d1d21;
+}
+.is-ods-banner-danger a {
+  color: #1d1d21;
+}
+
+@media screen and (max-width: 48em) {
+  .ods-banner {
+    grid-template-areas: initial;
+    grid-template-columns: repeat(2, minmax(min-content, max-content));
+    grid-template-rows: unset;
+    justify-content: start;
+    justify-items: start;
+  }
+
+  .ods-banner--icon,
+.ods-banner--title,
+.ods-banner--content,
+.ods-banner--actions {
+    grid-area: initial;
+  }
+
+  .ods-banner--title,
+.ods-banner--content,
+.ods-banner--actions {
+    grid-column: 2;
+  }
+}
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-button {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: inline-block;
+  position: relative;
+  margin-block: 0;
+  margin-inline: 0;
+  padding-block: 0.375em;
+  padding-inline: 0.75em;
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 100ms;
+  transition-timing-function: linear;
+  border: 1px solid transparent;
+  background-color: #1662dd;
+  box-shadow: 0 0 0 0 #a7b5ec;
+  color: #ffffff;
+  font-family: "Public Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", "Noto Sans Arabic", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-button {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-button {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-button:hover, .ods-button.is-ods-button-hover {
+  border-color: #00297a;
+  background-color: #00297a;
+}
+.ods-button:focus, .ods-button.is-ods-button-focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #a7b5ec;
+  background-color: #00297a;
+}
+.ods-button:disabled {
+  border-color: transparent;
+  background-color: #a7b5ec;
+  cursor: not-allowed;
+}
+
+.ods-button--label {
+  display: inline-block;
+  min-width: 3em;
+}
+.ods-button--label:not(:only-child) {
+  margin-inline-start: 0.375rem;
+}
+
+.is-ods-button-secondary {
+  border-color: #1662dd;
+  background-color: #ffffff;
+  color: #1662dd;
+}
+.is-ods-button-secondary:hover, .is-ods-button-secondary.is-ods-button-hover {
+  border-color: #1662dd;
+  background-color: #1662dd;
+  color: #ffffff;
+}
+.is-ods-button-secondary:focus, .is-ods-button-secondary.is-ods-button-focus {
+  border-color: #1662dd;
+  background-color: #ffffff;
+  color: #1662dd;
+}
+.is-ods-button-secondary:disabled {
+  border-color: #a7b5ec;
+  background-color: #ffffff;
+  color: #a7b5ec;
+}
+
+.is-ods-button-danger {
+  background-color: #da372c;
+}
+.is-ods-button-danger:hover, .is-ods-button-danger.is-ods-button-hover {
+  border-color: #640019;
+  background-color: #640019;
+}
+.is-ods-button-danger:focus, .is-ods-button-danger.is-ods-button-focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #f88c90;
+  background-color: #640019;
+}
+.is-ods-button-danger:disabled {
+  border-color: #f88c90;
+  background-color: #f88c90;
+}
+.is-ods-button-danger.is-ods-button-secondary {
+  border-color: #da372c;
+  background-color: #ffffff;
+  color: #da372c;
+}
+.is-ods-button-danger.is-ods-button-secondary:focus, .is-ods-button-danger.is-ods-button-secondary.is-ods-button-focus {
+  border-color: #640019;
+  background-color: #f88c90;
+  color: #640019;
+}
+.is-ods-button-danger.is-ods-button-secondary:disabled {
+  border-color: #f88c90;
+  background-color: #ffffff;
+  color: #f88c90;
+}
+
+.is-ods-button-dismiss {
+  padding-block: 0.1875em;
+  padding-inline: 0.1875em;
+  border: 0;
+  background-color: transparent;
+  color: inherit;
+  line-height: 1;
+}
+.is-ods-button-dismiss:hover, .is-ods-button-dismiss.is-ods-button-hover {
+  border-color: transparent;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+.is-ods-button-dismiss:focus, .is-ods-button-dismiss.is-ods-button-focus {
+  background-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 2px;
+}
+.is-ods-button-dismiss:disabled {
+  background-color: rgba(235, 235, 237, 0.4);
+  color: #6e6e78;
+}
+
+.is-ods-button-clear {
+  background-color: transparent;
+  color: #1662dd;
+}
+.is-ods-button-clear:hover, .is-ods-button-clear.is-ods-button-hover {
+  border-color: transparent;
+  background-color: #f2f5ff;
+  color: #00297a;
+}
+.is-ods-button-clear:focus, .is-ods-button-clear.is-ods-button-focus {
+  background-color: #ffffff;
+  color: #1662dd;
+}
+.is-ods-button-clear:disabled {
+  background-color: transparent;
+  color: #a7b5ec;
+}
+
+.ods-form--header .ods-button, .ods-table .ods-button, .is-ods-button-size-s {
+  font-size: 0.8705493166rem;
+  line-height: 1.3;
+}
+
+.is-ods-button-full-width {
+  display: block;
+  width: 100%;
+}
+
+.is-ods-button-size-l {
+  padding-block: 0.75em;
+  padding-inline: 1.5em;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-form:not([data-readonly]) .ods-form--header .ods-button {
+  display: none;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/* stylelint-disable-next-line no-descending-specificity */
+.ods-button + .ods-button {
+  margin-inline-start: 0.75rem;
+}
+.ods-button.is-ods-button-full-width {
+  margin-block: 0;
+  margin-inline: 0;
+}
+.ods-button.is-ods-button-full-width:not(:last-child) {
+  margin-block-end: 0.75rem;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/* stylelint-disable no-descending-specificity, max-nesting-depth */
+.ods-checkbox {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+.ods-checkbox:checked + .ods-checkbox--label::before, .ods-checkbox:indeterminate + .ods-checkbox--label::before {
+  border-color: #1662dd;
+  background-color: #1662dd;
+}
+.ods-checkbox:checked + .ods-checkbox--label::after {
+  transform: translateY(-50%) scale(0.9);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M0 5.6L1.6 4l3.2 3.3 5.6-5.7L12 3.1l-7.2 7.4L0 5.6z'/%3E%3C/svg%3E");
+}
+.ods-checkbox:not(:checked) + .ods-checkbox--label:hover::before, .ods-checkbox:not(:checked) + .ods-checkbox--label.is-ods-checkbox-hover::before {
+  border-color: #1662dd;
+}
+.ods-checkbox:indeterminate + .ods-checkbox--label::after, .ods-checkbox.is-ods-checkbox-indeterminate + .ods-checkbox--label::after {
+  transform: translateY(-50%) scale(0.9);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 10 2'%3E%3Cpath fill='%23ffffff' d='M0 0h10v2H0z'/%3E%3C/svg%3E");
+}
+.ods-checkbox:focus + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-focus + .ods-checkbox--label::before {
+  outline: 0;
+  box-shadow: 0 0 0 2px #a7b5ec;
+  border-color: #1662dd;
+}
+.ods-checkbox:disabled + .ods-checkbox--label,
+.ods-checkbox:disabled + .ods-checkbox--label:hover {
+  color: #1d1d21;
+  cursor: not-allowed;
+}
+.ods-checkbox:disabled + .ods-checkbox--label::before,
+.ods-checkbox:disabled + .ods-checkbox--label:hover::before {
+  border-color: #d7d7dc;
+  background-color: #f5f5f6;
+}
+.ods-checkbox:disabled:checked + .ods-checkbox--label::before, .ods-checkbox:disabled:indeterminate + .ods-checkbox--label::before, .ods-checkbox:disabled.is-ods-checkbox-indeterminate + .ods-checkbox--label::before {
+  border-color: #a7b5ec;
+  background-color: #a7b5ec;
+}
+.ods-checkbox:disabled:checked + .ods-checkbox--label::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M0 5.6L1.6 4l3.2 3.3 5.6-5.7L12 3.1l-7.2 7.4L0 5.6z'/%3E%3C/svg%3E");
+}
+.ods-checkbox:disabled:indeterminate + .ods-checkbox--label::after, .ods-checkbox:disabled.is-ods-checkbox-indeterminate + .ods-checkbox--label::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 10 2'%3E%3Cpath fill='%23ffffff' d='M0 0h10v2H0z'/%3E%3C/svg%3E");
+}
+.ods-checkbox:invalid + .ods-checkbox--label, .ods-checkbox.is-ods-checkbox-invalid + .ods-checkbox--label {
+  color: #da372c;
+}
+.ods-checkbox:invalid + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid + .ods-checkbox--label::before {
+  border-color: #da372c;
+}
+.ods-checkbox:invalid:checked + .ods-checkbox--label::before, .ods-checkbox:invalid:indeterminate + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid:checked + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid:indeterminate + .ods-checkbox--label::before {
+  background-color: #da372c;
+}
+.ods-checkbox:invalid:not(:checked) + .ods-checkbox--label:hover::before, .ods-checkbox:invalid:not(:checked) + .ods-checkbox--label.is-ods-checkbox-hover::before, .ods-checkbox.is-ods-checkbox-invalid:not(:checked) + .ods-checkbox--label:hover::before, .ods-checkbox.is-ods-checkbox-invalid:not(:checked) + .ods-checkbox--label.is-ods-checkbox-hover::before {
+  border-color: #640019;
+}
+.ods-checkbox:invalid:focus + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid:focus + .ods-checkbox--label::before {
+  outline: 0;
+  box-shadow: 0 0 0 2px #f88c90;
+  border-color: #da372c;
+}
+.ods-checkbox:invalid:disabled + .ods-checkbox--label, .ods-checkbox.is-ods-checkbox-invalid:disabled + .ods-checkbox--label {
+  color: #da372c;
+}
+.ods-checkbox:invalid:disabled + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid:disabled + .ods-checkbox--label::before {
+  border-color: #f88c90;
+}
+.ods-checkbox:invalid:disabled:checked + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid:disabled:checked + .ods-checkbox--label::before {
+  background-color: #f88c90;
+}
+.ods-checkbox:invalid:disabled:checked + .ods-checkbox--label::before, .ods-checkbox:invalid:disabled:not(:checked) + .ods-checkbox--label::before, .ods-checkbox:invalid:disabled:indeterminate + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid:disabled:checked + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid:disabled:not(:checked) + .ods-checkbox--label::before, .ods-checkbox.is-ods-checkbox-invalid:disabled:indeterminate + .ods-checkbox--label::before {
+  border-color: #f88c90;
+}
+.ods-checkbox:invalid:disabled:indeterminate + .ods-checkbox--label::after, .ods-checkbox.is-ods-checkbox-invalid:disabled:indeterminate + .ods-checkbox--label::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 10 2'%3E%3Cpath fill='%23ffffff' d='M0 0h10v2H0z'/%3E%3C/svg%3E");
+}
+
+.ods-checkbox--label {
+  display: block;
+  position: relative;
+  margin-block-end: 0.375rem;
+  padding-inline-start: 1.75em;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: start;
+}
+.ods-checkbox--label::before, .ods-checkbox--label::after {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  content: "";
+  display: block;
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  width: 1em;
+  height: 1em;
+  transition-property: border-color, background, opacity, box-shadow;
+  transition-duration: 100ms;
+  transition-timing-function: linear;
+  border: 2px solid transparent;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-checkbox--label::before, .ods-checkbox--label::after {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-checkbox--label::before, [dir=rtl] .ods-checkbox--label::after {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-checkbox--label::before {
+  transform: translateY(-50%);
+  border-color: #8c8c96;
+}
+.ods-checkbox--label::after {
+  transform: translateY(-50%) scale(0.9);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='transparent' d='M0 5.6L1.6 4l3.2 3.3 5.6-5.7L12 3.1l-7.2 7.4L0 5.6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-table .ods-checkbox--label:empty {
+  height: calc(1em * 1.3);
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-checkbox--label:last-child {
+  margin-block-end: 0;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-form {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  max-width: calc(32em + 1.5rem + 1.5rem + 2px);
+  margin-block-start: 0;
+  margin-block-end: 1.5rem;
+  margin-inline: 0;
+  padding-block: 1.5rem;
+  padding-inline: 1.5rem;
+  border: 1px solid #d7d7dc;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-form {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-form {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-form:last-child {
+  margin-block-end: 0;
+}
+
+.ods-form--header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-start: 0;
+  margin-block-end: 0.75rem;
+  margin-inline: 0;
+}
+
+.ods-form--title {
+  margin-block: 0.375em;
+  margin-inline: 0.375em;
+  padding-block: 0;
+  padding-inline: 0;
+  color: #1d1d21;
+  font-size: 1.31951169rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ods-form--actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.ods-form--actions:not(:last-child) {
+  margin-block-end: 0.75rem;
+}
+[data-readonly] .ods-form--actions {
+  display: none;
+}
+
+.ods-form--footer {
+  font-size: 0.8705493166rem;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-modal .ods-form {
+  padding-block: 0;
+  padding-inline: 0;
+  border: 0;
+}
+.ods-modal .ods-form--header {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-field--hint,
+.ods-field--error {
+  font-size: 0.8705493166rem;
+}
+
+.ods-field--hint {
+  margin-block-end: 0.375rem;
+  color: #1d1d21;
+}
+.ods-text-input:disabled ~ .ods-field--hint, .ods-text-input[readonly] ~ .ods-field--hint {
+  color: #6e6e78;
+}
+
+.ods-field--error {
+  display: flex;
+  align-items: center;
+  margin-block-start: 0.375rem;
+  color: #da372c;
+}
+
+.ods-fieldset--pair {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.ods-fieldset--pair .ods-number-input,
+.ods-fieldset--pair .ods-text-input,
+.ods-fieldset--pair .ods-select {
+  width: calc(50% - 0.75rem);
+}
+
+.ods-fieldset-flex {
+  display: flex;
+  flex-direction: column;
+  max-width: 32em;
+  /* stylelint-disable-next-line no-descending-specificity  */
+}
+.ods-fieldset-flex .ods-label,
+.ods-fieldset-flex .ods-input-legend {
+  order: 1;
+  margin-block-end: 0.375rem;
+}
+.ods-fieldset-flex .ods-number-input,
+.ods-fieldset-flex .ods-text-input,
+.ods-fieldset-flex .ods-select,
+.ods-fieldset-flex .ods-input--unavailable,
+.ods-fieldset-flex .ods-fieldset--pair,
+.ods-fieldset-flex output:not([class]) {
+  order: 3;
+}
+.ods-fieldset-flex .ods-input--unavailable {
+  margin-block: 0;
+  margin-inline: 0;
+}
+.ods-fieldset-flex .ods-field--hint {
+  order: 2;
+  margin-block-end: 0.375rem;
+}
+.ods-fieldset-flex .ods-field--hint + .ods-label {
+  margin-block-end: 0;
+}
+.ods-fieldset-flex .ods-field--error {
+  order: 4;
+}
+
+.ods-fieldset--attached {
+  display: flex;
+  max-width: 32em;
+}
+.ods-fieldset--attached .ods-button {
+  border-start-start-radius: 0;
+  border-start-end-radius: 4px;
+  border-end-start-radius: 0;
+  border-end-end-radius: 4px;
+}
+.ods-fieldset--attached .ods-text-input {
+  border-inline-end: 0;
+  border-start-start-radius: 4px;
+  border-start-end-radius: 0;
+  border-end-start-radius: 4px;
+  border-end-end-radius: 0;
+}
+.ods-fieldset--attached .ods-text-input:focus {
+  z-index: 1;
+}
+
+/* stylelint-disable-next-line no-descending-specificity  */
+.ods-input-legend {
+  margin-block-start: 0;
+  margin-block-end: 0.375em;
+  margin-inline: 0;
+  color: #1d1d21;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ods-group-legend {
+  margin-block-start: 0;
+  margin-block-end: 0.375em;
+  margin-inline: 0;
+  color: #1d1d21;
+  font-size: 1.1487rem;
+  font-weight: 600;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-fieldset {
+  margin-block-start: 0;
+  margin-block-end: 0.75rem;
+  margin-inline: 0;
+}
+.ods-fieldset:last-child {
+  margin-block: 0;
+  margin-inline: 0;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-label {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  color: #1d1d21;
+  font-weight: 600;
+}
+.ods-text-input:disabled ~ .ods-label, .ods-text-input[readonly] ~ .ods-label {
+  color: #1d1d21;
+}
+.ods-text-input[type=search] ~ .ods-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+.ods-label--optional {
+  display: none;
+  color: #6e6e78;
+  font-size: 0.8705493166rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+[data-optional] .ods-label--optional, :optional ~ .ods-label .ods-label--optional {
+  display: block;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-modal--overlay {
+  display: flex;
+  position: fixed;
+  z-index: 10;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  align-items: center;
+  justify-content: center;
+  background: rgba(29, 29, 33, 0.75);
+}
+
+.ods-modal--dialog {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  position: relative;
+  max-width: calc(32em + 1.5rem + 1.5rem);
+  max-height: calc(100vh - 1.5rem);
+  padding-block-start: 1.5rem;
+  padding-block-end: 0;
+  padding-inline: 1.5rem;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-modal--dialog {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-modal--dialog {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+
+.ods-modal--header {
+  display: flex;
+  flex-direction: column;
+}
+
+.ods-modal--dismiss {
+  align-self: flex-end;
+  margin-block-end: 0.375rem;
+}
+
+.ods-modal--title {
+  margin-block-start: 0;
+  margin-block-end: 0;
+  color: #1d1d21;
+  font-size: 1.31951169rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ods-modal--content {
+  padding-block-start: 0.375rem;
+  padding-block-end: 3rem;
+  padding-inline: 0;
+  font-size: 1rem;
+}
+
+.ods-modal--footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-block-end: 1.5rem;
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes dialog-in {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes dialog-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+}
+.ods-modal {
+  display: none;
+}
+.ods-modal.is-open {
+  display: block;
+}
+.ods-modal[aria-hidden=false] .ods-modal--overlay {
+  animation: overlay-in 100ms linear;
+}
+.ods-modal[aria-hidden=false] .ods-modal--dialog {
+  animation: dialog-in 100ms linear;
+}
+.ods-modal[aria-hidden=true] .ods-modal--overlay {
+  animation: overlay-out 100ms linear;
+}
+.ods-modal[aria-hidden=true][aria-hidden=true] .ods-modal--dialog {
+  animation: dialog-out 100ms linear;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-number-input {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: block;
+  position: relative;
+  width: 100%;
+  max-width: 32em;
+  margin-block: 0;
+  margin-inline: 0;
+  padding-block: 0.375em;
+  padding-inline: 0.75em;
+  transition-property: border-color, background-color, box-shadow;
+  transition-duration: 100ms;
+  transition-timing-function: linear;
+  border: 1px solid #8c8c96;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 0 #f2f5ff;
+  color: #1d1d21;
+  font-family: "Public Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", "Noto Sans Arabic", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-number-input {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-number-input {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-number-input:hover, .ods-number-input:focus, .ods-number-input.is-ods-input-hover, .ods-number-input.is-ods-input-focus {
+  border-color: #1662dd;
+}
+.ods-number-input:focus, .ods-number-input.is-ods-input-focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #a7b5ec;
+}
+.ods-number-input:disabled {
+  opacity: 1;
+  color: #1d1d21;
+  cursor: not-allowed;
+}
+.ods-number-input:disabled, .ods-number-input[readonly] {
+  border-color: #d7d7dc;
+  background-color: #f5f5f6;
+}
+.ods-number-input:disabled:hover, .ods-number-input[readonly]:hover {
+  border-color: #d7d7dc;
+}
+.ods-number-input:invalid, .ods-number-input.is-ods-input-invalid {
+  border-color: #da372c;
+}
+.ods-number-input:invalid:focus, .ods-number-input.is-ods-input-invalid:focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #f88c90;
+}
+.ods-number-input::placeholder {
+  color: #6e6e78;
+}
+.ods-number-input[readonly] {
+  appearance: textfield;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/* stylelint-disable no-descending-specificity, max-nesting-depth */
+.ods-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+.ods-radio:checked + .ods-radio--label::before {
+  border-color: #1662dd;
+  background-color: #1662dd;
+}
+.ods-radio:checked + .ods-radio--label::after {
+  background: #ffffff;
+}
+.ods-radio:focus + .ods-radio--label::before, .ods-radio.is-ods-radio-focus + .ods-radio--label::before {
+  outline: 0;
+  box-shadow: 0 0 0 2px #a7b5ec;
+  border-color: #1662dd;
+}
+.ods-radio:disabled + .ods-radio--label {
+  color: #1d1d21;
+  cursor: not-allowed;
+}
+.ods-radio:disabled + .ods-radio--label::before {
+  border-color: #d7d7dc;
+  background-color: #f5f5f6;
+}
+.ods-radio:disabled:checked + .ods-radio--label::before {
+  border-color: #a7b5ec;
+  background-color: #a7b5ec;
+}
+.ods-radio:disabled:checked + .ods-radio--label::after {
+  background-color: #ffffff;
+}
+.ods-radio:invalid:hover:not(:checked) + .ods-radio--label::before, .ods-radio.is-ods-radio-invalid:hover:not(:checked) + .ods-radio--label::before {
+  border-color: #640019;
+}
+.ods-radio:invalid + .ods-radio--label, .ods-radio.is-ods-radio-invalid + .ods-radio--label {
+  color: #da372c;
+}
+.ods-radio:invalid + .ods-radio--label::before, .ods-radio.is-ods-radio-invalid + .ods-radio--label::before {
+  border-color: #da372c;
+}
+.ods-radio:invalid:checked + .ods-radio--label::before, .ods-radio.is-ods-radio-invalid:checked + .ods-radio--label::before {
+  background-color: #da372c;
+}
+.ods-radio:invalid:focus + .ods-radio--label::before, .ods-radio.is-ods-radio-invalid:focus + .ods-radio--label::before {
+  outline: 0;
+  box-shadow: 0 0 0 2px #f88c90;
+  border-color: #da372c;
+}
+.ods-radio:invalid:disabled + .ods-radio--label, .ods-radio.is-ods-radio-invalid:disabled + .ods-radio--label {
+  color: #da372c;
+}
+.ods-radio:invalid:disabled + .ods-radio--label::before, .ods-radio.is-ods-radio-invalid:disabled + .ods-radio--label::before {
+  border-color: #f88c90;
+  background: #ffffff;
+}
+.ods-radio:invalid:disabled:hover + .ods-radio--label::before, .ods-radio.is-ods-radio-invalid:disabled:hover + .ods-radio--label::before {
+  border-color: #f88c90;
+}
+.ods-radio:invalid:disabled:checked + .ods-radio--label::before, .ods-radio.is-ods-radio-invalid:disabled:checked + .ods-radio--label::before {
+  border-color: #f88c90;
+  background-color: #f88c90;
+}
+.ods-radio:invalid:disabled:checked + .ods-radio--label::after, .ods-radio.is-ods-radio-invalid:disabled:checked + .ods-radio--label::after {
+  border-color: #f88c90;
+  background-color: #ffffff;
+}
+
+.ods-radio--label {
+  display: block;
+  position: relative;
+  margin-block-end: 0.375rem;
+  padding-inline-start: 1.75em;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: start;
+}
+.ods-radio--label::before, .ods-radio--label::after {
+  border-start-start-radius: 1.125rem;
+  border-start-end-radius: 1.125rem;
+  border-end-end-radius: 1.125rem;
+  border-end-start-radius: 1.125rem;
+  content: "";
+  display: block;
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  width: 1em;
+  height: 1em;
+  transition-property: border-color, background, opacity, box-shadow;
+  transition-duration: 100ms;
+  transition-timing-function: linear;
+  border: 2px solid transparent;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-radio--label::before, .ods-radio--label::after {
+    border-top-left-radius: 1.125rem;
+    border-top-right-radius: 1.125rem;
+    border-bottom-right-radius: 1.125rem;
+    border-bottom-left-radius: 1.125rem;
+  }
+  [dir=rtl] .ods-radio--label::before, [dir=rtl] .ods-radio--label::after {
+    border-top-left-radius: 1.125rem;
+    border-top-right-radius: 1.125rem;
+    border-bottom-right-radius: 1.125rem;
+    border-bottom-left-radius: 1.125rem;
+  }
+}
+.ods-radio--label::before {
+  transform: translateY(-50%);
+  border-color: #8c8c96;
+}
+.ods-radio--label::after {
+  transform: translateY(-50%) scale(0.4);
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.ods-radio--label:hover::before, .ods-radio--label.is-ods-radio-hover::before {
+  border-color: #1662dd;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-radio--label:last-child {
+  margin-block-end: 0;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-infobox {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: grid;
+  grid-template-areas: "icon title" ". content" ". actions";
+  grid-template-columns: max-content 1fr;
+  width: 100%;
+  max-width: calc(32em + 1.5rem + 1.5rem);
+  padding-block: 1.5rem;
+  padding-inline: 1.5rem;
+  column-gap: 0.75rem;
+  background-color: #f2f5ff;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-infobox {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-infobox {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-infobox a {
+  color: #1d1d21;
+  text-decoration: underline;
+}
+.ods-infobox:not(:last-child) {
+  margin-block-end: 1.5rem;
+}
+
+.ods-infobox--icon {
+  grid-area: icon;
+  align-self: start;
+  font-size: 1.1487rem;
+  line-height: 1;
+  justify-self: start;
+}
+
+.ods-infobox--title {
+  grid-area: title;
+  font-size: 1rem;
+}
+
+.ods-infobox--content {
+  grid-area: content;
+}
+.ods-infobox--content:not(:last-child) {
+  margin-block-end: 0.375rem;
+}
+
+.ods-infobox--actions {
+  display: flex;
+  grid-area: actions;
+  justify-content: start;
+}
+
+.is-ods-infobox-success {
+  background-color: #e5faf3;
+}
+
+.is-ods-infobox-caution {
+  background-color: #faf5dc;
+}
+
+.is-ods-infobox-danger {
+  background-color: #ffdfe2;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-select:not([data-type]) {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: block;
+  position: relative;
+  width: 100%;
+  max-width: 32em;
+  margin-block: 0;
+  margin-inline: 0;
+  padding-block: 0.375em;
+  padding-inline: 0.75em;
+  transition-property: border-color, background-color, box-shadow;
+  transition-duration: 100ms;
+  transition-timing-function: linear;
+  border: 1px solid #8c8c96;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 0 #f2f5ff;
+  color: #1d1d21;
+  font-family: "Public Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", "Noto Sans Arabic", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3E%3Cpath fill='%231d1d21' fill-rule='evenodd' d='M8.73105 9.21673c-.39533.42357-1.06677.42357-1.46211 0L3.13105 4.78327c-.39533-.42357-1.06677-.42357-1.46211 0l-.03211.03441c-.35859.38421-.35859.98043 0 1.36464l5.62704 6.02898c.3972.4256 1.07254.4232 1.4668-.0051l5.62423-6.11001c.3604-.39146.3473-.99759-.0295-1.37318-.3967-.39541-1.042-.38376-1.4242.02572l-4.17015 4.468z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75em center;
+  background-size: 0.8705493166rem;
+  appearance: none;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-select:not([data-type]) {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-select:not([data-type]) {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-select:not([data-type]):hover, .ods-select:not([data-type]):focus, .ods-select:not([data-type]).is-ods-input-hover, .ods-select:not([data-type]).is-ods-input-focus {
+  border-color: #1662dd;
+}
+.ods-select:not([data-type]):focus, .ods-select:not([data-type]).is-ods-input-focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #a7b5ec;
+}
+.ods-select:not([data-type]):disabled {
+  opacity: 1;
+  color: #1d1d21;
+  cursor: not-allowed;
+}
+.ods-select:not([data-type]):disabled, .ods-select:not([data-type])[readonly] {
+  border-color: #d7d7dc;
+  background-color: #f5f5f6;
+}
+.ods-select:not([data-type]):disabled:hover, .ods-select:not([data-type])[readonly]:hover {
+  border-color: #d7d7dc;
+}
+.ods-select:not([data-type]):invalid, .ods-select:not([data-type]).is-ods-input-invalid {
+  border-color: #da372c;
+}
+.ods-select:not([data-type]):invalid:focus, .ods-select:not([data-type]).is-ods-input-invalid:focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #f88c90;
+}
+.ods-select:not([data-type])::placeholder {
+  color: #6e6e78;
+}
+.ods-select:not([data-type]) option {
+  padding-block: 0;
+  padding-inline: 0;
+}
+.ods-select:not([data-type])[multiple] {
+  background-image: none;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-status--label {
+  display: block;
+  margin-block-end: 0.375rem;
+  font-weight: 600;
+}
+
+.ods-status--value {
+  position: relative;
+  padding-inline-start: 0.875em;
+  background-color: transparent;
+  color: #1d1d21;
+}
+.ods-status--value::before {
+  border-start-start-radius: 1em;
+  border-start-end-radius: 1em;
+  border-end-end-radius: 1em;
+  border-end-start-radius: 1em;
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  width: 0.5em;
+  height: 0.5em;
+  margin-inline-end: 0.375rem;
+  transform: translateY(-50%);
+  background-color: #6e6e78;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-status--value::before {
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    border-bottom-right-radius: 1em;
+    border-bottom-left-radius: 1em;
+  }
+  [dir=rtl] .ods-status--value::before {
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    border-bottom-right-radius: 1em;
+    border-bottom-left-radius: 1em;
+  }
+}
+
+.is-ods-status-label-hidden .ods-status--label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+.is-ods-status-success .ods-status--value::before {
+  background-color: #00b478;
+}
+
+.is-ods-status-caution .ods-status--value::before {
+  background-color: #ffc61c;
+}
+
+.is-ods-status-danger .ods-status--value::before {
+  background-color: #da372c;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-status {
+  margin-block-end: 1.5rem;
+}
+.ods-status:last-child {
+  margin-block-end: 0;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-tabs--tablist {
+  position: relative;
+  border-block-end: 1px solid #d7d7dc;
+}
+
+.ods-tabs--tab {
+  display: inline-block;
+  position: relative;
+  margin-block: 0;
+  margin-inline: 0;
+  padding-block: 0.75rem;
+  padding-inline: 0.75rem;
+  border: 0;
+  background: none;
+  color: #1d1d21;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.ods-tabs--tab[aria-selected=true]::before {
+  content: "";
+  position: absolute;
+  inset-block-end: -1px;
+  inset-inline-start: 0;
+  width: 100%;
+  height: 3px;
+  background: #1662dd;
+}
+
+.ods-tabs--tabpanel [role=tabpanel] {
+  padding-block: 3rem;
+  padding-inline: 0;
+}
+.ods-tabs--tabpanel [role=tabpanel]:focus {
+  outline: none;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/* stylelint-disable selector-max-compound-selectors, max-nesting-depth */
+.ods-table {
+  width: auto;
+  margin-block: 0;
+  margin-inline: 0;
+  border-spacing: 0;
+  border-collapse: collapse;
+  line-height: 1.3;
+}
+.ods-table:only-child {
+  margin-block-end: 0;
+}
+.ods-table caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin-block: -1px;
+  margin-inline: -1px;
+  padding-block: 0;
+  padding-inline: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+.ods-table td,
+.ods-table th {
+  max-width: 32em;
+  padding-block: 0.75rem;
+  padding-inline: 0.75rem;
+  text-align: start;
+  vertical-align: baseline;
+  overflow-wrap: break-word;
+}
+.ods-table th {
+  color: #1d1d21;
+  font-weight: 600;
+}
+.ods-table thead th {
+  border-block-start: 1px solid #d7d7dc;
+  border-block-end: 1px solid #d7d7dc;
+}
+.ods-table tbody [rowspan] {
+  border-block-end: 1px solid #d7d7dc;
+}
+.ods-table tbody tr td,
+.ods-table tbody tr th {
+  border-block-end: 1px solid #d7d7dc;
+}
+.ods-table tbody tr:first-child [rowspan] {
+  border-block-start: 0;
+}
+.ods-table[data-null] tbody {
+  display: block;
+}
+.ods-table[data-null] tfoot tr td {
+  max-width: 100%;
+  padding-block: 3rem;
+  padding-inline: 6rem;
+  background: #f5f5f6;
+  color: #6e6e78;
+  text-align: center;
+}
+.ods-table .ods-table--sort {
+  position: relative;
+  align-items: center;
+  width: 100%;
+  padding-block: 0;
+  padding-inline: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-align: inherit;
+  white-space: nowrap;
+}
+.ods-table .is-ods-table-unsorted,
+.ods-table .is-ods-table-asc,
+.ods-table .is-ods-table-desc {
+  padding-block: 0;
+  padding-inline-start: 0;
+  padding-inline-end: calc(1em + 0.75rem);
+}
+.ods-table .is-ods-table-unsorted::after,
+.ods-table .is-ods-table-asc::after,
+.ods-table .is-ods-table-desc::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 0;
+  width: 1em;
+  height: 1em;
+  margin-block: 0;
+  margin-inline-start: 0.75rem;
+  margin-inline-end: 0;
+  transform: translateY(-50%) scale(0.75);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.ods-table .is-ods-table-unsorted::after {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2.29289 0.292893C2.68342 -0.0976311 3.31658 -0.0976311 3.70711 0.292893L5.70711 2.29289C6.09763 2.68342 6.09763 3.31658 5.70711 3.70711C5.31658 4.09763 4.68342 4.09763 4.29289 3.70711L4 3.41421V10C4 10.5523 3.55228 11 3 11C2.44772 11 2 10.5523 2 10V3.41421L1.70711 3.70711C1.31658 4.09763 0.683417 4.09763 0.292893 3.70711C-0.0976311 3.31658 -0.0976311 2.68342 0.292893 2.29289L2.29289 0.292893Z' fill='%236e6e78'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M9 12C8.73478 12 8.48043 11.8946 8.29289 11.7071L6.29289 9.70711C5.90237 9.31658 5.90237 8.68342 6.29289 8.29289C6.68342 7.90237 7.31658 7.90237 7.70711 8.29289L8 8.58579L8 2C8 1.44771 8.44772 1 9 1C9.55229 1 10 1.44771 10 2L10 8.58579L10.2929 8.29289C10.6834 7.90237 11.3166 7.90237 11.7071 8.29289C12.0976 8.68342 12.0976 9.31658 11.7071 9.70711L9.70711 11.7071C9.51957 11.8946 9.26522 12 9 12Z' fill='%236e6e78'/%3E%3C/svg%3E");
+}
+.ods-table .is-ods-table-unsorted:hover::after {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2.29289 0.292893C2.68342 -0.0976311 3.31658 -0.0976311 3.70711 0.292893L5.70711 2.29289C6.09763 2.68342 6.09763 3.31658 5.70711 3.70711C5.31658 4.09763 4.68342 4.09763 4.29289 3.70711L4 3.41421V10C4 10.5523 3.55228 11 3 11C2.44772 11 2 10.5523 2 10V3.41421L1.70711 3.70711C1.31658 4.09763 0.683417 4.09763 0.292893 3.70711C-0.0976311 3.31658 -0.0976311 2.68342 0.292893 2.29289L2.29289 0.292893Z' fill='%231d1d21'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M9 12C8.73478 12 8.48043 11.8946 8.29289 11.7071L6.29289 9.70711C5.90237 9.31658 5.90237 8.68342 6.29289 8.29289C6.68342 7.90237 7.31658 7.90237 7.70711 8.29289L8 8.58579L8 2C8 1.44771 8.44772 1 9 1C9.55229 1 10 1.44771 10 2L10 8.58579L10.2929 8.29289C10.6834 7.90237 11.3166 7.90237 11.7071 8.29289C12.0976 8.68342 12.0976 9.31658 11.7071 9.70711L9.70711 11.7071C9.51957 11.8946 9.26522 12 9 12Z' fill='%231d1d21'/%3E%3C/svg%3E");
+}
+.ods-table .is-ods-table-asc::after {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M4.29289 0.292893C4.68342 -0.0976311 5.31658 -0.0976311 5.70711 0.292893L9.70711 4.29289C10.0976 4.68342 10.0976 5.31658 9.70711 5.70711C9.31658 6.09763 8.68342 6.09763 8.29289 5.70711L6 3.41421V11C6 11.5523 5.55228 12 5 12C4.44772 12 4 11.5523 4 11V3.41421L1.70711 5.70711C1.31658 6.09763 0.683417 6.09763 0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289L4.29289 0.292893Z' fill='%231d1d21'/%3E%3C/svg%3E");
+}
+.ods-table .is-ods-table-desc::after {
+  transform: translateY(-50%) rotate(180deg) scale(0.75);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M4.29289 0.292893C4.68342 -0.0976311 5.31658 -0.0976311 5.70711 0.292893L9.70711 4.29289C10.0976 4.68342 10.0976 5.31658 9.70711 5.70711C9.31658 6.09763 8.68342 6.09763 8.29289 5.70711L6 3.41421V11C6 11.5523 5.55228 12 5 12C4.44772 12 4 11.5523 4 11V3.41421L1.70711 5.70711C1.31658 6.09763 0.683417 6.09763 0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289L4.29289 0.292893Z' fill='%231d1d21'/%3E%3C/svg%3E");
+}
+.ods-table .is-ods-table-num {
+  /* Numerical data display should not swap for RTL languages. */
+  /* stylelint-disable-next-line liberty/use-logical-spec */
+  text-align: right;
+  font-feature-settings: "lnum", "tnum";
+}
+.ods-table .is-ods-table-date {
+  white-space: nowrap;
+}
+.ods-table .is-ods-table-checkbox {
+  padding-inline-end: 0;
+}
+.ods-table .is-ods-table-checkbox .u-visually-hidden {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 1em;
+}
+
+.ods-table--figure {
+  max-width: 100%;
+  margin-block-start: 0;
+  margin-block-end: 1.5em;
+  margin-inline: 0;
+  overflow-x: auto;
+}
+.ods-table--figure:last-child {
+  margin-block: 0;
+  margin-inline: 0;
+}
+.ods-table--figure .ods-table--figcaption {
+  margin-block-end: 0.375em;
+  color: #1d1d21;
+  font-size: 1.31951169rem;
+  font-weight: 600;
+  text-align: start;
+}
+
+@media only screen and (max-width: 40rem) {
+  .is-ods-table-inessential {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin-block: -1px;
+    margin-inline: -1px;
+    padding-block: 0;
+    padding-inline: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
+  }
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-tag {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: inline-block;
+  margin-block-start: 0;
+  margin-block-end: 0.375rem;
+  margin-inline-start: 0;
+  margin-inline-end: 0.375rem;
+  padding-block: 0;
+  padding-inline: 0.375em;
+  background: #ebebed;
+  color: #1d1d21;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-tag {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-tag {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+
+.ods-tag--list {
+  display: inline-block;
+  margin-block-end: -0.375rem;
+  margin-inline-start: 0.375rem;
+  list-style-type: none;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-text-input {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: block;
+  position: relative;
+  width: 100%;
+  max-width: 32em;
+  margin-block: 0;
+  margin-inline: 0;
+  padding-block: 0.375em;
+  padding-inline: 0.75em;
+  transition-property: border-color, background-color, box-shadow;
+  transition-duration: 100ms;
+  transition-timing-function: linear;
+  border: 1px solid #8c8c96;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 0 #f2f5ff;
+  color: #1d1d21;
+  font-family: "Public Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", "Noto Sans Arabic", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-text-input {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-text-input {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-text-input:hover, .ods-text-input:focus, .ods-text-input.is-ods-input-hover, .ods-text-input.is-ods-input-focus {
+  border-color: #1662dd;
+}
+.ods-text-input:focus, .ods-text-input.is-ods-input-focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #a7b5ec;
+}
+.ods-text-input:disabled {
+  opacity: 1;
+  color: #1d1d21;
+  cursor: not-allowed;
+}
+.ods-text-input:disabled, .ods-text-input[readonly] {
+  border-color: #d7d7dc;
+  background-color: #f5f5f6;
+}
+.ods-text-input:disabled:hover, .ods-text-input[readonly]:hover {
+  border-color: #d7d7dc;
+}
+.ods-text-input:invalid, .ods-text-input.is-ods-input-invalid {
+  border-color: #da372c;
+}
+.ods-text-input:invalid:focus, .ods-text-input.is-ods-input-invalid:focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #f88c90;
+}
+.ods-text-input::placeholder {
+  color: #6e6e78;
+}
+.ods-text-input[type=search] {
+  padding-inline-start: 2.2737rem;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg' class='ods-icon'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8.75739 10.1716C7.96696 10.6951 7.01908 11 6 11C3.23858 11 1 8.76142 1 6C1 3.23858 3.23858 1 6 1C8.76142 1 11 3.23858 11 6C11 7.01908 10.6951 7.96696 10.1716 8.75739L12.6908 11.2766C13.0813 11.6671 13.0813 12.3003 12.6908 12.6908C12.3003 13.0813 11.6671 13.0813 11.2766 12.6908L8.75739 10.1716ZM9 6C9 7.65685 7.65685 9 6 9C4.34315 9 3 7.65685 3 6C3 4.34315 4.34315 3 6 3C7.65685 3 9 4.34315 9 6Z' fill='%231d1d21'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  background-size: 1.1487rem;
+}
+.ods-text-input[type=search]::-webkit-search-decoration, .ods-text-input[type=search]::-webkit-search-cancel-button, .ods-text-input[type=search]::-webkit-search-results-button, .ods-text-input[type=search]::-webkit-search-results-decoration {
+  display: none;
+}
+.ods-text-input[type=search]::-ms-clear, .ods-text-input[type=search]::-ms-reveal {
+  display: none;
+}
+[dir=rtl] .ods-text-input[type=search] {
+  background-position: right 0.75rem center;
+}
+
+.ods-text-area {
+  min-width: 1.5rem;
+  max-width: 32em;
+  min-height: 3rem;
+  padding-block-start: 0.375em;
+  padding-block-end: 0.75em;
+  padding-inline: 0.75em;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-toast {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: grid;
+  position: relative;
+  grid-gap: 0 0.75rem;
+  grid-template-columns: min-content 1fr min-content;
+  align-items: start;
+  max-width: 32em;
+  padding-block: 1.5rem;
+  padding-inline: 0.75rem;
+  animation-name: ods-toast-in, ods-toast-out;
+  animation-duration: 300ms, 1000ms;
+  animation-delay: 0s, 5300ms;
+  border: 0;
+  background-color: #00297a;
+  box-shadow: 0 8px 12px rgba(29, 29, 33, 0.12);
+  color: #ffffff;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-toast {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-toast {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-toast:hover, .ods-toast:focus-within {
+  animation-delay: 0s, 300s;
+}
+.ods-toast.is-toast-dismissed {
+  animation-name: ods-toast-out;
+  animation-duration: 1000ms;
+  animation-delay: 1000ms;
+}
+.ods-toast:last-child {
+  margin-block-end: 0;
+}
+
+.ods-toast--icon {
+  width: 1.31951169rem;
+  color: #ffffff;
+  font-size: 1.31951169rem;
+  line-height: 1;
+}
+
+.ods-toast--title {
+  margin-block: 0;
+  margin-inline: 0;
+  padding-inline-end: 1.5rem;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ods-toast--dismiss {
+  position: absolute;
+  inset-block-start: 0.375rem;
+  inset-inline-end: 0.375rem;
+  margin-block-end: 0;
+  border: 0;
+}
+
+.ods-toast--body {
+  grid-column: 2;
+  margin-block-end: 0;
+  font-size: 1rem;
+}
+
+.is-ods-toast-success {
+  background-color: #008055;
+}
+
+.is-ods-toast-caution {
+  background-color: #ffc61c;
+  color: #1d1d21;
+}
+.is-ods-toast-caution .ods-toast--icon {
+  color: #1d1d21;
+}
+.is-ods-toast-caution .ods-toast--title {
+  color: #1d1d21;
+}
+
+.is-ods-toast-danger {
+  background-color: #da372c;
+}
+
+@keyframes ods-toast-in {
+  0% {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes ods-toast-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion) {
+  .ods-toast {
+    animation-name: ods-toast-in;
+    animation-duration: 300ms;
+    animation-delay: 0s;
+  }
+  .ods-toast.is-toast-dismissed {
+    animation-name: ods-toast-out;
+    animation-duration: 300ms;
+    animation-delay: 0s;
+  }
+}
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-toast-pen {
+  display: grid;
+  position: fixed;
+  z-index: 1;
+  inset-inline-end: 1.5rem;
+  inset-block-end: 1.5rem;
+  grid-gap: 0.75rem 0;
+  grid-template-columns: minmax(min-content, max-content);
+  max-height: 100vh;
+  overflow: visible;
+}
+
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+.ods-tooltip {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: block;
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  padding-block: 0.375rem;
+  padding-inline: 0.75rem;
+  transition: opacity 100ms linear 1s;
+  border: 1px solid #1d1d21;
+  opacity: 0;
+  background: #1d1d21;
+  color: #f5f5f6;
+  font-size: 0.8705493166rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-tooltip {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-tooltip {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-tooltip::after, .ods-tooltip::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: solid transparent;
+}
+.ods-tooltip::after {
+  border-width: calc(0.375rem - 2px);
+}
+.ods-tooltip::before {
+  border-width: 0.375rem;
+}
+*:focus + .ods-tooltip, .has-ods-tooltip:hover .ods-tooltip, .has-ods-tooltip:focus .ods-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.is-ods-tooltip-top {
+  inset-block-end: calc(100% + 0.75rem);
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+}
+.is-ods-tooltip-top::after, .is-ods-tooltip-top::before {
+  inset-block-start: 100%;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+}
+.is-ods-tooltip-top::after {
+  border-block-start-color: #1d1d21;
+}
+.is-ods-tooltip-top::before {
+  border-block-start-color: #1d1d21;
+}
+[dir=rtl] .is-ods-tooltip-top {
+  transform: translateX(50%);
+}
+[dir=rtl] .is-ods-tooltip-top::after, [dir=rtl] .is-ods-tooltip-top::before {
+  transform: translateX(50%);
+}
+
+.is-ods-tooltip-end {
+  inset-block-start: 50%;
+  inset-inline-start: calc(100% + 0.75rem);
+  transform: translateY(-50%);
+}
+.is-ods-tooltip-end::after, .is-ods-tooltip-end::before {
+  inset-block-start: 50%;
+  inset-inline-end: 100%;
+  transform: translateY(-50%);
+}
+.is-ods-tooltip-end::after {
+  border-inline-end-color: #1d1d21;
+}
+.is-ods-tooltip-end::before {
+  border-inline-end-color: #1d1d21;
+}
+
+.is-ods-tooltip-bottom {
+  inset-block-start: calc(100% + 0.75rem);
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+}
+.is-ods-tooltip-bottom::after, .is-ods-tooltip-bottom::before {
+  inset-block-end: 100%;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+}
+.is-ods-tooltip-bottom::after {
+  border-block-end-color: #1d1d21;
+}
+.is-ods-tooltip-bottom::before {
+  border-block-end-color: #1d1d21;
+}
+[dir=rtl] .is-ods-tooltip-bottom {
+  transform: translateX(50%);
+}
+[dir=rtl] .is-ods-tooltip-bottom::after, [dir=rtl] .is-ods-tooltip-bottom::before {
+  transform: translateX(50%);
+}
+
+.is-ods-tooltip-start {
+  inset-block-start: 50%;
+  inset-inline-end: calc(100% + 0.75rem);
+  transform: translateY(-50%);
+}
+.is-ods-tooltip-start::after, .is-ods-tooltip-start::before {
+  inset-block-start: 50%;
+  inset-inline-start: 100%;
+  transform: translateY(-50%);
+}
+.is-ods-tooltip-start::after {
+  border-inline-start-color: #1d1d21;
+}
+.is-ods-tooltip-start::before {
+  border-inline-start-color: #1d1d21;
+}
+
+.has-ods-tooltip {
+  display: inline-block;
+  position: relative;
+}
+
+@media only screen and (max-width: 40rem) {
+  .ods-tooltip {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+    border-end-start-radius: 0;
+    display: block;
+    visibility: hidden;
+    position: fixed;
+    z-index: 1;
+    inset-block-end: 0;
+    width: 100vw;
+    border: 0;
+    opacity: 0;
+    font-size: 0.8705493166rem;
+    white-space: wrap;
+    pointer-events: none;
+  }
+  @supports not (border-end-end-radius: 1px) {
+    .ods-tooltip {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    [dir=rtl] .ods-tooltip {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+  .ods-tooltip::after, .ods-tooltip::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: solid transparent;
+  }
+  .ods-tooltip::after {
+    border-width: calc(0.375rem - 2px);
+  }
+  .ods-tooltip::before {
+    border-width: 0.375rem;
+  }
+
+  .is-ods-tooltip-top,
+.is-ods-tooltip-end,
+.is-ods-tooltip-bottom,
+.is-ods-tooltip-start {
+    inset-block-start: 0;
+    inset-inline-end: unset;
+    inset-block-end: unset;
+    inset-inline-start: 0;
+    transform: none;
+  }
+  .is-ods-tooltip-top::after, .is-ods-tooltip-top::before,
+.is-ods-tooltip-end::after,
+.is-ods-tooltip-end::before,
+.is-ods-tooltip-bottom::after,
+.is-ods-tooltip-bottom::before,
+.is-ods-tooltip-start::after,
+.is-ods-tooltip-start::before {
+    inset-block-start: 100%;
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    border: 0;
+  }
+  [dir=rtl] .is-ods-tooltip-top::after, [dir=rtl] .is-ods-tooltip-top::before,
+[dir=rtl] .is-ods-tooltip-end::after,
+[dir=rtl] .is-ods-tooltip-end::before,
+[dir=rtl] .is-ods-tooltip-bottom::after,
+[dir=rtl] .is-ods-tooltip-bottom::before,
+[dir=rtl] .is-ods-tooltip-start::after,
+[dir=rtl] .is-ods-tooltip-start::before {
+    transform: translateX(50%);
+  }
+}
+/*!
+ * Copyright (c) 2018-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+/* stylelint-disable color-no-hex, declaration-no-important, selector-class-pattern, max-nesting-depth, selector-max-compound-selectors, selector-no-qualifying-type, no-descending-specificity */
+.ods-select {
+  position: relative;
+  max-width: 32em;
+  overflow: hidden;
+  font-size: 1rem;
+}
+.ods-select:focus, .ods-select.is-ods-select-focused, .is-ods-select-focus .ods-select {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  outline: none;
+  box-shadow: 0 0 0 4px #a7b5ec;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-select:focus, .ods-select.is-ods-select-focused, .is-ods-select-focus .ods-select {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-select:focus, [dir=rtl] .ods-select.is-ods-select-focused, [dir=rtl] .is-ods-select-focus .ods-select {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-select:focus.is-ods-select-open, .ods-select.is-ods-select-focused.is-ods-select-open, .is-ods-select-focus .ods-select.is-ods-select-open {
+  box-shadow: 0 0 0 4px #a7b5ec, 0 2px 0 4px #a7b5ec;
+}
+.ods-select:focus.is-ods-select-open.is-ods-select-flipped, .ods-select.is-ods-select-focused.is-ods-select-open.is-ods-select-flipped, .is-ods-select-focus .ods-select.is-ods-select-open.is-ods-select-flipped {
+  box-shadow: 0 0 0 4px #a7b5ec, 0 -2px 0 4px #a7b5ec;
+}
+.ods-select:last-child {
+  margin-block-end: 0;
+}
+.ods-select.is-ods-select-open {
+  overflow: initial;
+}
+.ods-select.is-ods-select-disabled .ods-select--inner,
+.ods-select.is-ods-select-disabled .ods-select--input {
+  border: 1px solid #d7d7dc;
+  background-color: #f5f5f6;
+  color: #6e6e78;
+  cursor: not-allowed;
+  user-select: none;
+}
+.ods-select.is-ods-select-disabled .ods-select--inner:hover,
+.ods-select.is-ods-select-disabled .ods-select--input:hover {
+  border-color: #8c8c96;
+}
+.ods-select.is-ods-select-disabled:focus, .ods-select.is-ods-select-disabled.is-ods-select-focused {
+  box-shadow: none;
+}
+.ods-select.is-ods-select-disabled .ods-select--item {
+  cursor: not-allowed;
+}
+.is-ods-select-invalid .ods-select:focus, .is-ods-select-invalid .ods-select.is-ods-select-focused {
+  outline: 0;
+  box-shadow: 0 0 0 4px #f88c90;
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  outline: none;
+}
+@supports not (border-end-end-radius: 1px) {
+  .is-ods-select-invalid .ods-select:focus, .is-ods-select-invalid .ods-select.is-ods-select-focused {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .is-ods-select-invalid .ods-select:focus, [dir=rtl] .is-ods-select-invalid .ods-select.is-ods-select-focused {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.is-ods-select-invalid .ods-select:focus.is-ods-select-open, .is-ods-select-invalid .ods-select.is-ods-select-focused.is-ods-select-open {
+  box-shadow: 0 0 0 4px #f88c90, 0 2px 0 4px #f88c90;
+}
+.is-ods-select-invalid .ods-select:focus.is-ods-select-open.is-ods-select-flipped, .is-ods-select-invalid .ods-select.is-ods-select-focused.is-ods-select-open.is-ods-select-flipped {
+  box-shadow: 0 0 0 4px #f88c90, 0 -2px 0 4px #f88c90;
+}
+.is-ods-select-invalid .ods-select .ods-select--inner,
+.is-ods-select-invalid .ods-select .ods-select--input {
+  border-color: #da372c;
+}
+.ods-select [hidden] {
+  display: none !important;
+}
+
+.ods-select[data-type*=select-one] .ods-select--input,
+.ods-select[data-type*=select-multiple] .ods-select--input {
+  display: inline-block;
+  width: 100%;
+  margin-block-start: 0;
+  margin-block-end: 0.375rem;
+  margin-inline: 0;
+  padding-block: 0;
+  padding-inline: 0;
+  border-block-end: 0;
+  background-color: transparent;
+  vertical-align: top;
+}
+.ods-select[data-type*=select-one] .ods-select--button,
+.ods-select[data-type*=select-multiple] .ods-select--button {
+  border-start-start-radius: 10em;
+  border-start-end-radius: 10em;
+  border-end-end-radius: 10em;
+  border-end-start-radius: 10em;
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 0;
+  width: 20px;
+  height: 20px;
+  margin-block-start: -0.75rem;
+  margin-inline-end: 25px;
+  padding-block: 0;
+  padding-inline: 0;
+  opacity: 0.25;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEiIGhlaWdodD0iMjEiIHZpZXdCb3g9IjAgMCAyMSAyMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSIjMDAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0yLjU5Mi4wNDRsMTguMzY0IDE4LjM2NC0yLjU0OCAyLjU0OEwuMDQ0IDIuNTkyeiIvPjxwYXRoIGQ9Ik0wIDE4LjM2NEwxOC4zNjQgMGwyLjU0OCAyLjU0OEwyLjU0OCAyMC45MTJ6Ii8+PC9nPjwvc3ZnPg==");
+  background-size: 8px;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-select[data-type*=select-one] .ods-select--button,
+.ods-select[data-type*=select-multiple] .ods-select--button {
+    border-top-left-radius: 10em;
+    border-top-right-radius: 10em;
+    border-bottom-right-radius: 10em;
+    border-bottom-left-radius: 10em;
+  }
+  [dir=rtl] .ods-select[data-type*=select-one] .ods-select--button,
+[dir=rtl] .ods-select[data-type*=select-multiple] .ods-select--button {
+    border-top-left-radius: 10em;
+    border-top-right-radius: 10em;
+    border-bottom-right-radius: 10em;
+    border-bottom-left-radius: 10em;
+  }
+}
+.ods-select[data-type*=select-one] .ods-select--button:hover, .ods-select[data-type*=select-one] .ods-select--button:focus,
+.ods-select[data-type*=select-multiple] .ods-select--button:hover,
+.ods-select[data-type*=select-multiple] .ods-select--button:focus {
+  opacity: 1;
+}
+.ods-select[data-type*=select-one] .ods-select--button:focus,
+.ods-select[data-type*=select-multiple] .ods-select--button:focus {
+  outline: 0;
+  box-shadow: 0 0 0 4px #a7b5ec;
+}
+.ods-select[data-type*=select-one] .ods-select--item[data-value=""] .ods-select--button,
+.ods-select[data-type*=select-multiple] .ods-select--item[data-value=""] .ods-select--button {
+  display: none;
+}
+.ods-select[data-type*=select-one]::after,
+.ods-select[data-type*=select-multiple]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 0.75em;
+  width: 0.8705493166rem;
+  height: 0.8705493166rem;
+  transform: translateY(-50%);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3E%3Cpath fill='%231d1d21' fill-rule='evenodd' d='M8.73105 9.21673c-.39533.42357-1.06677.42357-1.46211 0L3.13105 4.78327c-.39533-.42357-1.06677-.42357-1.46211 0l-.03211.03441c-.35859.38421-.35859.98043 0 1.36464l5.62704 6.02898c.3972.4256 1.07254.4232 1.4668-.0051l5.62423-6.11001c.3604-.39146.3473-.99759-.0295-1.37318-.3967-.39541-1.042-.38376-1.4242.02572l-4.17015 4.468z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 0.8705493166rem;
+  pointer-events: none;
+}
+.ods-select[data-type*=select-one].is-ods-select-open::after,
+.ods-select[data-type*=select-multiple].is-ods-select-open::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+.ods-select[data-type*=select-one][dir=rtl]::after,
+.ods-select[data-type*=select-multiple][dir=rtl]::after {
+  inset-inline-end: auto;
+  inset-inline-start: 11.5px;
+}
+.ods-select[data-type*=select-one][dir=rtl] .ods-select--button,
+.ods-select[data-type*=select-multiple][dir=rtl] .ods-select--button {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+  margin-inline-end: 0;
+  margin-inline-start: 25px;
+}
+
+.ods-select[data-type*=select-one] .ods-select--button {
+  display: none;
+}
+
+.ods-select[data-type*=select-multiple] .ods-select--inner,
+.ods-select[data-type*=text] .ods-select--inner {
+  padding-block-end: 0;
+  cursor: text;
+}
+.ods-select[data-type*=select-multiple] .ods-select--button,
+.ods-select[data-type*=text] .ods-select--button {
+  border-start-start-radius: 100%;
+  border-start-end-radius: 100%;
+  border-end-end-radius: 100%;
+  border-end-start-radius: 100%;
+  display: inline-block;
+  position: relative;
+  width: 1em;
+  height: 1em;
+  margin-block-start: 0;
+  margin-inline-end: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0.75rem;
+  padding-block: 0;
+  padding-inline: 0;
+  opacity: 1;
+  background-color: #788ee2;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg' class='ods-icon'%3E%3Cpath d='M2.32289 10.1181C1.89237 10.5486 1.89237 11.2466 2.32289 11.6771C2.7534 12.1076 3.45141 12.1076 3.88192 11.6771L7 8.55904L10.1181 11.6771C10.5486 12.1076 11.2466 12.1076 11.6771 11.6771C12.1076 11.2466 12.1076 10.5486 11.6771 10.1181L8.55904 7L11.6771 3.88193C12.1076 3.45141 12.1076 2.7534 11.6771 2.32289C11.2466 1.89237 10.5486 1.89237 10.1181 2.32289L7 5.44096L3.88193 2.32289C3.45141 1.89237 2.7534 1.89237 2.32289 2.32289C1.89237 2.7534 1.89237 3.45141 2.32289 3.88192L5.44096 7L2.32289 10.1181Z' fill='%23ffffff'/%3E%3C/svg%3E");
+  background-position: center;
+  background-size: 0.5em;
+  line-height: 1;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-select[data-type*=select-multiple] .ods-select--button,
+.ods-select[data-type*=text] .ods-select--button {
+    border-top-left-radius: 100%;
+    border-top-right-radius: 100%;
+    border-bottom-right-radius: 100%;
+    border-bottom-left-radius: 100%;
+  }
+  [dir=rtl] .ods-select[data-type*=select-multiple] .ods-select--button,
+[dir=rtl] .ods-select[data-type*=text] .ods-select--button {
+    border-top-left-radius: 100%;
+    border-top-right-radius: 100%;
+    border-bottom-right-radius: 100%;
+    border-bottom-left-radius: 100%;
+  }
+}
+.ods-select[data-type*=select-multiple] .ods-select--button:hover, .ods-select[data-type*=select-multiple] .ods-select--button:focus,
+.ods-select[data-type*=text] .ods-select--button:hover,
+.ods-select[data-type*=text] .ods-select--button:focus {
+  background-color: #1662dd;
+}
+
+.ods-select--inner {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+  border-end-start-radius: 4px;
+  display: inline-block;
+  width: 100%;
+  padding-block: 0.375em;
+  padding-inline: 0.75em;
+  overflow: hidden;
+  transition-property: border-color, background-color, box-shadow;
+  transition-duration: 100ms;
+  transition-timing-function: linear;
+  border: 1px solid #8c8c96;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 0 #a7b5ec;
+  color: #1d1d21;
+  font-family: "Public Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", "Noto Sans Arabic", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  vertical-align: top;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-select--inner {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  [dir=rtl] .ods-select--inner {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+.ods-select--inner:hover, .is-ods-select-focused .ods-select--inner, .is-ods-select-open .ods-select--inner, .is-ods-select-focus .ods-select--inner, .is-ods-select-hover .ods-select--inner {
+  border-color: #1662dd;
+}
+.is-ods-select-open .ods-select--inner, .is-ods-select-invalid .is-ods-select-open .ods-select--inner {
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+  border-block-end-color: #8c8c96;
+}
+.is-ods-select-flipped.is-ods-select-open .ods-select--inner, .is-ods-select-invalid .is-ods-select-flipped.is-ods-select-open .ods-select--inner {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-start-radius: 4px;
+  border-end-end-radius: 4px;
+  border-block-start-color: #8c8c96;
+  border-block-end-color: #1662dd;
+}
+
+.ods-select--list {
+  margin-block: 0;
+  margin-inline: 0;
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+.ods-select--list--single {
+  display: inline-block;
+  width: 100%;
+}
+.ods-select--list--single .ods-select--item {
+  width: 100%;
+}
+
+.ods-select--list--multiple {
+  display: inline;
+}
+.ods-select--list--multiple .ods-select--item {
+  border-start-start-radius: 1em;
+  border-start-end-radius: 1em;
+  border-end-end-radius: 1em;
+  border-end-start-radius: 1em;
+  display: inline-block;
+  margin-inline-end: 0.375rem;
+  margin-block-end: 0.375rem;
+  padding-block: 0;
+  padding-inline: 0.75rem;
+  border: 1px solid #a7b5ec;
+  background-color: #f2f5ff;
+  color: #1d1d21;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: calc((1.5 * 1em) - 2px);
+  overflow-wrap: break-word;
+  vertical-align: middle;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-select--list--multiple .ods-select--item {
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    border-bottom-right-radius: 1em;
+    border-bottom-left-radius: 1em;
+  }
+  [dir=rtl] .ods-select--list--multiple .ods-select--item {
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    border-bottom-right-radius: 1em;
+    border-bottom-left-radius: 1em;
+  }
+}
+.ods-select--list--multiple .ods-select--item[data-deletable] {
+  padding-inline-end: 0.375rem;
+}
+[dir=rtl] .ods-select--list--multiple .ods-select--item {
+  margin-inline-end: 0;
+  margin-inline-start: 0.375rem;
+}
+.ods-select--list--multiple .ods-select--item.is-ods-select-highlighted {
+  background-color: #a7b5ec;
+}
+.is-ods-select-disabled .ods-select--list--multiple .ods-select--item {
+  border: 1px solid #d7d7dc;
+  background-color: #f5f5f6;
+}
+
+.ods-select--list--dropdown {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  inset-block-start: 100%;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #8c8c96;
+  border-block-start-width: 0;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-start-radius: 4px;
+  border-end-end-radius: 4px;
+  background-color: #ffffff;
+  overflow-wrap: break-word;
+  will-change: visibility;
+}
+.ods-select--list--dropdown.is-ods-select-active {
+  visibility: visible;
+}
+.is-ods-select-focused .ods-select--list--dropdown {
+  outline: 0;
+  box-shadow: 0 0 0 4px #a7b5ec;
+  clip-path: inset(0 -4px -4px -4px);
+}
+.is-ods-select-open .ods-select--list--dropdown {
+  border-color: #1662dd;
+}
+.is-ods-select-flipped .ods-select--list--dropdown {
+  inset-block-start: auto;
+  inset-block-end: 100%;
+  border-block-end: 0;
+  border-block-start-width: 1px;
+  border-start-start-radius: 4px;
+  border-start-end-radius: 4px;
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+.is-ods-select-flipped.is-ods-select-focused .ods-select--list--dropdown {
+  clip-path: inset(-4px -4px 0 -4px);
+}
+.ods-select--list--dropdown .ods-select--list {
+  position: relative;
+  max-height: 300px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+}
+.ods-select--list--dropdown .ods-select--item {
+  position: relative;
+  padding-block: 0.375rem;
+  padding-inline: 0.75rem;
+  font-size: 1rem;
+}
+[dir=rtl] .ods-select--list--dropdown .ods-select--item {
+  text-align: end;
+}
+.ods-select--list--dropdown .ods-select--item:empty {
+  display: none;
+}
+@media (min-width: 640px) {
+  .ods-select--list--dropdown .ods-select--item--selectable {
+    padding-inline-end: 100px;
+  }
+  .ods-select--list--dropdown .ods-select--item--selectable::after {
+    content: attr(data-select-text);
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 0.75rem;
+    transform: translateY(-50%);
+    opacity: 0;
+    font-size: 0.8705493166rem;
+  }
+  [dir=rtl] .ods-select--list--dropdown .ods-select--item--selectable {
+    padding-inline-end: 0.75rem;
+    padding-inline-start: 100px;
+    text-align: end;
+  }
+  [dir=rtl] .ods-select--list--dropdown .ods-select--item--selectable::after {
+    inset-inline-end: auto;
+    inset-inline-start: 0.75rem;
+  }
+}
+.ods-select--list--dropdown .ods-select--item--selectable.is-ods-select-highlighted {
+  background-color: #f2f5ff;
+}
+.ods-select--list--dropdown .ods-select--item--selectable.is-ods-select-highlighted::after {
+  opacity: 0.5;
+}
+.is-ods-select-invalid .is-ods-select-focused .ods-select--list--dropdown {
+  outline: 0;
+  box-shadow: 0 0 0 4px #f88c90;
+}
+.is-ods-select-invalid .is-ods-select-open .ods-select--list--dropdown {
+  border-color: #da372c;
+}
+
+.ods-select--item {
+  cursor: default;
+}
+
+.ods-select--item--disabled {
+  color: #6e6e78;
+  cursor: not-allowed;
+  user-select: none;
+}
+
+.ods-select--heading {
+  padding-block-start: 0.75rem;
+  padding-block-end: 0;
+  padding-inline: 0.75rem;
+  color: #6e6e78;
+  font-size: 0.8705493166rem;
+  font-weight: 600;
+}
+
+.ods-select--button {
+  border: 0;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  text-indent: -9999px;
+  appearance: none;
+}
+.ods-select--button:focus {
+  outline: none;
+}
+
+.ods-select--input {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
+  display: inline-block;
+  max-width: 100%;
+  margin-block-end: 5px;
+  padding-block: 4px;
+  padding-inline-start: 2px;
+  padding-inline-end: 0;
+  border: 0;
+  background-color: #ffffff;
+  vertical-align: baseline;
+}
+@supports not (border-end-end-radius: 1px) {
+  .ods-select--input {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  [dir=rtl] .ods-select--input {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+.ods-select--input:focus {
+  outline: 0;
+}
+[dir=rtl] .ods-select--input {
+  padding-inline-end: 2px;
+  padding-inline-start: 0;
+}
+
+.ods-select--placeholder {
+  opacity: 0.5;
+}
+
+/*# sourceMappingURL=odyssey.css.map */
