@@ -827,6 +827,7 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 * [removeOriginalUri](#removeoriginaluri)
 * [isLoginRedirect](#isloginredirect)
 * [handleLoginRedirect](#handleloginredirecttokens)
+* [setHeaders](#setheaders)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
@@ -1110,6 +1111,31 @@ if (authClient.isLoginRedirect()) {
 Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by passing a value fro `originalUri` to this function in the 2nd parameter.
 
 > **Note:** `handleLoginRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval.
+
+### `setHeaders()`
+
+Can set (or unset) request headers after construction.
+
+```javascript
+const authClient = new OktaAuth({
+  issuer: 'https://{yourOktaDomain}',
+
+  // headers can be set during construction
+  headers: {
+    foo: 'bar'
+  }
+});
+
+// Headers can be set (or modified) after construction
+authClient.setHeaders({
+  foo: 'baz'
+});
+
+// Headers can be removed
+authClient.setHeaders({
+  foo: undefined
+})
+```
 
 ### `tx.resume()`
 

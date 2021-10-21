@@ -298,6 +298,10 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     this.tokenManager.stop();
   }
 
+  setHeaders(headers) {
+    this.options.headers = Object.assign({}, this.options.headers, headers);
+  }
+
   // ES6 module users can use named exports to access all symbols
   // CommonJS module users (CDN) need all exports on this object
 
