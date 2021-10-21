@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.7.0
+
+### Other
+- [#981](https://github.com/okta/okta-auth-js/pull/981) TypeScript: Allows optional paramters for IDX methods
+
 ## 5.6.0
 
 ### Features
