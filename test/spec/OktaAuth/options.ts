@@ -16,42 +16,81 @@ import {
 } from '@okta/okta-auth-js';
 
 describe('OktaAuth - options', function() {
-  let auth;
-  let issuer;
+  let testContext;
 
   beforeEach(function() {
-    issuer =  'http://my-okta-domain';
-    auth = new OktaAuth({ issuer, pkce: false });
+    const issuer =  'http://my-okta-domain';
+    testContext = {
+      issuer
+    };
   });
 
   describe('PKCE', function() {
 
     it('is true by default', function() {
+      const { issuer } = testContext;
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-      auth = new OktaAuth({ issuer });
+      const auth = new OktaAuth({ issuer });
       expect(auth.options.pkce).toBe(true);
     });
 
     it('can be set to "false" by arg', function() {
-      auth = new OktaAuth({ pkce: false, issuer: 'http://my-okta-domain' });
+      const { issuer } = testContext;
+      const auth = new OktaAuth({ pkce: false, issuer });
       expect(auth.options.pkce).toBe(false);
     });
   });
 
   describe('getToken options', function() {
     it('responseType is undefined by default', function() {
+      const { issuer } = testContext;
+      const auth = new OktaAuth({ issuer });
       expect(auth.options.responseType).toBeUndefined();
     });
     it('can set responseType', function() {
-      auth = new OktaAuth({ issuer, responseType: 'code' });
+      const { issuer } = testContext;
+      const auth = new OktaAuth({ issuer, responseType: 'code' });
       expect(auth.options.responseType).toBe('code');
     });
     it('scopes is undefined by default', function() {
+      const { issuer } = testContext;
+      const auth = new OktaAuth({ issuer });
       expect(auth.options.scopes).toBeUndefined();
     });
     it('can set scopes', function() {
-      auth = new OktaAuth({ issuer, scopes: ['fake', 'scope']});
+      const { issuer } = testContext;
+      const auth = new OktaAuth({ issuer, scopes: ['fake', 'scope']});
       expect(auth.options.scopes).toEqual(['fake', 'scope']);
+    });
+  });
+
+  describe('headers', function() {
+    it('headers are initially undefined', () => {
+      const { issuer } = testContext;
+      const auth = new OktaAuth({ issuer });
+      expect(auth.options.headers).toBeUndefined();
+    });
+    it('headers can be set in constructor', () => {
+      const { issuer } = testContext;
+      const headers = { foo: 'bar' };
+      const auth = new OktaAuth({ issuer, headers });
+      expect(auth.options.headers).toEqual(headers);
+    });
+    it('headers can be set after construction', () => {
+      const { issuer } = testContext;
+      const auth = new OktaAuth({ issuer });
+      expect(auth.options.headers).toBeUndefined();
+      const headers = { foo: 'bar' };
+      auth.setHeaders(headers);
+      expect(auth.options.headers).toEqual(headers);
+    });
+    it('headers can be removed after construction', () => {
+      const { issuer } = testContext;
+      const headers = { foo: 'bar' };
+      const auth = new OktaAuth({ issuer, headers });
+      expect(auth.options.headers).toEqual(headers);
+      auth.setHeaders({ foo: undefined });
+      expect(auth.options.headers).toEqual({});
     });
   });
 });
