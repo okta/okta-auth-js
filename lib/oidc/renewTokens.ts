@@ -10,24 +10,43 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+import { AuthSdkError } from '../errors';
 import { TokenParams, Tokens } from '../types';
 import { getWithoutPrompt } from './getWithoutPrompt';
 import { renewTokensWithRefresh } from './renewTokensWithRefresh';
 import { getDefaultTokenParams } from './util';
 
 // If we have a refresh token, renew using that, otherwise getWithoutPrompt
+// eslint-disable-next-line complexity
 export async function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
   const tokens = sdk.tokenManager.getTokensSync();
   if (tokens.refreshToken) {
     return renewTokensWithRefresh(sdk, options, tokens.refreshToken);
   }
 
+  if (!tokens.accessToken && !tokens.idToken) {
+    throw new AuthSdkError('renewTokens() was called but there is no existing token');
+  }
+
+  const accessToken = tokens.accessToken || {};
+  const idToken = tokens.idToken || {};
+  const scopes = accessToken.scopes || idToken.scopes;
+  if (!scopes) {
+    throw new AuthSdkError('renewTokens: invalid tokens: could not read scopes');
+  }
+  const authorizeUrl = accessToken.authorizeUrl || idToken.authorizeUrl;
+  if (!authorizeUrl) {
+    throw new AuthSdkError('renewTokens: invalid tokens: could not read authorizeUrl');
+  }
+  const userinfoUrl = accessToken.userinfoUrl || sdk.options.userinfoUrl;
+  const issuer = idToken.issuer || sdk.options.issuer;
+
   // Get tokens using the SSO cookie
   options = Object.assign({
-    scopes: sdk.options.scopes,
-    authorizeUrl: sdk.options.authorizeUrl,
-    userinfoUrl: sdk.options.userinfoUrl,
-    issuer: sdk.options.issuer
+    scopes,
+    authorizeUrl,
+    userinfoUrl,
+    issuer
   }, options);
 
   if (sdk.options.pkce) {

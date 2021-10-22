@@ -355,6 +355,7 @@ describe('TokenManager (browser)', function() {
       tokenManagerAddKeys = {
         'test-accessToken': {
           accessToken: 'testInitialToken',
+          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           expiresAt: 0,
           scopes: ['openid', 'email']
         }

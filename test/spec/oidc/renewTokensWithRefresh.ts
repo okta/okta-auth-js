@@ -63,6 +63,7 @@ describe('renewTokensWithRefresh', function () {
 
   it('is called when refresh token is available in browser storage', async function() {
     const { authInstance, renewTokenSpy } = testContext;
+    authInstance.tokenManager.add('accessToken', tokens.standardAccessTokenParsed);
     await authInstance.token.renewTokens();
     expect(renewTokenSpy).not.toHaveBeenCalled();
     expect(getWithoutPromptModule.getWithoutPrompt).toHaveBeenCalled();

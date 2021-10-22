@@ -10,6 +10,13 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+if (process.env.DETECT_LEAKS) {
+  // detect open timeouts, network connections
+  require('leaked-handles').set({
+    fullStack: true, // use full stack traces
+    debugSockets: true // pretty print tcp thrown exceptions.
+  });
+}
 
 // crypto to mimic browser environment
 const Crypto = require('@peculiar/webcrypto').Crypto;
@@ -22,8 +29,3 @@ global.TextEncoder = TextEncoder;
 
 // Suppress warning messages
 global.console.warn = function() {};
-
-// Throw an error if any test tries to make a live network request
-global.fetch = function(url) {
-  throw new Error(`Attempt to make a live network request: ${url}`);
-};
