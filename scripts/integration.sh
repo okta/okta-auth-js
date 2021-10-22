@@ -3,8 +3,9 @@
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
 export TEST_SUITE_TYPE="junit"
-export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/integration"
+export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/unit"
 
+export CI=true
 export ISSUER=https://oie-widget-tests.sigmanetcorp.us/oauth2/default
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
