@@ -22,7 +22,7 @@ export default async function (policyNamePrefix: string, policyType: string) {
     const defaultPolicy = policies.find(policy => (policy as ProfileEnrollmentPolicy).default);
     const testPolicies = policies.filter(policy => policy && policy.name.startsWith(policyNamePrefix));
 
-    if (policyType === 'Okta:ProfileEnrollment') {
+    if (policyType === 'PROFILE_ENROLLMENT') {
       // assign app to default policy first
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await addAppToPolicy(defaultPolicy!.id, config.clientId!);
