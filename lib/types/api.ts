@@ -205,7 +205,7 @@ export interface SigninOptions extends
     sendFingerprint?: boolean;
 }
 
-export interface SigninWithRedirectOptions extends SigninOptions {
+export interface SigninWithRedirectOptions extends SigninOptions, TokenParams {
   originalUri?: string;
 }
 
