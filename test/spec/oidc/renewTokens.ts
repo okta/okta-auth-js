@@ -10,191 +10,244 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { renewTokens, AuthSdkError } from '../../../lib';
 
-import tokens from '@okta/test.support/tokens';
-import oauthUtil from '@okta/test.support/oauthUtil';
+jest.mock('../../../lib/oidc/getWithoutPrompt', () => {
+  return {
+    getWithoutPrompt: () => {}
+  };
+});
+
+jest.mock('../../../lib/oidc/renewTokensWithRefresh', () => {
+  return {
+    renewTokensWithRefresh: () => {}
+  };
+});
+
+const mocked = {
+  getWithoutPrompt: require('../../../lib/oidc/getWithoutPrompt'),
+  renewTokensWithRefresh: require('../../../lib/oidc/renewTokensWithRefresh')
+};
 
 describe('token.renewTokens', function() {
-  it('should return tokens', function() {
-    return oauthUtil.setupFrame({
-      oktaAuthArgs: {
-        pkce: false,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect'
-      },
-      tokenRenewTokensArgs: [],
-      postMessageSrc: {
-        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        queryParams: {
-          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-          'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'token id_token',
-          'response_mode': 'okta_post_message',
-          'state': oauthUtil.mockedState,
-          'nonce': oauthUtil.mockedNonce,
-          'scope': 'openid email',
-          'prompt': 'none'
-        }
-      },
-      time: 1449699929,
-      postMessageResp: {
-        'id_token': tokens.standardIdToken,
-        'access_token': tokens.standardAccessToken,
-        'expires_in': 3600,
-        'token_type': 'Bearer',
-        'state': oauthUtil.mockedState
-      },
-      validateFunc: ({ accessToken, idToken }) => {
-        oauthUtil.validateResponse(accessToken, tokens.standardAccessTokenParsed);
-        oauthUtil.validateResponse(idToken, tokens.standardIdTokenParsed);
-      }
+  let testContext;
+  beforeEach(() => {
+    const getWihoutPromptResponse = {};
+    const renewWithRefreshResponse = {};
+    testContext = {
+      getWihoutPromptResponse,
+      renewWithRefreshResponse
+    };
+    jest.spyOn(mocked.getWithoutPrompt, 'getWithoutPrompt').mockImplementation(() => {
+      return Promise.resolve(testContext.getWihoutPromptResponse);
+    });
+    jest.spyOn(mocked.renewTokensWithRefresh, 'renewTokensWithRefresh').mockImplementation(() => {
+      return Promise.resolve(testContext.renewWithRefreshResponse);
     });
   });
 
-  it('should return tokens with authorization server', function() {
-    return oauthUtil.setupFrame({
-      oktaAuthArgs: {
-        pkce: false,
-        issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect'
-      },
-      tokenRenewTokensArgs: [],
-      postMessageSrc: {
-        baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-        queryParams: {
-          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-          'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'token id_token',
-          'response_mode': 'okta_post_message',
-          'state': oauthUtil.mockedState,
-          'nonce': oauthUtil.mockedNonce,
-          'scope': 'openid email',
-          'prompt': 'none'
-        }
-      },
-      time: 1449699929,
-      postMessageResp: {
-        'id_token': tokens.authServerIdToken,
-        'access_token': tokens.authServerAccessToken,
-        'expires_in': 3600,
-        'token_type': 'Bearer',
-        'state': oauthUtil.mockedState
-      },
-      validateFunc: (res) => {
-        oauthUtil.validateResponse(res.accessToken, tokens.authServerAccessTokenParsed);
-        oauthUtil.validateResponse(res.idToken, tokens.authServerIdTokenParsed);
+  it('will throw if there are no existing tokens', () => {
+    const tokens = {};
+    const sdk = {
+      tokenManager: {
+        getTokensSync: () => tokens
       }
+    };
+    return expect(renewTokens.bind(null, sdk)).rejects.toThrowError(new AuthSdkError('renewTokens() was called but there is no existing token'));
+  });
+
+  describe('using token endpoint', () => {
+    it('will renew using refresh token if it exists, passing along options', async () => {
+      const { renewWithRefreshResponse } = testContext;
+      const refreshToken = 'fake';
+      const tokens = {
+        refreshToken
+      };
+      const sdk = {
+        tokenManager: {
+          getTokensSync: () => tokens
+        }
+      };
+      jest.spyOn(mocked.renewTokensWithRefresh, 'renewTokensWithRefresh');
+      const options = {};
+      const res = await renewTokens(sdk, options);
+      expect(res).toBe(renewWithRefreshResponse);
+      expect(mocked.renewTokensWithRefresh.renewTokensWithRefresh).toHaveBeenCalledWith(sdk, options, refreshToken);
     });
   });
 
-  it('should accept tokenParams options', function() {
-    return oauthUtil.setupFrame({
-      oktaAuthArgs: {
-        pkce: false,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect'
-      },
-      tokenRenewTokensArgs: [{ scopes: ['openid', 'email', 'profile'] }],
-      postMessageSrc: {
-        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        queryParams: {
-          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-          'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'token id_token',
-          'response_mode': 'okta_post_message',
-          'state': oauthUtil.mockedState,
-          'nonce': oauthUtil.mockedNonce,
-          'scope': 'openid email profile',
-          'prompt': 'none'
+  describe('using authorize endpoint', () => {
+    beforeEach(() => {
+      const accessToken = {
+        accessToken: true,
+        scopes: ['access'],
+        authorizeUrl: 'access',
+        userinfoUrl: 'access'
+      };
+      const idToken = {
+        idtoken: true,
+        scopes: ['id'],
+        authorizeUrl: 'id',
+        issuer: 'id'
+      };
+      const sdk = {
+        options: {
+          userinfoUrl: 'sdk',
+          issuer: 'sdk'
+        },
+        tokenManager: {
+          getTokensSync: () => {
+            const { accessToken, idToken } = testContext;
+            return {
+              accessToken,
+              idToken
+            };
+          }
         }
-      },
-      time: 1449699929,
-      postMessageResp: {
-        'id_token': tokens.standardIdToken,
-        'access_token': tokens.standardAccessToken,
-        'expires_in': 3600,
-        'token_type': 'Bearer',
-        'state': oauthUtil.mockedState
-      },
-      validateFunc: ({ accessToken, idToken }) => {
-        oauthUtil.validateResponse(accessToken, tokens.standardAccessTokenParsed);
-        oauthUtil.validateResponse(idToken, tokens.standardIdTokenParsed);
-      }
+      };
+      Object.assign(testContext, {
+        accessToken,
+        idToken,
+        sdk
+      });
     });
-  });
 
-  it('returns access token when SDK is configured with { responseType: \'token\' }', function() {
-    return oauthUtil.setupFrame({
-      oktaAuthArgs: {
-        pkce: false,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect',
-        responseType: ['token'],
-      },
-      tokenRenewTokensArgs: [],
-      postMessageSrc: {
-        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        queryParams: {
-          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-          'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'token',
-          'response_mode': 'okta_post_message',
-          'state': oauthUtil.mockedState,
-          'nonce': oauthUtil.mockedNonce,
-          'scope': 'openid email',
-          'prompt': 'none'
-        }
-      },
-      time: 1449699929,
-      postMessageResp: {
-        'access_token': tokens.standardAccessToken,
-        'expires_in': 3600,
-        'token_type': 'Bearer',
-        'state': oauthUtil.mockedState
-      },
-      validateFunc: ({ accessToken }) => {
-        oauthUtil.validateResponse(accessToken, tokens.standardAccessTokenParsed);
-      }
+    it('returns tokens', async () => {
+      const { sdk, getWihoutPromptResponse } = testContext;
+      const tokens = { fake: true };
+      getWihoutPromptResponse.tokens = tokens;
+      const res = await renewTokens(sdk, {});
+      expect(res).toBe(tokens);
     });
-  });
 
-  it('returns ID token when SDK is configured with { responseType: \'id_token\' }', function() {
-    return oauthUtil.setupFrame({
-      oktaAuthArgs: {
-        pkce: false,
-        issuer: 'https://auth-js-test.okta.com',
-        clientId: 'NPSfOkH5eZrTy8PMDlvx',
-        redirectUri: 'https://example.com/redirect',
-        responseType: ['id_token'],
-      },
-      tokenRenewTokensArgs: [],
-      postMessageSrc: {
-        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-        queryParams: {
-          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
-          'redirect_uri': 'https://example.com/redirect',
-          'response_type': 'id_token',
-          'response_mode': 'okta_post_message',
-          'state': oauthUtil.mockedState,
-          'nonce': oauthUtil.mockedNonce,
-          'scope': 'openid email',
-          'prompt': 'none'
-        }
-      },
-      time: 1449699929,
-      postMessageResp: {
-        'id_token': tokens.standardIdToken,
-        'expires_in': 3600,
-        'token_type': 'Bearer',
-        'state': oauthUtil.mockedState
-      },
-      validateFunc: ({ idToken }) => {
-        oauthUtil.validateResponse(idToken, tokens.standardIdTokenParsed);
-      }
+    describe('responseType', () => {
+      it('if PKCE is not enabled, responseType is set to ["token", "id_token"]', async () => {
+        const { sdk } = testContext;
+        sdk.options.pkce = false;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.responseType).toEqual(['token', 'id_token']);
+      });
+  
+      it('if PKCE is enabled, responseType is set to "code"', async () => {
+        const { sdk } = testContext;
+        sdk.options.pkce = true;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.responseType).toBe('code');
+      });
     });
+
+    describe('scopes', () => {
+      it('will prefer scopes saved on accessToken', async () => {
+        const { sdk } = testContext;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.scopes).toEqual(['access']);
+      });
+  
+      it('will use scopes from idToken, if no accessToken', async () => {
+        const { sdk } = testContext;
+        testContext.accessToken = null;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.scopes).toEqual(['id']);
+      });
+
+      it('will throw if no scopes on the tokens', async () => {
+        const { sdk, accessToken, idToken } = testContext;
+        accessToken.scopes = null;
+        idToken.scopes = null;
+        return expect(renewTokens.bind(null, sdk)).rejects.toThrowError(new AuthSdkError('renewTokens: invalid tokens: could not read scopes'));
+      });
+
+      it('scopes can be overriden via options', async () => {
+        const { sdk } = testContext;
+        await renewTokens(sdk, { scopes: ['custom'] });
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.scopes).toEqual(['custom']);
+      });
+    });
+
+    describe('authorizeUrl', () => {
+      it('will prefer authorizeUrl saved on accessToken', async () => {
+        const { sdk } = testContext;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.authorizeUrl).toBe('access');
+      });
+
+      it('will use scopes from idToken, if no accessToken', async () => {
+        const { sdk } = testContext;
+        testContext.accessToken = null;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.authorizeUrl).toBe('id');
+      });
+
+      it('will throw if no authorizeUrl on the tokens', async () => {
+        const { sdk, accessToken, idToken } = testContext;
+        accessToken.authorizeUrl = null;
+        idToken.authorizeUrl = null;
+        return expect(renewTokens.bind(null, sdk)).rejects.toThrowError(new AuthSdkError('renewTokens: invalid tokens: could not read authorizeUrl'));
+      });
+
+      it('authorizeUrl can be overriden via options', async () => {
+        const { sdk } = testContext;
+        await renewTokens(sdk, { authorizeUrl: 'custom' });
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.authorizeUrl).toBe('custom');
+      });
+    });
+
+    describe('userinfoUrl', () => {
+      it('will prefer userinfoUrl saved on accessToken', async () => {
+        const { sdk } = testContext;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.userinfoUrl).toBe('access');
+      });
+
+      it('will use userinfoUrl from sdk options, if no accessToken', async () => {
+        const { sdk } = testContext;
+        testContext.accessToken = null;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.userinfoUrl).toBe('sdk');
+      });
+
+      it('userinfoUrl can be overridden via options', async () => {
+        const { sdk } = testContext;
+        await renewTokens(sdk, { userinfoUrl: 'custom' });
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.userinfoUrl).toBe('custom');
+      });
+    });
+
+    describe('issuer', () => {
+      it('will prefer issuer saved on idToken', async () => {
+        const { sdk } = testContext;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.issuer).toBe('id');
+      });
+
+      it('will use issuer from sdk options, if no idToken', async () => {
+        const { sdk } = testContext;
+        testContext.idToken = null;
+        await renewTokens(sdk, {});
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.issuer).toBe('sdk');
+      });
+
+      it('issuer can be overridden via options', async () => {
+        const { sdk } = testContext;
+        await renewTokens(sdk, { issuer: 'custom' });
+        const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
+        expect(options.issuer).toBe('custom');
+      });
+    });
+
   });
+ 
 });

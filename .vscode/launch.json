@@ -7,6 +7,22 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "sdk: integration test",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": [
+        "--runInBand",
+        "--no-cache",
+        "--collectCoverage=false",
+        "--config=jest.integration.js",
+        "--testTimeout=120000",
+        "${relativeFile}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "sdk: unit test (browser, jsdom)",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "args": [
