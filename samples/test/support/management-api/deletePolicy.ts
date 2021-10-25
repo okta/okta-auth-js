@@ -3,7 +3,8 @@ import { getConfig } from '../../util/configUtils';
 import addAppToPolicy from './addAppToPolicy';
 
 interface ProfileEnrollmentPolicy extends AuthorizationServerPolicy {
-  default: boolean;
+    default: boolean;
+    name: string;
 }
 
 export default async function (policyNamePrefix: string, policyType: string) {
@@ -19,7 +20,9 @@ export default async function (policyNamePrefix: string, policyType: string) {
       policies.push(policy);
     }
 
-    const defaultPolicy = policies.find(policy => (policy as ProfileEnrollmentPolicy).default);
+    const defaultPolicy = policies.find(policy =>
+        // eslint-disable-next-line max-len
+      (policy as ProfileEnrollmentPolicy).default || (policy as ProfileEnrollmentPolicy).name.localeCompare('Default Policy', undefined, {sensitivity: 'accent'}) === 0);
     const testPolicies = policies.filter(policy => policy && policy.name.startsWith(policyNamePrefix));
 
     if (policyType === 'PROFILE_ENROLLMENT') {
