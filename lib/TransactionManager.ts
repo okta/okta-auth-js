@@ -95,6 +95,11 @@ export default class TransactionManager {
 
     storage.setStorage(meta);
 
+    // Shared storage allows continuation of transaction in another tab
+    if (this.enableSharedStorage && meta.state) {
+      saveTransactionToSharedStorage(this.storageManager, meta.state, meta);
+    }
+
     if (!options.oauth) {
       return;
     }
@@ -134,11 +139,6 @@ export default class TransactionManager {
         // Set state cookie for servers to validate state
         cookieStorage.setItem(REDIRECT_STATE_COOKIE_NAME, meta.state, null);
       }
-    }
-
-    // Shared storage allows continuation of transaction in another tab
-    if (this.enableSharedStorage && meta.state) {
-      saveTransactionToSharedStorage(this.storageManager, meta.state, meta);
     }
   }
 
