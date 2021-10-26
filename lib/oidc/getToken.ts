@@ -16,7 +16,6 @@
 import {
   getOAuthUrls,
   loadFrame,
-  loadPopup,
 } from './util';
 
 import AuthSdkError from '../errors/AuthSdkError';
@@ -24,6 +23,7 @@ import AuthSdkError from '../errors/AuthSdkError';
 import {
   OktaAuth,
   TokenParams,
+  PopupParams,
 } from '../types';
 
 import { prepareTokenParams } from './util/prepareTokenParams';
@@ -80,12 +80,17 @@ import { handleOAuthResponse } from './handleOAuthResponse';
  * @param {String} [options.popupTitle] Title dispayed in the popup.
  *                                      Defaults to 'External Identity Provider User Authentication'
  */
-export function getToken(sdk: OktaAuth, options: TokenParams) {
+export function getToken(sdk: OktaAuth, options: TokenParams & PopupParams) {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getToken" takes only a single set of options'));
   }
 
   options = options || {};
+
+  // window object cannot be serialized, save for later use
+  // TODO: move popup related params into a separate options object
+  const popupWindow = options.popupWindow;
+  options.popupWindow = undefined;
 
   return prepareTokenParams(sdk, options)
     .then(function (tokenParams: TokenParams) {
@@ -154,16 +159,16 @@ export function getToken(sdk: OktaAuth, options: TokenParams) {
             oauthPromise = addPostMessageListener(sdk, options.timeout, tokenParams.state);
           }
 
-          // Create the window
-          var windowOptions = {
-            popupTitle: options.popupTitle
-          };
-          var windowEl = loadPopup(requestUrl, windowOptions);
+          // Redirect for authorization
+          // popupWindown can be null when popup is blocked
+          if (popupWindow) { 
+            popupWindow.location.assign(requestUrl);
+          }
 
           // The popup may be closed without receiving an OAuth response. Setup a poller to monitor the window.
           var popupPromise = new Promise(function (resolve, reject) {
             var closePoller = setInterval(function () {
-              if (!windowEl || windowEl.closed) {
+              if (!popupWindow || popupWindow.closed) {
                 clearInterval(closePoller);
                 reject(new AuthSdkError('Unable to parse OAuth flow response'));
               }
@@ -186,8 +191,8 @@ export function getToken(sdk: OktaAuth, options: TokenParams) {
               return handleOAuthResponse(sdk, tokenParams, res, urls);
             })
             .finally(function () {
-              if (windowEl && !windowEl.closed) {
-                windowEl.close();
+              if (popupWindow && !popupWindow.closed) {
+                popupWindow.close();
               }
             });
 

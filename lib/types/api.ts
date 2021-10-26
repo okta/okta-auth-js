@@ -120,7 +120,13 @@ export interface TokenParams extends CustomUrls {
   prompt?: string;
   sessionToken?: string;
   timeout?: number;
+  // TODO: remove in the next major version
   popupTitle?: string;
+}
+
+export interface PopupParams {
+  popupTitle?: string;
+  popupWindow?: Window;
 }
 
 export interface TokenResponse {
