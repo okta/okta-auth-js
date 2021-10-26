@@ -43,7 +43,8 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts'],
     alias: {
-      './node$': './browser' // use browser built-in objects and functions
+      './node$': './browser', // use browser built-in objects and functions
+      'node-cache': false // do not webpack node-only modules
     }
   },
   plugins: [

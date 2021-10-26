@@ -14,7 +14,9 @@
 import { SimpleStorage, StorageType, StorageUtil, Cookies } from '../types';
 import { AuthSdkError } from '../errors';
 const NodeCache = require('node-cache'); // commonJS module cannot be imported without esModuleInterop
-const sharedStorage = new NodeCache(); // this is a SHARED memory storage to support a stateless http server
+
+// this is a SHARED memory storage to support a stateless http server
+const sharedStorage = typeof NodeCache === 'function' ? new NodeCache() : null;
 
 class ServerCookies implements Cookies {
   nodeCache: any; // NodeCache

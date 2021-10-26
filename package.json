@@ -38,11 +38,11 @@
     "test:samples": "yarn workspace @okta/test.e2e.samples start",
     "test:integration": "jest --config ./jest.integration.js",
     "build": "node scripts/build.js",
-    "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js -p",
-    "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
+    "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js",
+    "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "build:cjs": "cross-env babel lib -d build/cjs --config-file ./babel.cjs.js --extensions \".ts\",\".js\" --source-maps",
     "build:esm": "cross-env babel lib -d build/esm --config-file ./babel.esm.js --extensions \".ts\",\".js\" --source-maps",
-    "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js --output-library-target=umd -p",
+    "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js",
     "generate:samples": "yarn workspace @okta/samples build && yarn install --ignore-scripts",
     "dev:samples": "yarn workspace @okta/samples dev",
     "prepare": "yarn build",
@@ -121,7 +121,8 @@
     "ts-loader": "^8.0.1",
     "tsd": "^0.17.0",
     "typescript": "^4.2.3",
-    "webpack": "^4.43.0"
+    "webpack": "^5.60.0",
+    "webpack-cli": "^4.9.1"
   },
   "jest-junit": {
     "outputDirectory": "./build2/reports/unit/",
