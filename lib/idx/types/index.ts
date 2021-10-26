@@ -14,7 +14,7 @@
 import { InteractOptions } from '../interact';
 import { APIError, Tokens } from '../../types';
 import { IdxTransactionMeta } from '../../types/Transaction';
-import { IdxAuthenticator, IdxMessage, IdxOption } from './idx-js';
+import { IdxAuthenticator, IdxMessage, IdxOption, IdxResponse } from './idx-js';
 
 export { IdxMessage } from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
@@ -70,6 +70,7 @@ export interface IdxTransaction {
   meta?: IdxTransactionMeta;
   enabledFeatures?: IdxFeature[];
   availableSteps?: NextStep[];
+  _idxResponse?: IdxResponse; // Temporary for widget conversion. Will not be supported long-term. OKTA-418165
 }
 
 export type IdxOptions = InteractOptions;

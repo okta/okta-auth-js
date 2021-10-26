@@ -89,13 +89,14 @@ export async function run(
   let availableSteps;
   let status = IdxStatus.PENDING;
   let shouldClearTransaction = false;
+  let idxResponse;
 
   try {
     // Start/resume the flow
     const { interactionHandle, meta: metaFromResp } = await interact(authClient, options); 
 
     // Introspect to get idx response
-    const idxResponse = await introspect(authClient, { interactionHandle });
+    idxResponse = await introspect(authClient, { interactionHandle });
 
     if (!options.flow && !options.actions) {
       // handle start transaction
@@ -171,6 +172,7 @@ export async function run(
   }
   
   return {
+    _idxResponse: idxResponse, 
     status,
     ...(meta && { meta }),
     ...(enabledFeatures && { enabledFeatures }),
