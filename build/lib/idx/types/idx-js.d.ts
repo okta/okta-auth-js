@@ -1,0 +1,102 @@
+/*!
+ * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+export interface IdxAuthenticatorMethod {
+    type: string;
+}
+export interface IdxAuthenticator {
+    displayName: string;
+    id: string;
+    key: string;
+    methods: IdxAuthenticatorMethod[];
+    type: string;
+    settings?: {
+        complexity?: unknown;
+        age?: unknown;
+    };
+}
+export interface IdxForm {
+    value: IdxRemediationValue[];
+}
+export interface IdxOption {
+    value: string | {
+        form: IdxForm;
+    };
+    label: string;
+    relatesTo?: IdxAuthenticator;
+}
+export interface IdpConfig {
+    id: string;
+    name: string;
+}
+export interface IdxRemediationValue {
+    name: string;
+    type?: string;
+    required?: boolean;
+    secret?: boolean;
+    value?: string;
+    label?: string;
+    form?: IdxForm;
+    options?: IdxOption[];
+    messages?: IdxMessages;
+    minLength?: number;
+    maxLength?: number;
+}
+export interface IdxRemediation {
+    name: string;
+    label?: string;
+    value?: IdxRemediationValue[];
+    relatesTo?: {
+        type?: string;
+        value: IdxAuthenticator;
+    };
+    idp?: IdpConfig;
+    href?: string;
+    method?: string;
+    type?: string;
+}
+export interface IdxMessage {
+    message: string;
+    class: string;
+    i18n: {
+        key: string;
+        params?: unknown[];
+    };
+}
+export interface IdxMessages {
+    type: 'array';
+    value: IdxMessage[];
+}
+export interface RawIdxResponse {
+    version: string;
+    stateHandle: string;
+    intent?: string;
+    expiresAt?: string;
+    remediation?: {
+        type: 'array';
+        value: IdxRemediation[];
+    };
+    messages?: IdxMessages;
+}
+export declare function isRawIdxResponse(obj: any): obj is RawIdxResponse;
+export interface IdxActions {
+    [key: string]: Function;
+}
+export interface IdxResponse {
+    proceed: (remediationName: string, params: unknown) => Promise<IdxResponse>;
+    neededToProceed: IdxRemediation[];
+    rawIdxState: RawIdxResponse;
+    interactionCode?: string;
+    actions: IdxActions;
+    toPersist: {
+        interactionHandle?: string;
+    };
+}
