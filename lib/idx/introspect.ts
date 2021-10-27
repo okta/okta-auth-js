@@ -19,6 +19,7 @@ import { IDX_API_VERSION } from '../constants';
 export interface IntrospectOptions {
   interactionHandle: string;
   stateHandle?: string;
+  stateTokenExternalId?: string;
 }
 
 export async function introspect (authClient: OktaAuth, options: IntrospectOptions): Promise<IdxResponse> {

@@ -21,7 +21,6 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const BundledOktaSignIn = require('@okta/okta-signin-widget');
-
 declare global {
   interface Window {
     OktaSignIn: any;
@@ -37,6 +36,8 @@ declare class OktaSignIn {
   on(event: string, fn: Function): void;
 }
 
+let widgetInstance: OktaSignIn; // static variable. Only one widget instance is allowed to exist at a time
+
 export function buildIdpsConfig(config: Config): any {
   return config.idps.split(/\s+/).map(idpToken => {
       const [type, id] = idpToken.split(/:/);
@@ -47,7 +48,7 @@ export function buildIdpsConfig(config: Config): any {
     }).filter(idpToken => idpToken);
 }
 
-export function buildWidgetConfig(config: Config): any {
+export function buildWidgetConfig(config: Config, options?: unknown): any {
   return Object.assign({}, config, {
     baseUrl: config.issuer.split('/oauth2')[0],
     el: '#widget',
@@ -55,7 +56,7 @@ export function buildWidgetConfig(config: Config): any {
       display: 'page'
     }),
     idps: buildIdpsConfig(config)
-  });
+  }, options);
 }
 
 export async function injectWidgetCSS(widgetVersion = ''): Promise<void> {
@@ -111,6 +112,12 @@ function getTokensFromResponse (res: TokenResponse): Tokens {
   return tokens;
 }
 
+function hideModal(): void {
+  const modal = document.getElementById('modal');
+  modal.style.display = 'none';
+  widgetInstance.remove();
+}
+
 function showModal(): void {
   let modal = document.getElementById('modal');
   if (!modal) {
@@ -126,19 +133,28 @@ function showModal(): void {
     document.body.insertBefore(modal, document.body.firstChild);
   }
   modal.style.display = 'block';
+  modal.onclick = function(): void {
+    hideModal(); // hide modal when clicking on the modal background
+  };
+  const widgetEl = document.getElementById('widget');
+  widgetEl.onclick = function(event): void {
+    event.stopPropagation(); // do not hide modal when clicking on the widget
+  };
 }
 
-export async function renderWidget(config: Config, authClient?: OktaAuth): Promise<Tokens> {
-  const siwVersion = config.siwVersion;
-  if (siwVersion) {
-    await injectWidgetFromCDN(siwVersion);
-  } else {
-    await injectWidgetCSS();
-    window.OktaSignIn = BundledOktaSignIn;
+export async function renderWidget(config: Config, authClient?: OktaAuth, options?: unknown): Promise<Tokens> {
+  if (!window.OktaSignIn) {
+    const siwVersion = config.siwVersion;
+    if (siwVersion) {
+      await injectWidgetFromCDN(siwVersion);
+    } else {
+      await injectWidgetCSS();
+      window.OktaSignIn = BundledOktaSignIn;
+    }
   }
 
   showModal();
-  const widgetConfig = buildWidgetConfig(config);
+  const widgetConfig = buildWidgetConfig(config, options);
   const { issuer, clientId, clientSecret, redirectUri, forceRedirect, scopes } = config;
   const state = widgetConfig.state || JSON.stringify({ issuer, clientId, clientSecret, redirectUri });
 
@@ -177,6 +193,7 @@ export async function renderWidget(config: Config, authClient?: OktaAuth): Promi
   }
 
   const signIn = new OktaSignIn(widgetConfig);
+  widgetInstance = signIn; // save this widget instance so it can be removed
   signIn.on('afterError', function (context: any, error: any) {
       console.log('Sign-in Widget afterError: ', context.controller, error);
   });

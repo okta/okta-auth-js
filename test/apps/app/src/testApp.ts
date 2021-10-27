@@ -23,8 +23,10 @@ import {
   TokenParams,
   isInteractionRequired,
   isInteractionRequiredError, isAuthorizationCodeError,
+  isEmailVerifyCallback,
+  parseEmailVerifyCallback,
   IdxStatus,
-  IdxTransaction
+  IdxTransaction,
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -111,6 +113,7 @@ class TestApp {
   contentElem?: Element;
   oktaAuth?: OktaAuth;
   getCount?: number;
+  widgetInstance?: unknown;
 
   constructor(config: Config) {
     this.config = config;
@@ -232,11 +235,10 @@ class TestApp {
   async loginWidget(): Promise<void> {
     saveConfigToStorage(this.config);
     return this.renderWidget();
-
   }
 
-  async renderWidget(): Promise<void> {
-    const tokens: Tokens = await renderWidget(this.config, this.oktaAuth);
+  async renderWidget(options?: unknown): Promise<void> {
+    const tokens: Tokens = await renderWidget(this.config, this.oktaAuth, options);
 
     // save tokens
     this.oktaAuth.tokenManager.setTokens(tokens);
@@ -402,6 +404,10 @@ class TestApp {
       return this.renderInteractionRequired();
     }
 
+    if (isEmailVerifyCallback()) {
+      return this.renderEmailVerifyCallback();
+    }
+
     return this.getTokensFromUrl()
       .then(res => {
         return this.renderCallback(res);
@@ -427,6 +433,12 @@ class TestApp {
   // Renders the login widget
   async renderInteractionRequired(): Promise<void> {
     return this.render(true).then(() => this.renderWidget());
+  }
+
+  async renderEmailVerifyCallback(): Promise<void> {
+    const { state, stateTokenExternalId } = parseEmailVerifyCallback();
+    await this.render(true);
+    return this.renderWidget({ state, stateTokenExternalId });
   }
 
   async getTokensFromUrl(): Promise<TokenResponse> {

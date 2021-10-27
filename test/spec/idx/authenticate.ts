@@ -125,6 +125,7 @@ describe('idx/authenticate', () => {
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     const res = await authenticate(authClient, {});
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'identify',
@@ -359,6 +360,7 @@ describe('idx/authenticate', () => {
         jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
         expect(res).toEqual({
+          _idxResponse: expect.any(Object),
           status: IdxStatus.SUCCESS,
           tokens: tokenResponse.tokens,
         });
@@ -469,6 +471,7 @@ describe('idx/authenticate', () => {
         res = await authenticate(authClient, { password: 'mypass' });
         expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'mypass' } });
         expect(res).toEqual({
+          _idxResponse: expect.any(Object),
           'status': IdxStatus.SUCCESS,
           'tokens': tokenResponse.tokens,
         });
@@ -505,6 +508,7 @@ describe('idx/authenticate', () => {
         const { authClient, identifyResponse, tokenResponse, interactionCode } = testContext;
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
         expect(res).toEqual({
+          _idxResponse: expect.any(Object),
           status: IdxStatus.SUCCESS,
           tokens: tokenResponse.tokens,
         });
@@ -554,6 +558,7 @@ describe('idx/authenticate', () => {
           }
         });
         expect(res).toEqual({
+          _idxResponse: expect.any(Object),
           'status': IdxStatus.SUCCESS,
           'tokens': tokenResponse.tokens,
         });
@@ -658,6 +663,7 @@ describe('idx/authenticate', () => {
           });
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' } });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'authenticator-verification-data',
@@ -705,6 +711,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.SUCCESS,
             tokens: {
               fakeToken: true
@@ -743,6 +750,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -868,6 +876,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-authenticator',
@@ -916,6 +925,7 @@ describe('idx/authenticate', () => {
               authenticator: { id: 'id-phone' }
             });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'authenticator-enrollment-data',
@@ -999,6 +1009,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -1107,6 +1118,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.SUCCESS,
             tokens: {
               fakeToken: true
@@ -1132,6 +1144,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -1240,6 +1253,7 @@ describe('idx/authenticate', () => {
             authenticator: { id: 'id-google-authenticator' } 
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'challenge-authenticator',
@@ -1293,6 +1307,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.SUCCESS,
             tokens: {
               fakeToken: true
@@ -1318,6 +1333,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -1409,6 +1425,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-authenticator',
@@ -1459,6 +1476,7 @@ describe('idx/authenticate', () => {
             }
           });
           expect(res).toEqual({
+            _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',

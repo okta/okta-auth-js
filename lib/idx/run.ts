@@ -33,6 +33,7 @@ export interface RunOptions {
   flow?: RemediationFlow;
   actions?: string[];
   flowMonitor?: FlowMonitor;
+  stateTokenExternalId?: string;
 }
 
 function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
@@ -96,7 +97,8 @@ export async function run(
     const { interactionHandle, meta: metaFromResp } = await interact(authClient, options); 
 
     // Introspect to get idx response
-    idxResponse = await introspect(authClient, { interactionHandle });
+    const { stateTokenExternalId } = options;
+    idxResponse = await introspect(authClient, { interactionHandle, stateTokenExternalId });
 
     if (!options.flow && !options.actions) {
       // handle start transaction

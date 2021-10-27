@@ -160,6 +160,7 @@ describe('idx/recoverPassword', () => {
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     const res = await recoverPassword(authClient, {});
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'identify-recovery',
@@ -201,6 +202,7 @@ describe('idx/recoverPassword', () => {
 
     const res = await recoverPassword(authClient, { username: 'myname' });
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.TERMINAL,
       messages: [{
         class: 'ERROR',
@@ -241,6 +243,7 @@ describe('idx/recoverPassword', () => {
 
     const res = await recoverPassword(authClient, { username });
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'identify-recovery',
@@ -278,6 +281,7 @@ describe('idx/recoverPassword', () => {
 
     const res = await recoverPassword(authClient, { username: 'myname' });
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'reenroll-authenticator',
@@ -351,6 +355,7 @@ describe('idx/recoverPassword', () => {
         }
       });
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'authenticator-verification-data',
@@ -412,6 +417,7 @@ describe('idx/recoverPassword', () => {
     // First call, get recovery form
     let res = await recoverPassword(authClient, {});
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'identify-recovery',
@@ -427,6 +433,7 @@ describe('idx/recoverPassword', () => {
     res = await recoverPassword(authClient, { username: 'myname' });
     expect(identifyRecoveryResponse.proceed).toHaveBeenCalledWith('identify-recovery', { identifier: 'myname' });
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'reenroll-authenticator',
@@ -476,6 +483,7 @@ describe('idx/recoverPassword', () => {
       }
     });
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'authenticator-verification-data',

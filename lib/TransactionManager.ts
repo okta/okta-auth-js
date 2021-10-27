@@ -54,13 +54,16 @@ export default class TransactionManager {
 
   clear(options: TransactionMetaOptions = {}) {
     const transactionStorage: StorageProvider = this.storageManager.getTransactionStorage();
+    const meta = transactionStorage.getStorage();
     transactionStorage.clearStorage();
 
     const idxStateStorage: StorageProvider = this.storageManager.getIdxResponseStorage();
     idxStateStorage?.clearStorage();
 
-    if (this.enableSharedStorage && options.state) {
-      clearTransactionFromSharedStorage(this.storageManager, options.state);
+    // Automatically clear shared storage if a matching state is found. options.state can be set to false to disable
+    const state = (typeof options.state === 'undefined') ? meta.state : options.state;
+    if (this.enableSharedStorage && state) {
+      clearTransactionFromSharedStorage(this.storageManager, state);
     }
   
     if (!this.legacyWidgetSupport) {

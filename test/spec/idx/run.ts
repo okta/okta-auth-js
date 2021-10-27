@@ -89,6 +89,7 @@ describe('idx/run', () => {
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: 'remediate-nextStep',
     });
@@ -107,6 +108,17 @@ describe('idx/run', () => {
       interactionHandle: 'meta-interactionHandle'
     });
   });
+
+  it('calls introspect with stateTokenExternalId', async () => {
+    const { authClient, options } = testContext;
+    options.stateTokenExternalId = 'abc';
+    await run(authClient, options);
+    expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, { 
+      interactionHandle: 'meta-interactionHandle',
+      stateTokenExternalId: 'abc'
+    });
+  });
+
 
   it('calls remediate, passing options and values through', async () => {
     const { authClient, options, idxResponse } = testContext;
@@ -131,6 +143,7 @@ describe('idx/run', () => {
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       messages: ['remediate-message-1'],
       nextStep: 'remediate-nextStep',
       status: IdxStatus.PENDING,
@@ -148,6 +161,7 @@ describe('idx/run', () => {
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         nextStep: 'remediate-nextStep',
         status: IdxStatus.PENDING,
       });
@@ -165,6 +179,7 @@ describe('idx/run', () => {
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         nextStep: 'remediate-nextStep',
         status: IdxStatus.TERMINAL,
       });
@@ -200,9 +215,10 @@ describe('idx/run', () => {
       });
 
       expect(res).toEqual({
-       nextStep: 'remediate-nextStep',
-       status: IdxStatus.SUCCESS,
-       tokens: tokenResponse.tokens,
+        _idxResponse: expect.any(Object),
+        nextStep: 'remediate-nextStep',
+        status: IdxStatus.SUCCESS,
+        tokens: tokenResponse.tokens,
       });
     });
 
@@ -251,9 +267,10 @@ describe('idx/run', () => {
       });
 
       expect(res).toEqual({
-       error,
-       nextStep: 'remediate-nextStep',
-       status: IdxStatus.FAILURE,
+        _idxResponse: expect.any(Object),
+        error,
+        nextStep: 'remediate-nextStep',
+        status: IdxStatus.FAILURE,
       });
     });
   });

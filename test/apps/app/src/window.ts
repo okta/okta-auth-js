@@ -113,7 +113,6 @@ Object.assign(window, {
   // Callback, read config from storage
   bootstrapCallback: function(): void {
     config = getConfigFromStorage() || getDefaultConfig();
-    clearStorage();
     mount();
     app.bootstrapCallback();
   }
