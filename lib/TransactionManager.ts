@@ -47,6 +47,8 @@ export default class TransactionManager {
 
   clear(options: TransactionMetaOptions = {}) {
     const transactionStorage: StorageProvider = this.storageManager.getTransactionStorage();
+    console.log('Clearing transaction meta: ', transactionStorage.getStorage());
+
     transactionStorage.clearStorage();
 
     const idxStateStorage: StorageProvider = this.storageManager.getIdxResponseStorage();
@@ -78,7 +80,7 @@ export default class TransactionManager {
       // eslint-disable-next-line max-len
       warn('a saved auth transaction exists in storage. This may indicate another auth flow is already in progress.');
     }
-
+    console.log('Saving transaction meta: ', meta);
     storage.setStorage(meta);
 
     if (!options.oauth) {
@@ -135,6 +137,7 @@ export default class TransactionManager {
   load(options: TransactionMetaOptions = {}): TransactionMeta {
     let storage: StorageProvider = this.storageManager.getTransactionStorage();
     let meta = storage.getStorage();
+    console.log('Loading transaction meta: ', meta);
     if (isTransactionMeta(meta)) {
       // if we have meta in the new location, there is no need to go further
       return meta;

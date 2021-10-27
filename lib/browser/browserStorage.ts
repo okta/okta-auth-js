@@ -112,6 +112,7 @@ var storageUtil: BrowserStorageUtil = {
     }
 
     if (storageUtil.testStorageType(curType)) {
+      console.log('available storage:', curType);
       return curType;
     }
 

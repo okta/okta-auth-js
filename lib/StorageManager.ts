@@ -92,6 +92,7 @@ export default class StorageManager {
   getTransactionStorage(options?: StorageOptions): TransactionStorage {
     options = this.getOptionsForSection('transaction', options);
     logServerSideMemoryStorageWarning(options);
+    console.log("Selecting storage for 'transaction'");
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || TRANSACTION_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
@@ -154,6 +155,7 @@ export default class StorageManager {
   getTokenStorage(options?: StorageOptions): StorageProvider {
     options = this.getOptionsForSection('token', options);
     logServerSideMemoryStorageWarning(options);
+    console.log("Selecting storage for 'token'");
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || TOKEN_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
@@ -162,6 +164,7 @@ export default class StorageManager {
   // caches well-known response, among others
   getHttpCache(options?: StorageOptions): StorageProvider {
     options = this.getOptionsForSection('cache', options);
+    console.log("Selecting storage for 'cache'");
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || CACHE_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
