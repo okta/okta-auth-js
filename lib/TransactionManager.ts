@@ -61,7 +61,7 @@ export default class TransactionManager {
     idxStateStorage?.clearStorage();
 
     // Automatically clear shared storage if a matching state is found. options.state can be set to false to disable
-    const state = (typeof options.state === 'undefined') ? meta.state : options.state;
+    const state = (typeof options.state === 'undefined') ? meta?.state : options.state;
     if (this.enableSharedStorage && state) {
       clearTransactionFromSharedStorage(this.storageManager, state);
     }

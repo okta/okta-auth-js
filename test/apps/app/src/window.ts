@@ -21,7 +21,6 @@ import {
   getDefaultConfig,
   getConfigFromUrl,
   getConfigFromStorage,
-  clearStorage,
   flattenConfig
 } from './config';
 import { onSubmitForm, onFormData, showConfigForm } from './form';

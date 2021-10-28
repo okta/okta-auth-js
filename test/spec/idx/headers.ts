@@ -81,7 +81,7 @@ describe('idx headers', () => {
         }),
         credentials: 'include',
         headers: {
-          'X-Okta-User-Agent-Extended': 'okta-idx-js/0.19.0',
+          'X-Okta-User-Agent-Extended': 'okta-idx-js/0.22.0',
           'accept': 'application/ion+json; okta-version=fake-version',
           'content-type': 'application/ion+json; okta-version=fake-version',
         },
@@ -101,7 +101,7 @@ describe('idx headers', () => {
         }),
         credentials: 'include',
         headers: {
-          'X-Okta-User-Agent-Extended': 'okta-idx-js/0.19.0',
+          'X-Okta-User-Agent-Extended': 'okta-idx-js/0.22.0',
           'accept': 'application/ion+json; okta-version=fake-version',
           'content-type': 'application/ion+json; okta-version=fake-version',
         },
