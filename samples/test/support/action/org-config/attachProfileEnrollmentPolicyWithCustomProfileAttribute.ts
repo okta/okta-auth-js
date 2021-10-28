@@ -5,7 +5,7 @@ import fetchPolicy from '../../management-api/fetchPolicy';
 
 export default async function (this: ActionContext) {
   const { clientId } = getConfig();
-  const policy = await fetchPolicy('Custom Attribute Policy', 'Okta:ProfileEnrollment');
+  const policy = await fetchPolicy('Custom Attribute Policy', 'PROFILE_ENROLLMENT');
   if (policy) {
     await addAppToPolicy(policy.id, clientId as string);
   }
