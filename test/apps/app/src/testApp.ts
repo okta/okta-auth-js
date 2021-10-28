@@ -404,7 +404,7 @@ class TestApp {
       return this.renderInteractionRequired();
     }
 
-    if (isEmailVerifyCallback()) {
+    if (isEmailVerifyCallback(window.location.search)) {
       return this.renderEmailVerifyCallback();
     }
 
@@ -436,7 +436,7 @@ class TestApp {
   }
 
   async renderEmailVerifyCallback(): Promise<void> {
-    const { state, stateTokenExternalId } = parseEmailVerifyCallback();
+    const { state, stateTokenExternalId } = parseEmailVerifyCallback(window.location.search);
     await this.render(true);
     return this.renderWidget({ state, stateTokenExternalId });
   }

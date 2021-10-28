@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global window */
 import { urlParamsToObject  } from '../oidc/util/urlParams';
 
 export interface EmailVerifyCallbackResponse {
@@ -20,12 +19,11 @@ export interface EmailVerifyCallbackResponse {
 }
 
 // Check if state && stateTokenExternalId have been passed back in the url
-export function isEmailVerifyCallback (urlPath?: string): boolean {
-  urlPath = urlPath || window.location.search;
+export function isEmailVerifyCallback (urlPath: string): boolean {
   return /(stateTokenExternalId=)/i.test(urlPath) && /(state=)/i.test(urlPath);
 }
 
-export function parseEmailVerifyCallback(urlPath?: string): EmailVerifyCallbackResponse {
-  urlPath = urlPath || window.location.search;
+// Parse state and stateTokenExternalId from a urlPath (should be either a search or fragment from the URL)
+export function parseEmailVerifyCallback(urlPath: string): EmailVerifyCallbackResponse {
   return urlParamsToObject(urlPath) as EmailVerifyCallbackResponse;
 }
