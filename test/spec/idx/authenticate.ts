@@ -313,7 +313,7 @@ describe('idx/authenticate', () => {
 
   describe('basic authentication', () => {
 
-    describe.only('identifier first', () => {
+    describe('identifier first', () => {
       beforeEach(() => {
         const { successResponse } = testContext;
         const identifyResponse = IdentifyResponseFactory.build();
@@ -419,7 +419,7 @@ describe('idx/authenticate', () => {
             key: 'string',
             name: 'authenticator'
           }]
-        })
+        });
 
         // Third call: proceeds with select-authenticator-authenticate
         res = await authenticate(authClient, { authenticator: AuthenticatorKey.OKTA_PASSWORD });
