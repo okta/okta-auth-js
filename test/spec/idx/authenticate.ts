@@ -33,6 +33,7 @@ import {
   AuthenticatorValueFactory,
   PhoneAuthenticatorOptionFactory,
   EmailAuthenticatorOptionFactory,
+  PasswordAuthenticatorOptionFactory,
   GoogleAuthenticatorOptionFactory,
   SelectAuthenticatorEnrollRemediationFactory,
   ChallengeAuthenticatorRemediationFactory,
@@ -312,26 +313,49 @@ describe('idx/authenticate', () => {
 
   describe('basic authentication', () => {
 
-    describe('identifier first', () => {
+    describe.only('identifier first', () => {
       beforeEach(() => {
         const { successResponse } = testContext;
-        const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
         const identifyResponse = IdentifyResponseFactory.build();
+        const selectAuthenticatorResponse = IdxResponseFactory.build({
+          neededToProceed: [
+            SelectAuthenticatorAuthenticateRemediationFactory.build({
+              value: [
+                AuthenticatorValueFactory.build({
+                  options: [
+                    PasswordAuthenticatorOptionFactory.build(),
+                  ]
+                })
+              ]
+            })
+          ]
+        });
+        const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
         chainResponses([
           identifyResponse,
+          selectAuthenticatorResponse,
           verifyPasswordResponse,
           successResponse
         ]);
         jest.spyOn(identifyResponse, 'proceed');
+        jest.spyOn(selectAuthenticatorResponse, 'proceed');
         jest.spyOn(verifyPasswordResponse, 'proceed');
         Object.assign(testContext, {
           identifyResponse,
+          selectAuthenticatorResponse,
           verifyPasswordResponse
         });
       });
 
       it('can authenticate, passing username and password up front', async () => {
-        const { authClient, identifyResponse, verifyPasswordResponse, tokenResponse, interactionCode } = testContext;
+        const { 
+          authClient, 
+          identifyResponse, 
+          selectAuthenticatorResponse, 
+          verifyPasswordResponse, 
+          tokenResponse, 
+          interactionCode 
+        } = testContext;
         jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
         expect(res).toEqual({
@@ -339,6 +363,9 @@ describe('idx/authenticate', () => {
           tokens: tokenResponse.tokens,
         });
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
+        expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', {
+          authenticator: { id: 'id-password' }
+        });
         expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' } });
         expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
           clientId: 'test-clientId',
@@ -353,17 +380,24 @@ describe('idx/authenticate', () => {
       });
 
       it('can authenticate, passing username and password on demand', async () => {
-        const { authClient, identifyResponse, verifyPasswordResponse, tokenResponse, interactionCode } = testContext;
+        const { 
+          authClient, 
+          identifyResponse, 
+          selectAuthenticatorResponse,
+          verifyPasswordResponse, 
+          tokenResponse, 
+          interactionCode 
+        } = testContext;
         jest.spyOn(mocked.introspect, 'introspect')
           .mockResolvedValueOnce(identifyResponse)
           .mockResolvedValueOnce(identifyResponse)
+          .mockResolvedValueOnce(selectAuthenticatorResponse)
           .mockResolvedValueOnce(verifyPasswordResponse);
 
         // First call: returns identify response
         let res = await authenticate(authClient, {});
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
-
           name: 'identify',
           inputs: [{
             name: 'username',
@@ -374,6 +408,24 @@ describe('idx/authenticate', () => {
         // Second call: proceeds with identify response
         res = await authenticate(authClient, { username: 'myuser' });
         expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'myuser' });
+        expect(res.status).toBe(IdxStatus.PENDING);
+        expect(res.nextStep).toEqual({
+          name: 'select-authenticator-authenticate',
+          options: [{ 
+            label: 'Password',
+            value: 'okta_password' 
+          }],
+          inputs: [{
+            key: 'string',
+            name: 'authenticator'
+          }]
+        })
+
+        // Third call: proceeds with select-authenticator-authenticate
+        res = await authenticate(authClient, { authenticator: AuthenticatorKey.OKTA_PASSWORD });
+        expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
+          authenticator: { id: 'id-password' }
+        });
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
           name: 'challenge-authenticator',
@@ -413,7 +465,7 @@ describe('idx/authenticate', () => {
           }]
         });
 
-        // Third call: proceeds with verify password
+        // Fourth call: proceeds with verify password
         res = await authenticate(authClient, { password: 'mypass' });
         expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'mypass' } });
         expect(res).toEqual({

@@ -38,7 +38,13 @@ export class Identify extends Remediator {
     if (password && !authenticators.some(authenticator => authenticator.type === 'password')) {
       this.values = {
         ...this.values,
-        authenticators: [{ type: 'password' }, ...authenticators] as Authenticator[]
+        authenticators: [
+          { 
+            type: 'password',
+            key: AuthenticatorKey.OKTA_PASSWORD
+          }, 
+          ...authenticators
+        ] as Authenticator[]
       };
     }
   }

@@ -41,7 +41,7 @@ export class VerifyAuthenticator extends Remediator {
     const challengeType = this.getAuthenticator().type;
     const name = challengeType === 'password' ? 'password' : 'verificationCode';
     return {
-      ...input.form.value[0],
+      ...input.form?.value[0],
       name,
       type: 'string',
       required: input.required
