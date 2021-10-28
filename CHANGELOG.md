@@ -5,6 +5,7 @@
 ### Features
 
 - [#983](https://github.com/okta/okta-auth-js/pull/983) Adds new method `setHeaders`
+- [#990](https://github.com/okta/okta-auth-js/pull/990) Supports email verify callback
 
 ### Fixes
 
