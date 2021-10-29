@@ -114,5 +114,11 @@ Object.assign(window, {
     config = getConfigFromStorage() || getDefaultConfig();
     mount();
     app.bootstrapCallback();
+  },
+
+  bootstrapProtected: function(): void {
+    config = window.location.search ? getConfigFromUrl() : getDefaultConfig();
+    mount();
+    app.bootstrapProtected();
   }
 });

@@ -46,6 +46,7 @@ class TestApp {
   get username() { return $('#username'); }
   get password() { return $('#password'); }
   get testConcurrentLoginBtn() { return $('#test-concurrent-login'); }
+  get navigateToProtectedBtn() { return $('#nav-to-protected'); }
 
   // Form
   get responseModeQuery() { return $('#f_responseMode [value="query"]'); }
@@ -58,7 +59,8 @@ class TestApp {
   // Callback
   get callbackSelector() { return $('#root.rendered.loaded.callback'); }
   get callbackHandledSelector() { return $('#root.callback-handled'); }
-
+  get callbackOriginalUri() { return $('#original-uri > a'); }
+  
   // Toolbar
   get subscribeAuthStateBtn() { return $('#subscribe-auth-state'); }
   get subscribeTokenEventsBtn() { return $('#subscribe-token-events'); }
@@ -107,6 +109,11 @@ class TestApp {
   async loginDirect() {
     await this.waitForLoginBtn();
     await this.loginDirectBtn.then(el => el.click());
+  }
+
+  async navigateToProtectedPage() {
+    const btn = await this.navigateToProtectedBtn;
+    await btn.click(); 
   }
 
   // renew the accessToken, using refreshToken if available

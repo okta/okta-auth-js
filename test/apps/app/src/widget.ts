@@ -156,7 +156,8 @@ export async function renderWidget(config: Config, authClient?: OktaAuth, option
   showModal();
   const widgetConfig = buildWidgetConfig(config, options);
   const { issuer, clientId, clientSecret, redirectUri, forceRedirect, scopes } = config;
-  const state = widgetConfig.state || JSON.stringify({ issuer, clientId, clientSecret, redirectUri });
+  const state = widgetConfig.state ||
+    JSON.stringify({ issuer, clientId, clientSecret, redirectUri, rand: Math.random() });
 
   // This test app allows selecting arbitrary widget versions.
   // We must use `renderEl` for compatibility with older versions.

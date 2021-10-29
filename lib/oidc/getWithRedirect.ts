@@ -43,10 +43,6 @@ export function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<vo
         codeChallengeMethod,
       } = tokenParams;
 
-      // Also store the originalUri (if any) in the transaction meta.
-      // This is needed to support continue flow in another tab.
-      const originalUri = sdk.getOriginalUri();
-
       const oauthMeta: TransactionMeta = {
         issuer,
         responseType,
@@ -59,8 +55,7 @@ export function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<vo
         redirectUri,
         codeVerifier,
         codeChallenge,
-        codeChallengeMethod,
-        originalUri,
+        codeChallengeMethod
       };
 
       sdk.transactionManager.save(oauthMeta, { oauth: true });

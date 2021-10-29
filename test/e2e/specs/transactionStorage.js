@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
+import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaLogin from '../pageobjects/OktaLogin';
 import { openPKCE } from '../util/appUtils';
@@ -19,16 +19,15 @@ import { handleCallback } from '../util/loginUtils';
 const USERNAME = process.env.USERNAME;
 const PASSWORD = process.env.PASSWORD;
 
-describe('email verify', () => {
+describe('transaction storage', () => {
 
-  it('can handle callback in another tab', async () => {
+  it('can handle PKCE callback in another tab', async () => {
     await openPKCE({});
     await TestApp.loginRedirect();
     await OktaLogin.signin(USERNAME, PASSWORD);
     await TestApp.waitForCallback();
 
     const url = await browser.getUrl();
-
     browser.newWindow(url, { windowFeatures: 'noopener=yes' });
 
     // Now handle the callback
@@ -38,5 +37,24 @@ describe('email verify', () => {
     await TestApp.getUserInfo();
     await TestApp.assertUserInfo();
     await TestApp.logoutRedirect();
+  });
+
+  it('if sharedStorage is disabled, will see PKCE error when handling callback in another tab', async () => {
+    await openPKCE({ enableSharedStorage: false });
+    await TestApp.loginRedirect();
+    await OktaLogin.signin(USERNAME, PASSWORD);
+    await TestApp.waitForCallback();
+
+    const url = await browser.getUrl();
+    browser.newWindow(url, { windowFeatures: 'noopener=yes' });
+
+    // Handle callback in the new tab
+    await TestApp.handleCallback();
+    await TestApp.error.then(el => el.getText()).then(value => {
+      console.log('VALUE', value);
+      assert(value.indexOf('Could not load PKCE codeVerifier from storage') >= 0);
+    });
+    await TestApp.returnHome();
+    await TestApp.assertLoggedOut();
   });
 });

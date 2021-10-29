@@ -48,6 +48,11 @@ const BROWSER_STORAGE: StorageManagerOptions = {
     storageTypes: [
       'localStorage'
     ]
+  },
+  'original-uri': {
+    storageTypes: [
+      'localStorage'
+    ]
   }
 };
 

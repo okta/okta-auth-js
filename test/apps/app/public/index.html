@@ -1,13 +1,26 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">
     <link rel="stylesheet" href="/oidc-app.css"/>
   </head>
   <body class="oidc-app landing">
-    <div class="box nav">
-      <a class="config-link" href="#" onclick="showConfigForm(event)">⚙️</a>
-      <div class="link selected">Webpack SPA App</div>
-      <a href="/server" onclick="navigateToApp('/server', event)">Server-side Web App</a>
-      <a href="/static" onclick="navigateToApp('/static', event)">Static SPA App</a>
+    <div id="header">
+      <div class="pure-menu pure-menu-horizontal">
+        <a class="pure-menu-heading pure-menu-link config-link" href="#config" onclick="showConfigForm(event)">⚙️</a>
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item pure-menu-selected">
+            <div class="pure-menu-link">Webpack SPA App</div>
+          </li>
+          <li class="pure-menu-item">
+            <a class="pure-menu-link" href="/server" onclick="navigateToApp('/server', event)">Server-side Web App</a>
+          </li>
+          <li class="pure-menu-item">
+            <a class="pure-menu-link" href="/static" onclick="navigateToApp('/static', event)">Static SPA App</a>
+          </li>
+        </ul>
+      </div>
     </div>
     <div id="root">
     </div>

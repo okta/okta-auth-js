@@ -17,6 +17,7 @@ import {
   TOKEN_STORAGE_NAME,
   TRANSACTION_STORAGE_NAME,
   SHARED_TRANSACTION_STORAGE_NAME,
+  ORIGINAL_URI_STORAGE_NAME,
   IDX_RESPONSE_STORAGE_NAME,
   CACHE_STORAGE_NAME,
   REDIRECT_OAUTH_PARAMS_NAME
@@ -103,6 +104,14 @@ export default class StorageManager {
     logServerSideMemoryStorageWarning(options);
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || SHARED_TRANSACTION_STORAGE_NAME;
+    return new SavedObject(storage, storageKey);
+  }
+
+  getOriginalUriStorage(options?: StorageOptions): TransactionStorage {
+    options = this.getOptionsForSection('original-uri', options);
+    logServerSideMemoryStorageWarning(options);
+    const storage = this.getStorage(options);
+    const storageKey = options.storageKey || ORIGINAL_URI_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
   }
 

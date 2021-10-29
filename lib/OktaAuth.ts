@@ -574,27 +574,45 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     this.tokenManager.setTokens(tokens);
   }
 
-  setOriginalUri(originalUri: string): void {
-    const storage = browserStorage.getSessionStorage();
-    storage.setItem(REFERRER_PATH_STORAGE_KEY, originalUri);
+  setOriginalUri(originalUri: string, state?: string): void {
+    // always store in session storage
+    const sessionStorage = browserStorage.getSessionStorage();
+    sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, originalUri);
+
+    // to support multi-tab flows, set a state in constructor or pass as param
+    state = state || this.options.state;
+    if (state) {
+      const sharedStorage = this.storageManager.getOriginalUriStorage();
+      sharedStorage.setItem(state, originalUri);
+    }
   }
 
   getOriginalUri(state?: string): string {
-    if (state) {
-      const meta: TransactionMeta = this.transactionManager.load({
-        oauth: true,
-        state
-      });
-      return meta.originalUri;
-    }
+    // Try to load from session storage
     const storage = browserStorage.getSessionStorage();
-    const originalUri = storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) : undefined;
+    let originalUri = storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) : undefined;
+
+    // If not found in sessionStorage, check shared storage (if state is available)
+    state = state || this.options.state;
+    if (!originalUri && state) {
+      const sharedStorage = this.storageManager.getOriginalUriStorage();
+      originalUri = sharedStorage.getItem(state);
+    }
+
     return originalUri;
   }
 
-  removeOriginalUri(): void {
+  removeOriginalUri(state?: string): void {
+    // Remove from sessionStorage
     const storage = browserStorage.getSessionStorage();
     storage.removeItem(REFERRER_PATH_STORAGE_KEY);
+
+    // Also remove from shared storage
+    state = state || this.options.state;
+    if (state) {
+      const sharedStorage = this.storageManager.getOriginalUriStorage();
+      sharedStorage.removeItem(state);
+    }
   }
 
   isLoginRedirect(): boolean {
@@ -602,13 +620,16 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   }
 
   async handleLoginRedirect(tokens?: Tokens, originalUri?: string): Promise<void> {
+    let state = this.options.state;
+
     // Store tokens and update AuthState by the emitted events
     if (tokens) {
       this.tokenManager.setTokens(tokens);
-      originalUri = originalUri || this.getOriginalUri();
+      originalUri = originalUri || this.getOriginalUri(this.options.state);
     } else if (this.isLoginRedirect()) {
       // For redirect flow, get state from the URL and use it to retrieve the originalUri
-      const { state } = await parseOAuthResponseFromUrl(this, {});
+      const oAuthResponse = await parseOAuthResponseFromUrl(this, {});
+      state = oAuthResponse.state;
       originalUri = originalUri || this.getOriginalUri(state);
       await this.storeTokensFromRedirect();
     } else {
@@ -619,7 +640,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     await this.authStateManager.updateAuthState();
 
     // clear originalUri from storage
-    this.removeOriginalUri();
+    this.removeOriginalUri(state);
 
     // Redirect to originalUri
     const { restoreOriginalUri } = this.options;

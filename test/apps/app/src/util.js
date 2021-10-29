@@ -35,7 +35,15 @@ function toQueryString(obj) {
   }
 }
 
+function makeClickHandler(fn) {
+  return function(event) {
+    event && event.preventDefault(); // prevent navigation / page reload
+    return fn();
+  };
+}
+
 module.exports = {
   htmlString,
-  toQueryString 
+  toQueryString,
+  makeClickHandler
 };
