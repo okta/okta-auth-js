@@ -10,6 +10,7 @@
 
 - [#981](https://github.com/okta/okta-auth-js/pull/981) TypeScript: Allows optional paramters for IDX methods
 - [#986](https://github.com/okta/okta-auth-js/pull/986) TypeScript: Interface `SignInWithRedirectOptions` should extend `TokenParams`
+- [#992](https://github.com/okta/okta-auth-js/pull/992) TypeScript: Adds fields for `Input` type in NextStep object
 
 ## 5.6.0
 
