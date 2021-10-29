@@ -40,6 +40,9 @@ export enum AuthenticatorKey {
 
 type Input = {
   name: string;
+  label?: string;
+  value?: string;
+  secret?: boolean;
   required?: boolean;
 }
 
