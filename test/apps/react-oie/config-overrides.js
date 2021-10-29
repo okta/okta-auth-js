@@ -24,6 +24,7 @@ module.exports = {
       }),
     ]);
 
+    config.mode = 'development';
     config.devtool = 'source-map';
     config.module.rules.push({
       test: /\.js$/,

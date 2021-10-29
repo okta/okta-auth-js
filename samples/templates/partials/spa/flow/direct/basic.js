@@ -1,4 +1,4 @@
-function resumeTransaction() {
+function resumeTransaction(options) {
   {{#if authn}}
   if (!config.useInteractionCodeFlow) {
     // Authn
@@ -15,18 +15,18 @@ function resumeTransaction() {
     // TODO: we may be in either authenticate or recoverPassword flow
     // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
     // Here we assume we are resuming an authenticate flow, but this could be wrong.
-    return authClient.idx.authenticate()
+    return authClient.idx.authenticate(options)
       .then(handleTransaction)
       .catch(showError);
   }
 }
 
-function showSigninForm() {
+function showSigninForm(options) {
   hideRecoveryChallenge();
   hideNewPasswordForm();
 
   // Is there an existing transaction we can resume?
-  if (resumeTransaction()) {
+  if (resumeTransaction(options)) {
     return;
   }
 

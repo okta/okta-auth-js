@@ -1,6 +1,6 @@
-function showSigninWidget() {
-  // Create an instance of the signin widget
-  var signIn = new OktaSignIn({
+function showSigninWidget(options) {
+  // Create widget options
+  options = Object.assign({
     baseUrl: config.issuer.split('/oauth2')[0],
     clientId: config.clientId,
     redirectUri: config.redirectUri,
@@ -15,7 +15,10 @@ function showSigninWidget() {
       }
       return { type, id };
     }).filter(idpToken => idpToken)
-  });
+  }, options);
+
+  // Create an instance of the signin widget
+  var signIn = new OktaSignIn(options);
 
   signIn.showSignIn({
     el: '#signin-widget',

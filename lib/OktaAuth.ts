@@ -87,7 +87,10 @@ import browserStorage from './browser/browserStorage';
 import { 
   toQueryString, 
   toAbsoluteUrl,
-  clone
+  clone,
+  isEmailVerifyCallback,
+  EmailVerifyCallbackResponse,
+  parseEmailVerifyCallback
 } from './util';
 import { getUserAgent } from './builderUtil';
 import { TokenManager } from './TokenManager';
@@ -312,6 +315,15 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
 
   isInteractionRequiredError(error: Error): boolean {
     return isInteractionRequiredError(error);
+  }
+
+  // Utility methods for email verify callback
+  isEmailVerifyCallback(urlPath: string): boolean {
+    return isEmailVerifyCallback(urlPath);
+  }
+
+  parseEmailVerifyCallback(urlPath: string): EmailVerifyCallbackResponse {
+    return parseEmailVerifyCallback(urlPath);
   }
 
   async signIn(opts: SigninOptions): Promise<AuthTransaction> {

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuth, IdxTransactionMeta } from '../types';
+import { OktaAuth, IdxTransactionMeta, TransactionMetaOptions } from '../types';
 import { warn } from '../util';
 import { getOAuthUrls } from '../oidc';
 
@@ -19,9 +19,9 @@ export async function createTransactionMeta(authClient: OktaAuth) {
   return authClient.token.prepareTokenParams();
 }
 
-export function transactionMetaExist(authClient: OktaAuth): boolean {
-  if (authClient.transactionManager.exists()) {
-    const existing = authClient.transactionManager.load() as IdxTransactionMeta;
+export function transactionMetaExist(authClient: OktaAuth, options?: TransactionMetaOptions): boolean {
+  if (authClient.transactionManager.exists(options)) {
+    const existing = authClient.transactionManager.load(options) as IdxTransactionMeta;
     if (isTransactionMetaValid(authClient, existing) && existing.interactionHandle) {
       return true;
     }
@@ -29,10 +29,13 @@ export function transactionMetaExist(authClient: OktaAuth): boolean {
   return false;
 }
 
-export async function getTransactionMeta(authClient: OktaAuth): Promise<IdxTransactionMeta> {
+export async function getTransactionMeta(
+  authClient: OktaAuth,
+  options?: TransactionMetaOptions
+): Promise<IdxTransactionMeta> {
   // Load existing transaction meta from storage
-  if (authClient.transactionManager.exists()) {
-    const existing = authClient.transactionManager.load();
+  if (authClient.transactionManager.exists(options)) {
+    const existing = authClient.transactionManager.load(options);
     if (isTransactionMetaValid(authClient, existing)) {
       return existing as IdxTransactionMeta;
     }

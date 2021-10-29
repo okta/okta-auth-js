@@ -50,9 +50,19 @@ export default function App() {
     oktaAuth.start();
 
     if(oktaAuth.isLoginRedirect()) {
-      parseFromUrl();
+      return parseFromUrl();
     }
-  }, [history, setAuthState]);
+    
+    const handleEmailVerifyCallback = async () => {
+      const { state, stateTokenExternalId } = await oktaAuth.parseEmailVerifyCallback(window.location.search);
+      const newTransaction = await oktaAuth.idx.authenticate({ state, stateTokenExternalId });
+      setTransaction(newTransaction);
+    }
+
+    if (oktaAuth.isEmailVerifyCallback(window.location.search)) {
+      return handleEmailVerifyCallback();
+    }
+  }, [history, setAuthState, setTransaction]);
 
   const handleChange = ({ target: { name, value } }) => setInputValues({
     ...inputValues,
@@ -123,7 +133,11 @@ export default function App() {
     );
   }
 
-  const { status, nextStep, error, messages, availableSteps } = transaction;
+  const { status, nextStep, error, messages, availableSteps, tokens } = transaction;
+  if (tokens) {
+    oktaAuth.tokenManager.setTokens(tokens);
+    return null;
+  }
 
   const idpMeta = availableSteps?.find(step => step.name === 'redirect-idp');
   if (idpMeta) {
@@ -136,7 +150,7 @@ export default function App() {
   }
 
   if (status === IdxStatus.FAILURE) {
-    return (<div>{error.errorSummary}</div>);
+    return (<div>{JSON.stringify(error, null, 4)}</div>);
   }
 
   if (status === IdxStatus.TERMINAL) {
