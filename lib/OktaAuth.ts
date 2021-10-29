@@ -44,7 +44,6 @@ import {
   IdxAPI,
   SignoutRedirectUrlOptions,
   HttpAPI,
-  TransactionMeta,
 } from './types';
 import {
   transactionStatus,

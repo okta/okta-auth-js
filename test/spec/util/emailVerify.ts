@@ -9,10 +9,10 @@ describe('emailVerify', () => {
       expect(isEmailVerifyCallback('foo=bar')).toBe(false);
     });
     it('returns false if only state exist', () => {
-      expect(isEmailVerifyCallback('state=a&foo=bar')).toBe(true);
+      expect(isEmailVerifyCallback('state=a&foo=bar')).toBe(false);
     });
     it('returns false if only stateTokenExternalId exist', () => {
-      expect(isEmailVerifyCallback('stateTokenExternalId=a&foo=bar')).toBe(true);
+      expect(isEmailVerifyCallback('stateTokenExternalId=a&foo=bar')).toBe(false);
     });
     it('returns true if both state and stateTokenExternalId exist', () => {
       expect(isEmailVerifyCallback('state=a&stateTokenExternalId=b')).toBe(true);
