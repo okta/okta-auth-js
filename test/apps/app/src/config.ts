@@ -123,7 +123,11 @@ export function saveConfigToStorage(config: Config): void {
 }
 
 export function getConfigFromStorage(): Config {
-  const config = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  const storedValue = localStorage.getItem(STORAGE_KEY);
+  if (!storedValue) {
+    return getDefaultConfig();
+  }
+  const config = JSON.parse(storedValue);
   return config;
 }
 

@@ -39,7 +39,8 @@ declare class OktaSignIn {
 let widgetInstance: OktaSignIn; // static variable. Only one widget instance is allowed to exist at a time
 
 export function buildIdpsConfig(config: Config): any {
-  return config.idps.split(/\s+/).map(idpToken => {
+  const idps = config.idps || '';
+  return idps.split(/\s+/).map(idpToken => {
       const [type, id] = idpToken.split(/:/);
       if (!type || !id) {
         return null;
@@ -156,8 +157,9 @@ export async function renderWidget(config: Config, authClient?: OktaAuth, option
   showModal();
   const widgetConfig = buildWidgetConfig(config, options);
   const { issuer, clientId, clientSecret, redirectUri, forceRedirect, scopes } = config;
-  const state = widgetConfig.state ||
-    JSON.stringify({ issuer, clientId, clientSecret, redirectUri, rand: Math.random() });
+  const state = widgetConfig.state || 
+    // Server-side test app reads config from state. This is bad security but is convenient for quick testing.
+    JSON.stringify({ issuer, clientId, clientSecret, redirectUri, rand: Math.round(Math.random() * 1000) });
 
   // This test app allows selecting arbitrary widget versions.
   // We must use `renderEl` for compatibility with older versions.

@@ -311,6 +311,7 @@ class TestApp {
   }
 
   async loginWidget(): Promise<void> {
+    this.config.state = 'widget-login-' + Math.round(Math.random() * 1000);
     saveConfigToStorage(this.config);
     return this.renderWidget();
   }

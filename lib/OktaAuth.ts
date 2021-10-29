@@ -587,18 +587,19 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   }
 
   getOriginalUri(state?: string): string {
-    // Try to load from session storage
-    const storage = browserStorage.getSessionStorage();
-    let originalUri = storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) : undefined;
-
-    // If not found in sessionStorage, check shared storage (if state is available)
+    // Prefer shared storage (if state is available)
     state = state || this.options.state;
-    if (!originalUri && state) {
+    if (state) {
       const sharedStorage = this.storageManager.getOriginalUriStorage();
-      originalUri = sharedStorage.getItem(state);
+      const originalUri = sharedStorage.getItem(state);
+      if (originalUri) {
+        return originalUri;
+      }
     }
 
-    return originalUri;
+    // Try to load from session storage
+    const storage = browserStorage.getSessionStorage();
+    return storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) : undefined;
   }
 
   removeOriginalUri(state?: string): void {

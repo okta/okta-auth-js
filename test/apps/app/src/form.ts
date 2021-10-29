@@ -14,7 +14,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
 /* eslint-disable max-len */
-import { flattenConfig, Config } from './config';
+import { flattenConfig, Config, saveConfigToStorage } from './config';
 import { FormDataEvent } from './types';
 import { htmlString, makeClickHandler } from './util';
 
@@ -192,6 +192,7 @@ export function onSubmitForm(event: Event): void {
 
 // Take the data from the form and update query parameters on the current page
 export function onFormData(event: FormDataEvent): void {
+
   const formData = event.formData;
   const params: any = {};
   formData.forEach((value, key) => {

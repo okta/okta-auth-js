@@ -144,9 +144,9 @@ describe('OktaAuth (browser)', function() {
     beforeEach(() => {
       auth.token.getWithRedirect = jest.fn().mockResolvedValue('fake');
       setItemMock = jest.fn();
-      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+      jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(() => ({
         setItem: setItemMock
-      }));
+      } as Storage));
     });
 
     it('should add originalUri to sessionStorage if provided in options', async () => {
@@ -477,9 +477,9 @@ describe('OktaAuth (browser)', function() {
     let setItemMock;
     beforeEach(() => {
       setItemMock = jest.fn();
-      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+      jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(() => ({
         setItem: setItemMock
-      }));
+      } as Storage));
     });
     it('should save the "referrerPath" in sessionStorage', () => {
       const uri = 'https://foo.random';
@@ -493,38 +493,49 @@ describe('OktaAuth (browser)', function() {
   });
 
   describe('getOriginalUri', () => {
-    let removeItemMock;
-    let getItemMock;
+    let mockSessionStorage;
+    let mockSharedStorage;
     beforeEach(() => {
-      removeItemMock = jest.fn();
-      getItemMock = jest.fn().mockReturnValue('fakeOriginalUri');
-      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
-        getItem: getItemMock,
-        removeItem: removeItemMock
-      }));
+      mockSessionStorage = {
+        getItem: () => {},
+        removeItem: () => {}
+      };
+      mockSharedStorage = {
+        getItem: () => {},
+        removeItem: () => {}
+      };
+      jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(() => mockSessionStorage as Storage);
+      jest.spyOn(auth.storageManager, 'getOriginalUriStorage').mockReturnValue(mockSharedStorage);
     });
-    it('should get and clear referrer from storage', () => {
+    it('should get referrer from storage', () => {
+      const originalUri = 'fakeOriginalUri';
+      jest.spyOn(mockSessionStorage, 'getItem').mockReturnValue(originalUri);
+      jest.spyOn(mockSharedStorage, 'getItem');
       const res = auth.getOriginalUri();
-      expect(res).toBe('fakeOriginalUri');
+      expect(res).toBe(originalUri);
+      expect(mockSessionStorage.getItem).toHaveBeenCalledWith('referrerPath');
+      expect(mockSharedStorage.getItem).not.toHaveBeenCalled();
     });
-    it('returns null if nothing was set', () => {
-      getItemMock = jest.fn().mockReturnValue(null);
+    it('returns undefined if nothing was set', () => {
       const res = auth.getOriginalUri();
-      expect(res).toBe(null);
+      expect(res).toBe(undefined);
     });
     describe('with state', () => {
-      it('returns value from transactionManager', () => {
-        const originalUri = 'http://fake';
-        const meta = {
-          originalUri
-        };
-        jest.spyOn(auth.transactionManager, 'load').mockReturnValue(meta);
+      it('prefers value from shared storage', () => {
+        jest.spyOn(mockSessionStorage, 'getItem').mockReturnValue('sessionUri');
+        jest.spyOn(mockSharedStorage, 'getItem').mockReturnValue('sharedUri');
         const res = auth.getOriginalUri('mock-state');
-        expect(res).toBe(originalUri);
-        expect(auth.transactionManager.load).toHaveBeenCalledWith({
-          oauth: true,
-          state: 'mock-state'
-        });
+        expect(res).toBe('sharedUri');
+        expect(mockSharedStorage.getItem).toHaveBeenCalledWith('mock-state');
+        expect(mockSessionStorage.getItem).not.toHaveBeenCalled();
+      });
+      it('returns value in session storage, if not found in shared storage', () => {
+        jest.spyOn(mockSessionStorage, 'getItem').mockReturnValue('sessionUri');
+        jest.spyOn(mockSharedStorage, 'getItem').mockReturnValue(undefined);
+        const res = auth.getOriginalUri('mock-state');
+        expect(res).toBe('sessionUri');
+        expect(mockSharedStorage.getItem).toHaveBeenCalledWith('mock-state');
+        expect(mockSessionStorage.getItem).toHaveBeenCalledWith('referrerPath');
       });
     });
   });
@@ -533,9 +544,9 @@ describe('OktaAuth (browser)', function() {
     let removeItemMock;
     beforeEach(() => {
       removeItemMock = jest.fn();
-      storageUtil.getSessionStorage = jest.fn().mockImplementation(() => ({
+      jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(() => ({
         removeItem: removeItemMock
-      }));
+      } as Storage));
     });
     it('should cleare referrer from localStorage', () => {
       auth.removeOriginalUri();
@@ -564,8 +575,8 @@ describe('OktaAuth (browser)', function() {
           accessToken: tokens.standardAccessTokenParsed,
           idToken: tokens.standardIdTokenParsed
         });
-        expect(auth.getOriginalUri).toHaveBeenCalledWith();
-        expect(auth.removeOriginalUri).toHaveBeenCalledWith();
+        expect(auth.getOriginalUri).toHaveBeenCalledWith(undefined);
+        expect(auth.removeOriginalUri).toHaveBeenCalledWith(undefined);
         expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
       });
 
@@ -574,8 +585,8 @@ describe('OktaAuth (browser)', function() {
           accessToken: tokens.standardAccessTokenParsed,
           idToken: tokens.standardIdTokenParsed
         }, '/overridden');
-        expect(auth.getOriginalUri).not.toHaveBeenCalledWith();
-        expect(auth.removeOriginalUri).toHaveBeenCalledWith();
+        expect(auth.getOriginalUri).not.toHaveBeenCalledWith(undefined);
+        expect(auth.removeOriginalUri).toHaveBeenCalledWith(undefined);
         expect(window.location.replace).toHaveBeenCalledWith('/overridden');
       });
     });
@@ -593,7 +604,7 @@ describe('OktaAuth (browser)', function() {
         });
 
         await auth.handleLoginRedirect();
-        expect(auth.getOriginalUri).toHaveBeenCalled();
+        expect(auth.getOriginalUri).toHaveBeenCalledWith(undefined);
         expect(auth.removeOriginalUri).toHaveBeenCalled();
         expect(window.location.replace).toHaveBeenCalledWith('/fakeuri');
       });
@@ -607,7 +618,7 @@ describe('OktaAuth (browser)', function() {
         });
         await auth.handleLoginRedirect(null, '/overridden');
         expect(auth.getOriginalUri).not.toHaveBeenCalledWith();
-        expect(auth.removeOriginalUri).toHaveBeenCalledWith();
+        expect(auth.removeOriginalUri).toHaveBeenCalledWith(undefined);
         expect(window.location.replace).toHaveBeenCalledWith('/overridden');
       });
 
