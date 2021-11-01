@@ -4,7 +4,7 @@
 <!-- omit in toc -->
 # Okta Authentication API (authn)
 
-> :warning: There is a new version of Okta's Authentication APIs. New applications should use the IDX API instead. Existing applications which use the Authn API will continue to work, but you should [migrate]((#migrating-to-idx)) your apps to use the [IDX APIs](./udx.md) if you want to leverage newer Okta capabilities.
+> :warning: There is a new version of Okta's Authentication APIs. New applications should use the IDX API instead. Existing applications which use the Authn API will continue to work, but you should [migrate](#migrating-to-idx)) your apps to use the [IDX APIs](./udx.md) if you want to leverage newer Okta capabilities.
 
 - [Introduction](#introduction)
 - [Migrating to IDX](#migrating-to-idx)
