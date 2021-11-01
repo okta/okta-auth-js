@@ -14,7 +14,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
 /* eslint-disable max-len */
-import { flattenConfig, Config, saveConfigToStorage } from './config';
+import { flattenConfig, Config } from './config';
 import { FormDataEvent } from './types';
 import { htmlString, makeClickHandler } from './util';
 
