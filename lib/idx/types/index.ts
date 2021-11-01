@@ -38,7 +38,7 @@ export enum AuthenticatorKey {
   GOOGLE_AUTHENTICATOR = 'google_otp',
 }
 
-type Input = {
+export type Input = {
   name: string;
   label?: string;
   value?: string;
