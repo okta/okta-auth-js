@@ -368,7 +368,10 @@ oauthUtil.setupPopup = function(opts) {
   var src;
   var fakeWindow = {
     location: {
-      hash: ''
+      hash: '',
+      assign: function(url) {
+        src = url;
+      }
     },
     closed: false,
     close: function() {
@@ -377,8 +380,7 @@ oauthUtil.setupPopup = function(opts) {
   };
   jest.spyOn(fakeWindow, 'close');
 
-  jest.spyOn(window, 'open').mockImplementation(function(s) {
-    src = s;
+  jest.spyOn(window, 'open').mockImplementation(function() {
     setTimeout(function() {
       if (opts.closePopup) {
         fakeWindow.close();

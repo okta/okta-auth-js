@@ -6,6 +6,10 @@
 
 - [#983](https://github.com/okta/okta-auth-js/pull/983) Adds new method `setHeaders`
 
+### Fixes
+
+- [#988](https://github.com/okta/okta-auth-js/pull/988) Fixes Safari & Firefox browsers block `getWithPopup` issue
+
 ### Other
 
 - [#981](https://github.com/okta/okta-auth-js/pull/981) TypeScript: Allows optional paramters for IDX methods

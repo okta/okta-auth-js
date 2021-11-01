@@ -14,7 +14,6 @@
 /* eslint-disable complexity, max-statements */
 import { AuthSdkError } from '../../errors';
 import { OktaAuth } from '../../types';
-import { isIE11OrLess } from '../../features';
 
 export function addListener(eventTarget, name, fn) {
   if (eventTarget.addEventListener) {
@@ -44,17 +43,7 @@ export function loadPopup(src, options) {
   var title = options.popupTitle || 'External Identity Provider User Authentication';
   var appearance = 'toolbar=no, scrollbars=yes, resizable=yes, ' +
     'top=100, left=500, width=600, height=600';
-
-  if (isIE11OrLess()) {
-    // IE<=11 doesn't fully support postMessage at time of writting.
-    // the following simple solution happened to solve the issue
-    // without adding another proxy layer which makes flow more complecated.
-    var winEl = window.open('/', title, appearance);
-    winEl.location.href = src;
-    return winEl;
-  } else {
-    return window.open(src, title, appearance);
-  }
+  return window.open(src, title, appearance);
 }
 
 export function addPostMessageListener(sdk: OktaAuth, timeout, state) {

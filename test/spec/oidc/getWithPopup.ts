@@ -66,7 +66,10 @@ describe('token.getWithPopup', function() {
     var timeoutMs = 120000;
     var mockWindow = {
       closed: false,
-      close: jest.fn()
+      close: jest.fn(),
+      location: {
+        assign: jest.fn()
+      }
     };
     jest.spyOn(window, 'open').mockImplementation(function () {
       return mockWindow as unknown as Window; // valid window is returned
@@ -273,6 +276,9 @@ describe('token.getWithPopup', function() {
         this.closed = false;
         this.close = () => {
           this.closed = true;
+        };
+        this.location = {
+          assign: jest.fn()
         };
       }
       jest.spyOn(window, 'open').mockImplementation(function() {
