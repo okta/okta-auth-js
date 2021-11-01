@@ -13,7 +13,7 @@
 
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
-import { NextStep, IdxMessage, Authenticator } from '../../types';
+import { NextStep, IdxMessage, Authenticator, Input } from '../../types';
 import { IdxAuthenticator, IdxRemediation } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
@@ -130,7 +130,7 @@ export class Remediator {
   }
 
   // Get inputs for the next step
-  private getInputs() {
+  private getInputs(): Input[] {
     if (!this.map) {
       return [];
     }
@@ -141,7 +141,7 @@ export class Remediator {
         return inputs;
       }
 
-      let input;
+      let input: Input;
       const aliases = this.map[key];
       const { type } = inputFromRemediation;
       if (typeof this[`getInput${titleCase(key)}`] === 'function') {
