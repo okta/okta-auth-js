@@ -10,6 +10,10 @@ export RUN_SAUCE_TESTS=true
 export SAUCE_USERNAME=OktaSignInWidget
 get_vault_secret_key devex/sauce-labs accessKey SAUCE_ACCESS_KEY
 
+export REFRESH_TOKEN=true
+export ORG_OIE_ENABLED=true
+export MFA_ENABLED=true
+
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 export CI=true
@@ -18,7 +22,6 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 echo "Running tests against production (ok12) org"
 export ISSUER=https://javascript-idx-sdk.okta.com/oauth2/default
 export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
-
 export USERNAME=mary@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 get_vault_secret_key devex/js-idx-sdk-vars client_secret CLIENT_SECRET
