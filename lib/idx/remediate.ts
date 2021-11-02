@@ -20,7 +20,8 @@ import { NextStep, IdxMessage } from './types';
 import { 
   IdxResponse, 
   isRawIdxResponse, 
-  IdxRemediation, 
+  IdxRemediation,
+  isIdxResponse, 
 } from './types/idx-js';
 
 interface RemediationResponse {
@@ -134,22 +135,22 @@ function getNextStep(
 
 function handleIdxError(e, flow, remediator?) {
   // Handle idx messages
-  if (isRawIdxResponse(e)) {
-    const idxState = idx.makeIdxState(e);
-    const terminal = isTerminalResponse(idxState);
-    const messages = getIdxMessages(idxState, flow);
-    if (terminal) {
-      return { terminal, messages };
-    } else {
-      const nextStep = remediator && getNextStep(remediator, idxState);
-      return { 
-        messages, 
-        ...(nextStep && { nextStep }) 
-      };
-    }
+  const idxState: IdxResponse = isIdxResponse(e) ? e : null;
+  if (!idxState) {
+    // Thrown error terminates the interaction with idx
+    throw e;
   }
-  // Thrown error terminates the interaction with idx
-  throw e;
+  const terminal = isTerminalResponse(idxState);
+  const messages = getIdxMessages(idxState, flow);
+  if (terminal) {
+    return { terminal, messages };
+  } else {
+    const nextStep = remediator && getNextStep(remediator, idxState);
+    return { 
+      messages, 
+      ...(nextStep && { nextStep }) 
+    };
+  }
 }
 
 function getActionFromValues(values, idxResponse: IdxResponse): string | undefined {

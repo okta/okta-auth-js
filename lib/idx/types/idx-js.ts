@@ -119,3 +119,7 @@ export interface IdxResponse {
     interactionHandle?: string;
   };
 }
+
+export function isIdxResponse(obj: any): obj is IdxResponse {
+  return obj && isRawIdxResponse(obj.rawIdxState);
+}
