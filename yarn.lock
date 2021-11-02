@@ -12865,6 +12865,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+jssha@^3.1.2:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/jssha/-/jssha-3.2.0.tgz#88ec50b866dd1411deaddbe6b3e3692e4c710f16"
+  integrity sha512-QuruyBENDWdN4tZwJbQq7/eAK85FqrI4oDbXjy5IBhYD+2pTJyBUWZe8ctWaCkrV0gy6AaelgOZZBMeswEa/6Q==
+
 "jsx-ast-utils@^2.4.1 || ^3.0.0", jsx-ast-utils@^3.1.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/jsx-ast-utils/-/jsx-ast-utils-3.2.0.tgz#41108d2cec408c3453c1bbe8a4aae9e1e2bd8f82"
@@ -19202,6 +19207,13 @@ toidentifier@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
   integrity sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==
+
+totp-generator@0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/totp-generator/-/totp-generator-0.0.12.tgz#98d7c77c1e3d007eddd5e810595bdd5f5eb9c555"
+  integrity sha512-7nPAMn43pbEXqHjxKDDbiYbd5mAtr7YugG98OTPTvIUQ7nKW+Oc0KKUNHcoygLJ7ZKYV2aNnUNTR7wAiDZ7rZg==
+  dependencies:
+    jssha "^3.1.2"
 
 touch@^3.1.0:
   version "3.1.0"

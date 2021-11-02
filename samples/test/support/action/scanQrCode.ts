@@ -11,16 +11,11 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
+import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
+import getText from './getText';
+import ActionContext from '../context';
 
-interface ActionContext {
-  credentials: UserCredentials;
-  user: User;
-  featureName: string;
-  currentTestCaseId: string;
-  userName?: string;
-  sharedSecret?: string;
+export default async function (this: ActionContext) {
+  const sharedSecret = await getText( EnrollGoogleAuthenticator.sharedSecret );
+  this.sharedSecret = sharedSecret;
 }
-
-export default ActionContext;

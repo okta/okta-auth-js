@@ -11,16 +11,12 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
+import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
+import setInputField from './setInputField';
+import ActionContext from '../context';
+import totp from 'totp-generator';
 
-interface ActionContext {
-  credentials: UserCredentials;
-  user: User;
-  featureName: string;
-  currentTestCaseId: string;
-  userName?: string;
-  sharedSecret?: string;
+export default async function (this: ActionContext) {
+  const token = totp(this.sharedSecret || '');
+  await setInputField('set', token, EnrollGoogleAuthenticator.code);
 }
-
-export default ActionContext;

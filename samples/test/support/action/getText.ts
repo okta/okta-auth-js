@@ -11,16 +11,15 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
+import { Selector } from 'webdriverio';
 
-interface ActionContext {
-  credentials: UserCredentials;
-  user: User;
-  featureName: string;
-  currentTestCaseId: string;
-  userName?: string;
-  sharedSecret?: string;
-}
-
-export default ActionContext;
+/**
+ * Get element inner text
+ * @param  {String}   selector Element selector
+ */
+export default async (
+    selector: Selector
+) => {
+  const el = await $(selector);
+  return await el.getText();
+};

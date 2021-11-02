@@ -11,16 +11,11 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
+import SelectAuthenticator from '../selectors/SelectAuthenticator';
+import clickElement from './clickElement';
+import selectOption from './selectOption';
 
-interface ActionContext {
-  credentials: UserCredentials;
-  user: User;
-  featureName: string;
-  currentTestCaseId: string;
-  userName?: string;
-  sharedSecret?: string;
-}
-
-export default ActionContext;
+export default async () => {
+  await selectOption('value', 'google_otp', SelectAuthenticator.options);
+  await clickElement('click', 'selector', SelectAuthenticator.submit);
+};
