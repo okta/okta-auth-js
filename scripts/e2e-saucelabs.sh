@@ -7,6 +7,8 @@ setup_service google-chrome-stable 89.0.4389.72-1
 
 # run e2e tests with test/e2e/sauce.wdio.conf.js config
 export RUN_SAUCE_TESTS=true
+export SAUCE_USERNAME=OktaSignInWidget
+get_vault_secret_key devex/sauce-labs accessKey SAUCE_ACCESS_KEY
 
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
@@ -24,7 +26,7 @@ get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
 
 # Run the tests
 if ! yarn test:e2e; then
-  echo "MFA e2e tests failed! Exiting..."
+  echo "Sauce e2e tests failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
 
