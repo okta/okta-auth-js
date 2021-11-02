@@ -9,6 +9,7 @@
 ### Fixes
 
 - [#988](https://github.com/okta/okta-auth-js/pull/988) Fixes Safari & Firefox browsers block `getWithPopup` issue
+- [#995](https://github.com/okta/okta-auth-js/pull/995) Sends cookie for `authn` related requests
 
 ### Other
 
