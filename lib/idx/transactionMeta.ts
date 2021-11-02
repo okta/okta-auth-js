@@ -29,15 +29,24 @@ export function transactionMetaExist(authClient: OktaAuth, options?: Transaction
   return false;
 }
 
+// Returns the saved transaction meta, if it exists and is valid, or undefined
+export function getSavedTransactionMeta(authClient: OktaAuth, options?: TransactionMetaOptions): IdxTransactionMeta {
+  const state = options?.state || authClient.options.state;
+  const existing = authClient.transactionManager.load({ state }) as IdxTransactionMeta;
+  if (existing && isTransactionMetaValid(authClient, existing)) {
+    return existing;
+  }
+}
+
 export async function getTransactionMeta(
   authClient: OktaAuth,
   options?: TransactionMetaOptions
 ): Promise<IdxTransactionMeta> {
   // Load existing transaction meta from storage
   if (authClient.transactionManager.exists(options)) {
-    const existing = authClient.transactionManager.load(options);
-    if (isTransactionMetaValid(authClient, existing)) {
-      return existing as IdxTransactionMeta;
+    const validExistingMeta = getSavedTransactionMeta(authClient, options);
+    if (validExistingMeta) {
+      return validExistingMeta;
     }
     // existing meta is not valid for this configuration
     // this is common when changing configuration in local development environment

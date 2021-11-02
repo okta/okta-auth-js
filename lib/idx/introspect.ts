@@ -17,7 +17,7 @@ import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
 
 export interface IntrospectOptions {
-  interactionHandle: string;
+  interactionHandle?: string;
   stateHandle?: string;
   stateTokenExternalId?: string;
 }

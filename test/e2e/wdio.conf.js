@@ -28,7 +28,7 @@ if (CI) {
         '--headless',
         '--disable-gpu',
         '--window-size=1600x1200',
-        // '--no-sandbox',
+        '--no-sandbox',
         '--whitelisted-ips',
         '--disable-extensions',
         '--verbose',

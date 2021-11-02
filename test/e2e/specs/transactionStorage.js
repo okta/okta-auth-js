@@ -15,6 +15,7 @@ import TestApp from '../pageobjects/TestApp';
 import OktaLogin from '../pageobjects/OktaLogin';
 import { openPKCE } from '../util/appUtils';
 import { handleCallback } from '../util/loginUtils';
+import { switchToMainWindow } from '../util/browserUtils';
 
 const USERNAME = process.env.USERNAME;
 const PASSWORD = process.env.PASSWORD;
@@ -37,6 +38,7 @@ describe('transaction storage', () => {
     await TestApp.getUserInfo();
     await TestApp.assertUserInfo();
     await TestApp.logoutRedirect();
+    await switchToMainWindow();
   });
 
   it('if sharedStorage is disabled, will see PKCE error when handling callback in another tab', async () => {
@@ -56,5 +58,6 @@ describe('transaction storage', () => {
     });
     await TestApp.returnHome();
     await TestApp.assertLoggedOut();
+    await switchToMainWindow();
   });
 });
