@@ -5,6 +5,8 @@ source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 setup_service java 1.8.222
 setup_service google-chrome-stable 89.0.4389.72-1
 
+export TRAVIS=true # work-around to run tests on saucelabs instead of chrome
+
 # run e2e tests with test/e2e/sauce.wdio.conf.js config
 export RUN_SAUCE_TESTS=true
 export SAUCE_USERNAME=OktaSignInWidget
