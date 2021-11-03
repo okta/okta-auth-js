@@ -12,7 +12,7 @@
 
 
 const express = require('express');
-const url = require('url');
+const URL = require('url').URL;
 const { 
   getAuthClient, 
   handleTransaction,
@@ -72,12 +72,13 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/login/callback', async (req, res, next) => {
   const { protocol, originalUrl } = req;
-  const parsedUrl = url.parse(protocol + '://' + req.get('host') + req.originalUrl);
+  const parsedUrl = new URL(protocol + '://' + req.get('host') + originalUrl);
+  const { search, href } = parsedUrl;
   const authClient = getAuthClient(req);
 
   try {
-    if (authClient.isEmailVerifyCallback(parsedUrl.search)) {
-      const { state, stateTokenExternald } = authClient.parseEmailVerifyCallback(parsedUrl.search);
+    if (authClient.isEmailVerifyCallback(search)) {
+      const { state, stateTokenExternald } = authClient.parseEmailVerifyCallback(search);
       const transaction = await authClient.idx.authenticate({ 
         state,
         stateTokenExternald
@@ -86,7 +87,7 @@ router.get('/login/callback', async (req, res, next) => {
       return;
     }
 
-    if (authClient.isInteractionRequired(parsedUrl.search)) {
+    if (authClient.isInteractionRequired(search)) {
       const error = new Error(
         'Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.'
       );
@@ -95,7 +96,7 @@ router.get('/login/callback', async (req, res, next) => {
     }
 
     // Exchange code for tokens
-    await authClient.idx.handleInteractionCodeRedirect(parsedUrl.href);
+    await authClient.idx.handleInteractionCodeRedirect(href);
     // Redirect back to home page
     res.redirect('/');
   } catch (err) {
