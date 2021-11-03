@@ -78,10 +78,10 @@ router.get('/login/callback', async (req, res, next) => {
 
   try {
     if (authClient.isEmailVerifyCallback(search)) {
-      const { state, stateTokenExternald } = authClient.parseEmailVerifyCallback(search);
+      const { state, stateTokenExternalId } = authClient.parseEmailVerifyCallback(search);
       const transaction = await authClient.idx.authenticate({ 
         state,
-        stateTokenExternald
+        stateTokenExternalId
       });
       handleTransaction({ req, res, next, authClient, transaction });
       return;

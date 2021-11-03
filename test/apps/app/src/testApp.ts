@@ -316,11 +316,14 @@ class TestApp {
     return this.renderWidget();
   }
 
-  async renderWidget(options?: unknown): Promise<void> {
+  async renderWidget(options?: any): Promise<void> {
     const tokens: Tokens = await renderWidget(this.config, this.oktaAuth, options);
 
     // save tokens
     this.oktaAuth.tokenManager.setTokens(tokens);
+
+    // shared storage can be cleared now
+    this.oktaAuth.transactionManager.clear({ clearSharedStorage: true, state: options?.state });
 
     // re-render
     this.render();

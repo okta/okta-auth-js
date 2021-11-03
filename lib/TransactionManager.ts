@@ -33,6 +33,10 @@ import {
   pruneSharedStorage,
   saveTransactionToSharedStorage
 } from './util/sharedStorage';
+
+export interface ClearTransactionMetaOptions extends TransactionMetaOptions {
+  clearSharedStorage?: boolean;
+}
 export default class TransactionManager {
   options: TransactionManagerOptions;
   storageManager: StorageManager;
@@ -52,18 +56,25 @@ export default class TransactionManager {
     this.options = options;
   }
 
-  clear(options: TransactionMetaOptions = {}) {
+  // eslint-disable-next-line complexity
+  clear(options: ClearTransactionMetaOptions = {}) {
     const transactionStorage: StorageProvider = this.storageManager.getTransactionStorage();
     const meta = transactionStorage.getStorage();
+
+    // Clear primary storage (by default, sessionStorage on browser)
     transactionStorage.clearStorage();
 
+    // clear IDX response storage
     const idxStateStorage: StorageProvider = this.storageManager.getIdxResponseStorage();
     idxStateStorage?.clearStorage();
 
-    // Automatically clear shared storage if a matching state is found. options.state can be set to false to disable
-    const state = (typeof options.state === 'undefined') ? meta?.state : options.state;
-    if (this.enableSharedStorage && state) {
-      clearTransactionFromSharedStorage(this.storageManager, state);
+    // Usually we do NOT want to clear shared storage because another tab may need it to continue/complete a flow
+    // It can be cleared after a user succcesfully signs in and receives tokens
+    if (this.enableSharedStorage && options.clearSharedStorage) {
+      const state = options.state || meta?.state;
+      if (state) {
+        clearTransactionFromSharedStorage(this.storageManager, state);
+      }
     }
   
     if (!this.legacyWidgetSupport) {
