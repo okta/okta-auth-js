@@ -91,6 +91,11 @@ export default async (pageName?: string) => {
       pageTitle = 'Enroll Google Authenticator';
       break;
     }
+    case 'Challenge Google Authenticator': {
+      selector = ChallengeAuthenticator.pageTitle;
+      pageTitle = 'Challenge Google Authenticator';
+      break;
+    }
     default: {
         throw new Error(`Unknown form "${pageTitle}"`);
     }

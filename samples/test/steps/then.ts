@@ -146,7 +146,16 @@ Then(
 Then(
   /^the screen changes to receive an input for a code$/,
   async function(this: ActionContext) {
-    const pageName = this.featureName.includes('Google Authenticator') ? 'Enroll Google Authenticator' : 'Enroll Factor: Enter SMS Code';
+    let pageName;
+    if (this.featureName.includes('Google Authenticator')) {
+      if (this.scenarioName.includes('enroll')) {
+        pageName = 'Enroll Google Authenticator';
+      } else {
+        pageName = 'Challenge Google Authenticator';
+      }
+    } else {
+      pageName = 'Enroll Factor: Enter SMS Code';
+    }
     checkIsOnPage.bind(null, pageName);
   }
 );
