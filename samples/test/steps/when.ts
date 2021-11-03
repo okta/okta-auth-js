@@ -316,7 +316,7 @@ When(
 );
 
 When(
-  /^she selects "Next" .*$/,
+  /^She selects "Next"*$/,
   () => ({}) // no-op
 );
 
