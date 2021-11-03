@@ -18,6 +18,12 @@ import { OktaAuthOptions } from './types';
 function assertValidConfig(args: OktaAuthOptions) {
   args = args || {};
 
+  var scopes = args.scopes;
+  if (scopes && !Array.isArray(scopes)) {
+    throw new AuthSdkError('scopes must be a array of strings. ' +
+      'Required usage: new OktaAuth({scopes: ["openid", "email"]})');
+  }
+
   var issuer = args.issuer;
   if (!issuer) {
     throw new AuthSdkError('No issuer passed to constructor. ' + 
