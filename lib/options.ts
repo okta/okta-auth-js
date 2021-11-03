@@ -110,7 +110,7 @@ function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS: boolean) {
 export function getDefaultOptions(): OktaAuthOptions {
   const storageUtil = isBrowser() ? browserStorage : serverStorage;
   const storageManager = isBrowser() ? BROWSER_STORAGE : SERVER_STORAGE;
-  const enableSharedStorage = isBrowser() ? true : false; // localStorage for multi-tab flows (web only)
+  const enableSharedStorage = isBrowser() ? true : false; // localStorage for multi-tab flows (browser only)
   return {
     devMode: false,
     httpRequestClient: fetchRequest,
