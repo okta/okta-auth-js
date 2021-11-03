@@ -78,4 +78,37 @@ describe('idx/introspect', () => {
     });
     expect(res.rawIdxState).toEqual(rawIdxResponse);
   });
+
+  it('on IDX error, calls makeIdxState to return a wrapped idxResponse', async () => {
+    const { authClient, introspectOptions } = testContext;
+    const rawIdxResponse = RawIdxResponseFactory.build();
+    jest.spyOn(mocked.idx, 'introspect').mockRejectedValueOnce(rawIdxResponse);
+    jest.spyOn(mocked.idx, 'makeIdxState');
+    authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue(null);
+    const res = await introspect(authClient, introspectOptions);
+    expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
+    expect(mocked.idx.introspect).toHaveBeenCalledWith({
+      domain: 'mock-domain',
+      interactionHandle: 'interaction-handle',
+      version: '1.0.0',
+    });
+    expect(mocked.idx.makeIdxState).toHaveBeenCalled();
+    expect(res.rawIdxState).toEqual(rawIdxResponse);
+  });
+
+  it('on non-IDX error, the error is thrown', async () => {
+    const { authClient, introspectOptions } = testContext;
+    const error = new Error('test error');
+    jest.spyOn(mocked.idx, 'introspect').mockRejectedValueOnce(error);
+    jest.spyOn(mocked.idx, 'makeIdxState');
+    authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue(null);
+    await expect(introspect(authClient, introspectOptions)).rejects.toEqual(error);
+    expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
+    expect(mocked.idx.introspect).toHaveBeenCalledWith({
+      domain: 'mock-domain',
+      interactionHandle: 'interaction-handle',
+      version: '1.0.0',
+    });
+    expect(mocked.idx.makeIdxState).not.toHaveBeenCalled();
+  });
 });

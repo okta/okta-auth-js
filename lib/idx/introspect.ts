@@ -12,7 +12,7 @@
 
 import idx from '@okta/okta-idx-js';
 import { OktaAuth } from '../types';
-import { IdxResponse, RawIdxResponse } from './types/idx-js';
+import { IdxResponse, isRawIdxResponse, RawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
 
@@ -35,7 +35,15 @@ export async function introspect (authClient: OktaAuth, options: IntrospectOptio
   if (!rawIdxResponse) {
     const version = IDX_API_VERSION;
     const domain = getOAuthDomain(authClient);
-    rawIdxResponse = await idx.introspect({ domain, version, ...options });
+    try {
+      rawIdxResponse = await idx.introspect({ domain, version, ...options });
+    } catch (err) {
+      if (isRawIdxResponse(err)) {
+        rawIdxResponse = err;
+      } else {
+        throw err;
+      }
+    }
   }
 
   return idx.makeIdxState(rawIdxResponse);
