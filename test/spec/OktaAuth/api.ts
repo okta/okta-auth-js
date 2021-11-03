@@ -80,7 +80,7 @@ describe('OktaAuth (api)', function() {
     });
     it('should call "/api/v1/authn" endpoint with default options', async () => {
       await auth.signInWithCredentials(options);
-      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, { withCredentials: true });
+      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
     });
     it('should call fingerprint if has sendFingerprint in options', async () => {
       options.sendFingerprint = true;
@@ -88,8 +88,7 @@ describe('OktaAuth (api)', function() {
       delete options.sendFingerprint;
       expect(auth.fingerprint).toHaveBeenCalled();
       expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, {
-        headers: { 'X-Device-Fingerprint': 'fake fingerprint' },
-        withCredentials: true
+        headers: { 'X-Device-Fingerprint': 'fake fingerprint' }
       });
     });
   });
@@ -433,6 +432,30 @@ describe('OktaAuth (api)', function() {
     it('will be true if responseType is [..., "code"]', () => {
       auth = new OktaAuth({ issuer, pkce: false, responseType: ['abc', 'code'] });
       expect(auth.isAuthorizationCodeFlow()).toBe(true);
+    });
+  });
+
+  describe('forgotPassword', () => {
+    it('calls postToTransaction with correct url and options', async () => {
+      const options = { fake: 'fake' };
+      await auth.forgotPassword(options);
+      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn/recovery/password', options);
+    });
+  });
+
+  describe('unlockAccount', () => {
+    it('calls postToTransaction with correct url and options', async () => {
+      const options = { fake: 'fake' };
+      await auth.unlockAccount(options);
+      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn/recovery/unlock', options);
+    });
+  });
+
+  describe('verifyRecoveryToken', () => {
+    it('calls postToTransaction with correct url and options', async () => {
+      const options = { fake: 'fake' };
+      await auth.verifyRecoveryToken(options);
+      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn/recovery/token', options);
     });
   });
 });

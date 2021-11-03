@@ -69,6 +69,7 @@ function transactionExists(sdk) {
 }
 
 function postToTransaction(sdk, url, args, options?) {
+  options = Object.assign({ withCredentials: true }, options);
   return post(sdk, url, args, options)
     .then(function(res) {
       return new AuthTransaction(sdk, res);

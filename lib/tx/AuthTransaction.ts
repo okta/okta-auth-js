@@ -185,7 +185,7 @@ function link2fn(sdk, res, obj, link, ref) {
             data.profile = omit(data.profile, 'updatePhone');
           }
           var href = link.href + toQueryString(params);
-          return postToTransaction(sdk, href, data, { withCredentials: true });
+          return postToTransaction(sdk, href, data);
         };
     }
   }
