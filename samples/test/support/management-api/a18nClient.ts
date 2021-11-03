@@ -41,22 +41,17 @@ class A18nClient {
   }
 
   async getEmailCode(profileId: string) {
+    let retryAttemptsRemaining = 5;
+    let response;
+    while (!response?.content && retryAttemptsRemaining > 0) {
+      await waitForOneSecond();
+      response = await this.getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as Record<string, string>;
+      --retryAttemptsRemaining;
+    }
 
-    const prompt = require('prompt-sync')();
-    const code = prompt('enter code from email\n');
-    console.log('you entered:', code)
-
-    // let retryAttemptsRemaining = 5;
-    // let response;
-    // while (!response?.content && retryAttemptsRemaining > 0) {
-    //   await waitForOneSecond();
-    //   response = await this.getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as Record<string, string>;
-    //   --retryAttemptsRemaining;
-    // }
-
-    // const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/) ||
-    //   response?.content?.match(/enter this code: <b>(?<code>\d+)<\/b>/);
-    // const code = match?.groups?.code;
+    const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/) ||
+      response?.content?.match(/enter this code: <b>(?<code>\d+)<\/b>/);
+    const code = match?.groups?.code;
     if (!code) {
       throw new Error('Unable to retrieve code from email.');
     }

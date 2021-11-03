@@ -23,8 +23,6 @@ export declare interface UserCredentials extends A18nProfile {
 export default async function (firstName: string, featureName = ''): Promise<UserCredentials> {
   featureName = featureName.substring(0, 32);
   const a18nProfile = await a18nClient.createProfile();
-console.log(333,a18nProfile )
-a18nProfile.emailAddress = 'testokta11123@gmail.com';
   return Object.assign({}, a18nProfile, {
     firstName,
     lastName: featureName || `Mc${firstName}face`,
