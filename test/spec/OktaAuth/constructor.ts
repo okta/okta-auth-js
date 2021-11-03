@@ -111,6 +111,9 @@ describe('OktaAuth (constructor)', () => {
         case 'pkce':
           val = false;
           break;
+        case 'scopes':
+          val = [val];
+          break;
       }
       config[option] = val;
     });
