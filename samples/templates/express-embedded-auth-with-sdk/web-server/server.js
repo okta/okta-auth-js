@@ -72,8 +72,6 @@ app.use(require('./routes'));
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars, complexity
 app.use(function(err, req, res, next) {
-  console.error(err.stack);
-
   let errors;
   if (Array.isArray(err.errorCauses) && err.errorCauses.length) {
     // handle error from SDK

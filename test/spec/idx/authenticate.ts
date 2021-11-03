@@ -213,11 +213,13 @@ describe('idx/authenticate', () => {
 
     it('returns terminal error when invalid password is provided', async () => {
       const { authClient } = testContext;
-      const errorResponse = RawIdxResponseFactory.build({
-        messages: IdxMessagesFactory.build({
-          value: [
-            IdxErrorIncorrectPassword.build()
-          ]
+      const errorResponse = IdxResponseFactory.build({
+        rawIdxState: RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorIncorrectPassword.build()
+            ]
+          })
         })
       });
 
@@ -238,11 +240,13 @@ describe('idx/authenticate', () => {
 
     it('returns terminal error when user account is deactivated or is not assigned to the application', async () => {
       const { authClient } = testContext;
-      const errorResponse = RawIdxResponseFactory.build({
-        messages: IdxMessagesFactory.build({
-          value: [
-            IdxErrorUserNotAssignedFactory.build()
-          ]
+      const errorResponse = IdxResponseFactory.build({
+        rawIdxState: RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorUserNotAssignedFactory.build()
+            ]
+          })
         })
       });
       const identifyResponse = IdentifyResponseFactory.build();
@@ -287,11 +291,13 @@ describe('idx/authenticate', () => {
 
     it('returns terminal error when user account is locked or suspeneded', async () => {
       const { authClient } = testContext;
-      const errorResponse = RawIdxResponseFactory.build({
-        messages: IdxMessagesFactory.build({
-          value: [
-            IdxErrorAuthenticationFailedFactory.build()
-          ]
+      const errorResponse = IdxResponseFactory.build({
+        rawIdxState: RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorAuthenticationFailedFactory.build()
+            ]
+          })
         })
       });
       const identifyResponse = IdentifyResponseFactory.build();
@@ -615,28 +621,35 @@ describe('idx/authenticate', () => {
               EnrollPhoneAuthenticatorRemediationFactory.build()
             ]
           });
-          const errorInvalidCodeResponse = RawIdxResponseFactory.build({
-            remediation: {
-              value: [
-                ChallengeAuthenticatorRemediationFactory.build({
+
+          const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+            value: [
+              CredentialsValueFactory.build({
+                form: {
                   value: [
-                    CredentialsValueFactory.build({
-                      form: {
+                    PasscodeValueFactory.build({
+                      messages: IdxMessagesFactory.build({
                         value: [
-                          PasscodeValueFactory.build({
-                            messages: IdxMessagesFactory.build({
-                              value: [
-                                IdxErrorPasscodeInvalidFactory.build()
-                              ]
-                            })
-                          })
+                          IdxErrorPasscodeInvalidFactory.build()
                         ]
-                      }
+                      })
                     })
                   ]
-                })
-              ]
-            }
+                }
+              })
+            ]
+          });
+          const errorInvalidCodeResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              challengeAuthenticatorRemediation
+            ],
+            rawIdxState: RawIdxResponseFactory.build({
+              remediation: {
+                value: [
+                  challengeAuthenticatorRemediation
+                ]
+              }
+            })
           });
           Object.assign(testContext, {
             selectAuthenticatorResponse,
@@ -809,26 +822,32 @@ describe('idx/authenticate', () => {
               EnrollPhoneAuthenticatorRemediationFactory.build()
             ]
           });
-          const errorInvalidPhoneResponse = RawIdxResponseFactory.build({
-            messages: IdxMessagesFactory.build({
-              value: [
-                IdxErrorEnrollmentInvalidPhoneFactory.build()
-              ]
-            }),
-            remediation: {
-              type: 'array',
-              value: [
-                SelectAuthenticatorEnrollRemediationFactory.build({
-                  value: [
-                    AuthenticatorValueFactory.build({
-                      options: [
-                        PhoneAuthenticatorOptionFactory.build(),
-                      ]
-                    })
-                  ]
-                })
-              ]
-            }
+          const selectAuthenticatorRemediation = SelectAuthenticatorEnrollRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  PhoneAuthenticatorOptionFactory.build(),
+                ]
+              })
+            ]
+          });
+          const errorInvalidPhoneResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              selectAuthenticatorRemediation,
+            ],
+            rawIdxState: RawIdxResponseFactory.build({
+              messages: IdxMessagesFactory.build({
+                value: [
+                  IdxErrorEnrollmentInvalidPhoneFactory.build()
+                ]
+              }),
+              remediation: {
+                type: 'array',
+                value: [
+                  selectAuthenticatorRemediation
+                ]
+              }
+            })
           });
 
           Object.assign(testContext, {
@@ -1069,29 +1088,36 @@ describe('idx/authenticate', () => {
               VerifyEmailRemediationFactory.build()
             ]
           });
-          const errorInvalidCodeResponse = RawIdxResponseFactory.build({
-            remediation: {
-              value: [
-                ChallengeAuthenticatorRemediationFactory.build({
+          const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+            value: [
+              CredentialsValueFactory.build({
+                form: {
                   value: [
-                    CredentialsValueFactory.build({
-                      form: {
+                    PasscodeValueFactory.build({
+                      messages: IdxMessagesFactory.build({
                         value: [
-                          PasscodeValueFactory.build({
-                            messages: IdxMessagesFactory.build({
-                              value: [
-                                IdxErrorPasscodeInvalidFactory.build()
-                              ]
-                            })
-                          })
+                          IdxErrorPasscodeInvalidFactory.build()
                         ]
-                      }
+                      })
                     })
                   ]
-                })
-              ]
-            }
+                }
+              })
+            ]
           });
+          const errorInvalidCodeResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              challengeAuthenticatorRemediation
+            ],
+            rawIdxState: RawIdxResponseFactory.build({
+              remediation: {
+                value: [
+                  challengeAuthenticatorRemediation
+                ]
+              }
+            })
+          });
+    
           Object.assign(testContext, {
             selectAuthenticatorResponse,
             verifyEmailResponse,
@@ -1184,26 +1210,25 @@ describe('idx/authenticate', () => {
     describe('google authenticator', () => {
       let errorInvalidCodeResponse;
       beforeEach(() => {
-        errorInvalidCodeResponse = RawIdxResponseFactory.build({
-          messages: IdxMessagesFactory.build({
-            value: [
-              IdxErrorGoogleAuthenticatorPasscodeInvalidFactory.build()
-            ]
+        errorInvalidCodeResponse = IdxResponseFactory.build({
+          rawIdxState: RawIdxResponseFactory.build({
+            messages: IdxMessagesFactory.build({
+              value: [
+                IdxErrorGoogleAuthenticatorPasscodeInvalidFactory.build()
+              ]
+            })
           }),
-          remediation: {
-            type: 'array',
-            value: [
-              SelectAuthenticatorEnrollRemediationFactory.build({
-                value: [
-                  AuthenticatorValueFactory.build({
-                    options: [
-                      PhoneAuthenticatorOptionFactory.build(),
-                    ]
-                  })
-                ]
-              })
-            ]
-          }
+          neededToProceed:[
+            SelectAuthenticatorEnrollRemediationFactory.build({
+              value: [
+                AuthenticatorValueFactory.build({
+                  options: [
+                    PhoneAuthenticatorOptionFactory.build(),
+                  ]
+                })
+              ]
+            })
+          ]
         });
       });
 

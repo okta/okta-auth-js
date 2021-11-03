@@ -1081,26 +1081,25 @@ describe('idx/register', () => {
         phoneEnrollmentDataResponse,
       } = testContext;
 
-      const errorResponse = RawIdxResponseFactory.build({
-        messages: IdxMessagesFactory.build({
-          value: [
-            IdxErrorEnrollmentInvalidPhoneFactory.build()
-          ]
+      const errorResponse = IdxResponseFactory.build({
+        rawIdxState: RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorEnrollmentInvalidPhoneFactory.build()
+            ]
+          })
         }),
-        remediation: {
-          type: 'array',
-          value: [
-            SelectAuthenticatorAuthenticateRemediationFactory.build({
-              value: [
-                AuthenticatorValueFactory.build({
-                  options: [
-                    PhoneAuthenticatorOptionFactory.build(),
-                  ]
-                })
-              ]
-            })
-          ]
-        }
+        neededToProceed: [
+          SelectAuthenticatorAuthenticateRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  PhoneAuthenticatorOptionFactory.build(),
+                ]
+              })
+            ]
+          })
+        ]
       });
 
       jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockRejectedValue(errorResponse);

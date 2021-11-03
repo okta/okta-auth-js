@@ -12,14 +12,12 @@
 
 
 /* eslint-disable max-statements, max-depth, complexity */
-import idx from '@okta/okta-idx-js';
 import { AuthSdkError } from '../errors';
 import { Remediator, RemediationValues } from './remediators';
 import { RunOptions, RemediationFlow } from './run';
 import { NextStep, IdxMessage } from './types';
 import { 
-  IdxResponse, 
-  isRawIdxResponse, 
+  IdxResponse,  
   IdxRemediation,
   isIdxResponse, 
 } from './types/idx-js';
