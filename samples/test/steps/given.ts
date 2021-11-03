@@ -90,7 +90,7 @@ Given(
 Given(
   /([^/s]+) has an account in the org/,
   async function(this: ActionContext, firstName: string) {
-    await createContextUserAndCredentials.call(this, firstName, ['MFA Required']);
+    await createContextUserAndCredentials.call(this, firstName, ['MFA Required', 'Google Authenticator Enrollment Required']);
   }
 );
 

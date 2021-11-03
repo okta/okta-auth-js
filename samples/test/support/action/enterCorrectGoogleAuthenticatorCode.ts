@@ -14,7 +14,7 @@
 import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
 import setInputField from './setInputField';
 import ActionContext from '../context';
-import totp from 'totp-generator';
+const totp = require('totp-generator');
 
 export default async function (this: ActionContext) {
   const token = totp(this.sharedSecret || '');
