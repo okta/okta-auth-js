@@ -2,7 +2,7 @@
   "private": true,
   "name": "@okta/okta-auth-js",
   "description": "The Okta Auth SDK",
-  "version": "5.7.0",
+  "version": "5.8.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "type": "commonjs",
