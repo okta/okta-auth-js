@@ -84,6 +84,10 @@ app.use(function(err, req, res, next) {
     errors = [err.error_description];
   } else if (err && err.errorSummary) {
     errors = [err.errorSummary];
+  } else if (err && err.xhr) { // AuthJS
+    errors = [JSON.stringify(err.xhr.responseJSON)];
+  } else if (err && err.messages && err.messages.value) { // IDX
+    errors = err.messages.value.map(val => val.message);
   } else {
     errors = ['Internal Error!'];
   }

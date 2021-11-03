@@ -140,12 +140,11 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   _oktaUserAgent: OktaUserAgent;
   _pending: { handleLogin: boolean };
   constructor(args: OktaAuthOptions) {
-    this.options = buildOptions(args);
-    const { storageManager, cookies, storageUtil } = this.options;
-    this.storageManager = new StorageManager(storageManager, cookies, storageUtil);
+    const options = this.options = buildOptions(args);
+    this.storageManager = new StorageManager(options.storageManager, options.cookies, options.storageUtil);
     this.transactionManager = new TransactionManager(Object.assign({
-      storageManager: this.storageManager
-    }, args.transactionManager));
+      storageManager: this.storageManager,
+    }, options.transactionManager));
     this._oktaUserAgent = new OktaUserAgent();
   
     this.tx = {
@@ -153,7 +152,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       resume: resumeTransaction.bind(null, this),
       exists: Object.assign(transactionExists.bind(null, this), {
         _get: (name) => {
-          const storage = storageUtil.storage;
+          const storage = options.storageUtil.storage;
           return storage.get(name);
         }
       }),
