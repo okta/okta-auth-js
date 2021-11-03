@@ -18,9 +18,18 @@ interface ActionContext {
   credentials: UserCredentials;
   user: User;
   featureName: string;
+  scenarioName: string;
   currentTestCaseId: string;
   userName?: string;
   sharedSecret?: string;
 }
+
+let reusedContext: ActionContext;
+export const getReusedContext = () => {
+  return reusedContext;
+};
+export const reuseContext = (context: ActionContext) => {
+  reusedContext = context;
+};
 
 export default ActionContext;
