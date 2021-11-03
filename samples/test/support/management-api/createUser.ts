@@ -34,17 +34,6 @@ export default async (credentials: UserCredentials, assignToGroups = [userGroup]
   };
 
   try {
-    console.log(2222, {
-      profile: {
-        firstName: credentials.firstName,
-        lastName: credentials.lastName,
-        email: credentials.emailAddress,
-        login: credentials.emailAddress
-      },
-      credentials: {
-        password : { value: credentials.password }
-      }
-    })
     user = await oktaClient.createUser({
       profile: {
         firstName: credentials.firstName,
@@ -75,21 +64,6 @@ export default async (credentials: UserCredentials, assignToGroups = [userGroup]
 
       await oktaClient.addUserToGroup((testGroup as Group).id, user.id);
     }
-
-    // const emailFactor = {
-    //   factorType: 'email',
-    //   provider: 'OKTA',
-    //   profile: {
-    //     email: credentials.emailAddress,
-    //   }
-    // };
-  
-    // const res = await oktaClient.enrollFactor(user.id, emailFactor, {
-    //   activate: true
-    // });
-    
-    // if (res.status != 'ACTIVE')
-    //   throw new Error('cant ativate email');
 
     return user;
   } catch (err) {

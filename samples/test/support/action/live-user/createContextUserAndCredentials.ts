@@ -18,8 +18,6 @@ import ActionContext from '../../context';
 export default async function (this: ActionContext, firstName: string, assignToGroups?: string[]): Promise<void> {
   const credentials = this.credentials || await createCredentials(firstName, this.featureName);
   this.credentials = credentials;
-console.log(44)
   const user = await createUser(credentials, assignToGroups);
-  console.log(45, user)
   this.user = user;
 } 
