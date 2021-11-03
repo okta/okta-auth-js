@@ -11,9 +11,9 @@
  */
 
 
-const { getAuthClient } = require('../utils');
+const { getAuthClient, withCatch } = require('../utils');
 
-module.exports = async function userContext(req, res, next) {
+module.exports = withCatch(async function userContext(req, res, next) {
   const authClient = getAuthClient(req);
   const { idToken, accessToken, refreshToken } = authClient.tokenManager.getTokensSync();
   if (idToken && accessToken) {
@@ -27,4 +27,4 @@ module.exports = async function userContext(req, res, next) {
   }
   
   next();
-};
+});

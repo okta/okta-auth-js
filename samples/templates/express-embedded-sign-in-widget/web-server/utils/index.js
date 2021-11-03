@@ -13,8 +13,11 @@
 
 const getAuthClient = require('./getAuthClient');
 const getAuthTransaction = require('./getAuthTransaction');
+const {withCatch, routerWithCatch} = require('./withCatch');
 
 module.exports = {
   getAuthClient,
   getAuthTransaction,
+  withCatch,
+  routerWithCatch,
 };

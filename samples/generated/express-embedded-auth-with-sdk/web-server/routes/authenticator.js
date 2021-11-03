@@ -11,16 +11,15 @@
  */
 
 
-const express = require('express');
-
 const { 
   getAuthClient, 
   handleTransaction,
   renderTemplate,
   renderPage,
+  routerWithCatch,
 } = require('../utils');
 
-const router = express.Router();
+const router = routerWithCatch();
 
 // Handle select-authenticator
 router.get('/select-authenticator', (req, res) => {

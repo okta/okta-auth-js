@@ -11,15 +11,15 @@
  */
 
 
-const express = require('express');
 const { 
   getAuthClient,
   handleTransaction,
   renderTemplate,
   renderPage,
+  routerWithCatch,
 } = require('../utils');
 
-const router = express.Router();
+const router = routerWithCatch();
 
 // entry route
 router.get('/recover-password', (req, res) => {
