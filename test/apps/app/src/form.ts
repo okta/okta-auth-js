@@ -14,7 +14,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
 /* eslint-disable max-len */
-import { flattenConfig, Config } from './config';
+import { flattenConfig, Config, clearStorage } from './config';
 import { FormDataEvent } from './types';
 import { htmlString, makeClickHandler } from './util';
 
@@ -116,6 +116,7 @@ const Form = `
   </div>
   <div class="pure-controls">
   <input id="f_submit" type="submit" value="Update Config" class="pure-button pure-button-primary"/>
+  <a href="#clear" onclick="resetConfig(event)" class="pure-button">Reset Config</a>
   </div>
   </form>
 `;
@@ -210,6 +211,13 @@ export function hideConfig(): void {
 }
 
 (window as any).hideConfig = makeClickHandler(hideConfig);
+
+export function resetConfig(): void {
+  clearStorage();
+  window.location.reload();
+}
+
+(window as any).resetConfig = makeClickHandler(resetConfig);
 
 export function showConfigForm(config: Config): void {
   let el = document.getElementById('config-area');
