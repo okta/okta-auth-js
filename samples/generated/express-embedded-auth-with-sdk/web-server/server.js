@@ -72,6 +72,9 @@ app.use(require('./routes'));
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars, complexity
 app.use(function(err, req, res, next) {
+  if (err && err.stack) {
+    console.error(err.stack);
+  }
   let errors;
   if (Array.isArray(err.errorCauses) && err.errorCauses.length) {
     // handle error from SDK
@@ -84,10 +87,6 @@ app.use(function(err, req, res, next) {
     errors = [err.error_description];
   } else if (err && err.errorSummary) {
     errors = [err.errorSummary];
-  } else if (err && err.xhr) { // AuthJS
-    errors = [JSON.stringify(err.xhr.responseJSON)];
-  } else if (err && err.messages && err.messages.value) { // IDX
-    errors = err.messages.value.map(val => val.message);
   } else {
     errors = ['Internal Error!'];
   }

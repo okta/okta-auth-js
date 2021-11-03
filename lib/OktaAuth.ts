@@ -307,8 +307,8 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   // CommonJS module users (CDN) need all exports on this object
 
   // Utility methods for interaction code flow
-  isInteractionRequired(): boolean {
-    return isInteractionRequired(this);
+  isInteractionRequired(hashOrSearch?: string): boolean {
+    return isInteractionRequired(this, hashOrSearch);
   }
 
   isInteractionRequiredError(error: Error): boolean {
