@@ -19,11 +19,13 @@ module.exports = function getAuthClient(req, options = {}) {
   const { oidc } = getConfig().webServer;
   const storageProvider = {
     getItem: function(key) {
-      let val;
-      try {
-        val = JSON.parse(req.session[key]);
-      } catch (err) {
-        val = null;
+      let val = req.session[key] || null;
+      if (val) {
+        try {
+          val = JSON.parse(req.session[key]);
+        } catch (err) {
+          val = null;
+        }
       }
       return val;
     },
