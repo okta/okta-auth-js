@@ -21,9 +21,9 @@ export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 echo "Running tests against production (ok12) org"
-export ISSUER=https://javascript-idx-sdk.okta.com/oauth2/default
-export CLIENT_ID=0oa17suj5x9khaVH75d7
-export USERNAME=mary@acme.com
+export ISSUER=https://samples-javascript.okta.com/oauth2/default
+export CLIENT_ID=0oa1xyzajgPFGWlLP4x7
+export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
 
