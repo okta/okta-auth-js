@@ -15,10 +15,10 @@ import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
 import setInputField from './setInputField';
 import ActionContext from '../context';
 const totp = require('totp-generator');
-const waitForNextPeriod = (seconds = 30) => browser.waitUntil(() => new Promise(resolve => setTimeout(resolve.bind(this, true), seconds*1000)));
 
 export default async function (this: ActionContext) {
-  await waitForNextPeriod();
-  const token = totp(this.sharedSecret || '');
+  const token = totp(this.sharedSecret || '', {
+    timestamp: Date.now() + (this.scenarioName.includes('enroll') ? -30*1000 : 0)
+  });
   await setInputField('set', token, EnrollGoogleAuthenticator.code);
 }
