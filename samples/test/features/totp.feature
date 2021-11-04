@@ -12,11 +12,6 @@ Feature: TOTP Support (Google Authenticator)
       And she has inserted her password
       And her password is correct
     When she clicks Login
-    # Then she is presented with an option to select Email to verify
-    # When She selects Email from the list
-    # Then the screen changes to receive an input for a Email code
-    # When She inputs the correct code from the Email
-    #   And She selects "Verify"
     Then she sees the list of required factors (Google Authenticator) to enroll
     When She selects Google Authenticator from the list
       And She scans a QR Code
