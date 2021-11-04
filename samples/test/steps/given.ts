@@ -154,7 +154,6 @@ Given(
 );
 
 
-
 // Given(
 //     /^I open the (url|site) "([^"]*)?"$/,
 //     openWebsite
