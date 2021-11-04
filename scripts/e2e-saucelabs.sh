@@ -12,9 +12,6 @@ export RUN_SAUCE_TESTS=true
 export SAUCE_USERNAME=OktaSignInWidget
 get_vault_secret_key devex/sauce-labs accessKey SAUCE_ACCESS_KEY
 
-export REFRESH_TOKEN=true
-export ORG_OIE_ENABLED=false
-
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 export CI=true
