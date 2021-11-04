@@ -1,15 +1,23 @@
 # Changelog
 
+## 5.8.0
+
+### Features
+
+- [#990](https://github.com/okta/okta-auth-js/pull/990) Supports email verify callback
+
 ## 5.7.0
 
 ### Features
 
 - [#983](https://github.com/okta/okta-auth-js/pull/983) Adds new method `setHeaders`
+- [#990](https://github.com/okta/okta-auth-js/pull/990) Supports email verify callback
 
 ### Fixes
 
 - [#988](https://github.com/okta/okta-auth-js/pull/988) Fixes Safari & Firefox browsers block `getWithPopup` issue
 - [#995](https://github.com/okta/okta-auth-js/pull/995) Sends cookie for `authn` related requests
+- [#985](https://github.com/okta/okta-auth-js/pull/985) Fixes issue with renewTokens that would drop scopes passed to `getToken`
 
 ### Other
 

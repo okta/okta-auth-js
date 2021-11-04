@@ -44,7 +44,6 @@ import {
   IdxAPI,
   SignoutRedirectUrlOptions,
   HttpAPI,
-  TransactionMeta,
 } from './types';
 import {
   transactionStatus,
@@ -87,7 +86,10 @@ import browserStorage from './browser/browserStorage';
 import { 
   toQueryString, 
   toAbsoluteUrl,
-  clone
+  clone,
+  isEmailVerifyCallback,
+  EmailVerifyCallbackResponse,
+  parseEmailVerifyCallback
 } from './util';
 import { getUserAgent } from './builderUtil';
 import { TokenManager } from './TokenManager';
@@ -138,12 +140,11 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   _oktaUserAgent: OktaUserAgent;
   _pending: { handleLogin: boolean };
   constructor(args: OktaAuthOptions) {
-    this.options = buildOptions(args);
-    const { storageManager, cookies, storageUtil } = this.options;
-    this.storageManager = new StorageManager(storageManager, cookies, storageUtil);
+    const options = this.options = buildOptions(args);
+    this.storageManager = new StorageManager(options.storageManager, options.cookies, options.storageUtil);
     this.transactionManager = new TransactionManager(Object.assign({
-      storageManager: this.storageManager
-    }, args.transactionManager));
+      storageManager: this.storageManager,
+    }, options.transactionManager));
     this._oktaUserAgent = new OktaUserAgent();
   
     this.tx = {
@@ -151,7 +152,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       resume: resumeTransaction.bind(null, this),
       exists: Object.assign(transactionExists.bind(null, this), {
         _get: (name) => {
-          const storage = storageUtil.storage;
+          const storage = options.storageUtil.storage;
           return storage.get(name);
         }
       }),
@@ -306,12 +307,21 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   // CommonJS module users (CDN) need all exports on this object
 
   // Utility methods for interaction code flow
-  isInteractionRequired(): boolean {
-    return isInteractionRequired(this);
+  isInteractionRequired(hashOrSearch?: string): boolean {
+    return isInteractionRequired(this, hashOrSearch);
   }
 
   isInteractionRequiredError(error: Error): boolean {
     return isInteractionRequiredError(error);
+  }
+
+  // Utility methods for email verify callback
+  isEmailVerifyCallback(urlPath: string): boolean {
+    return isEmailVerifyCallback(urlPath);
+  }
+
+  parseEmailVerifyCallback(urlPath: string): EmailVerifyCallbackResponse {
+    return parseEmailVerifyCallback(urlPath);
   }
 
   async signIn(opts: SigninOptions): Promise<AuthTransaction> {
@@ -562,27 +572,46 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     this.tokenManager.setTokens(tokens);
   }
 
-  setOriginalUri(originalUri: string): void {
-    const storage = browserStorage.getSessionStorage();
-    storage.setItem(REFERRER_PATH_STORAGE_KEY, originalUri);
+  setOriginalUri(originalUri: string, state?: string): void {
+    // always store in session storage
+    const sessionStorage = browserStorage.getSessionStorage();
+    sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, originalUri);
+
+    // to support multi-tab flows, set a state in constructor or pass as param
+    state = state || this.options.state;
+    if (state) {
+      const sharedStorage = this.storageManager.getOriginalUriStorage();
+      sharedStorage.setItem(state, originalUri);
+    }
   }
 
   getOriginalUri(state?: string): string {
+    // Prefer shared storage (if state is available)
+    state = state || this.options.state;
     if (state) {
-      const meta: TransactionMeta = this.transactionManager.load({
-        oauth: true,
-        state
-      });
-      return meta.originalUri;
+      const sharedStorage = this.storageManager.getOriginalUriStorage();
+      const originalUri = sharedStorage.getItem(state);
+      if (originalUri) {
+        return originalUri;
+      }
     }
+
+    // Try to load from session storage
     const storage = browserStorage.getSessionStorage();
-    const originalUri = storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) : undefined;
-    return originalUri;
+    return storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) : undefined;
   }
 
-  removeOriginalUri(): void {
+  removeOriginalUri(state?: string): void {
+    // Remove from sessionStorage
     const storage = browserStorage.getSessionStorage();
     storage.removeItem(REFERRER_PATH_STORAGE_KEY);
+
+    // Also remove from shared storage
+    state = state || this.options.state;
+    if (state) {
+      const sharedStorage = this.storageManager.getOriginalUriStorage();
+      sharedStorage.removeItem(state);
+    }
   }
 
   isLoginRedirect(): boolean {
@@ -590,13 +619,16 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   }
 
   async handleLoginRedirect(tokens?: Tokens, originalUri?: string): Promise<void> {
+    let state = this.options.state;
+
     // Store tokens and update AuthState by the emitted events
     if (tokens) {
       this.tokenManager.setTokens(tokens);
-      originalUri = originalUri || this.getOriginalUri();
+      originalUri = originalUri || this.getOriginalUri(this.options.state);
     } else if (this.isLoginRedirect()) {
       // For redirect flow, get state from the URL and use it to retrieve the originalUri
-      const { state } = await parseOAuthResponseFromUrl(this, {});
+      const oAuthResponse = await parseOAuthResponseFromUrl(this, {});
+      state = oAuthResponse.state;
       originalUri = originalUri || this.getOriginalUri(state);
       await this.storeTokensFromRedirect();
     } else {
@@ -607,7 +639,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     await this.authStateManager.updateAuthState();
 
     // clear originalUri from storage
-    this.removeOriginalUri();
+    this.removeOriginalUri(state);
 
     // Redirect to originalUri
     const { restoreOriginalUri } = this.options;

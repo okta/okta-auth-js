@@ -78,12 +78,14 @@ export function isLoginRedirect (sdk: OktaAuth) {
  * Check if error=interaction_required has been passed back in the url, which happens in
  * the social auth IDP redirect flow.
  */
-export function isInteractionRequired (sdk: OktaAuth) {
+export function isInteractionRequired (sdk: OktaAuth, hashOrSearch?: string) {
+  if (!hashOrSearch) { // web only
     // First check, is this a redirect URI?
     if (!isLoginRedirect(sdk)){
       return false;
     }
   
-  var hashOrSearch = getHashOrSearch(sdk.options);
+    hashOrSearch = getHashOrSearch(sdk.options);
+  }
   return /(error=interaction_required)/i.test(hashOrSearch);
 }

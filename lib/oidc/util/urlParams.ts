@@ -16,7 +16,7 @@ export function urlParamsToObject(hashOrSearch: string) {
   // Predefine regexs for parsing hash
   var plus2space = /\+/g;
   var paramSplit = /([^&=]+)=?([^&]*)/g;
-  var fragment = hashOrSearch;
+  var fragment = hashOrSearch || '';
 
   // Some hash based routers will automatically add a / character after the hash
   if (fragment.charAt(0) === '#' && fragment.charAt(1) === '/') {

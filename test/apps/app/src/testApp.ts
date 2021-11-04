@@ -23,12 +23,14 @@ import {
   TokenParams,
   isInteractionRequired,
   isInteractionRequiredError, isAuthorizationCodeError,
+  isEmailVerifyCallback,
+  parseEmailVerifyCallback,
   IdxStatus,
-  IdxTransaction
+  IdxTransaction,
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
-import { htmlString, toQueryString } from './util';
+import { htmlString, toQueryString, makeClickHandler } from './util';
 import { showConfigForm } from './form';
 import { tokensHTML } from './tokens';
 import { renderWidget } from './widget';
@@ -37,22 +39,79 @@ function homeLink(app: TestApp): string {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
 }
 
+function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
+  let protectedPageLink = '';
+  if (!onProtectedPage) {
+    protectedPageLink = `
+      <li class="pure-menu-item">
+        <a id="nav-to-protected" href="${app.protectedUrl}" class="pure-menu-link">Navigate to PROTECTED page</a>
+      </li>
+    `;
+  }
+  return `
+    <div class="pure-menu">
+      <ul class="pure-menu-list actions">
+        <li class="pure-menu-item">
+          <a id="login-widget" href="/" onclick="loginWidget(event)" class="pure-menu-link">Login using SIGNIN WIDGET</a>
+        </li>
+        <li class="pure-menu-item">
+          <a id="login-redirect" href="/" onclick="loginRedirect(event)" class="pure-menu-link">Login using REDIRECT</a>
+        </li>
+        <li class="pure-menu-item">
+          <a id="login-popup" href="/" onclick="loginPopup(event)" class="pure-menu-link">Login using POPUP</a>
+        </li>
+        <li class="pure-menu-item">
+        <a id="get-token" href="/" onclick="getToken(event)" class="pure-menu-link">Get Token (without prompt)</a>
+        </li>
+        <li class="pure-menu-item">
+          <a id="test-concurrent-login" href="/" onclick="testConcurrentLogin(event)" class="pure-menu-link">Test Concurrent Login</a>
+        </li>
+        ${protectedPageLink}
+      </ul>
+    </div>
+    <div class="box">
+      <form>
+        <input name="username" id="username" placeholder="username" type="email"/>
+        <input name="password" id="password" placeholder="password" type="password"/>
+        <a href="/" id="login-direct" onclick="loginDirect(event)">Login DIRECT</a>
+      </form>
+    </div>
+  `;
+}
+
 function logoutLink(app: TestApp): string {
   return `
-    <div class="actions signout">
-      <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)">Logout (and redirect here)</a>
-      <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)">Logout (XHR + reload)</a>
-      <a id="logout-app" href="${app.originalUrl}" onclick="logoutApp(event)">Logout (app only)</a>
+    <div class="actions signout pure-menu">
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item">
+          <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)" class="pure-menu-link">Logout (and redirect here)</a>
+        </li>
+        <li class="pure-menu-item">
+          <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)" class="pure-menu-link">Logout (XHR + reload)</a>
+        </li>
+        <li class="pure-menu-item">
+          <a id="logout-app" href="${app.originalUrl}" onclick="logoutApp(event)" class="pure-menu-link">Logout (app only)</a>
+        </li>
+      </ul>
     </div>
   `;
 }
 
 const Toolbar = `
-  <div class="actions subscribe">
-    <a id="start-service" onclick="startService(event)">Start service</a>
-    <a id="stop-service" onclick="stopService(event)">Stop service</a>
-    <a id="subscribe-auth-state" onclick="subscribeToAuthState(event)">Subscribe to AuthState</a>
-    <a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)">Subscribe to TokenManager events</a>
+  <div class="actions subscribe pure-menu pure-menu-horizontal">
+    <ul class="pure-menu-list">
+      <li class="pure-menu-item">
+        <a id="start-service" onclick="startService(event)" class="pure-menu-link">Start service</a>
+      </li>
+      <li class="pure-menu-item">
+        <a id="stop-service" onclick="stopService(event)" class="pure-menu-link">Stop service</a>
+      </li>
+      <li class="pure-menu-item">
+        <a id="subscribe-auth-state" onclick="subscribeToAuthState(event)" class="pure-menu-link">Subscribe to AuthState</a>
+      </li>
+      <li class="pure-menu-item">
+        <a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)" class="pure-menu-link">Subscribe to TokenManager events</a>
+      </li>
   </div>
 `;
 
@@ -61,17 +120,10 @@ const Layout = `
     <div id="session-expired" style="color: orange"></div>
     <div id="token-error" style="color: red"></div>
     <div id="token-msg" style="color: green"></div>
-    <div id="page-content"></div>
     ${Toolbar}
+    <div id="page-content"></div>
   </div>
 `;
-
-function makeClickHandler(fn: () => void): Function {
-  return function(event: Event): any {
-    event && event.preventDefault(); // prevent navigation / page reload
-    return fn();
-  };
-}
 
 function bindFunctions(testApp: TestApp, window: Window): void {
   const boundFunctions = {
@@ -107,10 +159,12 @@ function bindFunctions(testApp: TestApp, window: Window): void {
 class TestApp {
   config: Config;
   originalUrl?: string;
+  protectedUrl?: string;
   rootElem?: Element;
   contentElem?: Element;
   oktaAuth?: OktaAuth;
   getCount?: number;
+  widgetInstance?: unknown;
 
   constructor(config: Config) {
     this.config = config;
@@ -121,6 +175,7 @@ class TestApp {
   mount(window: Window, rootElem: Element): void {
     const queryParams = toQueryString(flattenConfig(this.config));
     this.originalUrl = MOUNT_PATH + queryParams;
+    this.protectedUrl = MOUNT_PATH + 'protected/' + queryParams;
     this.rootElem = rootElem;
     this.rootElem.innerHTML = Layout;
     this.contentElem = document.getElementById('page-content');
@@ -128,7 +183,7 @@ class TestApp {
     showConfigForm(this.config);
   }
 
-  async getSDKInstance(): Promise<OktaAuth> {
+  getSDKInstance(): OktaAuth {
     // can throw
     this.oktaAuth = this.oktaAuth || new OktaAuth(Object.assign({}, this.config, {
       scopes: this.config.defaultScopes ? [] : this.config.scopes
@@ -180,21 +235,47 @@ class TestApp {
     document.getElementById('token-error').innerText = error as string;
   }
 
-  async bootstrapCallback(): Promise<void> {
+  async bootstrapProtected(): Promise<void> {
+    this.getSDKInstance();
+    const { idToken, accessToken } = this.oktaAuth.tokenManager.getTokensSync();
+    let content;
+    if (idToken || accessToken) {
+      content = `
+        ${homeLink(this)}
+        <hr/>
+        <strong>You are authenticated</strong>
+      `;
+    } else {
+      content = `
+        ${homeLink(this)}
+        <hr/>
+        <strong>You are NOT authenticated. Login using one of these methods:</strong>
+        ${loginLinks(this, true)}
+      `;
+      this.config.state = 'protected-route-' + Math.round(Math.random() * 1000);
+      this.oktaAuth.setOriginalUri(this.protectedUrl, this.config.state);
+    }
+
+    this._setContent(content);
+    this._afterRender('protected');
+  }
+
+  bootstrapCallback(): void {
     const content = `
       <a id="handle-callback" href="/" onclick="handleCallback(event)">Handle callback (Continue Login)</a>
       <hr/>
       ${homeLink(this)}
     `;
-    return this.getSDKInstance(/*{ subscribeAuthStateChange: false }*/)
-      .then(() => this._setContent(content))
-      .then(() => this._afterRender('callback'));
+    this.getSDKInstance(/*{ subscribeAuthStateChange: false }*/);
+    this._setContent(content);
+    this._afterRender('callback');
   }
 
   async bootstrapHome(): Promise<void> {
     // Default home page
-    return this.getSDKInstance()
-      .then(() => this.render());
+    this.getSDKInstance();
+    this.oktaAuth.removeOriginalUri();
+    return this.render();
   }
 
   render(forceUnauth = false): Promise<void> {
@@ -230,16 +311,19 @@ class TestApp {
   }
 
   async loginWidget(): Promise<void> {
+    this.config.state = 'widget-login-' + Math.round(Math.random() * 1000);
     saveConfigToStorage(this.config);
     return this.renderWidget();
-
   }
 
-  async renderWidget(): Promise<void> {
-    const tokens: Tokens = await renderWidget(this.config, this.oktaAuth);
+  async renderWidget(options?: any): Promise<void> {
+    const tokens: Tokens = await renderWidget(this.config, this.oktaAuth, options);
 
     // save tokens
     this.oktaAuth.tokenManager.setTokens(tokens);
+
+    // shared storage can be cleared now
+    this.oktaAuth.transactionManager.clear({ clearSharedStorage: true, state: options?.state });
 
     // re-render
     this.render();
@@ -304,10 +388,12 @@ class TestApp {
   }
 
   async loginRedirect(options: TokenParams): Promise<void> {
+    this.config.state = this.config.state || 'login-redirect' + Math.round(Math.random() * 1000);
     saveConfigToStorage(this.config);
     options = Object.assign({}, {
       responseType: this.config.responseType,
       scopes: this.config.defaultScopes ? [] : this.config.scopes,
+      state: this.config.state
     }, options);
     return this.oktaAuth.token.getWithRedirect(options)
       .catch(e => {
@@ -402,6 +488,10 @@ class TestApp {
       return this.renderInteractionRequired();
     }
 
+    if (isEmailVerifyCallback(window.location.search)) {
+      return this.renderEmailVerifyCallback();
+    }
+
     return this.getTokensFromUrl()
       .then(res => {
         return this.renderCallback(res);
@@ -427,6 +517,12 @@ class TestApp {
   // Renders the login widget
   async renderInteractionRequired(): Promise<void> {
     return this.render(true).then(() => this.renderWidget());
+  }
+
+  async renderEmailVerifyCallback(): Promise<void> {
+    const { state, stateTokenExternalId } = parseEmailVerifyCallback(window.location.search);
+    await this.render(true);
+    return this.renderWidget({ state, stateTokenExternalId });
   }
 
   async getTokensFromUrl(): Promise<TokenResponse> {
@@ -530,20 +626,46 @@ class TestApp {
       // Authenticated user home page
       return `
         <strong>Welcome back</strong>
-        <hr/>
-        ${logoutLink(this)}
-        <hr/>
-        <div class="actions authenticated">
-            <a id="get-userinfo" href="/" onclick="getUserInfo(event)">Get User Info</a>
-            <a id="renew-token" href="/" onclick="renewToken(event)">Renew Token</a>
-            <a id="renew-tokens" href="/" onclick="renewTokens(event)">Renew Tokens</a>
-            <a id="get-token" href="/" onclick="getToken(event)">Get Token (without prompt)</a>
-            <a id="clear-tokens" href="/" onclick="clearTokens(event)">Clear Tokens</a>
-            <a id="revoke-token" href="/" onclick="revokeToken(event)">Revoke Access Token</a>
-            <a id="revoke-refresh-token" href="/" onclick="revokeRefreshToken(event)">Revoke Refresh Token</a>
-            <a id="refresh-session" href="/" onclick="refreshSession(event)">Refresh Session</a>
-            <a id="test-concurrent-get-token" href="/" onclick="testConcurrentGetToken(event)">Test Concurrent getToken</a>
-            <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)">Test Concurrent login via token renew failure</a>
+        <div class="pure-g">
+          <div class="pure-u-1-2">
+            <div class="actions authenticated pure-menu">
+              <ul class="pure-menu-list">
+                <li class="pure-menu-item">
+                  <a id="get-userinfo" href="/" onclick="getUserInfo(event)" class="pure-menu-link">Get User Info</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="renew-token" href="/" onclick="renewToken(event)" class="pure-menu-link">Renew Token</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="renew-tokens" href="/" onclick="renewTokens(event)" class="pure-menu-link">Renew Tokens</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="get-token" href="/" onclick="getToken(event)" class="pure-menu-link">Get Token (without prompt)</a>
+                </li>
+                <li class="pure-menu-item"> 
+                  <a id="clear-tokens" href="/" onclick="clearTokens(event)" class="pure-menu-link">Clear Tokens</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="revoke-token" href="/" onclick="revokeToken(event)" class="pure-menu-link">Revoke Access Token</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="revoke-refresh-token" href="/" onclick="revokeRefreshToken(event)" class="pure-menu-link">Revoke Refresh Token</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="refresh-session" href="/" onclick="refreshSession(event)" class="pure-menu-link">Refresh Session</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="test-concurrent-get-token" href="/" onclick="testConcurrentGetToken(event)" class="pure-menu-link">Test Concurrent getToken</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)" class="pure-menu-link pure-menu-item">Test Concurrent login via token renew failure</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="pure-u-1-2">
+            ${logoutLink(this)}
+          </div>
         </div>
         <div id="user-info"></div>
         <hr/>
@@ -553,33 +675,10 @@ class TestApp {
 
     // Unauthenticated user, Login page
     return `
-      <strong>Greetings, unknown user!</strong>
-      <hr/>
-      <ul>
-        <li>
-          <a id="login-widget" href="/" onclick="loginWidget(event)">Login using SIGNIN WIDGET</a>
-        </li>
-        <li>
-          <a id="login-redirect" href="/" onclick="loginRedirect(event)">Login using REDIRECT</a>
-        </li>
-        <li>
-          <a id="login-popup" href="/" onclick="loginPopup(event)">Login using POPUP</a>
-        </li>
-        <li>
-         <a id="get-token" href="/" onclick="getToken(event)">Get Token (without prompt)</a>
-        </li>
-        <li>
-          <a id="test-concurrent-login" href="/" onclick="testConcurrentLogin(event)">Test Concurrent Login</a>
-        </li>
-      </ul>
-      <h4/>
       <div class="box">
-        <form>
-          <input name="username" id="username" placeholder="username" type="email"/>
-          <input name="password" id="password" placeholder="password" type="password"/>
-          <a href="/" id="login-direct" onclick="loginDirect(event)">Login DIRECT</a>
-        </form>
+      <strong>Greetings, unknown user!</strong>
       </div>
+      ${loginLinks(this)}
       `;
   }
 
@@ -589,12 +688,14 @@ class TestApp {
     const errorMessage = success ? '' :  'Tokens not returned. Check error console for more details';
     const successMessage = success ?
       'Successfully received tokens on the callback page: ' + tokensReceived.join(', ') : '';
+    const originalUri = this.oktaAuth.getOriginalUri(res.state);
     const content = `
       <div id="callback-result">
         <strong><div id="success">${successMessage}</div></strong>
         <div id="error">${errorMessage}</div>
         <div id="xhr-error"></div>
         <div id="res-state">State: <strong>${res.state}</strong></div>
+        <div id="original-uri">Original Uri: <a href="${originalUri}">${originalUri}</a></div>
       </div>
       <hr/>
       ${homeLink(this)}

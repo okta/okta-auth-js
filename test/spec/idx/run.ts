@@ -16,10 +16,17 @@ import { IdxStatus } from '../../../lib/idx/types';
 import { IdxResponseFactory } from '@okta/test.support/idx';
 import { AuthSdkError } from '../../../lib/errors';
 
+jest.mock('../../../lib/idx/transactionMeta', () => {
+  return {
+    getSavedTransactionMeta: () => {}
+  };
+});
+
 const mocked = {
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect'),
-  remediate: require('../../../lib/idx/remediate')
+  remediate: require('../../../lib/idx/remediate'),
+  transactionMeta: require('../../../lib/idx/transactionMeta')
 };
 
 describe('idx/run', () => {
@@ -64,7 +71,8 @@ describe('idx/run', () => {
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
-      }
+      },
+      options: {}
     };
     const options = {
       flow: {
@@ -89,6 +97,7 @@ describe('idx/run', () => {
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: 'remediate-nextStep',
     });
@@ -131,6 +140,7 @@ describe('idx/run', () => {
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
     expect(res).toEqual({
+      _idxResponse: expect.any(Object),
       messages: ['remediate-message-1'],
       nextStep: 'remediate-nextStep',
       status: IdxStatus.PENDING,
@@ -148,6 +158,7 @@ describe('idx/run', () => {
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         nextStep: 'remediate-nextStep',
         status: IdxStatus.PENDING,
       });
@@ -165,6 +176,7 @@ describe('idx/run', () => {
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         nextStep: 'remediate-nextStep',
         status: IdxStatus.TERMINAL,
       });
@@ -200,9 +212,10 @@ describe('idx/run', () => {
       });
 
       expect(res).toEqual({
-       nextStep: 'remediate-nextStep',
-       status: IdxStatus.SUCCESS,
-       tokens: tokenResponse.tokens,
+        _idxResponse: expect.any(Object),
+        nextStep: 'remediate-nextStep',
+        status: IdxStatus.SUCCESS,
+        tokens: tokenResponse.tokens,
       });
     });
 
@@ -251,9 +264,51 @@ describe('idx/run', () => {
       });
 
       expect(res).toEqual({
-       error,
-       nextStep: 'remediate-nextStep',
-       status: IdxStatus.FAILURE,
+        _idxResponse: expect.any(Object),
+        error,
+        nextStep: 'remediate-nextStep',
+        status: IdxStatus.FAILURE,
+      });
+    });
+  });
+
+  describe('with stateTokenExternalId', () => {
+    describe('with saved interaction handle', () => {
+      beforeEach(() => {
+        const { transactionMeta } = testContext;
+        transactionMeta.interactionHandle = 'meta-interactionHandle';
+        jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+      });
+      it('calls introspect with stateTokenExternalId and interactionHandle', async () => {
+        const { authClient, options } = testContext;
+        options.stateTokenExternalId = 'abc';
+        await run(authClient, options);
+        expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, { 
+          interactionHandle: 'meta-interactionHandle',
+          stateTokenExternalId: 'abc'
+        });
+      });
+      it('passes `state` option to `getSavedTransactionMeta()`', async () => {
+        const { authClient, options } = testContext;
+        options.stateTokenExternalId = 'abc';
+        options.state = 'def';
+        await run(authClient, options);
+        expect(mocked.transactionMeta.getSavedTransactionMeta).toHaveBeenCalledWith(authClient, { 
+          state: 'def'
+        });
+      });
+    });
+    describe('without saved interaction handle', () => {
+      beforeEach(() => {
+        jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(undefined);
+      });
+      it('calls introspect with stateTokenExternalId and no interactionHandle', async () => {
+        const { authClient, options } = testContext;
+        options.stateTokenExternalId = 'abc';
+        await run(authClient, options);
+        expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, { 
+          stateTokenExternalId: 'abc'
+        });
       });
     });
   });

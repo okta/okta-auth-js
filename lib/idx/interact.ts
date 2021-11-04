@@ -36,7 +36,8 @@ function getResponse(meta: IdxTransactionMeta): InteractResponse {
 
 // Begin or resume a transaction. Returns an interaction handle
 export async function interact (authClient: OktaAuth, options: InteractOptions = {}): Promise<InteractResponse> {
-  const meta = await getTransactionMeta(authClient);
+  let state = options.state || authClient.options.state;
+  const meta = await getTransactionMeta(authClient, { state });
 
   // Saved transaction, return meta
   if (meta.interactionHandle) {
@@ -50,7 +51,7 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
   const { clientId, redirectUri } = authClient.options;
 
   // These properties can be set in options, but also have a default value in global configuration.
-  const state = options.state || authClient.options.state || meta.state;
+  state = state || meta.state;
   const scopes = options.scopes || authClient.options.scopes || meta.scopes;
 
   const baseUrl = getOAuthBaseUrl(authClient);

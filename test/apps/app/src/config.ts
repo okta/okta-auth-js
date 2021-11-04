@@ -36,23 +36,23 @@ export function getDefaultConfig(): Config {
   const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
 
   return {
+    issuer: ISSUER,
+    clientId: CLIENT_ID,
+    redirectUri: REDIRECT_URI,
+    useInteractionCodeFlow: false,
+    responseType: ['token', 'id_token'],
+    scopes: ['openid', 'email', 'offline_access'],
+    pkce: true,
     forceRedirect: false,
     siwVersion: DEFAULT_SIW_VERSION,
     siwAuthClient: false,
     idps: '',
-    redirectUri: REDIRECT_URI,
     postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
-    issuer: ISSUER,
-    clientId: CLIENT_ID,
     clientSecret: CLIENT_SECRET,
-    responseType: ['token', 'id_token'],
-    scopes: ['openid', 'email', 'offline_access'],
     defaultScopes: false,
-    pkce: true,
     cookies: {
       secure: true
     },
-    useInteractionCodeFlow: false,
     enableSharedStorage: true
   };
 }
@@ -82,21 +82,22 @@ export function getConfigFromUrl(): Config {
   const enableSharedStorage = url.searchParams.get('enableSharedStorage') !== 'false'; // on by default
 
   return {
-    forceRedirect,
-    siwVersion,
-    siwAuthClient,
-    idps,
-    enableSharedStorage,
-    redirectUri,
-    postLogoutRedirectUri,
     issuer,
     clientId,
-    clientSecret,
+    redirectUri,
+    useInteractionCodeFlow,
     pkce,
     defaultScopes,
     scopes,
     responseType,
     responseMode,
+    postLogoutRedirectUri,
+    forceRedirect,
+    siwVersion,
+    siwAuthClient,
+    idps,
+    enableSharedStorage,
+    clientSecret,
     cookies: {
       secure: secureCookies,
       sameSite
@@ -108,7 +109,6 @@ export function getConfigFromUrl(): Config {
     transactionManager: {
       enableSharedStorage
     },
-    useInteractionCodeFlow
   };
 }
 
@@ -123,7 +123,11 @@ export function saveConfigToStorage(config: Config): void {
 }
 
 export function getConfigFromStorage(): Config {
-  const config = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  const storedValue = localStorage.getItem(STORAGE_KEY);
+  if (!storedValue) {
+    return getDefaultConfig();
+  }
+  const config = JSON.parse(storedValue);
   return config;
 }
 

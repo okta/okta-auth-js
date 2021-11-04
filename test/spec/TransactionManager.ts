@@ -117,6 +117,41 @@ describe('TransactionManager', () => {
       expect(storageManager.getLegacyPKCEStorage).toHaveBeenNthCalledWith(1, { storageType: 'localStorage' });
       expect(storageManager.getLegacyPKCEStorage).toHaveBeenNthCalledWith(2, { storageType: 'sessionStorage' });
     });
+
+    describe('shared transaction storage', () => {
+      beforeEach(() => {
+        jest.spyOn(mocked.sharedStorage, 'clearTransactionFromSharedStorage');
+      });
+      it('by default, does not clear shared transaction', () => {
+        const { transactionManager } = testContext;
+        transactionManager.clear();
+        expect(mocked.sharedStorage.clearTransactionFromSharedStorage).not.toHaveBeenCalled();
+      });
+      it('`clearSharedStorage` option with `state` in saved transaction meta will clear shared transaction meta', () => {
+        const { transactionManager, transactionStorage, meta, storageManager } = testContext;
+        transactionStorage.getStorage.mockReturnValue(meta);
+        expect(meta.state).toBeTruthy();
+        transactionManager.clear({ clearSharedStorage: true });
+        expect(mocked.sharedStorage.clearTransactionFromSharedStorage).toHaveBeenCalledWith(storageManager, meta.state);
+      });
+      it('`clearSharedStorage` + `state` option will clear shared transaction meta', () => {
+        const { transactionManager, storageManager } = testContext;
+        const state = 'abc';
+        transactionManager.clear({ clearSharedStorage: true, state });
+        expect(mocked.sharedStorage.clearTransactionFromSharedStorage).toHaveBeenCalledWith(storageManager, state);
+      });
+      it('`clearSharedStorage` option without saved transaction meta will not clear shared transaction meta', () => {
+        const { transactionManager } = testContext;
+        transactionManager.clear({ clearSharedStorage: true });
+        expect(mocked.sharedStorage.clearTransactionFromSharedStorage).not.toHaveBeenCalled();
+      });
+      it('can be disabled via TransactionManager `enableSharedStorage` option', () => {
+        createInstance({ enableSharedStorage: false });
+        const { transactionManager } = testContext;
+        transactionManager.clear({ clearSharedStorage: true, state: 'abc' });
+        expect(mocked.sharedStorage.clearTransactionFromSharedStorage).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe('save', () => {

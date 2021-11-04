@@ -202,6 +202,28 @@ function handleLoginRedirect() {
     return Promise.resolve();
   }
   
+  {{#if emailVerify}}
+  if (authClient.isEmailVerifyCallback(window.location.search)) {
+    return authClient.parseEmailVerifyCallback(window.location.search).then(function(res) {
+      switch (config.flow) {
+        {{#if signinWidget}}
+        case 'widget':
+          showSigninWidget();
+          break;
+        {{/if}}
+        {{#if signinForm}}
+        case 'form':
+          showSigninForm();
+          break;
+        {{/if}}
+        default:
+          throw new Error(`Email verify callback can not be used with flow: ${config.flow}`);
+          break;
+      }
+    });
+  }
+  {{/if}}
+
   // If the URL contains a code, `parseFromUrl` will grab it and exchange the code for tokens
   return authClient.token.parseFromUrl().then(function (res) {
     endAuthFlow(res.tokens); // save tokens

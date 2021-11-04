@@ -18,11 +18,10 @@ import * as Cookies from 'js-cookie';
 import TestApp from './testApp';
 import {
   Config,
-  getDefaultConfig,
   getConfigFromUrl,
   getConfigFromStorage,
-  clearStorage,
-  flattenConfig
+  flattenConfig,
+  saveConfigToStorage
 } from './config';
 import { onSubmitForm, onFormData, showConfigForm } from './form';
 import { toQueryString } from './util';
@@ -55,6 +54,8 @@ window.addEventListener('load', () => {
 });
 
 function mount(): TestApp {
+  saveConfigToStorage(config);
+
   // Create the app as a function of config
   app = new TestApp(config);
 
@@ -72,7 +73,7 @@ Object.assign(window, {
   onFormData: onFormData,
 
   getConfig: function(): Config {
-    return window.location.search ? getConfigFromUrl() : getDefaultConfig();
+    return window.location.search ? getConfigFromUrl() : getConfigFromStorage();
   },
   constructAppUrl: function(basePath = ''): string {
     const config = window.getConfig();
@@ -93,7 +94,7 @@ Object.assign(window, {
   },
   // Login page, read config from URL
   getWidgetConfig: function(): any {
-    const siwConfig = window.location.search ? getConfigFromUrl() : getDefaultConfig();
+    const siwConfig = window.getConfig();
     return buildWidgetConfig(siwConfig);
   },
   renderWidget: function(event?: Event, extraConfig?: Config): any {
@@ -105,16 +106,21 @@ Object.assign(window, {
   },
   // Regular landing, read config from URL
   bootstrapLanding: function(): void {
-    config = window.location.search ? getConfigFromUrl() : getDefaultConfig();
+    config = window.getConfig();
     mount();
     app.bootstrapHome();
   },
 
   // Callback, read config from storage
   bootstrapCallback: function(): void {
-    config = getConfigFromStorage() || getDefaultConfig();
-    clearStorage();
+    config = getConfigFromStorage();
     mount();
     app.bootstrapCallback();
+  },
+
+  bootstrapProtected: function(): void {
+    config = window.getConfig();
+    mount();
+    app.bootstrapProtected();
   }
 });

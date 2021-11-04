@@ -27,12 +27,14 @@ import {
   NextStep,
 } from '../types';
 import { IdxResponse, IdxRemediation } from './types/idx-js';
+import { getSavedTransactionMeta } from './transactionMeta';
 
 export type RemediationFlow = Record<string, typeof remediators.Remediator>;
 export interface RunOptions {
   flow?: RemediationFlow;
   actions?: string[];
   flowMonitor?: FlowMonitor;
+  stateTokenExternalId?: string;
 }
 
 function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
@@ -89,13 +91,26 @@ export async function run(
   let availableSteps;
   let status = IdxStatus.PENDING;
   let shouldClearTransaction = false;
+  let idxResponse;
+  let interactionHandle;
+  let metaFromResp;
 
   try {
-    // Start/resume the flow
-    const { interactionHandle, meta: metaFromResp } = await interact(authClient, options); 
+
+    const { stateTokenExternalId, state } = options;
+    if (stateTokenExternalId) {
+      // Email verify callback: retrieve saved interactionHandle, if possible
+      metaFromResp = getSavedTransactionMeta(authClient, { state });
+      interactionHandle = metaFromResp?.interactionHandle; // may be undefined
+    } else {
+      // Start/resume the flow. Will request a new interactionHandle if none is found in storage.
+      const interactResponse = await interact(authClient, options); 
+      interactionHandle = interactResponse.interactionHandle;
+      metaFromResp = interactResponse.meta;
+    }
 
     // Introspect to get idx response
-    const idxResponse = await introspect(authClient, { interactionHandle });
+    idxResponse = await introspect(authClient, { interactionHandle, stateTokenExternalId });
 
     if (!options.flow && !options.actions) {
       // handle start transaction
@@ -171,6 +186,7 @@ export async function run(
   }
   
   return {
+    _idxResponse: idxResponse, 
     status,
     ...(meta && { meta }),
     ...(enabledFeatures && { enabledFeatures }),

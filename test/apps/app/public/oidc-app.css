@@ -2,18 +2,6 @@
   box-sizing: border-box;
 }
 
-body {
-  line-height: 30px;
-}
-
-.actions {
-  line-height: 30px;
-}
-.actions a {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-right: 5px;
-}
 #layout {
   position: relative;
   z-index: 1;
@@ -22,6 +10,11 @@ body {
 #tokens-dump, #config-dump {
   line-height: 24px;
 }
+
+#form-content {
+  flex-grow: 1
+}
+
 #modal {
   display: none;
   position: fixed;
@@ -55,12 +48,16 @@ body {
 .box {
   border: 1px solid darkgray;
   padding: 10px;
-  max-width: 700px;
   overflow-wrap: break-word;
 }
 
+.actions {
+  max-width: 500px;
+}
+
 input[type=text] {
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
 }
 
 label,
@@ -70,17 +67,21 @@ select {
 }
 
 label {
-  margin-right: 10px;
+  color: #333;
+}
+.pure-menu-link {
+  color: #000;
 }
 a, .link {
   padding: 4px;
   display: inline-block;
   background-color: #eeeeee;
+  color: #000;
   border: 1px #333 solid;
-  height: 40px;
   font-size: 16px;
+  cursor: pointer;
 }
-a:active, a.clicked {
+a:active, a.clicked, .pure-menu-link:hover {
   background-color: green;
   color: white;
 }
@@ -101,4 +102,8 @@ a:active, a.clicked {
 }
 .box.nav .link, .box.nav a {
   margin-right: 10px;
+}
+
+.hidden {
+  display: none;
 }

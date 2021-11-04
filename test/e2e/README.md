@@ -24,6 +24,8 @@ USERNAME=mytestuser
 PASSWORD=testPassword1
 ```
 
+You may need to set the `CHROMEDRIVER_VERSION` environment variable to match the version of Chrome on your machine. For example, `CHROMEDRIVER_VERSION=94.0.4606.41` can be added to the `testenv` file to work with Chrome version 94. Latest version numbers can be found at [chromedriver.chromium.org](https://chromedriver.chromium.org/downloads)
+
 ## Commands
 
 If running from the workspace directory: `yarn workspace @okta/test.e2e start`

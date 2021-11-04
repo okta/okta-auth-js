@@ -286,6 +286,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-enroll',
@@ -322,6 +323,7 @@ describe('idx/register', () => {
       let res = await register(authClient, {});
       expect(identifyResponse.proceed).toHaveBeenCalledWith('select-enroll-profile', { });
       expect(res).toMatchObject({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-profile',
@@ -345,6 +347,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-enroll',
@@ -396,6 +399,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-enroll',
@@ -438,6 +442,7 @@ describe('idx/register', () => {
       const password = 'my-password';
       let res = await register(authClient, {});
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-enroll',
@@ -463,6 +468,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-enroll',
@@ -512,6 +518,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -554,6 +561,7 @@ describe('idx/register', () => {
 
       let res = await register(authClient, {});
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-enroll',
@@ -585,6 +593,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -627,6 +636,7 @@ describe('idx/register', () => {
 
       let res = await register(authClient, {});
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -660,6 +670,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           canSkip: true,
@@ -732,6 +743,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         messages: [{
           class: 'ERROR',
@@ -823,6 +835,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -853,6 +866,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.SUCCESS,
         tokens: tokenResponse.tokens,
       });
@@ -904,6 +918,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'authenticator-enrollment-data',
@@ -942,6 +957,7 @@ describe('idx/register', () => {
           }
         });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -973,6 +989,7 @@ describe('idx/register', () => {
           }
         });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.SUCCESS,
         tokens: tokenResponse.tokens,
       });
@@ -1011,6 +1028,7 @@ describe('idx/register', () => {
 
       let res = await register(authClient, {});
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -1041,6 +1059,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         'status': IdxStatus.SUCCESS,
         'tokens': tokenResponse.tokens,
       });
@@ -1062,26 +1081,25 @@ describe('idx/register', () => {
         phoneEnrollmentDataResponse,
       } = testContext;
 
-      const errorResponse = RawIdxResponseFactory.build({
-        messages: IdxMessagesFactory.build({
-          value: [
-            IdxErrorEnrollmentInvalidPhoneFactory.build()
-          ]
+      const errorResponse = IdxResponseFactory.build({
+        rawIdxState: RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorEnrollmentInvalidPhoneFactory.build()
+            ]
+          })
         }),
-        remediation: {
-          type: 'array',
-          value: [
-            SelectAuthenticatorAuthenticateRemediationFactory.build({
-              value: [
-                AuthenticatorValueFactory.build({
-                  options: [
-                    PhoneAuthenticatorOptionFactory.build(),
-                  ]
-                })
-              ]
-            })
-          ]
-        }
+        neededToProceed: [
+          SelectAuthenticatorAuthenticateRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  PhoneAuthenticatorOptionFactory.build(),
+                ]
+              })
+            ]
+          })
+        ]
       });
 
       jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockRejectedValue(errorResponse);
@@ -1103,6 +1121,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         messages: [{
           class: 'ERROR',
@@ -1164,6 +1183,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -1212,6 +1232,7 @@ describe('idx/register', () => {
 
       let res = await register(authClient, {});
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-enroll',
@@ -1242,6 +1263,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -1290,6 +1312,7 @@ describe('idx/register', () => {
 
       let res = await register(authClient, {});
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'enroll-authenticator',
@@ -1329,6 +1352,7 @@ describe('idx/register', () => {
         }
       });
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
           canSkip: true,
@@ -1369,6 +1393,7 @@ describe('idx/register', () => {
 
       let res = await register(authClient, {});
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         nextStep: {
           inputs: [
             {
@@ -1390,6 +1415,7 @@ describe('idx/register', () => {
       res = await register(authClient, { skip: true });
       expect(selectPhoneResponse.proceed).toHaveBeenCalledWith('skip', {});
       expect(res).toEqual({
+        _idxResponse: expect.any(Object),
         status: IdxStatus.SUCCESS,
         tokens: tokenResponse.tokens,
       });

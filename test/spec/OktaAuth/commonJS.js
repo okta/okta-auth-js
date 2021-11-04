@@ -40,7 +40,14 @@ describe('commonJS interface', () => {
         oidc.isInteractionRequired.mockReturnValue(true);
         const res = auth.isInteractionRequired();
         expect(res).toBe(true);
-        expect(oidc.isInteractionRequired).toHaveBeenCalledWith(auth);
+        expect(oidc.isInteractionRequired).toHaveBeenCalledWith(auth, undefined);
+      });
+      it('accepts a hash or search string', () => {
+        oidc.isInteractionRequired.mockReturnValue(true);
+        const str = 'abc=def';
+        const res = auth.isInteractionRequired(str);
+        expect(res).toBe(true);
+        expect(oidc.isInteractionRequired).toHaveBeenCalledWith(auth, str);
       });
     });
     describe('isInteractionRequiredError', () => {

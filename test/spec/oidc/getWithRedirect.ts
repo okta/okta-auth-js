@@ -117,17 +117,6 @@ describe('getWithRedirect', () => {
         urls
       }, { oauth: true });
     });
-
-    it('retrieves and saves the originalUri', async () => {
-      const { sdk, urls } = testContext;
-      const originalUri = '/original';
-      jest.spyOn(sdk, 'getOriginalUri').mockReturnValue(originalUri);
-      await getWithRedirect(sdk, {});
-      expect(sdk.transactionManager.save).toHaveBeenCalledWith({
-        originalUri,
-        urls
-      }, { oauth: true });
-    });
   });
 
 

@@ -48,6 +48,11 @@ const BROWSER_STORAGE: StorageManagerOptions = {
     storageTypes: [
       'localStorage'
     ]
+  },
+  'original-uri': {
+    storageTypes: [
+      'localStorage'
+    ]
   }
 };
 
@@ -105,17 +110,22 @@ function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS: boolean) {
 export function getDefaultOptions(): OktaAuthOptions {
   const storageUtil = isBrowser() ? browserStorage : serverStorage;
   const storageManager = isBrowser() ? BROWSER_STORAGE : SERVER_STORAGE;
+  const enableSharedStorage = isBrowser() ? true : false; // localStorage for multi-tab flows (browser only)
   return {
     devMode: false,
     httpRequestClient: fetchRequest,
     storageUtil,
-    storageManager
+    storageManager,
+    transactionManager: {
+      enableSharedStorage
+    }
   };
 }
 
 function mergeOptions(options, args): OktaAuthOptions {
   return Object.assign({}, options, removeNils(args), {
-    storageManager: Object.assign({}, options.storageManager, args.storageManager)
+    storageManager: Object.assign({}, options.storageManager, args.storageManager),
+    transactionManager: Object.assign({}, options.transactionManager, args.transactionManager),
   });
 }
 
@@ -149,6 +159,7 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     headers: args.headers,
     devMode: !!args.devMode,
     storageManager: args.storageManager,
+    transactionManager: args.transactionManager,
     cookies: isBrowser() ? getCookieSettings(args, isHTTPS()) : args.cookies,
 
     // Give the developer the ability to disable token signature validation.

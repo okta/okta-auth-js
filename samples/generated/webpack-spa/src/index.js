@@ -419,6 +419,7 @@ function handleLoginRedirect() {
     return Promise.resolve();
   }
   
+
   // If the URL contains a code, `parseFromUrl` will grab it and exchange the code for tokens
   return authClient.token.parseFromUrl().then(function (res) {
     endAuthFlow(res.tokens); // save tokens
@@ -544,9 +545,9 @@ function redirectToLogin(additionalParams) {
   }, additionalParams));
 }
 window._loginRedirect = bindClick(redirectToLogin);
-function showSigninWidget() {
-  // Create an instance of the signin widget
-  var signIn = new OktaSignIn({
+function showSigninWidget(options) {
+  // Create widget options
+  options = Object.assign({
     baseUrl: config.issuer.split('/oauth2')[0],
     clientId: config.clientId,
     redirectUri: config.redirectUri,
@@ -561,7 +562,10 @@ function showSigninWidget() {
       }
       return { type, id };
     }).filter(idpToken => idpToken)
-  });
+  }, options);
+
+  // Create an instance of the signin widget
+  var signIn = new OktaSignIn(options);
 
   signIn.showSignIn({
     el: '#signin-widget',
@@ -578,7 +582,7 @@ function showSigninWidget() {
 
   document.getElementById('flow-widget').style.display = 'block'; // show login UI
 }
-function resumeTransaction() {
+function resumeTransaction(options) {
   if (!config.useInteractionCodeFlow) {
     // Authn
     if (authClient.tx.exists()) {
@@ -593,18 +597,18 @@ function resumeTransaction() {
     // TODO: we may be in either authenticate or recoverPassword flow
     // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
     // Here we assume we are resuming an authenticate flow, but this could be wrong.
-    return authClient.idx.authenticate()
+    return authClient.idx.authenticate(options)
       .then(handleTransaction)
       .catch(showError);
   }
 }
 
-function showSigninForm() {
+function showSigninForm(options) {
   hideRecoveryChallenge();
   hideNewPasswordForm();
 
   // Is there an existing transaction we can resume?
-  if (resumeTransaction()) {
+  if (resumeTransaction(options)) {
     return;
   }
 

@@ -33,6 +33,10 @@ import {
   pruneSharedStorage,
   saveTransactionToSharedStorage
 } from './util/sharedStorage';
+
+export interface ClearTransactionMetaOptions extends TransactionMetaOptions {
+  clearSharedStorage?: boolean;
+}
 export default class TransactionManager {
   options: TransactionManagerOptions;
   storageManager: StorageManager;
@@ -52,15 +56,25 @@ export default class TransactionManager {
     this.options = options;
   }
 
-  clear(options: TransactionMetaOptions = {}) {
+  // eslint-disable-next-line complexity
+  clear(options: ClearTransactionMetaOptions = {}) {
     const transactionStorage: StorageProvider = this.storageManager.getTransactionStorage();
+    const meta = transactionStorage.getStorage();
+
+    // Clear primary storage (by default, sessionStorage on browser)
     transactionStorage.clearStorage();
 
+    // clear IDX response storage
     const idxStateStorage: StorageProvider = this.storageManager.getIdxResponseStorage();
     idxStateStorage?.clearStorage();
 
-    if (this.enableSharedStorage && options.state) {
-      clearTransactionFromSharedStorage(this.storageManager, options.state);
+    // Usually we do NOT want to clear shared storage because another tab may need it to continue/complete a flow
+    // It can be cleared after a user succcesfully signs in and receives tokens
+    if (this.enableSharedStorage && options.clearSharedStorage) {
+      const state = options.state || meta?.state;
+      if (state) {
+        clearTransactionFromSharedStorage(this.storageManager, state);
+      }
     }
   
     if (!this.legacyWidgetSupport) {
@@ -94,6 +108,11 @@ export default class TransactionManager {
     }
 
     storage.setStorage(meta);
+
+    // Shared storage allows continuation of transaction in another tab
+    if (this.enableSharedStorage && meta.state) {
+      saveTransactionToSharedStorage(this.storageManager, meta.state, meta);
+    }
 
     if (!options.oauth) {
       return;
@@ -134,11 +153,6 @@ export default class TransactionManager {
         // Set state cookie for servers to validate state
         cookieStorage.setItem(REDIRECT_STATE_COOKIE_NAME, meta.state, null);
       }
-    }
-
-    // Shared storage allows continuation of transaction in another tab
-    if (this.enableSharedStorage && meta.state) {
-      saveTransactionToSharedStorage(this.storageManager, meta.state, meta);
     }
   }
 

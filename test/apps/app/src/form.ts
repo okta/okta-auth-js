@@ -14,32 +14,58 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
 /* eslint-disable max-len */
-import { flattenConfig, Config } from './config';
+import { flattenConfig, Config, clearStorage } from './config';
 import { FormDataEvent } from './types';
-import { htmlString } from './util';
+import { htmlString, makeClickHandler } from './util';
 
 const id = 'config-form';
 const Form = `
-  <form id="${id}" method="GET" onsubmit="onSubmitForm(event)" onformdata="onFormData(event)">
-  <label for="issuer">Issuer</label><input id="f_issuer" name="issuer" type="text" /><br/>
-  <label for="clientId">Client ID</label><input id="f_clientId" name="clientId" type="text" /><br/>
-  <label for="clientSecret">Client Secret</label><input id="f_clientSecret" name="clientSecret" type="text" /><br/>
-  <label for="responseType">Response Type (comma separated)</label><input id="f_responseType" name="responseType" type="text" /><br/>
-  <label for="defaultScopes">Use DEFAULT scopes (defined by authorization server)</label><br/>
-  <input id="f_default-scopes-yes" name="defaultScopes" type="radio" value="true"/>YES<br/>
-  <input id="f_default-scopes-no" name="defaultScopes" type="radio" value="false"/>NO (list scopes below)<br/>
-  <label for="scopes">Scopes (comma separated)</label><input id="f_scopes" name="scopes" type="text" /><br/>
-  <label for="redirectUri">Redirect URI</label><input id="f_redirectUri" name="redirectUri" type="text" /><br/>
-  <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="f_postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" /><br/>
+  <form id="${id}" method="GET" onsubmit="onSubmitForm(event)" onformdata="onFormData(event)" class="pure-form pure-form-aligned">
+  <div class="pure-control-group">
+  <label for="issuer">Issuer</label><input id="f_issuer" name="issuer" type="text" />
+  </div>
+  <div class="pure-control-group">
+  <label for="clientId">Client ID</label><input id="f_clientId" name="clientId" type="text" />
+  </div>
+  <div class="pure-control-group">
+  <label for="redirectUri">Redirect URI</label><input id="f_redirectUri" name="redirectUri" type="text" />
+  </div>
+  <div class="pure-control-group">
+  <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label>
+  <input id="f_useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES
+  <input id="f_useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO
+  </div>
+  <div class="pure-control-group">
+  <label for="clientSecret">Client Secret</label><input id="f_clientSecret" name="clientSecret" type="text" />
+  </div>
+  <div class="pure-control-group">
+  <label for="responseType">Response Type (comma separated)</label><input id="f_responseType" name="responseType" type="text" />
+  </div>
+  <div class="pure-control-group">
+  <label for="defaultScopes">Use DEFAULT scopes (defined by authorization server)</label>
+  <input id="f_default-scopes-yes" name="defaultScopes" type="radio" value="true"/>YES
+  <input id="f_default-scopes-no" name="defaultScopes" type="radio" value="false"/>NO (list scopes below)
+  </div>
+  <div class="pure-control-group">
+  <label for="scopes">Scopes (comma separated)</label><input id="f_scopes" name="scopes" type="text" />
+  </div>
+  <div class="pure-control-group">
+  <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="f_postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" />
+  </div>
+  <div class="pure-control-group">
   <label for="responseMode">Response Mode</label>
   <select id="f_responseMode" name="responseMode">
     <option value="" selected>Auto</option>
     <option value="fragment">Fragment</option>
     <option value="query">Query</option>
-  </select><br/>
-  <label for="pkce">PKCE</label><br/>
-  <input id="f_pkce-on" name="pkce" type="radio" value="true"/>ON<br/>
-  <input id="f_pkce-off" name="pkce" type="radio" value="false"/>OFF<br/>
+  </select>
+  </div>
+  <div class="pure-control-group">
+  <label for="pkce">PKCE</label>
+  <input id="f_pkce-on" name="pkce" type="radio" value="true"/>ON
+  <input id="f_pkce-off" name="pkce" type="radio" value="false"/>OFF
+  </div>
+  <div class="pure-control-group">
   <label for="storage">Storage</label>
   <select id="f_storage" name="storage">
     <option value="" selected>Auto</option>
@@ -47,36 +73,51 @@ const Form = `
     <option value="sessionStorage">Session Storage</option>
     <option value="cookie">Cookie</option>
     <option value="memory">Memory</option>
-  </select><br/>
-  <label for="enableSharedStorage">Enable shared transaction storage (to continue flow in another tab)</label><br/>
-  <input id="f_enableSharedStorage-on" name="enableSharedStorage" type="radio" value="true"/>YES<br/>
-  <input id="f_enableSharedStorage-off" name="enableSharedStorage" type="radio" value="false"/>NO<br/>
-  <label for="expireEarlySeconds">ExpireEarlySeconds</label><input id="f_expireEarlySeconds" name="expireEarlySeconds" type="number" /><br/>
-  <label for="secure">Secure Cookies</label><br/>
-  <input id="f_secureCookies-on" name="secure" type="radio" value="true"/>ON<br/>
-  <input id="f_secureCookies-off" name="secure" type="radio" value="false"/>OFF<br/>
+  </select>
+  </div>
+  <div class="pure-control-group">
+  <label for="enableSharedStorage">Enable shared transaction storage (to continue flow in another tab)</label>
+  <input id="f_enableSharedStorage-on" name="enableSharedStorage" type="radio" value="true"/>YES
+  <input id="f_enableSharedStorage-off" name="enableSharedStorage" type="radio" value="false"/>NO
+  </div>
+  <div class="pure-control-group">
+  <label for="expireEarlySeconds">ExpireEarlySeconds</label><input id="f_expireEarlySeconds" name="expireEarlySeconds" type="number" />
+  </div>
+  <div class="pure-control-group">
+  <label for="secure">Secure Cookies</label>
+  <input id="f_secureCookies-on" name="secure" type="radio" value="true"/>ON
+  <input id="f_secureCookies-off" name="secure" type="radio" value="false"/>OFF
+  </div>
+  <div class="pure-control-group">
   <label for="sameSite">SameSite</label>
   <select id="f_sameSite" name="sameSite">
     <option value="" selected>Auto</option>
     <option value="none">None</option>
     <option value="lax">Lax</option>
     <option value="strict">Strict</option>
-  </select><br/>
-  <label for="siwVersion">Sign-in Widget version (leave blank for bundled version)</label><input id="f_siwVersion" name="siwVersion" type="text" /><br/>
-  <label for="siwAuthClient">Use authClient option? (requires widget version >= 5.3)</label><br/>
-  <input id="f_authClient-on" name="f_siwAuthClient" type="radio" value="true"/>YES (inject current instance)<br/>
-  <input id="f_authClient-off" name="f_siwAuthClient" type="radio" value="false"/>NO (use widget bundled auth-js)<br/>
-
-  <label for="forceRedirect">Force redirect (for SPA applications)?</label><br/>
-  <input id="f_forceRedirect-on" name="forceRedirect" type="radio" value="true"/>YES<br/>
-  <input id="f_forceRedirect-off" name="forceRedirect" type="radio" value="false"/>NO<br/>
-  <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label><br/>
-  <input id="f_useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES<br/>
-  <input id="f_useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO<br/>
+  </select>
+  </div>
+  <div class="pure-control-group">
+  <label for="siwVersion">Sign-in Widget version (leave blank for bundled version)</label><input id="f_siwVersion" name="siwVersion" type="text" />
+  </div>
+  <div class="pure-control-group">
+  <label for="siwAuthClient">Use authClient option? (requires widget version >= 5.3)</label>
+  <input id="f_authClient-on" name="f_siwAuthClient" type="radio" value="true"/>YES (inject current instance)
+  <input id="f_authClient-off" name="f_siwAuthClient" type="radio" value="false"/>NO (use widget bundled auth-js)
+  </div>
+  <div class="pure-control-group">
+  <label for="forceRedirect">Force redirect (for SPA applications)?</label>
+  <input id="f_forceRedirect-on" name="forceRedirect" type="radio" value="true"/>YES
+  <input id="f_forceRedirect-off" name="forceRedirect" type="radio" value="false"/>NO
+  </div>
+  <div class="pure-control-group">
   <label for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
-  <input id="f_idps" name="idps" type="text" /><br/>
-  <hr/>
-  <input id="f_submit" type="submit" value="Update Config"/>
+  <input id="f_idps" name="idps" type="text" />
+  </div>
+  <div class="pure-controls">
+  <input id="f_submit" type="submit" value="Update Config" class="pure-button pure-button-primary"/>
+  <a href="#clear" onclick="resetConfig(event)" class="pure-button">Reset Config</a>
+  </div>
   </form>
 `;
 
@@ -152,6 +193,7 @@ export function onSubmitForm(event: Event): void {
 
 // Take the data from the form and update query parameters on the current page
 export function onFormData(event: FormDataEvent): void {
+
   const formData = event.formData;
   const params: any = {};
   formData.forEach((value, key) => {
@@ -162,11 +204,25 @@ export function onFormData(event: FormDataEvent): void {
   window.location.replace(newUri);
 }
 
+
+export function hideConfig(): void {
+  const configArea = document.getElementById('config-dump');
+  configArea.style.display = 'none';
+}
+
+(window as any).hideConfig = makeClickHandler(hideConfig);
+
+export function resetConfig(): void {
+  clearStorage();
+  window.location.reload();
+}
+
+(window as any).resetConfig = makeClickHandler(resetConfig);
+
 export function showConfigForm(config: Config): void {
   let el = document.getElementById('config-area');
   if (el) {
     el.remove();
-    return; // act as a toggle
   }
   el = document.createElement('DIV');
   document.body.appendChild(el);
@@ -179,7 +235,9 @@ export function showConfigForm(config: Config): void {
 
   updateForm(config);
   document.getElementById('config-dump').innerHTML = `
-    <h2>Config</h2>
+    <div class="flex-row">
+      <a href="#edit" onclick="hideConfig(event)">Hide Config</a>
+    </div>
     ${ htmlString(config) }
   `;
 }
