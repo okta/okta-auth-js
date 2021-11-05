@@ -372,8 +372,8 @@ class TestApp {
       await this.render();
     } else {
       console.error('IDX transaction:', tx);
-      // @ts-ignore
-      alert(tx?.error?.error_description || `${tx.status}`);
+      const error = tx?.error as any;
+      alert(error?.error_description || `${tx.status}`);
     }
   }
 

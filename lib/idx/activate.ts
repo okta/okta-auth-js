@@ -12,8 +12,6 @@
 
 
 import { run, RemediationFlow } from './run';
-import { transactionMetaExist } from './transactionMeta';
-import { startTransaction } from './startTransaction';
 import { 
   SelectAuthenticatorEnroll,
   SelectAuthenticatorEnrollValues,
@@ -25,7 +23,6 @@ import {
   SkipValues,
 } from './remediators';
 import { ActivationFlowMonitor } from './flowMonitors';
-import { AuthSdkError } from '../errors';
 import { 
   IdxOptions, 
   IdxTransaction, 
@@ -48,7 +45,6 @@ export type ActivationOptions = IdxOptions
 export async function activate(
   authClient: OktaAuth, options: ActivationOptions
 ): Promise<IdxTransaction> {
-  console.log(1, options)
   const flowMonitor = new ActivationFlowMonitor(authClient);
   return run(authClient, { 
     ...options, 
