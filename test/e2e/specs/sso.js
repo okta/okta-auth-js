@@ -70,7 +70,7 @@ describe('SSO', () => {
     // We should not be signed in on Okta page
     await openOktaHome();
     await OktaLogin.waitForLoad();
-
+    await browser.closeWindow();
     await switchToMainWindow();
   });
 
