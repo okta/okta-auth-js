@@ -109,6 +109,7 @@ import {
   recoverPassword,
   startTransaction,
   handleInteractionCodeRedirect,
+  activate,
 } from './idx';
 import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from './idx/headers';
 import { OktaUserAgent } from './OktaUserAgent';
@@ -268,6 +269,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       recoverPassword: recoverPassword.bind(null, this),
       handleInteractionCodeRedirect: handleInteractionCodeRedirect.bind(null, this),
       startTransaction: startTransaction.bind(null, this),
+      activate: activate.bind(null, this),
     };
     setGlobalRequestInterceptor(createGlobalRequestInterceptor(this)); // to pass custom headers to IDX endpoints
 

@@ -11,12 +11,20 @@
  */
 
 
-export * from './authenticate';
-export * from './cancel';
-export * from './interact';
-export * from './introspect';
-export * from './register';
-export * from './recoverPassword';
-export * from './handleInteractionCodeRedirect';
-export * from './startTransaction';
-export * from './activate';
+import { FlowMonitor } from './FlowMonitor';
+
+export class ActivationFlowMonitor extends FlowMonitor {
+  isRemediatorCandidate(remediator, remediations?, values?) {
+    const prevRemediatorName = this.previousRemediator?.getName();
+    const remediatorName = remediator.getName();
+    if (remediatorName === 'select-authenticator-enroll' 
+      && [
+          'select-authenticator-enroll', 
+          'authenticator-enrollment-data'
+        ].includes(prevRemediatorName)) {
+      return false;
+    }
+
+    return super.isRemediatorCandidate(remediator, remediations, values);
+  }
+}

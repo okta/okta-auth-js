@@ -27,6 +27,7 @@ import {
   CancelOptions,
   IdxOptions,
   IdxTransaction,
+  ActivationOptions
 } from '../idx/types';
 import { InteractOptions, InteractResponse } from '../idx/interact';
 import { IntrospectOptions } from '../idx/introspect';
@@ -268,4 +269,5 @@ export interface IdxAPI {
   startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;
   recoverPassword: (options?: PasswordRecoveryOptions) => Promise<IdxTransaction>;
   handleInteractionCodeRedirect: (url: string) => Promise<void>; 
+  activate: (options?: ActivationOptions) => Promise<IdxTransaction>;
 }

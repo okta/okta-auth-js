@@ -31,6 +31,7 @@
     - [`idx.startTransaction`](#idxstarttransaction)
     - [`idx.cancel`](#idxcancel)
     - [`idx.handleInteractionCodeRedirect`](#idxhandleinteractioncoderedirect)
+    - [`idx.activate`](#idxactivate)
 
 ## Introduction
 
@@ -351,4 +352,16 @@ try {
   }
   throw err;
 }
+```
+
+#### `idx.activate`
+
+The convenience method for user activation flow by activation token received in Magic Link.
+
+```javascript
+await authClient.idx.activate({
+  activationToken: 'xxxxx',
+  authenticator: 'okta_password',
+  password: 'xxx',
+});
 ```

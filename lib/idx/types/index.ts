@@ -21,6 +21,7 @@ export { AuthenticationOptions } from '../authenticate';
 export { RegistrationOptions } from '../register';
 export { PasswordRecoveryOptions } from '../recoverPassword';
 export { CancelOptions } from '../cancel';
+export { ActivationOptions } from '../activate';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
