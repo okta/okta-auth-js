@@ -89,6 +89,12 @@
           "tryExtensions": [".js", ".ts"]
         }]
       }
+    },
+    {
+      "files": ["rollup.config.js"],
+      "rules": {
+        "node/no-unsupported-features/es-syntax": 0
+      }
     }
   ],
   "rules": {

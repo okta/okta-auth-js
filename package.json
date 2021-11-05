@@ -5,7 +5,7 @@
   "version": "5.9.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
-  "type": "commonjs", 
+  "type": "commonjs",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "browser": {
@@ -124,6 +124,7 @@
     "lodash": "4.17.20",
     "rollup": "^2.59.0",
     "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-license": "^2.6.0",
     "rollup-plugin-typescript2": "^0.30.0",
     "shelljs": "0.8.4",
     "ts-jest": "^26.4.3",
