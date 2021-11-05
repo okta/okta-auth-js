@@ -12,6 +12,7 @@
 
 
 import { run, RemediationFlow } from './run';
+import { transactionMetaExist } from './transactionMeta';
 import { 
   SelectAuthenticatorEnroll,
   SelectAuthenticatorEnrollValues,
@@ -25,9 +26,11 @@ import {
 import { ActivationFlowMonitor } from './flowMonitors';
 import { 
   IdxOptions, 
+  IdxStatus, 
   IdxTransaction, 
   OktaAuth, 
 } from '../types';
+import { AuthSdkError } from '../errors';
 
 const flow: RemediationFlow = {
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
@@ -45,6 +48,14 @@ export type ActivationOptions = IdxOptions
 export async function activate(
   authClient: OktaAuth, options: ActivationOptions
 ): Promise<IdxTransaction> {
+  // Only check at the beginning of the transaction
+  if (!transactionMetaExist(authClient)) {
+    if (!options.activationToken) {
+      const error = new AuthSdkError('No activationToken passed');
+      return { status: IdxStatus.FAILURE, error };
+    }
+  }
+  
   const flowMonitor = new ActivationFlowMonitor(authClient);
   return run(authClient, { 
     ...options, 

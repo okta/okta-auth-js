@@ -373,7 +373,7 @@ class TestApp {
     } else {
       console.error('IDX transaction:', tx);
       const error = tx?.error as any;
-      alert(error?.error_description || `${tx.status}`);
+      alert(error?.error_description || `${tx.status} ${tx?.messages?.map(m => m.message).join('. ')}`);
     }
   }
 
