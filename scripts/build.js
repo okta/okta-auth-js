@@ -10,7 +10,7 @@ const BUNDLE_LIB_CMD = 'yarn build:web';
 const BUNDLE_CDN_CMD = 'yarn build:cdn';
 const BUNDLE_POLYFILL_CMD = 'yarn build:polyfill';
 const DIST_DIR = `${BUILD_DIR}/dist`; // will be uploaded to CDN
-const BABEL_ESM = 'yarn build:esm';
+const BUNDLE_ESM = 'yarn build:esm';
 const BABEL_CJS = 'yarn build:cjs';
 const TS_CMD = 'yarn tsc --emitDeclarationOnly';
 
@@ -44,8 +44,8 @@ if (shell.exec(BUNDLE_POLYFILL_CMD).code !== 0) {
 }
 shell.echo(chalk.green('Webpack completed'));
 
-// Babelify ES module
-if (shell.exec(BABEL_ESM).code !== 0) {
+// Bundle ES module
+if (shell.exec(BUNDLE_ESM).code !== 0) {
   shell.echo(chalk.red('Error: Babel esm failed'));
   shell.exit(1);
 }
@@ -69,7 +69,16 @@ packageJSON.scripts.prepare = '';
 
 // Remove "build/" from the entrypoint paths.
 ['main', 'module', 'browser', 'types'].forEach(function(key) {
-  packageJSON[key] = packageJSON[key].replace('build/', '');
+  const value = packageJSON[key];
+  if (typeof value === 'object' && value !== null) {
+    packageJSON[key] = Object.keys(value).reduce((acc, curr) => {
+      console.log(acc, curr);
+      acc[curr] = value[curr].replace('build/', '');
+      return acc;
+    }, {});
+  } else {
+    packageJSON[key] = packageJSON[key].replace('build/', '');
+  }
 });
 
 fs.writeFileSync(`${BUILD_DIR}/package.json`, JSON.stringify(packageJSON, null, 4));
