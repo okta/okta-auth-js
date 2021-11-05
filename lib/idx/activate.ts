@@ -13,6 +13,7 @@
 
 import { run, RemediationFlow } from './run';
 import { transactionMetaExist } from './transactionMeta';
+import { startTransaction } from './startTransaction';
 import { 
   SelectAuthenticatorEnroll,
   SelectAuthenticatorEnrollValues,
@@ -52,6 +53,12 @@ export async function activate(
   if (!transactionMetaExist(authClient)) {
     if (!options.activationToken) {
       const error = new AuthSdkError('No activationToken passed');
+      return { status: IdxStatus.FAILURE, error };
+    }
+
+    const {availableSteps} = await startTransaction(authClient, options);
+    if (availableSteps?.some(({ name }) => name === 'identify')) {
+      const error = new AuthSdkError('activationToken is not supported based on your current org configuration.');
       return { status: IdxStatus.FAILURE, error };
     }
   }
