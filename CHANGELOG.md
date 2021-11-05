@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.9.0
+
+### Other
+
+- [#1000](https://github.com/okta/okta-auth-js/pull/1000)
+  - Fixes broken ES module bundle
+  - Updates `browser` field in `package.json` to enable bundlers to use the ES module bundle by default
+
 ## 5.8.0
 
 ### Features
