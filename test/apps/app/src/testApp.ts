@@ -52,7 +52,9 @@ function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
     <div class="box">
       <form>
         <input name="activationToken" id="activationToken" placeholder="activation token" type="text"/>
-        <a href="/" id="activationToken-direct" onclick="useActivationToken(event)">Activate</a>
+        <a href="/" id="activationToken-widget" onclick="activateUserWithWidget(event)">Activate with widget</a>
+        <input name="activationPassword" id="activationPassword" placeholder="password" type="password"/>
+        <a href="/" id="activationToken-direct" onclick="activateUser(event)">Activate with IDX API</a>
       </form>
     </div>
     ` : '';
@@ -140,7 +142,8 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     loginRedirect: testApp.loginRedirect.bind(testApp, {}),
     loginPopup: testApp.loginPopup.bind(testApp, {}),
     loginDirect: testApp.loginDirect.bind(testApp),
-    useActivationToken: testApp.useActivationToken.bind(testApp),
+    activateUser: testApp.activateUser.bind(testApp),
+    activateUserWithWidget: testApp.activateUserWithWidget.bind(testApp),
     getToken: testApp.getToken.bind(testApp, {}),
     clearTokens: testApp.clearTokens.bind(testApp),
     logoutRedirect: testApp.logoutRedirect.bind(testApp),
@@ -339,7 +342,42 @@ class TestApp {
     this.render();
   }
 
-  async useActivationToken(): Promise<void> {
+  async activateUser(): Promise<void> {
+    // Make sure we are starting a fresh transaction
+    this.oktaAuth.storageManager.getTransactionStorage().clearStorage();
+
+    // Get activationToken and password
+    const activationToken = (document.getElementById('activationToken') as HTMLInputElement).value;
+    const password = (document.getElementById('activationPassword') as HTMLInputElement).value;
+
+    // Activate with password
+    let tx = await this.oktaAuth.idx.activate({ 
+      activationToken,
+      authenticator: 'okta_password',
+      password,
+    });
+
+    // Skip optional `select-authenticator-enroll` (eg. with `okta-verify`)
+    if (tx?.nextStep?.canSkip) {
+      tx = await this.oktaAuth.idx.activate({
+        skip: true
+      });
+    }
+
+    // Process result
+    if (tx.status == 'SUCCESS') {
+      if (tx.tokens) {
+        this.oktaAuth.tokenManager.setTokens(tx.tokens);
+      }
+      await this.render();
+    } else {
+      console.error('IDX transaction:', tx);
+      // @ts-ignore
+      alert(tx?.error?.error_description || `${tx.status}`);
+    }
+  }
+
+  async activateUserWithWidget(): Promise<void> {
     // Make sure we are starting a fresh transaction
     this.oktaAuth.storageManager.getTransactionStorage().clearStorage();
 
