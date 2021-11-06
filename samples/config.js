@@ -46,64 +46,64 @@ const templateDefaults = {
 };
 
 const samples = [
-  // {
-  //   name: 'static-spa',
-  //   pkgName: '@okta/samples.static-spa',
-  //   template: 'static-spa',
-  //   specs: ['spa-app'],
-  //   features: []
-  // },
-  // {
-  //   name: 'webpack-spa',
-  //   pkgName: '@okta/samples.webpack-spa',
-  //   template: 'webpack-spa',
-  //   specs: ['spa-app'],
-  //   features: []
-  // },
-  // {
-  //   name: 'express-web-no-oidc',
-  //   pkgName: '@okta/samples.express.web-no-oidc',
-  //   template: 'express-web',
-  //   specs: ['web-app'],
-  //   oidc: false
-  // },
-  // {
-  //   name: 'express-web-with-oidc',
-  //   pkgName: '@okta/samples.express.web-with-oidc',
-  //   template: 'express-web',
-  //   specs: ['web-app']
-  // },
+  {
+    name: 'static-spa',
+    pkgName: '@okta/samples.static-spa',
+    template: 'static-spa',
+    specs: ['spa-app'],
+    features: []
+  },
+  {
+    name: 'webpack-spa',
+    pkgName: '@okta/samples.webpack-spa',
+    template: 'webpack-spa',
+    specs: ['spa-app'],
+    features: []
+  },
+  {
+    name: 'express-web-no-oidc',
+    pkgName: '@okta/samples.express.web-no-oidc',
+    template: 'express-web',
+    specs: ['web-app'],
+    oidc: false
+  },
+  {
+    name: 'express-web-with-oidc',
+    pkgName: '@okta/samples.express.web-with-oidc',
+    template: 'express-web',
+    specs: ['web-app']
+  },
   {
     name: 'express-embedded-auth-with-sdk',
     pkgName: '@okta/samples.express.embedded-auth-with-sdk',
     template: 'express-embedded-auth-with-sdk',
     specs: [],
     features: [
-      // 'root-page', 
-      // 'basic-auth', 
-      // 'self-service-password-recovery', 
+      'root-page', 
+      'basic-auth', 
+      'self-service-password-recovery', 
       'self-service-registration',
-      // 'self-service-registration-custom-attribute',
-      // 'mfa-password-and-email',
-      // 'mfa-password-and-sms',
-      // 'social-login-mfa',
-      // 'social-idp',
+      'self-service-registration-custom-attribute',
+      'mfa-password-and-email',
+      'mfa-password-and-sms',
+      'social-login-mfa',
+      'social-idp',
       'totp'
     ],
     useEnv: true,
     express: true,
   },
-  // {
-  //   name: 'express-embedded-sign-in-widget',
-  //   pkgName: '@okta/samples.express.embedded-sign-in-widget',
-  //   template: 'express-embedded-sign-in-widget',
-  //   specs: [],
-  //   features: [
-  //     'embedded-widget-basic-auth',
-  //     'social-idp-with-widget'
-  //   ],
-  //   useEnv: true
-  // },
+  {
+    name: 'express-embedded-sign-in-widget',
+    pkgName: '@okta/samples.express.embedded-sign-in-widget',
+    template: 'express-embedded-sign-in-widget',
+    specs: [],
+    features: [
+      'embedded-widget-basic-auth',
+      'social-idp-with-widget'
+    ],
+    useEnv: true
+  },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {
     throw new Error('sample "name" is required');

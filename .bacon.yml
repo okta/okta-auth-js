@@ -1,53 +1,53 @@
 test_suites:
-    # - name: lint
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '1'
-    #   timeout: '60'
-    #   script_name: lint
-    #   criteria: MERGE
-    #   queue_name: small
-    # - name: unit
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '2'
-    #   timeout: '10'
-    #   script_name: unit
-    #   criteria: MERGE
-    #   queue_name: small
-    # - name: integration
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '2'
-    #   timeout: '10'
-    #   script_name: integration
-    #   criteria: MERGE
-    #   queue_name: small
-    # - name: e2e
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '3'
-    #   timeout: '10'
-    #   script_name: e2e
-    #   criteria: MERGE
-    #   queue_name: small
-    # - name: e2e-refresh-token
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '4'
-    #   timeout: '10'
-    #   script_name: e2e-refresh-token
-    #   criteria: MERGE
-    #   queue_name: small
-    # - name: e2e-mfa
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '5'
-    #   timeout: '10'
-    #   script_name: e2e-mfa
-    #   criteria: MERGE
-    #   queue_name: small
-    # - name: e2e-oie
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '6'
-    #   timeout: '10'
-    #   script_name: e2e-oie
-    #   criteria: MERGE
-    #   queue_name: small
+    - name: lint
+      script_path: ../okta-auth-js/scripts
+      sort_order: '1'
+      timeout: '60'
+      script_name: lint
+      criteria: MERGE
+      queue_name: small
+    - name: unit
+      script_path: ../okta-auth-js/scripts
+      sort_order: '2'
+      timeout: '10'
+      script_name: unit
+      criteria: MERGE
+      queue_name: small
+    - name: integration
+      script_path: ../okta-auth-js/scripts
+      sort_order: '2'
+      timeout: '10'
+      script_name: integration
+      criteria: MERGE
+      queue_name: small
+    - name: e2e
+      script_path: ../okta-auth-js/scripts
+      sort_order: '3'
+      timeout: '10'
+      script_name: e2e
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-refresh-token
+      script_path: ../okta-auth-js/scripts
+      sort_order: '4'
+      timeout: '10'
+      script_name: e2e-refresh-token
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-mfa
+      script_path: ../okta-auth-js/scripts
+      sort_order: '5'
+      timeout: '10'
+      script_name: e2e-mfa
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-oie
+      script_path: ../okta-auth-js/scripts
+      sort_order: '6'
+      timeout: '10'
+      script_name: e2e-oie
+      criteria: MERGE
+      queue_name: small
     - name: e2e-samples
       script_path: ../okta-auth-js/scripts
       sort_order: '7'
@@ -55,10 +55,10 @@ test_suites:
       script_name: e2e-samples
       criteria: MERGE
       queue_name: small
-    # - name: publish
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '8'
-    #   timeout: '60'
-    #   script_name: publish
-    #   criteria: MERGE
-    #   queue_name: small
+    - name: publish
+      script_path: ../okta-auth-js/scripts
+      sort_order: '8'
+      timeout: '60'
+      script_name: publish
+      criteria: MERGE
+      queue_name: small
