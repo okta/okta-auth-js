@@ -49,6 +49,8 @@ export interface IdxRemediationValue {
   type?: string;
   required?: boolean;
   secret?: boolean;
+  visible?: boolean;
+  mutable?: boolean;
   value?: string;
   label?: string;
   form?: IdxForm;
@@ -70,6 +72,7 @@ export interface IdxRemediation {
   href?: string;
   method?: string;
   type?: string;
+  accepts?: string;
 }
 
 export interface IdxMessage {
