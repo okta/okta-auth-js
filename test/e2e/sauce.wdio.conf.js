@@ -87,7 +87,7 @@ exports.config = {
     // from the same test should run tests.
     //
     maxInstances: 50,
-    tunnelIdentifier:process.env.JOB_NUMBER,
+    tunnelIdentifier: 'okta-auth-js-e2e',
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
