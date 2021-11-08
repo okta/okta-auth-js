@@ -173,9 +173,9 @@ describe('Token auto renew', () => {
 
     it(`${flow} can continuously renew tokens`, async () => {
       await openFn({ ...defaultOptions });
-      await loginDirect();
       await TestApp.startService();
       await TestApp.subscribeToAuthState();
+      await loginDirect();
       // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       for (const _ of [0, 0]) { // auto renew should be able to happen more than once
         // renews both token together
