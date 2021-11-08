@@ -26,10 +26,8 @@ get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
 
 # Run the tests
 if ! yarn test:e2e; then
-  echo "Sauce e2e tests failed! Exiting..."
-  exit ${TEST_FAILURE}
+  echo "e2e tests on Sauce Labs failed! Exiting..."
+  exit ${PUBLISH_TYPE_AND_RESULT_DIR_BUT_ALWAYS_FAIL}
 fi
 
-echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
-echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
-exit ${PUBLISH_TYPE_AND_RESULT_DIR}
+exit ${PUBLISH_TYPE_AND_RESULT_DIR};
