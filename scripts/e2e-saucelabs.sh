@@ -14,8 +14,6 @@ get_vault_secret_key devex/sauce-labs accessKey SAUCE_ACCESS_KEY
 
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
-export CI=true
-export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 echo "Running tests against production (ok12) org"
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
@@ -26,8 +24,10 @@ get_secret prod/okta-sdk-vars/idx_sdk_e2e_apiKey OKTA_API_KEY
 
 # Run the tests
 if ! yarn test:e2e; then
-  echo "e2e tests on Sauce Labs failed! Exiting..."
-  exit ${PUBLISH_TYPE_AND_RESULT_DIR_BUT_ALWAYS_FAIL}
+  echo "Sauce e2e tests failed! Exiting..."
+  exit ${TEST_FAILURE}
 fi
 
-exit ${PUBLISH_TYPE_AND_RESULT_DIR};
+echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
+echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
+exit ${PUBLISH_TYPE_AND_RESULT_DIR}

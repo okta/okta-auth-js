@@ -18,7 +18,7 @@ require('@babel/register'); // Allows use of import module syntax
 require('regenerator-runtime'); // Allows use of async/await
 
 const DEBUG = process.env.DEBUG;
-const CI = process.env.TRAVIS;
+const CI = process.env.CI;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
 
@@ -162,7 +162,7 @@ exports.config = {
       ['sauce', {
         sauceConnect: true,
         sauceConnectOpts: { noAutodetect: false },
-          tunnelIdentifier: 'okta-auth-js-e2e'
+          tunnelName: 'okta-auth-js-e2e'
       }],
     ],
     // Framework you want to run your specs with.
