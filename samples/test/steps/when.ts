@@ -62,6 +62,7 @@ import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
 import loginWidget from '../support/action/loginWidget';
 import enterCorrectQuestionAnswer from '../support/action/enterCorrectQuestionAnswer';
 import scanQrCode from '../support/action/scanQrCode';
+import getSharedSecret from '../support/action/getSharedSecret';
 import enterCorrectGoogleAuthenticatorCode from '../support/action/enterCorrectGoogleAuthenticatorCode';
 import ActionContext from '../support/context';
 
@@ -313,6 +314,11 @@ When(
 When(
   /^She scans a QR Code$/,
   scanQrCode
+);
+
+When(
+  /^She enters the shared Secret Key into the Google Authenticator App$/,
+  getSharedSecret
 );
 
 When(

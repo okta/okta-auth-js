@@ -16,6 +16,7 @@ class EnrollGoogleAuthenticator {
   get code() { return '#authenticator-code-input'; }
   get submit() { return '#challenge-authenticator-form button[type=submit]'; }
   get sharedSecret() { return '#authenticator-shared-secret'; }
+  get qrCode() { return '#authenticator-qr-code'; }
 }
 
 export default new EnrollGoogleAuthenticator();
