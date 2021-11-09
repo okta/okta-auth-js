@@ -13,7 +13,7 @@ export SAUCE_USERNAME=OktaSignInWidget
 get_vault_secret_key devex/sauce-labs accessKey SAUCE_ACCESS_KEY
 
 export TEST_SUITE_TYPE="junit"
-export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e-saucelabs"
+#export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e-saucelabs"
 
 echo "Running tests against production (ok12) org"
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
@@ -28,6 +28,6 @@ if ! yarn test:e2e; then
   exit ${TEST_FAILURE}
 fi
 
-echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
-echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
+#echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
+#echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
 exit ${PUBLISH_TYPE_AND_RESULT_DIR}
