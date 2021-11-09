@@ -18,7 +18,7 @@ import deleteUser from '../../management-api/deleteUser';
 import ActionContext, {reuseContext} from '../../context';
 
 export default async function(this: ActionContext): Promise<void> {
-  if (this.featureName.includes('Google Authenticator') && this.scenarioName.includes('enrolls')) {
+  if (this.featureName.includes('Google Authenticator') && this.scenarioName.includes('by entering a Secret Key')) {
     // save for reuse
     reuseContext(this);
   } else {

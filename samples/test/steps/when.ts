@@ -322,7 +322,7 @@ When(
 );
 
 When(
-  /^She selects "Next"*$/,
+  /^She selects "Next"/,
   () => ({}) // no-op
 );
 
