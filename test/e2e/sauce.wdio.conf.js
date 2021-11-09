@@ -101,7 +101,7 @@ exports.config = {
       {
         browserName: 'firefox',
         platformName: 'Windows 10',
-        browserVersion: '79',
+        browserVersion: 'latest',
         acceptInsecureCerts: true,
          'sauce:options': {
              tunnelName: 'okta-auth-js-e2e',
@@ -147,7 +147,7 @@ exports.config = {
     baseUrl: 'http://localhost:8080',
     //
     // Default timeout for all waitFor* commands.
-    waitforTimeout: 25000,
+    waitforTimeout: 90000,
     //
     // Default timeout in milliseconds for request
     // if Selenium Grid doesn't send response
