@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "@okta/okta-idx-js": "0.22.0",
+    "@okta/okta-idx-js": "0.23.0",
     "@peculiar/webcrypto": "1.1.6",
     "Base64": "1.1.0",
     "atob": "^2.1.2",
