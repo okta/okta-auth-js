@@ -103,9 +103,10 @@ exports.config = {
         platformName: 'Windows 10',
         browserVersion: '79',
         acceptInsecureCerts: true,
-        // 'sauce:options': {
-        //   'seleniumVersion': '3.14.0'
-        // }
+         'sauce:options': {
+             'tunnelName': 'okta-auth-js-e2e'
+             //   'seleniumVersion': '3.14.0'
+         }
       },
       {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'},
       // TODO - Enable after OKTA-284870 is fixed
@@ -161,8 +162,7 @@ exports.config = {
     services: [
       ['sauce', {
         sauceConnect: true,
-        sauceConnectOpts: { noAutodetect: false },
-          tunnelName: 'okta-auth-js-e2e'
+        sauceConnectOpts: { noAutodetect: false }
       }],
     ],
     // Framework you want to run your specs with.
