@@ -21,7 +21,10 @@
     "@okta/okta-sdk-nodejs": "^5.0.0",
     "cross-fetch": "^3.1.4",
     "cross-spawn-with-kill": "^1.0.0",
-    "regenerator-runtime": "^0.13.3"
+    "regenerator-runtime": "^0.13.3",
+    "totp-generator": "0.0.12",
+    "pngjs": "6.0.0",
+    "jsqr": "1.4.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-async-to-generator": "^7.5.0",

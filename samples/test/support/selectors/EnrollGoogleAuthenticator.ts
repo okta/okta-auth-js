@@ -11,25 +11,12 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
-
-interface ActionContext {
-  credentials: UserCredentials;
-  user: User;
-  featureName: string;
-  scenarioName: string;
-  currentTestCaseId: string;
-  userName?: string;
-  sharedSecret?: string;
+class EnrollGoogleAuthenticator {
+  get pageTitle() { return '#page-title-header'; }
+  get code() { return '#authenticator-code-input'; }
+  get submit() { return '#challenge-authenticator-form button[type=submit]'; }
+  get sharedSecret() { return '#authenticator-shared-secret'; }
+  get qrCode() { return '#authenticator-qr-code'; }
 }
 
-let reusedContext: ActionContext;
-export const getReusedContext = () => {
-  return reusedContext;
-};
-export const reuseContext = (context: ActionContext) => {
-  reusedContext = context;
-};
-
-export default ActionContext;
+export default new EnrollGoogleAuthenticator();

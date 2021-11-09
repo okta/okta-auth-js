@@ -78,8 +78,21 @@ Given(
 );
 
 Given(
+  /^configured Authenticators are (.*)$/,
+  setEnvironment
+);
+
+Given(
   /^the Application Sign on Policy is set to "(.*)"$/,
   setEnvironment
+);
+
+Given(
+  /([^/s]+) has an account in the org/,
+  async function(this: ActionContext, firstName: string) {
+    // eslint-disable-next-line max-len
+    await createContextUserAndCredentials.call(this, firstName, ['MFA Required', 'Google Authenticator Enrollment Required']);
+  }
 );
 
 Given(
@@ -133,6 +146,11 @@ Given(
 Given(
   /^Mary has enrolled in the SMS factor$/,
   activateContextUserSms
+);
+
+Given(
+  /^she is not enrolled in any authenticators$/,
+  () => ({}) // no-op
 );
 
 

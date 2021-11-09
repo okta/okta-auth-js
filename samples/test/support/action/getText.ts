@@ -11,25 +11,15 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
+import { Selector } from 'webdriverio';
 
-interface ActionContext {
-  credentials: UserCredentials;
-  user: User;
-  featureName: string;
-  scenarioName: string;
-  currentTestCaseId: string;
-  userName?: string;
-  sharedSecret?: string;
-}
-
-let reusedContext: ActionContext;
-export const getReusedContext = () => {
-  return reusedContext;
+/**
+ * Get element inner text
+ * @param  {String}   selector Element selector
+ */
+export default async (
+    selector: Selector
+) => {
+  const el = await $(selector);
+  return await el.getText();
 };
-export const reuseContext = (context: ActionContext) => {
-  reusedContext = context;
-};
-
-export default ActionContext;

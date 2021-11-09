@@ -40,6 +40,7 @@ import submitForm from '../support/action/submitForm';
 import clickLogout from '../support/action/clickLogout';
 import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
 import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
+import selectGoogleAuthenticator from '../support/action/selectGoogleAuthenticator';
 import selectSecurityQuestionAuthenticator from '../support/action/selectSecurityQuestionAuthenticator';
 import enterIncorrectCode from '../support/action/enterIncorrectCode';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
@@ -60,6 +61,9 @@ import clickLoginWithOktaOIDCIdPInWidget from '../support/action/clickLoginWithO
 import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
 import loginWidget from '../support/action/loginWidget';
 import enterCorrectQuestionAnswer from '../support/action/enterCorrectQuestionAnswer';
+import scanQrCode from '../support/action/scanQrCode';
+import getSharedSecret from '../support/action/getSharedSecret';
+import enterCorrectGoogleAuthenticatorCode from '../support/action/enterCorrectGoogleAuthenticatorCode';
 import ActionContext from '../support/context';
 
 When(
@@ -298,8 +302,33 @@ When(
 );
 
 When(
+  /^She selects Google Authenticator from the list$/,
+  selectGoogleAuthenticator
+);
+
+When(
   /^She inputs the correct code from the Email$/,
   enterCorrectCode
+);
+
+When(
+  /^She scans a QR Code$/,
+  scanQrCode
+);
+
+When(
+  /^She enters the shared Secret Key into the Google Authenticator App$/,
+  getSharedSecret
+);
+
+When(
+  /^She selects "Next"/,
+  () => ({}) // no-op
+);
+
+When(
+  /^She inputs the correct code from her Google Authenticator App$/,
+  enterCorrectGoogleAuthenticatorCode
 );
 
 // When(

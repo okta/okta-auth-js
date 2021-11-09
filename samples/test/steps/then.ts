@@ -30,6 +30,7 @@ import checkProfileEmail from '../support/check/checkProfileEmail';
 import { UserHome } from '../support/selectors';
 import isDisplayed from '../support/check/isDisplayed';
 import checkProfileName from '../support/check/checkProfileName';
+import ActionContext from '../support/context';
 
 Then(
   /^User can verify their profile data$/,
@@ -102,6 +103,11 @@ Then(
 );
 
 Then(
+  /^she sees the list of required factors \(Google Authenticator\) to enroll$/,
+  checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
   /^she sees the Select Authenticator page with password as the only option$/,
   checkIsOnPage.bind(null, 'Select authenticator')
 );
@@ -139,7 +145,19 @@ Then(
 
 Then(
   /^the screen changes to receive an input for a code$/,
-  checkIsOnPage.bind(null, 'Enroll Factor: Enter SMS Code')
+  async function(this: ActionContext) {
+    let pageName;
+    if (this.featureName.includes('Google Authenticator')) {
+      if (this.scenarioName.includes('enroll')) {
+        pageName = 'Enroll Google Authenticator';
+      } else {
+        pageName = 'Challenge Google Authenticator';
+      }
+    } else {
+      pageName = 'Enroll Factor: Enter SMS Code';
+    }
+    checkIsOnPage.bind(null, pageName);
+  }
 );
 
 Then(

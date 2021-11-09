@@ -11,25 +11,16 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
+import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
+import ActionContext from '../context';
+import jsqr from 'jsqr';
+const {PNG} = require('pngjs');
 
-interface ActionContext {
-  credentials: UserCredentials;
-  user: User;
-  featureName: string;
-  scenarioName: string;
-  currentTestCaseId: string;
-  userName?: string;
-  sharedSecret?: string;
+export default async function (this: ActionContext) {
+  const el = await $(EnrollGoogleAuthenticator.qrCode);
+  const dataUri = await el.getAttribute('src');
+  const png = PNG.sync.read(Buffer.from(dataUri.slice('data:image/png;base64,'.length), 'base64'));
+  const result = jsqr(Uint8ClampedArray.from(png.data), png.width, png.height);
+  const sharedSecret = result?.data?.match(/\?secret=(\w+)&/)?.[1];
+  this.sharedSecret = sharedSecret;
 }
-
-let reusedContext: ActionContext;
-export const getReusedContext = () => {
-  return reusedContext;
-};
-export const reuseContext = (context: ActionContext) => {
-  reusedContext = context;
-};
-
-export default ActionContext;

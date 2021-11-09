@@ -87,7 +87,8 @@ const samples = [
       'mfa-password-and-email',
       'mfa-password-and-sms',
       'social-login-mfa',
-      'social-idp'
+      'social-idp',
+      'totp'
     ],
     useEnv: true,
     express: true,

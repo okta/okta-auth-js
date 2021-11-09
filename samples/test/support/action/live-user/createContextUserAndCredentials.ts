@@ -13,12 +13,20 @@
 
 import createCredentials from '../../management-api/createCredentials';
 import createUser from '../../management-api/createUser';
-import ActionContext from '../../context';
+import ActionContext, {getReusedContext} from '../../context';
 
 export default async function (this: ActionContext, firstName: string, assignToGroups?: string[]): Promise<void> {
-  const credentials = this.credentials || await createCredentials(firstName, this.featureName);
-  this.credentials = credentials;
-
-  const user = await createUser(credentials, assignToGroups);
-  this.user = user;
+  
+  if (this.featureName.includes('Google Authenticator') && !this.scenarioName.includes('enrolls')) {
+    // reuse
+    this.credentials = getReusedContext().credentials;
+    this.sharedSecret = getReusedContext().sharedSecret;
+    this.user = getReusedContext().user;
+    this.userName = getReusedContext().userName;
+  } else {
+    const credentials = this.credentials || await createCredentials(firstName, this.featureName);
+    this.credentials = credentials;
+    const user = await createUser(credentials, assignToGroups);
+    this.user = user;
+  }
 } 

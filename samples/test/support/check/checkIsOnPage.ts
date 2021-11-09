@@ -17,6 +17,7 @@ import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import PasswordReset from '../selectors/PasswordReset';
 import VerifyPhone from '../selectors/VerifyPhone';
+import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
 
 /**
  * Check if browser has navigated to expected page
@@ -83,6 +84,16 @@ export default async (pageName?: string) => {
     case 'Challenge Security Question': {
       selector = ChallengeAuthenticator.pageTitle;
       pageTitle = 'Challenge Security Question';
+      break;
+    }
+    case 'Enroll Google Authenticator': {
+      selector = EnrollGoogleAuthenticator.pageTitle;
+      pageTitle = 'Enroll Google Authenticator';
+      break;
+    }
+    case 'Challenge Google Authenticator': {
+      selector = ChallengeAuthenticator.pageTitle;
+      pageTitle = 'Challenge Google Authenticator';
       break;
     }
     default: {
