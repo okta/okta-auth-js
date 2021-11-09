@@ -2,6 +2,10 @@
 
 ## 5.9.0
 
+### Features
+
+- [#1004](https://github.com/okta/okta-auth-js/pull/1004) Allows custom query parameters can be added to `authorize` url
+
 ### Other
 
 - [#1000](https://github.com/okta/okta-auth-js/pull/1000)
