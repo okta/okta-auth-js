@@ -13,7 +13,7 @@
 
 import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
 import ActionContext from '../context';
-import jsqr from "jsqr";
+import jsqr from 'jsqr';
 const {PNG} = require('pngjs');
 
 export default async function (this: ActionContext) {
