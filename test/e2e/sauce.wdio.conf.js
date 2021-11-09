@@ -161,7 +161,8 @@ exports.config = {
     services: [
       ['sauce', {
         sauceConnect: true,
-        sauceConnectOpts: { noAutodetect: false }
+        sauceConnectOpts: { noAutodetect: false },
+          tunnelIdentifier: 'okta-auth-js-e2e'
       }],
     ],
     // Framework you want to run your specs with.
