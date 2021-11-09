@@ -104,7 +104,7 @@ exports.config = {
         browserVersion: '79',
         acceptInsecureCerts: true,
          'sauce:options': {
-             'tunnelIdentifier': 'okta-auth-js-e2e'
+             'tunnelName': 'okta-auth-js-e2e'
              //   'seleniumVersion': '3.14.0'
          }
       },
@@ -113,7 +113,7 @@ exports.config = {
             platform: 'OS X 10.13',
             version: 'latest',
             'sauce:options': {
-                'tunnelIdentifier': 'okta-auth-js-e2e'
+                'tunnelName': 'okta-auth-js-e2e'
             }
         }
       // TODO - Enable after OKTA-284870 is fixed
