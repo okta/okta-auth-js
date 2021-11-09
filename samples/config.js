@@ -82,7 +82,7 @@ const samples = [
       // 'root-page', 
       // 'basic-auth', 
       // 'self-service-password-recovery', 
-      // 'self-service-registration',
+      'self-service-registration',
       // 'self-service-registration-custom-attribute',
       // 'mfa-password-and-email',
       // 'mfa-password-and-sms',
