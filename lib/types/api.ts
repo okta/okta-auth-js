@@ -120,6 +120,7 @@ export interface TokenParams extends CustomUrls {
   prompt?: string;
   sessionToken?: string;
   timeout?: number;
+  customParams?: { [propName: string]: string } // custom authorize query params
   // TODO: remove in the next major version
   popupTitle?: string;
 }
