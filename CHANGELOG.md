@@ -8,6 +8,12 @@
   - Fixes broken ES module bundle
   - Updates `browser` field in `package.json` to enable bundlers to use the ES module bundle by default
 
+### Fixes
+
+- [#1005](https://github.com/okta/okta-auth-js/pull/1005)
+  - Handles `rememberMe` boolean in IDX Identify remediation adapter
+  - Typescript: Adds `type` field for `Input` type in NextStep object
+
 ## 5.8.0
 
 ### Features
