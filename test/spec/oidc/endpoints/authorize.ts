@@ -57,13 +57,13 @@ describe('authorize endpoint', () => {
       })).toThrow(new AuthSdkError('openid scope must be specified in the scopes argument when requesting an id_token'));
     });
 
-    it('can add customParams to the authorize url', () => {
+    it('can add extraParams to the authorize url', () => {
       expect(buildAuthorizeParams({
         clientId: 'fakeClientId',
         codeChallenge: 'fakeCodeChallenge',
         scopes: ['openid', 'email'],
         responseType: ['id_token', 'token'],
-        customParams: {
+        extraParams: {
           launch: 'launch'
         }
       })).toBe('?client_id=fakeClientId&code_challenge=fakeCodeChallenge&response_type=id_token%20token&scope=openid%20email&launch=launch');
