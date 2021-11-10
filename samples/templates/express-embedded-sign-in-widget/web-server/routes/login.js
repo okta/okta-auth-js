@@ -12,6 +12,7 @@
 
 
 const express = require('express');
+const URL = require('url').URL;
 const { 
   getAuthTransaction,
   getAuthClient,
@@ -31,12 +32,7 @@ router.get('/login', (req, res, next) => {
         state,
       } = meta;
 
-      if (!interactionHandle) {
-        throw new Error(
-          'Missing required configuration "interactionHandle" to initialize the widget'
-        );
-      }
-
+      const { stateTokenExternalId } = req.query;
       console.log('renderLoginWithWidget: using interaction handle: ', interactionHandle);
       const { clientId, redirectUri, issuer, scopes } = getConfig().webServer.oidc;
       const widgetConfig = {
@@ -49,6 +45,7 @@ router.get('/login', (req, res, next) => {
         },
         useInteractionCodeFlow: true,
         state,
+        stateTokenExternalId,
         interactionHandle,
         codeChallenge,
         codeChallengeMethod,
@@ -56,11 +53,11 @@ router.get('/login', (req, res, next) => {
       res.render('login', {
         siwVersion: '{{siwVersion}}',
         widgetConfig: JSON.stringify(widgetConfig),
+        selfHosted: !!process.env.SELF_HOSTED_WIDGET
       });
     })
     .catch((error) => {
       // Clear transaction
-      const authClient = getAuthClient(req);
       authClient.transactionManager.clear();
 
       // Delegate error to global error handler
@@ -69,20 +66,27 @@ router.get('/login', (req, res, next) => {
 });
 
 router.get('/login/callback', async (req, res, next) => {
-  const url = req.protocol + '://' + req.get('host') + req.originalUrl;
+  const parsedUrl = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
+  const { search, href } = parsedUrl;
+  const { state, stateTokenExternalId } = req.query;
   const authClient = getAuthClient(req);
+
+  if (authClient.isEmailVerifyCallback(search)) {
+    res.redirect(`/login?state=${state}&stateTokenExternalId=${stateTokenExternalId}`);
+    return;
+  }
+
+  if (authClient.isInteractionRequired(search)) {
+    res.redirect(`/login?state=${state}`);
+    return;
+  }
+
   try {
     // Exchange code for tokens
-    await authClient.idx.handleInteractionCodeRedirect(url);
+    await authClient.idx.handleInteractionCodeRedirect(href);
     // Redirect back to home page
     res.redirect('/');
   } catch (err) {
-    if (authClient.isInteractionRequiredError(err) === true) {
-      const { state } = req.query;
-      res.redirect('/login?state=' + state);
-      return;
-    }
-
     next(err);
   }
 });

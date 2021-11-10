@@ -17,11 +17,13 @@
     "cors": "^2.8.5",
     "js-yaml": "^4.1.0",
     "dotenv": "^10.0.0",
-    "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "^{{ siwVersion }}"
+    "@okta/okta-auth-js": "*"
   },
   "devDependencies": {
     "nodemon": "^2.0.7",
     "concurrently": "^6.0.1"
+  },
+  "peerDependencies": {
+    "@okta/okta-signin-widget": "^{{ siwVersion }}"
   }
 }
