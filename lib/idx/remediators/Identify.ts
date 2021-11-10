@@ -27,7 +27,8 @@ export class Identify extends Remediator {
 
   map = {
     'identifier': ['username'],
-    'credentials': []
+    'credentials': [],
+    'rememberMe': ['rememberMe'],
   };
 
   constructor(remediation: IdxRemediation, values?: IdentifyValues) {
