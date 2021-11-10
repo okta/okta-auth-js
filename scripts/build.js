@@ -12,7 +12,7 @@ const BUNDLE_POLYFILL_CMD = 'yarn build:polyfill';
 const DIST_DIR = `${BUILD_DIR}/dist`; // will be uploaded to CDN
 const BUNDLE_ESM = 'yarn build:esm';
 const BABEL_CJS = 'yarn build:cjs';
-const TS_CMD = 'yarn tsc --emitDeclarationOnly';
+const TS_CMD = 'yarn build:types';
 
 shell.echo('Start building...');
 

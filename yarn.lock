@@ -2372,13 +2372,6 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@nuintun/qrcode@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@nuintun/qrcode/-/qrcode-3.0.1.tgz#29c1f67552882c542d9638a132650a372e4b2d5b"
-  integrity sha512-0dY347xYgJvmBP0I75UHeVEx7JeDczahhEYaS03uh9bhCqa3FycdtLPxWulQh/r3OsX5lpi+z3mEXfAaQtAPwQ==
-  dependencies:
-    tslib "^2.0.1"
-
 "@okta/okta-idx-js@0.22.0":
   version "0.22.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.22.0.tgz#c5dbebd155be2c8a8e2bbceb2e92701b6ba59349"
@@ -12872,7 +12865,7 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jsqr@1.4.0, jsqr@^1.4.0:
+jsqr@1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/jsqr/-/jsqr-1.4.0.tgz#8efb8d0a7cc6863cb6d95116b9069123ce9eb2d1"
   integrity sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==
@@ -16393,13 +16386,6 @@ q@^1.1.2:
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
   integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
 
-qrcode-decoder@0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/qrcode-decoder/-/qrcode-decoder-0.2.2.tgz#1f808afe927e901d402826d38c3bbbbffbb17b06"
-  integrity sha512-gyysRyA/SHaMn7yDKhFJ8AGNkbTJfSVq/7vtNWtBdW5PdT3m8SLX+YbWY04HRkoS/H7RaI3UfAsOw+cVqsfWHg==
-  dependencies:
-    jsqr "^1.4.0"
-
 qs@6.7.0:
   version "6.7.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.7.0.tgz#41dc1a015e3d581f1621776be31afb2876a9b1bc"
@@ -19398,11 +19384,6 @@ tslib@^2.0.0, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.0.tgz#803b8cdab3e12ba581a4ca41c8839bbb0dacb09e"
   integrity sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==
-
-tslib@^2.0.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
-  integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
 
 tsutils@^3.17.1, tsutils@^3.21.0:
   version "3.21.0"

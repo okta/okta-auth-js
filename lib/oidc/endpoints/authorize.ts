@@ -63,5 +63,8 @@ export function convertTokenParamsToOAuthParams(tokenParams: TokenParams) {
 
 export function buildAuthorizeParams(tokenParams: TokenParams) {
   var oauthQueryParams = convertTokenParamsToOAuthParams(tokenParams);
-  return toQueryString(oauthQueryParams);
+  return toQueryString({ 
+    ...oauthQueryParams, 
+    ...(tokenParams.extraParams && { ...tokenParams.extraParams })
+  });
 }
