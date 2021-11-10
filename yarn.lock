@@ -2413,20 +2413,6 @@
   optionalDependencies:
     fsevents "*"
 
-"@okta/okta-signin-widget@https://artifacts.aue1d.saasure.com/artifactory/npm-topic/@okta/okta-signin-widget/-/@okta/okta-signin-widget-5.14.0-gd16f684.tgz":
-  version "5.14.0-gd16f684"
-  resolved "https://artifacts.aue1d.saasure.com/artifactory/npm-topic/@okta/okta-signin-widget/-/@okta/okta-signin-widget-5.14.0-gd16f684.tgz#a5fa525c03b440caa0861684c7971378eaf51b4c"
-  dependencies:
-    "@babel/polyfill" "^7.10.1"
-    "@babel/runtime" "^7.10.3"
-    cross-fetch "^3.0.4"
-    handlebars "^4.5.3"
-    q "1.4.1"
-    u2f-api-polyfill "0.4.3"
-    underscore "1.13.1"
-  optionalDependencies:
-    fsevents "*"
-
 "@peculiar/asn1-schema@^2.0.27", "@peculiar/asn1-schema@^2.0.32":
   version "2.0.36"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.0.36.tgz#ca7978f43ffa4f35fbb74436c3f983c10a69ac27"
