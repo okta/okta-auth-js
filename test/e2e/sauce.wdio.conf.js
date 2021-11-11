@@ -86,7 +86,7 @@ exports.config = {
     // and 30 processes will get spawned. The property handles how many capabilities
     // from the same test should run tests.
     //
-    maxInstances: 60,
+    maxInstances: 1,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -103,13 +103,11 @@ exports.config = {
         platformName: 'Windows 10',
         browserVersion: 'latest',
         acceptInsecureCerts: true,
-         'sauce:options': {
-             tunnelName: 'okta-auth-js-e2e',
-             extendedDebugging: true
+          //'sauce:options': {
              //   'seleniumVersion': '3.14.0'
-         }
+         //}
       },
-        {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest', extendedDebugging: true}
+        {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'}
       // TODO - Enable after OKTA-284870 is fixed
       // {browserName: 'safari', platform: 'OS X 10.13', version: 'latest'},
     ],
@@ -180,7 +178,15 @@ exports.config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter.html
-    reporters: ['spec'],
+    reporters: [
+        'spec',
+        ['junit', {
+            outputDir: '../../build2/reports/e2e-saucelabs',
+            outputFileFormat: function() { // optional
+                return 'junit-results.xml';
+            }
+        }]
+    ],
 
     //
     // Options to be passed to Mocha.
