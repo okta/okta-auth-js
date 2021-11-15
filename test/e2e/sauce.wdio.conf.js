@@ -21,6 +21,22 @@ const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
+const browserOptions = {
+    args: []
+};
+
+if (CI) {
+    browserOptions.args = browserOptions.args.concat([
+        '--headless',
+        '--disable-gpu',
+        '--window-size=1600x1200',
+        '--no-sandbox',
+        '--whitelisted-ips',
+        '--disable-extensions',
+        '--verbose',
+        '--disable-dev-shm-usage'
+    ]);
+}
 
 exports.config = {
     jasmineNodeOpts: {
