@@ -22,9 +22,10 @@ const flows = ['implicit', 'pkce'];
 async function openImplicit(options, openInNewWindow) {
   options = Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: false }, options);
   await TestApp.open(options, openInNewWindow);
-  await TestApp.pkceOption.then(el => el.isSelected()).then(isSelected => {
-    assert(isSelected === false);
-  });
+  await TestApp.selectPkceOptionOff();
+  await TestApp.pkceOptionOff.then( el=> el.isSelected().then(isSelected=>{
+    assert(isSelected === true);
+  }));
   await TestApp.issuer.then(el => el.getValue()).then(value => {
     assert(value === ISSUER);
   });
@@ -36,7 +37,7 @@ async function openImplicit(options, openInNewWindow) {
 async function openPKCE(options, openInNewWindow) {
   options = Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: true }, options);
   await TestApp.open(options, openInNewWindow);
-  await TestApp.pkceOption.then(el => el.isSelected()).then(isSelected => {
+  await TestApp.pkceOptionOn.then(el => el.isSelected()).then(isSelected => {
     assert(isSelected);
   });
   await TestApp.issuer.then(el => el.getValue()).then(val => {

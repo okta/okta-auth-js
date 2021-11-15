@@ -51,7 +51,8 @@ class TestApp {
   // Form
   get responseModeQuery() { return $('#f_responseMode [value="query"]'); }
   get responseModeFragment() { return $('#f_responseMode [value="fragment"]'); }
-  get pkceOption() { return $('#f_pkce-on'); }
+  get pkceOptionOn() { return $('#f_pkce-on'); }
+  get pkceOptionOff() { return $('#f_pkce-off'); }
   get clientId() { return $('#f_clientId'); }
   get issuer() { return $('#f_issuer'); }
   get interactionCodeOption() { return $('#f_useInteractionCodeFlow-on'); }
@@ -219,6 +220,10 @@ class TestApp {
 
   async testConcurrentGetToken() {
     await this.testConcurrentGetTokenBtn.then(el => el.click());
+  }
+
+  async selectPkceOptionOff(){
+    await this.pkceOptionOff.then(el=> el.click());
   }
 
   async waitForLoginBtn() {
