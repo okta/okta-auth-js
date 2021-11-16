@@ -90,4 +90,13 @@ app.use(function(err, req, res, next) {
   });
 });
 
+// By default, the sample serves the widge from global CDN
+// If `SELF_HOSTED_WIDGET` environment var is set, widget will be served locally from NPM install
+if (process.env.SELF_HOSTED_WIDGET) {
+  const widgetDir = path.resolve(path.dirname(require.resolve('@okta/okta-signin-widget')), '..', '..');
+  const widgetPackage = require(path.resolve(widgetDir, 'package.json'));
+  console.log(`Serving widget version ${widgetPackage.version} from: ${widgetDir}`);
+  app.use('/widget', express.static(widgetDir));
+}
+
 app.listen(port, () => console.log(`App started on port ${port}`));

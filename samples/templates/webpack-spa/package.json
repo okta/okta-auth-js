@@ -10,8 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "^{{ siwVersion }}"
+    "@okta/okta-auth-js": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",
@@ -25,5 +24,8 @@
     "webpack-cli": "^3.3.0",
     "webpack-dev-middleware": "^3.7.2",
     "webpack-dev-server": "^3.2.1"
+  },
+  "peerDependencies": {
+    "@okta/okta-signin-widget": "^{{ siwVersion }}"
   }
 }
