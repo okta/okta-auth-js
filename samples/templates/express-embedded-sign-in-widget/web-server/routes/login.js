@@ -58,6 +58,7 @@ router.get('/login', (req, res, next) => {
     })
     .catch((error) => {
       // Clear transaction
+      const authClient = getAuthClient(req);
       authClient.transactionManager.clear();
 
       // Delegate error to global error handler
