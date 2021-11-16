@@ -28,8 +28,6 @@ export function validateClaims(sdk: OktaAuth, claims: UserClaims, validationPara
     throw new AuthSdkError('OAuth flow response nonce doesn\'t match request nonce');
   }
 
-  var now = Math.floor(Date.now()/1000);
-
   if (claims.iss !== iss) {
     throw new AuthSdkError('The issuer [' + claims.iss + '] ' +
       'does not match [' + iss + ']');
@@ -45,11 +43,12 @@ export function validateClaims(sdk: OktaAuth, claims: UserClaims, validationPara
   }
 
   if (!sdk.options.ignoreLifetime) {
-    if ((now - sdk.options.maxClockSkew) > claims.exp) {
+    const now = sdk._clock.now();
+    if (now > claims.exp) {
       throw new AuthSdkError('The JWT expired and is no longer valid');
     }
 
-    if (claims.iat > (now + sdk.options.maxClockSkew)) {
+    if (claims.iat > now) {
       throw new AuthSdkError('The JWT was issued in the future');
     }
   }

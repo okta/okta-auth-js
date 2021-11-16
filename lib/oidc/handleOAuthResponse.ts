@@ -81,14 +81,14 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
       var accessToken = res.access_token;
       var idToken = res.id_token;
       var refreshToken = res.refresh_token;
-      var now = Math.floor(Date.now()/1000);
 
       if (accessToken) {
         var accessJwt = sdk.token.decode(accessToken);
+        sdk._clock.calculateLocalOffset(accessJwt.payload.iat);
         tokenDict.accessToken = {
           accessToken: accessToken,
           claims: accessJwt.payload,
-          expiresAt: Number(expiresIn) + now,
+          expiresAt: Number(expiresIn) + sdk._clock.now(),
           tokenType: tokenType,
           scopes: scopes,
           authorizeUrl: urls.authorizeUrl,
@@ -101,7 +101,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
           refreshToken: refreshToken,
           // should not be used, this is the accessToken expire time
           // TODO: remove "expiresAt" in the next major version OKTA-407224
-          expiresAt: Number(expiresIn) + now, 
+          expiresAt: Number(expiresIn) + sdk._clock.now(), 
           scopes: scopes,
           tokenUrl: urls.tokenUrl,
           authorizeUrl: urls.authorizeUrl,
@@ -115,7 +115,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
         var idTokenObj: IDToken = {
           idToken: idToken,
           claims: idJwt.payload,
-          expiresAt: idJwt.payload.exp - idJwt.payload.iat + now, // adjusting expiresAt to be in local time
+          expiresAt: idJwt.payload.exp - idJwt.payload.iat + sdk._clock.now(), // adjusting expiresAt to be in local time
           scopes: scopes,
           authorizeUrl: urls.authorizeUrl,
           issuer: urls.issuer,

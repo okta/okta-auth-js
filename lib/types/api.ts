@@ -19,6 +19,7 @@ import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
 import { TokenManagerInterface } from './TokenManager';
 import { OktaUserAgent } from '../OktaUserAgent';
+import SdkClock from '../clock';
 
 import { 
   AuthenticationOptions, 
@@ -31,6 +32,7 @@ import {
 import { InteractOptions, InteractResponse } from '../idx/interact';
 import { IntrospectOptions } from '../idx/introspect';
 import { IdxResponse } from '../idx/types/idx-js';
+
 export interface OktaAuth {
   options: OktaAuthOptions;
   userAgent: string;
@@ -38,6 +40,7 @@ export interface OktaAuth {
   getOriginalUri(): string;
 
   _oktaUserAgent: OktaUserAgent;
+  _clock: SdkClock;
   storageManager: StorageManager;
   transactionManager: TransactionManager;
   tokenManager: TokenManagerInterface;

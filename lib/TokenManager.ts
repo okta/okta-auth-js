@@ -15,7 +15,6 @@ import { AuthSdkError } from './errors';
 import { isRefreshTokenError, validateToken  } from './oidc/util';
 import { isLocalhost, isIE11OrLess } from './features';
 import { TOKEN_STORAGE_NAME } from './constants';
-import SdkClock from './clock';
 import {
   EventEmitter,
   Token, 
@@ -64,7 +63,6 @@ function defaultState(): TokenManagerState {
 }
 export class TokenManager implements TokenManagerInterface {
   private sdk: OktaAuth;
-  private clock: SdkClock;
   private emitter: EventEmitter;
   private storage: StorageProvider;
   private state: TokenManagerState;
@@ -102,7 +100,6 @@ export class TokenManager implements TokenManagerInterface {
     }
 
     this.storage = sdk.storageManager.getTokenStorage(storageOptions);
-    this.clock = SdkClock.create(/* sdk, options */);
     this.state = defaultState();
 
     this.on = this.emitter.on.bind(this.emitter);
@@ -135,7 +132,7 @@ export class TokenManager implements TokenManagerInterface {
   
   hasExpired(token) {
     var expireTime = this.getExpireTime(token);
-    return expireTime <= this.clock.now();
+    return expireTime <= this.sdk._clock.now();
   }
   
   emitExpired(key, token) {
@@ -201,7 +198,7 @@ export class TokenManager implements TokenManagerInterface {
     }
 
     var expireTime = this.getExpireTime(token);
-    var expireEventWait = Math.max(expireTime - this.clock.now(), 0) * 1000;
+    var expireEventWait = Math.max(expireTime - this.sdk._clock.now(), 0) * 1000;
   
     // Clear any existing timeout
     this.clearExpireEventTimeout(key);

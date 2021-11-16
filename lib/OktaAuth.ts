@@ -113,6 +113,7 @@ import {
 import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from './idx/headers';
 import { OktaUserAgent } from './OktaUserAgent';
 import { parseOAuthResponseFromUrl } from './oidc/parseFromUrl';
+import SdkClock from './clock';
 
 const Emitter = require('tiny-emitter');
 
@@ -138,7 +139,9 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   http: HttpAPI;
   fingerprint: FingerprintAPI;
   _oktaUserAgent: OktaUserAgent;
+  _clock: SdkClock;
   _pending: { handleLogin: boolean };
+
   constructor(args: OktaAuthOptions) {
     const options = this.options = buildOptions(args);
     this.storageManager = new StorageManager(options.storageManager, options.cookies, options.storageUtil);
@@ -146,6 +149,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       storageManager: this.storageManager,
     }, options.transactionManager));
     this._oktaUserAgent = new OktaUserAgent();
+    this._clock = new SdkClock(this);
   
     this.tx = {
       status: transactionStatus.bind(null, this),

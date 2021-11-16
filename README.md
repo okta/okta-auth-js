@@ -460,6 +460,8 @@ ID token signatures are validated by default when `token.getWithoutPrompt`, `tok
 
 #### `maxClockSkew`
 
+> :no_entry: [DEPRECATED] The SDK currently calculates the local clock offset by comparing the difference between local time with idToken or accessToken's [iat](https://developer.okta.com/docs/reference/api/oidc/#base-claims-always-present). This configuration will be removed in the next major version.
+
 Defaults to 300 (five minutes). This is the maximum difference allowed between a client's clock and Okta's, in seconds, when validating tokens. Setting this to 0 is not recommended, because it increases the likelihood that valid tokens will fail validation.
 
 #### `ignoreLifetime`
