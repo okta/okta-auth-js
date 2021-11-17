@@ -111,6 +111,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
 
       if (idToken) {
         var idJwt = sdk.token.decode(idToken);
+        sdk._clock.calculateLocalOffset(idJwt.payload.iat);
 
         var idTokenObj: IDToken = {
           idToken: idToken,
