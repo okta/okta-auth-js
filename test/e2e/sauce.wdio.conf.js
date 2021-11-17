@@ -114,16 +114,34 @@ exports.config = {
       // 5 instance gets started at a time.
       //maxInstances: 5,
       //
-      {
-        browserName: 'firefox',
-        platformName: 'Windows 10',
-        browserVersion: 'latest',
-        acceptInsecureCerts: true,
-          //'sauce:options': {
-             //   'seleniumVersion': '3.14.0'
-         //}
-      },
-        {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'}
+      // {
+      //   browserName: 'firefox',
+      //   platformName: 'Windows 10',
+      //   browserVersion: 'latest',
+      //   acceptInsecureCerts: true,
+      //     //'sauce:options': {
+      //        //   'seleniumVersion': '3.14.0'
+      //    //}
+      // },
+        // {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'}
+        {
+            browserName: 'MicrosoftEdge',
+            browserVersion: 'latest',
+            platformName: 'Windows 10',
+            'sauce:options': {
+                recordScreenshots: 'false'
+            }
+        }
+            //{
+        //     browserName: 'internet explorer',
+        //     browserVersion: '11',
+        //     platformName: 'Windows 10',
+        //     'sauce:options': {
+        //         extendedDebugging: 'true',
+        //         recordScreenshots: 'false'
+        //     }
+        // }
+
       // TODO - Enable after OKTA-284870 is fixed
       // {browserName: 'safari', platform: 'OS X 10.13', version: 'latest'},
     ],
@@ -190,6 +208,7 @@ exports.config = {
     //
     // The number of times to retry the entire specfile when it fails as a whole
     specFileRetries: 3,
+    specFileRetriesDeferred: false,
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
