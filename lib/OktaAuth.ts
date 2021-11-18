@@ -34,6 +34,7 @@ import {
   SigninWithCredentialsOptions,
   SignoutOptions,
   SignOutCallbackOptions,
+  RevokeTokensOptions,
   Tokens,
   ForgotPasswordOptions,
   VerifyRecoveryTokenOptions,
@@ -383,13 +384,16 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       this._pending.handleLogin = false;
     }
   }
-  
+
   // Ends the current Okta SSO session without redirecting to Okta.
-  closeSession(): Promise<object> {
-    // Clear all local tokens
-    this.tokenManager.clear();
-  
+  closeSession(options?: RevokeTokensOptions): Promise<object> {
     return this.session.close() // DELETE /api/v1/sessions/me
+    .then(async () => {
+      this.revokeTokens(options);
+  
+      // Clear all local tokens
+      this.tokenManager.clear();
+    })
     .catch(function(e) {
       if (e.name === 'AuthApiError' && e.errorCode === 'E0000007') {
         // Session does not exist or has already been closed
@@ -427,6 +431,17 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     return this.token.revoke(refreshToken);
   }
 
+  async revokeTokens(options: RevokeTokensOptions = {}): Promise<void> {
+    const revokeAccessToken = options.revokeAccessToken !== false;
+    const revokeRefreshToken = options.revokeRefreshToken !== false;
+    if (revokeAccessToken) {
+      this.revokeAccessToken();
+    }
+    if (revokeRefreshToken) {
+      this.revokeRefreshToken();
+    }
+  }
+
   getSignOutRedirectUrl(options: SignoutRedirectUrlOptions = {}) {
     let {
       idToken,
@@ -461,22 +476,20 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     var postLogoutRedirectUri = options.postLogoutRedirectUri
       || this.options.postLogoutRedirectUri;
     const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });
-
     if (logoutUri) {
       // redirect to Okta to kill the SSO session
       options.redirectToOkta(logoutUri);
-      // window.location.assign(logoutUri);
     } else {
       return this.closeSession() // can throw if the user cannot be signed out
-        .then(() => {
-          this.handleLogoutCallback({ redirectToApp: options.redirectToApp })
-        });
+        .then(() => options.redirectToApp());
     }
   }
 
-  async handleLogoutCallback(options: SignOutCallbackOptions): Promise<void> {
-    await this.revokeAccessToken();
-    await this.revokeAccessToken();
+  async handleLogoutCallback(options: SignOutCallbackOptions & RevokeTokensOptions): Promise<void> {
+    await this.revokeTokens({
+      revokeAccessToken: options.revokeAccessToken,
+      revokeRefreshToken: options.revokeRefreshToken
+    });
     this.tokenManager.clear();
     options.redirectToApp();
   }

@@ -241,10 +241,13 @@ export interface SignOutCallbackOptions {
   redirectToApp: () => void;
 }
 
-export interface SignoutOptions extends SignoutRedirectUrlOptions, SignOutCallbackOptions {
-  accessToken?: AccessToken;
+export interface RevokeTokensOptions {
   revokeAccessToken?: boolean;
   revokeRefreshToken?: boolean;
+}
+
+export interface SignoutOptions extends SignoutRedirectUrlOptions, SignOutCallbackOptions, RevokeTokensOptions {
+  accessToken?: AccessToken;
   refreshToken?: RefreshToken;
   redirectToOkta: (url: string) => void;
 }
