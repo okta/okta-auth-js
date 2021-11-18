@@ -237,11 +237,16 @@ export interface SignoutRedirectUrlOptions {
   state?: string;
 }
 
-export interface SignoutOptions extends SignoutRedirectUrlOptions {
+export interface SignOutCallbackOptions {
+  redirectToApp: () => void;
+}
+
+export interface SignoutOptions extends SignoutRedirectUrlOptions, SignOutCallbackOptions {
   accessToken?: AccessToken;
   revokeAccessToken?: boolean;
   revokeRefreshToken?: boolean;
   refreshToken?: RefreshToken;
+  redirectToOkta: (url: string) => void;
 }
 
 export interface SignoutAPI {

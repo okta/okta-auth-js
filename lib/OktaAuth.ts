@@ -33,6 +33,7 @@ import {
   SigninWithRedirectOptions,
   SigninWithCredentialsOptions,
   SignoutOptions,
+  SignOutCallbackOptions,
   Tokens,
   ForgotPasswordOptions,
   VerifyRecoveryTokenOptions,
@@ -456,12 +457,28 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     return logoutUri;
   }
 
-  async signOutSSO(options: SignoutOptions = {}) {
+  async signOutSSO(options: SignoutOptions) {
     var postLogoutRedirectUri = options.postLogoutRedirectUri
       || this.options.postLogoutRedirectUri;
     const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });
-    // TODO: support both browser and node envs
-    window.location.assign(logoutUri);
+
+    if (logoutUri) {
+      // redirect to Okta to kill the SSO session
+      options.redirectToOkta(logoutUri);
+      // window.location.assign(logoutUri);
+    } else {
+      return this.closeSession() // can throw if the user cannot be signed out
+        .then(() => {
+          this.handleLogoutCallback({ redirectToApp: options.redirectToApp })
+        });
+    }
+  }
+
+  async handleLogoutCallback(options: SignOutCallbackOptions): Promise<void> {
+    await this.revokeAccessToken();
+    await this.revokeAccessToken();
+    this.tokenManager.clear();
+    options.redirectToApp();
   }
 
   // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
@@ -667,13 +684,6 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     } else {
       window.location.replace(originalUri);
     }
-  }
-
-  async handleLogoutRedirect(options: { redirectTo: Function }): Promise<void> {
-    await this.revokeAccessToken();
-    await this.revokeAccessToken();
-    this.tokenManager.clear();
-    options.redirectTo();
   }
 
   isPKCE(): boolean {

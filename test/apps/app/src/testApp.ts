@@ -286,8 +286,8 @@ class TestApp {
 
   async bootstrapLogoutCallback(): Promise<void> {
     this.getSDKInstance(/*{ subscribeAuthStateChange: false }*/);
-    await this.oktaAuth.handleLogoutRedirect({
-      redirectTo: () => window.location.replace(window.location.origin)
+    await this.oktaAuth.handleLogoutCallback({
+      redirectToApp: () => window.location.replace(window.location.origin)
     });
   }
 
@@ -543,8 +543,12 @@ class TestApp {
       });
   }
 
-  logoutRedirect(): void {
-    this.oktaAuth.signOutSSO()
+  async logoutRedirect(): Promise<void> {
+    this.oktaAuth
+      .signOutSSO({
+        redirectToOkta: (logoutUri: string) => window.location.assign(logoutUri),
+        redirectToApp: () => window.location.replace(window.location.origin)
+      })
       .catch(e => {
         console.error('Error during signout & redirect: ', e);
       });
