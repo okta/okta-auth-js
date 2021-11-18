@@ -55,6 +55,10 @@ describe('cross tabs AuthState update', () => {
     handles = await browser.getWindowHandles();
   });
 
+  afterEach(async () => {
+    await browser.reloadSession();
+  });
+
   it('should update login/logout status cross tabs', async () => {
     // assert login status
     for (let i = 0; i < handles.length; i++) {
@@ -99,7 +103,7 @@ describe('cross tabs AuthState update', () => {
         await TestApp.assertLoggedOut();
       } else {
         // other tabs show okta hosted login page
-        OktaLogin.waitForLoad();
+        await OktaLogin.waitForLoad();
       }
     }
   });
