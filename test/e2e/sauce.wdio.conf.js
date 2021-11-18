@@ -195,11 +195,13 @@ exports.config = {
     services: [
       ['sauce', {
         sauceConnect: true,
-        sauceConnectOpts: { noAutodetect: false }
+        sauceConnectOpts: { noAutodetect: false,
+            tunnelIdentifier: 'e2e-tunnel'
+        }
       }],
     ],
     // Framework you want to run your specs with.
-    // The following are supported: Mocha, Jasmine, and Cucumber
+    // The following are supported: Mocha, Jasmine, and Cucumber§
     // see also: https://webdriver.io/docs/frameworks.html
     //
     // Make sure you have the wdio adapter package for the specific framework installed
