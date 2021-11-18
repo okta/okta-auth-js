@@ -33,6 +33,7 @@ import {
   SigninWithRedirectOptions,
   SigninWithCredentialsOptions,
   SignoutOptions,
+  SignOutSsoOptions,
   SignOutCallbackOptions,
   RevokeTokensOptions,
   Tokens,
@@ -472,7 +473,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     return logoutUri;
   }
 
-  async signOutSSO(options: SignoutOptions) {
+  async signOutSSO(options: SignOutSsoOptions) {
     var postLogoutRedirectUri = options.postLogoutRedirectUri
       || this.options.postLogoutRedirectUri;
     const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });

@@ -246,9 +246,12 @@ export interface RevokeTokensOptions {
   revokeRefreshToken?: boolean;
 }
 
-export interface SignoutOptions extends SignoutRedirectUrlOptions, SignOutCallbackOptions, RevokeTokensOptions {
+export interface SignoutOptions extends SignoutRedirectUrlOptions, RevokeTokensOptions {
   accessToken?: AccessToken;
   refreshToken?: RefreshToken;
+}
+
+export interface SignOutSsoOptions extends SignoutOptions, SignOutCallbackOptions {
   redirectToOkta: (url: string) => void;
 }
 
