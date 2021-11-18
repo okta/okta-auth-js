@@ -27,6 +27,7 @@ import {
   parseEmailVerifyCallback,
   IdxStatus,
   IdxTransaction,
+  AuthState,
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -39,14 +40,18 @@ function homeLink(app: TestApp): string {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
 }
 
+function protectedLink(app: TestApp): string {
+  return `
+    <li class="pure-menu-item">
+      <a id="nav-to-protected" href="${app.protectedUrl}" class="pure-menu-link">Navigate to PROTECTED page</a>
+    </li>
+  `;
+}
+
 function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
   let protectedPageLink = '';
   if (!onProtectedPage) {
-    protectedPageLink = `
-      <li class="pure-menu-item">
-        <a id="nav-to-protected" href="${app.protectedUrl}" class="pure-menu-link">Navigate to PROTECTED page</a>
-      </li>
-    `;
+    protectedPageLink = protectedLink(app);
   }
   const useActivationToken = app.config.useInteractionCodeFlow ? `
     <div class="box">
@@ -255,6 +260,7 @@ class TestApp {
     if (idToken || accessToken) {
       content = `
         ${homeLink(this)}
+        ${logoutLink(this)}
         <hr/>
         <strong>You are authenticated</strong>
       `;
@@ -268,6 +274,13 @@ class TestApp {
       this.config.state = 'protected-route-' + Math.round(Math.random() * 1000);
       this.oktaAuth.setOriginalUri(this.protectedUrl, this.config.state);
     }
+
+    // simulate SecureRoute behaviour
+    this.oktaAuth.authStateManager.subscribe((authState: AuthState) => {
+      if (!authState.isAuthenticated) {
+        this.oktaAuth.signInWithRedirect();
+      }
+    });
 
     this._setContent(content);
     this._afterRender('protected');
@@ -748,6 +761,7 @@ class TestApp {
                 <li class="pure-menu-item">
                   <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)" class="pure-menu-link pure-menu-item">Test Concurrent login via token renew failure</a>
                 </li>
+                ${protectedLink(this)}
               </ul>
             </div>
           </div>

@@ -12,6 +12,7 @@
 
 
 import assert from 'assert';
+import OktaLogin from '../pageobjects/OktaLogin';
 import TestApp from '../pageobjects/TestApp';
 import { openPKCE } from '../util/appUtils';
 import { loginPopup } from '../util/loginUtils';
@@ -70,6 +71,36 @@ describe('cross tabs AuthState update', () => {
       await browser.switchToWindow(handles[i]);
       // check if login button is presented
       await TestApp.assertLoggedOut();
+    }
+  });
+
+  it('should update login/logout status for protected page cross tabs', async () => {
+    // assert login status
+    for (let i = 0; i < handles.length; i++) {
+      await browser.switchToWindow(handles[i]);
+      await TestApp.getUserInfo();
+      await TestApp.assertUserInfo();
+      await TestApp.navigateToProtectedPage();
+      // protected page reloads the browser, re-subscribe
+      await TestApp.subscribeToAuthState();
+      await TestApp.startService();
+    }
+
+    // swith back to the first tab
+    await browser.switchToWindow(handles[0]);
+    // logout in current tab (the last tab)
+    await TestApp.logoutRedirect();
+
+    // assert logout status
+    for (let i = 0; i < handles.length; i++) {
+      await browser.switchToWindow(handles[i]);
+      if (i === 0) {
+        // the first tab show sign buttons
+        await TestApp.assertLoggedOut();
+      } else {
+        // other tabs show okta hosted login page
+        OktaLogin.waitForLoad();
+      }
     }
   });
 
