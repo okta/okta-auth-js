@@ -912,7 +912,7 @@ if (authClient.isLoginRedirect()) {
 
 ### `signOut()`
 
-> :no_entry: [DEPRECATED] This method causes issues scenario when uses with `SecureRoute` component from Okta's downstream client SDKs in multiple tabs. Please use [signOutSSO](#signoutsso) with [handleLogoutCallback](#handlelogoutcallback) together to achieve same Okta SSO session signOut experience.
+> :no_entry: [DEPRECATED] This method causes issues when uses with `SecureRoute` component from Okta's downstream client SDKs in multiple tabs scenarios. Please use [signOutSSO](#signoutsso) with [handleLogoutCallback](#handlelogoutcallback) together to achieve the same Okta SSO session signOut experience.
 
 > :hourglass: async
 
@@ -1000,7 +1000,7 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 
 After removing the Okta SSO session, in most scenarios you will also want to clear and revoke the tokens to keep your application secure. [handleLogoutCallback](#handlelogoutcallback) method is provided for this purpose. It helps you handle the tokens and redirect the users to the desired post logout route.
 
-The steps:
+The logout steps:
 1. Call [signOutSSO](#signoutSSO) method to start the process. This method redirects the page to Okta to close the SSO session.
     ```javascript
     oktaAuth.signOutSSO({
