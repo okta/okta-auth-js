@@ -11,7 +11,6 @@
  */
 
 
-export * from './FlowMonitor';
-export * from './RegistrationFlowMonitor';
-export * from './AuthenticationFlowMonitor';
-export * from './PasswordRecoveryFlowMonitor';
+import * as remediators from '../remediators';
+
+export type RemediationFlow = Record<string, typeof remediators.Remediator>;

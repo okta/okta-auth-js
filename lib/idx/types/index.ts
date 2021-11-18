@@ -12,15 +12,19 @@
 
 
 import { InteractOptions } from '../interact';
+import { IntrospectOptions } from '../introspect';
 import { APIError, Tokens } from '../../types';
 import { IdxTransactionMeta } from '../../types/Transaction';
 import { IdxAuthenticator, IdxMessage, IdxOption, IdxResponse } from './idx-js';
+import { FlowIdentifier } from './FlowIdentifier';
 
 export { IdxMessage } from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
 export { RegistrationOptions } from '../register';
 export { PasswordRecoveryOptions } from '../recoverPassword';
+export { ProceedOptions } from '../proceed';
 export { CancelOptions } from '../cancel';
+export { FlowIdentifier };
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
@@ -74,7 +78,9 @@ export interface IdxTransaction {
   _idxResponse?: IdxResponse; // Temporary for widget conversion. Will not be supported long-term. OKTA-418165
 }
 
-export type IdxOptions = InteractOptions;
+export type IdxOptions = InteractOptions & IntrospectOptions & {
+  flow?: FlowIdentifier;
+};
 
 export type Authenticator = {
   key: string;

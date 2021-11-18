@@ -15,26 +15,26 @@
 import { interact } from './interact';
 import { introspect } from './introspect';
 import { remediate } from './remediate';
-import { FlowMonitor } from './flowMonitors';
+import { FlowMonitor, RemediationFlow } from './flow';
 import * as remediators from './remediators';
 import { AuthSdkError } from '../errors';
 import { 
   OktaAuth,
-  IdxOptions,
   IdxStatus,
   IdxTransaction,
   IdxFeature,
   NextStep,
+  FlowIdentifier,
 } from '../types';
 import { IdxResponse, IdxRemediation } from './types/idx-js';
 import { getSavedTransactionMeta } from './transactionMeta';
+import { ProceedOptions  } from './proceed';
 
-export type RemediationFlow = Record<string, typeof remediators.Remediator>;
-export interface RunOptions {
-  flow?: RemediationFlow;
-  actions?: string[];
+export type RunOptions = ProceedOptions & {
+  flow?: FlowIdentifier;
+  remediators?: RemediationFlow;
   flowMonitor?: FlowMonitor;
-  stateTokenExternalId?: string;
+  actions?: string[];
 }
 
 function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
@@ -80,7 +80,7 @@ function getAvailableSteps(remediations: IdxRemediation[]): NextStep[] {
 
 export async function run(
   authClient: OktaAuth, 
-  options: RunOptions & IdxOptions,
+  options: RunOptions = {},
 ): Promise<IdxTransaction> {
   let tokens;
   let nextStep;
@@ -97,13 +97,20 @@ export async function run(
 
   try {
 
-    const { stateTokenExternalId, state } = options;
-    if (stateTokenExternalId) {
-      // Email verify callback: retrieve saved interactionHandle, if possible
-      metaFromResp = getSavedTransactionMeta(authClient, { state });
-      interactionHandle = metaFromResp?.interactionHandle; // may be undefined
-    } else {
-      // Start/resume the flow. Will request a new interactionHandle if none is found in storage.
+    const { flow, stateTokenExternalId, state } = options;
+
+    // Only one flow can be operating at a time
+    if (flow) {
+      authClient.idx.setFlow(flow);
+    }
+
+    // Try to resume saved transaction
+    metaFromResp = getSavedTransactionMeta(authClient, { state });
+    interactionHandle = metaFromResp?.interactionHandle; // may be undefined
+
+    if (!interactionHandle && !stateTokenExternalId) {
+      // start a new transaction
+      authClient.transactionManager.clear();
       const interactResponse = await interact(authClient, options); 
       interactionHandle = interactResponse.interactionHandle;
       metaFromResp = interactResponse.meta;
@@ -112,7 +119,7 @@ export async function run(
     // Introspect to get idx response
     idxResponse = await introspect(authClient, { interactionHandle, stateTokenExternalId });
 
-    if (!options.flow && !options.actions) {
+    if (!options.remediators && !options.actions) {
       // handle start transaction
       meta = metaFromResp;
       enabledFeatures = getEnabledFeatures(idxResponse);

@@ -23,7 +23,7 @@ module.exports = {
       new webpack.DefinePlugin({
         'process.env': env,
       }),
-      new BundleAnalyzerPlugin()
+      new BundleAnalyzerPlugin({ openAnalyzer: false })
     ]);
 
     config.mode = 'development';

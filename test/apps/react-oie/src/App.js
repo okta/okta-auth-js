@@ -27,7 +27,6 @@ const formMetaMapper = (nextStep) => {
 
 export default function App() {
   const history = useHistory();
-  const flowMethodRef = useRef('');
   const [transaction, setTransaction] = useState(null);
   const [inputValues, setInputValues] = useState({});
   const [authState, setAuthState] = useState(null);
@@ -62,6 +61,16 @@ export default function App() {
     if (oktaAuth.isEmailVerifyCallback(window.location.search)) {
       return handleEmailVerifyCallback();
     }
+
+    const resumeTransaction = async () => {
+      const newTransaction = await oktaAuth.idx.proceed();
+      setTransaction(newTransaction);
+    }
+
+    if (oktaAuth.idx.canProceed()) {
+      resumeTransaction();
+    }
+
   }, [history, setAuthState, setTransaction]);
 
   const handleChange = ({ target: { name, value } }) => setInputValues({
@@ -72,7 +81,7 @@ export default function App() {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    const newTransaction = await oktaAuth.idx[flowMethodRef.current](inputValues);
+    const newTransaction = await oktaAuth.idx.proceed(inputValues);
     console.log('Transaction:', newTransaction);
 
     setInputValues({});
@@ -84,7 +93,7 @@ export default function App() {
   };
 
   const handleSkip = async () => {
-    const newTransaction = await oktaAuth.idx[flowMethodRef.current]({ skip: true });
+    const newTransaction = await oktaAuth.idx.proceed({ skip: true });
     setTransaction(newTransaction);
   };
 
@@ -101,7 +110,6 @@ export default function App() {
     const newTransaction = flowMethod === 'idp' 
       ? await oktaAuth.idx.startTransaction() 
       : await oktaAuth.idx[flowMethod]();
-    flowMethodRef.current = flowMethod;
     setTransaction(newTransaction);
   };
 
@@ -121,16 +129,17 @@ export default function App() {
     );
   }
 
+  const topNav = (
+    <div>
+      <button onClick={startIdxFlow('authenticate')}>Login</button>
+      <button onClick={startIdxFlow('recoverPassword')}>Recover Password</button>
+      <button onClick={startIdxFlow('register')}>Registration</button>
+      <button onClick={startIdxFlow('idp')}>IDP</button>
+    </div>
+  );
   if (!transaction) {
-    // initla page
-    return (
-      <div>
-        <button onClick={startIdxFlow('authenticate')}>Login</button>
-        <button onClick={startIdxFlow('recoverPassword')}>Recover Password</button>
-        <button onClick={startIdxFlow('register')}>Registration</button>
-        <button onClick={startIdxFlow('idp')}>IDP</button>
-      </div>
-    );
+    // initial page
+    return topNav;
   }
 
   const { status, nextStep, error, messages, availableSteps, tokens } = transaction;
@@ -167,7 +176,11 @@ export default function App() {
   }
 
   const { name, inputs, select, contextualData, canSkip } = formMetaMapper(nextStep);
+  const meta = oktaAuth.transactionManager.load();
   return (
+    <div>
+    {topNav}
+    <strong>{meta.flow || 'default'}</strong>
     <form onSubmit={handleSubmit}>
       <div className="messages">
         { messages && messages.map(message => (<div key={message.message}>{message.message}</div>)) }
@@ -203,5 +216,6 @@ export default function App() {
       <button type="submit">Submit</button>
       <button type="button" onClick={handleCancel}>Cancel</button>
     </form>
+    </div>
   );
 }

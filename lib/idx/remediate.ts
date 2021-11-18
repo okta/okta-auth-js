@@ -14,7 +14,8 @@
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
 import { Remediator, RemediationValues } from './remediators';
-import { RunOptions, RemediationFlow } from './run';
+import { RemediationFlow } from './flow';
+import { RunOptions } from './run';
 import { NextStep, IdxMessage } from './types';
 import { 
   IdxResponse,  
@@ -35,17 +36,17 @@ export function getRemediator(
   values: RemediationValues,
   options: RunOptions,
 ): Remediator {
-  const { flow, flowMonitor } = options;
+  const { remediators, flowMonitor } = options;
 
   let remediator;
   const remediatorCandidates = [];
   for (let remediation of idxRemediations) {
-    const isRemeditionInFlow = Object.keys(flow).includes(remediation.name);
+    const isRemeditionInFlow = Object.keys(remediators).includes(remediation.name);
     if (!isRemeditionInFlow) {
       continue;
     }
       
-    const T = flow[remediation.name];
+    const T = remediators[remediation.name];
     remediator = new T(remediation, values);
     if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations, values)) {
       if (remediator.canRemediate()) {
@@ -87,10 +88,10 @@ function canResendFn(idxResponse: IdxResponse) {
 }
 
 function getIdxMessages(
-  idxResponse: IdxResponse, flow: RemediationFlow
+  idxResponse: IdxResponse, remediators: RemediationFlow
 ): IdxMessage[] {
   let messages = [];
-  if (!flow) {
+  if (!remediators) {
     return messages;
   }
 
@@ -104,7 +105,7 @@ function getIdxMessages(
 
   // Handle field messages for current flow
   for (let remediation of neededToProceed) {
-    const T = flow[remediation.name];
+    const T = remediators[remediation.name];
     if (!T) {
       continue;
     }
@@ -131,7 +132,7 @@ function getNextStep(
   };
 }
 
-function handleIdxError(e, flow, remediator?) {
+function handleIdxError(e, remediators, remediator?) {
   // Handle idx messages
   const idxState: IdxResponse = isIdxResponse(e) ? e : null;
   if (!idxState) {
@@ -139,7 +140,7 @@ function handleIdxError(e, flow, remediator?) {
     throw e;
   }
   const terminal = isTerminalResponse(idxState);
-  const messages = getIdxMessages(idxState, flow);
+  const messages = getIdxMessages(idxState, remediators);
   if (terminal) {
     return { terminal, messages };
   } else {
@@ -169,7 +170,7 @@ export async function remediate(
   options: RunOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
-  const { flow, flowMonitor } = options;
+  const { remediators, flowMonitor } = options;
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -178,7 +179,7 @@ export async function remediate(
 
   // Reach to terminal state
   const terminal = isTerminalResponse(idxResponse);
-  const messages = getIdxMessages(idxResponse, flow);
+  const messages = getIdxMessages(idxResponse, remediators);
   if (terminal) {
     return { terminal, messages };
   }
@@ -196,7 +197,7 @@ export async function remediate(
         try {
           idxResponse = await idxResponse.actions[action]();
         } catch (e) {
-          return handleIdxError(e, flow);
+          return handleIdxError(e, remediators);
         }
         if (action === 'cancel') {
           return { canceled: true };
@@ -243,7 +244,7 @@ export async function remediate(
 
     // Reach to terminal state
     const terminal = isTerminalResponse(idxResponse);
-    const messages = getIdxMessages(idxResponse, flow);
+    const messages = getIdxMessages(idxResponse, remediators);
     if (terminal) {
       return { terminal, messages };
     }
@@ -259,6 +260,6 @@ export async function remediate(
     values = remediator.getValuesAfterProceed();
     return remediate(idxResponse, values, options); // recursive call
   } catch (e) {
-    return handleIdxError(e, flow, remediator);
+    return handleIdxError(e, remediators, remediator);
   }
 }

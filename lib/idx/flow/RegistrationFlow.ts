@@ -11,13 +11,21 @@
  */
 
 
-export * from './authenticate';
-export * from './cancel';
-export * from './interact';
-export * from './introspect';
-export * from './proceed';
-export * from './register';
-export * from './recoverPassword';
-export * from './handleInteractionCodeRedirect';
-export * from './startTransaction';
-export * from './transactionMeta';
+import { RemediationFlow } from './RemediationFlow';
+import { 
+  SelectEnrollProfile,
+  EnrollProfile,
+  SelectAuthenticatorEnroll,
+  EnrollAuthenticator,
+  AuthenticatorEnrollmentData,
+  Skip,
+} from '../remediators';
+
+export const RegistrationFlow: RemediationFlow = {
+  'select-enroll-profile': SelectEnrollProfile,
+  'enroll-profile': EnrollProfile,
+  'authenticator-enrollment-data': AuthenticatorEnrollmentData,
+  'select-authenticator-enroll': SelectAuthenticatorEnroll,
+  'enroll-authenticator': EnrollAuthenticator,
+  'skip': Skip,
+};

@@ -69,6 +69,9 @@ describe('idx/recoverPassword', () => {
         clear: () => {},
         save: () => {},
         saveIdxResponse: () => {}
+      },
+      idx: {
+        setFlow: () => {}
       }
     };
 

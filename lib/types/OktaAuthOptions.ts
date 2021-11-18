@@ -16,8 +16,8 @@ import { HttpRequestClient } from './http';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
 import { SimpleStorage } from './Storage';
+import { FlowIdentifier } from '../idx/types';
 import OktaAuth from '../OktaAuth';
-
 export interface TokenManagerOptions {
   autoRenew?: boolean;
   autoRemove?: boolean;
@@ -28,12 +28,10 @@ export interface TokenManagerOptions {
   syncStorage?: boolean;
   _storageEventDelay?: number;
 }
-
 export interface CustomUserAgent {
   template?: string;
   value?: string;
 }
-
 export interface CustomUrls {
   issuer?: string;
   authorizeUrl?: string;
@@ -42,7 +40,6 @@ export interface CustomUrls {
   revokeUrl?: string;
   logoutUrl?: string;
 }
-
 export interface OktaAuthOptions extends CustomUrls {
   pkce?: boolean;
   clientId?: string;
@@ -69,6 +66,7 @@ export interface OktaAuthOptions extends CustomUrls {
   devMode?: boolean;
   storageManager?: StorageManagerOptions;
   transactionManager?: TransactionManagerOptions;
+  flow?: FlowIdentifier;
 
   // For server-side web applications ONLY!
   clientSecret?: string;

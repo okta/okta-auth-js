@@ -58,6 +58,7 @@ jest.mock('../../../lib/idx/introspect', () => {
 const mocked = {
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect'),
+  startTransaction: require('../../../lib/idx/startTransaction')
 };
 
 describe('idx/register', () => {
@@ -99,6 +100,9 @@ describe('idx/register', () => {
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
+      },
+      idx: {
+        setFlow: () => {}
       }
     };
     jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 
@@ -237,21 +241,33 @@ describe('idx/register', () => {
     };
   });
   
-  it('throws an error if registration is not supported', async () => {
-    const { authClient, transactionMeta } = testContext;
-    jest.spyOn(authClient.transactionManager, 'exists').mockReturnValue(false);
-    authClient.token.prepareTokenParams = jest.fn().mockResolvedValue(transactionMeta);
-    const identifyResponse = IdxResponseFactory.build({
-      neededToProceed: [
-        IdentifyRemediationFactory.build(),
-        // does not contain select-enroll-profile
-      ]
+  describe('feature detection', () => {
+    it('throws an error if registration is not supported', async () => {
+      const { authClient, transactionMeta } = testContext;
+      jest.spyOn(authClient.transactionManager, 'exists').mockReturnValue(false);
+      authClient.token.prepareTokenParams = jest.fn().mockResolvedValue(transactionMeta);
+      const identifyResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          IdentifyRemediationFactory.build(),
+          // does not contain select-enroll-profile
+        ]
+      });
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
+      const res = await register(authClient, {});
+      expect(res.status).toBe(IdxStatus.FAILURE);
+      expect(res.error).toBeInstanceOf(AuthSdkError);
+      expect(res.error.errorSummary).toBe('Registration is not supported based on your current org configuration.');
     });
-    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
-    const res = await register(authClient, {});
-    expect(res.status).toBe(IdxStatus.FAILURE);
-    expect(res.error).toBeInstanceOf(AuthSdkError);
-    expect(res.error.errorSummary).toBe('Registration is not supported based on your current org configuration.');
+    it('calls startTransaction, setting flow to "register"', async () => {
+      const { authClient } = testContext;
+      jest.spyOn(authClient.transactionManager, 'exists').mockReturnValue(false);
+      jest.spyOn(mocked.startTransaction, 'startTransaction').mockReturnValue({ enabledFeatures: [] });
+      const res = await register(authClient, {});
+      expect(res.status).toBe(IdxStatus.FAILURE);
+      expect(res.error).toBeInstanceOf(AuthSdkError);
+      expect(res.error.errorSummary).toBe('Registration is not supported based on your current org configuration.');
+      expect(mocked.startTransaction.startTransaction).toHaveBeenCalledWith(authClient, { flow: 'register' });
+    });
   });
 
   describe('enroll profile', () => {

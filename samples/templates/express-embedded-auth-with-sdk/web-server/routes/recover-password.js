@@ -24,8 +24,7 @@ const router = express.Router();
 // entry route
 router.get('/recover-password', (req, res) => {
   req.setFlowStates({
-    entry: '/recover-password',
-    idxMethod: 'recoverPassword'
+    entry: '/recover-password'
   });
 
   renderTemplate(req, res, 'recover-password', {

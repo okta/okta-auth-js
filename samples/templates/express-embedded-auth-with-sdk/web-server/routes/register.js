@@ -23,8 +23,7 @@ const router = express.Router();
 // entry route
 router.get('/register', async (req, res, next) => {
   req.setFlowStates({
-    entry: '/register',
-    idxMethod: 'register'
+    entry: '/register'
   });
   const authClient = getAuthClient(req);
   const trans = await authClient.idx.register();

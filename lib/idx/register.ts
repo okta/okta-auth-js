@@ -11,23 +11,17 @@
  */
 
 
-import { run, RemediationFlow } from './run';
+import { run } from './run';
 import { transactionMetaExist } from './transactionMeta';
 import { startTransaction } from './startTransaction';
 import { 
-  SelectEnrollProfile,
-  EnrollProfile,
   EnrollProfileValues,
-  SelectAuthenticatorEnroll,
   SelectAuthenticatorEnrollValues,
-  EnrollAuthenticator,
   EnrollAuthenticatorValues,
-  AuthenticatorEnrollmentData,
   AuthenticatorEnrollmentDataValues,
-  Skip,
   SkipValues,
 } from './remediators';
-import { RegistrationFlowMonitor } from './flowMonitors';
+import { getFlowSpecification } from './flow';
 import { AuthSdkError } from '../errors';
 import { 
   IdxOptions, 
@@ -36,15 +30,6 @@ import {
   IdxFeature,
   IdxStatus,
 } from '../types';
-
-const flow: RemediationFlow = {
-  'select-enroll-profile': SelectEnrollProfile,
-  'enroll-profile': EnrollProfile,
-  'authenticator-enrollment-data': AuthenticatorEnrollmentData,
-  'select-authenticator-enroll': SelectAuthenticatorEnroll,
-  'enroll-authenticator': EnrollAuthenticator,
-  'skip': Skip,
-};
 
 export type RegistrationOptions = IdxOptions 
   & EnrollProfileValues 
@@ -58,17 +43,16 @@ export async function register(
 ): Promise<IdxTransaction> {
   // Only check at the beginning of the transaction
   if (!transactionMetaExist(authClient)) {
-    const { enabledFeatures } = await startTransaction(authClient, options);
+    const { enabledFeatures } = await startTransaction(authClient, { flow: 'register', ...options });
     if (enabledFeatures && !enabledFeatures.includes(IdxFeature.REGISTRATION)) {
       const error = new AuthSdkError('Registration is not supported based on your current org configuration.');
       return { status: IdxStatus.FAILURE, error };
     }
   }
-  
-  const flowMonitor = new RegistrationFlowMonitor(authClient);
+
+  const flowSpec = getFlowSpecification(authClient, 'register');
   return run(authClient, { 
     ...options, 
-    flow,
-    flowMonitor,
+    ...flowSpec
   });
 }
