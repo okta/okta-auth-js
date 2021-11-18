@@ -54,7 +54,7 @@ describe('E2E login', () => {
         if (process.env.ORG_OIE_ENABLED && flow === 'pkce') {
           options = Object.assign({ useInteractionCodeFlow: true }, options);
         }
-        await bootstrap(options, true);
+        await bootstrap(options);
         await loginWidget(flow, true);
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
