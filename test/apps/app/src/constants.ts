@@ -12,7 +12,8 @@
 
 
 const MOUNT_PATH = '/';
-const CALLBACK_PATH = `/login/callback`;
+const LOGIN_CALLBACK_PATH = '/login/callback';
+const LOGOUT_CALLBACK_PATH = '/logout/callback';
 const STORAGE_KEY = 'okta-auth-js-test-app';
 
-export { MOUNT_PATH, CALLBACK_PATH, STORAGE_KEY };
+export { MOUNT_PATH, LOGIN_CALLBACK_PATH, LOGOUT_CALLBACK_PATH, STORAGE_KEY };

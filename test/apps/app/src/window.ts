@@ -35,7 +35,8 @@ declare global {
     onSubmitForm: (event: Event) => void;
     onFormData: (event: FormDataEvent) => void;
     bootstrapLanding: () => void;
-    bootstrapCallback: () => void;
+    bootstrapLoginCallback: () => void;
+    bootstrapLogoutCallback: () => void;
     getWidgetConfig: () => any;
     getConfig: () => any;
     toQueryString: (obj: any) => string;
@@ -112,10 +113,17 @@ Object.assign(window, {
   },
 
   // Callback, read config from storage
-  bootstrapCallback: function(): void {
+  bootstrapLoginCallback: function(): void {
     config = getConfigFromStorage();
     mount();
-    app.bootstrapCallback();
+    app.bootstrapLoginCallback();
+  },
+
+  // Callback, read config from storage
+  bootstrapLogoutCallback: function(): void {
+    config = getConfigFromStorage();
+    mount();
+    app.bootstrapLogoutCallback();
   },
 
   bootstrapProtected: function(): void {

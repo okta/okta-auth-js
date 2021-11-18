@@ -456,6 +456,14 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     return logoutUri;
   }
 
+  async signOutSSO(options: SignoutOptions = {}) {
+    var postLogoutRedirectUri = options.postLogoutRedirectUri
+      || this.options.postLogoutRedirectUri;
+    const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });
+    // TODO: support both browser and node envs
+    window.location.assign(logoutUri);
+  }
+
   // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
   async signOut(options?: SignoutOptions) {
     options = Object.assign({}, options);
@@ -659,6 +667,13 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     } else {
       window.location.replace(originalUri);
     }
+  }
+
+  async handleLogoutRedirect(options: { redirectTo: Function }): Promise<void> {
+    await this.revokeAccessToken();
+    await this.revokeAccessToken();
+    this.tokenManager.clear();
+    options.redirectTo();
   }
 
   isPKCE(): boolean {
