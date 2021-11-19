@@ -33,8 +33,8 @@ describe('E2E login', () => {
 
   flows.forEach(flow => {
     describe(flow + ' flow', () => {
-      async function bootstrap(options = {}, openInNewWindow) {
-        (flow === 'pkce') ? await openPKCE(options, openInNewWindow) : await openImplicit(options, openInNewWindow);
+      async function bootstrap(options = {}) {
+        (flow === 'pkce') ? await openPKCE(options) : await openImplicit(options);
       }
 
       it('can login using signin widget (no redirect)', async () => {

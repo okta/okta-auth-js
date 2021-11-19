@@ -65,7 +65,7 @@ test_suites:
     - name: e2e-saucelabs 
       script_path: ../okta-auth-js/scripts
       sort_order: '8'
-      timeout: '60'
+      timeout: '20'
       script_name: e2e-saucelabs
       criteria: MERGE
       queue_name: small
