@@ -19,5 +19,8 @@ export async function startTransaction(
   authClient: OktaAuth, 
   options: IdxOptions = {}
 ): Promise<IdxTransaction> {
+  // Clear IDX response cache and saved transaction meta (if any)
+  authClient.transactionManager.clear();
+
   return run(authClient, options);
 }

@@ -96,6 +96,9 @@ describe('idx/authenticate', () => {
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
+      },
+      idx: {
+        setFlow: () => {}
       }
     };
     jest.spyOn(mocked.interact, 'interact').mockResolvedValue({

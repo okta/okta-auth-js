@@ -61,6 +61,9 @@ describe('idx/transactionMeta', () => {
       },
       token: {
         prepareTokenParams: () => Promise.resolve({})
+      },
+      idx: {
+        getFlow: () => {}
       }
     };
     testContext = {
@@ -87,6 +90,18 @@ describe('idx/transactionMeta', () => {
       assertIsPromise(res);
       return res;
     });
+    it('saves the configured flow', async () => {
+      const { authClient } = testContext;
+      const flow = 'fake';
+      jest.spyOn(authClient.idx, 'getFlow').mockReturnValue(flow);
+      const res = await createTransactionMeta(authClient);
+      expect(res.flow).toBe(flow);
+    });
+    it('saves the configured issuer', async () => {
+      const { authClient } = testContext;
+      const res = await createTransactionMeta(authClient);
+      expect(res.issuer).toBe(authClient.options.issuer);
+    });
   });
 
   describe('getTransactionMeta', () => {
@@ -106,6 +121,7 @@ describe('idx/transactionMeta', () => {
         const res = await getTransactionMeta(testContext.authClient);
         const issuer = testContext.authParams.issuer;
         expect(res).toEqual(Object.assign({}, testContext.newMeta, {
+          flow: 'default',
           issuer,
           urls: {
             authorizeUrl: `${issuer}/oauth2/v1/authorize`,
@@ -147,6 +163,7 @@ describe('idx/transactionMeta', () => {
           const res = await getTransactionMeta(testContext.authClient);
           const issuer = testContext.authParams.issuer;
           expect(res).toEqual(Object.assign({}, testContext.newMeta, {
+            flow: 'default',
             issuer,
             urls: {
               authorizeUrl: `${issuer}/oauth2/v1/authorize`,
@@ -209,14 +226,43 @@ describe('idx/transactionMeta', () => {
       expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(false);
     });
 
-    it('returns true if clientId, redirectId and issuer match', () => {
-      testContext.transactionMeta.clientId = 'abc';
-      testContext.authParams.clientId = 'abc';
-      testContext.transactionMeta.redirectUri = 'abc';
-      testContext.authParams.redirectUri = 'abc';
-      testContext.transactionMeta.issuer = 'abc';
-      testContext.authParams.issuer = 'abc';
-      expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+    describe('matching clientId, redirectId, issuer', () => {
+      beforeEach(() => {
+        const { transactionMeta, authParams } = testContext;
+        const clientId = 'abc';
+        const redirectUri = '123';
+        const issuer = 'lol';
+        Object.assign(transactionMeta, { clientId, redirectUri, issuer });
+        Object.assign(authParams, { clientId, redirectUri, issuer });
+      });
+      it('by default, returns true', () => {
+        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+      });
+      it('returns false if configured flow does not match', () => {
+        testContext.transactionMeta.flow = 'x';
+        testContext.authParams.flow = 'y';
+        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(false);
+      });
+      it('does not validate flow when flow = "default"', () => {
+        testContext.transactionMeta.flow = 'x';
+        testContext.authParams.flow = 'default';
+        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+      });
+      it('does not validate flow when flow = "proceed"', () => {
+        testContext.transactionMeta.flow = 'x';
+        testContext.authParams.flow = 'proceed';
+        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+      });
+      it('does not validate flow when flow is not set', () => {
+        testContext.transactionMeta.flow = 'x';
+        testContext.authParams.flow = undefined;
+        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+      });
+      it('returns false if configured state does not match', () => {
+        testContext.transactionMeta.state = 'x';
+        testContext.authParams.state = 'y';
+        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(false);
+      });
     });
 
   });

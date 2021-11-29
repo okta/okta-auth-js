@@ -13,10 +13,8 @@ function submitChallengeEmail() {
   hideMfa();
 
   // IDX
-  // TODO: email can be used for authentication or recovery.
-  // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
-  // Here we are assuming email is being used for recovery. This likely breaks email as authenticator
-  authClient.idx.recoverPassword({ verificationCode: passCode })
+  // email can be used for authentication or recovery
+  authClient.idx.proceed({ verificationCode: passCode })
   .then(handleTransaction)
   .catch(showError);
 }

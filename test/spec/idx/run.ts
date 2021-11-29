@@ -67,15 +67,19 @@ describe('idx/run', () => {
       transactionManager: {
         load: () => transactionMeta,
         clear: () => {},
-        saveIdxResponse: () => {}
+        saveIdxResponse: () => {},
+        clearIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       },
-      options: {}
+      options: {},
+      idx: {
+        setFlow: () => {}
+      }
     };
     const options = {
-      flow: {
+      remediators: {
         'fake': true
       },
       actions: [],
@@ -91,6 +95,60 @@ describe('idx/run', () => {
       authClient,
       options
     };
+  });
+
+  describe('flow', () => {
+    it('by default, does not set the flow', async () => {
+      const { authClient, options } = testContext;
+      jest.spyOn(authClient.idx, 'setFlow');
+      await run(authClient, options);
+      expect(authClient.idx.setFlow).not.toHaveBeenCalled();
+    });
+  
+    it('if flow is set in options, it sets the flow on the authClient', async () => {
+      const { authClient, options } = testContext;
+      options.flow = 'fake';
+      jest.spyOn(authClient.idx, 'setFlow');
+      await run(authClient, options);
+      expect(authClient.idx.setFlow).toHaveBeenCalledWith('fake');
+    });
+  });
+
+  describe('with saved transaction', () => {
+    beforeEach(() => {
+      const { transactionMeta } = testContext;
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+    });
+    it('if saved meta has no interactionHandle, will call interact', async () => {
+      const { authClient } = testContext;
+      await run(authClient);
+      expect(mocked.interact.interact).toHaveBeenCalled();
+    });
+    it('if saved meta has interactionHandle, does not call interact', async () => {
+      const { authClient, transactionMeta } = testContext;
+      transactionMeta.interactionHandle = 'fake';
+      await run(authClient);
+      expect(mocked.interact.interact).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('no saved transaction', () => {
+    beforeEach(() => {
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(undefined);
+    });
+    it('clears saved transaction data and calls interact', async () => {
+      const { authClient } = testContext;
+      jest.spyOn(authClient.transactionManager, 'clear');
+      await run(authClient);
+      expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
+      expect(mocked.interact.interact).toHaveBeenCalled();
+    });
+    it('if stateTokenExternalId is passed in options, does not call interact', async () => {
+      const { authClient } = testContext;
+      const stateTokenExternalId = 'fake';
+      await run(authClient, { stateTokenExternalId });
+      expect(mocked.interact.interact).not.toHaveBeenCalled();
+    });
   });
 
   it('returns transaction', async () => {
@@ -149,11 +207,16 @@ describe('idx/run', () => {
 
   describe('response is not terminal', () => {
     beforeEach(() => {
-      testContext.remediateResponse.terminal = false;
+      const { remediateResponse, transactionMeta } = testContext;
+      remediateResponse.terminal = false;
+      // load from saved transaction
+      transactionMeta.interactionHandle = 'fake';
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
     });
 
     it('does not clear transaction storage', async () => {
       const { authClient, options } = testContext;
+
       jest.spyOn(authClient.transactionManager, 'clear');
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
@@ -167,14 +230,18 @@ describe('idx/run', () => {
 
   describe('response is terminal', () => {
     beforeEach(() => {
-      testContext.remediateResponse.terminal = true;
+      const { remediateResponse, transactionMeta } = testContext;
+      remediateResponse.terminal = true;
+      // load from saved transaction
+      transactionMeta.interactionHandle = 'fake';
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
     });
 
     it('clears transaction storage', async () => {
       const { authClient, options } = testContext;
       jest.spyOn(authClient.transactionManager, 'clear');
       const res = await run(authClient, options);
-      expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
+      expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
       expect(res).toEqual({
         _idxResponse: expect.any(Object),
         nextStep: 'remediate-nextStep',

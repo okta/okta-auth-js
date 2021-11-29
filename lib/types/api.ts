@@ -19,11 +19,13 @@ import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
 import { TokenManagerInterface } from './TokenManager';
 import { OktaUserAgent } from '../OktaUserAgent';
+import { FlowIdentifier } from '../idx/types';
 
 import { 
   AuthenticationOptions, 
   RegistrationOptions as IdxRegistrationOptions,
   PasswordRecoveryOptions,
+  ProceedOptions,
   CancelOptions,
   IdxOptions,
   IdxTransaction,
@@ -36,11 +38,13 @@ export interface OktaAuth {
   userAgent: string;
   getIssuerOrigin(): string;
   getOriginalUri(): string;
-
+  
   _oktaUserAgent: OktaUserAgent;
   storageManager: StorageManager;
   transactionManager: TransactionManager;
   tokenManager: TokenManagerInterface;
+
+  idx: IdxAPI;
 
   // Browser only
   features?: FeaturesAPI;
@@ -265,8 +269,12 @@ export interface IdxAPI {
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
   authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;
   register: (options?: IdxRegistrationOptions) => Promise<IdxTransaction>;
+  proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
   startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;
   recoverPassword: (options?: PasswordRecoveryOptions) => Promise<IdxTransaction>;
-  handleInteractionCodeRedirect: (url: string) => Promise<void>; 
+  handleInteractionCodeRedirect: (url: string) => Promise<void>;
+  getFlow(): FlowIdentifier;
+  setFlow(flow: FlowIdentifier): void;
+  canProceed(options?: { state?: string }): boolean;
 }

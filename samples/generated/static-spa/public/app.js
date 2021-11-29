@@ -595,10 +595,7 @@ function resumeTransaction(options) {
   }
 
   if (authClient.transactionManager.exists()) {
-    // TODO: we may be in either authenticate or recoverPassword flow
-    // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
-    // Here we assume we are resuming an authenticate flow, but this could be wrong.
-    return authClient.idx.authenticate(options)
+    return authClient.idx.proceed(options)
       .then(handleTransaction)
       .catch(showError);
   }
@@ -1165,12 +1162,8 @@ function selectMfaFactorForVerification(index) {
     return selectMfaFactorForVerificationAuthn(index);
   }
 
-  // IDX
-  // TODO: we may be in either authentication or recovery flow
-  // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
-  // Here we are assuming we are doing authentication, but this may cause issues with recovery
   const authenticator = appState.transaction.nextStep.options[index].value;
-  authClient.idx.authenticate({ authenticator })
+  authClient.idx.proceed({ authenticator })
     .then(handleTransaction)
     .catch(showError);
 }
@@ -1367,10 +1360,8 @@ function submitChallengeEmail() {
   hideMfa();
 
   // IDX
-  // TODO: email can be used for authentication or recovery.
-  // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
-  // Here we are assuming email is being used for recovery. This likely breaks email as authenticator
-  authClient.idx.recoverPassword({ verificationCode: passCode })
+  // email can be used for authentication or recovery
+  authClient.idx.proceed({ verificationCode: passCode })
   .then(handleTransaction)
   .catch(showError);
 }

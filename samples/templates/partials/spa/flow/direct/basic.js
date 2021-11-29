@@ -12,10 +12,7 @@ function resumeTransaction(options) {
   {{/if}}
 
   if (authClient.transactionManager.exists()) {
-    // TODO: we may be in either authenticate or recoverPassword flow
-    // ExpressJS sample uses "idxMethod" in persistent storage to workaround not knowing which flow we are on
-    // Here we assume we are resuming an authenticate flow, but this could be wrong.
-    return authClient.idx.authenticate(options)
+    return authClient.idx.proceed(options)
       .then(handleTransaction)
       .catch(showError);
   }

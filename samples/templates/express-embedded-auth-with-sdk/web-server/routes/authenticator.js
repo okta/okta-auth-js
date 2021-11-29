@@ -39,17 +39,19 @@ router.get('/select-authenticator', (req, res) => {
 });
 
 router.post('/select-authenticator', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
-  const { authenticator } = req.body;
-  const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ authenticator });
-  handleTransaction({ req, res, next, authClient, transaction });
+  try {
+    const { authenticator } = req.body;
+    const authClient = getAuthClient(req);
+    const transaction = await authClient.idx.proceed({ authenticator });
+    handleTransaction({ req, res, next, authClient, transaction });
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.post('/select-authenticator/skip', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ skip: true });
+  const transaction = await authClient.idx.proceed({ skip: true });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -69,10 +71,9 @@ router.get('/challenge-authenticator/okta_email', (req, res) => {
 });
 
 router.post('/challenge-authenticator/okta_email', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ verificationCode });
+  const transaction = await authClient.idx.proceed({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });  
 
@@ -93,10 +94,9 @@ router.get('/enroll-authenticator/okta_email', (req, res) => {
 });
 
 router.post('/enroll-authenticator/okta_email', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ verificationCode });
+  const transaction = await authClient.idx.proceed({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -112,7 +112,6 @@ router.get('/enroll-authenticator/okta_password', (req, res) => {
 });
 
 router.post('/enroll-authenticator/okta_password', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { password, confirmPassword } = req.body;
   const authClient = getAuthClient(req);
   if (password !== confirmPassword) {
@@ -121,7 +120,7 @@ router.post('/enroll-authenticator/okta_password', async (req, res, next) => {
     return;
   }
 
-  const transaction = await authClient.idx[idxMethod]({ password });
+  const transaction = await authClient.idx.proceed({ password });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -141,10 +140,9 @@ router.get('/verify-authenticator/phone_number', (req, res) => {
 });
 
 router.post('/verify-authenticator/phone_number', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { methodType } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ methodType });
+  const transaction = await authClient.idx.proceed({ methodType });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -168,17 +166,15 @@ router.get('/challenge-authenticator/phone_number', (req, res) => {
 });
 
 router.post('/challenge-authenticator/phone_number', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ verificationCode });
+  const transaction = await authClient.idx.proceed({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
 router.post('/challenge-authenticator/resend', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ resend: true });
+  const transaction = await authClient.idx.proceed({ resend: true });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -196,10 +192,9 @@ router.get('/enroll-authenticator/phone_number/enrollment-data', (req, res) => {
 });
 
 router.post('/enroll-authenticator/phone_number/enrollment-data', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { phoneNumber, methodType } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ 
+  const transaction = await authClient.idx.proceed({ 
     methodType,
     phoneNumber,
   });
@@ -226,10 +221,9 @@ router.get('/enroll-authenticator/phone_number', (req, res) => {
 });
 
 router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ 
+  const transaction = await authClient.idx.proceed({ 
     verificationCode,
   });
   handleTransaction({ req, res, next, authClient, transaction });
@@ -252,10 +246,9 @@ router.get('/enroll-authenticator/google_otp', async (req, res) => {
 });
 
 router.post('/enroll-authenticator/google_otp', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ verificationCode });
+  const transaction = await authClient.idx.proceed({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -274,10 +267,9 @@ router.get('/challenge-authenticator/google_otp', async (req, res) => {
 });
 
 router.post('/challenge-authenticator/google_otp', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const { verificationCode } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx[idxMethod]({ verificationCode });
+  const transaction = await authClient.idx.proceed({ verificationCode });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 

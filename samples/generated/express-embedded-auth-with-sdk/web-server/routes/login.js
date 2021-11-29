@@ -35,8 +35,7 @@ const getIdpSemanticClass = (type) => {
 // entry route
 router.get('/login', async (req, res) => {
   req.setFlowStates({
-    entry: '/login',
-    idxMethod: 'authenticate'
+    entry: '/login'
   });
 
   // Delete the idp related render logic if you only want the username and password form

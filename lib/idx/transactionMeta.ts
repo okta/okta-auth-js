@@ -15,8 +15,43 @@ import { warn } from '../util';
 import { getOAuthUrls } from '../oidc';
 
 // Calculate new values
-export async function createTransactionMeta(authClient: OktaAuth) {
-  return authClient.token.prepareTokenParams();
+export async function createTransactionMeta(authClient: OktaAuth, options?: TransactionMetaOptions) {
+  const tokenParams = await authClient.token.prepareTokenParams(options);
+  const {
+    pkce,
+    clientId,
+    redirectUri,
+    responseType,
+    responseMode,
+    scopes,
+    state,
+    nonce,
+    ignoreSignature,
+    codeVerifier,
+    codeChallengeMethod,
+    codeChallenge,
+  } = tokenParams;
+  const urls = getOAuthUrls(authClient, tokenParams);
+  const flow = authClient.idx.getFlow() || 'default';
+  const issuer = authClient.options.issuer;
+  const meta = {
+    flow,
+    issuer,
+    pkce,
+    clientId,
+    redirectUri,
+    responseType,
+    responseMode,
+    scopes,
+    state,
+    nonce,
+    urls,
+    ignoreSignature,
+    codeVerifier,
+    codeChallengeMethod,
+    codeChallenge 
+  };
+  return meta;
 }
 
 export function transactionMetaExist(authClient: OktaAuth, options?: TransactionMetaOptions): boolean {
@@ -55,41 +90,7 @@ export async function getTransactionMeta(
       'This may indicate that two apps are sharing a storage key.');
   }
 
-  // Calculate new values
-  const tokenParams = await authClient.token.prepareTokenParams();
-  const urls = getOAuthUrls(authClient, tokenParams);
-  const issuer = authClient.options.issuer;
-  const {
-    pkce,
-    clientId,
-    redirectUri,
-    responseType,
-    responseMode,
-    scopes,
-    state,
-    nonce,
-    ignoreSignature,
-    codeVerifier,
-    codeChallengeMethod,
-    codeChallenge,
-  } = tokenParams;
-  const meta = {
-    issuer,
-    pkce,
-    clientId,
-    redirectUri,
-    responseType,
-    responseMode,
-    scopes,
-    state,
-    nonce,
-    urls,
-    ignoreSignature,
-    codeVerifier,
-    codeChallengeMethod,
-    codeChallenge 
-  };
-  return meta;
+  return createTransactionMeta(authClient, options);
 }
 
 export function saveTransactionMeta (authClient: OktaAuth, meta) {
@@ -101,10 +102,30 @@ export function clearTransactionMeta (authClient: OktaAuth) {
 }
 
 // returns true if values in meta match current authClient options
+// eslint-disable-next-line complexity
 export function isTransactionMetaValid (authClient: OktaAuth, meta) {
+  // First validate against required config
   const keys = ['issuer', 'clientId', 'redirectUri'];
-  const mismatch = keys.find(key => {
-    return authClient.options[key] !== meta[key];
-  });
-  return !mismatch;
+  if (keys.some(key => authClient.options[key] !== meta[key])) {
+    return false;
+  }
+
+  // Validate optional config
+  const { flow, state } = authClient.options;
+  
+  // If state is specified, it must match meta to be valid
+  if (state && state !== meta.state) {
+    return false;
+  }
+
+  // Specific flows should not share transaction data
+  const shouldValidateFlow = flow && flow !== 'default' && flow !== 'proceed';
+  if (shouldValidateFlow) {
+    if (flow !== meta.flow) {
+      // The flow has changed; abandon the old transaction
+      return false;
+    }
+  }
+
+  return true;
 }

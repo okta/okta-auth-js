@@ -664,4 +664,14 @@ describe('TransactionManager', () => {
     });
   });
 
+  describe('clearIdxResponse', () => {
+    beforeEach(() => {
+      createInstance();
+    });
+    it('clears idxResponse storage', () => {
+      const { transactionManager, idxResponseStorage } = testContext;
+      transactionManager.clearIdxResponse();
+      expect(idxResponseStorage.clearStorage).toHaveBeenCalledWith();
+    });
+  });
 });

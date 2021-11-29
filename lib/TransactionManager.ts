@@ -65,8 +65,7 @@ export default class TransactionManager {
     transactionStorage.clearStorage();
 
     // clear IDX response storage
-    const idxStateStorage: StorageProvider = this.storageManager.getIdxResponseStorage();
-    idxStateStorage?.clearStorage();
+    this.clearIdxResponse();
 
     // Usually we do NOT want to clear shared storage because another tab may need it to continue/complete a flow
     // It can be cleared after a user succcesfully signs in and receives tokens
@@ -323,5 +322,10 @@ export default class TransactionManager {
       return null;
     }
     return idxResponse;
+  }
+
+  clearIdxResponse(): void {
+    const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
+    storage?.clearStorage();
   }
 }

@@ -67,7 +67,12 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
     codeChallenge,
     codeChallengeMethod
   }).then(interactionHandle => {
-    const newMeta = { ...meta, interactionHandle, state, scopes };
+    const newMeta = {
+      ...meta,
+      interactionHandle,
+      state,
+      scopes
+    };
     // Save transaction meta so it can be resumed
     saveTransactionMeta(authClient, newMeta);
 

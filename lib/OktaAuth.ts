@@ -44,6 +44,7 @@ import {
   IdxAPI,
   SignoutRedirectUrlOptions,
   HttpAPI,
+  FlowIdentifier,
 } from './types';
 import {
   transactionStatus,
@@ -105,10 +106,12 @@ import {
   introspect as introspectV2,
   authenticate,
   cancel,
+  proceed,
   register,
   recoverPassword,
   startTransaction,
   handleInteractionCodeRedirect,
+  canProceed,
 } from './idx';
 import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from './idx/headers';
 import { OktaUserAgent } from './OktaUserAgent';
@@ -264,10 +267,18 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       introspect: introspectV2.bind(null, this),
       authenticate: authenticate.bind(null, this),
       register: register.bind(null, this),
+      proceed: proceed.bind(null, this),
       cancel: cancel.bind(null, this),
       recoverPassword: recoverPassword.bind(null, this),
       handleInteractionCodeRedirect: handleInteractionCodeRedirect.bind(null, this),
       startTransaction: startTransaction.bind(null, this),
+      setFlow: (flow: FlowIdentifier) => {
+        this.options.flow = flow;
+      },
+      getFlow: (): FlowIdentifier => {
+        return this.options.flow;
+      },
+      canProceed: canProceed.bind(null, this),
     };
     setGlobalRequestInterceptor(createGlobalRequestInterceptor(this)); // to pass custom headers to IDX endpoints
 

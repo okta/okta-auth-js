@@ -30,6 +30,10 @@
     - [`idx.recoverPassword`](#idxrecoverpassword)
     - [`idx.startTransaction`](#idxstarttransaction)
     - [`idx.cancel`](#idxcancel)
+    - [`idx.proceed`](#idxproceed)
+    - [`idx.canProceed`](#idxcanproceed)
+    - [`idx.getFlow`](#idxgetflow)
+    - [`idx.setFlow`](#idxsetflow)
     - [`idx.handleInteractionCodeRedirect`](#idxhandleinteractioncoderedirect)
 
 ## Introduction
@@ -335,6 +339,48 @@ Cancels the in progress idx interaction transaction.
 
 ```javascript
 await authClient.idx.cancel();
+```
+
+#### `idx.proceed`
+
+Continues an in-progress idx transaction. This method is useful when handling a callback or in other cases where the flow may not be known.
+
+```javascript
+await authClient.idx.proceed();
+```
+
+This method can be used to handle an email verify callback, by passing the `stateTokenExternalId`:
+
+```javascript
+await authClient.idx.proceed({ stateTokenExternalId });
+```
+
+If a `stateTokenExternalId` is not passed and a flow is not currently in progress, this method will throw an exception. To check if there is a flow, call `idx.canProceed`
+
+#### `idx.canProceed`
+
+Returns true if there is a saved transaction.
+
+#### `idx.getFlow`
+
+Returns the currently configured `flow`. The `flow` is set automatically when calling one of these methods:
+
+- `idx.authenticate`
+- `idx.register`
+- `idx.recoverPassword`
+
+The saved `flow` enables the `idx.proceed` method to corrrectly handle remediations, without needing additional context. Another purpose of the `flow` is to detect when an in-progress transaction should be abandoned. For example, if a user proceeds through a few steps of the `authorize` flow but then decides they want to `register` instead, the in-progress `authenticate` transaction data will be abandoned and a `register` flow will begin with new transaction data.
+
+```javascript
+const flow: FlowIdentifier = authClient.idx.getFlow();
+```
+
+#### `idx.setFlow`
+
+The `flow` is usually set automatically. This method can be used to manually set the `flow`:
+
+```javascript
+authClient.idx.setFlow('register');
 ```
 
 #### `idx.handleInteractionCodeRedirect`

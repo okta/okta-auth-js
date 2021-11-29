@@ -10,14 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-export * from './authenticate';
-export * from './cancel';
-export * from './interact';
-export * from './introspect';
-export * from './proceed';
-export * from './register';
-export * from './recoverPassword';
-export * from './handleInteractionCodeRedirect';
-export * from './startTransaction';
-export * from './transactionMeta';
+export * from './AuthenticationFlow';
+export * from './AuthenticationFlowMonitor';
+export * from './FlowMonitor';
+export * from './FlowSpecification';
+export * from './PasswordRecoveryFlow';
+export * from './PasswordRecoveryFlowMonitor';
+export * from './RegistrationFlow';
+export * from './RegistrationFlowMonitor';
+export * from './RemediationFlow';

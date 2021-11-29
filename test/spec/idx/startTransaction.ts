@@ -56,8 +56,12 @@ describe('idx/startTransaction', () => {
         exists: () => true,
         load: () => transactionMeta,
         clear: () => {},
-        save: () => {}
+        save: () => {},
+        clearIdxResponse: () => {}
       },
+      idx: {
+        setFlow: () => {}
+      }
     };
 
     const idxResponse = IdxResponseFactory.build();
