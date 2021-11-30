@@ -16,7 +16,7 @@ import { LOGIN_CALLBACK_PATH, STORAGE_KEY } from './constants';
 const HOST = window.location.host;
 const PROTO = window.location.protocol;
 const REDIRECT_URI = `${PROTO}//${HOST}${LOGIN_CALLBACK_PATH}`;
-const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}`;
+const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}/`;
 const DEFAULT_SIW_VERSION = ''; // blank for local/npm/bundled version
 
 export interface Config extends OktaAuthOptions {

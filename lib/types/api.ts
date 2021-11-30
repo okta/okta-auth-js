@@ -237,12 +237,9 @@ export interface SignoutRedirectUrlOptions {
   state?: string;
 }
 
-export interface RevokeTokensOptions {
+export interface SignoutOptions extends SignoutRedirectUrlOptions {
   revokeAccessToken?: boolean;
   revokeRefreshToken?: boolean;
-}
-
-export interface SignoutOptions extends SignoutRedirectUrlOptions, RevokeTokensOptions {
   accessToken?: AccessToken;
   refreshToken?: RefreshToken;
   clearTokensAfterRedirect?: boolean;

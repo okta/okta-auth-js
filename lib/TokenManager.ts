@@ -32,10 +32,10 @@ import {
   TokenManagerErrorEventHandler,
   TokenManagerEventHandler,
   TokenManagerInterface,
-  RefreshToken,
+  RefreshToken
 } from './types';
-import { TokenService } from './services/TokenService';
 import { REFRESH_TOKEN_STORAGE_KEY } from './constants';
+import { TokenService } from './services/TokenService';
 
 const DEFAULT_OPTIONS = {
   autoRenew: true,

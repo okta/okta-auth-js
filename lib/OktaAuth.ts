@@ -34,7 +34,6 @@ import {
   SigninWithRedirectOptions,
   SigninWithCredentialsOptions,
   SignoutOptions,
-  RevokeTokensOptions,
   Tokens,
   ForgotPasswordOptions,
   VerifyRecoveryTokenOptions,
@@ -428,17 +427,6 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       return Promise.resolve(null);
     }
     return this.token.revoke(refreshToken);
-  }
-
-  async revokeTokens(options: RevokeTokensOptions = {}): Promise<void> {
-    const revokeAccessToken = options.revokeAccessToken !== false;
-    const revokeRefreshToken = options.revokeRefreshToken !== false;
-    if (revokeAccessToken) {
-      this.revokeAccessToken();
-    }
-    if (revokeRefreshToken) {
-      this.revokeRefreshToken();
-    }
   }
 
   getSignOutRedirectUrl(options: SignoutRedirectUrlOptions = {}) {
