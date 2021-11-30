@@ -93,7 +93,7 @@ describe('cross tabs AuthState update', () => {
     // swith back to the first tab
     await browser.switchToWindow(handles[0]);
     // logout in current tab (the last tab)
-    await TestApp.logoutRedirect();
+    await TestApp.logoutRedirect({ clearTokensAfterRedirect: true });
 
     // assert logout status
     for (let i = 0; i < handles.length; i++) {

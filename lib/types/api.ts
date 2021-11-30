@@ -237,10 +237,6 @@ export interface SignoutRedirectUrlOptions {
   state?: string;
 }
 
-export interface SignOutCallbackOptions {
-  redirectToApp: () => void;
-}
-
 export interface RevokeTokensOptions {
   revokeAccessToken?: boolean;
   revokeRefreshToken?: boolean;
@@ -249,14 +245,16 @@ export interface RevokeTokensOptions {
 export interface SignoutOptions extends SignoutRedirectUrlOptions, RevokeTokensOptions {
   accessToken?: AccessToken;
   refreshToken?: RefreshToken;
-}
-
-export interface SignOutSsoOptions extends SignoutOptions, SignOutCallbackOptions {
-  redirectToOkta: (url: string) => void;
+  clearTokensAfterRedirect?: boolean;
 }
 
 export interface SignoutAPI {
   signOut(opts: SignoutOptions);
+}
+
+export interface PostSignOutStorageMeta {
+  clearTokens?: boolean;
+  timestamp?: number;
 }
 
 export interface ForgotPasswordOptions {

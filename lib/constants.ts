@@ -24,6 +24,7 @@ export const TRANSACTION_STORAGE_NAME = 'okta-transaction-storage';
 export const SHARED_TRANSACTION_STORAGE_NAME = 'okta-shared-transaction-storage';
 export const ORIGINAL_URI_STORAGE_NAME = 'okta-original-uri-storage';
 export const IDX_RESPONSE_STORAGE_NAME = 'okta-idx-response-storage';
+export const POST_SIGNOUT_STORAGE_NAME = 'okta-post-signout-storage';
 export const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
 export const ID_TOKEN_STORAGE_KEY =  'idToken';
 export const REFRESH_TOKEN_STORAGE_KEY =  'refreshToken';

@@ -809,7 +809,6 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 * [signInWithCredentials](#signinwithcredentialsoptions)
 * [signInWithRedirect](#signinwithredirectoptions)
 * [signOut](#signout)
-* [signOutSSO](#signoutsso)
 * [closeSession](#closesession)
 * [revokeAccessToken](#revokeaccesstokenaccesstoken)
 * [revokeRefreshToken](#revokerefreshtokenrefreshtoken)
@@ -912,9 +911,8 @@ if (authClient.isLoginRedirect()) {
 
 ### `signOut()`
 
-> :no_entry: [DEPRECATED] This method causes issues when uses with `SecureRoute` component from Okta's downstream client SDKs in multiple tabs scenarios. Please use [signOutSSO](#signoutsso) with [handleLogoutCallback](#handlelogoutcallback) together to achieve the same Okta SSO session signOut experience.
-
 > :hourglass: async
+> :link: web browser only
 
 Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. By default, the refresh token (if any) and access token are revoked so they can no longer be used. Some points to consider:
 
@@ -928,6 +926,7 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 * `postLogoutRedirectUri` - Setting a value will override the `postLogoutRedirectUri` configured on the SDK.
 * `state` - An optional value, used along with `postLogoutRedirectUri`. If set, this value will be returned as a query parameter during the redirect to the `postLogoutRedirectUri`
 * `idToken` - Specifies the ID token object. By default, `signOut` will look for a token object named `idToken` within the `TokenManager`. If you have stored the id token object in a different location, you should retrieve it first and then pass it here.
+* `clearTokensAfterRedirect` - If `true` (default: `false`) a flag will be added to the sessionStorage instead of clearing the local tokens immediately. The oktaAuth client will check the flag and clear local tokens after the logout redirect. This option can be used when work with `SecureRoute` component from Okta's downstream client SDKs to guarantee the local tokens can only be cleared after the Okta SSO session is fully killed.
 * `revokeAccessToken` - If `false` (default: `true`) the access token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.
 * `revokeRefreshToken` - If `false` (default: `true`) the refresh token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.  Revoking a refresh token will revoke any access tokens minted by it, even if `revokeAccessToken` is `false`.
 * `accessToken` - Specifies the access token object. By default, `signOut` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. This options is ignored if the `revokeAccessToken` option is `false`.
@@ -960,79 +959,6 @@ authClient.signOut({
 });
 ```
 
-### `signOutSSO()`
-
-> :hourglass: async
-
-Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. By default, the refresh token (if any) and access token are revoked so they can no longer be used. Some points to consider:
-
-* Will redirect to an Okta-hosted page before returning to your app.
-* If a `postLogoutRedirectUri` has not been specified or configured, the browser is redirected to the Okta sign-in page. This URI must be listed in the Okta application's [Login redirect URIs](#login-redirect-uris). If the URI is unknown or invalid the redirect will end on a 400 error page from Okta. This error will be visible to the user and cannot be handled by the app.
-* Requires a valid ID token. If an ID token is not available, this method will fallback to using the XHR-based [closeSession](#closesession) method. This method may fail to sign the user out if 3rd-party cookies have been blocked by the browser.
-* To support different runtime environments, this method takes `redirectToOkta` and `redirectToApp` callback options to let you provide environment specific redirect implementations. Both callback options are **required**. 
-* For more information, see [Logout](https://developer.okta.com/docs/reference/api/oidc/#logout) in the OIDC API documentation.
-
-`signOut` takes the following options:
-
-* `postLogoutRedirectUri` - Setting a value will override the `postLogoutRedirectUri` configured on the SDK.
-* `state` - An optional value, used along with `postLogoutRedirectUri`. If set, this value will be returned as a query parameter during the redirect to the `postLogoutRedirectUri`
-* `idToken` - Specifies the ID token object. By default, `signOut` will look for a token object named `idToken` within the `TokenManager`. If you have stored the id token object in a different location, you should retrieve it first and then pass it here.
-* `revokeAccessToken` - If `false` (default: `true`) the access token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.
-* `revokeRefreshToken` - If `false` (default: `true`) the refresh token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.  Revoking a refresh token will revoke any access tokens minted by it, even if `revokeAccessToken` is `false`.
-* `redirectToOkta` - **required** Callback function to redirect to Okta to remove the SSO session. Examples:
-```javascript
-// For browser environment
-{ redirectToOkta: (logoutUri) => window.location.assign(logoutUri) }
-
-// For node environment
-{ redirectToOkta: (logoutUri) => res.redirect(logoutUri) }
-```
-* `redirectToApp` - **required** Callback function to redirect back to desired app route after the XHR-based fallback process (`closeSession`). Examples:
-```javascript
-// For browser environment
-{ redirectToApp: () => window.location.replace(window.location.origin) }
-
-// For node environment
-{ redirectToApp: () => window.location.replace(url) }
-```
-
-#### Use together with `handleLogoutCallback`
-
-After removing the Okta SSO session, in most scenarios you will also want to clear and revoke the tokens to keep your application secure. [handleLogoutCallback](#handlelogoutcallback) method is provided for this purpose. It helps you handle the tokens and redirect the users to the desired post logout route.
-
-The logout steps:
-1. Call [signOutSSO](#signoutSSO) method to start the process. This method redirects the page to Okta to close the SSO session.
-    ```javascript
-    oktaAuth.signOutSSO({
-      postLogoutRedirectUri: window.location.origin + `/logout/callback`
-    });
-    ```
-2. Okta redirect back to the provided `postLogoutRedirectUri`, then you will need to call `handleLogoutCallback` method with the `redirectToApp` callback.
-    ```javascript
-    oktaAuth.handleLogoutCallback({
-      redirectToApp: () => window.location.replace(window.location.origin)
-    });
-    ```
-
-### `handleLogoutCallback()`
-
-> :hourglass: async
-
-Clears and revokes (by default) tokens after removing Okta SSO session, then redirect the application to the desired post logout route. This method is usually called when Okta redirecting to the `postLogoutRedirectUri`.
-
-`handleLogoutCallback` takes the following options:
-
-* `redirectToApp` - **required** Callback function to redirect back to desired app route. Examples:
-```javascript
-// For browser environment
-{ redirectToApp: () => window.location.replace(window.location.origin) }
-
-// For node environment
-{ redirectToApp: () => window.location.replace(url) }
-```
-* `revokeAccessToken` - If `false` (default: `true`) the access token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.
-* `revokeRefreshToken` - If `false` (default: `true`) the refresh token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.  Revoking a refresh token will revoke any access tokens minted by it, even if `revokeAccessToken` is `false`.
-
 ### `closeSession()`
 
 > :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
@@ -1046,13 +972,9 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 * It is recommended (but not required) for the app to call `window.location.reload()` after the `XHR` method completes to ensure your app is properly re-initialized in an unauthenticated state.
 * For more information, see [Close Current Session](https://developer.okta.com/docs/reference/api/sessions/#close-current-session) in the Session API documentation.
 
-`closeSession` takes the following options:
-
-* `revokeAccessToken` - If `false` (default: `true`) the access token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.
-* `revokeRefreshToken` - If `false` (default: `true`) the refresh token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.  Revoking a refresh token will revoke any access tokens minted by it, even if `revokeAccessToken` is `false`.
-
 ```javascript
-await authClient.closeSession()
+await authClient.revokeAccessToken(); // strongly recommended
+authClient.closeSession()
   .then(() => {
     window.location.reload(); // optional
   })

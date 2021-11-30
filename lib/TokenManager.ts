@@ -13,7 +13,7 @@
 import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
 import { isRefreshTokenError, validateToken  } from './oidc/util';
-import { isLocalhost, isIE11OrLess } from './features';
+import { isLocalhost, isIE11OrLess, isBrowser } from './features';
 import { TOKEN_STORAGE_NAME } from './constants';
 import SdkClock from './clock';
 import {
@@ -32,10 +32,12 @@ import {
   TokenManagerErrorEventHandler,
   TokenManagerEventHandler,
   TokenManagerInterface,
-  RefreshToken
+  RefreshToken,
+  PostSignOutStorageMeta
 } from './types';
-import { REFRESH_TOKEN_STORAGE_KEY } from './constants';
 import { TokenService } from './services/TokenService';
+import browserStorage from './browser/browserStorage';
+import { REFRESH_TOKEN_STORAGE_KEY, POST_SIGNOUT_STORAGE_NAME } from './constants';
 
 const DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -115,6 +117,21 @@ export class TokenManager implements TokenManagerInterface {
     }
     this.service = new TokenService(this, this.getOptions());
     this.service.start();
+
+    if (isBrowser()) {
+      const sessionStorage = browserStorage.getSessionStorage();
+      let postLogoutMeta: PostSignOutStorageMeta = {};
+      try {
+        postLogoutMeta = JSON.parse(sessionStorage.getItem(POST_SIGNOUT_STORAGE_NAME) || '');
+        sessionStorage.removeItem(POST_SIGNOUT_STORAGE_NAME);
+      } catch (e) {
+        // no valid meta in storage, do nothing
+      }
+      const now = Date.now();
+      if (postLogoutMeta.clearTokens && now - postLogoutMeta.timestamp < 30 * 1000) {
+        this.clear();
+      }
+    }
   }
   
   stop() {

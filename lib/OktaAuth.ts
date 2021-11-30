@@ -16,7 +16,8 @@
 
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
-  REFERRER_PATH_STORAGE_KEY
+  REFERRER_PATH_STORAGE_KEY,
+  POST_SIGNOUT_STORAGE_NAME
 } from './constants';
 import * as constants from './constants';
 import {
@@ -33,8 +34,6 @@ import {
   SigninWithRedirectOptions,
   SigninWithCredentialsOptions,
   SignoutOptions,
-  SignOutSsoOptions,
-  SignOutCallbackOptions,
   RevokeTokensOptions,
   Tokens,
   ForgotPasswordOptions,
@@ -48,6 +47,7 @@ import {
   SignoutRedirectUrlOptions,
   HttpAPI,
   FlowIdentifier,
+  PostSignOutStorageMeta,
 } from './types';
 import {
   transactionStatus,
@@ -387,11 +387,9 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   }
 
   // Ends the current Okta SSO session without redirecting to Okta.
-  closeSession(options?: RevokeTokensOptions): Promise<object> {
+  closeSession(): Promise<object> {
     return this.session.close() // DELETE /api/v1/sessions/me
     .then(async () => {
-      this.revokeTokens(options);
-  
       // Clear all local tokens
       this.tokenManager.clear();
     })
@@ -473,28 +471,6 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     return logoutUri;
   }
 
-  async signOutSSO(options: SignOutSsoOptions) {
-    var postLogoutRedirectUri = options.postLogoutRedirectUri
-      || this.options.postLogoutRedirectUri;
-    const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });
-    if (logoutUri) {
-      // redirect to Okta to kill the SSO session
-      options.redirectToOkta(logoutUri);
-    } else {
-      return this.closeSession() // can throw if the user cannot be signed out
-        .then(() => options.redirectToApp());
-    }
-  }
-
-  async handleLogoutCallback(options: SignOutCallbackOptions & RevokeTokensOptions): Promise<void> {
-    await this.revokeTokens({
-      revokeAccessToken: options.revokeAccessToken,
-      revokeRefreshToken: options.revokeRefreshToken
-    });
-    this.tokenManager.clear();
-    options.redirectToApp();
-  }
-
   // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
   async signOut(options?: SignoutOptions) {
     options = Object.assign({}, options);
@@ -523,9 +499,6 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       options.idToken = this.tokenManager.getTokensSync().idToken as IDToken;
     }
 
-    // Clear all local tokens
-    this.tokenManager.clear();
-
     if (revokeRefreshToken && refreshToken) {
       await this.revokeRefreshToken(refreshToken);
     }
@@ -538,6 +511,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     // No logoutUri? This can happen if the storage was cleared.
     // Fallback to XHR signOut, then simulate a redirect to the post logout uri
     if (!logoutUri) {
+      // local tokens are cleared once session is closed
       return this.closeSession() // can throw if the user cannot be signed out
       .then(function() {
         if (postLogoutRedirectUri === currentUri) {
@@ -547,6 +521,17 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
         }
       });
     } else {
+      if (options.clearTokensAfterRedirect) {
+        const sessionStorage = browserStorage.getSessionStorage();
+        const data: PostSignOutStorageMeta = {
+          clearTokens: true,
+          timestamp: Date.now()
+        };
+        sessionStorage.setItem(POST_SIGNOUT_STORAGE_NAME, JSON.stringify(data));
+      } else {
+        // Clear all local tokens
+        this.tokenManager.clear();
+      }
       // Flow ends with logout redirect
       window.location.assign(logoutUri);
     }
