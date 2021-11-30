@@ -812,7 +812,6 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 * [closeSession](#closesession)
 * [revokeAccessToken](#revokeaccesstokenaccesstoken)
 * [revokeRefreshToken](#revokerefreshtokenrefreshtoken)
-* [handleLogoutCallback](#handlelogoutcallback)
 * [forgotPassword](#forgotpasswordoptions)
 * [unlockAccount](#unlockaccountoptions)
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
