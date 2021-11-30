@@ -132,16 +132,6 @@ exports.config = {
                 recordScreenshots: 'false'
             }
         }
-            //{
-        //     browserName: 'internet explorer',
-        //     browserVersion: '11',
-        //     platformName: 'Windows 10',
-        //     'sauce:options': {
-        //         extendedDebugging: 'true',
-        //         recordScreenshots: 'false'
-        //     }
-        // }
-
       // TODO - Enable after OKTA-284870 is fixed
       // {browserName: 'safari', platform: 'OS X 10.13', version: 'latest'},
     ],
@@ -186,7 +176,7 @@ exports.config = {
     connectionRetryTimeout: 90000,
     //
     // Default request retries count
-    connectionRetryCount: 3,
+    connectionRetryCount: 2,
     //
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
@@ -210,7 +200,7 @@ exports.config = {
     framework: 'mocha',
     //
     // The number of times to retry the entire specfile when it fails as a whole
-    specFileRetries: 3,
+    specFileRetries: 2,
     specFileRetriesDeferred: false,
     //
     // Test reporter for stdout.
