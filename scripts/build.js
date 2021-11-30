@@ -72,8 +72,8 @@ packageJSON.scripts.prepare = '';
   const value = packageJSON[key];
   if (typeof value === 'object' && value !== null) {
     packageJSON[key] = Object.keys(value).reduce((acc, curr) => {
-      console.log(acc, curr);
-      acc[curr] = value[curr].replace('build/', '');
+      const newKey = curr.replace('build/', '');
+      acc[newKey] = value[curr].replace('build/', '');
       return acc;
     }, {});
   } else {

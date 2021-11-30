@@ -9,8 +9,7 @@
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "browser": {
-    "./dist/index.js": "build/dist/okta-auth-js.umd.js",
-    "./dist/index.esm.js": "build/esm/index.js"
+    "build/cjs/index.js": "./build/dist/okta-auth-js.umd.js"
   },
   "types": "build/lib/index.d.ts",
   "repository": {
