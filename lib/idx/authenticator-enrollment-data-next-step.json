@@ -1,0 +1,54 @@
+{
+  "name": "authenticator-enrollment-data",
+  "inputs": [
+    {
+      "name": "methodType",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "phoneNumber",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "type": "phone",
+  "authenticator": {
+    "resend": {
+      "rel": [
+        "create-form"
+      ],
+      "name": "resend",
+      "href": "https://javascript-idx-sdk.okta.com/idp/idx/challenge/resend",
+      "method": "POST",
+      "produces": "application/ion+json; okta-version=1.0.0",
+      "value": [
+        {
+          "name": "stateHandle",
+          "required": true,
+          "value": "02TqmSTyfT4LBWFt_cAZyHAk57jrRkrxSOIorHmmbp",
+          "visible": false,
+          "mutable": false
+        }
+      ],
+      "accepts": "application/json; okta-version=1.0.0"
+    },
+    "type": "phone",
+    "key": "phone_number",
+    "id": "autv2spvzk8MPm8F65d6",
+    "displayName": "Phone",
+    "methods": [
+      {
+        "type": "sms"
+      }
+    ]
+  },
+  "options": [
+    {
+      "label": "SMS",
+      "value": "sms"
+    }
+  ],
+  "canSkip": true,
+  "canResend": true
+}

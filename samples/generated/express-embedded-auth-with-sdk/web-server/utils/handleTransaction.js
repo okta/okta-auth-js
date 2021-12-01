@@ -64,6 +64,12 @@ const proceed = ({ nextStep, req, res }) => {
     case 'select-authenticator-enroll':
       redirect({ req, res, path: '/select-authenticator' });
       return true;
+    case 'enroll-poll':
+      redirect({ req, res, path: `/enroll-authenticator/${key}/enroll-poll` });
+      return true;
+    case 'select-enrollment-channel':
+      redirect({ req, res, path: `/enroll-authenticator/${key}/select-enrollment-channel` });
+      return true;
     case 'enroll-authenticator':
       redirect({ req, res, path: `/enroll-authenticator/${key}` });
       return true;

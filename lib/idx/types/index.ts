@@ -41,6 +41,7 @@ export enum AuthenticatorKey {
   PHONE_NUMBER = 'phone_number',
   GOOGLE_AUTHENTICATOR = 'google_otp',
   SECURITY_QUESTION = 'security_question',
+  OKTA_VERIFY = 'okta_verify'
 }
 
 export type Input = {

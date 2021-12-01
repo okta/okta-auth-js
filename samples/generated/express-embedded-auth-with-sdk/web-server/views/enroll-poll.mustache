@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+
+    <script type="text/javascript">
+      const intervalId = setInterval(function () {
+        fetch('{{{pollUrl}}}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+            },
+          body: JSON.stringify({
+            stateHandle: '{{stateHandle}}',
+          })
+        }).then(function (response) {
+          response.json(function (respJson) {
+            console.log(respJson);
+          })
+        });
+      }, 4000);
+    </script>
+  </head>
+  <body id="samples">
+  
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div id="page-title-header" class="ui header">
+          <h2>{{title}}</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      {{#contextualData}}
+        <div class="ui segments">
+          <div class="ui segment">
+            {{#contextualData.qrcode}}
+              <div class="ui fluid image">
+                <img id="authenticator-qr-code" src="{{contextualData.qrcode.href}}" />
+              </div>
+            {{/contextualData.qrcode}}
+          </div>
+        </div>
+      {{/contextualData}}
+
+      <div class="row">
+        <form id="enroll-poll-form" class="ui large form" action="{{action}}" method="POST">
+          <div class="field">
+            <div class="ui input">
+              {{#input}}
+                <input id="state-handle-input" type="hidden" name="state-handle" />
+              {{/input}}
+            </div>
+          </div>
+        </form>
+      </div>
+      {{>cancel}}
+    </div>
+  </body>
+</html>
