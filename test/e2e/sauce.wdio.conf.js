@@ -18,9 +18,25 @@ require('@babel/register'); // Allows use of import module syntax
 require('regenerator-runtime'); // Allows use of async/await
 
 const DEBUG = process.env.DEBUG;
-const CI = process.env.TRAVIS;
+const CI = process.env.CI;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = CI ? 'warn' : 'info';
+const browserOptions = {
+    args: []
+};
+
+if (CI) {
+    browserOptions.args = browserOptions.args.concat([
+        '--headless',
+        '--disable-gpu',
+        '--window-size=1600x1200',
+        '--no-sandbox',
+        '--whitelisted-ips',
+        '--disable-extensions',
+        '--verbose',
+        '--disable-dev-shm-usage'
+    ]);
+}
 
 exports.config = {
     jasmineNodeOpts: {
@@ -86,7 +102,7 @@ exports.config = {
     // and 30 processes will get spawned. The property handles how many capabilities
     // from the same test should run tests.
     //
-    maxInstances: 40,
+    maxInstances: 1,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -98,16 +114,24 @@ exports.config = {
       // 5 instance gets started at a time.
       //maxInstances: 5,
       //
-      {
-        browserName: 'firefox',
-        platformName: 'Windows 10',
-        browserVersion: '79',
-        acceptInsecureCerts: true,
-        // 'sauce:options': {
-        //   'seleniumVersion': '3.14.0'
-        // }
-      },
-      {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'},
+      // {
+      //   browserName: 'firefox',
+      //   platformName: 'Windows 10',
+      //   browserVersion: 'latest',
+      //   acceptInsecureCerts: true,
+      //     //'sauce:options': {
+      //        //   'seleniumVersion': '3.14.0'
+      //    //}
+      // },
+        // {browserName: 'chrome', platform: 'OS X 10.13', version: 'latest'}
+        {
+            browserName: 'MicrosoftEdge',
+            browserVersion: 'latest',
+            platformName: 'Windows 10',
+            'sauce:options': {
+                recordScreenshots: 'false'
+            }
+        }
       // TODO - Enable after OKTA-284870 is fixed
       // {browserName: 'safari', platform: 'OS X 10.13', version: 'latest'},
     ],
@@ -145,14 +169,14 @@ exports.config = {
     baseUrl: 'http://localhost:8080',
     //
     // Default timeout for all waitFor* commands.
-    waitforTimeout: 10000,
+    waitforTimeout: 90000,
     //
     // Default timeout in milliseconds for request
     // if Selenium Grid doesn't send response
     connectionRetryTimeout: 90000,
     //
     // Default request retries count
-    connectionRetryCount: 3,
+    connectionRetryCount: 2,
     //
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
@@ -161,11 +185,14 @@ exports.config = {
     services: [
       ['sauce', {
         sauceConnect: true,
-        sauceConnectOpts: { noAutodetect: false }
+        sauceConnectOpts: { noAutodetect: false,
+            tunnelIdentifier: 'e2e-tunnel'
+        }
       }],
     ],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
+
     // see also: https://webdriver.io/docs/frameworks.html
     //
     // Make sure you have the wdio adapter package for the specific framework installed
@@ -173,19 +200,28 @@ exports.config = {
     framework: 'mocha',
     //
     // The number of times to retry the entire specfile when it fails as a whole
-    // specFileRetries: 1,
+    specFileRetries: 2,
+    specFileRetriesDeferred: false,
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter.html
-    reporters: ['spec'],
+    reporters: [
+        'spec',
+        ['junit', {
+            outputDir: '../../build2/reports/e2e-saucelabs',
+            outputFileFormat: function() { // optional
+                return 'junit-results.xml';
+            }
+        }]
+    ],
 
     //
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: 90000
     },
     //
     // =====
