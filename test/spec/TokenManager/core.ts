@@ -18,6 +18,8 @@ import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../../lib/clock';
 import * as features from '../../../lib/features';
 import { TokenService } from '../../../lib/services/TokenService';
+import storageUtil from '../../../lib/browser/browserStorage';
+import { POST_SIGNOUT_STORAGE_NAME } from '../../../lib/constants';
 
 const Emitter = require('tiny-emitter');
 
@@ -96,6 +98,44 @@ describe('TokenManager', function() {
         jest.spyOn(TokenService.prototype, 'start');
         client.tokenManager.start();
         expect(TokenService.prototype.start).toHaveBeenCalled();
+      });
+      describe('clears post signout tokens when start the token service', () => {
+        const mockNow = 1000000;
+        const removeItemMock = jest.fn();
+        let mockMeta;
+        beforeEach(() => {
+          mockMeta = {
+            clearTokens: true,
+            timestamp: mockNow - 10 * 1000 // not expired
+          };
+          jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(() => ({
+            getItem: () => JSON.stringify(mockMeta),
+            removeItem: removeItemMock
+          } as unknown as Storage));
+          jest.spyOn(features, 'isBrowser').mockReturnValue(true);
+          jest.spyOn(Date, 'now').mockReturnValue(mockNow);
+          jest.spyOn(client.tokenManager, 'clear');
+        });
+
+        it('clears tokens when valid flag found in sessionStorage', () => {
+          mockMeta = {
+            clearTokens: true,
+            timestamp: mockNow - 10 * 1000 // not expired
+          };
+          client.tokenManager.start();
+          expect(removeItemMock).toHaveBeenCalledWith(POST_SIGNOUT_STORAGE_NAME);
+          expect(client.tokenManager.clear).toHaveBeenCalled();
+        });
+
+        it('will not clear tokens when flag found in sessionStorage is expired', () => {
+          mockMeta = {
+            clearTokens: true,
+            timestamp: mockNow - 31 * 1000 // expired
+          };
+          client.tokenManager.start();
+          expect(removeItemMock).toHaveBeenCalledWith(POST_SIGNOUT_STORAGE_NAME);
+          expect(client.tokenManager.clear).not.toHaveBeenCalled();
+        });
       });
       it('stops existing service', () => {
         const myService = client.tokenManager.service = {

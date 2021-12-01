@@ -19,6 +19,7 @@ import {
   REFERRER_PATH_STORAGE_KEY 
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
+import { POST_SIGNOUT_STORAGE_NAME } from '../../../lib/constants';
 import storageUtil from '../../../lib/browser/browserStorage';
 
 jest.mock('../../../lib/oidc/parseFromUrl', () => {
@@ -210,6 +211,7 @@ describe('OktaAuth (browser)', function() {
     describe('with idToken and accessToken', () => {
       let idToken;
       let accessToken;
+      let setItemMock;
 
       function initSpies() {
         auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ accessToken, idToken });
@@ -217,6 +219,10 @@ describe('OktaAuth (browser)', function() {
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
         spyOn(auth, 'revokeRefreshToken').and.returnValue(Promise.resolve());
         spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        setItemMock = jest.fn();
+        jest.spyOn(storageUtil, 'getSessionStorage').mockImplementation(() => ({
+          setItem: setItemMock
+        } as Storage));
       }
 
       beforeEach(() => {
@@ -339,6 +345,21 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+          });
+      });
+
+      it('Can pass a "clearTokensAfterRedirect=true" to skip clear tokens logic', function() {
+        const fakeDate = 4200;
+        jest.spyOn(Date, 'now').mockReturnValue(fakeDate);
+        return auth.signOut({ clearTokensAfterRedirect: true })
+          .then(function() {
+            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
+            const expectedPostSignOutStorage = {
+              clearTokens: true,
+              timestamp: fakeDate
+            };
+            expect(setItemMock).toHaveBeenCalledWith(POST_SIGNOUT_STORAGE_NAME, JSON.stringify(expectedPostSignOutStorage));
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
