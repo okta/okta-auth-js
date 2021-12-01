@@ -229,6 +229,72 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+
+
+
+router.get('/enroll-authenticator/okta_verify/select-enrollment-channel', async (req, res) => {
+  const { 
+    idx: { nextStep: { options, canSkip } }
+  } = req.getFlowStates();
+  renderPage({ 
+    req, res,
+    render: () => renderTemplate(req, res, 'select-authenticator', {
+      options,
+      action: '/enroll-authenticator/okta_verify/select-enrollment-channel',
+      canSkip,
+    })
+  });
+});
+
+router.post('/enroll-authenticator/okta_verify/select-enrollment-channel', async (req, res, next) => {
+  const { idxMethod } = req.getFlowStates();
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.proceed({ 
+    channel: 'email',
+  });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+
+router.get('/enroll-authenticator/okta_verify/enroll-poll', (req, res) => {
+  const { 
+    idx: { nextStep }
+  } = req.getFlowStates();
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'enroll-poll', {
+      title: 'Enroll Okta Verify',
+      action: '/enroll-authenticator/okta_verify/select-enrollment-channel',
+      pollUrl: nextStep.pollUrl,
+      stateHandle: nextStep.stateHandle
+    })
+  });
+});
+
+router.get('/enroll-authenticator/okta_verify/enrollment-data', (req, res) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator', {
+      title: 'Enroll Okta Verify',
+      action: '/enroll-authenticator/okta_verify/enrollment-data',
+      input: {
+        type: 'text',
+        name: 'verificationCode',
+      },
+    })
+  });
+});
+
+router.post('/enroll-authenticator/okta_verify/enrollment-data', async (req, res, next) => {
+  const { idxMethod } = req.getFlowStates();
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.proceed({ 
+    verificationCode,
+  });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
 // Handle Google Authenticator
 router.get('/enroll-authenticator/google_otp', async (req, res) => {
   renderPage({

@@ -24,6 +24,6 @@
     "concurrently": "^6.0.1"
   },
   "peerDependencies": {
-    "@okta/okta-signin-widget": "^5.13.0"
+    "@okta/okta-signin-widget": "^5.13.1"
   }
 }

@@ -45,7 +45,7 @@ export function getRemediator(
     if (!isRemeditionInFlow) {
       continue;
     }
-      
+
     const T = remediators[remediation.name];
     remediator = new T(remediation, values);
     if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations, values)) {
@@ -58,7 +58,7 @@ export function getRemediator(
       remediatorCandidates.push(remediator);  
     }
   }
-  
+
   // TODO: why is it a problem to have multiple remediations? 
   // JIRA: https://oktainc.atlassian.net/browse/OKTA-400758
   // if (remediatorCandidates.length > 1) {
@@ -122,11 +122,13 @@ function getIdxMessages(
 function getNextStep(
   remediator: Remediator, idxResponse: IdxResponse
 ): NextStep {
-  const nextStep = remediator.getNextStep();
+  // @ts-ignore
+  const nextStep = remediator.getNextStep(idxResponse.context);
   const canSkip = canSkipFn(idxResponse);
   const canResend = canResendFn(idxResponse);
   return {
     ...nextStep,
+
     ...(canSkip && {canSkip}),
     ...(canResend && {canResend}),
   };
