@@ -57,6 +57,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   Then the screen changes to receive an input for a code
   When She inputs the correct code from her SMS
     And She selects "Verify"
+  Then she sees a list of factors to register
+  When she selects "Skip" on remaining authenticators
   Then she is redirected to the Root View
     And an application session is created
 
