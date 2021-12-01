@@ -360,7 +360,6 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
           });
@@ -373,7 +372,6 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.reload).toHaveBeenCalled();
           });
