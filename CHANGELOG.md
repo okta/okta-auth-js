@@ -17,6 +17,7 @@
 - [#1005](https://github.com/okta/okta-auth-js/pull/1005)
   - Handles `rememberMe` boolean in IDX Identify remediation adapter
   - Typescript: Adds `type` field for `Input` type in NextStep object
+- [#1012](https://github.com/okta/okta-auth-js/pull/1012) Fixes null access when crypto is not present
 
 ## 5.8.0
 
