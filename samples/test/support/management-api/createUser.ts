@@ -34,6 +34,15 @@ export default async (credentials: UserCredentials, assignToGroups = [userGroup]
   };
 
   try {
+    // Create basic auth group if it doesn't exist
+    let {value: testGroup} = await oktaClient.listGroups({
+      q: userGroup
+    }).next();
+
+    if (!testGroup) {
+      testGroup = await oktaClient.createGroup(basicAuthGroup);
+    }
+
     user = await oktaClient.createUser({
       profile: {
         firstName: credentials.firstName,
@@ -59,7 +68,12 @@ export default async (credentials: UserCredentials, assignToGroups = [userGroup]
       }).next();
 
       if (!testGroup) {
-        testGroup = await oktaClient.createGroup(basicAuthGroup);
+        const group = {
+          profile: {
+            name: groupName
+          }
+        };
+        testGroup = await oktaClient.createGroup(group);
       }
 
       await oktaClient.addUserToGroup((testGroup as Group).id, user.id);
