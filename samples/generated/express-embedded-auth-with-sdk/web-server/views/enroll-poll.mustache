@@ -2,24 +2,13 @@
 <html>
   <head>
     {{>head}}
-
+    {{#pollInterval}}
     <script type="text/javascript">
-      const intervalId = setInterval(function () {
-        fetch('{{{pollUrl}}}', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-            },
-          body: JSON.stringify({
-            stateHandle: '{{stateHandle}}',
-          })
-        }).then(function (response) {
-          response.json(function (respJson) {
-            console.log(respJson);
-          })
-        });
-      }, 4000);
+      setTimeout(function () {
+        window.location.reload();
+      }, {{pollInterval}});
     </script>
+    {{/pollInterval}}
   </head>
   <body id="samples">
   
@@ -48,17 +37,6 @@
         </div>
       {{/contextualData}}
 
-      <div class="row">
-        <form id="enroll-poll-form" class="ui large form" action="{{action}}" method="POST">
-          <div class="field">
-            <div class="ui input">
-              {{#input}}
-                <input id="state-handle-input" type="hidden" name="state-handle" />
-              {{/input}}
-            </div>
-          </div>
-        </form>
-      </div>
       {{>cancel}}
     </div>
   </body>

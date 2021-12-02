@@ -17,7 +17,7 @@ import { NextStep } from '../../types';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface EnrollPollValues extends RemediationValues {
-  authenticator: string;
+  channel?: string;
 }
 
 export class EnrollPoll extends Remediator {
@@ -26,7 +26,7 @@ export class EnrollPoll extends Remediator {
   values: EnrollPollValues;
 
   canRemediate() {
-    return false;
+    return Boolean(this.values.channel);
   }
 
   getNextStep(context?): NextStep {
@@ -39,9 +39,12 @@ export class EnrollPoll extends Remediator {
       name, 
       authenticator,
       //@ts-ignore
-      pollUrl: this.remediation.href,
-      //@ts-ignore
-      stateHandle: this.values.stateHandle
+      pollInterval: parseInt(this.remediation?.refresh)
     };
+  }
+
+  getValuesAfterProceed(): unknown {
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'channel');
+    return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
   }
 }
