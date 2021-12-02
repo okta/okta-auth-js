@@ -247,52 +247,31 @@ router.get('/enroll-authenticator/okta_verify/select-enrollment-channel', async 
 });
 
 router.post('/enroll-authenticator/okta_verify/select-enrollment-channel', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
   const authClient = getAuthClient(req);
-  const transaction = await authClient.proceed({ 
+  const transaction = await authClient.idx.proceed({
     channel: 'email',
   });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-
-router.get('/enroll-authenticator/okta_verify/enroll-poll', (req, res) => {
-  const { 
-    idx: { nextStep }
-  } = req.getFlowStates();
-  renderPage({
-    req, res,
-    render: () => renderTemplate(req, res, 'enroll-poll', {
-      title: 'Enroll Okta Verify',
-      action: '/enroll-authenticator/okta_verify/select-enrollment-channel',
-      pollUrl: nextStep.pollUrl,
-      stateHandle: nextStep.stateHandle
-    })
-  });
-});
-
-router.get('/enroll-authenticator/okta_verify/enrollment-data', (req, res) => {
-  renderPage({
-    req, res,
-    render: () => renderTemplate(req, res, 'authenticator', {
-      title: 'Enroll Okta Verify',
-      action: '/enroll-authenticator/okta_verify/enrollment-data',
-      input: {
-        type: 'text',
-        name: 'verificationCode',
-      },
-    })
-  });
-});
-
-router.post('/enroll-authenticator/okta_verify/enrollment-data', async (req, res, next) => {
-  const { idxMethod } = req.getFlowStates();
-  const { verificationCode } = req.body;
+router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res, next) => {
   const authClient = getAuthClient(req);
-  const transaction = await authClient.proceed({ 
-    verificationCode,
-  });
-  handleTransaction({ req, res, next, authClient, transaction });
+  const transaction = await authClient.idx.proceed({channel: 'qrcode'});
+  const { 
+    nextStep
+  } = transaction;
+
+  if (nextStep) {
+    renderPage({
+      req, res,
+      render: () => renderTemplate(req, res, 'enroll-poll', {
+        title: 'Enroll Okta Verify',
+        pollInterval: nextStep.pollInterval,
+      })
+    });
+  } else {
+    handleTransaction({ req, res, next, authClient, transaction });
+  }
 });
 
 // Handle Google Authenticator

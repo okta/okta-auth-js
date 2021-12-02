@@ -235,7 +235,6 @@ export async function remediate(
   const data = remediator.getData();
   try {
     idxResponse = await idxResponse.proceed(name, data);
-
     // Track succeed remediations in the current transaction
     await flowMonitor.trackRemediations(name);
     
@@ -250,7 +249,7 @@ export async function remediate(
     if (terminal) {
       return { terminal, messages };
     }
-
+    
     // Handle idx message in nextStep
     if (messages.length) {
       const nextStep = getNextStep(remediator, idxResponse);

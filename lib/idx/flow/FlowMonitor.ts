@@ -31,6 +31,12 @@ export class FlowMonitor {
       return false;
     }
 
+    const previousValues = Object.keys(this.previousRemediator.values);
+    const currentValues = Object.keys(remediator.values);
+    if (remediator.getName() === 'enroll-poll' && previousValues.length !== currentValues.length) {
+      return false;
+    }
+
     if (this.previousRemediator.getName() === remediator.getName()) {
       return true;
     }
