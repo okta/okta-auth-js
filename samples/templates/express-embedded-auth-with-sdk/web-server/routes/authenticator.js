@@ -229,9 +229,6 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-
-
-
 router.get('/enroll-authenticator/okta_verify/select-enrollment-channel', async (req, res) => {
   const { 
     idx: { nextStep: { options, canSkip } }
@@ -254,24 +251,25 @@ router.post('/enroll-authenticator/okta_verify/select-enrollment-channel', async
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res, next) => {
-  const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.proceed({channel: 'qrcode'});
+router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
   const { 
-    nextStep
-  } = transaction;
+    idx: { nextStep }
+  } = req.getFlowStates();
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'enroll-poll', {
+      title: 'Enroll Okta Verify',
+      action: '/enroll-authenticator/okta_verify/enroll-poll',
+      pollInterval: nextStep.pollInterval,
+    })
+  });
+});
 
-  if (nextStep) {
-    renderPage({
-      req, res,
-      render: () => renderTemplate(req, res, 'enroll-poll', {
-        title: 'Enroll Okta Verify',
-        pollInterval: nextStep.pollInterval,
-      })
-    });
-  } else {
-    handleTransaction({ req, res, next, authClient, transaction });
-  }
+router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res, next) => {
+  const { channel } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({channel});
+  handleTransaction({ req, res, next, authClient, transaction });
 });
 
 // Handle Google Authenticator
