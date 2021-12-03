@@ -22,7 +22,6 @@ export * from './ReEnrollAuthenticator';
 export * from './RedirectIdp';
 export * from './SelectAuthenticatorAuthenticate';
 export * from './SelectAuthenticatorEnroll';
-export * from './SelectEnrollmentChannel';
 export * from './SelectEnrollProfile';
 export * from './AuthenticatorVerificationData';
 export * from './AuthenticatorEnrollmentData';
