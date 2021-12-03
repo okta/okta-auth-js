@@ -13,7 +13,7 @@
 
 /* eslint-disable max-len */
 import { Factory } from 'fishery';
-import { IdxResponse, RawIdxResponse } from '../../../../lib/idx/types/idx-js';
+import { IdxContext, IdxResponse, RawIdxResponse } from '../../../../lib/idx/types/idx-js';
 import {
   IdentifyRemediationFactory,
   IdentifyWithPasswordRemediationFactory,
@@ -45,7 +45,7 @@ export const IdxResponseFactory = Factory.define<IdxResponse, MockedIdxResponseT
     }),
     actions: {},
     toPersist: {},
-    context: {}
+    context: {} as IdxContext
   };
 });
 
