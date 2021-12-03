@@ -122,7 +122,6 @@ function getIdxMessages(
 function getNextStep(
   remediator: Remediator, idxResponse: IdxResponse
 ): NextStep {
-  // @ts-ignore
   const nextStep = remediator.getNextStep(idxResponse.context);
   const canSkip = canSkipFn(idxResponse);
   const canResend = canResendFn(idxResponse);

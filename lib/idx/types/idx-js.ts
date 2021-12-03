@@ -1,3 +1,4 @@
+import { IdxContext } from './idx-js';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -89,6 +90,38 @@ export interface IdxRemediation {
   method?: string;
   type?: string;
   accepts?: string;
+  refresh?: number;
+}
+
+export interface IdxContext {
+  version: string;
+  stateHandle: string;
+  expiresAt: string;
+  intent: string;
+  currentAuthenticator: {
+    type: 'object';
+    value: IdxAuthenticator;
+  };
+  authenticators: {
+    type: 'array';
+    value: IdxAuthenticator[];
+  };
+  authenticatorEnrollments: {
+    type: 'array';
+    value: IdxAuthenticator[];
+  };
+  enrollmentAuthenticator: {
+    type: 'object';
+    value: IdxAuthenticator;
+  };
+  user: {
+    type: 'object';
+    value: Record<string, unknown>;
+  };
+  app: {
+    type: object;
+    value: Record<string, unknown>;
+  };
 }
 
 export interface IdxMessage {
@@ -137,6 +170,7 @@ export interface IdxResponse {
   toPersist: {
     interactionHandle?: string;
   };
+  context?: IdxContext;
 }
 
 export function isIdxResponse(obj: any): obj is IdxResponse {
