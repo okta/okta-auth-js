@@ -13,6 +13,7 @@
 
 import { Remediator, RemediationValues } from './Base/Remediator';
 import { NextStep } from '../../types';
+import { IdxContext } from '../types/idx-js';
 
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -29,7 +30,7 @@ export class EnrollPoll extends Remediator {
     return Boolean(this.values.channel);
   }
 
-  getNextStep(context?): NextStep {
+  getNextStep(context?: IdxContext): NextStep & {pollInterval: number} {
     const name = this.getName();
     let authenticator = this.getAuthenticator();
     if (!authenticator && context?.currentAuthenticator) {
@@ -38,8 +39,7 @@ export class EnrollPoll extends Remediator {
     return { 
       name, 
       authenticator,
-      //@ts-ignore
-      pollInterval: parseInt(this.remediation?.refresh)
+      pollInterval: this.remediation?.refresh,
     };
   }
 

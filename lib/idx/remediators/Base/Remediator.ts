@@ -14,7 +14,7 @@
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
 import { NextStep, IdxMessage, Authenticator, Input } from '../../types';
-import { IdxAuthenticator, IdxRemediation } from '../../types/idx-js';
+import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
@@ -114,7 +114,7 @@ export class Remediator {
     return !!data;
   }
 
-  getNextStep(): NextStep {
+  getNextStep(_context?: IdxContext): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
     const authenticator = this.getAuthenticator();
