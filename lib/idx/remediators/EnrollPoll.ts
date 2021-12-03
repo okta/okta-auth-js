@@ -18,7 +18,7 @@ import { IdxContext } from '../types/idx-js';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface EnrollPollValues extends RemediationValues {
-  channel?: string;
+  startPolling?: unknown;
 }
 
 export class EnrollPoll extends Remediator {
@@ -27,7 +27,7 @@ export class EnrollPoll extends Remediator {
   values: EnrollPollValues;
 
   canRemediate() {
-    return Boolean(this.values.channel);
+    return Boolean(this.values.startPolling);
   }
 
   getNextStep(context?: IdxContext): NextStep & {pollInterval: number} {
@@ -44,7 +44,7 @@ export class EnrollPoll extends Remediator {
   }
 
   getValuesAfterProceed(): unknown {
-    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'channel');
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'startPolling');
     return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
   }
 }

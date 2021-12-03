@@ -229,28 +229,6 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.get('/enroll-authenticator/okta_verify/select-enrollment-channel', async (req, res) => {
-  const { 
-    idx: { nextStep: { options, canSkip } }
-  } = req.getFlowStates();
-  renderPage({ 
-    req, res,
-    render: () => renderTemplate(req, res, 'select-authenticator', {
-      options,
-      action: '/enroll-authenticator/okta_verify/select-enrollment-channel',
-      canSkip,
-    })
-  });
-});
-
-router.post('/enroll-authenticator/okta_verify/select-enrollment-channel', async (req, res, next) => {
-  const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.proceed({
-    channel: 'email',
-  });
-  handleTransaction({ req, res, next, authClient, transaction });
-});
-
 router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
   const { 
     idx: { nextStep }
@@ -266,9 +244,9 @@ router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => 
 });
 
 router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res, next) => {
-  const { channel } = req.body;
+  const { startPolling } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.proceed({channel});
+  const transaction = await authClient.idx.proceed({startPolling});
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
