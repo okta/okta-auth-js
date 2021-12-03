@@ -4,8 +4,11 @@
     {{>head}}
     {{#pollInterval}}
     <script type="text/javascript">
-      setTimeout(function () {
-        window.location.reload();
+      setInterval(function () {
+        const pollingForm = document.getElementById('enroll-poll-form');
+        if (pollingForm) {
+          pollingForm.submit();
+        }
       }, {{pollInterval}});
     </script>
     {{/pollInterval}}
@@ -35,8 +38,14 @@
             {{/contextualData.qrcode}}
           </div>
         </div>
+        <div class="row">
+          <form id="enroll-poll-form" class="ui large form" action="{{action}}" method="POST">
+            <div class="field">
+              <input id="selected-channel" type="hidden" name="channel" value="{{contextualData.selectedChannel}}"/>
+            </div>
+          </form>
+        </div>
       {{/contextualData}}
-
       {{>cancel}}
     </div>
   </body>
