@@ -268,6 +268,42 @@ describe('idx/register', () => {
       expect(res.error.errorSummary).toBe('Registration is not supported based on your current org configuration.');
       expect(mocked.startTransaction.startTransaction).toHaveBeenCalledWith(authClient, { flow: 'register' });
     });
+    it('presence of identify remediation means activationToken is not supported', async () => {
+      const { authClient, transactionMeta } = testContext;
+      jest.spyOn(authClient.transactionManager, 'exists').mockReturnValue(false);
+      authClient.token.prepareTokenParams = jest.fn().mockResolvedValue(transactionMeta);
+      const identifyResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          IdentifyRemediationFactory.build()
+        ]
+      });
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
+      const res = await register(authClient, { activationToken: 'fn-activationToken' });
+      expect(res.status).toBe(IdxStatus.FAILURE);
+      expect(res.error).toBeInstanceOf(AuthSdkError);
+      expect(res.error.errorSummary).toBe('activationToken is not supported based on your current org configuration.');
+    });
+    it('with activationToken should not check select-enroll-profile remediation', async () => {
+      const { authClient, transactionMeta } = testContext;
+      jest.spyOn(authClient.transactionManager, 'exists').mockReturnValue(false);
+      authClient.token.prepareTokenParams = jest.fn().mockResolvedValue(transactionMeta);
+      const identifyResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          SelectAuthenticatorEnrollRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  PasswordAuthenticatorOptionFactory.build()
+                ]
+              })
+            ]
+          })
+        ]
+      });
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
+      const res = await register(authClient, { activationToken: 'fn-activationToken' });
+      expect(res.status).toBe(IdxStatus.PENDING);
+    });
   });
 
   describe('enroll profile', () => {

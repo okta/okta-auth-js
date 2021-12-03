@@ -43,9 +43,13 @@ export async function register(
 ): Promise<IdxTransaction> {
   // Only check at the beginning of the transaction
   if (!transactionMetaExist(authClient)) {
-    const { enabledFeatures } = await startTransaction(authClient, { flow: 'register', ...options });
-    if (enabledFeatures && !enabledFeatures.includes(IdxFeature.REGISTRATION)) {
+    const { enabledFeatures, availableSteps } = await startTransaction(authClient, { flow: 'register', ...options });
+    if (!options.activationToken && enabledFeatures && !enabledFeatures.includes(IdxFeature.REGISTRATION)) {
       const error = new AuthSdkError('Registration is not supported based on your current org configuration.');
+      return { status: IdxStatus.FAILURE, error };
+    }
+    if (options.activationToken && availableSteps?.some(({ name }) => name === 'identify')) {
+      const error = new AuthSdkError('activationToken is not supported based on your current org configuration.');
       return { status: IdxStatus.FAILURE, error };
     }
   }
