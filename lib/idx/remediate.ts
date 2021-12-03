@@ -127,7 +127,6 @@ function getNextStep(
   const canResend = canResendFn(idxResponse);
   return {
     ...nextStep,
-
     ...(canSkip && {canSkip}),
     ...(canResend && {canResend}),
   };
@@ -184,7 +183,7 @@ export async function remediate(
   if (terminal) {
     return { terminal, messages };
   }
-  
+
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
   const actions = [
@@ -209,7 +208,7 @@ export async function remediate(
   }
 
   const remediator = getRemediator(neededToProceed, values, options);
-  
+
   if (!remediator) {
     throw new AuthSdkError(`
       No remediation can match current flow, check policy settings in your org.
@@ -236,7 +235,7 @@ export async function remediate(
     idxResponse = await idxResponse.proceed(name, data);
     // Track succeed remediations in the current transaction
     await flowMonitor.trackRemediations(name);
-    
+
     // Successfully get interaction code
     if (idxResponse.interactionCode) {
       return { idxResponse };
@@ -248,13 +247,13 @@ export async function remediate(
     if (terminal) {
       return { terminal, messages };
     }
-    
+
     // Handle idx message in nextStep
     if (messages.length) {
       const nextStep = getNextStep(remediator, idxResponse);
       return { nextStep, messages };
     }
-    
+
     // We may want to trim the values bag for the next remediation
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValuesAfterProceed();
