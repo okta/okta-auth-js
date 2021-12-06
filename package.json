@@ -2,10 +2,9 @@
   "private": true,
   "name": "@okta/okta-auth-js",
   "description": "The Okta Auth SDK",
-  "version": "5.9.0",
+  "version": "5.9.1",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
-  "type": "commonjs",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "browser": {
