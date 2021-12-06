@@ -64,7 +64,7 @@ function defaultState(): TokenManagerState {
     renewPromise: null,
   };
 }
-let iii = 0;
+
 export class TokenManager implements TokenManagerInterface {
   private sdk: OktaAuth;
   private clock: SdkClock;
@@ -399,38 +399,47 @@ export class TokenManager implements TokenManagerInterface {
   }
 
   // TODO: renew method should take no param, change in the next major version OKTA-407224
-  async renew(key): Promise<Token> {
+  renew(key): Promise<Token> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
     if (this.state.renewPromise) {
       return this.state.renewPromise;
     }
   
-    const token: Token = this.getSync(key);
-    if (!token) {
-      throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
-    }
-
-    this.state.renewPromise = this.syncService.renewTokenCrossTabs(key);
-    if (this.state.renewPromise) {
-      // Wait for renew in another tab
-      return this.state.renewPromise.catch(_e => {
-        // Retry
-        return this.renew(key);
-      });
+    let token: Token;
+    try {
+      token = this.getSync(key);
+      if (!token) {
+        throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
+      }
+    } catch(e) {
+      return Promise.reject(e);
     }
 
     // Remove existing autoRenew timeout
     this.clearExpireEventTimeout(key);
-  
-    // A refresh token means a replace instead of renewal
+
+    // Check if renewal was already started in other tab
     // Store the renew promise state, to avoid renewing again
-    this.state.renewPromise = this._renew(key, token);
-    try {
-      return await this.state.renewPromise;
-    } finally {
-      this.syncService.finishRenewToken(key);
-      this.state.renewPromise = null;
-    }
+    this.state.renewPromise = this.syncService.renewTokenCrossTabs(key).then(newToken => {
+      if (newToken) {
+        // Token was renewed from another tab
+        return newToken;
+      } else {
+        // Renew in current tab
+        return this._renew(key, token).finally(() => {
+          // Notify other tabs
+          this.syncService.finishRenewToken(key);
+          // Remove existing promise key
+          this.state.renewPromise = null;
+        });
+      }
+    }).catch(e => {
+      return Promise.reject(e);
+      // Token renewal in another tab failed
+      // Retry
+      //return this.renew(key);
+    });
+    return this.state.renewPromise;
   }
 
   private async _renew(key, token): Promise<Token> {

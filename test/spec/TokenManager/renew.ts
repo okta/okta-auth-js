@@ -13,10 +13,16 @@ describe('TokenManager renew', () => {
   let testContext;
 
   beforeEach(function() {
+    const syncStorageMap = {};
     const emitter = new Emitter();
     const tokenStorage = {
         getStorage: jest.fn().mockImplementation(() => testContext.storage),
         setStorage: jest.fn().mockImplementation(() => {})
+    };
+    const syncStorage = {
+      getItem: jest.fn().mockImplementation((k) => syncStorageMap[k]),
+      setItem: jest.fn().mockImplementation((k, v) => syncStorageMap[k] = v),
+      removeItem: jest.fn().mockImplementation((k) => delete syncStorageMap[k]),
     };
     const sdkMock = {
       options: {},
@@ -25,7 +31,7 @@ describe('TokenManager renew', () => {
       },
       storageManager: {
         getTokenStorage: jest.fn().mockReturnValue(tokenStorage),
-        getSyncStorage: jest.fn().mockReturnValue(null),
+        getSyncStorage: jest.fn().mockReturnValue(syncStorage),
       },
       emitter
     };

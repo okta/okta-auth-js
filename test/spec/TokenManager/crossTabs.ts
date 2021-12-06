@@ -22,16 +22,24 @@ const Emitter = require('tiny-emitter');
 describe('cross tabs communication', () => {
   let sdkMock;
   let instance;
+  let syncStorage, syncStorageMap;
   beforeEach(function() {
     jest.useFakeTimers();
     instance = null;
     const emitter = new Emitter();
+    syncStorageMap = {};
+    syncStorage = {
+      getItem: jest.fn().mockImplementation((k) => syncStorageMap[k]),
+      setItem: jest.fn().mockImplementation((k, v) => syncStorageMap[k] = v),
+      removeItem: jest.fn().mockImplementation((k) => delete syncStorageMap[k]),
+    };
     sdkMock = {
       options: {},
       storageManager: {
         getTokenStorage: jest.fn().mockReturnValue({
           getStorage: jest.fn().mockReturnValue({})
         }),
+        getSyncStorage: jest.fn().mockReturnValue(syncStorage),
         getOptionsForSection: jest.fn().mockReturnValue({})
       },
       emitter

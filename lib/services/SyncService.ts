@@ -21,7 +21,7 @@ const RACE_WAIT_TIMEOUT = 5;
 
 export const EVENT_RENEWED_SYNC = 'renewed_sync';
 
-declare type SyncEventHandler = () => void;
+declare type SyncEventHandler = (key: string) => void;
 
 // const DEFAULT_OPTIONS = {
 //   storageKey: SYNC_STORAGE_NAME,
@@ -39,7 +39,9 @@ export class SyncService {
   constructor(sdk: OktaAuth, tokenManager: TokenManager, storageOptions?: StorageOptions) {
     this.emitter = (sdk as any).emitter;
     this.storageOptions = storageOptions;
-    this.syncStorage = sdk.storageManager.getSyncStorage(storageOptions);
+    try {
+      this.syncStorage = sdk.storageManager.getSyncStorage(storageOptions);
+    } catch(_e) {}
     this.tokenManager = tokenManager;
 
     this.on = this.emitter.on.bind(this.emitter);
@@ -63,16 +65,16 @@ export class SyncService {
   }
 
   finishRenewToken(key: string) {
-    if (!this.tokenManager.getOptions().syncStorage || true) {
+    if (!this.tokenManager.getOptions().syncStorage || !this.syncStorage) {
       return;
     }
 
     this.syncStorage.removeItem(key);
   }
 
-  async renewTokenCrossTabs(key: string): Promise<Token> | null {
-    if (!this.tokenManager.getOptions().syncStorage || true) {
-      return null;
+  renewTokenCrossTabs(key: string): Promise<Token | null> {
+    if (!this.tokenManager.getOptions().syncStorage || !this.syncStorage) {
+      return Promise.resolve(null);
     }
 
     const tabId = Math.random().toString();
@@ -85,37 +87,34 @@ export class SyncService {
       syncItem = null;
     }
 
-    function makePromise(): Promise<Token> {
-      return new Promise(function (resolve, reject) {
+    const makePromise = () => new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        this.off(EVENT_RENEWED_SYNC, handler);
+        reject(new AuthSdkError('Token renew timed out'));
+      }, RENEWED_EVENT_TIMEOUT);
 
-        const timeoutId = setTimeout(function() {
-          this.off(EVENT_RENEWED_SYNC, handler);
-          reject(new AuthSdkError('Token renew timed out'));
-        }, RENEWED_EVENT_TIMEOUT);
-
-        function handler(ekey) {
-          if (ekey != key) {
-            // skip handler for another key
-            return;
-          }
-          // off
-          this.off(EVENT_RENEWED_SYNC, handler);
-          clearTimeout(timeoutId);
-
-          const newToken = this.tokenManager.getSync(key);
-
-          if (newToken && JSON.stringify(newToken) !== JSON.stringify(token)) {
-            // Token has been renewed in another tab
-            resolve(newToken);
-          } else {
-            // Token renewal in another tab failed
-            reject(new AuthSdkError('Token renew failed'));
-          }
+      const handler = (ekey) => {
+        if (ekey != key) {
+          // skip handler for another key
+          return;
         }
-        
-        this.on(EVENT_RENEWED_SYNC, handler);
-      });
-    };
+        // off
+        this.off(EVENT_RENEWED_SYNC, handler);
+        clearTimeout(timeoutId);
+
+        const newToken = this.tokenManager.getSync(key) as Token;
+
+        if (newToken && JSON.stringify(newToken) !== JSON.stringify(token)) {
+          // Token has been renewed in another tab
+          resolve(newToken);
+        } else {
+          // Token renewal in another tab failed
+          reject(new AuthSdkError('Token renew failed'));
+        }
+      };
+      
+      this.on(EVENT_RENEWED_SYNC, handler);
+    }) as Promise<Token>;
 
     if (syncItem) {
       return makePromise();
@@ -124,19 +123,21 @@ export class SyncService {
     // Notify other tabs about start of renewal process
     this.syncStorage.setItem(key, {date: new Date().getTime(), id: tabId});
 
-    // Wait for race condition
-    await new Promise(resolve => setTimeout(resolve, RACE_WAIT_TIMEOUT));
-
-    const syncItem2 = this.syncStorage.getItem(key);
-    if (!syncItem2) {
-      // race condition - anoter tab won race in 5ms
-      // renew as usual
-      return null;
-    }
-    if (syncItem2 && syncItem2.id != tabId) {
-      // race condition - not win
-      return makePromise();
-    }
+    // Wait 5ms for potential race condition
+    return new Promise(resolve => setTimeout(resolve, RACE_WAIT_TIMEOUT)).then(() => {
+      const syncItem2 = this.syncStorage.getItem(key);
+      if (!syncItem2) {
+        // race condition - anoter tab won race in 5ms
+        // renew as usual
+        return null;
+      } else if (syncItem2 && syncItem2.id != tabId) {
+        // race condition - not win
+        return makePromise();
+      } else {
+        // no race condition
+        return null;
+      }
+    });
 
   }
 
