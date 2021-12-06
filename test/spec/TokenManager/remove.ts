@@ -15,6 +15,7 @@ describe('TokenManager remove', () => {
       options: {},
       storageManager: {
         getTokenStorage: jest.fn().mockReturnValue(tokenStorage),
+        getSyncStorage: jest.fn().mockReturnValue(null),
       },
       emitter
     };

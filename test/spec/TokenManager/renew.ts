@@ -25,6 +25,7 @@ describe('TokenManager renew', () => {
       },
       storageManager: {
         getTokenStorage: jest.fn().mockReturnValue(tokenStorage),
+        getSyncStorage: jest.fn().mockReturnValue(null),
       },
       emitter
     };
