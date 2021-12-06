@@ -34,8 +34,9 @@ import {
   TokenManagerInterface,
   RefreshToken
 } from './types';
-import { REFRESH_TOKEN_STORAGE_KEY } from './constants';
+import { REFRESH_TOKEN_STORAGE_KEY, SYNC_STORAGE_NAME } from './constants';
 import { TokenService } from './services/TokenService';
+import { SyncService } from './services/SyncService';
 
 const DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -44,6 +45,7 @@ const DEFAULT_OPTIONS = {
   expireEarlySeconds: 30,
   storageKey: TOKEN_STORAGE_NAME,
   syncStorage: true,
+  syncStorageKey: SYNC_STORAGE_NAME,
   _storageEventDelay: 0
 };
 export const EVENT_EXPIRED = 'expired';
@@ -59,9 +61,10 @@ interface TokenManagerState {
 function defaultState(): TokenManagerState {
   return {
     expireTimeouts: {},
-    renewPromise: null
+    renewPromise: null,
   };
 }
+let iii = 0;
 export class TokenManager implements TokenManagerInterface {
   private sdk: OktaAuth;
   private clock: SdkClock;
@@ -70,6 +73,7 @@ export class TokenManager implements TokenManagerInterface {
   private state: TokenManagerState;
   private options: TokenManagerOptions;
   private service: TokenService;
+  private syncService: SyncService;
 
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
@@ -105,6 +109,11 @@ export class TokenManager implements TokenManagerInterface {
     this.clock = SdkClock.create(/* sdk, options */);
     this.state = defaultState();
 
+    const syncStorageOptions: StorageOptions = {
+      storageKey: this.options.syncStorageKey,
+    };
+    this.syncService = new SyncService(this.sdk, this, syncStorageOptions);
+
     this.on = this.emitter.on.bind(this.emitter);
     this.off = this.emitter.off.bind(this.emitter);
   }
@@ -113,7 +122,7 @@ export class TokenManager implements TokenManagerInterface {
     if (this.service) {
       this.stop();
     }
-    this.service = new TokenService(this, this.getOptions());
+    this.service = new TokenService(this, this.syncService, this.getOptions());
     this.service.start();
   }
   
@@ -121,6 +130,7 @@ export class TokenManager implements TokenManagerInterface {
     if (this.service) {
       this.service.stop();
       this.service = null;
+      this.syncService = null;
     }
   }
 
@@ -157,7 +167,7 @@ export class TokenManager implements TokenManagerInterface {
   emitError(error) {
     this.emitter.emit(EVENT_ERROR, error);
   }
-  
+
   emitEventsForCrossTabsStorageUpdate(newValue, oldValue) {
     const oldTokens = this.getTokensFromStorageValue(oldValue);
     const newTokens = this.getTokensFromStorageValue(newValue);
@@ -389,51 +399,60 @@ export class TokenManager implements TokenManagerInterface {
   }
 
   // TODO: renew method should take no param, change in the next major version OKTA-407224
-  renew(key): Promise<Token> {
+  async renew(key): Promise<Token> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
     if (this.state.renewPromise) {
       return this.state.renewPromise;
     }
   
-    try {
-      var token = this.getSync(key);
-      if (!token) {
-        throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
-      }
-    } catch (e) {
-      return Promise.reject(e);
+    const token: Token = this.getSync(key);
+    if (!token) {
+      throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
     }
-  
+
+    this.state.renewPromise = this.syncService.renewTokenCrossTabs(key);
+    if (this.state.renewPromise) {
+      // Wait for renew in another tab
+      return this.state.renewPromise.catch(_e => {
+        // Retry
+        return this.renew(key);
+      });
+    }
+
     // Remove existing autoRenew timeout
     this.clearExpireEventTimeout(key);
   
     // A refresh token means a replace instead of renewal
     // Store the renew promise state, to avoid renewing again
-    this.state.renewPromise = this.sdk.token.renewTokens()
-      .then(tokens => {
-        this.setTokens(tokens);
+    this.state.renewPromise = this._renew(key, token);
+    try {
+      return await this.state.renewPromise;
+    } finally {
+      this.syncService.finishRenewToken(key);
+      this.state.renewPromise = null;
+    }
+  }
 
-        // resolve token based on the key
-        const tokenType = this.getTokenType(token);
-        return tokens[tokenType];
-      })
-      .catch(err => {
-        // If renew fails, remove token and emit error
-        if (isRefreshTokenError(err) || err.name === 'OAuthError' || err.name === 'AuthSdkError') {
-          // remove token from storage
-          this.remove(key);
-          
-          err.tokenKey = key;
-          this.emitError(err);
-        }
-        throw err;
-      })
-      .finally(() => {
-        // Remove existing promise key
-        this.state.renewPromise = null;
-      });
-  
-    return this.state.renewPromise;
+  private async _renew(key, token): Promise<Token> {
+    try {
+      const tokens = await this.sdk.token.renewTokens();
+      this.setTokens(tokens);
+
+      // resolve token based on the key
+      const tokenType = this.getTokenType(token);
+      return tokens[tokenType];
+    } catch(err) {
+      // If renew fails, remove token and emit error
+      if (isRefreshTokenError(err) || err.name === 'OAuthError' || err.name === 'AuthSdkError') {
+        // remove token from storage
+        this.remove(key);
+        
+        err.tokenKey = key;
+        this.emitError(err);
+      }
+
+      throw err;
+    }
   }
   
   clear() {

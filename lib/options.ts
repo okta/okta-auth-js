@@ -53,6 +53,11 @@ const BROWSER_STORAGE: StorageManagerOptions = {
     storageTypes: [
       'localStorage'
     ]
+  },
+  sync: {
+    storageTypes: [
+      'localStorage'
+    ]
   }
 };
 

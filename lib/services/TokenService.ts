@@ -16,6 +16,7 @@ import { TokenManager, EVENT_EXPIRED } from '../TokenManager';
 import { AuthSdkError } from '../errors';
 import { isBrowser } from '../features';
 import { TokenManagerOptions } from '../types';
+import { SyncService } from './SyncService';
 
 function shouldThrottleRenew(renewTimeQueue) {
   let res = false;
@@ -35,9 +36,11 @@ export class TokenService {
   private storageListener: (event: StorageEvent) => void;
   private onTokenExpiredHandler: (key: string) => void;
   private syncTimeout: unknown;
+  private syncService: SyncService;
 
-  constructor(tokenManager: TokenManager, options: TokenManagerOptions = {}) {
+  constructor(tokenManager: TokenManager, syncService: SyncService, options: TokenManagerOptions = {}) {
     this.tokenManager = tokenManager;
+    this.syncService = syncService;
     this.options = options;
   }
 
@@ -66,16 +69,23 @@ export class TokenService {
       // https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent
 
       this.storageListener = ({ key, newValue, oldValue }: StorageEvent) => {
+        // if(key != 'okta-test-storage')
+        //   console.log('^^^ Crosstabs ^^^', key, newValue, oldValue, this.options.storageKey)
         const handleCrossTabsStorageChange = () => {
-          this.tokenManager.resetExpireEventTimeoutAll();
-          this.tokenManager.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+          if (key === this.syncService.storageKey) {
+            this.syncService.emitEventsForCrossTabsRenew(newValue, oldValue);
+          } else {
+            this.tokenManager.resetExpireEventTimeoutAll();
+            this.tokenManager.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
+          }
         };
 
         // Skip if:
         // not from localStorage.clear (event.key is null)
-        // event.key is not the storageKey
+        // event.key is not the storageKey and not syncStorageKey
         // oldValue === newValue
-        if (key && (key !== this.options.storageKey || newValue === oldValue)) {
+        const allowedKeys = [this.options.storageKey, this.syncService.storageKey];
+        if (key && (!allowedKeys.includes(key) || newValue === oldValue)) {
           return;
         }
 

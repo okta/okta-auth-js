@@ -20,7 +20,8 @@ import {
   ORIGINAL_URI_STORAGE_NAME,
   IDX_RESPONSE_STORAGE_NAME,
   CACHE_STORAGE_NAME,
-  REDIRECT_OAUTH_PARAMS_NAME
+  REDIRECT_OAUTH_PARAMS_NAME,
+  SYNC_STORAGE_NAME
 } from './constants';
 import {
   StorageUtil,
@@ -197,6 +198,14 @@ export default class StorageManager {
     options = this.getOptionsForSection('legacy-oauth-params', options);
     const storage = this.getStorage(options);
     const storageKey = options.storageKey || REDIRECT_OAUTH_PARAMS_NAME;
+    return new SavedObject(storage, storageKey);
+  }
+
+  // sync cross tabs
+  getSyncStorage(options?: StorageOptions): StorageProvider {
+    options = this.getOptionsForSection('sync', options);
+    const storage = this.getStorage(options);
+    const storageKey = options.storageKey || SYNC_STORAGE_NAME;
     return new SavedObject(storage, storageKey);
   }
 }
