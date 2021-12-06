@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.9.1
+
+### Other
+
+- [#1021](https://github.com/okta/okta-auth-js/pull/1021) Removes `type` field in package.json. As okta-auth-js includes multiple bundles (cjs, esm, umd) in the package, explicit `type` field causes error for some type of bundlers. This change fixes [issue](https://github.com/okta/okta-auth-js/issues/1017) with @angular/cli.
+
 ## 5.9.0
 
 ### Features
