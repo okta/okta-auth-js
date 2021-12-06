@@ -1,0 +1,16 @@
+{
+  "name": "@okta/tree-shaking",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "webpack --watch"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@okta/okta-auth-js": "*"
+  },
+  "devDependencies": {
+    "webpack": "^5.62.1",
+    "webpack-bundle-analyzer": "^4.5.0",
+    "terser-webpack-plugin": "^5.2.5"
+  }
+}
