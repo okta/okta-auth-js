@@ -37,7 +37,7 @@ This library uses semantic versioning and follows Okta's [library version policy
 
 ## Release Status
 
-:heavy_check_mark: The current stable major version series is: `4.x`
+:heavy_check_mark: The current stable major version series is: `5.x`
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
