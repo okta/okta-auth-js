@@ -2,16 +2,16 @@
 <html>
   <head>
     {{>head}}
-    {{#pollInterval}}
+    {{#pollForResult.refresh}}
     <script type="text/javascript">
       setInterval(function () {
         const pollingForm = document.getElementById('enroll-poll-form');
         if (pollingForm) {
           pollingForm.submit();
         }
-      }, {{pollInterval}});
+      }, {{pollForResult.refresh}});
     </script>
-    {{/pollInterval}}
+    {{/pollForResult.refresh}}
   </head>
   <body id="samples">
   
@@ -43,7 +43,7 @@
       <div class="row">
         <form id="enroll-poll-form" class="ui large form" action="{{action}}" method="POST">
           <div class="field">
-            <input id="start-polling" type="hidden" name="startPolling" value="1"/>
+            <input id="start-polling" type="hidden" name="pollForResult" value="1"/>
           </div>
         </form>
       </div>

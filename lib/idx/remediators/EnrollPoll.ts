@@ -15,10 +15,12 @@ import { Remediator, RemediationValues } from './Base/Remediator';
 import { NextStep } from '../../types';
 import { IdxContext } from '../types/idx-js';
 
+interface PollOptions {
+  refresh: number;
+}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface EnrollPollValues extends RemediationValues {
-  startPolling?: unknown;
+  pollForResult: PollOptions;
 }
 
 export class EnrollPoll extends Remediator {
@@ -27,10 +29,10 @@ export class EnrollPoll extends Remediator {
   values: EnrollPollValues;
 
   canRemediate() {
-    return Boolean(this.values.startPolling);
+    return Boolean(this.values.pollForResult);
   }
 
-  getNextStep(context?: IdxContext): NextStep & {pollInterval: number} {
+  getNextStep(context?: IdxContext): NextStep & {pollForResult: PollOptions} {
     const name = this.getName();
     let authenticator = this.getAuthenticator();
     if (!authenticator && context?.currentAuthenticator) {
@@ -39,12 +41,14 @@ export class EnrollPoll extends Remediator {
     return { 
       name, 
       authenticator,
-      pollInterval: this.remediation?.refresh,
+      pollForResult: {
+        refresh: this.remediation.refresh
+      },
     };
   }
 
   getValuesAfterProceed(): unknown {
-    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'startPolling');
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'pollForResult');
     return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
   }
 }
