@@ -27,7 +27,8 @@ import {
   EmailAuthenticatorFormFactory,
   PasswordAuthenticatorFormFactory,
   GoogleAuthenticatorFormFactory,
-  SecurityQuestionAuthenticatorFormFactory
+  SecurityQuestionAuthenticatorFormFactory,
+  OktaVerifyAuthenticatorFormFactory
 } from './forms';
 
 interface MockedIdxOption extends IdxOption {
@@ -67,7 +68,10 @@ export const PasswordAuthenticatorOptionFactory = AuthenticatorOptionFactory.par
 });
 
 export const OktaVerifyAuthenticatorOptionFactory = AuthenticatorOptionFactory.params({
-  _authenticator: OktaVerifyAuthenticatorFactory.build()
+  _authenticator: OktaVerifyAuthenticatorFactory.build(),
+  value: {
+    form: OktaVerifyAuthenticatorFormFactory.build()
+  }
 });
 
 

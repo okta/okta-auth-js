@@ -98,27 +98,27 @@ export interface IdxContext {
   expiresAt: string;
   intent: string;
   currentAuthenticator: {
-    type: 'object';
+    type: string;
     value: IdxAuthenticator;
   };
   authenticators: {
-    type: 'array';
+    type: string;
     value: IdxAuthenticator[];
   };
   authenticatorEnrollments: {
-    type: 'array';
+    type: string;
     value: IdxAuthenticator[];
   };
   enrollmentAuthenticator: {
-    type: 'object';
+    type: string;
     value: IdxAuthenticator;
   };
   user: {
-    type: 'object';
+    type: string;
     value: Record<string, unknown>;
   };
   app: {
-    type: object;
+    type: string;
     value: Record<string, unknown>;
   };
 }

@@ -47,13 +47,15 @@ import {
   SelectAuthenticatorAuthenticateRemediationFactory,
   EnrollGoogleAuthenticatorRemediationFactory,
   GoogleAuthenticatorOptionFactory,
+<<<<<<< HEAD
   SecurityQuestionAuthenticatorOptionFactory,
-  EnrollSecurityQuestionAuthenticatorRemediationFactory,
-  GoogleAuthenticatorOptionFactory,
+  EnrollSecurityQuestionAuthenticatorRemediationFactory
+=======
   OktaVerifyAuthenticatorOptionFactory,
   EnrollPollRemediationFactory,
   OktaVerifyAuthenticatorWithContextualDataFactory,
   IdxContextFactory,
+>>>>>>> add UT for Okta Verify enrollment polling
 } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/introspect', () => {
@@ -180,7 +182,11 @@ describe('idx/register', () => {
                 PhoneAuthenticatorOptionFactory.build(),
                 EmailAuthenticatorOptionFactory.build(),
                 GoogleAuthenticatorOptionFactory.build(),
+<<<<<<< HEAD
+                SecurityQuestionAuthenticatorOptionFactory.build()
+=======
                 OktaVerifyAuthenticatorOptionFactory.build(),
+>>>>>>> add UT for Okta Verify enrollment polling
               ]
             })
           ]
@@ -227,6 +233,15 @@ describe('idx/register', () => {
       ]
     });
 
+<<<<<<< HEAD
+    const enrollSecurityQuestionAuthenticatorResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollSecurityQuestionAuthenticatorRemediationFactory.build()
+      ]
+    });
+
+=======
+>>>>>>> add UT for Okta Verify enrollment polling
     testContext = {
       authClient,
       tokenResponse,
@@ -477,9 +492,15 @@ describe('idx/register', () => {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
           }, {
+<<<<<<< HEAD
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
+          }]
+=======
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY,
           },]
+>>>>>>> add UT for Okta Verify enrollment polling
         }
       });
     });
@@ -549,9 +570,15 @@ describe('idx/register', () => {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
           }, {
+<<<<<<< HEAD
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
+          }]
+=======
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY,
           },]
+>>>>>>> add UT for Okta Verify enrollment polling
         }
       });
     });
@@ -645,9 +672,15 @@ describe('idx/register', () => {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
           }, {
+<<<<<<< HEAD
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
+          }]
+=======
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY,
           },]
+>>>>>>> add UT for Okta Verify enrollment polling
         }
       });
 
@@ -1319,9 +1352,15 @@ describe('idx/register', () => {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
           }, {
+<<<<<<< HEAD
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
+          }]
+=======
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY
           },]
+>>>>>>> add UT for Okta Verify enrollment polling
         }
       });
 
@@ -1443,6 +1482,346 @@ describe('idx/register', () => {
 
   });
 
+<<<<<<< HEAD
+  describe('security question authenticator', () => {
+    it('can set an security question authenticator up front', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+        enrollSecurityQuestionAuthenticatorResponse
+      } = testContext;
+      
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollSecurityQuestionAuthenticatorResponse
+      ]);
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse);
+
+      let res = await register(authClient, {
+        authenticator: AuthenticatorKey.SECURITY_QUESTION
+      });
+      // Google authenticator is automatically selected
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+        authenticator: {
+          id: 'id-security-question-authenticator'
+        }
+      });
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'security_question',
+          authenticator: {
+            displayName: 'Security Question',
+            id: expect.any(String),
+            key: 'security_question',
+            methods: [
+              { type: 'security_question' }
+            ],
+            type: 'security_question',
+            contextualData: {
+              questions: [
+                {
+                  questionKey: 'disliked_food', 
+                  question: 'What is the food you least liked as a child?'
+                },
+                {
+                  questionKey: 'name_of_first_plush_toy', 
+                  question: 'What is the name of your first stuffed animal?'
+                },
+                {
+                  questionKey: 'first_award', 
+                  question: 'What did you earn your first medal or award for?'
+                }
+              ],
+              questionKeys: [
+                'disliked_food',
+                'name_of_first_plush_toy',
+                'first_award'
+              ]
+            }
+          },
+          inputs: [
+            { name: 'questionKey', type: 'string', require: true },
+            { name: 'question', type: 'string', label: 'Create a security question' },
+            { name: 'answer', type: 'string', label: 'Answer', required: true },
+          ]
+        }
+      });
+    });
+
+    it('can set an google authenticator on demand', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+        enrollSecurityQuestionAuthenticatorResponse,
+      } = testContext;
+      
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollSecurityQuestionAuthenticatorResponse
+      ]);
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(selectAuthenticatorResponse);
+
+      let res = await register(authClient, {});
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'select-authenticator-enroll',
+          inputs: [{
+            name: 'authenticator',
+            key: 'string',
+          }],
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }, {
+            label: 'Email',
+            value: AuthenticatorKey.OKTA_EMAIL
+          }, {
+            label: 'Google Authenticator',
+            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+          }, {
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
+          }]
+        }
+      });
+
+      res = await register(authClient, {
+        authenticators: [AuthenticatorKey.SECURITY_QUESTION]
+      });
+      // Email authenticator is automatically selected
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+        authenticator: {
+          id: 'id-security-question-authenticator'
+        }
+      });
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'security_question',
+          authenticator: {
+            displayName: 'Security Question',
+            id: expect.any(String),
+            key: 'security_question',
+            methods: [
+              { type: 'security_question' }
+            ],
+            type: 'security_question',
+            contextualData: {
+              questions: [
+                {
+                  questionKey: 'disliked_food', 
+                  question: 'What is the food you least liked as a child?'
+                },
+                {
+                  questionKey: 'name_of_first_plush_toy', 
+                  question: 'What is the name of your first stuffed animal?'
+                },
+                {
+                  questionKey: 'first_award', 
+                  question: 'What did you earn your first medal or award for?'
+                }
+              ],
+              questionKeys: [
+                'disliked_food',
+                'name_of_first_plush_toy',
+                'first_award'
+              ]
+            }
+          },
+          inputs: [
+            { name: 'questionKey', type: 'string', require: true },
+            { name: 'question', type: 'string', label: 'Create a security question' },
+            { name: 'answer', type: 'string', label: 'Answer', required: true },
+          ]
+        }
+      });
+    });
+
+    it('can enroll by choosing a question and with the answer', async () => {
+      const {
+        authClient,
+        enrollSecurityQuestionAuthenticatorResponse,
+        selectPhoneResponse,
+      } = testContext;
+      
+      chainResponses([
+        enrollSecurityQuestionAuthenticatorResponse,
+        selectPhoneResponse
+      ]);
+      jest.spyOn(enrollSecurityQuestionAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(enrollSecurityQuestionAuthenticatorResponse);
+
+      let res = await register(authClient, {});
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'security_question',
+          authenticator: {
+            displayName: 'Security Question',
+            id: expect.any(String),
+            key: 'security_question',
+            methods: [
+              { type: 'security_question' }
+            ],
+            type: 'security_question',
+            contextualData: {
+              questions: [
+                {
+                  questionKey: 'disliked_food', 
+                  question: 'What is the food you least liked as a child?'
+                },
+                {
+                  questionKey: 'name_of_first_plush_toy', 
+                  question: 'What is the name of your first stuffed animal?'
+                },
+                {
+                  questionKey: 'first_award', 
+                  question: 'What did you earn your first medal or award for?'
+                }
+              ],
+              questionKeys: [
+                'disliked_food',
+                'name_of_first_plush_toy',
+                'first_award'
+              ]
+            }
+          },
+          inputs: [
+            { name: 'questionKey', type: 'string', require: true },
+            { name: 'question', type: 'string', label: 'Create a security question' },
+            { name: 'answer', type: 'string', label: 'Answer', required: true },
+          ]
+        }
+      });
+
+      const answer = 'test-answer';
+      res = await register(authClient, { questionKey: 'test-key', answer });
+      expect(enrollSecurityQuestionAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
+        credentials: {
+          questionKey: 'test-key',
+          answer: 'test-answer'
+        }
+      });
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          canSkip: true,
+          name: 'select-authenticator-enroll',
+          inputs: [{
+            name: 'authenticator',
+            key: 'string',
+          }],
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }]
+        }
+      });
+    });
+
+    it('can enroll by creating own question and with the answer', async () => {
+      const {
+        authClient,
+        enrollSecurityQuestionAuthenticatorResponse,
+        selectPhoneResponse,
+      } = testContext;
+      
+      chainResponses([
+        enrollSecurityQuestionAuthenticatorResponse,
+        selectPhoneResponse
+      ]);
+      jest.spyOn(enrollSecurityQuestionAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(enrollSecurityQuestionAuthenticatorResponse);
+
+      let res = await register(authClient, {});
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'security_question',
+          authenticator: {
+            displayName: 'Security Question',
+            id: expect.any(String),
+            key: 'security_question',
+            methods: [
+              { type: 'security_question' }
+            ],
+            type: 'security_question',
+            contextualData: {
+              questions: [
+                {
+                  questionKey: 'disliked_food', 
+                  question: 'What is the food you least liked as a child?'
+                },
+                {
+                  questionKey: 'name_of_first_plush_toy', 
+                  question: 'What is the name of your first stuffed animal?'
+                },
+                {
+                  questionKey: 'first_award', 
+                  question: 'What did you earn your first medal or award for?'
+                }
+              ],
+              questionKeys: [
+                'disliked_food',
+                'name_of_first_plush_toy',
+                'first_award'
+              ]
+            }
+          },
+          inputs: [
+            { name: 'questionKey', type: 'string', require: true },
+            { name: 'question', type: 'string', label: 'Create a security question' },
+            { name: 'answer', type: 'string', label: 'Answer', required: true },
+          ]
+        }
+      });
+
+      const answer = 'test-answer';
+      res = await register(authClient, { question: 'test-question', answer });
+      expect(enrollSecurityQuestionAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
+        credentials: {
+          questionKey: 'custom',
+          question: 'test-question',
+          answer: 'test-answer'
+        }
+      });
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          canSkip: true,
+          name: 'select-authenticator-enroll',
+          inputs: [{
+            name: 'authenticator',
+            key: 'string',
+          }],
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }]
+        }
+      });
+    });
+
+=======
   describe('Okta Verify Authenticator', () => {
     const enrollPollResponse = IdxResponseFactory.build({
       neededToProceed: [
@@ -1552,6 +1931,7 @@ describe('idx/register', () => {
       expect(enrollPollResponse.proceed).toHaveBeenCalled();
       expect(Object.keys(response.nextStep)).toContain('pollForResult');
     });
+>>>>>>> add UT for Okta Verify enrollment polling
   });
 
   describe('skip', () => {

@@ -16,7 +16,7 @@ var SDK_VERSION = require('../../../package.json').version;
 
 module.exports = {
   'coverageDirectory': '<rootDir>/build2/reports/coverage-browser',
-  'collectCoverage': true,
+  'collectCoverage': false,
   'collectCoverageFrom': ['./lib/**','!./test/**'],
   'globals': {
     SDK_VERSION
