@@ -8,6 +8,8 @@ import {
 import { AuthApiError, AuthSdkError, OAuthError } from '../../../lib/errors';
 import { TokenManager } from '../../../lib/TokenManager';
 
+/* global window, StorageEvent */
+
 const Emitter = require('tiny-emitter');
 
 describe('TokenManager renew', () => {
@@ -25,7 +27,10 @@ describe('TokenManager renew', () => {
         key: SYNC_STORAGE_NAME, 
         newValue,
         oldValue,
-      })
+      });
+      if (typeof window === 'undefined') {
+        return;
+      }
       window.dispatchEvent(new StorageEvent('storage', {
         key: SYNC_STORAGE_NAME, 
         newValue,
@@ -40,7 +45,10 @@ describe('TokenManager renew', () => {
         key: SYNC_STORAGE_NAME, 
         newValue,
         oldValue,
-      })
+      });
+      if (typeof window === 'undefined') {
+        return;
+      }
       window.dispatchEvent(new StorageEvent('storage', {
         key: SYNC_STORAGE_NAME, 
         newValue,
@@ -50,7 +58,7 @@ describe('TokenManager renew', () => {
   };
   const sharedTokenStorage = {
     getStorage: jest.fn().mockImplementation(() => sharedTokenMap),
-    setStorage: jest.fn().mockImplementation((v) => { sharedTokenMap = v })
+    setStorage: jest.fn().mockImplementation((v) => { sharedTokenMap = v; })
   };
 
   const createContext = (tokenStorage?) => {
@@ -109,7 +117,7 @@ describe('TokenManager renew', () => {
 
   describe('cross tabs', () => {
     it('works for 2 tabs', async () => {
-      console.log('-------------- start')
+      console.log('-------------- start');
       sharedTokenStorage.setStorage(testContext.storage);
       const tabs = [...Array(2)].map(_ => createContext(sharedTokenStorage));
       tabs.map(c => c.instance.start());
@@ -120,14 +128,18 @@ describe('TokenManager renew', () => {
       res.map(r => {
         expect(r.status).toBe('fulfilled');
         expect((r as any).value).toMatchObject(testContext.freshTokens.idToken);
-      })
+      });
       
       const renewTokensCalls = tabs.map(c => c.sdkMock.token.renewTokens.mock.calls.length).reduce((v, c) => (c + v), 0);
       expect(renewTokensCalls).toEqual(1);
 
       tabs.map(c => c.instance.stop());
-      console.log('-------------- end')
+      console.log('-------------- end');
     });
+
+    // todo: simulate race
+
+    // todo: what if error ?
   });
 
   it('returns the fresh token', async () => {

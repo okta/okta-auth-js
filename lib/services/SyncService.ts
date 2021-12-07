@@ -50,10 +50,12 @@ export class SyncService {
   }
 
   emitEventsForCrossTabsRenew(newValue, oldValue) {
-    if (typeof newValue === 'string')
+    if (typeof newValue === 'string') {
       newValue = JSON.parse(newValue);
-    if (typeof oldValue === 'string')
+    }
+    if (typeof oldValue === 'string') {
       oldValue = JSON.parse(oldValue);
+    }
     Object.keys(oldValue).forEach(key => {
       if (!newValue || !newValue[key]) {
         this.emitRenewCompleted(key);
@@ -62,7 +64,7 @@ export class SyncService {
   }
 
   emitRenewCompleted(key) {
-    console.log('____ EVENT_RENEWED_SYNC', key)
+    console.log('____ EVENT_RENEWED_SYNC', key);
     this.emitter.emit(EVENT_RENEWED_SYNC, key);
   }
 
@@ -90,12 +92,14 @@ export class SyncService {
     }
 
     const makePromise = () => new Promise((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
+      let timeoutId, handler;
+
+      timeoutId = setTimeout(() => {
         this.off(EVENT_RENEWED_SYNC, handler);
         reject(new AuthSdkError('Token renew timed out'));
       }, RENEWED_EVENT_TIMEOUT);
 
-      const handler = (ekey) => {
+      handler = (ekey) => {
         if (ekey != key) {
           // skip handler for another key
           return;
