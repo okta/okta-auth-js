@@ -67,6 +67,15 @@ export const GoogleAuthenticatorFormFactory = IdxFormFactory.params({
   ]
 });
 
+export const OktaVerifyAuthenticatorFormFactory = IdxFormFactory.params({
+  value: [
+    IdValueFactory.build({
+      value: 'id-okta-verify-authenticator'
+    }),
+    OtpMethodTypeValueFactory.build()
+  ]
+});
+
 export const PhoneAuthenticatorFormFactory = IdxFormFactory.params({
   value: [
     IdValueFactory.build({

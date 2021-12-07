@@ -78,6 +78,16 @@ export const OktaVerifyAuthenticatorFactory = IdxAuthenticatorFactory.params({
   ]
 });
 
+export const OktaVerifyAuthenticatorWithContextualDataFactory = OktaVerifyAuthenticatorFactory.params({
+  contextualData: {
+    qrcode: {
+      href: 'data:image/png;base64,fake_encoding==',
+      method: 'embedded',
+      type: 'image/png'
+    },
+  }
+});
+
 export const PhoneAuthenticatorFactory = IdxAuthenticatorFactory.params({
   displayName: 'Phone',
   key: 'phone_number',

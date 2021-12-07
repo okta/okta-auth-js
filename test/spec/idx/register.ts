@@ -46,7 +46,11 @@ import {
   IdxErrorEnrollmentInvalidPhoneFactory,
   SelectAuthenticatorAuthenticateRemediationFactory,
   EnrollGoogleAuthenticatorRemediationFactory,
-  GoogleAuthenticatorOptionFactory
+  GoogleAuthenticatorOptionFactory,
+  OktaVerifyAuthenticatorOptionFactory,
+  EnrollPollRemediationFactory,
+  OktaVerifyAuthenticatorWithContextualDataFactory,
+  IdxContextFactory,
 } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/introspect', () => {
@@ -172,7 +176,8 @@ describe('idx/register', () => {
               options: [
                 PhoneAuthenticatorOptionFactory.build(),
                 EmailAuthenticatorOptionFactory.build(),
-                GoogleAuthenticatorOptionFactory.build()
+                GoogleAuthenticatorOptionFactory.build(),
+                OktaVerifyAuthenticatorOptionFactory.build(),
               ]
             })
           ]
@@ -218,7 +223,6 @@ describe('idx/register', () => {
         EnrollGoogleAuthenticatorRemediationFactory.build()
       ]
     });
-
 
     testContext = {
       authClient,
@@ -432,7 +436,10 @@ describe('idx/register', () => {
           }, {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }]
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY,
+          },]
         }
       });
     });
@@ -501,7 +508,10 @@ describe('idx/register', () => {
           }, {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }]
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY,
+          },]
         }
       });
     });
@@ -594,7 +604,10 @@ describe('idx/register', () => {
           }, {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }]
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY,
+          },]
         }
       });
 
@@ -1265,7 +1278,10 @@ describe('idx/register', () => {
           }, {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }]
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY
+          },]
         }
       });
 
@@ -1385,6 +1401,117 @@ describe('idx/register', () => {
       });
     });
 
+  });
+
+  describe('Okta Verify Authenticator', () => {
+    const enrollPollResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollPollRemediationFactory.build()
+      ],
+      context: IdxContextFactory.build({
+        currentAuthenticator: {
+          value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
+        }
+      }),
+    });
+
+    it('is available for selection', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(selectAuthenticatorResponse);
+
+      let response = await register(authClient, {});
+      expect(selectAuthenticatorResponse.proceed).not.toHaveBeenCalled();
+      expect(response.nextStep?.options).toContainEqual({
+        label: 'Okta Verify',
+        value: AuthenticatorKey.OKTA_VERIFY
+      });
+    });
+
+    it('prompts to start polling when selected', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollPollResponse,
+      ]);
+
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(enrollPollResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse)
+        .mockResolvedValueOnce(enrollPollResponse);
+
+      let response = await register(authClient, {
+        authenticator: AuthenticatorKey.OKTA_VERIFY
+      });
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalled();
+      expect(enrollPollResponse.proceed).not.toHaveBeenCalled();
+      expect(Object.keys(response.nextStep)).toContain('pollForResult');
+    });
+
+    it('offers QR code as a default channel for adding OV account', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollPollResponse,
+      ]);
+
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse);
+
+      let { nextStep:
+        { authenticator: { contextualData } }
+      } = await register(authClient, {
+        authenticator: AuthenticatorKey.OKTA_VERIFY
+      });
+      expect(Object.keys(contextualData)).toContain('qrcode');
+    });
+
+    it('performs single poll request when poll options are provided', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollPollResponse,
+        enrollPollResponse,
+      ]);
+
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(enrollPollResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse)
+        .mockResolvedValueOnce(enrollPollResponse);
+
+      let { nextStep } = await register(authClient, {
+        authenticator: AuthenticatorKey.OKTA_VERIFY
+      });
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalled();
+      expect(enrollPollResponse.proceed).not.toHaveBeenCalled();
+      const pollForResult = nextStep['pollForResult'];
+      expect(Object.keys(pollForResult)).toContain('refresh');
+
+      let response = await register(authClient, {
+        pollForResult
+      });
+      expect(enrollPollResponse.proceed).toHaveBeenCalled();
+      expect(Object.keys(response.nextStep)).toContain('pollForResult');
+    });
   });
 
   describe('skip', () => {

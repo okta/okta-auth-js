@@ -20,7 +20,7 @@ interface PollOptions {
 }
 
 export interface EnrollPollValues extends RemediationValues {
-  pollForResult: PollOptions;
+  pollForResult?: PollOptions;
 }
 
 export class EnrollPoll extends Remediator {

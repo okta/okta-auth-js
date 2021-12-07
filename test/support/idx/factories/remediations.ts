@@ -273,3 +273,8 @@ export const RedirectIdpRemediationFactory = IdxRemediationFactory.params({
 export const SkipRemediationFactory = IdxRemediationFactory.params({
   name: 'skip'
 });
+
+export const EnrollPollRemediationFactory = IdxRemediationFactory.params({
+  name: 'enroll-poll',
+  refresh: 1000
+});
