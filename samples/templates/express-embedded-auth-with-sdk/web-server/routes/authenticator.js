@@ -231,22 +231,24 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
 
 router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
   const { 
-    idx: { nextStep }
+    idx: { 
+      nextStep: { pollForResult }
+    }
   } = req.getFlowStates();
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'enroll-poll', {
       title: 'Enroll Okta Verify',
       action: '/enroll-authenticator/okta_verify/enroll-poll',
-      pollInterval: nextStep.pollInterval,
+      pollForResult,
     })
   });
 });
 
 router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res, next) => {
-  const { startPolling } = req.body;
+  const { pollForResult } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.proceed({startPolling});
+  const transaction = await authClient.idx.proceed({pollForResult});
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
