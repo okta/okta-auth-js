@@ -69,8 +69,6 @@ export class TokenService {
       // https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent
 
       this.storageListener = ({ key, newValue, oldValue }: StorageEvent) => {
-        // if(key != 'okta-test-storage')
-        //   console.log('^^^ Crosstabs ^^^', key, newValue, oldValue, this.options.storageKey)
         const handleCrossTabsStorageChange = () => {
           if (key === this.syncService.storageKey) {
             this.syncService.emitEventsForCrossTabsRenew(newValue, oldValue);

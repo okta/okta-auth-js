@@ -13,7 +13,6 @@
 import { OktaAuth, StorageProvider, Token, EventEmitter, StorageOptions } from '../types';
 import { TokenManager } from '../TokenManager';
 import { AuthSdkError } from '../errors';
-import { SYNC_STORAGE_NAME } from '../constants';
 
 const STALLED_TIMEOUT = 1000*30;
 const RENEWED_EVENT_TIMEOUT = 1000*10;
@@ -22,10 +21,6 @@ const RACE_WAIT_TIMEOUT = 5;
 export const EVENT_RENEWED_SYNC = 'renewed_sync';
 
 declare type SyncEventHandler = (key: string) => void;
-
-// const DEFAULT_OPTIONS = {
-//   storageKey: SYNC_STORAGE_NAME,
-// };
 
 export class SyncService {
   private syncStorage: StorageProvider;
@@ -41,7 +36,9 @@ export class SyncService {
     this.storageOptions = storageOptions;
     try {
       this.syncStorage = sdk.storageManager.getSyncStorage(storageOptions);
-    } catch(_e) {}
+    } catch(_e) {
+      //todo: server doen't support and throws exception
+    }
     this.tokenManager = tokenManager;
 
     this.on = this.emitter.on.bind(this.emitter);
@@ -53,6 +50,10 @@ export class SyncService {
   }
 
   emitEventsForCrossTabsRenew(newValue, oldValue) {
+    if (typeof newValue === 'string')
+      newValue = JSON.parse(newValue);
+    if (typeof oldValue === 'string')
+      oldValue = JSON.parse(oldValue);
     Object.keys(oldValue).forEach(key => {
       if (!newValue || !newValue[key]) {
         this.emitRenewCompleted(key);
@@ -61,6 +62,7 @@ export class SyncService {
   }
 
   emitRenewCompleted(key) {
+    console.log('____ EVENT_RENEWED_SYNC', key)
     this.emitter.emit(EVENT_RENEWED_SYNC, key);
   }
 
