@@ -318,7 +318,6 @@ describe('cross tabs renew', () => {
 
 
   it('works for 2 tabs', async () => {
-    console.log('-------------- start');
     sharedTokenStorage.setStorage(testContext.storage);
     const tabs = [...Array(2)].map(_ => createContext(sharedTokenStorage));
     tabs.map(c => c.instance.start());
@@ -335,33 +334,7 @@ describe('cross tabs renew', () => {
     expect(renewTokensCalls).toEqual(1);
 
     tabs.map(c => c.instance.stop());
-    console.log('-------------- end');
   });
-
-  // it('race', async () => {
-  //   console.log('-------------- start');
-
-  //   sharedTokenStorage.setStorage(testContext.storage);
-  //   const tabs = [...Array(2)].map(_ => createContext(sharedTokenStorage));
-  //   tabs.map(c => c.instance.start());
-
-  //   const renewPromises = tabs.map(c => c.instance.renew('idToken'));
-  //   const res = await Promise.allSettled(renewPromises);
-
-  //   console.log(111, res)
-
-  //   tabs.map(c => c.instance.stop());
-
-  //   console.log('-------------- end');
-  // });
-
-  // todo: simulate race
-
-//what if no event EVENT_RENEWED_SYNC
-//_storageEventDelay
-
-  // todo: what if error ?
-
 
 });
 

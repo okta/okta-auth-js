@@ -135,13 +135,6 @@ function loadConfig() {
   var newConfig = {};
   Object.assign(newConfig, state);
   Object.assign(newConfig, {
-
-    tokenManager: {
-      expireEarlySeconds: 5*60,
-      syncStorage: true,
-    },
-    startService: true,
-
     // ephemeral options, will not survive a redirect
     appUri,
     redirectUri,
@@ -342,7 +335,6 @@ function startApp() {
   // Calculates initial auth state and fires change event for listeners
   // Also starts the token auto-renew service
   authClient.start();
-
 }
 
 function renderApp() {
@@ -452,13 +444,6 @@ window._getUserInfo = bindClick(getUserInfo);
 
 // called when the "renew token" link is clicked
 function renewToken() {
-
-
-  setTimeout( () => {
-    console.log('>>>>');
-    document.getElementById('renew-token').click();
-  }, (10 - new Date().getSeconds() % 10) * 1000 );
-
   // when the token is written to storage, the authState will change and we will re-render.
   return authClient.tokenManager.renew('accessToken')
     .catch(function(error) {

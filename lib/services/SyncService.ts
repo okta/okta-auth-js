@@ -78,7 +78,6 @@ export class SyncService {
   }
 
   emitRenewCompleted(key) {
-    console.log('____ EVENT_RENEWED_SYNC', key);
     this.emitter.emit(EVENT_RENEWED_SYNC, key);
   }
 
@@ -99,7 +98,7 @@ export class SyncService {
     const token: Token = this.tokenManager.getSync(key);
 
     if (syncItem && (new Date().getTime() - syncItem.date) > STALLED_TIMEOUT) {
-      // stalled renew in another tab
+      // Stalled token renewal detected
       this.syncStorage.removeItem(key);
       syncItem = null;
     }
@@ -114,10 +113,9 @@ export class SyncService {
 
       handler = (ekey) => {
         if (ekey != key) {
-          // skip handler for another key
+          // Skip another keys
           return;
         }
-        // off
         this.off(EVENT_RENEWED_SYNC, handler);
         clearTimeout(timeoutId);
 
@@ -136,29 +134,24 @@ export class SyncService {
     }) as Promise<Token>;
 
     if (syncItem) {
-      console.log('*** wait', this.tabId)
       return makePromise();
     }
 
     // Notify other tabs about start of renewal process
-      console.log('*** set', this.tabId)
     this.syncStorage.setItem(key, {date: new Date().getTime(), id: this.tabId});
 
     // Wait 5ms for potential race condition
     return new Promise(resolve => setTimeout(resolve, RACE_WAIT_TIMEOUT)).then(() => {
       const syncItem2 = this.syncStorage.getItem(key);
       if (!syncItem2) {
-        console.log('*** race lost', this.tabId)
-        // race condition - anoter tab won race in 5ms
-        // renew as usual
+        // Another tab had renewed token in small time period
+        // Can renew token as usual
         return null;
       } else if (syncItem2 && syncItem2.id != this.tabId) {
-        console.log('*** race not won', this.tabId)
-        // race condition - not win
+        // Lost race condition
         return makePromise();
       } else {
-        console.log('*** no race', this.tabId)
-        // no race condition or win
+        // No race condition or won race condition
         return null;
       }
     });
