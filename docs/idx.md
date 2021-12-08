@@ -151,7 +151,7 @@ const {
 } = await authClient.idx.authenticate({ 
   username: 'xxx',
   password: 'xxx',
-  authenticators: ['email']
+  authenticators: [AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */]
 });
 // gather verification code from email (this call should happen in a separated request)
 const { 
@@ -184,7 +184,7 @@ const {
   nextStep: { 
     inputs // [{ name: 'verificationCode', ... }]
   }
-} = await authClient.idx.authenticate({ authenticator: 'email' });
+} = await authClient.idx.authenticate({ authenticator: AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */ });
 // gather verification code from email (this call should happen in a separated request)
 const { 
   status, // IdxStatus.SUCCESS
@@ -210,7 +210,7 @@ const {
   firstName: 'xxx',
   lastName: 'xxx',
   email: 'xxx',
-  authenticators: ['password']
+  authenticators: [AuthenticatorKey.OKTA_PASSWORD /* 'okta_password' */]
 });
 // gather password from user input (this call should happen in a separated request)
 const { 
@@ -246,7 +246,7 @@ const {
   nextStep: { 
     inputs // [{ name: 'password', ... }]
   }
-} = await authClient.idx.register({ authenticator: 'password' });
+} = await authClient.idx.register({ authenticator: AuthenticatorKey.OKTA_PASSWORD /* 'okta_password' */ });
 // gather password from user input (this call should happen in a separated request)
 const { 
   status, // IdxStatus.SUCCESS
@@ -270,7 +270,7 @@ const {
   }
 } = await authClient.idx.recoverPassword({
   username: 'xxx',
-  authenticators: ['email']
+  authenticators: [AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */]
 });
 // gather password from user input (this call should happen in a separated request)
 const { 
@@ -309,7 +309,7 @@ const {
   nextStep: {
     inputs // [{ name: 'verificationCode', ... }]
   } 
-} = await authClient.idx.recoverPassword({ authenticator: 'email' });
+} = await authClient.idx.recoverPassword({ authenticator: AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */ });
 // gather verification code from email (this call should happen in a separated request)
 const { 
   status, 
