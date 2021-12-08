@@ -221,11 +221,6 @@ describe('cross tabs renew', () => {
       const oldValue = JSON.stringify(syncStorageMap);
       syncStorageMap[k] = v;
       const newValue = JSON.stringify(syncStorageMap);
-      console.log('eeeeee  set', {
-        key: SYNC_STORAGE_NAME, 
-        newValue,
-        oldValue,
-      });
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new StorageEvent('storage', {
           key: SYNC_STORAGE_NAME, 
@@ -238,11 +233,6 @@ describe('cross tabs renew', () => {
       const oldValue = JSON.stringify(syncStorageMap);
       delete syncStorageMap[k];
       const newValue = JSON.stringify(syncStorageMap);
-      console.log('eeeeee  remove', {
-        key: SYNC_STORAGE_NAME, 
-        newValue,
-        oldValue,
-      });
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new StorageEvent('storage', {
           key: SYNC_STORAGE_NAME, 
