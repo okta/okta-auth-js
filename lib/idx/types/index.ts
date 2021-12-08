@@ -37,7 +37,6 @@ export enum IdxStatus {
 export enum AuthenticatorKey {
   OKTA_PASSWORD = 'okta_password',
   OKTA_EMAIL = 'okta_email',
-  OKTA_VERIFIER = 'okta_verifier',
   PHONE_NUMBER = 'phone_number',
   GOOGLE_AUTHENTICATOR = 'google_otp',
   OKTA_VERIFY = 'okta_verify'
