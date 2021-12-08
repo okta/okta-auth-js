@@ -4,7 +4,7 @@ const config = Object.assign({}, baseConfig, {
     'test/spec'
   ],
   'testMatch': [
-    '**/test/spec/idx/register.{js,ts}'
+    '**/test/spec/**/*.{js,ts}'
   ],
   'setupFiles': [
     '<rootDir>/test/support/nodeExceptions.js',
