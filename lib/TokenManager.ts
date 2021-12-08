@@ -61,7 +61,7 @@ interface TokenManagerState {
 function defaultState(): TokenManagerState {
   return {
     expireTimeouts: {},
-    renewPromise: null,
+    renewPromise: null
   };
 }
 
@@ -422,7 +422,7 @@ export class TokenManager implements TokenManagerInterface {
     // Store the renew promise state, to avoid renewing again
     this.state.renewPromise = this.syncService.renewTokenCrossTabs(key).then(newToken => {
       if (newToken) {
-        // Token was renewed from another tab
+        // Token has been renewed from another tab
         return newToken;
       } else {
         // Renew in current tab
@@ -434,10 +434,10 @@ export class TokenManager implements TokenManagerInterface {
         });
       }
     }).catch(e => {
-      return Promise.reject(e);
       // Token renewal in another tab failed
-      // Retry
-      //return this.renew(key);
+      return Promise.reject(e);
+      // TODO: Retry instead?
+      // return this.renew(key);
     });
     return this.state.renewPromise;
   }

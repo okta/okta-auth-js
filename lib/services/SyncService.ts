@@ -86,6 +86,7 @@ export class SyncService {
       return;
     }
 
+    // Free lock item
     this.syncStorage.removeItem(key);
   }
 
@@ -94,23 +95,23 @@ export class SyncService {
       return Promise.resolve(null);
     }
 
-    let syncItem = this.syncStorage.getItem(key);
+    // Get current token to renew
     const token: Token = this.tokenManager.getSync(key);
 
+    // Read lock item
+    let syncItem = this.syncStorage.getItem(key);
+
+    // Detect stalled token renewal
     if (syncItem && (new Date().getTime() - syncItem.date) > STALLED_TIMEOUT) {
-      // Stalled token renewal detected
       this.syncStorage.removeItem(key);
       syncItem = null;
     }
 
-    const makePromise = () => new Promise((resolve, reject) => {
+    // Create promise to wait for token renewal in another tab
+    const makeWaitPromise = () => new Promise((resolve, reject) => {
       let timeoutId, handler;
 
-      timeoutId = setTimeout(() => {
-        this.off(EVENT_RENEWED_SYNC, handler);
-        reject(new AuthSdkError('Token renew timed out'));
-      }, RENEWED_EVENT_TIMEOUT);
-
+      // Listen to EVENT_RENEWED_SYNC event
       handler = (ekey) => {
         if (ekey != key) {
           // Skip another keys
@@ -119,6 +120,7 @@ export class SyncService {
         this.off(EVENT_RENEWED_SYNC, handler);
         clearTimeout(timeoutId);
 
+        // Get fresh token that other tab had just renewed
         const newToken = this.tokenManager.getSync(key) as Token;
 
         if (newToken && JSON.stringify(newToken) !== JSON.stringify(token)) {
@@ -129,29 +131,38 @@ export class SyncService {
           reject(new AuthSdkError('Token renew failed'));
         }
       };
+
+      // Set timeout for EVENT_RENEWED_SYNC event
+      timeoutId = setTimeout(() => {
+        this.off(EVENT_RENEWED_SYNC, handler);
+        reject(new AuthSdkError('Token renew timed out'));
+      }, RENEWED_EVENT_TIMEOUT);
       
       this.on(EVENT_RENEWED_SYNC, handler);
     }) as Promise<Token>;
 
+    // If lock is not free, token renewal has been already started in another tab => wait for it
     if (syncItem) {
-      return makePromise();
+      return makeWaitPromise();
     }
 
-    // Notify other tabs about start of renewal process
+    // Try to acquire lock
     this.syncStorage.setItem(key, {date: new Date().getTime(), id: this.tabId});
 
-    // Wait 5ms for potential race condition
+    // Wait small period of time for potential race condition
     return new Promise(resolve => setTimeout(resolve, RACE_WAIT_TIMEOUT)).then(() => {
+      // Read lock item again
       const syncItem2 = this.syncStorage.getItem(key);
       if (!syncItem2) {
-        // Another tab had renewed token in small time period
+        // Another tab had just renewed token in small time period
         // Can renew token as usual
         return null;
+        // TODO: or get fresh token, compare and resolve???  add unit test with bigger RACE_WAIT_TIMEOUT
       } else if (syncItem2 && syncItem2.id != this.tabId) {
-        // Lost race condition
-        return makePromise();
+        // Lost race condition, lock was aquired by another tab => wait for it
+        return makeWaitPromise();
       } else {
-        // No race condition or won race condition
+        // No race condition or won race condition => can continue
         return null;
       }
     });

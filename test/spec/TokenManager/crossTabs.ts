@@ -23,8 +23,6 @@ import {
 
 const Emitter = require('tiny-emitter');
 
-/* global window, StorageEvent */
-
 describe('cross tabs communication', () => {
   let sdkMock;
   let instance;
@@ -280,13 +278,14 @@ describe('cross tabs renew', () => {
       },
       emitter
     };
-
-    const instance = new TokenManager(sdkMock as any, {
+    const options = {
       _storageEventDelay: 0,
       // disable because we start service
       autoRenew: false,
       autoRemove: false
-    });
+    };
+
+    const instance = new TokenManager(sdkMock as any, options);
     jest.spyOn(instance, 'setTokens');
     jest.spyOn(instance, 'remove').mockImplementation(() => {});
     jest.spyOn(instance, 'emitRenewed').mockImplementation(() => {});
@@ -319,7 +318,7 @@ describe('cross tabs renew', () => {
 
   it('works for 2 tabs', async () => {
     sharedTokenStorage.setStorage(testContext.storage);
-    const tabs = [...Array(2)].map(_ => createContext(sharedTokenStorage));
+    const tabs = [...Array(2)].map(() => createContext(sharedTokenStorage));
     tabs.map(c => c.instance.start());
 
     const renewPromises = tabs.map(c => c.instance.renew('idToken'));
