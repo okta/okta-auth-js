@@ -151,7 +151,7 @@ const {
 } = await authClient.idx.authenticate({ 
   username: 'xxx',
   password: 'xxx',
-  authenticators: [AuthenticatorKey.OKTA_EMAIL]
+  authenticators: [AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */]
 });
 // gather verification code from email (this call should happen in a separated request)
 const { 
