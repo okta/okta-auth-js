@@ -36,8 +36,12 @@ export class SyncService {
   constructor(sdk: OktaAuth, tokenManager: TokenManager, storageOptions: StorageOptions) {
     this.emitter = (sdk as any).emitter;
     this.storageOptions = storageOptions;
-    if (this.canUseCrossTabsStorage(sdk, storageOptions)) {
-      this.syncStorage = sdk.storageManager.getSyncStorage(storageOptions);
+    if (this.canUseCrossTabsStorage()) {
+      try {
+        this.syncStorage = sdk.storageManager.getSyncStorage(storageOptions);
+      } catch(_e) {
+        // Local storage is unavailable
+      }
     }
     this.tokenManager = tokenManager;
 
@@ -50,8 +54,9 @@ export class SyncService {
     return this.storageOptions.storageKey;
   }
 
-  canUseCrossTabsStorage(sdk: OktaAuth, storageOptions: StorageOptions) {
-    return (typeof window !== 'undefined' && sdk.storageManager.storageUtil.testStorageType(storageOptions.storageType));
+  canUseCrossTabsStorage() {
+    // We need to listen to StorageEvent from window (which is not available on sever-side)
+    return (typeof window !== 'undefined');
   }
 
   isSyncStorageEnabled() {
