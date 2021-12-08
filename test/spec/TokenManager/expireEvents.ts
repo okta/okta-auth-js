@@ -20,6 +20,7 @@ describe('expire events', () => {
         getTokenStorage: jest.fn().mockReturnValue({
           getStorage: jest.fn().mockImplementation(() => testContext.storage)
         }),
+        getSyncStorage: jest.fn().mockReturnValue(null),
       },
       emitter
     };

@@ -3,89 +3,34 @@ import tokens from '@okta/test.support/tokens';
 import { 
   OktaAuth, 
   TOKEN_STORAGE_NAME,
-  SYNC_STORAGE_NAME
 } from '../../../lib';
 import { AuthApiError, AuthSdkError, OAuthError } from '../../../lib/errors';
 import { TokenManager } from '../../../lib/TokenManager';
-
-/* global window, StorageEvent */
 
 const Emitter = require('tiny-emitter');
 
 describe('TokenManager renew', () => {
   let testContext;
-  // syncStorage is shared (simulate LocalStorage which is shared across tabs)
-  let syncStorageMap = {};
-  let sharedTokenMap = {};
-  const syncStorage = {
-    getItem: jest.fn().mockImplementation((k) => syncStorageMap[k]),
-    setItem: jest.fn().mockImplementation((k, v) => {
-      const oldValue = JSON.stringify(syncStorageMap);
-      syncStorageMap[k] = v;
-      const newValue = JSON.stringify(syncStorageMap);
-      console.log('eeeeee  set', {
-        key: SYNC_STORAGE_NAME, 
-        newValue,
-        oldValue,
-      });
-      if (typeof window === 'undefined') {
-        return;
-      }
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: SYNC_STORAGE_NAME, 
-        newValue,
-        oldValue,
-      }));
-    }),
-    removeItem: jest.fn().mockImplementation((k) => {
-      const oldValue = JSON.stringify(syncStorageMap);
-      delete syncStorageMap[k];
-      const newValue = JSON.stringify(syncStorageMap);
-      console.log('eeeeee  remove', {
-        key: SYNC_STORAGE_NAME, 
-        newValue,
-        oldValue,
-      });
-      if (typeof window === 'undefined') {
-        return;
-      }
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: SYNC_STORAGE_NAME, 
-        newValue,
-        oldValue,
-      }));
-    }),
-  };
-  const sharedTokenStorage = {
-    getStorage: jest.fn().mockImplementation(() => sharedTokenMap),
-    setStorage: jest.fn().mockImplementation((v) => { sharedTokenMap = v; })
-  };
 
-  const createContext = (tokenStorage?) => {
-    let testContext;
-
+  beforeEach(function() {
     const emitter = new Emitter();
-    if (!tokenStorage) {
-      tokenStorage = {
-          getStorage: jest.fn().mockImplementation(() => testContext.storage),
-          setStorage: jest.fn().mockImplementation(() => {})
-      };
-    }
+    const tokenStorage = {
+        getStorage: jest.fn().mockImplementation(() => testContext.storage),
+        setStorage: jest.fn().mockImplementation(() => {})
+    };
     const sdkMock = {
       options: {},
       token: {
-        renewTokens: jest.fn().mockImplementation(() => Promise.resolve(testContext.freshTokens))
+        renewTokens: () => Promise.resolve(testContext.freshTokens)
       },
       storageManager: {
         getTokenStorage: jest.fn().mockReturnValue(tokenStorage),
-        getSyncStorage: jest.fn().mockReturnValue(syncStorage),
+        getSyncStorage: jest.fn().mockReturnValue(null),
       },
       emitter
     };
 
-    const instance = new TokenManager(sdkMock as any, {
-      _storageEventDelay: 0
-    });
+    const instance = new TokenManager(sdkMock as any);
     jest.spyOn(instance, 'setTokens');
     jest.spyOn(instance, 'remove').mockImplementation(() => {});
     jest.spyOn(instance, 'emitRenewed').mockImplementation(() => {});
@@ -105,41 +50,7 @@ describe('TokenManager renew', () => {
         idToken: tokens.standardIdToken2Parsed
       }
     };
-
-    return testContext;
-  };
-
-  beforeEach(function() {
-    syncStorageMap = {};
-    sharedTokenMap = {};
-    testContext = createContext();
-  });
-
-  describe('cross tabs', () => {
-    it('works for 2 tabs', async () => {
-      console.log('-------------- start');
-      sharedTokenStorage.setStorage(testContext.storage);
-      const tabs = [...Array(2)].map(_ => createContext(sharedTokenStorage));
-      tabs.map(c => c.instance.start());
-
-      const renewPromises = tabs.map(c => c.instance.renew('idToken'));
-      const res = await Promise.allSettled(renewPromises);
-
-      res.map(r => {
-        expect(r.status).toBe('fulfilled');
-        expect((r as any).value).toMatchObject(testContext.freshTokens.idToken);
-      });
-      
-      const renewTokensCalls = tabs.map(c => c.sdkMock.token.renewTokens.mock.calls.length).reduce((v, c) => (c + v), 0);
-      expect(renewTokensCalls).toEqual(1);
-
-      tabs.map(c => c.instance.stop());
-      console.log('-------------- end');
-    });
-
-    // todo: simulate race
-
-    // todo: what if error ?
+    
   });
 
   it('returns the fresh token', async () => {

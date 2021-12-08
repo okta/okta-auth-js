@@ -37,8 +37,9 @@ function createAuth(options) {
       storageKey: options.tokenManager.storageKey,
       autoRenew: options.tokenManager.autoRenew || false,
       autoRemove: options.tokenManager.autoRemove || false,
-      secure: options.tokenManager.secure // used by cookie storage
-    }
+      secure: options.tokenManager.secure, // used by cookie storage
+      syncStorage: false, // don't use SyncService
+    },
   });
 }
 

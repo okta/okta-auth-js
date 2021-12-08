@@ -22,31 +22,40 @@ export const EVENT_RENEWED_SYNC = 'renewed_sync';
 
 declare type SyncEventHandler = (key: string) => void;
 
+
 export class SyncService {
   private syncStorage: StorageProvider;
   private tokenManager: TokenManager;
   private emitter: EventEmitter;
   private storageOptions: StorageOptions;
+  public tabId: string;
 
   on: (event: string, handler: SyncEventHandler) => void;
   off: (event: string, handler?: SyncEventHandler) => void;
 
-  constructor(sdk: OktaAuth, tokenManager: TokenManager, storageOptions?: StorageOptions) {
+  constructor(sdk: OktaAuth, tokenManager: TokenManager, storageOptions: StorageOptions) {
     this.emitter = (sdk as any).emitter;
     this.storageOptions = storageOptions;
-    try {
+    if (this.canUseCrossTabsStorage(sdk, storageOptions)) {
       this.syncStorage = sdk.storageManager.getSyncStorage(storageOptions);
-    } catch(_e) {
-      //todo: server doen't support and throws exception
     }
     this.tokenManager = tokenManager;
 
     this.on = this.emitter.on.bind(this.emitter);
     this.off = this.emitter.off.bind(this.emitter);
+    this.tabId = Math.random().toString();
   }
 
   get storageKey() {
     return this.storageOptions.storageKey;
+  }
+
+  canUseCrossTabsStorage(sdk: OktaAuth, storageOptions: StorageOptions) {
+    return (typeof window !== 'undefined' && sdk.storageManager.storageUtil.testStorageType(storageOptions.storageType));
+  }
+
+  isSyncStorageEnabled() {
+    return this.tokenManager.getOptions().syncStorage && this.syncStorage;
   }
 
   emitEventsForCrossTabsRenew(newValue, oldValue) {
@@ -69,7 +78,7 @@ export class SyncService {
   }
 
   finishRenewToken(key: string) {
-    if (!this.tokenManager.getOptions().syncStorage || !this.syncStorage) {
+    if (!this.isSyncStorageEnabled()) {
       return;
     }
 
@@ -77,11 +86,10 @@ export class SyncService {
   }
 
   renewTokenCrossTabs(key: string): Promise<Token | null> {
-    if (!this.tokenManager.getOptions().syncStorage || !this.syncStorage) {
+    if (!this.isSyncStorageEnabled()) {
       return Promise.resolve(null);
     }
 
-    const tabId = Math.random().toString();
     let syncItem = this.syncStorage.getItem(key);
     const token: Token = this.tokenManager.getSync(key);
 
@@ -123,24 +131,29 @@ export class SyncService {
     }) as Promise<Token>;
 
     if (syncItem) {
+      console.log('*** wait', this.tabId)
       return makePromise();
     }
 
     // Notify other tabs about start of renewal process
-    this.syncStorage.setItem(key, {date: new Date().getTime(), id: tabId});
+      console.log('*** set', this.tabId)
+    this.syncStorage.setItem(key, {date: new Date().getTime(), id: this.tabId});
 
     // Wait 5ms for potential race condition
     return new Promise(resolve => setTimeout(resolve, RACE_WAIT_TIMEOUT)).then(() => {
       const syncItem2 = this.syncStorage.getItem(key);
       if (!syncItem2) {
+        console.log('*** race lost', this.tabId)
         // race condition - anoter tab won race in 5ms
         // renew as usual
         return null;
-      } else if (syncItem2 && syncItem2.id != tabId) {
+      } else if (syncItem2 && syncItem2.id != this.tabId) {
+        console.log('*** race not won', this.tabId)
         // race condition - not win
         return makePromise();
       } else {
-        // no race condition
+        console.log('*** no race', this.tabId)
+        // no race condition or win
         return null;
       }
     });

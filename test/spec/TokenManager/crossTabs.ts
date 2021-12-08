@@ -16,8 +16,14 @@
 
 import { TokenManager } from '../../../lib/TokenManager';
 import * as features from '../../../lib/features';
+import tokens from '@okta/test.support/tokens';
+import {
+  SYNC_STORAGE_NAME
+} from '../../../lib';
 
 const Emitter = require('tiny-emitter');
+
+/* global window, StorageEvent */
 
 describe('cross tabs communication', () => {
   let sdkMock;
@@ -205,3 +211,157 @@ describe('cross tabs communication', () => {
     });
   });
 });
+
+describe('cross tabs renew', () => {
+  let testContext;
+  // syncStorage is shared (simulate LocalStorage which is shared across tabs)
+  let syncStorageMap = {};
+  let sharedTokenMap = {};
+  const syncStorage = {
+    getItem: jest.fn().mockImplementation((k) => syncStorageMap[k]),
+    setItem: jest.fn().mockImplementation((k, v) => {
+      const oldValue = JSON.stringify(syncStorageMap);
+      syncStorageMap[k] = v;
+      const newValue = JSON.stringify(syncStorageMap);
+      console.log('eeeeee  set', {
+        key: SYNC_STORAGE_NAME, 
+        newValue,
+        oldValue,
+      });
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: SYNC_STORAGE_NAME, 
+          newValue,
+          oldValue,
+        }));
+      }
+    }),
+    removeItem: jest.fn().mockImplementation((k) => {
+      const oldValue = JSON.stringify(syncStorageMap);
+      delete syncStorageMap[k];
+      const newValue = JSON.stringify(syncStorageMap);
+      console.log('eeeeee  remove', {
+        key: SYNC_STORAGE_NAME, 
+        newValue,
+        oldValue,
+      });
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: SYNC_STORAGE_NAME, 
+          newValue,
+          oldValue,
+        }));
+      }
+    }),
+  };
+  const sharedTokenStorage = {
+    getStorage: jest.fn().mockImplementation(() => sharedTokenMap),
+    setStorage: jest.fn().mockImplementation((v) => { sharedTokenMap = v; })
+  };
+
+  const createContext = (tokenStorage?) => {
+    let testContext;
+
+    const emitter = new Emitter();
+    if (!tokenStorage) {
+      tokenStorage = {
+          getStorage: jest.fn().mockImplementation(() => testContext.storage),
+          setStorage: jest.fn().mockImplementation(() => {})
+      };
+    }
+    const sdkMock = {
+      options: {},
+      token: {
+        renewTokens: jest.fn().mockImplementation(() => Promise.resolve(testContext.freshTokens))
+      },
+      storageManager: {
+        getTokenStorage: jest.fn().mockReturnValue(tokenStorage),
+        getSyncStorage: jest.fn().mockReturnValue(syncStorage),
+      },
+      emitter
+    };
+
+    const instance = new TokenManager(sdkMock as any, {
+      _storageEventDelay: 0,
+      // disable because we start service
+      autoRenew: false,
+      autoRemove: false
+    });
+    jest.spyOn(instance, 'setTokens');
+    jest.spyOn(instance, 'remove').mockImplementation(() => {});
+    jest.spyOn(instance, 'emitRenewed').mockImplementation(() => {});
+    jest.spyOn(instance, 'emitError').mockImplementation(() => {});
+    
+    const storage = {
+      idToken: tokens.standardIdTokenParsed
+    };
+
+    testContext = {
+      sdkMock,
+      tokenStorage,
+      storage,
+      instance,
+      oldToken: tokens.standardIdTokenParsed,
+      freshTokens: {
+        idToken: tokens.standardIdToken2Parsed
+      }
+    };
+
+    return testContext;
+  };
+
+  beforeEach(function() {
+    syncStorageMap = {};
+    sharedTokenMap = {};
+    testContext = createContext();
+  });
+
+
+  it('works for 2 tabs', async () => {
+    console.log('-------------- start');
+    sharedTokenStorage.setStorage(testContext.storage);
+    const tabs = [...Array(2)].map(_ => createContext(sharedTokenStorage));
+    tabs.map(c => c.instance.start());
+
+    const renewPromises = tabs.map(c => c.instance.renew('idToken'));
+    const res = await Promise.allSettled(renewPromises);
+
+    res.map(r => {
+      expect(r.status).toBe('fulfilled');
+      expect((r as any).value).toMatchObject(testContext.freshTokens.idToken);
+    });
+    
+    const renewTokensCalls = tabs.map(c => c.sdkMock.token.renewTokens.mock.calls.length).reduce((v, c) => (c + v), 0);
+    expect(renewTokensCalls).toEqual(1);
+
+    tabs.map(c => c.instance.stop());
+    console.log('-------------- end');
+  });
+
+  // it('race', async () => {
+  //   console.log('-------------- start');
+
+  //   sharedTokenStorage.setStorage(testContext.storage);
+  //   const tabs = [...Array(2)].map(_ => createContext(sharedTokenStorage));
+  //   tabs.map(c => c.instance.start());
+
+  //   const renewPromises = tabs.map(c => c.instance.renew('idToken'));
+  //   const res = await Promise.allSettled(renewPromises);
+
+  //   console.log(111, res)
+
+  //   tabs.map(c => c.instance.stop());
+
+  //   console.log('-------------- end');
+  // });
+
+  // todo: simulate race
+
+//what if no event EVENT_RENEWED_SYNC
+//_storageEventDelay
+
+  // todo: what if error ?
+
+
+});
+
