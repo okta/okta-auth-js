@@ -184,7 +184,7 @@ const {
   nextStep: { 
     inputs // [{ name: 'verificationCode', ... }]
   }
-} = await authClient.idx.authenticate({ authenticator: AuthenticatorKey.OKTA_EMAIL });
+} = await authClient.idx.authenticate({ authenticator: AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */ });
 // gather verification code from email (this call should happen in a separated request)
 const { 
   status, // IdxStatus.SUCCESS
@@ -210,7 +210,7 @@ const {
   firstName: 'xxx',
   lastName: 'xxx',
   email: 'xxx',
-  authenticators: [AuthenticatorKey.OKTA_PASSWORD]
+  authenticators: [AuthenticatorKey.OKTA_PASSWORD /* 'okta_password' */]
 });
 // gather password from user input (this call should happen in a separated request)
 const { 
@@ -246,7 +246,7 @@ const {
   nextStep: { 
     inputs // [{ name: 'password', ... }]
   }
-} = await authClient.idx.register({ authenticator: AuthenticatorKey.OKTA_PASSWORD });
+} = await authClient.idx.register({ authenticator: AuthenticatorKey.OKTA_PASSWORD /* 'okta_password' */ });
 // gather password from user input (this call should happen in a separated request)
 const { 
   status, // IdxStatus.SUCCESS
@@ -270,7 +270,7 @@ const {
   }
 } = await authClient.idx.recoverPassword({
   username: 'xxx',
-  authenticators: [AuthenticatorKey.OKTA_EMAIL]
+  authenticators: [AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */]
 });
 // gather password from user input (this call should happen in a separated request)
 const { 
@@ -309,7 +309,7 @@ const {
   nextStep: {
     inputs // [{ name: 'verificationCode', ... }]
   } 
-} = await authClient.idx.recoverPassword({ authenticator: AuthenticatorKey.OKTA_EMAIL });
+} = await authClient.idx.recoverPassword({ authenticator: AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */ });
 // gather verification code from email (this call should happen in a separated request)
 const { 
   status, 
