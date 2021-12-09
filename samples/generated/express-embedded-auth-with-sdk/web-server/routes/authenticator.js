@@ -246,9 +246,8 @@ router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => 
 });
 
 router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res, next) => {
-  const { pollForResult } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.proceed({pollForResult});
+  const transaction = await authClient.idx.poll();
   handleTransaction({ req, res, next, authClient, transaction });
 });
 

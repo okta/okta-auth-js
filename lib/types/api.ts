@@ -19,7 +19,7 @@ import StorageManager from '../StorageManager';
 import TransactionManager from '../TransactionManager';
 import { TokenManagerInterface } from './TokenManager';
 import { OktaUserAgent } from '../OktaUserAgent';
-import { FlowIdentifier } from '../idx/types';
+import { FlowIdentifier, IdxPollOptions } from '../idx/types';
 
 import { 
   AuthenticationOptions, 
@@ -269,6 +269,7 @@ export interface IdxAPI {
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
   authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;
   register: (options?: IdxRegistrationOptions) => Promise<IdxTransaction>;
+  poll: (options?: IdxPollOptions) => Promise<IdxTransaction>;
   proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
   startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;

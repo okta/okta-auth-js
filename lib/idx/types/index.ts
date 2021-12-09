@@ -83,6 +83,10 @@ export type IdxOptions = InteractOptions & IntrospectOptions & {
   flow?: FlowIdentifier;
 };
 
+export interface IdxPollOptions {
+  refresh?: number;
+}
+
 export type Authenticator = {
   key: string;
   methodType?: string;
