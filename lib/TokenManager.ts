@@ -428,8 +428,8 @@ export class TokenManager implements TokenManagerInterface {
           this.remove(key);
           
           err.tokenKey = key;
-          this.emitError(err);
         }
+        this.emitError(err);
         throw err;
       })
       .finally(() => {

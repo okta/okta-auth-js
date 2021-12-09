@@ -192,6 +192,25 @@ describe('TokenManager renew', () => {
       expect(testContext.error.tokenKey).toBe('idToken');
     });
 
+    it('Other AuthApiError', async () => {
+      testContext.error = new AuthApiError({
+        errorSummary: 'Not Found'
+      }, {
+        status: 404,
+        responseText: 'Not Found',
+        headers: {}
+      });
+      try {
+        await testContext.instance.renew('idToken');
+      } catch (e) {
+        expect(e).toMatchObject({
+          name: 'AuthApiError'
+        });
+      }
+      expect(testContext.instance.remove).not.toHaveBeenCalledWith('idToken');
+      expect(testContext.instance.emitError).toHaveBeenCalledWith(testContext.error);
+    });
+
   });
 
 });
