@@ -13,16 +13,18 @@
 
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
-import { NextStep, IdxMessage, Authenticator, Input } from '../../types';
+import { NextStep, IdxMessage, Authenticator, Input, IdxOptions } from '../../types';
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[]>;
 
-export interface RemediationValues {
+export interface RemediationValues extends IdxOptions {
   stateHandle?: string;
   authenticators?: Authenticator[] | string[];
+  authenticator?: string;
+  authenticatorsData?: Authenticator[];
 }
 
 // Base class - DO NOT expose static remediationName
@@ -34,15 +36,43 @@ export class Remediator {
   map?: IdxToRemediationValueMap;
 
   constructor(remediation: IdxRemediation, values: RemediationValues = {}) {
-    // map authenticators to Authenticator[] type
-    values.authenticators = (values.authenticators?.map(authenticator => {
-      return typeof authenticator === 'string' 
-        ? { key: authenticator } : authenticator;
-    }) || []) as Authenticator[];
-    
     // assign fields to the instance
-    this.values = values;
+    this.values = { ...values };
+    this.formatAuthenticators();
     this.remediation = remediation;
+  }
+
+  private formatAuthenticators() {
+    this.values.authenticators = (this.values.authenticators || []) as Authenticator[];
+    // add string authenticator from input to "authenticators" field
+    if (this.values.authenticator) {
+      const hasAuthenticatorInList = this.values.authenticators.some(authenticator => {
+        if (typeof authenticator === 'string') {
+          return authenticator === this.values.authenticator;
+        }
+        return authenticator.key === this.values.authenticator;
+      });
+      if (!hasAuthenticatorInList) {
+        this.values.authenticators.push({
+          key: this.values.authenticator 
+        });
+      }
+    }
+
+    // transform items in "authenticators" into one format
+    this.values.authenticators = this.values.authenticators.map(authenticator => {
+      return typeof authenticator === 'string' ? { key: authenticator } : authenticator;
+    });
+
+    // save non-key meta to "authenticatorsData" field
+    // authenticators will be removed after selection to avoid select-authenticator loop
+    this.values.authenticatorsData = this.values.authenticators.reduce((acc, authenticator) => {
+      if (typeof authenticator === 'object' && Object.keys(authenticator).length > 1) {
+        // save authenticator meta into authenticator data
+        acc.push(authenticator);
+      }
+      return acc;
+    }, this.values.authenticatorsData || []);
   }
 
   getName(): string {
@@ -173,12 +203,11 @@ export class Remediator {
     }, []);
   }
 
-  // Override this method to grab messages per remediation
-  getMessages(): IdxMessage[] | undefined {
-    if (!this.remediation.value) {
+  static getMessages(remediation: IdxRemediation): IdxMessage[] | undefined {
+    if (!remediation.value) {
       return;
     }
-    return this.remediation.value[0]?.form?.value.reduce((messages, field) => {
+    return remediation.value[0]?.form?.value.reduce((messages, field) => {
       if (field.messages) {
         messages = [...messages, ...field.messages.value];
       }
@@ -187,19 +216,14 @@ export class Remediator {
   }
 
   // Prepare values for the next remediation
-  // In general, remove finished authenticator from list
-  getValuesAfterProceed(): unknown {
-    // remove used values
+  // In general, remove used values from inputs for the current remediation
+  // Override this method if special cases need be handled
+  getValuesAfterProceed(): RemediationValues {
     const inputs = this.getInputs();
     for (const input of inputs) {
       delete this.values[input.name];
     }
-
-    // remove used authenticators from values
-    const authenticatorKey = this.getAuthenticator()?.key;
-    const authenticators = (this.values.authenticators as Authenticator[])
-      ?.filter(authenticator => authenticator.key !== authenticatorKey);
-    return { ...this.values, authenticators };
+    return this.values;
   }
 
   protected getAuthenticator(): IdxAuthenticator | undefined {

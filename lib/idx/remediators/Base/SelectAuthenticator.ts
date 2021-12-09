@@ -13,7 +13,7 @@
 
 import { Remediator, RemediationValues } from './Remediator';
 import { getAuthenticatorFromRemediation } from '../util';
-import { IdxRemediation, IdxRemediationValue } from '../../types/idx-js';
+import { IdxAuthenticator, IdxRemediationValue } from '../../types/idx-js';
 import { Authenticator } from '../../types';
 
 // Find matched authenticator in provided order
@@ -36,26 +36,10 @@ export type SelectAuthenticatorValues = RemediationValues & {
 // Base class - DO NOT expose static remediationName
 export class SelectAuthenticator extends Remediator {
   values: SelectAuthenticatorValues;
-  matchedOption: IdxRemediation;
+  selectedAuthenticator: IdxAuthenticator;
   
   map = {
     authenticator: []
-  }
-
-  constructor(remediation: IdxRemediation, values: SelectAuthenticatorValues = {}) {
-    super(remediation, values);
-    
-    // Unify authenticator input type
-    const { authenticator: selectedAuthenticator, authenticators } = this.values;
-    const hasSelectedAuthenticatorInList = authenticators
-        ?.some((authenticator => authenticator.key === selectedAuthenticator));
-    if (selectedAuthenticator && !hasSelectedAuthenticatorInList) {
-      // add selected authenticator to list
-      this.values.authenticators = [
-        ...(authenticators || []), 
-        { key: selectedAuthenticator }
-      ] as Authenticator[];
-    }
   }
 
   canRemediate() {
@@ -92,6 +76,8 @@ export class SelectAuthenticator extends Remediator {
     const { authenticators } = this.values;
     const { options } = remediationValue;
     const selectedOption = findMatchedOption(authenticators, options);
+    // track the selected authenticator
+    this.selectedAuthenticator = selectedOption.relatesTo;
     return {
       id: selectedOption?.value.form.value.find(({ name }) => name === 'id').value
     };
@@ -99,6 +85,16 @@ export class SelectAuthenticator extends Remediator {
 
   getInputAuthenticator() {
     return { name: 'authenticator', key: 'string' };
+  }
+
+  getValuesAfterProceed(): RemediationValues {
+    this.values = super.getValuesAfterProceed();
+    // remove used authenticators
+    const authenticators = (this.values.authenticators as Authenticator[])
+      .filter(authenticator => {
+        return authenticator.key !== this.selectedAuthenticator.key; 
+      });
+    return { ...this.values, authenticators };
   }
 
 }

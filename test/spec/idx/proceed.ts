@@ -85,7 +85,6 @@ describe('idx/proceed', () => {
       const flowSpec = {
         flow: 'fake',
         remediators: [],
-        flowMonitor: {}
       };
       jest.spyOn(mocked.FlowSpecification, 'getFlowSpecification').mockReturnValue(flowSpec);
       jest.spyOn(mocked.run, 'run').mockReturnValue(undefined);

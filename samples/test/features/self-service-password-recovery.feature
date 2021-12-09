@@ -9,7 +9,11 @@ Background:
     Given Mary navigates to the Self Service Password Reset View
     When she inputs her correct Email
     And she submits the recovery form
-    Then she sees a page to input her code
+    Then she sees a page to select authenticator
+    And password authenticator is not in options
+    When she selects email authenticator
+    And she submits the form
+    Then she sees a page to challenge her email authenticator
     When she fills in the correct code
     And she submits the form
     Then she sees a page to set her password

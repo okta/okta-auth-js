@@ -20,7 +20,6 @@ import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
 import checkButton from '../support/check/checkButton';
 import waitForURLPath from '../support/wait/waitForURLPath';
-import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import enterValidPassword from '../support/action/live-user/enterValidPassword';
 import confirmValidPassword from '../support/action/live-user/confirmValidPassword';
@@ -31,6 +30,7 @@ import { UserHome } from '../support/selectors';
 import isDisplayed from '../support/check/isDisplayed';
 import checkProfileName from '../support/check/checkProfileName';
 import ActionContext from '../support/context';
+import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticatorOptions';
 
 Then(
   /^User can verify their profile data$/,
@@ -113,14 +113,23 @@ Then(
 );
 
 Then(
+  /^she sees a page to select authenticator/,
+  checkIsOnPage.bind(null, 'Select authenticator')
+);
+
+Then(
   /^the sample shows an error message "(?<message>.+?)" on the Sample App$/,
   checkFormMessage
 );
 
-// TODO: add explicit spec step instead for password reset scenario
 Then(
-  /^she sees a page to input her code$/,
-  selectEmailAuthenticator
+  /^password authenticator is not in options/,
+  checkIsInAuthenticatorOptions.bind(null, 'okta_password', false)
+);
+
+Then(
+  /^she sees a page to challenge her email authenticator$/,
+  checkIsOnPage.bind(null, 'Challenge email authenticator')
 );
 
 Then(

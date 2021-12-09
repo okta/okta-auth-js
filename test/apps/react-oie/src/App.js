@@ -92,6 +92,7 @@ export default function App() {
     const newTransaction = flowMethod === 'idp' 
       ? await oktaAuth.idx.startTransaction() 
       : await oktaAuth.idx[flowMethod]();
+    console.log('Transaction:', newTransaction);
     setTransaction(newTransaction);
   };
 

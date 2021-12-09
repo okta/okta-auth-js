@@ -39,6 +39,7 @@ import submitAnyForm from '../support/action/submitAnyForm';
 import submitForm from '../support/action/submitForm';
 import clickLogout from '../support/action/clickLogout';
 import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
+import selectAuthenticator from '../support/action/selectAuthenticator';
 import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
 import selectGoogleAuthenticator from '../support/action/selectGoogleAuthenticator';
 import selectSecurityQuestionAuthenticator from '../support/action/selectSecurityQuestionAuthenticator';
@@ -234,6 +235,11 @@ When(
 When(
   /^she selects Email$/,
   selectEmailAuthenticator
+);
+
+When(
+  /^she selects email authenticator$/,
+  selectAuthenticator.bind(null, 'okta_email')
 );
 
 When(

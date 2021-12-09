@@ -20,20 +20,15 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
 
   values: AuthenticatorVerificationDataValues;
 
-  canRemediate() {
-    const authenticator = this.getAuthenticatorFromValues();
-    return !!(authenticator && authenticator.methodType);
-  }
-
   mapAuthenticator() {
+    const authenticatorData = this.getAuthenticatorData();
     const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
-    const authenticatorFromValues = this.getAuthenticatorFromValues();
     return { 
       id: authenticatorFromRemediation.form.value
         .find(({ name }) => name === 'id').value,
       enrollmentId: authenticatorFromRemediation.form.value
         .find(({ name }) => name === 'enrollmentId')?.value,
-      methodType: authenticatorFromValues.methodType,
+      methodType: authenticatorData.methodType,
     };
   }
 

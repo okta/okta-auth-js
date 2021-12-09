@@ -14,7 +14,6 @@
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
 import { Remediator, RemediationValues } from './remediators';
-import { RemediationFlow } from './flow';
 import { RunOptions } from './run';
 import { NextStep, IdxMessage } from './types';
 import { 
@@ -36,7 +35,7 @@ export function getRemediator(
   values: RemediationValues,
   options: RunOptions,
 ): Remediator {
-  const { remediators, flowMonitor } = options;
+  const { remediators } = options;
 
   let remediator;
   const remediatorCandidates = [];
@@ -48,29 +47,15 @@ export function getRemediator(
 
     const T = remediators[remediation.name];
     remediator = new T(remediation, values);
-    if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations, values)) {
-      if (remediator.canRemediate()) {
-        // found the remediator
-        return remediator;
-      }
-      // remediator cannot handle the current values
-      // maybe return for next step
-      remediatorCandidates.push(remediator);  
+    if (remediator.canRemediate()) {
+      // found the remediator
+      return remediator;
     }
+    // remediator cannot handle the current values
+    // maybe return for next step
+    remediatorCandidates.push(remediator);  
   }
-
-  // TODO: why is it a problem to have multiple remediations? 
-  // JIRA: https://oktainc.atlassian.net/browse/OKTA-400758
-  // if (remediatorCandidates.length > 1) {
-  //   const remediationNames = remediatorCandidates.reduce((acc, curr) => {
-  //     const name = curr.getName();
-  //     return acc ? `${acc}, ${name}` : name;
-  //   }, '');
-  //   throw new AuthSdkError(`
-  //     More than one remediation can match the current input, remediations: ${remediationNames}
-  //   `);
-  // }
-
+  
   return remediatorCandidates[0];
 }
 
@@ -87,14 +72,8 @@ function canResendFn(idxResponse: IdxResponse) {
   return Object.keys(idxResponse.actions).some(actionName => actionName.includes('resend'));
 }
 
-function getIdxMessages(
-  idxResponse: IdxResponse, remediators: RemediationFlow
-): IdxMessage[] {
+function getIdxMessages(idxResponse: IdxResponse): IdxMessage[] {
   let messages = [];
-  if (!remediators) {
-    return messages;
-  }
-
   const { rawIdxState, neededToProceed } = idxResponse;
 
   // Handle global messages
@@ -105,12 +84,7 @@ function getIdxMessages(
 
   // Handle field messages for current flow
   for (let remediation of neededToProceed) {
-    const T = remediators[remediation.name];
-    if (!T) {
-      continue;
-    }
-    const remediator = new T(remediation);
-    const fieldMessages = remediator.getMessages();
+    const fieldMessages = Remediator.getMessages(remediation);
     if (fieldMessages) {
       messages = [...messages, ...fieldMessages];
     }
@@ -132,7 +106,7 @@ function getNextStep(
   };
 }
 
-function handleIdxError(e, remediators, remediator?) {
+function handleIdxError(e, remediator?) {
   // Handle idx messages
   const idxState: IdxResponse = isIdxResponse(e) ? e : null;
   if (!idxState) {
@@ -140,7 +114,7 @@ function handleIdxError(e, remediators, remediator?) {
     throw e;
   }
   const terminal = isTerminalResponse(idxState);
-  const messages = getIdxMessages(idxState, remediators);
+  const messages = getIdxMessages(idxState);
   if (terminal) {
     return { terminal, messages };
   } else {
@@ -170,7 +144,7 @@ export async function remediate(
   options: RunOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
-  const { remediators, flowMonitor } = options;
+  const { remediators } = options;
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -179,11 +153,25 @@ export async function remediate(
 
   // Reach to terminal state
   const terminal = isTerminalResponse(idxResponse);
-  const messages = getIdxMessages(idxResponse, remediators);
+  const messages = getIdxMessages(idxResponse);
   if (terminal) {
     return { terminal, messages };
   }
 
+  const remediator = getRemediator(neededToProceed, values, options);
+  
+  if (!remediator) {
+    throw new AuthSdkError(`
+      No remediation can match current flow, check policy settings in your org.
+      Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
+    `);
+  }
+
+  if (messages.length) {
+    const nextStep = getNextStep(remediator, idxResponse);
+    return { nextStep, messages };
+  }
+  
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
   const actions = [
@@ -207,22 +195,6 @@ export async function remediate(
     }
   }
 
-  const remediator = getRemediator(neededToProceed, values, options);
-
-  if (!remediator) {
-    throw new AuthSdkError(`
-      No remediation can match current flow, check policy settings in your org.
-      Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
-    `);
-  }
-
-  if (flowMonitor.loopDetected(remediator)) {
-    throw new AuthSdkError(`
-      Remediation run into loop, break!!! remediation: ${remediator.getName()}
-    `);
-  }
-
-  // Recursive loop breaker
   // Return next step to the caller
   if (!remediator.canRemediate()) {
     const nextStep = getNextStep(remediator, idxResponse);
@@ -233,32 +205,12 @@ export async function remediate(
   const data = remediator.getData();
   try {
     idxResponse = await idxResponse.proceed(name, data);
-    // Track succeed remediations in the current transaction
-    await flowMonitor.trackRemediations(name);
-
-    // Successfully get interaction code
-    if (idxResponse.interactionCode) {
-      return { idxResponse };
-    }
-
-    // Reach to terminal state
-    const terminal = isTerminalResponse(idxResponse);
-    const messages = getIdxMessages(idxResponse, remediators);
-    if (terminal) {
-      return { terminal, messages };
-    }
-
-    // Handle idx message in nextStep
-    if (messages.length) {
-      const nextStep = getNextStep(remediator, idxResponse);
-      return { nextStep, messages };
-    }
 
     // We may want to trim the values bag for the next remediation
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValuesAfterProceed();
     return remediate(idxResponse, values, options); // recursive call
   } catch (e) {
-    return handleIdxError(e, remediators, remediator);
+    return handleIdxError(e, remediator);
   }
 }

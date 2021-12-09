@@ -10,8 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export * from './AuthenticationFlow';
-export * from './FlowSpecification';
-export * from './PasswordRecoveryFlow';
-export * from './RegistrationFlow';
-export * from './RemediationFlow';
+
+import SelectAuthenticator from '../selectors/SelectAuthenticator';
+
+export default async (optionValue: string, expectedValue: boolean) => {
+  const option = await $(`${SelectAuthenticator.options} option[value=${optionValue}]`);
+  const isExisting = await option.isExisting();
+  expect(isExisting).toBe(expectedValue);
+};
