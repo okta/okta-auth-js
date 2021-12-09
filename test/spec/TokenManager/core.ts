@@ -345,6 +345,7 @@ describe('TokenManager', function() {
           util.expectErrorToEqual(result.reason, {
             name: 'Error',
             message: 'expected',
+            tokenKey: 'test-idToken'
           });
         });
       });
@@ -374,6 +375,7 @@ describe('TokenManager', function() {
         util.expectErrorToEqual(err, {
           name: 'Error',
           message: 'expected',
+          tokenKey: 'test-idToken'
         });
         var p2 = client.tokenManager.renew('test-idToken');
         expect(p1).not.toBe(p2);
@@ -384,6 +386,7 @@ describe('TokenManager', function() {
         util.expectErrorToEqual(err, {
           name: 'Error',
           message: 'expected',
+          tokenKey: 'test-idToken'
         });
       });
       return p1;
