@@ -12,7 +12,7 @@
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
-import { IdxPollOptions, NextStep } from '../../types';
+import { NextStep } from '../../types';
 import { IdxContext } from '../types/idx-js';
 
 export interface EnrollPollValues extends RemediationValues {
@@ -28,7 +28,7 @@ export class EnrollPoll extends Remediator {
     return Boolean(this.values.startPolling);
   }
 
-  getNextStep(context?: IdxContext): NextStep & {pollForResult: IdxPollOptions} {
+  getNextStep(context?: IdxContext): NextStep {
     const name = this.getName();
     let authenticator = this.getAuthenticator();
     if (!authenticator && context?.currentAuthenticator) {

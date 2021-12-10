@@ -19,7 +19,6 @@ import {
   SelectAuthenticatorEnrollValues,
   EnrollAuthenticatorValues,
   AuthenticatorEnrollmentDataValues,
-  EnrollPollValues,
   SkipValues,
 } from './remediators';
 import { getFlowSpecification } from './flow';
@@ -34,7 +33,6 @@ import {
 
 export type RegistrationOptions = IdxOptions 
   & EnrollProfileValues 
-  & EnrollPollValues
   & SelectAuthenticatorEnrollValues 
   & EnrollAuthenticatorValues 
   & AuthenticatorEnrollmentDataValues 

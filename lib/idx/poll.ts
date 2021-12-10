@@ -30,7 +30,9 @@ export async function poll(authClient: OktaAuth, options: IdxPollOptions = {}): 
           if (transaction.error) {
             reject(transaction);
           } else if (transaction.status === IdxStatus.PENDING) {
-            resolve(poll(authClient, options));
+            resolve(poll(authClient, {
+              refresh: transaction.nextStep?.pollForResult?.refresh
+            }));
           } else {
             resolve(transaction);
           }

@@ -59,6 +59,7 @@ export type NextStep = {
   canResend?: boolean;
   inputs?: Input[];
   options?: IdxOption[];
+  pollForResult?: IdxPollOptions;
 }
 
 export enum IdxFeature {
