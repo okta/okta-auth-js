@@ -147,6 +147,35 @@ describe('idx/interact', () => {
       });
     });
 
+    it('uses activationToken from function options', async () => {
+      const { authClient } = testContext;
+      const res = await interact(authClient, { activationToken: 'fn-activationToken' });
+      expect(mocked.idx.interact).toHaveBeenCalledWith({
+        'clientId': 'authClient-clientId',
+        'baseUrl': 'authClient-issuer/oauth2',
+        'codeChallenge': 'meta-codeChallenge',
+        'codeChallengeMethod': 'meta-codeChallengeMethod',
+        'redirectUri': 'authClient-redirectUri',
+        'scopes': ['authClient'],
+        'state': 'authClient-state',
+        'activationToken': 'fn-activationToken'
+      });
+      expect(res).toEqual({
+        'interactionHandle': 'idx-interactionHandle',
+        'meta': {
+          'codeChallenge': 'meta-codeChallenge',
+          'codeChallengeMethod': 'meta-codeChallengeMethod',
+          'codeVerifier': 'meta-codeVerifier',
+          'interactionHandle': 'idx-interactionHandle',
+          'scopes': [
+            'authClient',
+          ],
+          'state': 'authClient-state',
+        },
+        'state': 'authClient-state',
+      });
+    });
+
     it('saves returned interactionHandle', async () => {
       const { authClient } = testContext;
       jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');

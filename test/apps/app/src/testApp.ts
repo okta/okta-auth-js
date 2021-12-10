@@ -48,6 +48,16 @@ function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
       </li>
     `;
   }
+  const useActivationToken = app.config.useInteractionCodeFlow ? `
+    <div class="box">
+      <form>
+        <input name="activationToken" id="activationToken" placeholder="activation token" type="text"/>
+        <a href="/" id="activationToken-widget" onclick="activateUserWithWidget(event)">Activate with widget</a>
+        <input name="activationPassword" id="activationPassword" placeholder="password" type="password"/>
+        <a href="/" id="activationToken-direct" onclick="activateUser(event)">Activate with IDX API</a>
+      </form>
+    </div>
+    ` : '';
   return `
     <div class="pure-menu">
       <ul class="pure-menu-list actions">
@@ -76,6 +86,7 @@ function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
         <a href="/" id="login-direct" onclick="loginDirect(event)">Login DIRECT</a>
       </form>
     </div>
+    ${useActivationToken}
   `;
 }
 
@@ -131,6 +142,8 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     loginRedirect: testApp.loginRedirect.bind(testApp, {}),
     loginPopup: testApp.loginPopup.bind(testApp, {}),
     loginDirect: testApp.loginDirect.bind(testApp),
+    activateUser: testApp.activateUser.bind(testApp),
+    activateUserWithWidget: testApp.activateUserWithWidget.bind(testApp),
     getToken: testApp.getToken.bind(testApp, {}),
     clearTokens: testApp.clearTokens.bind(testApp),
     logoutRedirect: testApp.logoutRedirect.bind(testApp),
@@ -327,6 +340,70 @@ class TestApp {
 
     // re-render
     this.render();
+  }
+
+  async activateUser(): Promise<void> {
+    // Make sure we are starting a fresh transaction
+    this.oktaAuth.storageManager.getTransactionStorage().clearStorage();
+
+    // Get activationToken and password
+    const activationToken = (document.getElementById('activationToken') as HTMLInputElement).value;
+    const password = (document.getElementById('activationPassword') as HTMLInputElement).value;
+
+    // Activate with password
+    let tx = await this.oktaAuth.idx.register({ 
+      activationToken,
+      authenticator: 'okta_password',
+      password,
+    });
+
+    // Skip optional `select-authenticator-enroll` (eg. with `okta-verify`)
+    if (tx?.nextStep?.canSkip) {
+      tx = await this.oktaAuth.idx.register({
+        skip: true
+      });
+    }
+
+    // Process result
+    if (tx.status == 'SUCCESS') {
+      if (tx.tokens) {
+        this.oktaAuth.tokenManager.setTokens(tx.tokens);
+      }
+      await this.render();
+    } else {
+      console.error('IDX transaction:', tx);
+      const error = tx?.error as any;
+      alert(error?.error_description || error?.message || `${tx.status} ${tx?.messages?.map(m => m.message)?.join('. ') || ''}`);
+    }
+  }
+
+  async activateUserWithWidget(): Promise<void> {
+    // Make sure we are starting a fresh transaction
+    this.oktaAuth.storageManager.getTransactionStorage().clearStorage();
+
+    // Get activationToken
+    const activationToken = (document.getElementById('activationToken') as HTMLInputElement).value;
+
+    try {
+      // Use interact with activationToken
+      const interactRes = await this.oktaAuth.idx.interact({ activationToken });
+      const {interactionHandle} = interactRes;
+
+      // Get stateHandle from introspect
+      const tx = await this.oktaAuth.idx.introspect({ interactionHandle });
+      const { rawIdxState: { stateHandle } } = tx;
+
+      // Render widget to continue user activation
+      return this.render(true).then(() => this.renderWidget({ 
+        authClient: this.oktaAuth,
+        stateToken: stateHandle
+      }));
+    } catch(e) {
+      console.error(e);
+      if (e.error_description) {
+        alert(e.error_description);
+      }
+    }
   }
 
   async loginDirect(): Promise<void> {

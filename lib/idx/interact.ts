@@ -18,6 +18,7 @@ import { getOAuthBaseUrl } from '../oidc';
 export interface InteractOptions {
   state?: string;
   scopes?: string[];
+  activationToken?: string;
 }
 
 export interface InteractResponse {
@@ -54,6 +55,9 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
   state = state || meta.state;
   const scopes = options.scopes || authClient.options.scopes || meta.scopes;
 
+  // These properties can be set in options
+  const { activationToken } = options;
+
   const baseUrl = getOAuthBaseUrl(authClient);
   return idx.interact({
     // OAuth
@@ -65,7 +69,10 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
 
     // PKCE
     codeChallenge,
-    codeChallengeMethod
+    codeChallengeMethod,
+    
+    // Magic Link
+    activationToken
   }).then(interactionHandle => {
     const newMeta = {
       ...meta,

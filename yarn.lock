@@ -2372,10 +2372,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@okta/okta-idx-js@0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.22.0.tgz#c5dbebd155be2c8a8e2bbceb2e92701b6ba59349"
-  integrity sha512-SehJVwQI51xWrB1YaMn6UB54cOzhrM7z5k2xOI62I3B7qOQ3uFOZJvRCJnBcZ6TEcQuqJ3/6q93h6n8omw0tVQ==
+"@okta/okta-idx-js@0.23.0":
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.23.0.tgz#894bce38922537b27f168c78c38b6df3f203f419"
+  integrity sha512-aw4zAuP+xkZPxUXk2yTWLpuQZfGusuoWXyvb1QSMWTNQ4CAwZN40nlurBYOYqYOwQjj1MGqUxEgtDGVQYITcDQ==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@babel/runtime-corejs3" "^7.12.5"

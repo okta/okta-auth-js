@@ -254,6 +254,19 @@ const {
 } = await authClient.idx.register({ password: 'xxx' });
 ```
 
+**Account activation**:
+
+```js
+const { 
+  status, // IdxStatus.SUCCESS
+  tokens 
+} = await authClient.idx.register({
+  activationToken: 'xxxxx',
+  authenticator: 'okta_password',
+  password: 'xxx'
+});
+```
+
 #### `idx.recoverPassword`
 
 The convenience method for `self service password recovery` flow.
