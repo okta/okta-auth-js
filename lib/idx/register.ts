@@ -39,7 +39,7 @@ export type RegistrationOptions = IdxOptions
   & SkipValues;
 
 export async function register(
-  authClient: OktaAuth, options: RegistrationOptions
+  authClient: OktaAuth, options: RegistrationOptions = {}
 ): Promise<IdxTransaction> {
   // Only check at the beginning of the transaction
   if (!transactionMetaExist(authClient)) {
