@@ -92,3 +92,8 @@ export const IdxErrorGoogleAuthenticatorPasscodeInvalidFactory = IdxErrorMessage
   i18n: { key: 'authfactor.challenge.soft_token.invalid_passcode' },
   message: 'Your code doesn\'t match our records. Please try again.'
 });
+
+export const IdxErrorSessionExpiredFactory = IdxErrorMessageFactory.params({
+  i18n: { key: 'idx.session.expired' },
+  message: 'You have been logged out due to inactivity. Refresh or return to the sign in screen.',
+});

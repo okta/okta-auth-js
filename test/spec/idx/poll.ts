@@ -13,8 +13,10 @@
 import { 
   chainResponses,
   EnrollPollRemediationFactory,
-  IdxContextFactory, IdxMessageCheckYourEmailFactory, IdxMessagesFactory, IdxResponseFactory,
-  OktaVerifyAuthenticatorWithContextualDataFactory,
+  IdxErrorSessionExpiredFactory,
+  IdxMessageCheckYourEmailFactory,
+  IdxMessagesFactory,
+  IdxResponseFactory,
   RawIdxResponseFactory
 } from '@okta/test.support/idx';
 import { poll } from '../../../lib/idx';
@@ -24,10 +26,9 @@ import { IdxStatus } from '../../../lib/idx/types';
 const mocked = {
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect'),
-  proceed: require('../../../lib/idx/proceed')
+  proceed: require('../../../lib/idx/proceed'),
+  transactionMeta: require('../../../lib/idx/transactionMeta')
 };
-
-
 
 describe('idx/poll', () => {
   let testContext;
@@ -35,7 +36,6 @@ describe('idx/poll', () => {
     const issuer = 'test-issuer';
     const clientId = 'test-clientId';
     const redirectUri = 'test-redirectUri';
-    const interactionCode = 'test-interactionCode';
     const transactionMeta = {
       issuer,
       clientId,
@@ -84,11 +84,22 @@ describe('idx/poll', () => {
       neededToProceed: [
         EnrollPollRemediationFactory.build()
       ],
-      context: IdxContextFactory.build({
-        currentAuthenticator: {
-          value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
-        }
-      }),
+    });
+
+    const enrollPollBackoff1Response = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollPollRemediationFactory.build({
+          refresh: 200
+        })
+      ],
+    });
+
+    const enrollPollBackoff2Response = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollPollRemediationFactory.build({
+          refresh: 400
+        })
+      ],
     });
 
     const successCheckEmailResponse = IdxResponseFactory.build({
@@ -101,10 +112,15 @@ describe('idx/poll', () => {
       })
     });
 
+    const sessionExpiredResponse = IdxErrorSessionExpiredFactory.build();
+
     testContext = {
       authClient,
       enrollPollResponse,
+      enrollPollBackoff1Response,
+      enrollPollBackoff2Response,
       successCheckEmailResponse,
+      sessionExpiredResponse,
     };
   });
 
@@ -135,7 +151,8 @@ describe('idx/poll', () => {
     ]);
 
     jest.spyOn(mocked.introspect, 'introspect')
-      .mockResolvedValueOnce(enrollPollResponse)
+      .mockResolvedValueOnce(enrollPollResponse) // get nextStep
+      .mockResolvedValueOnce(enrollPollResponse) // poll x3
       .mockResolvedValueOnce(enrollPollResponse)
       .mockResolvedValueOnce(enrollPollResponse)
       .mockResolvedValueOnce(successCheckEmailResponse);
@@ -143,15 +160,70 @@ describe('idx/poll', () => {
 
     const { nextStep } = await proceed(authClient, {});
     const transaction = await poll(authClient, {refresh: nextStep.pollForResult.refresh});
-    expect(enrollPollResponse.proceed).toHaveBeenCalledTimes(2);
+    expect(enrollPollResponse.proceed).toHaveBeenCalledTimes(3);
     expect(transaction.status).toEqual(IdxStatus.TERMINAL);
   });
 
-  it('rejects on session timeout', async () => {
+  it('uses refresh interval from poll response', async () => {
+    const {
+      authClient,
+      enrollPollResponse,
+      enrollPollBackoff1Response,
+      enrollPollBackoff2Response,
+      successCheckEmailResponse,
+    } = testContext;
 
+    chainResponses([
+      enrollPollResponse,
+      enrollPollBackoff1Response,
+      enrollPollBackoff2Response,
+      successCheckEmailResponse,
+    ]);
+
+    jest.spyOn(global, 'setTimeout');
+
+    jest.spyOn(mocked.introspect, 'introspect')
+      .mockResolvedValueOnce(enrollPollResponse)
+      .mockResolvedValueOnce(enrollPollBackoff1Response)
+      .mockResolvedValueOnce(enrollPollBackoff2Response)
+      .mockResolvedValueOnce(successCheckEmailResponse);
+
+    await poll(authClient, { refresh: 100 });
+    expect(setTimeout).toHaveBeenCalledTimes(3);
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 400);
   });
 
-  it('rejects on other errors', async () => {
+  it('stops polling on IDX error response', async () => {
+    const {
+      authClient,
+      enrollPollResponse,
+      sessionExpiredResponse,
+    } = testContext;
 
+    chainResponses([
+      enrollPollResponse,
+      enrollPollResponse,
+    ]);
+    jest.spyOn(mocked.introspect, 'introspect')
+      .mockResolvedValueOnce(enrollPollResponse)
+      .mockResolvedValueOnce(sessionExpiredResponse);
+
+    const transaction = await poll(authClient, { refresh: 100 });
+    expect(transaction.status).toEqual(IdxStatus.FAILURE);
+  });
+
+  it('propagates other errors', async () => {
+    const {
+      authClient
+    } = testContext;
+
+    jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockImplementationOnce(() => {
+      throw new Error('Storage Error');
+    });
+    try {
+      await poll(authClient, { refresh: 100 });
+    } catch (err) {
+      expect(err.message).toEqual('Storage Error');
+    }
   });
 });

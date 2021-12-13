@@ -329,5 +329,5 @@ export const SkipRemediationFactory = IdxRemediationFactory.params({
 
 export const EnrollPollRemediationFactory = IdxRemediationFactory.params({
   name: 'enroll-poll',
-  refresh: 1000
+  refresh: 100
 });
