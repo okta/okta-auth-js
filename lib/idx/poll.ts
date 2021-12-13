@@ -14,7 +14,6 @@ import { proceed } from './proceed';
 
 import { 
   IdxPollOptions,
-  IdxStatus,
   IdxTransaction,
   OktaAuth,
 } from '../types';
@@ -27,9 +26,10 @@ export async function poll(authClient: OktaAuth, options: IdxPollOptions = {}): 
           let transaction = await proceed(authClient, {
             startPolling: true
           });
-          if (transaction.status === IdxStatus.PENDING) {
+          const refresh = transaction.nextStep?.pollForResult?.refresh;
+          if (refresh) {
             resolve(poll(authClient, {
-              refresh: transaction.nextStep?.pollForResult?.refresh
+              refresh
             }));
           } else {
             resolve(transaction);
