@@ -55,6 +55,7 @@ import {
   OktaVerifyAuthenticatorWithContextualDataFactory,
   IdxContextFactory,
 } from '@okta/test.support/idx';
+import { proceed } from '../../../lib/idx/proceed';
 
 jest.mock('../../../lib/idx/introspect', () => {
   return {
@@ -1543,11 +1544,10 @@ describe('idx/register', () => {
       });
       expect(selectAuthenticatorResponse.proceed).toHaveBeenCalled();
       expect(enrollPollResponse.proceed).not.toHaveBeenCalled();
-      const pollForResult = nextStep['pollForResult'];
-      expect(Object.keys(pollForResult)).toContain('refresh');
+      expect(Object.keys(nextStep.pollForResult)).toContain('refresh');
 
-      let response = await register(authClient, {
-        pollForResult
+      let response = await proceed(authClient, {
+        startPolling: true
       });
       expect(enrollPollResponse.proceed).toHaveBeenCalled();
       expect(Object.keys(response.nextStep)).toContain('pollForResult');
