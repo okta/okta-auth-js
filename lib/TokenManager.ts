@@ -54,12 +54,12 @@ export const EVENT_ERROR = 'error';
 
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
-  renewPromise: Promise<Token>;
+  renewPromise: Record<string, Promise<Token>>;
 }
 function defaultState(): TokenManagerState {
   return {
     expireTimeouts: {},
-    renewPromise: null
+    renewPromise: {}
   };
 }
 export class TokenManager implements TokenManagerInterface {
@@ -182,7 +182,7 @@ export class TokenManager implements TokenManagerInterface {
     delete this.state.expireTimeouts[key];
   
     // Remove the renew promise (if it exists)
-    this.state.renewPromise = null;
+    this.state.renewPromise = {};
   }
   
   clearExpireEventTimeoutAll() {
@@ -391,8 +391,8 @@ export class TokenManager implements TokenManagerInterface {
   // TODO: renew method should take no param, change in the next major version OKTA-407224
   renew(key): Promise<Token> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
-    if (this.state.renewPromise) {
-      return this.state.renewPromise;
+    if (this.state.renewPromise[key]) {
+      return this.state.renewPromise[key];
     }
   
     try {
@@ -409,7 +409,7 @@ export class TokenManager implements TokenManagerInterface {
   
     // A refresh token means a replace instead of renewal
     // Store the renew promise state, to avoid renewing again
-    this.state.renewPromise = this.sdk.token.renewTokens()
+    this.state.renewPromise[key] = this.sdk.token.renewTokens()
       .then(tokens => {
         this.setTokens(tokens);
 
@@ -430,10 +430,10 @@ export class TokenManager implements TokenManagerInterface {
       })
       .finally(() => {
         // Remove existing promise key
-        this.state.renewPromise = null;
+        delete this.state.renewPromise[key];
       });
   
-    return this.state.renewPromise;
+    return this.state.renewPromise[key];
   }
   
   clear() {

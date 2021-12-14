@@ -155,6 +155,7 @@ export class AuthStateManager {
       };
 
       this._sdk.isAuthenticated()
+        .catch(() => {}) // Renew errors will emit an "error" event 
         .then(() => {
           if (cancelablePromise.isCanceled) {
             resolve();
