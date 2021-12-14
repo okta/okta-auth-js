@@ -189,6 +189,13 @@ export class Remediator {
   // Prepare values for the next remediation
   // In general, remove finished authenticator from list
   getValuesAfterProceed(): unknown {
+    // remove used values
+    const inputs = this.getInputs();
+    for (const input of inputs) {
+      delete this.values[input.name];
+    }
+
+    // remove used authenticators from values
     const authenticatorKey = this.getAuthenticator()?.key;
     const authenticators = (this.values.authenticators as Authenticator[])
       ?.filter(authenticator => authenticator.key !== authenticatorKey);

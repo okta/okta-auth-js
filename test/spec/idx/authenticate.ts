@@ -44,7 +44,9 @@ import {
   IdxErrorGoogleAuthenticatorPasscodeInvalidFactory,
   PhoneAuthenticatorVerificationDataRemediationFactory,
   VerifyEmailRemediationFactory,
-  VerifyGoogleAuthenticatorRemediationFactory
+  VerifyGoogleAuthenticatorRemediationFactory,
+  PhoneAuthenticatorFactory,
+  EmailAuthenticatorFactory
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -626,6 +628,10 @@ describe('idx/authenticate', () => {
           });
 
           const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+            relatesTo: {
+              type: 'object',
+              value: PhoneAuthenticatorFactory.build()
+            },
             value: [
               CredentialsValueFactory.build({
                 form: {
@@ -1092,6 +1098,10 @@ describe('idx/authenticate', () => {
             ]
           });
           const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+            relatesTo: {
+              type: 'object',
+              value: EmailAuthenticatorFactory.build()
+            },
             value: [
               CredentialsValueFactory.build({
                 form: {
