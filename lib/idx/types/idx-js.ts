@@ -30,8 +30,12 @@ export interface IdxAuthenticator {
     enrolledQuestion?: {
       question: string;
       questionKey: string;
-    },
-    qrcode?: string;
+    };
+    qrcode?: { 
+      href: string; 
+      method: string; 
+      type: string; 
+    };
     sharedSecret?: string;
   };
 }
