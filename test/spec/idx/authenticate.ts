@@ -1587,7 +1587,7 @@ describe('idx/authenticate', () => {
           });
         });
 
-        it.only('can auto-select the security question authenticator', async () => {
+        it('can auto-select the security question authenticator', async () => {
           const {
             authClient,
             selectAuthenticatorResponse,
