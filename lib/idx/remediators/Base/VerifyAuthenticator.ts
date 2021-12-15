@@ -12,13 +12,7 @@
 
 
 import { Remediator, RemediationValues } from './Remediator';
-import { 
-  getAuthenticator, 
-  Authenticator
-  // GeneralAuthenticatorInputValues, 
-  // OktaPasswordInputValues,
-  // SecurityQuestionInputValues 
-} from '../../authenticator';
+import { getAuthenticator, Authenticator } from '../../authenticator';
 import { IdxRemediation } from '../../types/idx-js';
 
 export interface VerifyAuthenticatorValues extends RemediationValues {
@@ -28,12 +22,6 @@ export interface VerifyAuthenticatorValues extends RemediationValues {
   question?: string;
   answer?: string;
 }
-
-// export type VerifyAuthenticatorValues = (
-//   GeneralAuthenticatorInputValues 
-//   | OktaPasswordInputValues 
-//   | SecurityQuestionInputValues
-// ) & RemediationValues;
 
 // Base class - DO NOT expose static remediationName
 export class VerifyAuthenticator extends Remediator {
