@@ -31,7 +31,7 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     skipAction: getFormActionPath(req, options.skipAction),
     resendAction: getFormActionPath(req, options.resendAction),
     cancelAction: getFormActionPath(req, '/cancel'),
-    contextualData
+    contextualData,
   };
   
   if (messages && messages.length) {

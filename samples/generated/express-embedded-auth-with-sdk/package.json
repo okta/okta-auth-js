@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node ./web-server/server.js",
-    "dev": "nodemon ./web-server/server.js --watch ../../../build/cjs"
+    "dev": "nodemon ./web-server/server.js --watch web-server ../../../build/cjs"
   },
   "dependencies": {
     "express": "^4.17.1",

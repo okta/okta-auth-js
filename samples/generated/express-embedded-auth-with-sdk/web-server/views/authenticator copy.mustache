@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+  
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div id="page-title-header" class="ui header">
+          <h2>{{title}}</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      {{#contextualData}}
+        <div class="ui segments">
+          <div class="ui segment">
+            {{#contextualData.qrcode}}
+              <div class="ui fluid image">
+                <img id="authenticator-qr-code" src="{{contextualData.qrcode.href}}" />
+              </div>
+            {{/contextualData.qrcode}}
+          </div>
+          <div class="ui segment">
+            {{#contextualData.sharedSecret}}
+              <div class="ui label">SharedSecret: </div>
+              <p id="authenticator-shared-secret">{{contextualData.sharedSecret}}</p>
+            {{/contextualData.sharedSecret}}
+          </div>
+        </div>
+      {{/contextualData}}
+
+      <div class="row">
+        <form id="challenge-authenticator-form" class="ui large form" action="{{action}}" method="POST">
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Enter Code
+              </div>
+              {{#input}}
+                <input id="authenticator-code-input" type="{{type}}" name="{{name}}" autoComplete="off" required />
+              {{/input}}
+            </div>
+          </div>
+          <button id="submit-button" class="ui fluid large primary submit button" type="submit">
+            Verify
+          </button>
+        </form>
+      </div>
+      {{#canResend}}
+        <form id="resend-code-form" class="ui form" action="{{resendAction}}" method="POST">
+          <button id="resend-button" class="ui fluid submit button" type="submit">
+            Resend
+          </button>
+        </form>
+      {{/canResend}}
+      {{>cancel}}
+
+    </div>
+  </body>
+</html>
