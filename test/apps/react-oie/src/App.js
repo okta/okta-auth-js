@@ -1,29 +1,11 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { OktaAuth, IdxStatus } from '@okta/okta-auth-js';
+import { formTransformer } from './formTransformer';
 import oidcConfig from './config';
 import './App.css';
 
 const oktaAuth = new OktaAuth(oidcConfig);
-
-const formMetaMapper = (nextStep) => {
-  const { inputs, options } = nextStep;
-  return {
-    ...nextStep,
-    inputs: !options && inputs.map(({ label, name, type, secret, required }) => {
-      if (secret) {
-        type = 'password';
-      } else if (type === 'string') {
-        type = 'text';
-      }
-      return { label, name, type, required };
-    }),
-    select: options && {
-      name: inputs[0].name,
-      options
-    },
-  };
-};
 
 export default function App() {
   const history = useHistory();
@@ -73,9 +55,9 @@ export default function App() {
 
   }, [history, setAuthState, setTransaction]);
 
-  const handleChange = ({ target: { name, value } }) => setInputValues({
+  const handleChange = ({ target: { name, value, checked } }) => setInputValues({
     ...inputValues,
-    [name]: value
+    [name]: value || checked
   });
 
   const handleSubmit = async e => {
@@ -175,17 +157,32 @@ export default function App() {
     );
   }
 
-  const { name, inputs, select, contextualData, canSkip } = formMetaMapper(nextStep);
+  const form = formTransformer(nextStep)({} /* initial form value */);
+  const { name, canSkip } = nextStep;
+  const { inputs, select, text, image } = form;
   const meta = oktaAuth.transactionManager.load();
   return (
     <div>
     {topNav}
-    <strong>{meta.flow || 'default'}</strong>
+    <strong>{meta?.flow || 'default'}</strong>
     <form onSubmit={handleSubmit}>
       <div className="messages">
         { messages && messages.map(message => (<div key={message.message}>{message.message}</div>)) }
       </div>
       <h3 className="title">{name}</h3>
+      {text && <div>{text.value}</div>}
+      {image && <img src={image.src} />}
+      {select && (
+        <>
+        <label>{select.label}</label>
+        <select name={select.name} onChange={handleChange}>
+          <option key="" value="">---</option>
+          {select.options.map(({ key, label, value }) => (
+            <option key={key}  value={key}>{label}</option>
+          ))}
+        </select>
+        </>
+      )}
       {inputs && inputs.map(({ label, name, type, required }) => (
         <label key={name}>{label}&nbsp;
           <input 
@@ -198,20 +195,6 @@ export default function App() {
           <br/>
         </label>
       ))}
-      {select && (
-        <select name={select.name} onChange={handleChange}>
-          <option value="">---</option>
-          {select.options.map(({ label, value }) => (
-            <option key={value}  value={value}>{label}</option>
-          ))}
-        </select>
-      )}
-      {contextualData && (
-        <div>
-          <img src={contextualData.qrcode.href} />
-          <div>{contextualData.sharedSecret}</div>
-        </div>
-      )}
       {canSkip && <button type="button" onClick={handleSkip}>Skip</button>}
       <button type="submit">Submit</button>
       <button type="button" onClick={handleCancel}>Cancel</button>
