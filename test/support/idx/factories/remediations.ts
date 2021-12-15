@@ -17,7 +17,8 @@ import {
   EmailAuthenticatorFactory,
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory,
-  GoogleAuthenticatorFactory
+  GoogleAuthenticatorFactory,
+  SecurityQuestionAuthenticatorFactory
 } from './authenticators';
 import { 
   EmailAuthenticatorFormFactory, 
@@ -93,6 +94,24 @@ export const VerifyGoogleAuthenticatorRemediationFactory = ChallengeAuthenticato
   }
 });
 
+export const VerifySecurityQuestionAuthenticatorRemediationFactory = ChallengeAuthenticatorRemediationFactory.params({
+  name: 'challenge-authenticator',
+  value: [
+    CredentialsValueFactory.build({
+      form: VerifyPasscodeFormFactory.build()
+    })
+  ],
+  relatesTo: {
+    value: SecurityQuestionAuthenticatorFactory.build({
+      contextualData: {
+        enrolledQuestion: {
+          questionKey: 'favorite_sports_player',
+          question: 'Who is your favorite sports player?'
+        }
+      }
+    })
+  }
+});
 
 export const VerifyPasswordRemediationFactory = ChallengeAuthenticatorRemediationFactory.params({
   name: 'challenge-authenticator',
@@ -177,6 +196,40 @@ export const EnrollGoogleAuthenticatorRemediationFactory = EnrollAuthenticatorRe
   relatesTo: {
     type: 'object',
     value: GoogleAuthenticatorFactory.build()
+  },
+  value: [
+    CredentialsValueFactory.build({
+      form: VerifyPasscodeFormFactory.build()
+    })
+  ]
+});
+
+export const EnrollSecurityQuestionAuthenticatorRemediationFactory = EnrollAuthenticatorRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: SecurityQuestionAuthenticatorFactory.build({
+      contextualData: {
+        questions: [
+          {
+            questionKey: 'disliked_food', 
+            question: 'What is the food you least liked as a child?'
+          },
+          {
+            questionKey: 'name_of_first_plush_toy', 
+            question: 'What is the name of your first stuffed animal?'
+          },
+          {
+            questionKey: 'first_award', 
+            question: 'What did you earn your first medal or award for?'
+          }
+        ],
+        questionKeys: [
+          'disliked_food',
+          'name_of_first_plush_toy',
+          'first_award'
+        ]
+      }
+    })
   },
   value: [
     CredentialsValueFactory.build({

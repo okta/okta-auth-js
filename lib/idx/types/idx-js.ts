@@ -37,6 +37,11 @@ export interface IdxAuthenticator {
       type: string; 
     };
     sharedSecret?: string;
+    questions?: {
+      questionKey: string;
+      question: string;
+    }[];
+    questionKeys?: string[];
   };
 }
 

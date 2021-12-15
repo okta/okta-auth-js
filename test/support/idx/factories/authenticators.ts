@@ -104,3 +104,12 @@ export const GoogleAuthenticatorFactory = IdxAuthenticatorFactory.params({
     sharedSecret: 'fake_secret'
   }
 });
+
+export const SecurityQuestionAuthenticatorFactory = IdxAuthenticatorFactory.params({
+  displayName: 'Security Question',
+  key: 'security_question',
+  type: 'security_question',
+  methods: [
+    { type: 'security_question' }
+  ]
+});
