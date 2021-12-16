@@ -382,7 +382,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       this._pending.handleLogin = false;
     }
   }
-  
+
   // Ends the current Okta SSO session without redirecting to Okta.
   closeSession(): Promise<object> {
     return this.session.close() // DELETE /api/v1/sessions/me
@@ -508,12 +508,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       });
     } else {
       if (options.clearTokensAfterRedirect) {
-        const tokens = this.tokenManager.getTokensSync();
-        // add pendingRemove flag to tokens
-        Object.keys(tokens).forEach(key => {
-          tokens[key].pendingRemove = true;
-        });
-        this.tokenManager.setTokens(tokens);
+        this.tokenManager.addPendingRemoveFlags();
       } else {
         // Clear all local tokens
         this.tokenManager.clear();

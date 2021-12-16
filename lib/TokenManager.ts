@@ -473,5 +473,13 @@ export class TokenManager implements TokenManagerInterface {
     tokenStorage[key] = token;
     this.storage.setStorage(tokenStorage);
   }
+
+  addPendingRemoveFlags() {
+    const tokens = this.getTokensSync();
+    Object.keys(tokens).forEach(key => {
+      tokens[key].pendingRemove = true;
+    });
+    this.setTokens(tokens);
+  }
   
 }
