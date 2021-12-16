@@ -803,7 +803,7 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 
 #### `clearPendingRemoveTokens`
 
-Defaults to `true`, set this option to false if you want to opt-out clear pendingRemove tokens when calling `tokenManager.start()`.
+Defaults to `true`, set this option to false if you want to opt-out of the default clearing pendingRemove tokens behaviour when `tokenManager.start()` is called.
 
 ## API Reference
 <!-- no toc -->
@@ -1598,7 +1598,7 @@ authClient.tokenManager.clear();
 
 #### `tokenManager.clearPendingRemoveTokens()`
 
-Remove all tokens with `pendingRemove` flags. This method is called within `tokenManager.start()` by default, you can opt-out the default behaviour by setting `tokenManager.clearPendingRemoveTokens` option to `false`.
+Remove all tokens with `pendingRemove` flags. This method is called within `tokenManager.start()` by default, you can opt-out of the default behaviour by setting `tokenManager.clearPendingRemoveTokens` option to `false`.
 
 #### `tokenManager.renew(key)`
 
