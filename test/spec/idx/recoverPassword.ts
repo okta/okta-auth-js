@@ -294,7 +294,7 @@ describe('idx/recoverPassword', () => {
         type: 'password',
         authenticator: {
           displayName: 'Password',
-          id: '14',
+          id: expect.any(String),
           key: 'okta_password',
           methods: [
             {
@@ -368,7 +368,7 @@ describe('idx/recoverPassword', () => {
         type: 'password',
         authenticator: {
           displayName: 'Password',
-          id: '15',
+          id: expect.any(String),
           key: 'okta_password',
           methods: [
             {
@@ -446,7 +446,7 @@ describe('idx/recoverPassword', () => {
         type: 'password',
         authenticator: {
           displayName: 'Password',
-          id: '14',
+          id: expect.any(String),
           key: 'okta_password',
           methods: [
             {
@@ -496,7 +496,7 @@ describe('idx/recoverPassword', () => {
         type: 'password',
         authenticator: {
           displayName: 'Password',
-          id: '15',
+          id: expect.any(String),
           key: 'okta_password',
           methods: [
             {

@@ -178,7 +178,7 @@ export default function App() {
         <select name={select.name} onChange={handleChange}>
           <option key="" value="">---</option>
           {select.options.map(({ key, label, value }) => (
-            <option key={key}  value={key}>{label}</option>
+            <option key={key} value={key}>{label}</option>
           ))}
         </select>
         </>

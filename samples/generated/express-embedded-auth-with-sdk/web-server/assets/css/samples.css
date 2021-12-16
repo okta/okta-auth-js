@@ -37,6 +37,10 @@ a:link, a:visited, a:active {
   padding-top: 0;
 }
 
+.hidden {
+  display: none;
+}
+
 /* Menu ***********************************************************************/
 
 .menu button {

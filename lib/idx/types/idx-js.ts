@@ -26,7 +26,23 @@ export interface IdxAuthenticator {
     complexity?: unknown;
     age?: unknown;
   };
-  contextualData?: unknown;
+  contextualData?: {
+    enrolledQuestion?: {
+      question: string;
+      questionKey: string;
+    };
+    qrcode?: { 
+      href: string; 
+      method: string; 
+      type: string; 
+    };
+    sharedSecret?: string;
+    questions?: {
+      questionKey: string;
+      question: string;
+    }[];
+    questionKeys?: string[];
+  };
 }
 
 export interface IdxForm {

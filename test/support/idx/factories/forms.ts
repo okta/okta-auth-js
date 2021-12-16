@@ -67,6 +67,15 @@ export const GoogleAuthenticatorFormFactory = IdxFormFactory.params({
   ]
 });
 
+export const SecurityQuestionAuthenticatorFormFactory = IdxFormFactory.params({
+  value: [
+    IdValueFactory.build({
+      value: 'id-security-question-authenticator'
+    })
+  ]
+});
+
+
 export const PhoneAuthenticatorFormFactory = IdxFormFactory.params({
   value: [
     IdValueFactory.build({

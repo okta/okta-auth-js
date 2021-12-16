@@ -44,7 +44,11 @@ import {
   IdxErrorGoogleAuthenticatorPasscodeInvalidFactory,
   PhoneAuthenticatorVerificationDataRemediationFactory,
   VerifyEmailRemediationFactory,
-  VerifyGoogleAuthenticatorRemediationFactory
+  VerifyGoogleAuthenticatorRemediationFactory,
+  PhoneAuthenticatorFactory,
+  EmailAuthenticatorFactory,
+  SecurityQuestionAuthenticatorOptionFactory,
+  VerifySecurityQuestionAuthenticatorRemediationFactory
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -443,7 +447,7 @@ describe('idx/authenticate', () => {
           type: 'password',
           authenticator: {
             displayName: 'Password',
-            id: '8',
+            id: expect.any(String),
             key: 'okta_password',
             methods: [
               {
@@ -626,6 +630,10 @@ describe('idx/authenticate', () => {
           });
 
           const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+            relatesTo: {
+              type: 'object',
+              value: PhoneAuthenticatorFactory.build()
+            },
             value: [
               CredentialsValueFactory.build({
                 form: {
@@ -686,7 +694,7 @@ describe('idx/authenticate', () => {
               type: 'phone',
               authenticator: {
                 displayName: 'Phone',
-                id: '16',
+                id: expect.any(String),
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -787,7 +795,7 @@ describe('idx/authenticate', () => {
               type: 'phone',
               authenticator: {
                 displayName: 'Phone',
-                id: '12',
+                id: expect.any(String),
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -905,7 +913,7 @@ describe('idx/authenticate', () => {
               type: 'phone',
               authenticator: {
                 displayName: 'Phone',
-                id: '12',
+                id: expect.any(String),
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -954,7 +962,7 @@ describe('idx/authenticate', () => {
               type: 'phone',
               authenticator: {
                 displayName: 'Phone',
-                id: '9',
+                id: expect.any(String),
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -989,7 +997,7 @@ describe('idx/authenticate', () => {
             type: 'phone',
             authenticator: {
               displayName: 'Phone',
-              id: '12',
+              id: expect.any(String),
               key: 'phone_number',
               methods: [
                 {
@@ -1045,7 +1053,7 @@ describe('idx/authenticate', () => {
               type: 'phone',
               authenticator: {
                 displayName: 'Phone',
-                id: '9',
+                id: expect.any(String),
                 key: 'phone_number',
                 methods: [
                   { type: 'sms' },
@@ -1092,6 +1100,10 @@ describe('idx/authenticate', () => {
             ]
           });
           const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+            relatesTo: {
+              type: 'object',
+              value: EmailAuthenticatorFactory.build()
+            },
             value: [
               CredentialsValueFactory.build({
                 form: {
@@ -1194,7 +1206,7 @@ describe('idx/authenticate', () => {
               type: 'email',
               authenticator: {
                 displayName: 'Email',
-                id: '6',
+                id: expect.any(String),
                 key: 'okta_email',
                 methods: [
                   {
@@ -1288,7 +1300,7 @@ describe('idx/authenticate', () => {
               type: 'app',
               authenticator: {
                 displayName: 'Google Authenticator',
-                id: '7',
+                id: expect.any(String),
                 key: 'google_otp',
                 methods: [
                   { type: 'otp' }
@@ -1375,7 +1387,7 @@ describe('idx/authenticate', () => {
               type: 'app',
               authenticator: {
                 displayName: 'Google Authenticator',
-                id: '7',
+                id: expect.any(String),
                 key: 'google_otp',
                 methods: [
                   { type: 'otp' }
@@ -1460,7 +1472,7 @@ describe('idx/authenticate', () => {
               type: 'app',
               authenticator: {
                 displayName: 'Google Authenticator',
-                id: '13',
+                id: expect.any(String),
                 key: 'google_otp',
                 methods: [
                   { type: 'otp' }
@@ -1518,7 +1530,7 @@ describe('idx/authenticate', () => {
               type: 'app',
               authenticator: {
                 displayName: 'Google Authenticator',
-                id: '13',
+                id: expect.any(String),
                 key: 'google_otp',
                 methods: [
                   { type: 'otp' }
@@ -1542,6 +1554,112 @@ describe('idx/authenticate', () => {
             }
           });
 
+        });
+      });
+
+    });
+
+    describe('security question', () => {
+
+      describe('verification', () => {
+        beforeEach(() => {
+          const selectAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              SelectAuthenticatorAuthenticateRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      SecurityQuestionAuthenticatorOptionFactory.build(),
+                    ]
+                  })
+                ]
+              })
+            ]
+          });
+          const verifyAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              VerifySecurityQuestionAuthenticatorRemediationFactory.build()
+            ]
+          });
+          Object.assign(testContext, {
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse,
+          });
+        });
+
+        it('can auto-select the security question authenticator', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse
+          } = testContext;
+          chainResponses([
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse
+          ]);
+          jest.spyOn(selectAuthenticatorResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+          const res = await authenticate(authClient, {
+            authenticator: AuthenticatorKey.SECURITY_QUESTION // will remediate select authenticator
+          });
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
+            authenticator: { id: 'id-security-question-authenticator' } 
+          });
+          expect(res).toEqual({
+            _idxResponse: expect.any(Object),
+            status: IdxStatus.PENDING,
+            nextStep: {
+              name: 'challenge-authenticator',
+              type: 'security_question',
+              authenticator: {
+                displayName: 'Security Question',
+                id: expect.any(String),
+                key: 'security_question',
+                methods: [
+                  { type: 'security_question' }
+                ],
+                type: 'security_question',
+                contextualData: {
+                  enrolledQuestion: {
+                    questionKey: 'favorite_sports_player',
+                    question: 'Who is your favorite sports player?'
+                  }
+                }
+              },
+              inputs: [
+                { name: 'answer', type: 'string', label: 'Answer', required: true }
+              ]
+            }
+          });
+        });
+
+        it('can verify security question authenticator using an answer', async () => {
+          const {
+            authClient,
+            verifyAuthenticatorResponse,
+            successResponse
+          } = testContext;
+          chainResponses([
+            verifyAuthenticatorResponse,
+            successResponse
+          ]);
+          jest.spyOn(verifyAuthenticatorResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
+          const answer = 'test-answer';
+          const res = await authenticate(authClient, { answer });
+          expect(verifyAuthenticatorResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', {
+            credentials: {
+              answer: 'test-answer',
+              questionKey: 'favorite_sports_player'
+            }
+          });
+          expect(res).toEqual({
+            _idxResponse: expect.any(Object),
+            status: IdxStatus.SUCCESS,
+            tokens: {
+              fakeToken: true
+            }
+          });
         });
       });
 

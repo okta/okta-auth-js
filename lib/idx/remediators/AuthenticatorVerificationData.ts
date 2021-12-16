@@ -32,7 +32,7 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
       id: authenticatorFromRemediation.form.value
         .find(({ name }) => name === 'id').value,
       enrollmentId: authenticatorFromRemediation.form.value
-        .find(({ name }) => name === 'enrollmentId').value,
+        .find(({ name }) => name === 'enrollmentId')?.value,
       methodType: authenticatorFromValues.methodType,
     };
   }

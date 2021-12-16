@@ -12,51 +12,42 @@
 
 
 import { Remediator, RemediationValues } from './Remediator';
+import { getAuthenticator, Authenticator } from '../../authenticator';
+import { IdxRemediation } from '../../types/idx-js';
 
 export interface VerifyAuthenticatorValues extends RemediationValues {
   verificationCode?: string;
   password?: string;
+  questionKey?: string;
+  question?: string;
+  answer?: string;
 }
 
 // Base class - DO NOT expose static remediationName
 export class VerifyAuthenticator extends Remediator {
 
+  authenticator: Authenticator;
   values: VerifyAuthenticatorValues;
 
   map = {
     'credentials': []
   };
 
+  constructor(remediation: IdxRemediation, values: RemediationValues = {}) {
+    super(remediation, values);
+    this.authenticator = getAuthenticator(remediation);
+  }
+
   canRemediate() {
-    return !!(this.values.password || this.values.verificationCode);
+    return this.authenticator.canVerify(this.values);
   }
 
   mapCredentials() {
-    return { 
-      passcode: this.values.verificationCode || this.values.password
-    };
+    return this.authenticator.mapCredentials(this.values);
   }
 
   getInputCredentials(input) {
-    const challengeType = this.getAuthenticator().type;
-    const name = challengeType === 'password' ? 'password' : 'verificationCode';
-    return {
-      ...input.form?.value[0],
-      name,
-      type: 'string',
-      required: input.required
-    };
-  }
-
-  getValuesAfterProceed() {
-    let values = super.getValuesAfterProceed() as VerifyAuthenticatorValues;
-    const authenticator = this.getAuthenticator();
-    if (authenticator.type === 'password') {
-      delete values.password;
-    } else {
-      delete values.verificationCode;
-    }
-    return values;
+    return this.authenticator.getInputs(input);
   }
 
 }

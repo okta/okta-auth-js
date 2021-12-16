@@ -273,4 +273,48 @@ router.post('/challenge-authenticator/google_otp', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+// Handle Security Question authenticator
+router.get('/enroll-authenticator/security_question', async (req, res) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator-security_question', {
+      req, res,
+      title: 'Enroll security question authenticator',
+      action: '/enroll-authenticator/security_question',
+      input: {
+        type: 'text',
+        name: 'answer',
+      }
+    })
+  });
+});
+
+router.post('/enroll-authenticator/security_question', async (req, res, next) => {
+  const { questionKey, question, answer } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ questionKey, question, answer });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+router.get('/challenge-authenticator/security_question', async (req, res) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator-security_question', {
+      title: 'Challenge security question',
+      input: {
+        type: 'text',
+        name: 'answer',
+      },
+      action: '/challenge-authenticator/security_question',
+    })
+  });
+});
+
+router.post('/challenge-authenticator/security_question', async (req, res, next) => {
+  const { answer } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ answer });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
 module.exports = router;
