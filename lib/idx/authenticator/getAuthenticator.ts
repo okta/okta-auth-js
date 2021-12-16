@@ -1,5 +1,5 @@
 import { Authenticator } from './Authenticator';
-import { GeneralAuthenticator } from './GeneralAuthenticator';
+import { VerificationCodeAuthenticator } from './VerificationCodeAuthenticator';
 import { OktaPassword } from './OktaPassword';
 import { SecurityQuestionEnrollment } from './SecurityQuestionEnrollment';
 import { SecurityQuestionVerification } from './SecurityQuestionVerification';
@@ -18,6 +18,6 @@ export function getAuthenticator(remediation: IdxRemediation): Authenticator {
         return new SecurityQuestionEnrollment(value);
       }
     default:
-      return new GeneralAuthenticator(value);
+      return new VerificationCodeAuthenticator(value);
   }
 }
