@@ -49,7 +49,6 @@ import {
   GoogleAuthenticatorOptionFactory,
   SecurityQuestionAuthenticatorOptionFactory,
   EnrollSecurityQuestionAuthenticatorRemediationFactory,
-  GoogleAuthenticatorOptionFactory,
   OktaVerifyAuthenticatorOptionFactory,
   EnrollPollRemediationFactory,
   OktaVerifyAuthenticatorWithContextualDataFactory,
@@ -180,6 +179,7 @@ describe('idx/register', () => {
                 PhoneAuthenticatorOptionFactory.build(),
                 EmailAuthenticatorOptionFactory.build(),
                 GoogleAuthenticatorOptionFactory.build(),
+                SecurityQuestionAuthenticatorOptionFactory.build(),
                 OktaVerifyAuthenticatorOptionFactory.build(),
               ]
             })
@@ -224,6 +224,12 @@ describe('idx/register', () => {
     const enrollGoogleAuthenticatorResponse = IdxResponseFactory.build({
       neededToProceed: [
         EnrollGoogleAuthenticatorRemediationFactory.build()
+      ]
+    });
+
+    const enrollSecurityQuestionAuthenticatorResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollSecurityQuestionAuthenticatorRemediationFactory.build()
       ]
     });
 
@@ -477,6 +483,9 @@ describe('idx/register', () => {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
           }, {
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
+          },{
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY,
           },]
@@ -548,6 +557,9 @@ describe('idx/register', () => {
           }, {
             label: 'Google Authenticator',
             value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+          }, {
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
           }, {
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY,
