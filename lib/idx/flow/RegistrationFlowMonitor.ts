@@ -27,4 +27,8 @@ export class RegistrationFlowMonitor extends FlowMonitor {
 
     return super.isRemediatorCandidate(remediator, remediations, values);
   }
+
+  protected getKnownCyclicRemediators() {
+    return ['enroll-poll'];
+  }
 }

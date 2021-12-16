@@ -38,4 +38,8 @@ export class AuthenticationFlowMonitor extends FlowMonitor {
 
     return super.isRemediatorCandidate(remediator, remediations, values);
   }
+
+  protected getKnownCyclicRemediators() {
+    return ['enroll-poll'];
+  }
 }

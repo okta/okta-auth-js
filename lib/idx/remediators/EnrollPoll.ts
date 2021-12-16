@@ -34,8 +34,8 @@ export class EnrollPoll extends Remediator {
     if (!authenticator && context?.currentAuthenticator) {
       authenticator = context.currentAuthenticator.value;
     }
-    return { 
-      name, 
+    return {
+      name,
       authenticator,
       pollForResult: {
         refresh: this.remediation.refresh
