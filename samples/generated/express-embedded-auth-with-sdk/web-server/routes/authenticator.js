@@ -19,6 +19,7 @@ const {
   renderTemplate,
   renderPage,
 } = require('../utils');
+const handleTransactionWithoutRedirect = require('../utils/handleTransactionWithoutRedirect');
 
 const router = express.Router();
 
@@ -245,10 +246,10 @@ router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => 
   });
 });
 
-router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res, next) => {
+router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
   const authClient = getAuthClient(req);
   const transaction = await authClient.idx.poll();
-  handleTransaction({ req, res, next, authClient, transaction });
+  handleTransactionWithoutRedirect({ req, res, authClient, transaction });
 });
 
 // Handle Google Authenticator

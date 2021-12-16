@@ -2,16 +2,6 @@
 <html>
   <head>
     {{>head}}
-    {{#pollForResult.refresh}}
-    <script type="text/javascript">
-      setInterval(function () {
-        const pollingForm = document.getElementById('enroll-poll-form');
-        if (pollingForm) {
-          pollingForm.submit();
-        }
-      }, {{pollForResult.refresh}});
-    </script>
-    {{/pollForResult.refresh}}
   </head>
   <body id="samples">
   
@@ -41,10 +31,33 @@
         
       {{/contextualData}}
       <div class="row">
-        <form id="enroll-poll-form" class="ui large form" action="{{action}}" method="POST">
-        </form>
-      </div>
       {{>cancel}}
+      </div>
     </div>
+    {{#pollForResult.refresh}}
+      <script type="text/javascript">
+        function poll(refresh) {
+          setTimeout(function () {
+            fetch('{{{action}}}', {
+              method: 'POST'
+            }).then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                console.error('Poll request failed: ', response.statusText);
+              }
+            })
+            .then(nextStep => {
+              if (nextStep.pollForResult) {
+                poll(nextStep.pollForResult.refresh);
+              } else {
+                window.location.href = nextStep.nextRoute
+              }
+            });
+          }, refresh)
+        }
+        poll({{pollForResult.refresh}});
+      </script>
+    {{/pollForResult.refresh}}
   </body>
 </html>

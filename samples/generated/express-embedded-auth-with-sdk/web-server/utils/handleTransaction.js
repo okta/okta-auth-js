@@ -13,11 +13,12 @@
 
 /* eslint-disable complexity */
 const { IdxStatus, AuthenticatorKey } = require('@okta/okta-auth-js');
+const getNextRouteFromTransaction = require('./getNextRouteFromTransaction');
 const redirect = require('./redirect');
 
 const proceed = ({ nextStep, req, res }) => {
-  const { name, authenticator } = nextStep;
-  const { key, displayName, type } = authenticator || {};
+  const { authenticator } = nextStep;
+  const { key, displayName } = authenticator || {};
 
   // Stop if unsupported types detected
   if (authenticator && !Object.values(AuthenticatorKey).includes(key)) {
@@ -27,63 +28,12 @@ const proceed = ({ nextStep, req, res }) => {
     `);
   }
 
-  switch (name) {
-    // authentication
-    case 'identify':
-      redirect({ req, res, path: '/login' });
-      return true;
-
-    // recover password
-    case 'identify-recovery':
-      redirect({ req, res, path: '/recover-password' });
-      return true;
-      
-    // registration
-    case 'enroll-profile':
-      redirect({ req, res, path: '/register' });
-      return true;
-
-    // authenticator authenticate
-    case 'select-authenticator-authenticate':
-      redirect({ 
-        req, res, path: '/select-authenticator'
-      });
-      return true;
-    case 'challenge-authenticator':
-      redirect({ 
-        req, 
-        res, 
-        path: type === 'password' ? '/login' : `/challenge-authenticator/${key}` 
-      });
-      return true;
-    case 'authenticator-verification-data':
-      redirect({ req, res, path: `/verify-authenticator/${key}` });
-      return true;
-
-    // authenticator enrollment
-    case 'select-authenticator-enroll':
-      redirect({ req, res, path: '/select-authenticator' });
-      return true;
-    case 'enroll-poll':
-      redirect({ req, res, path: `/enroll-authenticator/${key}/enroll-poll` });
-      return true;
-    case 'select-enrollment-channel':
-      redirect({ req, res, path: `/enroll-authenticator/${key}/select-enrollment-channel` });
-      return true;
-    case 'enroll-authenticator':
-      redirect({ req, res, path: `/enroll-authenticator/${key}` });
-      return true;
-    case 'authenticator-enrollment-data':
-      redirect({ req, res, path: `/enroll-authenticator/${key}/enrollment-data` });
-      return true;
-
-    // reset password
-    case 'reset-authenticator':
-      redirect({ req, res, path: '/reset-password' });
-      return true;
-    default:
-      return false;
+  const nextRoute = getNextRouteFromTransaction({ nextStep });
+  if (nextRoute) {
+    redirect({ req, res, path: nextRoute});
+    return true;
   }
+  return false;
 };
 
 module.exports = function handleTransaction({ 

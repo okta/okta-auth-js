@@ -51,11 +51,7 @@ router.get('/login', (req, res, next) => {
         codeChallengeMethod,
       };
       res.render('login', {
-<<<<<<< HEAD
         siwVersion: '5.14.1',
-=======
-        siwVersion: '5.14.0',
->>>>>>> break down poll endpoint
         widgetConfig: JSON.stringify(widgetConfig),
         selfHosted: !!process.env.SELF_HOSTED_WIDGET
       });

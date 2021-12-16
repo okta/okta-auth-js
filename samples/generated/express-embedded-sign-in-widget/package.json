@@ -24,10 +24,6 @@
     "concurrently": "^6.0.1"
   },
   "peerDependencies": {
-<<<<<<< HEAD
     "@okta/okta-signin-widget": "^5.14.1"
-=======
-    "@okta/okta-signin-widget": "^5.14.0"
->>>>>>> break down poll endpoint
   }
 }
