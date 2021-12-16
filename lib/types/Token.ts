@@ -16,6 +16,7 @@ export interface AbstractToken {
   expiresAt: number;
   authorizeUrl: string;
   scopes: string[];
+  pendingRemove?: boolean;
 }
 
 export interface AccessToken extends AbstractToken {

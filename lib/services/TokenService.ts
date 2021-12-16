@@ -15,8 +15,7 @@
 import { TokenManager, EVENT_EXPIRED } from '../TokenManager';
 import { AuthSdkError } from '../errors';
 import { isBrowser } from '../features';
-import browserStorage from '../browser/browserStorage';
-import { TokenManagerOptions, PostSignOutStorageMeta } from '../types';
+import { TokenManagerOptions } from '../types';
 
 function shouldThrottleRenew(renewTimeQueue) {
   let res = false;

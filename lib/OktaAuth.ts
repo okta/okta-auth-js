@@ -45,7 +45,6 @@ import {
   SignoutRedirectUrlOptions,
   HttpAPI,
   FlowIdentifier,
-  PostSignOutStorageMeta,
 } from './types';
 import {
   transactionStatus,
@@ -383,7 +382,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       this._pending.handleLogin = false;
     }
   }
-
+  
   // Ends the current Okta SSO session without redirecting to Okta.
   closeSession(): Promise<object> {
     return this.session.close() // DELETE /api/v1/sessions/me

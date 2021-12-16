@@ -249,11 +249,6 @@ export interface SignoutAPI {
   signOut(opts: SignoutOptions);
 }
 
-export interface PostSignOutStorageMeta {
-  clearTokens?: boolean;
-  timestamp?: number;
-}
-
 export interface ForgotPasswordOptions {
   username: string;
   factorType: 'SMS' | 'EMAIL' | 'CALL';
