@@ -55,7 +55,6 @@ import {
   OktaVerifyAuthenticatorWithContextualDataFactory,
   IdxContextFactory,
 } from '@okta/test.support/idx';
-import { proceed } from '../../../lib/idx/proceed';
 
 jest.mock('../../../lib/idx/introspect', () => {
   return {
@@ -1519,38 +1518,6 @@ describe('idx/register', () => {
         authenticator: AuthenticatorKey.OKTA_VERIFY
       });
       expect(Object.keys(contextualData)).toContain('qrcode');
-    });
-
-    it('performs single poll request when poll options are provided', async () => {
-      const {
-        authClient,
-        selectAuthenticatorResponse,
-      } = testContext;
-
-      chainResponses([
-        selectAuthenticatorResponse,
-        enrollPollResponse,
-        enrollPollResponse,
-      ]);
-
-      jest.spyOn(selectAuthenticatorResponse, 'proceed');
-      jest.spyOn(enrollPollResponse, 'proceed');
-      jest.spyOn(mocked.introspect, 'introspect')
-        .mockResolvedValueOnce(selectAuthenticatorResponse)
-        .mockResolvedValueOnce(enrollPollResponse);
-
-      let { nextStep } = await register(authClient, {
-        authenticator: AuthenticatorKey.OKTA_VERIFY
-      });
-      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalled();
-      expect(enrollPollResponse.proceed).not.toHaveBeenCalled();
-      expect(Object.keys(nextStep.pollForResult)).toContain('refresh');
-
-      let response = await proceed(authClient, {
-        startPolling: true
-      });
-      expect(enrollPollResponse.proceed).toHaveBeenCalled();
-      expect(Object.keys(response.nextStep)).toContain('pollForResult');
     });
   });
 
