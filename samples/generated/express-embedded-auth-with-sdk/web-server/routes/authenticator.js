@@ -233,17 +233,26 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
 router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
   const { 
     idx: { 
-      nextStep: { pollForResult }
+      nextStep,
+      error
     }
   } = req.getFlowStates();
-  renderPage({
-    req, res,
-    render: () => renderTemplate(req, res, 'enroll-poll', {
-      title: 'Enroll Okta Verify',
-      action: '/enroll-authenticator/okta_verify/enroll-poll',
-      pollForResult,
-    })
-  });
+
+  if (error) {
+    res.status(500).render('error', {
+      hasError: true,
+      errors: [error.message || error.errorSummary]
+    });
+  } else {
+    renderPage({
+      req, res,
+      render: () => renderTemplate(req, res, 'enroll-poll', {
+        title: 'Enroll Okta Verify',
+        action: '/enroll-authenticator/okta_verify/enroll-poll',
+        pollForResult: nextStep && nextStep.pollForResult,
+      })
+    });
+  }
 });
 
 router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
