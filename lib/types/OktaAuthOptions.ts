@@ -21,6 +21,7 @@ import OktaAuth from '../OktaAuth';
 export interface TokenManagerOptions {
   autoRenew?: boolean;
   autoRemove?: boolean;
+  clearPendingRemoveTokens?: boolean;
   secure?: boolean;
   storage?: string | SimpleStorage;
   storageKey?: string;

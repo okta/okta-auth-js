@@ -16,8 +16,7 @@
 
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
-  REFERRER_PATH_STORAGE_KEY,
-  POST_SIGNOUT_STORAGE_NAME
+  REFERRER_PATH_STORAGE_KEY
 } from './constants';
 import * as constants from './constants';
 import {
@@ -510,12 +509,12 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       });
     } else {
       if (options.clearTokensAfterRedirect) {
-        const sessionStorage = browserStorage.getSessionStorage();
-        const data: PostSignOutStorageMeta = {
-          clearTokens: true,
-          timestamp: Date.now()
-        };
-        sessionStorage.setItem(POST_SIGNOUT_STORAGE_NAME, JSON.stringify(data));
+        const tokens = this.tokenManager.getTokensSync();
+        // add pendingRemove flag to tokens
+        Object.keys(tokens).forEach(key => {
+          tokens[key].pendingRemove = true;
+        });
+        this.tokenManager.setTokens(tokens);
       } else {
         // Clear all local tokens
         this.tokenManager.clear();

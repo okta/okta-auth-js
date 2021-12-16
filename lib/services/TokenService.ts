@@ -17,7 +17,6 @@ import { AuthSdkError } from '../errors';
 import { isBrowser } from '../features';
 import browserStorage from '../browser/browserStorage';
 import { TokenManagerOptions, PostSignOutStorageMeta } from '../types';
-import { POST_SIGNOUT_STORAGE_NAME } from '../constants';
 
 function shouldThrottleRenew(renewTimeQueue) {
   let res = false;
@@ -88,8 +87,6 @@ export class TokenService {
 
       window.addEventListener('storage', this.storageListener);
     }
-
-    this.handlePostSignOutTokens();
   }
 
   stop() {
@@ -98,26 +95,6 @@ export class TokenService {
     if (this.options.syncStorage && isBrowser()) {
       window.removeEventListener('storage', this.storageListener);
       clearTimeout(this.syncTimeout as any);
-    }
-  }
-
-  private handlePostSignOutTokens() {
-    if (!isBrowser()) {
-      return;
-    }
-
-    const sessionStorage = browserStorage.getSessionStorage();
-    let postLogoutMeta: PostSignOutStorageMeta = {};
-    try {
-      postLogoutMeta = JSON.parse(sessionStorage.getItem(POST_SIGNOUT_STORAGE_NAME) || '');
-      sessionStorage.removeItem(POST_SIGNOUT_STORAGE_NAME);
-    } catch (e) {
-      // no valid meta in storage, do nothing
-    }
-    const now = Date.now();
-    // Only clear tokens when find postSignOut flag within 30s
-    if (postLogoutMeta.clearTokens && now - postLogoutMeta.timestamp < 30 * 1000) {
-      this.tokenManager.clear();
     }
   }
 }
