@@ -15,7 +15,6 @@
       </div>
       {{>errors}}
 
-
       <div class="row">
         {{>formMessages}}
       </div>
@@ -36,7 +35,7 @@
       {{>cancel}}
       </div>
     </div>
-    {{#pollForResult.refresh}}
+    {{#poll.refresh}}
       <script type="text/javascript">
         function poll(refresh) {
           setTimeout(function () {
@@ -50,16 +49,16 @@
               }
             })
             .then(nextStep => {
-              if (nextStep.pollForResult) {
-                poll(nextStep.pollForResult.refresh);
+              if (nextStep.poll) {
+                poll(nextStep.poll.refresh);
               } else {
                 window.location.href = nextStep.nextRoute
               }
             });
           }, refresh)
         }
-        poll({{pollForResult.refresh}});
+        poll({{poll.refresh}});
       </script>
-    {{/pollForResult.refresh}}
+    {{/poll.refresh}}
   </body>
 </html>

@@ -27,7 +27,8 @@ const mocked = {
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect'),
   proceed: require('../../../lib/idx/proceed'),
-  transactionMeta: require('../../../lib/idx/transactionMeta')
+  transactionMeta: require('../../../lib/idx/transactionMeta'),
+  util: require('../../../lib/util/console')
 };
 
 describe('idx/poll', () => {
@@ -159,7 +160,7 @@ describe('idx/poll', () => {
     jest.spyOn(enrollPollResponse, 'proceed');
 
     const { nextStep } = await proceed(authClient, {});
-    const transaction = await poll(authClient, {refresh: nextStep.pollForResult.refresh});
+    const transaction = await poll(authClient, {refresh: nextStep.poll.refresh});
     expect(enrollPollResponse.proceed).toHaveBeenCalledTimes(3);
     expect(transaction.status).toEqual(IdxStatus.TERMINAL);
   });
@@ -225,5 +226,14 @@ describe('idx/poll', () => {
     } catch (err) {
       expect(err.message).toEqual('Storage Error');
     }
+  });
+
+  it('issues a warning when no polling remediations available', async () => {
+    const {
+      authClient
+    } = testContext;
+    jest.spyOn(mocked.util, 'warn');
+    await poll(authClient);
+    expect(mocked.util.warn).toHaveBeenCalledTimes(1);
   });
 });

@@ -249,7 +249,7 @@ router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => 
       render: () => renderTemplate(req, res, 'enroll-poll', {
         title: 'Enroll Okta Verify',
         action: '/enroll-authenticator/okta_verify/enroll-poll',
-        pollForResult: nextStep && nextStep.pollForResult,
+        poll: nextStep && nextStep.poll,
       })
     });
   }

@@ -1857,7 +1857,7 @@ describe('idx/register', () => {
       });
       expect(selectAuthenticatorResponse.proceed).toHaveBeenCalled();
       expect(enrollPollResponse.proceed).not.toHaveBeenCalled();
-      expect(Object.keys(response.nextStep)).toContain('pollForResult');
+      expect(Object.keys(response.nextStep)).toContain('poll');
     });
 
     it('offers QR code as a default channel for adding OV account', async () => {

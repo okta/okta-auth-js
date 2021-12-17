@@ -37,7 +37,8 @@ export class EnrollPoll extends Remediator {
     return {
       name,
       authenticator,
-      pollForResult: {
+      poll: {
+        required: true,
         refresh: this.remediation.refresh
       },
     };

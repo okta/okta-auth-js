@@ -17,16 +17,25 @@ import {
   IdxTransaction,
   OktaAuth,
 } from '../types';
+import { getSavedTransactionMeta } from './transactionMeta';
+import { warn } from '../util';
 
 export async function poll(authClient: OktaAuth, options: IdxPollOptions = {}): Promise<IdxTransaction> {
+  let transaction = await proceed(authClient, {
+    startPolling: true
+  });
+
+  const meta = getSavedTransactionMeta(authClient);
+  let availablePollingRemeditaions = meta?.remediations?.find(remediation => remediation.includes('poll'));
+  if (!availablePollingRemeditaions?.length) {
+    warn('No polling remediations available at the current IDX flow stage');
+  }
+
   if (Number.isInteger(options.refresh)) {
     return new Promise(function (resolve, reject) {
       setTimeout(async function () {
         try {
-          let transaction = await proceed(authClient, {
-            startPolling: true
-          });
-          const refresh = transaction.nextStep?.pollForResult?.refresh;
+          const refresh = transaction.nextStep?.poll?.refresh;
           if (refresh) {
             resolve(poll(authClient, {
               refresh
@@ -39,9 +48,7 @@ export async function poll(authClient: OktaAuth, options: IdxPollOptions = {}): 
         }
       }, options.refresh);
     });
-  } else {
-    return proceed(authClient, {
-      startPolling: true
-    });
   }
+
+  return transaction;
 }

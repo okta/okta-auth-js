@@ -59,7 +59,7 @@ export type NextStep = {
   canResend?: boolean;
   inputs?: Input[];
   options?: IdxOption[];
-  pollForResult?: IdxPollOptions;
+  poll?: IdxPollOptions;
 }
 
 export enum IdxFeature {
@@ -85,6 +85,7 @@ export type IdxOptions = InteractOptions & IntrospectOptions & {
 };
 
 export interface IdxPollOptions {
+  required?: boolean;
   refresh?: number;
 }
 
