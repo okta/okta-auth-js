@@ -379,6 +379,19 @@ Returns true if there is a saved transaction.
 
 Resumes saved transaction and fires poll request to Okta API. Performs single poll request by default. Front-end clients can pass `{ refresh: millisecondsInt` } parameter, which enables polling to continue until it is considered complete by server or session times out. `refresh` value is available through the `nextStep` property of in-progress transaction.
 
+```javascript
+let idxTransaction = await authClient.idx.register();
+// ...
+// render view that matches current IDX stage
+// ...
+const pollOptions = idxTransaction?.nextStep?.poll;
+if (pollOptions.required) {
+  authClient.idx.poll(pollOptions.refresh).then(pollResult => {
+    // render view matching poll result
+  });
+}
+```
+
 #### `idx.getFlow`
 
 Returns the currently configured `flow`. The `flow` is set automatically when calling one of these methods:
