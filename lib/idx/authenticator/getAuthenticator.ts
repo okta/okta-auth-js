@@ -1,3 +1,4 @@
+import { OktaVerifyTotp } from './OktaVerifyTotp';
 import { Authenticator } from './Authenticator';
 import { VerificationCodeAuthenticator } from './VerificationCodeAuthenticator';
 import { OktaPassword } from './OktaPassword';
@@ -17,6 +18,8 @@ export function getAuthenticator(remediation: IdxRemediation): Authenticator {
       } else {
         return new SecurityQuestionEnrollment(value);
       }
+    case AuthenticatorKey.OKTA_VERIFY:
+      return new OktaVerifyTotp(value);
     default:
       return new VerificationCodeAuthenticator(value);
   }

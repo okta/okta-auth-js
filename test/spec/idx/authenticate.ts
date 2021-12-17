@@ -54,7 +54,9 @@ import {
   OktaVerifyAuthenticatorWithContextualDataFactory,
   EnrollPollRemediationFactory,
   OktaVerifyAuthenticatorVerificationDataRemediationFactory,
-  ChallengePollRemediationFactory
+  ChallengePollRemediationFactory,
+  VerifyOktaVerifyAuthenticatorRemediationFactory,
+  IdxErrorOktaVerifyPasscodeInvalidFactory
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -1566,8 +1568,52 @@ describe('idx/authenticate', () => {
     });
 
     describe('Okta Verify', () => {
+      let errorInvalidCodeResponse;
+      beforeEach(() => {
+        errorInvalidCodeResponse = IdxResponseFactory.build({
+          rawIdxState: RawIdxResponseFactory.build({
+            messages: IdxMessagesFactory.build({
+              value: [
+                IdxErrorOktaVerifyPasscodeInvalidFactory.build()
+              ]
+            })
+          }),
+          neededToProceed:[
+            SelectAuthenticatorEnrollRemediationFactory.build({
+              value: [
+                AuthenticatorValueFactory.build({
+                  options: [
+                    OktaVerifyAuthenticatorOptionFactory.build(),
+                  ]
+                })
+              ]
+            })
+          ]
+        });
+      });
+
       describe('verification', () => {
         beforeEach(() => {
+          const selectAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              SelectAuthenticatorAuthenticateRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      OktaVerifyAuthenticatorOptionFactory.build(),
+                    ]
+                  })
+                ]
+              })
+            ]
+          });
+
+          const verifyAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              VerifyOktaVerifyAuthenticatorRemediationFactory.build()
+            ]
+          });
+
           const verificationDataResponse = IdxResponseFactory.build({
             neededToProceed: [
               OktaVerifyAuthenticatorVerificationDataRemediationFactory.build()
@@ -1586,8 +1632,136 @@ describe('idx/authenticate', () => {
           });
 
           Object.assign(testContext, {
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse,
+            errorInvalidCodeResponse,
             verificationDataResponse,
             pollForPushResponse,
+          });
+        });
+
+        it('can auto-select Okta Verify authenticator', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse
+          } = testContext;
+          chainResponses([
+            selectAuthenticatorResponse,
+            verifyAuthenticatorResponse
+          ]);
+          jest.spyOn(selectAuthenticatorResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+          const res = await authenticate(authClient, {
+            authenticator: AuthenticatorKey.OKTA_VERIFY
+          });
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', {
+            authenticator: { id: 'id-okta-verify-authenticator' }
+          });
+          expect(res).toEqual({
+            _idxResponse: expect.any(Object),
+            status: IdxStatus.PENDING,
+            nextStep: {
+              name: 'challenge-authenticator',
+              type: 'app',
+              authenticator: {
+                displayName: 'Okta Verify',
+                id: expect.any(String),
+                key: 'okta_verify',
+                methods: [
+                  { type: 'push' },
+                  { type: 'totp' },
+                ],
+                type: 'app',
+              },
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
+              }]
+            }
+          });
+        });
+
+        it('can verify Okta Verify using a code', async () => {
+          const {
+            authClient,
+            verifyAuthenticatorResponse,
+            successResponse
+          } = testContext;
+          chainResponses([
+            verifyAuthenticatorResponse,
+            successResponse
+          ]);
+          jest.spyOn(verifyAuthenticatorResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
+          const verificationCode = 'test-code';
+          const res = await authenticate(authClient, {
+            verificationCode
+          });
+          expect(verifyAuthenticatorResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', {
+            credentials: {
+              totp: 'test-code'
+            }
+          });
+          expect(res).toEqual({
+            _idxResponse: expect.any(Object),
+            status: IdxStatus.SUCCESS,
+            tokens: {
+              fakeToken: true
+            }
+          });
+        });
+
+        it('returns a PENDING error if an invalid code is provided', async () => {
+          const {
+            authClient,
+            verifyAuthenticatorResponse,
+            errorInvalidCodeResponse
+          } = testContext;
+          jest.spyOn(verifyAuthenticatorResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
+          const verificationCode = 'invalid-test-code';
+          const res = await authenticate(authClient, {
+            verificationCode
+          });
+          expect(verifyAuthenticatorResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', {
+            credentials: {
+              totp: 'invalid-test-code'
+            }
+          });
+          expect(res).toEqual({
+            _idxResponse: expect.any(Object),
+            status: IdxStatus.PENDING,
+            messages: [{
+              class: 'ERROR',
+              i18n: {
+                key: 'api.authn.error.PASSCODE_INVALID',
+                params: [],
+              },
+              message: 'Invalid code. Try again.'
+            }],
+            nextStep: {
+              name: 'challenge-authenticator',
+              type: 'app',
+              authenticator: {
+                displayName: 'Okta Verify',
+                id: expect.any(String),
+                key: 'okta_verify',
+                methods: [
+                  { type: 'push' },
+                  { type: 'totp' }
+                ],
+                type: 'app',
+              },
+              inputs: [{
+                label: 'Enter code',
+                name: 'verificationCode',
+                required: true,
+                type: 'string',
+              }]
+            }
           });
         });
 
