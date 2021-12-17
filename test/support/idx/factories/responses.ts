@@ -13,12 +13,16 @@
 
 /* eslint-disable max-len */
 import { Factory } from 'fishery';
-import { IdxResponse, RawIdxResponse } from '../../../../lib/idx/types/idx-js';
+import { IdxContext, IdxResponse, RawIdxResponse } from '../../../../lib/idx/types/idx-js';
 import {
   IdentifyRemediationFactory,
   IdentifyWithPasswordRemediationFactory,
   VerifyPasswordRemediationFactory,
 } from './remediations';
+import { 
+  IdxAuthenticatorFactory,
+} from './authenticators';
+
 
 export const RawIdxResponseFactory = Factory.define<RawIdxResponse>(() => {
   return {
@@ -45,7 +49,7 @@ export const IdxResponseFactory = Factory.define<IdxResponse, MockedIdxResponseT
     }),
     actions: {},
     toPersist: {},
-    context: {}
+    context: {} as IdxContext
   };
 });
 
@@ -65,4 +69,37 @@ export const VerifyPasswordResponseFactory = IdxResponseFactory.params({
   neededToProceed: [
     VerifyPasswordRemediationFactory.build()
   ]
+});
+
+export const IdxContextFactory = Factory.define<IdxContext>(() => {
+  return {
+    version: '',
+    stateHandle: '',
+    intent: '',
+    user: {
+      type: '',
+      value: {}
+    },
+    app: {
+      type: '',
+      value: {}
+    },
+    expiresAt: '',
+    currentAuthenticator: {
+      type: 'object',
+      value: IdxAuthenticatorFactory.build(),
+    },
+    authenticators: {
+      type: 'array',
+      value: []
+    },
+    enrollmentAuthenticator: {
+      type: 'object',
+      value: IdxAuthenticatorFactory.build(),
+    },
+    authenticatorEnrollments: {
+      type: 'array',
+      value: []
+    }
+  };
 });

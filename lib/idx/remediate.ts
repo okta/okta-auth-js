@@ -45,7 +45,7 @@ export function getRemediator(
     if (!isRemeditionInFlow) {
       continue;
     }
-      
+
     const T = remediators[remediation.name];
     remediator = new T(remediation, values);
     if (flowMonitor.isRemediatorCandidate(remediator, idxRemediations, values)) {
@@ -58,7 +58,7 @@ export function getRemediator(
       remediatorCandidates.push(remediator);  
     }
   }
-  
+
   // TODO: why is it a problem to have multiple remediations? 
   // JIRA: https://oktainc.atlassian.net/browse/OKTA-400758
   // if (remediatorCandidates.length > 1) {
@@ -122,7 +122,7 @@ function getIdxMessages(
 function getNextStep(
   remediator: Remediator, idxResponse: IdxResponse
 ): NextStep {
-  const nextStep = remediator.getNextStep();
+  const nextStep = remediator.getNextStep(idxResponse.context);
   const canSkip = canSkipFn(idxResponse);
   const canResend = canResendFn(idxResponse);
   return {
@@ -183,7 +183,7 @@ export async function remediate(
   if (terminal) {
     return { terminal, messages };
   }
-  
+
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
   const actions = [
@@ -208,7 +208,7 @@ export async function remediate(
   }
 
   const remediator = getRemediator(neededToProceed, values, options);
-  
+
   if (!remediator) {
     throw new AuthSdkError(`
       No remediation can match current flow, check policy settings in your org.
@@ -233,10 +233,9 @@ export async function remediate(
   const data = remediator.getData();
   try {
     idxResponse = await idxResponse.proceed(name, data);
-
     // Track succeed remediations in the current transaction
     await flowMonitor.trackRemediations(name);
-    
+
     // Successfully get interaction code
     if (idxResponse.interactionCode) {
       return { idxResponse };
@@ -254,7 +253,7 @@ export async function remediate(
       const nextStep = getNextStep(remediator, idxResponse);
       return { nextStep, messages };
     }
-    
+
     // We may want to trim the values bag for the next remediation
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValuesAfterProceed();

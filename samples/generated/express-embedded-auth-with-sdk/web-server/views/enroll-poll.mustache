@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+  
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div id="page-title-header" class="ui header">
+          <h2>{{title}}</h2>
+        </div>
+      </div>
+      {{>errors}}
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      {{#contextualData}}
+        <div class="ui segments">
+          <div class="ui segment">
+            {{#contextualData.qrcode}}
+              <div class="ui fluid image">
+                <img id="authenticator-qr-code" src="{{contextualData.qrcode.href}}" />
+              </div>
+            {{/contextualData.qrcode}}
+          </div>
+        </div>
+        
+      {{/contextualData}}
+      <div class="row">
+      {{>cancel}}
+      </div>
+    </div>
+    {{#poll.refresh}}
+      <script type="text/javascript">
+        function poll(refresh) {
+          setTimeout(function () {
+            fetch('{{{action}}}', {
+              method: 'POST'
+            }).then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                console.error('Poll request failed: ', response.statusText);
+              }
+            })
+            .then(nextStep => {
+              if (nextStep.poll) {
+                poll(nextStep.poll.refresh);
+              } else {
+                window.location.href = nextStep.nextRoute
+              }
+            });
+          }, refresh)
+        }
+        poll({{poll.refresh}});
+      </script>
+    {{/poll.refresh}}
+  </body>
+</html>

@@ -19,6 +19,7 @@ const {
   renderTemplate,
   renderPage,
 } = require('../utils');
+const handleTransactionWithoutRedirect = require('../utils/handleTransactionWithoutRedirect');
 
 const router = express.Router();
 
@@ -227,6 +228,37 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
     verificationCode,
   });
   handleTransaction({ req, res, next, authClient, transaction });
+});
+
+router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
+  const { 
+    idx: { 
+      nextStep,
+      error
+    }
+  } = req.getFlowStates();
+
+  if (error) {
+    res.status(500).render('error', {
+      hasError: true,
+      errors: [error.message || error.errorSummary]
+    });
+  } else {
+    renderPage({
+      req, res,
+      render: () => renderTemplate(req, res, 'enroll-poll', {
+        title: 'Enroll Okta Verify',
+        action: '/enroll-authenticator/okta_verify/enroll-poll',
+        poll: nextStep && nextStep.poll,
+      })
+    });
+  }
+});
+
+router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.poll();
+  handleTransactionWithoutRedirect({ req, res, authClient, transaction });
 });
 
 // Handle Google Authenticator

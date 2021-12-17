@@ -22,6 +22,7 @@ import {
   SelectAuthenticatorEnroll,
   EnrollAuthenticator,
   AuthenticatorVerificationData,
+  EnrollPoll
 } from '../remediators';
 
 export const AuthenticationFlow: RemediationFlow = {
@@ -33,5 +34,6 @@ export const AuthenticationFlow: RemediationFlow = {
   'enroll-authenticator': EnrollAuthenticator,
   'challenge-authenticator': ChallengeAuthenticator,
   'reenroll-authenticator': ReEnrollAuthenticator,
+  'enroll-poll': EnrollPoll,
   'redirect-idp': RedirectIdp
 };

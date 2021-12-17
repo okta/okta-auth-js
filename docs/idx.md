@@ -32,6 +32,7 @@
     - [`idx.cancel`](#idxcancel)
     - [`idx.proceed`](#idxproceed)
     - [`idx.canProceed`](#idxcanproceed)
+    - [`idx.poll`](#idxpoll)
     - [`idx.getFlow`](#idxgetflow)
     - [`idx.setFlow`](#idxsetflow)
     - [`idx.handleInteractionCodeRedirect`](#idxhandleinteractioncoderedirect)
@@ -373,6 +374,23 @@ If a `stateTokenExternalId` is not passed and a flow is not currently in progres
 #### `idx.canProceed`
 
 Returns true if there is a saved transaction.
+
+#### `idx.poll`
+
+Resumes saved transaction and fires poll request to Okta API. Performs single poll request by default. Front-end clients can pass `{ refresh: millisecondsInt` } parameter, which enables polling to continue until it is considered complete by server or session times out. `refresh` value is available through the `nextStep` property of in-progress transaction.
+
+```javascript
+let idxTransaction = await authClient.idx.register();
+// ...
+// render view that matches current IDX stage
+// ...
+const pollOptions = idxTransaction?.nextStep?.poll;
+if (pollOptions.required) {
+  authClient.idx.poll(pollOptions.refresh).then(pollResult => {
+    // render view matching poll result
+  });
+}
+```
 
 #### `idx.getFlow`
 

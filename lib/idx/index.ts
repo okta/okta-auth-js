@@ -15,6 +15,7 @@ export * from './authenticate';
 export * from './cancel';
 export * from './interact';
 export * from './introspect';
+export * from './poll';
 export * from './proceed';
 export * from './register';
 export * from './recoverPassword';

@@ -11,23 +11,7 @@
  */
 
 
-import { RemediationFlow } from './RemediationFlow';
-import { 
-  SelectEnrollProfile,
-  EnrollPoll,
-  EnrollProfile,
-  SelectAuthenticatorEnroll,
-  EnrollAuthenticator,
-  AuthenticatorEnrollmentData,
-  Skip,
-} from '../remediators';
-
-export const RegistrationFlow: RemediationFlow = {
-  'select-enroll-profile': SelectEnrollProfile,
-  'enroll-profile': EnrollProfile,
-  'authenticator-enrollment-data': AuthenticatorEnrollmentData,
-  'select-authenticator-enroll': SelectAuthenticatorEnroll,
-  'enroll-poll': EnrollPoll,
-  'enroll-authenticator': EnrollAuthenticator,
-  'skip': Skip,
+module.exports = function sendJson(_req, res, data) {
+  res.header('Content-Type', 'application/json');
+  res.send(JSON.stringify(data));
 };

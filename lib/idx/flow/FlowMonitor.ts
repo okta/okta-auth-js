@@ -32,6 +32,12 @@ export class FlowMonitor {
     }
 
     if (this.previousRemediator.getName() === remediator.getName()) {
+      if (this.getKnownCyclicRemediators().includes(remediator.getName())) {
+        const previousValues = Object.keys(this.previousRemediator.values);
+        const currentValues = Object.keys(remediator.values);
+        return previousValues.length === currentValues.length;
+      }
+
       return true;
     }
 
@@ -65,5 +71,9 @@ export class FlowMonitor {
 
   isFinished(): Promise<boolean> {
     return Promise.resolve(true);
+  }
+
+  protected getKnownCyclicRemediators() {
+    return [];
   }
 }

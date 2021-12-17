@@ -13,6 +13,7 @@
 
 export * from './Base/Remediator';
 export * from './EnrollAuthenticator';
+export * from './EnrollPoll';
 export * from './ChallengeAuthenticator';
 export * from './ResetAuthenticator';
 export * from './EnrollProfile';

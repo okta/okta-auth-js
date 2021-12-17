@@ -1,3 +1,4 @@
+import { OktaVerifyAuthenticatorOptionFactory } from './../../support/idx/factories/options';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -48,7 +49,10 @@ import {
   EnrollGoogleAuthenticatorRemediationFactory,
   GoogleAuthenticatorOptionFactory,
   SecurityQuestionAuthenticatorOptionFactory,
-  EnrollSecurityQuestionAuthenticatorRemediationFactory
+  EnrollSecurityQuestionAuthenticatorRemediationFactory,
+  EnrollPollRemediationFactory,
+  IdxContextFactory,
+  OktaVerifyAuthenticatorWithContextualDataFactory
 } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/introspect', () => {
@@ -175,7 +179,8 @@ describe('idx/register', () => {
                 PhoneAuthenticatorOptionFactory.build(),
                 EmailAuthenticatorOptionFactory.build(),
                 GoogleAuthenticatorOptionFactory.build(),
-                SecurityQuestionAuthenticatorOptionFactory.build()
+                SecurityQuestionAuthenticatorOptionFactory.build(),
+                OktaVerifyAuthenticatorOptionFactory.build(),
               ]
             })
           ]
@@ -480,6 +485,9 @@ describe('idx/register', () => {
           }, {
             label: 'Security Question',
             value: AuthenticatorKey.SECURITY_QUESTION
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY
           }]
         }
       });
@@ -552,6 +560,9 @@ describe('idx/register', () => {
           }, {
             label: 'Security Question',
             value: AuthenticatorKey.SECURITY_QUESTION
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY
           }]
         }
       });
@@ -648,6 +659,9 @@ describe('idx/register', () => {
           }, {
             label: 'Security Question',
             value: AuthenticatorKey.SECURITY_QUESTION
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY
           }]
         }
       });
@@ -1322,6 +1336,9 @@ describe('idx/register', () => {
           }, {
             label: 'Security Question',
             value: AuthenticatorKey.SECURITY_QUESTION
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY
           }]
         }
       });
@@ -1551,7 +1568,11 @@ describe('idx/register', () => {
           }, {
             label: 'Security Question',
             value: AuthenticatorKey.SECURITY_QUESTION
-          }]
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY
+          }
+        ]
         }
       });
 
@@ -1782,6 +1803,84 @@ describe('idx/register', () => {
       });
     });
 
+  });
+
+  describe('Okta Verify Authenticator', () => {
+    const enrollPollResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollPollRemediationFactory.build()
+      ],
+      context: IdxContextFactory.build({
+        currentAuthenticator: {
+          value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
+        }
+      }),
+    });
+
+    it('is available for selection', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(selectAuthenticatorResponse);
+
+      let response = await register(authClient, {});
+      expect(selectAuthenticatorResponse.proceed).not.toHaveBeenCalled();
+      expect(response.nextStep?.options).toContainEqual({
+        label: 'Okta Verify',
+        value: AuthenticatorKey.OKTA_VERIFY
+      });
+    });
+
+    it('prompts to start polling when selected', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollPollResponse,
+      ]);
+
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(enrollPollResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse)
+        .mockResolvedValueOnce(enrollPollResponse);
+
+      let response = await register(authClient, {
+        authenticator: AuthenticatorKey.OKTA_VERIFY
+      });
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalled();
+      expect(enrollPollResponse.proceed).not.toHaveBeenCalled();
+      expect(Object.keys(response.nextStep)).toContain('poll');
+    });
+
+    it('offers QR code as a default channel for adding OV account', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollPollResponse,
+      ]);
+
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse);
+
+      let { nextStep:
+        { authenticator: { contextualData } }
+      } = await register(authClient, {
+        authenticator: AuthenticatorKey.OKTA_VERIFY
+      });
+      expect(Object.keys(contextualData)).toContain('qrcode');
+    });
   });
 
   describe('skip', () => {

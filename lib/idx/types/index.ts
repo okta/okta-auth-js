@@ -37,10 +37,10 @@ export enum IdxStatus {
 export enum AuthenticatorKey {
   OKTA_PASSWORD = 'okta_password',
   OKTA_EMAIL = 'okta_email',
-  OKTA_VERIFIER = 'okta_verifier',
   PHONE_NUMBER = 'phone_number',
   GOOGLE_AUTHENTICATOR = 'google_otp',
   SECURITY_QUESTION = 'security_question',
+  OKTA_VERIFY = 'okta_verify'
 }
 
 export type Input = {
@@ -59,6 +59,7 @@ export type NextStep = {
   canResend?: boolean;
   inputs?: Input[];
   options?: IdxOption[];
+  poll?: IdxPollOptions;
 }
 
 export enum IdxFeature {
@@ -82,6 +83,11 @@ export interface IdxTransaction {
 export type IdxOptions = InteractOptions & IntrospectOptions & {
   flow?: FlowIdentifier;
 };
+
+export interface IdxPollOptions {
+  required?: boolean;
+  refresh?: number;
+}
 
 export type Authenticator = {
   key: string;

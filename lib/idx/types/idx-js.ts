@@ -89,6 +89,38 @@ export interface IdxRemediation {
   method?: string;
   type?: string;
   accepts?: string;
+  refresh?: number;
+}
+
+export interface IdxContext {
+  version: string;
+  stateHandle: string;
+  expiresAt: string;
+  intent: string;
+  currentAuthenticator: {
+    type: string;
+    value: IdxAuthenticator;
+  };
+  authenticators: {
+    type: string;
+    value: IdxAuthenticator[];
+  };
+  authenticatorEnrollments: {
+    type: string;
+    value: IdxAuthenticator[];
+  };
+  enrollmentAuthenticator: {
+    type: string;
+    value: IdxAuthenticator;
+  };
+  user: {
+    type: string;
+    value: Record<string, unknown>;
+  };
+  app: {
+    type: string;
+    value: Record<string, unknown>;
+  };
 }
 
 export interface IdxMessage {
@@ -137,6 +169,7 @@ export interface IdxResponse {
   toPersist: {
     interactionHandle?: string;
   };
+  context?: IdxContext;
 }
 
 export function isIdxResponse(obj: any): obj is IdxResponse {
