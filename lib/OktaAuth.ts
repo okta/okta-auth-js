@@ -80,6 +80,7 @@ import {
   exchangeCodeForTokens,
   isInteractionRequiredError,
   isInteractionRequired,
+  loadFrame
 } from './oidc';
 import { isBrowser } from './features';
 import * as features from './features';
@@ -387,9 +388,6 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   
   // Ends the current Okta SSO session without redirecting to Okta.
   closeSession(): Promise<object> {
-    // Clear all local tokens
-    this.tokenManager.clear();
-  
     return this.session.close() // DELETE /api/v1/sessions/me
     .catch(function(e) {
       if (e.name === 'AuthApiError' && e.errorCode === 'E0000007') {
@@ -486,9 +484,6 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       options.idToken = this.tokenManager.getTokensSync().idToken as IDToken;
     }
 
-    // Clear all local tokens
-    this.tokenManager.clear();
-
     if (revokeRefreshToken && refreshToken) {
       await this.revokeRefreshToken(refreshToken);
     }
@@ -498,20 +493,55 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     }
 
     const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });
-    // No logoutUri? This can happen if the storage was cleared.
-    // Fallback to XHR signOut, then simulate a redirect to the post logout uri
-    if (!logoutUri) {
-      return this.closeSession() // can throw if the user cannot be signed out
-      .then(function() {
-        if (postLogoutRedirectUri === currentUri) {
-          window.location.reload(); // force a hard reload if URI is not changing
-        } else {
-          window.location.assign(postLogoutRedirectUri);
-        }
-      });
+    if (logoutUri) {
+      try {
+        await this.logoutThroughIFrame(logoutUri);
+      } catch (_) {
+        window.location.assign(logoutUri);
+      }
     } else {
-      // Flow ends with logout redirect
-      window.location.assign(logoutUri);
+      // No logoutUri? This can happen if the storage was cleared.
+      // Fallback to XHR signOut, then simulate a redirect to the post logout uri
+      await this.closeSession(); // can throw if the user cannot be signed out
+    }
+
+    // Clear all local tokens
+    this.tokenManager.clear();
+
+    if (postLogoutRedirectUri === currentUri) {
+      window.location.reload(); // force a hard reload if URI is not changing
+    } else {
+      window.location.assign(postLogoutRedirectUri);
+    }
+  }
+
+  async logoutThroughIFrame(logoutUri): Promise<void> {
+    let logoutPollIntervalId, logoutTimeoutId;
+    let iframeEl;
+    try {
+      iframeEl = loadFrame(logoutUri);
+      await new Promise<void>((resolve, reject) => {
+        logoutTimeoutId = setTimeout(() => {
+          reject('IFrame logout timed out - falling back to redirect logout');
+        }, 2000);
+        logoutPollIntervalId = setInterval(() => {
+          // redirected to post logout URL
+          if(iframeEl.contentDocument.URL !== logoutUri) {
+            clearTimeout(logoutTimeoutId);
+            clearInterval(logoutPollIntervalId);
+            iframeEl.parentElement.removeChild(iframeEl);
+            resolve();
+          }
+        }, 200);
+      });
+    } catch (err) {
+      console.warn(err);
+      clearTimeout(logoutTimeoutId);
+      clearInterval(logoutPollIntervalId);
+      if (iframeEl) {
+        iframeEl.parentElement.removeChild(iframeEl);
+      }
+      throw err;
     }
   }
 
