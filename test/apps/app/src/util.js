@@ -36,9 +36,9 @@ function toQueryString(obj) {
 }
 
 function makeClickHandler(fn) {
-  return function(event) {
+  return function(event, options) {
     event && event.preventDefault(); // prevent navigation / page reload
-    return fn();
+    return fn(options);
   };
 }
 

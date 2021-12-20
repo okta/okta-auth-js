@@ -22,6 +22,7 @@ class TestApp {
 
   // Authenticated landing
   get logoutRedirectBtn() { return $('#logout-redirect'); }
+  get logoutRedirectClearTokensAfterRedirectBtn() { return $('#logout-redirect-clear-tokens-after-redirect'); }
   get logoutXHRBtn() { return $('#logout-xhr'); }
   get logoutAppBtn() { return $('#logout-app'); }
   get renewTokenBtn() { return $('#renew-token'); }
@@ -187,8 +188,19 @@ class TestApp {
     await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
   }
 
-  async logoutRedirect() {
-    await this.logoutRedirectBtn.then(el => el.click());
+  async logoutRedirect(options = {}) {
+    if (options.clearTokensAfterRedirect) {
+      const url = await browser.getUrl();
+      await this.logoutRedirectClearTokensAfterRedirectBtn.then(el => el.click());
+      await browser.waitUntil(async () => {
+        const newUrl = await browser.getUrl();
+        return newUrl !== url;
+      });
+      await this.subscribeToAuthState();
+      await this.startService();
+    } else {
+      await this.logoutRedirectBtn.then(el => el.click());
+    }
     await this.waitForLoginBtn();
   }
 

@@ -317,6 +317,7 @@ describe('OktaAuth (browser)', function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(auth.revokeRefreshToken).toHaveBeenCalled();
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -330,6 +331,7 @@ describe('OktaAuth (browser)', function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalled();
             expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -339,6 +341,17 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+          });
+      });
+
+      it('Can pass a "clearTokensAfterRedirect=true" to skip clear tokens logic', function() {
+        auth.tokenManager.addPendingRemoveFlags = jest.fn();
+        return auth.signOut({ clearTokensAfterRedirect: true })
+          .then(function() {
+            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
+            expect(auth.tokenManager.addPendingRemoveFlags).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -360,7 +373,6 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
           });
@@ -373,7 +385,6 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.reload).toHaveBeenCalled();
           });

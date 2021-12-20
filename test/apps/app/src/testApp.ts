@@ -27,6 +27,7 @@ import {
   parseEmailVerifyCallback,
   IdxStatus,
   IdxTransaction,
+  AuthState,
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -39,14 +40,18 @@ function homeLink(app: TestApp): string {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
 }
 
+function protectedLink(app: TestApp): string {
+  return `
+    <li class="pure-menu-item">
+      <a id="nav-to-protected" href="${app.protectedUrl}" class="pure-menu-link">Navigate to PROTECTED page</a>
+    </li>
+  `;
+}
+
 function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
   let protectedPageLink = '';
   if (!onProtectedPage) {
-    protectedPageLink = `
-      <li class="pure-menu-item">
-        <a id="nav-to-protected" href="${app.protectedUrl}" class="pure-menu-link">Navigate to PROTECTED page</a>
-      </li>
-    `;
+    protectedPageLink = protectedLink(app);
   }
   const useActivationToken = app.config.useInteractionCodeFlow ? `
     <div class="box">
@@ -96,6 +101,9 @@ function logoutLink(app: TestApp): string {
       <ul class="pure-menu-list">
         <li class="pure-menu-item">
           <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)" class="pure-menu-link">Logout (and redirect here)</a>
+        </li>
+        <li class="pure-menu-item">
+          <a id="logout-redirect-clear-tokens-after-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event, { clearTokensAfterRedirect: true })" class="pure-menu-link">Logout (and redirect here, tokens will be cleared afterward)</a>
         </li>
         <li class="pure-menu-item">
           <a id="logout-xhr" href="${app.originalUrl}" onclick="logoutXHR(event)" class="pure-menu-link">Logout (XHR + reload)</a>
@@ -154,7 +162,7 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     renewTokens: testApp.renewTokens.bind(testApp),
     revokeToken: testApp.revokeToken.bind(testApp),
     revokeRefreshToken: testApp.revokeRefreshToken.bind(testApp),
-    handleCallback: testApp.handleCallback.bind(testApp),
+    handleLoginCallback: testApp.handleLoginCallback.bind(testApp),
     getUserInfo: testApp.getUserInfo.bind(testApp),
     testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
     testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp),
@@ -255,6 +263,7 @@ class TestApp {
     if (idToken || accessToken) {
       content = `
         ${homeLink(this)}
+        ${logoutLink(this)}
         <hr/>
         <strong>You are authenticated</strong>
       `;
@@ -269,13 +278,20 @@ class TestApp {
       this.oktaAuth.setOriginalUri(this.protectedUrl, this.config.state);
     }
 
+    // simulate SecureRoute behaviour
+    this.oktaAuth.authStateManager.subscribe((authState: AuthState) => {
+      if (!authState.isAuthenticated) {
+        this.oktaAuth.signInWithRedirect();
+      }
+    });
+
     this._setContent(content);
     this._afterRender('protected');
   }
 
-  bootstrapCallback(): void {
+  bootstrapLoginCallback(): void {
     const content = `
-      <a id="handle-callback" href="/" onclick="handleCallback(event)">Handle callback (Continue Login)</a>
+      <a id="handle-callback" href="/" onclick="handleLoginCallback(event)">Handle callback (Continue Login)</a>
       <hr/>
       ${homeLink(this)}
     `;
@@ -536,8 +552,8 @@ class TestApp {
       });
   }
 
-  logoutRedirect(): void {
-    this.oktaAuth.signOut()
+  async logoutRedirect(options = {}): Promise<void> {
+    this.oktaAuth.signOut(options)
       .catch(e => {
         console.error('Error during signout & redirect: ', e);
       });
@@ -560,7 +576,7 @@ class TestApp {
     window.location.reload();
   }
 
-  async handleCallback(): Promise<void> {
+  async handleLoginCallback(): Promise<void> {
     if (isInteractionRequired(this.oktaAuth)) {
       return this.renderInteractionRequired();
     }
@@ -737,6 +753,7 @@ class TestApp {
                 <li class="pure-menu-item">
                   <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)" class="pure-menu-link pure-menu-item">Test Concurrent login via token renew failure</a>
                 </li>
+                ${protectedLink(this)}
               </ul>
             </div>
           </div>

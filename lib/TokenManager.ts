@@ -40,6 +40,7 @@ import { TokenService } from './services/TokenService';
 const DEFAULT_OPTIONS = {
   autoRenew: true,
   autoRemove: true,
+  clearPendingRemoveTokens: true,
   storage: undefined, // will use value from storageManager config
   expireEarlySeconds: 30,
   storageKey: TOKEN_STORAGE_NAME,
@@ -112,6 +113,9 @@ export class TokenManager implements TokenManagerInterface {
   start() {
     if (this.service) {
       this.stop();
+    }
+    if (this.options.clearPendingRemoveTokens) {
+      this.clearPendingRemoveTokens();
     }
     this.service = new TokenService(this, this.getOptions());
     this.service.start();
@@ -440,6 +444,15 @@ export class TokenManager implements TokenManagerInterface {
     this.clearExpireEventTimeoutAll();
     this.storage.clearStorage();
   }
+
+  clearPendingRemoveTokens() {
+    const tokens = this.getTokensSync();
+    Object.keys(tokens).forEach(key => {
+      if (tokens[key].pendingRemove) {
+       this.remove(key);
+      }
+    });
+  }
   
   getTokensFromStorageValue(value) {
     let tokens;
@@ -459,6 +472,14 @@ export class TokenManager implements TokenManagerInterface {
     validateToken(token);
     tokenStorage[key] = token;
     this.storage.setStorage(tokenStorage);
+  }
+
+  addPendingRemoveFlags() {
+    const tokens = this.getTokensSync();
+    Object.keys(tokens).forEach(key => {
+      tokens[key].pendingRemove = true;
+    });
+    this.setTokens(tokens);
   }
   
 }

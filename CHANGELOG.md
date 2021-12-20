@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.10.0
+
+- [#1010](https://github.com/okta/okta-auth-js/pull/1010) Supports `clearPendingRemoveTokens` option in `signOut` method. This option can be used to avoid cross tabs sign out issue with Okta's downstream client SDK's `SecureRoute` component
+- [#1035](https://github.com/okta/okta-auth-js/pull/1035) Adds `security question` authenticator support in idx module
+
 ## 5.9.1
 
 ### Other

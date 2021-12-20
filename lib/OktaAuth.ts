@@ -384,13 +384,14 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       this._pending.handleLogin = false;
     }
   }
-  
+
   // Ends the current Okta SSO session without redirecting to Okta.
   closeSession(): Promise<object> {
-    // Clear all local tokens
-    this.tokenManager.clear();
-  
     return this.session.close() // DELETE /api/v1/sessions/me
+    .then(async () => {
+      // Clear all local tokens
+      this.tokenManager.clear();
+    })
     .catch(function(e) {
       if (e.name === 'AuthApiError' && e.errorCode === 'E0000007') {
         // Session does not exist or has already been closed
@@ -486,9 +487,6 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       options.idToken = this.tokenManager.getTokensSync().idToken as IDToken;
     }
 
-    // Clear all local tokens
-    this.tokenManager.clear();
-
     if (revokeRefreshToken && refreshToken) {
       await this.revokeRefreshToken(refreshToken);
     }
@@ -501,6 +499,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     // No logoutUri? This can happen if the storage was cleared.
     // Fallback to XHR signOut, then simulate a redirect to the post logout uri
     if (!logoutUri) {
+      // local tokens are cleared once session is closed
       return this.closeSession() // can throw if the user cannot be signed out
       .then(function() {
         if (postLogoutRedirectUri === currentUri) {
@@ -510,6 +509,12 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
         }
       });
     } else {
+      if (options.clearTokensAfterRedirect) {
+        this.tokenManager.addPendingRemoveFlags();
+      } else {
+        // Clear all local tokens
+        this.tokenManager.clear();
+      }
       // Flow ends with logout redirect
       window.location.assign(logoutUri);
     }

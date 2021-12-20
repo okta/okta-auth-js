@@ -22,7 +22,7 @@ import {
   RefreshToken,
   OktaAuth
 } from '@okta/okta-auth-js';
-import { expectType } from 'tsd';
+import { expectType, expectAssignable } from 'tsd';
 
 const authClient = new OktaAuth({});
 
@@ -36,7 +36,7 @@ const idTokenExample = {
   issuer: 'https://{yourOktaDomain}',
   clientId: 'NPSfOkH5eZrTy8PMDlvx'
 };
-expectType<IDToken>(idTokenExample);
+expectAssignable<IDToken>(idTokenExample);
 
 const accessTokenExample = {
   expiresAt: 1449699930,
@@ -47,7 +47,7 @@ const accessTokenExample = {
   tokenType: 'aud',
   userinfoUrl: 'https://some.com/userinfo'
 };
-expectType<AccessToken>(accessTokenExample);
+expectAssignable<AccessToken>(accessTokenExample);
 
 const refreshTokenExample = {
   expiresAt: 1449699930,
@@ -57,7 +57,7 @@ const refreshTokenExample = {
   tokenUrl: 'https://some.com/token',
   issuer: 'https://{yourOktaDomain}'
 };
-expectType<RefreshToken>(refreshTokenExample);
+expectAssignable<RefreshToken>(refreshTokenExample);
 
 const tokens = {
   accessToken: accessTokenExample,

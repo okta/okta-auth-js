@@ -37,7 +37,8 @@ function createAuth(options) {
       storageKey: options.tokenManager.storageKey,
       autoRenew: options.tokenManager.autoRenew || false,
       autoRemove: options.tokenManager.autoRemove || false,
-      secure: options.tokenManager.secure // used by cookie storage
+      secure: options.tokenManager.secure, // used by cookie storage,
+      clearPendingRemoveTokens: options.tokenManager.clearPendingRemoveTokens !== false
     }
   });
 }
@@ -96,6 +97,20 @@ describe('TokenManager', function() {
         jest.spyOn(TokenService.prototype, 'start');
         client.tokenManager.start();
         expect(TokenService.prototype.start).toHaveBeenCalled();
+      });
+      describe('pending remove tokens', () => {
+        it('clears pending remove tokens by default', () => {
+          jest.spyOn(client.tokenManager, 'clearPendingRemoveTokens');
+          client.tokenManager.start();
+          expect(client.tokenManager.clearPendingRemoveTokens).toHaveBeenCalled();
+        });
+
+        it('will not clear pending remove tokens when "clearPendingRemoveTokens = false" in options', () => {
+          setupSync({ tokenManager: { clearPendingRemoveTokens: false } });
+          jest.spyOn(client.tokenManager, 'clearPendingRemoveTokens');
+          client.tokenManager.start();
+          expect(client.tokenManager.clearPendingRemoveTokens).not.toHaveBeenCalled();
+        });
       });
       it('stops existing service', () => {
         const myService = client.tokenManager.service = {
@@ -802,6 +817,50 @@ describe('TokenManager', function() {
       expect(removedHandler).toHaveBeenCalledWith('accessToken', tokens.standardAccessTokenParsed);
     });
   });
+
+  describe('addPendingRemoveFlags', () => {
+    it('sets pendingRemove flags to tokens', () => {
+      const storageProvider = {
+        getItem: jest.fn().mockReturnValue(JSON.stringify({ 
+          idToken: tokens.standardIdTokenParsed,
+          accessToken: tokens.standardAccessTokenParsed, 
+        })),
+        setItem: jest.fn()
+      };
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
+      });
+      client.tokenManager.addPendingRemoveFlags();
+      const tokensObj = { 
+        idToken: { ...tokens.standardIdTokenParsed, pendingRemove: true },
+        accessToken: { ...tokens.standardAccessTokenParsed, pendingRemove: true } 
+      };
+      expect(storageProvider.getItem).toHaveBeenCalled();
+      expect(storageProvider.setItem).toHaveBeenCalledWith('okta-token-storage', JSON.stringify(tokensObj));
+    });
+  });
+
+  describe('clearPendingRemoveTokens', () => {
+    it('clears pending remove tokens', () => {
+      const storageProvider = {
+        getItem: jest.fn().mockReturnValue(JSON.stringify({ 
+          idToken: { ...tokens.standardIdTokenParsed, pendingRemove: true },
+          accessToken: { ...tokens.standardAccessTokenParsed, pendingRemove: true } 
+        })),
+        setItem: jest.fn()
+      };
+      setupSync({
+        tokenManager: {
+          storage: storageProvider
+        }
+      });
+      jest.spyOn(client.tokenManager, 'remove');
+      client.tokenManager.clearPendingRemoveTokens();
+      expect(client.tokenManager.remove).toHaveBeenCalledTimes(2);
+      expect(client.tokenManager.remove).toHaveBeenNthCalledWith(1, 'idToken');
+      expect(client.tokenManager.remove).toHaveBeenNthCalledWith(2, 'accessToken');
+    });
+  });
 });
-
-

@@ -801,6 +801,10 @@ Defaults to `true`, unless the application origin is `http://localhost`, in whic
 
 Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` option is false. Allows fine-grained control over the same-site cookie setting. A value of `none` allows embedding within an iframe. A value of `lax` will avoid being blocked by user "3rd party" cookie settings. A value of `strict` will block all cookies when redirecting from Okta and is not recommended.
 
+#### `clearPendingRemoveTokens`
+
+Defaults to `true`, set this option to false if you want to opt-out of the default clearing pendingRemove tokens behaviour when `tokenManager.start()` is called.
+
 ## API Reference
 <!-- no toc -->
 * [start](#start)
@@ -911,6 +915,7 @@ if (authClient.isLoginRedirect()) {
 ### `signOut()`
 
 > :hourglass: async
+> :link: web browser only
 
 Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. By default, the refresh token (if any) and access token are revoked so they can no longer be used. Some points to consider:
 
@@ -924,6 +929,7 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 * `postLogoutRedirectUri` - Setting a value will override the `postLogoutRedirectUri` configured on the SDK.
 * `state` - An optional value, used along with `postLogoutRedirectUri`. If set, this value will be returned as a query parameter during the redirect to the `postLogoutRedirectUri`
 * `idToken` - Specifies the ID token object. By default, `signOut` will look for a token object named `idToken` within the `TokenManager`. If you have stored the id token object in a different location, you should retrieve it first and then pass it here.
+* `clearTokensAfterRedirect` - If `true` (default: `false`) a flag (`pendingRemove`) will be added to local tokens instead of clearing them immediately. Calling `oktaAuth.start()` after logout redirect will clear local tokens if flags are found. This option can be used when work with `SecureRoute` component from Okta's downstream client SDKs to guarantee the local tokens can only be cleared after the Okta SSO session is fully killed.
 * `revokeAccessToken` - If `false` (default: `true`) the access token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.
 * `revokeRefreshToken` - If `false` (default: `true`) the refresh token will not be revoked. Use this option with care: not revoking tokens may pose a security risk if tokens have been leaked outside the application.  Revoking a refresh token will revoke any access tokens minted by it, even if `revokeAccessToken` is `false`.
 * `accessToken` - Specifies the access token object. By default, `signOut` will look for a token object named `accessToken` within the `TokenManager`. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. This options is ignored if the `revokeAccessToken` option is `false`.
@@ -1589,6 +1595,10 @@ Remove all tokens from the `tokenManager`.
 ```javascript
 authClient.tokenManager.clear();
 ```
+
+#### `tokenManager.clearPendingRemoveTokens()`
+
+Remove all tokens with `pendingRemove` flags. This method is called within `tokenManager.start()` by default, you can opt-out of the default behaviour by setting `tokenManager.clearPendingRemoveTokens` option to `false`.
 
 #### `tokenManager.renew(key)`
 

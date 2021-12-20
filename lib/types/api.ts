@@ -238,10 +238,11 @@ export interface SignoutRedirectUrlOptions {
 }
 
 export interface SignoutOptions extends SignoutRedirectUrlOptions {
-  accessToken?: AccessToken;
   revokeAccessToken?: boolean;
   revokeRefreshToken?: boolean;
+  accessToken?: AccessToken;
   refreshToken?: RefreshToken;
+  clearTokensAfterRedirect?: boolean;
 }
 
 export interface SignoutAPI {
