@@ -37,13 +37,13 @@ This library uses semantic versioning and follows Okta's [library version policy
 
 ## Release Status
 
-:heavy_check_mark: The current stable major version series is: `4.x`
+:heavy_check_mark: The current stable major version series is: `5.x`
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
 | `5.x`     | :heavy_check_mark: Stable        |
 | `4.x`     | :warning: Retiring on 2022-01-30 |
-| `3.x`     | :warning: Retiring on 2021-05-30 |
+| `3.x`     | :x: Retired                      |
 | `2.x`     | :x: Retired                      |
 | `1.x`     | :x: Retired                      |
 | `0.x`     | :x: Retired                      |
