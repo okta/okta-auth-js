@@ -114,6 +114,18 @@ export const VerifySecurityQuestionAuthenticatorRemediationFactory = ChallengeAu
   }
 });
 
+export const VerifyOktaVerifyAuthenticatorRemediationFactory = ChallengeAuthenticatorRemediationFactory.params({
+  name: 'challenge-authenticator',
+  value: [
+    CredentialsValueFactory.build({
+      form: VerifyPasscodeFormFactory.build()
+    })
+  ],
+  relatesTo: {
+    value: OktaVerifyAuthenticatorFactory.build()
+  }
+});
+
 export const VerifyPasswordRemediationFactory = ChallengeAuthenticatorRemediationFactory.params({
   name: 'challenge-authenticator',
   value: [
