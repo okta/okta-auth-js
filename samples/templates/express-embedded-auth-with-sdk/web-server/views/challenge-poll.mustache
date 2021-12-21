@@ -19,7 +19,13 @@
       <div class="row">
         {{>formMessages}}
       </div>
-
+      {{#message}}
+      <div class="row">
+        <div class="ui positive message">
+        {{message}}
+        </div>
+      </div>
+      {{/message}}
       {{#canResend}}
         <form id="resend-code-form" class="ui form" action="{{resendAction}}" method="POST">
           <button id="resend-button" class="ui fluid submit button" type="submit">

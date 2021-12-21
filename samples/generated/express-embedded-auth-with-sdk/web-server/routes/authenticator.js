@@ -272,15 +272,18 @@ router.get('/challenge-authenticator/:authenticator/poll', async (req, res) => {
       errors: [error.message || error.errorSummary]
     });
   } else {
-    const { authenticator: {
+    const { authenticator } = nextStep;
+    const {
       key, displayName
-    }} = nextStep;
+    } = authenticator;
+    const isPushMethod = authenticator.methods.find(({ type }) => type === 'push');
     renderPage({
       req, res,
       render: () => renderTemplate(req, res, 'challenge-poll', {
         title: `Challenge ${displayName}`,
+        message: isPushMethod ? 'Push sent' : '',
         action: `/poll-authenticator/${key}`,
-        poll: nextStep && nextStep.poll,
+        poll: nextStep.poll,
         canResend: nextStep.canResend,
         resendAction: '/challenge-authenticator/resend'
       })
