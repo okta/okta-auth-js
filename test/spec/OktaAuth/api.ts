@@ -17,6 +17,7 @@ jest.mock('../../../lib/tx');
 import { 
   OktaAuth, 
   AuthApiError,
+  AuthSdkError
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import {postToTransaction} from '../../../lib/tx';
@@ -295,6 +296,32 @@ describe('OktaAuth (api)', function() {
         expect(auth.tokenManager.hasExpired).toHaveBeenCalledTimes(2);
         expect(auth.tokenManager.renew).toHaveBeenCalledTimes(1);
         expect(auth.tokenManager.renew).toHaveBeenCalledWith('idToken');
+      });
+
+      it('does not reject with error caused by renew of accessToken', async () => {
+        jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+          accessToken: { accessToken: true },
+          idToken: { idToken: true }
+        });
+        jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
+          return isAccessToken(token) ? true : false;
+        });
+        jest.spyOn(auth.tokenManager, 'renew').mockRejectedValue(new AuthSdkError('does not matter'));
+        expect(async () => await auth.isAuthenticated()).not.toThrow();
+        expect(await auth.isAuthenticated()).toBe(false);
+      });
+
+      it('does not reject with error caused by renew of idToken', async () => {
+        jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+          accessToken: { accessToken: true },
+          idToken: { idToken: true }
+        });
+        jest.spyOn(auth.tokenManager, 'hasExpired').mockImplementation(token => {
+          return isIDToken(token) ? true : false;
+        });
+        jest.spyOn(auth.tokenManager, 'renew').mockRejectedValue(new AuthSdkError('does not matter'));
+        expect(async () => await auth.isAuthenticated()).not.toThrow();
+        expect(await auth.isAuthenticated()).toBe(false);
       });
     });
 
