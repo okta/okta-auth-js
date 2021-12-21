@@ -2,6 +2,7 @@
 <html>
   <head>
     {{>head}}
+    <script src="/assets/js/poll.js"></script>
   </head>
   <body id="samples">
   
@@ -34,30 +35,10 @@
       {{>cancel}}
       </div>
     </div>
-    {{#poll.refresh}}
+    {{#poll.required}}
       <script type="text/javascript">
-        function poll(refresh) {
-          setTimeout(function () {
-            fetch('{{{action}}}', {
-              method: 'POST'
-            }).then(response => {
-              if (response.ok) {
-                return response.json();
-              } else {
-                console.error('Poll request failed: ', response.statusText);
-              }
-            })
-            .then(nextStep => {
-              if (nextStep.poll) {
-                poll(nextStep.poll.refresh);
-              } else {
-                window.location.href = nextStep.nextRoute
-              }
-            });
-          }, refresh)
-        }
-        poll({{poll.refresh}});
+        poll('{{{action}}}', {{poll.refresh}});
       </script>
-    {{/poll.refresh}}
+    {{/poll.required}}
   </body>
 </html>
