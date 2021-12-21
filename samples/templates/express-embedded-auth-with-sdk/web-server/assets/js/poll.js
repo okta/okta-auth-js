@@ -13,8 +13,8 @@ function poll(url, refresh) {
       if (nextStep.poll) {
         poll(url, nextStep.poll.refresh);
       } else {
-        window.location.href = nextStep.nextRoute
+        window.location.href = nextStep.nextRoute;
       }
     });
-  }, refresh)
+  }, refresh);
 }

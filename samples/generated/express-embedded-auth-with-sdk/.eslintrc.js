@@ -3,6 +3,7 @@ module.exports = {
     browser: false,
     node: true
   },
+  ignorePatterns: ['assets/js/*.js'],
   overrides: [{
     files: ['public/*.js'],
     rules: {
