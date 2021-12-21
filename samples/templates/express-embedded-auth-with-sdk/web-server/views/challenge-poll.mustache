@@ -19,17 +19,14 @@
         {{>formMessages}}
       </div>
 
-      {{#contextualData}}
-        <div class="ui segments">
-          <div class="ui segment">
-            {{#contextualData.qrcode}}
-              <div class="ui fluid image">
-                <img id="authenticator-qr-code" src="{{contextualData.qrcode.href}}" />
-              </div>
-            {{/contextualData.qrcode}}
-          </div>
-        </div>
-      {{/contextualData}}
+      {{#canResend}}
+        <form id="resend-code-form" class="ui form" action="{{resendAction}}" method="POST">
+          <button id="resend-button" class="ui fluid submit button" type="submit">
+            Resend
+          </button>
+        </form>
+      {{/canResend}}
+
       <div class="row">
       {{>cancel}}
       </div>

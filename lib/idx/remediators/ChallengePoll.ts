@@ -10,20 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { EnrollPoll } from './EnrollPoll';
 
-export * from './Base/Remediator';
-export * from './EnrollAuthenticator';
-export * from './EnrollPoll';
-export * from './ChallengeAuthenticator';
-export * from './ChallengePoll';
-export * from './ResetAuthenticator';
-export * from './EnrollProfile';
-export * from './Identify';
-export * from './ReEnrollAuthenticator';
-export * from './RedirectIdp';
-export * from './SelectAuthenticatorAuthenticate';
-export * from './SelectAuthenticatorEnroll';
-export * from './SelectEnrollProfile';
-export * from './AuthenticatorVerificationData';
-export * from './AuthenticatorEnrollmentData';
-export * from './Skip';
+export class ChallengePoll extends EnrollPoll{
+  static remediationName = 'challenge-poll';
+}

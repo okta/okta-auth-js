@@ -40,6 +40,6 @@ export class AuthenticationFlowMonitor extends FlowMonitor {
   }
 
   protected getKnownCyclicRemediators() {
-    return ['enroll-poll'];
+    return ['enroll-poll', 'challenge-poll'];
   }
 }
