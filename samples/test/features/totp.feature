@@ -2,7 +2,7 @@ Feature: TOTP Support (Google Authenticator)
 
   Background:
 	  Given configured Authenticators are Password (required), and Google Authenticator (required)
-    And a user named "Mary"
+    # And a user named "Mary" // creates a18n profile (OKTA-456431)
     And Mary has an account in the org
     And she is not enrolled in any authenticators
 
