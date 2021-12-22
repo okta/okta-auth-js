@@ -10,6 +10,7 @@
 ### Fixes
 
 - [#1028](https://github.com/okta/okta-auth-js/pull/1028) Any error caught in `token.renew()` will be emitted and contain `tokenKey` property
+- [#1027](https://github.com/okta/okta-auth-js/pull/1027) Don't reject `isAuthenticated()` because of failed token renewal
 
 ## 5.9.1
 

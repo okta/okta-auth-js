@@ -544,7 +544,11 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     if (accessToken && this.tokenManager.hasExpired(accessToken)) {
       accessToken = null;
       if (autoRenew) {
-        accessToken = await this.tokenManager.renew('accessToken') as AccessToken;
+        try {
+          accessToken = await this.tokenManager.renew('accessToken') as AccessToken;
+        } catch {
+          // Renew errors will emit an "error" event 
+        }
       } else if (autoRemove) {
         this.tokenManager.remove('accessToken');
       }
@@ -553,7 +557,11 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     if (idToken && this.tokenManager.hasExpired(idToken)) {
       idToken = null;
       if (autoRenew) {
-        idToken = await this.tokenManager.renew('idToken') as IDToken;
+        try {
+          idToken = await this.tokenManager.renew('idToken') as IDToken;
+        } catch {
+          // Renew errors will emit an "error" event 
+        }
       } else if (autoRemove) {
         this.tokenManager.remove('idToken');
       }
