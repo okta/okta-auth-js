@@ -18,7 +18,8 @@ import {
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory,
   GoogleAuthenticatorFactory,
-  SecurityQuestionAuthenticatorFactory
+  SecurityQuestionAuthenticatorFactory,
+  OktaVerifyAuthenticatorFactory
 } from './authenticators';
 import { 
   EmailAuthenticatorFormFactory, 

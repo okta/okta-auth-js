@@ -252,7 +252,7 @@ router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
       render: () => renderTemplate(req, res, 'enroll-poll', {
         title: `Enroll ${displayName}`,
         action: `/poll-authenticator/${key}`,
-        poll: nextStep && nextStep.poll,
+        poll: nextStep.poll,
       })
     });
   }
