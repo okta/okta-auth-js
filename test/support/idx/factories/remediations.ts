@@ -18,7 +18,8 @@ import {
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory,
   GoogleAuthenticatorFactory,
-  SecurityQuestionAuthenticatorFactory
+  SecurityQuestionAuthenticatorFactory,
+  OktaVerifyAuthenticatorFactory
 } from './authenticators';
 import { 
   EmailAuthenticatorFormFactory, 
@@ -28,7 +29,7 @@ import {
   UserProfileFormFactory, 
   VerifyEmailFormFactory, 
   VerifySmsFormFactory,
-  VerifyPasscodeFormFactory
+  VerifyPasscodeFormFactory, OktaVerifyAuthenticatorFormFactory
 } from './forms';
 import {
   UsernameValueFactory,
@@ -319,6 +320,19 @@ export const PhoneAuthenticatorVerificationDataRemediationFactory = Authenticato
   ]
 });
 
+export const OktaVerifyAuthenticatorVerificationDataRemediationFactory = AuthenticatorVerificationDataRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: OktaVerifyAuthenticatorFactory.build()
+  },
+  value: [
+    AuthenticatorValueFactory.build({
+      label: 'Okta Verify',
+      form: OktaVerifyAuthenticatorFormFactory.build()
+    }),
+  ]
+});
+
 export const RedirectIdpRemediationFactory = IdxRemediationFactory.params({
   name: 'redirect-idp',
 });
@@ -330,4 +344,8 @@ export const SkipRemediationFactory = IdxRemediationFactory.params({
 export const EnrollPollRemediationFactory = IdxRemediationFactory.params({
   name: 'enroll-poll',
   refresh: 100
+});
+
+export const ChallengePollRemediationFactory = EnrollPollRemediationFactory.params({
+  name: 'challenge-poll'
 });

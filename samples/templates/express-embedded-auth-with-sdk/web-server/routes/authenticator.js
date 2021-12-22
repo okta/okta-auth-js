@@ -230,7 +230,7 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
+router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
   const { 
     idx: { 
       nextStep,
@@ -244,22 +244,81 @@ router.get('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => 
       errors: [error.message || error.errorSummary]
     });
   } else {
+    const { authenticator: {
+      key, displayName
+    }} = nextStep;
     renderPage({
       req, res,
       render: () => renderTemplate(req, res, 'enroll-poll', {
-        title: 'Enroll Okta Verify',
-        action: '/enroll-authenticator/okta_verify/enroll-poll',
-        poll: nextStep && nextStep.poll,
+        title: `Enroll ${displayName}`,
+        action: `/poll-authenticator/${key}`,
+        poll: nextStep.poll,
       })
     });
   }
 });
 
-router.post('/enroll-authenticator/okta_verify/enroll-poll', async (req, res) => {
+router.get('/challenge-authenticator/:authenticator/poll', async (req, res) => {
+  const {
+    idx: {
+      nextStep,
+      error
+    }
+  } = req.getFlowStates();
+
+  if (error) {
+    res.status(500).render('error', {
+      hasError: true,
+      errors: [error.message || error.errorSummary]
+    });
+  } else {
+    const { authenticator } = nextStep;
+    const {
+      key, displayName
+    } = authenticator;
+    const isPushMethod = authenticator.methods.find(({ type }) => type === 'push');
+    renderPage({
+      req, res,
+      render: () => renderTemplate(req, res, 'challenge-poll', {
+        title: `Challenge ${displayName}`,
+        message: isPushMethod ? 'Push sent' : '',
+        action: `/poll-authenticator/${key}`,
+        poll: nextStep.poll,
+        canResend: nextStep.canResend,
+        resendAction: '/challenge-authenticator/resend'
+      })
+    });
+  }
+});
+
+router.post('/poll-authenticator/:authenticator', async (req, res) => {
   const authClient = getAuthClient(req);
   const transaction = await authClient.idx.poll();
   handleTransactionWithoutRedirect({ req, res, authClient, transaction });
 });
+
+// Handle Okta Verify authenticator
+router.get('/verify-authenticator/okta_verify', (req, res) => {
+  const {
+    idx: { nextStep: { options } }
+  } = req.getFlowStates();
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'verify-phone', {
+      title: 'Verify using Okta Verify',
+      action: '/verify-authenticator/okta_verify',
+      options,
+    })
+  });
+});
+
+router.post('/verify-authenticator/okta_verify', async (req, res, next) => {
+  const { methodType } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ methodType });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
 
 // Handle Google Authenticator
 router.get('/enroll-authenticator/google_otp', async (req, res) => {

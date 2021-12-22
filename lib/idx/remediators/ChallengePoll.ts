@@ -10,10 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-const appendTransactionIdToPath = require('./appendTransactionIdToPath');
+import { EnrollPoll } from './EnrollPoll';
 
-module.exports = function redirect({ req, res, path }) {
-  const { transactionId } = req;
-  const redirectPath = appendTransactionIdToPath(path, transactionId);
-  res.redirect(redirectPath);
-};
+export class ChallengePoll extends EnrollPoll{
+  static remediationName = 'challenge-poll';
+}

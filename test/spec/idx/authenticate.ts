@@ -48,7 +48,13 @@ import {
   PhoneAuthenticatorFactory,
   EmailAuthenticatorFactory,
   SecurityQuestionAuthenticatorOptionFactory,
-  VerifySecurityQuestionAuthenticatorRemediationFactory
+  VerifySecurityQuestionAuthenticatorRemediationFactory,
+  OktaVerifyAuthenticatorOptionFactory,
+  IdxContextFactory,
+  OktaVerifyAuthenticatorWithContextualDataFactory,
+  EnrollPollRemediationFactory,
+  OktaVerifyAuthenticatorVerificationDataRemediationFactory,
+  ChallengePollRemediationFactory
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -1551,6 +1557,161 @@ describe('idx/authenticate', () => {
                 required: true,
                 type: 'string',
               }]
+            }
+          });
+
+        });
+      });
+
+    });
+
+    describe('Okta Verify', () => {
+      describe('verification', () => {
+        beforeEach(() => {
+          const verificationDataResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              OktaVerifyAuthenticatorVerificationDataRemediationFactory.build()
+            ]
+          });
+
+          const pollForPushResponse = IdxResponseFactory.build({
+            actions: {
+              'currentAuthenticator-resend': () => Promise.resolve(
+                ChallengePollRemediationFactory.build()
+              )
+            } as IdxActions,
+            neededToProceed: [
+              ChallengePollRemediationFactory.build()
+            ]
+          });
+
+          Object.assign(testContext, {
+            verificationDataResponse,
+            pollForPushResponse,
+          });
+        });
+
+        it('can select verification method type and verify Okta Verify via push', async () => {
+          const {
+            authClient,
+            verificationDataResponse,
+            pollForPushResponse,
+          } = testContext;
+          chainResponses([
+            verificationDataResponse,
+            pollForPushResponse
+          ]);
+
+          jest.spyOn(verificationDataResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect')
+            .mockResolvedValueOnce(verificationDataResponse);
+          const res = await authenticate(authClient, {
+            methodType: 'push'
+          });
+          expect(verificationDataResponse.proceed).toHaveBeenCalledWith('authenticator-verification-data', {
+            authenticator: {
+              id: 'id-okta-verify-authenticator',
+              methodType: 'push',
+            },
+          });
+          expect(res).toEqual({
+            _idxResponse: expect.any(Object),
+            status: IdxStatus.PENDING,
+            nextStep: {
+              authenticator: undefined,
+              name: 'challenge-poll',
+              poll: {
+                refresh: 100,
+                required: true,
+              },
+              canResend: true
+            },
+          });
+        });
+      });
+
+      describe('enrollment', () => {
+        beforeEach(() => {
+          const selectAuthenticatorResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              SelectAuthenticatorEnrollRemediationFactory.build({
+                value: [
+                  AuthenticatorValueFactory.build({
+                    options: [
+                      OktaVerifyAuthenticatorOptionFactory.build(),
+                    ]
+                  })
+                ]
+              })
+            ]
+          });
+          const enrollOktaVerifyResponse = IdxResponseFactory.build({
+            neededToProceed: [
+                  EnrollPollRemediationFactory.build()
+            ],
+            context: IdxContextFactory.build({
+              currentAuthenticator: {
+                value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
+              }
+            }),
+          });
+
+          Object.assign(testContext, {
+            selectAuthenticatorResponse,
+            enrollOktaVerifyResponse,
+          });
+        });
+
+        it('can select OktaVerify', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            enrollOktaVerifyResponse
+          } = testContext;
+
+          chainResponses([
+            selectAuthenticatorResponse,
+            enrollOktaVerifyResponse
+          ]);
+          jest.spyOn(selectAuthenticatorResponse, 'proceed');
+          jest.spyOn(enrollOktaVerifyResponse, 'proceed');
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+
+          const res = await authenticate(authClient, {
+            authenticator: AuthenticatorKey.OKTA_VERIFY
+          });
+          expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+            authenticator: {
+              id: 'id-okta-verify-authenticator'
+            }
+          });
+          expect(res).toEqual({
+            _idxResponse: expect.any(Object),
+            status: IdxStatus.PENDING,
+            nextStep: {
+              name: 'enroll-poll',
+              authenticator: {
+                displayName: 'Okta Verify',
+                id: expect.any(String),
+                key: 'okta_verify',
+                methods: [
+                  { type: 'push' },
+                  { type: 'totp' }
+
+                ],
+                type: 'app',
+                contextualData: {
+                  qrcode: {
+                    href: 'data:image/png;base64,fake_encoding==',
+                    method: 'embedded',
+                    type: 'image/png',
+                  },
+                },
+              },
+              poll: {
+                'refresh': 100,
+                'required': true,
+              },
             }
           });
 

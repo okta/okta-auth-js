@@ -13,6 +13,7 @@
 const { IdxStatus } = require('@okta/okta-auth-js');
 const getNextRouteFromTransaction = require('./getNextRouteFromTransaction');
 const sendJson = require('./sendJson');
+const appendTransactionIdToPath = require('./appendTransactionIdToPath');
 
 module.exports = function handleTransactionWithoutRedirect({ 
   req,
@@ -25,6 +26,8 @@ module.exports = function handleTransactionWithoutRedirect({
     status,
   } = transaction;
 
+  const { transactionId } = req;
+
   // Persist states to session
   req.setFlowStates({ idx: transaction });
 
@@ -36,7 +39,9 @@ module.exports = function handleTransactionWithoutRedirect({
 
       sendJson(req, res, {
         ...transaction.nextStep,
-        nextRoute: getNextRouteFromTransaction(transaction)
+        nextRoute: appendTransactionIdToPath(
+          getNextRouteFromTransaction(transaction),
+          transactionId),
       });
       return;
     case IdxStatus.SUCCESS:
@@ -44,19 +49,19 @@ module.exports = function handleTransactionWithoutRedirect({
       authClient.tokenManager.setTokens(tokens);
       // Redirect back to home page
       sendJson(req, res, {
-        nextRoute: '/'
+        nextRoute: appendTransactionIdToPath('/', transactionId)
        });
       return;
     case IdxStatus.FAILURE:
       // Set next page to current location - error repsonse is saved in session
       // and should be rendered on page reload
       sendJson(req, res, {
-        nextRoute: req.originalUrl
+        nextRoute: appendTransactionIdToPath(req.originalUrl, transactionId)
       });
       return;
     case IdxStatus.TERMINAL:
       sendJson(req, res, {
-        nextRoute: '/terminal'
+        nextRoute: appendTransactionIdToPath('/terminal', transactionId)
       });
       return;
     case IdxStatus.CANCELED:

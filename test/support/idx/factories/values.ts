@@ -57,6 +57,20 @@ export const PhoneMethodTypeValueFactory = IdxValueFactory.params({
   }]
 });
 
+export const OktaVerifyMethodTypeValueFactory = IdxValueFactory.params({
+  name: 'methodType',
+  required: true,
+  type: 'string',
+
+  options: [{
+    label: 'Enter a code',
+    value: 'totp'
+  }, {
+    label: 'Get a push notification',
+    value: 'push'
+  }]
+});
+
 export const OtpMethodTypeValueFactory = IdxValueFactory.params({
   name: 'methodType',
   required: false,
