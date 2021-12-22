@@ -10,13 +10,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+const appendTransactionIdToPath = require('./appendTransactionIdToPath');
 
 module.exports = function redirect({ req, res, path }) {
   const { transactionId } = req;
-
-  const url = new URL(path, 'relative:///');
-  url.searchParams.set('state', transactionId);
-  
-  const redirectPath = `${url.pathname}${url.search}${url.hash}`;
+  const redirectPath = appendTransactionIdToPath(path, transactionId);
   res.redirect(redirectPath);
 };
