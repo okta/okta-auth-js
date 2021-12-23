@@ -93,6 +93,11 @@ export const IdxErrorGoogleAuthenticatorPasscodeInvalidFactory = IdxErrorMessage
   message: 'Your code doesn\'t match our records. Please try again.'
 });
 
+export const IdxErrorOktaVerifyPasscodeInvalidFactory = IdxErrorMessageFactory.params({
+  i18n: { key: 'api.authn.error.PASSCODE_INVALID', params: [] },
+  message: 'Invalid code. Try again.'
+});
+
 export const IdxErrorSessionExpiredFactory = IdxErrorMessageFactory.params({
   i18n: { key: 'idx.session.expired' },
   message: 'You have been logged out due to inactivity. Refresh or return to the sign in screen.',

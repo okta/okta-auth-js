@@ -1,4 +1,8 @@
-import { Authenticator } from './Authenticator';
+import { Authenticator, Credentials } from './Authenticator';
+
+interface VerificationCodeCredentials extends Credentials {
+  passcode: string;
+}
 
 // general authenticator to handle "verificationCode" input
 // it can be used for "email", "phone", "google authenticator"
@@ -8,7 +12,7 @@ export class VerificationCodeAuthenticator extends Authenticator {
     return !!values.verificationCode;
   }
 
-  mapCredentials(values) {
+  mapCredentials(values): VerificationCodeCredentials | Credentials {
     return { passcode: values.verificationCode };
   }
 

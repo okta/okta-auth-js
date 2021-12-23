@@ -1,6 +1,11 @@
 import { RemediationValues } from '../remediators';
 import { IdxAuthenticator, IdxRemediationValue } from '../types/idx-js';
 
+
+export interface Credentials {
+  [key: string]: string;
+}
+
 export abstract class Authenticator {
   meta: IdxAuthenticator;
 
@@ -10,7 +15,7 @@ export abstract class Authenticator {
 
   abstract canVerify(values: RemediationValues): boolean;
 
-  abstract mapCredentials(values: RemediationValues): any; // TODO: add type
+  abstract mapCredentials(values: RemediationValues): Credentials;
 
   abstract getInputs(idxRemediationValue: IdxRemediationValue): any; // TODO: add type
 }

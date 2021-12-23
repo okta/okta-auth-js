@@ -320,6 +320,27 @@ router.post('/verify-authenticator/okta_verify', async (req, res, next) => {
 });
 
 
+router.get('/challenge-authenticator/okta_verify', async (req, res) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator', {
+      title: 'Challenge Okta Verify',
+      input: {
+        type: 'text',
+        name: 'verificationCode',
+      },
+      action: '/challenge-authenticator/okta_verify',
+    })
+  });
+});
+
+router.post('/challenge-authenticator/okta_verify', async (req, res, next) => {
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ verificationCode });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
 // Handle Google Authenticator
 router.get('/enroll-authenticator/google_otp', async (req, res) => {
   renderPage({
