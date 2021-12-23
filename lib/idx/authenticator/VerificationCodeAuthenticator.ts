@@ -1,11 +1,7 @@
-import { Authenticator } from './Authenticator';
+import { Authenticator, Credentials } from './Authenticator';
 
-type VerificationCodeCredentials = {
+interface VerificationCodeCredentials extends Credentials {
   passcode: string;
-  totp?: never;
-} | {
-  passcode?: never;
-  totp: string;
 }
 
 // general authenticator to handle "verificationCode" input
@@ -16,7 +12,7 @@ export class VerificationCodeAuthenticator extends Authenticator {
     return !!values.verificationCode;
   }
 
-  mapCredentials(values): VerificationCodeCredentials {
+  mapCredentials(values): VerificationCodeCredentials | Credentials {
     return { passcode: values.verificationCode };
   }
 
