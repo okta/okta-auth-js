@@ -15,6 +15,7 @@ import { RemediationFlow } from './RemediationFlow';
 import { 
   SelectEnrollProfile,
   EnrollPoll,
+  SelectEnrollmentChannel,
   EnrollProfile,
   SelectAuthenticatorEnroll,
   EnrollAuthenticator,
@@ -27,7 +28,8 @@ export const RegistrationFlow: RemediationFlow = {
   'enroll-profile': EnrollProfile,
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
   'select-authenticator-enroll': SelectAuthenticatorEnroll,
-  'enroll-poll': EnrollPoll,
+  'enroll-polls': EnrollPoll,
+  'select-enrollment-channel': SelectEnrollmentChannel,
   'enroll-authenticator': EnrollAuthenticator,
   'skip': Skip,
 };

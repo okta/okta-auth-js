@@ -230,6 +230,21 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+router.get('/select-enrollment-channel', async (req, res) => {
+  const {
+    idx: { nextStep: { options } }
+  } = req.getFlowStates();
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'verify-phone', {
+      title: 'Select Enrollment Channel',
+      action: '/select-enrollment-channel',
+      options,
+    })
+  });
+});
+
+
 router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
   const { 
     idx: { 

@@ -60,6 +60,7 @@ export type NextStep = {
   inputs?: Input[];
   options?: IdxOption[];
   poll?: IdxPollOptions;
+  nextStep?: NextStep;
 }
 
 export enum IdxFeature {
