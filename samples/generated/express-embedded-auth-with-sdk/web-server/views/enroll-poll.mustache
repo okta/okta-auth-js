@@ -34,6 +34,14 @@
       <div class="row">
       {{>cancel}}
       </div>
+      <div class="row">
+      {{#nextStep}}
+        <form action="{{action}}">
+          <input type="hidden" value="{{nextStep}}"/>
+          <button id="submit-button" class="ui fluid large primary submit button" type="submit">Can't Scan</button>
+        </form>
+      {{/nextStep}}
+      </div>
     </div>
     {{#poll.required}}
       <script type="text/javascript">

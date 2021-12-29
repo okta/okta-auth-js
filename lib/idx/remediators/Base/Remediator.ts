@@ -1,3 +1,4 @@
+import { IdxRemediationValueForm, IdxResponse } from './../../types/idx-js';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -144,18 +145,24 @@ export class Remediator {
     return !!data;
   }
 
-  getNextStep(_context?: IdxContext): NextStep {
+  getNextStep(idxResponse?: IdxResponse): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
     const authenticator = this.getAuthenticator();
     // TODO: remove type field in the next major version change
     // https://oktainc.atlassian.net/browse/OKTA-431749
     const type = authenticator?.type;
+    const nextSteps = this.getPeerRemediations(idxResponse?.neededToProceed);
     return { 
       name, 
       inputs, 
       ...(type && { type }),
       ...(authenticator && { authenticator }),
+      ...(nextSteps?.length && {
+        nextStep: {
+          name: nextSteps[0]
+        }
+      })
     };
   }
 
@@ -230,4 +237,7 @@ export class Remediator {
     return this.remediation.relatesTo?.value;
   }
 
+  protected getPeerRemediations(_remediations: IdxRemediation[]): string[] {
+    return [];
+  }
 }

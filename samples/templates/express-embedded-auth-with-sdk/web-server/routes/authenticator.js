@@ -230,18 +230,29 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.get('/select-enrollment-channel', async (req, res) => {
+router.get('/enroll-authenticator/:authenticator/select-enrollment-channel', async (req, res) => {
+  const authenticator = req.params.authenticator;
   const {
     idx: { nextStep: { options } }
   } = req.getFlowStates();
   renderPage({
     req, res,
-    render: () => renderTemplate(req, res, 'verify-phone', {
+    render: () => renderTemplate(req, res, 'select-enrollment-channel', {
       title: 'Select Enrollment Channel',
-      action: '/select-enrollment-channel',
+      action: `/enroll-authenticator/${authenticator}/select-enrollment-channel`,
       options,
     })
   });
+});
+
+router.post('/enroll-authenticator/:authenticator/select-enrollment-channel', async (req, res, next) => {
+  const { channel, nextStep } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ 
+    channel,
+    nextStep
+  });
+  handleTransaction({ req, res, next, authClient, transaction });
 });
 
 
@@ -260,7 +271,7 @@ router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
     });
   } else {
     const { authenticator: {
-      key, displayName
+      key, displayName, nextStep: furtherStep,
     }} = nextStep;
     renderPage({
       req, res,
@@ -268,6 +279,8 @@ router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
         title: `Enroll ${displayName}`,
         action: `/poll-authenticator/${key}`,
         poll: nextStep.poll,
+        nextStep: furtherStep,
+        nextStepAction: `/enroll-authenticator/${key}/${furtherStep}`
       })
     });
   }

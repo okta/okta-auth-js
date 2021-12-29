@@ -96,7 +96,7 @@ function getIdxMessages(idxResponse: IdxResponse): IdxMessage[] {
 function getNextStep(
   remediator: Remediator, idxResponse: IdxResponse
 ): NextStep {
-  const nextStep = remediator.getNextStep(idxResponse.context);
+  const nextStep = remediator.getNextStep(idxResponse);
   const canSkip = canSkipFn(idxResponse);
   const canResend = canResendFn(idxResponse);
   return {

@@ -60,6 +60,10 @@ export interface IdpConfig {
   name: string;
 }
 
+export interface IdxRemediationValueForm {
+  form: IdxForm;
+}
+
 export interface IdxRemediationValue {
   name: string;
   type?: string;

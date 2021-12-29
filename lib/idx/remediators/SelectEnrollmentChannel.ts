@@ -12,7 +12,11 @@
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
+import { IdxContext, IdxForm, IdxOption, IdxRemediationValue, IdxRemediationValueForm, IdxResponse } from '../types/idx-js';
+import { AuthenticatorData } from './Base/AuthenticatorData';
 import { getAuthenticatorFromRemediation } from './util';
+
+
 
 export type SelectEnrollmentChannelValues = RemediationValues & {
   channel?: string;
@@ -24,13 +28,23 @@ export class SelectEnrollmentChannel extends Remediator {
   values: SelectEnrollmentChannelValues;
 
   canRemediate() {
-    return true;
+    return Boolean(this.values.channel);
   }
 
-  getNextStep() {
+  getNextStep(idxResponse: IdxResponse) {
     const common = super.getNextStep();
-    const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
-    const options = authenticatorFromRemediation.form.value.find(({ name }) => name === 'channel').options;
-    return { ...common, options };
+    const options = this.getChannels();
+    const authenticator = idxResponse.context.currentAuthenticator.value;
+    return {
+      ...common,
+      ...(options && { options }),
+      authenticator,
+    };
+  }
+
+  private getChannels(): IdxOption[] {
+    const authenticator: IdxRemediationValue = getAuthenticatorFromRemediation(this.remediation);
+    // @ts-ignore
+    return authenticator.value.form.value.find(({ name }) => name === 'channel')?.options;
   }
 }

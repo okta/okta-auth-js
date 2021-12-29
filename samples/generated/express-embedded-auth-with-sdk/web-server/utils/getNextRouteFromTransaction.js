@@ -52,8 +52,6 @@ module.exports = function getNextRouteFromTransaction ({ nextStep }) {
       nextRoute = `/enroll-authenticator/${key}/poll`;
       break;
     case 'select-enrollment-channel':
-      nextRoute = '/select-enrollment-channel';
-    case 'select-enrollment-channel':
       nextRoute = `/enroll-authenticator/${key}/select-enrollment-channel`;
       break;
     case 'enroll-authenticator':

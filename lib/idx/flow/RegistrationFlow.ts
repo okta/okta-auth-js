@@ -28,7 +28,7 @@ export const RegistrationFlow: RemediationFlow = {
   'enroll-profile': EnrollProfile,
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
   'select-authenticator-enroll': SelectAuthenticatorEnroll,
-  'enroll-polls': EnrollPoll,
+  'enroll-poll': EnrollPoll,
   'select-enrollment-channel': SelectEnrollmentChannel,
   'enroll-authenticator': EnrollAuthenticator,
   'skip': Skip,

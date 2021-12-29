@@ -13,7 +13,7 @@
 
 import { Remediator, RemediationValues } from './Base/Remediator';
 import { NextStep } from '../../types';
-import { IdxContext } from '../types/idx-js';
+import { IdxRemediation, IdxResponse } from '../types/idx-js';
 
 export interface EnrollPollValues extends RemediationValues {
   startPolling?: boolean;
@@ -28,14 +28,14 @@ export class EnrollPoll extends Remediator {
     return Boolean(this.values.startPolling);
   }
 
-  getNextStep(context?: IdxContext): NextStep {
-    const name = this.getName();
+  getNextStep(idxResponse?: IdxResponse): NextStep {
+    const common = super.getNextStep(idxResponse);
     let authenticator = this.getAuthenticator();
-    if (!authenticator && context?.currentAuthenticator) {
-      authenticator = context.currentAuthenticator.value;
+    if (!authenticator && idxResponse?.context?.currentAuthenticator) {
+      authenticator = idxResponse?.context.currentAuthenticator.value;
     }
     return {
-      name,
+      ...common,
       authenticator,
       poll: {
         required: true,
@@ -47,5 +47,11 @@ export class EnrollPoll extends Remediator {
   getValuesAfterProceed(): EnrollPollValues {
     let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'startPolling');
     return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
+  }
+
+  getPeerRemediations(remediations: IdxRemediation[]) {
+    return remediations
+      .filter(remediation => ['select-enrollment-channel'].includes(remediation.name))
+      .map(remediation => remediation.name);
   }
 }
