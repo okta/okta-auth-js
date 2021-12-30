@@ -42,8 +42,13 @@ export class EnrollmentChannelData extends Remediator {
   getData() {
     return {
       stateHandle: this.values.stateHandle,
-      ...this.values
+      email: this.values.email,
+      phoneNumber: this.values.phoneNumber
     };
   }
 
+  getValuesAfterProceed() {
+    let trimmedValues = Object.keys(this.values).filter(valueKey => !['email', 'phoneNumber'].includes(valueKey));
+    return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
+  }
 }
