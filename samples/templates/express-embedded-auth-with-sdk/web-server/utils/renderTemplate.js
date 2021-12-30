@@ -31,6 +31,7 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     skipAction: getFormActionPath(req, options.skipAction),
     resendAction: getFormActionPath(req, options.resendAction),
     cancelAction: getFormActionPath(req, '/cancel'),
+    nextStepAction: getFormActionPath(req, options.nextStepAction),
     contextualData,
   };
   

@@ -15,6 +15,7 @@ export * from './Base/Remediator';
 export * from './EnrollAuthenticator';
 export * from './EnrollPoll';
 export * from './SelectEnrollmentChannel';
+export * from './EnrollmentChannelData';
 export * from './ChallengeAuthenticator';
 export * from './ChallengePoll';
 export * from './ResetAuthenticator';

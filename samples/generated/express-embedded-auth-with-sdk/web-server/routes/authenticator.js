@@ -246,15 +246,45 @@ router.get('/enroll-authenticator/:authenticator/select-enrollment-channel', asy
 });
 
 router.post('/enroll-authenticator/:authenticator/select-enrollment-channel', async (req, res, next) => {
-  const { channel, nextStep } = req.body;
+  const { channel } = req.body;
   const authClient = getAuthClient(req);
   const transaction = await authClient.idx.proceed({ 
     channel,
-    nextStep
   });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+router.post('/next-step', async (req, res, next) => {
+  const { nextStep } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ nextStep });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+router.get('/enroll-authenticator/:authenticator/enrollment-channel-data', async (req, res) => {
+  const authenticator = req.params.authenticator;
+  const {
+    idx: { nextStep: { options } }
+  } = req.getFlowStates();
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'verify-enrollment-channel', {
+      title: 'Enter phone or email',
+      action: `/enroll-authenticator/${authenticator}/enrollment-channel-data`,
+      options,
+    })
+  });
+});
+
+router.post('/enroll-authenticator/:authenticator/enrollment-channel-data', async (req, res, next) => {
+  const { email, phoneNumber } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ 
+    email,
+    phoneNumber
+  });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
 
 router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
   const { 
@@ -271,16 +301,16 @@ router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
     });
   } else {
     const { authenticator: {
-      key, displayName, nextStep: furtherStep,
-    }} = nextStep;
+      key, displayName,
+    }, nextStep: { name: nextStepName }} = nextStep;
     renderPage({
       req, res,
       render: () => renderTemplate(req, res, 'enroll-poll', {
         title: `Enroll ${displayName}`,
         action: `/poll-authenticator/${key}`,
         poll: nextStep.poll,
-        nextStep: furtherStep,
-        nextStepAction: `/enroll-authenticator/${key}/${furtherStep}`
+        nextStep: nextStepName,
+        nextStepAction: `/next-step`
       })
     });
   }

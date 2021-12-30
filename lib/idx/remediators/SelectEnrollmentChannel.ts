@@ -47,4 +47,21 @@ export class SelectEnrollmentChannel extends Remediator {
     // @ts-ignore
     return authenticator.value.form.value.find(({ name }) => name === 'channel')?.options;
   }
+
+  getData() {
+    return {
+      authenticator: {
+        // @ts-ignore
+        id: this.remediation.value[0].value.form.value[0].value,
+        channel: this.values.channel,
+      },
+      stateHandle: this.values.stateHandle,
+
+    };
+  }
+
+  getValuesAfterProceed() {
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'channel');
+    return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
+  }
 }
