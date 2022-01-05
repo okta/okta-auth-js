@@ -18,7 +18,7 @@
  */
 
  /* eslint-disable camelcase */
-export interface UserClaims {
+export type UserClaims<T = {}> = T & {
   auth_time?: number;
   aud?: string;
   email?: string;
@@ -37,5 +37,5 @@ export interface UserClaims {
   updated_at?: number;
   ver?: number;
   zoneinfo?: string;
-  [propName: string]: any;  // For custom claims that may be configured by the org admin
+  at_hash?: string;
 }
