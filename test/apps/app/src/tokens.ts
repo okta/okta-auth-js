@@ -26,7 +26,7 @@ function tokensHTML(tokens: Tokens): string {
     </thead>
     <tbody>
     ${
-      Object.keys(claims).map((key) => {
+      Object.keys(claims).map((key: keyof UserClaims) => {
         return `<tr><td>${key}</td><td>${claims[key]}</td></tr>`;
       }).join('\n')
     }
