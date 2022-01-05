@@ -40,7 +40,8 @@ export default async (pageName?: string) => {
       pageTitle = 'Select authenticator';
       break;
     }
-    case 'Enter Code': {
+    case 'Enter Code':
+    case 'Challenge email authenticator': {
       selector = ChallengeAuthenticator.pageTitle;
       pageTitle = 'Challenge email authenticator';
       break;

@@ -10,8 +10,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export * from './AuthenticationFlow';
-export * from './FlowSpecification';
-export * from './PasswordRecoveryFlow';
-export * from './RegistrationFlow';
-export * from './RemediationFlow';
+
+import SelectAuthenticator from '../selectors/SelectAuthenticator';
+import selectOption from './selectOption';
+
+export default async (authenticatorKey: string) => {
+  await selectOption('value', authenticatorKey, SelectAuthenticator.options);
+};

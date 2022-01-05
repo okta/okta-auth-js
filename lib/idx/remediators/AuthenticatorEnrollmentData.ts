@@ -13,7 +13,6 @@
 
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 import { getAuthenticatorFromRemediation } from './util';
-import { Authenticator } from '../types';
 
 export type AuthenticatorEnrollmentDataValues =  AuthenticatorDataValues & {
   phoneNumber?: string;
@@ -24,39 +23,35 @@ export class AuthenticatorEnrollmentData extends AuthenticatorData {
 
   values: AuthenticatorEnrollmentDataValues;
 
-  canRemediate() {
-    const authenticator = this.getAuthenticatorFromValues();
-    return !!(authenticator && authenticator.methodType && authenticator.phoneNumber);
-  }
-
   mapAuthenticator() {
-    const authenticatorFromValues = this.getAuthenticatorFromValues();
+    const authenticatorData = this.getAuthenticatorData();
     const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
     return { 
       id: authenticatorFromRemediation.form.value
         .find(({ name }) => name === 'id').value,
-      methodType: authenticatorFromValues.methodType,
-      phoneNumber: authenticatorFromValues.phoneNumber,
+      methodType: authenticatorData.methodType,
+      phoneNumber: authenticatorData.phoneNumber,
     };
   }
 
   getInputAuthenticator() {
     return [
       { name: 'methodType', type: 'string', required: true },
-      { name: 'phoneNumber', type: 'string', required: true },
+      { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
     ];
   }
 
-  protected mapAuthenticatorFromValues(authenticator?: Authenticator): Authenticator {
+  protected mapAuthenticatorDataFromValues(data?) {
     // get mapped authenticator from base class
-    authenticator = super.mapAuthenticatorFromValues(authenticator);
-
+    data = super.mapAuthenticatorDataFromValues(data);
     // add phoneNumber to authenticator if it exists in values
     const { phoneNumber } = this.values;
-    return { 
-      ...authenticator, 
+    data = { 
+      ...(data && data), 
       ...(phoneNumber && { phoneNumber }) 
     };
+
+    return (data.phoneNumber && data.methodType) ? data : null;
   }
 
 }

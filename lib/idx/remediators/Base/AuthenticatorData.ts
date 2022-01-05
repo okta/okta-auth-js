@@ -12,8 +12,8 @@
 
 
 import { Remediator, RemediationValues } from './Remediator';
-import { Authenticator } from '../../types';
 import { IdxRemediationValue, IdxOption, IdxRemediation } from '../../types/idx-js';
+import { Authenticator } from '../../types';
 
 export type AuthenticatorDataValues = RemediationValues & {
   methodType?: string;
@@ -27,30 +27,42 @@ export class AuthenticatorData extends Remediator {
   };
 
   values: AuthenticatorDataValues;
+  authenticator: Authenticator;
 
   constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}) {
     super(remediation, values);
 
-    // Unify authenticator input type
-    const { authenticators } = this.values;
-    const authenticatorKey = this.getAuthenticator().key;
-    const authenticator = (authenticators as Authenticator[])
-        ?.find(authenticator => authenticator.key === authenticatorKey);
-    if (authenticator) {
-      // map
-      this.values.authenticators = authenticators.map(authenticator => {
-        if (authenticatorKey === authenticator.type) {
-          return this.mapAuthenticatorFromValues(authenticator);
+    // set before other data calculation
+    this.authenticator = this.getAuthenticator();
+
+    this.formatAuthenticatorData();
+  }
+
+  protected formatAuthenticatorData() {
+    const authenticatorData = this.getAuthenticatorData();
+    if (authenticatorData) {
+      this.values.authenticatorsData = this.values.authenticatorsData.map(data => {
+        if (data.key === this.authenticator.key) {
+          return this.mapAuthenticatorDataFromValues(data);
         }
-        return authenticator;
+        return data;
       });
     } else {
-      // add
-      this.values.authenticators = [
-        ...authenticators, 
-        this.mapAuthenticatorFromValues()
-      ] as Authenticator[];
+      const data = this.mapAuthenticatorDataFromValues();
+      if (data) {
+        this.values.authenticatorsData.push(data);
+      }
     }
+  }
+
+  protected getAuthenticatorData() {
+    return this.values.authenticatorsData
+      .find(({ key }) => key === this.authenticator.key);
+  }
+
+  canRemediate() {
+    return this.values.authenticatorsData
+      .some(data => data.key === this.authenticator.key);
   }
 
   getNextStep() {
@@ -62,27 +74,16 @@ export class AuthenticatorData extends Remediator {
     };
   }
 
-  // Grab authenticator from authenticators list
-  protected getAuthenticatorFromValues(): Authenticator {
-    if (!this.values.authenticators) {
-      return null;
-    }
-
-    const authenticatorKey = this.getAuthenticator().key;
-    const authenticator = (this.values.authenticators as Authenticator[])
-      .find(authenticator => authenticator.key === authenticatorKey);
-    return authenticator;
-  }
-
-  protected mapAuthenticatorFromValues(authenticator?: Authenticator): Authenticator {
-    // add methodType to authenticator if it exists in values
-    const key = this.getAuthenticator().key;
+  protected mapAuthenticatorDataFromValues(authenticatorData?) {
+    // add methodType to authenticatorData if it exists in values
     const { methodType } = this.values;
-    return { 
-      key, 
-      ...(authenticator && authenticator),
+    const data = { 
+      key: this.authenticator.key, 
+      ...(authenticatorData && authenticatorData),
       ...(methodType && { methodType }) 
     };
+
+    return data.methodType ? data : null;
   }
 
   protected getAuthenticatorFromRemediation(): IdxRemediationValue {
@@ -94,5 +95,13 @@ export class AuthenticatorData extends Remediator {
   private getMethodTypes(): IdxOption[] {
     const authenticator: IdxRemediationValue = this.getAuthenticatorFromRemediation();
     return authenticator.form.value.find(({ name }) => name === 'methodType')?.options;
+  }
+
+  getValuesAfterProceed(): RemediationValues {
+    this.values = super.getValuesAfterProceed();
+    // remove used authenticatorData
+    const authenticatorsData = this.values.authenticatorsData
+      .filter(data => data.key !== this.authenticator.key);
+    return { ...this.values, authenticatorsData };
   }
 }

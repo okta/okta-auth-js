@@ -144,6 +144,10 @@ export const SelectAuthenticatorEnrollRemediationFactory = IdxRemediationFactory
   name: 'select-authenticator-enroll',
 });
 
+export const ResetAuthenticatorRemediationFactory = IdxRemediationFactory.params({
+  name: 'reset-authenticator',
+});
+
 export const RecoverPasswordRemediationFactory = IdxRemediationFactory.params({
   name: 'recover'
 });

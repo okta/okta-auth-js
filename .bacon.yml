@@ -57,7 +57,7 @@ test_suites:
       queue_name: small
     - name: publish
       script_path: ../okta-auth-js/scripts
-      sort_order: '8'
+      sort_order: '9'
       timeout: '60'
       script_name: publish
       criteria: MERGE

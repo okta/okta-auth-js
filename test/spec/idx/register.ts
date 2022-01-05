@@ -863,6 +863,7 @@ describe('idx/register', () => {
             label: 'Email',
             name: 'email',
             required: true,
+            messages: expect.any(Object)
           }]
         }
       });
@@ -1019,7 +1020,7 @@ describe('idx/register', () => {
           },
           inputs: [
             { name: 'methodType', type: 'string', required: true },
-            { name: 'phoneNumber', type: 'string', required: true },
+            { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
           ],
           options: [
             { label: 'SMS', value: 'sms' },
@@ -1229,7 +1230,7 @@ describe('idx/register', () => {
           },
           inputs: [
             { name: 'methodType', type: 'string', required: true },
-            { name: 'phoneNumber', type: 'string', required: true }
+            { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' }
           ],
           options: [
             { label: 'SMS', value: 'sms' },
