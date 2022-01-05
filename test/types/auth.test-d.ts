@@ -105,6 +105,10 @@ const authorizeOptions2: TokenParams = {
   // User
   expectType<boolean>(await authClient.isAuthenticated());
   expectType<UserClaims>(await authClient.getUser());
+  const user = { sub: 'sub', groups: ['fake group'] };
+  expectAssignable<UserClaims<{
+    groups: string[];
+  }>>(user);
 
   // Redirect
   expectType<boolean>(authClient.isLoginRedirect());
