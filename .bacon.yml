@@ -55,13 +55,6 @@ test_suites:
       script_name: e2e-samples
       criteria: MERGE
       queue_name: small
-    # - name: e2e-samples-id-first
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '8'
-    #   timeout: '20'
-    #   script_name: e2e-samples-id-first
-    #   criteria: MERGE
-    #   queue_name: small
     - name: publish
       script_path: ../okta-auth-js/scripts
       sort_order: '9'
