@@ -67,7 +67,7 @@
     "not IE_Mob 11"
   ],
   "engines": {
-    "node": ">=11.0",
+    "node": ">=12.20",
     "yarn": "^1.7.0"
   },
   "dependencies": {
