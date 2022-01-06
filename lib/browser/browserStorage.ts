@@ -166,7 +166,7 @@ var storageUtil: BrowserStorageUtil = {
         var value = {};
         Object.keys(data).forEach(k => {
           if (k.indexOf(key) === 0) { // filter out unrelated cookies
-            value[k.replace(`${key}_`, '')] = JSON.parse(data[k]); // populate with cookie dataa
+            value[k.replace(`${key}_`, '')] = JSON.parse(data[k]); // populate with cookie data
           }
         });
         return JSON.stringify(value);

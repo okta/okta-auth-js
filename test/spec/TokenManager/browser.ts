@@ -642,7 +642,7 @@ describe('TokenManager (browser)', function() {
       it('adds a token', function() {
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed.idToken
         });
       });
     });
@@ -668,7 +668,7 @@ describe('TokenManager (browser)', function() {
         }));
         client.tokenManager.remove('test-idToken');
         oauthUtil.expectTokenStorageToEqual(localStorage, {
-          anotherKey: tokens.standardIdTokenParsed
+          anotherKey: tokens.standardIdTokenParsed.idToken
         });
       });
     });
@@ -699,7 +699,7 @@ describe('TokenManager (browser)', function() {
       it('adds a token', function() {
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         oauthUtil.expectTokenStorageToEqual(sessionStorage, {
-          'test-idToken': tokens.standardIdTokenParsed
+          'test-idToken': tokens.standardIdTokenParsed.idToken
         });
       });
     });
@@ -725,7 +725,7 @@ describe('TokenManager (browser)', function() {
         }));
         client.tokenManager.remove('test-idToken');
         oauthUtil.expectTokenStorageToEqual(sessionStorage, {
-          anotherKey: tokens.standardIdTokenParsed
+          anotherKey: tokens.standardIdTokenParsed.idToken
         });
       });
     });

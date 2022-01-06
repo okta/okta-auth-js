@@ -12,7 +12,7 @@
  */
 import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
-import { isRefreshTokenError, validateToken  } from './oidc/util';
+import { isRefreshTokenError, validateToken, getOAuthUrls, getDefaultTokenParams } from './oidc/util';
 import { isLocalhost, isIE11OrLess } from './features';
 import { TOKEN_STORAGE_NAME } from './constants';
 import SdkClock from './clock';
@@ -34,7 +34,11 @@ import {
   TokenManagerInterface,
   RefreshToken
 } from './types';
-import { REFRESH_TOKEN_STORAGE_KEY } from './constants';
+import {
+  ACCESS_TOKEN_STORAGE_KEY,
+  ID_TOKEN_STORAGE_KEY,
+  REFRESH_TOKEN_STORAGE_KEY
+} from './constants';
 import { TokenService } from './services/TokenService';
 
 const DEFAULT_OPTIONS = {
@@ -238,7 +242,7 @@ export class TokenManager implements TokenManagerInterface {
   add(key, token: Token) {
     var tokenStorage = this.storage.getStorage();
     validateToken(token);
-    tokenStorage[key] = token;
+    tokenStorage[key] = this.getRawToken(token);
     this.storage.setStorage(tokenStorage);
     this.emitAdded(key, token);
     this.setExpireEventTimeout(key, token);
@@ -246,7 +250,7 @@ export class TokenManager implements TokenManagerInterface {
   
   getSync(key) {
     var tokenStorage = this.storage.getStorage();
-    return tokenStorage[key];
+    return this.toTokenObj(key, tokenStorage[key]);
   }
   
   async get(key) {
@@ -257,7 +261,7 @@ export class TokenManager implements TokenManagerInterface {
     const tokens = {} as Tokens;
     const tokenStorage = this.storage.getStorage();
     Object.keys(tokenStorage).forEach(key => {
-      const token = tokenStorage[key];
+      const token = this.toTokenObj(key, tokenStorage[key]);
       if (isAccessToken(token)) {
         tokens.accessToken = token;
       } else if (isIDToken(token)) {
@@ -295,6 +299,63 @@ export class TokenManager implements TokenManagerInterface {
       return 'refreshToken';
     }
     throw new AuthSdkError('Unknown token type');
+  }
+
+  private getRawToken(token: Token): string {
+    return token[this.getTokenType(token)];
+  }
+
+  private toTokenObj(key: string, t: string): Token {
+    const accessTokenKey = this.getStorageKeyByType('accessToken') || ACCESS_TOKEN_STORAGE_KEY;
+    const idTokenKey = this.getStorageKeyByType('idToken') || ID_TOKEN_STORAGE_KEY;
+    const refreshTokenKey = this.getStorageKeyByType('refreshToken') || REFRESH_TOKEN_STORAGE_KEY;
+
+    const tokenParams = getDefaultTokenParams(this.sdk);
+    const urls = getOAuthUrls(this.sdk, tokenParams);
+    const scopes = clone(tokenParams.scopes);
+    const clientId = this.sdk.options.clientId;
+    const now = Math.floor(Date.now()/1000);
+
+    if (refreshTokenKey === key) {
+      return {
+        refreshToken: t,
+        // should not be used, this is the accessToken expire time
+        // TODO: remove "expiresAt" in the next major version OKTA-407224
+        expiresAt: now, // TODO: incorrect value - frok OAuth resp?
+        scopes: scopes,
+        tokenUrl: urls.tokenUrl,
+        authorizeUrl: urls.authorizeUrl,
+        issuer: urls.issuer,
+      }
+    }
+
+    const jwt = this.sdk.token.decode(t);
+
+    if (accessTokenKey === key) {
+      return {
+        accessToken: t,
+        claims: jwt.payload,
+        expiresAt: now,           // TODO: incorrect value - frok OAuth resp?
+        tokenType: 'tokenType',   // TODO: incorrect value - from OAuth resp?
+        scopes: scopes,
+        authorizeUrl: urls.authorizeUrl,
+        userinfoUrl: urls.userinfoUrl
+      }
+    }
+
+    if (idTokenKey === key) {
+      return {
+        idToken: t,
+        claims: jwt.payload,
+        expiresAt: jwt.payload.exp - jwt.payload.iat + now, // adjusting expiresAt to be in local time
+        scopes: scopes,
+        authorizeUrl: urls.authorizeUrl,
+        issuer: urls.issuer,
+        clientId: clientId
+      }
+    }
+
+    // throw here?
   }
 
   setTokens(
@@ -347,7 +408,7 @@ export class TokenManager implements TokenManagerInterface {
       const token = tokens[type];
       if (token) {
         const storageKey = this.getStorageKeyByType(type) || type;
-        storage[storageKey] = token;
+        storage[storageKey] = this.getRawToken(token);
       }
       return storage;
     }, {});
