@@ -8,6 +8,7 @@
 - [#1049](https://github.com/okta/okta-auth-js/pull/1049) Bump minimum supported node version to 12.20
 - [#1050](https://github.com/okta/okta-auth-js/pull/1050) Removes `userAgent` field from oktaAuth instance
 - [#1014](https://github.com/okta/okta-auth-js/pull/1014) Shared transaction storage is automatically cleared on success and error states. Storage is not cleared for "terminal" state which is neither success nor error.
+- [#1051](https://github.com/okta/okta-auth-js/pull/1051) Removes `useMultipleCookies` from CookieStorage options
 
 ### Features
 

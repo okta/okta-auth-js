@@ -53,8 +53,7 @@ const config: OktaAuthOptions = {
 
   storageManager: {
     token: {
-      storageType: 'sessionStorage',
-      useMultipleCookies: true // puts each token in its own cookie
+      storageType: 'sessionStorage'
     },
     cache: {
       storageTypes: [
