@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.0.0
+
+### Breaking Changes
+
+- [#1003](https://github.com/okta/okta-auth-js/pull/1003) Supports generic UserClaims type. Custom claims should be extended by typescript generics, like `UserClaims<{ groups: string[]; }>`
+- [#1049](https://github.com/okta/okta-auth-js/pull/1049) Bump minimum supported node version to 12.20
+
 ## 5.10.0
 
 ### Features
