@@ -66,7 +66,7 @@ function generateSampleTaskFactory(options) {
     });
 
     const hbParams = Object.assign({}, strOptions, {
-      siwVersion: getPublishedModuleVersion('@okta/okta-signin-widget'),
+      siwVersion: process.env.SIW_VERSION || getPublishedModuleVersion('@okta/okta-signin-widget'),
       authJSVersion: getPublishedModuleVersion('@okta/okta-auth-js')
     });
     console.log(`generating sample: "${name}"`, hbParams);

@@ -24,42 +24,8 @@ import {
   OktaAuth
 } from '@okta/okta-auth-js';
 import * as constants from '../../../lib/constants';
-import * as oidc from '../../../lib/oidc';
 
 describe('commonJS interface', () => {
-  let auth;
-  let issuer;
-  describe('instance', () => {
-    beforeEach(() => {
-      issuer =  'http://my-okta-domain';
-      auth = new OktaAuth({ issuer, pkce: false });
-    });
-
-    describe('isInteractionRequired', () => {
-      it('calls OIDC utility', () => {
-        oidc.isInteractionRequired.mockReturnValue(true);
-        const res = auth.isInteractionRequired();
-        expect(res).toBe(true);
-        expect(oidc.isInteractionRequired).toHaveBeenCalledWith(auth, undefined);
-      });
-      it('accepts a hash or search string', () => {
-        oidc.isInteractionRequired.mockReturnValue(true);
-        const str = 'abc=def';
-        const res = auth.isInteractionRequired(str);
-        expect(res).toBe(true);
-        expect(oidc.isInteractionRequired).toHaveBeenCalledWith(auth, str);
-      });
-    });
-    describe('isInteractionRequiredError', () => {
-      it('calls OIDC utility', () => {
-        oidc.isInteractionRequiredError.mockReturnValue(true);
-        const fakeError = { foo: 'bar' };
-        const res = auth.isInteractionRequiredError(fakeError);
-        expect(res).toBe(true);
-        expect(oidc.isInteractionRequiredError).toHaveBeenCalledWith(fakeError);
-      });
-    });
-  });
 
   describe('static type', () => {
     it('exposes features on type and prototype', () => {
@@ -73,9 +39,6 @@ describe('commonJS interface', () => {
       keys.forEach(key => {
         expect(OktaAuth.constants[key]).toBe(constants[key]);
       });
-    });
-    it('exposes `isInteractionRequiredError`', () => {
-      expect(typeof OktaAuth.isInteractionRequiredError).toBe('function');
     });
   });
 });

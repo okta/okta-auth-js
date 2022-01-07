@@ -15,18 +15,11 @@ const getAuthClient = require('./getAuthClient');
 
 module.exports = function getAuthTransaction(req) {
   const authClient = getAuthClient(req);
-  const { state, stateTokenExternalId } = req.query;
+  const { state } = req.query;
   const meta = authClient.transactionManager.load({ state });
   if (meta) {
     console.log(`getAuthTransaction: using existing transaction: ${req.transactionId}`);
     return Promise.resolve({ meta });
-  }
-
-  if (stateTokenExternalId) {
-    console.log('getAuthTransaction: processing email verify callback in a different browser/device');
-    return Promise.resolve({
-      meta: { state }
-    });
   }
 
   console.log(`getAuthTransaction: starting new transaction: ${req.transactionId}`);

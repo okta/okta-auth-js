@@ -45,11 +45,16 @@ app.use(authTransaction);
 // Provide the configuration to the view layer because we show it on the homepage
 app.use((req, res, next) => {
   const { oidc } = getConfig().webServer;
+  const { clientSecret } = oidc;
+  if (!clientSecret) {
+    const error = new Error('Environment variable `CLIENT_SECRET` is not set');
+    return next(error);
+  }
   const displayConfig = Object.assign(
     {},
     oidc,
     {
-      clientSecret: '****' + oidc.clientSecret.substr(oidc.clientSecret.length - 4, 4)
+      clientSecret: '****' + clientSecret.substr(clientSecret.length - 4, 4)
     }
   );
   

@@ -29,7 +29,7 @@ describe('idx/proceed', () => {
     const clientId = 'test-clientId';
     const redirectUri = 'test-redirectUri';
     const transactionMeta = {
-      flow: 'meta-flow',
+      flow: 'fake',
       issuer,
       clientId,
       redirectUri,
@@ -94,23 +94,23 @@ describe('idx/proceed', () => {
     });
 
     it('retrieves saved meta', async () => {
-      const { authClient, transactionMeta, flowSpec } = testContext;
+      const { authClient, transactionMeta } = testContext;
       jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
       await proceed(authClient);
       expect(mocked.transactionMeta.getSavedTransactionMeta).toHaveBeenCalledWith(authClient, {});
       expect(mocked.run.run).toHaveBeenCalledWith(authClient, {
-        ...flowSpec
+        flow: 'fake'
       });
     });
 
     it('retrieves saved meta using state, if provided', async () => {
-      const { authClient, transactionMeta, flowSpec } = testContext;
+      const { authClient, transactionMeta } = testContext;
       jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
       const state = 'foo';
       await proceed(authClient, { state });
       expect(mocked.transactionMeta.getSavedTransactionMeta).toHaveBeenCalledWith(authClient, { state });
       expect(mocked.run.run).toHaveBeenCalledWith(authClient, {
-        ...flowSpec,
+        flow: 'fake',
         state
       });
     });
@@ -123,15 +123,6 @@ describe('idx/proceed', () => {
         const { authClient } = testContext;
         await expect(proceed(authClient)).rejects.toThrowError(new AuthSdkError('Unable to proceed: saved transaction could not be loaded'));
       });
-      it('does not throw if stateTokenExternalId is passed', async () => {
-        const { authClient, flowSpec } = testContext;
-        const stateTokenExternalId = 'foo';
-        await proceed(authClient, { stateTokenExternalId });
-        expect(mocked.run.run).toHaveBeenCalledWith(authClient, {
-          ...flowSpec,
-          stateTokenExternalId
-        });
-      });
     });
 
     describe('with saved meta', () => {
@@ -140,20 +131,11 @@ describe('idx/proceed', () => {
         jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
       });
 
-      it('retrieves flow specification based on saved meta flow', async () => {
-        const { authClient } = testContext;
-        await proceed(authClient);
-        expect(mocked.FlowSpecification.getFlowSpecification).toHaveBeenCalledWith(authClient, 'meta-flow');
-      });
-
       it('calls run, passing along the flowSpec and any options', async () => {
         const { authClient, flowSpec } = testContext;
-        const options = { state: 'bar' };
+        const options = { state: 'bar', ...flowSpec };
         await proceed(authClient, options);
-        expect(mocked.run.run).toHaveBeenCalledWith(authClient, {
-          ...flowSpec,
-          ...options
-        });
+        expect(mocked.run.run).toHaveBeenCalledWith(authClient, options);
       });
     });
 
