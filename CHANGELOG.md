@@ -11,6 +11,8 @@
 
 - [#1028](https://github.com/okta/okta-auth-js/pull/1028) Any error caught in `token.renew()` will be emitted and contain `tokenKey` property
 - [#1027](https://github.com/okta/okta-auth-js/pull/1027) Don't reject `isAuthenticated()` because of failed token renewal
+- [#1032](https://github.com/okta/okta-auth-js/pull/1032) Fixes idx recover password flow with identifier first org policy
+- [#1048](https://github.com/okta/okta-auth-js/pull/1048) Points browser field to UMD bundle 
 
 ## 5.9.1
 
