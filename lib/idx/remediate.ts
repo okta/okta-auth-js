@@ -14,8 +14,8 @@
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
 import { Remediator, RemediationValues } from './remediators';
-import { RunOptions } from './run';
-import { NextStep, IdxMessage } from './types';
+import { NextStep, IdxMessage, FlowIdentifier } from './types';
+import { RemediationFlow } from './flow';
 import { 
   IdxResponse,  
   IdxRemediation,
@@ -29,11 +29,17 @@ interface RemediationResponse {
   terminal?: boolean;
   canceled?: boolean;
 }
+export interface RemediateOptions {
+  remediators?: RemediationFlow;
+  actions?: string[];
+  flow?: FlowIdentifier;
+}
+
 // Return first match idxRemediation in allowed remediators
 export function getRemediator(
   idxRemediations: IdxRemediation[],
   values: RemediationValues,
-  options: RunOptions,
+  options: RemediateOptions,
 ): Remediator {
   const { remediators } = options;
 
@@ -141,10 +147,10 @@ function removeActionFromValues(values) {
 export async function remediate(
   idxResponse: IdxResponse,
   values: RemediationValues,
-  options: RunOptions
+  options: RemediateOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
-  const { remediators } = options;
+  const { remediators, flow } = options;
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -159,6 +165,9 @@ export async function remediate(
   }
 
   const remediator = getRemediator(neededToProceed, values, options);
+  if (!remediator && flow === 'default') {
+    return { idxResponse };
+  }
   
   if (!remediator) {
     throw new AuthSdkError(`

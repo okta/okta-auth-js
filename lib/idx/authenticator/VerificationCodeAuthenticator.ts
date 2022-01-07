@@ -9,11 +9,11 @@ interface VerificationCodeCredentials extends Credentials {
 // a new authenticator class should be created if special cases need to be handled
 export class VerificationCodeAuthenticator extends Authenticator {
   canVerify(values) {
-    return !!values.verificationCode;
+    return (values.verificationCode || values.otp);
   }
 
   mapCredentials(values): VerificationCodeCredentials | Credentials {
-    return { passcode: values.verificationCode };
+    return { passcode: values.verificationCode || values.otp };
   }
 
   getInputs(idxRemediationValue) {

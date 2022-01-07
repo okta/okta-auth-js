@@ -197,23 +197,23 @@ function renderUnauthenticated() {
 }
 
 function handleLoginRedirect() {
-  if (authClient.isInteractionRequired()) {
+  if (authClient.idx.isInteractionRequired()) {
     beginAuthFlow(); // widget will resume transaction
     return Promise.resolve();
   }
   
   {{#if emailVerify}}
-  if (authClient.isEmailVerifyCallback(window.location.search)) {
-    return authClient.parseEmailVerifyCallback(window.location.search).then(function(res) {
+  if (authClient.idx.isEmailVerifyCallback(window.location.search)) {
+    return authClient.idx.parseEmailVerifyCallback(window.location.search).then(function(res) {
       switch (config.flow) {
         {{#if signinWidget}}
         case 'widget':
-          showSigninWidget();
+          showSigninWidget(res);
           break;
         {{/if}}
         {{#if signinForm}}
         case 'form':
-          showSigninForm();
+          showSigninForm(res);
           break;
         {{/if}}
         default:

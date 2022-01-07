@@ -139,8 +139,7 @@ describe('idx/authenticate', () => {
     const identifyResponse = IdentifyResponseFactory.build();
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     const res = await authenticate(authClient, {});
-    expect(res).toEqual({
-      _idxResponse: expect.any(Object),
+    expect(res).toMatchObject({
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'identify',
@@ -380,8 +379,7 @@ describe('idx/authenticate', () => {
         } = testContext;
         jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
-        expect(res).toEqual({
-          _idxResponse: expect.any(Object),
+        expect(res).toMatchObject({
           status: IdxStatus.SUCCESS,
           tokens: tokenResponse.tokens,
         });
@@ -491,8 +489,7 @@ describe('idx/authenticate', () => {
         // Fourth call: proceeds with verify password
         res = await authenticate(authClient, { password: 'mypass' });
         expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'mypass' } });
-        expect(res).toEqual({
-          _idxResponse: expect.any(Object),
+        expect(res).toMatchObject({
           'status': IdxStatus.SUCCESS,
           'tokens': tokenResponse.tokens,
         });
@@ -528,8 +525,7 @@ describe('idx/authenticate', () => {
       it('can authenticate, passing username and password up front', async () => {
         const { authClient, identifyResponse, tokenResponse, interactionCode } = testContext;
         const res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
-        expect(res).toEqual({
-          _idxResponse: expect.any(Object),
+        expect(res).toMatchObject({
           status: IdxStatus.SUCCESS,
           tokens: tokenResponse.tokens,
         });
@@ -578,8 +574,7 @@ describe('idx/authenticate', () => {
             passcode: 'mypass'
           }
         });
-        expect(res).toEqual({
-          _idxResponse: expect.any(Object),
+        expect(res).toMatchObject({
           'status': IdxStatus.SUCCESS,
           'tokens': tokenResponse.tokens,
         });
@@ -694,8 +689,7 @@ describe('idx/authenticate', () => {
             authenticators: [AuthenticatorKey.PHONE_NUMBER] // will remediate select authenticator
           });
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' } });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'authenticator-verification-data',
@@ -742,8 +736,7 @@ describe('idx/authenticate', () => {
               passcode: 'test-code'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.SUCCESS,
             tokens: {
               fakeToken: true
@@ -781,8 +774,7 @@ describe('idx/authenticate', () => {
               passcode: 'invalid-test-code'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -913,8 +905,7 @@ describe('idx/authenticate', () => {
               phoneNumber: '(555) 555-5555'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-authenticator',
@@ -962,8 +953,7 @@ describe('idx/authenticate', () => {
             .toHaveBeenCalledWith('select-authenticator-enroll', {
               authenticator: { id: 'id-phone' }
             });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'authenticator-enrollment-data',
@@ -1046,8 +1036,7 @@ describe('idx/authenticate', () => {
               phoneNumber
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -1166,8 +1155,7 @@ describe('idx/authenticate', () => {
               passcode: 'test-code'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.SUCCESS,
             tokens: {
               fakeToken: true
@@ -1192,8 +1180,7 @@ describe('idx/authenticate', () => {
               passcode: 'invalid-test-code'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -1300,8 +1287,7 @@ describe('idx/authenticate', () => {
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
             authenticator: { id: 'id-google-authenticator' } 
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'challenge-authenticator',
@@ -1354,8 +1340,7 @@ describe('idx/authenticate', () => {
               passcode: 'test-code'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.SUCCESS,
             tokens: {
               fakeToken: true
@@ -1380,8 +1365,7 @@ describe('idx/authenticate', () => {
               passcode: 'invalid-test-code'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -1472,8 +1456,7 @@ describe('idx/authenticate', () => {
               id: 'id-google-authenticator'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-authenticator',
@@ -1523,8 +1506,7 @@ describe('idx/authenticate', () => {
               passcode: verificationCode
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -1658,8 +1640,7 @@ describe('idx/authenticate', () => {
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', {
             authenticator: { id: 'id-okta-verify-authenticator' }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'challenge-authenticator',
@@ -1705,8 +1686,7 @@ describe('idx/authenticate', () => {
               totp: 'test-code'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.SUCCESS,
             tokens: {
               fakeToken: true
@@ -1731,8 +1711,7 @@ describe('idx/authenticate', () => {
               totp: 'invalid-test-code'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             messages: [{
               class: 'ERROR',
@@ -1788,8 +1767,7 @@ describe('idx/authenticate', () => {
               methodType: 'push',
             },
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             nextStep: {
               authenticator: undefined,
@@ -1859,8 +1837,7 @@ describe('idx/authenticate', () => {
               id: 'id-okta-verify-authenticator'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
+          expect(res).toMatchObject({
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-poll',
@@ -1940,31 +1917,28 @@ describe('idx/authenticate', () => {
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
             authenticator: { id: 'id-security-question-authenticator' } 
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
-            status: IdxStatus.PENDING,
-            nextStep: {
-              name: 'challenge-authenticator',
+          expect(res.status).toBe(IdxStatus.PENDING);
+          expect(res.nextStep).toEqual({
+            name: 'challenge-authenticator',
+            type: 'security_question',
+            authenticator: {
+              displayName: 'Security Question',
+              id: expect.any(String),
+              key: 'security_question',
+              methods: [
+                { type: 'security_question' }
+              ],
               type: 'security_question',
-              authenticator: {
-                displayName: 'Security Question',
-                id: expect.any(String),
-                key: 'security_question',
-                methods: [
-                  { type: 'security_question' }
-                ],
-                type: 'security_question',
-                contextualData: {
-                  enrolledQuestion: {
-                    questionKey: 'favorite_sports_player',
-                    question: 'Who is your favorite sports player?'
-                  }
+              contextualData: {
+                enrolledQuestion: {
+                  questionKey: 'favorite_sports_player',
+                  question: 'Who is your favorite sports player?'
                 }
-              },
-              inputs: [
-                { name: 'answer', type: 'string', label: 'Answer', required: true }
-              ]
-            }
+              }
+            },
+            inputs: [
+              { name: 'answer', type: 'string', label: 'Answer', required: true }
+            ]
           });
         });
 
@@ -1988,12 +1962,9 @@ describe('idx/authenticate', () => {
               questionKey: 'favorite_sports_player'
             }
           });
-          expect(res).toEqual({
-            _idxResponse: expect.any(Object),
-            status: IdxStatus.SUCCESS,
-            tokens: {
-              fakeToken: true
-            }
+          expect(res.status).toBe(IdxStatus.SUCCESS);
+          expect(res.tokens).toEqual({
+            fakeToken: true
           });
         });
       });
