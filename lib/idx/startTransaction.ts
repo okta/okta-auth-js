@@ -11,16 +11,18 @@
  */
 
 
-import { run } from './run';
-import { OktaAuth, IdxOptions, IdxTransaction } from '../types';
+import { run, RunOptions } from './run';
+import { OktaAuth, IdxTransaction } from '../types';
 
-// This method only resolves { status: IdxStatus.PENDING } if transaction has already started
 export async function startTransaction(
   authClient: OktaAuth, 
-  options: IdxOptions = {}
+  options: RunOptions = {}
 ): Promise<IdxTransaction> {
   // Clear IDX response cache and saved transaction meta (if any)
   authClient.transactionManager.clear();
 
-  return run(authClient, options);
+  return run(authClient, {
+    exchangeCodeForTokens: false,
+    ...options
+  });
 }

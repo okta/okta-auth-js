@@ -16,13 +16,13 @@ import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaHome from '../pageobjects/OktaHome';
 import { openPKCE } from '../util/appUtils';
-import { loginPopup, loginDirect } from '../util/loginUtils';
+import { loginDirect } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 
 describe('token revoke', () => {
   it('can revoke the refresh token', async () => {
     await openPKCE();
-    await loginPopup();
+    await loginDirect();
     
     // Revoke the token
     await TestApp.revokeRefreshToken();
@@ -38,13 +38,12 @@ describe('token revoke', () => {
 });
 
 describe('E2E token flows', () => {
-  const flow = 'pkce';
   beforeEach(async () => {
     await openPKCE(); // Refresh tokens are supported in PKCE flow only
   });
 
   it('can renew the access token', async () => {
-    await loginPopup(flow);
+    await loginDirect();
     const prevToken = await TestApp.accessToken.then(el => el.getText());
     await TestApp.renewToken();
     await browser.waitUntil(async () => {
@@ -56,7 +55,7 @@ describe('E2E token flows', () => {
   });
   
   it('can refresh all tokens using getWithoutPrompt', async () => {
-    await loginPopup(flow);
+    await loginDirect();
     const prev = {
       idToken: await TestApp.idToken.then(el => el.getText()),
       accessToken: await TestApp.accessToken.then(el => el.getText()),
@@ -78,7 +77,7 @@ describe('E2E token flows', () => {
   });
 
   it('can renew all tokens', async () => {
-    await loginPopup(flow);
+    await loginDirect();
     const prev = {
       idToken: await TestApp.idToken.then(el => el.getText()),
       accessToken: await TestApp.accessToken.then(el => el.getText()),
@@ -100,7 +99,7 @@ describe('E2E token flows', () => {
   });
 
   it('can do token renew if user has signed out from Okta page', async () => {
-    await loginPopup(flow);
+    await loginDirect();
     const prevToken = await TestApp.accessToken.then(el => el.getText());
     let tokenError = await TestApp.tokenError.then(el => el.getText());
     assert(tokenError.trim() === '');

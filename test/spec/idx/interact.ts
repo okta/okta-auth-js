@@ -23,7 +23,8 @@ jest.mock('@okta/okta-idx-js', () => {
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
   return {
-    getTransactionMeta: () => {},
+    createTransactionMeta: () => {},
+    getSavedTransactionMeta: () => {},
     saveTransactionMeta: () => {}
   };
 });
@@ -43,158 +44,382 @@ describe('idx/interact', () => {
       codeChallenge: 'meta-codeChallenge',
       codeChallengeMethod: 'meta-codeChallengeMethod'
     };
-    jest.spyOn(mocked.transactionMeta, 'getTransactionMeta').mockResolvedValue(transactionMeta);
+    const authParams = {
+      issuer: 'authClient-issuer',
+      state: 'authClient-state',
+      scopes: ['authClient'],
+      clientId: 'authClient-clientId',
+      redirectUri: 'authClient-redirectUri'
+    };
+    const tokenParams = {
+      ...authParams,
+      state: 'tp-state',
+      scopes: ['tp-scopes'],
+      codeChallenge: 'tp-codeChallenge',
+      codeChallengeMethod: 'tp-codeChallengeMethod',
+      codeVerifier: 'tp-codeVerifier',
+      responseType: 'tp-responseType'
+    };
+
+    jest.spyOn(mocked.transactionMeta, 'createTransactionMeta').mockImplementation((authClient, options) => {
+      return Object.assign({}, tokenParams, authParams, options);
+    });
     jest.spyOn(mocked.idx, 'interact').mockResolvedValue('idx-interactionHandle');
 
     testContext = {
       transactionMeta,
       authClient: {
-        options: {
-          issuer: 'authClient-issuer',
-          state: 'authClient-state',
-          scopes: ['authClient'],
-          clientId: 'authClient-clientId',
-          redirectUri: 'authClient-redirectUri'
-        }
+        options: authParams,
+        token: {
+          prepareTokenParams: () => Promise.resolve(tokenParams)
+        },
       }
     };
   });
 
   describe('no saved interactionHandle', () => {
-    it('uses state/scopes from function options', async () => {
-      const { authClient } = testContext;
-      const res = await interact(authClient, { state: 'fn-state', scopes: ['fn']});
-      expect(mocked.idx.interact).toHaveBeenCalledWith({
-        'clientId': 'authClient-clientId',
-        'baseUrl': 'authClient-issuer/oauth2',
-        'codeChallenge': 'meta-codeChallenge',
-        'codeChallengeMethod': 'meta-codeChallengeMethod',
-        'redirectUri': 'authClient-redirectUri',
-        'scopes': ['fn'],
-        'state': 'fn-state',
+    describe('with saved (valid) meta', () => {
+      beforeEach(() => {
+        const { transactionMeta } = testContext;
+        jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
       });
-      expect(res).toEqual(expect.objectContaining({
-        'interactionHandle': 'idx-interactionHandle',
-        'meta': {
+  
+      it('uses state/scopes from function options', async () => {
+        const { authClient, transactionMeta } = testContext;
+        jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+        const res = await interact(authClient, { state: 'fn-state', scopes: ['fn']});
+        expect(mocked.idx.interact).toHaveBeenCalledWith({
+          'clientId': 'authClient-clientId',
+          'baseUrl': 'authClient-issuer/oauth2',
           'codeChallenge': 'meta-codeChallenge',
           'codeChallengeMethod': 'meta-codeChallengeMethod',
-          'codeVerifier': 'meta-codeVerifier',
-          'interactionHandle': 'idx-interactionHandle',
-          'scopes': [
-            'fn',
-          ],
+          'redirectUri': 'authClient-redirectUri',
+          'scopes': ['fn'],
           'state': 'fn-state',
-        },
-        'state': 'fn-state',
-      }));
-    });
-
-    it('if no state/scopes in function option, uses values from authClient.options', async () => {
-      const { authClient } = testContext;
-      const res = await interact(authClient, {});
-      expect(mocked.idx.interact).toHaveBeenCalledWith({
-        'clientId': 'authClient-clientId',
-        'baseUrl': 'authClient-issuer/oauth2',
-        'codeChallenge': 'meta-codeChallenge',
-        'codeChallengeMethod': 'meta-codeChallengeMethod',
-        'redirectUri': 'authClient-redirectUri',
-        'scopes': ['authClient'],
-        'state': 'authClient-state',
+        });
+        expect(res).toEqual({
+          'interactionHandle': 'idx-interactionHandle',
+          'meta': {
+            'clientId': 'authClient-clientId',
+            'issuer': 'authClient-issuer',
+            'redirectUri': 'authClient-redirectUri',
+            'codeChallenge': 'meta-codeChallenge',
+            'codeChallengeMethod': 'meta-codeChallengeMethod',
+            'codeVerifier': 'meta-codeVerifier',
+            'interactionHandle': 'idx-interactionHandle',
+            'responseType': 'tp-responseType',
+            'scopes': [
+              'fn',
+            ],
+            'state': 'fn-state',
+          },
+          'state': 'fn-state',
+        });
       });
-      expect(res).toEqual(expect.objectContaining({
-        'interactionHandle': 'idx-interactionHandle',
-        'meta': {
+
+      it('if no state/scopes in function option, uses values from meta', async () => {
+        const { authClient } = testContext;
+        const res = await interact(authClient, {});
+        expect(mocked.idx.interact).toHaveBeenCalledWith({
+          'clientId': 'authClient-clientId',
+          'baseUrl': 'authClient-issuer/oauth2',
           'codeChallenge': 'meta-codeChallenge',
           'codeChallengeMethod': 'meta-codeChallengeMethod',
-          'codeVerifier': 'meta-codeVerifier',
-          'interactionHandle': 'idx-interactionHandle',
-          'scopes': [
-            'authClient',
-          ],
-          'state': 'authClient-state',
-        },
-        'state': 'authClient-state',
-      }));
-    });
-
-    it('if no state/scopes in function option or authClient.options, uses values from meta', async () => {
-      const { authClient } = testContext;
-      authClient.options.state = undefined;
-      authClient.options.scopes = undefined;
-      const res = await interact(authClient, {});
-      expect(mocked.idx.interact).toHaveBeenCalledWith({
-        'clientId': 'authClient-clientId',
-        'baseUrl': 'authClient-issuer/oauth2',
-        'codeChallenge': 'meta-codeChallenge',
-        'codeChallengeMethod': 'meta-codeChallengeMethod',
-        'redirectUri': 'authClient-redirectUri',
-        'scopes': ['meta'],
-        'state': 'meta-state',
-      });
-      expect(res).toEqual(expect.objectContaining({
-        'interactionHandle': 'idx-interactionHandle',
-        'meta': {
-          'codeChallenge': 'meta-codeChallenge',
-          'codeChallengeMethod': 'meta-codeChallengeMethod',
-          'codeVerifier': 'meta-codeVerifier',
-          'interactionHandle': 'idx-interactionHandle',
-          'scopes': [
-            'meta',
-          ],
+          'redirectUri': 'authClient-redirectUri',
+          'scopes': ['meta'],
           'state': 'meta-state',
-        },
-        'state': 'meta-state',
-      }));
-    });
-
-    it('uses activationToken from function options', async () => {
-      const { authClient } = testContext;
-      const res = await interact(authClient, { activationToken: 'fn-activationToken' });
-      expect(mocked.idx.interact).toHaveBeenCalledWith({
-        'clientId': 'authClient-clientId',
-        'baseUrl': 'authClient-issuer/oauth2',
-        'codeChallenge': 'meta-codeChallenge',
-        'codeChallengeMethod': 'meta-codeChallengeMethod',
-        'redirectUri': 'authClient-redirectUri',
-        'scopes': ['authClient'],
-        'state': 'authClient-state',
-        'activationToken': 'fn-activationToken'
-      });
-      expect(res).toEqual(expect.objectContaining({
-        'interactionHandle': 'idx-interactionHandle',
-        'meta': {
-          'codeChallenge': 'meta-codeChallenge',
-          'codeChallengeMethod': 'meta-codeChallengeMethod',
-          'codeVerifier': 'meta-codeVerifier',
+        });
+        expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
-          'scopes': [
-            'authClient',
-          ],
-          'state': 'authClient-state',
-        },
-        'state': 'authClient-state',
-      }));
+          'meta': {
+            'clientId': 'authClient-clientId',
+            'issuer': 'authClient-issuer',
+            'redirectUri': 'authClient-redirectUri',
+            'codeChallenge': 'meta-codeChallenge',
+            'codeChallengeMethod': 'meta-codeChallengeMethod',
+            'codeVerifier': 'meta-codeVerifier',
+            'interactionHandle': 'idx-interactionHandle',
+            'responseType': 'tp-responseType',
+            'scopes': [
+              'meta',
+            ],
+            'state': 'meta-state',
+          },
+          'state': 'meta-state',
+        });
+      });
+
     });
 
-    it('saves returned interactionHandle', async () => {
-      const { authClient } = testContext;
-      jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
-      await interact(authClient);
-      expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, {
-        'codeChallenge': 'meta-codeChallenge',
-        'codeChallengeMethod': 'meta-codeChallengeMethod',
-        'codeVerifier': 'meta-codeVerifier',
-        'interactionHandle': 'idx-interactionHandle',
-        'scopes': ['authClient'],
-        'state': 'authClient-state'
+    describe('no saved meta', () => {
+      it('uses state/scopes from function options', async () => {
+        const { authClient } = testContext;
+        const res = await interact(authClient, { state: 'fn-state', scopes: ['fn']});
+        expect(mocked.idx.interact).toHaveBeenCalledWith({
+          'clientId': 'authClient-clientId',
+          'baseUrl': 'authClient-issuer/oauth2',
+          'codeChallenge': 'tp-codeChallenge',
+          'codeChallengeMethod': 'tp-codeChallengeMethod',
+          'redirectUri': 'authClient-redirectUri',
+          'scopes': ['fn'],
+          'state': 'fn-state',
+        });
+        expect(res).toEqual({
+          'interactionHandle': 'idx-interactionHandle',
+          'meta': {
+            'clientId': 'authClient-clientId',
+            'issuer': 'authClient-issuer',
+            'redirectUri': 'authClient-redirectUri',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'codeVerifier': 'tp-codeVerifier',
+            'interactionHandle': 'idx-interactionHandle',
+            'responseType': 'tp-responseType',
+            'scopes': [
+              'fn',
+            ],
+            'state': 'fn-state',
+          },
+          'state': 'fn-state',
+        });
+      });
+  
+      it('if no state/scopes in function option, uses values from authClient.options', async () => {
+        const { authClient } = testContext;
+        const res = await interact(authClient, {});
+        expect(mocked.idx.interact).toHaveBeenCalledWith({
+          'clientId': 'authClient-clientId',
+          'baseUrl': 'authClient-issuer/oauth2',
+          'codeChallenge': 'tp-codeChallenge',
+          'codeChallengeMethod': 'tp-codeChallengeMethod',
+          'redirectUri': 'authClient-redirectUri',
+          'scopes': ['authClient'],
+          'state': 'authClient-state',
+        });
+        expect(res).toEqual({
+          'interactionHandle': 'idx-interactionHandle',
+          'meta': {
+            'clientId': 'authClient-clientId',
+            'issuer': 'authClient-issuer',
+            'redirectUri': 'authClient-redirectUri',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'codeVerifier': 'tp-codeVerifier',
+            'interactionHandle': 'idx-interactionHandle',
+            'responseType': 'tp-responseType',
+            'scopes': [
+              'authClient',
+            ],
+            'state': 'authClient-state',
+          },
+          'state': 'authClient-state',
+        });
+      });
+  
+      it('if no state/scopes in function option or authClient.options, uses values from default token params', async () => {
+        const { authClient } = testContext;
+        delete authClient.options.state;
+        delete authClient.options.scopes;
+        const res = await interact(authClient, {});
+        expect(mocked.idx.interact).toHaveBeenCalledWith({
+          'clientId': 'authClient-clientId',
+          'baseUrl': 'authClient-issuer/oauth2',
+          'codeChallenge': 'tp-codeChallenge',
+          'codeChallengeMethod': 'tp-codeChallengeMethod',
+          'redirectUri': 'authClient-redirectUri',
+          'scopes': ['tp-scopes'],
+          'state': 'tp-state',
+        });
+        expect(res).toEqual({
+          'interactionHandle': 'idx-interactionHandle',
+          'meta': {
+            'clientId': 'authClient-clientId',
+            'issuer': 'authClient-issuer',
+            'redirectUri': 'authClient-redirectUri',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'codeVerifier': 'tp-codeVerifier',
+            'interactionHandle': 'idx-interactionHandle',
+            'responseType': 'tp-responseType',
+            'scopes': [
+              'tp-scopes',
+            ],
+            'state': 'tp-state',
+          },
+          'state': 'tp-state',
+        });
+      });
+  
+      describe('activationToken', () => {
+        it('uses activationToken from sdk options', async () => {
+          const { authClient } = testContext;
+          authClient.options.activationToken = 'sdk-activationToken';
+          const res = await interact(authClient);
+          expect(mocked.idx.interact).toHaveBeenCalledWith({
+            'clientId': 'authClient-clientId',
+            'baseUrl': 'authClient-issuer/oauth2',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'redirectUri': 'authClient-redirectUri',
+            'scopes': ['authClient'],
+            'state': 'authClient-state',
+            'activationToken': 'sdk-activationToken'
+          });
+          expect(res).toEqual({
+            'interactionHandle': 'idx-interactionHandle',
+            'meta': {
+              'clientId': 'authClient-clientId',
+              'issuer': 'authClient-issuer',
+              'redirectUri': 'authClient-redirectUri',
+              'codeChallenge': 'tp-codeChallenge',
+              'codeChallengeMethod': 'tp-codeChallengeMethod',
+              'codeVerifier': 'tp-codeVerifier',
+              'interactionHandle': 'idx-interactionHandle',
+              'responseType': 'tp-responseType',
+              'scopes': [
+                'authClient',
+              ],
+              'state': 'authClient-state',
+              'activationToken': 'sdk-activationToken'
+            },
+            'state': 'authClient-state',
+          });
+        });
+        it('uses activationToken from function options (overrides sdk option)', async () => {
+          const { authClient } = testContext;
+          authClient.options.activationToken = 'sdk-activationToken';
+          const res = await interact(authClient, { activationToken: 'fn-activationToken' });
+          expect(mocked.idx.interact).toHaveBeenCalledWith({
+            'clientId': 'authClient-clientId',
+            'baseUrl': 'authClient-issuer/oauth2',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'redirectUri': 'authClient-redirectUri',
+            'scopes': ['authClient'],
+            'state': 'authClient-state',
+            'activationToken': 'fn-activationToken'
+          });
+          expect(res).toEqual({
+            'interactionHandle': 'idx-interactionHandle',
+            'meta': {
+              'clientId': 'authClient-clientId',
+              'issuer': 'authClient-issuer',
+              'redirectUri': 'authClient-redirectUri',
+              'codeChallenge': 'tp-codeChallenge',
+              'codeChallengeMethod': 'tp-codeChallengeMethod',
+              'codeVerifier': 'tp-codeVerifier',
+              'interactionHandle': 'idx-interactionHandle',
+              'responseType': 'tp-responseType',
+              'scopes': [
+                'authClient',
+              ],
+              'state': 'authClient-state',
+              'activationToken': 'fn-activationToken'
+            },
+            'state': 'authClient-state',
+          });
+        });
+      });
+
+      describe('recoveryToken', () => {
+        it('uses recoveryToken from sdk options', async () => {
+          const { authClient } = testContext;
+          authClient.options.recoveryToken = 'sdk-recoveryToken';
+          const res = await interact(authClient, { recoveryToken: 'sdk-recoveryToken' });
+          expect(mocked.idx.interact).toHaveBeenCalledWith({
+            'clientId': 'authClient-clientId',
+            'baseUrl': 'authClient-issuer/oauth2',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'redirectUri': 'authClient-redirectUri',
+            'scopes': ['authClient'],
+            'state': 'authClient-state',
+            'recoveryToken': 'sdk-recoveryToken'
+          });
+          expect(res).toEqual({
+            'interactionHandle': 'idx-interactionHandle',
+            'meta': {
+              'clientId': 'authClient-clientId',
+              'issuer': 'authClient-issuer',
+              'redirectUri': 'authClient-redirectUri',
+              'codeChallenge': 'tp-codeChallenge',
+              'codeChallengeMethod': 'tp-codeChallengeMethod',
+              'codeVerifier': 'tp-codeVerifier',
+              'interactionHandle': 'idx-interactionHandle',
+              'responseType': 'tp-responseType',
+              'scopes': [
+                'authClient',
+              ],
+              'state': 'authClient-state',
+              'recoveryToken': 'sdk-recoveryToken'
+            },
+            'state': 'authClient-state',
+          });
+        });
+        it('uses recoveryToken from function options (overrides sdk option)', async () => {
+          const { authClient } = testContext;
+          authClient.options.recoveryToken = 'sdk-recoveryToken';
+          const res = await interact(authClient, { recoveryToken: 'fn-recoveryToken' });
+          expect(mocked.idx.interact).toHaveBeenCalledWith({
+            'clientId': 'authClient-clientId',
+            'baseUrl': 'authClient-issuer/oauth2',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'redirectUri': 'authClient-redirectUri',
+            'scopes': ['authClient'],
+            'state': 'authClient-state',
+            'recoveryToken': 'fn-recoveryToken'
+          });
+          expect(res).toEqual({
+            'interactionHandle': 'idx-interactionHandle',
+            'meta': {
+              'clientId': 'authClient-clientId',
+              'issuer': 'authClient-issuer',
+              'redirectUri': 'authClient-redirectUri',
+              'codeChallenge': 'tp-codeChallenge',
+              'codeChallengeMethod': 'tp-codeChallengeMethod',
+              'codeVerifier': 'tp-codeVerifier',
+              'interactionHandle': 'idx-interactionHandle',
+              'responseType': 'tp-responseType',
+              'scopes': [
+                'authClient',
+              ],
+              'state': 'authClient-state',
+              'recoveryToken': 'fn-recoveryToken'
+            },
+            'state': 'authClient-state',
+          });
+        });
+      });
+  
+      it('saves returned interactionHandle', async () => {
+        const { authClient } = testContext;
+        jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+        await interact(authClient);
+        expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, {
+          'clientId': 'authClient-clientId',
+          'issuer': 'authClient-issuer',
+          'redirectUri': 'authClient-redirectUri',
+          'codeChallenge': 'tp-codeChallenge',
+          'codeChallengeMethod': 'tp-codeChallengeMethod',
+          'codeVerifier': 'tp-codeVerifier',
+          'interactionHandle': 'idx-interactionHandle',
+          'responseType': 'tp-responseType',
+          'scopes': ['authClient'],
+          'state': 'authClient-state'
+        });
       });
     });
+
+
 
   });
 
   describe('with saved interactionHandle', () => {
     beforeEach(() => {
-      testContext.transactionMeta.interactionHandle = 'meta-interactionHandle';
+      const { transactionMeta } = testContext;
+      transactionMeta.interactionHandle = 'meta-interactionHandle';
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
     });
 
     it('should not call idx.interact', async () => {

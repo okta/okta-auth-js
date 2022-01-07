@@ -126,6 +126,9 @@ export interface IdxContext {
     type: string;
     value: Record<string, unknown>;
   };
+  messages?: IdxMessages;
+  success?: IdxRemediation;
+  failure?: IdxRemediation;
 }
 
 export interface IdxMessage {

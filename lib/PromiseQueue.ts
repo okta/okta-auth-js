@@ -14,7 +14,7 @@
 // Methods will be wrapped in a promise and execute sequentially
 // This can be used to prevent concurrent calls to a single method or a set of methods
 
-import { isPromise } from './util';
+import { isPromise, warn } from './util';
 
 interface QueueItem {
   method: () => void;
@@ -38,6 +38,12 @@ class PromiseQueue {
   // If the method returns a promise, it will resolve (or reject) with the value from the method's promise
   push(method: () => void, thisObject: object, ...args: any[]) {
     return new Promise((resolve, reject) => {
+      if (this.queue.length > 0) {
+        warn(
+          'Async method is being called but another async method is already running. ' +
+          'The new method will be delayed until the previous method completes.'
+        );
+      }
       this.queue.push({
         method,
         thisObject,

@@ -15,7 +15,17 @@ import { InteractOptions } from '../interact';
 import { IntrospectOptions } from '../introspect';
 import { APIError, Tokens } from '../../types';
 import { IdxTransactionMeta } from '../../types/Transaction';
-import { IdxAuthenticator, IdxMessage, IdxOption, IdxResponse, IdxForm } from './idx-js';
+import { 
+  IdxActions, 
+  IdxAuthenticator, 
+  IdxContext,
+  IdxForm,
+  IdxMessage, 
+  IdxOption, 
+  IdxRemediation, 
+  IdxResponse, 
+  RawIdxResponse 
+} from './idx-js';
 import { FlowIdentifier } from './FlowIdentifier';
 
 export { IdxMessage } from './idx-js';
@@ -25,6 +35,8 @@ export { PasswordRecoveryOptions } from '../recoverPassword';
 export { ProceedOptions } from '../proceed';
 export { CancelOptions } from '../cancel';
 export { FlowIdentifier };
+export { IdxTransactionMeta };
+export { EmailVerifyCallbackResponse } from '../emailVerify';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
@@ -77,11 +89,20 @@ export interface IdxTransaction {
   meta?: IdxTransactionMeta;
   enabledFeatures?: IdxFeature[];
   availableSteps?: NextStep[];
-  _idxResponse?: IdxResponse; // Temporary for widget conversion. Will not be supported long-term. OKTA-418165
+
+  // from idx-js, used by signin widget
+  proceed: (remediationName: string, params: unknown) => Promise<IdxResponse>;
+  neededToProceed: IdxRemediation[];
+  rawIdxState: RawIdxResponse;
+  interactionCode?: string;
+  actions: IdxActions;
+  context: IdxContext;
 }
 
 export type IdxOptions = InteractOptions & IntrospectOptions & {
   flow?: FlowIdentifier;
+  exchangeCodeForTokens?: boolean;
+  autoRemediate?: boolean;
 };
 
 export interface IdxPollOptions {

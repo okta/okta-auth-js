@@ -24,6 +24,7 @@ import {
 jest.mock('../../../lib/util', () => {
   const orig = jest.requireActual('../../../lib/util');
   return {
+    removeNils: orig.removeNils,
     removeTrailingSlash: orig.removeTrailingSlash,
     warn: () => {}
   };
@@ -61,9 +62,6 @@ describe('idx/transactionMeta', () => {
       },
       token: {
         prepareTokenParams: () => Promise.resolve({})
-      },
-      idx: {
-        getFlow: () => {}
       }
     };
     testContext = {
@@ -93,7 +91,7 @@ describe('idx/transactionMeta', () => {
     it('saves the configured flow', async () => {
       const { authClient } = testContext;
       const flow = 'fake';
-      jest.spyOn(authClient.idx, 'getFlow').mockReturnValue(flow);
+      authClient.options.flow = flow;
       const res = await createTransactionMeta(authClient);
       expect(res.flow).toBe(flow);
     });
@@ -130,7 +128,8 @@ describe('idx/transactionMeta', () => {
             revokeUrl: `${issuer}/oauth2/v1/revoke`,
             tokenUrl: `${issuer}/oauth2/v1/token`,
             userinfoUrl: `${issuer}/oauth2/v1/userinfo`,
-          }
+          },
+          withCredentials: true
         }));
       });
     });
@@ -172,7 +171,8 @@ describe('idx/transactionMeta', () => {
               revokeUrl: `${issuer}/oauth2/v1/revoke`,
               tokenUrl: `${issuer}/oauth2/v1/token`,
               userinfoUrl: `${issuer}/oauth2/v1/userinfo`,
-            }
+            },
+            withCredentials: true
           }));
         });
 
@@ -236,33 +236,67 @@ describe('idx/transactionMeta', () => {
         Object.assign(authParams, { clientId, redirectUri, issuer });
       });
       it('by default, returns true', () => {
-        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+        const { transactionMeta, authParams } = testContext;
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(true);
       });
       it('returns false if configured flow does not match', () => {
-        testContext.transactionMeta.flow = 'x';
-        testContext.authParams.flow = 'y';
-        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(false);
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.flow = 'x';
+        authParams.flow = 'y';
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(false);
       });
       it('does not validate flow when flow = "default"', () => {
-        testContext.transactionMeta.flow = 'x';
-        testContext.authParams.flow = 'default';
-        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.flow = 'x';
+        authParams.flow = 'default';
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(true);
       });
       it('does not validate flow when flow = "proceed"', () => {
-        testContext.transactionMeta.flow = 'x';
-        testContext.authParams.flow = 'proceed';
-        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.flow = 'x';
+        authParams.flow = 'proceed';
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(true);
       });
       it('does not validate flow when flow is not set', () => {
-        testContext.transactionMeta.flow = 'x';
-        testContext.authParams.flow = undefined;
-        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(true);
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.flow = 'x';
+        authParams.flow = undefined;
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(true);
       });
       it('returns false if configured state does not match', () => {
-        testContext.transactionMeta.state = 'x';
-        testContext.authParams.state = 'y';
-        expect(isTransactionMetaValid(testContext.authClient, testContext.transactionMeta)).toBe(false);
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.state = 'x';
+        authParams.state = 'y';
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(false);
       });
+
+      it('returns true if meta has a `state`, but options does not', () => {
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.state = 'abc';
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(true);
+      });
+  
+      it('returns false if `state` does not match value in options', () => {
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.state = 'abc';
+        authParams.state = 'def';
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(false);
+      });
+
+      it('returns false if `codeChallenge` does not match', () => {
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.codeChallenge = 'abc';
+        authParams.codeChallenge = 'def';
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(false);
+      });
+  
+      it('returns false if `codeChallengeMethod` does not match', () => {
+        const { transactionMeta, authParams } = testContext;
+        transactionMeta.codeChallengeMethod = 'abc';
+        authParams.codeChallengeMethod = 'def';
+        expect(isTransactionMetaValid(transactionMeta, authParams)).toBe(false);
+      });
+
     });
 
   });

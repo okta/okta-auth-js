@@ -9,16 +9,22 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
-
+/* eslint complexity:[0,8] */
 import idx from '@okta/okta-idx-js';
 import { OktaAuth, IdxTransactionMeta } from '../types';
-import { getTransactionMeta, saveTransactionMeta } from './transactionMeta';
+import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';
+import { createTransactionMeta } from '.';
+import { removeNils } from '../util';
 
 export interface InteractOptions {
+  withCredentials?: boolean;
   state?: string;
   scopes?: string[];
+  codeChallenge?: string;
+  codeChallengeMethod?: string;
   activationToken?: string;
+  recoveryToken?: string;
 }
 
 export interface InteractResponse {
@@ -37,29 +43,33 @@ function getResponse(meta: IdxTransactionMeta): InteractResponse {
 
 // Begin or resume a transaction. Returns an interaction handle
 export async function interact (authClient: OktaAuth, options: InteractOptions = {}): Promise<InteractResponse> {
-  let state = options.state || authClient.options.state;
-  const meta = await getTransactionMeta(authClient, { state });
+  options = removeNils(options);
 
-  // Saved transaction, return meta
-  if (meta.interactionHandle) {
-    return getResponse(meta);
+  let meta = getSavedTransactionMeta(authClient, options);
+  // If meta exists, it has been validated against all options
+
+  if (meta?.interactionHandle) {
+    return getResponse(meta); // Saved transaction, return meta
   }
 
-  // These properties are always loaded from meta (or calculated fresh)
-  const { codeChallenge, codeChallengeMethod } = meta;
-
-  // These properties are defined by global configuration
-  const { clientId, redirectUri } = authClient.options;
-
-  // These properties can be set in options, but also have a default value in global configuration.
-  state = state || meta.state;
-  const scopes = options.scopes || authClient.options.scopes || meta.scopes;
-
-  // These properties can be set in options
-  const { activationToken } = options;
-
+  // Create new meta, respecting previous meta if it has been set and is not overridden
+  meta = await createTransactionMeta(authClient, { ...meta, ...options });
   const baseUrl = getOAuthBaseUrl(authClient);
-  return idx.interact({
+  let {
+    clientId,
+    redirectUri,
+    state,
+    scopes,
+    withCredentials,
+    codeChallenge,
+    codeChallengeMethod,
+    activationToken,
+    recoveryToken
+  } = meta as IdxTransactionMeta;
+
+  const interactionHandle = await idx.interact({
+    withCredentials,
+
     // OAuth
     clientId, 
     baseUrl,
@@ -70,19 +80,26 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
     // PKCE
     codeChallenge,
     codeChallengeMethod,
-    
-    // Magic Link
-    activationToken
-  }).then(interactionHandle => {
-    const newMeta = {
-      ...meta,
-      interactionHandle,
-      state,
-      scopes
-    };
-    // Save transaction meta so it can be resumed
-    saveTransactionMeta(authClient, newMeta);
 
-    return getResponse(newMeta);
+    // Activation
+    activationToken,
+    
+    // Recovery
+    recoveryToken
   });
+  const newMeta = {
+    ...meta,
+    interactionHandle,
+    
+    // Options which can be passed into interact() should be saved in the meta
+    withCredentials,
+    state,
+    scopes,
+    recoveryToken,
+    activationToken
+  };
+  // Save transaction meta so it can be resumed
+  saveTransactionMeta(authClient, newMeta);
+
+  return getResponse(newMeta);
 }
