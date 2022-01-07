@@ -29,10 +29,13 @@ import {
   CancelOptions,
   IdxOptions,
   IdxTransaction,
+  IdxTransactionMeta,
+  EmailVerifyCallbackResponse
 } from '../idx/types';
 import { InteractOptions, InteractResponse } from '../idx/interact';
 import { IntrospectOptions } from '../idx/introspect';
 import { IdxResponse } from '../idx/types/idx-js';
+import { TransactionMetaOptions } from './Transaction';
 export interface OktaAuth {
   options: OktaAuthOptions;
   getIssuerOrigin(): string;
@@ -110,11 +113,10 @@ export interface TokenParams extends CustomUrls {
   scopes?: string[];
   display?: string;
   ignoreSignature?: boolean;
-  codeChallengeMethod?: string;
   codeVerifier?: string;
   authorizationCode?: string;
   codeChallenge?: string;
-  grantType?: string;
+  codeChallengeMethod?: string;
   interactionCode?: string;
   idp?: string;
   idpScope?: string | string[];
@@ -264,18 +266,43 @@ export interface PkceAPI {
   computeChallenge(str: string): PromiseLike<any>;
 }
 
+
 export interface IdxAPI {
+  // lowest level api
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
+
+  // flow entrypoints
   authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;
   register: (options?: IdxRegistrationOptions) => Promise<IdxTransaction>;
+  recoverPassword: (options?: PasswordRecoveryOptions) => Promise<IdxTransaction>;
   poll: (options?: IdxPollOptions) => Promise<IdxTransaction>;
+
+  // flow control
+  start: (options?: IdxOptions) => Promise<IdxTransaction>;
+  canProceed(options?: { state?: string }): boolean;
   proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
-  startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;
-  recoverPassword: (options?: PasswordRecoveryOptions) => Promise<IdxTransaction>;
-  handleInteractionCodeRedirect: (url: string) => Promise<void>;
   getFlow(): FlowIdentifier;
   setFlow(flow: FlowIdentifier): void;
-  canProceed(options?: { state?: string }): boolean;
+
+  // call `start` instead of `startTransaction`. `startTransaction` will be removed in next major version (7.0)
+  startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;
+
+  // redirect callbacks
+  isInteractionRequired: (hashOrSearch?: string) => boolean;
+  isInteractionRequiredError: (error: Error) => boolean; 
+  handleInteractionCodeRedirect: (url: string) => Promise<void>;
+  isEmailVerifyCallback: (search: string) => boolean;
+  parseEmailVerifyCallback: (search: string) => EmailVerifyCallbackResponse;
+  handleEmailVerifyCallback: (search: string) => Promise<IdxTransaction>;
+  isEmailVerifyCallbackError: (error: Error) => boolean;
+
+  // transaction meta
+  getSavedTransactionMeta: (options?: TransactionMetaOptions) => IdxTransactionMeta;
+  createTransactionMeta: (options?: TransactionMetaOptions) => Promise<IdxTransactionMeta>;
+  getTransactionMeta: (options?: TransactionMetaOptions) => Promise<IdxTransactionMeta>;
+  saveTransactionMeta: (meta: unknown) => void;
+  clearTransactionMeta: () => void;
+  isTransactionMetaValid: (meta: unknown) => boolean;
 }

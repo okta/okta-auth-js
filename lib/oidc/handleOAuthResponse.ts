@@ -29,7 +29,7 @@ import {
 } from '../types';
 import { exchangeCodeForTokens } from './exchangeCodeForTokens';
 import { verifyToken } from './verifyToken';
-import { getDefaultTokenParams } from '.';
+import { getDefaultTokenParams } from './util';
 
 function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
   if (res['error'] || res['error_description']) {

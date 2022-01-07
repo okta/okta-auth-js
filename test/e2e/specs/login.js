@@ -71,7 +71,7 @@ describe('E2E login', () => {
 
       it('can login using a popup window', async() => {
         await bootstrap();
-        await loginPopup(flow);
+        await loginPopup();
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
         await TestApp.logoutRedirect();
@@ -79,7 +79,7 @@ describe('E2E login', () => {
 
       it('can login directly, calling signin() with username and password', async () => {
         await bootstrap();
-        await loginDirect(flow);
+        await loginDirect();
         await TestApp.getUserInfo();
         await TestApp.assertUserInfo();
         await TestApp.logoutRedirect();

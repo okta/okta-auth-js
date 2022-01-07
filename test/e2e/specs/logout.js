@@ -14,14 +14,14 @@
 import TestApp from '../pageobjects/TestApp';
 import OktaHome from '../pageobjects/OktaHome';
 import { openPKCE } from '../util/appUtils';
-import { loginPopup } from '../util/loginUtils';
+import { loginDirect } from '../util/loginUtils';
 import { openOktaHome, switchToMainWindow } from '../util/browserUtils';
 import OktaLogin from '../pageobjects/OktaLogin';
 
 describe('E2E logout', () => {
     beforeEach(async () => {
       await openPKCE();
-      await loginPopup();
+      await loginDirect();
     });
 
     describe('logoutApp', () => {

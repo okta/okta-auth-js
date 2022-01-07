@@ -49,10 +49,10 @@ var config = {
   requireUserSession: 'true',
   flow: 'redirect',
   startService: false,
+  uniq: Date.now() + Math.round(Math.random() * 1000), // to guarantee a unique state
   idps: '',
   useInteractionCodeFlow: false,
 };
-
 
 /* eslint-disable max-statements,complexity */
 function loadConfig() {
@@ -95,9 +95,11 @@ function loadConfig() {
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
     useInteractionCodeFlow = state.useInteractionCodeFlow;
+    config.uniq = state.uniq;
     idps = state.idps;
   } else {
     // Read individually named parameters from URL, or use defaults
+    // Note that "uniq" is not read from the URL to prevent stale state
     issuer = url.searchParams.get('issuer') || config.issuer;
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
@@ -123,6 +125,7 @@ function loadConfig() {
   }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
   // Add all app options to the state, to preserve config across redirects
   state = {
+    uniq: config.uniq,
     issuer,
     clientId,
     storage,
@@ -415,7 +418,7 @@ function renderUnauthenticated() {
 }
 
 function handleLoginRedirect() {
-  if (authClient.isInteractionRequired()) {
+  if (authClient.idx.isInteractionRequired()) {
     beginAuthFlow(); // widget will resume transaction
     return Promise.resolve();
   }
@@ -553,6 +556,7 @@ function showSigninWidget(options) {
     clientId: config.clientId,
     redirectUri: config.redirectUri,
     useInteractionCodeFlow: config.useInteractionCodeFlow,
+    state: JSON.stringify(config.state),
     authParams: {
       issuer: config.issuer
     },
@@ -569,8 +573,7 @@ function showSigninWidget(options) {
   var signIn = new OktaSignIn(options);
 
   signIn.showSignIn({
-    el: '#signin-widget',
-    state: JSON.stringify(config.state)
+    el: '#signin-widget'
   })
   .then(function(response) {
     document.getElementById('flow-widget').style.display = 'none';
@@ -594,7 +597,7 @@ function resumeTransaction(options) {
     return;
   }
 
-  if (authClient.transactionManager.exists()) {
+  if (authClient.transactionManager.exists(options)) {
     return authClient.idx.proceed(options)
       .then(handleTransaction)
       .catch(showError);

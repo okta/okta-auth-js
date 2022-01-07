@@ -11,7 +11,7 @@ function resumeTransaction(options) {
   }
   {{/if}}
 
-  if (authClient.transactionManager.exists()) {
+  if (authClient.transactionManager.exists(options)) {
     return authClient.idx.proceed(options)
       .then(handleTransaction)
       .catch(showError);

@@ -13,6 +13,7 @@
 
 export * from './authenticate';
 export * from './cancel';
+export * from './emailVerify';
 export * from './interact';
 export * from './introspect';
 export * from './poll';

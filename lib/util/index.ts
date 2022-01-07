@@ -12,7 +12,6 @@
 
 
 export * from './console';
-export * from './emailVerify';
 export * from './misc';
 export * from './object';
 export * from './types';
