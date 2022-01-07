@@ -21,6 +21,7 @@ export interface TransactionManagerOptions {
   saveNonceCookie?: boolean; // default true
   saveStateCookie?: boolean; // default true
   saveParamsCookie?: boolean; // default true
+  saveLastResponse?: boolean; // default true
 }
 
 export interface TransactionMetaOptions {
@@ -28,6 +29,12 @@ export interface TransactionMetaOptions {
   oauth?: boolean;
   muteWarning?: boolean;
   state?: string;
+  flow?: FlowIdentifier;
+  codeVerifier?: string;
+  codeChallenge?: string;
+  codeChallengeMethod?: string;
+  activationToken?: string;
+  recoveryToken?: string;
 }
 
 // formerly known as "Redirect OAuth Params"
@@ -37,6 +44,7 @@ export interface OAuthTransactionMeta {
   state: string;
   nonce: string;
   responseType: string | string [];
+  responseMode?: string;
   scopes: string[];
   clientId: string;
   urls: CustomUrls;
@@ -54,6 +62,9 @@ export interface IdxTransactionMeta extends PKCETransactionMeta {
   interactionHandle?: string;
   remediations?: string[];
   flow?: FlowIdentifier;
+  withCredentials?: boolean;
+  activationToken?: string;
+  recoveryToken?: string;
 }
 
 export type CustomAuthTransactionMeta = Record<string, string | undefined>;

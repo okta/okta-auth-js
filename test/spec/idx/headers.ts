@@ -29,6 +29,7 @@ jest.mock('cross-fetch', () => {
 import idx from '@okta/okta-idx-js';
 import { setRequestHeader } from '../../../lib/http';
 import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from '../../../lib/idx/headers';
+const idxPackageJSON = require('@okta/okta-idx-js/package.json');
 
 describe('idx headers', () => {
 
@@ -39,7 +40,7 @@ describe('idx headers', () => {
       domain: 'fake-domain',
       interactionHandle: null,
       stateHandle: 'fake-stateHandle',
-      version: 'fake-version',
+      version: '1.0.0',
       sdk: {
         options: {
           httpRequestClient: () => Promise.resolve({
@@ -81,9 +82,9 @@ describe('idx headers', () => {
         }),
         credentials: 'include',
         headers: {
-          'X-Okta-User-Agent-Extended': 'okta-idx-js/0.23.0',
-          'accept': 'application/ion+json; okta-version=fake-version',
-          'content-type': 'application/ion+json; okta-version=fake-version',
+          'X-Okta-User-Agent-Extended': `okta-idx-js/${idxPackageJSON.version}`,
+          'accept': 'application/ion+json; okta-version=1.0.0',
+          'content-type': 'application/ion+json; okta-version=1.0.0',
         },
         method: 'POST'
       });
@@ -101,9 +102,9 @@ describe('idx headers', () => {
         }),
         credentials: 'include',
         headers: {
-          'X-Okta-User-Agent-Extended': 'okta-idx-js/0.23.0',
-          'accept': 'application/ion+json; okta-version=fake-version',
-          'content-type': 'application/ion+json; okta-version=fake-version',
+          'X-Okta-User-Agent-Extended': `okta-idx-js/${idxPackageJSON.version}`,
+          'accept': 'application/ion+json; okta-version=1.0.0',
+          'content-type': 'application/ion+json; okta-version=1.0.0',
         },
         method: 'POST'
       });
@@ -131,8 +132,8 @@ describe('idx headers', () => {
         credentials: 'include',
         headers: {
           'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
-          'accept': 'application/ion+json; okta-version=fake-version',
-          'content-type': 'application/ion+json; okta-version=fake-version',
+          'accept': 'application/ion+json; okta-version=1.0.0',
+          'content-type': 'application/ion+json; okta-version=1.0.0',
           'my-header': 'my-value',
           'other-header': 'other-value'
         },
@@ -153,8 +154,8 @@ describe('idx headers', () => {
         credentials: 'include',
         headers: {
           'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
-          'accept': 'application/ion+json; okta-version=fake-version',
-          'content-type': 'application/ion+json; okta-version=fake-version',
+          'accept': 'application/ion+json; okta-version=1.0.0',
+          'content-type': 'application/ion+json; okta-version=1.0.0',
           'my-header': 'my-value',
           'other-header': 'other-value'
         },
@@ -179,8 +180,8 @@ describe('idx headers', () => {
         credentials: 'include',
         headers: {
           'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
-          'accept': 'application/ion+json; okta-version=fake-version',
-          'content-type': 'application/ion+json; okta-version=fake-version',
+          'accept': 'application/ion+json; okta-version=1.0.0',
+          'content-type': 'application/ion+json; okta-version=1.0.0',
           'my-header': 'my-value2',
           'other-header': 'other-value2'
         },

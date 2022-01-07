@@ -10,6 +10,12 @@
 - [Installation](#installation)
 - [Usage](#usage)
   - [Concepts](#concepts)
+    - [Flow](#flow)
+      - [Flow Entrypoints](#flow-entrypoints)
+    - [Redirect Callbacks](#redirect-callbacks)
+      - [OAuth callback](#oauth-callback)
+      - [Social/IDP callback](#socialidp-callback)
+      - [Email verify callback](#email-verify-callback)
     - [Approaches](#approaches)
       - [Up-Front approach](#up-front-approach)
       - [On-Demand approach](#on-demand-approach)
@@ -28,6 +34,7 @@
     - [`idx.authenticate`](#idxauthenticate)
     - [`idx.register`](#idxregister)
     - [`idx.recoverPassword`](#idxrecoverpassword)
+    - [`idx.start`](#idxstart)
     - [`idx.startTransaction`](#idxstarttransaction)
     - [`idx.cancel`](#idxcancel)
     - [`idx.proceed`](#idxproceed)
@@ -59,9 +66,91 @@ This module provides convenience methods to support popular scenarios to communi
 
 ### Concepts
 
+#### Flow
+
+In addition to the default authentication flow, this SDK supports several pre-defined flows, such as [register](#idxregister) and [recoverPassword](#idxrecoverpassword). A flow can be started by calling one of the available [flow entrypoints](#flow-entrypoints) or by passing a valid flow identifier string to [`startTransaction`](#idxstarttransaction). The `flow` is saved with the transaction which enables the [proceed](#idxproceed) method to corrrectly handle remediations without additional context. Starting a new flow discards any existing in-progress transaction of a different type. For example, if an authentication flow is in-progress, a call to [authenticate](#idxauthenticate) or [proceed](#idxproceed) will continue using the current transaction but a call to [register](#idxregister) or [recoverPassword](#idxrecoverpassword) will start a new transaction.
+
+```javascript
+
+// a recover password flow can be started by calling the `recoverPassword` entrypoint
+await authClient.idx.recoverPassword();
+const flow = authClient.idx.getFlow(); // "recoverPassword"
+
+// or by passing the flow identifier to `startTransaction`
+await authClient.idx.startTransaction({ flow: 'recoverPassword' })
+
+```
+
+##### Flow Entrypoints
+
+The [flow](#flow) is set automatically when calling one of these methods:
+
+- [`idx.authenticate`](#idxauthenticate)
+- [`idx.register`](#idxregister)
+- [`idx.recoverPassword`](#idxrecoverpassword)
+
+The `flow` will be set to `default` unless otherwise specified in [`idx.startTransaction`](#idxstarttransaction)
+
+#### Redirect Callbacks
+
+A redirect callback occurrs when your app is reloaded in the browser as part of a [flow](#flow).
+During a redirect callback, the app is loaded at a specific URL path that you have defined in your Okta App configuration. Most callbacks can only be handled once and will produce an error if there is an attempt to handle it twice. Typically, the app will redirect itself to a well known or previously saved URL path after the callback logic has been handled to avoid errors on page reload.
+
+> **Note:** Most apps should be prepared to handle one or more redirect callbacks. Depending on how the App sign-on policy is configured, some SPA applications may be able to receive tokens without any redirect. However, logic will need to be added if the policy includes signing in with a [Social / IDP provider)](#socialidp-callback)) or allows [account recovery using email](#email-verify-callback).  
+
+##### OAuth callback
+
+All web applications will handle an OAuth callback which includes an `interaction_code` query parameter. SPA applications can receive an `interactionCode` directly from an IDX [Response](#response). However, they may still need to implement OAuth callback logic if the sign-on policy includes signing in with a [Social / IDP provider](#socialidp-callback).
+
+```javascript
+// https://myapp.mycompany.com/login/callback?interaction_code=ABC&state=XYZ
+if (authClient.isLoginRedirect()) {
+  await authClient.handleLoginRedirect();
+}
+```
+
+##### Social/IDP callback
+
+After signing in with a 3rd party IDP, the user is redirected back to the application. If no further input is needed from the user, then this will be an [OAuth callback](#oauth-callback) containing an `interaction_code` parameter. If further input is required, then the callback will contain an `error` parameter with the value `interaction_required`
+
+```javascript
+const search = window.location.search;
+if (authClient.idx.isInteractionRequired(search)) {
+  await authClient.idx.proceed();
+}
+```
+
+##### Email verify callback
+
+After the user clicks the link in an email, they are redirected back to the application. The query parameters include `state` and `otp`
+
+```javascript
+const { search } = window.location;
+if (authClient.idx.isEmailVerifyCallback(search)) {
+  try {
+    // Proceed, if possible. Throws an `EmailVerifyCallbackError` if proceed is not possible.
+    const { status, nextStep, tokens } = await authClient.idx.handleEmailVerifyCallback(search);
+    if (status === IdxStatus.SUCCESS) {
+      // user has successfully authenticated
+      authClient.tokenManager.setTokens(tokens);
+    } else {
+      // follow nextStep to see what is needed to proceed
+    }
+  } catch (e) {
+    if (authClient.idx.isEmailVerifyCallbackError(e)) {
+      const { otp, state } = e;
+      // you can add special handling for the email verify callback error
+      // by default it will have a message that says
+      // `Enter the OTP code in the originating client: ${otp}`
+    }
+    console.log(e.message);
+  }
+}
+```
+
 #### Approaches
 
-You can work with these methods with `Up-Front` and `On-Demand` approaches, normally a mix of both approaches will be needed when user inputs are required in the middle of the flow (e.g. multiple factors auth). Below are the general explaination of these two approaches, more code examples will be provided with the specific methods.
+You can work with these methods with `Up-Front` and `On-Demand` approaches, normally a mix of both approaches will be needed when user inputs are required in the middle of the flow (e.g. multiple factors auth). Below are the general explanation of these two approaches, more code examples will be provided with the specific methods.
 
 ##### Up-Front approach
 
@@ -132,12 +221,12 @@ It indicates what features are available based on the app / org policy configura
 ###### `availableSteps?`
 
 It provides information for avaiable next steps.
-  
+
 ### API Reference
 
 #### `idx.authenticate`
 
-The convenience method for `authentication` flow.
+The convenience method for starting an `authentication` flow.
 
 Example (Two factors auth with email authenticator):
 
@@ -154,11 +243,11 @@ const {
   password: 'xxx',
   authenticators: [AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */]
 });
-// gather verification code from email (this call should happen in a separated request)
+// submit verification code from email
 const { 
   status, // IdxStatus.SUCCESS
   tokens 
-} = await authClient.idx.authenticate({ verificationCode: 'xxx' });
+} = await authClient.idx.proceed({ verificationCode: 'xxx' });
 ```
 
 **On-Demand**:
@@ -171,31 +260,31 @@ const {
     inputs // [{ name: 'username', ... }, { name: 'password', ... }]
   }
 } = await authClient.idx.authenticate();
-// gather user inputs (this call should happen in a separated request)
+// gather user inputs
 const { 
   status, // IdxStatus.PENDING
   nextStep: { 
     inputs, // [{ name: 'authenticator', ... }]
     options // [{ name: 'email', ... }, ...]
   }
-} = await authClient.idx.authenticate({ username: 'xxx',  password: 'xxx' });
-// select authenticator (this call should happen in a separated request)
+} = await authClient.idx.proceed({ username: 'xxx',  password: 'xxx' });
+// a list of authenticators is shown and the user selects "email"
 const { 
   status, // IdxStatus.PENDING
   nextStep: { 
     inputs // [{ name: 'verificationCode', ... }]
   }
-} = await authClient.idx.authenticate({ authenticator: AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */ });
+} = await authClient.idx.proceed({ authenticator: AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */ });
 // gather verification code from email (this call should happen in a separated request)
 const { 
   status, // IdxStatus.SUCCESS
   tokens 
-} = await authClient.idx.authenticate({ verificationCode: 'xxx' });
+} = await authClient.idx.proceed({ verificationCode: 'xxx' });
 ```
 
 #### `idx.register`
 
-The convenience method for `self service registration` flow.
+The convenience method for starting a `self service registration` flow.
 
 Example (Registration with password authenticator enrollment)
 
@@ -213,11 +302,11 @@ const {
   email: 'xxx',
   authenticators: [AuthenticatorKey.OKTA_PASSWORD /* 'okta_password' */]
 });
-// gather password from user input (this call should happen in a separated request)
+// submit password
 const { 
   status, // IdxStatus.SUCCESS
   tokens 
-} = await authClient.idx.register({ password: 'xxx' });
+} = await authClient.idx.proceed({ password: 'xxx' });
 ```
 
 **On-Demand**:
@@ -229,17 +318,18 @@ const {
     inputs // [{ name: 'firstName', ... }, { name: 'lastName', ... }, { name: 'email', ... }]
   }
 } = await authClient.idx.register();
-// gather user inputs (this call should happen in a separated request)
+// submit user inputs and select password authenticator
 const { 
   status, // IdxStatus.PENDING
   nextStep: { 
     inputs, // [{ name: 'authenticator', ... }]
     options // [{ name: 'password', ... }, ...]
   } 
-} = await authClient.idx.register({
+} = await authClient.idx.proceed({
   firstName: 'xxx',
   lastName: 'xxx',
-  email: 'xxx'
+  email: 'xxx',
+  authenticator: 'password'
 });
 // select authenticator (this call should happen in a separated request)
 const { 
@@ -247,12 +337,12 @@ const {
   nextStep: { 
     inputs // [{ name: 'password', ... }]
   }
-} = await authClient.idx.register({ authenticator: AuthenticatorKey.OKTA_PASSWORD /* 'okta_password' */ });
+} = await authClient.idx.proceed({ authenticator: AuthenticatorKey.OKTA_PASSWORD /* 'okta_password' */ });
 // gather password from user input (this call should happen in a separated request)
 const { 
   status, // IdxStatus.SUCCESS
   tokens 
-} = await authClient.idx.register({ password: 'xxx' });
+} = await authClient.idx.proceed({ password: 'xxx' });
 ```
 
 **Account activation**:
@@ -270,7 +360,7 @@ const {
 
 #### `idx.recoverPassword`
 
-The convenience method for `self service password recovery` flow.
+The convenience method for starting a `self service password recovery` flow. See [Email Verify Callback](#email-verify-callback) for more detailed information on this flow.
 
 Example (Password recovery with email authenticator verification)
 
@@ -286,18 +376,18 @@ const {
   username: 'xxx',
   authenticators: [AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */]
 });
-// gather password from user input (this call should happen in a separated request)
+// submit verification code
 const { 
   status,  // IdxStatus.PENDING
   nextStep: {
     inputs // [{ name: 'password', ... }]
   }
-} = await authClient.idx.recoverPassword({ verificationCode: 'xxx' });
-// gather verification code from email (this call should happen in a separated request)
+} = await authClient.idx.proceed({ verificationCode: 'xxx' });
+// submit new password
 const { 
   status,  // IdxStatus.SUCCESS
   tokens
-} = await authClient.idx.recoverPassword({ password: 'xxx' });
+} = await authClient.idx.proceed({ password: 'xxx' });
 ```
 
 **On-Demand**:
@@ -309,34 +399,38 @@ const {
     inputs // [{ name: 'username', ... }]
   } 
 } = await authClient.idx.recoverPassword();
-// gather username from user input (this call should happen in a separated request)
+// gather username from user input 
 const { 
   status, // IdxStatus.PENDING
   nextStep: { 
     inputs, // [{ name: 'authenticator', ... }] 
     options // [{ name: 'email', ... }, ...]
   } 
-} = await authClient.idx.recoverPassword({ username });
-// select authenticator (this call should happen in a separated request)
+} = await authClient.idx.proceed({ username });
+// user sees a list of authenticators and selects "email"
 const { 
   status, // IdxStatus.PENDING
   nextStep: {
     inputs // [{ name: 'verificationCode', ... }]
   } 
-} = await authClient.idx.recoverPassword({ authenticator: AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */ });
+} = await authClient.idx.proceed({ authenticator: AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */ });
 // gather verification code from email (this call should happen in a separated request)
 const { 
   status, 
   nextStep: {
     inputs // [{ name: 'password', ...}]
   }
-} = await authClient.idx.recoverPassword({ verificationCode: 'xxx' });
-// gather new password from user input (this call should happen in a separated request)
+} = await authClient.idx.proceed({ verificationCode: 'xxx' });
+// submit new password
 const { 
   status, // IdxStatus.SUCCESS 
   tokens
-} = await authClient.idx.register({ password: 'xxx' });
+} = await authClient.idx.proceed({ password: 'xxx' });
 ```
+
+#### `idx.start`
+
+Alias for [idx.startTransaction](#idxstarttransaction)
 
 #### `idx.startTransaction`
 
@@ -344,8 +438,16 @@ Resolves [Start Transaction related fields](#start-transaction-related-fields).
 
 Popular use cases:
 
+- Single entry point when the [flow][] is dynamic
 - Provides `meta` for [Okta Sign-In Widget][] integration.
 - Provides `enabledFeatures` and `availableSteps` for dynamic UI rendering.
+
+```javascript
+
+// start a recoverPassword transaction
+await authClient.idx.startTransaction({ flow: 'recoverPassword' })
+
+```
 
 #### `idx.cancel`
 
@@ -357,23 +459,25 @@ await authClient.idx.cancel();
 
 #### `idx.proceed`
 
-Continues an in-progress idx transaction. This method is useful when handling a callback or in other cases where the flow may not be known. When provided with `{step: stepName}`, continues transaction at specified remediation (step).
+Continues an in-progress idx transaction. If there is no saved transaction, this method will throw. To check for the existence of an in-progress idx transaction, use `idx.canProceed`. When provided with `{step: stepName}`, continues transaction at specified remediation (step).
 
 ```javascript
-await authClient.idx.proceed();
+if (authClient.idx.canProceed()) {
+  await authClient.idx.proceed();
+}
 ```
-
-This method can be used to handle an email verify callback, by passing the `stateTokenExternalId`:
-
-```javascript
-await authClient.idx.proceed({ stateTokenExternalId });
-```
-
-If a `stateTokenExternalId` is not passed and a flow is not currently in progress, this method will throw an exception. To check if there is a flow, call `idx.canProceed`
 
 #### `idx.canProceed`
 
-Returns true if there is a saved transaction.
+Returns true if there is a saved in-progress idx transaction. To test against shared browser storage, pass `state`.
+
+```javascript
+ // checks against sessionStorage, can only proceed in same tab
+authClient.idx.canProceed();
+
+// will check against shared localStorage, allows proceeding in another tab if the state matches
+authClient.idx.canProceed({ state });
+```
 
 #### `idx.poll`
 
@@ -394,13 +498,7 @@ if (pollOptions.required) {
 
 #### `idx.getFlow`
 
-Returns the currently configured `flow`. The `flow` is set automatically when calling one of these methods:
-
-- `idx.authenticate`
-- `idx.register`
-- `idx.recoverPassword`
-
-The saved `flow` enables the `idx.proceed` method to corrrectly handle remediations, without needing additional context. Another purpose of the `flow` is to detect when an in-progress transaction should be abandoned. For example, if a user proceeds through a few steps of the `authorize` flow but then decides they want to `register` instead, the in-progress `authenticate` transaction data will be abandoned and a `register` flow will begin with new transaction data.
+Returns the identifier for the currently configured [flow](#flow).
 
 ```javascript
 const flow: FlowIdentifier = authClient.idx.getFlow();
@@ -408,7 +506,7 @@ const flow: FlowIdentifier = authClient.idx.getFlow();
 
 #### `idx.setFlow`
 
-The `flow` is usually set automatically. This method can be used to manually set the `flow`:
+The `flow` is usually set automatically when calling one of the [flow entrypoints](#flow-entrypoints) or [startTransaction](#idxstarttransaction). This method can be used to manually set the `flow`:
 
 ```javascript
 authClient.idx.setFlow('register');
@@ -423,7 +521,7 @@ try {
   // handle interactionCode and save tokens
   await authClient.idx.handleInteractionCodeRedirect(callbackUrl);
 } catch (err) {
-  if (authClient.isInteractionRequiredError(err)) {
+  if (authClient.idx.isInteractionRequiredError(err)) {
     // need to proceed with required authenticator/s
   }
   throw err;

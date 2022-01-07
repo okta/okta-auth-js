@@ -35,7 +35,6 @@ const authorizeOptions: TokenParams = {
   codeVerifier: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
   authorizationCode: 'ff34f',
   codeChallenge: 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
-  grantType: 'authorization_code',
   interactionCode: 'r34r5',
   loginHint: 'aa',
   timeout: 10,

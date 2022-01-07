@@ -24,7 +24,7 @@ export default (expectedUrl: string) => {
      */
     const windowHandles = browser.getWindowHandles();
 
-    expect(windowHandles).not.toHaveLength(
+    expect(windowHandles.length).not.toBe(
         1,
         // @ts-expect-error
         'A popup was not opened'

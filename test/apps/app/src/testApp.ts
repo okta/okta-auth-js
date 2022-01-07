@@ -21,10 +21,7 @@ import {
   AccessToken, 
   AuthTransaction, 
   TokenParams,
-  isInteractionRequired,
-  isInteractionRequiredError, isAuthorizationCodeError,
-  isEmailVerifyCallback,
-  parseEmailVerifyCallback,
+  isAuthorizationCodeError,
   IdxStatus,
   IdxTransaction,
   AuthState,
@@ -327,6 +324,7 @@ class TestApp {
     });
   }
 
+  // Usually the error should be thrown after rendering to prevent further renders
   renderError(e: Error): void {
     const xhrError = e && (e as any).xhr ? ((e as any).xhr.message || 'Network request failed') : '';
     this._setContent(`
@@ -447,12 +445,12 @@ class TestApp {
   }
 
   async getTokensDirectOIE(username: string, password: string): Promise<Tokens>  {
-    let tokens;
     const idxTransaction: IdxTransaction = await this.oktaAuth.idx.authenticate({ username, password });
-    if (idxTransaction.status === IdxStatus.SUCCESS) {
-      tokens = idxTransaction.tokens;
-    } else {
-      this.renderError(new Error(JSON.stringify(idxTransaction.error)));
+    const { status, tokens, nextStep, error } = idxTransaction;
+    if (status !== IdxStatus.SUCCESS) {
+      const e = new Error(JSON.stringify({ status, nextStep, error }));
+      this.renderError(e);
+      throw e;
     }
     return tokens;
   }
@@ -465,7 +463,9 @@ class TestApp {
       if (v1Transaction.status === 'SUCCESS') {
         sessionToken = v1Transaction.sessionToken;
       } else {
-        this.renderError(new Error(`Transaction returned status: ${v1Transaction.status}`));
+        const error = new Error(`Transaction returned status: ${v1Transaction.status}`);
+        this.renderError(error);
+        throw error;
       }
     }
     // No username or password? try getWithoutPrompt
@@ -577,11 +577,11 @@ class TestApp {
   }
 
   async handleLoginCallback(): Promise<void> {
-    if (isInteractionRequired(this.oktaAuth)) {
+    if (this.oktaAuth.idx.isInteractionRequired()) {
       return this.renderInteractionRequired();
     }
 
-    if (isEmailVerifyCallback(window.location.search)) {
+    if (this.oktaAuth.idx.isEmailVerifyCallback(window.location.search)) {
       return this.renderEmailVerifyCallback();
     }
 
@@ -590,7 +590,7 @@ class TestApp {
         return this.renderCallback(res);
       }, e => {
         // we will not see this if we are intercepting interaction_required earlier
-        if (isInteractionRequiredError(e)) {
+        if (this.oktaAuth.idx.isInteractionRequiredError(e)) {
           return this.renderInteractionRequired();
         }
         if (isAuthorizationCodeError(this.oktaAuth, e)){
@@ -613,9 +613,14 @@ class TestApp {
   }
 
   async renderEmailVerifyCallback(): Promise<void> {
-    const { state, stateTokenExternalId } = parseEmailVerifyCallback(window.location.search);
+    const { state, otp } = this.oktaAuth.idx.parseEmailVerifyCallback(window.location.search);
     await this.render(true);
-    return this.renderWidget({ state, stateTokenExternalId });
+    if (this.oktaAuth.idx.canProceed({ state })) {
+      return this.renderWidget({ state, otp });
+    }
+    const error = new Error(`Enter the OTP code in the original tab: ${otp}`);
+    this.renderError(error);
+    return;
   }
 
   async getTokensFromUrl(): Promise<TokenResponse> {
@@ -718,9 +723,9 @@ class TestApp {
     if (idToken || accessToken) {
       // Authenticated user home page
       return `
-        <strong>Welcome back</strong>
-        <div class="pure-g">
-          <div class="pure-u-1-2">
+        <strong>Authenticated</strong>
+        <div class="flex-row">
+          <div class="left-column">
             <div class="actions authenticated pure-menu">
               <ul class="pure-menu-list">
                 <li class="pure-menu-item">
@@ -756,21 +761,20 @@ class TestApp {
                 ${protectedLink(this)}
               </ul>
             </div>
-          </div>
-          <div class="pure-u-1-2">
             ${logoutLink(this)}
           </div>
+          <div class="right-column">
+            <div id="user-info"></div>
+            ${ tokensHTML({idToken, accessToken, refreshToken})}
+          </div>
         </div>
-        <div id="user-info"></div>
-        <hr/>
-        ${ tokensHTML({idToken, accessToken, refreshToken})}
       `;
     }
 
     // Unauthenticated user, Login page
     return `
       <div class="box">
-      <strong>Greetings, unknown user!</strong>
+      <strong>Unauthenticated</strong>
       </div>
       ${loginLinks(this)}
       `;

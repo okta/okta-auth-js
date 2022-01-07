@@ -21,6 +21,7 @@ export interface VerifyAuthenticatorValues extends RemediationValues {
   questionKey?: string;
   question?: string;
   answer?: string;
+  otp?: string;
 }
 
 // Base class - DO NOT expose static remediationName

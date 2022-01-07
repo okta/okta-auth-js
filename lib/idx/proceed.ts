@@ -24,7 +24,6 @@ import {
 import { RegistrationOptions } from './register';
 import { PasswordRecoveryOptions } from './recoverPassword';
 import { getSavedTransactionMeta } from './transactionMeta';
-import { getFlowSpecification } from './flow';
 import { AuthSdkError } from '../errors';
 
 export type ProceedOptions = AuthenticationOptions
@@ -43,19 +42,19 @@ export async function proceed(
   authClient: OktaAuth,
   options: ProceedOptions = {}
 ): Promise<IdxTransaction> {
-  const { stateTokenExternalId, state } = options;
+  const { state } = options;
   const meta = getSavedTransactionMeta(authClient, { state });
 
-  // Proceed always needs saved transaction meta, except in the case of email verify callback
-  if (!meta && !stateTokenExternalId) {
+  // Proceed always needs saved transaction meta
+  if (!meta) {
     throw new AuthSdkError('Unable to proceed: saved transaction could not be loaded');
   }
 
   // Determine the flow specification based on the saved flow
-  const flowSpec = getFlowSpecification(authClient, meta?.flow);
+  const flow = meta?.flow;
 
   return run(authClient, { 
     ...options, 
-    ...flowSpec
+    flow
   });
 }

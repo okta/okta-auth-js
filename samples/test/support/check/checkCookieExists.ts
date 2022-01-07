@@ -25,13 +25,13 @@ export default (name: string, falseCase: boolean) => {
     const cookie = browser.getCookies(name);
 
     if (falseCase) {
-        expect(cookie).toHaveLength(
+        expect(cookie.length).toBe(
             0,
             // @ts-expect-error
             `Expected cookie "${name}" not to exists but it does`
         );
     } else {
-        expect(cookie).not.toHaveLength(
+        expect(cookie.length).not.toBe(
             0,
             // @ts-expect-error
             `Expected cookie "${name}" to exists but it does not`

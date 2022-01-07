@@ -5,6 +5,7 @@ function showSigninWidget(options) {
     clientId: config.clientId,
     redirectUri: config.redirectUri,
     useInteractionCodeFlow: config.useInteractionCodeFlow,
+    state: JSON.stringify(config.state),
     authParams: {
       issuer: config.issuer
     },
@@ -21,8 +22,7 @@ function showSigninWidget(options) {
   var signIn = new OktaSignIn(options);
 
   signIn.showSignIn({
-    el: '#signin-widget',
-    state: JSON.stringify(config.state)
+    el: '#signin-widget'
   })
   .then(function(response) {
     document.getElementById('flow-widget').style.display = 'none';

@@ -16,20 +16,9 @@ import { OktaAuth, TokenParams } from '../../types';
 import { clone } from '../../util';
 import { getDefaultTokenParams } from './defaultTokenParams';
 import { DEFAULT_CODE_CHALLENGE_METHOD } from '../../constants';
-import pkce from './pkce';
+import PKCE from './pkce';
 
-// Prepares params for a call to /authorize or /token
-export function prepareTokenParams(sdk: OktaAuth, tokenParams?: TokenParams): Promise<TokenParams> {
-  // build params using defaults + options
-  const defaults = getDefaultTokenParams(sdk);
-  tokenParams = Object.assign({}, defaults, clone(tokenParams));
-
-  if (tokenParams.pkce === false) {
-    // Implicit flow or authorization_code without PKCE
-    return Promise.resolve(tokenParams);
-  }
-
-  // PKCE flow
+export function assertPKCESupport(sdk: OktaAuth) {
   if (!sdk.features.isPKCESupported()) {
     var errorMessage = 'PKCE requires a modern browser with encryption support running in a secure context.';
     if (!sdk.features.isHTTPS()) {
@@ -40,36 +29,61 @@ export function prepareTokenParams(sdk: OktaAuth, tokenParams?: TokenParams): Pr
       // eslint-disable-next-line max-len
       errorMessage += '\n"TextEncoder" is not defined. To use PKCE, you may need to include a polyfill/shim for this browser.';
     }
-    return Promise.reject(new AuthSdkError(errorMessage));
+    throw new AuthSdkError(errorMessage);
   }
+}
 
+export async function validateCodeChallengeMethod(sdk: OktaAuth, codeChallengeMethod: string) {
   // set default code challenge method, if none provided
-  if (!tokenParams.codeChallengeMethod) {
-    tokenParams.codeChallengeMethod = DEFAULT_CODE_CHALLENGE_METHOD;
+  codeChallengeMethod = codeChallengeMethod || sdk.options.codeChallengeMethod || DEFAULT_CODE_CHALLENGE_METHOD;
+
+  // validate against .well-known/openid-configuration
+  const wellKnownResponse = await getWellKnown(sdk, null);
+  var methods = wellKnownResponse['code_challenge_methods_supported'] || [];
+  if (methods.indexOf(codeChallengeMethod) === -1) {
+    throw new AuthSdkError('Invalid code_challenge_method');
+  }
+  return codeChallengeMethod;
+}
+
+export async function preparePKCE(sdk: OktaAuth, tokenParams: TokenParams): Promise<TokenParams> {
+  let {
+    codeVerifier,
+    codeChallenge,
+    codeChallengeMethod
+  } = tokenParams;
+
+  // PKCE calculations can be avoided by passing a codeChallenge
+  codeChallenge = codeChallenge || sdk.options.codeChallenge;
+  if (!codeChallenge) {
+    assertPKCESupport(sdk);
+    codeVerifier = codeVerifier || PKCE.generateVerifier();
+    codeChallenge = await PKCE.computeChallenge(codeVerifier);
+  }
+  codeChallengeMethod = await validateCodeChallengeMethod(sdk, codeChallengeMethod);
+
+  // Clone/copy the params. Set PKCE values
+  var clonedParams = clone(tokenParams) || {};
+  Object.assign(clonedParams, tokenParams, {
+    responseType: 'code', // responseType is forced
+    codeVerifier,
+    codeChallenge,
+    codeChallengeMethod
+  });
+  return clonedParams;
+}
+
+// Prepares params for a call to /authorize or /token
+export async function prepareTokenParams(sdk: OktaAuth, tokenParams?: TokenParams): Promise<TokenParams> {
+  // build params using defaults + options
+  const defaults = getDefaultTokenParams(sdk);
+  tokenParams = Object.assign({}, defaults, clone(tokenParams));
+
+
+  if (tokenParams.pkce === false) {
+    // Implicit flow or authorization_code without PKCE
+    return tokenParams;
   }
 
-  // responseType is forced
-  tokenParams.responseType = 'code';
-
-  return getWellKnown(sdk, null)
-    .then(function (res) {
-      var methods = res['code_challenge_methods_supported'] || [];
-      if (methods.indexOf(tokenParams.codeChallengeMethod) === -1) {
-        throw new AuthSdkError('Invalid code_challenge_method');
-      }
-    })
-    .then(function () {
-      if (!tokenParams.codeVerifier) {
-        tokenParams.codeVerifier = pkce.generateVerifier();
-      }
-      return pkce.computeChallenge(tokenParams.codeVerifier);
-    })
-    .then(function (codeChallenge) {
-      // Clone/copy the params. Set codeChallenge
-      var clonedParams = clone(tokenParams) || {};
-      Object.assign(clonedParams, tokenParams, {
-        codeChallenge: codeChallenge,
-      });
-      return clonedParams;
-    });
+  return preparePKCE(sdk, tokenParams);
 }

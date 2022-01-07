@@ -266,15 +266,23 @@ class TestApp {
     const currIdToken = await this.getIdToken();
     return browser.waitUntil(async () => {
       const newIdToken = await this.getIdToken();
-      return currIdToken.idToken !== newIdToken.idToken && newIdToken.idToken;
-    }, 10000, 'wait for id_token renew');
+      if (currIdToken.idToken !== newIdToken.idToken && newIdToken.idToken) {
+        console.log('see that the ID token has changed, renew successful');
+        return true;
+      }
+      console.log('still waiting for ID token renew...');
+    }, 30000, 'wait for id_token renew');
   }
 
   async waitForAccessTokenRenew() {
     const currAccessToken = await this.getAccessToken();
     return browser.waitUntil(async () => {
       const newAccessToken = await this.getAccessToken();
-      return currAccessToken.accessToken !== newAccessToken.accessToken && newAccessToken.accessToken;
+      if (currAccessToken.accessToken !== newAccessToken.accessToken && newAccessToken.accessToken) {
+        console.log('see that the access token has changed, renew successful');
+        return true;
+      }
+      console.log('still waiting for access token renew...');
     }, 10000, 'wait for access_token renew');
   }
 
