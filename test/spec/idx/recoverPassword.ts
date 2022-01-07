@@ -200,8 +200,7 @@ describe('idx/recoverPassword', () => {
       jest.spyOn(identifyResponse.actions, 'currentAuthenticator-recover');
       let res = await recoverPassword(authClient, {});
       expect(identifyResponse.actions['currentAuthenticator-recover']).toHaveBeenCalled();
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
+      expect(res).toMatchObject({
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'identify-recovery',
@@ -216,8 +215,7 @@ describe('idx/recoverPassword', () => {
       jest.spyOn(identifyRecoveryResponse, 'proceed');
       res = await recoverPassword(authClient, { username: 'myname' });
       expect(identifyRecoveryResponse.proceed).toHaveBeenCalledWith('identify-recovery', { identifier: 'myname' });
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
+      expect(res).toMatchObject({
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-authenticate',
@@ -238,8 +236,7 @@ describe('idx/recoverPassword', () => {
       expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
         authenticator: { id: 'id-email' }
       });
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
+      expect(res).toMatchObject({
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'challenge-authenticator',
@@ -266,8 +263,7 @@ describe('idx/recoverPassword', () => {
       expect(verifyEmailResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { 
         credentials: { passcode: 'fake_code' }
       });
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
+      expect(res).toMatchObject({
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'reset-authenticator',
@@ -351,8 +347,7 @@ describe('idx/recoverPassword', () => {
         .mockResolvedValueOnce(identifyResponse);
   
       const res = await recoverPassword(authClient, { username: 'myname' });
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
+      expect(res).toMatchObject({
         status: IdxStatus.TERMINAL,
         messages: [{
           class: 'ERROR',
@@ -392,8 +387,7 @@ describe('idx/recoverPassword', () => {
         .mockResolvedValueOnce(identifyResponse);
   
       const res = await recoverPassword(authClient, { username });
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
+      expect(res).toMatchObject({
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'identify-recovery',
@@ -477,8 +471,7 @@ describe('idx/recoverPassword', () => {
 
       // First call, get identify form
       let res = await recoverPassword(authClient, {});
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
+      expect(res).toMatchObject({
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'identify',
@@ -500,8 +493,7 @@ describe('idx/recoverPassword', () => {
       });
       // Invoke authenticator recover action
       expect(verifyPasswordResponse.actions['currentAuthenticatorEnrollment-recover']).toHaveBeenCalled();
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
+      expect(res).toMatchObject({
         status: IdxStatus.PENDING,
         nextStep: {
           name: 'select-authenticator-authenticate',

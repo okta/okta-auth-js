@@ -10,7 +10,7 @@ var commonConfig = require('./webpack.common.config');
 
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 var baseConfig = _.cloneDeep(commonConfig);
-var babelOptions = _.find(baseConfig.module.rules, (rule) => rule.loader === 'babel-loader').options;
+
 var extraBabelPlugins = [
   ['@babel/plugin-transform-modules-commonjs', {
     'strict': true,
@@ -18,7 +18,20 @@ var extraBabelPlugins = [
   }],
   'add-module-exports' // converts export.default into module.exports
 ];
-babelOptions.plugins = babelOptions.plugins.concat(extraBabelPlugins);
+
+function addBabelPlugins(rule) {
+  if (rule.use) {
+    rule.use.forEach(addBabelPlugins);
+    return;
+  }
+
+  if (rule.loader === 'babel-loader' && rule.options) {
+    rule.options = _.cloneDeep(rule.options);
+    rule.options.plugins = rule.options.plugins.concat(extraBabelPlugins);
+  }
+}
+
+baseConfig.module.rules.forEach(addBabelPlugins);
 
 module.exports = _.extend({}, baseConfig, {
   mode: 'production',

@@ -11,6 +11,11 @@
   line-height: 24px;
 }
 
+#access-token, #id-token, #refresh-token {
+  max-width: 300px;
+  overflow: scroll;
+}
+
 #form-content {
   flex-grow: 1
 }

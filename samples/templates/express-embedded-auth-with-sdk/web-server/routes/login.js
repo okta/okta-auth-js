@@ -76,17 +76,14 @@ router.get('/login/callback', async (req, res, next) => {
   const authClient = getAuthClient(req);
 
   try {
-    if (authClient.isEmailVerifyCallback(search)) {
-      const { state, stateTokenExternalId } = authClient.parseEmailVerifyCallback(search);
-      const transaction = await authClient.idx.authenticate({ 
-        state,
-        stateTokenExternalId
-      });
+    if (authClient.idx.isEmailVerifyCallback(search)) {
+      // may throw an EmailVerifyCallbackError if proceed is not possible
+      const transaction = await authClient.idx.handleEmailVerifyCallback(search);
       handleTransaction({ req, res, next, authClient, transaction });
       return;
     }
 
-    if (authClient.isInteractionRequired(search)) {
+    if (authClient.idx.isInteractionRequired(search)) {
       const error = new Error(
         'Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.'
       );

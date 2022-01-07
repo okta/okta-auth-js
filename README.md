@@ -1838,6 +1838,10 @@ We have implemented a small SPA app, located at `./test/app/` which is used inte
 
 The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the original PR.
 
+### From 5.x to 6.x
+
+* All async [IDX API](docs/idx.md) methods will either resolve with an IDX transaction object or throw an exception. In the previous version some exceptions were caught and returned as the `error` property on an IDX transaction object.
+
 ### From 4.x to 5.x
 
 * Token auto renew requires [running OktaAuth as a service](#running-as-a-service). To start the service, call [start()](#start). `start` will also call [updateAuthState](#authstatemanagerupdateauthstate) to set an initial [AuthState](#authstatemanager)

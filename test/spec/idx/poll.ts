@@ -71,6 +71,7 @@ describe('idx/poll', () => {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       },
       idx: {
+        getFlow: () => {},
         setFlow: () => {}
       }
     };
@@ -113,7 +114,15 @@ describe('idx/poll', () => {
       })
     });
 
-    const sessionExpiredResponse = IdxErrorSessionExpiredFactory.build();
+    const sessionExpiredResponse = IdxResponseFactory.build({
+      rawIdxState: RawIdxResponseFactory.build({
+        messages: IdxMessagesFactory.build({
+          value: [
+            IdxErrorSessionExpiredFactory.build()
+          ]
+        })
+      })
+    });
 
     testContext = {
       authClient,
@@ -130,6 +139,11 @@ describe('idx/poll', () => {
       authClient,
       enrollPollResponse
     } = testContext;
+
+    chainResponses([
+      enrollPollResponse,
+      enrollPollResponse,
+    ]);
 
     jest.spyOn(mocked.introspect, 'introspect')
       .mockResolvedValue(enrollPollResponse);
@@ -159,8 +173,9 @@ describe('idx/poll', () => {
       .mockResolvedValueOnce(successCheckEmailResponse);
     jest.spyOn(enrollPollResponse, 'proceed');
 
-    const { nextStep } = await proceed(authClient, {});
-    const transaction = await poll(authClient, {refresh: nextStep.poll.refresh});
+    const res = await proceed(authClient, {});
+    const refresh = res.nextStep.poll.refresh;
+    const transaction = await poll(authClient, { refresh });
     expect(enrollPollResponse.proceed).toHaveBeenCalledTimes(3);
     expect(transaction.status).toEqual(IdxStatus.TERMINAL);
   });
@@ -207,7 +222,7 @@ describe('idx/poll', () => {
     ]);
     jest.spyOn(mocked.introspect, 'introspect')
       .mockResolvedValueOnce(enrollPollResponse)
-      .mockResolvedValueOnce(sessionExpiredResponse);
+      .mockRejectedValueOnce(sessionExpiredResponse);
 
     const transaction = await poll(authClient, { refresh: 100 });
     expect(transaction.status).toEqual(IdxStatus.FAILURE);
@@ -230,8 +245,15 @@ describe('idx/poll', () => {
 
   it('issues a warning when no polling remediations available', async () => {
     const {
-      authClient
+      authClient,
+      enrollPollResponse
     } = testContext;
+    chainResponses([
+      enrollPollResponse,
+      enrollPollResponse,
+    ]);
+    jest.spyOn(mocked.introspect, 'introspect')
+    .mockResolvedValueOnce(enrollPollResponse);
     jest.spyOn(mocked.util, 'warn');
     await poll(authClient);
     expect(mocked.util.warn).toHaveBeenCalledTimes(1);

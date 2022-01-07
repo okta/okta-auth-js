@@ -25,15 +25,15 @@ export default (obsolete: never, falseCase: boolean) => {
     const windowHandles = browser.getWindowHandles();
 
     if (falseCase) {
-        expect(windowHandles)
-            .toHaveLength(
+        expect(windowHandles.length)
+            .toBe(
                 1,
                 // @ts-expect-error
                 'A new window should not have been opened'
             );
     } else {
-        expect(windowHandles)
-            .not.toHaveLength(
+        expect(windowHandles.length)
+            .not.toBe(
                 1,
                 // @ts-expect-error
                 'A new window has been opened'

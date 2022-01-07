@@ -7,6 +7,7 @@ var config = {
   requireUserSession: '{{ requireUserSession }}',
   flow: '{{ flow }}',
   startService: false,
+  uniq: Date.now() + Math.round(Math.random() * 1000), // to guarantee a unique state
   {{#if signinWidget}}
   idps: '',
   {{/if}}
@@ -16,7 +17,6 @@ var config = {
   useInteractionCodeFlow: true,
   {{/if}}
 };
-
 
 /* eslint-disable max-statements,complexity */
 function loadConfig() {
@@ -61,11 +61,13 @@ function loadConfig() {
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
     useInteractionCodeFlow = state.useInteractionCodeFlow;
+    config.uniq = state.uniq;
     {{#if signinWidget}}
     idps = state.idps;
     {{/if}}
   } else {
     // Read individually named parameters from URL, or use defaults
+    // Note that "uniq" is not read from the URL to prevent stale state
     issuer = url.searchParams.get('issuer') || config.issuer;
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
@@ -95,6 +97,7 @@ function loadConfig() {
   }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
   // Add all app options to the state, to preserve config across redirects
   state = {
+    uniq: config.uniq,
     issuer,
     clientId,
     storage,

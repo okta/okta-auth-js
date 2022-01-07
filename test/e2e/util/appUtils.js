@@ -16,11 +16,16 @@ import TestApp from '../pageobjects/TestApp';
 
 const ISSUER = process.env.ISSUER;
 const CLIENT_ID = process.env.CLIENT_ID;
+const ORG_OIE_ENABLED = process.env.ORG_OIE_ENABLED;
 
 const flows = ['implicit', 'pkce'];
 
 async function openImplicit(options) {
-  options = Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: false }, options);
+  options = Object.assign({
+    issuer: ISSUER,
+    clientId: CLIENT_ID,
+    pkce: false
+  }, options);
   await TestApp.open(options);
   await TestApp.selectPkceOptionOff();
   await TestApp.pkceOptionOff.then( el=> el.isSelected().then(isSelected=>{
@@ -35,7 +40,12 @@ async function openImplicit(options) {
 }
 
 async function openPKCE(options, openInNewWindow) {
-  options = Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: true }, options);
+  options = Object.assign({
+    useInteractionCodeFlow: !!ORG_OIE_ENABLED,
+    issuer: ISSUER,
+    clientId: CLIENT_ID,
+    pkce: true
+  }, options);
   await TestApp.open(options, openInNewWindow);
   await TestApp.pkceOptionOn.then(el => el.isSelected()).then(isSelected => {
     assert(isSelected);

@@ -32,9 +32,9 @@ router.get('/login', (req, res, next) => {
         state,
       } = meta;
 
-      const { stateTokenExternalId } = req.query;
       console.log('renderLoginWithWidget: using interaction handle: ', interactionHandle);
       const { clientId, redirectUri, issuer, scopes } = getConfig().webServer.oidc;
+      const { otp } = req.query;
       const widgetConfig = {
         baseUrl: issuer.split('/oauth2')[0],
         clientId: clientId,
@@ -45,10 +45,10 @@ router.get('/login', (req, res, next) => {
         },
         useInteractionCodeFlow: true,
         state,
-        stateTokenExternalId,
         interactionHandle,
         codeChallenge,
         codeChallengeMethod,
+        otp
       };
       res.render('login', {
         siwVersion: '5.14.1',
@@ -69,15 +69,21 @@ router.get('/login', (req, res, next) => {
 router.get('/login/callback', async (req, res, next) => {
   const parsedUrl = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
   const { search, href } = parsedUrl;
-  const { state, stateTokenExternalId } = req.query;
+  const { state, otp } = req.query;
   const authClient = getAuthClient(req);
 
-  if (authClient.isEmailVerifyCallback(search)) {
-    res.redirect(`/login?state=${state}&stateTokenExternalId=${stateTokenExternalId}`);
-    return;
+  if (authClient.idx.isEmailVerifyCallback(search)) {
+    if (authClient.idx.canProceed({ state })) {
+      res.redirect(`/login?state=${state}&otp=${otp}`);
+      return;
+    } else {
+      const error = new Error(`Enter the OTP code in the original tab: ${otp}`);
+      next(error);
+      return;
+    }
   }
 
-  if (authClient.isInteractionRequired(search)) {
+  if (authClient.idx.isInteractionRequired(search)) {
     res.redirect(`/login?state=${state}`);
     return;
   }
