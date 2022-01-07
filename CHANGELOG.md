@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.0.0
+
+### Breaking Changes
+
+- [#1003](https://github.com/okta/okta-auth-js/pull/1003) Supports generic UserClaims type. Custom claims should be extended by typescript generics, like `UserClaims<{ groups: string[]; }>`
+- [#1049](https://github.com/okta/okta-auth-js/pull/1049) Bump minimum supported node version to 12.20
+- [#1050](https://github.com/okta/okta-auth-js/pull/1050) Removes `userAgent` field from oktaAuth instance
+
 ## 5.11.0
 
 - [#1064](https://github.com/okta/okta-auth-js/pull/1064) Supports skip authenticator in idx authentication flow

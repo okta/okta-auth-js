@@ -42,21 +42,6 @@ function assertValidConfig(args: OktaAuthOptions) {
   }
 }
 
-function getUserAgent(args: OktaAuthOptions, sdkValue: string): string {
-  var userAgent = args.userAgent || {};
-
-  if (userAgent.value) {
-    return userAgent.value;
-  }
-
-  if (userAgent.template) {
-    return userAgent.template.replace('$OKTA_AUTH_JS', sdkValue);
-  }
-
-  return sdkValue;
-}
-
 export {
-  assertValidConfig,
-  getUserAgent
+  assertValidConfig
 };
