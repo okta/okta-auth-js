@@ -11,9 +11,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { getOAuthUrls } from '../oidc';
 import { CustomUrls, OAuthResponse, OktaAuth, TokenParams, TokenResponse } from '../types';
-import { getDefaultTokenParams } from './util';
+import { getOAuthUrls, getDefaultTokenParams } from './util';
 import { clone } from '../util';
 import { postToTokenEndpoint } from './endpoints/token';
 import { handleOAuthResponse } from './handleOAuthResponse';

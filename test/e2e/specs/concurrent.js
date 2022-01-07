@@ -13,12 +13,12 @@
 
 import TestApp from '../pageobjects/TestApp';
 import { openPKCE } from '../util/appUtils';
-import { loginPopup } from '../util/loginUtils';
+import { loginDirect } from '../util/loginUtils';
 
 describe('concurrent API use', () => {
   beforeEach(async () => {
     await openPKCE();
-    await loginPopup();
+    await loginDirect();
   });
 
   afterEach(async () => {

@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { OktaAuth, IdxStatus } from '@okta/okta-auth-js';
+import { OktaAuth, IdxStatus, urlParamsToObject } from '@okta/okta-auth-js';
 import { formTransformer } from './formTransformer';
 import oidcConfig from './config';
 import './App.css';
 
-const oktaAuth = new OktaAuth(oidcConfig);
+function createOktaAuthInstance() {
+  const { state } = urlParamsToObject(window.location.search);
+  return new OktaAuth(Object.assign({}, oidcConfig, {
+    state
+  }));
+}
+
+const oktaAuth = createOktaAuthInstance();
 
 export default function App() {
   const history = useHistory();
@@ -35,12 +42,20 @@ export default function App() {
     }
     
     const handleEmailVerifyCallback = async () => {
-      const { state, stateTokenExternalId } = await oktaAuth.parseEmailVerifyCallback(window.location.search);
-      const newTransaction = await oktaAuth.idx.authenticate({ state, stateTokenExternalId });
-      setTransaction(newTransaction);
+      try {
+        const newTransaction = await oktaAuth.idx.handleEmailVerifyCallback(window.location.search);
+        setTransaction(newTransaction);
+      } catch (error) {
+        setTransaction({
+          status: IdxStatus.FAILURE,
+          error
+        });
+      } finally {
+        history.push('/');
+      }
     }
 
-    if (oktaAuth.isEmailVerifyCallback(window.location.search)) {
+    if (oktaAuth.idx.isEmailVerifyCallback(window.location.search)) {
       return handleEmailVerifyCallback();
     }
 
@@ -122,7 +137,11 @@ export default function App() {
   );
   if (!transaction) {
     // initial page
-    return topNav;
+    return (
+      <div>
+        {topNav}
+      </div>
+    );
   }
 
   const { status, nextStep, error, messages, availableSteps, tokens } = transaction;
@@ -142,7 +161,7 @@ export default function App() {
   }
 
   if (status === IdxStatus.FAILURE) {
-    return (<div>{JSON.stringify(error, null, 4)}</div>);
+    return (<div>{error.message || JSON.stringify(error, null, 4)}</div>);
   }
 
   if (status === IdxStatus.TERMINAL) {

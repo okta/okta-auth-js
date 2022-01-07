@@ -31,6 +31,16 @@ module.exports = {
     filename: 'oidc-app.js',
     publicPath: '/'
   },
+  resolve: {
+    extensions: ['.js', '.ts'],
+    alias: {
+      // dev build of the widget
+      // '@okta/okta-signin-widget': '@okta/okta-signin-widget/dist/js/okta-sign-in.js',
+
+      // local dev build of the widget
+      // '@okta/okta-signin-widget': '@okta/okta-signin-widget/target/js/okta-sign-in.js'
+    }
+  },
   plugins: [
     new webpack.EnvironmentPlugin(['CLIENT_ID', 'ISSUER']),
   ],
@@ -66,8 +76,5 @@ module.exports = {
         ]
       }
     ]
-  },
-  resolve: {
-    extensions: ['.js', '.ts'],
   }
 };

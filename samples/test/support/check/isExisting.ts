@@ -27,7 +27,7 @@ export default (selector: Selector, falseCase: boolean) => {
     const elements = $$(selector);
 
     if (falseCase) {
-        expect(elements).toHaveLength(
+        expect(elements.length).toBe(
             0,
             // @ts-expect-error
             `Expected element "${selector}" not to exist`

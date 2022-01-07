@@ -43,7 +43,7 @@ import {
   IdxAPI,
   SignoutRedirectUrlOptions,
   HttpAPI,
-  FlowIdentifier,
+  FlowIdentifier
 } from './types';
 import {
   transactionStatus,
@@ -87,9 +87,6 @@ import {
   toQueryString, 
   toAbsoluteUrl,
   clone,
-  isEmailVerifyCallback,
-  EmailVerifyCallbackResponse,
-  parseEmailVerifyCallback
 } from './util';
 import { TokenManager } from './TokenManager';
 import { get, setRequestHeader } from './http';
@@ -111,10 +108,22 @@ import {
   startTransaction,
   handleInteractionCodeRedirect,
   canProceed,
+  handleEmailVerifyCallback,
+  isEmailVerifyCallback,
+  parseEmailVerifyCallback,
+  isEmailVerifyCallbackError
 } from './idx';
 import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from './idx/headers';
 import { OktaUserAgent } from './OktaUserAgent';
 import { parseOAuthResponseFromUrl } from './oidc/parseFromUrl';
+import {
+  getSavedTransactionMeta,
+  createTransactionMeta,
+  getTransactionMeta,
+  saveTransactionMeta,
+  clearTransactionMeta,
+  isTransactionMetaValid
+} from './idx/transactionMeta';
 
 const Emitter = require('tiny-emitter');
 
@@ -254,17 +263,38 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     });
 
     // IDX
+    const boundStartTransaction = startTransaction.bind(null, this);
     this.idx = {
       interact: interact.bind(null, this),
       introspect: introspectV2.bind(null, this),
       authenticate: authenticate.bind(null, this),
       register: register.bind(null, this),
+      start: boundStartTransaction,
+      startTransaction: boundStartTransaction, // Use `start` instead. `startTransaction` will be removed in 7.0
       poll: poll.bind(null, this),
       proceed: proceed.bind(null, this),
       cancel: cancel.bind(null, this),
       recoverPassword: recoverPassword.bind(null, this),
+
+      // oauth redirect callback
       handleInteractionCodeRedirect: handleInteractionCodeRedirect.bind(null, this),
-      startTransaction: startTransaction.bind(null, this),
+
+      // interaction required callback
+      isInteractionRequired: isInteractionRequired.bind(null, this),
+      isInteractionRequiredError,
+
+      // email verify callback
+      handleEmailVerifyCallback: handleEmailVerifyCallback.bind(null, this),
+      isEmailVerifyCallback,
+      parseEmailVerifyCallback,
+      isEmailVerifyCallbackError,
+      
+      getSavedTransactionMeta: getSavedTransactionMeta.bind(null, this),
+      createTransactionMeta: createTransactionMeta.bind(null, this),
+      getTransactionMeta: getTransactionMeta.bind(null, this),
+      saveTransactionMeta: saveTransactionMeta.bind(null, this),
+      clearTransactionMeta: clearTransactionMeta.bind(null, this),
+      isTransactionMetaValid: isTransactionMetaValid.bind(null, this),
       setFlow: (flow: FlowIdentifier) => {
         this.options.flow = flow;
       },
@@ -273,6 +303,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       },
       canProceed: canProceed.bind(null, this),
     };
+
     setGlobalRequestInterceptor(createGlobalRequestInterceptor(this)); // to pass custom headers to IDX endpoints
 
     // HTTP
@@ -305,27 +336,6 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
 
   setHeaders(headers) {
     this.options.headers = Object.assign({}, this.options.headers, headers);
-  }
-
-  // ES6 module users can use named exports to access all symbols
-  // CommonJS module users (CDN) need all exports on this object
-
-  // Utility methods for interaction code flow
-  isInteractionRequired(hashOrSearch?: string): boolean {
-    return isInteractionRequired(this, hashOrSearch);
-  }
-
-  isInteractionRequiredError(error: Error): boolean {
-    return isInteractionRequiredError(error);
-  }
-
-  // Utility methods for email verify callback
-  isEmailVerifyCallback(urlPath: string): boolean {
-    return isEmailVerifyCallback(urlPath);
-  }
-
-  parseEmailVerifyCallback(urlPath: string): EmailVerifyCallbackResponse {
-    return parseEmailVerifyCallback(urlPath);
   }
 
   async signIn(opts: SigninOptions): Promise<AuthTransaction> {
@@ -714,10 +724,9 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
 // Hoist feature detection functions to static type
 OktaAuth.features = OktaAuth.prototype.features = features;
 
-// Also hoist values and utility functions for CommonJS users
+// Also hoist constants for CommonJS users
 Object.assign(OktaAuth, {
-  constants,
-  isInteractionRequiredError
+  constants
 });
 
 export default OktaAuth;

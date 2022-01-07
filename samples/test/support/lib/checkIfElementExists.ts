@@ -31,7 +31,6 @@ export default async (
      * The number of elements found in the DOM
      * @type {Int}
      */
-
     if (falseCase !== true) {
         await waitForDisplayed(selector);
     }
@@ -39,13 +38,13 @@ export default async (
     const nrOfElements = await $$(selector);
 
     if (falseCase === true) {
-        expect(nrOfElements).toHaveLength(
+        expect(nrOfElements.length).toBe(
             0,
             // @ts-expect-error
             `Element with selector "${selector}" should not exist on the page`
         );
     } else if (exactly) {
-        expect(nrOfElements).toHaveLength(
+        expect(nrOfElements.length).toBe(
             exactly,
             // @ts-expect-error
             `Element with selector "${selector}" should exist exactly ${exactly} time(s)`

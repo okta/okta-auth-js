@@ -339,7 +339,7 @@ describe('TokenManager', function() {
       var p2 = client.tokenManager.renew('test-idToken');
       expect(p1).toBe(p2);
       return Promise.allSettled([p1, p2]).then(function(results) {
-        expect(results).toHaveLength(2);
+        expect(results.length).toBe(2);
         results.forEach(function(result) {
           expect(result.status).toBe('rejected');
           util.expectErrorToEqual(result.reason, {

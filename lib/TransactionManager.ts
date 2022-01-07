@@ -45,6 +45,7 @@ export default class TransactionManager {
   saveStateCookie: boolean;
   saveParamsCookie: boolean;
   enableSharedStorage: boolean;
+  saveLastResponse: boolean;
 
   constructor(options: TransactionManagerOptions) {
     this.storageManager = options.storageManager;
@@ -53,6 +54,7 @@ export default class TransactionManager {
     this.saveStateCookie = options.saveStateCookie === false ? false : true;
     this.saveParamsCookie = options.saveParamsCookie === false ? false : true;
     this.enableSharedStorage = options.enableSharedStorage === false ? false : true;
+    this.saveLastResponse = options.saveLastResponse === false ? false : true;
     this.options = options;
   }
 
@@ -67,9 +69,8 @@ export default class TransactionManager {
     // clear IDX response storage
     this.clearIdxResponse();
 
-    // Usually we do NOT want to clear shared storage because another tab may need it to continue/complete a flow
-    // It can be cleared after a user succcesfully signs in and receives tokens
-    if (this.enableSharedStorage && options.clearSharedStorage) {
+    // Usually we want to also clear shared storage unless another tab may need it to continue/complete a flow
+    if (this.enableSharedStorage && options.clearSharedStorage !== false) {
       const state = options.state || meta?.state;
       if (state) {
         clearTransactionFromSharedStorage(this.storageManager, state);
@@ -252,7 +253,7 @@ export default class TransactionManager {
         return obj;
       }
     }
-
+    
     // If meta is not valid, throw an exception to avoid misleading server-side error
     // The most likely cause of this error is trying to handle a callback twice
     // eslint-disable-next-line max-len
@@ -305,6 +306,9 @@ export default class TransactionManager {
   }
 
   saveIdxResponse(idxResponse: RawIdxResponse): void {
+    if (!this.saveLastResponse) {
+      return null;
+    }
     const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
     if (!storage) {
       return;
@@ -313,6 +317,9 @@ export default class TransactionManager {
   }
 
   loadIdxResponse(): RawIdxResponse {
+    if (!this.saveLastResponse) {
+      return null;
+    }
     const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
     if (!storage) {
       return null;
@@ -325,6 +332,9 @@ export default class TransactionManager {
   }
 
   clearIdxResponse(): void {
+    if (!this.saveLastResponse) {
+      return;
+    }
     const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
     storage?.clearStorage();
   }
