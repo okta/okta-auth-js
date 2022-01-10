@@ -27,8 +27,7 @@ const BROWSER_STORAGE: StorageManagerOptions = {
       'localStorage',
       'sessionStorage',
       'cookie'
-    ],
-    useMultipleCookies: true
+    ]
   },
   cache: {
     storageTypes: [
