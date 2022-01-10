@@ -153,6 +153,10 @@ var storageUtil: BrowserStorageUtil = {
       }
     };
 
+    if (!options.useSeparateCookies) {
+      return storage;
+    }
+
     // Tokens are stored separately because cookies have size limits.
     // Can only be used when storing an object value. Object properties will be saved to separate cookies.
     // Each property of the object must also be an object.

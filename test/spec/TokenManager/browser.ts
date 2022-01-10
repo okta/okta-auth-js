@@ -105,6 +105,7 @@ describe('TokenManager (browser)', function() {
         storageManager: {
           token: {
             storageTypes: ['cookie'],
+            useSeparateCookies: true
           }
         }
       });
