@@ -4,6 +4,7 @@ import alias from '@rollup/plugin-alias';
 import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
 import license from 'rollup-plugin-license';
+import commonjs from '@rollup/plugin-commonjs';
 import pkg from './package.json';
 
 const path = require('path');
@@ -25,15 +26,13 @@ const extensions = ['js', 'ts'];
 
 const external = makeExternalPredicate();
 const commonPlugins = [
+  commonjs({
+    extensions
+  }),
   replace({
     'SDK_VERSION': JSON.stringify(pkg.version),
     'global.': 'window.',
     preventAssignment: true
-  }),
-  alias({
-    entries: [
-      { find: /.\/node$/, replacement: './browser' }
-    ]
   }),
   typescript({
     // eslint-disable-next-line node/no-unpublished-require
@@ -42,9 +41,21 @@ const commonPlugins = [
       compilerOptions: {
         sourceMap: true,
         target: 'ES2017', // skip async/await transpile
-        declaration: false
+        declaration: false,
+        allowSyntheticDefaultImports: true
       }
     }
+  }),
+  babel({
+    babelHelpers: 'runtime',
+    presets: [
+      '@babel/preset-env'
+      
+    ],
+    plugins: [
+      '@babel/plugin-transform-runtime'
+    ],
+    extensions
   }),
   cleanup({ 
     extensions,
@@ -64,26 +75,33 @@ export default [
     input: 'lib/index.ts',
     external,
     plugins: [
-      ...commonPlugins,
-      babel({
-        babelHelpers: 'runtime',
-        presets: [
-          '@babel/preset-env'
-          
-        ],
-        plugins: [
-          '@babel/plugin-transform-runtime'
-        ],
-        extensions
+      alias({
+        entries: [
+          { find: /.\/node$/, replacement: './browser' }
+        ]
       }),
+      ...commonPlugins
     ],
     output: [
       {
         format: 'esm',
-        file: 'build/esm/index.js',
+        file: 'build/esm/browser.js',
         exports: 'named',
         sourcemap: true
       }
     ]
-  }
+  },
+  // {
+  //   input: 'lib/index.ts',
+  //   external,
+  //   plugins: commonPlugins,
+  //   output: [
+  //     {
+  //       format: 'esm',
+  //       file: 'build/esm/node.js',
+  //       exports: 'named',
+  //       sourcemap: true
+  //     }
+  //   ]
+  // }
 ];

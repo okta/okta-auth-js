@@ -23,8 +23,7 @@ import {
   CookieStorage
 } from '../types';
 import { warn } from '../util';
-
-const Cookies = require('js-cookie');
+import * as Cookies from 'js-cookie';
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil: BrowserStorageUtil = {
@@ -249,7 +248,8 @@ var storageUtil: BrowserStorageUtil = {
     },
 
     delete: function(name: string): string {
-      return Cookies.remove(name, { path: '/' });
+      Cookies.remove(name, { path: '/' });
+      return name;
     }
   }
 };

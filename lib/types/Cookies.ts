@@ -9,21 +9,14 @@
  *
  * See the License for the specific language governing permissions and limitations under the License.
  */
+import * as Cookies from 'js-cookie';
 
-export interface CookieOptions {
-  path?: string;
-  secure?: boolean;
-  sessionCookie?: boolean;
-  sameSite?: string | boolean;
-  expires?: Date;
-}
-
-export interface SetCookieOptions extends CookieOptions {
-  path?: string;
+export interface CookieOptions extends Cookies.CookieAttributes {
+    sessionCookie?: boolean;
 }
 
 export interface Cookies {
-  set(name: string, value: string, expiresAt: string, options: SetCookieOptions): string;
+  set(name: string, value: string, expiresAt: string, options: CookieOptions): string;
   get(name: string): string;
   delete(name: string): string;
 }
