@@ -102,7 +102,7 @@ export class TokenManager implements TokenManagerInterface {
       storageOptions.storageType = options.storage as StorageType;
     }
 
-    this.storage = sdk.storageManager.getTokenStorage(storageOptions);
+    this.storage = sdk.storageManager.getTokenStorage({...storageOptions, useSeparateCookies: true});
     this.clock = SdkClock.create(/* sdk, options */);
     this.state = defaultState();
 

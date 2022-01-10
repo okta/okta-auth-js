@@ -573,7 +573,6 @@ var config = {
         'sessionStorage',
         'cookie'
       ],
-      useMultipleCookies: true // puts each token in its own cookie
     },
     cache: {
       storageTypes: [

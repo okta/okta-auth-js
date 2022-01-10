@@ -61,7 +61,7 @@ export interface StorageOptions extends CookieOptions {
   storageTypes?: StorageType[];
   storageProvider?: SimpleStorage;
   storageKey?: string;
-  useMultipleCookies?: boolean;
+  useSeparateCookies?: boolean;
 }
 
 export type StorageType = 'memory' | 'sessionStorage' | 'localStorage' | 'cookie' | 'custom' | 'auto';
