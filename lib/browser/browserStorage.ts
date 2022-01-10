@@ -153,20 +153,20 @@ var storageUtil: BrowserStorageUtil = {
       }
     };
 
-    if (!options.useMultipleCookies) {
+    if (!options.useSeparateCookies) {
       return storage;
     }
 
-    // options.useMultipleCookies - because cookies have size limits.
+    // Tokens are stored separately because cookies have size limits.
     // Can only be used when storing an object value. Object properties will be saved to separate cookies.
-    //  Each property of the object must also be an object.
+    // Each property of the object must also be an object.
     return {
       getItem: function(key) {
         var data = storage.getItem(); // read all cookies
         var value = {};
         Object.keys(data).forEach(k => {
           if (k.indexOf(key) === 0) { // filter out unrelated cookies
-            value[k.replace(`${key}_`, '')] = JSON.parse(data[k]); // populate with cookie dataa
+            value[k.replace(`${key}_`, '')] = JSON.parse(data[k]); // populate with cookie data
           }
         });
         return JSON.stringify(value);
