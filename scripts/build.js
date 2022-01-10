@@ -68,7 +68,12 @@ packageJSON.private = false;
 packageJSON.scripts.prepare = '';
 
 // Remove "build/" from the entrypoint paths.
-['main', 'module', 'browser', 'types'].forEach(function(key) {
+[
+  'main', 
+  'module', 
+  // 'browser', 
+  'types'
+].forEach(function(key) {
   const value = packageJSON[key];
   if (typeof value === 'object' && value !== null) {
     packageJSON[key] = Object.keys(value).reduce((acc, curr) => {

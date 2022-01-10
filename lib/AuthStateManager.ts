@@ -11,12 +11,13 @@
  */
 
 
+import PCancelable from 'p-cancelable';
 import { AuthSdkError } from './errors';
 import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from '.';
 import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
-const PCancelable = require('p-cancelable');
+
 
 export const INITIAL_AUTH_STATE = null;
 const DEFAULT_PENDING = {
@@ -42,7 +43,7 @@ const isSameAuthState = (prevState: AuthState, state: AuthState) => {
 export class AuthStateManager {
   _sdk: OktaAuth;
   _pending: { 
-    updateAuthStatePromise: typeof PCancelable;
+    updateAuthStatePromise: PCancelable<AuthState>;
     canceledTimes: number; 
   };
   _authState: AuthState | null;
@@ -133,7 +134,7 @@ export class AuthStateManager {
     }
 
     /* eslint-disable complexity */
-    const cancelablePromise = new PCancelable((resolve, _, onCancel) => {
+    const cancelablePromise = new PCancelable<AuthState>((resolve, _, onCancel) => {
       onCancel.shouldReject = false;
       onCancel(() => {
         this._pending.updateAuthStatePromise = null;

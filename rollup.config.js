@@ -85,7 +85,7 @@ export default [
     output: [
       {
         format: 'esm',
-        file: 'build/esm/browser.js',
+        file: 'build/esm/index.js',
         exports: 'named',
         sourcemap: true
       }
