@@ -81,7 +81,7 @@
     "node-cache": "^5.1.2",
     "p-cancelable": "^3.0.0",
     "text-encoding": "^0.7.0",
-    "tiny-emitter": "1.1.0",
+    "tiny-emitter": "^2.1.0",
     "webcrypto-shim": "^0.1.5",
     "xhr2": "0.1.3"
   },

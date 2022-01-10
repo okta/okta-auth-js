@@ -12,7 +12,6 @@
 
 export * from './api';
 export * from './AuthState';
-export * from './EventEmitter';
 export * from './Transaction';
 export * from './Cookies';
 export * from './http';

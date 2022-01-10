@@ -19179,6 +19179,11 @@ tiny-emitter@1.1.0:
   resolved "https://registry.yarnpkg.com/tiny-emitter/-/tiny-emitter-1.1.0.tgz#ab405a21ffed814a76c19739648093d70654fecb"
   integrity sha1-q0BaIf/tgUp2wZc5ZICT1wZU/ss=
 
+tiny-emitter@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tiny-emitter/-/tiny-emitter-2.1.0.tgz#1d1a56edfc51c43e863cbb5382a72330e3555423"
+  integrity sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==
+
 tiny-invariant@^1.0.2:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.1.0.tgz#634c5f8efdc27714b7f386c35e6760991d230875"

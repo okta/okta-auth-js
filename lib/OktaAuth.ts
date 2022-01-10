@@ -115,8 +115,7 @@ import {
 import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from './idx/headers';
 import { OktaUserAgent } from './OktaUserAgent';
 import { parseOAuthResponseFromUrl } from './oidc/parseFromUrl';
-
-const Emitter = require('tiny-emitter');
+import { TinyEmitter } from 'tiny-emitter';
 
 class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   options: OktaAuthOptions;
@@ -130,7 +129,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   features: FeaturesAPI;
   token: TokenAPI;
   _tokenQueue: PromiseQueue;
-  emitter: typeof Emitter;
+  emitter: TinyEmitter;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
   http: HttpAPI;
@@ -283,7 +282,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     // Fingerprint API
     this.fingerprint = fingerprint.bind(null, this);
 
-    this.emitter = new Emitter();
+    this.emitter = new TinyEmitter();
 
     // TokenManager
     this.tokenManager = new TokenManager(this, args.tokenManager);

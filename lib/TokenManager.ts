@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+import { TinyEmitter } from 'tiny-emitter';
 import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
 import { isRefreshTokenError, validateToken  } from './oidc/util';
@@ -17,7 +18,6 @@ import { isLocalhost, isIE11OrLess } from './features';
 import { TOKEN_STORAGE_NAME } from './constants';
 import SdkClock from './clock';
 import {
-  EventEmitter,
   Token, 
   Tokens, 
   TokenType, 
@@ -66,7 +66,7 @@ function defaultState(): TokenManagerState {
 export class TokenManager implements TokenManagerInterface {
   private sdk: OktaAuth;
   private clock: SdkClock;
-  private emitter: EventEmitter;
+  private emitter: TinyEmitter;
   private storage: StorageProvider;
   private state: TokenManagerState;
   private options: TokenManagerOptions;

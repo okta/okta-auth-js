@@ -41,8 +41,7 @@ const commonPlugins = [
       compilerOptions: {
         sourceMap: true,
         target: 'ES2017', // skip async/await transpile
-        declaration: false,
-        allowSyntheticDefaultImports: true
+        declaration: false
       }
     }
   }),
