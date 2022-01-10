@@ -12,67 +12,13 @@
 
 
 /* eslint-disable complexity */
-import { removeTrailingSlash, warn, removeNils } from './util';
-import { assertValidConfig } from './builderUtil';
-import { OktaAuthOptions, StorageManagerOptions } from './types';
+import { removeTrailingSlash, warn, removeNils } from '../util';
+import { assertValidConfig } from '../builderUtil';
+import { OktaAuthOptions } from '../types';
 
-import fetchRequest from './fetch/fetchRequest';
-import browserStorage from './browser/browserStorage';
-import serverStorage from './server/serverStorage';
-import { isBrowser, isHTTPS } from './features';
-
-const BROWSER_STORAGE: StorageManagerOptions = {
-  token: {
-    storageTypes: [
-      'localStorage',
-      'sessionStorage',
-      'cookie'
-    ],
-    useMultipleCookies: true
-  },
-  cache: {
-    storageTypes: [
-      'localStorage',
-      'sessionStorage',
-      'cookie'
-    ]
-  },
-  transaction: {
-    storageTypes: [
-      'sessionStorage',
-      'localStorage',
-      'cookie'
-    ]
-  },
-  'shared-transaction': {
-    storageTypes: [
-      'localStorage'
-    ]
-  },
-  'original-uri': {
-    storageTypes: [
-      'localStorage'
-    ]
-  }
-};
-
-const SERVER_STORAGE: StorageManagerOptions = {
-  token: {
-    storageTypes: [
-      'memory'
-    ]
-  },
-  cache: {
-    storageTypes: [
-      'memory'
-    ]
-  },
-  transaction: {
-    storageTypes: [
-      'memory'
-    ]
-  }
-};
+import fetchRequest from '../fetch/fetchRequest';
+import { storage, STORAGE_MANAGER_OPTIONS, enableSharedStorage } from './node';
+import { isBrowser, isHTTPS } from '../features';
 
 function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS: boolean) {
   // Secure cookies will be automatically used on a HTTPS connection
@@ -108,14 +54,11 @@ function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS: boolean) {
 
 
 export function getDefaultOptions(): OktaAuthOptions {
-  const storageUtil = isBrowser() ? browserStorage : serverStorage;
-  const storageManager = isBrowser() ? BROWSER_STORAGE : SERVER_STORAGE;
-  const enableSharedStorage = isBrowser() ? true : false; // localStorage for multi-tab flows (browser only)
   return {
     devMode: false,
     httpRequestClient: fetchRequest,
-    storageUtil,
-    storageManager,
+    storageUtil: storage,
+    storageManager: STORAGE_MANAGER_OPTIONS,
     transactionManager: {
       enableSharedStorage
     }
