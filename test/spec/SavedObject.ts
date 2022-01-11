@@ -18,7 +18,7 @@ describe('SavedObject', () => {
 
   it('throws if a storage is not provided', () => {
     const fn = function() {
-      return new SavedObject(null, '');
+      return new SavedObject(undefined as unknown as SimpleStorage, '');
     };
     expect(fn).toThrowError('"storage" is required');
   });

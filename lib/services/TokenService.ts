@@ -32,13 +32,15 @@ function shouldThrottleRenew(renewTimeQueue) {
 export class TokenService {
   private tokenManager: TokenManager;
   private options: TokenManagerOptions;
-  private storageListener: (event: StorageEvent) => void;
-  private onTokenExpiredHandler: (key: string) => void;
+  private storageListener?: (event: StorageEvent) => void;
+  private onTokenExpiredHandler?: (key: string) => void;
   private syncTimeout: unknown;
 
   constructor(tokenManager: TokenManager, options: TokenManagerOptions = {}) {
     this.tokenManager = tokenManager;
     this.options = options;
+    this.storageListener = undefined;
+    this.onTokenExpiredHandler = undefined;
   }
 
   start() {
@@ -92,7 +94,8 @@ export class TokenService {
     this.tokenManager.clearExpireEventTimeoutAll();
     this.tokenManager.off(EVENT_EXPIRED, this.onTokenExpiredHandler);
     if (this.options.syncStorage && isBrowser()) {
-      window.removeEventListener('storage', this.storageListener);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      window.removeEventListener('storage', this.storageListener!);
       clearTimeout(this.syncTimeout as any);
     }
   }

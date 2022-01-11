@@ -20,7 +20,7 @@ import {
 } from '../oidc';
 import { FingerprintOptions } from '../types';
 
-export default function fingerprint(sdk: OktaAuth, options: FingerprintOptions) {
+export default function fingerprint(sdk: OktaAuth, options?: FingerprintOptions): Promise<string> {
   options = options || {};
 
   if (!isFingerprintSupported()) {
@@ -51,7 +51,7 @@ export default function fingerprint(sdk: OktaAuth, options: FingerprintOptions) 
 
       if (!msg) { return; }
       if (msg.type === 'FingerprintAvailable') {
-        return resolve(msg.fingerprint);
+        return resolve(msg.fingerprint as string);
       }
       if (msg.type === 'FingerprintServiceReady') {
         e.source.postMessage(JSON.stringify({
@@ -66,7 +66,7 @@ export default function fingerprint(sdk: OktaAuth, options: FingerprintOptions) 
 
     timeout = setTimeout(function() {
       reject(new AuthSdkError('Fingerprinting timed out'));
-    }, options.timeout || 15000);
+    }, options?.timeout || 15000);
   });
 
   return promise.finally(function() {
@@ -75,5 +75,5 @@ export default function fingerprint(sdk: OktaAuth, options: FingerprintOptions) 
     if (document.body.contains(iframe)) {
       iframe.parentElement.removeChild(iframe);
     }
-  });
+  }) as Promise<string>;
 }

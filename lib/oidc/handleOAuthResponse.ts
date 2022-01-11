@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 /* eslint-disable complexity, max-statements */
 /*!
@@ -32,8 +33,8 @@ import { verifyToken } from './verifyToken';
 import { getDefaultTokenParams } from './util';
 
 function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
-  if (res['error'] || res['error_description']) {
-    throw new OAuthError(res['error'], res['error_description']);
+  if (res['error'] || res['error_description']) { // TODO: should this be an AND instead of an OR condition?
+    throw new OAuthError(res['error']!, res['error_description']!);
   }
 
   if (res.state !== oauthParams.state) {
@@ -57,7 +58,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
   tokenParams = tokenParams || getDefaultTokenParams(sdk);
   urls = urls || getOAuthUrls(sdk, tokenParams);
 
-  var responseType = tokenParams.responseType;
+  var responseType = tokenParams.responseType || [];
   if (!Array.isArray(responseType)) {
     responseType = [responseType];
   }
@@ -89,10 +90,10 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
           accessToken: accessToken,
           claims: accessJwt.payload,
           expiresAt: Number(expiresIn) + now,
-          tokenType: tokenType,
+          tokenType: tokenType!,
           scopes: scopes,
-          authorizeUrl: urls.authorizeUrl,
-          userinfoUrl: urls.userinfoUrl
+          authorizeUrl: urls.authorizeUrl!,
+          userinfoUrl: urls.userinfoUrl!
         };
       }
 
@@ -103,9 +104,9 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
           // TODO: remove "expiresAt" in the next major version OKTA-407224
           expiresAt: Number(expiresIn) + now, 
           scopes: scopes,
-          tokenUrl: urls.tokenUrl,
-          authorizeUrl: urls.authorizeUrl,
-          issuer: urls.issuer,
+          tokenUrl: urls.tokenUrl!,
+          authorizeUrl: urls.authorizeUrl!,
+          issuer: urls.issuer!,
         };
       }
 
@@ -115,16 +116,16 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
         var idTokenObj: IDToken = {
           idToken: idToken,
           claims: idJwt.payload,
-          expiresAt: idJwt.payload.exp - idJwt.payload.iat + now, // adjusting expiresAt to be in local time
+          expiresAt: idJwt.payload.exp! - idJwt.payload.iat! + now, // adjusting expiresAt to be in local time
           scopes: scopes,
-          authorizeUrl: urls.authorizeUrl,
-          issuer: urls.issuer,
-          clientId: clientId
+          authorizeUrl: urls.authorizeUrl!,
+          issuer: urls.issuer!,
+          clientId: clientId!
         };
 
         var validationParams: TokenVerifyParams = {
-          clientId: clientId,
-          issuer: urls.issuer,
+          clientId: clientId!,
+          issuer: urls.issuer!,
           nonce: tokenParams.nonce,
           accessToken: accessToken
         };
@@ -155,7 +156,7 @@ export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res
 
       return {
         tokens: tokenDict,
-        state: res.state,
+        state: res.state!,
         code: res.code
       };
     });

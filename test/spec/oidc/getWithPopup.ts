@@ -63,19 +63,22 @@ describe('token.getWithPopup', function() {
   });
 
   it('promise will reject if fails due to timeout', function() {
-    var timeoutMs = 120000;
+    var timeoutMs = 120001;
     var mockWindow = {
       closed: false,
       close: jest.fn(),
       location: {
-        assign: jest.fn()
+        assign: jest.fn().mockImplementation(() => {
+          jest.runAllTicks(); // resolve pending promises
+          jest.advanceTimersByTime(timeoutMs); // should trigger timeout
+        })
       }
     };
     jest.spyOn(window, 'open').mockImplementation(function () {
       return mockWindow as unknown as Window; // valid window is returned
     });
     jest.useFakeTimers();
-    var promise = oauthUtil.setup({
+    return oauthUtil.setup({
       closePopup: true, // prevent any message being passed
       willFail: true,
       oktaAuthArgs: {
@@ -103,20 +106,13 @@ describe('token.getWithPopup', function() {
         errorCauses: []
       });
     });
-    return Promise.resolve()
-      .then(function() {
-        jest.runAllTicks(); // resolve pending promises
-        jest.advanceTimersByTime(timeoutMs); // should trigger timeout
-        return promise;
-      });
   });
   it('promise will reject if popup is blocked', function() {
     jest.spyOn(window, 'open').mockImplementation(function () {
       return null; // null window is returned
     });
-    jest.useFakeTimers();
 
-    var promise = oauthUtil.setup({
+    return oauthUtil.setup({
       closePopup: true,
       willFail: true,
       oktaAuthArgs: {
@@ -133,6 +129,7 @@ describe('token.getWithPopup', function() {
       expect(true).toEqual(false);
     })
     .catch(function(err) {
+      // should fail after 100ms
       util.expectErrorToEqual(err, {
         name: 'AuthSdkError',
         message: 'Unable to parse OAuth flow response',
@@ -143,11 +140,6 @@ describe('token.getWithPopup', function() {
         errorCauses: []
       });
     });
-    return Promise.resolve()
-      .then(function () {
-        jest.runAllTimers();
-        return promise;
-      });
   });
 
   it('returns tokens using idp', function() {
@@ -264,7 +256,7 @@ describe('token.getWithPopup', function() {
     // mock popup creation
     var popups = [];
     function getOpenPopups() {
-      return popups.filter(function(popup) {
+      return popups.filter(function(popup: Window) {
         return !popup.closed;
       });
     }
@@ -272,7 +264,7 @@ describe('token.getWithPopup', function() {
     return oauthUtil.setupSimultaneousPostMessage()
     .then(function(context) {
 
-      function FakePopup() {
+      function FakePopup(this: any) {
         this.closed = false;
         this.close = () => {
           this.closed = true;
@@ -283,7 +275,7 @@ describe('token.getWithPopup', function() {
       }
       jest.spyOn(window, 'open').mockImplementation(function() {
         var popup = new FakePopup();
-        popups.push(popup);
+        popups.push(popup as never);
         return popup;
       });
       // getWithPopup, but don't resolve
@@ -313,7 +305,7 @@ describe('token.getWithPopup', function() {
       context.emitter.emit('trigger', oauthUtil.mockedState);
       return firstPopup.then(val => {
         expect(val.tokens.idToken).toEqual(tokens.standardIdTokenParsed);
-        expect(popups[0].closed).toBe(true); // first popup should be closed
+        expect((popups[0] as Window).closed).toBe(true); // first popup should be closed
         expect(popups.length).toBe(1); // 2nd popup is not open yet
         return waitFor(() => {
           return getOpenPopups().length > 0 ? context : false;
@@ -329,7 +321,7 @@ describe('token.getWithPopup', function() {
       return secondPopup
       .then(function(val) {
         expect(val.tokens.idToken).toEqual(tokens.standardIdToken2Parsed);
-        expect(popups[1].closed).toBe(true); // 2nd popup should be closed
+        expect((popups[1] as Window).closed).toBe(true); // 2nd popup should be closed
         expect(popups.length).toBe(2); // no other popups were created
       });
     });

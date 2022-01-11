@@ -30,7 +30,7 @@ describe('expire events', () => {
     };
   });
 
-  function createInstance(options = null) {
+  function createInstance(options?) {
     testContext.instance = new TokenManager(testContext.sdkMock, options);
     jest.spyOn(testContext.instance.clock, 'now').mockReturnValue(0);
   }

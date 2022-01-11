@@ -18,6 +18,7 @@ const verifyToken = jest.fn();
 jest.mock('../../../../lib/oidc/verifyToken', () => { return { verifyToken }; });
 
 import { handleOAuthResponse } from '../../../../lib/oidc';
+import { CustomUrls, TokenParams } from '../../../../lib/types';
 
 describe('handleOAuthResponse', () => {
   let sdk;
@@ -44,42 +45,42 @@ describe('handleOAuthResponse', () => {
     describe('baseline', () => {
     
       it('returns access_token from the response', async () => {
-        const res = await handleOAuthResponse(sdk, { responseType: 'token' }, { access_token: 'foo' }, undefined);
+        const res = await handleOAuthResponse(sdk, { responseType: 'token' }, { access_token: 'foo' }, undefined as unknown as CustomUrls);
         expect(res.tokens).toBeTruthy();
         expect(res.tokens.accessToken).toBeTruthy();
-        expect(res.tokens.accessToken.accessToken).toBe('foo');
+        expect(res.tokens.accessToken!.accessToken).toBe('foo');
       });
       it('returns id_token from the response', async () => {
-        const res = await handleOAuthResponse(sdk, { responseType: 'id_token' }, { id_token: 'foo' }, undefined);
+        const res = await handleOAuthResponse(sdk, { responseType: 'id_token' }, { id_token: 'foo' }, undefined as unknown as CustomUrls);
         expect(res.tokens).toBeTruthy();
         expect(res.tokens.idToken).toBeTruthy();
-        expect(res.tokens.idToken.idToken).toBe('foo');
+        expect(res.tokens.idToken!.idToken).toBe('foo');
       });
       it('returns refresh_token from the response', async () => {
-        const res = await handleOAuthResponse(sdk, { responseType: 'refresh_token' }, { refresh_token: 'foo' }, undefined);
+        const res = await handleOAuthResponse(sdk, { responseType: 'refresh_token' }, { refresh_token: 'foo' }, undefined as unknown as CustomUrls);
         expect(res.tokens).toBeTruthy();
         expect(res.tokens.refreshToken).toBeTruthy();
-        expect(res.tokens.refreshToken.refreshToken).toBe('foo');
+        expect(res.tokens.refreshToken!.refreshToken).toBe('foo');
       });
       it('returns all tokens from the response', async () => {
         const tokenParams = { responseType: ['token', 'id_token', 'refresh_token'] };
         const oauthRes = { id_token: 'foo', access_token: 'blar', refresh_token: 'bloo' };
-        const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined);
+        const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined as unknown as CustomUrls);
         expect(res.tokens).toBeTruthy();
         expect(res.tokens.accessToken).toBeTruthy();
-        expect(res.tokens.accessToken.accessToken).toBe('blar');
+        expect(res.tokens.accessToken!.accessToken).toBe('blar');
         expect(res.tokens.idToken).toBeTruthy();
-        expect(res.tokens.idToken.idToken).toBe('foo');
+        expect(res.tokens.idToken!.idToken).toBe('foo');
         expect(res.tokens.refreshToken).toBeTruthy();
-        expect(res.tokens.refreshToken.refreshToken).toBe('bloo');
+        expect(res.tokens.refreshToken!.refreshToken).toBe('bloo');
       });
       it('prefers "scope" value from endpoint response over method parameter', async () => {
         const tokenParams = { responseType: ['token', 'id_token', 'refresh_token'], scopes: ['profile'] };
         const oauthRes = { id_token: 'foo', access_token: 'blar', refresh_token: 'bloo', scope: 'openid offline_access' };
-        const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined);
-        expect(res.tokens.accessToken.scopes).toEqual(['openid', 'offline_access']);
-        expect(res.tokens.idToken.scopes).toEqual(['openid', 'offline_access']);
-        expect(res.tokens.refreshToken.scopes).toEqual(['openid', 'offline_access']);
+        const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined as unknown as CustomUrls);
+        expect(res.tokens.accessToken!.scopes).toEqual(['openid', 'offline_access']);
+        expect(res.tokens.idToken!.scopes).toEqual(['openid', 'offline_access']);
+        expect(res.tokens.refreshToken!.scopes).toEqual(['openid', 'offline_access']);
       });
 
       describe('errors', () => {
@@ -89,7 +90,7 @@ describe('handleOAuthResponse', () => {
       
         it('throws if response contains "error"', async () => {
           try {
-            await handleOAuthResponse(sdk, undefined, { error: 'blah' }, undefined);
+            await handleOAuthResponse(sdk, undefined as unknown as TokenParams, { error: 'blah' }, undefined  as unknown as CustomUrls);
           } catch (err) {
             expect(err.name).toBe('OAuthError');
             expect(err.errorCode).toBe('blah');
@@ -98,7 +99,7 @@ describe('handleOAuthResponse', () => {
     
         it('throws if response contains "error_description"', async () => {
           try {
-            await handleOAuthResponse(sdk, undefined, { error_description: 'blah' }, undefined);
+            await handleOAuthResponse(sdk, undefined as unknown as TokenParams, { error_description: 'blah' }, undefined  as unknown as CustomUrls);
           } catch (err) {
             expect(err.name).toBe('OAuthError');
             expect(err.errorSummary).toBe('blah');
@@ -107,7 +108,7 @@ describe('handleOAuthResponse', () => {
     
         it('throws if state does not match', async () => {
           try {
-            await handleOAuthResponse(sdk, { state: 'bar' }, { state: 'foo' }, undefined);
+            await handleOAuthResponse(sdk, { state: 'bar' }, { state: 'foo' }, undefined as unknown as CustomUrls);
           } catch (err) {
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorSummary).toBe(`OAuth flow response state doesn't match request state`);
@@ -115,7 +116,7 @@ describe('handleOAuthResponse', () => {
         });
         it('throws if ID token was expected but not returend', async () => {
           try {
-            await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { access_token: 'foo' }, undefined);
+            await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { access_token: 'foo' }, undefined as unknown as CustomUrls);
           } catch (err) {
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
@@ -124,7 +125,7 @@ describe('handleOAuthResponse', () => {
         });
         it('throws if access token was expected but not returend', async () => {
           try {
-            await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { id_token: 'foo' }, undefined);
+            await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { id_token: 'foo' }, undefined as unknown as CustomUrls);
           } catch (err) {
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
@@ -133,7 +134,7 @@ describe('handleOAuthResponse', () => {
         });
         it('throws if id_token and access token were expected but not returned', async () => {
           try {
-            await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { }, undefined);
+            await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { }, undefined as unknown as CustomUrls);
           } catch (err) {
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
@@ -167,7 +168,7 @@ describe('handleOAuthResponse', () => {
 
     describe('Authorization code flow', () => {
       it('calls `exchangeCodeForTokens` if response contains "code"', async () => {
-        const res = await handleOAuthResponse(sdk, {}, { code: 'blah' }, undefined);
+        const res = await handleOAuthResponse(sdk, {}, { code: 'blah' }, undefined as unknown as CustomUrls);
         expect(exchangeCodeForTokens).toHaveBeenCalledWith(sdk, {
           authorizationCode: 'blah',
           interactionCode: undefined
@@ -178,7 +179,7 @@ describe('handleOAuthResponse', () => {
 
     describe('Interaction code flow', () => {
       it('calls `exchangeCodeForTokens` if response contains "interaction_code"', async () => {
-        const res = await handleOAuthResponse(sdk, {}, { 'interaction_code': 'blah' }, undefined);
+        const res = await handleOAuthResponse(sdk, {}, { 'interaction_code': 'blah' }, undefined as unknown as CustomUrls);
         expect(exchangeCodeForTokens).toHaveBeenCalledWith(sdk, {
           authorizationCode: undefined,
           interactionCode: 'blah'

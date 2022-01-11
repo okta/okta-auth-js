@@ -68,7 +68,7 @@ class ServerStorage implements StorageUtil {
   }
 
   getStorageByType(storageType: StorageType): SimpleStorage {
-    let storageProvider = null;
+    let storageProvider;
     switch (storageType) {
       case 'memory':
         storageProvider = this.getStorage();

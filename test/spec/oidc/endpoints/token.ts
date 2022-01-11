@@ -27,6 +27,7 @@ import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 import { postToTokenEndpoint } from '../../../../lib/oidc/endpoints/token';
 import factory from '@okta/test.support/factory';
+import { CustomUrls } from '../../../../lib/types';
 
 describe('token endpoint', function() {
   var ISSUER = 'http://example.okta.com';
@@ -112,40 +113,40 @@ describe('token endpoint', function() {
     it('Throws if no clientId', function() {
       oauthOptions.clientId = undefined;
       try {
-        postToTokenEndpoint(authClient, oauthOptions, null);
+        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
       } catch(e) {
         expect(e instanceof AuthSdkError).toBe(true);
-        expect(e.message).toBe('A clientId must be specified in the OktaAuth constructor to get a token');
+        expect((e as Error).message).toBe('A clientId must be specified in the OktaAuth constructor to get a token');
       }
     });
 
     it('Throws if no redirectUri', function() {
       oauthOptions.redirectUri = undefined;
       try {
-        postToTokenEndpoint(authClient, oauthOptions, null);
+        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
       } catch(e) {
         expect(e instanceof AuthSdkError).toBe(true);
-        expect(e.message).toBe('The redirectUri passed to /authorize must also be passed to /token');
+        expect((e as Error).message).toBe('The redirectUri passed to /authorize must also be passed to /token');
       }
     });
 
     it('Throws if no authorizationCode', function() {
       oauthOptions.authorizationCode = undefined;
       try {
-        postToTokenEndpoint(authClient, oauthOptions, null);
+        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
       } catch(e) {
         expect(e instanceof AuthSdkError).toBe(true);
-        expect(e.message).toBe('An authorization code (returned from /authorize) must be passed to /token');
+        expect((e as Error).message).toBe('An authorization code (returned from /authorize) must be passed to /token');
       }
     });
 
     it('Throws if no codeVerifier', function() {
       oauthOptions.codeVerifier = undefined;
       try {
-        postToTokenEndpoint(authClient, oauthOptions, null);
+        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
       } catch(e) {
         expect(e instanceof AuthSdkError).toBe(true);
-        expect(e.message).toBe('The "codeVerifier" (generated and saved by your app) must be passed to /token');
+        expect((e as Error).message).toBe('The "codeVerifier" (generated and saved by your app) must be passed to /token');
       }
     });
 

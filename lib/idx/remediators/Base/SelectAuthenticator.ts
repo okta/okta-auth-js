@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -13,7 +14,7 @@
 
 import { Remediator, RemediationValues } from './Remediator';
 import { getAuthenticatorFromRemediation } from '../util';
-import { IdxAuthenticator, IdxRemediationValue } from '../../types/idx-js';
+import { IdxAuthenticator, IdxOption, IdxRemediationValue } from '../../types/idx-js';
 import { Authenticator } from '../../types';
 
 // Find matched authenticator in provided order
@@ -35,8 +36,8 @@ export type SelectAuthenticatorValues = RemediationValues & {
 
 // Base class - DO NOT expose static remediationName
 export class SelectAuthenticator extends Remediator {
-  values: SelectAuthenticatorValues;
-  selectedAuthenticator: IdxAuthenticator;
+  values!: SelectAuthenticatorValues;
+  selectedAuthenticator?: IdxAuthenticator;
   
   map = {
     authenticator: []
@@ -62,11 +63,12 @@ export class SelectAuthenticator extends Remediator {
   getNextStep() {
     const common = super.getNextStep();
     const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
-    const options = authenticatorFromRemediation.options.map(option => {
+    const options = authenticatorFromRemediation.options!.map(option => {
       const { 
         label, 
-        relatesTo: { key } 
-      } = option;
+        relatesTo
+      } = option as IdxOption;
+      const key = relatesTo!.key!;
       return { label, value: key };
     });
     return { ...common, options };
@@ -92,7 +94,7 @@ export class SelectAuthenticator extends Remediator {
     // remove used authenticators
     const authenticators = (this.values.authenticators as Authenticator[])
       .filter(authenticator => {
-        return authenticator.key !== this.selectedAuthenticator.key; 
+        return authenticator.key !== this.selectedAuthenticator!.key; 
       });
     return { ...this.values, authenticators };
   }

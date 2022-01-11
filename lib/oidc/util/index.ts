@@ -17,6 +17,7 @@ export * from './defaultTokenParams';
 export * from './errors';
 export * from './loginRedirect';
 export * from './oauth';
+export * from './oauthMeta';
 import pkce from './pkce';
 export { pkce };
 export * from './prepareTokenParams';

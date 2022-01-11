@@ -48,7 +48,6 @@ export class AuthStateManager {
   _authState: AuthState | null;
   _prevAuthState: AuthState | null;
   _logOptions: AuthStateLogOptions;
-  _lastEventTimestamp: number;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
@@ -59,7 +58,8 @@ export class AuthStateManager {
     this._pending = { ...DEFAULT_PENDING };
     this._authState = INITIAL_AUTH_STATE;
     this._logOptions = {};
-
+    this._prevAuthState = null;
+ 
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process
     // Only listen on "added" event to update auth state
@@ -100,7 +100,8 @@ export class AuthStateManager {
     };
 
     const emitAuthStateChange = (authState) => {
-      if (isSameAuthState(this._authState, authState)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      if (isSameAuthState(this._authState!, authState)) {
         devMode && log('unchanged'); 
         return;
       }

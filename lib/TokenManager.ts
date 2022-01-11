@@ -55,7 +55,7 @@ export const EVENT_ERROR = 'error';
 
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
-  renewPromise: Promise<Token>;
+  renewPromise: Promise<Token | undefined> | null;
 }
 function defaultState(): TokenManagerState {
   return {
@@ -70,7 +70,7 @@ export class TokenManager implements TokenManagerInterface {
   private storage: StorageProvider;
   private state: TokenManagerState;
   private options: TokenManagerOptions;
-  private service: TokenService;
+  private service: TokenService | null;
 
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
@@ -81,7 +81,8 @@ export class TokenManager implements TokenManagerInterface {
     if (!this.emitter) {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }
-
+    this.service = null;
+    
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
     if (isIE11OrLess()) {
       options._storageEventDelay = options._storageEventDelay || 1000;
@@ -133,7 +134,8 @@ export class TokenManager implements TokenManagerInterface {
   }
   
   getExpireTime(token) {
-    var expireTime = token.expiresAt - this.options.expireEarlySeconds;
+    const expireEarlySeconds = this.options.expireEarlySeconds || 0;
+    var expireTime = token.expiresAt - expireEarlySeconds;
     return expireTime;
   }
   
@@ -385,7 +387,7 @@ export class TokenManager implements TokenManagerInterface {
   
   // TODO: this methods is redundant and can be removed in the next major version OKTA-407224
   async renewToken(token) {
-    return this.sdk.token.renew(token);
+    return this.sdk.token?.renew(token);
   }
   // TODO: this methods is redundant and can be removed in the next major version OKTA-407224
   validateToken(token: Token) {
@@ -393,7 +395,7 @@ export class TokenManager implements TokenManagerInterface {
   }
 
   // TODO: renew method should take no param, change in the next major version OKTA-407224
-  renew(key): Promise<Token> {
+  renew(key): Promise<Token | undefined> {
     // Multiple callers may receive the same promise. They will all resolve or reject from the same request.
     if (this.state.renewPromise) {
       return this.state.renewPromise;

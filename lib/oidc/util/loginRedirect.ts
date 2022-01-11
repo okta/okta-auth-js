@@ -34,7 +34,10 @@ export function hasErrorInUrl(hashOrSearch: string): boolean {
 
 export function isRedirectUri(uri: string, sdk: OktaAuth): boolean {
   var authParams = sdk.options;
-  return uri && uri.indexOf(authParams.redirectUri) === 0;
+  if (!uri || !authParams.redirectUri) {
+    return false;
+  }
+  return uri.indexOf(authParams.redirectUri) === 0;
 }
 
 export function isCodeFlow(options: OktaAuthOptions) {

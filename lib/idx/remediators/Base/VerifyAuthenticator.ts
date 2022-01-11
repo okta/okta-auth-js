@@ -28,7 +28,7 @@ export interface VerifyAuthenticatorValues extends RemediationValues {
 export class VerifyAuthenticator extends Remediator {
 
   authenticator: Authenticator;
-  values: VerifyAuthenticatorValues;
+  values!: VerifyAuthenticatorValues;
 
   map = {
     'credentials': []

@@ -11,6 +11,23 @@
 - [#1059](https://github.com/okta/okta-auth-js/pull/1059) 
   - Removes signOut option `clearTokensAfterRedirect`
   - Adds signOut option `clearTokensBeforeRedirect` (default: `false`) to remove local tokens before logout redirect happen
+- [#1049](https://github.com/okta/okta-auth-js/pull/1049) Bump minimum supported node version to 12.20
+- [#1050](https://github.com/okta/okta-auth-js/pull/1050) Removes `userAgent` field from oktaAuth instance
+- [#1014](https://github.com/okta/okta-auth-js/pull/1014) Shared transaction storage is automatically cleared on success and error states. Storage is not cleared for "terminal" state which is neither success nor error.
+- [#1057](https://github.com/okta/okta-auth-js/pull/1057) Strict checks are now enabled in the Typescript compiler options. Some type signatures have been changed to match current behavior.
+
+### Features
+
+- [#1014](https://github.com/okta/okta-auth-js/pull/1014) Updates IDX API to support email verify and recovery/activation
+  - adds new configuration options `recoveryToken` and `activationToken`
+  - email verify callback:
+    - adds support for passing `otp` to idx pipeline
+    - updates samples to display error message with OTP code
+  - idx methods support new options:
+    - `exchangeCodeForTokens`. If false, `interactionCode` will be returned on the transaction at the end of the flow instead of `tokens`.
+    - `autoRemediate`. If false, there will be no attempt to satisfy remediations even if values have been passed.
+  - TransactionManager supports new option:
+    - `saveLastResponse`. If false, IDX responses will not be cached.
 
 ### Features
 

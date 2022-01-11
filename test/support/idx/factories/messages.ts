@@ -17,7 +17,7 @@ import { IdxMessage, IdxMessages } from '../../../../lib/idx/types/idx-js';
 export const IdxMessagesFactory = Factory.define<IdxMessages>(() => {
   return {
     type: 'array',
-    value: null
+    value: []
   };
 });
 
@@ -25,7 +25,7 @@ export const IdxInfoMessageFactory = Factory.define<IdxMessage>(() => {
   return {
     class: 'INFO',
     i18n: {
-      key: undefined
+      key: 'undefined'
     },
     message: 'Default info message'
   };

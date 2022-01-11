@@ -20,7 +20,7 @@ export interface SkipValues extends RemediationValues {
 export class Skip extends Remediator {
   static remediationName = 'skip';
 
-  values: SkipValues;
+  values!: SkipValues;
 
   map = {
     skip: ['skip']
