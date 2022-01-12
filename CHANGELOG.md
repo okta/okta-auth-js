@@ -4,7 +4,7 @@
 
 ### Fixes
 
-- [#1054](https://github.com/okta/okta-auth-js/pull/1054) Fixes Typescript build error and adds strict null checks
+- [#1054](https://github.com/okta/okta-auth-js/pull/1054) Fixes Typescript build error
 
 ## 5.10.0
 
