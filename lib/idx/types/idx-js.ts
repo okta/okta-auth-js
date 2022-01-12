@@ -72,7 +72,7 @@ export interface IdxRemediationValue {
   secret?: boolean;
   visible?: boolean;
   mutable?: boolean;
-  value?: string;
+  value?: string | IdxRemediationValueForm;
   label?: string;
   form?: IdxForm;
   options?: IdxOption[];

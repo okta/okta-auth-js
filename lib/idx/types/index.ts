@@ -15,7 +15,7 @@ import { InteractOptions } from '../interact';
 import { IntrospectOptions } from '../introspect';
 import { APIError, Tokens } from '../../types';
 import { IdxTransactionMeta } from '../../types/Transaction';
-import { IdxAuthenticator, IdxMessage, IdxOption, IdxResponse } from './idx-js';
+import { IdxAuthenticator, IdxMessage, IdxOption, IdxResponse, IdxForm } from './idx-js';
 import { FlowIdentifier } from './FlowIdentifier';
 
 export { IdxMessage } from './idx-js';
@@ -47,7 +47,7 @@ export type Input = {
   name: string;
   type?: string;
   label?: string;
-  value?: string;
+  value?: string | {form: IdxForm};
   secret?: boolean;
   required?: boolean;
 }

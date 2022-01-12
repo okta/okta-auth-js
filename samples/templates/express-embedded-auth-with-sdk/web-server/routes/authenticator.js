@@ -270,7 +270,7 @@ router.get('/enroll-authenticator/:authenticator/enrollment-channel-data/', asyn
   } } = req.getFlowStates();
   let selectedChannelName, selectedChannelDisplayName;
   if (selectedChannel === 'sms') {
-    selectedChannelName = 'phoneNumber'
+    selectedChannelName = 'phoneNumber';
     selectedChannelDisplayName = 'Phone number';
   } else if (selectedChannel === 'email') {
     selectedChannelName = 'email';

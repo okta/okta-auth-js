@@ -38,9 +38,7 @@ export function getRemediator(
   const { remediators } = options;
 
   let remediator;
-  // @ts-ignore
   if (options.nextStep) {
-    // @ts-ignore
     const remediation = idxRemediations.find(({ name }) => name === options.nextStep);
     const T = remediators[remediation.name];
     return new T(remediation, values);

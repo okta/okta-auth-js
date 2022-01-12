@@ -27,7 +27,8 @@ import { AuthSdkError } from '../errors';
 export type ProceedOptions = AuthenticationOptions
   & RegistrationOptions
   & PasswordRecoveryOptions
-  & EnrollPollOptions;
+  & EnrollPollOptions
+  & { nextStep?: string };
 
 export function canProceed(authClient: OktaAuth, options?: { state?: string }) {
   const meta = getSavedTransactionMeta(authClient, options);
