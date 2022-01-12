@@ -20,9 +20,9 @@
 
       <div class="row">
         <form id="verify-form" class="ui large form" action="{{action}}" method="POST">
+          <div class="default text">Enter {{selectedChannelDisplayName}}</div>
           <div class="field">
-          <input type="text" name="email"/>
-          <input type="text" name="phoneNumber"/>
+          <input type="text" name="{{selectedChannelName}}"/>
           </div>
           <button id="submit-button" class="ui fluid large primary submit button" type="submit">
             Next

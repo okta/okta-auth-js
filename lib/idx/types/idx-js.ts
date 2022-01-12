@@ -42,6 +42,7 @@ export interface IdxAuthenticator {
       question: string;
     }[];
     questionKeys?: string[];
+    selectedChannel?: string;
   };
 }
 

@@ -12,8 +12,7 @@
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
-import { IdxContext, IdxForm, IdxOption, IdxRemediationValue, IdxRemediationValueForm, IdxResponse } from '../types/idx-js';
-import { AuthenticatorData } from './Base/AuthenticatorData';
+import { IdxOption, IdxRemediationValue, IdxResponse } from '../types/idx-js';
 import { getAuthenticatorFromRemediation } from './util';
 
 

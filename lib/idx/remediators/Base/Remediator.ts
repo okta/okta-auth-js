@@ -1,4 +1,3 @@
-import { IdxRemediationValueForm, IdxResponse } from './../../types/idx-js';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -15,7 +14,7 @@ import { IdxRemediationValueForm, IdxResponse } from './../../types/idx-js';
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
 import { NextStep, IdxMessage, Authenticator, Input, IdxOptions } from '../../types';
-import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
+import { IdxAuthenticator, IdxRemediation, IdxResponse } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)

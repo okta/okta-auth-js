@@ -29,6 +29,16 @@
           </div>
         </div>
       {{/contextualData.qrcode}}
+      {{#contextualData.phoneNumber}}
+        <div class="ui positive message">
+        SMS with setup link sent to {{{contextualData.phoneNumber}}}
+        </div>
+      {{/contextualData.phoneNumber}}
+      {{#contextualData.email}}
+        <div class="ui positive message">
+        Setup link sent to {{{contextualData.email}}}
+        </div>
+      {{/contextualData.email}}
       <div class="row">
       {{#nextStep}}
         <form id="select-channel-form" action="{{nextStepAction}}" method="POST">
