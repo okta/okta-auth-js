@@ -44,6 +44,7 @@ export function getRemediator(
 ): Remediator {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const remediators = options.remediators!;
+  const { flow } = options;
 
   let remediator;
   // remediation name specified by caller - fast-track remediator lookup 
@@ -63,7 +64,7 @@ export function getRemediator(
 
     const T = remediators[remediation.name];
     remediator = new T(remediation, values);
-    if (remediator.canRemediate()) {
+    if (remediator.canRemediate(flow)) {
       // found the remediator
       return remediator;
     }
@@ -161,6 +162,7 @@ export async function remediate(
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
   const { remediators, flow } = options;
+  let remediator;
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -173,23 +175,6 @@ export async function remediate(
   if (terminal) {
     return { terminal, messages };
   }
-
-  const remediator = getRemediator(neededToProceed, values, options);
-  if (!remediator && flow === 'default') {
-    return { idxResponse };
-  }
-  
-  if (!remediator) {
-    throw new AuthSdkError(`
-      No remediation can match current flow, check policy settings in your org.
-      Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
-    `);
-  }
-
-  if (messages.length) {
-    const nextStep = getNextStep(remediator, idxResponse);
-    return { nextStep, messages };
-  }
   
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
@@ -198,6 +183,7 @@ export async function remediate(
     ...(actionFromValues && [actionFromValues] || []),
   ];
   if (actions) {
+    let foundRemediationCandidate = false;
     for (let action of actions) {
       let valuesWithoutExecutedAction = removeActionFromValues(values);
       if (typeof idxResponse.actions[action] === 'function') {
@@ -211,11 +197,55 @@ export async function remediate(
         }
         return remediate(idxResponse, valuesWithoutExecutedAction, options); // recursive call
       }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      else if (typeof action ==='string' && action in remediators!) {
+        const remediation = neededToProceed.find(({ name }) => name === action);
+        if (!remediation) {
+          continue;
+        }
+        foundRemediationCandidate = true;   // signal remediation(s) were passed as actions
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const T = remediators![action];
+        const remediatorCandidate = new T(remediation, values);
+        if (remediatorCandidate.canRemediate(flow)) {
+          remediator = remediatorCandidate;
+        }
+      }
+    }
+
+    // if remediations were passed as actions, but were unable to proceed/remediate, throw
+    if (foundRemediationCandidate && !remediator) {
+      // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+      const {flow, stateHandle, ...rest} = values;
+      throw new AuthSdkError(
+        `Unable to proceed with the configured remediations:
+        Attempted: [${actions.join(', ')}]
+        Received: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
+        Values: ${JSON.stringify(rest)}`
+      );
     }
   }
 
+  remediator = remediator || getRemediator(neededToProceed, values, options);
+  if (!remediator && flow === 'default') {
+    return { idxResponse };
+  }
+
+  if (!remediator) {
+    throw new AuthSdkError(`
+      No remediation can match current flow, check policy settings in your org.
+      Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
+    `);
+  }
+
+  if (messages.length) {
+    const nextStep = getNextStep(remediator, idxResponse);
+    return { nextStep, messages };
+  }
+
   // Return next step to the caller
-  if (!remediator.canRemediate()) {
+  if (!remediator.canRemediate(flow)) {
     const nextStep = getNextStep(remediator, idxResponse);
     return { idxResponse, nextStep };
   }

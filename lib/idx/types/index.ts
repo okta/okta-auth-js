@@ -32,6 +32,7 @@ export { IdxMessage, ChallengeData, ActivationData } from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
 export { RegistrationOptions } from '../register';
 export { PasswordRecoveryOptions } from '../recoverPassword';
+export { AccountUnlockOptions } from '../unlockAccount';
 export { ProceedOptions } from '../proceed';
 export { CancelOptions } from '../cancel';
 export { FlowIdentifier };
@@ -85,6 +86,7 @@ export enum IdxFeature {
   PASSWORD_RECOVERY = 'recover-password',
   REGISTRATION = 'enroll-profile',
   SOCIAL_IDP = 'redirect-idp',
+  ACCOUNT_UNLOCK = 'unlock-account',
 }
 
 export interface IdxTransaction {

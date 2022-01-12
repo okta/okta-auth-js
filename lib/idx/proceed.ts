@@ -23,12 +23,14 @@ import {
 } from './remediators';
 import { RegistrationOptions } from './register';
 import { PasswordRecoveryOptions } from './recoverPassword';
+import { AccountUnlockOptions } from './unlockAccount';
 import { getSavedTransactionMeta } from './transactionMeta';
 import { AuthSdkError } from '../errors';
 
 export type ProceedOptions = AuthenticationOptions
   & RegistrationOptions
   & PasswordRecoveryOptions
+  & AccountUnlockOptions
   & EnrollPollOptions
   & SelectEnrollmentChannelOptions
   & { step?: string };

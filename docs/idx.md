@@ -466,7 +466,6 @@ if (authClient.idx.canProceed()) {
   await authClient.idx.proceed();
 }
 ```
-
 #### `idx.canProceed`
 
 Returns true if there is a saved in-progress idx transaction. To test against shared browser storage, pass `state`.

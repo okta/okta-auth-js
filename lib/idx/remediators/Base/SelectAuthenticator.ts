@@ -17,30 +17,33 @@ import { getAuthenticatorFromRemediation } from '../util';
 import { IdxAuthenticator, IdxOption, IdxRemediationValue } from '../../types/idx-js';
 import { Authenticator } from '../../types';
 
-// Find matched authenticator in provided order
-function findMatchedOption(authenticators, options) {
-  let option;
-  for (let authenticator of authenticators) {
-    option = options
-      .find(({ relatesTo }) => relatesTo.key === authenticator.key);
-    if (option) {
-      break;
-    }
-  }
-  return option;
-}
 
 export type SelectAuthenticatorValues = RemediationValues & {
   authenticator?: string;
+  methodType?: string;
 };
 
 // Base class - DO NOT expose static remediationName
 export class SelectAuthenticator extends Remediator {
   values!: SelectAuthenticatorValues;
   selectedAuthenticator?: IdxAuthenticator;
+  selectedOption?: any;
   
   map = {
     authenticator: []
+  }
+
+  // Find matched authenticator in provided order
+  findMatchedOption(authenticators, options) {
+    let option;
+    for (let authenticator of authenticators) {
+      option = options
+        .find(({ relatesTo }) => relatesTo.key === authenticator.key);
+      if (option) {
+        break;
+      }
+    }
+    return option;
   }
 
   canRemediate() {
@@ -52,7 +55,7 @@ export class SelectAuthenticator extends Remediator {
       return false;
     }
     // Proceed with provided authenticators
-    const matchedOption = findMatchedOption(authenticators, options);
+    const matchedOption = this.findMatchedOption(authenticators, options);
     if (matchedOption) {
       return true;
     }
@@ -77,9 +80,10 @@ export class SelectAuthenticator extends Remediator {
   mapAuthenticator(remediationValue: IdxRemediationValue) {
     const { authenticators } = this.values;
     const { options } = remediationValue;
-    const selectedOption = findMatchedOption(authenticators, options);
+    const selectedOption = this.findMatchedOption(authenticators, options);
     // track the selected authenticator
     this.selectedAuthenticator = selectedOption.relatesTo;
+    this.selectedOption = selectedOption;
     return {
       id: selectedOption?.value.form.value.find(({ name }) => name === 'id').value
     };

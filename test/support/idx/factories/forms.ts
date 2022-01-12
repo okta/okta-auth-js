@@ -27,6 +27,7 @@ import {
   CustomAttributeValueFactory,
   OktaVerifyMethodTypeValueFactory,
   WebauthnMethodTypeValueFactory,
+  OktaVerifyPushOnlyMethodTypeValueFactory,
 } from './values';
 
 export const IdxFormFactory = Factory.define<IdxForm>(() => {
@@ -117,6 +118,16 @@ export const OktaVerifyAuthenticatorEnollmentChannelFormFactory = IdxRemediation
       OktaVerifyEnrollmentChannelValueFactory.build(),
     ]
   }
+});
+
+// push only
+export const OktaVerifyPushOnlyAuthenticatorFormFactory = IdxFormFactory.params({
+  value: [
+    IdValueFactory.build({
+      value: 'id-okta-verify-authenticator'
+    }),
+    OktaVerifyPushOnlyMethodTypeValueFactory.build()
+  ]
 });
 
 export const PhoneAuthenticatorFormFactory = IdxFormFactory.params({

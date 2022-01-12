@@ -11,16 +11,18 @@
  */
 
 
-export * from './authenticate';
-export * from './cancel';
-export * from './emailVerify';
-export * from './interact';
-export * from './introspect';
-export * from './poll';
-export * from './proceed';
-export * from './register';
-export * from './recoverPassword';
-export * from './handleInteractionCodeRedirect';
-export * from './startTransaction';
-export * from './transactionMeta';
-export * from './unlockAccount';
+import { Remediator, RemediationValues } from './Base/Remediator';
+import { FlowIdentifier } from '../types';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface UnlockAccountValues extends RemediationValues {}
+
+export class UnlockAccount extends Remediator {
+  static remediationName = 'unlock-account';
+
+  values!: UnlockAccountValues;
+
+  canRemediate(flow?: FlowIdentifier) {
+    return !!flow && flow === 'unlockAccount';
+  }
+}

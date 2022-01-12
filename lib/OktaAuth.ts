@@ -113,6 +113,7 @@ import {
   proceed,
   register,
   recoverPassword,
+  unlockAccount,
   startTransaction,
   handleInteractionCodeRedirect,
   canProceed,
@@ -328,6 +329,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
         return this.options.flow;
       },
       canProceed: canProceed.bind(null, this),
+      unlockAccount: unlockAccount.bind(null, this),
     };
 
     setGlobalRequestInterceptor(createGlobalRequestInterceptor(this)); // to pass custom headers to IDX endpoints
