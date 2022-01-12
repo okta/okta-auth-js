@@ -340,7 +340,7 @@ describe('OktaAuth (browser)', function() {
 
       it('Can pass a "clearTokensAfterRedirect=false" to force clear tokens logic', function() {
         auth.tokenManager.addPendingRemoveFlags = jest.fn();
-        return auth.signOut({ clearTokensAfterRedirect: false })
+        return auth.signOut({ clearTokensBeforeRedirect: true })
           .then(function() {
             expect(auth.tokenManager.clear).toHaveBeenCalled();
             expect(auth.tokenManager.addPendingRemoveFlags).not.toHaveBeenCalled();

@@ -109,7 +109,7 @@
   
       function logout(e) {
         e.preventDefault();
-        authClient.signOut({ clearTokensAfterRedirect: false })
+        authClient.signOut({ clearTokensBeforeRedirect: true })
       }
   
       main();

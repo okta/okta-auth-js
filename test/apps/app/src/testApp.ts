@@ -97,7 +97,7 @@ function logoutLink(app: TestApp): string {
     <div class="actions signout pure-menu">
       <ul class="pure-menu-list">
         <li class="pure-menu-item">
-          <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event, { clearTokensAfterRedirect: false })" class="pure-menu-link">Logout (and redirect here)</a>
+          <a id="logout-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event, { clearTokensBeforeRedirect: true })" class="pure-menu-link">Logout (and redirect here)</a>
         </li>
         <li class="pure-menu-item">
           <a id="logout-redirect-clear-tokens-after-redirect" href="${app.originalUrl}" onclick="logoutRedirect(event)" class="pure-menu-link">Logout (and redirect here, tokens will be cleared afterward)</a>
