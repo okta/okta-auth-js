@@ -1796,6 +1796,7 @@ describe('idx/authenticate', () => {
             nextStep: {
               authenticator: undefined,
               name: 'challenge-poll',
+              inputs: [],
               poll: {
                 refresh: 100,
                 required: true,
@@ -1838,7 +1839,7 @@ describe('idx/authenticate', () => {
           });
         });
 
-        it('can select OktaVerify', async () => {
+        it('can select Okta Verify', async () => {
           const {
             authClient,
             selectAuthenticatorResponse,
@@ -1866,6 +1867,7 @@ describe('idx/authenticate', () => {
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-poll',
+              inputs: [],
               authenticator: {
                 displayName: 'Okta Verify',
                 id: expect.any(String),
