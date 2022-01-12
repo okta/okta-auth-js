@@ -266,24 +266,14 @@ router.get('/enroll-authenticator/:authenticator/enrollment-channel-data/', asyn
 
   const {
     idx: { nextStep: {
-      authenticator: { contextualData: { selectedChannel } } }
-  } } = req.getFlowStates();
-  let selectedChannelName, selectedChannelDisplayName;
-  if (selectedChannel === 'sms') {
-    selectedChannelName = 'phoneNumber';
-    selectedChannelDisplayName = 'Phone number';
-  } else if (selectedChannel === 'email') {
-    selectedChannelName = 'email';
-    selectedChannelDisplayName = 'Email';
-  }
+      inputs } } } = req.getFlowStates();
 
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'verify-enrollment-channel', {
-      title: 'Enter phone or email',
+      title: 'Select Enrollment Channel',
       action: `/enroll-authenticator/${authenticator}/enrollment-channel-data`,
-      selectedChannelName,
-      selectedChannelDisplayName,
+      inputs,
     })
   });
 });

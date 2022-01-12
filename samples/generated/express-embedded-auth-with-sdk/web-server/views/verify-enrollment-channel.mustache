@@ -20,10 +20,19 @@
 
       <div class="row">
         <form id="verify-form" class="ui large form" action="{{action}}" method="POST">
-          <div class="default text">Enter {{selectedChannelDisplayName}}</div>
           <div class="field">
           <input type="text" name="{{selectedChannelName}}"/>
           </div>
+          {{#inputs}}
+            <div class="field">
+              <div class="ui labeled input">
+                <div class="ui label">
+                  {{label}}
+                </div>
+                <input id={{name}} type="text" name="{{name}}" />
+              </div>
+            </div>
+          {{/inputs}}
           <button id="submit-button" class="ui fluid large primary submit button" type="submit">
             Next
           </button>

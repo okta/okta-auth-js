@@ -1,3 +1,4 @@
+import { getAuthenticator } from '../authenticator/getAuthenticator';
 import { IdxResponse } from '../types/idx-js';
 /*!
  * Copyright (c) 2021-present, Okta, Inc. and/or its affiliates. All rights reserved.
@@ -25,6 +26,23 @@ export class EnrollmentChannelData extends Remediator {
   static remediationName = 'enrollment-channel-data';
 
   values: EnrollmentChannelDataValues;
+
+  map = {
+    email: [],
+    phoneNumber: []
+  }
+
+  getInputEmail() {
+    return [
+      { name: 'email', type: 'string', required: true, label: 'Email' },
+    ];
+  }
+
+  getInputPhoneNumber() {
+    return [
+      { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
+    ];
+  }
 
   canRemediate() {
     return Boolean(this.values.email || this.values.phoneNumber);
