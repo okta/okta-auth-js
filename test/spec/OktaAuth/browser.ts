@@ -216,10 +216,9 @@ describe('OktaAuth (browser)', function() {
       it('Default options when no refreshToken: will revokeAccessToken and use window.location.origin for postLogoutRedirectUri', function() {
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(3);
             expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(auth.closeSession).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -231,10 +230,9 @@ describe('OktaAuth (browser)', function() {
 
         return auth.signOut()
           .then(function() {
-            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(3);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.revokeRefreshToken).toHaveBeenCalledWith(refreshToken);
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(auth.closeSession).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -257,7 +255,6 @@ describe('OktaAuth (browser)', function() {
         var customToken = { idToken: 'fake-custom' };
         return auth.signOut({ idToken: customToken })
           .then(function() {
-            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${customToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -302,10 +299,9 @@ describe('OktaAuth (browser)', function() {
 
         return auth.signOut({ revokeAccessToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(auth.revokeRefreshToken).toHaveBeenCalled();
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -316,10 +312,9 @@ describe('OktaAuth (browser)', function() {
         
         return auth.signOut({ revokeRefreshToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).toHaveBeenCalled();
             expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -327,19 +322,28 @@ describe('OktaAuth (browser)', function() {
       it('Can pass a "accessToken=false" to skip accessToken logic', function() {
         return auth.signOut({ accessToken: false })
           .then(function() {
-            expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(2);
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
-            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
 
-      it('Can pass a "clearTokensAfterRedirect=true" to skip clear tokens logic', function() {
+      it('skips token clear logic by default', () => {
         auth.tokenManager.addPendingRemoveFlags = jest.fn();
-        return auth.signOut({ clearTokensAfterRedirect: true })
+        return auth.signOut()
           .then(function() {
             expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(auth.tokenManager.addPendingRemoveFlags).toHaveBeenCalled();
+            expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+          });
+      });
+
+      it('Can pass a "clearTokensAfterRedirect=false" to force clear tokens logic', function() {
+        auth.tokenManager.addPendingRemoveFlags = jest.fn();
+        return auth.signOut({ clearTokensAfterRedirect: false })
+          .then(function() {
+            expect(auth.tokenManager.clear).toHaveBeenCalled();
+            expect(auth.tokenManager.addPendingRemoveFlags).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });

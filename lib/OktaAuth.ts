@@ -475,6 +475,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     var refreshToken = options.refreshToken;
     var revokeAccessToken = options.revokeAccessToken !== false;
     var revokeRefreshToken = options.revokeRefreshToken !== false;
+    var clearTokensAfterRedirect = options.clearTokensAfterRedirect !== false;
   
     if (revokeRefreshToken && typeof refreshToken === 'undefined') {
       refreshToken = this.tokenManager.getTokensSync().refreshToken as RefreshToken;
@@ -510,7 +511,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
         }
       });
     } else {
-      if (options.clearTokensAfterRedirect) {
+      if (clearTokensAfterRedirect) {
         this.tokenManager.addPendingRemoveFlags();
       } else {
         // Clear all local tokens
