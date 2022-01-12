@@ -1,5 +1,3 @@
-import { getAuthenticator } from '../authenticator/getAuthenticator';
-import { IdxResponse } from '../types/idx-js';
 /*!
  * Copyright (c) 2021-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -14,7 +12,7 @@ import { IdxResponse } from '../types/idx-js';
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
-
+import { IdxResponse } from '../types/idx-js';
 
 
 export type EnrollmentChannelDataValues = RemediationValues & {
