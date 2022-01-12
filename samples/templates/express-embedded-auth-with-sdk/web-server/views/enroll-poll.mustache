@@ -20,17 +20,15 @@
         {{>formMessages}}
       </div>
 
-      {{#contextualData}}
+      {{#contextualData.qrcode}}
         <div class="ui segments">
           <div class="ui segment">
-            {{#contextualData.qrcode}}
               <div class="ui fluid image">
                 <img id="authenticator-qr-code" src="{{contextualData.qrcode.href}}" />
               </div>
-            {{/contextualData.qrcode}}
           </div>
         </div>
-      {{/contextualData}}
+      {{/contextualData.qrcode}}
       <div class="row">
       {{#nextStep}}
         <form id="select-channel-form" action="{{nextStepAction}}" method="POST">
