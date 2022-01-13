@@ -4,6 +4,8 @@ import alias from '@rollup/plugin-alias';
 import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
 import license from 'rollup-plugin-license';
+import commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import pkg from './package.json';
 
 const path = require('path');
@@ -12,7 +14,7 @@ const makeExternalPredicate = () => {
   const externalArr = [
     ...Object.keys(pkg.peerDependencies || {}),
     ...Object.keys(pkg.dependencies || {}),
-  ];
+  ].filter(dep => dep !== 'p-cancelable');
 
   if (externalArr.length === 0) {
     return () => false;
@@ -25,6 +27,8 @@ const extensions = ['js', 'ts'];
 
 const external = makeExternalPredicate();
 const commonPlugins = [
+  nodeResolve(),
+  commonjs(),
   replace({
     'SDK_VERSION': JSON.stringify(pkg.version),
     'global.': 'window.',
