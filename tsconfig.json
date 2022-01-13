@@ -19,7 +19,6 @@
     "outDir": "./build",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": false,
     "skipLibCheck": true,
     "rootDir": "./",
     "baseUrl": "./"

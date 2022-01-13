@@ -10,20 +10,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export interface CookieOptions {
-  path?: string;
-  secure?: boolean;
-  sessionCookie?: boolean;
-  sameSite?: string | boolean;
-  expires?: Date;
-}
+import { CookieAttributes } from 'js-cookie';
 
-export interface SetCookieOptions extends CookieOptions {
-  path?: string;
+export interface CookieOptions extends CookieAttributes {
+  sessionCookie?: boolean;
 }
 
 export interface Cookies {
-  set(name: string, value: string, expiresAt: string, options: SetCookieOptions): string;
+  set(name: string, value: string, expiresAt: string, options: CookieOptions): string;
   get(name: string): string;
   delete(name: string): string;
 }
