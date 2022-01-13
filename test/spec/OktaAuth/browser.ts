@@ -218,7 +218,6 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
-            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(auth.closeSession).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -232,7 +231,6 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.revokeRefreshToken).toHaveBeenCalledWith(refreshToken);
-            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(auth.closeSession).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
@@ -301,7 +299,6 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
             expect(auth.revokeRefreshToken).toHaveBeenCalled();
-            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -314,7 +311,6 @@ describe('OktaAuth (browser)', function() {
           .then(function() {
             expect(auth.revokeAccessToken).toHaveBeenCalled();
             expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
-            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });
@@ -323,7 +319,6 @@ describe('OktaAuth (browser)', function() {
         return auth.signOut({ accessToken: false })
           .then(function() {
             expect(auth.revokeAccessToken).not.toHaveBeenCalled();
-            expect(auth.tokenManager.clear).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
           });
       });

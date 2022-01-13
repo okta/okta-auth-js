@@ -109,6 +109,8 @@
   
       function logout(e) {
         e.preventDefault();
+        // authClient.start() is not triggered by default
+        // clear local tokens before redirect to end up with correct authState
         authClient.signOut({ clearTokensBeforeRedirect: true })
       }
   
