@@ -11,7 +11,7 @@
 - [#1051](https://github.com/okta/okta-auth-js/pull/1051) Removes `useMultipleCookies` from CookieStorage options
 - [#1059](https://github.com/okta/okta-auth-js/pull/1059) 
   - Removes signOut option `clearTokensAfterRedirect`
-  - Adds signOut option `clearTokensAfterRedirect` (default: `false`) to remove local tokens before logout redirect happen
+  - Adds signOut option `clearTokensBeforeRedirect` (default: `false`) to remove local tokens before logout redirect happen
 
 ### Features
 
