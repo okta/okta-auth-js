@@ -44,7 +44,7 @@ export class EnrollPoll extends Remediator {
     };
   }
 
-  getValuesAfterProceed(): unknown {
+  getValuesAfterProceed(): EnrollPollValues {
     let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'startPolling');
     return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
   }

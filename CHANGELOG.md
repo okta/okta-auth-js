@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.10.1
+
+### Fixes
+
+- [#1054](https://github.com/okta/okta-auth-js/pull/1054) Fixes Typescript build error
+
 ## 5.10.0
 
 ### Features
