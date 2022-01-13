@@ -510,11 +510,11 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
         }
       });
     } else {
-      if (options.clearTokensAfterRedirect) {
-        this.tokenManager.addPendingRemoveFlags();
-      } else {
+      if (options.clearTokensBeforeRedirect) {
         // Clear all local tokens
         this.tokenManager.clear();
+      } else {
+        this.tokenManager.addPendingRemoveFlags();
       }
       // Flow ends with logout redirect
       window.location.assign(logoutUri);
