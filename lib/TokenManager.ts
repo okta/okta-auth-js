@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+
+import EventEmitter from 'tiny-emitter';
 import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
 import { isRefreshTokenError, validateToken  } from './oidc/util';
@@ -17,7 +19,6 @@ import { isLocalhost, isIE11OrLess } from './features';
 import { TOKEN_STORAGE_NAME } from './constants';
 import SdkClock from './clock';
 import {
-  EventEmitter,
   Token, 
   Tokens, 
   TokenType, 
