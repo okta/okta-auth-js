@@ -39,7 +39,7 @@ export function getDefaultConfig(): Config {
     issuer: ISSUER,
     clientId: CLIENT_ID,
     redirectUri: REDIRECT_URI,
-    useInteractionCodeFlow: false,
+    useInteractionCodeFlow: true,
     responseType: ['token', 'id_token'],
     scopes: ['openid', 'email', 'offline_access'],
     pkce: true,

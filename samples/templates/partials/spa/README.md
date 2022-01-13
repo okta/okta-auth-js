@@ -30,24 +30,24 @@ The following parameters are accepted by this app:
 {{#if requireUserSession}}
 * `requireUserSession` - (true|false) - by default, a user will be considered authenticated if there are tokens in storage. This check does not require a network request. If the `requireUserSession` option is set to `true`, an additional check will be done to verify that the user has a valid Okta SSO
 {{/if}}
-* `flow` - ("redirect"{{#if signinForm}}|"form"{{/if}}{{#if signinWidget}}|"widget"{{/if}}) - set the authorization flow
+* `authMethod` - ("redirect"{{#if signinForm}}|"form"{{/if}}{{#if signinWidget}}|"widget"{{/if}}) - set the method used to sign in the user.
 
-## Authorization flows
+## Authorization methods
 
-Okta supports several methods of authentication. An authorization "flow" begins with one of these methods and ends when the app receives OIDC tokens. This sample demonstrates how to authenticate using the following flows:
+Okta supports several methods of authentication. An authorization flow begins with one of these methods and ends when the app receives OIDC tokens. This sample demonstrates how to authenticate using the following methods:
 
 ### Redirect
 
-Redirecting to Okta for authentication means your app does not need to provide any UI for signin. The signin page hosted by Okta will handle all details such as collecting credentials and multi-factor challenges and redirects back to your app on success.
+Redirecting to Okta for authentication means your app does not need to provide any UI for signin. The sign-in page hosted by Okta will handle all details such as collecting credentials and multi-factor challenges and redirects back to your app on success.
 
 {{#if signinWidget}}
-### Self-hosted signin widget
+### Embedded Sign-in Widget
 
-The [Okta signin widget](https://github.com/okta/okta-signin-widget) can be embedded within your app. This provides the same signin experience as the Okta-hosted signin page within your app's UI and avoids a redirect round-trip.
+The [Okta Sign-in Widget](https://github.com/okta/okta-signin-widget) can be embedded within your app. This provides the same sign-in experience as the Okta-hosted sign-in page within your app's UI and avoids a redirect round-trip.
 
 {{/if}}
 {{#if signinForm}}
-### Custom signin form
+### Custom forms
 
-This is a standard form which collects username and password. The UI is completely controlled by the app, including error handling. This flow will not work if MFA (multi-factor authentication) is enabled for this app.
+These are a standard forms which collects username, password and other credentials for sign-in. The UI is completely controlled by the app, including error handling.
 {{/if}}

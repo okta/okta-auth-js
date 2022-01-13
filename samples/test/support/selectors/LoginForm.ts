@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { Selectors } from './types';
+
 
 const loginForm = '#login-form';
 const username = `${loginForm} #username`;
@@ -21,7 +23,7 @@ const facebookButton = '#idp-buttons #facebook';
 const googleButton = '#idp-buttons #google';
 const oidcIdPButton = '#idp-buttons #oidc';
 
-export class LoginForm {
+export class LoginForm implements Selectors {
   get username() { return username; }
   get password() { return password; }
   get submit() { return submit; }

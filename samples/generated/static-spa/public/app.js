@@ -46,12 +46,13 @@ var config = {
   clientId: '',
   scopes: ['openid','email'],
   storage: 'sessionStorage',
+  useInteractionCodeFlow: true,
   requireUserSession: 'true',
-  flow: 'redirect',
+  authMethod: 'form',
   startService: false,
+  useDynamicForm: false,
   uniq: Date.now() + Math.round(Math.random() * 1000), // to guarantee a unique state
   idps: '',
-  useInteractionCodeFlow: false,
 };
 
 /* eslint-disable max-statements,complexity */
@@ -71,11 +72,13 @@ function loadConfig() {
   var clientId;
   var appUri;
   var storage;
-  var flow;
+  var authMethod;
   var startService;
   var requireUserSession;
   var scopes;
   var useInteractionCodeFlow;
+  var useDynamicForm;
+
   var idps;
 
   var state;
@@ -90,11 +93,12 @@ function loadConfig() {
     issuer = state.issuer;
     clientId = state.clientId;
     storage = state.storage;
-    flow = state.flow;
+    authMethod = state.authMethod;
     startService = state.startService;
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
     useInteractionCodeFlow = state.useInteractionCodeFlow;
+    useDynamicForm = state.useDynamicForm;
     config.uniq = state.uniq;
     idps = state.idps;
   } else {
@@ -103,12 +107,13 @@ function loadConfig() {
     issuer = url.searchParams.get('issuer') || config.issuer;
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
-    flow = url.searchParams.get('flow') || config.flow;
+    authMethod = url.searchParams.get('authMethod') || config.authMethod;
     startService = url.searchParams.get('startService') === 'true' || config.startService;
     requireUserSession = url.searchParams.get('requireUserSession') ? 
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
     scopes = url.searchParams.get('scopes') ? url.searchParams.get('scopes').split(' ') : config.scopes;
     useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true' || config.useInteractionCodeFlow;
+    useDynamicForm = url.searchParams.get('useDynamicForm') === 'true' || config.useDynamicForm;
     idps = url.searchParams.get('idps') || config.idps;
   }
   // Create a canonical app URI that allows clean reloading with this config
@@ -117,10 +122,11 @@ function loadConfig() {
     clientId,
     storage,
     requireUserSession,
-    flow,
+    authMethod,
     startService,
     scopes: scopes.join(' '),
     useInteractionCodeFlow,
+    useDynamicForm,
     idps,
   }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
   // Add all app options to the state, to preserve config across redirects
@@ -130,10 +136,11 @@ function loadConfig() {
     clientId,
     storage,
     requireUserSession,
-    flow,
+    authMethod,
     startService,
     scopes,
     useInteractionCodeFlow,
+    useDynamicForm,
     idps,
   };
   var newConfig = {};
@@ -167,7 +174,7 @@ function showForm() {
   document.getElementById('scopes').value = config.scopes.join(' ');
   document.getElementById('idps').value = config.idps;
   try {
-    document.querySelector(`#flow [value="${config.flow || ''}"]`).selected = true;
+    document.querySelector(`#authMethod [value="${config.authMethod || ''}"]`).selected = true;
   } catch (e) { showError(e); }
 
   if (config.startService) {
@@ -191,23 +198,33 @@ function showForm() {
     document.getElementById('useInteractionCodeFlow-off').checked = true;
   }
   
+  if (config.useDynamicForm) {
+    document.getElementById('useDynamicForm-on').checked = true;
+  } else {
+    document.getElementById('useDynamicForm-off').checked = true;
+  }
+
+
   // Show the form
   document.getElementById('config-form').style.display = 'block'; // show form
 
-  onChangeFlow();
+  onChangeAuthMethod();
 }
 
-function onChangeFlow() {
-  const flow = document.getElementById('flow').value;
-  const display = flow == 'widget' ? 'inline-block' : 'none';
-  document.getElementById('idps').style.display = display;
-  document.querySelector(`label[for=idps]`).style.display = display;
+function onChangeAuthMethod() {
+  const authMethod = document.getElementById('authMethod').value;
+  document.querySelector('#form .field-useDynamicForm').style.display = authMethod == 'form' ? 'block' : 'none';
+  document.querySelector('#form .field-idps').style.display = authMethod == 'widget' ? 'block' : 'none';
 }
-window._onChangeFlow = onChangeFlow;
+window._onChangeAuthMethod = onChangeAuthMethod;
 
 // Keep us in the same tab
 function onSubmitForm(event) {
   event.preventDefault();
+
+  // clear transaction data to prevent odd behavior when switching to static form
+  sessionStorage.clear();
+
   // eslint-disable-next-line no-new
   new FormData(document.getElementById('form')); // will fire formdata event
 }
@@ -457,7 +474,7 @@ function renewToken() {
 window._renewToken = bindClick(renewToken);
 
 function beginAuthFlow() {
-  switch (config.flow) {
+  switch (config.authMethod) {
     case 'redirect':
       showRedirectButton();
       break;
@@ -480,7 +497,7 @@ function endAuthFlow(tokens) {
 }
 
 function showRedirectButton() {
-  document.getElementById('flow-redirect').style.display = 'block';
+  document.getElementById('authMethod-redirect').style.display = 'block';
 }
 
 function logout(e) {
@@ -576,7 +593,7 @@ function showSigninWidget(options) {
     el: '#signin-widget'
   })
   .then(function(response) {
-    document.getElementById('flow-widget').style.display = 'none';
+    document.getElementById('authMethod-widget').style.display = 'none';
     signIn.remove();
     endAuthFlow(response.tokens);
   })
@@ -584,7 +601,7 @@ function showSigninWidget(options) {
     console.log('login error', error);
   });
 
-  document.getElementById('flow-widget').style.display = 'block'; // show login UI
+  document.getElementById('authMethod-widget').style.display = 'block'; // show login UI
 }
 function resumeTransaction(options) {
   if (!config.useInteractionCodeFlow) {
@@ -608,22 +625,33 @@ function showSigninForm(options) {
   hideRecoveryChallenge();
   hideNewPasswordForm();
 
-  // Is there an existing transaction we can resume?
-  if (resumeTransaction(options)) {
+  // Authn must use static login form
+  if (config.useDynamicForm === false || !config.useInteractionCodeFlow) {
+    // Is there an existing transaction we can resume? If so, we will be in MFA flow
+    if (resumeTransaction(options)) {
+      return;
+    }
+    document.getElementById('static-signin-form').style.display = 'block';
     return;
   }
 
-  document.getElementById('login-form').style.display = 'block';
+  // Dynamic form
+  document.getElementById('static-signin-form').style.display = 'none';
+  renderDynamicSigninForm(); // will be empty until first server response
+  return authClient.idx.authenticate()
+    .then(handleTransaction)
+    .catch(showError);
 }
 window._showSigninForm = bindClick(showSigninForm);
 
 function hideSigninForm() {
-  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('static-signin-form').style.display = 'none';
+  document.getElementById('dynamic-signin-form').style.display = 'none';
 }
 
-function submitSigninForm() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
+function submitStaticSigninForm() {
+  const username = document.querySelector('#static-signin-form input[name=username]').value;
+  const password = document.querySelector('#static-signin-form input[name=password]').value;
 
   if (!config.useInteractionCodeFlow) {
     // Authn
@@ -637,7 +665,44 @@ function submitSigninForm() {
     .catch(showError);
 
 }
-window._submitSigninForm = bindClick(submitSigninForm);
+window._submitStaticSigninForm = bindClick(submitStaticSigninForm);
+
+function renderDynamicSigninForm(transaction) {
+  document.getElementById('dynamic-signin-form').style.display = 'block';
+  [
+    '.field-username',
+    '.field-password',
+    '.link-recover-password',
+    '.link-signin'
+  ].forEach(function(key) {
+    document.querySelector(`#dynamic-signin-form ${key}`).style.display = 'none';
+  });
+  if (!transaction) {
+    return;
+  }
+  const inputs = transaction.nextStep.inputs;
+  if (inputs.some(input => input.name === 'username')) {
+    document.querySelector('#dynamic-signin-form .field-username').style.display = 'block';
+  }
+  if (inputs.some(input => input.name === 'password')) {
+    document.querySelector('#dynamic-signin-form .field-password').style.display = 'block';
+  }
+  if (transaction.enabledFeatures.includes('recover-password')) {
+    document.querySelector('#dynamic-signin-form .link-recover-password').style.display = 'inline-block';
+  }
+  document.querySelector('#dynamic-signin-form .link-signin').style.display = 'inline-block';
+}
+
+function submitDynamicSigninForm() {
+  const username = document.querySelector('#dynamic-signin-form input[name=username]').value;
+  const password = document.querySelector('#dynamic-signin-form input[name=password]').value;
+  hideSigninForm();
+  return authClient.idx.authenticate({ username, password })
+    .then(handleTransaction)
+    .catch(showError);
+
+}
+window._submitDynamicSigninForm = bindClick(submitDynamicSigninForm);
 
 function handleTransaction(transaction) {
   if (!config.useInteractionCodeFlow) {
@@ -652,6 +717,10 @@ function handleTransaction(transaction) {
 
   switch (transaction.status) {
     case 'PENDING':
+      if (transaction.nextStep.name === 'identify') {
+        renderDynamicSigninForm(transaction);
+        break;
+      }
       hideSigninForm();
       updateAppState({ transaction });
       showMfa();
@@ -1285,7 +1354,12 @@ function submitChallengeAuthenticator() {
 }
 function showRecoverPassword() {
   // Copy username from login form to recover password form
-  const username = document.querySelector('#login-form input[name=username]').value;
+  let username;
+  if (config.useDynamicForm && config.useInteractionCodeFlow) {
+    username = document.querySelector('#dynamic-signin-form input[name=username]').value;
+  } else {
+    username = document.querySelector('#static-signin-form input[name=username]').value;
+  }
   document.querySelector('#recover-password-form input[name=recover-username]').value = username;
 
   hideSigninForm();

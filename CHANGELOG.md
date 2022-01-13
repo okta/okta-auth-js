@@ -15,6 +15,9 @@
 - [#1066](https://github.com/okta/okta-auth-js/pull/1066) Extends type `CookieOptions` from `js-cookie` v3
   - Uses enums for `CookieOptions.sameSite`
   - Removes type `SetCookieOptions`
+- [#1062](https://github.com/okta/okta-auth-js/pull/1062)
+  - Authn method `introspect` is renamed to `introspectAuthn` (still callable as `tx.introspect`)
+  - `IdxFeature` enum is now defined as strings instead of numbers
 
 ### Features
 
@@ -28,6 +31,9 @@
     - `autoRemediate`. If false, there will be no attempt to satisfy remediations even if values have been passed.
   - TransactionManager supports new option:
     - `saveLastResponse`. If false, IDX responses will not be cached.
+- [#1062](https://github.com/okta/okta-auth-js/pull/1062)
+  - All IDX methods are exported.
+  - `useInteractionCodeFlow` defaults to `true` for sample and test apps.
 
 ## 5.10.1
 
