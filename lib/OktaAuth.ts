@@ -13,6 +13,7 @@
  */
 /* global window */
 
+import Emitter from 'tiny-emitter';
 import { 
   DEFAULT_MAX_CLOCK_SKEW, 
   REFERRER_PATH_STORAGE_KEY
@@ -128,8 +129,6 @@ import {
   isTransactionMetaValid
 } from './idx/transactionMeta';
 
-const Emitter = require('tiny-emitter');
-
 class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   options: OktaAuthOptions;
   storageManager: StorageManager;
@@ -142,7 +141,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   features!: FeaturesAPI;
   token: TokenAPI;
   _tokenQueue: PromiseQueue;
-  emitter: typeof Emitter;
+  emitter: Emitter;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
   http: HttpAPI;

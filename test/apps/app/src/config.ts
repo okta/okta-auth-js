@@ -12,6 +12,7 @@
 
 
 import { OktaAuthOptions } from '@okta/okta-auth-js';
+import { CookieAttributes } from 'js-cookie';
 import { LOGIN_CALLBACK_PATH, STORAGE_KEY } from './constants';
 const HOST = window.location.host;
 const PROTO = window.location.protocol;
@@ -73,7 +74,7 @@ export function getConfigFromUrl(): Config {
   const storage = url.searchParams.get('storage') || undefined;
   const expireEarlySeconds = +url.searchParams.get('expireEarlySeconds') || undefined;
   const secureCookies = url.searchParams.get('secure') !== 'false'; // On by default
-  const sameSite = url.searchParams.get('sameSite') || undefined;
+  const sameSite = (url.searchParams.get('sameSite') || undefined) as CookieAttributes['sameSite'];
   const siwVersion = url.searchParams.get('siwVersion') || DEFAULT_SIW_VERSION;
   const siwAuthClient = url.searchParams.get('siwAuthClient') === 'true'; // off by default
   const idps = url.searchParams.get('idps') || '';
