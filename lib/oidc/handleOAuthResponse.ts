@@ -33,8 +33,8 @@ import { verifyToken } from './verifyToken';
 import { getDefaultTokenParams } from './util';
 
 function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
-  if (res['error'] || res['error_description']) { // TODO: should this be an AND instead of an OR condition?
-    throw new OAuthError(res['error']!, res['error_description']!);
+  if (res['error'] && res['error_description']) {
+    throw new OAuthError(res['error'], res['error_description']);
   }
 
   if (res.state !== oauthParams.state) {
