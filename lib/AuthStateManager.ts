@@ -27,7 +27,7 @@ const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 const MAX_PROMISE_CANCEL_TIMES = 10;
 
 // only compare first level of authState
-const isSameAuthState = (prevState: AuthState = null, state: AuthState) => {
+const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
   // initial state is null
   if (!prevState) {
     return false;
