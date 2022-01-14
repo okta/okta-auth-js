@@ -51,7 +51,8 @@ export async function verifyToken(sdk: OktaAuth, token: IDToken, validationParam
     return token;
   }
 
-  const key = await getKey(sdk, token.issuer, jwt.header.kid);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const key = await getKey(sdk, token.issuer, jwt.header.kid!);
   const valid = await sdkCrypto.verifyToken(token.idToken, key);
   if (!valid) {
     throw new AuthSdkError('The token signature is not valid');

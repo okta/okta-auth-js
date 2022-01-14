@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -39,13 +40,13 @@ const authClient = new OktaAuth({});
 
   // Manage
   tokenManager.setTokens(tokens);
-  expectType<void>(tokenManager.add('accessToken', tokens.accessToken));
+  expectType<void>(tokenManager.add('accessToken', tokens.accessToken!));
   expectType<void>(tokenManager.remove('accessToken'));
   expectType<void>(tokenManager.clear());
 
   // Renew
   expectType<boolean>(tokenManager.hasExpired(accessToken));
-  expectType<Token>(await tokenManager.renew('idToken'));
+  expectType<Token | undefined>(await tokenManager.renew('idToken'));
 
   // Events
   tokenManager.on('expired', function (key, expiredToken) {
@@ -55,7 +56,7 @@ const authClient = new OktaAuth({});
   tokenManager.on('renewed', function (key, newToken, oldToken) {
     expectType<string>(key);
     expectType<Token>(newToken);
-    expectType<Token>(oldToken);
+    expectType<Token>(oldToken!);
   });
   tokenManager.on('error', function (error) {
     expectAssignable<object>(error);

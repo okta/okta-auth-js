@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -11,6 +12,7 @@
  */
 
 
+import { IdxRemediationValue } from '../types/idx-js';
 import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface EnrollProfileValues extends RemediationValues {
@@ -22,7 +24,7 @@ export interface EnrollProfileValues extends RemediationValues {
 export class EnrollProfile extends Remediator {
   static remediationName = 'enroll-profile';
 
-  values: EnrollProfileValues;
+  values!: EnrollProfileValues;
 
   map = {
     'userProfile': []
@@ -30,8 +32,9 @@ export class EnrollProfile extends Remediator {
 
   canRemediate() {
     const userProfileFromValues = this.getData().userProfile;
-    const userProfileFromRemediation = this.remediation.value.find(({ name }) => name === 'userProfile');
-    return userProfileFromRemediation.form.value.reduce((canRemediate, curr) => {
+    // eslint-disable-next-line max-len
+    const userProfileFromRemediation = this.remediation.value!.find(({ name }) => name === 'userProfile') as IdxRemediationValue;
+    return userProfileFromRemediation.form!.value.reduce((canRemediate, curr) => {
       if (curr.required) {
         canRemediate = canRemediate && !!userProfileFromValues[curr.name];
       }

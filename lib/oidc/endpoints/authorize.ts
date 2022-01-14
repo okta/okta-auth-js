@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -51,11 +52,11 @@ export function convertTokenParamsToOAuthParams(tokenParams: TokenParams) {
     }
   });
 
-  if (tokenParams.responseType.indexOf('id_token') !== -1 &&
-    tokenParams.scopes.indexOf('openid') === -1) {
+  if (tokenParams.responseType!.indexOf('id_token') !== -1 &&
+    tokenParams.scopes!.indexOf('openid') === -1) {
     throw new AuthSdkError('openid scope must be specified in the scopes argument when requesting an id_token');
   } else {
-    oauthParams.scope = tokenParams.scopes.join(' ');
+    oauthParams.scope = tokenParams.scopes!.join(' ');
   }
 
   return oauthParams;

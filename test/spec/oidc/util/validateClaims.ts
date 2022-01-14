@@ -34,7 +34,7 @@ describe('validateClaims', function () {
   });
 
   it('throws an AuthSdkError when no jwt is provided', function () {
-    var fn = function () { validateClaims(sdk, undefined, validationOptions); };
+    var fn = function () { validateClaims(sdk, undefined as unknown as UserClaims, validationOptions); };
     expect(fn).toThrowError('The jwt, iss, and aud arguments are all required');
   });
 

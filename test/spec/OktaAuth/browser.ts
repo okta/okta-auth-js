@@ -43,7 +43,7 @@ describe('OktaAuth (browser)', function() {
 
   beforeEach(function() {
     originalLocation = global.window.location;
-    delete global.window.location;
+    delete (global.window as any).location;
     global.window.location = {
       protocol: 'https:',
       hostname: 'somesite.local',
@@ -104,7 +104,7 @@ describe('OktaAuth (browser)', function() {
       it('console warning if secure is forced to false running on HTTP', () => {
         window.location.protocol = 'http:';
         window.location.hostname = 'my-site';
-        jest.spyOn(console, 'warn').mockReturnValue(null);
+        jest.spyOn(console, 'warn').mockReturnValue();
         auth = new OktaAuth({ issuer: 'http://my-okta-domain' , cookies: { secure: true }});
         
         // eslint-disable-next-line no-console

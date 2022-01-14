@@ -174,7 +174,7 @@ describe('idx/poll', () => {
     jest.spyOn(enrollPollResponse, 'proceed');
 
     const res = await proceed(authClient, {});
-    const refresh = res.nextStep.poll.refresh;
+    const refresh = res.nextStep!.poll!.refresh;
     const transaction = await poll(authClient, { refresh });
     expect(enrollPollResponse.proceed).toHaveBeenCalledTimes(3);
     expect(transaction.status).toEqual(IdxStatus.TERMINAL);

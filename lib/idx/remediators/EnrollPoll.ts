@@ -22,7 +22,7 @@ export interface EnrollPollValues extends RemediationValues {
 export class EnrollPoll extends Remediator {
   static remediationName = 'enroll-poll';
 
-  values: EnrollPollValues;
+  values!: EnrollPollValues;
 
   canRemediate() {
     return Boolean(this.values.startPolling);

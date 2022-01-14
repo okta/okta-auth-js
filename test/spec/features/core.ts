@@ -17,7 +17,7 @@ const modulesToMock = {
 
 const mocked = {
   crypto: {
-    webcrypto: null
+    webcrypto: undefined
   }
 };
 
@@ -68,7 +68,7 @@ describe('features', function() {
     beforeEach(() => {
       orig.Uint8Array = global.Uint8Array;
       orig.TextEncoder = global.TextEncoder;
-      mocked.crypto.webcrypto = { subtle: {} };
+      (mocked.crypto as any).webcrypto = { subtle: {} };
     });
     afterEach(() => {
       global.Uint8Array = orig.Uint8Array as unknown  as Uint8ArrayConstructor;
@@ -88,12 +88,12 @@ describe('features', function() {
       });
 
       it('fails if no webcrypto.subtle', function() {
-        mocked.crypto.webcrypto = {};
+        (mocked.crypto as any).webcrypto = {};
         expect(OktaAuth.features.isTokenVerifySupported()).toBe(false);
       });
 
       it('fails if no Uint8Array', function() {
-        delete global.Uint8Array;
+        delete (global as any).Uint8Array;
         expect(OktaAuth.features.isTokenVerifySupported()).toBe(false);
       });
     });
@@ -103,7 +103,7 @@ describe('features', function() {
         expect(OktaAuth.features.hasTextEncoder()).toBe(true);
       });
       it('returns false if TextEncoder is undefined', function() {
-        delete global.TextEncoder;
+        delete (global as any).TextEncoder;
         expect(OktaAuth.features.hasTextEncoder()).toBe(false);
       });
     });
@@ -119,17 +119,17 @@ describe('features', function() {
       });
 
       it('fails if no webcrypto.subtle', function() {
-        mocked.crypto.webcrypto = {};
+        (mocked.crypto as any).webcrypto = {};
         expect(OktaAuth.features.isPKCESupported()).toBe(false);
       });
 
       it('fails if no Uint8Array', function() {
-        delete global.Uint8Array;
+        delete (global as any).Uint8Array;
         expect(OktaAuth.features.isPKCESupported()).toBe(false);
       });
 
       it('fails if no TextEncoder', function() {
-        delete global.TextEncoder;
+        delete (global as any).TextEncoder;
         expect(OktaAuth.features.isPKCESupported()).toBe(false);
       });
 
@@ -179,7 +179,7 @@ describe('features', function() {
         var err;
         spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
         spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(true);
-        delete global.TextEncoder;
+        delete (global as any).TextEncoder;
 
         var auth = new OktaAuth({
           issuer: 'https://dev-12345.oktapreview.com',
@@ -202,7 +202,7 @@ describe('features', function() {
         var err;
         spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(false);
         spyOn(OktaAuth.features, 'isHTTPS').and.returnValue(false);
-        delete global.TextEncoder;
+        delete (global as any).TextEncoder;
 
         var auth = new OktaAuth({
           issuer: 'https://dev-12345.oktapreview.com',

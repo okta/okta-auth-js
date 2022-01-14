@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -26,6 +27,6 @@ const authClient = new OktaAuth({});
 
   // Session
   expectType<string>(session.status);
-  expectType<object>(await session.user());
-  expectType<object>(await session.refresh());
+  expectType<object>(await session.user!());
+  expectType<object>(await session.refresh!());
 })();

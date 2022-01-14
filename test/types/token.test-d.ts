@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -73,9 +74,9 @@ const tokens = {
   const tokenRes = await authClient.token.getWithoutPrompt(authorizeOptions);
   expectType<TokenResponse>(tokenRes);
   expectType<Tokens>(tokenRes.tokens);
-  expectType<AccessToken>(tokenRes.tokens.accessToken);
-  expectType<IDToken>(tokenRes.tokens.idToken);
-  expectType<RefreshToken>(tokenRes.tokens.refreshToken);
+  expectType<AccessToken>(tokenRes.tokens.accessToken!);
+  expectType<IDToken>(tokenRes.tokens.idToken!);
+  expectType<RefreshToken>(tokenRes.tokens.refreshToken!);
 
   expectType<TokenResponse>(await authClient.token.getWithPopup(authorizeOptions));
   expectType<void>(await authClient.token.getWithRedirect(authorizeOptions));
@@ -98,7 +99,7 @@ const tokens = {
   expectType<string>(decodedToken.header.alg);
   expectType<string>(decodedToken.signature);
 
-  expectType<Token>(await authClient.token.renew(accessTokenExample));
+  expectType<Token | undefined>(await authClient.token.renew(accessTokenExample));
 
   const userInfo = await authClient.token.getUserInfo(accessTokenExample, idTokenExample);
   expectType<UserClaims>(userInfo);

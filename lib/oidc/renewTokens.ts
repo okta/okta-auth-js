@@ -18,10 +18,10 @@ import { getDefaultTokenParams } from './util';
 
 // If we have a refresh token, renew using that, otherwise getWithoutPrompt
 // eslint-disable-next-line complexity
-export async function renewTokens(sdk, options: TokenParams): Promise<Tokens> {
+export async function renewTokens(sdk, options?: TokenParams): Promise<Tokens> {
   const tokens = sdk.tokenManager.getTokensSync();
   if (tokens.refreshToken) {
-    return renewTokensWithRefresh(sdk, options, tokens.refreshToken);
+    return renewTokensWithRefresh(sdk, options || {}, tokens.refreshToken);
   }
 
   if (!tokens.accessToken && !tokens.idToken) {

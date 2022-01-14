@@ -22,17 +22,17 @@ export type SelectAuthenticatorAuthenticateValues = SelectAuthenticatorValues & 
 
 export class SelectAuthenticatorAuthenticate extends SelectAuthenticator {
   static remediationName = 'select-authenticator-authenticate';
-  values: SelectAuthenticatorAuthenticateValues;
+  values!: SelectAuthenticatorAuthenticateValues;
 
   constructor(remediation: IdxRemediation, values: SelectAuthenticatorValues = {}) {
     super(remediation, values);
 
     // Preset password authenticator to trigger recover action
     const hasPasswordInOptions = getAuthenticatorFromRemediation(remediation)
-      .options?.some(({ relatesTo }) => relatesTo.key === AuthenticatorKey.OKTA_PASSWORD);
+      .options?.some(({ relatesTo }) => relatesTo?.key === AuthenticatorKey.OKTA_PASSWORD);
     if (hasPasswordInOptions && (this.values.flow === 'recoverPassword' || this.values.password)) {
       this.values.authenticators = [
-        ...this.values.authenticators,
+        ...this.values.authenticators || [],
         { key: AuthenticatorKey.OKTA_PASSWORD }
       ] as Authenticator[];
     }

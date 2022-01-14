@@ -292,7 +292,7 @@ describe('idx/register', () => {
       } catch (error) {
         didThrow = true;
         expect(error).toBeInstanceOf(AuthSdkError);
-        expect(error.errorSummary).toBe('Registration is not supported based on your current org configuration.');
+        expect((error as any).errorSummary).toBe('Registration is not supported based on your current org configuration.');
       }
       expect(didThrow).toBe(true);
     });
@@ -305,7 +305,7 @@ describe('idx/register', () => {
       } catch (error) {
         didThrow = true;
         expect(error).toBeInstanceOf(AuthSdkError);
-        expect(error.errorSummary).toBe('Registration is not supported based on your current org configuration.');
+        expect((error as any).errorSummary).toBe('Registration is not supported based on your current org configuration.');
       }
       expect(didThrow).toBe(true);
       expect(mocked.startTransaction.startTransaction).toHaveBeenCalledWith(authClient, { flow: 'register', autoRemediate: false });
@@ -327,7 +327,7 @@ describe('idx/register', () => {
       } catch (error) {
         didThrow = true;
         expect(error).toBeInstanceOf(AuthSdkError);
-        expect(error.errorSummary).toBe('activationToken is not supported based on your current org configuration.');
+        expect((error as any).errorSummary).toBe('activationToken is not supported based on your current org configuration.');
       }
       expect(didThrow).toBe(true);
     });
@@ -428,7 +428,7 @@ describe('idx/register', () => {
         }
       });
 
-      const inputs = res.nextStep.inputs.map(({name}) => name);
+      const inputs = res.nextStep!.inputs!.map(({name}) => name);
       const inputValues = inputs.reduce((formData, inputName, inputIndex) => ({
         ...formData,
         [inputName]: `value${inputIndex}`
@@ -1883,7 +1883,7 @@ describe('idx/register', () => {
       });
       expect(selectAuthenticatorResponse.proceed).toHaveBeenCalled();
       expect(enrollPollResponse.proceed).not.toHaveBeenCalled();
-      expect(Object.keys(response.nextStep)).toContain('poll');
+      expect(Object.keys(response.nextStep as object)).toContain('poll');
     });
 
     it('offers QR code as a default channel for adding OV account', async () => {
@@ -1900,12 +1900,12 @@ describe('idx/register', () => {
       jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(selectAuthenticatorResponse);
 
-      let { nextStep:
-        { authenticator: { contextualData } }
-      } = await register(authClient, {
+      const { nextStep } = await register(authClient, {
         authenticator: AuthenticatorKey.OKTA_VERIFY
       });
-      expect(Object.keys(contextualData)).toContain('qrcode');
+      const { authenticator } = nextStep!;
+      const { contextualData } = authenticator!;
+      expect(Object.keys(contextualData as object)).toContain('qrcode');
     });
 
     it('can enroll via SMS link', async () => {

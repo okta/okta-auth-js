@@ -41,7 +41,8 @@ export const IdxResponseFactory = Factory.define<IdxResponse, MockedIdxResponseT
   transientParams
 }) => {
   return {
-    proceed: () => Promise.resolve(transientParams.nextResponse),
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    proceed: () => Promise.resolve(transientParams.nextResponse!),
     neededToProceed: [],
     rawIdxState: RawIdxResponseFactory.build({
       version: transientParams.idxVersion,

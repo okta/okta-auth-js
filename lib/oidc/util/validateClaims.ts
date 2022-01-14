@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -40,16 +41,16 @@ export function validateClaims(sdk: OktaAuth, claims: UserClaims, validationPara
       'does not match [' + aud + ']');
   }
 
-  if (claims.iat > claims.exp) {
+  if (claims.iat! > claims.exp!) {
     throw new AuthSdkError('The JWT expired before it was issued');
   }
 
   if (!sdk.options.ignoreLifetime) {
-    if ((now - sdk.options.maxClockSkew) > claims.exp) {
+    if ((now - sdk.options.maxClockSkew!) > claims.exp!) {
       throw new AuthSdkError('The JWT expired and is no longer valid');
     }
 
-    if (claims.iat > (now + sdk.options.maxClockSkew)) {
+    if (claims.iat! > (now + sdk.options.maxClockSkew!)) {
       throw new AuthSdkError('The JWT was issued in the future');
     }
   }

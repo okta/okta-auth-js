@@ -11,10 +11,19 @@
  */
 
 
-export class TransactionState {
+export interface TransactionLink {
+  name?: string;
+  type: string;
+  href: string;
+  hints?: {
+    allow?: string[];
+  };
+}
+export interface TransactionState {
   interactionHandle?: string;
 
 // Authn V1 only
+  status: string;
   stateToken?: string;
   type?: string;
   expiresAt?: string;
@@ -28,4 +37,5 @@ export class TransactionState {
   profile?: {
     updatePhone?: boolean;
   };
+  _links?: Record<string, TransactionLink>;
 }

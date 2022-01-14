@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -94,12 +95,12 @@ const authorizeOptions2: TokenParams = {
 
   // originalUri
   expectType<void>(authClient.setOriginalUri(`${window.location.href}`));
-  expectType<string>(authClient.getOriginalUri());
+  expectType<string>(authClient.getOriginalUri()!);
   expectType<void>(authClient.removeOriginalUri());
 
   // Tokens
-  expectType<string>(authClient.getIdToken());
-  expectType<string>(authClient.getAccessToken());
+  expectType<string>(authClient.getIdToken()!);
+  expectType<string>(authClient.getAccessToken()!);
 
   // User
   expectType<boolean>(await authClient.isAuthenticated());
@@ -126,7 +127,7 @@ const authorizeOptions2: TokenParams = {
     revokeRefreshToken: false,
     accessToken: tokens.accessToken,
   }));
-  expectAssignable<object>(await authClient.closeSession());
-  expectType<object>(await authClient.revokeAccessToken(tokens.accessToken));
-  expectType<object>(await authClient.revokeRefreshToken(tokens.refreshToken));
+  expectAssignable<unknown>(await authClient.closeSession());
+  expectType<unknown>(await authClient.revokeAccessToken(tokens.accessToken));
+  expectType<unknown>(await authClient.revokeRefreshToken(tokens.refreshToken));
 })();

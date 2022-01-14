@@ -43,7 +43,10 @@ import {
   IdxAPI,
   SignoutRedirectUrlOptions,
   HttpAPI,
-  FlowIdentifier
+  FlowIdentifier,
+  GetWithRedirectAPI,
+  ParseFromUrlInterface,
+  GetWithRedirectFunction,
 } from './types';
 import {
   transactionStatus,
@@ -136,7 +139,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   session: SessionAPI;
   pkce: PkceAPI;
   static features: FeaturesAPI;
-  features: FeaturesAPI;
+  features!: FeaturesAPI;
   token: TokenAPI;
   _tokenQueue: PromiseQueue;
   emitter: typeof Emitter;
@@ -148,18 +151,20 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   _pending: { handleLogin: boolean };
   constructor(args: OktaAuthOptions) {
     const options = this.options = buildOptions(args);
-    this.storageManager = new StorageManager(options.storageManager, options.cookies, options.storageUtil);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.storageManager = new StorageManager(options.storageManager!, options.cookies!, options.storageUtil!);
     this.transactionManager = new TransactionManager(Object.assign({
       storageManager: this.storageManager,
     }, options.transactionManager));
     this._oktaUserAgent = new OktaUserAgent();
-  
+
     this.tx = {
       status: transactionStatus.bind(null, this),
       resume: resumeTransaction.bind(null, this),
       exists: Object.assign(transactionExists.bind(null, this), {
         _get: (name) => {
-          const storage = options.storageUtil.storage;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const storage = options.storageUtil!.storage;
           return storage.get(name);
         }
       }),
@@ -213,39 +218,21 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     };
 
     this._tokenQueue = new PromiseQueue();
-    this.token = {
-      prepareTokenParams: prepareTokenParams.bind(null, this),
-      exchangeCodeForTokens: exchangeCodeForTokens.bind(null, this),
-      getWithoutPrompt: getWithoutPrompt.bind(null, this),
-      getWithPopup: getWithPopup.bind(null, this),
-      getWithRedirect: getWithRedirect.bind(null, this),
-      parseFromUrl: parseFromUrl.bind(null, this),
-      decode: decodeToken,
-      revoke: revokeToken.bind(null, this),
-      renew: renewToken.bind(null, this),
-      renewTokensWithRefresh: renewTokensWithRefresh.bind(null, this),
-      renewTokens: renewTokens.bind(null, this),
-      getUserInfo: getUserInfo.bind(null, this),
-      verify: verifyToken.bind(null, this),
-      isLoginRedirect: isLoginRedirect.bind(null, this)
+    const useQueue = (method) => {
+      return PromiseQueue.prototype.push.bind(this._tokenQueue, method, null);
     };
-    // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
-    const syncMethods = ['decode', 'isLoginRedirect'];
-    Object.keys(this.token).forEach(key => {
-      if (syncMethods.indexOf(key) >= 0) { // sync methods should not be wrapped
-        return;
-      }
-      var method = this.token[key];
-      this.token[key] = PromiseQueue.prototype.push.bind(this._tokenQueue, method, null);
-    });
-    
-    Object.assign(this.token.getWithRedirect, {
+
+    // eslint-disable-next-line max-len
+    const getWithRedirectFn = useQueue(getWithRedirect.bind(null, this)) as GetWithRedirectFunction;
+    const getWithRedirectApi: GetWithRedirectAPI = Object.assign(getWithRedirectFn, {
       // This is exposed so we can set window.location in our tests
       _setLocation: function(url) {
         window.location = url;
       }
     });
-    Object.assign(this.token.parseFromUrl, {
+    // eslint-disable-next-line max-len
+    const parseFromUrlFn = useQueue(parseFromUrl.bind(null, this)) as ParseFromUrlInterface;
+    const parseFromUrlApi: ParseFromUrlInterface = Object.assign(parseFromUrlFn, {
       // This is exposed so we can mock getting window.history in our tests
       _getHistory: function() {
         return window.history;
@@ -260,6 +247,38 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       _getDocument: function() {
         return window.document;
       }
+    });
+    this.token = {
+      prepareTokenParams: prepareTokenParams.bind(null, this),
+      exchangeCodeForTokens: exchangeCodeForTokens.bind(null, this),
+      getWithoutPrompt: getWithoutPrompt.bind(null, this),
+      getWithPopup: getWithPopup.bind(null, this),
+      getWithRedirect: getWithRedirectApi,
+      parseFromUrl: parseFromUrlApi,
+      decode: decodeToken,
+      revoke: revokeToken.bind(null, this),
+      renew: renewToken.bind(null, this),
+      renewTokensWithRefresh: renewTokensWithRefresh.bind(null, this),
+      renewTokens: renewTokens.bind(null, this),
+      getUserInfo: getUserInfo.bind(null, this),
+      verify: verifyToken.bind(null, this),
+      isLoginRedirect: isLoginRedirect.bind(null, this)
+    };
+    // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
+    const syncMethods = [
+      // sync methods
+      'decode',
+      'isLoginRedirect',
+      // already bound
+      'getWithRedirect',
+      'parseFromUrl'
+    ];
+    Object.keys(this.token).forEach(key => {
+      if (syncMethods.indexOf(key) >= 0) { // sync methods should not be wrapped
+        return;
+      }
+      var method = this.token[key];
+      this.token[key] = PromiseQueue.prototype.push.bind(this._tokenQueue, method, null);
     });
 
     // IDX
@@ -294,11 +313,11 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       getTransactionMeta: getTransactionMeta.bind(null, this),
       saveTransactionMeta: saveTransactionMeta.bind(null, this),
       clearTransactionMeta: clearTransactionMeta.bind(null, this),
-      isTransactionMetaValid: isTransactionMetaValid.bind(null, this),
+      isTransactionMetaValid,
       setFlow: (flow: FlowIdentifier) => {
         this.options.flow = flow;
       },
-      getFlow: (): FlowIdentifier => {
+      getFlow: (): FlowIdentifier | undefined => {
         return this.options.flow;
       },
       canProceed: canProceed.bind(null, this),
@@ -387,7 +406,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   }
 
   // Ends the current Okta SSO session without redirecting to Okta.
-  closeSession(): Promise<object> {
+  closeSession(): Promise<unknown> {
     return this.session.close() // DELETE /api/v1/sessions/me
     .then(async () => {
       // Clear all local tokens
@@ -403,7 +422,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   }
   
   // Revokes the access token for the application session
-  async revokeAccessToken(accessToken?: AccessToken): Promise<object> {
+  async revokeAccessToken(accessToken?: AccessToken): Promise<unknown> {
     if (!accessToken) {
       accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
       const accessTokenKey = this.tokenManager.getStorageKeyByType('accessToken');
@@ -417,7 +436,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   }
 
   // Revokes the refresh token for the application session
-  async revokeRefreshToken(refreshToken?: RefreshToken): Promise<object> {
+  async revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown> {
     if (!refreshToken) {
       refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
       const refreshTokenKey = this.tokenManager.getStorageKeyByType('refreshToken');
@@ -543,7 +562,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     const { autoRenew, autoRemove } = this.tokenManager.getOptions();
 
     if (accessToken && this.tokenManager.hasExpired(accessToken)) {
-      accessToken = null;
+      accessToken = undefined;
       if (autoRenew) {
         try {
           accessToken = await this.tokenManager.renew('accessToken') as AccessToken;
@@ -556,7 +575,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     }
 
     if (idToken && this.tokenManager.hasExpired(idToken)) {
-      idToken = null;
+      idToken = undefined;
       if (autoRenew) {
         try {
           idToken = await this.tokenManager.renew('idToken') as IDToken;
@@ -612,7 +631,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     }
   }
 
-  getOriginalUri(state?: string): string {
+  getOriginalUri(state?: string): string | undefined {
     // Prefer shared storage (if state is available)
     state = state || this.options.state;
     if (state) {
@@ -625,7 +644,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
 
     // Try to load from session storage
     const storage = browserStorage.getSessionStorage();
-    return storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) : undefined;
+    return storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) || undefined : undefined;
   }
 
   removeOriginalUri(state?: string): void {
@@ -637,7 +656,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     state = state || this.options.state;
     if (state) {
       const sharedStorage = this.storageManager.getOriginalUriStorage();
-      sharedStorage.removeItem(state);
+      sharedStorage.removeItem && sharedStorage.removeItem(state);
     }
   }
 
@@ -672,7 +691,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     const { restoreOriginalUri } = this.options;
     if (restoreOriginalUri) {
       await restoreOriginalUri(this, originalUri);
-    } else {
+    } else if (originalUri) {
       window.location.replace(originalUri);
     }
   }
@@ -702,7 +721,8 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
 
   getIssuerOrigin(): string {
     // Infer the URL from the issuer URL, omitting the /oauth2/{authServerId}
-    return this.options.issuer.split('/oauth2/')[0];
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return this.options.issuer!.split('/oauth2/')[0];
   }
 
   // { username, (relayState) }

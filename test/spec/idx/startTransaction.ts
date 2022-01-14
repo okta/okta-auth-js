@@ -161,7 +161,7 @@ describe('idx/startTransaction', () => {
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
-    expect(res.enabledFeatures.includes(IdxFeature.PASSWORD_RECOVERY)).toBeTruthy();
+    expect(res.enabledFeatures!.includes(IdxFeature.PASSWORD_RECOVERY)).toBeTruthy();
   });
 
   it('has registration feature enabled with RegistrationEnabledResponseFactory', async () => {
@@ -173,7 +173,7 @@ describe('idx/startTransaction', () => {
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
-    expect(res.enabledFeatures.includes(IdxFeature.REGISTRATION)).toBeTruthy();
+    expect(res.enabledFeatures!.includes(IdxFeature.REGISTRATION)).toBeTruthy();
   });
 
   it('has social idp feature enabled with SocialIDPEnabledResponseFactory', async () => {
@@ -185,7 +185,7 @@ describe('idx/startTransaction', () => {
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
-    expect(res.enabledFeatures.includes(IdxFeature.SOCIAL_IDP)).toBeTruthy();
+    expect(res.enabledFeatures!.includes(IdxFeature.SOCIAL_IDP)).toBeTruthy();
   });
 
   it('maps remediations to availableSteps', async () => {

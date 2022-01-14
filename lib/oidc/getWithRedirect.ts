@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -11,54 +12,21 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuth, TokenParams, TransactionMeta } from '../types';
+import { OktaAuth, TokenParams } from '../types';
 import { clone } from '../util';
-import { getOAuthUrls, prepareTokenParams } from './util';
+import { prepareTokenParams, createOAuthMeta } from './util';
 import { buildAuthorizeParams } from './endpoints/authorize';
 
-export function getWithRedirect(sdk: OktaAuth, options: TokenParams): Promise<void> {
+export async function getWithRedirect(sdk: OktaAuth, options?: TokenParams): Promise<void> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
   }
 
   options = clone(options) || {};
 
-  return prepareTokenParams(sdk, options)
-    .then(function (tokenParams: TokenParams) {
-      const urls = getOAuthUrls(sdk, options);
-      const requestUrl = urls.authorizeUrl + buildAuthorizeParams(tokenParams);
-      const issuer = sdk.options.issuer;
-
-      // Gather the values we want to save in the transaction
-      const {
-        responseType,
-        state,
-        nonce,
-        scopes,
-        clientId,
-        ignoreSignature,
-        redirectUri,
-        codeVerifier,
-        codeChallenge,
-        codeChallengeMethod,
-      } = tokenParams;
-
-      const oauthMeta: TransactionMeta = {
-        issuer,
-        responseType,
-        state,
-        nonce,
-        scopes,
-        clientId,
-        urls,
-        ignoreSignature,
-        redirectUri,
-        codeVerifier,
-        codeChallenge,
-        codeChallengeMethod
-      };
-
-      sdk.transactionManager.save(oauthMeta, { oauth: true });
-      sdk.token.getWithRedirect._setLocation(requestUrl);
-    });
+  const tokenParams = await prepareTokenParams(sdk, options);
+  const meta = createOAuthMeta(sdk, tokenParams);
+  const requestUrl = meta.urls.authorizeUrl + buildAuthorizeParams(tokenParams);
+  sdk.transactionManager.save(meta, { oauth: true });
+  sdk.token.getWithRedirect._setLocation(requestUrl);
 }

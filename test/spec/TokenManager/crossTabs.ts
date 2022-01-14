@@ -46,7 +46,7 @@ describe('cross tabs communication', () => {
     }
   });
 
-  function createInstance(options = null) {
+  function createInstance(options?) {
     instance = new TokenManager(sdkMock, options);
     instance.start();
     return instance;

@@ -756,7 +756,7 @@ describe('idx/authenticate', () => {
           const res = await authenticate(authClient, {
             resend: true
           });
-          expect(res.nextStep.canResend).toBe(true);
+          expect(res.nextStep!.canResend).toBe(true);
         });
 
         it('returns a PENDING error if an invalid code is provided', async () => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable max-len */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
@@ -49,7 +50,7 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
       // Here we modify the response from `/token` so that it more closely matches a response from `/authorize`
       // `responseType` is used to validate that the expected tokens were returned
       const responseType = ['token']; // an accessToken will always be returned
-      if (scopes.indexOf('openid') !== -1) {
+      if (scopes!.indexOf('openid') !== -1) {
         responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
       }
       const handleResponseOptions: TokenParams = {
@@ -59,11 +60,11 @@ export function exchangeCodeForTokens(sdk: OktaAuth, tokenParams: TokenParams, u
         responseType,
         ignoreSignature,
       };
-      return handleOAuthResponse(sdk, handleResponseOptions, response, urls)
+      return handleOAuthResponse(sdk, handleResponseOptions, response, urls!)
         .then((response: TokenResponse) => {
           // For compatibility, "code" is returned in the TokenResponse. OKTA-326091
           response.code = authorizationCode;
-          response.state = state;
+          response.state = state!;
           return response;
         });
     })

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -25,43 +26,43 @@ const authClient = new OktaAuth({});
 
   // Manage transaction
   expectType<AuthTransaction>(await authClient.tx.resume());
-  expectType<AuthTransaction>(await tx.verify({
+  expectType<AuthTransaction>(await tx.verify!({
     passCode: '123456',
     autoPush: true
   }));
-  expectType<AuthTransaction>(await tx.activate({
+  expectType<AuthTransaction>(await tx.activate!({
     passCode: '123456'
   }));
-  expectType<AuthTransaction>(await tx.cancel());
-  expectType<AuthTransaction>(await tx.poll({
+  expectType<AuthTransaction>(await tx.cancel!());
+  expectType<AuthTransaction>(await tx.poll!({
     autoPush: true
   }));
-  expectType<AuthTransaction>(await tx.prev());
-  expectType<AuthTransaction>(await tx.skip());
-  expectType<AuthTransaction>(await tx.changePassword({
+  expectType<AuthTransaction>(await tx.prev!());
+  expectType<AuthTransaction>(await tx.skip!());
+  expectType<AuthTransaction>(await tx.changePassword!({
     oldPassword: '0ldP4ssw0rd',
     newPassword: 'N3wP4ssw0rd'
   }));
-  expectType<AuthTransaction>(await tx.resetPassword({
+  expectType<AuthTransaction>(await tx.resetPassword!({
     newPassword: 'N3wP4ssw0rd'
   }));
-  expectType<AuthTransaction>(await tx.unlock({
+  expectType<AuthTransaction>(await tx.unlock!({
     username: 'dade.murphy@example.com',
     factorType: 'EMAIL',
     relayState: 'd3de23'
   }));
-  expectType<AuthTransaction>(await tx.answer({
+  expectType<AuthTransaction>(await tx.answer!({
     answer: 'My favorite recovery question answer'
   }));
-  expectType<AuthTransaction>(await tx.recovery({
+  expectType<AuthTransaction>(await tx.recovery!({
     recoveryToken: '00xdqXOE5qDZX8-PBR1bYv8AESqIFinDy3yul01tyh'
   }));
-  expectType<AuthTransaction>(await tx.resend());
+  expectType<AuthTransaction>(await tx.resend!());
 
   // Questions
-  const questionFactor = tx.factors.find(function(factor) {
+  const questionFactor = tx.factors!.find(function(factor) {
     return factor.provider === 'OKTA' && factor.factorType === 'question';
-  });
+  })!;
   const questions = await questionFactor.questions() as Array<object>;
   expectType<Array<object>>(questions);
   questionFactor.enroll({

@@ -134,7 +134,7 @@ describe('HTTP Requestor', () => {
       return httpRequest(sdk, {
         url, 
         headers: {
-          'fake': undefined
+          'fake': undefined as unknown as string
         }
       })
       .then(res => {

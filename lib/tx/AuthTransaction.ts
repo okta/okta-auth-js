@@ -65,7 +65,7 @@ export class AuthTransaction implements TransactionState, AuthTransactionFunctio
   poll?: AuthTransactionFunction;
   prev?: AuthTransactionFunction;
 
-  data: TransactionState;
+  data?: TransactionState;
   stateToken?: string;
   sessionToken?: string;
   status: string | IdxStatus;
@@ -76,7 +76,9 @@ export class AuthTransaction implements TransactionState, AuthTransactionFunctio
   scopes?: Array<Record<string, any> >;
   target?: Record<string, any>;
   authentication?: Record<string, any>;
-  constructor(sdk, res = null) {
+  constructor(sdk, res: TransactionState | null = null) {
+    this.data = undefined;
+    this.status = undefined as unknown as string;
     if (res) {
       this.data = res;
 
@@ -234,7 +236,7 @@ function flattenEmbedded(sdk, res, obj, ref) {
   if (Array.isArray(obj)) {
     var objArr = [];
     for (var o = 0, ol = obj.length; o < ol; o++) {
-      objArr.push(flattenEmbedded(sdk, res, obj[o], ref));
+      objArr.push(flattenEmbedded(sdk, res, obj[o], ref) as never);
     }
     return objArr;
   }
