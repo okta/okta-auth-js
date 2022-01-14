@@ -139,7 +139,17 @@ var storageUtil: BrowserStorageUtil = {
       throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
     }
     const storage: CookieStorage = {
-      getItem: storageUtil.storage.get,
+      getItem: function(key) {
+        const value = storageUtil.storage.get(key);
+        try {
+          // return object
+          return JSON.parse(value);
+        } catch (e) {
+          // ignore parse error
+          // return string value
+          return value;
+        }
+      },
       setItem: function(key, value, expiresAt = '2200-01-01T00:00:00.000Z') {
         // By defauilt, cookie shouldn't expire
         expiresAt = (sessionCookie ? null : expiresAt) as string;
@@ -245,6 +255,13 @@ var storageUtil: BrowserStorageUtil = {
     },
 
     get: function(name: string): string {
+      // get all cookies
+      if (typeof name === 'undefined') {
+        // js-cookie returns object when no argument is provided
+        const value = Cookies.get();
+        return JSON.stringify(value);
+      }
+      // get cookie by name
       return Cookies.get(name);
     },
 
