@@ -141,14 +141,15 @@ var storageUtil: BrowserStorageUtil = {
     const storage: CookieStorage = {
       getItem: function(key) {
         const value = storageUtil.storage.get(key);
-        try {
-          // return object
-          return JSON.parse(value);
-        } catch (e) {
-          // ignore parse error
-          // return string value
-          return value;
+        // returns object that contains all cookies when no key is provided
+        if (!key) {
+          try {
+            return JSON.parse(value);
+          } catch (e) {
+            // do nothing
+          }
         }
+        return value;
       },
       setItem: function(key, value, expiresAt = '2200-01-01T00:00:00.000Z') {
         // By defauilt, cookie shouldn't expire
@@ -257,8 +258,7 @@ var storageUtil: BrowserStorageUtil = {
     get: function(name: string): string {
       // get all cookies
       if (typeof name === 'undefined') {
-        // js-cookie returns object when no argument is provided
-        const value = Cookies.get();
+        const value = Cookies.get(); // no arguments returns all cookies in object
         return JSON.stringify(value);
       }
       // get cookie by name

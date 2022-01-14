@@ -778,7 +778,7 @@ describe('TokenManager (browser)', function() {
         return client.tokenManager.get('test-idToken')
         .then(function(token) {
           expect(token).toEqual(tokens.standardIdTokenParsed);
-          expect(getCookieMock).toHaveBeenCalledWith();
+          expect(getCookieMock).toHaveBeenCalledWith(undefined);
           expect(setCookieMock).not.toHaveBeenCalled();
         });
       });
