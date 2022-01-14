@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -21,16 +22,16 @@ export type AuthenticatorEnrollmentDataValues =  AuthenticatorDataValues & {
 export class AuthenticatorEnrollmentData extends AuthenticatorData {
   static remediationName = 'authenticator-enrollment-data';
 
-  values: AuthenticatorEnrollmentDataValues;
+  values!: AuthenticatorEnrollmentDataValues;
 
   mapAuthenticator() {
     const authenticatorData = this.getAuthenticatorData();
-    const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
+    const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation)!;
     return { 
-      id: authenticatorFromRemediation.form.value
-        .find(({ name }) => name === 'id').value,
-      methodType: authenticatorData.methodType,
-      phoneNumber: authenticatorData.phoneNumber,
+      id: authenticatorFromRemediation.form!.value
+        .find(({ name }) => name === 'id')!.value,
+      methodType: authenticatorData!.methodType,
+      phoneNumber: authenticatorData!.phoneNumber,
     };
   }
 

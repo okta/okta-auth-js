@@ -138,7 +138,7 @@ describe('TokenManager', function() {
         expect(client.tokenManager.service).toBe(null); 
       });
       it('does not error if there is no service instance', () => {
-        expect(client.tokenManager.service).toBe(undefined); 
+        expect(client.tokenManager.service).toBe(null); 
         client.tokenManager.stop();
       });
     });
@@ -169,7 +169,7 @@ describe('TokenManager', function() {
     it('Event callbacks can have an optional context', function() {
       setupSync();
       var context = jest.fn();
-      var handler = jest.fn().mockImplementation(function() {
+      var handler = jest.fn().mockImplementation(function(this: any) {
         expect(this).toBe(context);
       });
       client.tokenManager.on('fake', handler, context);
@@ -342,7 +342,7 @@ describe('TokenManager', function() {
         expect(results.length).toBe(2);
         results.forEach(function(result) {
           expect(result.status).toBe('rejected');
-          util.expectErrorToEqual(result.reason, {
+          util.expectErrorToEqual((result as any).reason, {
             name: 'Error',
             message: 'expected',
             tokenKey: 'test-idToken'

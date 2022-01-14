@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -18,29 +19,29 @@ export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 export class AuthenticatorVerificationData extends AuthenticatorData {
   static remediationName = 'authenticator-verification-data';
 
-  values: AuthenticatorVerificationDataValues;
+  values!: AuthenticatorVerificationDataValues;
 
   mapAuthenticator() {
     const authenticatorData = this.getAuthenticatorData();
     const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
     return { 
-      id: authenticatorFromRemediation.form.value
-        .find(({ name }) => name === 'id').value,
-      enrollmentId: authenticatorFromRemediation.form.value
+      id: authenticatorFromRemediation.form!.value
+        .find(({ name }) => name === 'id')!.value,
+      enrollmentId: authenticatorFromRemediation.form!.value
         .find(({ name }) => name === 'enrollmentId')?.value,
-      methodType: authenticatorData.methodType,
+      methodType: authenticatorData!.methodType,
     };
   }
 
   getInputAuthenticator() {
     const authenticator = this.getAuthenticatorFromRemediation();
-    const methodType = authenticator.form.value.find(({ name }) => name === 'methodType');
+    const methodType = authenticator.form!.value.find(({ name }) => name === 'methodType');
     // if has methodType in form, let user select the methodType
     if (methodType && methodType.options) {
       return { name: 'methodType', type: 'string', required: true };
     }
     // no methodType, then return form values
-    const inputs = [...authenticator.form.value];
+    const inputs = [...authenticator.form!.value];
     return inputs;
   }
 

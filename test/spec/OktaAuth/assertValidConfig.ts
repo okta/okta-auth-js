@@ -12,14 +12,14 @@
 
 
 
-import { OktaAuth } from '@okta/okta-auth-js';
+import { OktaAuth, OktaAuthOptions } from '@okta/okta-auth-js';
 
 describe('assertValidConfig', () => {
 
   it('throw an error if no arguments are passed to the constructor', function () {
     var err;
     try {
-      new OktaAuth(undefined); // eslint-disable-line no-new
+      new OktaAuth(undefined as unknown as OktaAuthOptions); // eslint-disable-line no-new
     } catch (e) {
       err = e;
     }

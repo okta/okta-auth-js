@@ -38,7 +38,7 @@ function generateVerifier(prefix?: string): string {
 function computeChallenge(str: string): PromiseLike<any> {  
   var buffer = new TextEncoder().encode(str);
   return webcrypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
-    var hash = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+    var hash = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer) as unknown as number[]);
     var b64u = stringToBase64Url(hash); // url-safe base64 variant
     return b64u;
   });

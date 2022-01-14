@@ -48,14 +48,14 @@ describe('renewTokens', () => {
       const client = createClient({ pkce: false, responseType: ['token'] });
       const { tokens: originalTokens } = await signinAndGetTokens(client, { scopes });
       expect(originalTokens.idToken).toBeUndefined();
-      expect(originalTokens.accessToken.scopes.sort()).toEqual(scopes);
+      expect(originalTokens.accessToken!.scopes.sort()).toEqual(scopes);
       client.tokenManager.setTokens(originalTokens);
       mockGetWithoutPrompt();
       const renewedTokens = await client.token.renewTokens();
       expect(mocked.getWithoutPrompt.getWithoutPrompt).toHaveBeenCalled();
-      expect(originalTokens.accessToken.accessToken).not.toEqual(renewedTokens.accessToken.accessToken);
+      expect(originalTokens.accessToken!.accessToken).not.toEqual(renewedTokens.accessToken!.accessToken);
       expect(renewedTokens.idToken).toBeUndefined();
-      expect(renewedTokens.accessToken.scopes.sort()).toEqual(scopes);
+      expect(renewedTokens.accessToken!.scopes.sort()).toEqual(scopes);
     });
 
     it('renews with only an id token', async () => {
@@ -63,16 +63,16 @@ describe('renewTokens', () => {
       const client = createClient({ pkce: false, responseType: ['id_token'] });
       const { tokens: originalTokens } = await signinAndGetTokens(client, { scopes });
       expect(originalTokens.accessToken).toBeUndefined();
-      expect(originalTokens.idToken.scopes.sort()).toEqual(scopes);
+      expect(originalTokens.idToken!.scopes.sort()).toEqual(scopes);
       assertHasClaims(originalTokens, ['name']);
       assertDoesNotHaveClaims(originalTokens, ['email']);
       client.tokenManager.setTokens(originalTokens);
       mockGetWithoutPrompt();
       const renewedTokens = await client.token.renewTokens();
       expect(mocked.getWithoutPrompt.getWithoutPrompt).toHaveBeenCalled();
-      expect(originalTokens.idToken.idToken).not.toEqual(renewedTokens.idToken.idToken);
+      expect(originalTokens.idToken!.idToken).not.toEqual(renewedTokens.idToken!.idToken);
       expect(renewedTokens.accessToken).toBeUndefined();
-      expect(renewedTokens.idToken.scopes.sort()).toEqual(scopes);
+      expect(renewedTokens.idToken!.scopes.sort()).toEqual(scopes);
       assertHasClaims(renewedTokens, ['name']);
       assertDoesNotHaveClaims(renewedTokens, ['email']);
     });
@@ -88,8 +88,8 @@ describe('renewTokens', () => {
       mockGetWithoutPrompt();
       const renewedTokens = await client.token.renewTokens();
       expect(mocked.getWithoutPrompt.getWithoutPrompt).toHaveBeenCalled();
-      expect(originalTokens.accessToken.accessToken).not.toEqual(renewedTokens.accessToken.accessToken);
-      expect(originalTokens.idToken.idToken).not.toEqual(renewedTokens.idToken.idToken);
+      expect(originalTokens.accessToken!.accessToken).not.toEqual(renewedTokens.accessToken!.accessToken);
+      expect(originalTokens.idToken!.idToken).not.toEqual(renewedTokens.idToken!.idToken);
       assertScopesMatch(renewedTokens, scopes);
       assertHasClaims(renewedTokens, ['email']);
       assertDoesNotHaveClaims(renewedTokens, ['name']);
@@ -106,8 +106,8 @@ describe('renewTokens', () => {
       mockGetWithoutPrompt();
       const renewedTokens = await client.token.renewTokens();
       expect(mocked.getWithoutPrompt.getWithoutPrompt).toHaveBeenCalled();
-      expect(originalTokens.accessToken.accessToken).not.toEqual(renewedTokens.accessToken.accessToken);
-      expect(originalTokens.idToken.idToken).not.toEqual(renewedTokens.idToken.idToken);
+      expect(originalTokens.accessToken!.accessToken).not.toEqual(renewedTokens.accessToken!.accessToken);
+      expect(originalTokens.idToken!.idToken).not.toEqual(renewedTokens.idToken!.idToken);
       assertScopesMatch(renewedTokens, scopes);
       assertHasClaims(renewedTokens, ['name']);
       assertDoesNotHaveClaims(renewedTokens, ['email']);
@@ -124,8 +124,8 @@ describe('renewTokens', () => {
       mockGetWithoutPrompt();
       const renewedTokens = await client.token.renewTokens();
       expect(mocked.getWithoutPrompt.getWithoutPrompt).toHaveBeenCalled();
-      expect(originalTokens.accessToken.accessToken).not.toEqual(renewedTokens.accessToken.accessToken);
-      expect(originalTokens.idToken.idToken).not.toEqual(renewedTokens.idToken.idToken);
+      expect(originalTokens.accessToken!.accessToken).not.toEqual(renewedTokens.accessToken!.accessToken);
+      expect(originalTokens.idToken!.idToken).not.toEqual(renewedTokens.idToken!.idToken);
       assertScopesMatch(renewedTokens, scopes);
       assertHasClaims(renewedTokens, ['name']);
       assertDoesNotHaveClaims(renewedTokens, ['email']);
@@ -144,8 +144,8 @@ describe('renewTokens', () => {
       client.tokenManager.setTokens(originalTokens);
       mockGetWithoutPrompt(true);
       const renewedTokens = await client.token.renewTokens();
-      expect(originalTokens.accessToken.accessToken).not.toEqual(renewedTokens.accessToken.accessToken);
-      expect(originalTokens.idToken.idToken).not.toEqual(renewedTokens.idToken.idToken);
+      expect(originalTokens.accessToken!.accessToken).not.toEqual(renewedTokens.accessToken!.accessToken);
+      expect(originalTokens.idToken!.idToken).not.toEqual(renewedTokens.idToken!.idToken);
       assertScopesMatch(renewedTokens, scopes);
       assertHasClaims(renewedTokens, ['name']);
       assertDoesNotHaveClaims(renewedTokens, ['email']);
@@ -161,8 +161,8 @@ describe('renewTokens', () => {
       client.tokenManager.setTokens(originalTokens);
       mockGetWithoutPrompt(true);
       const renewedTokens = await client.token.renewTokens();
-      expect(originalTokens.accessToken.accessToken).not.toEqual(renewedTokens.accessToken.accessToken);
-      expect(originalTokens.idToken.idToken).not.toEqual(renewedTokens.idToken.idToken);
+      expect(originalTokens.accessToken!.accessToken).not.toEqual(renewedTokens.accessToken!.accessToken);
+      expect(originalTokens.idToken!.idToken).not.toEqual(renewedTokens.idToken!.idToken);
       assertScopesMatch(renewedTokens, scopes);
       assertHasClaims(renewedTokens, ['name']);
       assertDoesNotHaveClaims(renewedTokens, ['email']);

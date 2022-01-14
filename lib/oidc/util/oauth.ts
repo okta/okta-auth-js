@@ -40,7 +40,7 @@ export function getOAuthDomain(sdk: OktaAuth, options: CustomUrls = {}) {
   return domain;
 }
 
-export function getOAuthUrls(sdk: OktaAuth, options?: CustomUrls) {
+export function getOAuthUrls(sdk: OktaAuth, options?: CustomUrls): CustomUrls {
   if (arguments.length > 2) {
     throw new AuthSdkError('As of version 3.0, "getOAuthUrls" takes only a single set of options');
   }

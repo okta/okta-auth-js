@@ -39,7 +39,7 @@ import { TransactionMetaOptions } from './Transaction';
 export interface OktaAuth {
   options: OktaAuthOptions;
   getIssuerOrigin(): string;
-  getOriginalUri(): string;
+  getOriginalUri(): string | undefined;
   
   _oktaUserAgent: OktaUserAgent;
   storageManager: StorageManager;
@@ -49,8 +49,8 @@ export interface OktaAuth {
   idx: IdxAPI;
 
   // Browser only
-  features?: FeaturesAPI;
-  token?: TokenAPI;
+  features: FeaturesAPI;
+  token: TokenAPI;
 }
 
 export interface APIError {
@@ -173,8 +173,8 @@ export interface TokenAPI extends BaseTokenAPI {
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
   revoke(token: RevocableToken): Promise<object>;
-  renew(token: Token): Promise<Token>;
-  renewTokens(): Promise<Tokens>;
+  renew(token: Token): Promise<Token | undefined>;
+  renewTokens(options?: TokenParams): Promise<Tokens>;
   renewTokensWithRefresh(tokenParams: TokenParams, refreshTokenObject: RefreshToken): Promise<Tokens>;
   verify(token: IDToken, params?: object): Promise<IDToken>;
   isLoginRedirect(): boolean;
@@ -283,7 +283,7 @@ export interface IdxAPI {
   canProceed(options?: { state?: string }): boolean;
   proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
-  getFlow(): FlowIdentifier;
+  getFlow(): FlowIdentifier | undefined;
   setFlow(flow: FlowIdentifier): void;
 
   // call `start` instead of `startTransaction`. `startTransaction` will be removed in next major version (7.0)
@@ -295,11 +295,11 @@ export interface IdxAPI {
   handleInteractionCodeRedirect: (url: string) => Promise<void>;
   isEmailVerifyCallback: (search: string) => boolean;
   parseEmailVerifyCallback: (search: string) => EmailVerifyCallbackResponse;
-  handleEmailVerifyCallback: (search: string) => Promise<IdxTransaction>;
+  handleEmailVerifyCallback: (search: string) => Promise<IdxTransaction | undefined>;
   isEmailVerifyCallbackError: (error: Error) => boolean;
 
   // transaction meta
-  getSavedTransactionMeta: (options?: TransactionMetaOptions) => IdxTransactionMeta;
+  getSavedTransactionMeta: (options?: TransactionMetaOptions) => IdxTransactionMeta | undefined;
   createTransactionMeta: (options?: TransactionMetaOptions) => Promise<IdxTransactionMeta>;
   getTransactionMeta: (options?: TransactionMetaOptions) => Promise<IdxTransactionMeta>;
   saveTransactionMeta: (meta: unknown) => void;

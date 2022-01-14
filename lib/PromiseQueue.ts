@@ -63,10 +63,11 @@ class PromiseQueue {
       return;
     }
     this.running = true;
-    var queueItem = this.queue.shift();
-    var res = queueItem.method.apply(queueItem.thisObject, queueItem.args);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    var queueItem = this.queue.shift()!;
+    var res = queueItem.method.apply(queueItem.thisObject, queueItem.args as never) as unknown;
     if (isPromise(res)) {
-      res.then(queueItem.resolve, queueItem.reject).finally(() => {
+      (res as Promise<unknown>).then(queueItem.resolve, queueItem.reject).finally(() => {
         this.running = false;
         this.run();
       });

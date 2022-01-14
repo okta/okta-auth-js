@@ -24,6 +24,7 @@ import {
   OktaAuth,
   TokenParams,
   PopupParams,
+  OAuthResponse,
 } from '../types';
 
 import { prepareTokenParams } from './util/prepareTokenParams';
@@ -139,11 +140,11 @@ export function getToken(sdk: OktaAuth, options: TokenParams & PopupParams) {
           var iframeEl = loadFrame(requestUrl);
           return iframePromise
             .then(function (res) {
-              return handleOAuthResponse(sdk, tokenParams, res, urls);
+              return handleOAuthResponse(sdk, tokenParams, res as OAuthResponse, urls);
             })
             .finally(function () {
               if (document.body.contains(iframeEl)) {
-                iframeEl.parentElement.removeChild(iframeEl);
+                iframeEl.parentElement?.removeChild(iframeEl);
               }
             });
 
@@ -188,7 +189,7 @@ export function getToken(sdk: OktaAuth, options: TokenParams & PopupParams) {
 
           return popupPromise
             .then(function (res) {
-              return handleOAuthResponse(sdk, tokenParams, res, urls);
+              return handleOAuthResponse(sdk, tokenParams, res as OAuthResponse, urls);
             })
             .finally(function () {
               if (popupWindow && !popupWindow.closed) {

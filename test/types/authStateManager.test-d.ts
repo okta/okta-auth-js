@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -30,11 +31,11 @@ const authClient = new OktaAuth({});
 
   authStateManager.updateAuthState();
 
-  const authState = authStateManager.getAuthState();
+  const authState = authStateManager.getAuthState()!;
   expectType<AuthState>(authState);
-  expectType<AccessToken>(authState.accessToken);
-  expectType<IDToken>(authState.idToken);
-  expectType<RefreshToken>(authState.refreshToken);
-  expectType<boolean>(authState.isAuthenticated);
-  expectType<string>(authState.error.message);
+  expectType<AccessToken>(authState.accessToken!);
+  expectType<IDToken>(authState.idToken!);
+  expectType<RefreshToken>(authState.refreshToken!);
+  expectType<boolean>(authState.isAuthenticated!);
+  expectType<string>(authState.error!.message);
 })();

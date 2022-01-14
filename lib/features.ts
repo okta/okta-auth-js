@@ -22,7 +22,11 @@ export function isBrowser() {
 }
 
 export function isIE11OrLess() {
-  return isBrowser() && !!document.documentMode && document.documentMode <= 11;
+  if (!isBrowser()) {
+    return false;
+  }
+  const documentMode = (document as any).documentMode;
+  return !!documentMode && documentMode <= 11;
 }
 
 export function getUserAgent() {
@@ -38,8 +42,9 @@ export function isPopupPostMessageSupported() {
   if (!isBrowser()) {
     return false;
   }
-  var isIE8or9 = document.documentMode && document.documentMode < 10;
-  if (window.postMessage && !isIE8or9) {
+  const documentMode = (document as any).documentMode;
+  var isIE8or9 = documentMode && documentMode < 10;
+  if (typeof window.postMessage !== 'undefined' && !isIE8or9) {
     return true;
   }
   return false;

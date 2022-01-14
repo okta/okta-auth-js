@@ -10,12 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
 import { VerifyAuthenticator, VerifyAuthenticatorValues } from './Base/VerifyAuthenticator';
 
 export type ChallengeAuthenticatorValues = VerifyAuthenticatorValues;
 
 export class ChallengeAuthenticator extends VerifyAuthenticator {
   static remediationName = 'challenge-authenticator';
-  values: ChallengeAuthenticatorValues;
+  values!: ChallengeAuthenticatorValues;
 }

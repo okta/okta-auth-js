@@ -85,10 +85,11 @@ describe('token.getWithoutPrompt', function() {
       // Capture the iframe
       body = document.getElementsByTagName('body')[0];
       var origAppend = body.appendChild;
-      jest.spyOn(body, 'appendChild').mockImplementation(function (el: HTMLFrameElement) {
-        if (el.tagName === 'IFRAME') {
+      jest.spyOn(body, 'appendChild').mockImplementation(function (this: any, el) {
+        const frame = el as HTMLFrameElement;
+        if (frame.tagName === 'IFRAME') {
           // Remove the src so it doesn't actually load
-          el.src = '';
+          frame.src = '';
           return origAppend.call(this, el);
         }
         return origAppend.apply(this, arguments);
@@ -447,10 +448,11 @@ describe('token.getWithoutPrompt', function() {
       // mock frame creation
       body = document.getElementsByTagName('body')[0];
       var origAppend = body.appendChild;
-      jest.spyOn(body, 'appendChild').mockImplementation(function(el: HTMLFrameElement) {
-        if (el.tagName === 'IFRAME') {
+      jest.spyOn(body, 'appendChild').mockImplementation(function(this: any, el) {
+        const frame = el as HTMLFrameElement;
+        if (frame.tagName === 'IFRAME') {
           // Remove the src so it doesn't actually load
-          el.src = '';
+          frame.src = '';
           return origAppend.call(this, el);
         }
         return origAppend.apply(this, arguments);

@@ -19,7 +19,7 @@ export function getOidcHash(str) {
   return webcrypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
     var intBuffer = new Uint8Array(arrayBuffer);
     var firstHalf = intBuffer.slice(0, 16);
-    var hash = String.fromCharCode.apply(null, firstHalf);
+    var hash = String.fromCharCode.apply(null, firstHalf as unknown as number[]);
     var b64u = stringToBase64Url(hash); // url-safe base64 variant
     return b64u;
   });

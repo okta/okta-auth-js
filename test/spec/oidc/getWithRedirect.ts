@@ -1,9 +1,9 @@
 import { getWithRedirect } from '../../../lib/oidc/getWithRedirect';
-import { TokenParams } from '../../../lib/types';
 
 jest.mock('../../../lib/oidc/util', () => {
   return {
     prepareTokenParams: () => {},
+    createOAuthMeta: () => {},
     getOAuthUrls: () => {}
   };
 });
@@ -43,19 +43,26 @@ describe('getWithRedirect', () => {
     const urls = {
       authorizeUrl: 'http://fake-authorize'
     };
+    const meta = {
+      urls
+    };
     testContext = {
       sdk,
       tokenParams,
       authorizeParams,
-      urls
+      urls,
+      meta
     };
     jest.spyOn(mocked.util, 'prepareTokenParams').mockResolvedValue(testContext.tokenParams);
     jest.spyOn(mocked.util, 'getOAuthUrls').mockReturnValue(testContext.urls);
     jest.spyOn(mocked.authorize, 'buildAuthorizeParams').mockReturnValue(testContext.authorizeParams);
+    jest.spyOn(mocked.util, 'createOAuthMeta').mockReturnValue(testContext.meta);
   });
 
   it('throws an error if more than 2 parameters are passed', async () => {
     const { sdk } = testContext;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    //@ts-ignore
     const promise = getWithRedirect.apply(null, [sdk, {}, {}]);
     await expect(promise).rejects.toThrow('As of version 3.0, "getWithRedirect" takes only a single set of options');
   });
@@ -66,57 +73,14 @@ describe('getWithRedirect', () => {
       jest.spyOn(sdk.transactionManager, 'save');
     });
     
-    it('saves issuer from sdk', async () => {
-      const { sdk, urls } = testContext;
+    it('saves using the oauth option', async () => {
+      const { sdk, meta } = testContext;
       const issuer = 'http://fake';
       sdk.options.issuer = issuer;
       await getWithRedirect(sdk, {});
-      expect(sdk.transactionManager.save).toHaveBeenCalledWith({
-        issuer,
-        urls
-      }, { oauth: true });
+      expect(sdk.transactionManager.save).toHaveBeenCalledWith(meta, { oauth: true });
     });
 
-    it('saves urls from `getOAuthUrls`', async () => {
-      const { sdk, urls } = testContext;
-      const options = { foo: 'bar' } as unknown as TokenParams;
-      await getWithRedirect(sdk, options);
-      expect(mocked.util.getOAuthUrls).toHaveBeenCalledWith(sdk, options);
-      expect(sdk.transactionManager.save).toHaveBeenCalledWith({
-        urls
-      }, { oauth: true });
-    });
-
-    it('saves OAuth values from the tokenParams', async () => {
-      const { sdk, urls, tokenParams } = testContext;
-      Object.assign(tokenParams, {
-        responseType: 'code',
-        state: 'mock-state',
-        nonce: 'mock-nonce',
-        scopes: ['a', 'b'],
-        clientId: 'mock-clientId',
-        ignoreSignature: true,
-        redirectUri: 'http://localhost/login/callback',
-        codeVerifier: 'abcd',
-        codeChallenge: 'efgh',
-        codeChallengeMethod: 'fake',
-      });
-
-      await getWithRedirect(sdk, {});
-      expect(sdk.transactionManager.save).toHaveBeenCalledWith({
-        responseType: 'code',
-        state: 'mock-state',
-        nonce: 'mock-nonce',
-        scopes: ['a', 'b'],
-        clientId: 'mock-clientId',
-        ignoreSignature: true,
-        redirectUri: 'http://localhost/login/callback',
-        codeVerifier: 'abcd',
-        codeChallenge: 'efgh',
-        codeChallengeMethod: 'fake',
-        urls
-      }, { oauth: true });
-    });
   });
 
 

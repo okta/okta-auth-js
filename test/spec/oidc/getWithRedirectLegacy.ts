@@ -65,7 +65,7 @@ describe('token.getWithRedirect', function() {
 
     // mock window.location so we appear to be on an HTTPS origin
     originalLocation = global.window.location;
-    delete global.window.location;
+    delete (global.window as any).location;
     global.window.location = {
       protocol: 'https:',
       hostname: 'somesite.local'
@@ -116,7 +116,7 @@ describe('token.getWithRedirect', function() {
     spyOn(pkce, 'computeChallenge').and.returnValue(Promise.resolve(codeChallenge));
   }
   it('Uses insecure cookie settings if running on http://localhost', function() {
-    delete window.location;
+    delete (window as any).location;
     window.location = {
       protocol: 'http:',
       hostname: 'localhost'

@@ -12,8 +12,8 @@
  */
 
 /* global SDK_VERSION */
-import { isBrowser } from './features';
 
+import { isBrowser } from './features';
 export class OktaUserAgent {
   private environments: string[];
 

@@ -62,6 +62,7 @@ export default class StorageManager {
   }
  
   // generic method to get any available storage provider
+  // eslint-disable-next-line complexity
   getStorage(options: StorageOptions): SimpleStorage {
     options = Object.assign({}, this.cookieOptions, options); // set defaults
 
@@ -80,12 +81,13 @@ export default class StorageManager {
       const idx = storageTypes.indexOf(storageType);
       if (idx >= 0) {
         storageTypes = storageTypes.slice(idx);
-        storageType = null;
+        storageType = undefined;
       }
     }
 
     if (!storageType) {
-      storageType = this.storageUtil.findStorageType(storageTypes);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      storageType = this.storageUtil.findStorageType(storageTypes!);
     }
     return this.storageUtil.getStorageByType(storageType, options);
   }
@@ -118,7 +120,7 @@ export default class StorageManager {
   // intermediate idxResponse
   // store for network traffic optimazation purpose
   // TODO: revisit in auth-js 6.0 epic JIRA: OKTA-399791
-  getIdxResponseStorage(options?: StorageOptions): IdxResponseStorage {
+  getIdxResponseStorage(options?: StorageOptions): IdxResponseStorage | null {
     let storage;
     if (isBrowser()) {
       // on browser side only use memory storage 
