@@ -50,8 +50,11 @@ export class EnrollPoll extends Remediator {
   }
 
   getPeerRemediations(remediations: IdxRemediation[]) {
-    return remediations
-      .filter(remediation => ['select-enrollment-channel'].includes(remediation.name))
-      .map(remediation => remediation.name);
+    const availableRemediations = remediations.map(({ name }) => name);
+
+    return [{
+      remediationName: 'select-enrollment-channel',
+      actionDisplayName: 'Enroll with another method'
+    }].filter(remediationDescriptor => availableRemediations.includes(remediationDescriptor.remediationName));
   }
 }

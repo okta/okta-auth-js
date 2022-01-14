@@ -304,15 +304,15 @@ router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
   } else {
     const { authenticator: {
       key, displayName,
-    }, nextStep: { name: nextStepName }} = nextStep;
+    }, nextSteps } = nextStep;
     renderPage({
       req, res,
       render: () => renderTemplate(req, res, 'enroll-poll', {
         title: `Enroll ${displayName}`,
         action: `/poll-authenticator/${key}`,
         poll: nextStep.poll,
-        nextStep: nextStepName,
-        nextStepAction: `/next-step`
+        nextStepAction: `/next-step`,
+        nextSteps,
       })
     });
   }

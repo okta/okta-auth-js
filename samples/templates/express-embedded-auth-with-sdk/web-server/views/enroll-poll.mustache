@@ -40,12 +40,12 @@
         </div>
       {{/contextualData.email}}
       <div class="row">
-      {{#nextStep}}
-        <form id="select-channel-form" action="{{nextStepAction}}" method="POST">
-          <input type="hidden" name="nextStep" value="{{nextStep}}"/>
-          <button id="submit-button" class="ui fluid primary submit button" type="submit">Get Link</button>
+      {{#nextSteps}}
+        <form id="{{remediationName}}-form" action="{{nextStepAction}}" method="POST">
+          <input type="hidden" name="nextStep" value="{{remediationName}}"/>
+          <button id="submit-button" class="ui fluid primary submit button" type="submit">{{actionDisplayName}}</button>
         </form>
-      {{/nextStep}}
+      {{/nextSteps}}
       </div>
       <div class="row">
       {{>cancel}}

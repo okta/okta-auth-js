@@ -17,6 +17,7 @@ import { APIError, Tokens } from '../../types';
 import { IdxTransactionMeta } from '../../types/Transaction';
 import { IdxAuthenticator, IdxMessage, IdxOption, IdxResponse, IdxForm } from './idx-js';
 import { FlowIdentifier } from './FlowIdentifier';
+import { RemediationDescriptor } from '../remediators';
 
 export { IdxMessage } from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
@@ -60,7 +61,7 @@ export type NextStep = {
   inputs?: Input[];
   options?: IdxOption[];
   poll?: IdxPollOptions;
-  nextStep?: NextStep;
+  nextSteps?: RemediationDescriptor[];
 }
 
 export enum IdxFeature {

@@ -27,6 +27,11 @@ export interface RemediationValues extends IdxOptions {
   authenticatorsData?: Authenticator[];
 }
 
+export interface RemediationDescriptor {
+  remediationName: string;
+  actionDisplayName?: string;
+}
+
 // Base class - DO NOT expose static remediationName
 export class Remediator {
   static remediationName: string;
@@ -157,11 +162,7 @@ export class Remediator {
       inputs, 
       ...(type && { type }),
       ...(authenticator && { authenticator }),
-      ...(nextSteps?.length && {
-        nextStep: {
-          name: nextSteps[0]
-        }
-      })
+      ...(nextSteps?.length && { nextSteps })
     };
   }
 
@@ -236,7 +237,7 @@ export class Remediator {
     return this.remediation.relatesTo?.value;
   }
 
-  protected getPeerRemediations(_remediations: IdxRemediation[]): string[] {
+  protected getPeerRemediations(_remediations: IdxRemediation[]): RemediationDescriptor[] {
     return [];
   }
 }
