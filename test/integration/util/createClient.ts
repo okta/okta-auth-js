@@ -1,7 +1,7 @@
 import { OktaAuth } from '../../../lib';
 
 // Cleanup clients after test completes
-const activeClients = [];
+const activeClients: OktaAuth[] = [];
 afterEach(() => {
   activeClients.forEach(client => {
     client.tokenManager.clearExpireEventTimeoutAll();

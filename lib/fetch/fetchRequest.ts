@@ -11,11 +11,12 @@
  */
 
 import crossFetch from 'cross-fetch';
-import { FetchOptions, FetchResponse, HttpResponse } from '../types';
+import { FetchOptions, HttpResponse } from '../types';
 
-function readData(response: FetchResponse): Promise<object | string> {
+function readData(response: Response): Promise<object | string> {
   if (response.headers.get('Content-Type') &&
-    response.headers.get('Content-Type').toLowerCase().indexOf('application/json') >= 0) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    response.headers.get('Content-Type')!.toLowerCase().indexOf('application/json') >= 0) {
   return response.json()
     // JSON parse can fail if response is not a valid object
     .catch(e => {
@@ -32,7 +33,7 @@ function readData(response: FetchResponse): Promise<object | string> {
 function formatResult(status: number, data: object | string, response: Response) {
   const isObject = typeof data === 'object';
   const headers = {};
-  for (const pair of response.headers.entries()) {
+  for (const pair of (response.headers as any).entries()) {
     headers[pair[0]] = pair[1];
   }
   const result: HttpResponse = {

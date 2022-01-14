@@ -274,7 +274,7 @@ describe('StorageManager', () => {
       it('always use memory storage on browser side', () => {
         const storageManager = setup();
         const options = {};
-        const res: IdxResponseStorage = storageManager.getIdxResponseStorage(options);
+        const res: IdxResponseStorage = storageManager.getIdxResponseStorage(options)!;
         expect(storageManager.storageUtil.getStorageByType).toHaveBeenCalledWith('memory', options);
         expect((res as SavedObject).storageName).toBe('okta-idx-response-storage');
       });
@@ -306,7 +306,7 @@ describe('StorageManager', () => {
           }
         };
         const storageManager = setup(options);
-        const res: IdxResponseStorage = storageManager.getIdxResponseStorage();
+        const res: IdxResponseStorage = storageManager.getIdxResponseStorage()!;
         expect(typeof (res as SavedObject).storageProvider.getItem).toBe('function');
         expect(typeof (res as SavedObject).storageProvider.setItem).toBe('function');
         expect(typeof (res as SavedObject).storageProvider.removeItem).toBe('function');
@@ -317,7 +317,7 @@ describe('StorageManager', () => {
         const options: StorageManagerOptions = {};
         const storageManager = setup(options);
         storageManager.getTransactionStorage = jest.fn().mockReturnValue(null);
-        const res: IdxResponseStorage = storageManager.getIdxResponseStorage();
+        const res: IdxResponseStorage = storageManager.getIdxResponseStorage()!;
         expect(res).toBeNull();
       });
     });

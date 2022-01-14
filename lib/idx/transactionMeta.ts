@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2021, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -10,53 +11,30 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuth, IdxTransactionMeta, TransactionMetaOptions } from '../types';
+import { OktaAuth, IdxTransactionMeta, TransactionMetaOptions, PKCETransactionMeta } from '../types';
 import { removeNils, warn } from '../util';
-import { getOAuthUrls } from '../oidc';
+import { createOAuthMeta } from '../oidc';
 
 // Calculate new values
-export async function createTransactionMeta(authClient: OktaAuth, options: TransactionMetaOptions = {}) {
+export async function createTransactionMeta(
+  authClient: OktaAuth,
+  options: TransactionMetaOptions = {}
+): Promise<IdxTransactionMeta> {
   const tokenParams = await authClient.token.prepareTokenParams(options);
-  const {
-    clientId,
-    redirectUri,
-    responseType,
-    responseMode,
-    scopes,
-    state,
-    nonce,
-    ignoreSignature,
-    codeVerifier,
-    codeChallengeMethod,
-    codeChallenge,
-  } = tokenParams;
-  const urls = getOAuthUrls(authClient, tokenParams);
+  const pkceMeta = createOAuthMeta(authClient, tokenParams) as PKCETransactionMeta;
   let {
     flow = 'default',
     withCredentials = true,
-    activationToken,
-    recoveryToken
+    activationToken = undefined,
+    recoveryToken = undefined,
   } = { ...authClient.options, ...options }; // local options override SDK options
-  const issuer = authClient.options.issuer;
 
   const meta: IdxTransactionMeta = {
-    withCredentials,
+    ...pkceMeta,
     flow,
-    issuer,
-    clientId,
-    redirectUri,
-    responseType,
-    responseMode,
-    scopes,
-    state,
-    nonce,
-    urls,
-    ignoreSignature,
-    codeVerifier,
-    codeChallengeMethod,
-    codeChallenge,
+    withCredentials,
     activationToken,
-    recoveryToken
+    recoveryToken,
   };
   return meta;
 }
@@ -70,7 +48,10 @@ export function hasSavedInteractionHandle(authClient: OktaAuth, options?: Transa
 }
 
 // Returns the saved transaction meta, if it exists and is valid
-export function getSavedTransactionMeta(authClient: OktaAuth, options?: TransactionMetaOptions): IdxTransactionMeta {
+export function getSavedTransactionMeta(
+  authClient: OktaAuth,
+  options?: TransactionMetaOptions
+): IdxTransactionMeta | undefined {
   options = removeNils(options);
   options = { ...authClient.options, ...options }; // local options override SDK options
   let savedMeta;
@@ -81,7 +62,7 @@ export function getSavedTransactionMeta(authClient: OktaAuth, options?: Transact
   }
 
   if (!savedMeta) {
-    return null;
+    return;
   }
 
   if (isTransactionMetaValid(savedMeta, options)) {

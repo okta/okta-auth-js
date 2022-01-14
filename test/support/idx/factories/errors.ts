@@ -20,7 +20,7 @@ export const IdxErrorMessageFactory = Factory.define<IdxMessage>(() => {
   return {
     class: 'ERROR',
     i18n: {
-      key: undefined
+      key: undefined as unknown as string
     },
     message: 'Default error message'
   };

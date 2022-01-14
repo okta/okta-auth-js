@@ -50,7 +50,7 @@ function createAccessToken(strValue): AccessToken {
 describe('token.revoke', function() {
   it('throws if token is not passed', function() {
     var oa = setupSync();
-    return oa.token.revoke(undefined as AccessToken)
+    return oa.token.revoke(undefined as unknown as AccessToken)
       .catch(function(err) {
         util.assertAuthSdkError(err, 'A valid access or refresh token object is required');
       });

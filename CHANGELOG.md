@@ -9,9 +9,10 @@
 - [#1050](https://github.com/okta/okta-auth-js/pull/1050) Removes `userAgent` field from oktaAuth instance
 - [#1014](https://github.com/okta/okta-auth-js/pull/1014) Shared transaction storage is automatically cleared on success and error states. Storage is not cleared for "terminal" state which is neither success nor error.
 - [#1051](https://github.com/okta/okta-auth-js/pull/1051) Removes `useMultipleCookies` from CookieStorage options
-- [#1059](https://github.com/okta/okta-auth-js/pull/1059) 
+- [#1059](https://github.com/okta/okta-auth-js/pull/1059)
   - Removes signOut option `clearTokensAfterRedirect`
   - Adds signOut option `clearTokensBeforeRedirect` (default: `false`) to remove local tokens before logout redirect happen
+- [#1057](https://github.com/okta/okta-auth-js/pull/1057) Strict checks are now enabled in the Typescript compiler options. Some type signatures have been changed to match current behavior.
 
 ### Features
 

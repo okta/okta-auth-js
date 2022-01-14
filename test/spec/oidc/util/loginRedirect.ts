@@ -40,7 +40,7 @@ describe('util/loginRedirect', function() {
   });
 
   function mockHash(hash) {
-    delete window.location;
+    delete (window as any).location;
     window.location = {
       hash: `#${hash}`,
       href: `${redirectUri}#${hash}`
@@ -48,7 +48,7 @@ describe('util/loginRedirect', function() {
   }
 
   function mockSearch(search) {
-    delete window.location;
+    delete (window as any).location;
     window.location = {
       search: `?${search}`,
       href: `${redirectUri}?${search}`

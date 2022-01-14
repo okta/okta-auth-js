@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -26,14 +27,14 @@ export class AuthenticatorData extends Remediator {
     'authenticator': []
   };
 
-  values: AuthenticatorDataValues;
+  values!: AuthenticatorDataValues;
   authenticator: Authenticator;
 
   constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}) {
     super(remediation, values);
 
     // set before other data calculation
-    this.authenticator = this.getAuthenticator();
+    this.authenticator = this.getAuthenticator()!;
 
     this.formatAuthenticatorData();
   }
@@ -41,7 +42,7 @@ export class AuthenticatorData extends Remediator {
   protected formatAuthenticatorData() {
     const authenticatorData = this.getAuthenticatorData();
     if (authenticatorData) {
-      this.values.authenticatorsData = this.values.authenticatorsData.map(data => {
+      this.values.authenticatorsData = this.values.authenticatorsData!.map(data => {
         if (data.key === this.authenticator.key) {
           return this.mapAuthenticatorDataFromValues(data);
         }
@@ -50,18 +51,18 @@ export class AuthenticatorData extends Remediator {
     } else {
       const data = this.mapAuthenticatorDataFromValues();
       if (data) {
-        this.values.authenticatorsData.push(data);
+        this.values.authenticatorsData!.push(data);
       }
     }
   }
 
   protected getAuthenticatorData() {
-    return this.values.authenticatorsData
+    return this.values.authenticatorsData!
       .find(({ key }) => key === this.authenticator.key);
   }
 
   canRemediate() {
-    return this.values.authenticatorsData
+    return this.values.authenticatorsData!
       .some(data => data.key === this.authenticator.key);
   }
 
@@ -87,20 +88,20 @@ export class AuthenticatorData extends Remediator {
   }
 
   protected getAuthenticatorFromRemediation(): IdxRemediationValue {
-    const authenticator = this.remediation.value
-      .find(({ name }) => name === 'authenticator');
+    const authenticator = this.remediation.value!
+      .find(({ name }) => name === 'authenticator') as IdxRemediationValue;
     return authenticator;
   }
 
   private getMethodTypes(): IdxOption[] {
     const authenticator: IdxRemediationValue = this.getAuthenticatorFromRemediation();
-    return authenticator.form.value.find(({ name }) => name === 'methodType')?.options;
+    return authenticator.form!.value.find(({ name }) => name === 'methodType')?.options as IdxOption[];
   }
 
   getValuesAfterProceed(): RemediationValues {
     this.values = super.getValuesAfterProceed();
     // remove used authenticatorData
-    const authenticatorsData = this.values.authenticatorsData
+    const authenticatorsData = this.values.authenticatorsData!
       .filter(data => data.key !== this.authenticator.key);
     return { ...this.values, authenticatorsData };
   }

@@ -69,7 +69,7 @@ export type StorageType = 'memory' | 'sessionStorage' | 'localStorage' | 'cookie
 export interface StorageUtil {
   storage: TxStorage;
   testStorageType(storageType: StorageType): boolean;
-  getStorageByType(storageType: StorageType, options: StorageOptions): SimpleStorage;
+  getStorageByType(storageType: StorageType, options?: StorageOptions): SimpleStorage;
   findStorageType(types: StorageType[]): StorageType;
 }
 
@@ -97,7 +97,7 @@ export interface NodeStorageUtil extends StorageUtil {
 }
 
 export interface CookieStorage extends SimpleStorage {
-  setItem(key: string, value: any, expiresAt?: string): void; // can customize expiresAt
+  setItem(key: string, value: any, expiresAt?: string | null): void; // can customize expiresAt
   getItem(key?: string): any; // if no key is passed, all cookies are returned
   removeItem(key: string); // remove a cookie
 }

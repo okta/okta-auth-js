@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
 import waitFor from '@okta/test.support/waitFor';
-import { AuthTransaction, handleOAuthResponse } from '../../../lib';
+import { AuthTransaction, CustomUrls, handleOAuthResponse } from '../../../lib';
 import { getWithRedirect } from '../../../lib/oidc';
 import { parseOAuthResponseFromUrl } from '../../../lib/oidc/parseFromUrl';
 
@@ -31,16 +31,16 @@ async function getTokens(client, tokenParams) {
   getWithRedirect(client, tokenParams);
   await waitFor(() => localContext.authorizeUrl);
   const { authorizeUrl } = localContext;
-  const res = await fetch(authorizeUrl, {
+  const res = await fetch(authorizeUrl as unknown as string, {
     redirect: 'manual'
   });
   const redirectUrl = res.headers.get('location');
   const oauthResponse = parseOAuthResponseFromUrl(client, {
-    url: redirectUrl,
+    url: redirectUrl!,
     responseMode: 'fragment'
   });
   const transactionMeta = client.transactionManager.load();
-  const tokenResponse = await handleOAuthResponse(client, transactionMeta, oauthResponse, null);
+  const tokenResponse = await handleOAuthResponse(client, transactionMeta, oauthResponse, undefined as unknown as CustomUrls);
   unmockGetWithRedirect(client);
   return tokenResponse;
 }

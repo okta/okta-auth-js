@@ -33,7 +33,7 @@ function getSingleToken(originalToken: Token, tokens: Tokens) {
 }
 
 // If we have a refresh token, renew using that, otherwise getWithoutPrompt
-export async function renewToken(sdk: OktaAuth, token: Token): Promise<Token> {
+export async function renewToken(sdk: OktaAuth, token: Token): Promise<Token | undefined> {
   if (!isIDToken(token) && !isAccessToken(token)) {
     throwInvalidTokenError();
   }

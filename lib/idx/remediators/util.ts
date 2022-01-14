@@ -14,13 +14,13 @@
 import { IdxRemediation, IdxRemediationValue } from '../types/idx-js';
 
 export function getAllValues(idxRemediation: IdxRemediation) {
-  return idxRemediation.value.map(r => r.name);
+  return idxRemediation.value?.map(r => r.name);
 }
 
 export function getRequiredValues(idxRemediation: IdxRemediation) {
-  return idxRemediation.value.reduce((required, cur) => {
+  return idxRemediation.value?.reduce((required, cur) => {
     if (cur.required) {
-      required.push(cur.name);
+      required.push(cur.name as never);
     }
     return required;
   }, []);
@@ -33,5 +33,6 @@ export function titleCase(str: string) {
 export function getAuthenticatorFromRemediation(
   remediation: IdxRemediation
 ): IdxRemediationValue {
-  return remediation.value.find(({ name }) => name === 'authenticator');
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return remediation.value!.find(({ name }) => name === 'authenticator') as IdxRemediationValue;
 }

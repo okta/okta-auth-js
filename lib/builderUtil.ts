@@ -24,14 +24,15 @@ function assertValidConfig(args: OktaAuthOptions) {
       'Required usage: new OktaAuth({scopes: ["openid", "email"]})');
   }
 
-  var issuer = args.issuer;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  var issuer = args.issuer!;
   if (!issuer) {
     throw new AuthSdkError('No issuer passed to constructor. ' + 
       'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com/oauth2/{authServerId}"})');
   }
 
   var isUrlRegex = new RegExp('^http?s?://.+');
-  if (!isUrlRegex.test(args.issuer)) {
+  if (!isUrlRegex.test(issuer)) {
     throw new AuthSdkError('Issuer must be a valid URL. ' + 
       'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com/oauth2/{authServerId}"})');
   }

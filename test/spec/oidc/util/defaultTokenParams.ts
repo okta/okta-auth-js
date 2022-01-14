@@ -37,7 +37,7 @@ describe('getDefaultTokenParams', () => {
   });
   afterEach(() => {
     if ((global.window as any).fake) {
-      delete global.window;
+      delete (global as any).window;
     }
   });
   it('`pkce`: uses value from sdk.options', () => {

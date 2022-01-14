@@ -36,7 +36,7 @@ export type PasswordRecoveryOptions = IdxOptions
   & ReEnrollAuthenticatorValues;
 
 export async function recoverPassword(
-  authClient: OktaAuth, options: PasswordRecoveryOptions
+  authClient: OktaAuth, options: PasswordRecoveryOptions = {}
 ): Promise<IdxTransaction> {
   const flowSpec = getFlowSpecification(authClient, 'recoverPassword');
   return run(

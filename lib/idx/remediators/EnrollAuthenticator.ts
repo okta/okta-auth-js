@@ -17,5 +17,5 @@ export type EnrollAuthenticatorValues = VerifyAuthenticatorValues;
 
 export class EnrollAuthenticator extends VerifyAuthenticator {
   static remediationName = 'enroll-authenticator';
-  values: EnrollAuthenticatorValues;
+  values!: EnrollAuthenticatorValues;
 }

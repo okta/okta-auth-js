@@ -27,36 +27,33 @@ import {
 } from '../types';
 
 // refresh tokens have precedence to be revoked if no token is specified
-export function revokeToken(sdk: OktaAuth, token: RevocableToken): Promise<any> {
-  return Promise.resolve()
-    .then(function () {
-      var accessToken: string;
-      var refreshToken: string;
-      if (token) { 
-          accessToken = (token as AccessToken).accessToken;
-          refreshToken = (token as RefreshToken).refreshToken;  
-      }
-        
-      if(!accessToken && !refreshToken) { 
-        throw new AuthSdkError('A valid access or refresh token object is required');
-      }
-      var clientId = sdk.options.clientId;
-      var clientSecret = sdk.options.clientSecret;
-      if (!clientId) {
-        throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to revoke a token');
-      }
-      var revokeUrl = getOAuthUrls(sdk).revokeUrl;
-      var args = toQueryString({
-        // eslint-disable-next-line camelcase
-        token_type_hint: refreshToken ? 'refresh_token' : 'access_token', 
-        token: refreshToken || accessToken,
-      }).slice(1);
-      var creds = clientSecret ? btoa(`${clientId}:${clientSecret}`) : btoa(clientId);
-      return post(sdk, revokeUrl, args, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic ' + creds
-        }
-      });
-    });
+export async function revokeToken(sdk: OktaAuth, token: RevocableToken): Promise<any> {
+  let accessToken = '';
+  let refreshToken = '';
+  if (token) { 
+      accessToken = (token as AccessToken).accessToken;
+      refreshToken = (token as RefreshToken).refreshToken;  
+  }
+  if(!accessToken && !refreshToken) { 
+    throw new AuthSdkError('A valid access or refresh token object is required');
+  }
+  var clientId = sdk.options.clientId;
+  var clientSecret = sdk.options.clientSecret;
+  if (!clientId) {
+    throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to revoke a token');
+  }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  var revokeUrl = getOAuthUrls(sdk).revokeUrl!;
+  var args = toQueryString({
+    // eslint-disable-next-line camelcase
+    token_type_hint: refreshToken ? 'refresh_token' : 'access_token', 
+    token: refreshToken || accessToken,
+  }).slice(1);
+  var creds = clientSecret ? btoa(`${clientId}:${clientSecret}`) : btoa(clientId);
+  return post(sdk, revokeUrl, args, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Basic ' + creds
+    }
+  });
 }

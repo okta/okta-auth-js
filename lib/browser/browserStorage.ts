@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -31,11 +32,11 @@ var storageUtil: BrowserStorageUtil = {
 
   // These are shimmed in `OktaAuthBase.ts`
   getHttpCache(): StorageProvider {
-    return null;
+    return null as never as StorageProvider;
   },
 
   getPKCEStorage(): PKCEStorage {
-    return null;
+    return null as never as PKCEStorage;
   },
 
   // IE11 bug that Microsoft doesn't plan to fix
@@ -78,8 +79,8 @@ var storageUtil: BrowserStorageUtil = {
     return supported;
   },
 
-  getStorageByType: function(storageType: StorageType, options: StorageOptions): SimpleStorage {
-    let storageProvider = null;
+  getStorageByType: function(storageType: StorageType, options?: StorageOptions): SimpleStorage {
+    let storageProvider;
     switch (storageType) {
       case 'sessionStorage':
         storageProvider = storageUtil.getSessionStorage();
@@ -132,9 +133,9 @@ var storageUtil: BrowserStorageUtil = {
 
   // Provides webStorage-like interface for cookies
   getCookieStorage: function(options): CookieStorage {
-    const secure = options.secure;
-    const sameSite = options.sameSite;
-    const sessionCookie = options.sessionCookie;
+    const secure = options!.secure;
+    const sameSite = options!.sameSite;
+    const sessionCookie = options!.sessionCookie;
     if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
       throw new AuthSdkError('getCookieStorage: "secure" and "sameSite" options must be provided');
     }
@@ -142,7 +143,7 @@ var storageUtil: BrowserStorageUtil = {
       getItem: storageUtil.storage.get,
       setItem: function(key, value, expiresAt = '2200-01-01T00:00:00.000Z') {
         // By defauilt, cookie shouldn't expire
-        expiresAt = sessionCookie ? null : expiresAt;
+        expiresAt = (sessionCookie ? null : expiresAt) as string;
         storageUtil.storage.set(key, value, expiresAt, {
           secure: secure, 
           sameSite: sameSite,
@@ -153,7 +154,7 @@ var storageUtil: BrowserStorageUtil = {
       }
     };
 
-    if (!options.useSeparateCookies) {
+    if (!options!.useSeparateCookies) {
       return storage;
     }
 
@@ -165,7 +166,7 @@ var storageUtil: BrowserStorageUtil = {
         var data = storage.getItem(); // read all cookies
         var value = {};
         Object.keys(data).forEach(k => {
-          if (k.indexOf(key) === 0) { // filter out unrelated cookies
+          if (k.indexOf(key!) === 0) { // filter out unrelated cookies
             value[k.replace(`${key}_`, '')] = JSON.parse(data[k]); // populate with cookie data
           }
         });

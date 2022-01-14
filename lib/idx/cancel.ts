@@ -16,7 +16,7 @@ import { getFlowSpecification } from './flow';
 
 export type CancelOptions = IdxOptions;
 
-export async function cancel (authClient: OktaAuth, options: CancelOptions) {
+export async function cancel (authClient: OktaAuth, options?: CancelOptions) {
   const meta = authClient.transactionManager.load() as IdxTransactionMeta;
   const flowSpec = getFlowSpecification(authClient, meta.flow);
   return run(authClient, {

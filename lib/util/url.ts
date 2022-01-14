@@ -37,7 +37,7 @@ export function toQueryString(obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key) &&
           obj[key] !== undefined &&
           obj[key] !== null) {
-        str.push(key + '=' + encodeURIComponent(obj[key]));
+        str.push(key + '=' + encodeURIComponent(obj[key]) as never);
       }
     }
   }

@@ -39,7 +39,8 @@ export async function handleInteractionCodeRedirect(
   // Error handling
   const error = searchParams.get('error');
   if (error) {
-    throw new OAuthError(error, searchParams.get('error_description'));
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    throw new OAuthError(error, searchParams.get('error_description')!);
   }
   if (state !== savedState) {
     throw new AuthSdkError('State in redirect uri does not match with transaction state');
