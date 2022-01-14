@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -26,12 +27,12 @@ export function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any
       accessToken = options.accessToken,
       withCredentials = options.withCredentials === true, // default value is false
       storageUtil = sdk.options.storageUtil,
-      storage = storageUtil.storage,
+      storage = storageUtil!.storage,
       httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies);
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
-    var cachedResponse = cacheContents[url];
+    var cachedResponse = cacheContents[url as string];
     if (cachedResponse && Date.now()/1000 < cachedResponse.expiresAt) {
       return Promise.resolve(cachedResponse.response);
     }
@@ -57,7 +58,7 @@ export function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any
   };
 
   var err, res;
-  return sdk.options.httpRequestClient(method, url, ajaxOptions)
+  return sdk.options.httpRequestClient!(method!, url!, ajaxOptions)
     .then(function(resp) {
       res = resp.responseText;
       if (res && isString(res)) {
@@ -74,11 +75,11 @@ export function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any
       }
 
       if (res && res.stateToken && res.expiresAt) {
-        storage.set(STATE_TOKEN_KEY_NAME, res.stateToken, res.expiresAt, sdk.options.cookies);
+        storage.set(STATE_TOKEN_KEY_NAME, res.stateToken, res.expiresAt, sdk.options.cookies!);
       }
 
       if (res && options.cacheResponse) {
-        httpCache.updateStorage(url, {
+        httpCache.updateStorage(url!, {
           expiresAt: Math.floor(Date.now()/1000) + DEFAULT_CACHE_DURATION,
           response: res
         });

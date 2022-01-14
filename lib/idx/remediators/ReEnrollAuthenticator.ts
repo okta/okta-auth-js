@@ -20,7 +20,7 @@ export interface ReEnrollAuthenticatorValues extends RemediationValues {
 export class ReEnrollAuthenticator extends Remediator {
   static remediationName = 'reenroll-authenticator';
 
-  values: ReEnrollAuthenticatorValues;
+  values!: ReEnrollAuthenticatorValues;
 
   map = {
     'credentials': []
@@ -33,7 +33,8 @@ export class ReEnrollAuthenticator extends Remediator {
   }
 
   getInputCredentials(input) {
-    const challengeType = this.getAuthenticator().type;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const challengeType = this.getAuthenticator()!.type;
     const name = challengeType === 'password' ? 'newPassword' : 'verificationCode';
     return {
       ...input.form.value[0],

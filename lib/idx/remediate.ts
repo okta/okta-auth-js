@@ -41,12 +41,13 @@ export function getRemediator(
   values: RemediationValues,
   options: RemediateOptions,
 ): Remediator {
-  const { remediators } = options;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const remediators = options.remediators!;
 
   let remediator;
   const remediatorCandidates = [];
   for (let remediation of idxRemediations) {
-    const isRemeditionInFlow = Object.keys(remediators).includes(remediation.name);
+    const isRemeditionInFlow = Object.keys(remediators as object).includes(remediation.name);
     if (!isRemeditionInFlow) {
       continue;
     }
@@ -59,7 +60,7 @@ export function getRemediator(
     }
     // remediator cannot handle the current values
     // maybe return for next step
-    remediatorCandidates.push(remediator);  
+    remediatorCandidates.push(remediator as never);  
   }
   
   return remediatorCandidates[0];
@@ -85,14 +86,14 @@ function getIdxMessages(idxResponse: IdxResponse): IdxMessage[] {
   // Handle global messages
   const globalMessages = rawIdxState.messages?.value.map(message => message);
   if (globalMessages) {
-    messages = [...messages, ...globalMessages];
+    messages = [...messages, ...globalMessages] as never;
   }
 
   // Handle field messages for current flow
   for (let remediation of neededToProceed) {
     const fieldMessages = Remediator.getMessages(remediation);
     if (fieldMessages) {
-      messages = [...messages, ...fieldMessages];
+      messages = [...messages, ...fieldMessages] as never;
     }
   }
 
@@ -114,7 +115,7 @@ function getNextStep(
 
 function handleIdxError(e, remediator?) {
   // Handle idx messages
-  const idxState: IdxResponse = isIdxResponse(e) ? e : null;
+  const idxState = isIdxResponse(e) ? e : null;
   if (!idxState) {
     // Thrown error terminates the interaction with idx
     throw e;

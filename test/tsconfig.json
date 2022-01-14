@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es6",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "checkJs": true,
+    "alwaysStrict": true,
+    "noImplicitAny": false,
+    "strict": true,
+    "noEmit": true,
+    "outDir": "../build/test",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": false,
+    "skipLibCheck": true,
+    "rootDir": "../",
+    "baseUrl": "../",
+    "lib": [
+      "ES2020.Promise"
+    ]
+  },
+  "include": [
+    "../types/global.d.ts",
+    "spec/**/*.ts",
+    "integration/**/*.ts",
+    "support/**/*.ts",
+    "types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

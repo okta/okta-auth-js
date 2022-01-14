@@ -322,7 +322,7 @@ describe('idx/recoverPassword', () => {
         authenticator: { id: 'id-email' } 
       });
       expect(res.status).toBe(IdxStatus.PENDING);
-      expect(res.nextStep.name).toBe('challenge-authenticator');
+      expect(res.nextStep!.name).toBe('challenge-authenticator');
     });
 
     it('returns a terminal error if reset password is not allowed by server policy', async () => {

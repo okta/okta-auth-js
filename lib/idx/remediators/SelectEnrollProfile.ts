@@ -19,7 +19,7 @@ export interface SelectEnrollProfileValues extends RemediationValues {}
 export class SelectEnrollProfile extends Remediator {
   static remediationName = 'select-enroll-profile';
 
-  values: SelectEnrollProfileValues;
+  values!: SelectEnrollProfileValues;
 
   canRemediate() {
     return true;

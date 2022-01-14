@@ -48,7 +48,8 @@ export default class TransactionManager {
   saveLastResponse: boolean;
 
   constructor(options: TransactionManagerOptions) {
-    this.storageManager = options.storageManager;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.storageManager = options.storageManager!;
     this.legacyWidgetSupport = options.legacyWidgetSupport === false ? false : true;
     this.saveNonceCookie = options.saveNonceCookie === false ? false : true;
     this.saveStateCookie = options.saveStateCookie === false ? false : true;
@@ -158,7 +159,7 @@ export default class TransactionManager {
 
   exists(options: TransactionMetaOptions = {}): boolean {
     try {
-      const meta: TransactionMeta = this.load(options);
+      const meta = this.load(options);
       return !!meta;
     } catch {
       return false;
@@ -167,7 +168,7 @@ export default class TransactionManager {
 
   // load transaction meta from storage
   // eslint-disable-next-line complexity,max-statements
-  load(options: TransactionMetaOptions = {}): TransactionMeta {
+  load(options: TransactionMetaOptions = {}): TransactionMeta | null {
 
     let meta: TransactionMeta;
 
@@ -257,7 +258,7 @@ export default class TransactionManager {
     // If meta is not valid, throw an exception to avoid misleading server-side error
     // The most likely cause of this error is trying to handle a callback twice
     // eslint-disable-next-line max-len
-    throw new AuthSdkError('Could not load PKCE codeVerifier from storage. This may indicate the auth flow has already completed or multiple auth flows are executing concurrently.', null);
+    throw new AuthSdkError('Could not load PKCE codeVerifier from storage. This may indicate the auth flow has already completed or multiple auth flows are executing concurrently.', undefined);
   }
 
   clearLegacyOAuthParams(): void {
@@ -307,20 +308,20 @@ export default class TransactionManager {
 
   saveIdxResponse(idxResponse: RawIdxResponse): void {
     if (!this.saveLastResponse) {
-      return null;
+      return;
     }
-    const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
+    const storage = this.storageManager.getIdxResponseStorage();
     if (!storage) {
       return;
     }
     storage.setStorage(idxResponse);
   }
 
-  loadIdxResponse(): RawIdxResponse {
+  loadIdxResponse(): RawIdxResponse | null {
     if (!this.saveLastResponse) {
       return null;
     }
-    const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
+    const storage = this.storageManager.getIdxResponseStorage();
     if (!storage) {
       return null;
     }
@@ -335,7 +336,7 @@ export default class TransactionManager {
     if (!this.saveLastResponse) {
       return;
     }
-    const storage: StorageProvider = this.storageManager.getIdxResponseStorage();
+    const storage = this.storageManager.getIdxResponseStorage();
     storage?.clearStorage();
   }
 }

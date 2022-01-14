@@ -358,7 +358,7 @@ describe('getKey', function() {
     },
     execute: function(test) {
       oauthUtilHelpers.loadWellKnownAndKeysCache(test.oa);
-      return getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return getKey(test.oa, '', 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -386,7 +386,7 @@ describe('getKey', function() {
           response: wellKnownResponse
         }
       });
-      return getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return getKey(test.oa, '', 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -442,7 +442,7 @@ describe('getKey', function() {
         }
       });
 
-      return getKey(test.oa, null, 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
+      return getKey(test.oa, '', 'U5R8cHbGw445Qbq8zVO1PcCpXL8yG6IcovVa3laCoxM');
     },
     expectations: function(test, key) {
       expect(key).toEqual(tokens.standardKey);
@@ -488,7 +488,7 @@ describe('getKey', function() {
         }
       });
 
-      return getKey(test.oa, null, 'invalidKid');
+      return getKey(test.oa, '', 'invalidKid');
     },
     expectations: function(test, err) {
       util.assertAuthSdkError(err, 'The key id, invalidKid, was not found in the server\'s keys');

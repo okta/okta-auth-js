@@ -27,7 +27,7 @@ const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
 const MAX_PROMISE_CANCEL_TIMES = 10;
 
 // only compare first level of authState
-const isSameAuthState = (prevState: AuthState, state: AuthState) => {
+const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
   // initial state is null
   if (!prevState) {
     return false;
@@ -48,7 +48,6 @@ export class AuthStateManager {
   _authState: AuthState | null;
   _prevAuthState: AuthState | null;
   _logOptions: AuthStateLogOptions;
-  _lastEventTimestamp: number;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
@@ -59,7 +58,8 @@ export class AuthStateManager {
     this._pending = { ...DEFAULT_PENDING };
     this._authState = INITIAL_AUTH_STATE;
     this._logOptions = {};
-
+    this._prevAuthState = null;
+ 
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process
     // Only listen on "added" event to update auth state

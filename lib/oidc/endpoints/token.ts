@@ -90,7 +90,8 @@ export function postRefreshToken(sdk, options: TokenParams, refreshToken: Refres
       scope: refreshToken.scopes.join(' '),
       refresh_token: refreshToken.refreshToken, // eslint-disable-line camelcase
     }).map(function ([name, value]) {
-      return name + '=' + encodeURIComponent(value);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return name + '=' + encodeURIComponent(value!);
     }).join('&'),
   });
 }

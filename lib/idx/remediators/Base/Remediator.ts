@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -85,7 +86,7 @@ export class Remediator {
       return false;
     }
     const required = getRequiredValues(this.remediation);
-    const needed = required.find((key) => !this.hasData(key));
+    const needed = required!.find((key) => !this.hasData(key));
     if (needed) {
       return false; // missing data for a required field
     }
@@ -97,7 +98,7 @@ export class Remediator {
 
     if (!key) {
       let allValues = getAllValues(this.remediation);
-      let res = allValues.reduce((data, key) => {
+      let res = allValues!.reduce((data, key) => {
         data[key] = this.getData(key); // recursive
         return data;
       }, {});
@@ -107,7 +108,7 @@ export class Remediator {
     // Map value by "map${Property}" function in each subClass
     if (typeof this[`map${titleCase(key)}`] === 'function') {
       return this[`map${titleCase(key)}`](
-        this.remediation.value.find(({name}) => name === key)
+        this.remediation.value!.find(({name}) => name === key)
       );
     }
 
@@ -166,13 +167,13 @@ export class Remediator {
     }
 
     return Object.keys(this.map).reduce((inputs, key) => {
-      const inputFromRemediation = this.remediation.value.find(item => item.name === key);
+      const inputFromRemediation = this.remediation.value!.find(item => item.name === key);
       if (!inputFromRemediation) {
         return inputs;
       }
 
-      let input: Input;
-      const aliases = this.map[key];
+      let input;
+      const aliases = this.map![key];
       const { type } = inputFromRemediation;
       if (typeof this[`getInput${titleCase(key)}`] === 'function') {
         input = this[`getInput${titleCase(key)}`](inputFromRemediation);
@@ -195,9 +196,9 @@ export class Remediator {
       }
 
       if (Array.isArray(input)) {
-        input.forEach(i => inputs.push(i));
+        input.forEach(i => inputs.push(i as never));
       } else {
-        inputs.push(input);
+        inputs.push(input as never);
       }
       return inputs;
     }, []);
@@ -209,7 +210,7 @@ export class Remediator {
     }
     return remediation.value[0]?.form?.value.reduce((messages, field) => {
       if (field.messages) {
-        messages = [...messages, ...field.messages.value];
+        messages = [...messages, ...field.messages.value] as never;
       }
       return messages;
     }, []);

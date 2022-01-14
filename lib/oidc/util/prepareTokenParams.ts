@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -33,12 +34,12 @@ export function assertPKCESupport(sdk: OktaAuth) {
   }
 }
 
-export async function validateCodeChallengeMethod(sdk: OktaAuth, codeChallengeMethod: string) {
+export async function validateCodeChallengeMethod(sdk: OktaAuth, codeChallengeMethod?: string) {
   // set default code challenge method, if none provided
   codeChallengeMethod = codeChallengeMethod || sdk.options.codeChallengeMethod || DEFAULT_CODE_CHALLENGE_METHOD;
 
   // validate against .well-known/openid-configuration
-  const wellKnownResponse = await getWellKnown(sdk, null);
+  const wellKnownResponse = await getWellKnown(sdk);
   var methods = wellKnownResponse['code_challenge_methods_supported'] || [];
   if (methods.indexOf(codeChallengeMethod) === -1) {
     throw new AuthSdkError('Invalid code_challenge_method');
@@ -46,7 +47,10 @@ export async function validateCodeChallengeMethod(sdk: OktaAuth, codeChallengeMe
   return codeChallengeMethod;
 }
 
-export async function preparePKCE(sdk: OktaAuth, tokenParams: TokenParams): Promise<TokenParams> {
+export async function preparePKCE(
+  sdk: OktaAuth, 
+  tokenParams: TokenParams
+): Promise<TokenParams> {
   let {
     codeVerifier,
     codeChallenge,
@@ -63,22 +67,25 @@ export async function preparePKCE(sdk: OktaAuth, tokenParams: TokenParams): Prom
   codeChallengeMethod = await validateCodeChallengeMethod(sdk, codeChallengeMethod);
 
   // Clone/copy the params. Set PKCE values
-  var clonedParams = clone(tokenParams) || {};
-  Object.assign(clonedParams, tokenParams, {
+  tokenParams = {
+    ...tokenParams,
     responseType: 'code', // responseType is forced
     codeVerifier,
     codeChallenge,
     codeChallengeMethod
-  });
-  return clonedParams;
+  };
+
+  return tokenParams;
 }
 
 // Prepares params for a call to /authorize or /token
-export async function prepareTokenParams(sdk: OktaAuth, tokenParams?: TokenParams): Promise<TokenParams> {
+export async function prepareTokenParams(
+  sdk: OktaAuth,
+  tokenParams: TokenParams = {}
+): Promise<TokenParams> {
   // build params using defaults + options
   const defaults = getDefaultTokenParams(sdk);
   tokenParams = Object.assign({}, defaults, clone(tokenParams));
-
 
   if (tokenParams.pkce === false) {
     // Implicit flow or authorization_code without PKCE

@@ -77,7 +77,7 @@ describe('TransactionManager', () => {
       options,
       meta
     };
-    jest.spyOn(global.console, 'warn').mockReturnValue(null); // ignore storage warnings
+    jest.spyOn(global.console, 'warn').mockReturnValue(undefined); // ignore storage warnings
   });
 
   function createInstance(additionalOptions = {}) {

@@ -84,7 +84,7 @@ export function cleanOAuthResponseFromUrl(sdk, options: ParseFromUrlOptions) {
   responseMode === 'query' ? removeSearch(sdk) : removeHash(sdk);
 }
 
-export async function parseFromUrl(sdk, options: string | ParseFromUrlOptions): Promise<TokenResponse> {
+export async function parseFromUrl(sdk, options?: string | ParseFromUrlOptions): Promise<TokenResponse> {
   options = options || {};
   if (isString(options)) {
     options = { url: options } as ParseFromUrlOptions;

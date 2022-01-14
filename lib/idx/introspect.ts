@@ -23,13 +23,13 @@ export interface IntrospectOptions {
   version?: string;
 }
 
-export async function introspect (authClient: OktaAuth, options: IntrospectOptions): Promise<IdxResponse> {
+export async function introspect (authClient: OktaAuth, options: IntrospectOptions = {}): Promise<IdxResponse> {
   // try load from storage first
   let rawIdxResponse = authClient.transactionManager.loadIdxResponse();
   
   // call idx.introspect if no existing idx response available in storage
   if (!rawIdxResponse) {
-    const version = options?.version || IDX_API_VERSION;
+    const version = options.version || IDX_API_VERSION;
     const domain = getOAuthDomain(authClient);
     try {
       rawIdxResponse = await idx.introspect({ domain, ...options, version });

@@ -41,15 +41,15 @@ function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
   const { actions, neededToProceed } = idxResponse;
 
   if (actions['currentAuthenticator-recover']) {
-    res.push(IdxFeature.PASSWORD_RECOVERY);
+    res.push(IdxFeature.PASSWORD_RECOVERY as never);
   }
 
   if (neededToProceed.some(({ name }) => name === 'select-enroll-profile')) {
-    res.push(IdxFeature.REGISTRATION);
+    res.push(IdxFeature.REGISTRATION as never);
   }
 
   if (neededToProceed.some(({ name }) => name === 'redirect-idp')) {
-    res.push(IdxFeature.SOCIAL_IDP);
+    res.push(IdxFeature.SOCIAL_IDP as never);
   }
 
   return res;
@@ -70,7 +70,7 @@ function getAvailableSteps(remediations: IdxRemediation[]): NextStep[] {
     const T = remediatorMap[remediation.name];
     if (T) {
       const remediator = new T(remediation);
-      res.push (remediator.getNextStep());
+      res.push (remediator.getNextStep() as never);
     }
   }
 

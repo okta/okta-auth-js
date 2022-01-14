@@ -17,5 +17,5 @@ export type ResetAuthenticatorValues = VerifyAuthenticatorValues;
 
 export class ResetAuthenticator extends VerifyAuthenticator {
   static remediationName = 'reset-authenticator';
-  values: ResetAuthenticatorValues;
+  values!: ResetAuthenticatorValues;
 }
