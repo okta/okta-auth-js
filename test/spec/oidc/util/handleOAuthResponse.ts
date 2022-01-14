@@ -88,58 +88,85 @@ describe('handleOAuthResponse', () => {
           sdk = mockOktaAuth();
         });
       
-        it('throws if response contains "error"', async () => {
+        it('does not throw if response contains only "error" without "error_description"', async () => {
+          let errorThrown = false;
           try {
-            await handleOAuthResponse(sdk, undefined as unknown as TokenParams, { error: 'blah' }, undefined  as unknown as CustomUrls);
+            await handleOAuthResponse(sdk, {}, { error: 'blah' }, undefined  as unknown as CustomUrls);
           } catch (err) {
-            expect(err.name).toBe('OAuthError');
-            expect(err.errorCode).toBe('blah');
+            errorThrown = true;
           }
+          expect(errorThrown).toBe(false);
         });
-    
-        it('throws if response contains "error_description"', async () => {
+
+        it('does not throw if response contains only "error_description" without "error"', async () => {
+          let errorThrown = false;
           try {
-            await handleOAuthResponse(sdk, undefined as unknown as TokenParams, { error_description: 'blah' }, undefined  as unknown as CustomUrls);
+            await handleOAuthResponse(sdk, {}, { error_description: 'blah' }, undefined  as unknown as CustomUrls);
           } catch (err) {
-            expect(err.name).toBe('OAuthError');
-            expect(err.errorSummary).toBe('blah');
+            errorThrown = true;
           }
+          expect(errorThrown).toBe(false);
+        });
+
+        it('throws if response contains both "error" and "error_description"', async () => {
+          let errorThrown = false;
+          try {
+            await handleOAuthResponse(sdk, {}, { error: 'error code', error_description: 'error description' }, undefined  as unknown as CustomUrls);
+          } catch (err) {
+            errorThrown = true;
+            expect(err.name).toBe('OAuthError');
+            expect(err.errorCode).toBe('error code');
+            expect(err.errorSummary).toBe('error description');
+          }
+          expect(errorThrown).toBe(true);
         });
     
         it('throws if state does not match', async () => {
+          let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, { state: 'bar' }, { state: 'foo' }, undefined as unknown as CustomUrls);
           } catch (err) {
+            errorThrown = true;
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorSummary).toBe(`OAuth flow response state doesn't match request state`);
           }
+          expect(errorThrown).toBe(true);
         });
         it('throws if ID token was expected but not returend', async () => {
+          let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { access_token: 'foo' }, undefined as unknown as CustomUrls);
           } catch (err) {
+            errorThrown = true;
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
             expect(err.errorSummary).toBe(`Unable to parse OAuth flow response: response type "id_token" was requested but "id_token" was not returned.`);
           }
+          expect(errorThrown).toBe(true);
         });
         it('throws if access token was expected but not returend', async () => {
+          let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { id_token: 'foo' }, undefined as unknown as CustomUrls);
           } catch (err) {
+            errorThrown = true;
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
             expect(err.errorSummary).toBe(`Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.`);
           }
+          expect(errorThrown).toBe(true);
         });
         it('throws if id_token and access token were expected but not returned', async () => {
+          let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { }, undefined as unknown as CustomUrls);
           } catch (err) {
+            errorThrown = true;
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
             expect(err.errorSummary).toBe(`Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.`);
           }
+          expect(errorThrown).toBe(true);
         });
       });
     });

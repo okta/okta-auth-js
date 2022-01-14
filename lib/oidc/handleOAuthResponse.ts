@@ -43,7 +43,12 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
 }
 
 // eslint-disable-next-line max-len
-export function handleOAuthResponse(sdk: OktaAuth, tokenParams: TokenParams, res: OAuthResponse, urls: CustomUrls): Promise<TokenResponse> {
+export function handleOAuthResponse(
+  sdk: OktaAuth,
+  tokenParams: TokenParams,
+  res: OAuthResponse,
+  urls?: CustomUrls
+): Promise<TokenResponse> {
   var pkce = sdk.options.pkce !== false;
 
   // The result contains an authorization_code and PKCE is enabled 
