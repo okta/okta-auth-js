@@ -42,7 +42,7 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
 export class AuthStateManager {
   _sdk: OktaAuth;
   _pending: { 
-    updateAuthStatePromise: PCancelable<AuthState> | undefined;
+  updateAuthStatePromise?: PCancelable<AuthState>;
     canceledTimes: number; 
   };
   _authState: AuthState | null;
