@@ -18,6 +18,6 @@ export interface CookieOptions extends CookieAttributes {
 
 export interface Cookies {
   set(name: string, value: string, expiresAt: string, options: CookieOptions): string;
-  get(name: string): string;
+  get(name?: string): string;
   delete(name: string): string;
 }

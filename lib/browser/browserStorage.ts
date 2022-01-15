@@ -255,13 +255,14 @@ var storageUtil: BrowserStorageUtil = {
       return storageUtil.storage.get(name);
     },
 
-    get: function(name: string): string {
+    get: function(name?: string): string {
       // get all cookies
       if (typeof name === 'undefined') {
         const value = Cookies.get(); // no arguments returns all cookies in object
         return JSON.stringify(value);
       }
       // get cookie by name
+      // @ts-ignore
       return Cookies.get(name);
     },
 

@@ -20,7 +20,7 @@ import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
 
 export const INITIAL_AUTH_STATE = null;
 const DEFAULT_PENDING = {
-  updateAuthStatePromise: null,
+  updateAuthStatePromise: undefined,
   canceledTimes: 0
 };
 const EVENT_AUTH_STATE_CHANGE = 'authStateChange';
@@ -42,7 +42,7 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
 export class AuthStateManager {
   _sdk: OktaAuth;
   _pending: { 
-    updateAuthStatePromise: PCancelable<AuthState>;
+    updateAuthStatePromise: PCancelable<AuthState> | undefined;
     canceledTimes: number; 
   };
   _authState: AuthState | null;
@@ -112,7 +112,7 @@ export class AuthStateManager {
     };
 
     const finalPromise = (origPromise) => {       
-      return this._pending.updateAuthStatePromise.then(() => {
+      return this._pending.updateAuthStatePromise?.then(() => {
         const curPromise = this._pending.updateAuthStatePromise;
         if (curPromise && curPromise !== origPromise) {
           return finalPromise(curPromise);
@@ -136,7 +136,7 @@ export class AuthStateManager {
     const cancelablePromise = new PCancelable<AuthState>((resolve, _, onCancel) => {
       onCancel.shouldReject = false;
       onCancel(() => {
-        this._pending.updateAuthStatePromise = null;
+        this._pending.updateAuthStatePromise = undefined;
         this._pending.canceledTimes = this._pending.canceledTimes + 1;
         devMode && log('canceled');
       });
