@@ -282,8 +282,8 @@ router.post('/enroll-authenticator/:authenticator/enrollment-channel-data', asyn
   const { email, phoneNumber } = req.body;
   const authClient = getAuthClient(req);
   const transaction = await authClient.idx.proceed({ 
-    email,
-    phoneNumber
+    ...(email && { email }),
+    ...(phoneNumber && { phoneNumber })
   });
   handleTransaction({ req, res, next, authClient, transaction });
 });

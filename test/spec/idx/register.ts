@@ -1,4 +1,3 @@
-import { OktaVerifyAuthenticatorOptionFactory } from './../../support/idx/factories/options';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -14,6 +13,7 @@ import { OktaVerifyAuthenticatorOptionFactory } from './../../support/idx/factor
 
 /* eslint-disable max-statements */
 import { register } from '../../../lib/idx/register';
+import { proceed } from '../../../lib/idx/proceed';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { AuthSdkError } from '../../../lib/errors';
 
@@ -52,7 +52,9 @@ import {
   EnrollSecurityQuestionAuthenticatorRemediationFactory,
   EnrollPollRemediationFactory,
   IdxContextFactory,
-  OktaVerifyAuthenticatorWithContextualDataFactory
+  OktaVerifyAuthenticatorWithContextualDataFactory,
+  SelectEnrollmentChannelRemediationFactory,
+  OktaVerifyAuthenticatorOptionFactory, EnrollmentChannelDataEmailRemediationFactory, EnrollmentChannelDataSmsRemediationFactory
 } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/introspect', () => {
@@ -83,7 +85,8 @@ describe('idx/register', () => {
       scopes: ['meta'],
       urls: { authorizeUrl: 'meta-authorizeUrl' },
       interactionHandle: 'meta-interactionHandle',
-      ignoreSignature: true
+      ignoreSignature: true,
+      flow: 'register',
     };
     const tokenResponse = {
       tokens: {
@@ -251,7 +254,7 @@ describe('idx/register', () => {
       phoneEnrollmentDataResponse,
       enrollPhoneAuthenticatorResponse,
       enrollGoogleAuthenticatorResponse,
-      enrollSecurityQuestionAuthenticatorResponse
+      enrollSecurityQuestionAuthenticatorResponse,
     };
   });
   
@@ -1809,7 +1812,34 @@ describe('idx/register', () => {
   describe('Okta Verify Authenticator', () => {
     const enrollPollResponse = IdxResponseFactory.build({
       neededToProceed: [
-        EnrollPollRemediationFactory.build()
+        EnrollPollRemediationFactory.build(),
+        SelectEnrollmentChannelRemediationFactory.build(),
+      ],
+      context: IdxContextFactory.build({
+        currentAuthenticator: {
+          value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
+        }
+      }),
+    });
+
+    const selectEnrollmentChannelResponse = IdxResponseFactory.build({
+
+    });
+
+    const enrollmentChannelDataEmailResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollmentChannelDataEmailRemediationFactory.build()
+      ],
+      context: IdxContextFactory.build({
+        currentAuthenticator: {
+          value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
+        }
+      }),
+    });
+
+    const enrollmentChannelDataSmsResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollmentChannelDataSmsRemediationFactory.build()
       ],
       context: IdxContextFactory.build({
         currentAuthenticator: {
@@ -1881,6 +1911,118 @@ describe('idx/register', () => {
         authenticator: AuthenticatorKey.OKTA_VERIFY
       });
       expect(Object.keys(contextualData)).toContain('qrcode');
+    });
+
+    it('can enroll via SMS link', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollPollResponse,
+        enrollmentChannelDataSmsResponse,
+      ]);
+
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse)
+        .mockResolvedValueOnce(enrollPollResponse)
+        .mockResolvedValueOnce(enrollPollResponse) // submit enrollment channel
+        .mockResolvedValueOnce(enrollmentChannelDataSmsResponse);
+
+      jest.spyOn(enrollPollResponse, 'proceed');
+      jest.spyOn(enrollmentChannelDataSmsResponse, 'proceed');
+
+      await register(authClient, {
+        authenticator: AuthenticatorKey.OKTA_VERIFY
+      });
+      const { nextStep: { options } } = await proceed(authClient, {
+        nextStep: 'select-enrollment-channel'
+      });
+
+      expect(options).toContainEqual({
+        label: 'SMS',
+        value: 'sms'
+      });
+
+      const { nextStep: { inputs } } = await proceed(authClient, {
+        channel: 'phoneNumber'
+      });
+
+      expect(enrollPollResponse.proceed).toHaveBeenCalledWith(
+        'select-enrollment-channel',
+        expect.objectContaining({ authenticator: expect.objectContaining({ channel: 'phoneNumber' }) })
+      );
+
+      expect(inputs).toContainEqual({
+        name: 'phoneNumber',
+        label: 'Phone Number',
+        required: true,
+        type: 'string',
+      });
+
+      await proceed(authClient, {
+        phoneNumber: '+1234'
+      });
+
+      expect(enrollmentChannelDataSmsResponse.proceed).toHaveBeenCalled();
+    });
+
+    it('can enroll via email link', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+      } = testContext;
+
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollPollResponse,
+        enrollmentChannelDataEmailResponse,
+      ]);
+
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse)
+        .mockResolvedValueOnce(enrollPollResponse)
+        .mockResolvedValueOnce(enrollPollResponse) // submit enrollment channel
+        .mockResolvedValueOnce(enrollmentChannelDataEmailResponse);
+
+      jest.spyOn(enrollPollResponse, 'proceed');
+      jest.spyOn(enrollmentChannelDataEmailResponse, 'proceed');
+
+      await register(authClient, {
+        authenticator: AuthenticatorKey.OKTA_VERIFY
+      });
+      const { nextStep: { options } } = await proceed(authClient, {
+        nextStep: 'select-enrollment-channel'
+      });
+
+      expect(options).toContainEqual({
+        label: 'EMAIL',
+        value: 'email'
+      });
+
+      const { nextStep: { inputs } } = await proceed(authClient, {
+        channel: 'email'
+      });
+
+      expect(enrollPollResponse.proceed).toHaveBeenCalledWith(
+        'select-enrollment-channel',
+        expect.objectContaining({ authenticator: expect.objectContaining({ channel: 'email' }) })
+      );
+
+      expect(inputs).toContainEqual({
+        name: 'email',
+        label: 'Email',
+        required: true,
+        type: 'string',
+      });
+
+      await proceed(authClient, {
+        email: 'noreply@devnull.org'
+      });
+
+      expect(enrollmentChannelDataEmailResponse.proceed).toHaveBeenCalled();
     });
   });
 

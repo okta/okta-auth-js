@@ -1,4 +1,3 @@
-import { CustomAttributeValueFactory, OktaVerifyMethodTypeValueFactory } from './values';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -13,7 +12,7 @@ import { CustomAttributeValueFactory, OktaVerifyMethodTypeValueFactory } from '.
 
 
 import { Factory } from 'fishery';
-import { IdxForm } from '../../../../lib/idx/types/idx-js';
+import { IdxForm, IdxRemediationValueForm } from '../../../../lib/idx/types/idx-js';
 
 import {
   IdValueFactory,
@@ -23,7 +22,10 @@ import {
   LastNameValueFactory,
   EmailValueFactory,
   PasscodeValueFactory,
-  OtpMethodTypeValueFactory
+  OtpMethodTypeValueFactory,
+  OktaVerifyEnrollmentChannelValueFactory,
+  CustomAttributeValueFactory,
+  OktaVerifyMethodTypeValueFactory
 } from './values';
 
 export const IdxFormFactory = Factory.define<IdxForm>(() => {
@@ -31,6 +33,15 @@ export const IdxFormFactory = Factory.define<IdxForm>(() => {
     value: [
       // IdValueFactory.build()
     ]
+  };
+});
+
+
+export const IdxRemediationValueFormFactory = Factory.define<IdxRemediationValueForm>(() => {
+  return {
+    form: {
+      value: [IdValueFactory.build()]
+    }
   };
 });
 
@@ -84,6 +95,18 @@ export const OktaVerifyAuthenticatorFormFactory = IdxFormFactory.params({
     }),
     OktaVerifyMethodTypeValueFactory.build(),
   ]
+});
+
+// select enrollment channel
+export const OktaVerifyAuthenticatorEnollmentChannelFormFactory = IdxRemediationValueFormFactory.params({
+  form: {
+    value: [
+      IdValueFactory.build({
+        value: 'id-okta-verify-authenticator'
+      }),
+      OktaVerifyEnrollmentChannelValueFactory.build(),
+    ]
+  }
 });
 
 export const PhoneAuthenticatorFormFactory = IdxFormFactory.params({

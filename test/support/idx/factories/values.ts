@@ -71,6 +71,26 @@ export const OktaVerifyMethodTypeValueFactory = IdxValueFactory.params({
   }]
 });
 
+export const OktaVerifyEnrollmentChannelValueFactory = IdxValueFactory.params({
+  name: 'channel',
+  type: 'string',
+  required: false,
+  options: [
+    {
+      label: 'QRCODE',
+      value: 'qrcode'
+    },
+    {
+      label: 'EMAIL',
+      value: 'email'
+    },
+    {
+      label: 'SMS',
+      value: 'sms'
+    }
+  ]
+});
+
 export const OtpMethodTypeValueFactory = IdxValueFactory.params({
   name: 'methodType',
   required: false,
