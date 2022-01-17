@@ -32,6 +32,11 @@ export interface RefreshToken extends AbstractToken {
   issuer: string;
 }
 
+export interface DeviceSecret extends AbstractToken {
+  deviceSecret: string;
+  subjectToken: string;
+}
+
 // eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IDToken extends AbstractToken {
   idToken: string;
@@ -40,14 +45,14 @@ export interface IDToken extends AbstractToken {
   clientId: string;
 }
 
-export type Token = AccessToken | IDToken | RefreshToken;
-export type RevocableToken = AccessToken | RefreshToken;
+export type Token = AccessToken | IDToken | RefreshToken | DeviceSecret;
+export type RevocableToken = AccessToken | RefreshToken | DeviceSecret;
 
-export type TokenType = 'accessToken' | 'idToken' | 'refreshToken';
+export type TokenType = 'accessToken' | 'idToken' | 'refreshToken' | 'deviceSecret';
 
 export function isToken(obj: any): obj is Token {
   if (obj &&
-      (obj.accessToken || obj.idToken || obj.refreshToken) &&
+      (obj.accessToken || obj.idToken || obj.refreshToken || obj.deviceSecret) &&
       Array.isArray(obj.scopes)) {
     return true;
   }
@@ -66,8 +71,13 @@ export function isRefreshToken(obj: any): obj is RefreshToken {
   return obj && obj.refreshToken;
 }
 
+export function isDeviceSecret(obj: any): obj is DeviceSecret {
+  return obj && obj.deviceSecret;
+}
+
 export interface Tokens {
   accessToken?: AccessToken;
   idToken?: IDToken;
   refreshToken?: RefreshToken;
+  deviceSecret?: DeviceSecret;
 }

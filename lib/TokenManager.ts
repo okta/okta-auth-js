@@ -25,6 +25,7 @@ import {
   isIDToken, 
   isAccessToken,
   isRefreshToken,
+  isDeviceSecret,
   StorageOptions,
   StorageType,
   OktaAuth,
@@ -264,6 +265,8 @@ export class TokenManager implements TokenManagerInterface {
         tokens.idToken = token;
       } else if (isRefreshToken(token)) { 
         tokens.refreshToken = token;
+      } else if (isDeviceSecret(token)) { 
+        tokens.deviceSecret = token;
       }
     });
     return tokens;
@@ -275,11 +278,13 @@ export class TokenManager implements TokenManagerInterface {
 
   getStorageKeyByType(type: TokenType): string {
     const tokenStorage = this.storage.getStorage();
+    // eslint-disable-next-line complexity
     const key = Object.keys(tokenStorage).filter(key => {
       const token = tokenStorage[key];
       return (isAccessToken(token) && type === 'accessToken') 
         || (isIDToken(token) && type === 'idToken')
-        || (isRefreshToken(token) && type === 'refreshToken');
+        || (isRefreshToken(token) && type === 'refreshToken')
+        || (isDeviceSecret(token) && type === 'deviceSecret');
     })[0];
     return key;
   }
@@ -294,6 +299,9 @@ export class TokenManager implements TokenManagerInterface {
     if(isRefreshToken(token)) {
       return 'refreshToken';
     }
+    if(isDeviceSecret(token)) {
+      return 'deviceSecret';
+    }
     throw new AuthSdkError('Unknown token type');
   }
 
@@ -302,8 +310,10 @@ export class TokenManager implements TokenManagerInterface {
     // TODO: callbacks can be removed in the next major version OKTA-407224
     accessTokenCb?: Function, 
     idTokenCb?: Function,
-    refreshTokenCb?: Function
+    refreshTokenCb?: Function,
+    deviceSecretCb?: Function
   ): void {
+    // eslint-disable-next-line complexity
     const handleTokenCallback = (key, token) => {
       const type = this.getTokenType(token);
       if (type === 'accessToken') {
@@ -312,6 +322,8 @@ export class TokenManager implements TokenManagerInterface {
         idTokenCb && idTokenCb(key, token);
       } else if (type === 'refreshToken') {
         refreshTokenCb && refreshTokenCb(key, token);
+      } else if (type === 'deviceSecret') {
+        deviceSecretCb && deviceSecretCb(key, token);
       }
     };
     const handleAdded = (key, token) => {
@@ -331,7 +343,7 @@ export class TokenManager implements TokenManagerInterface {
       handleTokenCallback(key, token);
     };
     
-    const types: TokenType[] = ['idToken', 'accessToken', 'refreshToken'];
+    const types: TokenType[] = ['idToken', 'accessToken', 'refreshToken', 'deviceSecret'];
     const existingTokens = this.getTokensSync();
 
     // valid tokens

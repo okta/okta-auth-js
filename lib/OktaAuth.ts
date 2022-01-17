@@ -199,7 +199,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       this.options.maxClockSkew = args.maxClockSkew;
     }
 
-    // As some end user's devices can have their date 
+    // As some end user's devices can have their date
     // and time incorrectly set, allow for the disabling
     // of the jwt liftetime validation
     this.options.ignoreLifetime = !!args.ignoreLifetime;
@@ -588,6 +588,13 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   getRefreshToken(): string | undefined {
     const { refreshToken } = this.tokenManager.getTokensSync();
     return refreshToken ? refreshToken.refreshToken : undefined;
+  }
+
+  getDeviceSecret(): object | undefined {
+    const { deviceSecret, idToken } = this.tokenManager.getTokensSync();
+    return (deviceSecret && idToken) ? 
+      { deviceSecret: deviceSecret.deviceSecret, subject: idToken.idToken } : 
+      undefined;
   }
 
   /**

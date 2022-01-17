@@ -42,6 +42,7 @@ export interface OAuthResponse {
   access_token?: string;
   id_token?: string;
   refresh_token?: string;
+  device_secret?: string;
   scope?: string;
   error?: string;
   error_description?: string;
