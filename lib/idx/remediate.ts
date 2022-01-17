@@ -38,8 +38,8 @@ export function getRemediator(
   const { remediators } = options;
 
   let remediator;
-  if (options.nextStep) {
-    const remediation = idxRemediations.find(({ name }) => name === options.nextStep);
+  if (options.step) {
+    const remediation = idxRemediations.find(({ name }) => name === options.step);
     const T = remediators[remediation.name];
     return new T(remediation, values);
   }
@@ -102,7 +102,7 @@ function getIdxMessages(idxResponse: IdxResponse): IdxMessage[] {
 function getNextStep(
   remediator: Remediator, idxResponse: IdxResponse
 ): NextStep {
-  const nextStep = remediator.getNextStep(idxResponse);
+  const nextStep = remediator.getNextStep(idxResponse.context);
   const canSkip = canSkipFn(idxResponse);
   const canResend = canResendFn(idxResponse);
   return {

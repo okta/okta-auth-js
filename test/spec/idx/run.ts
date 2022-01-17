@@ -150,11 +150,11 @@ describe('idx/run', () => {
   it('returns transaction', async () => {
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
-    expect(res).toEqual({
+    expect(res).toEqual(expect.objectContaining({
       _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: 'remediate-nextStep',
-    });
+    }));
   });
 
   it('calls interact, passing options through', async () => {
@@ -193,12 +193,12 @@ describe('idx/run', () => {
     testContext.remediateResponse.messages = ['remediate-message-1'];
     const { authClient, options } = testContext;
     const res = await run(authClient, options);
-    expect(res).toEqual({
+    expect(res).toEqual(expect.objectContaining({
       _idxResponse: expect.any(Object),
       messages: ['remediate-message-1'],
       nextStep: 'remediate-nextStep',
       status: IdxStatus.PENDING,
-    });
+    }));
   });
 
   describe('response is not terminal', () => {
@@ -216,11 +216,11 @@ describe('idx/run', () => {
       jest.spyOn(authClient.transactionManager, 'clear');
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         nextStep: 'remediate-nextStep',
         status: IdxStatus.PENDING,
-      });
+      }));
     });
   });
 
@@ -238,11 +238,11 @@ describe('idx/run', () => {
       jest.spyOn(authClient.transactionManager, 'clear');
       const res = await run(authClient, options);
       expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         nextStep: 'remediate-nextStep',
         status: IdxStatus.TERMINAL,
-      });
+      }));
     });
   });
 
@@ -274,12 +274,12 @@ describe('idx/run', () => {
         'authorizeUrl': 'meta-authorizeUrl'
       });
 
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         nextStep: 'remediate-nextStep',
         status: IdxStatus.SUCCESS,
         tokens: tokenResponse.tokens,
-      });
+      }));
     });
 
     it('catches errors from exchangeCodeForTokens and clears storage', async () => {
@@ -308,12 +308,12 @@ describe('idx/run', () => {
         'authorizeUrl': 'meta-authorizeUrl'
       });
 
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         error,
         nextStep: 'remediate-nextStep',
         status: IdxStatus.FAILURE,
-      });
+      }));
     });
   });
 

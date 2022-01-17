@@ -14,7 +14,7 @@
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
 import { NextStep, IdxMessage, Authenticator, Input, IdxOptions } from '../../types';
-import { IdxAuthenticator, IdxRemediation, IdxResponse } from '../../types/idx-js';
+import { IdxAuthenticator, IdxContext, IdxRemediation } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
@@ -25,11 +25,6 @@ export interface RemediationValues extends IdxOptions {
   authenticators?: Authenticator[] | string[];
   authenticator?: string;
   authenticatorsData?: Authenticator[];
-}
-
-export interface RemediationDescriptor {
-  remediationName: string;
-  actionDisplayName?: string;
 }
 
 // Base class - DO NOT expose static remediationName
@@ -149,20 +144,18 @@ export class Remediator {
     return !!data;
   }
 
-  getNextStep(idxResponse?: IdxResponse): NextStep {
+  getNextStep(_context?: IdxContext): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
     const authenticator = this.getAuthenticator();
     // TODO: remove type field in the next major version change
     // https://oktainc.atlassian.net/browse/OKTA-431749
     const type = authenticator?.type;
-    const nextSteps = this.getPeerRemediations(idxResponse?.neededToProceed);
     return { 
       name, 
       inputs, 
       ...(type && { type }),
       ...(authenticator && { authenticator }),
-      ...(nextSteps?.length && { nextSteps })
     };
   }
 
@@ -235,9 +228,5 @@ export class Remediator {
 
   protected getAuthenticator(): IdxAuthenticator | undefined {
     return this.remediation.relatesTo?.value;
-  }
-
-  protected getPeerRemediations(_remediations: IdxRemediation[]): RemediationDescriptor[] {
-    return [];
   }
 }

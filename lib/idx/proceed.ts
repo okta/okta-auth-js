@@ -32,7 +32,7 @@ export type ProceedOptions = AuthenticationOptions
   & PasswordRecoveryOptions
   & EnrollPollOptions
   & SelectEnrollmentChannelOptions
-  & { nextStep?: string };
+  & { step?: string };
 
 export function canProceed(authClient: OktaAuth, options?: { state?: string }) {
   const meta = getSavedTransactionMeta(authClient, options);

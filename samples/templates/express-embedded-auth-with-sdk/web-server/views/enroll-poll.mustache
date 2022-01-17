@@ -40,12 +40,12 @@
         </div>
       {{/contextualData.email}}
       <div class="row">
-      {{#nextSteps}}
-        <form id="{{remediationName}}-form" action="{{nextStepAction}}" method="POST">
-          <input type="hidden" name="nextStep" value="{{remediationName}}"/>
+      {{#availableSteps}}
+        <form id="{{stepName}}-form" action="{{selectStepAction}}" method="POST">
+          <input type="hidden" name="step" value="{{stepName}}"/>
           <button id="submit-button" class="ui fluid primary submit button" type="submit">{{actionDisplayName}}</button>
         </form>
-      {{/nextSteps}}
+      {{/availableSteps}}
       </div>
       <div class="row">
       {{>cancel}}

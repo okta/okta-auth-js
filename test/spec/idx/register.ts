@@ -354,7 +354,7 @@ describe('idx/register', () => {
           lastName: 'Lawbla'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -368,7 +368,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.OKTA_PASSWORD
           }]
         }
-      });
+      }));
     });
 
     it('can register, passing firstName, lastName, email and customAttribute on demand', async () => {
@@ -415,7 +415,7 @@ describe('idx/register', () => {
           customAttribute: 'value3'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -429,7 +429,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.OKTA_PASSWORD
           }]
         }
-      });
+      }));
     });
   });
 
@@ -467,7 +467,7 @@ describe('idx/register', () => {
           passcode: 'my-password'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -493,7 +493,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.OKTA_VERIFY
           }]
         }
-      });
+      }));
     });
 
     it('can set a password on demand', async () => {
@@ -516,7 +516,7 @@ describe('idx/register', () => {
   
       const password = 'my-password';
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -530,7 +530,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.OKTA_PASSWORD
           }]
         }
-      });
+      }));
       res = await register(authClient, { password, authenticators: [AuthenticatorKey.OKTA_PASSWORD]});
       expect(selectPasswordResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
         authenticator: {
@@ -542,7 +542,7 @@ describe('idx/register', () => {
           passcode: 'my-password'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -568,7 +568,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.OKTA_VERIFY
           }]
         }
-      });
+      }));
     });
   });
 
@@ -598,7 +598,7 @@ describe('idx/register', () => {
           id: 'id-email'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -622,7 +622,7 @@ describe('idx/register', () => {
             value: 'id-email'
           }]
         }
-      });
+      }));
     });
 
     it('can set an email on demand', async () => {
@@ -641,7 +641,7 @@ describe('idx/register', () => {
         .mockResolvedValue(selectAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -667,7 +667,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.OKTA_VERIFY
           }]
         }
-      });
+      }));
 
       res = await register(authClient, {
         email: 'boblawbla@bobslawblog.com',
@@ -679,7 +679,7 @@ describe('idx/register', () => {
           id: 'id-email'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -703,7 +703,7 @@ describe('idx/register', () => {
             value: 'id-email'
           }]
         }
-      });
+      }));
     });
 
     it('can verify email using a code', async () => {
@@ -722,7 +722,7 @@ describe('idx/register', () => {
         .mockResolvedValue(enrollEmailAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -746,7 +746,7 @@ describe('idx/register', () => {
             value: 'id-email'
           }]
         }
-      });
+      }));
 
       // Verify email
       const verificationCode = 'test-code';
@@ -756,7 +756,7 @@ describe('idx/register', () => {
           passcode: 'test-code'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -771,7 +771,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.PHONE_NUMBER
           }]
         }
-      });
+      }));
     });
 
     it('returns an error if value for email is not an email address', async () => {
@@ -829,7 +829,7 @@ describe('idx/register', () => {
           lastName: 'Lawbla'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         messages: [{
@@ -869,7 +869,7 @@ describe('idx/register', () => {
             messages: expect.any(Object)
           }]
         }
-      });
+      }));
     });
   });
 
@@ -922,7 +922,7 @@ describe('idx/register', () => {
           phoneNumber: '(555) 555-5555'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -945,7 +945,7 @@ describe('idx/register', () => {
             type: 'string',
           }]
         }
-      });
+      }));
 
       res = await register(authClient, { verificationCode });
       expect(enrollPhoneAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
@@ -953,11 +953,11 @@ describe('idx/register', () => {
           passcode: 'test-code'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.SUCCESS,
         tokens: tokenResponse.tokens,
-      });
+      }));
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         clientId: 'test-clientId',
         codeVerifier: 'meta-code',
@@ -1005,7 +1005,7 @@ describe('idx/register', () => {
           id: 'id-phone'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1030,7 +1030,7 @@ describe('idx/register', () => {
             { label: 'Voice call', value: 'voice' },
           ]
         }
-      });
+      }));
 
       res = await register(authClient, { 
         phoneNumber: '(555) 555-5555', 
@@ -1044,7 +1044,7 @@ describe('idx/register', () => {
             phoneNumber: '(555) 555-5555'
           }
         });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1067,7 +1067,7 @@ describe('idx/register', () => {
             type: 'string',
           }]
         }
-      });
+      }));
 
       res = await register(authClient, { verificationCode });
       expect(enrollPhoneAuthenticatorResponse.proceed)
@@ -1076,11 +1076,11 @@ describe('idx/register', () => {
             passcode: 'test-code'
           }
         });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.SUCCESS,
         tokens: tokenResponse.tokens,
-      });
+      }));
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         clientId: 'test-clientId',
         codeVerifier: 'meta-code',
@@ -1115,7 +1115,7 @@ describe('idx/register', () => {
       const verificationCode = 'test-code';
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1138,7 +1138,7 @@ describe('idx/register', () => {
             type: 'string',
           }]
         }
-      });
+      }));
 
       res = await register(authClient, { verificationCode });
       expect(enrollPhoneAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
@@ -1146,11 +1146,11 @@ describe('idx/register', () => {
           passcode: 'test-code'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         'status': IdxStatus.SUCCESS,
         'tokens': tokenResponse.tokens,
-      });
+      }));
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         clientId: 'test-clientId',
         codeVerifier: 'meta-code',
@@ -1208,7 +1208,7 @@ describe('idx/register', () => {
           phoneNumber
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         messages: [{
@@ -1240,7 +1240,7 @@ describe('idx/register', () => {
             { label: 'Voice call', value: 'voice' },
           ]
         }
-      });
+      }));
 
     });
   });
@@ -1270,7 +1270,7 @@ describe('idx/register', () => {
           id: 'id-google-authenticator'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1300,7 +1300,7 @@ describe('idx/register', () => {
             type: 'string',
           }]
         }
-      });
+      }));
     });
 
     it('can set an google authenticator on demand', async () => {
@@ -1319,7 +1319,7 @@ describe('idx/register', () => {
         .mockResolvedValue(selectAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1345,7 +1345,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.OKTA_VERIFY
           }]
         }
-      });
+      }));
 
       res = await register(authClient, {
         authenticators: [AuthenticatorKey.GOOGLE_AUTHENTICATOR]
@@ -1356,7 +1356,7 @@ describe('idx/register', () => {
           id: 'id-google-authenticator'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1386,7 +1386,7 @@ describe('idx/register', () => {
             type: 'string',
           }]
         }
-      });
+      }));
     });
 
     it('can verify google authenticator using a code', async () => {
@@ -1405,7 +1405,7 @@ describe('idx/register', () => {
         .mockResolvedValue(enrollGoogleAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1435,7 +1435,7 @@ describe('idx/register', () => {
             type: 'string',
           }]
         }
-      });
+      }));
 
       // Verify email
       const verificationCode = 'test-code';
@@ -1445,7 +1445,7 @@ describe('idx/register', () => {
           passcode: 'test-code'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1460,7 +1460,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.PHONE_NUMBER
           }]
         }
-      });
+      }));
     });
 
   });
@@ -1490,7 +1490,7 @@ describe('idx/register', () => {
           id: 'id-security-question-authenticator'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1532,7 +1532,7 @@ describe('idx/register', () => {
             { name: 'answer', type: 'string', label: 'Answer', required: true },
           ]
         }
-      });
+      }));
     });
 
     it('can set an google authenticator on demand', async () => {
@@ -1551,7 +1551,7 @@ describe('idx/register', () => {
         .mockResolvedValue(selectAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1578,7 +1578,7 @@ describe('idx/register', () => {
           }
         ]
         }
-      });
+      }));
 
       res = await register(authClient, {
         authenticators: [AuthenticatorKey.SECURITY_QUESTION]
@@ -1589,7 +1589,7 @@ describe('idx/register', () => {
           id: 'id-security-question-authenticator'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1631,7 +1631,7 @@ describe('idx/register', () => {
             { name: 'answer', type: 'string', label: 'Answer', required: true },
           ]
         }
-      });
+      }));
     });
 
     it('can enroll by choosing a question and with the answer', async () => {
@@ -1650,7 +1650,7 @@ describe('idx/register', () => {
         .mockResolvedValue(enrollSecurityQuestionAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1692,7 +1692,7 @@ describe('idx/register', () => {
             { name: 'answer', type: 'string', label: 'Answer', required: true },
           ]
         }
-      });
+      }));
 
       const answer = 'test-answer';
       res = await register(authClient, { questionKey: 'test-key', answer });
@@ -1702,7 +1702,7 @@ describe('idx/register', () => {
           answer: 'test-answer'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1717,7 +1717,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.PHONE_NUMBER
           }]
         }
-      });
+      }));
     });
 
     it('can enroll by creating own question and with the answer', async () => {
@@ -1736,7 +1736,7 @@ describe('idx/register', () => {
         .mockResolvedValue(enrollSecurityQuestionAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1778,7 +1778,7 @@ describe('idx/register', () => {
             { name: 'answer', type: 'string', label: 'Answer', required: true },
           ]
         }
-      });
+      }));
 
       const answer = 'test-answer';
       res = await register(authClient, { question: 'test-question', answer });
@@ -1789,7 +1789,7 @@ describe('idx/register', () => {
           answer: 'test-answer'
         }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -1804,7 +1804,7 @@ describe('idx/register', () => {
             value: AuthenticatorKey.PHONE_NUMBER
           }]
         }
-      });
+      }));
     });
 
   });
@@ -1820,10 +1820,6 @@ describe('idx/register', () => {
           value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
         }
       }),
-    });
-
-    const selectEnrollmentChannelResponse = IdxResponseFactory.build({
-
     });
 
     const enrollmentChannelDataEmailResponse = IdxResponseFactory.build({
@@ -1938,7 +1934,7 @@ describe('idx/register', () => {
         authenticator: AuthenticatorKey.OKTA_VERIFY
       });
       const { nextStep: { options } } = await proceed(authClient, {
-        nextStep: 'select-enrollment-channel'
+        step: 'select-enrollment-channel'
       });
 
       expect(options).toContainEqual({
@@ -1994,7 +1990,7 @@ describe('idx/register', () => {
         authenticator: AuthenticatorKey.OKTA_VERIFY
       });
       const { nextStep: { options } } = await proceed(authClient, {
-        nextStep: 'select-enrollment-channel'
+        step: 'select-enrollment-channel'
       });
 
       expect(options).toContainEqual({
@@ -2047,7 +2043,7 @@ describe('idx/register', () => {
       jest.spyOn(authClient.token, 'exchangeCodeForTokens');
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         nextStep: {
           inputs: [
@@ -2066,14 +2062,14 @@ describe('idx/register', () => {
           canSkip: true,
         },
         status: IdxStatus.PENDING,
-      });
+      }));
       res = await register(authClient, { skip: true });
       expect(selectPhoneResponse.proceed).toHaveBeenCalledWith('skip', {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.SUCCESS,
         tokens: tokenResponse.tokens,
-      });
+      }));
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalledWith({
         clientId: 'test-clientId',
         codeVerifier: 'meta-code',

@@ -12,7 +12,7 @@
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
-import { IdxResponse } from '../types/idx-js';
+import { IdxContext } from '../types/idx-js';
 
 
 export type EnrollmentChannelDataValues = RemediationValues & {
@@ -46,9 +46,9 @@ export class EnrollmentChannelData extends Remediator {
     return Boolean(this.values.email || this.values.phoneNumber);
   }
 
-  getNextStep(idxResponse: IdxResponse) {
+  getNextStep(context: IdxContext) {
     const common = super.getNextStep();
-    const authenticator = idxResponse.context.currentAuthenticator.value;
+    const authenticator = context.currentAuthenticator.value;
     return {
       ...common,
       authenticator,

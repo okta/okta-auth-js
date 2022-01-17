@@ -254,10 +254,11 @@ router.post('/enroll-authenticator/:authenticator/select-enrollment-channel', as
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-router.post('/next-step', async (req, res, next) => {
-  const { nextStep } = req.body;
+// proceed to specified remediation (step)
+router.post('/select-step', async (req, res, next) => {
+  const { step } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.proceed({ nextStep });
+  const transaction = await authClient.idx.proceed({ step });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
@@ -291,6 +292,7 @@ router.post('/enroll-authenticator/:authenticator/enrollment-channel-data', asyn
 router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
   const { 
     idx: { 
+      availableSteps,
       nextStep,
       error
     }
@@ -304,15 +306,22 @@ router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
   } else {
     const { authenticator: {
       key, displayName,
-    }, nextSteps } = nextStep;
+    } } = nextStep;
+
+    const availableStepsNames = availableSteps.map(({ name }) => name);
+    let stepsToDisplay = [{
+      stepName: 'select-enrollment-channel',
+      actionDisplayName: 'Enroll with another method'
+    }].filter(step => availableStepsNames.includes(step.stepName));
+
     renderPage({
       req, res,
       render: () => renderTemplate(req, res, 'enroll-poll', {
         title: `Enroll ${displayName}`,
         action: `/poll-authenticator/${key}`,
         poll: nextStep.poll,
-        nextStepAction: `/next-step`,
-        nextSteps,
+        selectStepAction: `/select-step`,
+        availableSteps: stepsToDisplay,
       })
     });
   }
