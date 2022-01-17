@@ -254,7 +254,7 @@ router.post('/enroll-authenticator/:authenticator/select-enrollment-channel', as
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
-// proceed to specified remediation (step)
+// proceed to specified remediation (step) chosen from the list of available steps of the flow stage
 router.post('/select-step', async (req, res, next) => {
   const { step } = req.body;
   const authClient = getAuthClient(req);
