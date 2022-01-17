@@ -8,7 +8,11 @@ const config = Object.assign({}, baseConfig, {
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     '<rootDir>/test/spec/serverStorage.js',
     '<rootDir>/test/spec/features/server'
-  ])
+  ]),
+  moduleNameMapper: Object.assign({}, baseConfig.moduleNameMapper, {
+    // eslint-disable-next-line no-useless-escape
+    '^\.\/node$': './browser'
+  })
 });
 
 module.exports = config;

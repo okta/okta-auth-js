@@ -36,7 +36,7 @@ const commonPlugins = [
   }),
   alias({
     entries: [
-      { find: /.\/node$/, replacement: './browser' }
+      { find: /^\.\/node$/, replacement: './browser' }
     ]
   }),
   typescript({

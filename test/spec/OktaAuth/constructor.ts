@@ -85,6 +85,16 @@ describe('OktaAuth (constructor)', () => {
             },
             transaction: {
               storageTypes: ['a', 'b']
+            },
+            'shared-transaction': {
+              storageTypes: [
+                'a'
+              ]
+            },
+            'original-uri': {
+              storageTypes: [
+                'a'
+              ]
             }
           };
           break;

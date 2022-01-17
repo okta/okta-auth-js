@@ -11,5 +11,5 @@
  */
 
 
-// ./node is swapped for ./browser in webpack config
+// ./node is swapped for ./browser at build time for browser specific bundles
 export * from './node';
