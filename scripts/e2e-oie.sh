@@ -8,7 +8,7 @@ setup_service google-chrome-stable 89.0.4389.72-1
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 
-export ISSUER=https://oie-widget-tests.sigmanetcorp.us/oauth2/default
+export ISSUER=https://oie-signin-widget.okta.com/oauth2/default
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 
@@ -18,7 +18,7 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 export ORG_OIE_ENABLED=true 
 
 # This client has refresh token enabled
-export CLIENT_ID=0oa3n0cgbfiNvI6Aa0g7
+export CLIENT_ID=0oa8lrg7ojTsbJgRQ696
 export REFRESH_TOKEN=true
 
 export FB_USERNAME=ycfjikukbl_1613767309@tfbnw.net 
