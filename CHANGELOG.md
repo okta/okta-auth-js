@@ -12,6 +12,9 @@
   - Removes signOut option `clearTokensAfterRedirect`
   - Adds signOut option `clearTokensBeforeRedirect` (default: `false`) to remove local tokens before logout redirect happen
 - [#1057](https://github.com/okta/okta-auth-js/pull/1057) Strict checks are now enabled in the Typescript compiler options. Some type signatures have been changed to match current behavior.
+- [#1066](https://github.com/okta/okta-auth-js/pull/1066) Extends type `CookieOptions` from `js-cookie` v3
+  - Uses enums for `CookieOptions.sameSite`
+  - Removes type `SetCookieOptions`
 
 ### Features
 
