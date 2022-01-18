@@ -38,3 +38,18 @@ if ! yarn build; then
   echo "build failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
+
+# DO NOT MERGE - BETA VERSION - DO NOT MERGE
+echo "Installing BETA VERSION"
+cd ${OKTA_HOME}/${REPO}
+
+npm config set strict-ssl false
+yarn add -DW --no-lockfile https://artifacts.aue1d.saasure.com/artifactory/npm-topic/@okta/okta-signin-widget/-/@okta/okta-signin-widget-5.17.0-g48b4537.tgz
+
+# Sample should use beta version, not CDN
+export SELF_HOSTED_WIDGET="1"
+
+echo "BETA VERSION installed"
+# End BETA VERSION
+
+
