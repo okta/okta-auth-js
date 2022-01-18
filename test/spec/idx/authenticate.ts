@@ -11,6 +11,7 @@
  */
 
 import { authenticate } from '../../../lib/idx/authenticate';
+import { proceed } from '../../../lib/idx/proceed';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { IdxActions } from './../../../lib/idx/types/idx-js';
 
@@ -56,7 +57,7 @@ import {
   OktaVerifyAuthenticatorVerificationDataRemediationFactory,
   ChallengePollRemediationFactory,
   VerifyOktaVerifyAuthenticatorRemediationFactory,
-  IdxErrorOktaVerifyPasscodeInvalidFactory
+  IdxErrorOktaVerifyPasscodeInvalidFactory, SkipRemediationFactory
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -87,6 +88,7 @@ describe('idx/authenticate', () => {
       urls: { authorizeUrl: 'meta-authorizeUrl' },
       ignoreSignature: true,
       interactionHandle: 'meta-interactionHandle',
+      flow: 'authenticate'
     };
     const tokenResponse = {
       tokens: {
@@ -1997,8 +1999,104 @@ describe('idx/authenticate', () => {
           });
         });
       });
-
     });
+  });
 
+  describe('skip', () => {
+    it('can skip enrolling in optional authenticators during sign in', async () => {
+      const {
+        authClient,
+        successResponse,
+      } = testContext;
+
+      const identifyResponse = IdentifyResponseFactory.build();
+
+      const selectAuthenticatorResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          SelectAuthenticatorAuthenticateRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  PasswordAuthenticatorOptionFactory.build(),
+                ]
+              })
+            ]
+          })
+        ]
+      });
+
+      const selectEnrollRequiredAuthenticatorResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          SelectAuthenticatorEnrollRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  EmailAuthenticatorOptionFactory.build(),
+                ]
+              })
+            ]
+          })
+        ]
+      });
+
+      const selectEnrollOptionalAuthenticatorResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          SelectAuthenticatorEnrollRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  PhoneAuthenticatorOptionFactory.build()
+                ]
+              })
+            ]
+          }),
+          SkipRemediationFactory.build()
+        ]
+      });
+
+      const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
+
+      chainResponses([
+        identifyResponse,
+        selectAuthenticatorResponse,
+        verifyPasswordResponse,
+        selectEnrollRequiredAuthenticatorResponse
+      ]);
+
+      chainResponses([
+        selectEnrollOptionalAuthenticatorResponse,
+        successResponse
+      ]);
+
+      jest.spyOn(identifyResponse, 'proceed');
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(verifyPasswordResponse, 'proceed');
+      jest.spyOn(selectEnrollOptionalAuthenticatorResponse, 'proceed');
+
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(identifyResponse)
+        .mockResolvedValueOnce(selectEnrollOptionalAuthenticatorResponse);
+
+      let response = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
+
+      expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', expect.any(Object));
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', expect.any(Object));
+      expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', expect.any(Object));
+      expect(response.nextStep).toMatchObject({
+        name: 'select-authenticator-enroll',
+        options: [{
+          label: 'Email',
+          value: AuthenticatorKey.OKTA_EMAIL
+        }],
+      });
+
+      response = await proceed(authClient, { skip: true });
+      expect(selectEnrollOptionalAuthenticatorResponse.proceed).toHaveBeenCalledWith('skip', {});
+      expect(response).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.SUCCESS,
+        tokens: expect.any(Object),
+      });
+    });
   });
 });
