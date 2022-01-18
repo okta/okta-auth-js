@@ -20,7 +20,11 @@ const config = [
       '**/*.js'
     ],
     exclude: [
-      'mfa.js'
+      'mfa.js',
+      'logout.js',
+      'sso.js',
+      'refreshTokens.js',
+      'tokens.js'
     ],
     flags: [ORG_OIE_ENABLED, REFRESH_TOKEN]
   },
