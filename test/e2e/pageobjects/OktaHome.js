@@ -18,16 +18,32 @@ class OktaHome {
   get popUpCloseButton() { return $('a[data-role="close-button"]'); }
   get widgetFormTitle() { return $('.okta-form-title.o-form-head'); }
 
+  // OIE org
+  get mainContent() { return $('#main-content'); }
+  get userProfileButton() { return $('[data-se="dropdown-menu--button-toggle-svg"]');}
+  get signOutLink() { return $('a[data-se="topbar--sign-out"]'); }
+
   async signOut() {
-    await browser.waitUntil(async () => this.userMenu.then(el => el.isDisplayed()), 5000, 'wait for user menu');
-    await this.userMenu.then(el => el.click());
-    await browser.waitUntil(async () => this.signOutBtn.then(el => el.isDisplayed()), 5000, 'wait for signout btn');
-    await this.signOutBtn.then(el => el.click());
+    if (process.env.ORG_OIE_ENABLED) {
+      await browser.waitUntil(async () => this.userProfileButton.then(el => el.isDisplayed()), 5000, 'wait for user profile');
+      await this.userProfileButton.then(el => el.click());
+      await browser.waitUntil(async () => this.signOutLink.then(el => el.isDisplayed()), 5000, 'wait for signout link');
+      await this.signOutLink.then(el => el.click());
+    } else {
+      await browser.waitUntil(async () => this.userMenu.then(el => el.isDisplayed()), 5000, 'wait for user menu');
+      await this.userMenu.then(el => el.click());
+      await browser.waitUntil(async () => this.signOutBtn.then(el => el.isDisplayed()), 5000, 'wait for signout btn');
+      await this.signOutBtn.then(el => el.click());
+    }
     await browser.waitUntil(async () => this.widgetFormTitle.then(el => el.isDisplayed()), 5000, 'wait for widget');
   }
 
   async waitForLoad() {
-    await browser.waitUntil(async () => this.userMenu.then(el => el.isDisplayed()), 5000, 'wait for user menu');
+    if (process.env.ORG_OIE_ENABLED) {
+      await browser.waitUntil(async () => this.mainContent.then(el => el.isDisplayed()), 5000, 'wait for main content');
+    } else {
+      await browser.waitUntil(async () => this.userMenu.then(el => el.isDisplayed()), 5000, 'wait for user menu');
+    }
   }
 
   async closeInitialPopUp() {

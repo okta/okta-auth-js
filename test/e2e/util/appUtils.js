@@ -17,7 +17,11 @@ import TestApp from '../pageobjects/TestApp';
 const ISSUER = process.env.ISSUER;
 const CLIENT_ID = process.env.CLIENT_ID;
 
-const flows = ['implicit', 'pkce'];
+let flows = ['implicit', 'pkce'];
+
+if (process.env.ORG_OIE_ENABLED) {
+  flows = ['pkce'];  
+}
 
 async function openImplicit(options) {
   options = Object.assign({ issuer: ISSUER, clientId: CLIENT_ID, pkce: false }, options);
