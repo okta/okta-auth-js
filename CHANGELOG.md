@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.11.0
+
+- [#1064](https://github.com/okta/okta-auth-js/pull/1064) Supports skip authenticator in idx authentication flow
+
 ## 5.10.1
 
 ### Fixes
