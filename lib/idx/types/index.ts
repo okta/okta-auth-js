@@ -64,6 +64,8 @@ export type Input = {
   type?: string;
   label?: string;
   value?: string | {form: IdxForm};
+  minLength?: number;
+  maxLength?: number;
   secret?: boolean;
   required?: boolean;
 }
