@@ -205,7 +205,7 @@ function handleLoginRedirect() {
   {{#if emailVerify}}
   if (authClient.idx.isEmailVerifyCallback(window.location.search)) {
     return authClient.idx.parseEmailVerifyCallback(window.location.search).then(function(res) {
-      switch (config.flow) {
+      switch (config.authMethod) {
         {{#if signinWidget}}
         case 'widget':
           showSigninWidget(res);
@@ -217,7 +217,7 @@ function handleLoginRedirect() {
           break;
         {{/if}}
         default:
-          throw new Error(`Email verify callback can not be used with flow: ${config.flow}`);
+          throw new Error(`Email verify callback can not be used with authMethod: ${config.authMethod}`);
           break;
       }
     });
@@ -257,7 +257,7 @@ function renewToken() {
 window._renewToken = bindClick(renewToken);
 
 function beginAuthFlow() {
-  switch (config.flow) {
+  switch (config.authMethod) {
     case 'redirect':
       showRedirectButton();
       break;
@@ -284,7 +284,7 @@ function endAuthFlow(tokens) {
 }
 
 function showRedirectButton() {
-  document.getElementById('flow-redirect').style.display = 'block';
+  document.getElementById('authMethod-redirect').style.display = 'block';
 }
 
 function logout(e) {
@@ -315,16 +315,16 @@ function returnHome() {
 }
 window._returnHome = bindClick(returnHome);
 
-{{> spa/flow/redirect.js }}
+{{> spa/authMethod/redirect.js }}
 
 {{#if signinWidget}}
-{{> spa/flow/widget.js }}
+{{> spa/authMethod/widget.js }}
 {{/if}}
 
 {{#if signinForm}}
-{{> spa/flow/direct/basic.js }}
+{{> spa/authMethod/direct/basic.js }}
 {{/if}}
 
 {{#if mfa}}
-{{> spa/flow/direct/mfa.js }}
+{{> spa/authMethod/direct/mfa.js }}
 {{/if}}

@@ -4,17 +4,14 @@ var config = {
   clientId: '',
   scopes: {{{ scopes }}},
   storage: '{{ storage }}',
+  useInteractionCodeFlow: true,
   requireUserSession: '{{ requireUserSession }}',
-  flow: '{{ flow }}',
+  authMethod: '{{ authMethod }}',
   startService: false,
+  useDynamicForm: false,
   uniq: Date.now() + Math.round(Math.random() * 1000), // to guarantee a unique state
   {{#if signinWidget}}
   idps: '',
-  {{/if}}
-  {{#if authn}}
-  useInteractionCodeFlow: false,
-  {{else}}
-  useInteractionCodeFlow: true,
   {{/if}}
 };
 
@@ -35,11 +32,13 @@ function loadConfig() {
   var clientId;
   var appUri;
   var storage;
-  var flow;
+  var authMethod;
   var startService;
   var requireUserSession;
   var scopes;
   var useInteractionCodeFlow;
+  var useDynamicForm;
+
   {{#if signinWidget}}
   var idps;
   {{/if}}
@@ -56,11 +55,12 @@ function loadConfig() {
     issuer = state.issuer;
     clientId = state.clientId;
     storage = state.storage;
-    flow = state.flow;
+    authMethod = state.authMethod;
     startService = state.startService;
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
     useInteractionCodeFlow = state.useInteractionCodeFlow;
+    useDynamicForm = state.useDynamicForm;
     config.uniq = state.uniq;
     {{#if signinWidget}}
     idps = state.idps;
@@ -71,12 +71,13 @@ function loadConfig() {
     issuer = url.searchParams.get('issuer') || config.issuer;
     clientId = url.searchParams.get('clientId') || config.clientId;
     storage = url.searchParams.get('storage') || config.storage;
-    flow = url.searchParams.get('flow') || config.flow;
+    authMethod = url.searchParams.get('authMethod') || config.authMethod;
     startService = url.searchParams.get('startService') === 'true' || config.startService;
     requireUserSession = url.searchParams.get('requireUserSession') ? 
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
     scopes = url.searchParams.get('scopes') ? url.searchParams.get('scopes').split(' ') : config.scopes;
     useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true' || config.useInteractionCodeFlow;
+    useDynamicForm = url.searchParams.get('useDynamicForm') === 'true' || config.useDynamicForm;
     {{#if signinWidget}}
     idps = url.searchParams.get('idps') || config.idps;
     {{/if}}
@@ -87,10 +88,11 @@ function loadConfig() {
     clientId,
     storage,
     requireUserSession,
-    flow,
+    authMethod,
     startService,
     scopes: scopes.join(' '),
     useInteractionCodeFlow,
+    useDynamicForm,
     {{#if signinWidget}}
     idps,
     {{/if}}
@@ -102,10 +104,11 @@ function loadConfig() {
     clientId,
     storage,
     requireUserSession,
-    flow,
+    authMethod,
     startService,
     scopes,
     useInteractionCodeFlow,
+    useDynamicForm,
     {{#if signinWidget}}
     idps,
     {{/if}}
@@ -143,7 +146,7 @@ function showForm() {
   document.getElementById('idps').value = config.idps;
   {{/if}}
   try {
-    document.querySelector(`#flow [value="${config.flow || ''}"]`).selected = true;
+    document.querySelector(`#authMethod [value="${config.authMethod || ''}"]`).selected = true;
   } catch (e) { showError(e); }
 
   if (config.startService) {
@@ -169,25 +172,35 @@ function showForm() {
   }
   {{/if}}
   
+  if (config.useDynamicForm) {
+    document.getElementById('useDynamicForm-on').checked = true;
+  } else {
+    document.getElementById('useDynamicForm-off').checked = true;
+  }
+
+
   // Show the form
   document.getElementById('config-form').style.display = 'block'; // show form
 
-  onChangeFlow();
+  onChangeAuthMethod();
 }
 
-function onChangeFlow() {
-  const flow = document.getElementById('flow').value;
+function onChangeAuthMethod() {
+  const authMethod = document.getElementById('authMethod').value;
+  document.querySelector('#form .field-useDynamicForm').style.display = authMethod == 'form' ? 'block' : 'none';
   {{#if signinWidget}}
-  const display = flow == 'widget' ? 'inline-block' : 'none';
-  document.getElementById('idps').style.display = display;
-  document.querySelector(`label[for=idps]`).style.display = display;
+  document.querySelector('#form .field-idps').style.display = authMethod == 'widget' ? 'block' : 'none';
   {{/if}}
 }
-window._onChangeFlow = onChangeFlow;
+window._onChangeAuthMethod = onChangeAuthMethod;
 
 // Keep us in the same tab
 function onSubmitForm(event) {
   event.preventDefault();
+
+  // clear transaction data to prevent odd behavior when switching to static form
+  sessionStorage.clear();
+
   // eslint-disable-next-line no-new
   new FormData(document.getElementById('form')); // will fire formdata event
 }

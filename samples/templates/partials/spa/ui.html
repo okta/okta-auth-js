@@ -18,31 +18,47 @@
     <div id="config-form" style="display: none" class="panel">
       {{> spa/form.html }}
     </div>
-    <!-- flow: redirect -->
-    <div id="flow-redirect" style="display: none">
+    <!-- authMethod: redirect -->
+    <div id="authMethod-redirect" style="display: none">
       <a id="login-redirect" href="#" onclick="_loginRedirect(event)">Click to login.</a>
     </div>
     {{#if signinWidget}}
-    <!-- flow: widget -->
-    <div id="flow-widget" class="panel" style="display: none">
+    <!-- authMethod: widget -->
+    <div id="authMethod-widget" class="panel" style="display: none">
       <div class="header">Sign-in Widget</div>
       <div id="signin-widget"></div>
     </div>
     {{/if}}
     {{#if signinForm}}
-    <!-- flow: form -->
-    <div id="login-form" style="display: none" class="panel pure-form pure-form-aligned">
+    <!-- authMethod: form -->
+    <!-- static signin form (authn and oie)-->
+    <div id="static-signin-form" style="display: none" class="panel pure-form pure-form-aligned">
       <div class="pure-control-group">
         <label for="username">Username</label>
-        <input id="username" name="username" type="email" autocomplete="username">
+        <input name="username" type="email" autocomplete="username">
       </div>
       <div class="pure-control-group">
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" autocomplete="password">
+        <input name="password" type="password" autocomplete="password">
       </div>
       <div class="pure-controls">
-        <p><a href="/" id="recover-password-link" onclick="_showRecoverPassword(event)">Forgot your password?</a></p>
-        <a href="/" id="submit-login-form" onclick="_submitSigninForm(event)" class="pure-button pure-button-primary">Signin</a>
+        <p><a href="/" data-se="recover-password" onclick="_showRecoverPassword(event)">Forgot your password?</a></p>
+        <a class="pure-button pure-button-primary" href="/" data-se="submit" onclick="_submitStaticSigninForm(event)">Signin</a>
+      </div>
+    </div>
+    <!-- dynamic signin form (oie only)-->
+    <div id="dynamic-signin-form" style="display: none" class="panel pure-form pure-form-aligned">
+      <div class="pure-control-group field-username">
+        <label for="username">Username</label>
+        <input name="username" type="email" autocomplete="username">
+      </div>
+      <div class="pure-control-group field-password">
+        <label for="password">Password</label>
+        <input name="password" type="password" autocomplete="password">
+      </div>
+      <div class="pure-controls">
+        <p><a class="link-recover-password" href="/" data-se="recover-password" onclick="_showRecoverPassword(event)">Forgot your password?</a></p>
+        <a class="link-signin pure-button pure-button-primary" href="/" data-se="submit" onclick="_submitDynamicSigninForm(event)">Signin</a>
       </div>
     </div>
     <div id="recover-password-form" style="display: none" class="panel pure-form pure-form-aligned">

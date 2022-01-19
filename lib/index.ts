@@ -15,6 +15,7 @@ import * as crypto from './crypto';
 
 export { default as OktaAuth } from './OktaAuth';
 export * from './constants';
+export * from './idx';
 export * from './types';
 export * from './tx';
 export * from './errors';

@@ -25,7 +25,7 @@ function showSigninWidget(options) {
     el: '#signin-widget'
   })
   .then(function(response) {
-    document.getElementById('flow-widget').style.display = 'none';
+    document.getElementById('authMethod-widget').style.display = 'none';
     signIn.remove();
     endAuthFlow(response.tokens);
   })
@@ -33,5 +33,5 @@ function showSigninWidget(options) {
     console.log('login error', error);
   });
 
-  document.getElementById('flow-widget').style.display = 'block'; // show login UI
+  document.getElementById('authMethod-widget').style.display = 'block'; // show login UI
 }

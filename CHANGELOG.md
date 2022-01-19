@@ -13,6 +13,9 @@
   - Removes signOut option `clearTokensAfterRedirect`
   - Adds signOut option `clearTokensBeforeRedirect` (default: `false`) to remove local tokens before logout redirect happen
 - [#1057](https://github.com/okta/okta-auth-js/pull/1057) Strict checks are now enabled in the Typescript compiler options. Some type signatures have been changed to match current behavior.
+- [#1062](https://github.com/okta/okta-auth-js/pull/1062)
+  - Authn method `introspect` is renamed to `introspectAuthn` (still callable as `tx.introspect`)
+  - `IdxFeature` enum is now defined as strings instead of numbers
 
 ### Features
 
@@ -26,6 +29,9 @@
     - `autoRemediate`. If false, there will be no attempt to satisfy remediations even if values have been passed.
   - TransactionManager supports new option:
     - `saveLastResponse`. If false, IDX responses will not be cached.
+- [#1062](https://github.com/okta/okta-auth-js/pull/1062)
+  - All IDX methods are exported.
+  - `useInteractionCodeFlow` defaults to `true` for sample and test apps.
 
 ## 5.11.0
 

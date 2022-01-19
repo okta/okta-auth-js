@@ -20,34 +20,43 @@ import checkProfile from '../support/check/checkProfile';
 import checkNoProfile from '../support/check/checkNoProfile';
 import checkNoWidget from '../support/check/checkNoWidget';
 import clickProfile from '../support/action/clickProfile';
-import loginDirect from '../support/action/loginDirect';
+import { default as _loginDirect } from '../support/action/loginDirect';
 import loginWidget from '../support/action/loginWidget';
 import loginRedirect from '../support/action/loginRedirect';
 import logoutRedirect from '../support/action/logoutRedirect';
 import openRedirectUrl from '../support/action/openRedirectUrl';
 import checkSocialLoginButton from '../support/check/checkSocialLoginButton';
+import SpaApp from '../pageobjects/SpaApp';
 
 const sampleConfig = getSampleConfig();
 const config = getConfig();
 
+// Bind login direct to the app's selectors
+function loginDirect(options) {
+  return _loginDirect({
+    ...options,
+    selectors: SpaApp.selectors
+  });
+}
+
 describe('spa-app: ' + sampleConfig.name, () => {
 
   it('can login using redirect', async () => {
-    await startApp('/', { requireUserSession: true });
+    await startApp('/', { authMethod: 'redirect', requireUserSession: true });
     await loginRedirect();
     await checkProfile();
     await logoutRedirect();
   });
 
   it('can use memory token storage', async () => {
-    await startApp('/', { requireUserSession: true, storage: 'memory' });
+    await startApp('/', { authMethod: 'redirect', requireUserSession: true, storage: 'memory' });
     await loginRedirect();
     await checkProfile();
     await logoutRedirect();
   });
 
   it('can get user info', async () => {
-    await startApp('/', { requireUserSession: false });
+    await startApp('/', { authMethod: 'redirect', requireUserSession: false });
     await loginRedirect();
     await checkNoProfile();
     await clickProfile();
@@ -57,7 +66,7 @@ describe('spa-app: ' + sampleConfig.name, () => {
 
   if (sampleConfig.signinForm) {
     it('can login directly, calling signin() with username and password', async () => {
-      await startApp('/', { flow: 'form', requireUserSession: true });
+      await startApp('/', { authMethod: 'form', requireUserSession: true });
       await loginDirect();
       await checkProfile();
       await logoutRedirect();
@@ -65,8 +74,8 @@ describe('spa-app: ' + sampleConfig.name, () => {
   }
 
   if (sampleConfig.signinWidget) {
-    it('can login using a self-hosted widget', async () => {
-      await startApp('/', { flow: 'widget' });
+    it('can login using an embedded widget', async () => {
+      await startApp('/', { authMethod: 'widget' });
       await loginWidget();
       await checkProfile();
       await logoutRedirect();
@@ -74,11 +83,11 @@ describe('spa-app: ' + sampleConfig.name, () => {
   
     it('does not show the widget when receiving error=access_denied on redirect', async () => {
       await startApp('/', {
-        flow: 'widget'
+        authMethod: 'widget'
       });
       await openRedirectUrl(sampleConfig.redirectPath, config, {
         error: 'access_denied',
-        flow: 'widget'
+        authMethod: 'widget'
       });
 
       await checkNoWidget();
@@ -86,11 +95,11 @@ describe('spa-app: ' + sampleConfig.name, () => {
 
     it('shows the widget when receiving error=interaction_required on redirect', async () => {
       await startApp('/', {
-        flow: 'widget'
+        authMethod: 'widget'
       });
       await openRedirectUrl(sampleConfig.redirectPath, config, {
         error: 'interaction_required',
-        flow: 'widget'
+        authMethod: 'widget'
       });
 
       await loginWidget();
@@ -100,7 +109,7 @@ describe('spa-app: ' + sampleConfig.name, () => {
 
     it('show social login buttons in self-hosted widget', async () => {
       await startApp('/', {
-        flow: 'widget',
+        authMethod: 'widget',
         idps: 'Facebook:111 Google:222'
       });
       await checkSocialLoginButton('social-auth-facebook-button', '111');

@@ -221,12 +221,12 @@ function listMfaFactors() {
   return transaction.nextStep.options.map(option => option.label);
 }
 
-{{> spa/flow/direct/mfa_enroll.js }}
-{{> spa/flow/direct/mfa_activate.js }}
-{{> spa/flow/direct/mfa_required.js }}
-{{> spa/flow/direct/mfa_challenge.js }}
-{{> spa/flow/direct/factors/password.js }}
-{{> spa/flow/direct/factors/email.js }}
-{{> spa/flow/direct/factors/okta_verify.js }}
-{{> spa/flow/direct/factors/phone.js }}
-{{> spa/flow/direct/factors/question.js }}
+{{> spa/authMethod/direct/mfa_enroll.js }}
+{{> spa/authMethod/direct/mfa_activate.js }}
+{{> spa/authMethod/direct/mfa_required.js }}
+{{> spa/authMethod/direct/mfa_challenge.js }}
+{{> spa/authMethod/direct/factors/password.js }}
+{{> spa/authMethod/direct/factors/email.js }}
+{{> spa/authMethod/direct/factors/okta_verify.js }}
+{{> spa/authMethod/direct/factors/phone.js }}
+{{> spa/authMethod/direct/factors/question.js }}

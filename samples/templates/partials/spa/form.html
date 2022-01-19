@@ -8,22 +8,34 @@
     <input id="clientId" name="clientId" type="text" class="pure-input-1-2" />
   </div>
   <div class="pure-control-group">
-    <label for="flow">Authentication Flow</label>
-    <select id="flow" name="flow" onchange="_onChangeFlow(event)">
-      <option value="redirect">Redirect to Okta (federated)</option>
+    <label for="scopes">Scopes</label>
+    <input id="scopes" name="scopes" type="text" class="pure-input-1-2" />
+  </div>
+  <div class="pure-control-group">
+    <label for="authMethod">Authentication Method</label>
+    <select id="authMethod" name="authMethod" onchange="_onChangeAuthMethod(event)">
+      <option value="redirect">Redirect to Okta</option>
       {{#if signinWidget}}
-      <option value="widget">Okta Sign-in Widget (embedded)</option>
+      <option value="widget">Okta Sign-in Widget</option>
       {{/if}}
       {{#if signinForm}}
-      <option value="form">Custom form (direct)</option>
+      <option value="form">Custom forms</option>
       {{/if}}
       <!-- Other login flows can be added -->
     </select>
   </div>
-  <div class="pure-control-group">
-    <label for="scopes">Scopes</label>
-    <input id="scopes" name="scopes" type="text" class="pure-input-1-2" />
+  <div class="pure-control-group field-useDynamicForm">
+    <label for="useDynamicForm">Use dynamic sign-in form (interaction code flow only)</label>
+    <input id="useDynamicForm-on" name="useDynamicForm" type="radio" value="true"/> YES
+    <input id="useDynamicForm-off" name="useDynamicForm" type="radio" value="false"/> NO
   </div>
+
+  {{#if signinWidget}}
+  <div class="pure-control-group field-idps">
+    <label for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
+    <input id="idps" name="idps" type="text" />
+  </div>
+  {{/if}}
   <div class="pure-control-group">
     <label for="requireUserSession">Require Okta SSO session</label>
     <input id="requireUserSession-on" name="requireUserSession" type="radio" value="true"/> ON 
@@ -48,13 +60,6 @@
     <label for="useInteractionCodeFlow">Use Okta Identity Engine (interaction code flow)</label>
     <input id="useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/> YES
     <input id="useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/> NO
-  </div>
-  {{/if}}
-
-  {{#if signinWidget}}
-  <div class="pure-control-group">
-    <label style="display: none" for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
-    <input style="display: none" id="idps" name="idps" type="text" />
   </div>
   {{/if}}
 
