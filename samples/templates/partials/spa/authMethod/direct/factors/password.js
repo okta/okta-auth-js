@@ -1,6 +1,11 @@
 function showRecoverPassword() {
   // Copy username from login form to recover password form
-  const username = document.querySelector('#login-form input[name=username]').value;
+  let username;
+  if (config.useDynamicForm && config.useInteractionCodeFlow) {
+    username = document.querySelector('#dynamic-signin-form input[name=username]').value;
+  } else {
+    username = document.querySelector('#static-signin-form input[name=username]').value;
+  }
   document.querySelector('#recover-password-form input[name=recover-username]').value = username;
 
   hideSigninForm();

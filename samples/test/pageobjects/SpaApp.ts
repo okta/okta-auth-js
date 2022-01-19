@@ -10,23 +10,35 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/* eslint-disable max-len */
 
 import assert from 'assert';
 import toQueryString from '../util/toQueryString';
 import {
-  LoginForm,
   Nav,
+  Selectors,
   Unauth,
   UserHome,
-  UserProfile
 } from  '../support/selectors';
 import waitForDisplayed from '../support/wait/waitForDisplayed';
 import clickElement from '../support/action/clickElement';
 import checkEqualsText from '../support/check/checkEqualsText';
 
-/* eslint-disable max-len */
-class SpaApp {
 
+// Selectors
+const loginForm = '#static-signin-form';
+const username = `${loginForm} input[name=username]`;
+const password = `${loginForm} input[name=password]`;
+const submit = `${loginForm} [data-se=submit]`;
+const userEmail = `#userinfo #claim-email`;
+
+const selectors = {
+  username,
+  password,
+  submit
+};
+class SpaApp {
+  selectors: Selectors = selectors;
   // Authenticated landing
   get logoutRedirectBtn() { return $('#logout-redirect'); }
   get getUserInfoBtn() { return $(UserHome.profileButton); }
@@ -34,9 +46,9 @@ class SpaApp {
 
   // Unauthenticated landing
   get loginRedirectBtn() { return $(Unauth.loginRedirect); }
-  get username() { return $(LoginForm.username); }
-  get password() { return $(LoginForm.password); }
-  get signinFormSubmit() { return $(LoginForm.submit); }
+  get username() { return $(selectors.username); }
+  get password() { return $(selectors.password); }
+  get signinFormSubmit() { return $(selectors.submit); }
 
   // Form
   get configForm() { return $('#config-form'); }
@@ -105,7 +117,7 @@ class SpaApp {
   }
 
   async waitForUserInfo() {
-    await waitForDisplayed(UserProfile.email, false);
+    await waitForDisplayed(userEmail, false);
   }
 
   async assertLoggedIn() {
@@ -119,8 +131,8 @@ class SpaApp {
   }
 
   async assertUserInfo() {
-    await waitForDisplayed(UserProfile.email, false);
-    await checkEqualsText('element', UserProfile.email, false, process.env.USERNAME as string);
+    await waitForDisplayed(userEmail, false);
+    await checkEqualsText('element', userEmail, false, process.env.USERNAME as string);
   }
 
   async assertNoUserInfo() {

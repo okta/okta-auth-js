@@ -52,7 +52,7 @@ import {
   transactionStatus,
   resumeTransaction,
   transactionExists,
-  introspect,
+  introspectAuthn,
   postToTransaction,
   AuthTransaction
 } from './tx';
@@ -101,7 +101,7 @@ import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
 import {
   interact,
-  introspect as introspectV2,
+  introspect,
   authenticate,
   cancel,
   poll,
@@ -168,7 +168,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
           return storage.get(name);
         }
       }),
-      introspect: introspect.bind(null, this)
+      introspect: introspectAuthn.bind(null, this)
     };
 
     this.pkce = {
@@ -285,7 +285,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     const boundStartTransaction = startTransaction.bind(null, this);
     this.idx = {
       interact: interact.bind(null, this),
-      introspect: introspectV2.bind(null, this),
+      introspect: introspect.bind(null, this),
       authenticate: authenticate.bind(null, this),
       register: register.bind(null, this),
       start: boundStartTransaction,
@@ -357,12 +357,13 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
     this.options.headers = Object.assign({}, this.options.headers, headers);
   }
 
+
+  // Authn  V1
   async signIn(opts: SigninOptions): Promise<AuthTransaction> {
-    // TODO: support interaction code flow
-    // Authn V1 flow
     return this.signInWithCredentials(opts as SigninWithCredentialsOptions);
   }
 
+  // Authn  V1
   async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction> {
     opts = clone(opts || {});
     const _postToTransaction = (options?) => {

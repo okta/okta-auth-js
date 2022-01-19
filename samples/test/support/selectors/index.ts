@@ -11,6 +11,8 @@
  */
 
 
+export * from './types';
+
 import LoginForm from './LoginForm';
 import Nav from './Nav';
 import OktaSignInV1 from './OktaSignInV1';

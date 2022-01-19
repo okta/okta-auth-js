@@ -75,9 +75,9 @@ export type NextStep = {
 }
 
 export enum IdxFeature {
-  PASSWORD_RECOVERY,
-  REGISTRATION,
-  SOCIAL_IDP,
+  PASSWORD_RECOVERY = 'recover-password',
+  REGISTRATION = 'enroll-profile',
+  SOCIAL_IDP = 'redirect-idp',
 }
 
 export interface IdxTransaction {

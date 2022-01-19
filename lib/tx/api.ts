@@ -18,12 +18,12 @@ import { STATE_TOKEN_KEY_NAME } from '../constants';
 import { addStateToken } from './util';
 import { AuthTransaction } from './AuthTransaction';
 
-function transactionStatus(sdk, args) {
+export function transactionStatus(sdk, args) {
   args = addStateToken(sdk, args);
   return post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn', args, { withCredentials: true });
 }
 
-function resumeTransaction(sdk, args) {
+export function resumeTransaction(sdk, args) {
   if (!args || !args.stateToken) {
     var stateToken = sdk.tx.exists._get(STATE_TOKEN_KEY_NAME);
     if (stateToken) {
@@ -40,7 +40,7 @@ function resumeTransaction(sdk, args) {
     });
 }
 
-function introspect (sdk, args) {
+export function introspectAuthn (sdk, args) {
   if (!args || !args.stateToken) {
     var stateToken = sdk.tx.exists._get(STATE_TOKEN_KEY_NAME);
     if (stateToken) {
@@ -57,29 +57,21 @@ function introspect (sdk, args) {
     });
 }
 
-function transactionStep(sdk, args) {
+export function transactionStep(sdk, args) {
   args = addStateToken(sdk, args);
   // v1 pipeline introspect API
   return post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn/introspect', args, { withCredentials: true });
 }
 
-function transactionExists(sdk) {
+export function transactionExists(sdk) {
   // We have a cookie state token
   return !!sdk.tx.exists._get(STATE_TOKEN_KEY_NAME);
 }
 
-function postToTransaction(sdk, url, args, options?) {
+export function postToTransaction(sdk, url, args, options?) {
   options = Object.assign({ withCredentials: true }, options);
   return post(sdk, url, args, options)
     .then(function(res) {
       return new AuthTransaction(sdk, res);
     });
 }
-
-export {
-  transactionStatus,
-  resumeTransaction,
-  transactionExists,
-  postToTransaction,
-  introspect,
-};

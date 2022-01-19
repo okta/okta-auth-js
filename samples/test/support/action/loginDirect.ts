@@ -11,16 +11,23 @@
  */
 
 
-import { LoginForm } from  '../selectors';
+import { LoginForm, Selectors } from  '../selectors';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import clickElement from './clickElement';
 import setInputField from './setInputField';
 import { getConfig } from '../../util/configUtils';
 
+interface LoginDirectOptions {
+  username?: string;
+  password?: string;
+  selectors?: Selectors;
+}
+
 export default async (
-  options: Record<string, string> = {}
+  options: LoginDirectOptions
 ) => {
-  await waitForDisplayed(LoginForm.username, false);
+  const selectors = options.selectors || LoginForm;
+  await waitForDisplayed(selectors.username, false);
   const config = getConfig();
   const username = options.username || config.username;
   if (!username) {
@@ -30,8 +37,8 @@ export default async (
   if (!password) {
     throw new Error('PASSWORD was not set');
   }
-  await setInputField('set', username, LoginForm.username);
-  await setInputField('set', password, LoginForm.password);
+  await setInputField('set', username, selectors.username);
+  await setInputField('set', password, selectors.password);
 
-  await clickElement('click', 'selector', LoginForm.submit);
+  await clickElement('click', 'selector', selectors.submit);
 };
