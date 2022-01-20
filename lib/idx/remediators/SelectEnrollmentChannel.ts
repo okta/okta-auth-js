@@ -24,7 +24,7 @@ export type SelectEnrollmentChannelValues = RemediationValues & {
 export class SelectEnrollmentChannel extends Remediator {
   static remediationName = 'select-enrollment-channel';
 
-  values: SelectEnrollmentChannelValues;
+  values!: SelectEnrollmentChannelValues;
 
   canRemediate() {
     return Boolean(this.values.channel);
@@ -41,14 +41,15 @@ export class SelectEnrollmentChannel extends Remediator {
     };
   }
 
-  private getChannels(): IdxOption[] {
+  private getChannels(): IdxOption[] | undefined {
     const authenticator: IdxRemediationValue = getAuthenticatorFromRemediation(this.remediation);
     const remediationValue = authenticator.value as IdxRemediationValueForm;
     return remediationValue.form.value.find(({ name }) => name === 'channel')?.options;
   }
 
   getData() {
-    const remediationValue = this.remediation.value[0].value as IdxRemediationValueForm;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const remediationValue = this.remediation!.value![0].value as IdxRemediationValueForm;
     return {
       authenticator: {
         id: remediationValue.form.value[0].value,

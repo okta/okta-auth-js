@@ -23,7 +23,7 @@ export type EnrollmentChannelDataValues = RemediationValues & {
 export class EnrollmentChannelData extends Remediator {
   static remediationName = 'enrollment-channel-data';
 
-  values: EnrollmentChannelDataValues;
+  values!: EnrollmentChannelDataValues;
 
   map = {
     email: [],
