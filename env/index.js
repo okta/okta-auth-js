@@ -49,7 +49,7 @@ function loadTestEnvYaml() {
     return;
   }
 
-  return yaml.load(fs.readFileSync(TESTENV_YAML, "utf8"));
+  return yaml.load(fs.readFileSync(TESTENV_YAML, 'utf8'));
 }
 
 function getTestEnvironmentNames() {
