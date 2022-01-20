@@ -25,7 +25,7 @@ export function getAuthenticator(remediation: IdxRemediation): Authenticator<any
     case AuthenticatorKey.OKTA_VERIFY:
       return new OktaVerifyTotp(value);
     case AuthenticatorKey.WEBAUTHN:
-      if (value.contextualData.challengeData) {
+      if (value.contextualData?.challengeData) {
         return new WebauthnVerification(value);
       } else {
         return new WebauthnEnrollment(value);
