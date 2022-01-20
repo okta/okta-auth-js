@@ -17,7 +17,7 @@ const mocked = {
     __esModule: true, // fool babel require interop
     default: () => Promise.resolve({
       ok: true,
-      json: () => {}
+      json: () => ({})
     })
   }
 };
@@ -45,6 +45,12 @@ describe('idx headers', () => {
       interactionHandle: null,
       stateHandle: 'fake-stateHandle',
       version: '1.0.0',
+      clientId: 'fake-clientid',
+      baseUrl: 'fake-baseurl',
+      redirectUri: 'fake-redirecturi',
+      codeChallenge: 'fake-codeChallenge',
+      codeChallengeMethod: 'fake-codeChallengeMethod',
+      state: 'fake-state',
       sdk: {
         options: {
           httpRequestClient: () => Promise.resolve({
@@ -69,6 +75,11 @@ describe('idx headers', () => {
   async function callIntrospect() {
     const { domain, interactionHandle, stateHandle, version } = testContext;
     await idx.introspect({ domain, interactionHandle, stateHandle, version });
+  }
+
+  async function callInteract() {
+    const { clientId, baseUrl, redirectUri, codeChallenge, codeChallengeMethod, state } = testContext;
+    await idx.interact({ clientId, baseUrl, redirectUri, codeChallenge, codeChallengeMethod, state });
   }
 
   describe('without interceptor', () => {
@@ -148,6 +159,27 @@ describe('idx headers', () => {
         method: 'POST'
       });
     });
+
+    it('idx uses header values set in SDK options and SDK user agent for interact', async () => {
+      const { sdk } = testContext;
+      sdk.options.headers = {
+        'my-header': 'my-value',
+        'other-header': 'other-value'
+      };
+      jest.spyOn(mocked.crossFetch, 'default');
+      await callInteract();
+      expect(mocked.crossFetch.default).toHaveBeenCalledWith('fake-baseurl/v1/interact', {
+        body: 'client_id=fake-clientid&scope=openid%20email&redirect_uri=fake-redirecturi&code_challenge=fake-codeChallenge&code_challenge_method=fake-codeChallengeMethod&state=fake-state',
+        credentials: 'include',
+        headers: {
+          'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
+          'content-type': 'application/x-www-form-urlencoded',
+          'my-header': 'my-value',
+          'other-header': 'other-value'
+        },
+        method: 'POST'
+      });
+    });
   
     it('idx uses header values set using setRequestHeader and SDK user agent', async () => {
       const { sdk } = testContext;
@@ -205,17 +237,14 @@ describe('idx headers', () => {
         };
         sdk.options.clientSecret = 'fake-clientSecret';
         jest.spyOn(mocked.crossFetch, 'default');
-        await callIntrospect();
-        expect(mocked.crossFetch.default).toHaveBeenCalledWith('fake-domain/idp/idx/introspect', {
-          body: JSON.stringify({
-            stateToken: 'fake-stateHandle'
-          }),
+        await callInteract();
+        expect(mocked.crossFetch.default).toHaveBeenCalledWith('fake-baseurl/v1/interact', {
+          body: 'client_id=fake-clientid&scope=openid%20email&redirect_uri=fake-redirecturi&code_challenge=fake-codeChallenge&code_challenge_method=fake-codeChallengeMethod&state=fake-state',
           credentials: 'include',
           headers: {
             'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
             'X-Device-Token': 'fake-ip',
-            'accept': 'application/ion+json; okta-version=fake-version',
-            'content-type': 'application/ion+json; okta-version=fake-version'
+            'content-type': 'application/x-www-form-urlencoded'
           },
           method: 'POST'
         });
@@ -228,16 +257,13 @@ describe('idx headers', () => {
         };
         sdk.options.clientSecret = undefined;
         jest.spyOn(mocked.crossFetch, 'default');
-        await callIntrospect();
-        expect(mocked.crossFetch.default).toHaveBeenCalledWith('fake-domain/idp/idx/introspect', {
-          body: JSON.stringify({
-            stateToken: 'fake-stateHandle'
-          }),
+        await callInteract();
+        expect(mocked.crossFetch.default).toHaveBeenCalledWith('fake-baseurl/v1/interact', {
+          body: 'client_id=fake-clientid&scope=openid%20email&redirect_uri=fake-redirecturi&code_challenge=fake-codeChallenge&code_challenge_method=fake-codeChallengeMethod&state=fake-state',
           credentials: 'include',
           headers: {
             'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
-            'accept': 'application/ion+json; okta-version=fake-version',
-            'content-type': 'application/ion+json; okta-version=fake-version'
+            'content-type': 'application/x-www-form-urlencoded'
           },
           method: 'POST'
         });
