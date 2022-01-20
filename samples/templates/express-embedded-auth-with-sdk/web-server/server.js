@@ -27,6 +27,7 @@ const {
 
 const templateDir = path.join(__dirname, '', 'views');
 const frontendDir = path.join(__dirname, '', 'assets');
+const authJSAssets = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js')), '..', 'dist');
 
 const getConfig = require('../config.js');
 const { port } = getConfig().webServer;
@@ -65,6 +66,8 @@ app.use('/assets', express.static(frontendDir));
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', templateDir);
+// okta-auth-js assets
+app.use(express.static(authJSAssets));
 
 app.use(userContext);
 

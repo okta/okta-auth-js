@@ -1,15 +1,15 @@
 import { Authenticator } from './Authenticator';
 
-export type OktaPasswordInputValues = {
-  password: string;
-};
+export interface OktaPasswordInputValues {
+  password?: string;
+}
 
-export class OktaPassword extends Authenticator {
-  canVerify(values) {
+export class OktaPassword extends Authenticator<OktaPasswordInputValues> {
+  canVerify(values: OktaPasswordInputValues) {
     return !!values.password;
   }
 
-  mapCredentials(values) {
+  mapCredentials(values: OktaPasswordInputValues) {
     return { passcode: values.password };
   }
 

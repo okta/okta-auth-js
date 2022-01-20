@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+    <script src="/okta-auth-js.min.js" type="text/javascript"></script>
+  </head>
+  <body id="samples">
+  
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div id="page-title-header" class="ui header">
+          <h2>{{title}}</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      {{#challengeData}}
+        <div class="row">
+          <form id="challenge-authenticator-form" class="ui large form" action="{{action}}" method="POST">
+
+            <input id="credentials-id" type="hidden" name="id" autoComplete="off" required />
+            <input id="credentials-clientData" type="hidden" name="clientData" autoComplete="off" required />
+            <input id="credentials-authenticatorData" type="hidden" name="authenticatorData" autoComplete="off" required />
+            <input id="credentials-signatureData" type="hidden" name="signatureData" autoComplete="off" required />
+            
+            <div class="row">
+              <div id="credentials-error" class="ui negative message"></div>
+            </div>
+
+            <div class="row">
+              <button id="retry-button" class="ui fluid large button" onclick="askCredentials()" type="button">
+                Retry
+              </button>
+
+              <button id="submit-button" class="ui fluid large primary submit button" type="submit">
+                Verify
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <script type="text/javascript">
+          const challengeData = {{{challengeData}}};
+          const authenticatorEnrollments = {{{authenticatorEnrollments}}};
+
+          const askCredentials = async () => {
+            try {
+              // https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API
+              const options = OktaAuth.webauthn.buildCredentialRequestOptions(challengeData, authenticatorEnrollments);
+              const credential = await navigator.credentials.get(options);
+              const res = OktaAuth.webauthn.getAssertion(credential);
+              onSuccess(res);
+            } catch(e) {
+              onError(e);
+            }
+          };
+
+          const onInit = () => {
+            document.getElementById('credentials-error').hidden = true;
+            document.getElementById('retry-button').style.display = 'none';
+            document.getElementById('submit-button').style.display = 'none';
+          };
+
+          const onSuccess = (res) => {
+            document.getElementById('credentials-clientData').value = res.clientData;
+            document.getElementById('credentials-authenticatorData').value = res.authenticatorData;
+            document.getElementById('credentials-signatureData').value = res.signatureData;
+            document.getElementById('credentials-id').value = res.id;
+
+            document.getElementById('credentials-error').innerText = '';
+            document.getElementById('credentials-error').hidden = true;
+            document.getElementById('submit-button').style.display = null;
+            document.getElementById('retry-button').style.display = 'none';
+          };
+
+          const onError = (e) => {
+            document.getElementById('credentials-error').innerText = `${e.name}: ${e.message}`;
+            document.getElementById('credentials-error').hidden = false;
+            document.getElementById('retry-button').style.display = null;
+          };
+
+          document.addEventListener('DOMContentLoaded', () => {
+            onInit();
+            askCredentials();
+          });
+        </script>
+      {{/challengeData}}
+      
+      {{>cancel}}
+
+    </div>
+  </body>
+</html>

@@ -123,3 +123,30 @@ export const SecurityQuestionAuthenticatorFactory = IdxAuthenticatorFactory.para
     { type: 'security_question' }
   ]
 });
+
+export const WebauthnAuthenticatorFactory = IdxAuthenticatorFactory.params({
+  displayName: 'Security Key or Biometric',
+  key: 'webauthn',
+  type: 'security_key',
+  methods: [
+    { type: 'webauthn' }
+  ]
+});
+
+export const WebauthnEnrolledAuthenticatorFactory = IdxAuthenticatorFactory.params({
+  displayName: 'MacBook Touch ID',
+  key: 'webauthn',
+  type: 'security_key',
+  methods: [
+    { type: 'webauthn' }
+  ],
+  credentialId: 'CREDENTIAL-ID'
+});
+
+export const AuthenticatorEnrollmentsForWebauthnDataFactory = {
+  type: 'array',
+  value: [
+    WebauthnEnrolledAuthenticatorFactory.build()
+  ]
+};
+

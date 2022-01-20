@@ -13,6 +13,39 @@
 
 // TODO: remove when idx-js provides type information
 
+export interface ChallengeData {
+  challenge: string; 
+  userVerification: string; 
+  extensions?: {
+    appid: string;
+  };
+}
+export interface ActivationData {
+  challenge: string;
+  rp: {
+    name: string;
+  };
+  user: {
+    id: string;
+    name: string;
+    displayName: string;
+  };
+  pubKeyCredParams: {
+    type: string;
+    alg: number;
+  }[];
+  attestation?: string;
+  authenticatorSelection?: {
+    userVerification?: string;
+    authenticatorAttachment?: string;
+    requireResidentKey?: boolean;
+    residentKey?: string;
+  };
+  excludeCredentials?: {
+    id: string;
+    type: string;
+  }[];
+}
 export interface IdxAuthenticatorMethod {
   type: string;
 }
@@ -43,7 +76,10 @@ export interface IdxAuthenticator {
     }[];
     questionKeys?: string[];
     selectedChannel?: string;
+    activationData?: ActivationData;
+    challengeData?: ChallengeData;
   };
+  credentialId?: string;
 }
 
 export interface IdxForm {

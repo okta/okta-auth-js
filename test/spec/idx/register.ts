@@ -54,7 +54,9 @@ import {
   IdxContextFactory,
   OktaVerifyAuthenticatorWithContextualDataFactory,
   SelectEnrollmentChannelRemediationFactory,
-  OktaVerifyAuthenticatorOptionFactory, EnrollmentChannelDataEmailRemediationFactory, EnrollmentChannelDataSmsRemediationFactory
+  OktaVerifyAuthenticatorOptionFactory, EnrollmentChannelDataEmailRemediationFactory, EnrollmentChannelDataSmsRemediationFactory,
+  WebauthnAuthenticatorOptionFactory,
+  EnrollWebauthnAuthenticatorRemediationFactory,
 } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
@@ -196,6 +198,7 @@ describe('idx/register', () => {
                 GoogleAuthenticatorOptionFactory.build(),
                 SecurityQuestionAuthenticatorOptionFactory.build(),
                 OktaVerifyAuthenticatorOptionFactory.build(),
+                WebauthnAuthenticatorOptionFactory.build()
               ]
             })
           ]
@@ -248,6 +251,12 @@ describe('idx/register', () => {
       ]
     });
 
+    const enrollWebauthnAuthenticatorResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        EnrollWebauthnAuthenticatorRemediationFactory.build()
+      ]
+    });
+
     testContext = {
       authClient,
       tokenResponse,
@@ -267,6 +276,7 @@ describe('idx/register', () => {
       enrollPhoneAuthenticatorResponse,
       enrollGoogleAuthenticatorResponse,
       enrollSecurityQuestionAuthenticatorResponse,
+      enrollWebauthnAuthenticatorResponse,
     };
   });
   
@@ -518,6 +528,9 @@ describe('idx/register', () => {
           }, {
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY
+          }, {
+            label: 'Security Key or Biometric',
+            value: AuthenticatorKey.WEBAUTHN
           }]
         },
       });
@@ -591,6 +604,9 @@ describe('idx/register', () => {
           }, {
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY
+          }, {
+            label: 'Security Key or Biometric',
+            value: AuthenticatorKey.WEBAUTHN
           }]
         },
       });
@@ -688,6 +704,9 @@ describe('idx/register', () => {
           }, {
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY
+          }, {
+            label: 'Security Key or Biometric',
+            value: AuthenticatorKey.WEBAUTHN
           }]
         },
       });
@@ -1352,6 +1371,9 @@ describe('idx/register', () => {
           }, {
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY
+          }, {
+            label: 'Security Key or Biometric',
+            value: AuthenticatorKey.WEBAUTHN
           }]
         }
       });
@@ -1579,8 +1601,10 @@ describe('idx/register', () => {
           }, {
             label: 'Okta Verify',
             value: AuthenticatorKey.OKTA_VERIFY
-          }
-        ]
+          }, {
+            label: 'Security Key or Biometric',
+            value: AuthenticatorKey.WEBAUTHN
+          }]
         }
       });
 
@@ -2025,6 +2049,272 @@ describe('idx/register', () => {
       });
 
       expect(enrollmentChannelDataEmailResponse.proceed).toHaveBeenCalled();
+    });
+  });
+
+  describe('webauthn', () => {
+    it('can set an webauthn authenticator up front', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+        enrollWebauthnAuthenticatorResponse
+      } = testContext;
+      
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollWebauthnAuthenticatorResponse
+      ]);
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(selectAuthenticatorResponse);
+
+      let res = await register(authClient, {
+        authenticator: AuthenticatorKey.WEBAUTHN
+      });
+      // Webauthn authenticator is automatically selected
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+        authenticator: {
+          id: 'id-webauthn-authenticator'
+        }
+      });
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'security_key',
+          authenticator: {
+            displayName: 'Security Key or Biometric',
+            id: expect.any(String),
+            key: 'webauthn',
+            methods: [
+              { type: 'webauthn' }
+            ],
+            type: 'security_key',
+            contextualData: {
+              activationData: {
+                rp: {
+                  name: 'Javascript IDX SDK Test Org'
+                },
+                user: {
+                  id: '000000001',
+                  name: 'mary@acme.com',
+                  displayName: 'Mary'
+                },
+                pubKeyCredParams: [{
+                  type: 'public-key',
+                  alg: -7
+                }, {
+                  type: 'public-key',
+                  alg: -257
+                }],
+                challenge: 'CHALLENGE',
+                attestation: 'direct',
+                authenticatorSelection: {
+                  userVerification: 'discouraged',
+                  requireResidentKey: false,
+                }
+              }
+            }
+          },
+          inputs: [
+            { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
+            { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
+          ]
+        }
+      });
+    });
+
+    it('can set an webauthn authenticator on demand', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+        enrollWebauthnAuthenticatorResponse,
+      } = testContext;
+      
+      chainResponses([
+        selectAuthenticatorResponse,
+        enrollWebauthnAuthenticatorResponse
+      ]);
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(selectAuthenticatorResponse);
+
+      let res = await register(authClient, {});
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'select-authenticator-enroll',
+          inputs: [{
+            name: 'authenticator',
+            key: 'string',
+          }],
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }, {
+            label: 'Email',
+            value: AuthenticatorKey.OKTA_EMAIL
+          }, {
+            label: 'Google Authenticator',
+            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+          }, {
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY
+          }, {
+            label: 'Security Key or Biometric',
+            value: AuthenticatorKey.WEBAUTHN
+          }]
+        }
+      });
+
+      res = await register(authClient, {
+        authenticators: [AuthenticatorKey.WEBAUTHN]
+      });
+      // Webauthn authenticator is automatically selected
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-enroll', {
+        authenticator: {
+          id: 'id-webauthn-authenticator'
+        }
+      });
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'security_key',
+          authenticator: {
+            displayName: 'Security Key or Biometric',
+            id: expect.any(String),
+            key: 'webauthn',
+            methods: [
+              { type: 'webauthn' }
+            ],
+            type: 'security_key',
+            contextualData: {
+              activationData: {
+                rp: {
+                  name: 'Javascript IDX SDK Test Org'
+                },
+                user: {
+                  id: '000000001',
+                  name: 'mary@acme.com',
+                  displayName: 'Mary'
+                },
+                pubKeyCredParams: [{
+                  type: 'public-key',
+                  alg: -7
+                }, {
+                  type: 'public-key',
+                  alg: -257
+                }],
+                challenge: 'CHALLENGE',
+                attestation: 'direct',
+                authenticatorSelection: {
+                  userVerification: 'discouraged',
+                  requireResidentKey: false,
+                }
+              }
+            }
+          },
+          inputs: [
+            { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
+            { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
+          ]
+        }
+      });
+    });
+
+    it('can enroll with clientData and attestation', async () => {
+      const {
+        authClient,
+        enrollWebauthnAuthenticatorResponse,
+        selectPhoneResponse,
+      } = testContext;
+
+      chainResponses([
+        enrollWebauthnAuthenticatorResponse,
+        selectPhoneResponse
+      ]);
+      jest.spyOn(enrollWebauthnAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(enrollWebauthnAuthenticatorResponse);
+
+      let res = await register(authClient, {});
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          name: 'enroll-authenticator',
+          type: 'security_key',
+          authenticator: {
+            displayName: 'Security Key or Biometric',
+            id: expect.any(String),
+            key: 'webauthn',
+            methods: [
+              { type: 'webauthn' }
+            ],
+            type: 'security_key',
+            contextualData: {
+              activationData: {
+                rp: {
+                  name: 'Javascript IDX SDK Test Org'
+                },
+                user: {
+                  id: '000000001',
+                  name: 'mary@acme.com',
+                  displayName: 'Mary'
+                },
+                pubKeyCredParams: [{
+                  type: 'public-key',
+                  alg: -7
+                }, {
+                  type: 'public-key',
+                  alg: -257
+                }],
+                challenge: 'CHALLENGE',
+                attestation: 'direct',
+                authenticatorSelection: {
+                  userVerification: 'discouraged',
+                  requireResidentKey: false,
+                }
+              }
+            }
+          },
+          inputs: [
+            { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
+            { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
+          ]
+        }
+      });
+
+      res = await register(authClient, { clientData: 'CLIENT-DATA', attestation: 'ATTESTATION' });
+      expect(enrollWebauthnAuthenticatorResponse.proceed).toHaveBeenCalledWith('enroll-authenticator', {
+        credentials: {
+          clientData: 'CLIENT-DATA',
+          attestation: 'ATTESTATION'
+        }
+      });
+      expect(res).toEqual({
+        _idxResponse: expect.any(Object),
+        status: IdxStatus.PENDING,
+        nextStep: {
+          canSkip: true,
+          name: 'select-authenticator-enroll',
+          inputs: [{
+            name: 'authenticator',
+            key: 'string',
+          }],
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }]
+        }
+      });
     });
   });
 

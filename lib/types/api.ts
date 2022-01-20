@@ -30,7 +30,12 @@ import {
   IdxOptions,
   IdxTransaction,
   IdxTransactionMeta,
-  EmailVerifyCallbackResponse
+  EmailVerifyCallbackResponse,
+  IdxAuthenticator,
+  ChallengeData,
+  ActivationData,
+  WebauthnEnrollValues,
+  WebauthnVerificationValues
 } from '../idx/types';
 import { InteractOptions, InteractResponse } from '../idx/interact';
 import { IntrospectOptions } from '../idx/introspect';
@@ -202,6 +207,22 @@ export interface FeaturesAPI {
   isTokenVerifySupported(): boolean;
   isPKCESupported(): boolean;
   isIE11OrLess(): boolean;
+}
+
+export interface CryptoAPI {
+  base64UrlToBuffer(b64u: string): Uint8Array;
+  bufferToBase64Url(bin: Uint8Array): string;
+}
+
+export interface WebauthnAPI {
+  getAssertion(credential: PublicKeyCredential): WebauthnVerificationValues;
+  getAttestation(credential: PublicKeyCredential): WebauthnEnrollValues;
+  buildCredentialRequestOptions(
+    challengeData: ChallengeData, authenticatorEnrollments: IdxAuthenticator[]
+  ): CredentialRequestOptions;
+  buildCredentialCreationOptions(
+    activationData: ActivationData, authenticatorEnrollments: IdxAuthenticator[]
+  ): CredentialCreationOptions;
 }
 
 export interface SupportsCodeFlow {

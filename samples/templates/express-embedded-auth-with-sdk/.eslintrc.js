@@ -5,7 +5,7 @@ module.exports = {
   },
   ignorePatterns: ['assets/js/*.js'],
   overrides: [{
-    files: ['public/*.js'],
+    files: ['public/*.js', 'web-server/assets/js/*.js'],
     rules: {
       'node/no-unsupported-features/node-builtins': 0
     },

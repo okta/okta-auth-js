@@ -137,7 +137,7 @@ export class Remediator {
   {
     // no attempt to format, we want simple true/false
 
-    // First see if the remediation has a mapping for this vale
+    // First see if the remediation has a mapping for this value
     const data = this.getData(key);
     if (typeof data === 'object') {
       return !!Object.keys(data).find(key => !!data[key]);

@@ -57,7 +57,11 @@ import {
   OktaVerifyAuthenticatorVerificationDataRemediationFactory,
   ChallengePollRemediationFactory,
   VerifyOktaVerifyAuthenticatorRemediationFactory,
-  IdxErrorOktaVerifyPasscodeInvalidFactory, SkipRemediationFactory
+  IdxErrorOktaVerifyPasscodeInvalidFactory, 
+  SkipRemediationFactory,
+  WebauthnAuthenticatorOptionFactory,
+  VerifyWebauthnAuthenticatorRemediationFactory,
+  WebauthnEnrolledAuthenticatorFactory,
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -2071,4 +2075,133 @@ describe('idx/authenticate', () => {
       });
     });
   });
+
+  describe('webauthn', () => {
+    describe('verification', () => {
+      beforeEach(() => {
+        const selectAuthenticatorResponse = IdxResponseFactory.build({
+          neededToProceed: [
+            SelectAuthenticatorAuthenticateRemediationFactory.build({
+              value: [
+                AuthenticatorValueFactory.build({
+                  options: [
+                    WebauthnAuthenticatorOptionFactory.build(),
+                  ]
+                })
+              ]
+            })
+          ],
+        });
+        const verifyAuthenticatorResponse = IdxResponseFactory.build({
+          neededToProceed: [
+            VerifyWebauthnAuthenticatorRemediationFactory.build()
+          ],
+          context: IdxContextFactory.build({
+            authenticatorEnrollments: {
+              type: 'array',
+              value: [
+                WebauthnEnrolledAuthenticatorFactory.build()
+              ]
+            }
+          })
+        });
+        Object.assign(testContext, {
+          selectAuthenticatorResponse,
+          verifyAuthenticatorResponse,
+        });
+      });
+
+      it('can auto-select the webauthn authenticator', async () => {
+        const {
+          authClient,
+          selectAuthenticatorResponse,
+          verifyAuthenticatorResponse
+        } = testContext;
+        chainResponses([
+          selectAuthenticatorResponse,
+          verifyAuthenticatorResponse
+        ]);
+        jest.spyOn(selectAuthenticatorResponse, 'proceed');
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+        const res = await authenticate(authClient, {
+          authenticator: AuthenticatorKey.WEBAUTHN // will remediate select authenticator
+        });
+        expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
+          authenticator: { id: 'id-webauthn-authenticator' } 
+        });
+        expect(res).toEqual({
+          _idxResponse: expect.any(Object),
+          status: IdxStatus.PENDING,
+          nextStep: {
+            name: 'challenge-authenticator',
+            type: 'security_key',
+            authenticator: {
+              displayName: 'Security Key or Biometric',
+              id: expect.any(String),
+              key: 'webauthn',
+              methods: [
+                { type: 'webauthn' }
+              ],
+              type: 'security_key',
+              contextualData: {
+                challengeData: {
+                  challenge: 'CHALLENGE',
+                  userVerification: 'preferred'
+                }
+              }
+            },
+            authenticatorEnrollments: [{
+              id: expect.any(String),
+              displayName: 'MacBook Touch ID',
+              key: 'webauthn',
+              type: 'security_key',
+              methods: [
+                { type: 'webauthn' }
+              ],
+              credentialId: 'CREDENTIAL-ID'
+            }],
+            inputs: [
+              { name: 'authenticatorData', type: 'string', label: 'Authenticator Data', required: true, visible: false },
+              { name: 'clientData', type: 'string', label: 'Client Data', required: true, visible: false },
+              { name: 'signatureData', type: 'string', label: 'Signature Data', required: true, visible: false },
+            ]
+          }
+        });
+      });
+
+      it('can verify webauthn authenticator using clientData, authenticatorData and signatureData', async () => {
+        const {
+          authClient,
+          verifyAuthenticatorResponse,
+          successResponse
+        } = testContext;
+        chainResponses([
+          verifyAuthenticatorResponse,
+          successResponse
+        ]);
+        jest.spyOn(verifyAuthenticatorResponse, 'proceed');
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
+        const res = await authenticate(authClient, {
+          clientData: 'ClIENT-DATA',
+          authenticatorData: 'AUTHENTICATOR-DATA',
+          signatureData: 'SIGNATURE-DATA'
+        });
+        expect(verifyAuthenticatorResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', {
+          credentials: {
+            clientData: 'ClIENT-DATA',
+            authenticatorData: 'AUTHENTICATOR-DATA',
+            signatureData: 'SIGNATURE-DATA'
+          }
+        });
+        expect(res).toEqual({
+          _idxResponse: expect.any(Object),
+          status: IdxStatus.SUCCESS,
+          tokens: {
+            fakeToken: true
+          }
+        });
+      });
+    });
+  });
+
 });

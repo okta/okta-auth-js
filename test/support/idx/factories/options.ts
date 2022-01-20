@@ -19,7 +19,8 @@ import {
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory,
   GoogleAuthenticatorFactory,
-  SecurityQuestionAuthenticatorFactory
+  SecurityQuestionAuthenticatorFactory,
+  WebauthnAuthenticatorFactory
 } from './authenticators';
 import {
   IdxFormFactory,
@@ -28,7 +29,8 @@ import {
   PasswordAuthenticatorFormFactory,
   GoogleAuthenticatorFormFactory,
   SecurityQuestionAuthenticatorFormFactory,
-  OktaVerifyAuthenticatorFormFactory
+  OktaVerifyAuthenticatorFormFactory,
+  WebauthnAuthenticatorFormFactory
 } from './forms';
 
 interface MockedIdxOption extends IdxOption {
@@ -100,5 +102,12 @@ export const SecurityQuestionAuthenticatorOptionFactory = AuthenticatorOptionFac
   _authenticator: SecurityQuestionAuthenticatorFactory.build(),
   value: {
     form: SecurityQuestionAuthenticatorFormFactory.build()
+  }
+});
+
+export const WebauthnAuthenticatorOptionFactory = AuthenticatorOptionFactory.params({
+  _authenticator: WebauthnAuthenticatorFactory.build(),
+  value: {
+    form: WebauthnAuthenticatorFormFactory.build()
   }
 });
