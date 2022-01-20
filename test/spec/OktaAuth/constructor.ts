@@ -162,22 +162,6 @@ describe('OktaAuth (constructor)', () => {
     });
   });
 
-  // TODO: remove in 6.0
-  describe('userAgent', () => {
-    let sdkVersion;
-    beforeEach(async () => {
-      sdkVersion = (await import('../../../package.json')).version;
-    });
-
-    // browser env is tested in "./browser.ts"
-    it('initials userAgent field for node env', () => {
-      jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(false);
-      const config = { issuer: 'http://fake' };
-      const oa = new OktaAuth(config);
-      expect(oa.userAgent).toBe(`okta-auth-js-server/${sdkVersion}`);
-    });
-  });
-
   it('sets global headers for idx requests', () => {
     const config = { issuer: 'http://fake' };
     // eslint-disable-next-line no-new
