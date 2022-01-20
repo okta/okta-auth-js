@@ -1,4 +1,4 @@
-import { Authenticator } from './Authenticator';
+import { Authenticator, Credentials } from './Authenticator';
 
 export interface OktaPasswordInputValues {
   password?: string;
@@ -9,7 +9,7 @@ export class OktaPassword extends Authenticator<OktaPasswordInputValues> {
     return !!values.password;
   }
 
-  mapCredentials(values: OktaPasswordInputValues) {
+  mapCredentials(values: OktaPasswordInputValues): Credentials {
     return { passcode: values.password };
   }
 

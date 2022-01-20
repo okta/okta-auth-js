@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Authenticator } from './Authenticator';
+import { Authenticator, Credentials } from './Authenticator';
 
 export interface SecurityQuestionVerificationValues {
   answer?: string;
@@ -10,7 +10,7 @@ export class SecurityQuestionVerification extends Authenticator<SecurityQuestion
     return !!values.answer;
   }
 
-  mapCredentials(values: SecurityQuestionVerificationValues) {
+  mapCredentials(values: SecurityQuestionVerificationValues): Credentials {
     return {
       questionKey: this.meta.contextualData!.enrolledQuestion!.questionKey,
       answer: values.answer

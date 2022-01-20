@@ -1,4 +1,4 @@
-import { Authenticator } from './Authenticator';
+import { Authenticator, Credentials } from './Authenticator';
 
 export interface SecurityQuestionEnrollValues {
   questionKey?: string;
@@ -12,7 +12,7 @@ export class SecurityQuestionEnrollment extends Authenticator<SecurityQuestionEn
     return !!(questionKey && answer) || !!(question && answer);
   }
 
-  mapCredentials(values: SecurityQuestionEnrollValues) {
+  mapCredentials(values: SecurityQuestionEnrollValues): Credentials {
     const { questionKey, question, answer } = values;
     return {
       questionKey: question ? 'custom' : questionKey,

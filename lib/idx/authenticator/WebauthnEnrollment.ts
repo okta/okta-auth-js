@@ -1,4 +1,4 @@
-import { Authenticator } from './Authenticator';
+import { Authenticator, Credentials } from './Authenticator';
 
 export interface WebauthnEnrollValues {
   clientData?: string;
@@ -11,7 +11,7 @@ export class WebauthnEnrollment extends Authenticator<WebauthnEnrollValues> {
     return !!(clientData && attestation);
   }
 
-  mapCredentials(values: WebauthnEnrollValues) {
+  mapCredentials(values: WebauthnEnrollValues): Credentials {
     const { clientData, attestation } = values;
     return {
       clientData,
