@@ -2077,51 +2077,48 @@ describe('idx/register', () => {
           id: 'id-webauthn-authenticator'
         }
       });
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
-        status: IdxStatus.PENDING,
-        nextStep: {
-          name: 'enroll-authenticator',
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        name: 'enroll-authenticator',
+        type: 'security_key',
+        authenticator: {
+          displayName: 'Security Key or Biometric',
+          id: expect.any(String),
+          key: 'webauthn',
+          methods: [
+            { type: 'webauthn' }
+          ],
           type: 'security_key',
-          authenticator: {
-            displayName: 'Security Key or Biometric',
-            id: expect.any(String),
-            key: 'webauthn',
-            methods: [
-              { type: 'webauthn' }
-            ],
-            type: 'security_key',
-            contextualData: {
-              activationData: {
-                rp: {
-                  name: 'Javascript IDX SDK Test Org'
-                },
-                user: {
-                  id: '000000001',
-                  name: 'mary@acme.com',
-                  displayName: 'Mary'
-                },
-                pubKeyCredParams: [{
-                  type: 'public-key',
-                  alg: -7
-                }, {
-                  type: 'public-key',
-                  alg: -257
-                }],
-                challenge: 'CHALLENGE',
-                attestation: 'direct',
-                authenticatorSelection: {
-                  userVerification: 'discouraged',
-                  requireResidentKey: false,
-                }
+          contextualData: {
+            activationData: {
+              rp: {
+                name: 'Javascript IDX SDK Test Org'
+              },
+              user: {
+                id: '000000001',
+                name: 'mary@acme.com',
+                displayName: 'Mary'
+              },
+              pubKeyCredParams: [{
+                type: 'public-key',
+                alg: -7
+              }, {
+                type: 'public-key',
+                alg: -257
+              }],
+              challenge: 'CHALLENGE',
+              attestation: 'direct',
+              authenticatorSelection: {
+                userVerification: 'discouraged',
+                requireResidentKey: false,
               }
             }
-          },
-          inputs: [
-            { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
-            { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
-          ]
-        }
+          }
+        },
+        inputs: [
+          { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
+          { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
+        ]
       });
     });
 
@@ -2141,35 +2138,32 @@ describe('idx/register', () => {
         .mockResolvedValue(selectAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
-        status: IdxStatus.PENDING,
-        nextStep: {
-          name: 'select-authenticator-enroll',
-          inputs: [{
-            name: 'authenticator',
-            key: 'string',
-          }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }, {
-            label: 'Email',
-            value: AuthenticatorKey.OKTA_EMAIL
-          }, {
-            label: 'Google Authenticator',
-            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }, {
-            label: 'Security Question',
-            value: AuthenticatorKey.SECURITY_QUESTION
-          }, {
-            label: 'Okta Verify',
-            value: AuthenticatorKey.OKTA_VERIFY
-          }, {
-            label: 'Security Key or Biometric',
-            value: AuthenticatorKey.WEBAUTHN
-          }]
-        }
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        name: 'select-authenticator-enroll',
+        inputs: [{
+          name: 'authenticator',
+          key: 'string',
+        }],
+        options: [{
+          label: 'Phone',
+          value: AuthenticatorKey.PHONE_NUMBER
+        }, {
+          label: 'Email',
+          value: AuthenticatorKey.OKTA_EMAIL
+        }, {
+          label: 'Google Authenticator',
+          value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+        }, {
+          label: 'Security Question',
+          value: AuthenticatorKey.SECURITY_QUESTION
+        }, {
+          label: 'Okta Verify',
+          value: AuthenticatorKey.OKTA_VERIFY
+        }, {
+          label: 'Security Key or Biometric',
+          value: AuthenticatorKey.WEBAUTHN
+        }]
       });
 
       res = await register(authClient, {
@@ -2181,51 +2175,48 @@ describe('idx/register', () => {
           id: 'id-webauthn-authenticator'
         }
       });
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
-        status: IdxStatus.PENDING,
-        nextStep: {
-          name: 'enroll-authenticator',
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        name: 'enroll-authenticator',
+        type: 'security_key',
+        authenticator: {
+          displayName: 'Security Key or Biometric',
+          id: expect.any(String),
+          key: 'webauthn',
+          methods: [
+            { type: 'webauthn' }
+          ],
           type: 'security_key',
-          authenticator: {
-            displayName: 'Security Key or Biometric',
-            id: expect.any(String),
-            key: 'webauthn',
-            methods: [
-              { type: 'webauthn' }
-            ],
-            type: 'security_key',
-            contextualData: {
-              activationData: {
-                rp: {
-                  name: 'Javascript IDX SDK Test Org'
-                },
-                user: {
-                  id: '000000001',
-                  name: 'mary@acme.com',
-                  displayName: 'Mary'
-                },
-                pubKeyCredParams: [{
-                  type: 'public-key',
-                  alg: -7
-                }, {
-                  type: 'public-key',
-                  alg: -257
-                }],
-                challenge: 'CHALLENGE',
-                attestation: 'direct',
-                authenticatorSelection: {
-                  userVerification: 'discouraged',
-                  requireResidentKey: false,
-                }
+          contextualData: {
+            activationData: {
+              rp: {
+                name: 'Javascript IDX SDK Test Org'
+              },
+              user: {
+                id: '000000001',
+                name: 'mary@acme.com',
+                displayName: 'Mary'
+              },
+              pubKeyCredParams: [{
+                type: 'public-key',
+                alg: -7
+              }, {
+                type: 'public-key',
+                alg: -257
+              }],
+              challenge: 'CHALLENGE',
+              attestation: 'direct',
+              authenticatorSelection: {
+                userVerification: 'discouraged',
+                requireResidentKey: false,
               }
             }
-          },
-          inputs: [
-            { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
-            { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
-          ]
-        }
+          }
+        },
+        inputs: [
+          { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
+          { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
+        ]
       });
     });
 
@@ -2245,51 +2236,48 @@ describe('idx/register', () => {
         .mockResolvedValue(enrollWebauthnAuthenticatorResponse);
 
       let res = await register(authClient, {});
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
-        status: IdxStatus.PENDING,
-        nextStep: {
-          name: 'enroll-authenticator',
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        name: 'enroll-authenticator',
+        type: 'security_key',
+        authenticator: {
+          displayName: 'Security Key or Biometric',
+          id: expect.any(String),
+          key: 'webauthn',
+          methods: [
+            { type: 'webauthn' }
+          ],
           type: 'security_key',
-          authenticator: {
-            displayName: 'Security Key or Biometric',
-            id: expect.any(String),
-            key: 'webauthn',
-            methods: [
-              { type: 'webauthn' }
-            ],
-            type: 'security_key',
-            contextualData: {
-              activationData: {
-                rp: {
-                  name: 'Javascript IDX SDK Test Org'
-                },
-                user: {
-                  id: '000000001',
-                  name: 'mary@acme.com',
-                  displayName: 'Mary'
-                },
-                pubKeyCredParams: [{
-                  type: 'public-key',
-                  alg: -7
-                }, {
-                  type: 'public-key',
-                  alg: -257
-                }],
-                challenge: 'CHALLENGE',
-                attestation: 'direct',
-                authenticatorSelection: {
-                  userVerification: 'discouraged',
-                  requireResidentKey: false,
-                }
+          contextualData: {
+            activationData: {
+              rp: {
+                name: 'Javascript IDX SDK Test Org'
+              },
+              user: {
+                id: '000000001',
+                name: 'mary@acme.com',
+                displayName: 'Mary'
+              },
+              pubKeyCredParams: [{
+                type: 'public-key',
+                alg: -7
+              }, {
+                type: 'public-key',
+                alg: -257
+              }],
+              challenge: 'CHALLENGE',
+              attestation: 'direct',
+              authenticatorSelection: {
+                userVerification: 'discouraged',
+                requireResidentKey: false,
               }
             }
-          },
-          inputs: [
-            { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
-            { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
-          ]
-        }
+          }
+        },
+        inputs: [
+          { name: 'clientData', type: 'string', required: true, visible: false, label: 'Client Data' },
+          { name: 'attestation', type: 'string', required: true, visible: false, label: 'Attestation' },
+        ]
       });
 
       res = await register(authClient, { clientData: 'CLIENT-DATA', attestation: 'ATTESTATION' });
@@ -2299,21 +2287,18 @@ describe('idx/register', () => {
           attestation: 'ATTESTATION'
         }
       });
-      expect(res).toEqual({
-        _idxResponse: expect.any(Object),
-        status: IdxStatus.PENDING,
-        nextStep: {
-          canSkip: true,
-          name: 'select-authenticator-enroll',
-          inputs: [{
-            name: 'authenticator',
-            key: 'string',
-          }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }]
-        }
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        canSkip: true,
+        name: 'select-authenticator-enroll',
+        inputs: [{
+          name: 'authenticator',
+          key: 'string',
+        }],
+        options: [{
+          label: 'Phone',
+          value: AuthenticatorKey.PHONE_NUMBER
+        }]
       });
     });
   });

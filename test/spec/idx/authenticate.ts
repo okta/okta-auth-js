@@ -2129,43 +2129,40 @@ describe('idx/authenticate', () => {
         expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
           authenticator: { id: 'id-webauthn-authenticator' } 
         });
-        expect(res).toEqual({
-          _idxResponse: expect.any(Object),
-          status: IdxStatus.PENDING,
-          nextStep: {
-            name: 'challenge-authenticator',
+        expect(res.status).toBe(IdxStatus.PENDING);
+        expect(res.nextStep).toEqual({
+          name: 'challenge-authenticator',
+          type: 'security_key',
+          authenticator: {
+            displayName: 'Security Key or Biometric',
+            id: expect.any(String),
+            key: 'webauthn',
+            methods: [
+              { type: 'webauthn' }
+            ],
             type: 'security_key',
-            authenticator: {
-              displayName: 'Security Key or Biometric',
-              id: expect.any(String),
-              key: 'webauthn',
-              methods: [
-                { type: 'webauthn' }
-              ],
-              type: 'security_key',
-              contextualData: {
-                challengeData: {
-                  challenge: 'CHALLENGE',
-                  userVerification: 'preferred'
-                }
+            contextualData: {
+              challengeData: {
+                challenge: 'CHALLENGE',
+                userVerification: 'preferred'
               }
-            },
-            authenticatorEnrollments: [{
-              id: expect.any(String),
-              displayName: 'MacBook Touch ID',
-              key: 'webauthn',
-              type: 'security_key',
-              methods: [
-                { type: 'webauthn' }
-              ],
-              credentialId: 'CREDENTIAL-ID'
-            }],
-            inputs: [
-              { name: 'authenticatorData', type: 'string', label: 'Authenticator Data', required: true, visible: false },
-              { name: 'clientData', type: 'string', label: 'Client Data', required: true, visible: false },
-              { name: 'signatureData', type: 'string', label: 'Signature Data', required: true, visible: false },
-            ]
-          }
+            }
+          },
+          authenticatorEnrollments: [{
+            id: expect.any(String),
+            displayName: 'MacBook Touch ID',
+            key: 'webauthn',
+            type: 'security_key',
+            methods: [
+              { type: 'webauthn' }
+            ],
+            credentialId: 'CREDENTIAL-ID'
+          }],
+          inputs: [
+            { name: 'authenticatorData', type: 'string', label: 'Authenticator Data', required: true, visible: false },
+            { name: 'clientData', type: 'string', label: 'Client Data', required: true, visible: false },
+            { name: 'signatureData', type: 'string', label: 'Signature Data', required: true, visible: false },
+          ]
         });
       });
 
@@ -2193,12 +2190,9 @@ describe('idx/authenticate', () => {
             signatureData: 'SIGNATURE-DATA'
           }
         });
-        expect(res).toEqual({
-          _idxResponse: expect.any(Object),
-          status: IdxStatus.SUCCESS,
-          tokens: {
-            fakeToken: true
-          }
+        expect(res.status).toBe(IdxStatus.SUCCESS);
+        expect(res.tokens).toEqual({
+          fakeToken: true
         });
       });
     });
