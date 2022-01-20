@@ -17,8 +17,13 @@
 // TODO: use AuthJS http agent for IDX API requests. OKTA-417473
 import { OktaAuth } from '../types';
 import idx from '@okta/okta-idx-js';
+
 export function setGlobalRequestInterceptor(fn) {
   idx.client.interceptors.request.use(fn);
+}
+
+export function clearGlobalRequestInterceptor() {
+  idx.client.interceptors.request.clear();
 }
 
 // A factory which returns a function that can be passed to `setGlobalRequestInterceptor`
@@ -30,6 +35,12 @@ export function createGlobalRequestInterceptor(sdk: OktaAuth) {
       ...oktaUserAgentHeader
     }, sdk.options.headers);
     Object.keys(headers).forEach(name => {
+      // X-Device-Token may only be specified if the /interact request includes a `client_secret`
+      // which indicates a trusted client which is allowed to present this information on behalf of the end user. 
+      // https://oktainc.atlassian.net/browse/OKTA-441021
+      if (!sdk.options.clientSecret && name === 'X-Device-Token') {
+        return;
+      }
       requestConfig.headers[name] = headers[name];
     });
   };

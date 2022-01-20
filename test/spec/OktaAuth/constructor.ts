@@ -24,6 +24,19 @@ jest.mock('../../../lib/features', () => {
   };
 });
 
+jest.mock('../../../lib/idx/headers', () => {
+  return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...jest.requireActual('../../../lib/idx/headers') as any,
+    setGlobalRequestInterceptor: jest.fn()
+  };
+});
+
+const mocked = {
+  features: require('../../../lib/features'),
+  idxHeaders: require('../../../lib/idx/headers')
+};
+
 describe('OktaAuth (constructor)', () => {
   const apiUrlOptions = [
     'issuer',
@@ -147,6 +160,29 @@ describe('OktaAuth (constructor)', () => {
       const oa = new OktaAuth(config);
       expect(oa.authStateManager).toBeDefined();
     });
+  });
+
+  // TODO: remove in 6.0
+  describe('userAgent', () => {
+    let sdkVersion;
+    beforeEach(async () => {
+      sdkVersion = (await import('../../../package.json')).version;
+    });
+
+    // browser env is tested in "./browser.ts"
+    it('initials userAgent field for node env', () => {
+      jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(false);
+      const config = { issuer: 'http://fake' };
+      const oa = new OktaAuth(config);
+      expect(oa.userAgent).toBe(`okta-auth-js-server/${sdkVersion}`);
+    });
+  });
+
+  it('sets global headers for idx requests', () => {
+    const config = { issuer: 'http://fake' };
+    // eslint-disable-next-line no-new
+    new OktaAuth(config);
+    expect(mocked.idxHeaders.setGlobalRequestInterceptor).toHaveBeenCalled();
   });
 
 });
