@@ -74,7 +74,9 @@ Then(
 
 Then(
   /^she is redirected to the ([\s\w]+)$/,
-  checkIsOnPage
+  async function(this: ActionContext, pageName: string) {
+    await checkIsOnPage(pageName, this.disableEmailVerification);
+  }
 );
 
 Then(
@@ -89,32 +91,32 @@ Then(
   
 Then(
   /^She sees a list of factors$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
   /^she sees a list of available factors to setup$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
   /^she sees a list of factors to register$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
   /^she sees the list of required factors \(Google Authenticator\) to enroll$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
   /^she sees the Select Authenticator page with password as the only option$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
   /^she sees a page to select authenticator/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
@@ -129,27 +131,27 @@ Then(
 
 Then(
   /^she sees a page to challenge her email authenticator$/,
-  checkIsOnPage.bind(null, 'Challenge email authenticator')
+  () => checkIsOnPage('Challenge email authenticator')
 );
 
 Then(
   /^she sees a page to input a code for email authenticator enrollment$/,
-  checkIsOnPage.bind(null, 'Enroll email authenticator')
+  () => checkIsOnPage('Enroll email authenticator')
 );
 
 Then(
   /^she sees a page to set her password$/,
-  checkIsOnPage.bind(null, 'Reset Password')
+  () => checkIsOnPage('Reset Password')
 );
 
 Then(
   /^she sees the set new password form$/,
-  checkIsOnPage.bind(null, 'Set up Password')
+  () => checkIsOnPage('Set up Password')
 );
 
 Then(
   /^she is presented with a list of factors$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
@@ -157,15 +159,15 @@ Then(
   async function(this: ActionContext) {
     let pageName;
     if (this.featureName.includes('Google Authenticator')) {
-      if (this.scenarioName.includes('enroll')) {
-        pageName = 'Enroll Google Authenticator';
-      } else {
+      if (this.scenarioName.includes('Signs in')) {
         pageName = 'Challenge Google Authenticator';
+      } else {
+        pageName = 'Enroll Google Authenticator';
       }
     } else {
       pageName = 'Enroll Factor: Enter SMS Code';
     }
-    checkIsOnPage.bind(null, pageName);
+    checkIsOnPage(pageName);
   }
 );
 
@@ -186,22 +188,22 @@ Then(
 
 Then(
   /^she is presented with an option to select SMS to verify$/,
-  checkIsOnPage.bind(null, 'Verify using phone authenticator')
+  () => checkIsOnPage('Verify using phone authenticator')
 );
 
 Then(
   /^she is presented with an option to select Email to verify$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
   /^she is presented with an option to select Security Question to verify$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
   /^the screen changes to receive an input for a code to verify$/,
-  checkIsOnPage.bind(null, 'Challenge phone authenticator')
+  () => checkIsOnPage('Challenge phone authenticator')
 );
 
 Then(
@@ -211,7 +213,7 @@ Then(
 
 Then(
   /^she sees a field to re-enter another code$/,
-  checkIsOnPage.bind(null, 'Challenge phone authenticator')
+  () => checkIsOnPage('Challenge phone authenticator')
 );
 
 Then(
@@ -238,17 +240,17 @@ Then(
 
 Then(
   /^she is presented with an option to select SMS to enroll$/,
-  checkIsOnPage.bind(null, 'Select authenticator')
+  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
   /^the screen changes to receive an input for a Email code$/,
-  checkIsOnPage.bind(null, 'Enter Code')
+  () => checkIsOnPage('Enter Code')
 );
 
 Then(
   /^the screen changes to challenge the Security Question$/,
-  checkIsOnPage.bind(null, 'Challenge Security Question')
+  () => checkIsOnPage('Challenge Security Question')
 );
 
 // import checkClass from '../support/check/checkClass';

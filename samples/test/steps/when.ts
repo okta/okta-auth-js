@@ -88,7 +88,7 @@ When(
 );
 
 When(
-  /^she fills out (?:her\s)?(First Name|Last Name|Email|another property)$/,
+  /^she fills out (?:her\s)?(First Name|Last Name|Email|another property|Age)$/,
   enterRegistrationField
 );
 
@@ -293,7 +293,7 @@ When(
 );
 
 When(
-  /^she selects "Skip" .*$/,
+  /^she selects "Skip".*$/,
   skipForm
 );
 

@@ -12,3 +12,6 @@ Password + Another Factor:
 Custom Profile Enrolment Policy:
   CLIENT_ID: REPLACE_CUSTOM_CLIENT_ID
   CLIENT_SECRET: REPLACE_CUSTOM_CLIENT_SECRET
+Password and Google Authenticator Required:
+  CLIENT_ID: REPLACE_TOTP_CLIENT_ID
+  CLIENT_SECRET: REPLACE_TOTP_CLIENT_SECRET
