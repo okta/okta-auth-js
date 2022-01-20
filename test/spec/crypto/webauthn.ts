@@ -11,7 +11,6 @@
  */
 
 
-/* global atob */
 import {
   buildCredentialCreationOptions,
   buildCredentialRequestOptions,

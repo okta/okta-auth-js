@@ -9,6 +9,7 @@ import { WebauthnVerification } from './WebauthnVerification';
 import { IdxAuthenticator, IdxRemediation } from '../types/idx-js';
 import { AuthenticatorKey } from '../types';
 
+/* eslint complexity:[0,8] */
 export function getAuthenticator(remediation: IdxRemediation): Authenticator<any> {
   const relatesTo = remediation.relatesTo;
   const value = relatesTo?.value || {} as IdxAuthenticator;
