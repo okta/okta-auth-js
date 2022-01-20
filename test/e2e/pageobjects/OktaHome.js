@@ -48,12 +48,13 @@ class OktaHome {
 
   async closeInitialPopUp() {
     // If this is newly created org, there is a "help" window that pops up. We need to close that.
-    await this.popUpCloseButton.then(el => { if(el.isExisting()) {
-        el.click();
-      } else {
-        // Do nothing
-      }
-    });
+    const el = await this.popUpCloseButton;
+    const isExisting = await el.isExisting();
+    if (isExisting) {
+      el.click();
+    } else {
+      // Do nothing
+    }
   }
 }
 
