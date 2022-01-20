@@ -20,17 +20,33 @@
         {{>formMessages}}
       </div>
 
-      {{#contextualData}}
+      {{#contextualData.qrcode}}
         <div class="ui segments">
           <div class="ui segment">
-            {{#contextualData.qrcode}}
               <div class="ui fluid image">
                 <img id="authenticator-qr-code" src="{{contextualData.qrcode.href}}" />
               </div>
-            {{/contextualData.qrcode}}
           </div>
         </div>
-      {{/contextualData}}
+      {{/contextualData.qrcode}}
+      {{#contextualData.phoneNumber}}
+        <div class="ui positive message">
+        We sent an SMS to {{{contextualData.phoneNumber}}} with an Okta Verify setup link. To continue, open the link on your mobile device.
+        </div>
+      {{/contextualData.phoneNumber}}
+      {{#contextualData.email}}
+        <div class="ui positive message">
+        We sent an Email to {{{contextualData.email}}} with an Okta Verify setup link. To continue, open the link in your email.
+        </div>
+      {{/contextualData.email}}
+      <div class="row">
+      {{#availableSteps}}
+        <form id="{{stepName}}-form" action="{{selectStepAction}}" method="POST">
+          <input type="hidden" name="step" value="{{stepName}}"/>
+          <button id="submit-button" class="ui fluid primary submit button" type="submit">{{actionDisplayName}}</button>
+        </form>
+      {{/availableSteps}}
+      </div>
       <div class="row">
       {{>cancel}}
       </div>

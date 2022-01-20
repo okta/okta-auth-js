@@ -29,7 +29,9 @@ import {
   UserProfileFormFactory, 
   VerifyEmailFormFactory, 
   VerifySmsFormFactory,
-  VerifyPasscodeFormFactory, OktaVerifyAuthenticatorFormFactory
+  VerifyPasscodeFormFactory,
+  OktaVerifyAuthenticatorFormFactory,
+  OktaVerifyAuthenticatorEnollmentChannelFormFactory
 } from './forms';
 import {
   UsernameValueFactory,
@@ -37,7 +39,7 @@ import {
   AuthenticatorValueFactory,
   CredentialsValueFactory,
   IdxValueFactory,
-  NewPasswordValueFactory,
+  NewPasswordValueFactory, EmailValueFactory, PhoneNumberValueFactory
 } from './values';
 
 interface MockedIdxRemediation extends IdxRemediation {
@@ -364,4 +366,28 @@ export const EnrollPollRemediationFactory = IdxRemediationFactory.params({
 
 export const ChallengePollRemediationFactory = EnrollPollRemediationFactory.params({
   name: 'challenge-poll'
+});
+
+export const SelectEnrollmentChannelRemediationFactory = IdxRemediationFactory.params({
+  name: 'select-enrollment-channel',
+  value: [
+    AuthenticatorValueFactory.build({
+      label: 'Okta Verify',
+      value: OktaVerifyAuthenticatorEnollmentChannelFormFactory.build()
+    }),
+  ]
+});
+
+export const EnrollmentChannelDataEmailRemediationFactory = IdxRemediationFactory.params({
+  name: 'enrollment-channel-data',
+  value: [
+    EmailValueFactory.build()
+  ]
+});
+
+export const EnrollmentChannelDataSmsRemediationFactory = IdxRemediationFactory.params({
+  name: 'enrollment-channel-data',
+  value: [
+    PhoneNumberValueFactory.build()
+  ]
 });

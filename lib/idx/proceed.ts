@@ -17,7 +17,10 @@ import {
 } from '../types';
 import { run } from './run';
 import { AuthenticationOptions } from './authenticate';
-import { EnrollPollValues as EnrollPollOptions} from './remediators';
+import {
+  EnrollPollValues as EnrollPollOptions,
+  SelectEnrollmentChannelValues as SelectEnrollmentChannelOptions
+} from './remediators';
 import { RegistrationOptions } from './register';
 import { PasswordRecoveryOptions } from './recoverPassword';
 import { getSavedTransactionMeta } from './transactionMeta';
@@ -27,7 +30,9 @@ import { AuthSdkError } from '../errors';
 export type ProceedOptions = AuthenticationOptions
   & RegistrationOptions
   & PasswordRecoveryOptions
-  & EnrollPollOptions;
+  & EnrollPollOptions
+  & SelectEnrollmentChannelOptions
+  & { step?: string };
 
 export function canProceed(authClient: OktaAuth, options?: { state?: string }) {
   const meta = getSavedTransactionMeta(authClient, options);

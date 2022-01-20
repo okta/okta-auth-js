@@ -38,6 +38,13 @@ export function getRemediator(
   const { remediators } = options;
 
   let remediator;
+  // remediation name specified by caller - fast-track remediator lookup 
+  if (options.step) {
+    const remediation = idxRemediations.find(({ name }) => name === options.step);
+    const T = remediators[remediation.name];
+    return new T(remediation, values);
+  }
+
   const remediatorCandidates = [];
   for (let remediation of idxRemediations) {
     const isRemeditionInFlow = Object.keys(remediators).includes(remediation.name);

@@ -141,7 +141,7 @@ describe('idx/authenticate', () => {
     const identifyResponse = IdentifyResponseFactory.build();
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
     const res = await authenticate(authClient, {});
-    expect(res).toEqual({
+    expect(res).toEqual(expect.objectContaining({
       _idxResponse: expect.any(Object),
       status: IdxStatus.PENDING,
       nextStep: {
@@ -151,7 +151,7 @@ describe('idx/authenticate', () => {
           label: 'Username'
         }]
       }
-    });
+    }));
   });
 
   describe('error handling', () => {
@@ -696,7 +696,7 @@ describe('idx/authenticate', () => {
             authenticators: [AuthenticatorKey.PHONE_NUMBER] // will remediate select authenticator
           });
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' } });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
@@ -720,7 +720,7 @@ describe('idx/authenticate', () => {
                 { label: 'Voice call', value: 'voice' },
               ]
             }
-          });
+          }));
         });
 
         it('can verify phone authenticator using a code', async () => {
@@ -783,7 +783,7 @@ describe('idx/authenticate', () => {
               passcode: 'invalid-test-code'
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
@@ -814,7 +814,7 @@ describe('idx/authenticate', () => {
                 type: 'phone',
               },
             }
-          });
+          }));
         });
       });
 
@@ -915,7 +915,7 @@ describe('idx/authenticate', () => {
               phoneNumber: '(555) 555-5555'
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
@@ -938,7 +938,7 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }]
             }
-          });
+          }));
         });
 
         it('can provide phoneNumber and methodType on demand', async () => {
@@ -964,7 +964,7 @@ describe('idx/authenticate', () => {
             .toHaveBeenCalledWith('select-authenticator-enroll', {
               authenticator: { id: 'id-phone' }
             });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
@@ -989,7 +989,7 @@ describe('idx/authenticate', () => {
                 { label: 'Voice call', value: 'voice' },
               ],
             }
-          });
+          }));
 
           res = await authenticate(authClient, {
             phoneNumber: '(555) 555-5555', methodType: 'sms'
@@ -1048,7 +1048,7 @@ describe('idx/authenticate', () => {
               phoneNumber
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
@@ -1080,7 +1080,7 @@ describe('idx/authenticate', () => {
                 { label: 'Voice call', value: 'voice' }
               ],
             }
-          });
+          }));
 
         });
       });
@@ -1194,7 +1194,7 @@ describe('idx/authenticate', () => {
               passcode: 'invalid-test-code'
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
@@ -1226,7 +1226,7 @@ describe('idx/authenticate', () => {
                 type: 'email',
               },
             }
-          });
+          }));
         });
       });
 
@@ -1302,7 +1302,7 @@ describe('idx/authenticate', () => {
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
             authenticator: { id: 'id-google-authenticator' } 
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
@@ -1332,7 +1332,7 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }]
             }
-          });
+          }));
         });
 
         it('can verify google authenticator using a code', async () => {
@@ -1382,7 +1382,7 @@ describe('idx/authenticate', () => {
               passcode: 'invalid-test-code'
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
@@ -1419,7 +1419,7 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }]
             }
-          });
+          }));
         });
       });
 
@@ -1474,7 +1474,7 @@ describe('idx/authenticate', () => {
               id: 'id-google-authenticator'
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
@@ -1504,7 +1504,7 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }]
             }
-          });
+          }));
         });
 
         it('returns a PENDING error if an invalid code was entered', async () => {
@@ -1525,7 +1525,7 @@ describe('idx/authenticate', () => {
               passcode: verificationCode
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
@@ -1562,7 +1562,7 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }]
             }
-          });
+          }));
 
         });
       });
@@ -1660,7 +1660,7 @@ describe('idx/authenticate', () => {
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', {
             authenticator: { id: 'id-okta-verify-authenticator' }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
@@ -1683,7 +1683,7 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }]
             }
-          });
+          }));
         });
 
         it('can verify Okta Verify using a code', async () => {
@@ -1733,7 +1733,7 @@ describe('idx/authenticate', () => {
               totp: 'invalid-test-code'
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             messages: [{
@@ -1764,7 +1764,7 @@ describe('idx/authenticate', () => {
                 type: 'string',
               }]
             }
-          });
+          }));
         });
 
         it('can select verification method type and verify Okta Verify via push', async () => {
@@ -1790,19 +1790,20 @@ describe('idx/authenticate', () => {
               methodType: 'push',
             },
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
               authenticator: undefined,
               name: 'challenge-poll',
+              inputs: [],
               poll: {
                 refresh: 100,
                 required: true,
               },
               canResend: true
             },
-          });
+          }));
         });
       });
 
@@ -1838,7 +1839,7 @@ describe('idx/authenticate', () => {
           });
         });
 
-        it('can select OktaVerify', async () => {
+        it('can select Okta Verify', async () => {
           const {
             authClient,
             selectAuthenticatorResponse,
@@ -1861,11 +1862,12 @@ describe('idx/authenticate', () => {
               id: 'id-okta-verify-authenticator'
             }
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
               name: 'enroll-poll',
+              inputs: [],
               authenticator: {
                 displayName: 'Okta Verify',
                 id: expect.any(String),
@@ -1889,7 +1891,7 @@ describe('idx/authenticate', () => {
                 'required': true,
               },
             }
-          });
+          }));
 
         });
       });
@@ -1942,7 +1944,7 @@ describe('idx/authenticate', () => {
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
             authenticator: { id: 'id-security-question-authenticator' } 
           });
-          expect(res).toEqual({
+          expect(res).toEqual(expect.objectContaining({
             _idxResponse: expect.any(Object),
             status: IdxStatus.PENDING,
             nextStep: {
@@ -1967,7 +1969,7 @@ describe('idx/authenticate', () => {
                 { name: 'answer', type: 'string', label: 'Answer', required: true }
               ]
             }
-          });
+          }));
         });
 
         it('can verify security question authenticator using an answer', async () => {

@@ -25,7 +25,7 @@ import {
   NextStep,
   FlowIdentifier,
 } from '../types';
-import { IdxResponse, IdxRemediation } from './types/idx-js';
+import { IdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta } from './transactionMeta';
 import { ProceedOptions } from './proceed';
 
@@ -54,7 +54,7 @@ function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
   return res;
 }
 
-function getAvailableSteps(remediations: IdxRemediation[]): NextStep[] {
+function getAvailableSteps(idxResponse: IdxResponse): NextStep[] {
   const res = [];
 
   const remediatorMap = Object.values(remediators).reduce((map, remediatorClass) => {
@@ -65,11 +65,11 @@ function getAvailableSteps(remediations: IdxRemediation[]): NextStep[] {
     return map;
   }, {});
 
-  for (let remediation of remediations) {
+  for (let remediation of idxResponse.neededToProceed) {
     const T = remediatorMap[remediation.name];
     if (T) {
       const remediator = new T(remediation);
-      res.push (remediator.getNextStep());
+      res.push (remediator.getNextStep(idxResponse.context));
     }
   }
 
@@ -121,7 +121,7 @@ export async function run(
       // handle start transaction
       meta = metaFromResp;
       enabledFeatures = getEnabledFeatures(idxResponse);
-      availableSteps = getAvailableSteps(idxResponse.neededToProceed);
+      availableSteps = getAvailableSteps(idxResponse);
     } else {
       const values: remediators.RemediationValues = { 
         ...options, 
@@ -141,9 +141,10 @@ export async function run(
       nextStep = nextStepFromResp;
       messages = messagesFromResp;
 
-      // Save intermediate idx response in storage to reduce introspect call
       if (nextStep && idxResponseFromResp) {
+        // Save intermediate idx response in storage to reduce introspect call
         authClient.transactionManager.saveIdxResponse(idxResponseFromResp.rawIdxState);
+        availableSteps = getAvailableSteps(idxResponseFromResp);
       }
 
       if (terminal) {
@@ -183,7 +184,7 @@ export async function run(
   if (shouldClearTransaction) {
     authClient.transactionManager.clear();
   }
-  
+
   return {
     _idxResponse: idxResponse, 
     status,

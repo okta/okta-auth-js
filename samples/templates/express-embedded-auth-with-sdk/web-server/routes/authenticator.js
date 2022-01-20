@@ -230,9 +230,69 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+router.get('/enroll-authenticator/:authenticator/select-enrollment-channel', async (req, res) => {
+  const authenticator = req.params.authenticator;
+  const {
+    idx: { nextStep: { options } }
+  } = req.getFlowStates();
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'select-enrollment-channel', {
+      title: 'Select Enrollment Channel',
+      action: `/enroll-authenticator/${authenticator}/select-enrollment-channel`,
+      options,
+    })
+  });
+});
+
+router.post('/enroll-authenticator/:authenticator/select-enrollment-channel', async (req, res, next) => {
+  const { channel } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ 
+    channel,
+  });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+// proceed to specified remediation (step) chosen from the list of available steps of the flow stage
+router.post('/select-step', async (req, res, next) => {
+  const { step } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ step });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+router.get('/enroll-authenticator/:authenticator/enrollment-channel-data/', async (req, res) => {
+  const authenticator = req.params.authenticator;
+
+  const {
+    idx: { nextStep: {
+      inputs } } } = req.getFlowStates();
+
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'verify-enrollment-channel', {
+      title: 'Select Enrollment Channel',
+      action: `/enroll-authenticator/${authenticator}/enrollment-channel-data`,
+      inputs,
+    })
+  });
+});
+
+router.post('/enroll-authenticator/:authenticator/enrollment-channel-data', async (req, res, next) => {
+  const { email, phoneNumber } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ 
+    ...(email && { email }),
+    ...(phoneNumber && { phoneNumber })
+  });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
 router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
   const { 
     idx: { 
+      availableSteps,
       nextStep,
       error
     }
@@ -245,14 +305,23 @@ router.get('/enroll-authenticator/:authenticator/poll', async (req, res) => {
     });
   } else {
     const { authenticator: {
-      key, displayName
-    }} = nextStep;
+      key, displayName,
+    } } = nextStep;
+
+    const availableStepsNames = availableSteps.map(({ name }) => name);
+    let stepsToDisplay = [{
+      stepName: 'select-enrollment-channel',
+      actionDisplayName: 'Enroll with another method'
+    }].filter(step => availableStepsNames.includes(step.stepName));
+
     renderPage({
       req, res,
       render: () => renderTemplate(req, res, 'enroll-poll', {
         title: `Enroll ${displayName}`,
         action: `/poll-authenticator/${key}`,
         poll: nextStep.poll,
+        selectStepAction: `/select-step`,
+        availableSteps: stepsToDisplay,
       })
     });
   }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+  
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div id="page-title-header" class="ui header">
+          <h2>{{title}}</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      <div class="row">
+        <form id="verify-form" class="ui large form" action="{{action}}" method="POST">
+          {{#inputs}}
+            <div class="field">
+              <div class="ui labeled input">
+                <div class="ui label">
+                  {{label}}
+                </div>
+                <input id={{name}} type="text" name="{{name}}" />
+              </div>
+            </div>
+          {{/inputs}}
+          <button id="submit-button" class="ui fluid large primary submit button" type="submit">
+            Next
+          </button>
+        </form>
+      </div>
+
+      {{>cancel}}
+
+    </div>
+  </body>
+</html>

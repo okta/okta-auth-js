@@ -42,6 +42,7 @@ export interface IdxAuthenticator {
       question: string;
     }[];
     questionKeys?: string[];
+    selectedChannel?: string;
   };
 }
 
@@ -60,6 +61,10 @@ export interface IdpConfig {
   name: string;
 }
 
+export interface IdxRemediationValueForm {
+  form: IdxForm;
+}
+
 export interface IdxRemediationValue {
   name: string;
   type?: string;
@@ -67,7 +72,7 @@ export interface IdxRemediationValue {
   secret?: boolean;
   visible?: boolean;
   mutable?: boolean;
-  value?: string;
+  value?: string | IdxRemediationValueForm;
   label?: string;
   form?: IdxForm;
   options?: IdxOption[];

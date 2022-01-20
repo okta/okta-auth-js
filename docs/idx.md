@@ -357,7 +357,7 @@ await authClient.idx.cancel();
 
 #### `idx.proceed`
 
-Continues an in-progress idx transaction. This method is useful when handling a callback or in other cases where the flow may not be known.
+Continues an in-progress idx transaction. This method is useful when handling a callback or in other cases where the flow may not be known. When provided with `{step: stepName}`, continues transaction at specified remediation (step).
 
 ```javascript
 await authClient.idx.proceed();

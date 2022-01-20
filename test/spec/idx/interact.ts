@@ -73,7 +73,7 @@ describe('idx/interact', () => {
         'scopes': ['fn'],
         'state': 'fn-state',
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         'interactionHandle': 'idx-interactionHandle',
         'meta': {
           'codeChallenge': 'meta-codeChallenge',
@@ -86,7 +86,7 @@ describe('idx/interact', () => {
           'state': 'fn-state',
         },
         'state': 'fn-state',
-      });
+      }));
     });
 
     it('if no state/scopes in function option, uses values from authClient.options', async () => {
@@ -101,7 +101,7 @@ describe('idx/interact', () => {
         'scopes': ['authClient'],
         'state': 'authClient-state',
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         'interactionHandle': 'idx-interactionHandle',
         'meta': {
           'codeChallenge': 'meta-codeChallenge',
@@ -114,7 +114,7 @@ describe('idx/interact', () => {
           'state': 'authClient-state',
         },
         'state': 'authClient-state',
-      });
+      }));
     });
 
     it('if no state/scopes in function option or authClient.options, uses values from meta', async () => {
@@ -131,7 +131,7 @@ describe('idx/interact', () => {
         'scopes': ['meta'],
         'state': 'meta-state',
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         'interactionHandle': 'idx-interactionHandle',
         'meta': {
           'codeChallenge': 'meta-codeChallenge',
@@ -144,7 +144,7 @@ describe('idx/interact', () => {
           'state': 'meta-state',
         },
         'state': 'meta-state',
-      });
+      }));
     });
 
     it('uses activationToken from function options', async () => {
@@ -160,7 +160,7 @@ describe('idx/interact', () => {
         'state': 'authClient-state',
         'activationToken': 'fn-activationToken'
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         'interactionHandle': 'idx-interactionHandle',
         'meta': {
           'codeChallenge': 'meta-codeChallenge',
@@ -173,7 +173,7 @@ describe('idx/interact', () => {
           'state': 'authClient-state',
         },
         'state': 'authClient-state',
-      });
+      }));
     });
 
     it('saves returned interactionHandle', async () => {

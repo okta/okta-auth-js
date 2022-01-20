@@ -200,7 +200,7 @@ describe('idx/recoverPassword', () => {
       jest.spyOn(identifyResponse.actions, 'currentAuthenticator-recover');
       let res = await recoverPassword(authClient, {});
       expect(identifyResponse.actions['currentAuthenticator-recover']).toHaveBeenCalled();
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -210,13 +210,13 @@ describe('idx/recoverPassword', () => {
             label: 'Username'
           }],
         }
-      });
+      }));
   
       // Second call, submit username
       jest.spyOn(identifyRecoveryResponse, 'proceed');
       res = await recoverPassword(authClient, { username: 'myname' });
       expect(identifyRecoveryResponse.proceed).toHaveBeenCalledWith('identify-recovery', { identifier: 'myname' });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -230,7 +230,7 @@ describe('idx/recoverPassword', () => {
             { label: 'Email', value: 'okta_email' }
           ]
         }
-      });
+      }));
 
       // Third call, select email authenticator
       jest.spyOn(selectAuthenticatorResponse, 'proceed');
@@ -238,7 +238,7 @@ describe('idx/recoverPassword', () => {
       expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
         authenticator: { id: 'id-email' }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -258,7 +258,7 @@ describe('idx/recoverPassword', () => {
             type: 'string' 
           }]
         }
-      });
+      }));
 
       // Fourth call, submit verification code
       jest.spyOn(verifyEmailResponse, 'proceed');
@@ -266,7 +266,7 @@ describe('idx/recoverPassword', () => {
       expect(verifyEmailResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { 
         credentials: { passcode: 'fake_code' }
       });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -288,7 +288,7 @@ describe('idx/recoverPassword', () => {
             type: 'string' 
           }]
         }
-      });
+      }));
 
       // Sixth call, submit new password
       jest.spyOn(resetAuthenticatorResponse, 'proceed');
@@ -392,7 +392,7 @@ describe('idx/recoverPassword', () => {
         .mockResolvedValueOnce(identifyResponse);
   
       const res = await recoverPassword(authClient, { username });
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -410,7 +410,7 @@ describe('idx/recoverPassword', () => {
           },
           message: 'There is no account with the Username incorrect@wrong.com.'
         }]
-      });
+      }));
     });
 
   });
@@ -477,7 +477,7 @@ describe('idx/recoverPassword', () => {
 
       // First call, get identify form
       let res = await recoverPassword(authClient, {});
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -486,7 +486,7 @@ describe('idx/recoverPassword', () => {
             { label: 'Username', name: 'username' }
           ]
         }
-      });
+      }));
 
       // Second call, submit username
       jest.spyOn(identifyResponse, 'proceed');
@@ -500,7 +500,7 @@ describe('idx/recoverPassword', () => {
       });
       // Invoke authenticator recover action
       expect(verifyPasswordResponse.actions['currentAuthenticatorEnrollment-recover']).toHaveBeenCalled();
-      expect(res).toEqual({
+      expect(res).toEqual(expect.objectContaining({
         _idxResponse: expect.any(Object),
         status: IdxStatus.PENDING,
         nextStep: {
@@ -514,7 +514,7 @@ describe('idx/recoverPassword', () => {
             { label: 'Email', value: 'okta_email' }
           ]
         }
-      });
+      }));
 
       // the rest flow is as same as the classic org policy, skip
     });

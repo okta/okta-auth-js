@@ -29,13 +29,13 @@ export class EnrollPoll extends Remediator {
   }
 
   getNextStep(context?: IdxContext): NextStep {
-    const name = this.getName();
+    const common = super.getNextStep(context);
     let authenticator = this.getAuthenticator();
     if (!authenticator && context?.currentAuthenticator) {
       authenticator = context.currentAuthenticator.value;
     }
     return {
-      name,
+      ...common,
       authenticator,
       poll: {
         required: true,
