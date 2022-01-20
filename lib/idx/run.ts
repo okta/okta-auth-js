@@ -107,7 +107,8 @@ export async function run(
       actions,
       withCredentials,
       exchangeCodeForTokens,
-      autoRemediate
+      autoRemediate,
+      step
     } = options;
 
     // Only one flow can be operating at a time
@@ -155,7 +156,7 @@ export async function run(
         terminal,
         canceled,
         messages: messagesFromResp,
-      } = await remediate(idxResponse, values, { remediators, actions, flow });
+      } = await remediate(idxResponse, values, { remediators, actions, flow, step });
       idxResponse = idxResponseFromResp || idxResponse;
 
       // Track fields from remediation response

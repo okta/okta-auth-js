@@ -1912,12 +1912,14 @@ describe('idx/register', () => {
       const {
         authClient,
         selectAuthenticatorResponse,
+        successWithInteractionCodeResponse
       } = testContext;
 
       chainResponses([
         selectAuthenticatorResponse,
         enrollPollResponse,
         enrollmentChannelDataSmsResponse,
+        successWithInteractionCodeResponse
       ]);
 
       jest.spyOn(mocked.introspect, 'introspect')
@@ -1932,18 +1934,19 @@ describe('idx/register', () => {
       await register(authClient, {
         authenticator: AuthenticatorKey.OKTA_VERIFY
       });
-      const { nextStep: { options } } = await proceed(authClient, {
+      let res = await proceed(authClient, {
         step: 'select-enrollment-channel'
       });
-
+      const { options } = res.nextStep!;
       expect(options).toContainEqual({
         label: 'SMS',
         value: 'sms'
       });
 
-      const { nextStep: { inputs } } = await proceed(authClient, {
+      res = await proceed(authClient, {
         channel: 'phoneNumber'
       });
+      const { inputs } = res.nextStep!;
 
       expect(enrollPollResponse.proceed).toHaveBeenCalledWith(
         'select-enrollment-channel',
@@ -1968,12 +1971,14 @@ describe('idx/register', () => {
       const {
         authClient,
         selectAuthenticatorResponse,
+        successWithInteractionCodeResponse
       } = testContext;
 
       chainResponses([
         selectAuthenticatorResponse,
         enrollPollResponse,
         enrollmentChannelDataEmailResponse,
+        successWithInteractionCodeResponse
       ]);
 
       jest.spyOn(mocked.introspect, 'introspect')
@@ -1988,18 +1993,20 @@ describe('idx/register', () => {
       await register(authClient, {
         authenticator: AuthenticatorKey.OKTA_VERIFY
       });
-      const { nextStep: { options } } = await proceed(authClient, {
+      let res = await proceed(authClient, {
         step: 'select-enrollment-channel'
       });
+      const { options } = res.nextStep!;
 
       expect(options).toContainEqual({
         label: 'EMAIL',
         value: 'email'
       });
 
-      const { nextStep: { inputs } } = await proceed(authClient, {
+      res = await proceed(authClient, {
         channel: 'email'
       });
+      const { inputs }  = res.nextStep!;
 
       expect(enrollPollResponse.proceed).toHaveBeenCalledWith(
         'select-enrollment-channel',

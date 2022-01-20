@@ -48,7 +48,8 @@ export function getRemediator(
   let remediator;
   // remediation name specified by caller - fast-track remediator lookup 
   if (options.step) {
-    const remediation = idxRemediations.find(({ name }) => name === options.step);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const remediation = idxRemediations.find(({ name }) => name === options.step)!;
     const T = remediators[remediation.name];
     return new T(remediation, values);
   }
