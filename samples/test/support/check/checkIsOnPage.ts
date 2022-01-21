@@ -26,7 +26,7 @@ import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
 
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
-export default async (pageName?: string) => {
+export default async (pageName?: string, disableEmailVerification = false) => {
   let selector;
   let pageTitle;
   switch (pageName) {
@@ -59,7 +59,7 @@ export default async (pageName?: string) => {
     case 'Root Page':
     case 'Root View': {
       selector = '#claim-email_verified';
-      pageTitle = 'true';
+      pageTitle = disableEmailVerification ? 'false' : 'true';
       break;
     }
     case 'Set up Password': {

@@ -22,6 +22,8 @@ interface ActionContext {
   currentTestCaseId: string;
   userName?: string;
   sharedSecret?: string;
+  disableEmailVerification?: boolean;
+  useProfileEnrollPolicy: boolean;
 }
 
 let reusedContext: ActionContext;

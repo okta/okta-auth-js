@@ -78,8 +78,15 @@ Given(
 );
 
 Given(
-  /^configured Authenticators are (.*)$/,
-  setEnvironment
+  /^configured Authenticators are Password \(required\), and Google Authenticator \(required\)$/,
+  () => ({}) // no-op
+  // 1. Org has preconfigured MFA policy "Google Authenticator Required Policy"
+  //    for group "Google Authenticator Enrollment Required"
+  // 2. App has preconfigured sign-on policy "MFA Required" for group "MFA Required"
+  // 3. App has preconfigured profile enrollment policy "Google Authenticator Policy"
+  //    for group "Google Authenticator Enrollment Required"
+  // 4. App should be changed with environment "Password and Google Authenticator Required"
+  //    (see next line)
 );
 
 Given(

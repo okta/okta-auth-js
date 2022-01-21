@@ -8,5 +8,6 @@ export default async function (this: ActionContext) {
   const policy = await fetchPolicy('Custom Attribute Policy', 'PROFILE_ENROLLMENT');
   if (policy) {
     await addAppToPolicy(policy.id, clientId as string);
+    this.useProfileEnrollPolicy = true;
   }
 }

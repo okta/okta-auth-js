@@ -16,13 +16,23 @@ import createUser from '../../management-api/createUser';
 import ActionContext, {getReusedContext} from '../../context';
 
 export default async function (this: ActionContext, firstName: string, assignToGroups?: string[]): Promise<void> {
-  
-  if (this.featureName.includes('Google Authenticator') && !this.scenarioName.includes('enrolls')) {
-    // reuse
+  // Scenarios 10.1.4, 10.1.5
+  const isSignUpWithTotp = this.scenarioName.includes(
+    'Mary signs up for an account with Password, setups up required Google Authenticator'
+  );
+  // Scenario 10.1.3
+  const isSignInWithTotp = this.featureName.includes('Google Authenticator') && 
+    this.scenarioName.includes('Signs in');
+
+  if (isSignInWithTotp) {
+    // reuse context
     this.credentials = getReusedContext().credentials;
     this.sharedSecret = getReusedContext().sharedSecret;
     this.user = getReusedContext().user;
     this.userName = getReusedContext().userName;
+  } else if (isSignUpWithTotp) {
+    this.disableEmailVerification = true;
+    this.credentials = this.credentials || await createCredentials(firstName, this.featureName, false);
   } else {
     const credentials = this.credentials || await createCredentials(firstName, this.featureName);
     this.credentials = credentials;

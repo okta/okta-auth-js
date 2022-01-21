@@ -49,7 +49,7 @@ function loadTestEnvYaml() {
     return;
   }
 
-  return yaml.load(fs.readFileSync(TESTENV_YAML));
+  return yaml.load(fs.readFileSync(TESTENV_YAML, 'utf8'));
 }
 
 function getTestEnvironmentNames() {
@@ -63,6 +63,7 @@ function getTestEnvironmentNames() {
 function setEnvironmentVarsFromTestEnvYaml(name) {
   const doc = loadTestEnvYaml();
   if (!doc) {
+    console.log(`Can't load testenv.yml`);
     return;
   }
 
