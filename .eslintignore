@@ -9,3 +9,4 @@ node_modules
 /samples/templates
 /samples/generated/webpack-spa/public/*-bundle.*
 /samples/generated/express-direct-auth-dynamic
+.eslintrc.js
