@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.1.0
+
+### Features
+
+- [#1036](https://github.com/okta/okta-auth-js/pull/1036) Adds `webauthn` authenticator support in idx module
+
 ## 6.0.0
 
 ### Breaking Changes

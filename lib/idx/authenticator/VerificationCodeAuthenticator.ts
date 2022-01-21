@@ -1,5 +1,10 @@
 import { Authenticator, Credentials } from './Authenticator';
 
+export interface VerificationCodeValues {
+  verificationCode?: string;
+  otp?: string;
+}
+
 interface VerificationCodeCredentials extends Credentials {
   passcode: string;
 }
@@ -7,9 +12,9 @@ interface VerificationCodeCredentials extends Credentials {
 // general authenticator to handle "verificationCode" input
 // it can be used for "email", "phone", "google authenticator"
 // a new authenticator class should be created if special cases need to be handled
-export class VerificationCodeAuthenticator extends Authenticator {
-  canVerify(values) {
-    return (values.verificationCode || values.otp);
+export class VerificationCodeAuthenticator extends Authenticator<VerificationCodeValues> {
+  canVerify(values: VerificationCodeValues) {
+    return !!(values.verificationCode || values.otp);
   }
 
   mapCredentials(values): VerificationCodeCredentials | Credentials {

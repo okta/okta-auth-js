@@ -23,7 +23,6 @@ import {
   IdxAuthenticatorFactory,
 } from './authenticators';
 
-
 export const RawIdxResponseFactory = Factory.define<RawIdxResponse>(() => {
   return {
     version: '1.0.0',

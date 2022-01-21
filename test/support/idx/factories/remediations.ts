@@ -19,7 +19,8 @@ import {
   PhoneAuthenticatorFactory,
   GoogleAuthenticatorFactory,
   SecurityQuestionAuthenticatorFactory,
-  OktaVerifyAuthenticatorFactory
+  OktaVerifyAuthenticatorFactory,
+  WebauthnAuthenticatorFactory,
 } from './authenticators';
 import { 
   EmailAuthenticatorFormFactory, 
@@ -31,7 +32,8 @@ import {
   VerifySmsFormFactory,
   VerifyPasscodeFormFactory,
   OktaVerifyAuthenticatorFormFactory,
-  OktaVerifyAuthenticatorEnollmentChannelFormFactory
+  OktaVerifyAuthenticatorEnollmentChannelFormFactory,
+  WebauthnAuthenticatorFormFactory,
 } from './forms';
 import {
   UsernameValueFactory,
@@ -39,7 +41,7 @@ import {
   AuthenticatorValueFactory,
   CredentialsValueFactory,
   IdxValueFactory,
-  NewPasswordValueFactory, EmailValueFactory, PhoneNumberValueFactory
+  NewPasswordValueFactory, EmailValueFactory, PhoneNumberValueFactory,
 } from './values';
 
 interface MockedIdxRemediation extends IdxRemediation {
@@ -219,6 +221,64 @@ export const EnrollGoogleAuthenticatorRemediationFactory = EnrollAuthenticatorRe
   value: [
     CredentialsValueFactory.build({
       form: VerifyPasscodeFormFactory.build()
+    })
+  ]
+});
+
+export const VerifyWebauthnAuthenticatorRemediationFactory = ChallengeAuthenticatorRemediationFactory.params({
+  name: 'challenge-authenticator',
+  value: [
+    CredentialsValueFactory.build({
+      form: WebauthnAuthenticatorFormFactory.build()
+    })
+  ],
+  relatesTo: {
+    type: 'object',
+    value: WebauthnAuthenticatorFactory.build({
+      contextualData: {
+        challengeData: {
+          challenge: 'CHALLENGE',
+          userVerification: 'preferred'
+        }
+      }
+    })
+  }
+});
+
+export const EnrollWebauthnAuthenticatorRemediationFactory = EnrollAuthenticatorRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: WebauthnAuthenticatorFactory.build({
+      contextualData: {
+        activationData: {
+          rp: {
+            name: 'Javascript IDX SDK Test Org'
+          },
+          user: {
+            id: '000000001',
+            name: 'mary@acme.com',
+            displayName: 'Mary'
+          },
+          pubKeyCredParams: [{
+            type: 'public-key',
+            alg: -7
+          }, {
+            type: 'public-key',
+            alg: -257
+          }],
+          challenge: 'CHALLENGE',
+          attestation: 'direct',
+          authenticatorSelection: {
+            userVerification: 'discouraged',
+            requireResidentKey: false,
+          }
+        }
+      }
+    })
+  },
+  value: [
+    CredentialsValueFactory.build({
+      form: WebauthnAuthenticatorFormFactory.build()
     })
   ]
 });

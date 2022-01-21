@@ -498,4 +498,48 @@ router.post('/challenge-authenticator/security_question', async (req, res, next)
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+
+// Handle Webauthn
+router.get('/enroll-authenticator/webauthn', async (req, res) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator-webauthn-enroll', {
+      req, res,
+      title: 'Enroll Webauthn',
+      action: '/enroll-authenticator/webauthn',
+    })
+  });
+});
+
+router.post('/enroll-authenticator/webauthn', async (req, res, next) => {
+  const { clientData, attestation } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({
+    clientData,
+    attestation
+  });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
+router.get('/challenge-authenticator/webauthn', async (req, res) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator-webauthn-verify', {
+      title: 'Challenge Webauthn',
+      action: '/challenge-authenticator/webauthn',
+    })
+  });
+});
+
+router.post('/challenge-authenticator/webauthn', async (req, res, next) => {
+  const { clientData, authenticatorData, signatureData } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({
+    clientData,
+    authenticatorData,
+    signatureData
+  });
+  handleTransaction({ req, res, next, authClient, transaction });
+});
+
 module.exports = router;

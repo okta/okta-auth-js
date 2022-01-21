@@ -28,7 +28,7 @@ import {
 } from './idx-js';
 import { FlowIdentifier } from './FlowIdentifier';
 
-export { IdxMessage } from './idx-js';
+export { IdxMessage, ChallengeData, ActivationData } from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
 export { RegistrationOptions } from '../register';
 export { PasswordRecoveryOptions } from '../recoverPassword';
@@ -36,7 +36,10 @@ export { ProceedOptions } from '../proceed';
 export { CancelOptions } from '../cancel';
 export { FlowIdentifier };
 export { IdxTransactionMeta };
+export { IdxAuthenticator };
 export { EmailVerifyCallbackResponse } from '../emailVerify';
+export { WebauthnEnrollValues } from '../authenticator/WebauthnEnrollment';
+export { WebauthnVerificationValues } from '../authenticator/WebauthnVerification';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
@@ -52,7 +55,8 @@ export enum AuthenticatorKey {
   PHONE_NUMBER = 'phone_number',
   GOOGLE_AUTHENTICATOR = 'google_otp',
   SECURITY_QUESTION = 'security_question',
-  OKTA_VERIFY = 'okta_verify'
+  OKTA_VERIFY = 'okta_verify',
+  WEBAUTHN = 'webauthn',
 }
 
 export type Input = {
@@ -72,6 +76,7 @@ export type NextStep = {
   inputs?: Input[];
   options?: IdxOption[];
   poll?: IdxPollOptions;
+  authenticatorEnrollments?: IdxAuthenticator[];
 }
 
 export enum IdxFeature {

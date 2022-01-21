@@ -12,7 +12,10 @@
 
 
 /* global atob */
-import { base64ToBase64Url, stringToBase64Url, base64UrlToString } from '../../../lib/crypto/base64';
+import {
+  base64ToBase64Url, stringToBase64Url, base64UrlToString,
+  base64UrlToBuffer, bufferToBase64Url
+} from '../../../lib/crypto/base64';
 
 describe('base64', function() {
 
@@ -63,6 +66,23 @@ describe('base64', function() {
       var b = stringToBase64Url(orig);
       var str = base64UrlToString(b);
       expect(str).toBe(orig);
+    });
+  });
+
+  describe('base64UrlToBuffer', () => {
+    it('converts base64 string to binary data view', () => {
+      const b64u = 'aGVsbG8='; // 'hello' in base64
+      const buf = base64UrlToBuffer(b64u);
+      const expectedBuf = new Uint8Array([104, 101, 108, 108, 111]);
+      expect(buf.toString()).toBe(expectedBuf.toString());
+    });
+  });
+
+  describe('bufferToBase64Url', () => {
+    it('converts buffer with binary data to base64 string', () => {
+      const buf = new Uint8Array([104, 101, 108, 108, 111]);
+      const b64u = bufferToBase64Url(buf);
+      expect(b64u).toBe('aGVsbG8=');
     });
   });
 });

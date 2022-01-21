@@ -62,3 +62,15 @@ export function stringToBuffer(str) {
 export function base64UrlDecode(str) {
   return atob(base64UrlToBase64(str));
 }
+
+// Converts base64 string to binary data view
+export function base64UrlToBuffer(b64u) {
+  return Uint8Array.from(base64UrlDecode(b64u), (c: string) => c.charCodeAt(0));
+}
+
+// Converts an ArrayBuffer object that contains binary data to base64 encoded string
+export function bufferToBase64Url(bin) {
+  return btoa(new Uint8Array(bin).reduce((s, byte) => s + String.fromCharCode(byte), ''));
+}
+
+
