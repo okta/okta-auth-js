@@ -561,5 +561,34 @@ describe('OktaAuth (api)', function() {
       );
     });
 
+    it('sends no Authorization header if accessToken is not available', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({});
+      const options = {
+        url: 'fake-url',
+        method: 'POST',
+        args: {
+          fake1: 'fake1',
+          fake2: 'fake2'
+        }
+      };
+      await auth.invokeApiMethod(options);
+      expect(auth.options.httpRequestClient).toHaveBeenCalledWith(
+        'POST',
+        'fake-url',
+        {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'fake-okta-ua'
+          },
+          data: {
+            fake1: 'fake1',
+            fake2: 'fake2',
+          },
+          withCredentials: false
+        }
+      );
+    });
+
   });
 });

@@ -752,7 +752,7 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   async invokeApiMethod(options: RequestOptions): Promise<unknown> {
     if (!options.accessToken) {
       const accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
-      options.accessToken = accessToken.accessToken;
+      options.accessToken = accessToken?.accessToken;
     }
     return httpRequest(this, options);
   }
