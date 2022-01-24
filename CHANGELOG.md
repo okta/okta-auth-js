@@ -5,6 +5,7 @@
 ### Features
 
 - [#1036](https://github.com/okta/okta-auth-js/pull/1036) Adds `webauthn` authenticator support in idx module
+- [#1075](https://github.com/okta/okta-auth-js/pull/1075) Adds top level `invokeApiMethod` method as an escape hatch to make arbitrary OKTA API request
 
 ## 6.0.0
 
