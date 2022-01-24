@@ -49,6 +49,7 @@ import {
   GetWithRedirectAPI,
   ParseFromUrlInterface,
   GetWithRedirectFunction,
+  RequestOptions,
 } from './types';
 import {
   transactionStatus,
@@ -96,7 +97,7 @@ import {
   clone,
 } from './util';
 import { TokenManager } from './TokenManager';
-import { get, setRequestHeader } from './http';
+import { get, httpRequest, setRequestHeader } from './http';
 import PromiseQueue from './PromiseQueue';
 import fingerprint from './browser/fingerprint';
 import { AuthStateManager } from './AuthStateManager';
@@ -745,6 +746,15 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
   // { recoveryToken }
   verifyRecoveryToken(opts: VerifyRecoveryTokenOptions): Promise<AuthTransaction> {
     return postToTransaction(this, '/api/v1/authn/recovery/token', opts);
+  }
+
+  // Escape hatch method to make arbitrary OKTA API call
+  async invokeApiMethod(options: RequestOptions): Promise<unknown> {
+    if (!options.accessToken) {
+      const accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
+      options.accessToken = accessToken.accessToken;
+    }
+    return httpRequest(this, options);
   }
 }
 
