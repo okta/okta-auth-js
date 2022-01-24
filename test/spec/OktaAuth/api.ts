@@ -485,4 +485,110 @@ describe('OktaAuth (api)', function() {
       expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn/recovery/token', options);
     });
   });
+
+  describe('invokeApiMethod', () => {
+    beforeEach(async () => {
+      auth.options.httpRequestClient = jest.fn().mockResolvedValue({
+        responseText: null
+      });
+      auth._oktaUserAgent.getHttpHeader = jest.fn().mockReturnValue({
+        'X-Okta-User-Agent-Extended': 'fake-okta-ua'
+      });
+    });
+
+    it('uses accessToken from storage when no accessToken is available from options', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: { accessToken: 'fake-accessToken-storage' }
+      });
+      const options = {
+        url: 'fake-url',
+        method: 'POST',
+        args: {
+          fake1: 'fake1',
+          fake2: 'fake2'
+        }
+      };
+      await auth.invokeApiMethod(options);
+      expect(auth.options.httpRequestClient).toHaveBeenCalledWith(
+        'POST',
+        'fake-url',
+        {
+          headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer fake-accessToken-storage',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'fake-okta-ua'
+          },
+          data: {
+            fake1: 'fake1',
+            fake2: 'fake2',
+          },
+          withCredentials: false
+        }
+      );
+    });
+
+    it('uses accessToken from options when it\'s provided', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({
+        accessToken: { accessToken: 'fake-accessToken-storage' }
+      });
+      const options = {
+        url: 'fake-url',
+        method: 'POST',
+        args: {
+          fake1: 'fake1',
+          fake2: 'fake2'
+        },
+        accessToken: 'fake-accessToken-option'
+      };
+      await auth.invokeApiMethod(options);
+      expect(auth.options.httpRequestClient).toHaveBeenCalledWith(
+        'POST',
+        'fake-url',
+        {
+          headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer fake-accessToken-option',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'fake-okta-ua'
+          },
+          data: {
+            fake1: 'fake1',
+            fake2: 'fake2',
+          },
+          withCredentials: false
+        }
+      );
+    });
+
+    it('sends no Authorization header if accessToken is not available', async () => {
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({});
+      const options = {
+        url: 'fake-url',
+        method: 'POST',
+        args: {
+          fake1: 'fake1',
+          fake2: 'fake2'
+        }
+      };
+      await auth.invokeApiMethod(options);
+      expect(auth.options.httpRequestClient).toHaveBeenCalledWith(
+        'POST',
+        'fake-url',
+        {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': 'fake-okta-ua'
+          },
+          data: {
+            fake1: 'fake1',
+            fake2: 'fake2',
+          },
+          withCredentials: false
+        }
+      );
+    });
+
+  });
 });
