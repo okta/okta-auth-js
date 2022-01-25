@@ -17,7 +17,7 @@ const mocked = {
     __esModule: true, // fool babel require interop
     default: () => Promise.resolve({
       ok: true,
-      json: () => {}
+      json: () => ({})
     })
   }
 };
@@ -28,7 +28,11 @@ jest.mock('cross-fetch', () => {
 
 import idx from '@okta/okta-idx-js';
 import { setRequestHeader } from '../../../lib/http';
-import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from '../../../lib/idx/headers';
+import { 
+  createGlobalRequestInterceptor, 
+  setGlobalRequestInterceptor,
+  clearGlobalRequestInterceptor 
+} from '../../../lib/idx/headers';
 const idxPackageJSON = require('@okta/okta-idx-js/package.json');
 
 describe('idx headers', () => {
@@ -41,6 +45,12 @@ describe('idx headers', () => {
       interactionHandle: null,
       stateHandle: 'fake-stateHandle',
       version: '1.0.0',
+      clientId: 'fake-clientid',
+      baseUrl: 'fake-baseurl',
+      redirectUri: 'fake-redirecturi',
+      codeChallenge: 'fake-codeChallenge',
+      codeChallengeMethod: 'fake-codeChallengeMethod',
+      state: 'fake-state',
       sdk: {
         options: {
           httpRequestClient: () => Promise.resolve({
@@ -65,6 +75,11 @@ describe('idx headers', () => {
   async function callIntrospect() {
     const { domain, interactionHandle, stateHandle, version } = testContext;
     await idx.introspect({ domain, interactionHandle, stateHandle, version });
+  }
+
+  async function callInteract() {
+    const { clientId, baseUrl, redirectUri, codeChallenge, codeChallengeMethod, state } = testContext;
+    await idx.interact({ clientId, baseUrl, redirectUri, codeChallenge, codeChallengeMethod, state });
   }
 
   describe('without interceptor', () => {
@@ -117,6 +132,10 @@ describe('idx headers', () => {
       setGlobalRequestInterceptor(createGlobalRequestInterceptor(sdk));
     });
 
+    afterEach(() => {
+      clearGlobalRequestInterceptor();
+    });
+
     it('idx uses header values set in SDK options and SDK user agent', async () => {
       const { sdk } = testContext;
       sdk.options.headers = {
@@ -134,6 +153,27 @@ describe('idx headers', () => {
           'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
           'accept': 'application/ion+json; okta-version=1.0.0',
           'content-type': 'application/ion+json; okta-version=1.0.0',
+          'my-header': 'my-value',
+          'other-header': 'other-value'
+        },
+        method: 'POST'
+      });
+    });
+
+    it('idx uses header values set in SDK options and SDK user agent for interact', async () => {
+      const { sdk } = testContext;
+      sdk.options.headers = {
+        'my-header': 'my-value',
+        'other-header': 'other-value'
+      };
+      jest.spyOn(mocked.crossFetch, 'default');
+      await callInteract();
+      expect(mocked.crossFetch.default).toHaveBeenCalledWith('fake-baseurl/v1/interact', {
+        body: 'client_id=fake-clientid&scope=openid%20email&redirect_uri=fake-redirecturi&code_challenge=fake-codeChallenge&code_challenge_method=fake-codeChallengeMethod&state=fake-state',
+        credentials: 'include',
+        headers: {
+          'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
+          'content-type': 'application/x-www-form-urlencoded',
           'my-header': 'my-value',
           'other-header': 'other-value'
         },
@@ -187,6 +227,48 @@ describe('idx headers', () => {
         },
         method: 'POST'
       });
+    });
+
+    describe('"X-Device-Token" header', () => {
+      it('idx uses header when clientSecret is in sdk.options', async () => {
+        const { sdk } = testContext;
+        sdk.options.headers = {
+          'X-Device-Token': 'fake-ip',
+        };
+        sdk.options.clientSecret = 'fake-clientSecret';
+        jest.spyOn(mocked.crossFetch, 'default');
+        await callInteract();
+        expect(mocked.crossFetch.default).toHaveBeenCalledWith('fake-baseurl/v1/interact', {
+          body: 'client_id=fake-clientid&scope=openid%20email&redirect_uri=fake-redirecturi&code_challenge=fake-codeChallenge&code_challenge_method=fake-codeChallengeMethod&state=fake-state',
+          credentials: 'include',
+          headers: {
+            'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
+            'X-Device-Token': 'fake-ip',
+            'content-type': 'application/x-www-form-urlencoded'
+          },
+          method: 'POST'
+        });
+      });
+
+      it('idx does not use header when clientSecret is not in options', async () => {
+        const { sdk } = testContext;
+        sdk.options.headers = {
+          'X-Device-Token': 'fake-ip',
+        };
+        sdk.options.clientSecret = undefined;
+        jest.spyOn(mocked.crossFetch, 'default');
+        await callInteract();
+        expect(mocked.crossFetch.default).toHaveBeenCalledWith('fake-baseurl/v1/interact', {
+          body: 'client_id=fake-clientid&scope=openid%20email&redirect_uri=fake-redirecturi&code_challenge=fake-codeChallenge&code_challenge_method=fake-codeChallengeMethod&state=fake-state',
+          credentials: 'include',
+          headers: {
+            'X-Okta-User-Agent-Extended': 'fake-sdk-user-agent',
+            'content-type': 'application/x-www-form-urlencoded'
+          },
+          method: 'POST'
+        });
+      });
+
     });
   });
 });
