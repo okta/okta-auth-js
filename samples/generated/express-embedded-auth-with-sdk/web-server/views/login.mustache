@@ -11,7 +11,7 @@
 
       <div class="row">
         <div class="ui header">
-          <h2>Login with Username and Password</h2>
+          <h2>Login with Username{{#hasPassword}} and Password{{/hasPassword}}</h2>
         </div>
       </div>
 
@@ -29,6 +29,7 @@
               <input id="username" type="text" name="username" required />
             </div>
           </div>
+          {{#hasPassword}}
           <div class="field">
             <div class="ui labeled input">
               <div class="ui label">
@@ -37,6 +38,7 @@
               <input id="password" type="password" name="password" required />
             </div>
           </div>
+          {{/hasPassword}}
           <button id="submit-login-form" class="ui fluid large primary submit button" type="submit">
             LOGIN
           </button>
@@ -54,13 +56,18 @@
           </div>
         {{/hasIdps}}
 
+        {{#canRecoverPassword}}
         <div class="ui messages row">
           <a href="/recover-password">Forgot your password?</a>
         </div>
+        {{/canRecoverPassword}}
 
+        {{#canSignup}}
         <div class="ui messages row">
           <a href="/register">Sign Up</a>
         </div>
+        {{/canSignup}}
+        
       </div>
 
     </div>

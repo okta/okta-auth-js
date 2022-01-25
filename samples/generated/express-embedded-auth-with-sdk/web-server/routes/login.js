@@ -40,7 +40,8 @@ router.get('/login', async (req, res) => {
 
   // Delete the idp related render logic if you only want the username and password form
   const authClient = getAuthClient(req);
-  const { availableSteps } = await authClient.idx.startTransaction({ state: req.transactionId });
+  const tx = await authClient.idx.startTransaction({ state: req.transactionId });
+  const { availableSteps, enabledFeatures } = tx;
   const idps = availableSteps 
     ? availableSteps
       .filter(({ name }) => name === 'redirect-idp')
@@ -52,9 +53,21 @@ router.get('/login', async (req, res) => {
       }))
     : [];
 
+  // Some policies do not ask for password up-front
+  const hasPassword = availableSteps
+    .find(step => step.name === 'identify')
+    .inputs.some(input => input.name === 'password');
+
+  // Check for other features which are configurable by the Org administrator
+  const canRecoverPassword = enabledFeatures.includes('recover-password');
+  const canSignup = enabledFeatures.includes('enroll-profile');
+
   renderTemplate(req, res, 'login', { 
     action: '/login',
     hasIdps: !!idps.length,
+    hasPassword,
+    canRecoverPassword,
+    canSignup,
     idps,
   });
 });
