@@ -22,10 +22,18 @@ const {
 const router = express.Router();
 
 // entry route
-router.get('/recover-password', (req, res) => {
+router.get('/recover-password', async (req, res, next) => {
   req.setFlowStates({
     entry: '/recover-password'
   });
+  const { query } = req;
+  const recoveryToken = query['token'];
+  if (recoveryToken) {
+    const authClient = getAuthClient(req);
+    const transaction = await authClient.idx.recoverPassword({ recoveryToken });
+    handleTransaction({ req, res, next, authClient, transaction });
+    return;
+  }
 
   renderTemplate(req, res, 'recover-password', {
     action: '/recover-password'

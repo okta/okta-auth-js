@@ -108,7 +108,9 @@ export async function run(
       withCredentials,
       exchangeCodeForTokens,
       autoRemediate,
-      step
+      step,
+      recoveryToken,
+      activationToken
     } = options;
 
     // Only one flow can be operating at a time
@@ -123,13 +125,19 @@ export async function run(
     }
 
     // Try to resume saved transaction
-    metaFromResp = getSavedTransactionMeta(authClient, { state });
+    metaFromResp = getSavedTransactionMeta(authClient, { state, recoveryToken, activationToken });
     interactionHandle = metaFromResp?.interactionHandle; // may be undefined
 
     if (!interactionHandle) {
       // start a new transaction
       authClient.transactionManager.clear();
-      const interactResponse = await interact(authClient, { withCredentials, state, scopes }); 
+      const interactResponse = await interact(authClient, {
+        withCredentials,
+        state,
+        scopes,
+        activationToken,
+        recoveryToken
+      }); 
       interactionHandle = interactResponse.interactionHandle;
       metaFromResp = interactResponse.meta;
       withCredentials = metaFromResp.withCredentials;
