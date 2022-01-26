@@ -143,6 +143,36 @@ describe('idx/recoverPassword', () => {
     };
   });
 
+  describe('recovery token', () => {
+    beforeEach(() => {
+      const { authClient: { transactionManager } } = testContext;
+      transactionManager.exists = () => false;
+      transactionManager.load = () => {};
+      const idxError = IdxResponseFactory.build({
+        rawIdxState: RawIdxResponseFactory.build({
+          messages: IdxMessagesFactory.build({
+            value: [
+              IdxErrorResetPasswordNotAllowedFactory.build()
+            ]
+          })
+        })
+      });
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxError);
+    });
+
+    it('by default it does not pass a recoveryToken to interact', async () => {
+      const { authClient } = testContext;
+      await recoverPassword(authClient, {});
+      expect(mocked.interact.interact).toHaveBeenCalledWith(authClient, { withCredentials: false });
+    });
+
+    it('can pass recoveryToken to interact', async () => {
+      const { authClient } = testContext;
+      const recoveryToken = 'abc';
+      await recoverPassword(authClient, { recoveryToken });
+      expect(mocked.interact.interact).toHaveBeenCalledWith(authClient, { withCredentials: false, recoveryToken });
+    });
+  });
   describe('classic org policy', () => {
     beforeEach(() => {
       const identifyRecoveryResponse = IdxResponseFactory.build({
