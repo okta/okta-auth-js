@@ -40,7 +40,8 @@ module.exports = function getAuthClient(req, options = {}) {
   let authClient;
   try {
     authClient = new OktaAuth({ 
-      ...oidc, 
+      ...oidc,
+      state: transactionId,
       storageManager: {
         token: {
           storageProvider
