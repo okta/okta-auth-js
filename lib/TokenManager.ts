@@ -14,7 +14,6 @@ import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
 import { validateToken  } from './oidc/util';
 import { isLocalhost, isIE11OrLess } from './features';
-import { TOKEN_STORAGE_NAME } from './constants';
 import SdkClock from './clock';
 import {
   EventEmitter,
@@ -27,14 +26,14 @@ import {
   isRefreshToken,
   StorageOptions,
   StorageType,
-  OktaAuth,
+  OktaAuthInterface,
   StorageProvider,
   TokenManagerErrorEventHandler,
   TokenManagerEventHandler,
   TokenManagerInterface,
   RefreshToken
 } from './types';
-import { REFRESH_TOKEN_STORAGE_KEY } from './constants';
+import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
 import { TokenService } from './services/TokenService';
 
 const DEFAULT_OPTIONS = {
@@ -64,7 +63,7 @@ function defaultState(): TokenManagerState {
   };
 }
 export class TokenManager implements TokenManagerInterface {
-  private sdk: OktaAuth;
+  private sdk: OktaAuthInterface;
   private clock: SdkClock;
   private emitter: EventEmitter;
   private storage: StorageProvider;
@@ -75,7 +74,7 @@ export class TokenManager implements TokenManagerInterface {
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
 
-  constructor(sdk: OktaAuth, options: TokenManagerOptions = {}) {
+  constructor(sdk: OktaAuthInterface, options: TokenManagerOptions = {}) {
     this.sdk = sdk;
     this.emitter = (sdk as any).emitter;
     if (!this.emitter) {

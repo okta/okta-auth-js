@@ -12,12 +12,12 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuth, TokenParams } from '../types';
+import { OktaAuthInterface, TokenParams } from '../types';
 import { clone } from '../util';
 import { prepareTokenParams, createOAuthMeta } from './util';
 import { buildAuthorizeParams } from './endpoints/authorize';
 
-export async function getWithRedirect(sdk: OktaAuth, options?: TokenParams): Promise<void> {
+export async function getWithRedirect(sdk: OktaAuthInterface, options?: TokenParams): Promise<void> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
   }

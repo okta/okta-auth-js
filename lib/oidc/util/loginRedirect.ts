@@ -12,7 +12,7 @@
  */
 /* global window */
 /* eslint-disable complexity, max-statements */
-import { OktaAuth, OktaAuthOptions } from '../../types';
+import { OktaAuthInterface, OktaAuthOptions } from '../../types';
 
 export function hasTokensInHash(hash: string): boolean {
   return /((id|access)_token=)/i.test(hash);
@@ -32,7 +32,7 @@ export function hasErrorInUrl(hashOrSearch: string): boolean {
   return /(error=)/i.test(hashOrSearch) || /(error_description)/i.test(hashOrSearch);
 }
 
-export function isRedirectUri(uri: string, sdk: OktaAuth): boolean {
+export function isRedirectUri(uri: string, sdk: OktaAuthInterface): boolean {
   var authParams = sdk.options;
   if (!uri || !authParams.redirectUri) {
     return false;
@@ -54,7 +54,7 @@ export function getHashOrSearch(options: OktaAuthOptions) {
  * Check if tokens or a code have been passed back into the url, which happens in
  * the OIDC (including social auth IDP) redirect flow.
  */
-export function isLoginRedirect (sdk: OktaAuth) {
+export function isLoginRedirect (sdk: OktaAuthInterface) {
   // First check, is this a redirect URI?
   if (!isRedirectUri(window.location.href, sdk)){
     return false;
@@ -81,7 +81,7 @@ export function isLoginRedirect (sdk: OktaAuth) {
  * Check if error=interaction_required has been passed back in the url, which happens in
  * the social auth IDP redirect flow.
  */
-export function isInteractionRequired (sdk: OktaAuth, hashOrSearch?: string) {
+export function isInteractionRequired (sdk: OktaAuthInterface, hashOrSearch?: string) {
   if (!hashOrSearch) { // web only
     // First check, is this a redirect URI?
     if (!isLoginRedirect(sdk)){

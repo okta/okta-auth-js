@@ -15,9 +15,8 @@
 // Currently we must modify request headers using the single instance of `idx.client.interceptors` exported from IDX-JS
 // This means that multiple instances of OktaAuth will see the same header modifications
 // TODO: use AuthJS http agent for IDX API requests. OKTA-417473
-import { OktaAuth } from '../types';
+import { OktaAuthInterface } from '../types';
 import idx from './idx-js';
-
 export function setGlobalRequestInterceptor(fn) {
   idx.client.interceptors.request.use(fn);
 }
@@ -27,7 +26,7 @@ export function clearGlobalRequestInterceptor() {
 }
 
 // A factory which returns a function that can be passed to `setGlobalRequestInterceptor`
-export function createGlobalRequestInterceptor(sdk: OktaAuth) {
+export function createGlobalRequestInterceptor(sdk: OktaAuthInterface) {
   return function (requestConfig) {
     // Set user-agent and any other custom headers set in the options
     var oktaUserAgentHeader = sdk._oktaUserAgent.getHttpHeader();

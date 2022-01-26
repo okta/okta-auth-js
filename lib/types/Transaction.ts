@@ -11,9 +11,10 @@
  */
 
 
-import StorageManager from '../StorageManager';
+import { StorageManager } from '../StorageManager';
 import { CustomUrls } from './OktaAuthOptions';
-import { FlowIdentifier } from '../idx/types';
+import { FlowIdentifier, IdxTransactionMeta } from '../idx/types';
+
 export interface TransactionManagerOptions {
   storageManager?: StorageManager;
   enableSharedStorage?: boolean; // default true
@@ -56,15 +57,6 @@ export interface PKCETransactionMeta extends OAuthTransactionMeta {
   codeVerifier: string;
   codeChallengeMethod: string;
   codeChallenge: string;
-}
-
-export interface IdxTransactionMeta extends PKCETransactionMeta {
-  interactionHandle?: string;
-  remediations?: string[];
-  flow?: FlowIdentifier;
-  withCredentials?: boolean;
-  activationToken?: string;
-  recoveryToken?: string;
 }
 
 export type CustomAuthTransactionMeta = Record<string, string | undefined>;

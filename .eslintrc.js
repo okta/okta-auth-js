@@ -78,6 +78,10 @@ module.exports = {
         // https://github.com/import-js/eslint-plugin-import#typescript
         'import',
       ],
+      extends: [
+        'plugin:import/recommended',
+        'plugin:import/typescript'
+      ],
       parser: "@typescript-eslint/parser",
       parserOptions: {
         project: "./tsconfig.json",

@@ -16,12 +16,13 @@
 import {
   getOAuthUrls,
   loadFrame,
+  addPostMessageListener
 } from './util';
 
 import AuthSdkError from '../errors/AuthSdkError';
 
 import {
-  OktaAuth,
+  OktaAuthInterface,
   TokenParams,
   PopupParams,
   OAuthResponse,
@@ -29,7 +30,6 @@ import {
 
 import { prepareTokenParams } from './util/prepareTokenParams';
 import { buildAuthorizeParams } from './endpoints/authorize';
-import { addPostMessageListener } from './util';
 import { handleOAuthResponse } from './handleOAuthResponse';
 /*
  * Retrieve an idToken from an Okta or a third party idp
@@ -81,7 +81,7 @@ import { handleOAuthResponse } from './handleOAuthResponse';
  * @param {String} [options.popupTitle] Title dispayed in the popup.
  *                                      Defaults to 'External Identity Provider User Authentication'
  */
-export function getToken(sdk: OktaAuth, options: TokenParams & PopupParams) {
+export function getToken(sdk: OktaAuthInterface, options: TokenParams & PopupParams) {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getToken" takes only a single set of options'));
   }

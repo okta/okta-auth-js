@@ -15,12 +15,10 @@ import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } fro
 import { JWTObject } from './JWT';
 import { UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
-import StorageManager from '../StorageManager';
+import { StorageManager } from '../StorageManager';
 import TransactionManager from '../TransactionManager';
 import { TokenManagerInterface } from './TokenManager';
 import { OktaUserAgent } from '../OktaUserAgent';
-import { FlowIdentifier, IdxPollOptions } from '../idx/types';
-
 import { 
   AuthenticationOptions, 
   RegistrationOptions as IdxRegistrationOptions,
@@ -36,13 +34,15 @@ import {
   ChallengeData,
   ActivationData,
   WebauthnEnrollValues,
-  WebauthnVerificationValues
+  WebauthnVerificationValues,
+  FlowIdentifier, 
+  IdxPollOptions
 } from '../idx/types';
 import { InteractOptions, InteractResponse } from '../idx/interact';
 import { IntrospectOptions } from '../idx/introspect';
 import { IdxResponse } from '../idx/types/idx-js';
 import { TransactionMetaOptions } from './Transaction';
-export interface OktaAuth {
+export interface OktaAuthInterface {
   options: OktaAuthOptions;
   getIssuerOrigin(): string;
   getOriginalUri(): string | undefined;

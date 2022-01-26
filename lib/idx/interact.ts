@@ -12,7 +12,7 @@
  */
 /* eslint complexity:[0,8] */
 import idx from './idx-js';
-import { OktaAuth, IdxTransactionMeta } from '../types';
+import { OktaAuthInterface, IdxTransactionMeta } from '../types';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';
 import { createTransactionMeta } from '.';
@@ -44,7 +44,10 @@ function getResponse(meta: IdxTransactionMeta): InteractResponse {
 }
 
 // Begin or resume a transaction. Returns an interaction handle
-export async function interact (authClient: OktaAuth, options: InteractOptions = {}): Promise<InteractResponse> {
+export async function interact (
+  authClient: OktaAuthInterface, 
+  options: InteractOptions = {}
+): Promise<InteractResponse> {
   options = removeNils(options);
 
   let meta = getSavedTransactionMeta(authClient, options);

@@ -22,7 +22,7 @@ import {
 } from './remediators';
 import { getFlowSpecification } from './flow';
 import { 
-  OktaAuth, 
+  OktaAuthInterface, 
   IdxOptions, 
   IdxTransaction,
 } from '../types';
@@ -36,7 +36,7 @@ export type PasswordRecoveryOptions = IdxOptions
   & ReEnrollAuthenticatorValues;
 
 export async function recoverPassword(
-  authClient: OktaAuth, options: PasswordRecoveryOptions = {}
+  authClient: OktaAuthInterface, options: PasswordRecoveryOptions = {}
 ): Promise<IdxTransaction> {
   const flowSpec = getFlowSpecification(authClient, 'recoverPassword');
   return run(

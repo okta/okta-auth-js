@@ -19,7 +19,7 @@ import {
 } from './constants';
 import * as constants from './constants';
 import {
-  OktaAuth as SDKInterface,
+  OktaAuthInterface,
   OktaAuthOptions, 
   AccessToken, 
   IDToken,
@@ -101,7 +101,7 @@ import { get, httpRequest, setRequestHeader } from './http';
 import PromiseQueue from './PromiseQueue';
 import fingerprint from './browser/fingerprint';
 import { AuthStateManager } from './AuthStateManager';
-import StorageManager from './StorageManager';
+import { StorageManager } from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
 import {
@@ -136,7 +136,7 @@ import {
 
 const Emitter = require('tiny-emitter');
 
-class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
+class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   options: OktaAuthOptions;
   storageManager: StorageManager;
   transactionManager: TransactionManager;

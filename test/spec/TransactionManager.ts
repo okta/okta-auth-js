@@ -12,7 +12,7 @@
 
 
 import TransactionManager from '../../lib/TransactionManager';
-import StorageManager from '../../lib/StorageManager';
+import { StorageManager } from '../../lib/StorageManager';
 import { RawIdxResponseFactory } from '@okta/test.support/idx';
 
 jest.mock('../../lib/util/sharedStorage', () => {

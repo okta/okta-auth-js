@@ -12,17 +12,17 @@
  */
 import { get } from '../../http';
 import { find } from '../../util';
-import { OktaAuth, WellKnownResponse } from '../../types';
+import { OktaAuthInterface, WellKnownResponse } from '../../types';
 import AuthSdkError from '../../errors/AuthSdkError';
 
-export function getWellKnown(sdk: OktaAuth, issuer?: string): Promise<WellKnownResponse> {
+export function getWellKnown(sdk: OktaAuthInterface, issuer?: string): Promise<WellKnownResponse> {
   var authServerUri = (issuer || sdk.options.issuer);
   return get(sdk, authServerUri + '/.well-known/openid-configuration', {
     cacheResponse: true
   });
 }
 
-export function getKey(sdk: OktaAuth, issuer: string, kid: string): Promise<string> {
+export function getKey(sdk: OktaAuthInterface, issuer: string, kid: string): Promise<string> {
   var httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies);
 
   return getWellKnown(sdk, issuer)

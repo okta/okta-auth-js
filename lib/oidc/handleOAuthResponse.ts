@@ -19,7 +19,7 @@ import {
 } from './util/oauth';
 import { AuthSdkError, OAuthError } from '../errors';
 import {
-  OktaAuth,
+  OktaAuthInterface,
   TokenVerifyParams,
   IDToken,
   OAuthResponse,
@@ -43,7 +43,7 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
 }
 
 export async function handleOAuthResponse(
-  sdk: OktaAuth,
+  sdk: OktaAuthInterface,
   tokenParams: TokenParams,
   res: OAuthResponse,
   urls?: CustomUrls

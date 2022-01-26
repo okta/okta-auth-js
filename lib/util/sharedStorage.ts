@@ -1,5 +1,5 @@
 import { isTransactionMeta, TransactionMeta } from '../types';
-import StorageManager from '../StorageManager';
+import { StorageManager } from '../StorageManager';
 
 const MAX_ENTRY_LIFETIME = 30 * 60 * 1000; // 30 minutes
 

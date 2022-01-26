@@ -12,9 +12,8 @@
  */
 
  /* eslint-disable complexity, max-statements */
-import { stringToBase64Url } from '../../crypto';
+import { stringToBase64Url, webcrypto } from '../../crypto';
 import { MIN_VERIFIER_LENGTH, MAX_VERIFIER_LENGTH, DEFAULT_CODE_CHALLENGE_METHOD } from '../../constants';
-import { webcrypto } from '../../crypto';
 
 function dec2hex (dec) {
   return ('0' + dec.toString(16)).substr(-2);
