@@ -26,6 +26,7 @@ function loadConfig() {
   var error = url.searchParams.get('error'); // received on login redirect callback
   var showForm = url.searchParams.get('showForm'); // forces config form to show
   var getTokens = url.searchParams.get('getTokens'); // forces redirect to get tokens
+  var recoveryToken = url.searchParams.get('recoveryToken');
 
   // Params which are encoded into the state
   var issuer;
@@ -122,7 +123,8 @@ function loadConfig() {
     state,
     error,
     showForm,
-    getTokens
+    getTokens,
+    recoveryToken
   });
   Object.assign(config, newConfig);
   // Render the config to HTML

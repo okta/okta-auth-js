@@ -25,7 +25,8 @@ function createAuthClient() {
       tokenManager: {
         storage: config.storage
       },
-      transformAuthState
+      transformAuthState,
+      recoveryToken: config.recoveryToken
     });
     if (config.startService) {
       authClient.start();
