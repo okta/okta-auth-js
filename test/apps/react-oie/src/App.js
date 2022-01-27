@@ -6,9 +6,10 @@ import oidcConfig from './config';
 import './App.css';
 
 function createOktaAuthInstance() {
-  const { state } = urlParamsToObject(window.location.search);
+  const { state, recoveryToken } = urlParamsToObject(window.location.search);
   return new OktaAuth(Object.assign({}, oidcConfig, {
-    state
+    state,
+    recoveryToken
   }));
 }
 
