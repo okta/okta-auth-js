@@ -27,7 +27,7 @@ router.get('/recover-password', async (req, res, next) => {
     entry: '/recover-password'
   });
   const { query } = req;
-  const recoveryToken = query['token'];
+  const recoveryToken = query['recoveryToken'] || query['token'];
   if (recoveryToken) {
     const authClient = getAuthClient(req);
     const transaction = await authClient.idx.recoverPassword({ recoveryToken });

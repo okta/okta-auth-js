@@ -85,7 +85,7 @@ export async function prepareTokenParams(
 ): Promise<TokenParams> {
   // build params using defaults + options
   const defaults = getDefaultTokenParams(sdk);
-  tokenParams = Object.assign({}, defaults, clone(tokenParams));
+  tokenParams = { ...defaults, ...tokenParams };
 
   if (tokenParams.pkce === false) {
     // Implicit flow or authorization_code without PKCE
