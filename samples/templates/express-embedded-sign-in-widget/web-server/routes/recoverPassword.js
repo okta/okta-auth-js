@@ -24,7 +24,8 @@ router.get('/recover-password', async (req, res, next) => {
   try {
     const { query } = req;
     const recoveryToken = query['recoveryToken'] || query['token'];
-    const flow = 'resetPassword'; // https://github.com/okta/okta-signin-widget/blob/master/docs/interaction_code_flow.md#flow
+    // https://github.com/okta/okta-signin-widget/blob/master/docs/interaction_code_flow.md#flow
+    const flow = 'resetPassword';
     const state = req.transactionId;
     const meta = await authClient.idx.getTransactionMeta({
       state,
