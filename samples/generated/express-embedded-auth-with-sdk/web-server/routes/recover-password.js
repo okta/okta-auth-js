@@ -27,11 +27,15 @@ router.get('/recover-password', async (req, res, next) => {
     entry: '/recover-password'
   });
   const { query } = req;
-  const recoveryToken = query['token'];
+  const recoveryToken = query['recoveryToken'] || query['token'];
   if (recoveryToken) {
     const authClient = getAuthClient(req);
-    const transaction = await authClient.idx.recoverPassword({ recoveryToken });
-    handleTransaction({ req, res, next, authClient, transaction });
+    try {
+      const transaction = await authClient.idx.recoverPassword({ recoveryToken });
+      handleTransaction({ req, res, next, authClient, transaction });
+    } catch (error) {
+      next(error);
+    }
     return;
   }
 
@@ -43,8 +47,12 @@ router.get('/recover-password', async (req, res, next) => {
 router.post('/recover-password', async (req, res, next) => {
   const { username } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.recoverPassword({ username });
-  handleTransaction({ req, res, next, authClient, transaction });
+  try {
+    const transaction = await authClient.idx.recoverPassword({ username });
+    handleTransaction({ req, res, next, authClient, transaction });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Handle reset password

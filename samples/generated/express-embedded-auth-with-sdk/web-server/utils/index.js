@@ -12,7 +12,6 @@
 
 
 const getAuthClient = require('./getAuthClient');
-const getAuthTransaction = require('./getAuthTransaction');
 const renderMessages = require('./renderMessages');
 const handleTransaction = require('./handleTransaction');
 const renderTemplate = require('./renderTemplate');
@@ -22,7 +21,6 @@ const getFormActionPath = require('./getFormActionPath');
 
 module.exports = {
   getAuthClient,
-  getAuthTransaction,
   renderMessages,
   handleTransaction,
   renderTemplate,
