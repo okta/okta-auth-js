@@ -12,9 +12,9 @@
 
 
 const getAuthClient = require('./getAuthClient');
-const getAuthTransaction = require('./getAuthTransaction');
+const getTransactionMeta = require('./getTransactionMeta');
 
 module.exports = {
   getAuthClient,
-  getAuthTransaction,
+  getTransactionMeta
 };

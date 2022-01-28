@@ -127,7 +127,7 @@
       "request": "launch",
       "autoAttachChildProcesses": true,
       "console": "integratedTerminal",
-      "cwd": "${workspaceRoot}/samples/generated/express-embedded-widget",
+      "cwd": "${workspaceRoot}/samples/generated/express-embedded-sign-in-widget",
       "program": "web-server/server.js"
     },
 

@@ -14,56 +14,49 @@
 const express = require('express');
 const URL = require('url').URL;
 const { 
-  getAuthTransaction,
   getAuthClient,
+  getTransactionMeta
 } = require('../utils');
-
-const getConfig = require('../../config');
 
 const router = express.Router();
 
-router.get('/login', (req, res, next) => {
-  getAuthTransaction(req)
-    .then(({ meta }) => {
-      const {
-        interactionHandle,
-        codeChallenge, 
-        codeChallengeMethod, 
-        state,
-      } = meta;
-
-      console.log('renderLoginWithWidget: using interaction handle: ', interactionHandle);
-      const { clientId, redirectUri, issuer, scopes } = getConfig().webServer.oidc;
-      const { otp } = req.query;
-      const widgetConfig = {
-        baseUrl: issuer.split('/oauth2')[0],
-        clientId: clientId,
-        redirectUri: redirectUri,
-        authParams: {
-          issuer: issuer,
-          scopes: scopes,
-        },
-        useInteractionCodeFlow: true,
-        state,
-        interactionHandle,
-        codeChallenge,
-        codeChallengeMethod,
-        otp
-      };
-      res.render('login', {
-        siwVersion: '5.16.1',
-        widgetConfig: JSON.stringify(widgetConfig),
-        selfHosted: !!process.env.SELF_HOSTED_WIDGET
-      });
-    })
-    .catch((error) => {
-      // Clear transaction
-      const authClient = getAuthClient(req);
-      authClient.transactionManager.clear();
-
-      // Delegate error to global error handler
-      next(error);
+router.get('/login', async (req, res, next) => {
+  const authClient = getAuthClient(req);
+  try {
+    const meta = await getTransactionMeta(req);
+    const {
+      clientId,
+      redirectUri,
+      issuer,
+      scopes,
+      state,
+      codeChallenge, 
+      codeChallengeMethod,
+    } = meta;
+    const { otp } = req.query;
+    const widgetConfig = {
+      useInteractionCodeFlow: true,
+      issuer,
+      clientId,
+      redirectUri,
+      state,
+      scopes,
+      codeChallenge,
+      codeChallengeMethod,
+      otp
+    };
+    res.render('login', {
+      siwVersion: '6.0.0',
+      widgetConfig: JSON.stringify(widgetConfig),
+      selfHosted: !!process.env.SELF_HOSTED_WIDGET
     });
+  } catch(error) {
+    // Clear transaction
+    authClient.transactionManager.clear();
+
+    // Delegate error to global error handler
+    next(error);
+  }
 });
 
 router.get('/login/callback', async (req, res, next) => {

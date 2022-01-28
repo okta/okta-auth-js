@@ -14,7 +14,6 @@
 import { getWellKnown } from '../endpoints/well-known';
 import { AuthSdkError } from '../../errors';
 import { OktaAuth, TokenParams } from '../../types';
-import { clone } from '../../util';
 import { getDefaultTokenParams } from './defaultTokenParams';
 import { DEFAULT_CODE_CHALLENGE_METHOD } from '../../constants';
 import PKCE from './pkce';
@@ -85,7 +84,7 @@ export async function prepareTokenParams(
 ): Promise<TokenParams> {
   // build params using defaults + options
   const defaults = getDefaultTokenParams(sdk);
-  tokenParams = Object.assign({}, defaults, clone(tokenParams));
+  tokenParams = { ...defaults, ...tokenParams };
 
   if (tokenParams.pkce === false) {
     // Implicit flow or authorization_code without PKCE

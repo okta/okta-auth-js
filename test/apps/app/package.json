@@ -36,6 +36,6 @@
     "typescript": "^4.2.3"
   },
   "peerDependencies": {
-    "@okta/okta-signin-widget": "^5.13.0"
+    "@okta/okta-signin-widget": "^6.0.0"
   }
 }

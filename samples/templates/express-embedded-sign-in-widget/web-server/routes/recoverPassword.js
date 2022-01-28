@@ -12,7 +12,6 @@
 
 
 const express = require('express');
-const URL = require('url').URL;
 const { 
   getAuthClient,
   getTransactionMeta
@@ -20,22 +19,31 @@ const {
 
 const router = express.Router();
 
-router.get('/login', async (req, res, next) => {
+router.get('/recover-password', async (req, res, next) => {
   const authClient = getAuthClient(req);
   try {
-    const meta = await getTransactionMeta(req);
+    const { query } = req;
+    const recoveryToken = query['recoveryToken'] || query['token'];
+    // https://github.com/okta/okta-signin-widget/blob/master/docs/interaction_code_flow.md#flow
+    const flow = 'resetPassword';
+    const state = req.transactionId;
+    const meta = await getTransactionMeta(req, {
+      flow,
+      recoveryToken
+    });
+
     const {
       clientId,
       redirectUri,
       issuer,
       scopes,
-      state,
       codeChallenge, 
-      codeChallengeMethod,
+      codeChallengeMethod, 
     } = meta;
-    const { otp } = req.query;
+
     const widgetConfig = {
       useInteractionCodeFlow: true,
+      flow,
       issuer,
       clientId,
       redirectUri,
@@ -43,7 +51,7 @@ router.get('/login', async (req, res, next) => {
       scopes,
       codeChallenge,
       codeChallengeMethod,
-      otp
+      recoveryToken
     };
     res.render('login', {
       siwVersion: '{{siwVersion}}',
@@ -56,38 +64,6 @@ router.get('/login', async (req, res, next) => {
 
     // Delegate error to global error handler
     next(error);
-  }
-});
-
-router.get('/login/callback', async (req, res, next) => {
-  const parsedUrl = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-  const { search, href } = parsedUrl;
-  const { state, otp } = req.query;
-  const authClient = getAuthClient(req);
-
-  if (authClient.idx.isEmailVerifyCallback(search)) {
-    if (authClient.idx.canProceed({ state })) {
-      res.redirect(`/login?state=${state}&otp=${otp}`);
-      return;
-    } else {
-      const error = new Error(`Enter the OTP code in the original tab: ${otp}`);
-      next(error);
-      return;
-    }
-  }
-
-  if (authClient.idx.isInteractionRequired(search)) {
-    res.redirect(`/login?state=${state}`);
-    return;
-  }
-
-  try {
-    // Exchange code for tokens
-    await authClient.idx.handleInteractionCodeRedirect(href);
-    // Redirect back to home page
-    res.redirect('/');
-  } catch (err) {
-    next(err);
   }
 });
 

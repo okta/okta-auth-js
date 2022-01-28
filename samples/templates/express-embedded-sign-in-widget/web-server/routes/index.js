@@ -15,9 +15,11 @@
 const login = require('./login');
 const logout = require('./logout');
 const home = require('./home');
+const recoverPassword = require('./recoverPassword');
 
 module.exports = [
   login,
   logout,
   home,
+  recoverPassword
 ];
