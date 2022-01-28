@@ -19,14 +19,20 @@ import {
   AuthenticatorVerificationData,
   ResetAuthenticator,
   ReEnrollAuthenticator,
+  SelectAuthenticatorEnroll,
+  AuthenticatorEnrollmentData,
+  EnrollPoll
 } from '../remediators';
 
 export const PasswordRecoveryFlow: RemediationFlow = {
   'identify': Identify,
   'identify-recovery': Identify,
   'select-authenticator-authenticate': SelectAuthenticatorAuthenticate,
+  'select-authenticator-enroll': SelectAuthenticatorEnroll,
   'challenge-authenticator': ChallengeAuthenticator,
   'authenticator-verification-data': AuthenticatorVerificationData,
+  'authenticator-enrollment-data': AuthenticatorEnrollmentData,
   'reset-authenticator': ResetAuthenticator,
   'reenroll-authenticator': ReEnrollAuthenticator,
+  'enroll-poll': EnrollPoll,
 };
