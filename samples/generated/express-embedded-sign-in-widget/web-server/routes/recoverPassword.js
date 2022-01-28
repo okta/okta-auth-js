@@ -14,9 +14,9 @@
 const express = require('express');
 const { 
   getAuthClient,
+  getTransactionMeta
 } = require('../utils');
 
-const getConfig = require('../../config');
 const router = express.Router();
 
 router.get('/recover-password', async (req, res, next) => {
@@ -27,18 +27,20 @@ router.get('/recover-password', async (req, res, next) => {
     // https://github.com/okta/okta-signin-widget/blob/master/docs/interaction_code_flow.md#flow
     const flow = 'resetPassword';
     const state = req.transactionId;
-    const meta = await authClient.idx.getTransactionMeta({
-      state,
+    const meta = await getTransactionMeta(req, {
       flow,
       recoveryToken
     });
 
     const {
+      clientId,
+      redirectUri,
+      issuer,
+      scopes,
       codeChallenge, 
       codeChallengeMethod, 
     } = meta;
 
-    const { clientId, redirectUri, issuer, scopes } = getConfig().webServer.oidc;
     const widgetConfig = {
       useInteractionCodeFlow: true,
       flow,

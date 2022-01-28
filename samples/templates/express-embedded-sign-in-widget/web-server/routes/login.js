@@ -15,30 +15,30 @@ const express = require('express');
 const URL = require('url').URL;
 const { 
   getAuthClient,
+  getTransactionMeta
 } = require('../utils');
-
-const getConfig = require('../../config');
 
 const router = express.Router();
 
 router.get('/login', async (req, res, next) => {
   const authClient = getAuthClient(req);
   try {
-    const state = req.transactionId;
-    const meta = await authClient.idx.getTransactionMeta({
-      state
-    });
+    const meta = await getTransactionMeta(req);
     const {
+      clientId,
+      redirectUri,
+      issuer,
+      scopes,
+      state,
       codeChallenge, 
       codeChallengeMethod,
     } = meta;
-    const { clientId, redirectUri, issuer, scopes } = getConfig().webServer.oidc;
     const { otp } = req.query;
     const widgetConfig = {
       useInteractionCodeFlow: true,
       issuer,
-      clientId: clientId,
-      redirectUri: redirectUri,
+      clientId,
+      redirectUri,
       state,
       scopes,
       codeChallenge,
