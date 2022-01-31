@@ -198,7 +198,7 @@ export async function remediate(
         return remediate(idxResponse, valuesWithoutExecutedAction, options); // recursive call
       }
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      else if (typeof action ==='string' && action in remediators!) {
+      else if (action in remediators!) {
         const remediation = neededToProceed.find(({ name }) => name === action);
         if (!remediation) {
           continue;
@@ -207,7 +207,7 @@ export async function remediate(
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const T = remediators![action];
-        const remediatorCandidate = new T(remediation, values);
+        const remediatorCandidate = new T(remediation, valuesWithoutExecutedAction);
         if (remediatorCandidate.canRemediate(flow)) {
           remediator = remediatorCandidate;
         }
