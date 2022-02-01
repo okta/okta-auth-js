@@ -14,7 +14,6 @@
 import { RemediationFlow } from './RemediationFlow';
 import {
   Identify,
-  UnlockAccount,
   SelectAuthenticatorUnlockAccount,
   SelectAuthenticatorAuthenticate,
   ChallengeAuthenticator,
@@ -24,7 +23,9 @@ import {
 
 export const AccountUnlockFlow: RemediationFlow = {
   'identify': Identify,
-  'unlock-account': UnlockAccount,
+  // NOTE: unlock-account is purposely not included. Handled as action
+  // because it's a rememdiation which requires no input
+  // 'unlock-account': UnlockAccount,
   'select-authenticator-unlock-account': SelectAuthenticatorUnlockAccount,
   'select-authenticator-authenticate': SelectAuthenticatorAuthenticate,
   'challenge-authenticator': ChallengeAuthenticator,

@@ -16,7 +16,6 @@ import { hasSavedInteractionHandle } from './transactionMeta';
 import { startTransaction } from './startTransaction';
 import {
   IdentifyValues,
-  UnlockAccountValues,
   SelectAuthenticatorUnlockAccountValues,
   SelectAuthenticatorAuthenticateValues,
   ChallengeAuthenticatorValues,
@@ -32,7 +31,6 @@ import {
 
 export type AccountUnlockOptions = IdxOptions
   & IdentifyValues
-  & UnlockAccountValues 
   & SelectAuthenticatorUnlockAccountValues
   & SelectAuthenticatorAuthenticateValues
   & ChallengeAuthenticatorValues

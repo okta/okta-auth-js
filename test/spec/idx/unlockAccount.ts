@@ -251,43 +251,6 @@ describe('/idx/unlockAccout', () => {
     });
   });
 
-  it ('throws AuthSDKError when remediation passed as `actions` cannot be fulfilled', async () => {
-    const { 
-      authClient,
-      unlockAccoutRemediationResponse
-    } = testContext;
-
-    const flowMocks = {
-      flow: 'unlockAccount',
-      remediators: AccountUnlockFlow,
-      withCredentials: false,
-    };
-
-    jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(unlockAccoutRemediationResponse);
-    jest.spyOn(mocked.flowSpec, 'getFlowSpecification')
-      .mockImplementation(() => ({
-        ...flowMocks,
-        actions: ['select-authenticator-unlock-account', 'select-authenticator-unlock-account']
-      }));
-    let didThrow = false;
-
-    try {
-      await unlockAccount(authClient, {});    // call with no values
-    }
-    catch (err) {
-      didThrow = true;
-      expect(err).toBeInstanceOf(AuthSdkError);
-      expect((err as any).errorSummary).toBe(
-        `Unable to proceed with the configured remediations:
-        Attempted: [select-authenticator-unlock-account, select-authenticator-unlock-account]
-        Received: [select-authenticator-unlock-account]
-        Values: {}`
-      );
-    }
-    expect(didThrow).toBe(true);
-    expect(mocked.flowSpec.getFlowSpecification).toHaveBeenCalled();
-  });
-
   describe('feature detection', () => {
     beforeEach(() => {
       jest.spyOn(mocked.transactionMeta, 'hasSavedInteractionHandle').mockReturnValue(false);
