@@ -197,7 +197,7 @@ export async function remediate(
 
       // search for action in remediation list
       const remediationAction = neededToProceed.find(({ name }) => name === action);
-      if (!!remediationAction) {
+      if (remediationAction) {
         try {
           idxResponse = await idxResponse.proceed(action, {});
         }

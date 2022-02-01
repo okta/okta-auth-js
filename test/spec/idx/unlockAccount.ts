@@ -12,7 +12,6 @@
 
 
 import { unlockAccount } from '../../../lib/idx/unlockAccount';
-import { AccountUnlockFlow } from '../../../lib/idx/flow/AccountUnlockFlow';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { AuthSdkError } from '../../../lib/errors';
 

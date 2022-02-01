@@ -34,8 +34,13 @@ router.get('/unlock-account', (req, res) => {
 
 router.post('/unlock-account', async (req, res, next) => {
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.unlockAccount({});
-  handleTransaction({ req, res, next, authClient, transaction });
+  try {
+    const transaction = await authClient.idx.unlockAccount({});
+    handleTransaction({ req, res, next, authClient, transaction });
+  }
+  catch (err) {
+    next(err);
+  }
 });
 
 // Handle reset password
@@ -58,8 +63,13 @@ router.get('/select-authenticator-unlock-account', (req, res) => {
 router.post('/select-authenticator-unlock-account', async (req, res, next) => {
   const { username, authenticator } = req.body;
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.unlockAccount({ username, authenticator });
-  handleTransaction({ req, res, next, authClient, transaction });
+  try {
+    const transaction = await authClient.idx.unlockAccount({ username, authenticator });
+    handleTransaction({ req, res, next, authClient, transaction });
+  }
+  catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;

@@ -20,7 +20,6 @@ import { Authenticator } from '../../types';
 
 export type SelectAuthenticatorValues = RemediationValues & {
   authenticator?: string;
-  methodType?: string;
 };
 
 // Base class - DO NOT expose static remediationName
