@@ -19,6 +19,7 @@ const authenticator = require('./authenticator');
 const cancel = require('./cancel');
 const home = require('./home');
 const terminal = require('./terminal');
+const unlockAccount = require('./unlock-account');
 
 module.exports = [
   // idx routes
@@ -28,6 +29,7 @@ module.exports = [
   recoverPassword,
   authenticator,
   cancel,
+  unlockAccount,
 
   // general routes
   home,

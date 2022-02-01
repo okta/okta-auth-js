@@ -10,4 +10,6 @@ export type FlowIdentifier = 'default'
   | 'enrollProfile'
 // idx.recoverPassword
   | 'recoverPassword'
-  | 'resetPassword';
+  | 'resetPassword'
+// idx.unlockAccount
+  | 'unlockAccount';

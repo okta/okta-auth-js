@@ -78,6 +78,18 @@ export const OktaVerifyAuthenticatorFactory = IdxAuthenticatorFactory.params({
   ]
 });
 
+export const OktaVerifyPushOnlyAuthenticatorFactory = IdxAuthenticatorFactory.params({
+  // TODO: add resend mock? // resend: ResendPushOktaVerifyPushResendFactory
+  displayName: 'Okta Verify',
+  key: 'okta_verify',
+  type: 'app',
+  methods: [
+    // push only
+    PushAuthenticatorMethodFactory.build()
+    // push only
+  ]
+});
+
 export const OktaVerifyAuthenticatorWithContextualDataFactory = OktaVerifyAuthenticatorFactory.params({
   contextualData: {
     qrcode: {

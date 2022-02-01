@@ -15,7 +15,7 @@
 /* eslint-disable complexity */
 import { AuthSdkError } from '../../../errors';
 import { NextStep, IdxMessage, Authenticator, Input, IdxOptions } from '../../types';
-import { IdxAuthenticator, IdxContext, IdxRemediation } from '../../types/idx-js';
+import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
@@ -81,6 +81,7 @@ export class Remediator {
   }
 
   // Override this method to provide custom check
+  /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   canRemediate(): boolean {
     if (!this.map) {
       return false;

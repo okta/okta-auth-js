@@ -25,6 +25,7 @@ import {
   AuthenticationOptions, 
   RegistrationOptions as IdxRegistrationOptions,
   PasswordRecoveryOptions,
+  AccountUnlockOptions,
   ProceedOptions,
   CancelOptions,
   IdxOptions,
@@ -297,6 +298,7 @@ export interface IdxAPI {
   authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;
   register: (options?: IdxRegistrationOptions) => Promise<IdxTransaction>;
   recoverPassword: (options?: PasswordRecoveryOptions) => Promise<IdxTransaction>;
+  unlockAccount: (options?: AccountUnlockOptions) => Promise<IdxTransaction>;
   poll: (options?: IdxPollOptions) => Promise<IdxTransaction>;
 
   // flow control

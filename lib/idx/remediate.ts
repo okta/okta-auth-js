@@ -173,23 +173,6 @@ export async function remediate(
   if (terminal) {
     return { terminal, messages };
   }
-
-  const remediator = getRemediator(neededToProceed, values, options);
-  if (!remediator && flow === 'default') {
-    return { idxResponse };
-  }
-  
-  if (!remediator) {
-    throw new AuthSdkError(`
-      No remediation can match current flow, check policy settings in your org.
-      Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
-    `);
-  }
-
-  if (messages.length) {
-    const nextStep = getNextStep(remediator, idxResponse);
-    return { nextStep, messages };
-  }
   
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
@@ -211,7 +194,37 @@ export async function remediate(
         }
         return remediate(idxResponse, valuesWithoutExecutedAction, options); // recursive call
       }
+
+      // search for action in remediation list
+      const remediationAction = neededToProceed.find(({ name }) => name === action);
+      if (remediationAction) {
+        try {
+          idxResponse = await idxResponse.proceed(action, {});
+        }
+        catch (e) {
+          return handleIdxError(e, remediators);
+        }
+
+        return remediate(idxResponse, values, options); // recursive call
+      }
     }
+  }
+
+  const remediator = getRemediator(neededToProceed, values, options);
+  if (!remediator && flow === 'default') {
+    return { idxResponse };
+  }
+
+  if (!remediator) {
+    throw new AuthSdkError(`
+      No remediation can match current flow, check policy settings in your org.
+      Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
+    `);
+  }
+
+  if (messages.length) {
+    const nextStep = getNextStep(remediator, idxResponse);
+    return { nextStep, messages };
   }
 
   // Return next step to the caller

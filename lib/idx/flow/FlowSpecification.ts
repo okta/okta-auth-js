@@ -2,6 +2,7 @@ import { OktaAuth, FlowIdentifier } from '../../types';
 import { AuthenticationFlow } from './AuthenticationFlow';
 import { PasswordRecoveryFlow } from './PasswordRecoveryFlow';
 import { RegistrationFlow } from './RegistrationFlow';
+import { AccountUnlockFlow } from './AccountUnlockFlow';
 import { RemediationFlow } from './RemediationFlow';
 
 export interface FlowSpecification {
@@ -29,6 +30,13 @@ export function getFlowSpecification(oktaAuth: OktaAuth, flow: FlowIdentifier = 
         'currentAuthenticatorEnrollment-recover'
       ];
       withCredentials = false;
+      break;
+    case 'unlockAccount':
+      remediators = AccountUnlockFlow;
+      withCredentials = false;
+      actions = [
+        'unlock-account'
+      ];
       break;
     case 'authenticate':
     case 'login':

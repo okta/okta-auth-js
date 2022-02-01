@@ -14,4 +14,5 @@ export * from './AuthenticationFlow';
 export * from './FlowSpecification';
 export * from './PasswordRecoveryFlow';
 export * from './RegistrationFlow';
+export * from './AccountUnlockFlow';
 export * from './RemediationFlow';

@@ -67,6 +67,13 @@ module.exports = function getNextRouteFromTransaction ({ nextStep }) {
     case 'reset-authenticator':
       nextRoute = '/reset-password';
       break;
+    // unlock account
+    case 'unlock-account':
+      nextRoute = '/unlock-account';
+      break;
+    case 'select-authenticator-unlock-account':
+      nextRoute = '/select-authenticator-unlock-account';
+      break;
     default:
       break;
   }

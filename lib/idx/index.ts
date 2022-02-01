@@ -23,3 +23,4 @@ export * from './recoverPassword';
 export * from './handleInteractionCodeRedirect';
 export * from './startTransaction';
 export * from './transactionMeta';
+export * from './unlockAccount';

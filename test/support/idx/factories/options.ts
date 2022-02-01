@@ -16,6 +16,7 @@ import { IdxOption, IdxAuthenticator } from '../../../../lib/idx/types/idx-js';
 import {
   EmailAuthenticatorFactory,
   OktaVerifyAuthenticatorFactory,
+  OktaVerifyPushOnlyAuthenticatorFactory,
   PasswordAuthenticatorFactory,
   PhoneAuthenticatorFactory,
   GoogleAuthenticatorFactory,
@@ -30,7 +31,8 @@ import {
   GoogleAuthenticatorFormFactory,
   SecurityQuestionAuthenticatorFormFactory,
   OktaVerifyAuthenticatorFormFactory,
-  WebauthnAuthenticatorFormFactory
+  WebauthnAuthenticatorFormFactory,
+  OktaVerifyPushOnlyAuthenticatorFormFactory
 } from './forms';
 
 interface MockedIdxOption extends IdxOption {
@@ -76,6 +78,12 @@ export const OktaVerifyAuthenticatorOptionFactory = AuthenticatorOptionFactory.p
   }
 });
 
+export const OktaVerifyAuthenticatorPushOnlyOptionFactory = AuthenticatorOptionFactory.params({
+  _authenticator: OktaVerifyPushOnlyAuthenticatorFactory.build(),
+  value: {
+    form: OktaVerifyPushOnlyAuthenticatorFormFactory.build()
+  }
+});
 
 export const PhoneAuthenticatorOptionFactory = AuthenticatorOptionFactory.params({
   _authenticator: PhoneAuthenticatorFactory.build(),

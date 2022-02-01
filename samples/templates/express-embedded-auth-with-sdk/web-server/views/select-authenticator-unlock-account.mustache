@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+
+    {{>menu}}
+
+    <div class="okta-sign-in-form ui center aligned relaxed grid">
+      <div class="row">
+        <div id="select-authenticator-page-title-header" class="ui header">
+          <h2>Select authenticator</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        {{>formMessages}}
+      </div>
+
+      <div class="row">
+        <form id="select-authenticator-form" class="ui large form" action="{{action}}" method="POST">
+          <div class="field">
+            <div class="ui labeled input">
+              <div class="ui label">
+                Username or Email
+              </div>
+              <input id="username" type="text" name="username" />
+            </div>
+          </div>
+          <div class="field">
+            <select id="authenticator-options" class="ui selection dropdown" name="authenticator">
+              {{#options}}
+                <option value="{{value}}">{{label}}</option>
+              {{/options}}
+            </select>
+          </div>
+          <button id="submit-button" class="ui fluid large primary submit button" type="submit">
+            Select
+          </button>
+        </form>
+      </div>
+
+      {{#canSkip}}
+        <form class="ui form" action="{{skipAction}}" method="POST">
+          <button id="skip-button" class="ui fluid submit button" type="submit">
+            Skip
+          </button>
+        </form>
+      {{/canSkip}}
+
+      {{>cancel}}
+
+    </div>
+  </body>
+</html>
