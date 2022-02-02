@@ -12,7 +12,7 @@
  */
 import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
-import { isRefreshTokenError, validateToken  } from './oidc/util';
+import { validateToken  } from './oidc/util';
 import { isLocalhost, isIE11OrLess } from './features';
 import { TOKEN_STORAGE_NAME } from './constants';
 import SdkClock from './clock';
