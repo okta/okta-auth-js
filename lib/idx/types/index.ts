@@ -102,7 +102,7 @@ export interface IdxTransaction {
   tokens?: Tokens;
   nextStep?: NextStep;
   messages?: IdxMessage[];
-  error?: APIError;
+  error?: APIError | IdxResponse;
   meta?: IdxTransactionMeta;
   enabledFeatures?: IdxFeature[];
   availableSteps?: NextStep[];
@@ -128,7 +128,12 @@ export interface IdxPollOptions {
 }
 
 export type Authenticator = {
-  key: string;
+  id?: string;
+  key?: string;
   methodType?: string;
   phoneNumber?: string;
 };
+
+export function isAuthenticator(obj: any): obj is Authenticator {
+  return obj && (obj.key || obj.id);
+}

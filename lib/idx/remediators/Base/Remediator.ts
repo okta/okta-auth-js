@@ -17,14 +17,15 @@ import { AuthSdkError } from '../../../errors';
 import { NextStep, IdxMessage, Authenticator, Input, IdxOptions } from '../../types';
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
+import { formatAuthenticator, compareAuthenticators } from '../../authenticator/util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[]>;
 
 export interface RemediationValues extends IdxOptions {
   stateHandle?: string;
-  authenticators?: Authenticator[] | string[];
-  authenticator?: string;
+  authenticators?: (Authenticator | string)[];
+  authenticator?: string | Authenticator;
   authenticatorsData?: Authenticator[];
 }
 
@@ -45,25 +46,22 @@ export class Remediator {
 
   private formatAuthenticators() {
     this.values.authenticators = (this.values.authenticators || []) as Authenticator[];
-    // add string authenticator from input to "authenticators" field
+
+    // ensure authenticators are in the correct format
+    this.values.authenticators = this.values.authenticators.map(authenticator => {
+      return formatAuthenticator(authenticator);
+    });
+
+    // add authenticator (if any) to "authenticators"
     if (this.values.authenticator) {
-      const hasAuthenticatorInList = this.values.authenticators.some(authenticator => {
-        if (typeof authenticator === 'string') {
-          return authenticator === this.values.authenticator;
-        }
-        return authenticator.key === this.values.authenticator;
+      const authenticator = formatAuthenticator(this.values.authenticator);
+      const hasAuthenticatorInList = this.values.authenticators.some(existing => {
+        return compareAuthenticators(authenticator, existing);
       });
       if (!hasAuthenticatorInList) {
-        this.values.authenticators.push({
-          key: this.values.authenticator 
-        });
+        this.values.authenticators.push(authenticator);
       }
     }
-
-    // transform items in "authenticators" into one format
-    this.values.authenticators = this.values.authenticators.map(authenticator => {
-      return typeof authenticator === 'string' ? { key: authenticator } : authenticator;
-    });
 
     // save non-key meta to "authenticatorsData" field
     // authenticators will be removed after selection to avoid select-authenticator loop
@@ -113,23 +111,19 @@ export class Remediator {
       );
     }
 
-    if (!this.map) {
-      return this.values[key];
-    }
-
-    // Handle general primitive types
-    const entry = this.map[key];
-    if (!entry) {
-      return this.values[key];
-    }
-
-    // find the first aliased property that returns a truthy value
-    for (let i = 0; i < entry.length; i++) {
-      let val = this.values[entry[i]];
-      if (val) {
-        return val;
+    // If a map is defined for this key, return the first aliased property that returns a truthy value
+    if (this.map && this.map[key]) {
+      const entry = this.map[key];
+      for (let i = 0; i < entry.length; i++) {
+        let val = this.values[entry[i]];
+        if (val) {
+          return val;
+        }
       }
     }
+
+    // fallback: return the value by key
+    return this.values[key];
   }
 
   hasData(

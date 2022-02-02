@@ -3,6 +3,7 @@ import { Authenticator, Credentials } from './Authenticator';
 export interface VerificationCodeValues {
   verificationCode?: string;
   otp?: string;
+  credentials?: Credentials;
 }
 
 interface VerificationCodeCredentials extends Credentials {
@@ -14,11 +15,11 @@ interface VerificationCodeCredentials extends Credentials {
 // a new authenticator class should be created if special cases need to be handled
 export class VerificationCodeAuthenticator extends Authenticator<VerificationCodeValues> {
   canVerify(values: VerificationCodeValues) {
-    return !!(values.verificationCode || values.otp);
+    return !!(values.credentials ||values.verificationCode || values.otp);
   }
 
   mapCredentials(values): VerificationCodeCredentials | Credentials {
-    return { passcode: values.verificationCode || values.otp };
+    return values.credentials || { passcode: values.verificationCode || values.otp };
   }
 
   getInputs(idxRemediationValue) {

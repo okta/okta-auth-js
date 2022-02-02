@@ -24,7 +24,7 @@ describe('OktaAuth - options', function() {
       issuer
     };
   });
-
+  
   describe('PKCE', function() {
 
     it('is true by default', function() {

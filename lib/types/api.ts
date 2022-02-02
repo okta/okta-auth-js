@@ -307,7 +307,7 @@ export interface IdxAPI {
 
   // flow control
   start: (options?: IdxOptions) => Promise<IdxTransaction>;
-  canProceed(options?: { state?: string }): boolean;
+  canProceed(options?: ProceedOptions): boolean;
   proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
   getFlow(): FlowIdentifier | undefined;

@@ -16,6 +16,7 @@ import { Remediator, RemediationValues } from './Base/Remediator';
 export interface IdentifyValues extends RemediationValues {
   username?: string;
   password?: string;
+  credentials?: { passcode: string };
 }
 
 export class Identify extends Remediator {
@@ -35,7 +36,7 @@ export class Identify extends Remediator {
   }
 
   mapCredentials() {
-    return { passcode: this.values.password };
+    return this.values.credentials || { passcode: this.values.password };
   }
 
   getInputCredentials(input) {

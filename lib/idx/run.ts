@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -24,10 +25,14 @@ import {
   IdxFeature,
   NextStep,
   FlowIdentifier,
+  IdxTransactionMeta,
+  Tokens,
+  APIError,
 } from '../types';
-import { IdxResponse, isIdxResponse } from './types/idx-js';
+import { IdxMessage, IdxResponse, isIdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { ProceedOptions } from './proceed';
+import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
 
 export type RunOptions = ProceedOptions & RemediateOptions & {
   flow?: FlowIdentifier;
@@ -36,101 +41,74 @@ export type RunOptions = ProceedOptions & RemediateOptions & {
   withCredentials?: boolean;
 }
 
-function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
-  const res = [];
-  const { actions, neededToProceed } = idxResponse;
-
-  if (actions['currentAuthenticator-recover']) {
-    res.push(IdxFeature.PASSWORD_RECOVERY as never);
-  }
-
-  if (neededToProceed.some(({ name }) => name === 'select-enroll-profile')) {
-    res.push(IdxFeature.REGISTRATION as never);
-  }
-
-  if (neededToProceed.some(({ name }) => name === 'redirect-idp')) {
-    res.push(IdxFeature.SOCIAL_IDP as never);
-  }
-
-  if (neededToProceed.some(({ name }) => name === 'unlock-account')) {
-    res.push(IdxFeature.ACCOUNT_UNLOCK as never);
-  }
-
-  return res;
+declare interface RunData {
+  options: RunOptions;
+  values: remediators.RemediationValues;
+  status?: IdxStatus;
+  tokens?: Tokens;
+  nextStep?: NextStep;
+  messages?: IdxMessage[];
+  error?: APIError | IdxResponse;
+  meta?: IdxTransactionMeta;
+  enabledFeatures?: IdxFeature[];
+  availableSteps?: NextStep[];
+  idxResponse?: IdxResponse;
+  canceled?: boolean;
+  interactionCode?: string;
+  shouldClearTransaction?: boolean;
+  clearSharedStorage?: boolean;
+  terminal?: boolean;
 }
 
-function getAvailableSteps(idxResponse: IdxResponse): NextStep[] {
-  const res = [];
+function initializeData(authClient, data: RunData): RunData {
+  const { options } = data;
+  let {
+    flow,
+    withCredentials,
+    remediators,
+    actions
+  } = options;
 
-  const remediatorMap = Object.values(remediators).reduce((map, remediatorClass) => {
-    // Only add concrete subclasses to the map
-    if (remediatorClass.remediationName) {
-      map[remediatorClass.remediationName] = remediatorClass;
-    }
-    return map;
-  }, {});
+  const status = IdxStatus.PENDING;
 
-  for (let remediation of idxResponse.neededToProceed) {
-    const T = remediatorMap[remediation.name];
-    if (T) {
-      const remediator = new T(remediation);
-      res.push (remediator.getNextStep(idxResponse.context) as never);
-    }
+  // certain options can be set by the flow specification
+  flow = flow || authClient.idx.getFlow() || 'default';
+  if (flow) {
+    authClient.idx.setFlow(flow);
+    const flowSpec = getFlowSpecification(authClient, flow);
+    // Favor option values over flow spec
+    withCredentials = (typeof withCredentials !== 'undefined') ? withCredentials : flowSpec.withCredentials;
+    remediators = remediators || flowSpec.remediators;
+    actions = actions || flowSpec.actions;
   }
-
-  return res;
+  return { 
+    ...data,
+    options: { ...options, flow, withCredentials, remediators, actions },
+    status
+  };
 }
 
-export async function run(
-  authClient: OktaAuthInterface, 
-  options: RunOptions = {},
-): Promise<IdxTransaction> {
-  let tokens;
-  let nextStep;
-  let messages;
-  let error;
-  let meta;
-  let enabledFeatures;
-  let availableSteps;
-  let status = IdxStatus.PENDING;
-  let shouldClearTransaction = false;
-  let clearSharedStorage = true;
+async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData> {
+  const { options } = data;
+  const {
+    stateHandle,
+    withCredentials,
+    version,
+    state,
+    scopes,
+    recoveryToken,
+    activationToken
+  } = options;
+
   let idxResponse;
-  let interactionHandle;
-  let metaFromResp;
-  let interactionCode;
+  let meta;
 
-  try {
-
-    let {
-      flow,
-      state,
-      scopes,
-      version,
-      remediators,
-      actions,
-      withCredentials,
-      exchangeCodeForTokens,
-      autoRemediate,
-      step,
-      recoveryToken,
-      activationToken
-    } = options;
-
-    // Only one flow can be operating at a time
-    flow = flow || authClient.idx.getFlow() || 'default';
-    if (flow) {
-      authClient.idx.setFlow(flow);
-      const flowSpec = getFlowSpecification(authClient, flow);
-      // Favor option values over flow spec
-      withCredentials = (typeof withCredentials !== 'undefined') ? withCredentials : flowSpec.withCredentials;
-      remediators = remediators || flowSpec.remediators;
-      actions = actions || flowSpec.actions;
-    }
-
+  if (stateHandle) {
+    idxResponse = await introspect(authClient, { withCredentials, version, stateHandle });
+  } else {
     // Try to resume saved transaction
-    metaFromResp = getSavedTransactionMeta(authClient, { state, recoveryToken, activationToken });
-    interactionHandle = metaFromResp?.interactionHandle; // may be undefined
+    meta = getSavedTransactionMeta(authClient, { state, recoveryToken, activationToken });
+    let interactionHandle = meta?.interactionHandle; // may be undefined
 
     if (!interactionHandle) {
       // start a new transaction
@@ -143,92 +121,178 @@ export async function run(
         recoveryToken
       }); 
       interactionHandle = interactResponse.interactionHandle;
-      metaFromResp = interactResponse.meta;
-      withCredentials = metaFromResp.withCredentials;
+      meta = interactResponse.meta;
     }
-
+  
     // Introspect to get idx response
     idxResponse = await introspect(authClient, { withCredentials, version, interactionHandle });
+  }
+  return { ...data, idxResponse, meta };
+}
+
+async function getDataFromRemediate(data: RunData): Promise<RunData> {
+  let {
+    idxResponse,
+    options,
+    values
+  } = data;
+
+  const {
+    autoRemediate,
+    remediators,
+    actions,
+    flow,
+    step,
+  } = options;
+  
+  const shouldRemediate = (autoRemediate !== false && (remediators || actions || step));
+  if (!shouldRemediate) {
+    return data;
+  }
+
+  values = { 
+    ...values, 
+    stateHandle: idxResponse!.rawIdxState.stateHandle 
+  };
+
+  // Can we handle the remediations?
+  const { 
+    idxResponse: idxResponseFromRemediation, 
+    nextStep,
+    canceled,
+  } = await remediate(idxResponse!, values, { remediators, actions, flow, step });
+  idxResponse = idxResponseFromRemediation;
+
+  return { ...data, idxResponse, nextStep, canceled };
+}
+
+async function getTokens(authClient, data: RunData): Promise<Tokens> {
+  let { meta, idxResponse } = data;
+  const { interactionCode } = idxResponse as IdxResponse;
+  const {
+    clientId,
+    codeVerifier,
+    ignoreSignature,
+    redirectUri,
+    urls,
+    scopes,
+  } = meta as IdxTransactionMeta;
+  const tokenResponse = await authClient.token.exchangeCodeForTokens({
+    interactionCode,
+    clientId,
+    codeVerifier,
+    ignoreSignature,
+    redirectUri,
+    scopes
+  }, urls);
+  return tokenResponse.tokens;
+}
+
+async function finalizeData(authClient, data: RunData): Promise<RunData> {
+  let {
+    options,
+    idxResponse,
+    canceled,
+    status,
+  } = data;
+  const { exchangeCodeForTokens } = options;
+  let shouldClearTransaction = false;
+  let clearSharedStorage = true;
+  let interactionCode;
+  let tokens;
+  let enabledFeatures;
+  let availableSteps;
+  let messages;
+  let terminal;
+
+  if (idxResponse) {
     enabledFeatures = getEnabledFeatures(idxResponse);
     availableSteps = getAvailableSteps(idxResponse);
-    
-    // Include meta in the transaction response
-    meta = metaFromResp;
+    messages = getMessagesFromResponse(idxResponse);
+    terminal = isTerminalResponse(idxResponse);
+  }
 
-    if (autoRemediate !== false && (remediators || actions)) {
-      const values: remediators.RemediationValues = { 
-        ...options, 
-        stateHandle: idxResponse.rawIdxState.stateHandle 
-      };
-
-      // Can we handle the remediations?
-      const { 
-        idxResponse: idxResponseFromResp, 
-        nextStep: nextStepFromResp,
-        terminal,
-        canceled,
-        messages: messagesFromResp,
-      } = await remediate(idxResponse, values, { remediators, actions, flow, step });
-      idxResponse = idxResponseFromResp || idxResponse;
-
-      // Track fields from remediation response
-      nextStep = nextStepFromResp;
-      messages = messagesFromResp;
-
-      // Save intermediate idx response in storage to reduce introspect call
-      if (nextStep) {
-        authClient.transactionManager.saveIdxResponse(idxResponse.rawIdxState);
-        availableSteps = getAvailableSteps(idxResponse);
-      }
-
-      if (terminal) {
-        status = IdxStatus.TERMINAL;
-        shouldClearTransaction = true;
-        clearSharedStorage = false; // transaction may be continued in another tab
-      } if (canceled) {
-        status = IdxStatus.CANCELED;
-        shouldClearTransaction = true;
-      } else if (idxResponse?.interactionCode) { 
-        interactionCode = idxResponse.interactionCode;
-
-        if (exchangeCodeForTokens === false) {
-          status = IdxStatus.SUCCESS;
-          shouldClearTransaction = false;
-        } else {
-          // exchange the interaction code for tokens
-          const {
-            clientId,
-            codeVerifier,
-            ignoreSignature,
-            redirectUri,
-            urls,
-            scopes,
-          } = metaFromResp;
-          tokens = await authClient.token.exchangeCodeForTokens({
-            interactionCode,
-            clientId,
-            codeVerifier,
-            ignoreSignature,
-            redirectUri,
-            scopes
-          }, urls);
-
-          status = IdxStatus.SUCCESS;
-          shouldClearTransaction = true;
-        }
-      }
-    }
-  } catch (err) {
-    // current version of idx-js will throw/reject IDX responses. Handle these differently than regular errors
-    if (isIdxResponse(err)) {
-      error = err;
-      status = IdxStatus.FAILURE;
-      shouldClearTransaction = true;
+  if (terminal) {
+    status = IdxStatus.TERMINAL;
+    shouldClearTransaction = true;
+    clearSharedStorage = false;
+  } else if (canceled) {
+    status = IdxStatus.CANCELED;
+    shouldClearTransaction = true;
+  } else if (idxResponse?.interactionCode) { 
+    interactionCode = idxResponse.interactionCode;
+    if (exchangeCodeForTokens === false) {
+      status = IdxStatus.SUCCESS;
+      shouldClearTransaction = false;
     } else {
-      // error is not an IDX response, throw it like a regular error
-      throw err;
+      tokens = await getTokens(authClient, data);
+      status = IdxStatus.SUCCESS;
+      shouldClearTransaction = true;
     }
+  }
+  return {
+    ...data,
+    status,
+    interactionCode,
+    tokens,
+    shouldClearTransaction,
+    clearSharedStorage,
+    enabledFeatures,
+    availableSteps,
+    messages,
+    terminal
+  };
+}
 
+function handleError(err, data: RunData): RunData {
+  let { error, status, shouldClearTransaction } = data;
+
+  // current version of idx-js will throw/reject IDX responses. Handle these differently than regular errors
+  if (isIdxResponse(err)) {
+    error = err;
+    status = IdxStatus.FAILURE;
+    shouldClearTransaction = true;
+  } else {
+    // error is not an IDX response, throw it like a regular error
+    throw err;
+  }
+
+  return { ...data, error, status, shouldClearTransaction };
+}
+
+export async function run(
+  authClient: OktaAuthInterface, 
+  options: RunOptions = {},
+): Promise<IdxTransaction> {
+  let data: RunData = { options, values: { ...options } };
+
+  data = initializeData(authClient, data);
+  try {
+    data = await getDataFromIntrospect(authClient, data);
+    data = await getDataFromRemediate(data);
+  } catch (err) {
+    data = handleError(err, data);
+  }
+  data = await finalizeData(authClient, data);
+
+  const {
+    idxResponse,
+    meta,
+    shouldClearTransaction,
+    clearSharedStorage,
+    status,
+    enabledFeatures,
+    availableSteps,
+    tokens,
+    nextStep,
+    messages,
+    error,
+    interactionCode
+  } = data;
+
+  if (idxResponse) {
+    // Save intermediate idx response in storage to reduce introspect call
+    authClient.transactionManager.saveIdxResponse(idxResponse.rawIdxState);
   }
 
   if (shouldClearTransaction) {
@@ -242,21 +306,21 @@ export async function run(
   // from idx-js, used by the widget
   const { actions, context, neededToProceed, proceed, rawIdxState } = idxResponse || {};
   return {
-    status,
+    status: status!,
     ...(meta && { meta }),
     ...(enabledFeatures && { enabledFeatures }),
     ...(availableSteps && { availableSteps }),
-    ...(tokens && { tokens: tokens.tokens }),
+    ...(tokens && { tokens }),
     ...(nextStep && { nextStep }),
-    ...(messages && { messages }),
+    ...(messages && messages.length && { messages }),
     ...(error && { error }),
     interactionCode, // if options.exchangeCodeForTokens is false
 
     // from idx-js
-    actions,
-    context,
-    neededToProceed,
-    proceed,
-    rawIdxState,
+    actions: actions!,
+    context: context!,
+    neededToProceed: neededToProceed!,
+    proceed: proceed!,
+    rawIdxState: rawIdxState!,
   };
 }

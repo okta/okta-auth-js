@@ -83,7 +83,7 @@ export interface BrowserStorageUtil extends StorageUtil {
   getCookieStorage(options?: StorageOptions): CookieStorage;
   testStorage(storage: any): boolean;
   storage: Cookies;
-  inMemoryStore: { string? : string };
+  inMemoryStore: Record<string, unknown>;
 
   // will be removed in next version. OKTA-362589
   getHttpCache(options?: StorageOptions): StorageProvider;

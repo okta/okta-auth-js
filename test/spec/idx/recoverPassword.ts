@@ -77,7 +77,9 @@ describe('idx/recoverPassword', () => {
         setFlow: () => {}
       },
       token: {
-        exchangeCodeForTokens: jest.fn()
+        exchangeCodeForTokens: jest.fn().mockReturnValue({
+          tokens: {}
+        })
       }
     };
 

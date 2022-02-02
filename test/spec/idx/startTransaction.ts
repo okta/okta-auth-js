@@ -58,7 +58,8 @@ describe('idx/startTransaction', () => {
         load: () => transactionMeta,
         clear: () => {},
         save: () => {},
-        clearIdxResponse: () => {}
+        clearIdxResponse: () => {},
+        saveIdxResponse: () => {}
       },
       idx: {
         getFlow: () => {},
@@ -69,7 +70,11 @@ describe('idx/startTransaction', () => {
       }
     };
 
-    const idxResponse = IdxResponseFactory.build();
+    const idxResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        IdentifyRemediationFactory.build(),
+      ]
+    });
     jest.spyOn(mocked.interact, 'interact').mockResolvedValue({
       meta: transactionMeta,
       interactionHandle: 'meta-interactionHandle',
@@ -94,6 +99,7 @@ describe('idx/startTransaction', () => {
     await startTransaction(authClient);
     expect(mocked.interact.interact).toHaveBeenCalledWith(authClient, { withCredentials: true });
     expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, { 
+      withCredentials: true,
       interactionHandle: 'meta-interactionHandle' 
     });
     expect(mocked.remediate.remediate).toHaveBeenCalledWith(
@@ -123,7 +129,13 @@ describe('idx/startTransaction', () => {
       const res = await startTransaction(authClient);
       expect(res).toEqual(Object.assign({}, idxResponse, {
         status: 'PENDING',
-        availableSteps: [],
+        availableSteps: [{
+          inputs: [{
+            label: 'Username',
+            name: 'username'
+          }],
+          name: 'identify'
+        }],
         enabledFeatures: [],
         meta: transactionMeta,
         toPersist: undefined
@@ -159,6 +171,7 @@ describe('idx/startTransaction', () => {
       }
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
+    jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue({ idxResponse });
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
     expect(res.enabledFeatures!.includes(IdxFeature.PASSWORD_RECOVERY)).toBeTruthy();
@@ -171,6 +184,7 @@ describe('idx/startTransaction', () => {
       ]
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
+    jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue({ idxResponse });
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
     expect(res.enabledFeatures!.includes(IdxFeature.REGISTRATION)).toBeTruthy();
@@ -183,6 +197,7 @@ describe('idx/startTransaction', () => {
       ]
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
+    jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue({ idxResponse });
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
     expect(res.enabledFeatures!.includes(IdxFeature.SOCIAL_IDP)).toBeTruthy();
@@ -196,6 +211,7 @@ describe('idx/startTransaction', () => {
       ]
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
+    jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue({ idxResponse });
     const { authClient } = testContext;
     const res = await startTransaction(authClient);
     expect(res.availableSteps).toEqual([

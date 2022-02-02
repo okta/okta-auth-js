@@ -2,15 +2,16 @@ import { Authenticator, Credentials } from './Authenticator';
 
 export interface OktaPasswordInputValues {
   password?: string;
+  credentials?: Credentials;
 }
 
 export class OktaPassword extends Authenticator<OktaPasswordInputValues> {
   canVerify(values: OktaPasswordInputValues) {
-    return !!values.password;
+    return !!(values.credentials || values.password);
   }
 
   mapCredentials(values: OktaPasswordInputValues): Credentials {
-    return { passcode: values.password };
+    return values.credentials || { passcode: values.password };
   }
 
   getInputs(idxRemediationValue) {

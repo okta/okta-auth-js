@@ -14,18 +14,18 @@
 
 import { Remediator, RemediationValues } from './Remediator';
 import { getAuthenticatorFromRemediation } from '../util';
-import { IdxAuthenticator, IdxOption, IdxRemediationValue } from '../../types/idx-js';
-import { Authenticator } from '../../types';
-
+import { IdxOption, IdxRemediationValue } from '../../types/idx-js';
+import { Authenticator, isAuthenticator } from '../../types';
+import { compareAuthenticators, findMatchedOption} from '../../authenticator/util';
 
 export type SelectAuthenticatorValues = RemediationValues & {
-  authenticator?: string;
+  authenticator?: string | Authenticator;
 };
 
 // Base class - DO NOT expose static remediationName
 export class SelectAuthenticator extends Remediator {
   values!: SelectAuthenticatorValues;
-  selectedAuthenticator?: IdxAuthenticator;
+  selectedAuthenticator?: Authenticator;
   selectedOption?: any;
   
   map = {
@@ -46,13 +46,19 @@ export class SelectAuthenticator extends Remediator {
   }
 
   canRemediate() {
-    const { authenticators } = this.values;
+    const { authenticators, authenticator } = this.values;
     const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
     const { options } = authenticatorFromRemediation;
     // Let users select authenticator if no input is provided
     if (!authenticators || !authenticators.length) {
       return false;
     }
+
+    // Authenticator is explicitly specified by id
+    if (isAuthenticator(authenticator) && authenticator.id) {
+      return true;
+    }
+
     // Proceed with provided authenticators
     const matchedOption = this.findMatchedOption(authenticators, options);
     if (matchedOption) {
@@ -77,11 +83,17 @@ export class SelectAuthenticator extends Remediator {
   }
 
   mapAuthenticator(remediationValue: IdxRemediationValue) {
-    const { authenticators } = this.values;
+    const { authenticators, authenticator } = this.values;
+
+    // Authenticator is explicitly specified by id
+    if (isAuthenticator(authenticator) && authenticator.id) {
+      this.selectedAuthenticator = authenticator; // track the selected authenticator
+      return authenticator;
+    }
+
     const { options } = remediationValue;
-    const selectedOption = this.findMatchedOption(authenticators, options);
-    // track the selected authenticator
-    this.selectedAuthenticator = selectedOption.relatesTo;
+    const selectedOption = findMatchedOption(authenticators, options);
+    this.selectedAuthenticator = selectedOption.relatesTo; // track the selected authenticator
     this.selectedOption = selectedOption;
     return {
       id: selectedOption?.value.form.value.find(({ name }) => name === 'id').value
@@ -97,7 +109,7 @@ export class SelectAuthenticator extends Remediator {
     // remove used authenticators
     const authenticators = (this.values.authenticators as Authenticator[])
       .filter(authenticator => {
-        return authenticator.key !== this.selectedAuthenticator!.key; 
+        return compareAuthenticators(authenticator, this.selectedAuthenticator) !== true;
       });
     return { ...this.values, authenticators };
   }
