@@ -424,11 +424,8 @@ export class TokenManager implements TokenManagerInterface {
         return tokens[tokenType];
       })
       .catch(err => {
-        // If renew fails, remove token and emit error
-        if (isRefreshTokenError(err) || err.name === 'OAuthError' || err.name === 'AuthSdkError') {
-          // remove token from storage
-          this.remove(key);
-        }
+        // If renew fails, remove token from storage and emit error
+        this.remove(key);
         err.tokenKey = key;
         this.emitError(err);
         throw err;
