@@ -91,6 +91,7 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
     recoveryToken,
 
     // X-Device-Token header need to pair with `client_secret`
+    // eslint-disable-next-line max-len
     // https://oktawiki.atlassian.net/wiki/spaces/eng/pages/2445902453/Support+Device+Binding+in+interact#Scenario-1%3A-Non-User-Agent-with-Confidential-Client-(top-priority)
     clientSecret
   });
