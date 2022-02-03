@@ -67,8 +67,8 @@ export async function interact (authClient: OktaAuth, options: InteractOptions =
     codeChallengeMethod,
     activationToken,
     recoveryToken,
-    clientSecret
-  } = meta as IdxTransactionMeta & InteractOptions;
+  } = meta as IdxTransactionMeta;
+  const clientSecret = options.clientSecret || authClient.options.clientSecret;
 
   const interactionHandle = await idx.interact({
     withCredentials,
