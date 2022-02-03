@@ -2364,7 +2364,7 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@okta/okta-idx-js@0.25.0", "@okta/okta-idx-js@^0.25.0":
+"@okta/okta-idx-js@0.25.0":
   version "0.25.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.25.0.tgz#4ca1d1a9b5617cbdc5374965caea9949b5b22cbc"
   integrity sha512-cNOYSHCzLR5NKqiBsvPYYuWYPerLIVva6SNF7+/vb4zH1/hBjznlj/W6guVl0m5Tycz/ZUuVSQzHtEQoock/uQ==
