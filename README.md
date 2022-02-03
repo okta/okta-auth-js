@@ -267,7 +267,7 @@ const authClient: OktaAuth = new OktaAuth(config)
 const tokenManager: TokenManager = authClient.tokenManager;
 const accessToken: AccessToken = await tokenManager.get('accessToken') as AccessToken;
 const idToken: IDToken = await tokenManager.get('idToken') as IDToken;
-const userInfo: UserClaims = await authClient.getUserInfo(accessToken, idToken);
+const userInfo: UserClaims = await authClient.token.getUserInfo(accessToken, idToken);
 
 if (!userInfo) {
   const tokenParams: TokenParams = {
