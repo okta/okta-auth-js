@@ -391,6 +391,39 @@ describe('idx/interact', () => {
           });
         });
       });
+
+      describe('clientSecret', () => {
+        it('uses clientSecret from sdk options', async () => {
+          const { authClient } = testContext;
+          authClient.options.clientSecret = 'sdk-clientSecret';
+          const res = await interact(authClient, {});
+          expect(mocked.idx.interact).toHaveBeenCalledWith({
+            'clientId': 'authClient-clientId',
+            'baseUrl': 'authClient-issuer/oauth2',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'redirectUri': 'authClient-redirectUri',
+            'scopes': ['authClient'],
+            'state': 'authClient-state',
+            'clientSecret': 'sdk-clientSecret'
+          });
+        });
+        it('uses clientSecret from function options (overrides sdk option)', async () => {
+          const { authClient } = testContext;
+          authClient.options.clientSecret = 'sdk-clientSecret';
+          const res = await interact(authClient, { clientSecret: 'fn-clientSecret' });
+          expect(mocked.idx.interact).toHaveBeenCalledWith({
+            'clientId': 'authClient-clientId',
+            'baseUrl': 'authClient-issuer/oauth2',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'redirectUri': 'authClient-redirectUri',
+            'scopes': ['authClient'],
+            'state': 'authClient-state',
+            'clientSecret': 'fn-clientSecret'
+          });
+        });
+      });
   
       it('saves returned interactionHandle', async () => {
         const { authClient } = testContext;
