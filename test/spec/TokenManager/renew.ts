@@ -141,7 +141,7 @@ describe('TokenManager renew', () => {
       jest.spyOn(testContext.sdkMock.token, 'renewTokens').mockImplementation(() => Promise.reject(testContext.error));
     });
 
-    it('OAuthError', async () => {
+    it('on OAuthError, should remove token and emit error', async () => {
       testContext.error = new OAuthError('does not matter', 'also not important');
       try {
         await testContext.instance.renew('idToken');
@@ -155,7 +155,7 @@ describe('TokenManager renew', () => {
       expect(testContext.error.tokenKey).toBe('idToken');
     });
 
-    it('AuthSdkError', async () => {
+    it('on AuthSdkError, should remove token and emit error', async () => {
       testContext.error = new AuthSdkError('does not matter');
       try {
         await testContext.instance.renew('idToken');
@@ -169,7 +169,7 @@ describe('TokenManager renew', () => {
       expect(testContext.error.tokenKey).toBe('idToken');
     });
 
-    it('Refresh token error', async () => {
+    it('on refresh token error, should remove token and emit error', async () => {
       testContext.error = new AuthApiError({
         errorSummary: 'does not matter'
       }, {
@@ -192,7 +192,7 @@ describe('TokenManager renew', () => {
       expect(testContext.error.tokenKey).toBe('idToken');
     });
 
-    it('Other AuthApiError', async () => {
+    it('on other error, should remove token and emit error', async () => {
       testContext.error = new AuthApiError({
         errorSummary: 'Not Found'
       }, {
@@ -207,8 +207,9 @@ describe('TokenManager renew', () => {
           name: 'AuthApiError'
         });
       }
-      expect(testContext.instance.remove).not.toHaveBeenCalledWith('idToken');
+      expect(testContext.instance.remove).toHaveBeenCalledWith('idToken');
       expect(testContext.instance.emitError).toHaveBeenCalledWith(testContext.error);
+      expect(testContext.error.tokenKey).toBe('idToken');
     });
 
   });

@@ -383,10 +383,15 @@ describe('TokenManager', function() {
       }).then(function() {
         expect(false).toBe(true);
       }).catch(function(err) {
+        // After token renew fails it is removed from storage, so next call will throw error
         util.expectErrorToEqual(err, {
-          name: 'Error',
-          message: 'expected',
-          tokenKey: 'test-idToken'
+          name: 'AuthSdkError',
+          message: 'The tokenManager has no token for the key: test-idToken',
+          errorCode: 'INTERNAL',
+          errorSummary: 'The tokenManager has no token for the key: test-idToken',
+          errorLink: 'INTERNAL',
+          errorId: 'INTERNAL',
+          errorCauses: []
         });
       });
       return p1;
