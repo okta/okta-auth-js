@@ -682,11 +682,17 @@ class OktaAuth implements SDKInterface, SigninAPI, SignoutAPI {
       this.tokenManager.setTokens(tokens);
       originalUri = originalUri || this.getOriginalUri(this.options.state);
     } else if (this.isLoginRedirect()) {
-      // For redirect flow, get state from the URL and use it to retrieve the originalUri
-      const oAuthResponse = await parseOAuthResponseFromUrl(this, {});
-      state = oAuthResponse.state;
-      originalUri = originalUri || this.getOriginalUri(state);
-      await this.storeTokensFromRedirect();
+      try {
+        // For redirect flow, get state from the URL and use it to retrieve the originalUri
+        const oAuthResponse = await parseOAuthResponseFromUrl(this, {});
+        state = oAuthResponse.state;
+        originalUri = originalUri || this.getOriginalUri(state);
+        await this.storeTokensFromRedirect();
+      } catch(e) {
+        // auth state should be updated
+        await this.authStateManager.updateAuthState();
+        throw e;
+      }
     } else {
       return; // nothing to do
     }

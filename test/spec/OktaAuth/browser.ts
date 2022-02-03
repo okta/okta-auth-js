@@ -694,6 +694,24 @@ describe('OktaAuth (browser)', function() {
       expect(window.location.replace).not.toHaveBeenCalled();
     });
 
+    it('will call updateAuthState if parseFromUrl throws an error', async () => {
+      const error = new Error('mock error');
+      auth.authStateManager.updateAuthState = jest.fn();
+      auth.token.parseFromUrl.mockImplementation(async () => {
+        throw error;
+      });
+      auth.isLoginRedirect = jest.fn().mockReturnValue(true);
+      let errorThrown = false;
+      try {
+        await auth.handleLoginRedirect();
+      } catch (e) {
+        expect(e).toBe(error);
+        errorThrown = true;
+      }
+      expect(errorThrown).toBe(true);
+      expect(auth.authStateManager.updateAuthState).toHaveBeenCalled();
+    });
+
   });
 
 });
