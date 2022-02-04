@@ -13,8 +13,8 @@
 
 import { interact } from '../../../lib/idx/interact';
 
-jest.mock('@okta/okta-idx-js', () => {
-  const actual = jest.requireActual('@okta/okta-idx-js').default;
+jest.mock('../../../lib/idx/idx-js', () => {
+  const actual = jest.requireActual('../../../lib/idx/idx-js').default;
   return {
     client: actual.client,
     interact: () => {}
@@ -31,7 +31,7 @@ jest.mock('../../../lib/idx/transactionMeta', () => {
 });
 
 const mocked = {
-  idx: require('@okta/okta-idx-js'),
+  idx: require('../../../lib/idx/idx-js'),
   transactionMeta: require('../../../lib/idx/transactionMeta')
 };
 

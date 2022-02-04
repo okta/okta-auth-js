@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import idx from '@okta/okta-idx-js';
+import idx from './idx-js';
 import { OktaAuth } from '../types';
 import { IdxResponse, isRawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';
@@ -32,6 +32,7 @@ export async function introspect (authClient: OktaAuth, options: IntrospectOptio
     const version = options.version || IDX_API_VERSION;
     const domain = getOAuthDomain(authClient);
     try {
+      // @ts-ignore
       rawIdxResponse = await idx.introspect({ domain, ...options, version });
     } catch (err) {
       if (isRawIdxResponse(err)) {
@@ -43,5 +44,6 @@ export async function introspect (authClient: OktaAuth, options: IntrospectOptio
   }
 
   const { withCredentials } = options;
+  // @ts-ignore
   return idx.makeIdxState(rawIdxResponse, { withCredentials });
 }

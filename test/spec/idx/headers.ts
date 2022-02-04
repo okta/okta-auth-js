@@ -26,14 +26,13 @@ jest.mock('cross-fetch', () => {
   return mocked.crossFetch;
 });
 
-import idx from '@okta/okta-idx-js';
+import idx from '../../../lib/idx/idx-js';
 import { setRequestHeader } from '../../../lib/http';
 import { 
   createGlobalRequestInterceptor, 
   setGlobalRequestInterceptor,
   clearGlobalRequestInterceptor 
 } from '../../../lib/idx/headers';
-const idxPackageJSON = require('@okta/okta-idx-js/package.json');
 
 describe('idx headers', () => {
 
@@ -74,11 +73,13 @@ describe('idx headers', () => {
 
   async function callIntrospect() {
     const { domain, interactionHandle, stateHandle, version } = testContext;
+    // @ts-ignore
     await idx.introspect({ domain, interactionHandle, stateHandle, version });
   }
 
   async function callInteract() {
     const { clientId, baseUrl, redirectUri, codeChallenge, codeChallengeMethod, state } = testContext;
+    // @ts-ignore
     await idx.interact({ clientId, baseUrl, redirectUri, codeChallenge, codeChallengeMethod, state });
   }
 
@@ -97,7 +98,6 @@ describe('idx headers', () => {
         }),
         credentials: 'include',
         headers: {
-          'X-Okta-User-Agent-Extended': `okta-idx-js/${idxPackageJSON.version}`,
           'accept': 'application/ion+json; okta-version=1.0.0',
           'content-type': 'application/ion+json; okta-version=1.0.0',
         },
@@ -117,7 +117,6 @@ describe('idx headers', () => {
         }),
         credentials: 'include',
         headers: {
-          'X-Okta-User-Agent-Extended': `okta-idx-js/${idxPackageJSON.version}`,
           'accept': 'application/ion+json; okta-version=1.0.0',
           'content-type': 'application/ion+json; okta-version=1.0.0',
         },
