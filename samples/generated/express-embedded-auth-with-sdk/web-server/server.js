@@ -18,7 +18,6 @@ const express = require('express');
 const session = require('express-session');
 const mustacheExpress = require('mustache-express');
 const path = require('path');
-require('express-async-errors');
 const { 
   userContext, 
   authTransaction,

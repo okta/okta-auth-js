@@ -17,7 +17,6 @@
     "cors": "^2.8.5",
     "js-yaml": "^4.1.0",
     "dotenv": "^10.0.0",
-    "express-async-errors": "^3.1.1",
     "@okta/okta-auth-js": "*"
   },
   "devDependencies": {
