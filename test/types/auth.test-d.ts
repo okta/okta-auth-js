@@ -53,7 +53,10 @@ const authorizeOptions2: TokenParams = {
   expectType<AuthTransaction>(await authClient.signInWithCredentials({
     username: 'some-username',
     password: 'some-password',
-    sendFingerprint: true
+    sendFingerprint: true,
+    context: {
+      deviceToken: 'device-1'
+    }
   }));
   expectType<void>(await authClient.signInWithRedirect());
   expectType<void>(await authClient.signInWithRedirect({

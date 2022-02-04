@@ -235,7 +235,9 @@ export interface SigninOptions extends
   AuthenticationOptions {
     // Only used in Authn V1
     relayState?: string;
-    context?: string;
+    context?: {
+      deviceToken?: string;
+    };
     sendFingerprint?: boolean;
 }
 
