@@ -22,8 +22,9 @@ jest.mock('@okta/okta-idx-js', () => {
 });
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
+  const actual = jest.requireActual('../../../lib/idx/transactionMeta');
   return {
-    createTransactionMeta: () => {},
+    ...actual,
     getSavedTransactionMeta: () => {},
     saveTransactionMeta: () => {}
   };
@@ -388,6 +389,79 @@ describe('idx/interact', () => {
               'recoveryToken': 'fn-recoveryToken'
             },
             'state': 'authClient-state',
+          });
+        });
+      });
+
+      describe('clientSecret', () => {
+        beforeEach(() => {
+          // use original createTransactionMeta implementation
+          jest.spyOn(mocked.transactionMeta, 'createTransactionMeta').mockRestore();
+          jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+        });
+
+        it('uses clientSecret from sdk options', async () => {
+          const { authClient } = testContext;
+          authClient.options.clientSecret = 'sdk-clientSecret';
+          await interact(authClient, {});
+          expect(mocked.idx.interact).toHaveBeenCalled();
+          const interactArg = mocked.idx.interact.mock.calls[0][0];
+          expect(interactArg).toMatchObject({
+            'clientId': 'authClient-clientId',
+            'baseUrl': 'authClient-issuer/oauth2',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'redirectUri': 'authClient-redirectUri',
+            'scopes': ['tp-scopes'],
+            'state': 'tp-state',
+            'clientSecret': 'sdk-clientSecret'
+          });
+          expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, {
+            'clientId': 'authClient-clientId',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'codeVerifier': 'tp-codeVerifier',
+            'flow': 'default',
+            'interactionHandle': 'idx-interactionHandle',
+            'issuer': 'authClient-issuer',
+            'redirectUri': 'authClient-redirectUri',
+            'responseType': 'tp-responseType',
+            'scopes': ['tp-scopes'],
+            'state': 'tp-state',
+            'urls': expect.any(Object),
+            'withCredentials': true,
+          });
+        });
+        it('uses clientSecret from function options (overrides sdk option)', async () => {
+          const { authClient } = testContext;
+          authClient.options.clientSecret = 'sdk-clientSecret';
+          await interact(authClient, { clientSecret: 'fn-clientSecret' });
+          expect(mocked.idx.interact).toHaveBeenCalled();
+          const functionArg = mocked.idx.interact.mock.calls[0][0];
+          expect(functionArg).toMatchObject({
+            'clientId': 'authClient-clientId',
+            'baseUrl': 'authClient-issuer/oauth2',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'redirectUri': 'authClient-redirectUri',
+            'scopes': ['tp-scopes'],
+            'state': 'tp-state',
+            'clientSecret': 'fn-clientSecret'
+          });
+          expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, {
+            'clientId': 'authClient-clientId',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'codeVerifier': 'tp-codeVerifier',
+            'flow': 'default',
+            'interactionHandle': 'idx-interactionHandle',
+            'issuer': 'authClient-issuer',
+            'redirectUri': 'authClient-redirectUri',
+            'responseType': 'tp-responseType',
+            'scopes': ['tp-scopes'],
+            'state': 'tp-state',
+            'urls': expect.any(Object),
+            'withCredentials': true,
           });
         });
       });

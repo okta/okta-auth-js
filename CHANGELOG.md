@@ -6,6 +6,7 @@
 
 - [#1036](https://github.com/okta/okta-auth-js/pull/1036) Adds `webauthn` authenticator support in idx module
 - [#1075](https://github.com/okta/okta-auth-js/pull/1075) Adds top level `invokeApiMethod` method as an escape hatch to make arbitrary OKTA API request
+- [#1093](https://github.com/okta/okta-auth-js/pull/1093) Allows passing device context headers (`X-Forwarded-For`, `User-Agent`, `X-Okta-User-Agent-Extended` and `X-Device-Token`) to `idx.interact`. Follow [setHeaders](README.md#setheaders) section to add headers to http requests.
 
 ### Fixes
 
