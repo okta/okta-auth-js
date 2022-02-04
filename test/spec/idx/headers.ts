@@ -73,12 +73,14 @@ describe('idx headers', () => {
 
   async function callIntrospect() {
     const { domain, interactionHandle, stateHandle, version } = testContext;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     await idx.introspect({ domain, interactionHandle, stateHandle, version });
   }
 
   async function callInteract() {
     const { clientId, baseUrl, redirectUri, codeChallenge, codeChallengeMethod, state } = testContext;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     await idx.interact({ clientId, baseUrl, redirectUri, codeChallenge, codeChallengeMethod, state });
   }

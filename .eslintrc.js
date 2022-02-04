@@ -93,6 +93,12 @@ module.exports = {
         // https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-extraneous-dependencies.md
         'import/no-extraneous-dependencies': ['error', {
           'devDependencies': false
+        }],
+        'node/no-unsupported-features/es-builtins': ['error', {
+          // handled with babel
+          ignores: [
+            'Object.fromEntries'
+          ]
         }]
       },
       settings: {

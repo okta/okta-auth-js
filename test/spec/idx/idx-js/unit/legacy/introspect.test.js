@@ -51,9 +51,7 @@ describe('introspect', () => {
   });
 
   it.only('sends the version along', async () => {
-    fetch.mockImplementation( () => {
-      return Promise.resolve( new Response(JSON.stringify( mockIdxResponse )) ) 
-    });
+    fetch.mockImplementation( () => Promise.resolve( new Response(JSON.stringify( mockIdxResponse )) ));
     return introspect({ domain, stateHandle, version })
       .then( () => {
         expect( fetch.mock.calls.length ).toBe(1);

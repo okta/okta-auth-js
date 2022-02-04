@@ -193,6 +193,7 @@ describe('generateIdxAction', () => {
 
 
   // TODO: Conditions to decide if polling is finished are being discussed
+  // eslint-disable-next-line jasmine/no-disabled-tests
   xit('generates a polling function when appropriate', () => {
     generateIdxAction( mockPollingIdxResponse.factor.value.poll );
     fail('not done yet');

@@ -33,6 +33,7 @@ const version = '1.0.0';
 describe('idx-js', () => {
   describe('start', () => {
 
+    // eslint-disable-next-line jasmine/no-disabled-tests
     xit('rejects without a stateHandle', async () => {
       return idx.start({ domain, version })
         .then( () => {

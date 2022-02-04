@@ -70,6 +70,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
+    "@babel/runtime-corejs3": "^7.17.0",
     "@peculiar/webcrypto": "1.1.6",
     "Base64": "1.1.0",
     "atob": "^2.1.2",
