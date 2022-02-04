@@ -1,0 +1,90 @@
+{
+  "stateHandle": "02Yi84bXNZ3STdPKisJIV0vQ7pY4hkyFHs6a9c12Fw",
+  "version": "1.0.0",
+  "expiresAt": "2020-04-13T22:55:53.000Z",
+  "step": "IDENTIFY",
+  "intent": "LOGIN",
+  "remediation": {
+    "type": "array",
+    "value": [
+      {
+        "rel": [
+          "create-form"
+        ],
+        "name": "identify",
+        "href": "https://dev-550580.okta.com/idp/idx/identify",
+        "method": "POST",
+        "accepts": "application/vnd.okta.v1+json; okta-version=1.0.0",
+        "value": [
+          {
+            "name": "identifier",
+            "label": "Username"
+          },
+          {
+            "name": "stateHandle",
+            "required": true,
+            "value": "02Yi84bXNZ3STdPKisJIV0vQ7pY4hkyFHs6a9c12Fw",
+            "visible": false,
+            "mutable": false
+          }
+        ]
+      },
+      {
+        "name": "redirect-idp",
+        "type": "GOOGLE",
+        "idp": {
+          "id": "0oa2sykfl6Fnb9ZMN0g4",
+          "name": "Google IDP"
+        },
+        "href": "https://dev-550580.okta.com/sso/idps/0oa2sykfl6Fnb9ZMN0g4?stateToken=02Yi84bXNZ3STdPKisJIV0vQ7pY4hkyFHs6a9c12Fw",
+        "method": "GET"
+      },
+      {
+        "name": "redirect-idp",
+        "type": "FACEBOOK",
+        "idp": {
+          "id": "0oa2szc1K1YPgz1pe0g4",
+          "name": "Facebook IDP"
+        },
+        "href": "https://dev-550580.okta.com/sso/idps/0oa2szc1K1YPgz1pe0g4?stateToken=02Yi84bXNZ3STdPKisJIV0vQ7pY4hkyFHs6a9c12Fw",
+        "method": "GET"
+      },
+      {
+        "rel": [
+          "create-form"
+        ],
+        "name": "select-enroll-profile",
+        "href": "https://dev-550580.okta.com/idp/idx/enroll",
+        "method": "POST",
+        "accepts": "application/vnd.okta.v1+json",
+        "value": [
+          {
+            "name": "stateHandle",
+            "required": true,
+            "value": "02Yi84bXNZ3STdPKisJIV0vQ7pY4hkyFHs6a9c12Fw",
+            "visible": false,
+            "mutable": false
+          }
+        ]
+      }
+    ]
+  },
+  "cancel": {
+    "rel": [
+      "create-form"
+    ],
+    "name": "cancel",
+    "href": "https://dev-550580.okta.com/idp/idx/cancel",
+    "method": "POST",
+    "accepts": "application/vnd.okta.v1+json; okta-version=1.0.0",
+    "value": [
+      {
+        "name": "stateHandle",
+        "required": true,
+        "value": "02Yi84bXNZ3STdPKisJIV0vQ7pY4hkyFHs6a9c12Fw",
+        "visible": false,
+        "mutable": false
+      }
+    ]
+  }
+}

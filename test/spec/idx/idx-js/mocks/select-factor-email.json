@@ -1,0 +1,74 @@
+{
+  "stateHandle": "02XK6MwQm7S4ajhvjKZGBSQBdp-SdtywmrSdEmadmU",
+  "version": "1.0.0",
+  "expiresAt": "2019-12-19T21:44:23.000Z",
+  "step": "AUTHENTICATE",
+  "intent": "LOGIN",
+  "remediation": {
+    "type": "array",
+    "value": [
+      {
+        "rel": [
+          "create-form"
+        ],
+        "name": "select-factor",
+        "href": "https://dev-550580.okta.com/idp/idx/challenge",
+        "method": "POST",
+        "accepts": "application/vnd.okta.v1+json",
+        "value": [
+          {
+            "name": "factorId",
+            "type": "set",
+            "options": [
+              {
+                "label": "Email",
+                "value": "emf2a6n2omrZ7Abnt357"
+              }
+            ]
+          },
+          {
+            "name": "stateHandle",
+            "required": true,
+            "value": "02XK6MwQm7S4ajhvjKZGBSQBdp-SdtywmrSdEmadmU",
+            "visible": false,
+            "mutable": false
+          }
+        ]
+      }
+    ]
+  },
+  "factors": {
+    "type": "array",
+    "value": [
+      {
+        "factorType": "email",
+        "factorProfileId": "fpr1w2vlstxSAQsHZ357",
+        "factorId": "emf2a6n2omrZ7Abnt357"
+      }
+    ]
+  },
+  "user": {
+    "type": "object",
+    "value": {
+      "id": "00u1wlnlh2x3sQemR357"
+    }
+  },
+  "cancel": {
+    "rel": [
+      "create-form"
+    ],
+    "name": "cancel",
+    "href": "https://dev-550580.okta.com/idp/idx/cancel",
+    "method": "POST",
+    "accepts": "application/vnd.okta.v1+json",
+    "value": [
+      {
+        "name": "stateHandle",
+        "required": true,
+        "value": "02XK6MwQm7S4ajhvjKZGBSQBdp-SdtywmrSdEmadmU",
+        "visible": false,
+        "mutable": false
+      }
+    ]
+  }
+}

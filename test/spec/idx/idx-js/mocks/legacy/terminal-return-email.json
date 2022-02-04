@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "stateHandle": "01OCl7uyAUC4CUqHsObI9bvFiq01cRFgbnpJQ1bz82",
+  "terminal" : {
+    "type" : "object",
+    "value" : {
+      "name" : "terminal-return",
+      "message" : {
+        "message" : "To finish signing in, return to the screen where you requested the email link.",
+        "i18n" : {
+          "key" : "idx.session.expired",
+          "params" : []
+        }
+      }
+    }
+  },
+  "factor": {
+    "type": "object",
+    "value": {
+      "factorType": "email",
+      "provider": "okta",
+      "profile": {
+        "email": "o*****m@abbott.dev"
+      }
+    }
+  }
+}
