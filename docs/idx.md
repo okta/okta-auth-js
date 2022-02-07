@@ -1,6 +1,6 @@
 [Okta's Identity Engine]: https://developer.okta.com/docs/concepts/ie-intro/
 [Okta Sign-In Widget]: https://github.com/okta/okta-signin-widget
-[Embedded auth with SDKs]: https://github.com/okta/okta-auth-js/tree/master/samples/generated/express-direct-auth
+[Embedded auth with SDKs]: https://github.com/okta/okta-auth-js/tree/master/samples/generated/express-embedded-auth-with-sdk
 
 <!-- omit in toc -->
 # IDX
