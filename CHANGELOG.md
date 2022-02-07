@@ -12,6 +12,7 @@
 
 - [#1071](https://github.com/okta/okta-auth-js/pull/1071) TypeScript: Adds fields for `Input` type in NextStep object
 - [#1094](https://github.com/okta/okta-auth-js/pull/1094) TypeScript: Fixes `SigninOptions.context` type
+- [#1092](https://github.com/okta/okta-auth-js/pull/1092) Call `updateAuthState` when `handleLoginRedirect` fails
 
 ## 6.0.0
 
