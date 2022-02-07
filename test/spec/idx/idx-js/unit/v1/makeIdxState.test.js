@@ -11,7 +11,7 @@
  */
 
 
-import makeIdxState from '../../../../../../lib/idx/idx-js/v1/makeIdxState';
+import { makeIdxState } from '../../../../../../lib/idx/idx-js/v1/makeIdxState';
 const mockIdxResponse = require('../../mocks/request-identifier');
 const mockIdxResponseWithIdps = require('../../mocks/request-identifier-with-idps');
 

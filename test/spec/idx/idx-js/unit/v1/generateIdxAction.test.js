@@ -23,7 +23,7 @@ const mockResponse = ( respondWith ) => Promise.resolve( new Response( JSON.stri
 
 // import targets for mockery
 import fetch from 'cross-fetch';
-import makeIdxState from '../../../../../../lib/idx/idx-js/v1/makeIdxState';
+import { makeIdxState } from '../../../../../../lib/idx/idx-js/v1/makeIdxState';
 
 jest.mock('cross-fetch');
 /*
@@ -32,11 +32,11 @@ jest.mock('cross-fetch');
   Alternative mocking approach: https://jestjs.io/docs/en/es6-class-mocks
 */
 const mockMakeIdxState = jest.fn();
-jest.mock('../../../../../../lib/idx/idx-js/v1/makeIdxState', () => {
-  return jest.fn().mockImplementation(() => {
+jest.mock('../../../../../../lib/idx/idx-js/v1/makeIdxState', () => ({
+  makeIdxState: jest.fn().mockImplementation(() => {
     return {makeIdxState: mockMakeIdxState};
-  });
-});
+  })
+}));
 
 describe('generateIdxAction', () => {
   it('builds a function', () => {
