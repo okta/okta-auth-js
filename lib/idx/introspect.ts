@@ -32,7 +32,6 @@ export async function introspect (authClient: OktaAuth, options: IntrospectOptio
     const version = options.version || IDX_API_VERSION;
     const domain = getOAuthDomain(authClient);
     try {
-      // @ts-ignore
       rawIdxResponse = await idx.introspect({ domain, ...options, version });
     } catch (err) {
       if (isRawIdxResponse(err)) {
@@ -44,6 +43,5 @@ export async function introspect (authClient: OktaAuth, options: IntrospectOptio
   }
 
   const { withCredentials } = options;
-  // @ts-ignore
   return idx.makeIdxState(rawIdxResponse, { withCredentials });
 }

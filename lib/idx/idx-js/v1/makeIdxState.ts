@@ -10,15 +10,15 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-// @ts-nocheck
+import { IdxResponse } from '../../types/idx-js';
 import { parseIdxResponse } from './idxResponseParser';
 
-export function makeIdxState( idxResponse, toPersist ) {
+export function makeIdxState( idxResponse, toPersist ): IdxResponse {
   const rawIdxResponse =  idxResponse;
   const { remediations, context, actions } = parseIdxResponse( idxResponse, toPersist );
   const neededToProceed = [...remediations];
 
-  const proceed = async function( remediationChoice, paramsFromUser = {} ) {
+  const proceed: IdxResponse['proceed'] = async function( remediationChoice, paramsFromUser = {} ) {
     /*
     remediationChoice is the name attribute on each form
     name should remain unique for items inside the remediation that are considered forms(identify, select-factor)
@@ -33,10 +33,6 @@ export function makeIdxState( idxResponse, toPersist ) {
     return remediationChoiceObject.action(paramsFromUser);
   };
 
-  const hasInteractionCode = function hasInteractionCode() {
-    return !!rawIdxResponse.successWithInteractionCode;
-  };
-
   const findCode = item => item.name === 'interaction_code';
   const interactionCode = rawIdxResponse.successWithInteractionCode?.value.find( findCode ).value;
 
@@ -46,7 +42,6 @@ export function makeIdxState( idxResponse, toPersist ) {
     actions,
     context,
     rawIdxState: rawIdxResponse,
-    hasInteractionCode,
     interactionCode,
     toPersist,
   };

@@ -16,7 +16,7 @@ import fetch from 'cross-fetch';
 /**
  * Reusable interceptor interface
  */
-class Interceptor {
+export class Interceptor {
   handlers = [];
 
   // Adds a new interceptor to our HttpClient
@@ -38,13 +38,21 @@ class Interceptor {
  * Invoke the `use` method to add a new interceptor:
  *   - client.interceptors.request.use((requestConfig) => { some logic });
  */
-const HttpClient = {
+export const HttpClient = {
   interceptors: {
     request: new Interceptor(),
   },
 };
 
-const request = async function request( target, { method = 'POST', headers = {}, credentials = 'include', body } ) {
+export const request = async (
+  target, 
+  { 
+    method = 'POST', 
+    headers = {}, 
+    credentials = 'include', 
+    body 
+  }
+) => {
   const requestOptions = {
     url: target,
     method,
@@ -66,9 +74,4 @@ const request = async function request( target, { method = 'POST', headers = {},
   delete requestOptions.url;
 
   return fetch( url, requestOptions );
-};
-
-export {
-  HttpClient,
-  request,
 };

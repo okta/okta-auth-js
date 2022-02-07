@@ -96,7 +96,11 @@ const convertRemediationAction = (remediation, toPersist) => {
   };
 };
 
-export const parseIdxResponse = function parseIdxResponse( idxResponse, toPersist = {} ) {
+export const parseIdxResponse = function parseIdxResponse( idxResponse, toPersist = {} ): {
+  remediations: IdxRemediation[];
+  context: IdxContext;
+  actions: IdxActions;
+} {
   const remediationData = idxResponse.remediation?.value || [];
 
   remediationData.forEach(

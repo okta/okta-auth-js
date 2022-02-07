@@ -10,9 +10,16 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-// @ts-nocheck
 import { request } from './client';
 import { validateVersionConfig } from './util';
+
+export interface IntrospectOptions {
+  domain: string;
+  withCredentials?: boolean;
+  interactionHandle?: string;
+  stateHandle?: string;
+  version?: string;
+}
 
 const parseAndReject = response => response.json().then( err => Promise.reject(err) );
 
@@ -22,7 +29,7 @@ const introspect = async function introspect({
   interactionHandle,
   stateHandle,
   version,
-}) {
+}: IntrospectOptions) {
   validateVersionConfig(version);
   const target = `${domain}/idp/idx/introspect`;
   const body = stateHandle ? { stateToken: stateHandle } : { interactionHandle };
