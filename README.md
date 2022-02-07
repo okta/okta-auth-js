@@ -37,12 +37,13 @@ This library uses semantic versioning and follows Okta's [library version policy
 
 ## Release Status
 
-:heavy_check_mark: The current stable major version series is: `5.x`
+:heavy_check_mark: The current stable major version series is: `6.x`
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
-| `5.x`     | :heavy_check_mark: Stable        |
-| `4.x`     | :warning: Retiring on 2022-01-30 |
+| `6.x`     | :heavy_check_mark: Stable        |
+| `5.x`     | :warning: Retiring on 2022-10-31 |
+| `4.x`     | :x: Retired                      |
 | `3.x`     | :x: Retired                      |
 | `2.x`     | :x: Retired                      |
 | `1.x`     | :x: Retired                      |
@@ -57,7 +58,7 @@ If you run into problems using the SDK, you can:
 * Ask questions on the [Okta Developer Forums][devforum]
 * Post [issues][github-issues] here on GitHub (for code errors)
 
-Users migrating from version 4.x of this SDK should see [Migrating from 4.x](#migrating-from-previous-versions) to learn what changes are necessary.
+Users migrating from previous versions of this SDK should see [Migrating Guide](#migrating-from-previous-versions) to learn what changes are necessary.
 
 ### Browser compatibility / polyfill
 
