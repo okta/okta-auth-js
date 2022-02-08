@@ -24,6 +24,7 @@ export default async function (this: ActionContext, firstName: string, assignToG
     this.user = getReusedContext().user;
     this.userName = getReusedContext().userName;
   } else {
+    // don't create a18n profile and don't save credentials in context
     const credentials = this.credentials || await createCredentials(firstName, this.featureName, false);
     const user = await createUser(credentials, assignToGroups);
     this.user = user;

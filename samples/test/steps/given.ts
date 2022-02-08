@@ -42,6 +42,7 @@ import createContextCredentials from '../support/action/live-user/createContextC
 import activateContextUserSms from '../support/action/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
 import attachSSRPolicy from '../support/action/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
+import createContextUser from '../support/action/live-user/createContextUser';
 
 
 Given(
@@ -97,8 +98,7 @@ Given(
 Given(
   /([^/s]+) has an account in the org/,
   async function(this: ActionContext, firstName: string) {
-    // eslint-disable-next-line max-len
-    await createContextUserAndCredentials.call(this, firstName, ['MFA Required', 'Google Authenticator Enrollment Required']);
+    await createContextUser.call(this, firstName, ['MFA Required', 'Google Authenticator Enrollment Required']);
   }
 );
 
