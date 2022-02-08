@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "@okta/okta-idx-js": "0.25.0",
+    "@babel/runtime-corejs3": "^7.17.0",
     "@peculiar/webcrypto": "1.1.6",
     "Base64": "1.1.0",
     "atob": "^2.1.2",
@@ -78,6 +78,7 @@
     "core-js": "^3.6.5",
     "cross-fetch": "^3.1.5",
     "js-cookie": "2.2.1",
+    "jsonpath-plus": "^6.0.1",
     "node-cache": "^5.1.2",
     "p-cancelable": "^2.0.0",
     "text-encoding": "^0.7.0",

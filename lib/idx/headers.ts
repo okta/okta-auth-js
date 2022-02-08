@@ -16,7 +16,7 @@
 // This means that multiple instances of OktaAuth will see the same header modifications
 // TODO: use AuthJS http agent for IDX API requests. OKTA-417473
 import { OktaAuth } from '../types';
-import idx from '@okta/okta-idx-js';
+import idx from './idx-js';
 
 export function setGlobalRequestInterceptor(fn) {
   idx.client.interceptors.request.use(fn);

@@ -93,6 +93,10 @@ module.exports = {
         // https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-extraneous-dependencies.md
         'import/no-extraneous-dependencies': ['error', {
           'devDependencies': false
+        }],
+        'node/no-unsupported-features/es-builtins': ['error', {
+          // features that are not supported before v12 are transformed in babel.cjs.js for commonjs output
+          version: '>=12.0.0'
         }]
       },
       settings: {

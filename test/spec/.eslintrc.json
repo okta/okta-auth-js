@@ -51,6 +51,9 @@
         "Promise.allSettled"
       ]
     }],
+    "node/no-missing-require": ["error", {
+      "tryExtensions": [".js", ".ts", ".json"]
+    }],
     "jasmine/no-unsafe-spy": 0,
     "jasmine/new-line-before-expect": 0,
     "jasmine/prefer-toHaveBeenCalledWith": 0,

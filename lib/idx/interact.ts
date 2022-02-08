@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 /* eslint complexity:[0,8] */
-import idx from '@okta/okta-idx-js';
+import idx from './idx-js';
 import { OktaAuth, IdxTransactionMeta } from '../types';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';

@@ -1,0 +1,105 @@
+{
+  "stateHandle": "02TptqPN4BOLIwMAGUVLPlZVJEnONAq7xkg19dy6Gk",
+  "version": "1.0.0",
+  "expiresAt": "2021-01-19T15:10:35.000Z",
+  "intent": "LOGIN",
+  "messages": {
+    "type": "array",
+    "value": [
+      {
+        "message": "Unable to enroll. Try again or contact your admin for assistance.",
+        "i18n": {
+          "key": "",
+          "params": []
+        },
+        "class": "ERROR"
+      }
+    ]
+  },
+  "remediation": {
+    "type": "array",
+    "value": [
+      {
+        "name": "redirect-idp",
+        "type": "OIDC",
+        "idp": {
+          "id": "0oa69chx4bZyx8O7l0g4",
+          "name": "IDP Authenticator"
+        },
+        "href": "http://localhost:3000/sso/idps/0oa69chx4bZyx8O7l0g4?stateToken=02TptqPN4BOLIwMAGUVLPlZVJEnONAq7xkg19dy6Gk",
+        "method": "GET",
+        "relatesTo" : [ "$.currentAuthenticator" ]
+      }
+    ]
+  },
+  "currentAuthenticator": {
+    "type": "object",
+    "value": {
+      "key": "external_idp",
+      "type": "federated",
+      "id": "aut4mhtS1b84AR0iQ0g4",
+      "displayName": "IDP Authenticator",
+      "methods": [
+        { "type": "idp" }
+      ]
+    }
+  },
+  "authenticators": {
+    "type": "array",
+    "value": [
+      {
+        "key": "external_idp",
+        "type": "federated",
+        "id": "aut4mhtS1b84AR0iQ0g4",
+        "displayName": "IDP Authenticator",
+        "methods": [
+          { "type": "idp" }
+        ]
+      }
+    ]
+  },
+  "authenticatorEnrollments": {
+    "type": "array",
+    "value": []
+  },
+  "enrollmentAuthenticator": {
+    "type": "object",
+    "value": {
+      "key": "external_idp",
+      "type": "federated",
+      "id": "aut4mhtS1b84AR0iQ0g4",
+      "displayName": "IDP Authenticator",
+      "methods": [
+        { "type": "idp" }
+      ]
+    }
+  },
+  "user": {
+    "type": "object",
+    "value": { "id": "00u2m55pu8UZyeMMl0g4" }
+  },
+  "cancel": {
+    "rel": [ "create-form" ],
+    "name": "cancel",
+    "href": "http://localhost:3000/idp/idx/cancel",
+    "method": "POST",
+    "value": [
+      {
+        "name": "stateHandle",
+        "required": true,
+        "value": "02TptqPN4BOLIwMAGUVLPlZVJEnONAq7xkg19dy6Gk",
+        "visible": false,
+        "mutable": false
+      }
+    ],
+    "accepts": "application/ion+json; okta-version=1.0.0"
+  },
+  "app": {
+    "type": "object",
+    "value": {
+      "name": "oidc_client",
+      "label": "Test OIDC App",
+      "id": "0oa11ch8m94eTn0Qe0g4"
+    }
+  }
+}

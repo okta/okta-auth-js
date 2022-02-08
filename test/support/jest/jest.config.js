@@ -26,6 +26,7 @@ module.exports = {
     '^.+\\.(ts|html)$': 'ts-jest'
   },
   'restoreMocks': true,
+  'clearMocks': true,
   'moduleNameMapper': {
     '^@okta/okta-auth-js$': OktaAuth,
     '^lib/(.*)$': '<rootDir>/lib/$1'

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import idx from '@okta/okta-idx-js';
+import idx from './idx-js';
 import { OktaAuth } from '../types';
 import { IdxResponse, isRawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';

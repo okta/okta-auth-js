@@ -14,8 +14,8 @@
 import { RawIdxResponseFactory } from '@okta/test.support/idx';
 import { introspect } from '../../../lib/idx/introspect';
 
-jest.mock('@okta/okta-idx-js', () => {
-  const { makeIdxState } = jest.requireActual('@okta/okta-idx-js').default;
+jest.mock('../../../lib/idx/idx-js', () => {
+  const { makeIdxState } = jest.requireActual('../../../lib/idx/idx-js').default;
   return {
     introspect: () => {},
     makeIdxState
@@ -28,7 +28,7 @@ jest.mock('../../../lib/oidc', () => {
 });
 
 const mocked = {
-  idx: require('@okta/okta-idx-js'),
+  idx: require('../../../lib/idx/idx-js'),
   oidc: require('../../../lib/oidc')
 };
 

@@ -14,7 +14,9 @@ module.exports = {
   'plugins': [
     '@babel/plugin-transform-typescript',
     '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-transform-runtime',
+    ['@babel/plugin-transform-runtime', {
+      corejs: 3
+    }],
     ['@babel/plugin-transform-modules-commonjs', {
       'strict': true,
       'noInterop': false
