@@ -32,6 +32,7 @@ import EnrollEmailAuthenticator from './EnrollEmailAuthenticator';
 import ChallengePhoneAuthenticator from './ChallengePhoneAuthenticator';
 import ChallengeSecurityQuestion from './ChallengeSecurityQuestion';
 import ChallengeGoogleAuthenticator from './ChallengeGoogleAuthenticator';
+import PasswordSetup from './PasswordSetup';
 
 const pages: { [key: string]: Page } = {
   'Self Service Password Reset View': PasswordRecover,
@@ -42,7 +43,7 @@ const pages: { [key: string]: Page } = {
   'Reset Password': PasswordReset,
   'Root Page': Home,
   'Root View': Home,
-  'Set up Password': PasswordReset,
+  'Set up Password': PasswordSetup,
   'Enroll email authenticator': EnrollEmailAuthenticator,
   'Verify using phone authenticator': VerifyPhone,
   'Challenge phone authenticator': ChallengePhoneAuthenticator,
