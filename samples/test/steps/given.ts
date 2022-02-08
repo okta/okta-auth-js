@@ -103,6 +103,11 @@ Given(
 );
 
 Given(
+  /[^/s]+ does not have account in the org/,
+  () => ({}) // no-op
+);
+
+Given(
   /^a User named "([^/w]+)" exists, and this user has already setup email and password factors$/,
   async function(this: ActionContext, firstName: string) {
     await createContextUserAndCredentials.call(this, firstName);

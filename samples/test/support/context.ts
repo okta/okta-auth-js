@@ -13,6 +13,7 @@
 
 import { User } from '@okta/okta-sdk-nodejs';
 import {UserCredentials} from './management-api/createCredentials';
+import { Scenario } from './scenario';
 
 interface ActionContext {
   credentials: UserCredentials;
@@ -24,6 +25,7 @@ interface ActionContext {
   sharedSecret?: string;
   disableEmailVerification?: boolean;
   useProfileEnrollPolicy: boolean;
+  isCurrentScenario: (scenario: Scenario) => boolean;
 }
 
 let reusedContext: ActionContext;

@@ -15,14 +15,12 @@
 import a18nClient from '../../management-api/a18nClient';
 import deleteSelfEnrolledUser from '../../management-api/deleteSelfEnrolledUser';
 import deleteUser from '../../management-api/deleteUser';
-import ActionContext, {reuseContext} from '../../context';
+import ActionContext, {reuseContext } from '../../context';
+import { Scenario } from '../../scenario';
 
 export default async function(this: ActionContext): Promise<void> {
   // Scenario 10.1.2
-  const isTotpEnroll = this.featureName.includes('Google Authenticator') && 
-    this.scenarioName.includes('by entering a Secret Key');
-
-  if (isTotpEnroll) {
+  if (this.isCurrentScenario(Scenario.TOTP_ENROLL_WITH_SECRET_KEY)) {
     // save context for reuse
     reuseContext(this);
   } else {

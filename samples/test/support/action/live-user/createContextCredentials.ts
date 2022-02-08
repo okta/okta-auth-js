@@ -12,8 +12,15 @@
 
 
 import createCredentials from '../../management-api/createCredentials';
-import ActionContext from '../../context';
+import ActionContext, { getReusedContext } from '../../context';
+import { Scenario } from '../../scenario';
 
 export default async function (this: ActionContext, firstName: string): Promise<void> {
-  this.credentials = await createCredentials(firstName, this.featureName);
+  if (this.isCurrentScenario(Scenario.TOTP_SIGN_IN_REUSE_SHARED_SECRET)) {
+    this.credentials = getReusedContext().credentials;
+    this.sharedSecret = getReusedContext().sharedSecret;
+    this.userName = getReusedContext().userName;
+  } else {
+    this.credentials = await createCredentials(firstName, this.featureName);
+  }
 }

@@ -18,6 +18,7 @@ import waitForDisplayed from '../wait/waitForDisplayed';
 import PasswordReset from '../selectors/PasswordReset';
 import VerifyPhone from '../selectors/VerifyPhone';
 import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
+import Home from '../selectors/Home';
 
 /**
  * Check if browser has navigated to expected page
@@ -26,7 +27,7 @@ import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
 
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
-export default async (pageName?: string, disableEmailVerification = false) => {
+export default async (pageName?: string) => {
   let selector;
   let pageTitle;
   switch (pageName) {
@@ -58,8 +59,8 @@ export default async (pageName?: string, disableEmailVerification = false) => {
     }
     case 'Root Page':
     case 'Root View': {
-      selector = '#claim-email_verified';
-      pageTitle = disableEmailVerification ? 'false' : 'true';
+      selector = Home.logoutButton;
+      pageTitle = 'Logout';
       break;
     }
     case 'Set up Password': {
