@@ -95,10 +95,8 @@ module.exports = {
           'devDependencies': false
         }],
         'node/no-unsupported-features/es-builtins': ['error', {
-          // handled with babel
-          ignores: [
-            'Object.fromEntries'
-          ]
+          // features that are not supported before v12 are transformed in babel.cjs.js for commonjs output
+          version: '>=12.0.0'
         }]
       },
       settings: {
