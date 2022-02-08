@@ -10,15 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { Page } from './Page';
+import { ChallengeAuthenticator } from './ChallengeAuthenticator';
 
 
-class Home implements Page {
-  get isDisplayedElementSelector() { return this.serverConfig; }
-
-  get serverConfig() { return '#server-config'; }
-  get loginButton() { return '#login-button'; }
-  get registerButton() { return '#register-button'; }
+class ChallengeSecurityQuestion extends ChallengeAuthenticator {
+  title = 'Challenge Security Question';
 }
 
-export default new Home();
+export default new ChallengeSecurityQuestion();

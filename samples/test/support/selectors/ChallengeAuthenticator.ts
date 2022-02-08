@@ -13,7 +13,7 @@
 import { PageWithTitle } from './Page';
 
 
-class ChallengeAuthenticator extends PageWithTitle {
+export class ChallengeAuthenticator extends PageWithTitle {
   title = 'Challenge Authenticator';
 
   get code() { return '#authenticator-code-input'; }

@@ -21,29 +21,34 @@ import Unauth from './Unauth';
 import UserHome from './UserHome';
 import PasswordRecover from './PasswordRecover';
 import SelectAuthenticator from './SelectAuthenticator';
-import ChallengeAuthenticator from './ChallengeAuthenticator';
 import PasswordReset from './PasswordReset';
 import Home from './Home';
 import { Page } from './Page';
 import VerifyPhone from './VerifyPhone';
 import EnrollGoogleAuthenticator from './EnrollGoogleAuthenticator';
+import ChallengeEmailAuthenticator from './ChallengeEmailAuthenticator';
+import EnrollPhoneAuthenticator from './EnrollPhoneAuthenticator';
+import EnrollEmailAuthenticator from './EnrollEmailAuthenticator';
+import ChallengePhoneAuthenticator from './ChallengePhoneAuthenticator';
+import ChallengeSecurityQuestion from './ChallengeSecurityQuestion';
+import ChallengeGoogleAuthenticator from './ChallengeGoogleAuthenticator';
 
 const pages: { [key: string]: Page } = {
   'Self Service Password Reset View': PasswordRecover,
   'Select authenticator': SelectAuthenticator,
-  'Enter Code': ChallengeAuthenticator,
-  'Challenge email authenticator': ChallengeAuthenticator,
-  'Enroll Factor: Enter SMS Code': ChallengeAuthenticator,
+  'Enter Code': ChallengeEmailAuthenticator,
+  'Challenge email authenticator': ChallengeEmailAuthenticator,
+  'Enroll Factor: Enter SMS Code': EnrollPhoneAuthenticator,
   'Reset Password': PasswordReset,
   'Root Page': Home,
   'Root View': Home,
   'Set up Password': PasswordReset,
-  'Enroll email authenticator': ChallengeAuthenticator,
+  'Enroll email authenticator': EnrollEmailAuthenticator,
   'Verify using phone authenticator': VerifyPhone,
-  'Challenge phone authenticator': ChallengeAuthenticator,
-  'Challenge Security Question': ChallengeAuthenticator,
+  'Challenge phone authenticator': ChallengePhoneAuthenticator,
+  'Challenge Security Question': ChallengeSecurityQuestion,
   'Enroll Google Authenticator':  EnrollGoogleAuthenticator,
-  'Challenge Google Authenticator':  ChallengeAuthenticator,
+  'Challenge Google Authenticator':  ChallengeGoogleAuthenticator,
 };
 
 
