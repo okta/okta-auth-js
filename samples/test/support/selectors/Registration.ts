@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { Page } from './Page';
+
 
 const registrationForm = '#registration-form';
 const firstName = `${registrationForm} #firstName`;
@@ -19,7 +21,9 @@ const submit = `${registrationForm} #submit-button`;
 const formMessages = `#form-messages li`;
 const formMessage = `${formMessages}:first-child`;
 
-class RegistrationForm {
+class RegistrationForm implements Page {
+  get isDisplayedElementSelector() { return this.submit; }
+
   get firstName() { return firstName; }
   get lastName() { return lastName; }
   get email() { return email; }

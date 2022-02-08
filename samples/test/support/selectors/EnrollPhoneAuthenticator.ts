@@ -10,8 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { PageWithTitle } from './Page';
 
-class EnrollPhoneAuthenticator {
+
+class EnrollPhoneAuthenticator extends PageWithTitle {
+  title = 'Enroll phone authenticator';
+
   get pageTitle() {return '#page-title-header'; }
   get options() { return '#phone-authenticator-method-options'; }
   get phoneNumber() { return '#enroll-phone-authenticator-form #phoneNumber'; }

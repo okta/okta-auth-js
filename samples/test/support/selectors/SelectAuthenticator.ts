@@ -10,9 +10,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { PageWithTitle } from './Page';
 
-class SelectAuthenticator {
+
+class SelectAuthenticator extends PageWithTitle {
+  title = 'Select authenticator';
+
   get pageTitle() {return '#select-authenticator-page-title-header';}
+
   get options() { return '#authenticator-options';  }
   get submit() { return '#select-authenticator-form button[type=submit]';}
   get skip() { return '#skip-button'; }

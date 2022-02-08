@@ -10,9 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { Page } from './Page';
 
 
-class Home {
+class Home implements Page {
+  get isDisplayedElementSelector() { return this.serverConfig; }
+
   get serverConfig() { return '#server-config'; }
   get loginButton() { return '#login-button'; }
   get registerButton() { return '#register-button'; }

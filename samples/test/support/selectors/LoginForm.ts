@@ -11,6 +11,7 @@
  */
 
 import { Selectors } from './types';
+import { Page } from './Page';
 
 
 const loginForm = '#login-form';
@@ -23,7 +24,9 @@ const facebookButton = '#idp-buttons #facebook';
 const googleButton = '#idp-buttons #google';
 const oidcIdPButton = '#idp-buttons #oidc';
 
-export class LoginForm implements Selectors {
+export class LoginForm implements Page, Selectors {
+  get isDisplayedElementSelector() { return this.password; }
+
   get username() { return username; }
   get password() { return password; }
   get submit() { return submit; }

@@ -19,6 +19,33 @@ import OktaSignInV1 from './OktaSignInV1';
 import OktaSignInOIE from './OktaSignInOIE';
 import Unauth from './Unauth';
 import UserHome from './UserHome';
+import PasswordRecover from './PasswordRecover';
+import SelectAuthenticator from './SelectAuthenticator';
+import ChallengeAuthenticator from './ChallengeAuthenticator';
+import PasswordReset from './PasswordReset';
+import Home from './Home';
+import { Page } from './Page';
+import VerifyPhone from './VerifyPhone';
+import EnrollGoogleAuthenticator from './EnrollGoogleAuthenticator';
+
+const pages: { [key: string]: Page } = {
+  'Self Service Password Reset View': PasswordRecover,
+  'Select authenticator': SelectAuthenticator,
+  'Enter Code': ChallengeAuthenticator,
+  'Challenge email authenticator': ChallengeAuthenticator,
+  'Enroll Factor: Enter SMS Code': ChallengeAuthenticator,
+  'Reset Password': PasswordReset,
+  'Root Page': Home,
+  'Root View': Home,
+  'Set up Password': PasswordReset,
+  'Enroll email authenticator': ChallengeAuthenticator,
+  'Verify using phone authenticator': VerifyPhone,
+  'Challenge phone authenticator': ChallengeAuthenticator,
+  'Challenge Security Question': ChallengeAuthenticator,
+  'Enroll Google Authenticator':  EnrollGoogleAuthenticator,
+  'Challenge Google Authenticator':  ChallengeAuthenticator,
+};
+
 
 export {
   LoginForm,
@@ -27,4 +54,5 @@ export {
   OktaSignInOIE,
   Unauth,
   UserHome,
+  pages
 };

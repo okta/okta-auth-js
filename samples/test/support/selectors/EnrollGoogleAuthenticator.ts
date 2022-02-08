@@ -10,9 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { PageWithTitle } from './Page';
 
-class EnrollGoogleAuthenticator {
-  get pageTitle() { return '#page-title-header'; }
+
+class EnrollGoogleAuthenticator extends PageWithTitle {
+  title = 'Enroll Google Authenticator';
+
   get code() { return '#authenticator-code-input'; }
   get submit() { return '#challenge-authenticator-form button[type=submit]'; }
   get sharedSecret() { return '#authenticator-shared-secret'; }
