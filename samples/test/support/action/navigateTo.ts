@@ -32,7 +32,6 @@ function getContext(formName: string) {
   const url = urls.get(page);
   let queryParams = { flow: 'form' };
 
-  
   if (page instanceof WidgetForm) {
     queryParams = { flow: 'widget' };
   }
