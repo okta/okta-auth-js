@@ -19,13 +19,19 @@ import startApp from './startApp';
 import { pages } from '../selectors';
 import { Page } from '../selectors/Page';
 import PasswordRecover from '../selectors/PasswordRecover';
+import Registration from '../selectors/Registration';
+import OktaSignInOIEFacebookIdp from '../selectors/OktaSignInOIEFacebookIdp';
+import OktaSignInOIEOktaIdp from '../selectors/OktaSignInOIEOktaIdp';
 
 
 const urls = new Map<Page, string>([
   [LoginForm, '/login'],
-  [Home, '/'],
   [OktaSignInOIE, '/login'],
+  [OktaSignInOIEFacebookIdp, '/login'],
+  [OktaSignInOIEOktaIdp, '/login'],
+  [Home, '/'],
   [PasswordRecover, '/recover-password'],
+  [Registration, '/register'],
 ]);
 
 function getContext(formName: string) {
