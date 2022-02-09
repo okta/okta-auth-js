@@ -11,9 +11,9 @@
  */
 
 
-import Registration from '../../selectors/Registration';
-import setInputField from '../setInputField';
-import ActionContext from '../../context';
+import Registration from '../../../selectors/Registration';
+import setInputField from '../../setInputField';
+import ActionContext from '../../../context';
 
 export default async function (this: ActionContext, fieldName: string) {
   let value, selector;

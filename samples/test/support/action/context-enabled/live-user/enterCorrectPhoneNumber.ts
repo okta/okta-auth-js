@@ -11,12 +11,10 @@
  */
 
 
-import clickElement from './clickElement';
-import ActionContext from '../context';
-import getLoginForm from '../lib/getLoginForm';
+import EnrollPhoneAuthenticator from '../../../selectors/EnrollPhoneAuthenticator';
+import setInputField from '../../setInputField';
+import ActionContext from '../../../context';
 
-export default async function(this: ActionContext) {
-  const loginForm = getLoginForm(this.featureName);
-  const selector = loginForm.submit;
-  await clickElement('click', 'selector', selector);
+export default async function (this: ActionContext) {
+  await setInputField('set', this.credentials.phoneNumber, EnrollPhoneAuthenticator.phoneNumber);
 }

@@ -36,13 +36,15 @@ import { Given } from '@cucumber/cucumber';
 
 import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
-import navigateToLoginAndAuthenticate from '../support/action/navigateToLoginAndAuthenticate';
-import createContextUserAndCredentials from '../support/action/live-user/createContextUserAndCredentials';
-import createContextCredentials from '../support/action/live-user/createContextCredentials';
-import activateContextUserSms from '../support/action/live-user/activateContextUserSms';
+import navigateToLoginAndAuthenticate from '../support/action/context-enabled/live-user/navigateToLoginAndAuthenticate';
+import createContextUserAndCredentials from
+  '../support/action/context-enabled/live-user/createContextUserAndCredentials';
+import createContextCredentials from '../support/action/context-enabled/live-user/createContextCredentials';
+import activateContextUserSms from '../support/action/context-enabled/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
-import attachSSRPolicy from '../support/action/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
-import createContextUser from '../support/action/live-user/createContextUser';
+import attachSSRPolicy from
+  '../support/action/context-enabled/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
+import createContextUser from '../support/action/context-enabled/live-user/createContextUser';
 
 
 Given(

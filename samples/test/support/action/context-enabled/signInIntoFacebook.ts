@@ -11,21 +11,24 @@
  */
 
 
-import a18nClient from '../../management-api/a18nClient';
+import { getConfig } from '../../../util';
+import FacebookSignIn from '../../selectors/FacebookSignIn';
+import waitForDisplayed from '../../wait/waitForDisplayed';
 import setInputField from '../setInputField';
-import ActionContext from '../../context';
 import clickElement from '../clickElement';
-import ChallengeAuthenticator from '../../selectors/ChallengeAuthenticator';
+import ActionContext from '../../context';
 
-export default async function (this: ActionContext) {
-  let retryResend = 3;
-  let code = await a18nClient.getSMSCode(this.credentials.profileId);
-  while (!code && retryResend-- > 0) {
-    await clickElement('click', 'selector', ChallengeAuthenticator.resend);
-    code = await a18nClient.getSMSCode(this.credentials.profileId);
-  }
-  if (!code) {
-    throw new Error('Failed to get sms code');
-  }
-  await setInputField('set', code, ChallengeAuthenticator.code);
+export default async function(
+  this: ActionContext
+) {
+  const { fbUsername, fbPassword } = getConfig();
+
+  // save username to context
+  this.userName = fbUsername;
+
+  // enter login and password
+  await waitForDisplayed(FacebookSignIn.username);
+  await setInputField('set', fbUsername as string, FacebookSignIn.username);
+  await setInputField('set', fbPassword as string, FacebookSignIn.password);
+  await clickElement('click', 'selector', FacebookSignIn.submit);
 }

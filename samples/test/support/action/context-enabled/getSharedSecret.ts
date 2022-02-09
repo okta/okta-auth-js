@@ -11,9 +11,11 @@
  */
 
 
-import setInputField from '../setInputField';
+import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
+import getText from '../getText';
 import ActionContext from '../../context';
 
 export default async function (this: ActionContext) {
-  await setInputField('set', this.credentials.password, '#confirm-password');
+  const sharedSecret = await getText( EnrollGoogleAuthenticator.sharedSecret );
+  this.sharedSecret = sharedSecret;
 }

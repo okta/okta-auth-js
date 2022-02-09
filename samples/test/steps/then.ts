@@ -21,14 +21,14 @@ import checkGuest from '../support/check/checkGuest';
 import checkButton from '../support/check/checkButton';
 import waitForURLPath from '../support/wait/waitForURLPath';
 import checkIsOnPage from '../support/check/checkIsOnPage';
-import enterValidPassword from '../support/action/live-user/enterValidPassword';
-import confirmValidPassword from '../support/action/live-user/confirmValidPassword';
+import enterValidPassword from '../support/action/context-enabled/live-user/enterValidPassword';
+import confirmValidPassword from '../support/action/context-enabled/live-user/confirmValidPassword';
 import submitAnyForm from '../support/action/submitAnyForm';
 import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
 import checkProfileEmail from '../support/check/checkProfileEmail';
 import { UserHome } from '../support/selectors';
 import isDisplayed from '../support/check/isDisplayed';
-import checkProfileName from '../support/check/checkProfileName';
+import checkProfileName from '../support/check/context-enabled/checkProfileName';
 import ActionContext from '../support/context';
 import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticatorOptions';
 

@@ -11,10 +11,9 @@
  */
 
 
-import setInputField from '../setInputField';
-import PasswordRecover from '../../selectors/PasswordRecover';
-import ActionContext from '../../context';
+import activateUserSms from '../../../management-api/activateUserSms';
+import ActionContext from '../../../context';
 
-export default async function(this: ActionContext) {
-  await setInputField('set', this.user.profile.email, PasswordRecover.username);
+export default async function (this: ActionContext): Promise<void> {
+  await activateUserSms(this.user, this.credentials.phoneNumber);
 }

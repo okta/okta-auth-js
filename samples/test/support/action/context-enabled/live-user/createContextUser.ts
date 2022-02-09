@@ -11,10 +11,10 @@
  */
 
 
-import createCredentials from '../../management-api/createCredentials';
-import createUser from '../../management-api/createUser';
-import ActionContext, { getReusedContext } from '../../context';
-import { Scenario } from '../../scenario';
+import createCredentials from '../../../management-api/createCredentials';
+import createUser from '../../../management-api/createUser';
+import ActionContext, { getReusedContext } from '../../../context';
+import { Scenario } from '../../../scenario';
 
 export default async function (this: ActionContext, firstName: string, assignToGroups?: string[]): Promise<void> {
   // Scenario 10.1.3

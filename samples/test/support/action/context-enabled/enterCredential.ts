@@ -11,10 +11,10 @@
  */
 
 
-import setInputField from './setInputField';
-import getLoginForm from '../lib/getLoginForm';
-import { getConfig } from '../../util/configUtils';
-import ActionContext from '../context';
+import setInputField from '../setInputField';
+import getLoginForm from '../../lib/getLoginForm';
+import { getConfig } from '../../../util/configUtils';
+import ActionContext from '../../context';
 
 /* eslint complexity:[0,8] */
 export default async function (

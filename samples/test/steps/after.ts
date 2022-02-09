@@ -13,8 +13,8 @@
 
 import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
-import deleteUserAndCredentials from '../support/action/live-user/deleteUserAndCredentials';
-import deleteTestPolicies from '../support/action/org-config/deleteTestPolicies';
+import deleteUserAndCredentials from '../support/action/context-enabled/live-user/deleteUserAndCredentials';
+import deleteTestPolicies from '../support/action/context-enabled/org-config/deleteTestPolicies';
 
 After(deleteUserAndCredentials);
 After(deleteTestPolicies);

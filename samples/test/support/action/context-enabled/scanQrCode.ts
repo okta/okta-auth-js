@@ -11,16 +11,16 @@
  */
 
 
-import createCredentials from '../../management-api/createCredentials';
-import ActionContext, { getReusedContext } from '../../context';
-import { Scenario } from '../../scenario';
+import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
+import ActionContext from '../../context';
+import jsqr from 'jsqr';
+const {PNG} = require('pngjs');
 
-export default async function (this: ActionContext, firstName: string): Promise<void> {
-  if (this.isCurrentScenario(Scenario.TOTP_SIGN_IN_REUSE_SHARED_SECRET)) {
-    this.credentials = getReusedContext().credentials;
-    this.sharedSecret = getReusedContext().sharedSecret;
-    this.userName = getReusedContext().userName;
-  } else {
-    this.credentials = await createCredentials(firstName, this.featureName);
-  }
+export default async function (this: ActionContext) {
+  const el = await $(EnrollGoogleAuthenticator.qrCode);
+  const dataUri = await el.getAttribute('src');
+  const png = PNG.sync.read(Buffer.from(dataUri.slice('data:image/png;base64,'.length), 'base64'));
+  const result = jsqr(Uint8ClampedArray.from(png.data), png.width, png.height);
+  const sharedSecret = result?.data?.match(/\?secret=(\w+)&/)?.[1];
+  this.sharedSecret = sharedSecret;
 }

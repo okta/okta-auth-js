@@ -12,11 +12,11 @@
 
 
 
-import a18nClient from '../../management-api/a18nClient';
-import deleteSelfEnrolledUser from '../../management-api/deleteSelfEnrolledUser';
-import deleteUser from '../../management-api/deleteUser';
-import ActionContext, {reuseContext } from '../../context';
-import { Scenario } from '../../scenario';
+import a18nClient from '../../../management-api/a18nClient';
+import deleteSelfEnrolledUser from '../../../management-api/deleteSelfEnrolledUser';
+import deleteUser from '../../../management-api/deleteUser';
+import ActionContext, {reuseContext } from '../../../context';
+import { Scenario } from '../../../scenario';
 
 export default async function(this: ActionContext): Promise<void> {
   // Scenario 10.1.2

@@ -11,17 +11,14 @@
  */
 
 
-import navigateTo from './navigateTo';
-import loginDirect from './loginDirect';
-import ActionContext from '../context';
+import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
+import setInputField from '../setInputField';
+import ActionContext from '../../context';
+const totp = require('totp-generator');
 
-export default async function (
-    this: ActionContext,
-    userName: string
-) {
-    await navigateTo(userName, 'Login with Username and Password');
-    await loginDirect({
-        username: this.credentials?.emailAddress,
-        password: this.credentials?.password
-    });
+export default async function (this: ActionContext) {
+  const token = totp(this.sharedSecret || '', {
+    timestamp: Date.now() + (this.scenarioName.includes('enroll') ? -30*1000 : 0)
+  });
+  await setInputField('set', token, EnrollGoogleAuthenticator.code);
 }

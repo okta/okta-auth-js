@@ -11,9 +11,12 @@
  */
 
 
-import activateUserSms from '../../management-api/activateUserSms';
+import clickElement from '../clickElement';
 import ActionContext from '../../context';
+import getLoginForm from '../../lib/getLoginForm';
 
-export default async function (this: ActionContext): Promise<void> {
-  await activateUserSms(this.user, this.credentials.phoneNumber);
+export default async function(this: ActionContext) {
+  const loginForm = getLoginForm(this.featureName);
+  const selector = loginForm.submit;
+  await clickElement('click', 'selector', selector);
 }

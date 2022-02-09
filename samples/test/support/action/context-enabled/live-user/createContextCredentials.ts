@@ -11,12 +11,16 @@
  */
 
 
-import ChallengeAuthenticator from '../../selectors/ChallengeAuthenticator';
-import a18nClient from '../../management-api/a18nClient';
-import setInputField from '../setInputField';
-import ActionContext from '../../context';
+import createCredentials from '../../../management-api/createCredentials';
+import ActionContext, { getReusedContext } from '../../../context';
+import { Scenario } from '../../../scenario';
 
-export default async function (this: ActionContext) {
-  const code = await a18nClient.getEmailCode(this.credentials.profileId);
-  await setInputField('set', code, ChallengeAuthenticator.code);
+export default async function (this: ActionContext, firstName: string): Promise<void> {
+  if (this.isCurrentScenario(Scenario.TOTP_SIGN_IN_REUSE_SHARED_SECRET)) {
+    this.credentials = getReusedContext().credentials;
+    this.sharedSecret = getReusedContext().sharedSecret;
+    this.userName = getReusedContext().userName;
+  } else {
+    this.credentials = await createCredentials(firstName, this.featureName);
+  }
 }
