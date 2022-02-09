@@ -13,6 +13,7 @@
 
 const express = require('express');
 const URL = require('url').URL;
+const { hasErrorInUrl } = require('@okta/okta-auth-js');
 const { 
   getAuthClient, 
   handleTransaction,
@@ -89,6 +90,12 @@ router.get('/login/callback', async (req, res, next) => {
   const authClient = getAuthClient(req);
 
   try {
+    if(hasErrorInUrl(search)) {
+      const error = new Error(`${req.query.error}: ${req.query.error_description}`);
+      next(error);
+      return;
+    }
+
     if (authClient.idx.isEmailVerifyCallback(search)) {
       // may throw an EmailVerifyCallbackError if proceed is not possible
       const transaction = await authClient.idx.handleEmailVerifyCallback(search);
