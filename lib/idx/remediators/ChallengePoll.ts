@@ -14,4 +14,8 @@ import { EnrollPoll } from './EnrollPoll';
 
 export class ChallengePoll extends EnrollPoll{
   static remediationName = 'challenge-poll';
+
+  canRemediate() {
+    return !!this.values.startPolling || this.options.step === 'challenge-poll';
+  }
 }

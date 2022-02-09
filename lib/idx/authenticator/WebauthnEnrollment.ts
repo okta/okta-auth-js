@@ -11,8 +11,11 @@ export class WebauthnEnrollment extends Authenticator<WebauthnEnrollValues> {
     return !!(clientData && attestation);
   }
 
-  mapCredentials(values: WebauthnEnrollValues): Credentials {
+  mapCredentials(values: WebauthnEnrollValues): Credentials | undefined {
     const { clientData, attestation } = values;
+    if (!clientData && !attestation) {
+      return;
+    }
     return {
       clientData,
       attestation

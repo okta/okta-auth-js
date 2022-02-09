@@ -13,8 +13,7 @@
 
 
 /* eslint-disable complexity */
-import { AuthSdkError } from '../../../errors';
-import { NextStep, IdxMessage, Authenticator, Input, IdxOptions } from '../../types';
+import { NextStep, IdxMessage, Authenticator, Input, IdxOptions, RemediateOptions } from '../../types';
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase } from '../util';
 import { formatAuthenticator, compareAuthenticators } from '../../authenticator/util';
@@ -35,11 +34,13 @@ export class Remediator {
 
   remediation: IdxRemediation;
   values: RemediationValues;
+  options: RemediateOptions;
   map?: IdxToRemediationValueMap;
 
-  constructor(remediation: IdxRemediation, values: RemediationValues = {}) {
+  constructor(remediation: IdxRemediation, values: RemediationValues = {}, options: RemediateOptions = {}) {
     // assign fields to the instance
     this.values = { ...values };
+    this.options = { ...options };
     this.formatAuthenticators();
     this.remediation = remediation;
   }
@@ -81,9 +82,6 @@ export class Remediator {
   // Override this method to provide custom check
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
   canRemediate(): boolean {
-    if (!this.map) {
-      return false;
-    }
     const required = getRequiredValues(this.remediation);
     const needed = required!.find((key) => !this.hasData(key));
     if (needed) {
@@ -106,9 +104,12 @@ export class Remediator {
 
     // Map value by "map${Property}" function in each subClass
     if (typeof this[`map${titleCase(key)}`] === 'function') {
-      return this[`map${titleCase(key)}`](
+      const val = this[`map${titleCase(key)}`](
         this.remediation.value!.find(({name}) => name === key)
       );
+      if (val) {
+        return val;
+      }
     }
 
     // If a map is defined for this key, return the first aliased property that returns a truthy value
@@ -131,13 +132,7 @@ export class Remediator {
   ): boolean 
   {
     // no attempt to format, we want simple true/false
-
-    // First see if the remediation has a mapping for this value
-    const data = this.getData(key);
-    if (typeof data === 'object') {
-      return !!Object.keys(data).find(key => !!data[key]);
-    }
-    return !!data;
+    return !!this.getData(key);
   }
 
   getNextStep(_context?: IdxContext): NextStep {
@@ -157,46 +152,38 @@ export class Remediator {
 
   // Get inputs for the next step
   private getInputs(): Input[] {
-    if (!this.map) {
-      return [];
-    }
-
-    return Object.keys(this.map).reduce((inputs, key) => {
-      const inputFromRemediation = this.remediation.value!.find(item => item.name === key);
-      if (!inputFromRemediation) {
-        return inputs;
-      }
-
+    const inputs = [];
+    const inputsFromRemediation = this.remediation.value || [];
+    inputsFromRemediation.map(inputFromRemediation => {
       let input;
-      const aliases = this.map![key];
-      const { type } = inputFromRemediation;
-      if (typeof this[`getInput${titleCase(key)}`] === 'function') {
-        input = this[`getInput${titleCase(key)}`](inputFromRemediation);
+      let { name, type } = inputFromRemediation;
+      if (typeof this[`getInput${titleCase(name)}`] === 'function') {
+        input = this[`getInput${titleCase(name)}`](inputFromRemediation);
       } else if (type !== 'object') {
         // handle general primitive types
-        let name;
+        let alias;
+        const aliases = (this.map ? this.map[name] : null) || [];
         if (aliases.length === 1) {
-          name = aliases[0];
+          alias = aliases[0];
         } else {
           // try find key from values
-          name = aliases.find(name => Object.keys(this.values).includes(name));
+          alias = aliases.find(name => Object.keys(this.values).includes(name));
         }
-        if (name) {
-          input = { ...inputFromRemediation, name };
+        if (alias) {
+          input = { ...inputFromRemediation, name: alias };
         }
-      } 
-
-      if (!input) {
-        throw new AuthSdkError(`Missing custom getInput${titleCase(key)} method in Remediator: ${this.getName()}`);
       }
-
+      if (!input) {
+        input = inputFromRemediation;
+        // throw new AuthSdkError(`Missing custom getInput${titleCase(name)} method in Remediator: ${this.getName()}`);
+      }
       if (Array.isArray(input)) {
         input.forEach(i => inputs.push(i as never));
       } else {
         inputs.push(input as never);
       }
-      return inputs;
-    }, []);
+    });
+    return inputs;
   }
 
   static getMessages(remediation: IdxRemediation): IdxMessage[] | undefined {

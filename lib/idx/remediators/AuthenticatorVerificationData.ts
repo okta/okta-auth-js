@@ -41,7 +41,13 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
   }
 
   mapAuthenticator() {
+    // authenticator data may already be specified
     const authenticatorData = this.getAuthenticatorData();
+    if (authenticatorData) {
+      return authenticatorData;
+    }
+    
+    // infer the value from the remediation
     const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
 
     // auto proceed with the only methodType option
@@ -80,4 +86,9 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
     return inputs;
   }
 
+  getValuesAfterProceed(): AuthenticatorVerificationDataValues {
+    this.values = super.getValuesAfterProceed();
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'authenticator');
+    return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
+  }
 }

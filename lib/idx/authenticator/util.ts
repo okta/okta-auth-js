@@ -16,6 +16,9 @@ export function formatAuthenticator(incoming: unknown): Authenticator {
 
 // Returns true if the authenticators are equivalent
 export function compareAuthenticators(auth1, auth2) {
+  if (!auth1 || !auth2) {
+    return false;
+  }
   // by id
   if (auth1.id && auth2.id) {
     return (auth1.id === auth2.id);

@@ -1,6 +1,7 @@
 import * as remediators from './remediators';
+import { RemediationValues } from './remediators';
 import { IdxFeature, NextStep } from './types';
-import { IdxMessage, IdxRemediation, IdxResponse } from './types/idx-js';
+import { IdxMessage, IdxRemediationValue, IdxResponse } from './types/idx-js';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
@@ -15,20 +16,37 @@ export function canResendFn(idxResponse: IdxResponse) {
   return Object.keys(idxResponse.actions).some(actionName => actionName.includes('resend'));
 }
 
-export function getMessagesFromRemediation(remediation: IdxRemediation): IdxMessage[] | undefined {
-  if (!remediation.value) {
+export function getMessagesFromIdxRemediationValue(
+  value?: IdxRemediationValue[]
+): IdxMessage[] | undefined {
+  if (!value || !Array.isArray(value)) {
     return;
   }
-  return remediation.value[0]?.form?.value.reduce((messages, field) => {
-    if (field.messages) {
-      messages = [...messages, ...field.messages.value] as never;
+  return value.reduce((messages, value) => {
+    if (value.messages) {
+      messages = [...messages, ...value.messages.value] as never;
+    }
+    if (value.form) {
+      const messagesFromForm = getMessagesFromIdxRemediationValue(value.form.value) || [];
+      messages = [...messages, ...messagesFromForm] as never;
+    } 
+    if (value.options) {
+      let optionValues = [];
+      value.options.forEach(option => {
+        if (!option.value || typeof option.value === 'string') {
+          return;
+        }
+        optionValues = [...optionValues, option.value] as never;
+      });
+      const messagesFromOptions = getMessagesFromIdxRemediationValue(optionValues) || [];
+      messages = [...messages, ...messagesFromOptions] as never;
     }
     return messages;
   }, []);
 }
 
 export function getMessagesFromResponse(idxResponse: IdxResponse): IdxMessage[] {
-  let messages = [];
+  let messages: IdxMessage[] = [];
   const { rawIdxState, neededToProceed } = idxResponse;
 
   // Handle global messages
@@ -39,12 +57,23 @@ export function getMessagesFromResponse(idxResponse: IdxResponse): IdxMessage[] 
 
   // Handle field messages for current flow
   for (let remediation of neededToProceed) {
-    const fieldMessages = getMessagesFromRemediation(remediation);
+    const fieldMessages = getMessagesFromIdxRemediationValue(remediation.value);
     if (fieldMessages) {
       messages = [...messages, ...fieldMessages] as never;
     }
   }
 
+  // API may return identical error on same field, filter by i18n key
+  const seen = {};
+  messages = messages.reduce((filtered, message) => {
+    const key = message.i18n?.key;
+    if (key && seen[key]) {
+      return filtered;
+    }
+    seen[key] = message;
+    filtered = [...filtered, message] as never;
+    return filtered;
+  }, []);
   return messages;
 }
 
@@ -92,4 +121,14 @@ export function getAvailableSteps(idxResponse: IdxResponse): NextStep[] {
   }
 
   return res;
+}
+
+export function filterValuesForRemediation(idxResponse: IdxResponse, values: RemediationValues): RemediationValues {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const valuesForRemediation = idxResponse.neededToProceed![0]!.value!.reduce((res, entry) => {
+    const { name } = entry;
+    res[name] = values[name];
+    return res;
+  }, {});
+  return valuesForRemediation;
 }

@@ -207,9 +207,12 @@ describe('idx/run', () => {
   it('calls remediate, passing options and values through', async () => {
     const { authClient, idxResponse } = testContext;
     const flow = 'register';
-    const options: RunOptions = { username: 'x', flow };
+    const username = 'x';
+    const password = 'y';
+    const options: RunOptions = { username, password, flow };
     const values = { 
-      ...options, 
+      username,
+      password, 
       stateHandle: idxResponse.rawIdxState.stateHandle 
     };
     const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow);

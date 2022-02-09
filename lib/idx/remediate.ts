@@ -21,7 +21,14 @@ import {
   IdxRemediation,
   isIdxResponse, 
 } from './types/idx-js';
-import { canResendFn, canSkipFn, getMessagesFromResponse, isTerminalResponse } from './util';
+import {
+  canResendFn,
+  canSkipFn,
+  getMessagesFromResponse,
+  isTerminalResponse,
+  filterValuesForRemediation
+} from './util';
+import { warn } from '../util';
 
 interface RemediationResponse {
   idxResponse: IdxResponse;
@@ -51,8 +58,14 @@ export function getRemediator(
   if (options.step) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const remediation = idxRemediations.find(({ name }) => name === options.step)!;
-    const T = remediators[remediation.name];
-    return T ? new T(remediation, values) : undefined;
+    if (remediation) {
+      const T = remediation ? remediators[remediation.name] : undefined;
+      return T ? new T(remediation, values, options) : undefined;
+    } else {
+      // step was specified, but remediation was not found. This is unexpected!
+      warn(`step "${options.step}" did not match any remediations`);
+      return;
+    }
   }
 
   const remediatorCandidates = [];
@@ -63,7 +76,7 @@ export function getRemediator(
     }
 
     const T = remediators[remediation.name];
-    remediator = new T(remediation, values);
+    remediator = new T(remediation, values, options);
     if (remediator.canRemediate()) {
       // found the remediator
       return remediator;
@@ -144,13 +157,15 @@ export async function remediate(
   
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
+  const actionFromOptions = options.actions || [];
   const actions = [
-    ...options.actions || [],
+    ...actionFromOptions,
     ...(actionFromValues && [actionFromValues] || []),
   ];
   if (actions) {
     for (let action of actions) {
       let valuesWithoutExecutedAction = removeActionFromValues(values);
+      let optionsWithoutExecutedAction = { ...options, actions: actionFromOptions.filter(entry => entry !== action) };
       if (typeof idxResponse.actions[action] === 'function') {
         try {
           idxResponse = await idxResponse.actions[action]();
@@ -160,7 +175,7 @@ export async function remediate(
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
         }
-        return remediate(idxResponse, valuesWithoutExecutedAction, options); // recursive call
+        return remediate(idxResponse, valuesWithoutExecutedAction, optionsWithoutExecutedAction); // recursive call
       }
 
       // search for action in remediation list
@@ -173,7 +188,7 @@ export async function remediate(
           return handleIdxError(e, remediators);
         }
 
-        return remediate(idxResponse, values, options); // recursive call
+        return remediate(idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
   }
@@ -181,6 +196,7 @@ export async function remediate(
   const remediator = getRemediator(neededToProceed, values, options);
   if (!remediator) {
     if (options.step) {
+      values = filterValuesForRemediation(idxResponse, values); // include only requested values
       idxResponse = await idxResponse.proceed(options.step, values);
       return { idxResponse };
     }

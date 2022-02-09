@@ -35,6 +35,7 @@ export { PasswordRecoveryOptions } from '../recoverPassword';
 export { AccountUnlockOptions } from '../unlockAccount';
 export { ProceedOptions } from '../proceed';
 export { CancelOptions } from '../cancel';
+export { RemediateOptions } from '../remediate';
 export { FlowIdentifier };
 export { IdxAuthenticator };
 export { EmailVerifyCallbackResponse } from '../emailVerify';
@@ -120,6 +121,7 @@ export type IdxOptions = InteractOptions & IntrospectOptions & {
   flow?: FlowIdentifier;
   exchangeCodeForTokens?: boolean;
   autoRemediate?: boolean;
+  step?: string;
 };
 
 export interface IdxPollOptions {

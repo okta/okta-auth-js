@@ -27,10 +27,6 @@ export class SelectAuthenticator extends Remediator {
   values!: SelectAuthenticatorValues;
   selectedAuthenticator?: Authenticator;
   selectedOption?: any;
-  
-  map = {
-    authenticator: []
-  }
 
   // Find matched authenticator in provided order
   findMatchedOption(authenticators, options) {

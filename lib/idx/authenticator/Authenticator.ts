@@ -14,7 +14,7 @@ export abstract class Authenticator<Values> {
 
   abstract canVerify(values: Values): boolean;
 
-  abstract mapCredentials(values: Values): Credentials;
+  abstract mapCredentials(values: Values): Credentials | undefined;
 
   abstract getInputs(idxRemediationValue: IdxRemediationValue): any; // TODO: add type
 }

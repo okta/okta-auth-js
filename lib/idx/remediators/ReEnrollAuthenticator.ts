@@ -22,13 +22,13 @@ export class ReEnrollAuthenticator extends Remediator {
 
   values!: ReEnrollAuthenticatorValues;
 
-  map = {
-    'credentials': []
-  };
-
   mapCredentials() {
+    const { newPassword } = this.values;
+    if (!newPassword) {
+      return;
+    }
     return { 
-      passcode: this.values.newPassword,
+      passcode: newPassword,
     };
   }
 

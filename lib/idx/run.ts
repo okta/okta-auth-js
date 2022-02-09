@@ -60,6 +60,16 @@ declare interface RunData {
   terminal?: boolean;
 }
 
+function initializeValues(options: RunOptions) {
+  // remove known options, everything else is assumed to be a value
+  const knownOptions = ['flow', 'remediators', 'actions', 'withCredentials', 'step'];
+  const values = { ...options };
+  knownOptions.forEach(option => {
+    delete values[option];
+  });
+  return values;
+}
+
 function initializeData(authClient, data: RunData): RunData {
   const { options } = data;
   let {
@@ -264,7 +274,10 @@ export async function run(
   authClient: OktaAuthInterface, 
   options: RunOptions = {},
 ): Promise<IdxTransaction> {
-  let data: RunData = { options, values: { ...options } };
+  let data: RunData = {
+    options,
+    values: initializeValues(options)
+  };
 
   data = initializeData(authClient, data);
   try {

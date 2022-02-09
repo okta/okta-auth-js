@@ -11,12 +11,13 @@
  */
 
 
+import { Credentials } from '../authenticator';
 import { Remediator, RemediationValues } from './Base/Remediator';
 
 export interface IdentifyValues extends RemediationValues {
   username?: string;
   password?: string;
-  credentials?: { passcode: string };
+  credentials?: Credentials;
 }
 
 export class Identify extends Remediator {
@@ -25,9 +26,7 @@ export class Identify extends Remediator {
   values!: IdentifyValues;
 
   map = {
-    'identifier': ['username'],
-    'credentials': [],
-    'rememberMe': ['rememberMe'],
+    'identifier': ['username']
   };
 
   canRemediate() {
@@ -36,7 +35,11 @@ export class Identify extends Remediator {
   }
 
   mapCredentials() {
-    return this.values.credentials || { passcode: this.values.password };
+    const { credentials, password } = this.values;
+    if (!credentials && !password) {
+      return;
+    }
+    return credentials || { passcode: password };
   }
 
   getInputCredentials(input) {

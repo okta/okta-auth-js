@@ -27,7 +27,6 @@ export class SelectAuthenticatorUnlockAccount extends SelectAuthenticator {
   authenticator?: Authenticator;
 
   map = {
-    authenticator: [],
     identifier: ['username']
   }
 

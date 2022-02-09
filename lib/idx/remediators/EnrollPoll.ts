@@ -25,7 +25,7 @@ export class EnrollPoll extends Remediator {
   values!: EnrollPollValues;
 
   canRemediate() {
-    return Boolean(this.values.startPolling);
+    return !!this.values.startPolling || this.options.step === 'enroll-poll';
   }
 
   getNextStep(context?: IdxContext): NextStep {

@@ -10,8 +10,12 @@ export class OktaPassword extends Authenticator<OktaPasswordInputValues> {
     return !!(values.credentials || values.password);
   }
 
-  mapCredentials(values: OktaPasswordInputValues): Credentials {
-    return values.credentials || { passcode: values.password };
+  mapCredentials(values: OktaPasswordInputValues): Credentials | undefined {
+    const { credentials, password } = values;
+    if (!credentials && !password) {
+      return;
+    }
+    return credentials || { passcode: password };
   }
 
   getInputs(idxRemediationValue) {

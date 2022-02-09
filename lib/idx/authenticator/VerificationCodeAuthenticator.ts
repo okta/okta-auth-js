@@ -18,8 +18,12 @@ export class VerificationCodeAuthenticator extends Authenticator<VerificationCod
     return !!(values.credentials ||values.verificationCode || values.otp);
   }
 
-  mapCredentials(values): VerificationCodeCredentials | Credentials {
-    return values.credentials || { passcode: values.verificationCode || values.otp };
+  mapCredentials(values): VerificationCodeCredentials | Credentials | undefined {
+    const { credentials, verificationCode, otp } = values;
+    if (!credentials && !verificationCode && !otp) {
+      return;
+    }
+    return credentials || { passcode: verificationCode || otp };
   }
 
   getInputs(idxRemediationValue) {

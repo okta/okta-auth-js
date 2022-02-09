@@ -25,11 +25,6 @@ export class EnrollmentChannelData extends Remediator {
 
   values!: EnrollmentChannelDataValues;
 
-  map = {
-    email: [],
-    phoneNumber: []
-  }
-
   getInputEmail() {
     return [
       { name: 'email', type: 'string', required: true, label: 'Email' },

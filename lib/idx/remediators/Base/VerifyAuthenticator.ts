@@ -24,10 +24,6 @@ export class VerifyAuthenticator extends Remediator {
   authenticator: Authenticator<VerifyAuthenticatorValues>;
   values!: VerifyAuthenticatorValues;
 
-  map = {
-    'credentials': []
-  };
-
   constructor(remediation: IdxRemediation, values: VerifyAuthenticatorValues = {}) {
     super(remediation, values);
     this.authenticator = getAuthenticator(remediation);
