@@ -33,8 +33,16 @@ import ChallengePhoneAuthenticator from './ChallengePhoneAuthenticator';
 import ChallengeSecurityQuestion from './ChallengeSecurityQuestion';
 import ChallengeGoogleAuthenticator from './ChallengeGoogleAuthenticator';
 import PasswordSetup from './PasswordSetup';
+import Registration from './Registration';
+import OktaSignInOIEFacebookIdp from './OktaSignInOIEFacebookIdp';
+import OktaSignInOIEOktaIdp from './OktaSignInOIEOktaIdp';
 
 const pages: { [key: string]: Page } = {
+  'Login View': LoginForm,
+  'Basic Login View': LoginForm,
+  'Login with Username and Password': LoginForm,
+  'Basic Social Login View': LoginForm,
+  'Self Service Registration View': Registration,
   'Self Service Password Reset View': PasswordRecover,
   'Select authenticator': SelectAuthenticator,
   'Enter Code': ChallengeEmailAuthenticator,
@@ -50,6 +58,10 @@ const pages: { [key: string]: Page } = {
   'Challenge Security Question': ChallengeSecurityQuestion,
   'Enroll Google Authenticator':  EnrollGoogleAuthenticator,
   'Challenge Google Authenticator':  ChallengeGoogleAuthenticator,
+  // SIW form
+  'Embedded Widget View': OktaSignInOIE,
+  'Login with Social IDP': OktaSignInOIEFacebookIdp,
+  'Login with Okta OIDC IDP': OktaSignInOIEOktaIdp,
 };
 
 
