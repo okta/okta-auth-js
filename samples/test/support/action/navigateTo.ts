@@ -18,12 +18,14 @@ import Home from '../selectors/Home';
 import startApp from './startApp';
 import { pages } from '../selectors';
 import { Page } from '../selectors/Page';
+import PasswordRecover from '../selectors/PasswordRecover';
 
 
 const urls = new Map<Page, string>([
   [LoginForm, '/login'],
   [Home, '/'],
   [OktaSignInOIE, '/login'],
+  [PasswordRecover, '/recover-password'],
 ]);
 
 function getContext(formName: string) {
