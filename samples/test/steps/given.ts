@@ -127,7 +127,7 @@ Given(
 );
 
 Given(
-  /^([^/s]+) navigates to (?:the)??(.*)$/,
+  /^([^/s]+) navigates to (?:the)?(.*)$/,
   navigateTo
 );
 
