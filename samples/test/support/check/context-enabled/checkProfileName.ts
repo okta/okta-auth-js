@@ -11,9 +11,12 @@
  */
 
 
-import setInputField from '../setInputField';
+import checkEqualsText from '../checkEqualsText';
+import UserHome from '../../selectors/UserHome';
 import ActionContext from '../../context';
 
-export default async function (this: ActionContext) {
-  await setInputField('set', this.credentials.password, '#confirm-password');
+export default async function(this: ActionContext) {
+  const firstName = this.credentials?.firstName;
+  const lastName = this.credentials?.lastName;
+  await checkEqualsText('element', UserHome.name, false, `${firstName} ${lastName}` as string);
 }

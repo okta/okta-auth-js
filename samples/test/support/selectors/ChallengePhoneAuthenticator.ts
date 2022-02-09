@@ -10,15 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { ChallengeAuthenticator } from './ChallengeAuthenticator';
 
-import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
-import setInputField from './setInputField';
-import ActionContext from '../context';
-const totp = require('totp-generator');
 
-export default async function (this: ActionContext) {
-  const token = totp(this.sharedSecret || '', {
-    timestamp: Date.now() + (this.scenarioName.includes('enroll') ? -30*1000 : 0)
-  });
-  await setInputField('set', token, EnrollGoogleAuthenticator.code);
+class ChallengePhoneAuthenticator extends ChallengeAuthenticator {
+  title = 'Challenge phone authenticator';
 }
+
+export default new ChallengePhoneAuthenticator();

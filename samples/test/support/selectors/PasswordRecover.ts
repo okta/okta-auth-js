@@ -10,9 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { PageWithTitle } from './Page';
 
-class PasswordRecover {
-  get pageTitle() { return '#page-title-header'; }
+
+class PasswordRecover extends PageWithTitle {
+  title = 'Recover password';
+
   get username() { return '#password-recover-form #username'; }
   get submit() { return '#password-recover-form #submit-button'; }
 

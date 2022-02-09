@@ -11,11 +11,12 @@
  */
 
 
-import checkEqualsText from './checkEqualsText';
-import UserHome from '../selectors/UserHome';
-import ActionContext from '../context';
+import clickElement from '../clickElement';
+import ActionContext from '../../context';
+import getLoginForm from '../../lib/getLoginForm';
 
 export default async function(this: ActionContext) {
-  const userName = this?.credentials?.emailAddress || process.env.USERNAME;
-  await checkEqualsText('element', UserHome.email, false, userName as string);
+  const loginForm = getLoginForm(this.featureName);
+  const selector = loginForm.submit;
+  await clickElement('click', 'selector', selector);
 }

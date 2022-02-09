@@ -10,13 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { ChallengeAuthenticator } from './ChallengeAuthenticator';
 
-import clickElement from './clickElement';
-import ActionContext from '../context';
-import getLoginForm from '../lib/getLoginForm';
 
-export default async function(this: ActionContext) {
-  const loginForm = getLoginForm(this.featureName);
-  const selector = loginForm.submit;
-  await clickElement('click', 'selector', selector);
+class ChallengeSecurityQuestion extends ChallengeAuthenticator {
+  title = 'Challenge Security Question';
 }
+
+export default new ChallengeSecurityQuestion();

@@ -11,16 +11,10 @@
  */
 
 
-import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
-import ActionContext from '../context';
-import jsqr from 'jsqr';
-const {PNG} = require('pngjs');
+import EnrollPhoneAuthenticator from '../../../selectors/EnrollPhoneAuthenticator';
+import setInputField from '../../setInputField';
+import ActionContext from '../../../context';
 
 export default async function (this: ActionContext) {
-  const el = await $(EnrollGoogleAuthenticator.qrCode);
-  const dataUri = await el.getAttribute('src');
-  const png = PNG.sync.read(Buffer.from(dataUri.slice('data:image/png;base64,'.length), 'base64'));
-  const result = jsqr(Uint8ClampedArray.from(png.data), png.width, png.height);
-  const sharedSecret = result?.data?.match(/\?secret=(\w+)&/)?.[1];
-  this.sharedSecret = sharedSecret;
+  await setInputField('set', this.credentials.phoneNumber, EnrollPhoneAuthenticator.phoneNumber);
 }

@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { PasswordReset } from './PasswordReset';
 
-import setInputField from '../setInputField';
-import PasswordRecover from '../../selectors/PasswordRecover';
-import ActionContext from '../../context';
 
-export default async function(this: ActionContext) {
-  await setInputField('set', this.user.profile.email, PasswordRecover.username);
+class PasswordSetup extends PasswordReset {
+  title = 'Set up password';
 }
+
+export default new PasswordSetup();

@@ -10,12 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { OktaSignInOIE } from './OktaSignInOIE';
 
-import checkEqualsText from './checkEqualsText';
-import UserHome from '../selectors/UserHome';
-import ActionContext from '../context';
-
-export default async function(this: ActionContext) {
-  const userName = this?.credentials?.emailAddress || process.env.USERNAME;
-  await checkEqualsText('element', UserHome.email, false, userName as string);
+class OktaSignInOIEOktaIdp extends OktaSignInOIE {
+  // override fields from base form
+  get isDisplayedElementSelector() { return this.signinWithOktaOIDCIdPBtn; }
 }
+
+export default new OktaSignInOIEOktaIdp();

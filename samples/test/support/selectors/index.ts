@@ -19,6 +19,51 @@ import OktaSignInV1 from './OktaSignInV1';
 import OktaSignInOIE from './OktaSignInOIE';
 import Unauth from './Unauth';
 import UserHome from './UserHome';
+import PasswordRecover from './PasswordRecover';
+import SelectAuthenticator from './SelectAuthenticator';
+import PasswordReset from './PasswordReset';
+import Home from './Home';
+import { Page } from './Page';
+import VerifyPhone from './VerifyPhone';
+import EnrollGoogleAuthenticator from './EnrollGoogleAuthenticator';
+import ChallengeEmailAuthenticator from './ChallengeEmailAuthenticator';
+import EnrollPhoneAuthenticator from './EnrollPhoneAuthenticator';
+import EnrollEmailAuthenticator from './EnrollEmailAuthenticator';
+import ChallengePhoneAuthenticator from './ChallengePhoneAuthenticator';
+import ChallengeSecurityQuestion from './ChallengeSecurityQuestion';
+import ChallengeGoogleAuthenticator from './ChallengeGoogleAuthenticator';
+import PasswordSetup from './PasswordSetup';
+import Registration from './Registration';
+import OktaSignInOIEFacebookIdp from './OktaSignInOIEFacebookIdp';
+import OktaSignInOIEOktaIdp from './OktaSignInOIEOktaIdp';
+
+const pages: { [key: string]: Page } = {
+  'Login View': LoginForm,
+  'Basic Login View': LoginForm,
+  'Login with Username and Password': LoginForm,
+  'Basic Social Login View': LoginForm,
+  'Self Service Registration View': Registration,
+  'Self Service Password Reset View': PasswordRecover,
+  'Select authenticator': SelectAuthenticator,
+  'Enter Code': ChallengeEmailAuthenticator,
+  'Challenge email authenticator': ChallengeEmailAuthenticator,
+  'Enroll Factor: Enter SMS Code': EnrollPhoneAuthenticator,
+  'Reset Password': PasswordReset,
+  'Root Page': Home,
+  'Root View': Home,
+  'Set up Password': PasswordSetup,
+  'Enroll email authenticator': EnrollEmailAuthenticator,
+  'Verify using phone authenticator': VerifyPhone,
+  'Challenge phone authenticator': ChallengePhoneAuthenticator,
+  'Challenge Security Question': ChallengeSecurityQuestion,
+  'Enroll Google Authenticator':  EnrollGoogleAuthenticator,
+  'Challenge Google Authenticator':  ChallengeGoogleAuthenticator,
+  // SIW form
+  'Embedded Widget View': OktaSignInOIE,
+  'Login with Social IDP': OktaSignInOIEFacebookIdp,
+  'Login with Okta OIDC IDP': OktaSignInOIEOktaIdp,
+};
+
 
 export {
   LoginForm,
@@ -27,4 +72,5 @@ export {
   OktaSignInOIE,
   Unauth,
   UserHome,
+  pages
 };

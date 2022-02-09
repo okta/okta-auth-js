@@ -10,12 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { OktaSignInOIE } from './OktaSignInOIE';
 
-import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
-import getText from './getText';
-import ActionContext from '../context';
-
-export default async function (this: ActionContext) {
-  const sharedSecret = await getText( EnrollGoogleAuthenticator.sharedSecret );
-  this.sharedSecret = sharedSecret;
+class OktaSignInOIEFacebookIdp extends OktaSignInOIE {
+  // override fields from base form
+  get isDisplayedElementSelector() { return this.signinWithFacebookBtn; }
 }
+
+export default new OktaSignInOIEFacebookIdp();

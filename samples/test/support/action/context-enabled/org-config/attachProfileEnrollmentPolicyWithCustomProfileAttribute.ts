@@ -1,7 +1,7 @@
-import { getConfig } from '../../../util/configUtils';
-import ActionContext from '../../context';
-import addAppToPolicy from '../../management-api/addAppToPolicy';
-import fetchPolicy from '../../management-api/fetchPolicy';
+import { getConfig } from '../../../../util/configUtils';
+import ActionContext from '../../../context';
+import addAppToPolicy from '../../../management-api/addAppToPolicy';
+import fetchPolicy from '../../../management-api/fetchPolicy';
 
 export default async function (this: ActionContext) {
   const { clientId } = getConfig();

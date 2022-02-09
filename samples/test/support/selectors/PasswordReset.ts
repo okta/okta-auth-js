@@ -10,9 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { PageWithTitle } from './Page';
 
-class PasswordReset {
-  get pageTitle() { return '#page-title-header'; }
+
+export class PasswordReset extends PageWithTitle {
+  title = 'Reset password';
+
   get password() { return '#password-reset-form #password'; }
   get confirmPassword() { return '#password-reset-form #confirm-password'; }
   get submit() {return '#password-reset-form #submit-button';}

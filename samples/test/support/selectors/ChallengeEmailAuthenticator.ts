@@ -10,12 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { ChallengeAuthenticator } from './ChallengeAuthenticator';
 
-import checkEqualsText from './checkEqualsText';
-import UserHome from '../selectors/UserHome';
-import ActionContext from '../context';
 
-export default async function(this: ActionContext) {
-  const userName = this?.credentials?.emailAddress || process.env.USERNAME;
-  await checkEqualsText('element', UserHome.email, false, userName as string);
+class ChallengeEmailAuthenticator extends ChallengeAuthenticator {
+  title = 'Challenge email authenticator';
 }
+
+export default new ChallengeEmailAuthenticator();

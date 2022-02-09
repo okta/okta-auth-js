@@ -10,8 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { Page } from './Page';
 
-class FacebookSignIn {
+
+class FacebookSignIn implements Page {
+  get isDisplayedElementSelector() { return this.password; }
+
   get signinForm() { return '#login_form';}
   get username() { return '#login_form #email'; }
   get password() { return '#login_form #pass'; }

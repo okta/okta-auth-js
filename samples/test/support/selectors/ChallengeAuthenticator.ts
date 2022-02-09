@@ -10,9 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { PageWithTitle } from './Page';
 
-class ChallengeAuthenticator {
-  get pageTitle() { return '#page-title-header'; }
+
+export class ChallengeAuthenticator extends PageWithTitle {
+  title = 'Challenge Authenticator';
+
   get code() { return '#authenticator-code-input'; }
   get answer() { return '#challenge-authenticator-form input[name=answer]'; }
   get submit() { return '#challenge-authenticator-form button[type=submit]'; }

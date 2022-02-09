@@ -10,10 +10,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
 import { LoginForm } from './LoginForm';
 
-class OktaSignInOIE extends LoginForm {
+export class OktaSignInOIE extends LoginForm {
   get signinForm() { return 'form[data-se="o-form"]';}
   get signinUsername() { return  '[name="identifier"]'; }
   get signinPassword()  { return '[name="credentials.passcode"]'; }
@@ -26,6 +25,8 @@ class OktaSignInOIE extends LoginForm {
   get username() { return this.signinUsername; }
   get password() { return this.signinPassword; }
   get submit() { return this.signinSubmitBtn; }
+  get isDisplayedElementSelector() { return this.username; }
+
 }
 
 export default new OktaSignInOIE();

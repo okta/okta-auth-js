@@ -11,9 +11,9 @@
  */
 
 
-import navigateTo from './navigateTo';
-import loginDirect from './loginDirect';
-import ActionContext from '../context';
+import navigateTo from '../../navigateTo';
+import loginDirect from '../../loginDirect';
+import ActionContext from '../../../context';
 
 export default async function (
     this: ActionContext,

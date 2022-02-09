@@ -19,6 +19,6 @@ import ActionContext from '../context';
 export default async function(this: ActionContext) {
   // verify profile info
   await waitForDisplayed(UserHome.email, false);
-  const userName = this.credentials?.emailAddress || this.userName || process.env.USERNAME;
+  const userName = this?.credentials?.emailAddress || this?.userName || process.env.USERNAME;
   await checkEqualsText('element', UserHome.email, false, userName as string);
 }

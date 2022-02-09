@@ -1,8 +1,8 @@
-import { getConfig } from '../../../util/configUtils';
-import ActionContext from '../../context';
-import addAppToPolicy from '../../management-api/addAppToPolicy';
-import addCustomProfileEnrollmentAttribute from '../../management-api/addCustomProfileEnrollmentAttribute';
-import createPolicy from '../../management-api/createPolicy';
+import { getConfig } from '../../../../util/configUtils';
+import ActionContext from '../../../context';
+import addAppToPolicy from '../../../management-api/addAppToPolicy';
+import addCustomProfileEnrollmentAttribute from '../../../management-api/addCustomProfileEnrollmentAttribute';
+import createPolicy from '../../../management-api/createPolicy';
 
 export default async function (this: ActionContext) {
   const { clientId } = getConfig();

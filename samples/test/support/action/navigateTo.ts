@@ -13,69 +13,53 @@
 
 import waitForDisplayed from '../wait/waitForDisplayed';
 import LoginForm from '../selectors/LoginForm';
-import OktaSignInOIE from '../selectors/OktaSignInOIE';
+import OktaSignInOIE, { OktaSignInOIE as WidgetForm } from '../selectors/OktaSignInOIE';
 import Home from '../selectors/Home';
 import startApp from './startApp';
+import { pages } from '../selectors';
+import { Page } from '../selectors/Page';
+import PasswordRecover from '../selectors/PasswordRecover';
+import Registration from '../selectors/Registration';
+import OktaSignInOIEFacebookIdp from '../selectors/OktaSignInOIEFacebookIdp';
+import OktaSignInOIEOktaIdp from '../selectors/OktaSignInOIEOktaIdp';
 
-// eslint-disable-next-line complexity
+
+const urls = new Map<Page, string>([
+  [LoginForm, '/login'],
+  [OktaSignInOIE, '/login'],
+  [OktaSignInOIEFacebookIdp, '/login'],
+  [OktaSignInOIEOktaIdp, '/login'],
+  [Home, '/'],
+  [PasswordRecover, '/recover-password'],
+  [Registration, '/register'],
+]);
+
 function getContext(formName: string) {
-  let url = '/';
-  let queryParams;
-  let selector;
-  let isNotDisplayed = false;
-  switch (formName) {
-    case 'the Login View':
-    case 'the Basic Login View':
-    case 'Login with Username and Password':
-    case 'Basic Social Login View':
-      url = '/login';
-      selector = LoginForm.password;
-      queryParams = { flow: 'form' };
-      break;
-    case 'the Root View': 
-      url = '/';
-      selector = Home.serverConfig;
-      queryParams = { flow: 'form' };
-      break;  
-    case 'the Self Service Password Reset View':
-      url = '/recover-password';
-      selector = 'a[href="/recover-password"]';
-      isNotDisplayed = true;
-      break;
-    case 'the Self Service Registration View':
-      url = '/register';
-      selector = 'a[href="/register"]';
-      isNotDisplayed = true;
-      break;
-    case 'the Embedded Widget View':
-      url = '/login';
-      selector = OktaSignInOIE.signinUsername;
-      queryParams = { flow: 'widget' };
-      break;
-    case 'Login with Social IDP': {
-      url = '/login';
-      selector = OktaSignInOIE.signinWithFacebookBtn;
-      queryParams = { flow: 'widget' };
-      break;
-    }
-    case 'Login with Okta OIDC IDP': {
-      url = '/login';
-      selector = OktaSignInOIE.signinWithOktaOIDCIdPBtn;
-      queryParams = { flow: 'widget' };
-      break;
-    }    
-    default:
-      throw new Error(`Unknown form "${formName}"`);
+  const page = pages[formName];
+  const selector = page?.isDisplayedElementSelector;
+  const url = urls.get(page);
+  let queryParams = { flow: 'form' };
+
+  if (page instanceof WidgetForm) {
+    queryParams = { flow: 'widget' };
   }
 
-  return { url, selector, queryParams, isNotDisplayed };
+  if (!selector) {
+    throw new Error(`Unknown form "${formName}"`);
+  }
+
+  if (!url) {
+    throw new Error(`Form "${formName}" has no associated URL`);
+  }
+
+  return { url, selector, queryParams };
 }
 
 export default async (
   userName: string,
   formName: string
 ) => {
-  const { url, queryParams, selector, isNotDisplayed } = getContext(formName);
+  const { url, queryParams, selector } = getContext(formName);
   await startApp(url, queryParams);
-  await waitForDisplayed(selector, isNotDisplayed);
+  await waitForDisplayed(selector);
 };

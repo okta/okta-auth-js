@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { ChallengeAuthenticator } from './ChallengeAuthenticator';
 
-import EnrollPhoneAuthenticator from '../../selectors/EnrollPhoneAuthenticator';
-import setInputField from '../setInputField';
-import ActionContext from '../../context';
 
-export default async function (this: ActionContext) {
-  await setInputField('set', this.credentials.phoneNumber, EnrollPhoneAuthenticator.phoneNumber);
+class ChallengeGoogleAuthenticator extends ChallengeAuthenticator {
+  title = 'Challenge Google Authenticator';
 }
+
+export default new ChallengeGoogleAuthenticator();

@@ -11,12 +11,16 @@
  */
 
 
-import checkEqualsText from './checkEqualsText';
-import UserHome from '../selectors/UserHome';
-import ActionContext from '../context';
+import createCredentials from '../../../management-api/createCredentials';
+import ActionContext, { getReusedContext } from '../../../context';
+import { Scenario } from '../../../scenario';
 
-export default async function(this: ActionContext) {
-  const firstName = this.credentials?.firstName;
-  const lastName = this.credentials?.lastName;
-  await checkEqualsText('element', UserHome.name, false, `${firstName} ${lastName}` as string);
+export default async function (this: ActionContext, firstName: string): Promise<void> {
+  if (this.isCurrentScenario(Scenario.TOTP_SIGN_IN_REUSE_SHARED_SECRET)) {
+    this.credentials = getReusedContext().credentials;
+    this.sharedSecret = getReusedContext().sharedSecret;
+    this.userName = getReusedContext().userName;
+  } else {
+    this.credentials = await createCredentials(firstName, this.featureName);
+  }
 }

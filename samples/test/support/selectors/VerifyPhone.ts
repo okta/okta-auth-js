@@ -10,9 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { PageWithTitle } from './Page';
 
-class VerifyPhone {
-  get pageTitle() { return '#page-title-header'; }
+class VerifyPhone extends PageWithTitle {
+  title = 'Verify using phone authenticator';
+
   get options() { return '#phone-authenticator-method-options'; }
   get submit() { return '#verify-form #submit-button'; }
 }

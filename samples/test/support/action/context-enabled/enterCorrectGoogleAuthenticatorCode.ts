@@ -11,11 +11,14 @@
  */
 
 
-import checkEqualsText from './checkEqualsText';
-import UserHome from '../selectors/UserHome';
-import ActionContext from '../context';
+import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
+import setInputField from '../setInputField';
+import ActionContext from '../../context';
+const totp = require('totp-generator');
 
-export default async function(this: ActionContext) {
-  const userName = this?.credentials?.emailAddress || process.env.USERNAME;
-  await checkEqualsText('element', UserHome.email, false, userName as string);
+export default async function (this: ActionContext) {
+  const token = totp(this.sharedSecret || '', {
+    timestamp: Date.now() + (this.scenarioName.includes('enroll') ? -30*1000 : 0)
+  });
+  await setInputField('set', token, EnrollGoogleAuthenticator.code);
 }
