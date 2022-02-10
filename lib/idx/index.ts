@@ -27,5 +27,5 @@ export { register } from './register';
 export { recoverPassword } from './recoverPassword';
 export { handleInteractionCodeRedirect } from './handleInteractionCodeRedirect';
 export { startTransaction } from './startTransaction';
+export { unlockAccount } from './unlockAccount';
 export * from './transactionMeta';
-export * from './unlockAccount';

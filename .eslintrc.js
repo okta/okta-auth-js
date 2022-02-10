@@ -101,7 +101,8 @@ module.exports = {
         'node/no-unsupported-features/es-builtins': ['error', {
           // features that are not supported before v12 are transformed in babel.cjs.js for commonjs output
           version: '>=12.0.0'
-        }]
+        }],
+        'import/no-commonjs': 'error'
       },
       settings: {
         // https://github.com/import-js/eslint-plugin-import#typescript

@@ -13,6 +13,7 @@
 
 import { SimpleStorage, StorageType, StorageUtil, Cookies } from '../types';
 import { AuthSdkError } from '../errors';
+// eslint-disable-next-line import/no-commonjs
 const NodeCache = require('node-cache'); // commonJS module cannot be imported without esModuleInterop
 
 // this is a SHARED memory storage to support a stateless http server
