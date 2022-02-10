@@ -28,6 +28,7 @@ export interface Config extends OktaAuthOptions {
   forceRedirect: boolean;
   useInteractionCodeFlow: boolean; // widget option
   enableSharedStorage: boolean; // TransactionManager
+  isTokenRenewPage?: boolean; // special lite /renew page to test cross-tab token renew
 }
 
 export function getDefaultConfig(): Config {
@@ -115,7 +116,7 @@ export function getConfigFromUrl(): Config {
 export function saveConfigToStorage(config: Config): void {
   const configCopy: any = {};
   Object.keys(config).forEach(key => {
-    if (typeof (config as any)[key] !== 'function') {
+    if (typeof (config as any)[key] !== 'function' && !['isTokenRenewPage'].includes(key)) {
       configCopy[key] = (config as any)[key];
     }
   });

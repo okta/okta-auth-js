@@ -128,18 +128,24 @@ const Toolbar = `
       <li class="pure-menu-item">
         <a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)" class="pure-menu-link">Subscribe to TokenManager events</a>
       </li>
+      <li class="pure-menu-item">
+        <a id="cross-tab-token-renew" onclick="simulateCrossTabTokenRenew(event)" class="pure-menu-link">Simulate cross-tab token renew</a>
+      </li>
   </div>
 `;
 
-const Layout = `
-  <div id="layout">
-    <div id="session-expired" style="color: orange"></div>
-    <div id="token-error" style="color: red"></div>
-    <div id="token-msg" style="color: green"></div>
-    ${Toolbar}
-    <div id="page-content"></div>
-  </div>
-`;
+function getLayout(app: TestApp): string {
+  return `
+    <div id="layout">
+      <div id="session-expired" style="color: orange"></div>
+      <div id="token-error" style="color: red"></div>
+      <div id="token-msg" style="color: green"></div>
+      ${app.config.isTokenRenewPage ? '' : Toolbar}
+      <div id="cross-tab-test"></div>
+      <div id="page-content"></div>
+    </div>
+  `;
+}
 
 function bindFunctions(testApp: TestApp, window: Window): void {
   const boundFunctions = {
@@ -159,13 +165,14 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     renewTokens: testApp.renewTokens.bind(testApp),
     revokeToken: testApp.revokeToken.bind(testApp),
     revokeRefreshToken: testApp.revokeRefreshToken.bind(testApp),
-    handleLoginCallback: testApp.handleLoginCallback.bind(testApp),
+    handleLoginCallback: testApp.handleLoginCallback.bind(testApp), 
     getUserInfo: testApp.getUserInfo.bind(testApp),
     testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
     testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp),
     testConcurrentLoginViaTokenRenewFailure: testApp.testConcurrentLoginViaTokenRenewFailure.bind(testApp),
     subscribeToAuthState: testApp.subscribeToAuthState.bind(testApp),
     subscribeToTokenEvents: testApp.subscribeToTokenEvents.bind(testApp),
+    simulateCrossTabTokenRenew: testApp.simulateCrossTabTokenRenew.bind(testApp),
     startService: testApp.startService.bind(testApp),
     stopService: testApp.stopService.bind(testApp),
   };
@@ -178,8 +185,10 @@ class TestApp {
   config: Config;
   originalUrl?: string;
   protectedUrl?: string;
+  renewUrl?: string;
   rootElem?: Element;
   contentElem?: Element;
+  crossTabTestElem?: Element;
   oktaAuth?: OktaAuth;
   getCount?: number;
   widgetInstance?: unknown;
@@ -194,11 +203,15 @@ class TestApp {
     const queryParams = toQueryString(flattenConfig(this.config));
     this.originalUrl = MOUNT_PATH + queryParams;
     this.protectedUrl = MOUNT_PATH + 'protected/' + queryParams;
+    this.renewUrl = MOUNT_PATH + 'renew';
     this.rootElem = rootElem;
-    this.rootElem.innerHTML = Layout;
+    this.rootElem.innerHTML = getLayout(this);
     this.contentElem = document.getElementById('page-content');
+    this.crossTabTestElem = document.getElementById('cross-tab-test');
     bindFunctions(this, window);
-    showConfigForm(this.config);
+    if (!this.config.isTokenRenewPage) {
+      showConfigForm(this.config);
+    }
   }
 
   getSDKInstance(): OktaAuth {
@@ -224,6 +237,27 @@ class TestApp {
     });
   }
 
+  async simulateCrossTabTokenRenew(): Promise<void> {
+    const tabsCount = 20; // should be > 15
+    const waitBeforeRenewSeconds = 10; // give some time to bootstrap all pages
+    const tokenStorage = await this.oktaAuth.tokenManager.getTokens();
+    if (tokenStorage && tokenStorage.accessToken) {
+      const expiresAt = tokenStorage.accessToken.expiresAt;
+      const now = Math.ceil(Date.now() / 1000);
+      if (expiresAt > now) {
+        const expireEarlySeconds = expiresAt - now - waitBeforeRenewSeconds;
+        const content = Array.from({length: tabsCount}, (_, i) => `
+          <iframe src="${this.renewUrl}#${expireEarlySeconds}" width="250" height="100"></iframe>
+        `).join('\n');
+        this._setCrossTabsContent(content);
+      } else {
+        alert('Access token is exipred');
+      }
+    } else {
+      alert('No access token');
+    }
+  }
+
   subscribeToTokenEvents(): void {
     ['expired', 'renewed', 'added', 'removed'].forEach(event => {
       this.oktaAuth.tokenManager.on(event, (arg1: unknown, arg2?: unknown) => {
@@ -238,6 +272,12 @@ class TestApp {
 
   _setContent(content: string): void {
     this.contentElem.innerHTML = `
+      <div>${content}</div>
+    `;
+  }
+
+  _setCrossTabsContent(content: string): void {
+    this.crossTabTestElem.innerHTML = `
       <div>${content}</div>
     `;
   }
@@ -284,6 +324,51 @@ class TestApp {
 
     this._setContent(content);
     this._afterRender('protected');
+  }
+
+  async bootstrapRenew(): Promise<void> {
+    const content = `
+      <span id="renew-status"></span>
+      <hr/>
+    `;
+    this.getSDKInstance();
+    this._setContent(content);
+
+    this.oktaAuth.start();
+
+    const renewTimer = setInterval(() => {
+      this.renderRenewStatus();
+    }, 100);
+    
+    this.oktaAuth.authStateManager.subscribe(() => {
+      const authState = this.oktaAuth.authStateManager.getAuthState();
+      if (authState.isAuthenticated)
+        document.getElementById('renew-status').innerHTML = 'Authenticated';
+      else
+        document.getElementById('renew-status').innerHTML = 'Not authenticated';
+    });
+    this.oktaAuth.tokenManager.on('error', (err: unknown) => {
+      this._onTokenError(err);
+    });
+    this.oktaAuth.tokenManager.on('expired', () => {
+      this.oktaAuth.tokenManager.off('expired');
+      document.getElementById('renew-status').innerHTML = 'Expired';
+      this.oktaAuth.stop();
+      clearInterval(renewTimer);
+    });
+  }
+
+
+  async renderRenewStatus(): Promise<void> {
+    const tokenStorage = await this.oktaAuth.tokenManager.getTokens();
+    if (tokenStorage && tokenStorage.accessToken) {
+      const expireTime = this.oktaAuth.tokenManager.getExpireTime(tokenStorage.accessToken);
+      const now = Date.now() / 1000;
+      const expireEventWait = Math.max(expireTime - now, 0) ;
+      document.getElementById('renew-status').innerHTML = 'Renew in '+expireEventWait.toFixed(1);
+    } else {
+      document.getElementById('renew-status').innerHTML = 'Not authenticated';
+    }
   }
 
   bootstrapLoginCallback(): void {

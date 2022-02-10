@@ -36,6 +36,7 @@ declare global {
     onFormData: (event: FormDataEvent) => void;
     bootstrapLanding: () => void;
     bootstrapLoginCallback: () => void;
+    bootstrapRenew: () => void;
     getWidgetConfig: () => any;
     getConfig: () => any;
     toQueryString: (obj: any) => string;
@@ -116,6 +117,22 @@ Object.assign(window, {
     config = getConfigFromStorage();
     mount();
     app.bootstrapLoginCallback();
+  },
+
+  bootstrapRenew: function(): void {
+    config = getConfigFromStorage();
+    const expireEarlySeconds = parseInt(window.location.hash.substring(1));
+    config.tokenManager = {
+      ...(config.tokenManager || {}),
+      expireEarlySeconds,
+      autoRenew: true,
+      autoRemove: false,
+      syncStorage: false
+    };
+    config.isTokenRenewPage = true;
+
+    mount();
+    app.bootstrapRenew();
   },
 
   bootstrapProtected: function(): void {
