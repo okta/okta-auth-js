@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 class EmbeddedAuthWithSDKApp {
-  get formMessages() { return $('#form-messages .list') }
+  get formMessages() { return $('#form-messages .list'); }
 
   async open() {
     await browser.url('');
