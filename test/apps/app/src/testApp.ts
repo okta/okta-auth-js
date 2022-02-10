@@ -246,7 +246,7 @@ class TestApp {
       const now = Math.ceil(Date.now() / 1000);
       if (expiresAt > now) {
         const expireEarlySeconds = expiresAt - now - waitBeforeRenewSeconds;
-        const content = Array.from({length: tabsCount}, (_, i) => `
+        const content = Array.from({length: tabsCount}, () => `
           <iframe src="${this.renewUrl}#${expireEarlySeconds}" width="250" height="100"></iframe>
         `).join('\n');
         this._setCrossTabsContent(content);
@@ -342,10 +342,11 @@ class TestApp {
     
     this.oktaAuth.authStateManager.subscribe(() => {
       const authState = this.oktaAuth.authStateManager.getAuthState();
-      if (authState.isAuthenticated)
+      if (authState.isAuthenticated) {
         document.getElementById('renew-status').innerHTML = 'Authenticated';
-      else
+      } else {
         document.getElementById('renew-status').innerHTML = 'Not authenticated';
+      }
     });
     this.oktaAuth.tokenManager.on('error', (err: unknown) => {
       this._onTokenError(err);
