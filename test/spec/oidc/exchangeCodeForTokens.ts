@@ -17,9 +17,9 @@ const handleOAuthResponse = jest.fn();
 jest.mock('../../../lib/oidc/handleOAuthResponse', () => { return { handleOAuthResponse }; });
 
 import { exchangeCodeForTokens, getOAuthUrls } from '../../../lib/oidc';
-import { OktaAuth } from '../../../lib/types';
+import { OktaAuthInterface } from '../../../lib/types';
 
-function mockOktaAuth(): OktaAuth {
+function mockOktaAuth(): OktaAuthInterface {
   return {
     options: {
       issuer: 'http://fake'
@@ -27,7 +27,7 @@ function mockOktaAuth(): OktaAuth {
     transactionManager: {
       clear: jest.fn()
     }
-  } as unknown as OktaAuth;
+  } as unknown as OktaAuthInterface;
 }
 
 describe('exchangeCodeForTokens', () => {

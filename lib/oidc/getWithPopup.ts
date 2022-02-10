@@ -11,12 +11,12 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuth, TokenParams, TokenResponse } from '../types';
+import { OktaAuthInterface, TokenParams, TokenResponse } from '../types';
 import { clone } from '../util';
 import { getToken } from './getToken';
 import { loadPopup } from './util';
 
-export function getWithPopup(sdk: OktaAuth, options: TokenParams): Promise<TokenResponse> {
+export function getWithPopup(sdk: OktaAuthInterface, options: TokenParams): Promise<TokenResponse> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithPopup" takes only a single set of options'));
   }

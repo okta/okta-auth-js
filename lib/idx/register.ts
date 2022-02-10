@@ -25,7 +25,7 @@ import { AuthSdkError } from '../errors';
 import { 
   IdxOptions, 
   IdxTransaction, 
-  OktaAuth, 
+  OktaAuthInterface, 
   IdxFeature,
 } from '../types';
 
@@ -37,7 +37,7 @@ export type RegistrationOptions = IdxOptions
   & SkipValues;
 
 export async function register(
-  authClient: OktaAuth, options: RegistrationOptions = {}
+  authClient: OktaAuthInterface, options: RegistrationOptions = {}
 ): Promise<IdxTransaction> {
 
   // Only check at the beginning of the transaction

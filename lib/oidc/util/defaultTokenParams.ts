@@ -13,11 +13,11 @@
  *
  */
 import { generateNonce, generateState } from './oauth';
-import { OktaAuth, TokenParams } from '../../types';
+import { OktaAuthInterface, TokenParams } from '../../types';
 import { isBrowser } from '../../features';
 import { removeNils } from '../../util';
 
-export function getDefaultTokenParams(sdk: OktaAuth): TokenParams {
+export function getDefaultTokenParams(sdk: OktaAuthInterface): TokenParams {
   const {
     pkce,
     clientId,

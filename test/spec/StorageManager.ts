@@ -12,7 +12,7 @@
 
 
 import SavedObject from '../../lib/SavedObject';
-import StorageManager from '../../lib/StorageManager';
+import { StorageManager } from '../../lib/StorageManager';
 import { 
   CookieOptions, 
   StorageManagerOptions, 

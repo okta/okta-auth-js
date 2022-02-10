@@ -11,7 +11,7 @@
  */
 
 
-import { OktaAuth } from '../../types';
+import { OktaAuthInterface } from '../../types';
 import { OAuthError, AuthApiError } from '../../errors';
 
 export function isInteractionRequiredError(error: Error) {
@@ -22,7 +22,7 @@ export function isInteractionRequiredError(error: Error) {
   return (oauthError.errorCode === 'interaction_required');
 }
 
-export function isAuthorizationCodeError(sdk: OktaAuth, error: Error) {
+export function isAuthorizationCodeError(sdk: OktaAuthInterface, error: Error) {
   if (error.name !== 'AuthApiError') {
     return false;
   }

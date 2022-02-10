@@ -23,7 +23,7 @@ import {
 } from './remediators';
 import { AuthSdkError } from '../errors';
 import { 
-  OktaAuth, 
+  OktaAuthInterface, 
   IdxOptions, 
   IdxTransaction,
   IdxFeature,
@@ -37,7 +37,7 @@ export type AccountUnlockOptions = IdxOptions
   & AuthenticatorVerificationDataValues;
 
 export async function unlockAccount(
-  authClient: OktaAuth, options: AccountUnlockOptions = {}
+  authClient: OktaAuthInterface, options: AccountUnlockOptions = {}
 ): Promise<IdxTransaction> {
   options.flow = 'unlockAccount';
 

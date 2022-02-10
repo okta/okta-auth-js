@@ -13,7 +13,7 @@
 /* global window, document */
 /* eslint-disable complexity, max-statements */
 import { AuthSdkError } from '../../errors';
-import { OktaAuth } from '../../types';
+import { OktaAuthInterface } from '../../types';
 
 export function addListener(eventTarget, name, fn) {
   if (eventTarget.addEventListener) {
@@ -46,7 +46,7 @@ export function loadPopup(src, options) {
   return window.open(src, title, appearance);
 }
 
-export function addPostMessageListener(sdk: OktaAuth, timeout, state) {
+export function addPostMessageListener(sdk: OktaAuthInterface, timeout, state) {
   var responseHandler;
   var timeoutId;
   var msgReceivedOrTimeout = new Promise(function (resolve, reject) {

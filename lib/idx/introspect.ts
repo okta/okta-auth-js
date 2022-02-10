@@ -11,7 +11,7 @@
  */
 
 import idx from './idx-js';
-import { OktaAuth } from '../types';
+import { OktaAuthInterface } from '../types';
 import { IdxResponse, isRawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
@@ -23,7 +23,10 @@ export interface IntrospectOptions {
   version?: string;
 }
 
-export async function introspect (authClient: OktaAuth, options: IntrospectOptions = {}): Promise<IdxResponse> {
+export async function introspect (
+  authClient: OktaAuthInterface, 
+  options: IntrospectOptions = {}
+): Promise<IdxResponse> {
   // try load from storage first
   let rawIdxResponse = authClient.transactionManager.loadIdxResponse();
   

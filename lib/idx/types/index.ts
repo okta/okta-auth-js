@@ -14,7 +14,7 @@
 import { InteractOptions } from '../interact';
 import { IntrospectOptions } from '../introspect';
 import { APIError, Tokens } from '../../types';
-import { IdxTransactionMeta } from '../../types/Transaction';
+import { PKCETransactionMeta } from '../../types/Transaction';
 import { 
   IdxActions, 
   IdxAuthenticator, 
@@ -36,7 +36,6 @@ export { AccountUnlockOptions } from '../unlockAccount';
 export { ProceedOptions } from '../proceed';
 export { CancelOptions } from '../cancel';
 export { FlowIdentifier };
-export { IdxTransactionMeta };
 export { IdxAuthenticator };
 export { EmailVerifyCallbackResponse } from '../emailVerify';
 export { WebauthnEnrollValues } from '../authenticator/WebauthnEnrollment';
@@ -87,6 +86,15 @@ export enum IdxFeature {
   REGISTRATION = 'enroll-profile',
   SOCIAL_IDP = 'redirect-idp',
   ACCOUNT_UNLOCK = 'unlock-account',
+}
+
+export interface IdxTransactionMeta extends PKCETransactionMeta {
+  interactionHandle?: string;
+  remediations?: string[];
+  flow?: FlowIdentifier;
+  withCredentials?: boolean;
+  activationToken?: string;
+  recoveryToken?: string;
 }
 
 export interface IdxTransaction {

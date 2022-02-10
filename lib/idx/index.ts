@@ -11,16 +11,21 @@
  */
 
 
-export * from './authenticate';
-export * from './cancel';
-export * from './emailVerify';
-export * from './interact';
-export * from './introspect';
-export * from './poll';
-export * from './proceed';
-export * from './register';
-export * from './recoverPassword';
-export * from './handleInteractionCodeRedirect';
-export * from './startTransaction';
+export { authenticate } from './authenticate';
+export { cancel } from './cancel';
+export { 
+  handleEmailVerifyCallback, 
+  isEmailVerifyCallback, 
+  parseEmailVerifyCallback, 
+  isEmailVerifyCallbackError, 
+} from './emailVerify';
+export { interact } from './interact';
+export { introspect } from './introspect';
+export { poll } from './poll';
+export { proceed, canProceed } from './proceed';
+export { register } from './register';
+export { recoverPassword } from './recoverPassword';
+export { handleInteractionCodeRedirect } from './handleInteractionCodeRedirect';
+export { startTransaction } from './startTransaction';
+export { unlockAccount } from './unlockAccount';
 export * from './transactionMeta';
-export * from './unlockAccount';

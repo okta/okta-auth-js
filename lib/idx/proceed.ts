@@ -12,7 +12,7 @@
 
 
 import { 
-  OktaAuth,
+  OktaAuthInterface,
   IdxTransaction,
 } from '../types';
 import { run } from './run';
@@ -35,13 +35,13 @@ export type ProceedOptions = AuthenticationOptions
   & SelectEnrollmentChannelOptions
   & { step?: string };
 
-export function canProceed(authClient: OktaAuth, options?: { state?: string }) {
+export function canProceed(authClient: OktaAuthInterface, options?: { state?: string }) {
   const meta = getSavedTransactionMeta(authClient, options);
   return !!meta;
 }
 
 export async function proceed(
-  authClient: OktaAuth,
+  authClient: OktaAuthInterface,
   options: ProceedOptions = {}
 ): Promise<IdxTransaction> {
   const { state } = options;

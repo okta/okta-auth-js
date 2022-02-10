@@ -16,9 +16,9 @@
 import { isString, clone, isAbsoluteUrl, removeNils } from '../util';
 import AuthApiError from '../errors/AuthApiError';
 import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION } from '../constants';
-import { OktaAuth, RequestOptions, FetchOptions, RequestData } from '../types';
+import { OktaAuthInterface, RequestOptions, FetchOptions, RequestData } from '../types';
 
-export function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any> {
+export function httpRequest(sdk: OktaAuthInterface, options: RequestOptions): Promise<any> {
   options = options || {};
   var url = options.url,
       method = options.method,
@@ -117,7 +117,7 @@ export function httpRequest(sdk: OktaAuth, options: RequestOptions): Promise<any
     });
 }
 
-export function get(sdk: OktaAuth, url: string, options?: RequestOptions) {
+export function get(sdk: OktaAuthInterface, url: string, options?: RequestOptions) {
   url = isAbsoluteUrl(url) ? url : sdk.getIssuerOrigin() + url;
   var getOptions = {
     url: url,
@@ -127,7 +127,7 @@ export function get(sdk: OktaAuth, url: string, options?: RequestOptions) {
   return httpRequest(sdk, getOptions);
 }
 
-export function post(sdk: OktaAuth, url: string, args?: RequestData, options?: RequestOptions) {
+export function post(sdk: OktaAuthInterface, url: string, args?: RequestData, options?: RequestOptions) {
   url = isAbsoluteUrl(url) ? url : sdk.getIssuerOrigin() + url;
   var postOptions = {
     url: url,

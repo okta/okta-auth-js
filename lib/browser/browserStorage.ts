@@ -25,6 +25,7 @@ import {
 } from '../types';
 import { warn } from '../util';
 
+// eslint-disable-next-line import/no-commonjs
 const Cookies = require('js-cookie');
 
 // Building this as an object allows us to mock the functions in our tests

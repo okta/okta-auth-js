@@ -13,7 +13,7 @@
 
 import { AuthSdkError } from './errors';
 import { REDIRECT_NONCE_COOKIE_NAME, REDIRECT_OAUTH_PARAMS_NAME, REDIRECT_STATE_COOKIE_NAME } from './constants';
-import StorageManager from './StorageManager';
+import { StorageManager } from './StorageManager';
 import {
   StorageProvider,
   TransactionMeta,

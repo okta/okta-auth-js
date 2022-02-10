@@ -11,7 +11,7 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuth, Token, Tokens, isAccessToken, AccessToken, IDToken, isIDToken } from '../types';
+import { OktaAuthInterface, Token, Tokens, isAccessToken, AccessToken, IDToken, isIDToken } from '../types';
 import { getWithoutPrompt } from './getWithoutPrompt';
 import { renewTokensWithRefresh } from './renewTokensWithRefresh';
 
@@ -33,7 +33,7 @@ function getSingleToken(originalToken: Token, tokens: Tokens) {
 }
 
 // If we have a refresh token, renew using that, otherwise getWithoutPrompt
-export async function renewToken(sdk: OktaAuth, token: Token): Promise<Token | undefined> {
+export async function renewToken(sdk: OktaAuthInterface, token: Token): Promise<Token | undefined> {
   if (!isIDToken(token) && !isAccessToken(token)) {
     throwInvalidTokenError();
   }

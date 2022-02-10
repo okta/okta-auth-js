@@ -12,10 +12,10 @@
 
 
 import { run, RunOptions } from './run';
-import { OktaAuth, IdxTransaction } from '../types';
+import { OktaAuthInterface, IdxTransaction } from '../types';
 
 export async function startTransaction(
-  authClient: OktaAuth, 
+  authClient: OktaAuthInterface, 
   options: RunOptions = {}
 ): Promise<IdxTransaction> {
   // Clear IDX response cache and saved transaction meta (if any)

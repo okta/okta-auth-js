@@ -15,12 +15,12 @@
 import { getWellKnown, getKey } from './endpoints/well-known';
 import { validateClaims } from './util';
 import { AuthSdkError } from '../errors';
-import { IDToken, OktaAuth, TokenVerifyParams } from '../types';
+import { IDToken, OktaAuthInterface, TokenVerifyParams } from '../types';
 import { decodeToken } from './decodeToken';
 import * as sdkCrypto from '../crypto';
 
 // Verify the id token
-export async function verifyToken(sdk: OktaAuth, token: IDToken, validationParams: TokenVerifyParams): Promise<IDToken> {
+export async function verifyToken(sdk: OktaAuthInterface, token: IDToken, validationParams: TokenVerifyParams): Promise<IDToken> {
   if (!token || !token.idToken) {
     throw new AuthSdkError('Only idTokens may be verified');
   }

@@ -15,12 +15,12 @@ import { proceed } from './proceed';
 import { 
   IdxPollOptions,
   IdxTransaction,
-  OktaAuth,
+  OktaAuthInterface,
 } from '../types';
 import { getSavedTransactionMeta } from './transactionMeta';
 import { warn } from '../util';
 
-export async function poll(authClient: OktaAuth, options: IdxPollOptions = {}): Promise<IdxTransaction> {
+export async function poll(authClient: OktaAuthInterface, options: IdxPollOptions = {}): Promise<IdxTransaction> {
   let transaction = await proceed(authClient, {
     startPolling: true
   });

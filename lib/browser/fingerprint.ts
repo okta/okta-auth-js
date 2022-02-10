@@ -11,16 +11,15 @@
  */
 
 
-import { OktaAuth } from '../types';
 import { AuthSdkError } from '../errors';
 import { isFingerprintSupported } from '../features';
 import {
   addListener,
   removeListener
 } from '../oidc';
-import { FingerprintOptions } from '../types';
+import { FingerprintOptions, OktaAuthInterface } from '../types';
 
-export default function fingerprint(sdk: OktaAuth, options?: FingerprintOptions): Promise<string> {
+export default function fingerprint(sdk: OktaAuthInterface, options?: FingerprintOptions): Promise<string> {
   options = options || {};
 
   if (!isFingerprintSupported()) {

@@ -1,4 +1,4 @@
-import { OktaAuth, FlowIdentifier } from '../../types';
+import { OktaAuthInterface, FlowIdentifier } from '../../types';
 import { AuthenticationFlow } from './AuthenticationFlow';
 import { PasswordRecoveryFlow } from './PasswordRecoveryFlow';
 import { RegistrationFlow } from './RegistrationFlow';
@@ -13,7 +13,7 @@ export interface FlowSpecification {
 }
 
 // eslint-disable-next-line complexity
-export function getFlowSpecification(oktaAuth: OktaAuth, flow: FlowIdentifier = 'default'): FlowSpecification {
+export function getFlowSpecification(oktaAuth: OktaAuthInterface, flow: FlowIdentifier = 'default'): FlowSpecification {
   let remediators, actions, withCredentials = true;
   switch (flow) {
     case 'register':
