@@ -77,7 +77,7 @@ const samples = [
     name: 'express-embedded-auth-with-sdk',
     pkgName: '@okta/samples.express.embedded-auth-with-sdk',
     template: 'express-embedded-auth-with-sdk',
-    specs: [],
+    specs: ['express-embedded-auth-with-sdk'],
     features: [
       'root-page', 
       'basic-auth', 
