@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { OktaAuth, IdxStatus, urlParamsToObject } from '@okta/okta-auth-js';
+import { OktaAuth, IdxStatus, urlParamsToObject, hasErrorInUrl } from '@okta/okta-auth-js';
 import { formTransformer } from './formTransformer';
 import oidcConfig from './config';
 import './App.css';
@@ -38,7 +38,16 @@ export default function App() {
     oktaAuth.authStateManager.subscribe(updateAuthState);
     oktaAuth.start();
 
-    if(oktaAuth.isLoginRedirect()) {
+    if (hasErrorInUrl(window.location.search)) {
+      const url = new URL(window.location.href);
+      const error = new Error(`${url.searchParams.get('error')}: ${url.searchParams.get('error_description')}`);
+      setAuthState({ isAuthenticated: false });
+      setTransaction({
+        status: IdxStatus.FAILURE,
+        error
+      });
+      return;
+    } else if(oktaAuth.isLoginRedirect()) {
       return parseFromUrl();
     }
     
