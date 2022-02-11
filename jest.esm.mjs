@@ -10,15 +10,16 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+//Jest doc: https://jestjs.io/docs/ecmascript-modules
 
 var OktaAuth = '<rootDir>/build/bundles-for-validation/esm/index.mjs';
 
 export default {
   'roots': [
-    'test/bundle-spec'
+    'test/validate-bundles'
   ],
   'testMatch': [
-    '**/test/bundle-spec/**/*.{js,ts}'
+    '**/test/validate-bundles/**/*.{js,ts}'
   ],
   'transform': {},
   'restoreMocks': true,
