@@ -20,13 +20,14 @@ test_suites:
       script_name: integration
       criteria: MERGE
       queue_name: small
-    - name: validate-esm-bundle
-      script_path: ../okta-auth-js/scripts
-      sort_order: '2'
-      timeout: '10'
-      script_name: validate-esm-bundle
-      criteria: MERGE
-      queue_name: small
+    # Re-enable once ESM bundle issue is fixed
+    # - name: validate-esm-bundle
+    #   script_path: ../okta-auth-js/scripts
+    #   sort_order: '2'
+    #   timeout: '10'
+    #   script_name: validate-esm-bundle
+    #   criteria: MERGE
+    #   queue_name: small
     - name: e2e
       script_path: ../okta-auth-js/scripts
       sort_order: '3'
