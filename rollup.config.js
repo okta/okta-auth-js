@@ -84,10 +84,11 @@ export default [
         exports: 'named',
         sourcemap: true
       },
-      // DO NOT MERGE
       {
+        // generate ems bundle for jest test, ".mjs" extension should be used
+        // this bundle is excluded from the release package
         format: 'esm',
-        file: 'build/esm/index.mjs',
+        file: 'build/bundles-for-validation/esm/index.mjs',
         exports: 'named',
         sourcemap: true
       }

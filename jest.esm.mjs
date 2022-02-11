@@ -11,7 +11,7 @@
  */
 
 
-var OktaAuth = '<rootDir>/build/esm/index.mjs';
+var OktaAuth = '<rootDir>/build/bundles-for-validation/esm/index.mjs';
 
 export default {
   'roots': [
