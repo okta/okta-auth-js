@@ -14,7 +14,7 @@ var babelOptions = {
   shouldPrintComment: () => false 
 };
 
-var babelExclude = /node_modules\/(?!p-cancelable|node-cache)/;
+var babelExclude = /node_modules\/(?!p-cancelable)/;
 
 module.exports = {
   module: {
@@ -44,7 +44,6 @@ module.exports = {
     extensions: ['.js', '.ts'],
     alias: {
       './node$': './browser', // use browser built-in objects and functions
-      'node-cache': false // do not webpack node-only modules
     }
   },
   plugins: [

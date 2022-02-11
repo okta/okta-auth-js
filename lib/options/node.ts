@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { StorageManagerOptions } from '../types';
+import { StorageManagerOptions, OktaAuthOptions } from '../types';
 
 export { default as storage } from '../server/serverStorage';
 
@@ -33,3 +33,8 @@ export const STORAGE_MANAGER_OPTIONS: StorageManagerOptions = {
 };
 
 export const enableSharedStorage = false;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+export function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS?: boolean) {
+  return args.cookies;
+}

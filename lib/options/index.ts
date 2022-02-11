@@ -10,48 +10,13 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-/* eslint-disable complexity */
-import { removeTrailingSlash, warn, removeNils } from '../util';
+import { removeTrailingSlash, removeNils } from '../util';
 import { assertValidConfig } from '../builderUtil';
 import { OktaAuthOptions } from '../types';
 
 import fetchRequest from '../fetch/fetchRequest';
-import { storage, STORAGE_MANAGER_OPTIONS, enableSharedStorage } from './node';
-import { isBrowser, isHTTPS } from '../features';
-
-function getCookieSettings(args: OktaAuthOptions = {}, isHTTPS: boolean) {
-  // Secure cookies will be automatically used on a HTTPS connection
-  // Non-secure cookies will be automatically used on a HTTP connection
-  // secure option can override the automatic behavior
-  var cookieSettings = args.cookies || {};
-  if (typeof cookieSettings.secure === 'undefined') {
-    cookieSettings.secure = isHTTPS;
-  }
-  if (typeof cookieSettings.sameSite === 'undefined') {
-    cookieSettings.sameSite = cookieSettings.secure ? 'none' : 'lax';
-  }
-
-  // If secure=true, but the connection is not HTTPS, set secure=false.
-  if (cookieSettings.secure && !isHTTPS) {
-    // eslint-disable-next-line no-console
-    warn(
-      'The current page is not being served with the HTTPS protocol.\n' +
-      'For security reasons, we strongly recommend using HTTPS.\n' +
-      'If you cannot use HTTPS, set "cookies.secure" option to false.'
-    );
-    cookieSettings.secure = false;
-  }
-
-  // Chrome >= 80 will block cookies with SameSite=None unless they are also Secure
-  // If sameSite=none, but the connection is not HTTPS, set sameSite=lax.
-  if (cookieSettings.sameSite === 'none' && !cookieSettings.secure) {
-    cookieSettings.sameSite = 'lax';
-  }
-
-  return cookieSettings;
-}
-
+import { storage, STORAGE_MANAGER_OPTIONS, enableSharedStorage, getCookieSettings } from './node';
+import { isHTTPS } from '../features';
 
 export function getDefaultOptions(): OktaAuthOptions {
   const options = {
@@ -104,7 +69,7 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     devMode: !!args.devMode,
     storageManager: args.storageManager,
     transactionManager: args.transactionManager,
-    cookies: isBrowser() ? getCookieSettings(args, isHTTPS()) : args.cookies,
+    cookies: getCookieSettings(args, isHTTPS()),
     flow: args.flow,
     codeChallenge: args.codeChallenge,
     codeChallengeMethod: args.codeChallengeMethod,
