@@ -9,7 +9,10 @@ const config = Object.assign({}, baseConfig, {
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     '<rootDir>/test/spec/serverStorage.js',
     '<rootDir>/test/spec/features/server'
-  ])
+  ]),
+  moduleNameMapper: Object.assign({}, baseConfig.moduleNameMapper, {
+    '^./node$': './browser'
+  })
 });
 
 module.exports = config;
