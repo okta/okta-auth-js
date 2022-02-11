@@ -36,6 +36,7 @@
     "test:report": "yarn test --ci --silent || true",
     "test:samples": "yarn workspace @okta/test.e2e.samples start",
     "test:integration": "jest --config ./jest.integration.js",
+    "test:bundle:esm": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "build": "node scripts/build.js",
     "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js",

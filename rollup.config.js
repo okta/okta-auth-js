@@ -83,6 +83,13 @@ export default [
         file: 'build/esm/index.js',
         exports: 'named',
         sourcemap: true
+      },
+      // DO NOT MERGE
+      {
+        format: 'esm',
+        file: 'build/esm/index.mjs',
+        exports: 'named',
+        sourcemap: true
       }
     ]
   }
