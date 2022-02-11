@@ -11,20 +11,6 @@
  */
 
 
-/* global window */
-import { TokenManager } from '../TokenManager';
-import { TokenManagerOptions } from '../types';
-
-export class TokenService {
-  protected tokenManager: TokenManager;
-  protected options: TokenManagerOptions;
-
-  constructor(tokenManager: TokenManager, options: TokenManagerOptions = {}) {
-    this.tokenManager = tokenManager;
-    this.options = options;
-  }
-
-  start() {}
-
-  stop() {}
-}
+export * from './TokenService';
+export * from './AutoRenewService';
+export * from './SyncStorageService';

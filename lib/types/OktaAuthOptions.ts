@@ -17,15 +17,22 @@ import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
 import { FlowIdentifier } from '../idx/types';
 import OktaAuth from '../OktaAuth';
+
+
+export interface AutoRenewServiceOptions {
+  enablePassiveRenew: boolean;
+  enableActiveRenew: boolean;
+}
+
 export interface TokenManagerOptions {
-  autoRenew?: boolean;
+  autoRenew?: AutoRenewServiceOptions | boolean;
   autoRemove?: boolean;
   clearPendingRemoveTokens?: boolean;
   secure?: boolean;
   storage?: string | SimpleStorage;
   storageKey?: string;
   expireEarlySeconds?: number;
-  syncStorage?: boolean;
+  syncStorage?: boolean;  // TODO: change this type to accept object as well
   _storageEventDelay?: number;
 }
 

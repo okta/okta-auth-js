@@ -50,6 +50,7 @@ import {
   ParseFromUrlInterface,
   GetWithRedirectFunction,
   RequestOptions,
+  AutoRenewServiceOptions,
 } from './types';
 import {
   transactionStatus,
@@ -571,10 +572,11 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
 
     let { accessToken, idToken } = this.tokenManager.getTokensSync();
     const { autoRenew, autoRemove } = this.tokenManager.getOptions();
+    const { enablePassiveRenew } = <AutoRenewServiceOptions>autoRenew;
 
     if (accessToken && this.tokenManager.hasExpired(accessToken)) {
       accessToken = undefined;
-      if (autoRenew) {
+      if (enablePassiveRenew) {
         try {
           accessToken = await this.tokenManager.renew('accessToken') as AccessToken;
         } catch {
@@ -587,7 +589,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
 
     if (idToken && this.tokenManager.hasExpired(idToken)) {
       idToken = undefined;
-      if (autoRenew) {
+      if (enablePassiveRenew) {
         try {
           idToken = await this.tokenManager.renew('idToken') as IDToken;
         } catch {

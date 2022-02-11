@@ -31,10 +31,11 @@ import {
   TokenManagerErrorEventHandler,
   TokenManagerEventHandler,
   TokenManagerInterface,
-  RefreshToken
+  RefreshToken,
+  AutoRenewServiceOptions
 } from './types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
-import { TokenService } from './services/TokenService';
+import { TokenService, AutoRenewService, SyncStorageService } from './services';
 
 const DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -69,7 +70,7 @@ export class TokenManager implements TokenManagerInterface {
   private storage: StorageProvider;
   private state: TokenManagerState;
   private options: TokenManagerOptions;
-  private service: TokenService | null;
+  private services: TokenService[];
 
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
@@ -80,9 +81,16 @@ export class TokenManager implements TokenManagerInterface {
     if (!this.emitter) {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }
-    this.service = null;
+    this.services = [];
     
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
+    if (!options.autoRenew) {
+      options.autoRenew = { enableActiveRenew: false, enablePassiveRenew: false };
+    }
+    else if (typeof options.autoRenew === 'boolean') {
+      options.autoRenew = { enableActiveRenew: true, enablePassiveRenew: true };
+    }
+
     if (isIE11OrLess()) {
       options._storageEventDelay = options._storageEventDelay || 1000;
     }
@@ -111,21 +119,28 @@ export class TokenManager implements TokenManagerInterface {
   }
 
   start() {
-    if (this.service) {
+    if (this.services.length > 0) {
       this.stop();
     }
     if (this.options.clearPendingRemoveTokens) {
       this.clearPendingRemoveTokens();
     }
-    this.service = new TokenService(this, this.getOptions());
-    this.service.start();
+
+    if ((<AutoRenewServiceOptions>this.options.autoRenew!).enableActiveRenew) {
+      const autoRenewService = new AutoRenewService(this, this.getOptions());
+      autoRenewService.start();
+      this.services.push(autoRenewService);
+    }
+
+    if (this.options.syncStorage) {
+      const syncStorageService = new SyncStorageService(this, this.getOptions());
+      syncStorageService.start();
+      this.services.push(syncStorageService);
+    }
   }
   
   stop() {
-    if (this.service) {
-      this.service.stop();
-      this.service = null;
-    }
+    this.services.map(s => s.stop());
   }
 
   getOptions(): TokenManagerOptions {
