@@ -25,6 +25,7 @@ module.exports = {
     '^.+\\.(js)$': 'babel-jest',
     '^.+\\.(ts|html)$': 'ts-jest'
   },
+  'testRunner': 'jest-jasmine2',
   'restoreMocks': true,
   'clearMocks': true,
   'moduleNameMapper': {

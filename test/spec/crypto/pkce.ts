@@ -68,7 +68,7 @@ describe('pkce', function() {
 
   describe('computeChallenge', function() {
 
-    it('creates value that matches server', function() {
+    it('creates value that matches server', async () => {
       // Values are from okta-core test
       var SAMPLE_CODE_CHALLENGE = 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM';
       var SAMPLE_CODE_VERIFIER = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
@@ -79,7 +79,7 @@ describe('pkce', function() {
         });
     });
 
-    it('is URL safe', function() {
+    it('is URL safe', async () => {
       var codeVerifier = pkce.generateVerifier();
       return pkce.computeChallenge(codeVerifier)
       .then(function(computed) {

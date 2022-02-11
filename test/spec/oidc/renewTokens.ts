@@ -46,14 +46,14 @@ describe('token.renewTokens', function() {
     });
   });
 
-  it('will throw if there are no existing tokens', () => {
+  it('will throw if there are no existing tokens', async () => {
     const tokens = {};
     const sdk = {
       tokenManager: {
         getTokensSync: () => tokens
       }
     };
-    return expect(renewTokens.bind(null, sdk)).rejects.toThrowError(new AuthSdkError('renewTokens() was called but there is no existing token'));
+    await expect(renewTokens(sdk)).rejects.toEqual(new AuthSdkError('renewTokens() was called but there is no existing token'));
   });
 
   describe('using token endpoint', () => {
@@ -158,7 +158,7 @@ describe('token.renewTokens', function() {
         const { sdk, accessToken, idToken } = testContext;
         accessToken.scopes = null;
         idToken.scopes = null;
-        return expect(renewTokens.bind(null, sdk)).rejects.toThrowError(new AuthSdkError('renewTokens: invalid tokens: could not read scopes'));
+        await expect(renewTokens(sdk)).rejects.toEqual(new AuthSdkError('renewTokens: invalid tokens: could not read scopes'));
       });
 
       it('scopes can be overriden via options', async () => {
@@ -189,7 +189,7 @@ describe('token.renewTokens', function() {
         const { sdk, accessToken, idToken } = testContext;
         accessToken.authorizeUrl = null;
         idToken.authorizeUrl = null;
-        return expect(renewTokens.bind(null, sdk)).rejects.toThrowError(new AuthSdkError('renewTokens: invalid tokens: could not read authorizeUrl'));
+        await expect(renewTokens(sdk)).rejects.toEqual(new AuthSdkError('renewTokens: invalid tokens: could not read authorizeUrl'));
       });
 
       it('authorizeUrl can be overriden via options', async () => {
