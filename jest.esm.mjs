@@ -10,31 +10,22 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+//Jest doc: https://jestjs.io/docs/ecmascript-modules
 
-var OktaAuth = '<rootDir>/lib';
-var SDK_VERSION = require('../../../package.json').version;
+var OktaAuth = '<rootDir>/build/bundles-for-validation/esm/index.mjs';
 
-module.exports = {
-  'coverageDirectory': '<rootDir>/build2/reports/coverage-browser',
-  'collectCoverage': true,
-  'collectCoverageFrom': ['./lib/**','!./test/**'],
-  'globals': {
-    SDK_VERSION
-  },
-  'transform': {
-    '^.+\\.(js)$': 'babel-jest',
-    '^.+\\.(ts|html)$': 'ts-jest'
-  },
-  'testRunner': 'jest-jasmine2',
+export default {
+  'roots': [
+    'test/validate-bundles'
+  ],
+  'testMatch': [
+    '**/test/validate-bundles/**/*.{js,ts}'
+  ],
+  'transform': {},
   'restoreMocks': true,
-  'clearMocks': true,
   'moduleNameMapper': {
-    '^@okta/okta-auth-js$': OktaAuth,
-    '^lib/(.*)$': '<rootDir>/lib/$1'
+    '^@okta/okta-auth-js$': OktaAuth
   },
-  'testPathIgnorePatterns': [],
-  'reporters': [
-    'default',
-    'jest-junit'
-  ]
+  'extensionsToTreatAsEsm': ['.ts'],
+  'testPathIgnorePatterns': []
 };

@@ -83,6 +83,14 @@ export default [
         file: 'build/esm/index.js',
         exports: 'named',
         sourcemap: true
+      },
+      {
+        // generate ems bundle for jest test, ".mjs" extension should be used
+        // this bundle is excluded from the release package
+        format: 'esm',
+        file: 'build/bundles-for-validation/esm/index.mjs',
+        exports: 'named',
+        sourcemap: true
       }
     ]
   }

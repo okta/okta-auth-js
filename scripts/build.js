@@ -60,7 +60,14 @@ shell.echo(chalk.green('Babel completed'));
 
 shell.echo(chalk.green('Bundling completed'));
 
-shell.cp('-Rf', ['package.json', 'LICENSE', 'THIRD-PARTY-NOTICES', '*.md', 'polyfill'], `${BUILD_DIR}`);
+shell.cp('-Rf', [
+  'package.json', 
+  'LICENSE', 
+  'THIRD-PARTY-NOTICES', 
+  '*.md', 
+  'polyfill',
+  '.npmignore'
+], `${BUILD_DIR}`);
 
 shell.echo('Modifying final package.json');
 let packageJSON = JSON.parse(fs.readFileSync(`${BUILD_DIR}/package.json`));

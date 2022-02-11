@@ -38,6 +38,7 @@ describe('expire events', () => {
   describe('setExpireEventTimeout', () => {
     beforeEach(() => {
       jest.useFakeTimers();
+      jest.spyOn(global, 'setTimeout');
       createInstance({
         expireEarlySeconds: 0
       });
