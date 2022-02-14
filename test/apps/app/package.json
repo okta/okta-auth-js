@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "@okta/test.app",
   "version": "1.0.0",
   "description": "",
@@ -37,5 +38,11 @@
   },
   "peerDependencies": {
     "@okta/okta-signin-widget": "^6.0.0"
+  },
+  "workspaces": {
+    "nohoist": [
+      "**/js-cookie",
+      "**/@types/js-cookie"
+    ]
   }
 }

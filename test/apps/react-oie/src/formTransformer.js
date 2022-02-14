@@ -16,7 +16,7 @@ const inputTransformer = nextStep => form => {
       } else if (type === 'string') {
         type = 'text';
       } else if (type === 'boolean') {
-        type = 'checkbox'
+        type = 'checkbox';
       }
       return { label, name, type, required };
     })

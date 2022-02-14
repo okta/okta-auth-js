@@ -12,6 +12,7 @@
  *
  */
 
+import Cookies from 'js-cookie';
 import AuthSdkError from '../errors/AuthSdkError';
 import {
   StorageProvider,
@@ -24,9 +25,6 @@ import {
   CookieStorage
 } from '../types';
 import { warn } from '../util';
-
-// eslint-disable-next-line import/no-commonjs
-const Cookies = require('js-cookie');
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil: BrowserStorageUtil = {
@@ -246,7 +244,11 @@ var storageUtil: BrowserStorageUtil = {
       return storageUtil.storage.get(name);
     },
 
-    get: function(name: string): string {
+    get: function(name?: string): string {
+      // return all cookies when no args is provided
+      if (!arguments.length) {
+        return Cookies.get();
+      }
       return Cookies.get(name);
     },
 

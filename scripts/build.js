@@ -74,18 +74,24 @@ let packageJSON = JSON.parse(fs.readFileSync(`${BUILD_DIR}/package.json`));
 packageJSON.private = false;
 packageJSON.scripts.prepare = '';
 
-// Remove "build/" from the entrypoint paths.
-['main', 'module', 'browser', 'types'].forEach(function(key) {
-  const value = packageJSON[key];
-  if (typeof value === 'object' && value !== null) {
-    packageJSON[key] = Object.keys(value).reduce((acc, curr) => {
-      const newKey = curr.replace('build/', '');
-      acc[newKey] = value[curr].replace('build/', '');
+function removeBuildDir(val) {
+  if (typeof val === 'string') {
+    return val.replace('build/', '');
+  }
+
+  if (typeof val === 'object') {
+    return Object.entries(val).reduce((acc, [key, value]) => {
+      acc[key] = removeBuildDir(value);
       return acc;
     }, {});
-  } else {
-    packageJSON[key] = packageJSON[key].replace('build/', '');
   }
+
+  throw new Error('Value type not supported');
+}
+
+// Remove "build/" from the entrypoint paths.
+['main', 'module', 'browser', 'types', 'exports'].forEach(function(key) {
+  packageJSON[key] = removeBuildDir(packageJSON[key]);
 });
 
 fs.writeFileSync(`${BUILD_DIR}/package.json`, JSON.stringify(packageJSON, null, 4));

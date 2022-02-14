@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "@okta/test.app.node-esm",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@okta/okta-auth-js": "*"
+  }
+}

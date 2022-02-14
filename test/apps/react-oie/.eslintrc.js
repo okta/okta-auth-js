@@ -1,4 +1,17 @@
-// eslint is disabled due to the current yarn workspace cannot support CRA submodule very well
 module.exports = {
-  ignorePatterns: ['**/*.js']
+  'env': {
+    'browser': true
+  },
+  'parserOptions': {
+    'sourceType': 'module',
+    'ecmaVersion': 2020
+  },
+  'rules': {
+    'node/no-extraneous-import': ['error', {
+      'allowModules': [
+        '@okta/okta-auth-js',
+        '@okta/env'
+      ]
+    }]
+  }
 };
