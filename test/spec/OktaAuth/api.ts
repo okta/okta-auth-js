@@ -92,6 +92,11 @@ describe('OktaAuth (api)', function() {
         headers: { 'X-Device-Fingerprint': 'fake fingerprint' }
       });
     });
+    it('can pass stateToken to /authn endpoint', async () => {
+      options = { stateToken: 'fake-stateToken' };
+      await auth.signInWithCredentials(options);
+      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
+    });
   });
 
   describe('signIn', () => {
