@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.2.0
+
+### Features
+
+- [#1113](https://github.com/okta/okta-auth-js/pull/1113) Updates types for `SigninWithCredentialsOptions` and `SignInOptions` to support `SP Initiated Auth`
+
 ## 6.1.0
 
 ### Features
