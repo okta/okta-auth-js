@@ -1,0 +1,36 @@
+name: Feature Request
+description: Request a new feature for this SDK?
+labels: [ enhancement ]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the feature request?
+      description: |
+        Please leave a helpful description of the feature request here.
+    validations:
+      required: true
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: New or Affected Resource(s)
+      description: |
+         Please list the new or affected resources
+    validations:
+      required: true
+
+  - type: textarea
+    id: documentation
+    attributes:
+      label: Provide a documentation link
+      description: |
+        Please provide any links to the documentation that is at
+        https://developer.okta.com/. This will help us with this
+        feature request.
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information?
+

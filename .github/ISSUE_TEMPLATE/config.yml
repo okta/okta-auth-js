@@ -1,0 +1,5 @@
+contact_links:
+  - name: Developer Forum
+    url: https://devforum.okta.com/
+    about: Get help with building your applicaiton on the Okta Platform.
+blank_issues_enabled: false
