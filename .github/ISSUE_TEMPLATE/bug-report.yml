@@ -36,11 +36,6 @@ body:
       required: true
 
   - type: textarea
-    id: additional
-    attributes:
-      label: Additional Information?
-
-  - type: textarea
     id: sdkVersion
     attributes:
       label: SDK Versions
@@ -57,3 +52,10 @@ body:
       description: |
         Please description the application's execution environment
         For example: browser(s), NodeJS, and OS versions
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information?
