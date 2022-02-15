@@ -239,6 +239,7 @@ export interface SigninOptions extends
       deviceToken?: string;
     };
     sendFingerprint?: boolean;
+    stateToken?: string;
 }
 
 export interface SigninWithRedirectOptions extends SigninOptions, TokenParams {
@@ -246,9 +247,8 @@ export interface SigninWithRedirectOptions extends SigninOptions, TokenParams {
 }
 
 export interface SigninWithCredentialsOptions extends SigninOptions {
-  // Require a username and password
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
 }
 
 export interface SigninAPI {

@@ -56,7 +56,8 @@ const authorizeOptions2: TokenParams = {
     sendFingerprint: true,
     context: {
       deviceToken: 'device-1'
-    }
+    },
+    stateToken: 'fake-state-token'
   }));
   expectType<void>(await authClient.signInWithRedirect());
   expectType<void>(await authClient.signInWithRedirect({
