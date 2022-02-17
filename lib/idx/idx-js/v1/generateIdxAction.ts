@@ -34,29 +34,18 @@ const generateDirectFetch = function generateDirectFetch({
       ...immutableParamsForAction
     });
     const credentials = toPersist && toPersist.withCredentials === false ? 'omit' : 'include';
-    return request(target, { method: actionDefinition.method, headers, body, credentials })
-      .then( response => {
-        const respJson = response.json();
-        if (response.ok) {
-          return respJson;
-        } else if (response.status === 401 && response.headers.get('WWW-Authenticate') === 'Oktadevicejwt realm="Okta Device"') {
-          // Okta server responds 401 status code with WWW-Authenticate header and new remediation
-          // so that the iOS/MacOS credential SSO extension (Okta Verify) can intercept
-          // the response reaches here when Okta Verify is not installed
-          // we need to return an idx object so that
-          // the SIW can proceed to the next step without showing error
-          return respJson.then(err => {
-            let ms = makeIdxState(err, toPersist);
-            // set to true if flow should be continued without showing any errors
-            ms.stepUp = true;
-            return Promise.reject(ms);
-          });
-        }
-        return respJson.then(err => {
-          return Promise.reject(makeIdxState(err, toPersist));
-        });
-      })
-      .then( idxResponse => makeIdxState(idxResponse, toPersist) );
+    const response = await request(target, { method: actionDefinition.method, headers, body, credentials });
+    const responseJSON = await response.json();
+    const requestDidSucceed = response.ok;
+    const idxResponse = makeIdxState({ ...responseJSON, requestDidSucceed }, toPersist);
+    if (response.status === 401 && response.headers.get('WWW-Authenticate') === 'Oktadevicejwt realm="Okta Device"') {
+      // Okta server responds 401 status code with WWW-Authenticate header and new remediation
+      // so that the iOS/MacOS credential SSO extension (Okta Verify) can intercept
+      // the response reaches here when Okta Verify is not installed
+      // set `stepUp` to true if flow should be continued without showing any errors
+      idxResponse.stepUp = true;
+    }
+    return idxResponse;
   };
 };
 

@@ -21,8 +21,6 @@ export interface IntrospectOptions {
   version?: string;
 }
 
-const parseAndReject = response => response.json().then( err => Promise.reject(err) );
-
 const introspect = async function introspect({
   withCredentials,
   domain,
@@ -38,8 +36,10 @@ const introspect = async function introspect({
     accept: `application/ion+json; okta-version=${version}`,
   };
   const credentials = withCredentials === false ? 'omit' : 'include';
-  return request(target, { credentials, headers, body: JSON.stringify(body) })
-    .then( response => response.ok ? response.json() : parseAndReject( response ) );
+  const response = await request(target, { credentials, headers, body: JSON.stringify(body) });
+  const requestDidSucceed = response.ok;
+  const responseJSON = await response.json();
+  return { ...responseJSON, requestDidSucceed };
 };
 
 export default introspect;
