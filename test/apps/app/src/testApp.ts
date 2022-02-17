@@ -251,7 +251,7 @@ class TestApp {
         `).join('\n');
         this._setCrossTabsContent(content);
         const iframes = document.getElementsByTagName('iframe');
-        let iframesWindows: Window[] = [];
+        const iframesWindows: Window[] = [];
         for (let i = 0 ; i < iframes.length ; i++) {
           iframesWindows.push(iframes[i].contentWindow);
         }

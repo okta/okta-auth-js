@@ -61,7 +61,7 @@ export function getDefaultConfig(): Config {
   };
 }
 
-// eslint-disable-next-line complexity
+// eslint-disable-next-line complexity,max-statements
 export function getConfigFromUrl(): Config {
   const url = new URL(window.location.href);
   const issuer = url.searchParams.get('issuer');
