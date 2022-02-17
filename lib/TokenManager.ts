@@ -34,7 +34,6 @@ import {
   RefreshToken
 } from './types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
-import { TokenService } from './services/TokenService';
 
 const DEFAULT_OPTIONS = {
   autoRenew: true,
@@ -69,7 +68,6 @@ export class TokenManager implements TokenManagerInterface {
   private storage: StorageProvider;
   private state: TokenManagerState;
   private options: TokenManagerOptions;
-  private service: TokenService | null;
 
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
@@ -80,7 +78,6 @@ export class TokenManager implements TokenManagerInterface {
     if (!this.emitter) {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }
-    this.service = null;
     
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
     if (isIE11OrLess()) {
@@ -88,6 +85,9 @@ export class TokenManager implements TokenManagerInterface {
     }
     if (!isLocalhost()) {
       options.expireEarlySeconds = DEFAULT_OPTIONS.expireEarlySeconds;
+    }
+    if (!options.broadcastChannelName) {
+      options.broadcastChannelName = sdk.options.clientId;
     }
     this.options = options;
 
@@ -111,21 +111,20 @@ export class TokenManager implements TokenManagerInterface {
   }
 
   start() {
-    if (this.service) {
-      this.stop();
-    }
     if (this.options.clearPendingRemoveTokens) {
       this.clearPendingRemoveTokens();
     }
-    this.service = new TokenService(this, this.getOptions());
-    this.service.start();
+    this.setExpireEventTimeoutAll();
+
+    // todo
+    this.sdk.serviceManager.start();
   }
   
   stop() {
-    if (this.service) {
-      this.service.stop();
-      this.service = null;
-    }
+    this.clearExpireEventTimeoutAll();
+
+    // todo
+    this.sdk.serviceManager.stop();
   }
 
   getOptions(): TokenManagerOptions {
@@ -423,6 +422,7 @@ export class TokenManager implements TokenManagerInterface {
         return tokens[tokenType];
       })
       .catch(err => {
+        console.log(222, err)
         // If renew fails, remove token from storage and emit error
         this.remove(key);
         err.tokenKey = key;
