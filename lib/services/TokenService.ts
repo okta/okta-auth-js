@@ -11,7 +11,6 @@
  */
 
 
-/* global window */
 import { TokenManager } from '../TokenManager';
 import { TokenManagerOptions, TokenServiceInterface } from '../types';
 

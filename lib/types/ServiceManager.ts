@@ -5,5 +5,5 @@ export interface ServiceManagerInterface {
   isLeader(): boolean;
   start(): void;
   stop(): void;
-  getService(name: string): TokenServiceInterface | undefined
+  getService(name: string): TokenServiceInterface | undefined;
 }
