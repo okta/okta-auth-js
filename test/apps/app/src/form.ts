@@ -114,6 +114,15 @@ const Form = `
   <label for="idps">IDPs (in format "type:id" space-separated, example: "Facebook:111aaa Google:222bbb")</label>
   <input id="f_idps" name="idps" type="text" />
   </div>
+  <div class="pure-control-group">
+  <label for="syncStorage">Sync storage cross-tab</label>
+  <input id="f_syncStorage-on" name="syncStorage" type="radio" value="true"/>YES
+  <input id="f_syncStorage-off" name="syncStorage" type="radio" value="false"/>NO
+  </div>
+  <div class="pure-control-group">
+  <label for="crossTabsCount">Simulated tabs count</label>
+  <input id="f_crossTabsCount" name="crossTabsCount" type="number" min="1" max="1000" />
+  </div>
   <div class="pure-controls">
   <input id="f_submit" type="submit" value="Update Config" class="pure-button pure-button-primary"/>
   <a href="#clear" onclick="resetConfig(event)" class="pure-button">Reset Config</a>
@@ -138,6 +147,7 @@ export function updateForm(origConfig: Config): void {
   (document.querySelector(`#f_sameSite [value="${config.sameSite || ''}"]`) as HTMLOptionElement).selected = true;
   (document.getElementById('f_siwVersion') as HTMLInputElement).value = config.siwVersion;
   (document.getElementById('f_idps') as HTMLInputElement).value = config.idps;
+  (document.getElementById('f_crossTabsCount') as HTMLInputElement).value = config.crossTabsCount;
 
   if (config.pkce) {
     (document.getElementById('f_pkce-on') as HTMLInputElement).checked = true;
@@ -181,6 +191,12 @@ export function updateForm(origConfig: Config): void {
     (document.getElementById('f_enableSharedStorage-on') as HTMLInputElement).checked = true;
   } else {
     (document.getElementById('f_enableSharedStorage-off') as HTMLInputElement).checked = true;
+  }
+
+  if (config.syncStorage == false) {
+    (document.getElementById('f_syncStorage-off') as HTMLInputElement).checked = true;
+  } else {
+    (document.getElementById('f_syncStorage-on') as HTMLInputElement).checked = true;
   }
 }
 

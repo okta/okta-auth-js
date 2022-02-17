@@ -238,23 +238,48 @@ class TestApp {
   }
 
   async simulateCrossTabTokenRenew(): Promise<void> {
-    const tabsCount = 20; // should be > 15
-    const waitBeforeRenewSeconds = 10; // give some time to bootstrap all pages
+    const tabsCount = this.config.crossTabsCount;
+    const waitBeforeRenew = 3;
+    const maxTimeToRenew = 30; // expected time to load all iframes
     const tokenStorage = await this.oktaAuth.tokenManager.getTokens();
     if (tokenStorage && tokenStorage.accessToken) {
       const expiresAt = tokenStorage.accessToken.expiresAt;
       const now = Math.ceil(Date.now() / 1000);
-      if (expiresAt > now) {
-        const expireEarlySeconds = expiresAt - now - waitBeforeRenewSeconds;
+      if (expiresAt - now > maxTimeToRenew) {
         const content = Array.from({length: tabsCount}, () => `
-          <iframe src="${this.renewUrl}#${expireEarlySeconds}" width="250" height="100"></iframe>
+          <iframe src="${this.renewUrl}" width="250" height="100"></iframe>
         `).join('\n');
         this._setCrossTabsContent(content);
+        const iframes = document.getElementsByTagName('iframe');
+        let iframesWindows: Window[] = [];
+        for (let i = 0 ; i < iframes.length ; i++) {
+          iframesWindows.push(iframes[i].contentWindow);
+        }
+        let readyCnt = 0;
+        iframesWindows.map(w => {
+          w.addEventListener('message', (e) => {
+            if (e.data?.name === 'crossTabTest_ready') {
+              readyCnt++;
+              if (readyCnt == iframesWindows.length) {
+                const now = Math.ceil(Date.now() / 1000);
+                const expireEarlySeconds = expiresAt - now - waitBeforeRenew;
+                iframesWindows.map(w => {
+                  w.postMessage({
+                    name: 'crossTabTest_bootstrap',
+                    expireEarlySeconds
+                  }, w.location.origin);
+                });
+              }
+            }
+          });
+        });
       } else {
-        alert('Access token is exipred');
+        // Access token is exipred or about to expire
+        // Renew and retry
+        this.renewToken().then(() => this.simulateCrossTabTokenRenew());
       }
     } else {
-      alert('No access token');
+      console.warn('No access token');
     }
   }
 
@@ -328,7 +353,8 @@ class TestApp {
 
   async bootstrapRenew(): Promise<void> {
     const content = `
-      <span id="renew-status"></span>
+      <div id="renew-status"></div>
+      <div id="auth-status"></div>
       <hr/>
     `;
     this.getSDKInstance();
@@ -343,9 +369,9 @@ class TestApp {
     this.oktaAuth.authStateManager.subscribe(() => {
       const authState = this.oktaAuth.authStateManager.getAuthState();
       if (authState.isAuthenticated) {
-        document.getElementById('renew-status').innerHTML = 'Authenticated';
+        document.getElementById('auth-status').innerHTML = 'Authenticated';
       } else {
-        document.getElementById('renew-status').innerHTML = 'Not authenticated';
+        document.getElementById('auth-status').innerHTML = 'Not authenticated';
       }
     });
     this.oktaAuth.tokenManager.on('error', (err: unknown) => {
@@ -353,7 +379,18 @@ class TestApp {
     });
     this.oktaAuth.tokenManager.on('expired', () => {
       this.oktaAuth.tokenManager.off('expired');
-      document.getElementById('renew-status').innerHTML = 'Expired';
+      document.getElementById('renew-status').innerHTML = '<span style=\'color: red\'>Expired';
+      clearInterval(renewTimer);
+    });
+    this.oktaAuth.tokenManager.on('added', () => {
+      this.oktaAuth.tokenManager.off('added');
+      document.getElementById('renew-status').innerHTML = '<span style=\'color: blue\'>Updated';
+      this.oktaAuth.stop();
+      clearInterval(renewTimer);
+    });
+    this.oktaAuth.tokenManager.on('renewed', () => {
+      this.oktaAuth.tokenManager.off('renewed');
+      document.getElementById('renew-status').innerHTML = '<span style=\'color: green\'>Renewed';
       this.oktaAuth.stop();
       clearInterval(renewTimer);
     });

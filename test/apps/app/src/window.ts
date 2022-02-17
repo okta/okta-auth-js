@@ -120,19 +120,28 @@ Object.assign(window, {
   },
 
   bootstrapRenew: function(): void {
-    config = getConfigFromStorage();
-    const expireEarlySeconds = parseInt(window.location.hash.substring(1));
-    config.tokenManager = {
-      ...(config.tokenManager || {}),
-      expireEarlySeconds,
-      autoRenew: true,
-      autoRemove: false,
-      syncStorage: false
-    };
-    config.isTokenRenewPage = true;
-
-    mount();
-    app.bootstrapRenew();
+    rootElem.innerHTML = 'Loading...';
+    window.postMessage({
+      name:'crossTabTest_ready'
+    }, window.parent.location.origin);
+    window.addEventListener('message', (e) => {
+      if (e.data?.name === 'crossTabTest_bootstrap') {
+        const { expireEarlySeconds } = e.data;
+        config = getConfigFromStorage();
+        config.tokenManager = {
+          ...(config.tokenManager || {}),
+          expireEarlySeconds,
+          autoRenew: true,
+          autoRemove: false,
+          syncStorage: config?.tokenManager?.syncStorage,
+          broadcastChannelName: config.clientId + "_crossTabTest"
+        };
+        config.isTokenRenewPage = true;
+    
+        mount();
+        app.bootstrapRenew();
+      }
+    });
   },
 
   bootstrapProtected: function(): void {
