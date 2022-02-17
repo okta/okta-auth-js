@@ -133,8 +133,7 @@ Object.assign(window, {
           expireEarlySeconds,
           autoRenew: true,
           autoRemove: false,
-          syncStorage: config?.tokenManager?.syncStorage,
-          broadcastChannelName: config.clientId + '_crossTabTest'
+          syncStorage: config?.tokenManager?.syncStorage
         };
         config.isTokenRenewPage = true;
     
