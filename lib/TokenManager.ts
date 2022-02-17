@@ -72,6 +72,7 @@ export class TokenManager implements TokenManagerInterface {
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
 
+  // eslint-disable-next-line complexity
   constructor(sdk: OktaAuthInterface, options: TokenManagerOptions = {}) {
     this.sdk = sdk;
     this.emitter = (sdk as any).emitter;
@@ -422,7 +423,6 @@ export class TokenManager implements TokenManagerInterface {
         return tokens[tokenType];
       })
       .catch(err => {
-        console.log(222, err)
         // If renew fails, remove token from storage and emit error
         this.remove(key);
         err.tokenKey = key;

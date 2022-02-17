@@ -11,11 +11,11 @@
  */
 
 
-/* global window */
 import { TokenService } from './TokenService';
 import { TokenManager, EVENT_EXPIRED } from '../TokenManager';
 import { AuthSdkError } from '../errors';
-import { TokenManagerOptions, Token } from '../types';
+import { TokenManagerOptions } from '../types';
+import { isBrowser } from '../features';
 
 export class AutoRenewService extends TokenService {
   private renewTimeQueue: Array<number>;
@@ -44,7 +44,7 @@ export class AutoRenewService extends TokenService {
 
   requiresLeadership() {
     // If tokens sync storage is enabled, handle tokens expiration only in 1 leader tab
-    return !!this.options.syncStorage;
+    return !!this.options.syncStorage && isBrowser();
   }
 
   private onTokenExpiredHandler(key: string) {

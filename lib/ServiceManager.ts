@@ -11,7 +11,6 @@
  */
 
 
-/* global window */
 import {
   TokenManagerOptions,
   ServiceManagerInterface
