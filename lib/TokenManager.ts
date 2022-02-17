@@ -116,16 +116,10 @@ export class TokenManager implements TokenManagerInterface {
       this.clearPendingRemoveTokens();
     }
     this.setExpireEventTimeoutAll();
-
-    // todo
-    this.sdk.serviceManager.start();
   }
   
   stop() {
     this.clearExpireEventTimeoutAll();
-
-    // todo
-    this.sdk.serviceManager.stop();
   }
 
   getOptions(): TokenManagerOptions {
