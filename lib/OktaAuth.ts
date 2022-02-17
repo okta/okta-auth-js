@@ -97,6 +97,7 @@ import {
   clone,
 } from './util';
 import { TokenManager } from './TokenManager';
+import { ServiceManager } from './ServiceManager';
 import { get, httpRequest, setRequestHeader } from './http';
 import PromiseQueue from './PromiseQueue';
 import fingerprint from './browser/fingerprint';
@@ -154,6 +155,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   emitter: typeof Emitter;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
+  serviceManager: ServiceManager;
   http: HttpAPI;
   fingerprint: FingerprintAPI;
   _oktaUserAgent: OktaUserAgent;
@@ -350,6 +352,9 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
 
     // AuthStateManager
     this.authStateManager = new AuthStateManager(this);
+
+    // ServiceManager
+    this.serviceManager = new ServiceManager(this.tokenManager, this.tokenManager.getOptions());
   }
 
   start() {
@@ -357,10 +362,12 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     if (!this.token.isLoginRedirect()) {
       this.authStateManager.updateAuthState();
     }
+    this.serviceManager.start();
   }
 
   stop() {
     this.tokenManager.stop();
+    this.serviceManager.stop();
   }
 
   setHeaders(headers) {

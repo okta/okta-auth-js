@@ -27,6 +27,7 @@ export interface TokenManagerOptions {
   expireEarlySeconds?: number;
   syncStorage?: boolean;
   _storageEventDelay?: number;
+  broadcastChannelName?: string;
 }
 
 export interface CustomUrls {
