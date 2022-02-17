@@ -246,8 +246,8 @@ class TestApp {
       const expiresAt = tokenStorage.accessToken.expiresAt;
       const now = Math.ceil(Date.now() / 1000);
       if (expiresAt - now > maxTimeToRenew) {
-        const content = Array.from({length: tabsCount}, () => `
-          <iframe src="${this.renewUrl}" width="250" height="100"></iframe>
+        const content = Array.from({length: tabsCount}, (_, i) => `
+          <iframe src="${this.renewUrl}#${i}" width="250" height="100"></iframe>
         `).join('\n');
         this._setCrossTabsContent(content);
         const iframes = document.getElementsByTagName('iframe');
