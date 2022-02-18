@@ -106,18 +106,20 @@ export class ServiceManager implements ServiceManagerInterface {
 
   private startElector() {
     if (ServiceManager.canUseLeaderElection()) {
-      this.channel = new BroadcastChannel(this.options.broadcastChannelName as string);
-      this.elector = createLeaderElection(this.channel);
-      this.elector.onduplicate = this.onLeaderDuplicate;
-      this.elector.awaitLeadership().then(this.onLeader);
+      if (!this.channel) {
+        this.channel = new BroadcastChannel(this.options.broadcastChannelName as string);
+      }
+      if (!this.elector) {
+        this.elector = createLeaderElection(this.channel);
+        this.elector.onduplicate = this.onLeaderDuplicate;
+        this.elector.awaitLeadership().then(this.onLeader);
+      }
     }
   }
 
   private stopElector() {
     this.elector?.die();
     this.elector = undefined;
-    this.channel?.close();
-    this.channel = undefined;
   }
 
   private createService(name: string): TokenService | undefined {

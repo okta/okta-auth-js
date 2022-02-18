@@ -90,9 +90,8 @@ describe('TokenManager (browser)', function() {
   });
   
   afterEach(() => {
-    if (client && client.tokenManager) {
-      client.tokenManager.stop();
-    }
+    client?.tokenManager?.stop();
+    client?.serviceManager?.stop();
   });
 
   describe('options', () => {
