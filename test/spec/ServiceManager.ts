@@ -12,12 +12,14 @@
 
 
 import { OktaAuth } from '@okta/okta-auth-js';
+import util from '@okta/test.support/util';
 
 jest.mock('broadcast-channel', () => {
   const actual = jest.requireActual('broadcast-channel');
+  class FakeBroadcastChannel {}
   return {
     createLeaderElection: actual.createLeaderElection,
-    BroadcastChannel: actual.BroadcastChannel
+    BroadcastChannel: FakeBroadcastChannel
   };
 });
 
@@ -52,6 +54,7 @@ describe('ServiceManager', () => {
     const options = { tokenManager: { syncStorage: true, autoRenew: true } };
     let client1 = createAuth(options);
     let client2 = createAuth(options);
+    util.disableLeaderElection();
     jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
     jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
     client1.serviceManager.start();
@@ -68,6 +71,7 @@ describe('ServiceManager', () => {
     const options = { tokenManager: { syncStorage: false, autoRenew: true } };
     let client1 = createAuth(options);
     let client2 = createAuth(options);
+    util.disableLeaderElection();
     jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
     jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
     client1.serviceManager.start();
@@ -84,6 +88,7 @@ describe('ServiceManager', () => {
     const options = { tokenManager: { syncStorage: false, autoRenew: false } };
     let client1 = createAuth(options);
     let client2 = createAuth(options);
+    util.disableLeaderElection();
     jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
     jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
     client1.serviceManager.start();
@@ -111,7 +116,6 @@ describe('ServiceManager', () => {
 
     const options = { tokenManager: { syncStorage: true, autoRenew: true } };
     let client = createAuth(options);
-    //jest.spyOn(client.serviceManager, 'isLeader').mockReturnValue(false);
     jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(mockedElector);
     client.serviceManager.start();
     expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
