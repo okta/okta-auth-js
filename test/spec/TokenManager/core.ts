@@ -17,7 +17,6 @@ import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../../lib/clock';
 import * as features from '../../../lib/features';
-import { TokenService } from '../../../lib/services/TokenService';
 
 const Emitter = require('tiny-emitter');
 
@@ -88,16 +87,6 @@ describe('TokenManager', function() {
       setupSync();
     });
     describe('start', () => {
-      it('instantiates the token service', () => {
-        expect(client.tokenManager.service).not.toBeTruthy();
-        client.tokenManager.start();
-        expect(client.tokenManager.service).toBeTruthy();
-      });
-      it('starts the token service', () => {
-        jest.spyOn(TokenService.prototype, 'start');
-        client.tokenManager.start();
-        expect(TokenService.prototype.start).toHaveBeenCalled();
-      });
       describe('pending remove tokens', () => {
         it('clears pending remove tokens by default', () => {
           jest.spyOn(client.tokenManager, 'clearPendingRemoveTokens');
@@ -112,37 +101,7 @@ describe('TokenManager', function() {
           expect(client.tokenManager.clearPendingRemoveTokens).not.toHaveBeenCalled();
         });
       });
-      it('stops existing service', () => {
-        const myService = client.tokenManager.service = {
-          stop: jest.fn()
-        };
-        client.tokenManager.start();
-        expect(myService.stop).toHaveBeenCalled();
-        expect(myService).not.toBe(client.tokenManager.service); 
-      });
     });
-
-    describe('stop', () => {
-      it('stops the token service, if it exists', () => {
-        const myService = client.tokenManager.service = {
-          stop: jest.fn()
-        };
-        client.tokenManager.stop();
-        expect(myService.stop).toHaveBeenCalled();
-      });
-      it('sets service instance to null', () => {
-        client.tokenManager.service = {
-          stop: jest.fn()
-        };
-        client.tokenManager.stop();
-        expect(client.tokenManager.service).toBe(null); 
-      });
-      it('does not error if there is no service instance', () => {
-        expect(client.tokenManager.service).toBe(null); 
-        client.tokenManager.stop();
-      });
-    });
-
   });
 
   describe('Event emitter', function() {
@@ -402,14 +361,17 @@ describe('TokenManager', function() {
     beforeEach(function() {
       jest.useFakeTimers();
       jest.spyOn(features, 'isLocalhost').mockReturnValue(true);
+      util.disableLeaderElection();
+      util.mockLeader();
     });
     afterEach(async () => {
       jest.useRealTimers();
     });
     it('should register listener for "expired" event', function() {
       jest.spyOn(Emitter.prototype, 'on');
-      setupSync({}, true);
+      setupSync({ tokenManager: { syncStorage: true, autoRenew: true } }, true);
       client.tokenManager.start();
+      client.serviceManager.start();
       expect(Emitter.prototype.on).toHaveBeenCalledWith('expired', expect.any(Function));
     });
 
@@ -472,6 +434,7 @@ describe('TokenManager', function() {
         setupSync({
           tokenManager: { autoRenew: true }
         }, true);
+        client.serviceManager.start();
         client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
         const handler = jest.fn().mockImplementation(err => {
           util.expectErrorToEqual(err, {
@@ -500,6 +463,7 @@ describe('TokenManager', function() {
         setupSync({
           tokenManager: { autoRenew: true }
         }, true);
+        client.serviceManager.start();
         client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
         const handler = jest.fn();
         client.tokenManager.on('error', handler);
@@ -520,6 +484,7 @@ describe('TokenManager', function() {
         }, true);
         const handler = jest.fn();
         client.tokenManager.on('error', handler);
+        client.serviceManager.start();
         client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
         let startTime = Math.round(Date.now() / 1000);
         // 5 * 10 > 30 => not emit error
@@ -538,6 +503,7 @@ describe('TokenManager', function() {
         }, true);
         const handler = jest.fn();
         client.tokenManager.on('error', handler);
+        client.serviceManager.start();
         client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
 
         // trigger too many requests error
@@ -567,6 +533,8 @@ describe('TokenManager', function() {
   describe('autoRemove', () => {
     beforeEach(() => {
       jest.useFakeTimers();
+      util.disableLeaderElection();
+      util.mockLeader();
     });
     afterEach(() => {
       jest.useRealTimers();
@@ -575,6 +543,7 @@ describe('TokenManager', function() {
     it('should call tokenManager.remove() when autoRenew === false && autoRemove === true', () => {
       setupSync({ tokenManager: { autoRenew: false, autoRemove: true } }, true);
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      client.serviceManager.start();
       client.tokenManager.remove = jest.fn();
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
@@ -584,6 +553,7 @@ describe('TokenManager', function() {
     it('should not call tokenManager.remove() when autoRenew === false && autoRemove === false', () => {
       setupSync({ tokenManager: { autoRenew: false, autoRemove: false } }, true);
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      client.serviceManager.start();
       client.tokenManager.remove = jest.fn();
       util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
       util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);

@@ -22,13 +22,14 @@ import {
   LeaderElector
 } from 'broadcast-channel';
 import { TokenService, AutoRenewService, SyncStorageService } from './services';
+import { isBrowser } from './features';
 
 export class ServiceManager implements ServiceManagerInterface {
   protected tokenManager: TokenManager;
   protected options: TokenManagerOptions;
   private services: Map<string, TokenService>;
-  private channel: BroadcastChannel;
-  private elector: LeaderElector;
+  private channel?: BroadcastChannel;
+  private elector?: LeaderElector;
   private started: boolean;
 
   private static knownServices = ['autoRenew', 'syncStorage'];
@@ -38,12 +39,12 @@ export class ServiceManager implements ServiceManagerInterface {
     this.tokenManager = tokenManager;
     this.options = options;
     this.services = new Map();
+    this.onLeaderDuplicate = this.onLeaderDuplicate.bind(this);
+    this.onLeader = this.onLeader.bind(this);
+  }
 
-    // Start elector
-    this.channel = new BroadcastChannel(options.broadcastChannelName as string);
-    this.elector = createLeaderElection(this.channel);
-    this.elector.onduplicate = this.onLeaderDuplicate.bind(this);
-    this.elector.awaitLeadership().then(this.onLeader.bind(this));
+  public static canUseLeaderElection() {
+    return isBrowser();
   }
 
   private onLeader() {
@@ -57,35 +58,30 @@ export class ServiceManager implements ServiceManagerInterface {
   }
 
   isLeader() {
-    return this.elector.isLeader;
+    return !!this.elector?.isLeader;
   }
 
   hasLeader() {
-    return this.elector.hasLeader;
+    return this.elector?.hasLeader;
   }
 
   start() {
     if (this.started) {
       this.stop();
     }
+    this.startElector();
     this.startServices();
     this.started = true;
   }
   
   stop() {
+    this.stopElector();
     this.stopServices();
     this.started = false;
   }
 
   getService(name: string): TokenService | undefined {
     return this.services.get(name);
-  }
-
-  private stopServices() {
-    for (const srv of this.services.values()) {
-      srv.stop();
-    }
-    this.services = new Map();
   }
 
   private startServices() {
@@ -99,6 +95,29 @@ export class ServiceManager implements ServiceManagerInterface {
         }
       }
     }
+  }
+
+  private stopServices() {
+    for (const srv of this.services.values()) {
+      srv.stop();
+    }
+    this.services = new Map();
+  }
+
+  private startElector() {
+    if (ServiceManager.canUseLeaderElection()) {
+      this.channel = new BroadcastChannel(this.options.broadcastChannelName as string);
+      this.elector = createLeaderElection(this.channel);
+      this.elector.onduplicate = this.onLeaderDuplicate;
+      this.elector.awaitLeadership().then(this.onLeader);
+    }
+  }
+
+  private stopElector() {
+    this.elector?.die();
+    this.elector = undefined;
+    this.channel?.close();
+    this.channel = undefined;
   }
 
   private createService(name: string): TokenService | undefined {

@@ -18,6 +18,7 @@ import _ from 'lodash';
 import { OktaAuth } from '@okta/okta-auth-js';
 
 import browserStorage from '../../lib/browser/browserStorage';
+import { ServiceManager } from '../../lib/ServiceManager';
 const cookies = browserStorage.storage;
 
 var util = {};
@@ -455,6 +456,14 @@ util.assertAuthSdkError = function (err, message) {
   expect(err.errorLink).toEqual('INTERNAL');
   expect(err.errorId).toEqual('INTERNAL');
   expect(err.errorCauses).toEqual([]);
+};
+
+util.disableLeaderElection = function() {
+  jest.spyOn(ServiceManager, 'canUseLeaderElection').mockReturnValue(false);
+};
+
+util.mockLeader = function() {
+  jest.spyOn(ServiceManager.prototype, 'isLeader').mockReturnValue(true);
 };
 
 export default util;
