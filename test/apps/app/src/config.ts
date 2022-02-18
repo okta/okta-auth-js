@@ -18,6 +18,7 @@ const PROTO = window.location.protocol;
 const REDIRECT_URI = `${PROTO}//${HOST}${LOGIN_CALLBACK_PATH}`;
 const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}/`;
 const DEFAULT_SIW_VERSION = ''; // blank for local/npm/bundled version
+const DEFAULT_CROSS_TABS_COUNT = 20;
 
 export interface Config extends OktaAuthOptions {
   defaultScopes: boolean;
@@ -28,6 +29,8 @@ export interface Config extends OktaAuthOptions {
   forceRedirect: boolean;
   useInteractionCodeFlow: boolean; // widget option
   enableSharedStorage: boolean; // TransactionManager
+  isTokenRenewPage?: boolean; // special lite /renew page to test cross-tab token renew
+  crossTabsCount?: number;
 }
 
 export function getDefaultConfig(): Config {
@@ -53,11 +56,12 @@ export function getDefaultConfig(): Config {
     cookies: {
       secure: true
     },
-    enableSharedStorage: true
+    enableSharedStorage: true,
+    crossTabsCount: DEFAULT_CROSS_TABS_COUNT
   };
 }
 
-// eslint-disable-next-line complexity
+// eslint-disable-next-line complexity,max-statements
 export function getConfigFromUrl(): Config {
   const url = new URL(window.location.href);
   const issuer = url.searchParams.get('issuer');
@@ -80,6 +84,11 @@ export function getConfigFromUrl(): Config {
   const useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true'; // off by default
   const forceRedirect = url.searchParams.get('forceRedirect') === 'true'; // off by default
   const enableSharedStorage = url.searchParams.get('enableSharedStorage') !== 'false'; // on by default
+  const syncStorage = url.searchParams.get('syncStorage') !== 'false'; // on by default
+  let crossTabsCount = parseInt(url.searchParams.get('crossTabsCount'));
+  if (isNaN(crossTabsCount)) {
+    crossTabsCount = DEFAULT_CROSS_TABS_COUNT;
+  }
 
   return {
     issuer,
@@ -104,22 +113,26 @@ export function getConfigFromUrl(): Config {
     },
     tokenManager: {
       storage,
-      expireEarlySeconds
+      expireEarlySeconds,
+      syncStorage
     },
     transactionManager: {
       enableSharedStorage
     },
+    crossTabsCount
   };
 }
 
 export function saveConfigToStorage(config: Config): void {
   const configCopy: any = {};
-  Object.keys(config).forEach(key => {
-    if (typeof (config as any)[key] !== 'function') {
-      configCopy[key] = (config as any)[key];
-    }
-  });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(configCopy));
+  if (!config.isTokenRenewPage) {
+    Object.keys(config).forEach(key => {
+      if (typeof (config as any)[key] !== 'function') {
+        configCopy[key] = (config as any)[key];
+      }
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(configCopy));
+  }
 }
 
 export function getConfigFromStorage(): Config {

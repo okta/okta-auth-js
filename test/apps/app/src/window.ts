@@ -36,6 +36,7 @@ declare global {
     onFormData: (event: FormDataEvent) => void;
     bootstrapLanding: () => void;
     bootstrapLoginCallback: () => void;
+    bootstrapRenew: () => void;
     getWidgetConfig: () => any;
     getConfig: () => any;
     toQueryString: (obj: any) => string;
@@ -116,6 +117,30 @@ Object.assign(window, {
     config = getConfigFromStorage();
     mount();
     app.bootstrapLoginCallback();
+  },
+
+  bootstrapRenew: function(): void {
+    rootElem.innerHTML = 'Loading...';
+    window.postMessage({
+      name:'crossTabTest_ready'
+    }, window.parent.location.origin);
+    window.addEventListener('message', (e) => {
+      if (e.data?.name === 'crossTabTest_bootstrap') {
+        const { expireEarlySeconds } = e.data;
+        config = getConfigFromStorage();
+        config.tokenManager = {
+          ...(config.tokenManager || {}),
+          expireEarlySeconds,
+          autoRenew: true,
+          autoRemove: false,
+          syncStorage: config?.tokenManager?.syncStorage
+        };
+        config.isTokenRenewPage = true;
+    
+        mount();
+        app.bootstrapRenew();
+      }
+    });
   },
 
   bootstrapProtected: function(): void {
