@@ -17,6 +17,7 @@
 import { flattenConfig, Config, clearStorage } from './config';
 import { FormDataEvent } from './types';
 import { htmlString, makeClickHandler } from './util';
+import { DEFAULT_CROSS_TABS_COUNT } from './config';
 
 const id = 'config-form';
 const Form = `
@@ -147,7 +148,7 @@ export function updateForm(origConfig: Config): void {
   (document.querySelector(`#f_sameSite [value="${config.sameSite || ''}"]`) as HTMLOptionElement).selected = true;
   (document.getElementById('f_siwVersion') as HTMLInputElement).value = config.siwVersion;
   (document.getElementById('f_idps') as HTMLInputElement).value = config.idps;
-  (document.getElementById('f_crossTabsCount') as HTMLInputElement).value = config.crossTabsCount;
+  (document.getElementById('f_crossTabsCount') as HTMLInputElement).value = config.crossTabsCount || DEFAULT_CROSS_TABS_COUNT;
 
   if (config.pkce) {
     (document.getElementById('f_pkce-on') as HTMLInputElement).checked = true;

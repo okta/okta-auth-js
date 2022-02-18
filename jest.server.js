@@ -25,7 +25,8 @@ const config = Object.assign({}, baseConfig, {
     'oidc/renewToken.ts',
     'oidc/renewTokens.ts',
     'TokenManager/browser',
-    'TokenManager/crossTabs'
+    'SyncStorageService',
+    'ServiceManager'
   ])
 });
 
