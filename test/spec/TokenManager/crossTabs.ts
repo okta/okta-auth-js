@@ -15,6 +15,7 @@
 /* global window, localStorage, StorageEvent */
 
 import { TokenManager } from '../../../lib/TokenManager';
+import { SyncStorageService } from '../../../lib/services/SyncStorageService';
 import * as features from '../../../lib/features';
 
 const Emitter = require('tiny-emitter');
@@ -22,6 +23,7 @@ const Emitter = require('tiny-emitter');
 describe('cross tabs communication', () => {
   let sdkMock;
   let instance;
+  let syncInstance;
   beforeEach(function() {
     jest.useFakeTimers();
     instance = null;
@@ -44,11 +46,16 @@ describe('cross tabs communication', () => {
     if (instance) {
       instance.stop();
     }
+    if (syncInstance) {
+      syncInstance.stop();
+    }
   });
 
   function createInstance(options?) {
     instance = new TokenManager(sdkMock, options);
     instance.start();
+    syncInstance = new SyncStorageService(instance, instance.getOptions());
+    syncInstance.start();
     return instance;
   }
 

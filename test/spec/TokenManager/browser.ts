@@ -75,7 +75,10 @@ describe('TokenManager (browser)', function() {
     client.tokenManager.off('added');
     client.tokenManager.off('removed');
     if (start) {
+      util.disableLeaderElection();
+      util.mockLeader();
       client.tokenManager.start();
+      client.serviceManager.start();
     }
     return client;
   }

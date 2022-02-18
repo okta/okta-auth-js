@@ -205,7 +205,10 @@ oauthUtil.setup = function(opts) {
   oauthUtil.loadWellKnownAndKeysCache(authClient);
 
   if (opts.autoRenew) {
+    util.disableLeaderElection();
+    util.mockLeader();
     authClient.tokenManager.start();
+    authClient.serviceManager.start();
   }
 
   if (opts.tokenManagerAddKeys) {
