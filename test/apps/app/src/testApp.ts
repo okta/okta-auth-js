@@ -343,6 +343,7 @@ class TestApp {
     // simulate SecureRoute behaviour
     this.oktaAuth.authStateManager.subscribe((authState: AuthState) => {
       if (!authState.isAuthenticated) {
+        document.title = 'Auth required';
         this.checkAuthRequired();
       }
     });
