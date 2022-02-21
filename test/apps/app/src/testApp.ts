@@ -343,12 +343,23 @@ class TestApp {
     // simulate SecureRoute behaviour
     this.oktaAuth.authStateManager.subscribe((authState: AuthState) => {
       if (!authState.isAuthenticated) {
-        this.oktaAuth.signInWithRedirect();
+        this.checkAuthRequired();
+      }
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === 'visible') {
+        this.checkAuthRequired();
       }
     });
 
     this._setContent(content);
     this._afterRender('protected');
+  }
+
+  checkAuthRequired() {
+    if (document.visibilityState === 'visible' && this.oktaAuth.authStateManager.getAuthState()?.isAuthenticated == false) {
+      this.oktaAuth.signInWithRedirect();
+    }
   }
 
   async bootstrapRenew(): Promise<void> {
