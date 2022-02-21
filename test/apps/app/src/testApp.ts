@@ -347,7 +347,7 @@ class TestApp {
         this.checkAuthRequired();
       }
     });
-    document.addEventListener("visibilitychange", () => {
+    document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         this.checkAuthRequired();
       }
@@ -357,7 +357,7 @@ class TestApp {
     this._afterRender('protected');
   }
 
-  checkAuthRequired() {
+  checkAuthRequired(): void {
     if (document.visibilityState === 'visible' && this.oktaAuth.authStateManager.getAuthState()?.isAuthenticated == false) {
       this.oktaAuth.signInWithRedirect();
     }
