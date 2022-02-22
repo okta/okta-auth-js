@@ -12,23 +12,27 @@
 
 
 /* global window */
-import { TokenService } from './TokenService';
 import { TokenManager } from '../TokenManager';
 import { isBrowser } from '../features';
-import { TokenManagerOptions } from '../types';
+import { ServiceManagerOptions, ServiceInterface } from '../types';
 
 
-export class SyncStorageService extends TokenService {
+export class SyncStorageService implements ServiceInterface {
+  private tokenManager: TokenManager;
+  private options: ServiceManagerOptions;
   private storageListener?: (event: StorageEvent) => void;
   private syncTimeout: unknown;
 
-  constructor(tokenManager: TokenManager, options: TokenManagerOptions = {}) {
-    super(tokenManager, options);
+  constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
+    this.tokenManager = tokenManager;
+    this.options = options;
     this.storageListener = undefined;
   }
 
   start() {
     if (this.options.syncStorage && isBrowser()) {
+      const opts = this.tokenManager.getOptions();
+
       // Sync authState cross multiple tabs when localStorage is used as the storageProvider
       // A StorageEvent is sent to a window when a storage area it has access to is changed 
       // within the context of another document.
@@ -44,13 +48,13 @@ export class SyncStorageService extends TokenService {
         // not from localStorage.clear (event.key is null)
         // event.key is not the storageKey
         // oldValue === newValue
-        if (key && (key !== this.options.storageKey || newValue === oldValue)) {
+        if (key && (key !== opts.storageKey || newValue === oldValue)) {
           return;
         }
 
         // LocalStorage cross tabs update is not synced in IE, set a 1s timer by default to read latest value
         // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
-        this.syncTimeout = setTimeout(() => handleCrossTabsStorageChange(), this.options._storageEventDelay);
+        this.syncTimeout = setTimeout(() => handleCrossTabsStorageChange(), opts._storageEventDelay);
       };
 
       window.addEventListener('storage', this.storageListener);

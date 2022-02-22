@@ -18,21 +18,28 @@ import { TransactionManagerOptions } from './Transaction';
 import { FlowIdentifier } from '../idx/types';
 import OktaAuth from '../OktaAuth';
 
+export enum isAuthenticatedExpiredTokenBehaviors {
+  renew = 'renew',
+  remove = 'remove',
+  none = 'none'
+}
 
-export interface AutoRenewServiceOptions {
-  enablePassiveRenew: boolean;
-  enableActiveRenew: boolean;
+export interface isAuthenticatedOptions {
+  expiredTokenBehavior?: isAuthenticatedExpiredTokenBehaviors;
 }
 
 export interface TokenManagerOptions {
-  autoRenew?: AutoRenewServiceOptions | boolean;
+  // TODO: remove these in next major version
+  autoRenew?: boolean;
   autoRemove?: boolean;
+  syncStorage?: boolean;
+  // --
+  enableActiveAutoRenew?: boolean;
   clearPendingRemoveTokens?: boolean;
   secure?: boolean;
   storage?: string | SimpleStorage;
   storageKey?: string;
   expireEarlySeconds?: number;
-  syncStorage?: boolean;  // TODO: change this type to accept object as well
   _storageEventDelay?: number;
 }
 

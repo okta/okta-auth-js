@@ -560,6 +560,21 @@ var config = {
 }
 ```
 
+#### `isAuthExpiredTokenBehavior`
+
+When `oktaAuth.isAuthenticated` is called, a check is made to ensure tokens exist and are valid (not expired). With default configurations, if a token is expired an attempt is made to renew said token before the resulting `Promise` from `isAuthenticated` resolves. This configuration sets the behavior of `isAuthenticated`.
+
+Possible Values: `'renew'`, `'remove'`, `'none'`
+
+```javascript
+// default config
+var config = {
+  isAuthExpiredTokenBehavior: 'renew'
+}
+```
+
+> This configuration can be overwritten on each `.isAuthenticated` call. See [isAuthenticated](#isauthenticatedoptions) for more info
+
 #### `storageManager`
 
 The `storageManager` provides access to client storage for specific purposes. `storageManager` configuration is divided into named sections. The default configuration is shown below:
@@ -697,18 +712,13 @@ var config = {
 ```
 
 ##### `autoRenew`
+> :warning: Moved to [TokenService](#tokenservice). For backwards compatibility will set `services.tokenService.autoRenew`
 
-> :gear: Requires a [running service](#running-as-a-service)
+##### `expireEarlySeconds`
 
-By default, the `tokenManager` will attempt to renew tokens before they expire. If you wish to manually control token renewal, set `autoRenew` to false to disable this feature. You can listen to [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
+> :warning: DEV ONLY
 
-```javascript
-tokenManager: {
-  autoRenew: false
-}
-```
-
-Renewing tokens slightly early helps ensure a stable user experience. By default, the `expired` event will fire 30 seconds before actual expiration time. If `autoRenew` is set to true, tokens will be renewed within 30 seconds of expiration. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
+To facilitate a more stable user experience, tokens are considered expired 30 seconds before actual expiration time. You can customize this value by setting the `expireEarlySeconds` option. The value should be large enough to account for network latency and clock drift between the client and Okta's servers.
 
 **NOTE** `expireEarlySeconds` option is only allowed in the **DEV** environment (localhost). It will be reset to 30 seconds when running in environments other than **DEV**.
 
@@ -720,23 +730,17 @@ tokenManager: {
 }
 ```
 
-###### `autoRemove`
-
-> :gear: Requires a [running service](#running-as-a-service)
-
-By default, the library will attempt to remove expired tokens during initialization when `autoRenew` is off. If you wish to  to disable auto removal of tokens, set autoRemove to false.
+##### `autoRemove`
+> :warning: Moved to [TokenService](#tokenservice). For backwards compatibility will set `services.tokenService.autoRenew`
 
 ##### `syncStorage`
+> :warning: Moved to [SyncStorageService](#syncstorageservice). For backwards compatibility will set `services.syncStorageService.enable`
 
-> :gear: Requires a [running service](#running-as-a-service)
-
-Automatically syncs tokens across browser tabs when token storage is `localStorage`. To disable this behavior, set `syncStorage` to false.
-
-###### `storageKey`
+##### `storageKey`
 
 By default all tokens will be stored under the key `okta-token-storage`. You may want to change this if you have multiple apps running on a single domain which share the same storage type. Giving each app a unique storage key will prevent them from reading or writing each other's token values.
 
-###### `storage`
+##### `storage`
 
 Specify the [storage type](#storagetype) for tokens. This will override any value set for the `token` section in the [storageManager](#storagemanager) configuration. By default, [localStorage][] will be used. This will fall back to [sessionStorage][] or [cookie][] if the previous type is not available. You may pass an object or a string. If passing an object, it should meet the requirements of a [custom storage provider](#storage). Pass a string to specify one of the built-in storage types:
 
@@ -805,6 +809,42 @@ Defaults to `none` if the `secure` option is `true`, or `lax` if the `secure` op
 
 Defaults to `true`, set this option to false if you want to opt-out of the default clearing pendingRemove tokens behaviour when `tokenManager.start()` is called.
 
+## Services
+> :gear: Requires a [running service](#running-as-a-service)
+The following configurations require `OktaAuth` to be running as a service. See [running service](#running-as-a-service) for more info.
+
+### TokenService
+
+Default configuration:
+```javascript
+services: {
+  tokenService: {
+    autoRenew: true,
+    autoRemove: true
+  }
+}
+```
+
+#### `autoRenew`
+By default, the `TokenService` will attempt to renew tokens before they expire. If you wish to manually control token renewal, set `autoRenew` to `false` to disable this feature. You can listen to [`expired`](#tokenmanageronevent-callback-context) events to know when the token has expired.
+
+> **NOTE** tokens are considered `expired` slightly before their actual expiration time. For more info, see [expireEarlySeconds](#expireearlyseconds).
+
+#### `autoRemove`
+By default, the library will attempt to remove expired tokens when `autoRenew` is `false`. If you wish to disable auto removal of tokens, set `autoRemove` to `false`.
+
+### SyncStorageService
+Automatically syncs tokens across browser tabs when token storage is `localStorage`. To disable this behavior, set `syncStorage.enable` to false.
+
+Default configuration:
+```javascript
+services: {
+  syncStorageService: {
+    enable: true
+  }
+}
+```
+
 ## API Reference
 <!-- no toc -->
 * [start](#start)
@@ -821,7 +861,7 @@ Defaults to `true`, set this option to false if you want to opt-out of the defau
 * [verifyRecoveryToken](#verifyrecoverytokenoptions)
 * [webfinger](#webfingeroptions)
 * [fingerprint](#fingerprintoptions)
-* [isAuthenticated](#isauthenticatedtimeout)
+* [isAuthenticated](#isauthenticatedoptions)
 * [getUser](#getuser)
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
@@ -1052,11 +1092,17 @@ authClient.fingerprint()
 })
 ```
 
-### `isAuthenticated(timeout?)`
+### `isAuthenticated(options?)`
 
 > :hourglass: async
 
 Resolves with `authState.isAuthenticated` from non-pending [authState](#authstatemanager).
+
+`options`
+*  `expiredTokenBehavior`: `'renew'` (default) | `'remove'` | `null`
+  * `'renew'` - attempt to renew token before `Promise` resolves
+  * `'remove'` - removes token
+  * `'none'` - neither renews or removes expired token
 
 ### `getUser()`
 

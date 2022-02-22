@@ -12,10 +12,9 @@
 
 
 /* global window */
-import { TokenService } from './TokenService';
 import { TokenManager, EVENT_EXPIRED } from '../TokenManager';
 import { AuthSdkError } from '../errors';
-import { TokenManagerOptions, AutoRenewServiceOptions } from '../types';
+import { ServiceManagerOptions, ServiceInterface } from '../types';
 
 function shouldThrottleRenew(renewTimeQueue) {
   let res = false;
@@ -29,26 +28,30 @@ function shouldThrottleRenew(renewTimeQueue) {
   return res;
 }
 
-export class AutoRenewService extends TokenService {
+export class AutoRenewService implements ServiceInterface {
+  private tokenManager: TokenManager;
+  private options: ServiceManagerOptions;
   private onTokenExpiredHandler?: (key: string) => void;
 
-  constructor(tokenManager: TokenManager, options: TokenManagerOptions = {}) {
-    super(tokenManager, options);
+  constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
+    this.tokenManager = tokenManager;
+    this.options = options;
     this.onTokenExpiredHandler = undefined;
   }
 
   start() {
-    const { enableActiveRenew } = <AutoRenewServiceOptions>this.options.autoRenew!;
+    // TODO: fix this
+    const { activeAutoRenew, autoRemove } = this.options;
     const renewTimeQueue = [];
     this.onTokenExpiredHandler = (key) => {
-      if (enableActiveRenew) {
+      if (activeAutoRenew) {
         if (shouldThrottleRenew(renewTimeQueue)) {
           const error = new AuthSdkError('Too many token renew requests');
           this.tokenManager.emitError(error);
         } else {
           this.tokenManager.renew(key).catch(() => {}); // Renew errors will emit an "error" event 
         }
-      } else if (this.options.autoRemove) {
+      } else if (autoRemove) {
         this.tokenManager.remove(key);
       }
     };

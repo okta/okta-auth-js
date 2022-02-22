@@ -31,20 +31,21 @@ import {
   TokenManagerErrorEventHandler,
   TokenManagerEventHandler,
   TokenManagerInterface,
-  RefreshToken,
-  AutoRenewServiceOptions
+  RefreshToken
 } from './types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
-import { TokenService, AutoRenewService, SyncStorageService } from './services';
+
 
 const DEFAULT_OPTIONS = {
-  autoRenew: true,
+  // TODO: remove these next major version
+  syncStorage: true,
   autoRemove: true,
+  // --
+  enableActiveAutoRenew: true,
   clearPendingRemoveTokens: true,
   storage: undefined, // will use value from storageManager config
   expireEarlySeconds: 30,
   storageKey: TOKEN_STORAGE_NAME,
-  syncStorage: true,
   _storageEventDelay: 0
 };
 export const EVENT_EXPIRED = 'expired';
@@ -70,7 +71,6 @@ export class TokenManager implements TokenManagerInterface {
   private storage: StorageProvider;
   private state: TokenManagerState;
   private options: TokenManagerOptions;
-  private services: TokenService[];
 
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
@@ -81,15 +81,7 @@ export class TokenManager implements TokenManagerInterface {
     if (!this.emitter) {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }
-    this.services = [];
-    
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
-    if (!options.autoRenew) {
-      options.autoRenew = { enableActiveRenew: false, enablePassiveRenew: false };
-    }
-    else if (typeof options.autoRenew === 'boolean') {
-      options.autoRenew = { enableActiveRenew: true, enablePassiveRenew: true };
-    }
 
     if (isIE11OrLess()) {
       options._storageEventDelay = options._storageEventDelay || 1000;
@@ -116,31 +108,6 @@ export class TokenManager implements TokenManagerInterface {
 
     this.on = this.emitter.on.bind(this.emitter);
     this.off = this.emitter.off.bind(this.emitter);
-  }
-
-  start() {
-    if (this.services.length > 0) {
-      this.stop();
-    }
-    if (this.options.clearPendingRemoveTokens) {
-      this.clearPendingRemoveTokens();
-    }
-
-    if ((<AutoRenewServiceOptions>this.options.autoRenew!).enableActiveRenew) {
-      const autoRenewService = new AutoRenewService(this, this.getOptions());
-      autoRenewService.start();
-      this.services.push(autoRenewService);
-    }
-
-    if (this.options.syncStorage) {
-      const syncStorageService = new SyncStorageService(this, this.getOptions());
-      syncStorageService.start();
-      this.services.push(syncStorageService);
-    }
-  }
-  
-  stop() {
-    this.services.map(s => s.stop());
   }
 
   getOptions(): TokenManagerOptions {
