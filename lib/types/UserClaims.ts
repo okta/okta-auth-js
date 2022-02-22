@@ -20,7 +20,7 @@
  /* eslint-disable camelcase */
 export type UserClaims<T = {}> = T & {
   auth_time?: number;
-  aud?: string;
+  aud?: string | string[];
   email?: string;
   email_verified?: boolean;
   exp?: number;
