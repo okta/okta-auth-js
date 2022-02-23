@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+const GENERATE_TYPE_FULL = 'full';
+const GENERATE_TYPE_OVERWRITE = 'overwrite';
 
 const defaults = {
   port: '8080'
@@ -50,6 +52,7 @@ const samples = [
     name: 'static-spa',
     pkgName: '@okta/samples.static-spa',
     template: 'static-spa',
+    generateType: GENERATE_TYPE_FULL,
     specs: ['spa-app'],
     features: []
   },
@@ -57,6 +60,7 @@ const samples = [
     name: 'webpack-spa',
     pkgName: '@okta/samples.webpack-spa',
     template: 'webpack-spa',
+    generateType: GENERATE_TYPE_FULL,
     specs: ['spa-app'],
     features: []
   },
@@ -64,6 +68,7 @@ const samples = [
     name: 'express-web-no-oidc',
     pkgName: '@okta/samples.express.web-no-oidc',
     template: 'express-web',
+    generateType: GENERATE_TYPE_FULL,
     specs: ['web-app'],
     oidc: false
   },
@@ -71,12 +76,14 @@ const samples = [
     name: 'express-web-with-oidc',
     pkgName: '@okta/samples.express.web-with-oidc',
     template: 'express-web',
+    generateType: GENERATE_TYPE_FULL,
     specs: ['web-app']
   },
   {
     name: 'express-embedded-auth-with-sdk',
     pkgName: '@okta/samples.express.embedded-auth-with-sdk',
     template: 'express-embedded-auth-with-sdk',
+    generateType: GENERATE_TYPE_OVERWRITE,
     specs: ['express-embedded-auth-with-sdk'],
     features: [
       'root-page', 
@@ -98,6 +105,7 @@ const samples = [
     name: 'express-embedded-sign-in-widget',
     pkgName: '@okta/samples.express.embedded-sign-in-widget',
     template: 'express-embedded-sign-in-widget',
+    generateType: GENERATE_TYPE_OVERWRITE,
     specs: [],
     features: [
       'embedded-widget-basic-auth',
@@ -122,6 +130,10 @@ function getSampleConfig(sampleName) {
   return sampleConfig;
 }
 
+function getSamplesConfig() {
+  return samples;
+}
+
 function getSampleNames() {
   return samples.map(sample => sample.name).filter(name => {
     if (process.env.SAMPLE_NAME) {
@@ -133,5 +145,8 @@ function getSampleNames() {
 
 module.exports = {
   getSampleNames,
-  getSampleConfig
+  getSampleConfig,
+  getSamplesConfig,
+  GENERATE_TYPE_FULL,
+  GENERATE_TYPE_OVERWRITE
 };
