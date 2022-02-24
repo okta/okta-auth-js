@@ -24,5 +24,5 @@ export * from './Storage';
 export * from './Token';
 export * from './TokenManager';
 export * from './TokenService';
-export * from './ServiceManager';
+export * from './Service';
 export * from './UserClaims';

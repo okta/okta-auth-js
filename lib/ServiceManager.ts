@@ -12,32 +12,37 @@
 
 
 import {
-  TokenManagerOptions,
-  ServiceManagerInterface
+  OktaAuthOptions,
+  ServiceManagerInterface,
+  ServiceInterface
 } from './types';
-import { TokenManager } from './TokenManager';
+import { OktaAuth } from '.';
 import {
   BroadcastChannel,
   createLeaderElection,
   LeaderElector
 } from 'broadcast-channel';
-import { TokenService, AutoRenewService, SyncStorageService } from './services';
+import { AutoRenewService, SyncStorageService } from './services';
 import { isBrowser } from './features';
 
 export class ServiceManager implements ServiceManagerInterface {
-  protected tokenManager: TokenManager;
-  protected options: TokenManagerOptions;
-  private services: Map<string, TokenService>;
+  private sdk: OktaAuth;
+  private options: OktaAuthOptions;
+  private services: Map<string, ServiceInterface>;
   private channel?: BroadcastChannel;
   private elector?: LeaderElector;
   private started: boolean;
 
   private static knownServices = ['autoRenew', 'syncStorage'];
 
-  constructor(tokenManager: TokenManager, options: TokenManagerOptions = {}) {
+  constructor(sdk: OktaAuth) {
+    this.sdk = sdk;
+    this.options = { ...sdk.options, tokenManager: sdk.tokenManager.getOptions() };
+
+    this.options.services ??= {};
+    this.options.services = Object.assign({broadcastChannelName: sdk.options.clientId}, {...this.options.services});
+
     this.started = false;
-    this.tokenManager = tokenManager;
-    this.options = options;
     this.services = new Map();
     this.onLeaderDuplicate = this.onLeaderDuplicate.bind(this);
     this.onLeader = this.onLeader.bind(this);
@@ -80,7 +85,7 @@ export class ServiceManager implements ServiceManagerInterface {
     this.started = false;
   }
 
-  getService(name: string): TokenService | undefined {
+  getService(name: string): ServiceInterface | undefined {
     return this.services.get(name);
   }
 
@@ -107,7 +112,8 @@ export class ServiceManager implements ServiceManagerInterface {
   private startElector() {
     if (ServiceManager.canUseLeaderElection()) {
       if (!this.channel) {
-        this.channel = new BroadcastChannel(this.options.broadcastChannelName as string);
+        const { broadcastChannelName } = this.options.services!;
+        this.channel = new BroadcastChannel(broadcastChannelName as string);
       }
       if (!this.elector) {
         this.elector = createLeaderElection(this.channel);
@@ -122,14 +128,16 @@ export class ServiceManager implements ServiceManagerInterface {
     this.elector = undefined;
   }
 
-  private createService(name: string): TokenService | undefined {
-    let service: TokenService | undefined;
+  private createService(name: string): ServiceInterface | undefined {
+    const tokenManager = this.sdk.tokenManager;
+    
+    let service: ServiceInterface | undefined;
     switch (name) {
       case 'autoRenew':
-        service = new AutoRenewService(this.tokenManager, this.options);
+        service = new AutoRenewService(tokenManager, this.options.tokenManager);
         break;
       case 'syncStorage':
-        service = new SyncStorageService(this.tokenManager, this.options);
+        service = new SyncStorageService(tokenManager, this.options.tokenManager);
         break;
       default:
         throw new Error(`Unknown service ${name}`);

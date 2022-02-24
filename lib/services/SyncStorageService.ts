@@ -12,17 +12,20 @@
 
 
 /* global window */
-import { TokenService } from './TokenService';
 import { TokenManager } from '../TokenManager';
 import { isBrowser } from '../features';
-import { TokenManagerOptions, TokenServiceInterface } from '../types';
+import { ServiceManagerOptions, ServiceInterface } from '../types';
 
 
-export class SyncStorageService extends TokenService implements TokenServiceInterface {
+export class SyncStorageService implements ServiceInterface {
+  private tokenManager: TokenManager;
+  private options: ServiceManagerOptions;
   private syncTimeout: unknown;
+  private started: boolean = false;
 
-  constructor(tokenManager: TokenManager, options: TokenManagerOptions = {}) {
-    super(tokenManager, options);
+  constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
+    this.tokenManager = tokenManager;
+    this.options = options;
     this.storageListener = this.storageListener.bind(this);
   }
 
@@ -31,6 +34,8 @@ export class SyncStorageService extends TokenService implements TokenServiceInte
   // within the context of another document.
   // https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent
   private storageListener({ key, newValue, oldValue }: StorageEvent) {
+    const opts = this.tokenManager.getOptions();
+
     const handleCrossTabsStorageChange = () => {
       this.tokenManager.resetExpireEventTimeoutAll();
       this.tokenManager.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
@@ -40,30 +45,41 @@ export class SyncStorageService extends TokenService implements TokenServiceInte
     // not from localStorage.clear (event.key is null)
     // event.key is not the storageKey
     // oldValue === newValue
-    if (key && (key !== this.options.storageKey || newValue === oldValue)) {
+    if (key && (key !== opts.storageKey || newValue === oldValue)) {
       return;
     }
 
     // LocalStorage cross tabs update is not synced in IE, set a 1s timer by default to read latest value
     // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
-    this.syncTimeout = setTimeout(() => handleCrossTabsStorageChange(), this.options._storageEventDelay);
-  }
-
-  canStart() {
-    return !!this.options.syncStorage && isBrowser();
+    this.syncTimeout = setTimeout(() => handleCrossTabsStorageChange(), opts._storageEventDelay);
   }
 
   requiresLeadership() {
     return false;
   }
 
-  _start() {
-    window.addEventListener('storage', this.storageListener);
+  isStarted() {
+    return this.started;
   }
 
-  _stop() {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    window.removeEventListener('storage', this.storageListener!);
-    clearTimeout(this.syncTimeout as any);
+  canStart() {
+    return !!this.options.syncStorage && isBrowser();
+  }
+
+  start() {
+    if (this.canStart()) {
+      this.stop();
+      window.addEventListener('storage', this.storageListener);
+      this.started = true;
+    }
+  }
+
+  stop() {
+    if (this.started) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      window.removeEventListener('storage', this.storageListener!);
+      clearTimeout(this.syncTimeout as any);
+      this.started = false;
+    }
   }
 } 

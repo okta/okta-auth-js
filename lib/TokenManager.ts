@@ -36,8 +36,10 @@ import {
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
 
 const DEFAULT_OPTIONS = {
+  // TODO: remove in next major version
   autoRenew: true,
   autoRemove: true,
+  // --- //
   clearPendingRemoveTokens: true,
   storage: undefined, // will use value from storageManager config
   expireEarlySeconds: 30,
@@ -87,9 +89,7 @@ export class TokenManager implements TokenManagerInterface {
     if (!isLocalhost()) {
       options.expireEarlySeconds = DEFAULT_OPTIONS.expireEarlySeconds;
     }
-    if (!options.broadcastChannelName) {
-      options.broadcastChannelName = sdk.options.clientId;
-    }
+
     this.options = options;
 
     const storageOptions: StorageOptions = removeNils({

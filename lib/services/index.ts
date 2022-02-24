@@ -11,6 +11,5 @@
  */
 
 
-export * from './TokenService';
 export * from './AutoRenewService';
 export * from './SyncStorageService';

@@ -11,17 +11,20 @@
  */
 
 
-import { TokenService } from './TokenService';
 import { TokenManager, EVENT_EXPIRED } from '../TokenManager';
 import { AuthSdkError } from '../errors';
-import { TokenManagerOptions } from '../types';
+import { ServiceInterface, ServiceManagerOptions } from '../types';
 import { isBrowser } from '../features';
 
-export class AutoRenewService extends TokenService {
+export class AutoRenewService implements ServiceInterface {
+  private tokenManager: TokenManager;
+  private options: ServiceManagerOptions;
   private renewTimeQueue: Array<number>;
+  private started: boolean = false;
 
-  constructor(tokenManager: TokenManager, options: TokenManagerOptions = {}) {
-    super(tokenManager, options);
+  constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
+    this.tokenManager = tokenManager;
+    this.options = options;
     this.renewTimeQueue = [];
     this.onTokenExpiredHandler = this.onTokenExpiredHandler.bind(this);
   }
@@ -36,10 +39,6 @@ export class AutoRenewService extends TokenService {
       res = (lastTime - firstTime) < 30 * 1000;
     }
     return res;
-  }
-
-  canStart() {
-    return (!!this.options.autoRenew || !!this.options.autoRemove);
   }
 
   requiresLeadership() {
@@ -60,12 +59,27 @@ export class AutoRenewService extends TokenService {
     }
   }
 
-  _start() {
-    this.tokenManager.on(EVENT_EXPIRED, this.onTokenExpiredHandler);
+  canStart() {
+    return this.options.autoRenew ?? this.options.autoRemove ?? true;
   }
 
-  _stop() {
-    this.tokenManager.off(EVENT_EXPIRED, this.onTokenExpiredHandler);
-    this.renewTimeQueue = [];
+  start() {
+    if (this.canStart()) {
+      this.stop();
+      this.tokenManager.on(EVENT_EXPIRED, this.onTokenExpiredHandler);
+      this.started = true;
+    }
+  }
+
+  stop() {
+    if (this.started) {
+      this.tokenManager.off(EVENT_EXPIRED, this.onTokenExpiredHandler);
+      this.renewTimeQueue = [];
+      this.started = false;
+    }
+  }
+
+  isStarted() {
+    return this.started;
   }
 }
