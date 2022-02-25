@@ -20,7 +20,7 @@ export class AutoRenewService implements ServiceInterface {
   private tokenManager: TokenManager;
   private options: ServiceManagerOptions;
   private renewTimeQueue: Array<number>;
-  private started: boolean = false;
+  private started = false;
 
   constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
     this.tokenManager = tokenManager;
@@ -60,7 +60,7 @@ export class AutoRenewService implements ServiceInterface {
   }
 
   canStart() {
-    return this.options.autoRenew ?? this.options.autoRemove ?? true;
+    return (!!this.options.autoRenew || !!this.options.autoRemove);
   }
 
   start() {

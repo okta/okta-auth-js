@@ -12,9 +12,9 @@
 
 
 import {
-  OktaAuthOptions,
   ServiceManagerInterface,
-  ServiceInterface
+  ServiceInterface,
+  ServiceManagerOptions
 } from './types';
 import { OktaAuth } from '.';
 import {
@@ -27,7 +27,7 @@ import { isBrowser } from './features';
 
 export class ServiceManager implements ServiceManagerInterface {
   private sdk: OktaAuth;
-  private options: OktaAuthOptions;
+  private options: ServiceManagerOptions;
   private services: Map<string, ServiceInterface>;
   private channel?: BroadcastChannel;
   private elector?: LeaderElector;
@@ -35,12 +35,22 @@ export class ServiceManager implements ServiceManagerInterface {
 
   private static knownServices = ['autoRenew', 'syncStorage'];
 
-  constructor(sdk: OktaAuth) {
-    this.sdk = sdk;
-    this.options = { ...sdk.options, tokenManager: sdk.tokenManager.getOptions() };
+  private static defaultOptions = {
+    autoRenew: true,
+    autoRemove: true,
+    syncStorage: true
+  };
 
-    this.options.services ??= {};
-    this.options.services = Object.assign({broadcastChannelName: sdk.options.clientId}, {...this.options.services});
+  constructor(sdk: OktaAuth, options: ServiceManagerOptions = {}) {
+    this.sdk = sdk;
+
+    // TODO: backwards compatibility, remove in next major version - OKTA-473815
+    const { autoRenew, autoRemove, syncStorage } = sdk.tokenManager.getOptions();
+    this.options = Object.assign({}, 
+      ServiceManager.defaultOptions,
+      { autoRenew, autoRemove, syncStorage },
+      options
+    );
 
     this.started = false;
     this.services = new Map();
@@ -112,7 +122,7 @@ export class ServiceManager implements ServiceManagerInterface {
   private startElector() {
     if (ServiceManager.canUseLeaderElection()) {
       if (!this.channel) {
-        const { broadcastChannelName } = this.options.services!;
+        const { broadcastChannelName } = this.options;
         this.channel = new BroadcastChannel(broadcastChannelName as string);
       }
       if (!this.elector) {
@@ -130,14 +140,14 @@ export class ServiceManager implements ServiceManagerInterface {
 
   private createService(name: string): ServiceInterface | undefined {
     const tokenManager = this.sdk.tokenManager;
-    
+
     let service: ServiceInterface | undefined;
     switch (name) {
       case 'autoRenew':
-        service = new AutoRenewService(tokenManager, this.options.tokenManager);
+        service = new AutoRenewService(tokenManager, {...this.options});
         break;
       case 'syncStorage':
-        service = new SyncStorageService(tokenManager, this.options.tokenManager);
+        service = new SyncStorageService(tokenManager, {...this.options});
         break;
       default:
         throw new Error(`Unknown service ${name}`);

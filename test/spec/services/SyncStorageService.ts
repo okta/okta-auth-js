@@ -14,9 +14,9 @@
 /* eslint-disable max-statements */
 /* global window, localStorage, StorageEvent */
 
-import { TokenManager } from '../../lib/TokenManager';
-import { SyncStorageService } from '../../lib/services/SyncStorageService';
-import * as features from '../../lib/features';
+import { TokenManager } from '../../../lib/TokenManager';
+import { SyncStorageService } from '../../../lib/services/SyncStorageService';
+import * as features from '../../../lib/features';
 
 const Emitter = require('tiny-emitter');
 

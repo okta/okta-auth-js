@@ -50,6 +50,7 @@ import {
   ParseFromUrlInterface,
   GetWithRedirectFunction,
   RequestOptions,
+  IsAuthenticatedOptions,
 } from './types';
 import {
   transactionStatus,
@@ -354,7 +355,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     this.authStateManager = new AuthStateManager(this);
 
     // ServiceManager
-    this.serviceManager = new ServiceManager(this);
+    this.serviceManager = new ServiceManager(this, args.services);
   }
 
   start() {
@@ -576,33 +577,36 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
 
   // Returns true if both accessToken and idToken are not expired
   // If `autoRenew` option is set, will attempt to renew expired tokens before returning.
-  async isAuthenticated(): Promise<boolean> {
-
+  async isAuthenticated(options: IsAuthenticatedOptions = {}): Promise<boolean> {
     let { accessToken, idToken } = this.tokenManager.getTokensSync();
+    // TODO: remove dependency on tokenManager options in next major version - OKTA-473815
     const { autoRenew, autoRemove } = this.tokenManager.getOptions();
+
+    const shouldRenew = options.onExpiredToken ? options.onExpiredToken === 'renew' : autoRenew;
+    const shouldRemove = options.onExpiredToken ? options.onExpiredToken === 'remove' : autoRemove;
 
     if (accessToken && this.tokenManager.hasExpired(accessToken)) {
       accessToken = undefined;
-      if (autoRenew) {
+      if (shouldRenew) {
         try {
           accessToken = await this.tokenManager.renew('accessToken') as AccessToken;
         } catch {
           // Renew errors will emit an "error" event 
         }
-      } else if (autoRemove) {
+      } else if (shouldRemove) {
         this.tokenManager.remove('accessToken');
       }
     }
 
     if (idToken && this.tokenManager.hasExpired(idToken)) {
       idToken = undefined;
-      if (autoRenew) {
+      if (shouldRenew) {
         try {
           idToken = await this.tokenManager.renew('idToken') as IDToken;
         } catch {
           // Renew errors will emit an "error" event 
         }
-      } else if (autoRemove) {
+      } else if (shouldRemove) {
         this.tokenManager.remove('idToken');
       }
     }

@@ -36,15 +36,15 @@ import {
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
 
 const DEFAULT_OPTIONS = {
-  // TODO: remove in next major version
+  // TODO: remove in next major version - OKTA-473815
   autoRenew: true,
   autoRemove: true,
+  syncStorage: true,
   // --- //
   clearPendingRemoveTokens: true,
   storage: undefined, // will use value from storageManager config
   expireEarlySeconds: 30,
   storageKey: TOKEN_STORAGE_NAME,
-  syncStorage: true,
   _storageEventDelay: 0
 };
 export const EVENT_EXPIRED = 'expired';

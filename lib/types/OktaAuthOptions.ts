@@ -20,6 +20,10 @@ import { ServiceManagerOptions } from './Service';
 import OktaAuth from '../OktaAuth';
 
 
+export interface IsAuthenticatedOptions {
+  onExpiredToken?: 'renew' | 'remove' | 'none';
+}
+
 export interface TokenManagerOptions {
   autoRenew?: boolean;
   autoRemove?: boolean;

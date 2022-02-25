@@ -14,8 +14,8 @@
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
-import SdkClock from '../../lib/clock';
-import * as features from '../../lib/features';
+import SdkClock from '../../../lib/clock';
+import * as features from '../../../lib/features';
 
 const Emitter = require('tiny-emitter');
 
@@ -29,6 +29,7 @@ function createAuth(options) {
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
     redirectUri: 'https://example.com/redirect',
     storageUtil: options.storageUtil,
+    services: options.services || {},
     tokenManager: {
       expireEarlySeconds: options.tokenManager.expireEarlySeconds || 0,
       storage: options.tokenManager.storage,
@@ -214,6 +215,48 @@ describe('AutoRenewService', function() {
 
     it('should not call tokenManager.remove() when autoRenew === false && autoRemove === false', () => {
       setupSync({ tokenManager: { autoRenew: false, autoRemove: false } }, true);
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      client.serviceManager.start();
+      client.tokenManager.remove = jest.fn();
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(client.tokenManager.remove).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('options.services config', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      util.disableLeaderElection();
+      util.mockLeader();
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should register listener for "expired" event', function() {
+      jest.spyOn(Emitter.prototype, 'on');
+      jest.spyOn(Emitter.prototype, 'off');
+      setupSync({ services: { autoRenew: true } }, true);
+      client.tokenManager.start();
+      client.serviceManager.start();
+      expect(Emitter.prototype.on).toHaveBeenCalledWith('expired', expect.any(Function));
+      client.serviceManager.stop();
+      expect(Emitter.prototype.off).toHaveBeenCalledWith('expired', expect.any(Function));
+    });
+
+    it('should call tokenManager.remove() when autoRenew === false && autoRemove === true', () => {
+      setupSync({ services: { autoRenew: false, autoRemove: true } }, true);
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      client.serviceManager.start();
+      client.tokenManager.remove = jest.fn();
+      util.warpToUnixTime(tokens.standardIdTokenClaims.iat);
+      util.warpByTicksToUnixTime(tokens.standardIdTokenParsed.expiresAt + 1);
+      expect(client.tokenManager.remove).toHaveBeenCalledWith('test-idToken');
+    });
+
+    it('should not call tokenManager.remove() when autoRenew === false && autoRemove === false', () => {
+      setupSync({ services: { autoRenew: false, autoRemove: false } }, true);
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
       client.serviceManager.start();
       client.tokenManager.remove = jest.fn();

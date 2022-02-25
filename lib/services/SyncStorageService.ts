@@ -21,7 +21,7 @@ export class SyncStorageService implements ServiceInterface {
   private tokenManager: TokenManager;
   private options: ServiceManagerOptions;
   private syncTimeout: unknown;
-  private started: boolean = false;
+  private started = false;
 
   constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
     this.tokenManager = tokenManager;

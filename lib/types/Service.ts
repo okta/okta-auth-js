@@ -26,5 +26,5 @@ export interface SyncStorageServiceOptions {
 export type ServiceManagerOptions = AutoRenewServiceOptions &
   SyncStorageServiceOptions & 
   {
-    broadcastChannelName?: string
+    broadcastChannelName?: string;
   };
