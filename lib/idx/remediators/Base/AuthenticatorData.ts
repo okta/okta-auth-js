@@ -13,8 +13,7 @@
 
 
 import { Remediator, RemediationValues } from './Remediator';
-import { IdxRemediationValue, IdxOption, IdxRemediation } from '../../types/idx-js';
-import { Authenticator } from '../../types';
+import { IdxRemediationValue, IdxOption, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
 
 export type AuthenticatorDataValues = RemediationValues & {
   methodType?: string;
@@ -28,7 +27,7 @@ export class AuthenticatorData extends Remediator {
   };
 
   values!: AuthenticatorDataValues;
-  authenticator: Authenticator;
+  authenticator: IdxAuthenticator;
 
   constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}) {
     super(remediation, values);

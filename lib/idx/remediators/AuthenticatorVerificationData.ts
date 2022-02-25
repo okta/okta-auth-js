@@ -12,6 +12,7 @@
  */
 
 
+import { AuthSdkError } from '../../errors';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
@@ -21,15 +22,39 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
 
   values!: AuthenticatorVerificationDataValues;
 
+  canRemediate() {
+    // auto proceed if there is only one method
+    if (this.authenticator.methods.length === 1) {
+      return true;
+    }
+    return super.canRemediate();
+  }
+
   mapAuthenticator() {
     const authenticatorData = this.getAuthenticatorData();
     const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
+
+    // auto proceed with the only methodType option
+    if (this.authenticator.methods.length === 1) {
+      return authenticatorFromRemediation.form?.value.reduce((acc, curr) => {
+        if (curr.value) {
+          acc[curr.name] = curr.value;
+        } else if (curr.options) {
+          acc[curr.name] = curr.options![0].value;
+        } else {
+          throw new AuthSdkError('Unknown authenticator date type.');
+        }
+        return acc;
+      }, {});
+    }
+
+    // return based on user selection
     return { 
       id: authenticatorFromRemediation.form!.value
         .find(({ name }) => name === 'id')!.value,
       enrollmentId: authenticatorFromRemediation.form!.value
         .find(({ name }) => name === 'enrollmentId')?.value,
-      methodType: authenticatorData!.methodType,
+      methodType: authenticatorData?.methodType,
     };
   }
 
