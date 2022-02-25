@@ -78,8 +78,6 @@ function generateSampleTaskFactory(options) {
     const { name, template, subDir, useEnv, generateType } = options;
     const inDir = `${SRC_DIR}/${template}/**/*`;
     const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${name}`;
-
-    console.log('outDir', outDir);
     const strOptions = {};
     Object.keys(options).forEach(key => {
       let val = options[key];
@@ -109,8 +107,8 @@ function generateSampleTaskFactory(options) {
         .pipe(rename('okta-env.js'))
         .pipe(dest(() => {
           gitattributes.add(`${outDir}/env/okta-env.js linguist-generated=true`);
-          return `${outDir}/env/`
-        }))
+          return `${outDir}/env/`;
+        }));
       merged.add(copyEnvModule);
     }
     return merged;
