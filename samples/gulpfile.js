@@ -29,6 +29,8 @@ const {
   GENERATE_TYPE_OVERWRITE
 } = require('./config');
 
+Handlebars.registerHelper('append', (str) => str);
+
 const SRC_DIR = 'templates';
 const BUILD_DIR = 'generated';
 const PARTIALS_DIR = `${SRC_DIR}/partials`;

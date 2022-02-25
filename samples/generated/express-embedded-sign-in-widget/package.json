@@ -7,8 +7,8 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "SIW_VERSION=${SIW_VERSION-6.1.0 } node ./web-server/server.js",
-    "dev": "SIW_VERSION=${SIW_VERSION-6.1.0 } nodemon ./web-server/server.js --watch ../../../build/cjs"
+    "start": "SIW_VERSION=${SIW_VERSION-6.1.0} node ./web-server/server.js",
+    "dev": "SIW_VERSION=${SIW_VERSION-6.1.0} nodemon ./web-server/server.js --watch ../../../build/cjs"
   },
   "dependencies": {
     "express": "^4.17.1",
