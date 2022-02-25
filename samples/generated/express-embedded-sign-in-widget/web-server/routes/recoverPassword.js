@@ -54,7 +54,7 @@ router.get('/recover-password', async (req, res, next) => {
       recoveryToken
     };
     res.render('login', {
-      siwVersion: '6.0.0',
+      siwVersion: '6.1.0',
       widgetConfig: JSON.stringify(widgetConfig),
       selfHosted: !!process.env.SELF_HOSTED_WIDGET
     });

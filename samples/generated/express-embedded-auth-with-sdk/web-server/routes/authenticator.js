@@ -78,6 +78,27 @@ router.post('/challenge-authenticator/okta_email', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });  
 
+router.get('/verify-authenticator/okta_email', (req, res) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator', {
+      title: 'Verify email authenticator',
+      input: {
+        type: 'text',
+        name: 'verificationCode',
+      },
+      action: '/challenge-authenticator/okta_email',
+    })
+  });
+});
+
+router.post('/verify-authenticator/okta_email', async (req, res, next) => {
+  const { verificationCode } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ verificationCode });
+  handleTransaction({ req, res, next, authClient, transaction });
+}); 
+
 // Handle enroll authenticator -- email
 router.get('/enroll-authenticator/okta_email', (req, res) => {
   renderPage({
