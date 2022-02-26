@@ -20,16 +20,41 @@ const rename = require('gulp-rename');
 const shell = require('shelljs');
 const merge = require('merge-stream');
 const path = require('path');
+const fs = require('fs');
 
-const config = require('./config');
+const { 
+  getSampleNames, 
+  getSampleConfig,
+  GENERATE_TYPE_FULL,
+  GENERATE_TYPE_OVERWRITE
+} = require('./config');
+
+Handlebars.registerHelper('append', (str) => str);
 
 const SRC_DIR = 'templates';
 const BUILD_DIR = 'generated';
 const PARTIALS_DIR = `${SRC_DIR}/partials`;
 const OKTA_ENV_SCRIPT_PATH = '../env/index.js';
+const GIT_ATTRIBUTES_PATH = '.gitattributes';
+
+const versionsCache = {
+  siwVersion: process.env.SIW_VERSION || getPublishedModuleVersion('@okta/okta-signin-widget'),
+  authJSVersion: getPublishedModuleVersion('@okta/okta-auth-js')
+};
+const gitattributes = (() => {
+  const arr = fs.readFileSync(GIT_ATTRIBUTES_PATH)
+    .toString()
+    .split('\n')
+    .map(str => str.trim())
+    .filter(str => !!str);
+  return new Set(arr);
+})();
 
 function cleanTask() {
-  const dirs = config.getSampleNames().map(name => path.join(BUILD_DIR, name));
+  const dirs = getSampleNames()
+    .map(name => getSampleConfig(name))
+    .filter(config => config.generateType === GENERATE_TYPE_FULL)
+    .map(({ name }) => path.join(BUILD_DIR, name));
   return src(dirs, { read: false, allowEmpty: true })
     .pipe(clean({ force: true }));
 }
@@ -52,9 +77,8 @@ function registerPartials() {
 
 function generateSampleTaskFactory(options) {
   return function generateSample() {
-    const { name, template, subDir, useEnv } = options;
+    const { name, template, subDir, useEnv, generateType } = options;
     const inDir = `${SRC_DIR}/${template}/**/*`;
-    const viewTemplatesDir = `${SRC_DIR}/${template}/**/views/*`;
     const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${name}`;
     const strOptions = {};
     Object.keys(options).forEach(key => {
@@ -65,45 +89,64 @@ function generateSampleTaskFactory(options) {
       strOptions[key] = val;
     });
 
-    const hbParams = Object.assign({}, strOptions, {
-      siwVersion: process.env.SIW_VERSION || getPublishedModuleVersion('@okta/okta-signin-widget'),
-      authJSVersion: getPublishedModuleVersion('@okta/okta-auth-js')
-    });
+    if (generateType === GENERATE_TYPE_FULL) {
+      gitattributes.add(`${outDir}/**/* linguist-generated=true`);
+    }
+
+    const hbParams = Object.assign({}, strOptions, versionsCache);
     console.log(`generating sample: "${name}"`, hbParams);
-    const generateWithoutViewTemplates = src([inDir, `!${viewTemplatesDir}`], { dot: true })
+    const generateTemplates = src(inDir, { dot: true })
       .pipe(handlebars(hbParams))
-      .pipe(dest(outDir));
-    const copyViewTemplates = src(viewTemplatesDir, { dot: true })
-      .pipe(dest(outDir));
-    const merged = merge(generateWithoutViewTemplates, copyViewTemplates);
+      .pipe(dest((file) => {
+        if (generateType === GENERATE_TYPE_OVERWRITE) {
+          gitattributes.add(`${outDir}${file.path.split(name)[1]} linguist-generated=true`);
+        }
+        return outDir;
+      }));
+    const merged = merge(generateTemplates);
     if (useEnv) {
       const copyEnvModule = src(OKTA_ENV_SCRIPT_PATH, { dot: true })
         .pipe(rename('okta-env.js'))
-        .pipe(dest(`${outDir}/env/`));
+        .pipe(dest(() => {
+          gitattributes.add(`${outDir}/env/okta-env.js linguist-generated=true`);
+          return `${outDir}/env/`;
+        }));
       merged.add(copyEnvModule);
     }
     return merged;
    };
 }
 
-const generateSampleTasks = config.getSampleNames().map(function(sampleName) {
-  const sampleConfig = config.getSampleConfig(sampleName);
+const generateSampleTasks = getSampleNames().map(function(sampleName) {
+  const sampleConfig = getSampleConfig(sampleName);
   const taskFn = generateSampleTaskFactory(sampleConfig);
-  task(sampleName, series(registerPartials, taskFn));
+  task(sampleConfig.name, series(registerPartials, taskFn));
   return taskFn;
 });
 const buildSamples = parallel.apply(null, generateSampleTasks);
 
+function writeGitAttributes(done) {
+  fs.writeFileSync(
+    GIT_ATTRIBUTES_PATH, 
+    Array.from(gitattributes).reduce((acc, curr) => {
+      acc += curr + '\n';
+      return acc;
+    }, '')
+  );
+  done();
+}
+
 const defaultTask = series(
   cleanTask,
   registerPartials,
-  buildSamples
+  buildSamples,
+  writeGitAttributes
 );
 
 function watchSamples() {
   watch([`${PARTIALS_DIR}/**/*`, `config.js`], defaultTask);
-  config.getSampleNames().map(function(sampleName) {
-    const sampleConfig = config.getSampleConfig(sampleName);
+  getSampleNames().map(function(sampleName) {
+    const sampleConfig = getSampleConfig(sampleName);
     const { template } = sampleConfig;
     const task = generateSampleTaskFactory(sampleConfig);
     watch(`${SRC_DIR}/${template}/**/*`, task);
