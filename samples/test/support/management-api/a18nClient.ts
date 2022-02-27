@@ -58,6 +58,24 @@ class A18nClient {
     return code;
   }
 
+  async getEmailMagicLink(profileId: string) {
+    let retryAttemptsRemaining = 5;
+    let response;
+    while (!response?.content && retryAttemptsRemaining > 0) {
+      await waitForOneSecond();
+      response = await this.getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as Record<string, string>;
+      --retryAttemptsRemaining;
+    }
+
+    const match = response?.content?.match(/<a id="email-authentication-button" href="(?<url>\S+)"/);
+    const url = match?.groups?.url;
+    if (!url) {
+      throw new Error('Unable to retrieve magic link from email.');
+    }
+
+    return url;
+  }
+
   async getSMSCode(profileId: string) {
     let retryAttemptsRemaining = 30; // sms take some time to arrive, set maximum try to 30
     let response;

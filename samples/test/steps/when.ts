@@ -65,6 +65,7 @@ import enterCorrectQuestionAnswer from '../support/action/enterCorrectQuestionAn
 import scanQrCode from '../support/action/context-enabled/scanQrCode';
 import getSharedSecret from '../support/action/context-enabled/getSharedSecret';
 import enterCorrectGoogleAuthenticatorCode from '../support/action/context-enabled/enterCorrectGoogleAuthenticatorCode';
+import openEmailMagicLink from '../support/action/context-enabled/live-user/openEmailMagicLink';
 import ActionContext from '../support/context';
 
 When(
@@ -315,6 +316,11 @@ When(
 When(
   /^She inputs the correct code from the Email$/,
   enterCorrectCode
+);
+
+When(
+  /^she clicks the Email magic link$/,
+  openEmailMagicLink
 );
 
 When(
