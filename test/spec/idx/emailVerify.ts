@@ -7,6 +7,15 @@ import {
   EmailVerifyCallbackError
 } from '../../../lib/idx/emailVerify';
 
+jest.mock('../../../lib/idx/transactionMeta', () => {
+  const actual = jest.requireActual('../../../lib/idx/transactionMeta');
+  return {
+    ...actual,
+    getSavedTransactionMeta: () => {},
+    saveTransactionMeta: () => {}
+  };
+});
+
 describe('emailVerify', () => {
 
   describe('isEmailVerifyCallback', () => {
