@@ -126,4 +126,15 @@ describe('ServiceManager', () => {
     client.serviceManager.stop();
   });
 
+  describe('Backwards Compatibility', () => {
+    it('will respect `tokenManager` and `services` configurations', async () => {
+      const options = {
+        tokenManager: { autoRenew: true },
+        services: { autoRenew: false }
+      };
+      const client = createAuth(options);
+      expect((<any>client).options).toMatchObject({ autoRenew: false });
+    });
+  });
+
 });
