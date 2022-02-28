@@ -14,6 +14,7 @@
 
 import { AuthSdkError } from '../../errors';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
+import { IdxRemediation } from '../types/idx-js';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 
@@ -21,10 +22,18 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
   static remediationName = 'authenticator-verification-data';
 
   values!: AuthenticatorVerificationDataValues;
+  shouldProceedWithEmailAuthenticator: boolean;
+
+  constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}) {
+    super(remediation, values);
+
+    // TODO: extend this feature to all authenticators
+    this.shouldProceedWithEmailAuthenticator = this.authenticator.methods.length === 1 && this.authenticator.methods[0].type === 'email';
+  }
 
   canRemediate() {
     // auto proceed if there is only one method
-    if (this.authenticator.methods.length === 1) {
+    if (this.shouldProceedWithEmailAuthenticator) {
       return true;
     }
     return super.canRemediate();
@@ -35,7 +44,7 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
     const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
 
     // auto proceed with the only methodType option
-    if (this.authenticator.methods.length === 1) {
+    if (this.shouldProceedWithEmailAuthenticator) {
       return authenticatorFromRemediation.form?.value.reduce((acc, curr) => {
         if (curr.value) {
           acc[curr.name] = curr.value;
