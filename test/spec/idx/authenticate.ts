@@ -43,6 +43,7 @@ import {
   IdxErrorPasscodeInvalidFactory,
   IdxErrorEnrollmentInvalidPhoneFactory,
   IdxErrorGoogleAuthenticatorPasscodeInvalidFactory,
+  EmailAuthenticatorVerificationDataRemediationFactory,
   PhoneAuthenticatorVerificationDataRemediationFactory,
   VerifyEmailRemediationFactory,
   VerifyGoogleAuthenticatorRemediationFactory,
@@ -1097,6 +1098,11 @@ describe('idx/authenticate', () => {
               })
             ]
           });
+          const verificationDataResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              EmailAuthenticatorVerificationDataRemediationFactory.build()
+            ]
+          });
           const verifyEmailResponse = IdxResponseFactory.build({
             neededToProceed: [
               VerifyEmailRemediationFactory.build()
@@ -1138,6 +1144,7 @@ describe('idx/authenticate', () => {
     
           Object.assign(testContext, {
             selectAuthenticatorResponse,
+            verificationDataResponse,
             verifyEmailResponse,
             errorInvalidCodeResponse
           });
@@ -1165,6 +1172,29 @@ describe('idx/authenticate', () => {
             status: IdxStatus.SUCCESS,
             tokens: {
               fakeToken: true
+            }
+          });
+        });
+
+        it('can auto select email methodType as authenticator verification data', async () => {
+          const {
+            authClient,
+            verificationDataResponse,
+            verifyEmailResponse
+          } = testContext;
+
+          jest.spyOn(verificationDataResponse, 'proceed').mockResolvedValue(verifyEmailResponse);
+          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verificationDataResponse);
+          const res = await authenticate(authClient);
+          expect(verificationDataResponse.proceed).toHaveBeenCalledWith('authenticator-verification-data', {
+            authenticator: {
+              id: 'id-email'
+            }
+          });
+          expect(res).toMatchObject({
+            status: IdxStatus.PENDING,
+            nextStep: {
+              name: 'challenge-authenticator'
             }
           });
         });

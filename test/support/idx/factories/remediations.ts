@@ -398,6 +398,19 @@ export const PasswordAuthenticatorVerificationDataRemediationFactory = Authentic
   ]
 });
 
+export const EmailAuthenticatorVerificationDataRemediationFactory = AuthenticatorVerificationDataRemediationFactory.params({
+  relatesTo: {
+    type: 'object',
+    value: EmailAuthenticatorFactory.build()
+  },
+  value: [
+    AuthenticatorValueFactory.build({
+      label: 'Email',
+      form: EmailAuthenticatorFormFactory.build()
+    })
+  ]
+});
+
 export const PhoneAuthenticatorVerificationDataRemediationFactory = AuthenticatorVerificationDataRemediationFactory.params({
   relatesTo: {
     type: 'object',
