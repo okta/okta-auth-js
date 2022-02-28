@@ -42,7 +42,7 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
         } else if (curr.options) {
           acc[curr.name] = curr.options![0].value;
         } else {
-          throw new AuthSdkError('Unknown authenticator date type.');
+          throw new AuthSdkError(`Unsupported authenticator data type: ${curr}`);
         }
         return acc;
       }, {});
