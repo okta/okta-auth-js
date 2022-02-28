@@ -28,7 +28,8 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
     super(remediation, values);
 
     // TODO: extend this feature to all authenticators
-    this.shouldProceedWithEmailAuthenticator = this.authenticator.methods.length === 1 && this.authenticator.methods[0].type === 'email';
+    this.shouldProceedWithEmailAuthenticator = this.authenticator.methods.length === 1 
+      && this.authenticator.methods[0].type === 'email';
   }
 
   canRemediate() {
