@@ -5,6 +5,7 @@
 ### Features
 
 - [#1113](https://github.com/okta/okta-auth-js/pull/1113) Updates types for `SigninWithCredentialsOptions` and `SignInOptions` to support `SP Initiated Auth`
+- [#1125](https://github.com/okta/okta-auth-js/pull/1125) IDX - Supports auto select methodType (when only one selection is available) for `authenticator-verification-data` remediation
 
 ## 6.1.0
 
