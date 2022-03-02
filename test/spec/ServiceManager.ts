@@ -30,6 +30,7 @@ const mocked = {
 function createAuth(options) {
   options = options || {};
   options.tokenManager = options.tokenManager || {};
+  options.services = options.services || {};
   return new OktaAuth({
     issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
@@ -38,7 +39,8 @@ function createAuth(options) {
       syncStorage: options.tokenManager.syncStorage || false,
       autoRenew: options.tokenManager.autoRenew || false,
       autoRemove: options.tokenManager.autoRemove || false,
-    }
+    },
+    services: options.services
   });
 }
 
@@ -127,13 +129,15 @@ describe('ServiceManager', () => {
   });
 
   describe('Backwards Compatibility', () => {
-    it('will respect `tokenManager` and `services` configurations', async () => {
+    it('`services` will supersede `tokenManager` configurations', async () => {
       const options = {
         tokenManager: { autoRenew: true },
         services: { autoRenew: false }
       };
       const client = createAuth(options);
-      expect((<any>client).options).toMatchObject({ autoRenew: false });
+      util.disableLeaderElection();
+      client.serviceManager.start();
+      expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
     });
   });
 

@@ -578,13 +578,13 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   // Returns true if both accessToken and idToken are not expired
   // If `autoRenew` option is set, will attempt to renew expired tokens before returning.
   async isAuthenticated(options: IsAuthenticatedOptions = {}): Promise<boolean> {
-    let { accessToken, idToken } = this.tokenManager.getTokensSync();
     // TODO: remove dependency on tokenManager options in next major version - OKTA-473815
     const { autoRenew, autoRemove } = this.tokenManager.getOptions();
 
     const shouldRenew = options.onExpiredToken ? options.onExpiredToken === 'renew' : autoRenew;
     const shouldRemove = options.onExpiredToken ? options.onExpiredToken === 'remove' : autoRemove;
 
+    let { accessToken } = this.tokenManager.getTokensSync();
     if (accessToken && this.tokenManager.hasExpired(accessToken)) {
       accessToken = undefined;
       if (shouldRenew) {
@@ -598,6 +598,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       }
     }
 
+    let { idToken } = this.tokenManager.getTokensSync();
     if (idToken && this.tokenManager.hasExpired(idToken)) {
       idToken = undefined;
       if (shouldRenew) {
