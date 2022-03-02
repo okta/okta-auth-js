@@ -68,7 +68,7 @@ This module provides convenience methods to support popular scenarios to communi
 
 #### Flow
 
-In addition to the default authentication flow, this SDK supports several pre-defined flows, such as [register](#idxregister) and [recoverPassword](#idxrecoverpassword). A flow can be started by calling one of the available [flow entrypoints](#flow-entrypoints) or by passing a valid flow identifier string to [`startTransaction`](#idxstarttransaction). The `flow` is saved with the transaction which enables the [proceed](#idxproceed) method to corrrectly handle remediations without additional context. Starting a new flow discards any existing in-progress transaction of a different type. For example, if an authentication flow is in-progress, a call to [authenticate](#idxauthenticate) or [proceed](#idxproceed) will continue using the current transaction but a call to [register](#idxregister) or [recoverPassword](#idxrecoverpassword) will start a new transaction.
+In addition to the default authentication flow, this SDK supports several pre-defined flows, such as [register](#idxregister), [recoverPassword](#idxrecoverpassword) and [unlockAccount](#idxunlockaccount). A flow can be started by calling one of the available [flow entrypoints](#flow-entrypoints) or by passing a valid flow identifier string to [`startTransaction`](#idxstarttransaction). The `flow` is saved with the transaction which enables the [proceed](#idxproceed) method to corrrectly handle remediations without additional context. Starting a new flow discards any existing in-progress transaction of a different type. For example, if an authentication flow is in-progress, a call to [authenticate](#idxauthenticate) or [proceed](#idxproceed) will continue using the current transaction but a call to a [flow entrypoint](#flow-entrypoints) will start a new transaction.
 
 ```javascript
 
@@ -88,6 +88,7 @@ The [flow](#flow) is set automatically when calling one of these methods:
 - [`idx.authenticate`](#idxauthenticate)
 - [`idx.register`](#idxregister)
 - [`idx.recoverPassword`](#idxrecoverpassword)
+- [`idx.unlockAccount`](#idxunlockaccount)
 
 The `flow` will be set to `default` unless otherwise specified in [`idx.startTransaction`](#idxstarttransaction)
 
@@ -426,6 +427,56 @@ const {
   status, // IdxStatus.SUCCESS 
   tokens
 } = await authClient.idx.proceed({ password: 'xxx' });
+```
+
+#### `idx.unlockAccount`
+
+The convenience method for starting a self service account recovery` flow.
+
+Example (Account unlock with email authenticator verification)
+
+**Up-Front**:
+
+```javascript
+const { 
+  status, // IdxStatus.PENDING
+  nextStep: { 
+    inputs // [{ name: 'verificationCode', ... }]
+  }
+} = await authClient.idx.unlockAccount({
+  username: 'xxx',
+  authenticators: [AuthenticatorKey.OKTA_EMAIL /* 'okta_email' */]
+});
+// submit verification code
+const { 
+  status,  // IdxStatus.TERMINAL
+  messages // 'Your Account is now unlocked!'
+} = await authClient.idx.proceed({ verificationCode: 'xxx' });
+```
+
+**On-Demand**:
+
+```javascript
+const { 
+  status, // IdxStatus.PENDING
+  nextStep: { 
+    inputs // [{ name: 'username', ... }]
+  } 
+} = await authClient.idx.unlockAccount();
+// gather username from user input and
+// user sees a list of authenticators and selects "email"
+const { 
+  status, // IdxStatus.PENDING
+  nextStep: { 
+    inputs, // [{ name: 'authenticator', ... }] 
+    options // [{ name: 'email', ... }, ...]
+  } 
+} = await authClient.idx.proceed({ username, authenticator: AuthenticatorKey.OKTA_EMAIL });
+// gather verification code from email (this call should happen in a separated request)
+const { 
+  status,  // IdxStatus.TERMINAL
+  messages // 'Your Account is now unlocked!'
+} = await authClient.idx.proceed({ verificationCode: 'xxx' });
 ```
 
 #### `idx.start`

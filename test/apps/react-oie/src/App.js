@@ -142,6 +142,7 @@ export default function App() {
       <button onClick={startIdxFlow('authenticate')}>Login</button>
       <button onClick={startIdxFlow('recoverPassword')}>Recover Password</button>
       <button onClick={startIdxFlow('register')}>Registration</button>
+      <button onClick={startIdxFlow('unlockAccount')}>Unlock Account</button>
       <button onClick={startIdxFlow('idp')}>IDP</button>
     </div>
   );

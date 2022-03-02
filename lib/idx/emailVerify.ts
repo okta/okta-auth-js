@@ -15,7 +15,6 @@ import { OktaAuthInterface } from '../types';
 
 import CustomError from '../errors/CustomError';
 import { urlParamsToObject  } from '../oidc/util/urlParams';
-import { saveTransactionMeta } from './transactionMeta';
 
 export interface EmailVerifyCallbackResponse {
   state: string;
@@ -51,7 +50,6 @@ export function parseEmailVerifyCallback(urlPath: string): EmailVerifyCallbackRe
 export async function handleEmailVerifyCallback(authClient: OktaAuthInterface, search: string) {
   if (isEmailVerifyCallback(search)) {
     const { state, otp } = parseEmailVerifyCallback(search);
-    await saveTransactionMeta(authClient, { state });
     if (authClient.idx.canProceed({ state })) {
       // same browser / device
       return await authClient.idx.proceed({ state, otp });

@@ -26,7 +26,7 @@ import {
   FlowIdentifier,
 } from '../types';
 import { IdxResponse, isIdxResponse } from './types/idx-js';
-import { getSavedTransactionMeta } from './transactionMeta';
+import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { ProceedOptions } from './proceed';
 
 export type RunOptions = ProceedOptions & RemediateOptions & {
@@ -233,6 +233,10 @@ export async function run(
 
   if (shouldClearTransaction) {
     authClient.transactionManager.clear({ clearSharedStorage });
+  }
+  else if (meta?.state) {
+    // ensures state is saved to sessionStorage
+    saveTransactionMeta(authClient, { ...meta });
   }
   
   // from idx-js, used by the widget
