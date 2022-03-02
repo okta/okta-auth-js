@@ -12,6 +12,7 @@
 
 
 const express = require('express');
+
 const { 
   getAuthClient,
   handleTransaction,
@@ -26,15 +27,27 @@ router.get('/register', async (req, res, next) => {
     entry: '/register'
   });
   const authClient = getAuthClient(req);
-  const trans = await authClient.idx.register();
-  if (trans.error) {
-    next(trans.error);
+
+  const { query } = req;
+  const activationToken = query['activationToken'] || query['token'];
+
+  const transaction = await authClient.idx.register({ activationToken });
+  if (transaction.error) {
+    next(transaction.error);
     return;
   }
 
   const {
-    nextStep: { inputs }
-  } = trans;
+    nextStep
+  } = transaction;
+
+  const { inputs } = nextStep;
+
+  if (activationToken) {
+    handleTransaction({ req, res, next, authClient, transaction });
+    return; 
+  }
+
   renderTemplate(req, res, 'enroll-profile', {
     action: '/register',
     inputs

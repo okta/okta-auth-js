@@ -146,6 +146,13 @@ Given(
 );
 
 Given(
+  /^a User named "([^/s]+)" created and activated returning activation token$/,
+  async function(this: ActionContext, firstName: string) {
+    await createContextUserAndCredentials.call(this, firstName, ['MFA Required']);
+  }
+);
+
+Given(
   /^an Authenticator Enrollment Policy that has PHONE as optional and EMAIL as required for the Everyone Group$/,
   () => ({}) // no-op
 );

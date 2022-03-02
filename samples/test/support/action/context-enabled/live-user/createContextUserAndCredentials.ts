@@ -16,7 +16,7 @@ import createUser from '../../../management-api/createUser';
 import ActionContext, {getReusedContext } from '../../../context';
 import { Scenario } from '../../../scenario';
 
-export default async function (this: ActionContext, firstName: string, assignToGroups?: string[]): Promise<void> {
+export default async function (this: ActionContext, firstName: string, assignToGroups?: string[], activate: boolean = true): Promise<void> {
   // Scenario 10.1.3
   if (this.isCurrentScenario(Scenario.TOTP_SIGN_IN_REUSE_SHARED_SECRET)) {
     // reuse context
@@ -27,7 +27,7 @@ export default async function (this: ActionContext, firstName: string, assignToG
   } else {
     const credentials = this.credentials || await createCredentials(firstName, this.featureName);
     this.credentials = credentials;
-    const user = await createUser(credentials, assignToGroups);
+    const user = await createUser(credentials, assignToGroups, activate);
     this.user = user;
   }
 } 

@@ -18,7 +18,7 @@ import { UserCredentials } from './createCredentials';
 
 const userGroup = 'Basic Auth Web';
 
-export default async (credentials: UserCredentials, assignToGroups = [userGroup]): Promise<User> => {
+export default async (credentials: UserCredentials, assignToGroups = [userGroup], activate: boolean = true): Promise<User> => {
   const config = getConfig();
   const oktaClient = new Client({
     orgUrl: config.orgUrl,
@@ -54,7 +54,7 @@ export default async (credentials: UserCredentials, assignToGroups = [userGroup]
         password : { value: credentials.password }
       }
     }, {
-      activate: true
+      activate: activate
     });
 
     await oktaClient.assignUserToApplication(config.clientId as string, {
