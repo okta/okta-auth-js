@@ -17,7 +17,8 @@ import { IdxResponseFactory } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
   return {
-    getSavedTransactionMeta: () => {}
+    getSavedTransactionMeta: () => {},
+    saveTransactionMeta: () => {}
   };
 });
 
@@ -233,6 +234,14 @@ describe('idx/run', () => {
         nextStep: 'remediate-nextStep',
         status: IdxStatus.PENDING,
       });
+    });
+
+    it('saves `state` in transaction meta', async () => {
+      const { authClient, transactionMeta } = testContext;
+
+      jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+      await run(authClient);
+      expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, transactionMeta);
     });
   });
 
