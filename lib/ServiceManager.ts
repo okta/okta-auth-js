@@ -56,6 +56,13 @@ export class ServiceManager implements ServiceManagerInterface {
     this.services = new Map();
     this.onLeaderDuplicate = this.onLeaderDuplicate.bind(this);
     this.onLeader = this.onLeader.bind(this);
+
+    ServiceManager.knownServices.forEach(name => {
+      const svc = this.createService(name);
+      if (svc) {
+        this.services.set(name, svc);
+      }
+    });
   }
 
   public static canUseLeaderElection() {
@@ -80,11 +87,18 @@ export class ServiceManager implements ServiceManagerInterface {
     return this.elector?.hasLeader;
   }
 
+  isLeaderRequired() {
+    return [...this.services.values()].some(srv => srv.requiresLeadership());
+  }
+
   start() {
     if (this.started) {
       this.stop();
     }
-    this.startElector();
+    // only start election if a leader is required
+    if (this.isLeaderRequired()) {
+      this.startElector();
+    }
     this.startServices();
     this.started = true;
   }
@@ -100,14 +114,10 @@ export class ServiceManager implements ServiceManagerInterface {
   }
 
   private startServices() {
-    for (const name of ServiceManager.knownServices) {
-      const srv = this.createService(name);
-      if (srv) {
-        const canStart = srv.canStart() && !srv.isStarted() && (srv.requiresLeadership() ? this.isLeader() : true);
-        if (canStart) {
-          srv.start();
-          this.services.set(name, srv);
-        }
+    for (const srv of this.services.values()) {
+      const canStart = srv.canStart() && !srv.isStarted() && (srv.requiresLeadership() ? this.isLeader() : true);
+      if (canStart) {
+        srv.start();
       }
     }
   }
@@ -120,6 +130,7 @@ export class ServiceManager implements ServiceManagerInterface {
   }
 
   private startElector() {
+    this.stopElector();
     if (ServiceManager.canUseLeaderElection()) {
       if (!this.channel) {
         const { broadcastChannelName } = this.options;
@@ -134,8 +145,10 @@ export class ServiceManager implements ServiceManagerInterface {
   }
 
   private stopElector() {
-    this.elector?.die();
-    this.elector = undefined;
+    if (this.elector) {
+      this.elector?.die();
+      this.elector = undefined;
+    }
   }
 
   private createService(name: string): ServiceInterface {
