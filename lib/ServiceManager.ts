@@ -138,7 +138,7 @@ export class ServiceManager implements ServiceManagerInterface {
     this.elector = undefined;
   }
 
-  private createService(name: string): ServiceInterface | undefined {
+  private createService(name: string): ServiceInterface {
     const tokenManager = this.sdk.tokenManager;
 
     let service: ServiceInterface | undefined;
