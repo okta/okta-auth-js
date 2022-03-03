@@ -34,16 +34,17 @@ import {
   RefreshToken
 } from './types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
-import { TokenService } from './services/TokenService';
 
 const DEFAULT_OPTIONS = {
+  // TODO: remove in next major version - OKTA-473815
   autoRenew: true,
   autoRemove: true,
+  syncStorage: true,
+  // --- //
   clearPendingRemoveTokens: true,
   storage: undefined, // will use value from storageManager config
   expireEarlySeconds: 30,
   storageKey: TOKEN_STORAGE_NAME,
-  syncStorage: true,
   _storageEventDelay: 0
 };
 export const EVENT_EXPIRED = 'expired';
@@ -69,18 +70,17 @@ export class TokenManager implements TokenManagerInterface {
   private storage: StorageProvider;
   private state: TokenManagerState;
   private options: TokenManagerOptions;
-  private service: TokenService | null;
 
   on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
   off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
 
+  // eslint-disable-next-line complexity
   constructor(sdk: OktaAuthInterface, options: TokenManagerOptions = {}) {
     this.sdk = sdk;
     this.emitter = (sdk as any).emitter;
     if (!this.emitter) {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }
-    this.service = null;
     
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
     if (isIE11OrLess()) {
@@ -89,6 +89,7 @@ export class TokenManager implements TokenManagerInterface {
     if (!isLocalhost()) {
       options.expireEarlySeconds = DEFAULT_OPTIONS.expireEarlySeconds;
     }
+
     this.options = options;
 
     const storageOptions: StorageOptions = removeNils({
@@ -111,21 +112,14 @@ export class TokenManager implements TokenManagerInterface {
   }
 
   start() {
-    if (this.service) {
-      this.stop();
-    }
     if (this.options.clearPendingRemoveTokens) {
       this.clearPendingRemoveTokens();
     }
-    this.service = new TokenService(this, this.getOptions());
-    this.service.start();
+    this.setExpireEventTimeoutAll();
   }
   
   stop() {
-    if (this.service) {
-      this.service.stop();
-      this.service = null;
-    }
+    this.clearExpireEventTimeoutAll();
   }
 
   getOptions(): TokenManagerOptions {

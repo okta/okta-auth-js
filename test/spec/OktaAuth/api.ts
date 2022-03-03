@@ -22,6 +22,7 @@ import {
 import tokens from '@okta/test.support/tokens';
 import {postToTransaction} from '../../../lib/tx';
 import { APIError, isAccessToken, isIDToken } from '../../../lib/types';
+import util from '@okta/test.support/util';
 
 describe('OktaAuth (api)', function() {
   let auth;
@@ -39,6 +40,7 @@ describe('OktaAuth (api)', function() {
   describe('service methods', () => {
     beforeEach(() => {
       jest.spyOn(auth.token, 'isLoginRedirect').mockReturnValue(false);
+      util.disableLeaderElection();
     });
     afterEach(() => {
       auth.stop();

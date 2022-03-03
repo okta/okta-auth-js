@@ -16,7 +16,14 @@ import { HttpRequestClient } from './http';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
 import { FlowIdentifier } from '../idx/types';
+import { ServiceManagerOptions } from './Service';
 import OktaAuth from '../OktaAuth';
+
+
+export interface IsAuthenticatedOptions {
+  onExpiredToken?: 'renew' | 'remove' | 'none';
+}
+
 export interface TokenManagerOptions {
   autoRenew?: boolean;
   autoRemove?: boolean;
@@ -61,6 +68,7 @@ export interface OktaAuthOptions extends CustomUrls {
   restoreOriginalUri?: (oktaAuth: OktaAuth, originalUri?: string) => Promise<void>;
   devMode?: boolean;
   storageManager?: StorageManagerOptions;
+  services?: ServiceManagerOptions;
   transactionManager?: TransactionManagerOptions;
   flow?: FlowIdentifier;
   codeChallenge?: string;

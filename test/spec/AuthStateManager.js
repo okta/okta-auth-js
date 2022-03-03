@@ -18,6 +18,7 @@ import { AuthStateManager, INITIAL_AUTH_STATE } from '../../lib/AuthStateManager
 import { AuthSdkError } from '../../lib/errors';
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
+import util from '@okta/test.support/util';
 
 function createAuth() {
   return new OktaAuth({
@@ -129,10 +130,12 @@ describe('AuthStateManager', () => {
         return;
       }
       it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', () => {
+        util.disableLeaderElection();
         jest.useFakeTimers();
         const auth = createAuth();
         auth.authStateManager.updateAuthState = jest.fn();
         auth.tokenManager.start(); // uses TokenService / crossTabs
+        auth.serviceManager.start();
         // simulate localStorage change from other dom context
         window.dispatchEvent(new StorageEvent('storage', {
           key: 'okta-token-storage', 
@@ -143,6 +146,7 @@ describe('AuthStateManager', () => {
         expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
         jest.useRealTimers();
         auth.tokenManager.stop();
+        auth.serviceManager.stop();
       });
     });
 

@@ -205,7 +205,10 @@ oauthUtil.setup = function(opts) {
   oauthUtil.loadWellKnownAndKeysCache(authClient);
 
   if (opts.autoRenew) {
+    util.disableLeaderElection();
+    util.mockLeader();
     authClient.tokenManager.start();
+    authClient.serviceManager.start();
   }
 
   if (opts.tokenManagerAddKeys) {
@@ -295,9 +298,8 @@ oauthUtil.setup = function(opts) {
       if (authClient && authClient._tokenQueue) {
         expect(authClient._tokenQueue.queue.length).toBe(0);
       }
-      if (authClient && authClient.tokenManager) {
-        authClient.tokenManager.stop();
-      }
+      authClient?.tokenManager?.stop();
+      authClient?.serviceManager?.stop();
     });
 };
 

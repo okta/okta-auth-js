@@ -18,7 +18,7 @@ const PROTO = window.location.protocol;
 const REDIRECT_URI = `${PROTO}//${HOST}${LOGIN_CALLBACK_PATH}`;
 const POST_LOGOUT_REDIRECT_URI = `${PROTO}//${HOST}/`;
 const DEFAULT_SIW_VERSION = ''; // blank for local/npm/bundled version
-const DEFAULT_CROSS_TABS_COUNT = 20;
+export const DEFAULT_CROSS_TABS_COUNT = 20;
 
 export interface Config extends OktaAuthOptions {
   defaultScopes: boolean;

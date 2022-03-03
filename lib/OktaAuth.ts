@@ -50,6 +50,7 @@ import {
   ParseFromUrlInterface,
   GetWithRedirectFunction,
   RequestOptions,
+  IsAuthenticatedOptions,
 } from './types';
 import {
   transactionStatus,
@@ -97,6 +98,7 @@ import {
   clone,
 } from './util';
 import { TokenManager } from './TokenManager';
+import { ServiceManager } from './ServiceManager';
 import { get, httpRequest, setRequestHeader } from './http';
 import PromiseQueue from './PromiseQueue';
 import fingerprint from './browser/fingerprint';
@@ -154,6 +156,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   emitter: any;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
+  serviceManager: ServiceManager;
   http: HttpAPI;
   fingerprint: FingerprintAPI;
   _oktaUserAgent: OktaUserAgent;
@@ -350,17 +353,24 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
 
     // AuthStateManager
     this.authStateManager = new AuthStateManager(this);
+
+    // ServiceManager
+    this.serviceManager = new ServiceManager(this, args.services);
   }
 
   start() {
+    // TODO: review tokenManager.start
     this.tokenManager.start();
     if (!this.token.isLoginRedirect()) {
       this.authStateManager.updateAuthState();
     }
+    this.serviceManager.start();
   }
 
   stop() {
+    // TODO: review tokenManager.stop
     this.tokenManager.stop();
+    this.serviceManager.stop();
   }
 
   setHeaders(headers) {
@@ -567,33 +577,37 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
 
   // Returns true if both accessToken and idToken are not expired
   // If `autoRenew` option is set, will attempt to renew expired tokens before returning.
-  async isAuthenticated(): Promise<boolean> {
-
-    let { accessToken, idToken } = this.tokenManager.getTokensSync();
+  async isAuthenticated(options: IsAuthenticatedOptions = {}): Promise<boolean> {
+    // TODO: remove dependency on tokenManager options in next major version - OKTA-473815
     const { autoRenew, autoRemove } = this.tokenManager.getOptions();
 
+    const shouldRenew = options.onExpiredToken ? options.onExpiredToken === 'renew' : autoRenew;
+    const shouldRemove = options.onExpiredToken ? options.onExpiredToken === 'remove' : autoRemove;
+
+    let { accessToken } = this.tokenManager.getTokensSync();
     if (accessToken && this.tokenManager.hasExpired(accessToken)) {
       accessToken = undefined;
-      if (autoRenew) {
+      if (shouldRenew) {
         try {
           accessToken = await this.tokenManager.renew('accessToken') as AccessToken;
         } catch {
           // Renew errors will emit an "error" event 
         }
-      } else if (autoRemove) {
+      } else if (shouldRemove) {
         this.tokenManager.remove('accessToken');
       }
     }
 
+    let { idToken } = this.tokenManager.getTokensSync();
     if (idToken && this.tokenManager.hasExpired(idToken)) {
       idToken = undefined;
-      if (autoRenew) {
+      if (shouldRenew) {
         try {
           idToken = await this.tokenManager.renew('idToken') as IDToken;
         } catch {
           // Renew errors will emit an "error" event 
         }
-      } else if (autoRemove) {
+      } else if (shouldRemove) {
         this.tokenManager.remove('idToken');
       }
     }
