@@ -16,11 +16,15 @@
 // Ponyfill for NodeJS
 // Webpack config excludes this file
 
+import atobModule from 'atob';
+import btoaModule from 'btoa';
+import { Crypto } from '@peculiar/webcrypto';
+
 let a;
 if (typeof atob !== 'undefined') {
   a = atob;
 } else {
-  a = require('atob');
+  a = atobModule;
 }
 export { a as atob };
 
@@ -29,22 +33,23 @@ let b;
 if (typeof btoa !== 'undefined') {
   b = btoa;
 } else {
-  b = require('btoa');
+  b = btoaModule;
 }
 export { b as btoa };
 
-let crypto;
-try {
-  crypto = require('crypto');
-} catch (err) {
-  // this environment has no crypto module!
-}
+const crypto = (async () => {
+  try {
+    return await import('crypto');
+  } catch (err) {
+    // this environment has no crypto module!
+    return undefined;
+  }
+})();
 
 let webcrypto;
 if (typeof crypto !== 'undefined' && crypto['webcrypto']) {
   webcrypto = crypto['webcrypto'];
 } else {
-  const { Crypto } = require('@peculiar/webcrypto');
   webcrypto = new Crypto();
 }
 

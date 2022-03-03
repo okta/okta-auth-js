@@ -6,9 +6,19 @@
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "build/cjs/index.js",
-  "module": "build/esm/index.js",
+  "module": "build/esm/esm.node.mjs",
   "browser": "build/dist/okta-auth-js.umd.js",
   "types": "build/lib/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./build/esm/esm.node.mjs",
+      "require": "./build/cjs/index.js"
+    },
+    "browser": {
+      "import": "./build/esm/esm.browser.js"
+    },
+    "default": "./build/dist/okta-auth-js.umd.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/okta/okta-auth-js.git"
@@ -20,7 +30,7 @@
     "banners": "node ./scripts/maintain-banners.js",
     "clean": "yarn clean:build",
     "clean:build": "rimraf build && rimraf build2",
-    "dev": "webpack --config webpack.dev.config.js",
+    "dev": "NODE_ENV=development yarn build:esm --watch",
     "lint": "eslint .",
     "tsd": "tsd",
     "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",
@@ -36,7 +46,9 @@
     "test:report": "yarn test --ci --silent || true",
     "test:samples": "yarn workspace @okta/test.e2e.samples start",
     "test:integration": "jest --config ./jest.integration.js",
-    "test:bundle:esm": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
+    "test:bundle:esm:browser": "cross-env BUNDLE_ENV=browser NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
+    "test:bundle:esm:node": "cross-env BUNDLE_ENV=node NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
+    "test:bundle:cjs": "cross-env BUNDLE_ENV=node jest --config ./jest.cjs.js",
     "build": "node scripts/build.js",
     "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js",
@@ -78,7 +90,7 @@
     "btoa": "^1.2.1",
     "core-js": "^3.6.5",
     "cross-fetch": "^3.1.5",
-    "js-cookie": "2.2.1",
+    "js-cookie": "^3.0.1",
     "jsonpath-plus": "^6.0.1",
     "node-cache": "^5.1.2",
     "p-cancelable": "^2.0.0",

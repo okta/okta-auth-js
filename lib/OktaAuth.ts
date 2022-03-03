@@ -133,9 +133,9 @@ import {
   clearTransactionMeta,
   isTransactionMetaValid
 } from './idx/transactionMeta';
-
-// eslint-disable-next-line import/no-commonjs
-const Emitter = require('tiny-emitter');
+// @ts-ignore 
+// Do not use this type in code, so it won't be emitted in the declaration output
+import Emitter from 'tiny-emitter';
 
 class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   options: OktaAuthOptions;
@@ -151,7 +151,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   features!: FeaturesAPI;
   token: TokenAPI;
   _tokenQueue: PromiseQueue;
-  emitter: typeof Emitter;
+  emitter: any;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
   http: HttpAPI;

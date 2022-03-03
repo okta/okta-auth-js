@@ -9,15 +9,15 @@
  * 
  * See the License for the specific language governing permissions and limitations under the License.
  */
-
-
+ 
+// @ts-ignore 
+// Do not use this type in code, so it won't be emitted in the declaration output
+import PCancelable from 'p-cancelable';
 import { AuthSdkError } from './errors';
 import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from '.';
 import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
-// eslint-disable-next-line import/no-commonjs
-const PCancelable = require('p-cancelable');
 
 export const INITIAL_AUTH_STATE = null;
 const DEFAULT_PENDING = {
@@ -43,7 +43,7 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
 export class AuthStateManager {
   _sdk: OktaAuth;
   _pending: { 
-    updateAuthStatePromise: typeof PCancelable;
+    updateAuthStatePromise: any;
     canceledTimes: number; 
   };
   _authState: AuthState | null;

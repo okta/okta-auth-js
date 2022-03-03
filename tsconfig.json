@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "composite": false,
-    "module": "es6",
+    "module": "es2020",
     "target": "es6",
     "allowJs": true,
     "checkJs": true,
