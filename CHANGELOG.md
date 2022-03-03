@@ -7,6 +7,18 @@
 - [#1113](https://github.com/okta/okta-auth-js/pull/1113) Updates types for `SigninWithCredentialsOptions` and `SignInOptions` to support `SP Initiated Auth`
 - [#1125](https://github.com/okta/okta-auth-js/pull/1125) IDX - Supports auto select methodType (when only one selection is available) for `authenticator-verification-data` remediation
 
+### Fixes
+
+- [#1130](https://github.com/okta/okta-auth-js/pull/1130) `state` now stored in session during verifyEmail flow
+
+### Other
+
+- [#1124](https://github.com/okta/okta-auth-js/pull/1124)
+  - Adds multi-tab "leadership" election to prevent all tabs from renewing tokens at the same time
+  - Adds granular configurations for `autoRenew` (active vs passive)
+  - Adds options to `isAuthenticated` to override client configuration
+  - Fixes issue in token renew logic within `isAuthenticated`, tokens are now read from `tokenManager` (not memory) before expiration is checked
+
 ## 6.1.0
 
 ### Features
