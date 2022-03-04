@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 
 const envModule = require('@okta/env');
-envModule.setEnvironmentVarsFromTestEnv();
+envModule.setEnvironmentVarsFromTestEnv(__dirname);
 
 const env = {};
 // List of environment variables made available to the app

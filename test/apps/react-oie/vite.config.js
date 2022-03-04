@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { visualizer } from 'rollup-plugin-visualizer';
 import envModule from '@okta/env';
 
-envModule.setEnvironmentVarsFromTestEnv();
+envModule.setEnvironmentVarsFromTestEnv(__dirname);
 
 const env = {};
 // List of environment variables made available to the app

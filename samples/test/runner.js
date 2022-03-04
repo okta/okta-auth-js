@@ -13,7 +13,7 @@
 
 /* eslint-disable no-console */
 
-require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
+require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 
 const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
