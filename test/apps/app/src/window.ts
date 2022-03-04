@@ -134,6 +134,8 @@ Object.assign(window, {
           autoRenew: true,
           autoRemove: false,
           syncStorage: config?.tokenManager?.syncStorage,
+        };
+        config.services = {
           broadcastChannelName: config.clientId + '_crossTabTest'
         };
         config.isTokenRenewPage = true;
