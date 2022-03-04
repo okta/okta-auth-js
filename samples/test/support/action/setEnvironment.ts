@@ -23,7 +23,7 @@ import startApp from './startApp';
 
 export default async (envName: string) => {
   // update variables for runner process
-  env.setEnvironmentVarsFromTestEnvYaml(envName);
+  env.setEnvironmentVarsFromTestEnvYaml(envName, __dirname);
 
   // update variables for server process
   await startApp('/', { testenv: envName });

@@ -10,22 +10,13 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
 const dotenv = require('dotenv');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
-const ROOT_DIR = path.resolve(__dirname, '..');
 
-// Read environment variables from "testenv". Override environment vars if they are already set.
-const TESTENV = path.resolve(ROOT_DIR, 'testenv');
-
-// Multiple sets of environment variables can be stored in a file called "testenv.yml"
-const TESTENV_YAML = path.resolve(ROOT_DIR, 'testenv.yml');
-
-if (fs.existsSync(TESTENV)) {
-  setEnvironmentVarsFromTestEnv();
-}
+const TESTENV_FILE = 'testenv';
+const TESTENV_YAML = 'testenv.yml';
 
 function setEnvironmentVars(envConfig) {
   Object.keys(envConfig).forEach((k) => {
@@ -36,32 +27,32 @@ function setEnvironmentVars(envConfig) {
   });  
 }
 
-function setEnvironmentVarsFromTestEnv() {
-  if (!fs.existsSync(TESTENV)) {
+function getPath(filename, currDir = __dirname) {
+  let res, prevDir;
+  // stop when find testenv file or reach to root dir
+  while (!fs.existsSync(res) && currDir !== prevDir)  {
+    prevDir = currDir;
+    res = path.resolve(currDir, filename);
+    currDir = path.resolve(currDir, '..');
+  }
+  return fs.existsSync(res) ? res : null;
+}
+
+function setEnvironmentVarsFromTestEnv(currDir) {
+  const testEnvPath = getPath(TESTENV_FILE, currDir);
+  if (!testEnvPath) {
     return;
   }
-  const envConfig = dotenv.parse(fs.readFileSync(TESTENV));
+  const envConfig = dotenv.parse(fs.readFileSync(testEnvPath));
   setEnvironmentVars(envConfig);
 }
 
-function loadTestEnvYaml() {
-  if (!fs.existsSync(TESTENV_YAML)) {
+function setEnvironmentVarsFromTestEnvYaml(name, currDir) {
+  const testEnvPath = getPath(TESTENV_YAML, currDir);
+  if (!testEnvPath) {
     return;
   }
-
-  return yaml.load(fs.readFileSync(TESTENV_YAML, 'utf8'));
-}
-
-function getTestEnvironmentNames() {
-  const doc = loadTestEnvYaml();
-  if (!doc) {
-    return;
-  }
-  return Object.keys(doc);
-}
-
-function setEnvironmentVarsFromTestEnvYaml(name) {
-  const doc = loadTestEnvYaml();
+  const doc = yaml.load(fs.readFileSync(testEnvPath, 'utf8'));
   if (!doc) {
     console.log(`Can't load testenv.yml`);
     return;
@@ -79,8 +70,6 @@ function setEnvironmentVarsFromTestEnvYaml(name) {
 }
 
 module.exports = {
-  setEnvironmentVars,
   setEnvironmentVarsFromTestEnv,
-  setEnvironmentVarsFromTestEnvYaml,
-  getTestEnvironmentNames
+  setEnvironmentVarsFromTestEnvYaml
 };

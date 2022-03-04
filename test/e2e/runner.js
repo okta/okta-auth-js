@@ -17,7 +17,7 @@ const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
 const { config, configPredicate } = require('./config');
 
-env.setEnvironmentVarsFromTestEnv();
+env.setEnvironmentVarsFromTestEnv(__dirname);
 
 const getTask = (config) => () => {
   return new Promise(resolve => {

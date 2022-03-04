@@ -13,7 +13,7 @@
 
 /* eslint-disable no-console */
 
-require('@okta/env').setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
+require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 
 const createProxyMiddleware = require('./proxyMiddleware');
 const loginMiddleware = require('./loginMiddleware');
