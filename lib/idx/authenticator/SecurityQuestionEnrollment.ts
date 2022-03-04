@@ -23,7 +23,7 @@ export class SecurityQuestionEnrollment extends Authenticator<SecurityQuestionEn
 
   getInputs() {
     return [
-      { name: 'questionKey', type: 'string', require: true },
+      { name: 'questionKey', type: 'string', required: true },
       { name: 'question', type: 'string', label: 'Create a security question' },
       { name: 'answer', type: 'string', label: 'Answer', required: true },
     ];
