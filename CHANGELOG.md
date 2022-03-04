@@ -1,4 +1,9 @@
 # Changelog
+## 6.3.0
+
+### Fixes
+
+- [#1136](https://github.com/okta/okta-auth-js/pull/1136) Fixes typo in security question enrollment
 
 ## 6.2.0
 
@@ -11,7 +16,6 @@
 ### Fixes
 
 - [#1114](https://github.com/okta/okta-auth-js/pull/1114) Fixes ESM browser bundle issue by only using ESM `import` syntax
-- [#1136](https://github.com/okta/okta-auth-js/pull/1136) Fixes typo in security question enrollment
 
 ### Fixes
 
