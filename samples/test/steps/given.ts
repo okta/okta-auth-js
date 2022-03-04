@@ -45,8 +45,8 @@ import ActionContext from '../support/context';
 import attachSSRPolicy from
   '../support/action/context-enabled/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
 import createContextUser from '../support/action/context-enabled/live-user/createContextUser';
-import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
-
+import activateContextUserActivationToken from 
+  '../support/action/context-enabled/live-user/activateContextUserActivationToken';
 
 Given(
   /^^a Profile Enrollment policy defined .* (?=by .* and a random property *.).*/,
@@ -149,7 +149,7 @@ Given(
 Given(
   /^a User named "([^/s]+)" is created in staged state$/,
   async function(this: ActionContext, firstName: string) {
-    await createContextUserAndCredentials.call(this, firstName, [''], false);
+    await createContextUserAndCredentials.call(this, firstName, ['MFA Required'], false);
   }
 );
 

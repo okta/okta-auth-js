@@ -13,15 +13,12 @@
 
 import { User } from '@okta/okta-sdk-nodejs';
 
-export default async function(user: User) : Promise<void> {
+export default async function(user: User): Promise<void> {
   const sendEmail = { sendEmail : false };
   const token = await user.activate(sendEmail);
-  console.log(token);
-  console.log(token);
-  console.log(token);
-  console.log(token);
-  console.log(token);
-  const url = `http://localhost:8080/register?activationToken=${token}`;
-  browser.url(url);
+
+  const baseUrl = browser.options.baseUrl;
+  const registerWithActivationTokenUrl = `${baseUrl}/register?activationToken=${token.activationToken}`;
+  browser.url(registerWithActivationTokenUrl);
 }
 

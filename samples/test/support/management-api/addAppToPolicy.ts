@@ -10,13 +10,10 @@ export default async function(policyId: string, appId: string) {
   });
 
   try {
-    const issuer = config.issuer?.replace('/oauth2/default', '');
+    const orgUrl = config.issuer?.replace('/oauth2/default', '');
     let policy = await oktaClient.getPolicy(policyId);
-    let mappingsUrl = `${issuer}/api/v1/policies/${policyId}/mappings?forceCreate=true`;
-    await oktaClient.http.post(mappingsUrl, { body: JSON.stringify({
-      resourceId: appId,
-      resourceType: 'APP',
-    })});
+    let assignAppToPolicyUrl = `${orgUrl}/api/v1/apps/${appId}/policies/${policyId}`;
+    await oktaClient.http.put(assignAppToPolicyUrl);
     return policy;
   } catch (err) {
     console.warn('Unable to create policy-to-app mapping.', policyId, appId);
