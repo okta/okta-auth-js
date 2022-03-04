@@ -12,7 +12,7 @@
 
 
 const env = require('./env')();
-env.setEnvironmentVarsFromTestEnv(); // Set environment variables from "testenv" file
+env.setEnvironmentVarsFromTestEnv(__dirname);
 
 module.exports = function () {
   const { 
