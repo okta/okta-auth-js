@@ -11,10 +11,12 @@
  */
 
 const dotenv = require('dotenv');
+const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
 
 const TESTENV_FILE = 'testenv';
+const TESTENV_YAML = 'testenv.yml';
 
 function setEnvironmentVars(envConfig) {
   Object.keys(envConfig).forEach((k) => {
@@ -25,19 +27,19 @@ function setEnvironmentVars(envConfig) {
   });  
 }
 
-function getPath(currDir = __dirname) {
+function getPath(filename, currDir = __dirname) {
   let res, prevDir;
   // stop when find testenv file or reach to root dir
   while (!fs.existsSync(res) && currDir !== prevDir)  {
     prevDir = currDir;
     currDir = path.resolve(currDir, '..');
-    res = path.resolve(currDir, TESTENV_FILE);
+    res = path.resolve(currDir, filename);
   }
   return fs.existsSync(res) ? res : null;
 }
 
 function setEnvironmentVarsFromTestEnv(currDir) {
-  const testEnvPath = getPath(currDir);
+  const testEnvPath = getPath(TESTENV_FILE, currDir);
   if (!testEnvPath) {
     return;
   }
@@ -45,6 +47,29 @@ function setEnvironmentVarsFromTestEnv(currDir) {
   setEnvironmentVars(envConfig);
 }
 
+function setEnvironmentVarsFromTestEnvYaml(name, currDir) {
+  const testEnvPath = getPath(TESTENV_YAML, currDir);
+  if (!testEnvPath) {
+    return;
+  }
+  const doc = yaml.load(fs.readFileSync(testEnvPath, 'utf8'));
+  if (!doc) {
+    console.log(`Can't load testenv.yml`);
+    return;
+  }
+
+  if (doc.default) {
+    console.log(`Loading environment variables from testenv.yml: "default"`);
+    setEnvironmentVars(doc.default);
+  }
+
+  if (doc[name]) {
+    console.log(`Loading environment variables from testenv.yml: "${name}"`);
+    setEnvironmentVars(doc[name]);
+  }
+}
+
 module.exports = {
-  setEnvironmentVarsFromTestEnv
+  setEnvironmentVarsFromTestEnv,
+  setEnvironmentVarsFromTestEnvYaml
 };
