@@ -18,7 +18,8 @@ import { UserCredentials } from './createCredentials';
 
 const userGroup = 'Basic Auth Web';
 
-export default async (credentials: UserCredentials, assignToGroups = [userGroup]): Promise<User> => {
+export default async (credentials: UserCredentials, assignToGroups = [userGroup], activate = true): 
+  Promise<User> => {
   const config = getConfig();
   const oktaClient = new Client({
     orgUrl: config.orgUrl,
@@ -43,19 +44,33 @@ export default async (credentials: UserCredentials, assignToGroups = [userGroup]
       testGroup = await oktaClient.createGroup(basicAuthGroup);
     }
 
-    user = await oktaClient.createUser({
-      profile: {
-        firstName: credentials.firstName,
-        lastName: credentials.lastName,
-        email: credentials.emailAddress,
-        login: credentials.emailAddress
-      },
-      credentials: {
-        password : { value: credentials.password }
-      }
-    }, {
-      activate: true
-    });
+    if (activate === false) {
+      // Create user without password
+      user = await oktaClient.createUser({
+        profile: {
+          firstName: credentials.firstName,
+          lastName: credentials.lastName,
+          email: credentials.emailAddress,
+          login: credentials.emailAddress
+        }
+      }, {
+        activate: activate
+      });
+    } else {
+      user = await oktaClient.createUser({
+        profile: {
+          firstName: credentials.firstName,
+          lastName: credentials.lastName,
+          email: credentials.emailAddress,
+          login: credentials.emailAddress
+        },
+        credentials: {
+          password : { value: credentials.password }
+        }
+      }, {
+        activate: activate
+      });
+    }
 
     await oktaClient.assignUserToApplication(config.clientId as string, {
       id: user.id

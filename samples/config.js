@@ -91,6 +91,7 @@ const samples = [
       'self-service-password-recovery', 
       'self-service-registration',
       'self-service-registration-custom-attribute',
+      'self-service-registration-activation-token',
       'mfa-password-and-email',
       'mfa-password-and-sms',
       'social-login-mfa',

@@ -45,7 +45,8 @@ import ActionContext from '../support/context';
 import attachSSRPolicy from
   '../support/action/context-enabled/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
 import createContextUser from '../support/action/context-enabled/live-user/createContextUser';
-
+import activateContextUserActivationToken from 
+  '../support/action/context-enabled/live-user/activateContextUserActivationToken';
 
 Given(
   /^^a Profile Enrollment policy defined .* (?=by .* and a random property *.).*/,
@@ -143,6 +144,18 @@ Given(
   async function(this: ActionContext, firstName: string) {
     await createContextUserAndCredentials.call(this, firstName, ['MFA Required']);
   }
+);
+
+Given(
+  /^a User named "([^/s]+)" is created in staged state$/,
+  async function(this: ActionContext, firstName: string) {
+    await createContextUserAndCredentials.call(this, firstName, ['MFA Required'], false);
+  }
+);
+
+Given(
+  /^Mary opens the Self Service Registration View with activation token/,
+  activateContextUserActivationToken
 );
 
 Given(
