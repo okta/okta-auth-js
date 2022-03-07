@@ -417,11 +417,19 @@ export class TokenManager implements TokenManagerInterface {
         return tokens[tokenType];
       })
       .catch(err => {
-        // If renew fails, remove token from storage and emit error
-        this.remove(key);
-        err.tokenKey = key;
-        this.emitError(err);
-        throw err;
+        // If renew has been performed succesfully from other tab, use fresh token
+        const currentTokens = this.getTokensSync();
+        const currentToken = currentTokens[key];
+        if (currentToken && !this.hasExpired(currentToken)) {
+          this.setTokens(currentTokens);
+          return currentToken;
+        } else {
+          // If renew fails, remove token from storage and emit error
+          this.remove(key);
+          err.tokenKey = key;
+          this.emitError(err);
+          throw err;
+        }
       })
       .finally(() => {
         // Remove existing promise key

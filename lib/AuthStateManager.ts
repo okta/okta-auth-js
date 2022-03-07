@@ -14,7 +14,7 @@
 // Do not use this type in code, so it won't be emitted in the declaration output
 import PCancelable from 'p-cancelable';
 import { AuthSdkError } from './errors';
-import { AuthState, AuthStateLogOptions } from './types';
+import { AuthState, AuthStateLogOptions, IsAuthenticatedOptions } from './types';
 import { OktaAuth } from '.';
 import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
@@ -70,7 +70,7 @@ export class AuthStateManager {
     });
     sdk.tokenManager.on(EVENT_REMOVED, (key, token) => {
       this._setLogOptions({ event: EVENT_REMOVED, key, token });
-      this.updateAuthState();
+      this.updateAuthState({ onExpiredToken: 'none' });
     });
   }
 
@@ -86,7 +86,7 @@ export class AuthStateManager {
     return this._prevAuthState;
   }
 
-  async updateAuthState(): Promise<AuthState> {
+  async updateAuthState(options: IsAuthenticatedOptions = {}): Promise<AuthState> {
     const { transformAuthState, devMode } = this._sdk.options;
 
     const log = (status) => {
@@ -155,7 +155,7 @@ export class AuthStateManager {
         this._pending = { ...DEFAULT_PENDING };
       };
 
-      this._sdk.isAuthenticated()
+      this._sdk.isAuthenticated(options)
         .then(() => {
           if (cancelablePromise.isCanceled) {
             resolve();
