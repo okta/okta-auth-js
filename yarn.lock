@@ -2919,16 +2919,16 @@
   dependencies:
     tslib "^2.0.0"
 
-"@peculiar/webcrypto@1.1.6":
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/@peculiar/webcrypto/-/webcrypto-1.1.6.tgz#484bb58be07149e19e873861b585b0d5e4f83b7b"
-  integrity sha512-xcTjouis4Y117mcsJslWAGypwhxtXslkVdRp7e3tHwtuw0/xCp1te8RuMMv/ia5TsvxomcyX/T+qTbRZGLLvyA==
+"@peculiar/webcrypto@1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@peculiar/webcrypto/-/webcrypto-1.3.2.tgz#8ea98f1410068cf7da0c7e74758a21caa26caf8d"
+  integrity sha512-oUgNj+8oT7uROEMEpZZ3U+kZjyxj1KXuvA8P5kiMUveTya9eyS8KTqu/dzdEtYC3u7dvjknVz+0sUfkWOBHfQg==
   dependencies:
-    "@peculiar/asn1-schema" "^2.0.27"
+    "@peculiar/asn1-schema" "^2.0.44"
     "@peculiar/json-schema" "^1.1.12"
-    pvtsutils "^1.1.2"
-    tslib "^2.1.0"
-    webcrypto-core "^1.2.0"
+    pvtsutils "^1.2.2"
+    tslib "^2.3.1"
+    webcrypto-core "^1.7.1"
 
 "@peculiar/webcrypto@^1.1.4":
   version "1.1.7"
@@ -2940,17 +2940,6 @@
     pvtsutils "^1.1.6"
     tslib "^2.2.0"
     webcrypto-core "^1.2.0"
-
-"@peculiar/webcrypto@^1.3.2":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@peculiar/webcrypto/-/webcrypto-1.3.2.tgz#8ea98f1410068cf7da0c7e74758a21caa26caf8d"
-  integrity sha512-oUgNj+8oT7uROEMEpZZ3U+kZjyxj1KXuvA8P5kiMUveTya9eyS8KTqu/dzdEtYC3u7dvjknVz+0sUfkWOBHfQg==
-  dependencies:
-    "@peculiar/asn1-schema" "^2.0.44"
-    "@peculiar/json-schema" "^1.1.12"
-    pvtsutils "^1.2.2"
-    tslib "^2.3.1"
-    webcrypto-core "^1.7.1"
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
