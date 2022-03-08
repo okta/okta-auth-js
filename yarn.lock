@@ -2862,6 +2862,35 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
+"@okta/odyssey-design-tokens@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@okta/odyssey-design-tokens/-/odyssey-design-tokens-0.10.0.tgz#8d9df6efa33e3484f51dae3f60ef64db6de76087"
+  integrity sha512-3YLjtyRZrZlynxWMmAzTAhNrN2Xtmki8ubSKIfFlZpKa/aGSTdH4Jzv6j+A7bIa8HkiOrRnPdj1WW2JXJhFLqw==
+
+"@okta/odyssey-react-theme@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@okta/odyssey-react-theme/-/odyssey-react-theme-0.10.0.tgz#95d3124ae700d36559eea6eca5f4f7cdc598d508"
+  integrity sha512-jZ0yHeegx+JqBMdU9rXOg68WQzN9cAlhFxgWQLh/qMvxWzmx8Czv3M8JBP2TRODdo5BEG4IlkX3DFDOQFNf9Ew==
+  dependencies:
+    "@okta/odyssey-design-tokens" "^0.10.0"
+    hoist-non-react-statics "^3.3.2"
+
+"@okta/odyssey-react@0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@okta/odyssey-react/-/odyssey-react-0.10.0.tgz#e87af44f39a013b5bb9b2b34bf968ae9f859bcfd"
+  integrity sha512-gYvjaQ2GOW3KV89Y/lcfU9amzEaSA39Dn/hJTrtL91zEGjOZTAg7e9rbFVlbrD6hyG7mZP53PUbUMHghZelScA==
+  dependencies:
+    "@okta/odyssey-react-theme" "^0.10.0"
+    choices.js "^9.0.1"
+
+"@okta/okta-react@^6.4.3":
+  version "6.4.3"
+  resolved "https://registry.yarnpkg.com/@okta/okta-react/-/okta-react-6.4.3.tgz#bcb28dafbcdb46e27ef1f899a8e6d2ab57c4ab7c"
+  integrity sha512-fxMs74ICGq/C2GWAiIcTsO/MCEVgpaKnu6J11qzWHjiUIWbIABYTyM6RqECXJ5YdmmtzrliYLZ8xxSMvlZAg7A==
+  dependencies:
+    "@babel/runtime" "^7.11.2"
+    compare-versions "^4.1.2"
+
 "@okta/okta-sdk-nodejs@^6.4.0":
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-sdk-nodejs/-/okta-sdk-nodejs-6.4.0.tgz#ac5620d9eefca908b9c672c425768ce066c3238d"
@@ -6762,6 +6791,15 @@ check-types@^11.1.1:
   resolved "https://registry.yarnpkg.com/check-types/-/check-types-11.1.2.tgz#86a7c12bf5539f6324eb0e70ca8896c0e38f3e2f"
   integrity sha512-tzWzvgePgLORb9/3a0YenggReLKAIb2owL03H2Xdoe5pKcUyWRSEQ8xfCar8t2SIAuEDwtmx2da1YB52YuHQMQ==
 
+choices.js@^9.0.1:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/choices.js/-/choices.js-9.1.0.tgz#fdf5c1f9df4f85f015fb82c01841f22d15b56ee0"
+  integrity sha512-6NnqiE/MNnNAiMzdW7phJ49nMQylkKMQ6La6PAS1+h1VhrGt38MOPnjzEJ3cRaECieqaGpl9eFGtI2icW27r8A==
+  dependencies:
+    deepmerge "^4.2.2"
+    fuse.js "^3.4.6"
+    redux "^4.1.2"
+
 chokidar@^2.0.0, chokidar@^2.1.8:
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.1.8.tgz#804b3a7b6a99358c3c5c61e71d8728f041cff917"
@@ -7202,6 +7240,11 @@ commondir@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
   integrity sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=
+
+compare-versions@^4.1.2:
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-4.1.3.tgz#8f7b8966aef7dc4282b45dfa6be98434fc18a1a4"
+  integrity sha512-WQfnbDcrYnGr55UwbxKiQKASnTtNnaAWVi8jZyy8NTpVAXWACSne8lMD1iaIo9AiU6mnuLvSVshCzewVuWxHUg==
 
 component-emitter@^1.2.1:
   version "1.3.0"
@@ -10507,6 +10550,11 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
+fuse.js@^3.4.6:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-3.6.1.tgz#7de85fdd6e1b3377c23ce010892656385fd9b10c"
+  integrity sha512-hT9yh/tiinkmirKrlv4KWOjztdoZo1mx9Qh4KvWqC7isoXwdUY3PNWUxceF4/qO9R6riA2C29jdTOeQOIROjgw==
+
 gaze@^1.1.2:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/gaze/-/gaze-1.1.3.tgz#c441733e13b927ac8c0ff0b4c3b033f28812924a"
@@ -11273,7 +11321,7 @@ hmac-drbg@^1.0.1:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.1"
 
-hoist-non-react-statics@^3.1.0:
+hoist-non-react-statics@^3.1.0, hoist-non-react-statics@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz#ece0acaf71d62c2969c2ec59feff42a4b1a85b45"
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
@@ -18273,6 +18321,13 @@ redent@^3.0.0:
   dependencies:
     indent-string "^4.0.0"
     strip-indent "^3.0.0"
+
+redux@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-4.1.2.tgz#140f35426d99bb4729af760afcf79eaaac407104"
+  integrity sha512-SH8PglcebESbd/shgf6mii6EIoRM0zrQyjcuQ+ojmfxjTtE0z9Y8pa62iA/OJ58qjP6j27uyW4kUF4jl/jd6sw==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
 
 reflect-metadata@0.1.13:
   version "0.1.13"

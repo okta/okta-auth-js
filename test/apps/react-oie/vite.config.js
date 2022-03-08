@@ -7,7 +7,7 @@ envModule.setEnvironmentVarsFromTestEnv(__dirname);
 
 const env = {};
 // List of environment variables made available to the app
-['ISSUER', 'CLIENT_ID', 'SPA_CLIENT_ID'].forEach((key) => {
+['ISSUER', 'CLIENT_ID'].forEach((key) => {
   if (!process.env[key]) {
     throw new Error(`Environment variable ${key} must be set. See README.md`);
   }
