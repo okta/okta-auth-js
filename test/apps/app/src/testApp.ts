@@ -128,9 +128,6 @@ const Toolbar = `
       <li class="pure-menu-item">
         <a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)" class="pure-menu-link">Subscribe to TokenManager events</a>
       </li>
-      <li class="pure-menu-item">
-        <a id="cross-tab-token-renew" onclick="simulateCrossTabTokenRenew(event)" class="pure-menu-link">Simulate cross-tab token renew</a>
-      </li>
   </div>
 `;
 
@@ -140,6 +137,7 @@ function getLayout(app: TestApp): string {
       <div id="session-expired" style="color: orange"></div>
       <div id="token-error" style="color: red"></div>
       <div id="token-msg" style="color: green"></div>
+      <div id="auth-required-test-msg"></div>
       ${app.config.isTokenRenewPage ? '' : Toolbar}
       <div id="cross-tab-test"></div>
       <div id="page-content"></div>
@@ -170,6 +168,7 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
     testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp),
     testConcurrentLoginViaTokenRenewFailure: testApp.testConcurrentLoginViaTokenRenewFailure.bind(testApp),
+    testAuthRequired: testApp.testAuthRequired.bind(testApp),
     subscribeToAuthState: testApp.subscribeToAuthState.bind(testApp),
     subscribeToTokenEvents: testApp.subscribeToTokenEvents.bind(testApp),
     simulateCrossTabTokenRenew: testApp.simulateCrossTabTokenRenew.bind(testApp),
@@ -318,48 +317,86 @@ class TestApp {
     document.getElementById('token-error').innerText = error as string;
   }
 
-  async bootstrapProtected(): Promise<void> {
-    this.getSDKInstance();
-    const { idToken, accessToken } = this.oktaAuth.tokenManager.getTokensSync();
+  appProtectedHTML(): string {
+    const authState = this.oktaAuth.authStateManager.getAuthState();
     let content;
-    if (idToken || accessToken) {
+    if (authState?.isAuthenticated) {
       content = `
         ${homeLink(this)}
+        <div class="pure-menu">
+          <ul class="pure-menu-list actions">
+            <li class="pure-menu-item">
+              <a id="test-auth-required" onclick="testAuthRequired(event)" class="pure-menu-link">Test auth required</a>
+            </li>
+          </ul>
+        </div>
         ${logoutLink(this)}
         <hr/>
-        <strong>You are authenticated</strong>
+        <strong id="auth-status-text">You are authenticated</strong>
       `;
     } else {
-      content = `
-        ${homeLink(this)}
-        <hr/>
-        <strong>You are NOT authenticated. Login using one of these methods:</strong>
-        ${loginLinks(this, true)}
-      `;
+      if (this.isAppInitialization()) {
+        content = `
+          ${homeLink(this)}
+          <hr/>
+          <strong id="auth-status-text">You are NOT authenticated.<br />You are being redirected to sign-in page automatically...</strong>
+        `;
+      } else {
+        content = `
+          ${homeLink(this)}
+          <hr/>
+          <strong id="auth-status-text">You are NOT authenticated.<br />Sign-in again using one of these methods:</strong>
+          ${loginLinks(this, true)}
+        `;
+      }
       this.config.state = 'protected-route-' + Math.round(Math.random() * 1000);
       this.oktaAuth.setOriginalUri(this.protectedUrl, this.config.state);
     }
+    return content;
+  }
+
+  async bootstrapProtected(): Promise<void> {
+    this.getSDKInstance();
 
     // simulate SecureRoute behaviour
-    this.oktaAuth.authStateManager.subscribe((authState: AuthState) => {
-      if (!authState.isAuthenticated) {
-        document.title = 'Auth required';
-        this.checkAuthRequired();
-      }
+    this.oktaAuth.authStateManager.subscribe(() => {
+      this.checkAuthRequired();
     });
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        this.checkAuthRequired();
-      }
+      this.checkAuthRequired();
     });
+    this.oktaAuth.start();
 
-    this._setContent(content);
+    this.render();
     this._afterRender('protected');
+
+    this.prepareForTestAuthRequired();
+  }
+
+  isAppInitialization(): boolean {
+    const previousAuthState = this.oktaAuth.authStateManager.getPreviousAuthState();
+    const authState = this.oktaAuth.authStateManager.getAuthState();
+    return !previousAuthState && !authState?.isAuthenticated;
   }
 
   checkAuthRequired(): void {
-    if (document.visibilityState === 'visible' && this.oktaAuth.authStateManager.getAuthState()?.isAuthenticated == false) {
-      this.oktaAuth.signInWithRedirect();
+    const authState = this.oktaAuth.authStateManager.getAuthState();
+    if (!authState.isAuthenticated) {
+      document.title = 'Protected: Auth required';
+    } else {
+      document.title = 'Protected';
+    }
+
+    if (document.visibilityState === 'visible') {
+      this.render();
+    }
+
+    if (document.visibilityState === 'visible' && this.isAppInitialization()) {
+      // App initialization stage
+      // Sign in with redirect automatically
+      setTimeout(() => {
+        this.oktaAuth.signInWithRedirect();
+      }, 100);
     }
   }
 
@@ -407,7 +444,6 @@ class TestApp {
       clearInterval(renewTimer);
     });
   }
-
 
   async renderRenewStatus(): Promise<void> {
     const tokenStorage = await this.oktaAuth.tokenManager.getTokens();
@@ -823,6 +859,90 @@ class TestApp {
       });
   }
 
+  prepareForTestAuthRequired(): void {
+    window.addEventListener('message', async (e) => {
+      if (e.data?.name === 'logout') {
+        // Logout
+        await this.oktaAuth.revokeAccessToken();
+        this.oktaAuth.tokenManager.clear();
+        // Wait for render on auth state change
+        setTimeout(() => {
+          const authStatusText = document.getElementById('auth-status-text')?.innerText;
+          window.postMessage({
+            name: 'logout_answer',
+            value: authStatusText
+          }, window.location.origin);
+        }, 10);
+      } else if (e.data?.name === 'authStatusText') {
+        const authStatusText = document.getElementById('auth-status-text')?.innerText;
+        window.postMessage({
+          name: 'authStatusText_answer',
+          value: authStatusText
+        }, window.location.origin);
+      }
+    });
+  }
+
+  testAuthRequired(): void {
+    // Open protected page in new tab #1 and trigger logout
+    // Expected text in tab #1: "You are NOT authenticated. Sign-in again using one of these methods:"
+    const w1 = window.open(this.protectedUrl);
+    w1.addEventListener('load', () => {
+      setTimeout(() => {
+        w1.postMessage({
+          name: 'logout'
+        }, window.location.origin);
+      }, 500);
+    }, false);
+    w1.addEventListener('message', async (e) => {
+      if (e.data?.name === 'logout_answer') {
+        const authStatusText_tab1 = e.data.value;
+        // Current tab is hidden for now.
+        // Expected text in current tab: "You are authenticated"
+        // Close tab #1 and return visibility for current tab.
+        // Then expected text in current tab: "You are NOT authenticated. Sign-in again using one of these methods:"
+        const authStatusText_hidden = document.getElementById('auth-status-text')?.innerText;
+        w1.close();
+        window.focus();
+        setTimeout(() => {
+          const authStatusText_visible = document.getElementById('auth-status-text')?.innerText;
+          // Open tab #2
+          // Expected text in tab #2: "You are NOT authenticated. You are being redirected to sign-in page automatically..."
+          const w2 = window.open(this.protectedUrl);
+          w2.addEventListener('load', () => {
+            w2.postMessage({
+              name: 'authStatusText'
+            }, window.location.origin);
+          }, false);
+          w2.addEventListener('message', async (e) => {
+            if (e.data?.name === 'authStatusText_answer') {
+              const authStatusText_tab2 = e.data.value;
+              // Close tab #2 and complete test
+              w2.close();
+              window.focus();
+
+              const isOk = authStatusText_tab1.includes('Sign-in again') 
+                && authStatusText_hidden.includes('You are authenticated') 
+                && authStatusText_visible.includes('Sign-in again') 
+                && authStatusText_tab2.includes('You are being redirected to sign-in page automatically');
+              if (isOk) {
+                document.getElementById('auth-required-test-msg').innerHTML = 'auth required test passed';
+              } else {
+                document.getElementById('auth-required-test-msg').innerHTML = 'auth required test NOT passed';
+                console.warn({
+                  authStatusText_tab1,
+                  authStatusText_hidden,
+                  authStatusText_visible,
+                  authStatusText_tab2,
+                });
+              }
+            }
+          });
+        }, 10);
+      }
+    });
+  }
+
   // To test this, open another tab and logout from the Okta session
   // The token renew should fail, triggering an error event.
   // Two concurrent login attempts should then be running
@@ -854,6 +974,10 @@ class TestApp {
   }
 
   appHTML(props: Tokens): string {
+    if (window.location.pathname.includes("/protected")) {
+      return this.appProtectedHTML();
+    }
+
     const { idToken, accessToken, refreshToken } = props || {};
     if (idToken || accessToken) {
       // Authenticated user home page
@@ -892,6 +1016,9 @@ class TestApp {
                 </li>
                 <li class="pure-menu-item">
                   <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)" class="pure-menu-link pure-menu-item">Test Concurrent login via token renew failure</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="cross-tab-token-renew" onclick="simulateCrossTabTokenRenew(event)" class="pure-menu-link">Simulate cross-tab token renew</a>
                 </li>
                 ${protectedLink(this)}
               </ul>
