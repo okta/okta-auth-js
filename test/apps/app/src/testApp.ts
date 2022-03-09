@@ -871,7 +871,7 @@ class TestApp {
             name: 'logout_answer',
             value: authStatusText
           }, window.location.origin);
-        }, 10);
+        }, 100);
       } else if (e.data?.name === 'authStatusText') {
         const authStatusText = document.getElementById('auth-status-text')?.innerText;
         window.postMessage({
@@ -896,7 +896,7 @@ class TestApp {
     w1.addEventListener('message', async (e) => {
       if (e.data?.name === 'logout_answer') {
         const authStatusTextTab1 = e.data.value;
-        // Current tab is hidden for now.
+        // Current tab is not in focus for now.
         // Expected text in current tab: "You are authenticated"
         // Close tab #1 and return visibility for current tab.
         // Then expected text in current tab: "You are NOT authenticated. Sign-in again using one of these methods:"
@@ -917,24 +917,26 @@ class TestApp {
             if (e.data?.name === 'authStatusText_answer') {
               const authStatusTextTab2 = e.data.value;
               // Close tab #2 and complete test
-              w2.close();
-              window.focus();
-
-              const isOk = authStatusTextTab1.includes('Sign-in again') 
-                && authStatusTextHidden.includes('You are authenticated') 
-                && authStatusTextVisible.includes('Sign-in again') 
-                && authStatusTextTab2.includes('You are being redirected to sign-in page automatically');
-              if (isOk) {
-                document.getElementById('auth-required-test-msg').innerHTML = 'auth required test passed';
-              } else {
-                document.getElementById('auth-required-test-msg').innerHTML = 'auth required test NOT passed';
-                console.warn({
-                  authStatusTextTab1,
-                  authStatusTextHidden,
-                  authStatusTextVisible,
-                  authStatusTextTab2,
-                });
-              }
+              setTimeout(() => {
+                w2.close();
+                window.focus();
+  
+                const isOk = authStatusTextTab1.includes('Sign-in again') 
+                  && authStatusTextHidden.includes('You are authenticated') 
+                  && authStatusTextVisible.includes('Sign-in again') 
+                  && authStatusTextTab2.includes('You are being redirected to sign-in page automatically');
+                if (isOk) {
+                  document.getElementById('auth-required-test-msg').innerHTML = 'auth required test passed';
+                } else {
+                  document.getElementById('auth-required-test-msg').innerHTML = 'auth required test NOT passed';
+                  console.warn({
+                    authStatusTextTab1,
+                    authStatusTextHidden,
+                    authStatusTextVisible,
+                    authStatusTextTab2,
+                  });
+                }
+              }, 500);
             }
           });
         }, 10);
