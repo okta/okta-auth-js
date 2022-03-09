@@ -24,7 +24,6 @@ import {
   isAuthorizationCodeError,
   IdxStatus,
   IdxTransaction,
-  AuthState,
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -896,16 +895,16 @@ class TestApp {
     }, false);
     w1.addEventListener('message', async (e) => {
       if (e.data?.name === 'logout_answer') {
-        const authStatusText_tab1 = e.data.value;
+        const authStatusTextTab1 = e.data.value;
         // Current tab is hidden for now.
         // Expected text in current tab: "You are authenticated"
         // Close tab #1 and return visibility for current tab.
         // Then expected text in current tab: "You are NOT authenticated. Sign-in again using one of these methods:"
-        const authStatusText_hidden = document.getElementById('auth-status-text')?.innerText;
+        const authStatusTextHidden = document.getElementById('auth-status-text')?.innerText;
         w1.close();
         window.focus();
         setTimeout(() => {
-          const authStatusText_visible = document.getElementById('auth-status-text')?.innerText;
+          const authStatusTextVisible = document.getElementById('auth-status-text')?.innerText;
           // Open tab #2
           // Expected text in tab #2: "You are NOT authenticated. You are being redirected to sign-in page automatically..."
           const w2 = window.open(this.protectedUrl);
@@ -916,24 +915,24 @@ class TestApp {
           }, false);
           w2.addEventListener('message', async (e) => {
             if (e.data?.name === 'authStatusText_answer') {
-              const authStatusText_tab2 = e.data.value;
+              const authStatusTextTab2 = e.data.value;
               // Close tab #2 and complete test
               w2.close();
               window.focus();
 
-              const isOk = authStatusText_tab1.includes('Sign-in again') 
-                && authStatusText_hidden.includes('You are authenticated') 
-                && authStatusText_visible.includes('Sign-in again') 
-                && authStatusText_tab2.includes('You are being redirected to sign-in page automatically');
+              const isOk = authStatusTextTab1.includes('Sign-in again') 
+                && authStatusTextHidden.includes('You are authenticated') 
+                && authStatusTextVisible.includes('Sign-in again') 
+                && authStatusTextTab2.includes('You are being redirected to sign-in page automatically');
               if (isOk) {
                 document.getElementById('auth-required-test-msg').innerHTML = 'auth required test passed';
               } else {
                 document.getElementById('auth-required-test-msg').innerHTML = 'auth required test NOT passed';
                 console.warn({
-                  authStatusText_tab1,
-                  authStatusText_hidden,
-                  authStatusText_visible,
-                  authStatusText_tab2,
+                  authStatusTextTab1,
+                  authStatusTextHidden,
+                  authStatusTextVisible,
+                  authStatusTextTab2,
                 });
               }
             }
@@ -974,7 +973,7 @@ class TestApp {
   }
 
   appHTML(props: Tokens): string {
-    if (window.location.pathname.includes("/protected")) {
+    if (window.location.pathname.includes('/protected')) {
       return this.appProtectedHTML();
     }
 
