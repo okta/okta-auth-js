@@ -395,7 +395,7 @@ class TestApp {
       // Sign in with redirect automatically
       setTimeout(() => {
         this.oktaAuth.signInWithRedirect();
-      }, 100);
+      }, 500);
     }
   }
 
@@ -891,7 +891,7 @@ class TestApp {
         w1.postMessage({
           name: 'logout'
         }, window.location.origin);
-      }, 500);
+      }, 100);
     }, false);
     w1.addEventListener('message', async (e) => {
       if (e.data?.name === 'logout_answer') {
@@ -920,10 +920,10 @@ class TestApp {
               setTimeout(() => {
                 w2.close();
                 window.focus();
-  
+                
                 const isOk = authStatusTextTab1.includes('Sign-in again') 
                   && authStatusTextHidden.includes('You are authenticated') 
-                  && authStatusTextVisible.includes('Sign-in again') 
+                  && (this.oktaAuth.tokenManager.getOptions().syncStorage ? authStatusTextVisible.includes('Sign-in again') : true)
                   && authStatusTextTab2.includes('You are being redirected to sign-in page automatically');
                 if (isOk) {
                   document.getElementById('auth-required-test-msg').innerHTML = 'auth required test passed';
