@@ -83,7 +83,7 @@ describe('TokenManager renew', () => {
       setItem: (key, val) => mockTokenStore[key] = val,
     };
   
-    const buildAuthClient = () => {
+    const buildAuthClient = (tokenManagerOptions = {}) => {
       const authClient = new OktaAuth({
         pkce: false,
         issuer: 'https://auth-js-test.okta.com',
@@ -91,7 +91,8 @@ describe('TokenManager renew', () => {
         redirectUri: 'https://example.com/redirect',
         tokenManager: {
           autoRenew: false,
-          storage: storageProvider
+          storage: storageProvider,
+          ...tokenManagerOptions
         },
       });
       // mock functions
@@ -165,6 +166,26 @@ describe('TokenManager renew', () => {
   
       expect(errorHandler).toHaveBeenCalledTimes(0);
       expect(renewedHandler).toHaveBeenCalledTimes(4); // 2 for each client (1 for access token, 1 for id token)
+    });
+
+    it('should not try passive token renew when active renew resulted in error', async () => {
+      const errorHandler = jest.fn();
+      const authClient = buildAuthClient({
+        autoRenew: true,
+        autoRemove: false,
+      });
+      authClient.tokenManager.on('error', errorHandler);
+      const renewTokensMock = jest.spyOn(authClient.token, 'renewTokens').mockRejectedValue(new Error('HTTP 429'));
+      
+      expect.assertions(3);
+      try {
+        await authClient.tokenManager.renew('accessToken')
+      } catch(e) {
+        expect(e).toBeInstanceOf(Error);
+      }
+
+      expect(errorHandler).toHaveBeenCalledTimes(1);
+      expect(renewTokensMock).toHaveBeenCalledTimes(1);
     });
 
   });
