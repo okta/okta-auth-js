@@ -179,7 +179,7 @@ describe('TokenManager renew', () => {
       
       expect.assertions(3);
       try {
-        await authClient.tokenManager.renew('accessToken')
+        await authClient.tokenManager.renew('accessToken');
       } catch(e) {
         expect(e).toBeInstanceOf(Error);
       }
