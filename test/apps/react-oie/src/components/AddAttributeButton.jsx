@@ -73,8 +73,9 @@ const AddAttributeButton = ({
           <Heading level="1" visualLevel="4">{heading}</Heading>
           <TextInput 
             type="text" 
-            label="Verificarion Code" 
+            label="Verification Code" 
             name="verificationCode" 
+            autoComplete="off"
             value={verificationCode} 
             onChange={handleVerificationCodeChange} 
           />
