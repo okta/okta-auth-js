@@ -41,6 +41,10 @@ function loginDirect(options) {
 
 describe('spa-app: ' + sampleConfig.name, () => {
 
+  afterEach(async () => {
+    await browser.reloadSession();
+  });
+
   it('can login using redirect', async () => {
     await startApp('/', { authMethod: 'redirect', requireUserSession: true });
     await loginRedirect();
