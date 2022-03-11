@@ -1,0 +1,11 @@
+.container {
+  overflow: hidden;
+  word-wrap: break-word;
+  border-style: dashed;
+  color: #8d6e97;
+}
+
+.container h1,
+.container span{
+  color: #8d6e97;
+}
