@@ -13,15 +13,15 @@ import { useTransaction } from '../TransactionContext';
 
 const AddAttributeButton = ({ 
   heading, 
-  inputLabel,
+  initInputLabel,
+  autoStartTransaction,
   onStartTransaction, 
   onFinishTransaction,
-  onClick,
   children
 }) => {
   const { myAccountTransaction, setMyAccountTransaction } = useTransaction();
-  const [inputLabelState, setInputLabelState] = useState(inputLabel);
-  const [adding, setAdding] = useState(false);
+  const [inputLabel, setInputLabel] = useState(initInputLabel);
+  const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
   const [error, setError] = useState(null);
 
@@ -30,31 +30,37 @@ const AddAttributeButton = ({
       handleFinishTransaction();
     }
     if (myAccountTransaction?.status === 'UNVERIFIED') {
-      setInputLabelState('Verification Code');
+      setInputLabel('Verification Code');
     }
   }, [myAccountTransaction]);
 
   const handleFinishTransaction = () => {
-    onFinishTransaction();
-    setAdding(false);
     setValue('');
     setMyAccountTransaction(null);
+    setError(null);
+    setOpen(false);
+    onFinishTransaction();
   };
 
   const handleButtonClick = async () => {
-    if (onClick) {
+    if (autoStartTransaction) {
       try {
-        const transaction = await onClick();
+        const transaction = await onStartTransaction();
         setMyAccountTransaction(transaction);
       } catch (err) {
         setError(err);
       }
     }
-    setAdding(true);
+    setOpen(true);
   };
 
   const handleChange = (e, v) => {
     setValue(v);
+  };
+
+  const handleCancel = async (e) => {
+    e.preventDefault();
+    handleFinishTransaction();
   };
 
   const handleSubmit = async (e) => {
@@ -82,7 +88,7 @@ const AddAttributeButton = ({
 
   return (
     <>
-    <Modal open={adding} onClose={handleFinishTransaction}>
+    <Modal open={open} onClose={handleFinishTransaction}>
       <Form heading={heading} onSubmit={handleSubmit}>
         <Form.Error>
           {error && (
@@ -96,13 +102,13 @@ const AddAttributeButton = ({
         <Form.Main>
           <TextInput 
             type="text" 
-            label={inputLabelState} 
+            label={inputLabel} 
             value={value} 
             onChange={handleChange} 
           />
         </Form.Main>
         <Form.Actions>
-          <Button variant="clear" onClick={handleFinishTransaction}>Cancel</Button>
+          <Button variant="clear" onClick={handleCancel}>Cancel</Button>
           <Button type="submit">Continue</Button> 
         </Form.Actions>
       </Form>

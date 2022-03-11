@@ -78,7 +78,6 @@ const IdentifiersSection = () => {
 
   const handleRemoveEmail = async (emailId) => {
     await deleteEmail(oktaAuth, emailId);
-    setEmails(null);
   };
 
   const startAddPhoneTransaction = async phone => {
@@ -87,7 +86,6 @@ const IdentifiersSection = () => {
 
   const handleRemovePhone = async (phoneId) => {
     await deletePhone(oktaAuth, phoneId);
-    setPhones(null);
   };
 
   const startEmailVerificationTransaction = async (email) => {
@@ -116,8 +114,8 @@ const IdentifiersSection = () => {
                   {email.status === 'VERIFIED' ? (
                     <Box marginLeft="s">
                       <AddAttributeButton 
-                        heading="Verify Email"
-                        inputLabel="Email"
+                        heading="Edit Email"
+                        initInputLabel="Email"
                         onStartTransaction={startUpdateEmailTransaction.bind(null, email)} 
                         onFinishTransaction={finishEmailTransaction}
                       >
@@ -129,8 +127,9 @@ const IdentifiersSection = () => {
                     <Box marginLeft="s">
                       <AddAttributeButton 
                         heading="Verify Email"
-                        inputLabel="Verification Code"
-                        onClick={startEmailVerificationTransaction.bind(null, email)} 
+                        initInputLabel="Verification Code"
+                        autoStartTransaction
+                        onStartTransaction={startEmailVerificationTransaction.bind(null, email)} 
                         onFinishTransaction={finishEmailTransaction}
                       >
                         Verify
@@ -140,7 +139,8 @@ const IdentifiersSection = () => {
                       <RemoveButton 
                         heading="Are you sure you want to remove this email?" 
                         description={email.profile.email}
-                        onConfirm={handleRemoveEmail.bind(null, email.id)}
+                        onStartTransaction={handleRemoveEmail.bind(null, email.id)}
+                        onFinishTransaction={finishEmailTransaction}
                       >
                         Remove
                       </RemoveButton>
@@ -156,7 +156,7 @@ const IdentifiersSection = () => {
             {!emails.some(email => email.roles.includes('SECONDARY')) && (
               <AddAttributeButton 
                 heading="Add secondary email" 
-                inputLabel="Email"
+                initInputLabel="Email"
                 onStartTransaction={startAddSecondaryEmailTransaction} 
                 onFinishTransaction={finishEmailTransaction}
               >
@@ -178,8 +178,9 @@ const IdentifiersSection = () => {
                 <Box marginLeft="s">
                   <AddAttributeButton 
                     heading="Verify Phone Number"
-                    inputLabel="Verification Code"
-                    onClick={startPhoneVerificationTransaction.bind(null, phone)} 
+                    initInputLabel="Verification Code"
+                    autoStartTransaction
+                    onStartTransaction={startPhoneVerificationTransaction.bind(null, phone)} 
                     onFinishTransaction={finishPhoneTransaction}
                   >
                     Verify
@@ -190,7 +191,8 @@ const IdentifiersSection = () => {
                 <RemoveButton 
                   heading="Are you sure you want to remove this phone number?" 
                   description={phone.profile.phoneNumber}
-                  onConfirm={handleRemovePhone.bind(null, phone.id)}
+                  onStartTransaction={handleRemovePhone.bind(null, phone.id)}
+                  onFinishTransaction={finishPhoneTransaction}
                 >
                   Remove
                 </RemoveButton>
@@ -202,7 +204,7 @@ const IdentifiersSection = () => {
           <Box paddingTop="s" paddingBottom="s">
             <AddAttributeButton 
               heading="Add Phone Number"
-              inputLabel="Phone Number"
+              initInputLabel="Phone Number"
               onStartTransaction={startAddPhoneTransaction} 
               onFinishTransaction={finishPhoneTransaction}
             >

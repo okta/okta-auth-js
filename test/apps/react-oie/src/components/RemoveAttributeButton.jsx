@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { Modal, Heading, Box, Button, Text } from '@okta/odyssey-react';
 import LinkButton from "./LinkButton"
 
-const RemoveButton = ({ children, onConfirm, heading, description }) => {
+const RemoveButton = ({ 
+  heading, 
+  description,
+  onStartTransaction, 
+  onFinishTransaction,
+  children
+}) => {
   const [open, setOpen] = useState(false);
 
   const handleButtonClick = () => {
@@ -14,7 +20,8 @@ const RemoveButton = ({ children, onConfirm, heading, description }) => {
   };
 
   const handleConfirm = async () => {
-    await onConfirm();
+    await onStartTransaction();
+    onFinishTransaction();
     setOpen(false);
   };
   
