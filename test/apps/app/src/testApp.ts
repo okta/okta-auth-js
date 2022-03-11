@@ -368,8 +368,6 @@ class TestApp {
 
     this.render();
     this._afterRender('protected');
-
-    this.prepareForTestAuthRequired();
   }
 
   isAppInitialization(): boolean {
@@ -858,90 +856,84 @@ class TestApp {
       });
   }
 
-  prepareForTestAuthRequired(): void {
-    window.addEventListener('message', async (e) => {
-      if (e.data?.name === 'logout') {
-        // Logout
-        await this.oktaAuth.revokeAccessToken();
-        this.oktaAuth.tokenManager.clear();
-        // Wait for render on auth state change
-        setTimeout(() => {
-          const authStatusText = document.getElementById('auth-status-text')?.innerText;
-          window.postMessage({
-            name: 'logout_answer',
-            value: authStatusText
-          }, window.location.origin);
-        }, 100);
-      } else if (e.data?.name === 'authStatusText') {
-        const authStatusText = document.getElementById('auth-status-text')?.innerText;
-        window.postMessage({
-          name: 'authStatusText_answer',
-          value: authStatusText
-        }, window.location.origin);
-      }
-    });
-  }
+  async testAuthRequired(): Promise<void> {
+    // Helpers
+    const waitForWindowLoad = (w: Window, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let loaded = false;
+        const timer = setTimeout(() => {
+          if (!loaded) {
+            reject('Window has not been loaded');
+          }
+        }, timeout);
+        w.addEventListener('load', () => {
+          resolve(undefined);
+          loaded = true;
+          clearTimeout(timer);
+        });
+      });
+    };
+    const sleep = (timeout: number) => {
+      return new Promise((resolve) => {
+        setTimeout(resolve, timeout);
+      });
+    };
 
-  testAuthRequired(): void {
-    // Open protected page in new tab #1 and trigger logout
-    // Expected text in tab #1: "You are NOT authenticated. Sign-in again using one of these methods:"
-    const w1 = window.open(this.protectedUrl);
-    w1.addEventListener('load', () => {
-      setTimeout(() => {
-        w1.postMessage({
-          name: 'logout'
-        }, window.location.origin);
-      }, 100);
-    }, false);
-    w1.addEventListener('message', async (e) => {
-      if (e.data?.name === 'logout_answer') {
-        const authStatusTextTab1 = e.data.value;
-        // Current tab is not in focus for now.
-        // Expected text in current tab: "You are authenticated"
-        // Close tab #1 and return visibility for current tab.
-        // Then expected text in current tab: "You are NOT authenticated. Sign-in again using one of these methods:"
-        const authStatusTextHidden = document.getElementById('auth-status-text')?.innerText;
-        w1.close();
-        window.focus();
-        setTimeout(() => {
-          const authStatusTextVisible = document.getElementById('auth-status-text')?.innerText;
-          // Open tab #2
-          // Expected text in tab #2: "You are NOT authenticated. You are being redirected to sign-in page automatically..."
-          const w2 = window.open(this.protectedUrl);
-          w2.addEventListener('load', () => {
-            w2.postMessage({
-              name: 'authStatusText'
-            }, window.location.origin);
-          }, false);
-          w2.addEventListener('message', async (e) => {
-            if (e.data?.name === 'authStatusText_answer') {
-              const authStatusTextTab2 = e.data.value;
-              // Close tab #2 and complete test
-              setTimeout(() => {
-                w2.close();
-                window.focus();
-                
-                const isOk = authStatusTextTab1.includes('Sign-in again') 
-                  && authStatusTextHidden.includes('You are authenticated') 
-                  && (this.oktaAuth.tokenManager.getOptions().syncStorage ? authStatusTextVisible.includes('Sign-in again') : true)
-                  && authStatusTextTab2.includes('You are being redirected to sign-in page automatically');
-                if (isOk) {
-                  document.getElementById('auth-required-test-msg').innerHTML = 'auth required test passed';
-                } else {
-                  document.getElementById('auth-required-test-msg').innerHTML = 'auth required test NOT passed';
-                  console.warn({
-                    authStatusTextTab1,
-                    authStatusTextHidden,
-                    authStatusTextVisible,
-                    authStatusTextTab2,
-                  });
-                }
-              }, 500);
-            }
-          });
-        }, 10);
+    // Test
+    let w1, w2;
+    try {
+      // Open protected page in new tab #1 and trigger logout
+      // Expected text in tab #1: "You are NOT authenticated. Sign-in again using one of these methods:"
+      w1 = window.open(this.protectedUrl);
+      await waitForWindowLoad(w1);
+      await sleep(100);
+      await this.oktaAuth.revokeAccessToken();
+      this.oktaAuth.tokenManager.clear();
+      await sleep(100); // wait for render on auth state change
+      const authStatusTextTab1 = w1.document.getElementById('auth-status-text')?.innerText;
+      // Current tab is not in focus for now.
+      // Expected text in current tab: "You are authenticated"
+      // Close tab #1 and return visibility for current tab.
+      // Then expected text in current tab: "You are NOT authenticated. Sign-in again using one of these methods:"
+      const authStatusTextHidden = document.getElementById('auth-status-text')?.innerText;
+      w1.close();
+      window.focus();
+      await sleep(10);
+      const authStatusTextVisible = document.getElementById('auth-status-text')?.innerText;
+      // Open tab #2
+      // Expected text in tab #2: "You are NOT authenticated. You are being redirected to sign-in page automatically..."
+      w2 = window.open(this.protectedUrl);
+      await waitForWindowLoad(w2);
+      const authStatusTextTab2 = w2.document.getElementById('auth-status-text')?.innerText;
+      // Close tab #2 and complete test
+      await sleep(500);
+      w2.close();
+      window.focus();
+      
+      const isOk = (this.oktaAuth.tokenManager.getOptions().syncStorage ? authStatusTextTab1.includes('Sign-in again') : true)
+        && authStatusTextHidden.includes('You are authenticated') 
+        && authStatusTextVisible.includes('Sign-in again')
+        && authStatusTextTab2.includes('You are being redirected to sign-in page automatically');
+      if (isOk) {
+        document.getElementById('auth-required-test-msg').innerHTML = 'auth required test passed';
+      } else {
+        document.getElementById('auth-required-test-msg').innerHTML = 'auth required test NOT passed';
+        console.warn({
+          authStatusTextTab1,
+          authStatusTextHidden,
+          authStatusTextVisible,
+          authStatusTextTab2,
+        });
       }
-    });
+    } catch (e) {
+      document.getElementById('auth-required-test-msg').innerHTML = 'Error: ' + (e?.message || e?.toString());
+      if (w1 && !w1.closed) {
+        w1.close();
+      }
+      if (w2 && !w2.closed) {
+        w2.close();
+      }
+    }
   }
 
   // To test this, open another tab and logout from the Okta session
