@@ -60,15 +60,14 @@ const IdentifiersSection = () => {
     setMyAccountTransaction(null);
   };
 
-  const startUpdatePrimaryEmailTransaction = async (email) => {
+  const startUpdateEmailTransaction = async (email) => {
     let transaction = await addEmail(oktaAuth, {
       profile: {
-        email
+        email: email.profile.email
       },
-      sendEmail: false, // true returns 403
-      role: 'PRIMARY'
+      sendEmail: true,
+      role: email.roles[0]
     });
-    transaction = await transaction.challenge();
     setMyAccountTransaction(transaction);
   };
 
@@ -77,10 +76,9 @@ const IdentifiersSection = () => {
       profile: {
         email
       },
-      sendEmail: false, // true returns 403
+      sendEmail: true,
       role: 'SECONDARY'
     });
-    transaction = await transaction.challenge();
     setMyAccountTransaction(transaction);
   };
 
@@ -120,21 +118,20 @@ const IdentifiersSection = () => {
         {!!emails ? (
           <Box>
             {emails.map(email => (
-              <Box key={email.id} display="flex" flexDirection="column">
+              <Box key={email.id} display="flex" flexDirection="column" paddingBottom="s">
                 <Box display="flex" alignItems="center" justifyContent="flex-start">
                   <Text as="strong">{email.label}</Text>
                   <Box marginLeft="s">
-                    <AddAttributeButton 
-                      heading="Verify Email"
-                      inputLabel="Email"
-                      onStartTransaction={startUpdatePrimaryEmailTransaction} 
-                      onFinishTransaction={finishEmailTransaction}
-                    >
-                      Edit
-                    </AddAttributeButton>
-                  </Box>
-                  {email.status === 'UNVERIFIED' && (
-                    <Box marginLeft="s">
+                    {email.status === 'VERIFIED' ? (
+                      !email.roles.includes('SECONDARY') && <AddAttributeButton 
+                        heading="Verify Email"
+                        inputLabel="Email"
+                        onStartTransaction={startUpdateEmailTransaction.bind(null, email)} 
+                        onFinishTransaction={finishEmailTransaction}
+                      >
+                        Edit
+                      </AddAttributeButton>
+                    ) : (
                       <AddAttributeButton 
                         heading="Verify Email"
                         inputLabel="Verification Code"
@@ -143,13 +140,13 @@ const IdentifiersSection = () => {
                       >
                         Verify
                       </AddAttributeButton>
-                    </Box>
-                  )}
+                    )}
+                  </Box>
                   {email.roles.includes('SECONDARY') && (
                     <Box marginLeft="s">
                       <RemoveButton 
                         heading="Are you sure you want to remove this email?" 
-                        description={phone.profile.email}
+                        description={email.profile.email}
                         onConfirm={handleRemoveEmail.bind(null, email.id)}
                       >
                         Remove
@@ -157,7 +154,9 @@ const IdentifiersSection = () => {
                     </Box>
                   )}
                 </Box>
-                <Text>{email.profile.email}</Text>
+                <Box paddingTop="s">
+                  <Text>{email.profile.email}</Text>
+                </Box>
               </Box>
             ))}
             {!emails.some(email => email.roles.includes('SECONDARY')) && (
@@ -178,7 +177,9 @@ const IdentifiersSection = () => {
           <Text as="strong">Phone number</Text>
           {!!phones ? phones.map(phone => (
             <Box key={phone.id} display="flex" alignItems="center">
-              <Text>{phone.profile.phoneNumber}</Text>
+              <Box paddingTop="s">
+                <Text>{phone.profile.phoneNumber}</Text>
+              </Box>
               {phone.status === 'UNVERIFIED' && (
                 <Box marginLeft="s">
                   <AddAttributeButton 
@@ -204,14 +205,16 @@ const IdentifiersSection = () => {
           )) : (
             <Spinner />
           )}
-          <AddAttributeButton 
-            heading="Add Phone Number"
-            inputLabel="Phone Number"
-            onStartTransaction={startAddPhoneTransaction} 
-            onFinishTransaction={finishPhoneTransaction}
-          >
-            Add phone number
-          </AddAttributeButton>
+          <Box paddingTop="s" paddingBottom="s">
+            <AddAttributeButton 
+              heading="Add Phone Number"
+              inputLabel="Phone Number"
+              onStartTransaction={startAddPhoneTransaction} 
+              onFinishTransaction={finishPhoneTransaction}
+            >
+              Add phone number
+            </AddAttributeButton>
+          </Box>
         </Box>
       </Box>
       <Box className="pure-u-1 pure-u-sm-1-2">

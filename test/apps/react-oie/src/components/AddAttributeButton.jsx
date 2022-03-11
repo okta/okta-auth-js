@@ -87,7 +87,7 @@ const AddAttributeButton = ({
         )}
       </Box>
     </Modal>
-    <Box marginTop="s" marginBottom="s">
+    <Box>
       <LinkButton onClick={handleButtonClick}>
         {children}
       </LinkButton>
