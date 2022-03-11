@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   Button, 
@@ -25,6 +25,14 @@ const AddAttributeButton = ({
   const [value, setValue] = useState('');
   const [error, setError] = useState(null);
 
+  const handleFinishTransaction = useCallback(() => {
+    setValue('');
+    setMyAccountTransaction(null);
+    setError(null);
+    setOpen(false);
+    onFinishTransaction();
+  }, [setValue, setError, setOpen, setMyAccountTransaction, onFinishTransaction]);
+
   useEffect(() => {
     if (myAccountTransaction?.status === 'VERIFIED') {
       handleFinishTransaction();
@@ -32,15 +40,7 @@ const AddAttributeButton = ({
     if (myAccountTransaction?.status === 'UNVERIFIED') {
       setInputLabel('Verification Code');
     }
-  }, [myAccountTransaction]);
-
-  const handleFinishTransaction = () => {
-    setValue('');
-    setMyAccountTransaction(null);
-    setError(null);
-    setOpen(false);
-    onFinishTransaction();
-  };
+  }, [myAccountTransaction, handleFinishTransaction]);
 
   const handleButtonClick = async () => {
     if (autoStartTransaction) {

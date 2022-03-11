@@ -1,4 +1,4 @@
-import { Link } from '@okta/odyssey-react';
+import { Link, Box } from '@okta/odyssey-react';
 import { useTransaction } from '../TransactionContext';
 
 const IdpForm = () => {
@@ -10,7 +10,7 @@ const IdpForm = () => {
       <Box>Type: {idpMeta.type}</Box>
       <Link href={idpMeta.href}>Login With Google</Link>
     </Box>
-  )
+  );
 };
 
 export default IdpForm;

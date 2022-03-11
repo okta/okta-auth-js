@@ -19,14 +19,14 @@ const FlowPage = () => {
       ? await oktaAuth.idx.startTransaction() 
       : await oktaAuth.idx[flow]();
     setTransaction(newTransaction);
-  }, [oktaAuth]);
+  }, [oktaAuth, flow, setTransaction]);
 
   useEffect(() => {
     // start a new flow based on path param, `/flow/${flowMethod}`
     if (flow && !transaction) { 
       startFlow();
     }
-  }, [flow]);
+  }, [flow, transaction, startFlow]);
 
   const backToHomePage = async () => {
     await oktaAuth.idx.cancel();
@@ -62,6 +62,6 @@ const FlowPage = () => {
       </Box>
     </Box>
   );
-}
+};
 
 export default FlowPage;

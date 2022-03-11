@@ -19,17 +19,17 @@ const ProfileSection = () => {
     }).catch((err) => {
       console.error(err);
     });
-  }, []);
+  }, [oktaAuth]);
 
   const handleEditNames = () => {
     const newInputs = inputs.map(input => ({ ...input, editing: true, value: profile[input.name] }));
     setInputs(newInputs);
-  }
+  };
 
   const handleCancelEditNames = () => {
     const newInputs = inputs.map(input => ({ ...input, editing: false, value: '' }));
     setInputs(newInputs);
-  }
+  };
 
   const handleUpdateProfiles = async () => {
     const updatedProfile = inputs.reduce((acc, curr) => {
@@ -47,7 +47,7 @@ const ProfileSection = () => {
         input.value = value;
       }
       return input;
-    })
+    });
     setInputs(newInputs);
   };
 

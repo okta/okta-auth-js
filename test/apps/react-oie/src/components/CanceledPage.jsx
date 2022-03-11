@@ -2,7 +2,7 @@ import { Heading, Button } from '@okta/odyssey-react';
 import { useHistory } from 'react-router-dom';
 import { useTransaction } from '../TransactionContext';
 
-export default function() {
+export default function CanceledPage() {
   const history = useHistory();
   const { setTransaction } = useTransaction();
 

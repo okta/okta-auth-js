@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Modal, Heading, Box, Button, Text } from '@okta/odyssey-react';
-import LinkButton from "./LinkButton"
+import LinkButton from './LinkButton';
 
 const RemoveButton = ({ 
   heading, 

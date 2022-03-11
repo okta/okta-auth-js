@@ -22,7 +22,7 @@ const GeneralForm = () => {
     return setInputValues({
       ...inputValues,
       [name]: value || checked
-    })
+    });
   };
 
   const handleSubmit = async e => {
@@ -66,7 +66,7 @@ const GeneralForm = () => {
         {select && (
           <Select label={select.label} name={select.name} onChange={handleChange}>
             <Select.Option key="" value="">---</Select.Option>
-            {select.options.map(({ key, label, value }) => (
+            {select.options.map(({ key, label }) => (
               <Select.Option key={key} value={key}>{label}</Select.Option>
             ))}
           </Select>
@@ -93,6 +93,6 @@ const GeneralForm = () => {
       </Form.Actions>
     </Form>
   );
-}
+};
 
 export default GeneralForm;

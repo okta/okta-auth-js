@@ -8,6 +8,6 @@ const LinkButton = (props) => {
       <Link {...props} />
     </Box>
   );
-}
+};
 
 export default LinkButton;

@@ -1,6 +1,6 @@
 import { useTransaction } from '../TransactionContext';
 
-export default function() {
+export default function TerminalPage() {
   const { 
     transaction: { messages } 
   } = useTransaction();

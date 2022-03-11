@@ -56,7 +56,7 @@ function App() {
     } else if (status === IdxStatus.PENDING) {
       history.replace(`/flow/${meta.flow}`);
     }
-  }, [transaction]);
+  }, [transaction, history]);
 
   useEffect(() => {
     const resumeTransaction = async () => {
@@ -64,12 +64,12 @@ function App() {
       const newTransaction = await oktaAuth.idx.proceed();
       setTransaction(newTransaction);
       setLoading(false);
-    }
+    };
 
     if (!isRedirectUri(window.location.href, oktaAuth) && oktaAuth.idx.canProceed()) {
       resumeTransaction();
     }
-  }, [])
+  }, []);
 
   if (loading) {
     return <Spinner />;
@@ -100,4 +100,6 @@ function App() {
   );
 }
 
-export default () => <Router><App /></Router>;
+export default function AppWithRouter() {
+  return <Router><App /></Router>
+}

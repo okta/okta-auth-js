@@ -26,7 +26,7 @@ const IdentifiersSection = () => {
         if (email.roles.includes('PRIMARY')) {
           email.label = 'Primary email';
         } else {
-          email.label = 'Secondary email'
+          email.label = 'Secondary email';
         }
         return email;
       }));
@@ -34,7 +34,7 @@ const IdentifiersSection = () => {
     if (!emails) {
       fetchEmails();
     }
-  }, [emails]);
+  }, [oktaAuth, emails]);
 
   useEffect(() => {
     const fetchPhones = async () => {
@@ -44,7 +44,7 @@ const IdentifiersSection = () => {
     if (!phones) {
       fetchPhones();
     }
-  }, [phones]);
+  }, [oktaAuth, phones]);
 
   const finishEmailTransaction = () => {
     // re-fetch phones list
@@ -105,7 +105,7 @@ const IdentifiersSection = () => {
         display="flex" 
         flexDirection="column"
       >
-        {!!emails ? (
+        {emails ? (
           <Box>
             {emails.map(email => (
               <Box key={email.id} display="flex" flexDirection="column" paddingBottom="s">
@@ -169,7 +169,7 @@ const IdentifiersSection = () => {
         )}
         <Box>
           <Text as="strong">Phone number</Text>
-          {!!phones ? phones.map(phone => (
+          {phones ? phones.map(phone => (
             <Box key={phone.id} display="flex" alignItems="center" paddingTop="s">
               <Box>
                 <Text>{phone.profile.phoneNumber}</Text>

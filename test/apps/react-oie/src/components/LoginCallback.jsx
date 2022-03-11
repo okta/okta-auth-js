@@ -1,6 +1,7 @@
 import { useEffect } from 'react'; 
 import { useHistory } from 'react-router-dom';
 import { useOktaAuth } from '@okta/okta-react';
+import { hasErrorInUrl, IdxStatus } from '@okta/okta-auth-js';
 import { useTransaction } from '../TransactionContext';
 
 const LoginCallback = () => {
@@ -42,12 +43,12 @@ const LoginCallback = () => {
       } finally {
         history.push('/');
       }
-    }
+    };
 
     if (oktaAuth.idx.isEmailVerifyCallback(window.location.search)) {
       return handleEmailVerifyCallback();
     }
-  }, [history, setTransaction]);
+  }, [oktaAuth, history, setTransaction]);
   
   return null;
 };
