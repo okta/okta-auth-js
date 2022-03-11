@@ -3,35 +3,35 @@ import { getUrl } from './APIUtils';
 
 const OKTA_VERSION = '1.0.0';
 
-const replaceLinksWithFns = (oktaAuth, item) => {
-  const newItem = Object.entries(item._links)
-    .reduce((acc, [ key, value ]) => {
-      if (key === 'self' && value.hints) {
-        value.hints.allow.forEach(method => {
-          acc[method.toLowerCase()] = async (options) => {
+const makeRequest = async (oktaAuth, options) => {
+  const replaceLinksWithFns = (item) => {
+    const newItem = Object.entries(item._links)
+      .reduce((acc, [ key, value ]) => {
+        if (key === 'self' && value.hints) {
+          value.hints.allow.forEach(method => {
+            acc[method.toLowerCase()] = async (options) => {
+              return makeRequest(oktaAuth, {
+                url: value.href,
+                method,
+                ...options
+              });
+            };
+          });
+        } else {
+          acc[key] = async (options) => {
             return makeRequest(oktaAuth, {
               url: value.href,
-              method,
+              method: value.hints.allow[0],
               ...options
             });
           };
-        });
-      } else {
-        acc[key] = async (options) => {
-          return makeRequest(oktaAuth, {
-            url: value.href,
-            method: value.hints.allow[0],
-            ...options
-          });
-        };
-      }
-      return acc;
-    }, item);
-  delete newItem._links;
-  return newItem;
-}
-
-const makeRequest = async (oktaAuth, options) => {
+        }
+        return acc;
+      }, item);
+    delete newItem._links;
+    return newItem;
+  };
+  
   const { url, method, data } = options;
   return oktaAuth.invokeApiMethod({
     headers: { 'okta-version': OKTA_VERSION },
@@ -41,10 +41,10 @@ const makeRequest = async (oktaAuth, options) => {
   }).then(res => {
     let newRes;
     if (Array.isArray(res)) {
-      newRes = res.map(item => replaceLinksWithFns(oktaAuth, item));
+      newRes = res.map(item => replaceLinksWithFns(item));
       newRes.headers = res.headers;
     } else if(res) {
-      res = replaceLinksWithFns(oktaAuth, res);
+      res = replaceLinksWithFns(res);
     }
     return res;
   });
