@@ -59,7 +59,6 @@ const ProfileSection = () => {
   return (
     <Box>
       <Box 
-        className="pure-u-1 pure-u-sm-1-2"
         display="flex" 
         justifyContent="space-between" 
         alignItems="center" 
@@ -71,7 +70,7 @@ const ProfileSection = () => {
           Your Profile
         </Heading>
         { editing ? (
-          <Box>
+          <Box display="flex" alignItems="center">
             <Button variant="clear" onClick={handleCancelEditNames}>Cancel</Button>
             <Button onClick={handleUpdateProfiles}>Save</Button>
           </Box>

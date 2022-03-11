@@ -89,7 +89,7 @@ const GeneralForm = () => {
       </Form.Main>
       <Form.Actions>
         {canSkip && <Button type="button" onClick={handleSkip}>Skip</Button>}
-        <Button variant="primary" wide type="submit">Submit</Button>
+        <Button wide type="submit">Submit</Button>
       </Form.Actions>
     </Form>
   );

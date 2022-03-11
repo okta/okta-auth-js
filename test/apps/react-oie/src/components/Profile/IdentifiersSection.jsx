@@ -13,11 +13,9 @@ import {
   getEmails, 
   getPhones 
 } from '../../api/MyAccountAPI';
-import { useTransaction } from '../../TransactionContext';
 
 const IdentifiersSection = () => {
   const { oktaAuth } = useOktaAuth();
-  const { setMyAccountTransaction } = useTransaction();
   const [emails, setEmails] = useState();
   const [phones, setPhones] = useState();
 
@@ -51,60 +49,54 @@ const IdentifiersSection = () => {
   const finishEmailTransaction = () => {
     // re-fetch phones list
     setEmails(null);
-    setMyAccountTransaction(null);
   };
 
   const finishPhoneTransaction = () => {
     // re-fetch phones list
     setPhones(null);
-    setMyAccountTransaction(null);
   };
 
-  const startUpdateEmailTransaction = async (email) => {
-    let transaction = await addEmail(oktaAuth, {
+  const startUpdateEmailTransaction = async (emailObj, email) => {
+    return addEmail(oktaAuth, {
       profile: {
-        email: email.profile.email
+        email: email
       },
       sendEmail: true,
-      role: email.roles[0]
+      role: emailObj.roles[0]
     });
-    setMyAccountTransaction(transaction);
   };
 
   const startAddSecondaryEmailTransaction = async (email) => {
-    let transaction = await addEmail(oktaAuth, {
+    return addEmail(oktaAuth, {
       profile: {
         email
       },
       sendEmail: true,
       role: 'SECONDARY'
     });
-    setMyAccountTransaction(transaction);
   };
 
   const handleRemoveEmail = async (emailId) => {
     await deleteEmail(oktaAuth, emailId);
-    finishEmailTransaction();
+    setEmails(null);
   };
 
   const startAddPhoneTransaction = async phone => {
-    const transaction = await addPhone(oktaAuth, phone);
-    setMyAccountTransaction(transaction);
+    return addPhone(oktaAuth, phone);
   };
 
   const handleRemovePhone = async (phoneId) => {
     await deletePhone(oktaAuth, phoneId);
-    finishPhoneTransaction();
+    setPhones(null);
   };
 
   const startEmailVerificationTransaction = async (email) => {
-    const transaction = await email.challenge();
-    setMyAccountTransaction(transaction);
+    return email.challenge();
   };
 
   const startPhoneVerificationTransaction = async (phone) => {
     await phone.challenge({ data: { method: 'SMS' } }); // no response
-    setMyAccountTransaction(phone);
+    return phone;
   };
 
   return (
@@ -121,9 +113,9 @@ const IdentifiersSection = () => {
               <Box key={email.id} display="flex" flexDirection="column" paddingBottom="s">
                 <Box display="flex" alignItems="center" justifyContent="flex-start">
                   <Text as="strong">{email.label}</Text>
-                  <Box marginLeft="s">
-                    {email.status === 'VERIFIED' ? (
-                      !email.roles.includes('SECONDARY') && <AddAttributeButton 
+                  {email.status === 'VERIFIED' ? (
+                    <Box marginLeft="s">
+                      <AddAttributeButton 
                         heading="Verify Email"
                         inputLabel="Email"
                         onStartTransaction={startUpdateEmailTransaction.bind(null, email)} 
@@ -131,7 +123,10 @@ const IdentifiersSection = () => {
                       >
                         Edit
                       </AddAttributeButton>
-                    ) : (
+                    </Box>
+                  ) : (
+                    <>
+                    <Box marginLeft="s">
                       <AddAttributeButton 
                         heading="Verify Email"
                         inputLabel="Verification Code"
@@ -140,9 +135,7 @@ const IdentifiersSection = () => {
                       >
                         Verify
                       </AddAttributeButton>
-                    )}
-                  </Box>
-                  {email.roles.includes('SECONDARY') && (
+                    </Box>
                     <Box marginLeft="s">
                       <RemoveButton 
                         heading="Are you sure you want to remove this email?" 
@@ -152,6 +145,7 @@ const IdentifiersSection = () => {
                         Remove
                       </RemoveButton>
                     </Box>
+                    </>
                   )}
                 </Box>
                 <Box paddingTop="s">
@@ -176,8 +170,8 @@ const IdentifiersSection = () => {
         <Box>
           <Text as="strong">Phone number</Text>
           {!!phones ? phones.map(phone => (
-            <Box key={phone.id} display="flex" alignItems="center">
-              <Box paddingTop="s">
+            <Box key={phone.id} display="flex" alignItems="center" paddingTop="s">
+              <Box>
                 <Text>{phone.profile.phoneNumber}</Text>
               </Box>
               {phone.status === 'UNVERIFIED' && (
