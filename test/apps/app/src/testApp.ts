@@ -854,11 +854,12 @@ class TestApp {
       .then(() => {
         document.getElementById('token-msg').innerHTML = 'concurrent test passed';
       });
-  }
+    }
 
+  /* eslint-disable max-statements, complexity */
   async testAuthRequired(): Promise<void> {
     // Helpers
-    const waitForWindowLoad = (w: Window, timeout = 5000) => {
+    const waitForWindowLoad = (w: Window, timeout = 5000): Promise<void> => {
       return new Promise((resolve, reject) => {
         let loaded = false;
         const timer = setTimeout(() => {
@@ -873,7 +874,7 @@ class TestApp {
         });
       });
     };
-    const sleep = (timeout: number) => {
+    const sleep = (timeout: number): Promise<void> => {
       return new Promise((resolve) => {
         setTimeout(resolve, timeout);
       });
