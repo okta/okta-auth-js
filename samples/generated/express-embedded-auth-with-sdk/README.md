@@ -81,3 +81,4 @@ See implementation details in [getAuthClient.js](./web-server/utils/getAuthClien
 The [Okta's Identity Engine][] is a state machine, it responses different states based on the request. To handle the complex response states, a centralized transaction handler pattern is introduced in this sample. It handles the response based on [transaction.status](https://github.com/okta/okta-auth-js/blob/master/docs/idx.md#status), then dispatches the requests to proper routes based on [transaction.nextStep](https://github.com/okta/okta-auth-js/blob/master/docs/idx.md#nextstep).
 
 See implementation details in [handleTransaction.js](./web-server/utils/handleTransaction.js).
+
