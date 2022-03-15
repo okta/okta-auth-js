@@ -35,9 +35,11 @@ class TestApp {
   get userInfo() { return $('#user-info'); }
   get sessionExpired() { return $('#session-expired'); }
   get testConcurrentGetTokenBtn() { return $('#test-concurrent-get-token'); }
+  get testAuthRequiredBtn() { return $('#test-auth-required'); }
 
   get tokenError() { return $('#token-error'); }
   get tokenMsg() { return $('#token-msg'); }
+  get authRequiredTestMsg() { return $('#auth-required-test-msg'); }
   
   // Unauthenticated landing
   get loginWidgetBtn() { return $('#login-widget'); }
@@ -234,6 +236,10 @@ class TestApp {
     await this.testConcurrentGetTokenBtn.then(el => el.click());
   }
 
+  async testAuthRequired() {
+    await this.testAuthRequiredBtn.then(el => el.click());
+  }
+
   async selectPkceOptionOff(){
     await this.pkceOptionOff.then(el=> el.click());
   }
@@ -338,6 +344,15 @@ class TestApp {
       return txt !== '';
     }, 10000, 'wait for token message');
     const txt = await this.tokenMsg.then(el => el.getText());
+    assert(txt === msg);
+  }
+
+  async assertAuthRequiredTestMessage(msg) {
+    await browser.waitUntil(async () => {
+      const txt = await this.authRequiredTestMsg.then(el => el.getText());
+      return txt !== '';
+    }, 10000, 'wait for auth required test message');
+    const txt = await this.authRequiredTestMsg.then(el => el.getText());
     assert(txt === msg);
   }
 
