@@ -365,7 +365,6 @@ class TestApp {
     document.addEventListener('visibilitychange', () => {
       this.checkAuthRequired();
     });
-    this.oktaAuth.start();
 
     this.render();
     this._afterRender('protected');
@@ -393,7 +392,7 @@ class TestApp {
       // App initialization stage
       // Sign in with redirect automatically
       setTimeout(() => {
-        this.loginRedirect({});
+        this.oktaAuth.signInWithRedirect();
       }, 500);
     }
   }
@@ -880,7 +879,7 @@ class TestApp {
         setTimeout(resolve, timeout);
       });
     };
-
+    
     // Test
     let w1, w2;
     try {
