@@ -339,6 +339,7 @@ class TestApp {
           ${homeLink(this)}
           <hr/>
           <strong id="auth-status-text">You are NOT authenticated.<br />You are being redirected to sign-in page automatically...</strong>
+          ${loginLinks(this, true)}
         `;
       } else {
         content = `
@@ -392,7 +393,7 @@ class TestApp {
       // App initialization stage
       // Sign in with redirect automatically
       setTimeout(() => {
-        this.oktaAuth.signInWithRedirect();
+        this.loginRedirect({});
       }, 500);
     }
   }
