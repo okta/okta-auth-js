@@ -22,27 +22,14 @@ import { ServiceManagerInterface } from './Service';
 import { OktaUserAgent } from '../OktaUserAgent';
 import { 
   AuthenticationOptions, 
-  RegistrationOptions as IdxRegistrationOptions,
-  PasswordRecoveryOptions,
-  AccountUnlockOptions,
-  ProceedOptions,
-  CancelOptions,
-  IdxOptions,
-  IdxTransaction,
-  IdxTransactionMeta,
-  EmailVerifyCallbackResponse,
   IdxAuthenticator,
   ChallengeData,
   ActivationData,
   WebauthnEnrollValues,
   WebauthnVerificationValues,
-  FlowIdentifier, 
-  IdxPollOptions
 } from '../idx/types';
-import { InteractOptions, InteractResponse } from '../idx/interact';
-import { IntrospectOptions } from '../idx/introspect';
-import { IdxResponse } from '../idx/types/idx-js';
-import { TransactionMetaOptions } from './Transaction';
+import { IdxClientInterface } from '../idx';
+
 export interface OktaAuthInterface {
   options: OktaAuthOptions;
   getIssuerOrigin(): string;
@@ -54,7 +41,7 @@ export interface OktaAuthInterface {
   tokenManager: TokenManagerInterface;
   serviceManager: ServiceManagerInterface;
 
-  idx: IdxAPI;
+  idx: IdxClientInterface;
 
   // Browser only
   features: FeaturesAPI;
@@ -290,46 +277,4 @@ export interface PkceAPI {
   DEFAULT_CODE_CHALLENGE_METHOD: string;
   generateVerifier(prefix: string): string;
   computeChallenge(str: string): PromiseLike<any>;
-}
-
-
-export interface IdxAPI {
-  // lowest level api
-  interact: (options?: InteractOptions) => Promise<InteractResponse>;
-  introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
-
-  // flow entrypoints
-  authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;
-  register: (options?: IdxRegistrationOptions) => Promise<IdxTransaction>;
-  recoverPassword: (options?: PasswordRecoveryOptions) => Promise<IdxTransaction>;
-  unlockAccount: (options?: AccountUnlockOptions) => Promise<IdxTransaction>;
-  poll: (options?: IdxPollOptions) => Promise<IdxTransaction>;
-
-  // flow control
-  start: (options?: IdxOptions) => Promise<IdxTransaction>;
-  canProceed(options?: { state?: string }): boolean;
-  proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
-  cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
-  getFlow(): FlowIdentifier | undefined;
-  setFlow(flow: FlowIdentifier): void;
-
-  // call `start` instead of `startTransaction`. `startTransaction` will be removed in next major version (7.0)
-  startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;
-
-  // redirect callbacks
-  isInteractionRequired: (hashOrSearch?: string) => boolean;
-  isInteractionRequiredError: (error: Error) => boolean; 
-  handleInteractionCodeRedirect: (url: string) => Promise<void>;
-  isEmailVerifyCallback: (search: string) => boolean;
-  parseEmailVerifyCallback: (search: string) => EmailVerifyCallbackResponse;
-  handleEmailVerifyCallback: (search: string) => Promise<IdxTransaction | undefined>;
-  isEmailVerifyCallbackError: (error: Error) => boolean;
-
-  // transaction meta
-  getSavedTransactionMeta: (options?: TransactionMetaOptions) => IdxTransactionMeta | undefined;
-  createTransactionMeta: (options?: TransactionMetaOptions) => Promise<IdxTransactionMeta>;
-  getTransactionMeta: (options?: TransactionMetaOptions) => Promise<IdxTransactionMeta>;
-  saveTransactionMeta: (meta: unknown) => void;
-  clearTransactionMeta: () => void;
-  isTransactionMetaValid: (meta: unknown) => boolean;
 }

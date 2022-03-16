@@ -84,8 +84,6 @@ import {
   verifyToken,
   prepareTokenParams,
   exchangeCodeForTokens,
-  isInteractionRequiredError,
-  isInteractionRequired,
 } from './oidc';
 import { isBrowser } from './features';
 import * as features from './features';
@@ -106,35 +104,10 @@ import { AuthStateManager } from './AuthStateManager';
 import { StorageManager } from './StorageManager';
 import TransactionManager from './TransactionManager';
 import { buildOptions } from './options';
-import {
-  interact,
-  introspect,
-  authenticate,
-  cancel,
-  poll,
-  proceed,
-  register,
-  recoverPassword,
-  unlockAccount,
-  startTransaction,
-  handleInteractionCodeRedirect,
-  canProceed,
-  handleEmailVerifyCallback,
-  isEmailVerifyCallback,
-  parseEmailVerifyCallback,
-  isEmailVerifyCallbackError
-} from './idx';
+import { IdxClient } from './idx';
 import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from './idx/headers';
 import { OktaUserAgent } from './OktaUserAgent';
 import { parseOAuthResponseFromUrl } from './oidc/parseFromUrl';
-import {
-  getSavedTransactionMeta,
-  createTransactionMeta,
-  getTransactionMeta,
-  saveTransactionMeta,
-  clearTransactionMeta,
-  isTransactionMetaValid
-} from './idx/transactionMeta';
 // @ts-ignore 
 // Do not use this type in code, so it won't be emitted in the declaration output
 import Emitter from 'tiny-emitter';
@@ -294,47 +267,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     });
 
     // IDX
-    const boundStartTransaction = startTransaction.bind(null, this);
-    this.idx = {
-      interact: interact.bind(null, this),
-      introspect: introspect.bind(null, this),
-      authenticate: authenticate.bind(null, this),
-      register: register.bind(null, this),
-      start: boundStartTransaction,
-      startTransaction: boundStartTransaction, // Use `start` instead. `startTransaction` will be removed in 7.0
-      poll: poll.bind(null, this),
-      proceed: proceed.bind(null, this),
-      cancel: cancel.bind(null, this),
-      recoverPassword: recoverPassword.bind(null, this),
-
-      // oauth redirect callback
-      handleInteractionCodeRedirect: handleInteractionCodeRedirect.bind(null, this),
-
-      // interaction required callback
-      isInteractionRequired: isInteractionRequired.bind(null, this),
-      isInteractionRequiredError,
-
-      // email verify callback
-      handleEmailVerifyCallback: handleEmailVerifyCallback.bind(null, this),
-      isEmailVerifyCallback,
-      parseEmailVerifyCallback,
-      isEmailVerifyCallbackError,
-      
-      getSavedTransactionMeta: getSavedTransactionMeta.bind(null, this),
-      createTransactionMeta: createTransactionMeta.bind(null, this),
-      getTransactionMeta: getTransactionMeta.bind(null, this),
-      saveTransactionMeta: saveTransactionMeta.bind(null, this),
-      clearTransactionMeta: clearTransactionMeta.bind(null, this),
-      isTransactionMetaValid,
-      setFlow: (flow: FlowIdentifier) => {
-        this.options.flow = flow;
-      },
-      getFlow: (): FlowIdentifier | undefined => {
-        return this.options.flow;
-      },
-      canProceed: canProceed.bind(null, this),
-      unlockAccount: unlockAccount.bind(null, this),
-    };
+    this.idx = new IdxClient(this);
 
     setGlobalRequestInterceptor(createGlobalRequestInterceptor(this)); // to pass custom headers to IDX endpoints
 
