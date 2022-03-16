@@ -15,6 +15,7 @@
 import { AuthSdkError } from '../../errors';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 import { IdxRemediation } from '../types/idx-js';
+import { Authenticator } from '../types';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 
@@ -70,7 +71,7 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
         .find(({ name }) => name === 'id')!.value,
       enrollmentId: authenticatorFromRemediation.form!.value
         .find(({ name }) => name === 'enrollmentId')?.value,
-      methodType: authenticatorData?.methodType,
+      // methodType: authenticatorData?.methodType,
     };
   }
 
