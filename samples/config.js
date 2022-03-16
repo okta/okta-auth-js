@@ -112,9 +112,6 @@ const samples = [
   if (!sampleConfig.name) {
     throw new Error('sample "name" is required');
   }
-  if (!sampleConfig.template) {
-    throw new Error('sample "template" is required');
-  }
   const mergedConfig = Object.assign({}, templateDefaults[sampleConfig.template], sampleConfig);
   return mergedConfig;
 });

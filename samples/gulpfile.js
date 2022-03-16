@@ -78,6 +78,12 @@ function registerPartials() {
 function generateSampleTaskFactory(options) {
   return function generateSample() {
     const { name, template, subDir, useEnv, generateType } = options;
+
+    // skip task if no template is available
+    if (!template) {
+      return Promise.resolve();
+    }
+
     const outFolder = (() => {
       const parts = name.split('.');
       return parts[parts.length - 1];
