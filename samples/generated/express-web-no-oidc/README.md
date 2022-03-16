@@ -1,7 +1,7 @@
 [sessionToken]: https://developer.okta.com/docs/reference/api/sessions/#session-token
 [signIn]: https://github.com/okta/okta-auth-js#signinoptions
 
-# express-web-no-oidc sample
+# @okta/samples.express-web-no-oidc sample
 
 This sample demonstrates using `@okta/okta-auth-js` in NodeJS. The [signIn][signIn] method is used to authenticate users given a username and password. On success, the [signIn][signIn] method returns a transaction object containing a [sessionToken][sessionToken]. The [sessionToken][sessionToken] can be used to establish an Okta session.
 
@@ -9,7 +9,7 @@ By default the app server runs at `http://localhost:8080`.
 
 ## Commands
 
-If running from the workspace directory: `yarn workspace @okta/samples.express.web-no-oidc start`
+If running from the workspace directory: `yarn workspace @okta/samples.express-web-no-oidc start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |

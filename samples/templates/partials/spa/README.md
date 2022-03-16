@@ -6,7 +6,7 @@ This sample uses a [polyfill](https://github.com/okta/okta-auth-js#browser-compa
 
 ## Commands
 
-If running from the workspace directory: `yarn workspace {{ pkgName }} start`
+If running from the workspace directory: `yarn workspace {{ name }} start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |

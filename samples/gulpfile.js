@@ -78,8 +78,12 @@ function registerPartials() {
 function generateSampleTaskFactory(options) {
   return function generateSample() {
     const { name, template, subDir, useEnv, generateType } = options;
+    const outFolder = (() => {
+      const parts = name.split('.');
+      return parts[parts.length - 1];
+    })();
     const inDir = `${SRC_DIR}/${template}/**/*`;
-    const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${name}`;
+    const outDir = `${BUILD_DIR}/` + (subDir ? `${subDir}/` : '') + `${outFolder}`;
     const strOptions = {};
     Object.keys(options).forEach(key => {
       let val = options[key];
@@ -99,7 +103,7 @@ function generateSampleTaskFactory(options) {
       .pipe(handlebars(hbParams))
       .pipe(dest((file) => {
         if (generateType === GENERATE_TYPE_OVERWRITE) {
-          gitattributes.add(`${outDir}${file.path.split(name)[1]} linguist-generated=true`);
+          gitattributes.add(`${outDir}${file.path.split(outFolder)[1]} linguist-generated=true`);
         }
         return outDir;
       }));

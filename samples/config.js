@@ -49,39 +49,34 @@ const templateDefaults = {
 
 const samples = [
   {
-    name: 'static-spa',
-    pkgName: '@okta/samples.static-spa',
+    name: '@okta/samples.static-spa',
     template: 'static-spa',
     generateType: GENERATE_TYPE_FULL,
     specs: ['spa-app'],
     features: []
   },
   {
-    name: 'webpack-spa',
-    pkgName: '@okta/samples.webpack-spa',
+    name: '@okta/samples.webpack-spa',
     template: 'webpack-spa',
     generateType: GENERATE_TYPE_FULL,
     specs: ['spa-app'],
     features: []
   },
   {
-    name: 'express-web-no-oidc',
-    pkgName: '@okta/samples.express.web-no-oidc',
+    name: '@okta/samples.express-web-no-oidc',
     template: 'express-web',
     generateType: GENERATE_TYPE_FULL,
     specs: ['web-app'],
     oidc: false
   },
   {
-    name: 'express-web-with-oidc',
-    pkgName: '@okta/samples.express.web-with-oidc',
+    name: '@okta/samples.express-web-with-oidc',
     template: 'express-web',
     generateType: GENERATE_TYPE_FULL,
     specs: ['web-app']
   },
   {
-    name: 'express-embedded-auth-with-sdk',
-    pkgName: '@okta/samples.express.embedded-auth-with-sdk',
+    name: '@okta/samples.express-embedded-auth-with-sdk',
     template: 'express-embedded-auth-with-sdk',
     generateType: GENERATE_TYPE_OVERWRITE,
     specs: ['express-embedded-auth-with-sdk'],
@@ -103,8 +98,7 @@ const samples = [
     express: true,
   },
   {
-    name: 'express-embedded-sign-in-widget',
-    pkgName: '@okta/samples.express.embedded-sign-in-widget',
+    name: '@okta/samples.express-embedded-sign-in-widget',
     template: 'express-embedded-sign-in-widget',
     generateType: GENERATE_TYPE_OVERWRITE,
     specs: [],
