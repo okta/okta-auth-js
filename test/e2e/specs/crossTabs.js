@@ -102,8 +102,8 @@ describe('cross tabs AuthState update', () => {
         // the first tab show sign buttons
         await TestApp.assertLoggedOut();
       } else {
-        // other tabs show okta hosted login page
-        await OktaLogin.waitForLoad();
+        // other tabs ask to sign-in again
+        await TestApp.assertAuthStatusText('Sign-in again');
       }
     }
   });

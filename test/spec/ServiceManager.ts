@@ -128,6 +128,18 @@ describe('ServiceManager', () => {
     client.serviceManager.stop();
   });
 
+  it('can restart', async () => {
+    const options = {
+      services: { syncStorage: true }
+    };
+    const client = createAuth(options);
+    client.serviceManager.start();
+    client.serviceManager.stop();
+    client.serviceManager.start();
+    expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
+    client.serviceManager.stop();
+  });
+
   describe('Backwards Compatibility', () => {
     it('`services` will supersede `tokenManager` configurations', async () => {
       const options = {
