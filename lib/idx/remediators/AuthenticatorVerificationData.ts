@@ -15,7 +15,6 @@
 import { AuthSdkError } from '../../errors';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 import { IdxRemediation } from '../types/idx-js';
-import { Authenticator } from '../types';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 
