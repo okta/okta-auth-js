@@ -45,7 +45,6 @@ import {
   IdxAPI,
   SignoutRedirectUrlOptions,
   HttpAPI,
-  FlowIdentifier,
   GetWithRedirectAPI,
   ParseFromUrlInterface,
   GetWithRedirectFunction,

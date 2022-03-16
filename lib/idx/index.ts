@@ -56,6 +56,9 @@ import {
 import { IdxResponse } from './types/idx-js';
 import { TransactionMetaOptions } from '../types'
 
+export * from './transactionMeta';
+export { poll } from './poll';
+
 export interface IdxClientInterface {
   // lowest level api
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
