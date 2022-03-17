@@ -16,7 +16,9 @@ import util from '@okta/test.support/util';
 
 jest.mock('broadcast-channel', () => {
   const actual = jest.requireActual('broadcast-channel');
-  class FakeBroadcastChannel {}
+  class FakeBroadcastChannel {
+    close() {}
+  }
   return {
     createLeaderElection: actual.createLeaderElection,
     BroadcastChannel: FakeBroadcastChannel
@@ -132,6 +134,7 @@ describe('ServiceManager', () => {
     const options = {
       services: { syncStorage: true }
     };
+    util.disableLeaderElection();
     const client = createAuth(options);
     client.serviceManager.start();
     client.serviceManager.stop();
