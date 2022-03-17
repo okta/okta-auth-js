@@ -43,6 +43,7 @@ describe('spa-app: ' + sampleConfig.name, () => {
 
   afterEach(async () => {
     await browser.reloadSession();
+    await browser.closeWindow();
   });
 
   it('can login using redirect', async () => {
