@@ -14,29 +14,50 @@
 import TestApp from '../pageobjects/TestApp';
 import { openPKCE } from '../util/appUtils';
 import { loginDirect } from '../util/loginUtils';
+import {
+  switchToMainWindow,
+  switchToSecondWindow,
+} from '../util/browserUtils';
+import OktaLogin from '../pageobjects/OktaLogin';
 
 describe('protected page', () => {
-  let testContext;
-
-  beforeEach(async () => {
-    testContext = {};
-    await openPKCE();
-    await loginDirect();
-    await TestApp.assertLoggedIn();
-    testContext.loggedIn = true;
-  });
-
-  afterEach(async () => {
-    if (testContext.loggedIn) {
-      await TestApp.logoutRedirect();
-    }
-  });
 
   it('auth required', async () => {
-    await TestApp.navigateToProtectedPage();
-    await TestApp.testAuthRequired();
-    await TestApp.assertAuthRequiredTestMessage('auth required test passed');
+    // Open protected page for the first time without being authenticated
+    // Expected: auto redirect to sign-in page
+    await openPKCE({});
     await TestApp.assertLoggedOut();
-    testContext.loggedIn = false;
+    await TestApp.navigateToProtectedPage();
+    await TestApp.assertAuthStatusText('You are being redirected to sign-in page automatically');
+    await OktaLogin.waitForLoad();
+
+    // Authenticate, open protected page, start service
+    await openPKCE({});
+    await loginDirect();
+    await TestApp.assertLoggedIn();
+    await TestApp.navigateToProtectedPage();
+    await TestApp.startService();
+
+    // Open protected page in new tab, logout
+    await openPKCE({}, true);
+    await switchToSecondWindow();
+    await TestApp.waitForLogoutBtn();
+    await TestApp.logoutRedirect();
+    await TestApp.assertLoggedOut();
+    await browser.closeWindow();
+
+    // Go back to original tab
+    // Expected: Show user buttons to sign-in again
+    await switchToMainWindow();
+    await TestApp.assertAuthStatusText('Sign-in again');
+
+    // Sign-in directly
+    // Expected: page is being updated
+    await loginDirect();
+    await TestApp.assertAuthStatusText('You are authenticated');
+    
+    // Complete test
+    await TestApp.waitForLogoutBtn();
+    await TestApp.logoutRedirect();
   });
 });
