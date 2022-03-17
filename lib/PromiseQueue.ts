@@ -41,13 +41,17 @@ class PromiseQueue {
   // Returns a promise
   // If the method is synchronous, it will resolve when the method completes
   // If the method returns a promise, it will resolve (or reject) with the value from the method's promise
-  push(method: () => void, thisObject: object, ...args: any[]) {
+  push(method: (...args: any) => any, thisObject: any, ...args: any[]) {
     return new Promise((resolve, reject) => {
-      if (this.queue.length > 0 && this.options.quiet !== false) {
-        warn(
-          'Async method is being called but another async method is already running. ' +
-          'The new method will be delayed until the previous method completes.'
-        );
+      if (this.queue.length > 0) {
+        // There is at least one other pending call.
+        // The PromiseQueue will prevent these methods from running concurrently.
+        if (this.options.quiet !== false) {
+          warn(
+            'Async method is being called but another async method is already running. ' +
+            'The new method will be delayed until the previous method completes.'
+          );
+        }
       }
       this.queue.push({
         method,
