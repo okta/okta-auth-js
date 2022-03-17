@@ -38,7 +38,8 @@ function runWithConfig(sampleConfig) {
   const port = sampleConfig.port || 8080;
 
   // exit early if no spec is available
-  if ((process.env.RUN_CUCUMBER_TESTS && !features?.length) || (!process.env.RUN_CUCUMBER_TESTS && !specs?.length)) {
+  if ((process.env.RUN_CUCUMBER_TESTS && (!features || !features.length)) 
+      || (!process.env.RUN_CUCUMBER_TESTS && (!specs || !specs.length))) {
     process.exit(0);
   }
 

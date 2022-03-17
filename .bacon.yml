@@ -62,44 +62,51 @@ test_suites:
       script_name: e2e-samples
       criteria: MERGE
       queue_name: small
-    - name: e2e-samples-express-web-no-oidc
+    - name: e2e-express-web-no-oidc
       script_path: ../okta-auth-js/scripts
       sort_order: '8'
       timeout: '10'
-      script_name: e2e-samples-express-web-no-oidc
+      script_name: e2e-express-web-no-oidc
       criteria: MERGE
       queue_name: small
-    - name: e2e-samples-express-web-with-oidc
+    - name: e2e-express-web-with-oidc
       script_path: ../okta-auth-js/scripts
       sort_order: '9'
       timeout: '10'
-      script_name: e2e-samples-express-web-with-oidc
+      script_name: e2e-express-web-with-oidc
       criteria: MERGE
       queue_name: small
-    - name: e2e-samples-express-static-spa
+    - name: e2e-static-spa
       script_path: ../okta-auth-js/scripts
       sort_order: '11'
       timeout: '10'
-      script_name: e2e-samples-static-spa
+      script_name: e2e-static-spa
       criteria: MERGE
       queue_name: small
-    - name: e2e-samples-webpack-spa
+    - name: e2e-webpack-spa
       script_path: ../okta-auth-js/scripts
       sort_order: '12'
       timeout: '10'
-      script_name: e2e-samples-webpack-spa
+      script_name: e2e-webpack-spa
       criteria: MERGE
       queue_name: small
-    - name: e2e-samples-express-embedded-sign-in-widget
+    - name: e2e-express-embedded-sign-in-widget
       script_path: ../okta-auth-js/scripts
       sort_order: '13'
       timeout: '10'
-      script_name: e2e-samples-express-embedded-sign-in-widget
+      script_name: e2e-express-embedded-sign-in-widget
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-react-oie
+      script_path: ../okta-auth-js/scripts
+      sort_order: '14'
+      timeout: '10'
+      script_name: e2e-react-oie
       criteria: MERGE
       queue_name: small
     - name: publish
       script_path: ../okta-auth-js/scripts
-      sort_order: '9'
+      sort_order: '15'
       timeout: '60'
       script_name: publish
       criteria: MERGE
