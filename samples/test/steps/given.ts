@@ -28,20 +28,16 @@ import noop from '../support/action/noop';
 
 // NOTE: noop function is used for predefined settings
 
+Given('a Profile defined assigning new users to the Everyone Group', noop);
+
 Given(
-  /^a Profile defined assigning new users to the Everyone Group$/,
+  /^by collecting "First Name", "Last Name", "Email"(?: is allowed and assigned to a SPA, WEB APP or MOBILE application)?$/, 
   noop
 );
 
 Given(
-  /^a Profile Enrollment policy defined .* (?=by .* and a random property *.).*/,
+  'a property named {string} is allowed and assigned to a SPA, WEB APP or MOBILE application',
   attachSSRPolicy
-);
-
-Given(
-  // eslint-disable-next-line max-len
-  /^a Profile Enrollment policy defined assigning new users to the Everyone Group and (?!by .* and a random property *.).*/,
-  noop
 );
 
 Given(
@@ -103,7 +99,7 @@ Given(
 );
 
 Given(
-  /^a user named "([^/w]+)"$/,
+  'a user named {string}',
   createContextCredentials
 );
 

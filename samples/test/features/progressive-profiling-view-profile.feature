@@ -2,8 +2,9 @@ Feature: View Profile Information
   
   Background:
     Given a Profile defined assigning new users to the Everyone Group
-    # And by collecting "First Name", "Last Name", "Email", and another property "Age" is allowed and assigned to a SPA, WEB APP or MOBILE application
-    # And a user named "Mary"
+    And by collecting "First Name", "Last Name", "Email"
+    #And a property named "age" is allowed and assigned to a SPA, WEB APP or MOBILE application
+    #And a user named "Mary"
     # And Mary has an account in the org
     
   Scenario: Mary views her profile
