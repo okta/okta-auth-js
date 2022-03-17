@@ -22,7 +22,7 @@ get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 # If this script is run as a bacon task, run against trexcloud environment
 if [[ "${BACON_TASK}" == true ]]; then
   echo "Running tests against trexcloud org"
-  export ISSUER=https://javascript-idx-sdk.trexcloud.com/oauth2/default
+  export ISSUER=https://javascript-idx-sdk.trexcloud.com
   export CLIENT_ID=0oa3r1keeeFFb7VMG0g7
   export SPA_CLIENT_ID=0oa3r92jj01DWBeWC0g7
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_client_secret CLIENT_SECRET
@@ -33,7 +33,7 @@ if [[ "${BACON_TASK}" == true ]]; then
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_secret CUSTOM_CLIENT_SECRET
 else
   echo "Running tests against production (ok12) org"
-  export ISSUER=https://javascript-idx-sdk.okta.com/oauth2/default
+  export ISSUER=https://javascript-idx-sdk.okta.com
   export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
   export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret CLIENT_SECRET
