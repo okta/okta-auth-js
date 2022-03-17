@@ -116,7 +116,9 @@ Given(
 
 Given(
   /^([^/s]+) navigates to (?:the )?(.*)$/,
-  navigateTo
+  async function(this: ActionContext, firstName, pageName) {
+    await navigateTo(pageName);
+  }
 );
 
 Given(
