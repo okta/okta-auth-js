@@ -20,10 +20,9 @@ import {
 } from '../util/browserUtils';
 import OktaLogin from '../pageobjects/OktaLogin';
 
-describe('protected page', () => {
-
-  it('auth required', async () => {
-    // Open protected page for the first time without being authenticated
+describe('auth required', () => {
+  it('can redirect to sign-in page only on initial load and if document is visible, otherwise show UI to sign-in again', async () => {
+    // Open protected page for the first time in unauthenticated state
     // Expected: auto redirect to sign-in page
     await openPKCE({});
     await TestApp.assertLoggedOut();
@@ -38,7 +37,7 @@ describe('protected page', () => {
     await TestApp.navigateToProtectedPage();
     await TestApp.startService();
 
-    // Open protected page in new tab, logout
+    // Logout in another tab
     await openPKCE({}, true);
     await switchToSecondWindow();
     await TestApp.waitForLogoutBtn();
@@ -47,17 +46,17 @@ describe('protected page', () => {
     await browser.closeWindow();
 
     // Go back to original tab
-    // Expected: Show user buttons to sign-in again
+    // Expected: show buttons to sign-in again
     await switchToMainWindow();
     await TestApp.assertAuthStatusText('Sign-in again');
 
     // Sign-in directly
-    // Expected: page is being updated
+    // Expected: page is being updated for authenticated state
     await loginDirect();
+    await TestApp.waitForLogoutBtn();
     await TestApp.assertAuthStatusText('You are authenticated');
     
     // Complete test
-    await TestApp.waitForLogoutBtn();
     await TestApp.logoutRedirect();
   });
 });
