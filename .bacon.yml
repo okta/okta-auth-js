@@ -62,6 +62,41 @@ test_suites:
       script_name: e2e-samples
       criteria: MERGE
       queue_name: small
+    - name: e2e-samples-express-web-no-oidc
+      script_path: ../okta-auth-js/scripts
+      sort_order: '8'
+      timeout: '10'
+      script_name: e2e-samples-express-web-no-oidc
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-samples-express-web-with-oidc
+      script_path: ../okta-auth-js/scripts
+      sort_order: '9'
+      timeout: '10'
+      script_name: e2e-samples-express-web-with-oidc
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-samples-express-static-spa
+      script_path: ../okta-auth-js/scripts
+      sort_order: '11'
+      timeout: '10'
+      script_name: e2e-samples-static-spa
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-samples-webpack-spa
+      script_path: ../okta-auth-js/scripts
+      sort_order: '12'
+      timeout: '10'
+      script_name: e2e-samples-webpack-spa
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-samples-express-embedded-sign-in-widget
+      script_path: ../okta-auth-js/scripts
+      sort_order: '13'
+      timeout: '10'
+      script_name: e2e-samples-express-embedded-sign-in-widget
+      criteria: MERGE
+      queue_name: small
     - name: publish
       script_path: ../okta-auth-js/scripts
       sort_order: '9'
