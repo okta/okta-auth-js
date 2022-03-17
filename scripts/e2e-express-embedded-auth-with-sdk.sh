@@ -12,6 +12,7 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # Configuration
 # Remember to set this while running tests locally 
+SAMPLE_NAME=@okta/samples.express-embedded-auth-with-sdk
 export ORG_OIE_ENABLED=true 
 export USERNAME=mary@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD

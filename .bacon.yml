@@ -55,11 +55,11 @@ test_suites:
       script_name: e2e-oie
       criteria: MERGE
       queue_name: small
-    - name: e2e-samples
+    - name: e2e-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts
       sort_order: '7'
       timeout: '20'
-      script_name: e2e-samples
+      script_name: e2e-express-embedded-auth-with-sdk
       criteria: MERGE
       queue_name: small
     - name: e2e-express-web-no-oidc
