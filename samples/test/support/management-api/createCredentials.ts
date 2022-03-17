@@ -21,16 +21,16 @@ export declare interface UserCredentials extends A18nProfile {
 }
 
 export default async function (
-  firstName: string, featureName = '', createA18nProfile = true
+  firstName: string, lastName = '', createA18nProfile = true
 ): Promise<UserCredentials> {
-  featureName = featureName.substring(0, 32);
+  lastName = lastName.substring(0, 32);
   const a18nProfile = createA18nProfile ? await a18nClient.createProfile() : {
     emailAddress: 'fake_'+crypto.randomBytes(4).toString('hex')+'@acme.com',
   } as A18nProfile;
   
   return Object.assign({}, a18nProfile, {
     firstName,
-    lastName: featureName || `Mc${firstName}face`,
+    lastName: lastName || `Mc${firstName}face`,
     password: crypto.randomBytes(16).toString('base64')
   });
 }

@@ -18,7 +18,17 @@ import { UserCredentials } from './createCredentials';
 
 const userGroup = 'Basic Auth Web';
 
-export default async (credentials: UserCredentials, assignToGroups = [userGroup], activate = true): 
+export default async ({
+  credentials,
+  assignToGroups = [userGroup], 
+  activate = true,
+  customAttribute
+}: {
+  credentials: UserCredentials;
+  assignToGroups?: string[];
+  activate?: boolean;
+  customAttribute?: string;
+}): 
   Promise<User> => {
   const config = getConfig();
   const oktaClient = new Client({
@@ -44,26 +54,30 @@ export default async (credentials: UserCredentials, assignToGroups = [userGroup]
       testGroup = await oktaClient.createGroup(basicAuthGroup);
     }
 
+    const profile = {
+      firstName: credentials.firstName,
+      lastName: credentials.lastName,
+      email: credentials.emailAddress,
+      login: credentials.emailAddress
+    };
+    if (customAttribute) {
+      if (customAttribute === 'age') {
+        (profile as any).age = Math.floor(Math.random() * 100);
+      } else {
+        throw new Error(`Unsupported customAttribute: ${customAttribute}`);
+      }
+    }
+
     if (activate === false) {
       // Create user without password
       user = await oktaClient.createUser({
-        profile: {
-          firstName: credentials.firstName,
-          lastName: credentials.lastName,
-          email: credentials.emailAddress,
-          login: credentials.emailAddress
-        }
+        profile
       }, {
         activate: activate
       });
     } else {
       user = await oktaClient.createUser({
-        profile: {
-          firstName: credentials.firstName,
-          lastName: credentials.lastName,
-          email: credentials.emailAddress,
-          login: credentials.emailAddress
-        },
+        profile,
         credentials: {
           password : { value: credentials.password }
         }

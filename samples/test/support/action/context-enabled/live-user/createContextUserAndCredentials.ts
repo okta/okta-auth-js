@@ -28,7 +28,12 @@ export default async function
   } else {
     const credentials = this.credentials || await createCredentials(firstName, this.featureName);
     this.credentials = credentials;
-    const user = await createUser(credentials, assignToGroups, activate);
+    const user = await createUser({ 
+      credentials, 
+      assignToGroups, 
+      activate,
+      customAttribute: this.customAttribute
+    });
     this.user = user;
   }
 } 

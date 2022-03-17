@@ -28,7 +28,10 @@ import noop from '../support/action/noop';
 
 // NOTE: noop function is used for predefined settings
 
-Given('a Profile defined assigning new users to the Everyone Group', noop);
+Given(
+  'a Profile Enrollment policy defined assigning new users to the Everyone Group', 
+  noop
+);
 
 Given(
   /^by collecting "First Name", "Last Name", "Email"(?: is allowed and assigned to a SPA, WEB APP or MOBILE application)?$/, 
@@ -82,7 +85,7 @@ Given(
 Given(
   /([^/s]+) has an account in the org/,
   async function(this: ActionContext, firstName: string) {
-    await createContextUser.call(this, firstName, ['MFA Required', 'Google Authenticator Enrollment Required']);
+    await createContextUser.call(this, { firstName });
   }
 );
 

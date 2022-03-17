@@ -25,6 +25,7 @@ interface ActionContext {
   sharedSecret?: string;
   disableEmailVerification?: boolean;
   useProfileEnrollPolicy: boolean;
+  customAttribute: string;
   isCurrentScenario: (scenario: Scenario) => boolean;
 }
 

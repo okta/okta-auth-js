@@ -25,13 +25,11 @@ import enterValidPassword from '../support/action/context-enabled/live-user/ente
 import confirmValidPassword from '../support/action/context-enabled/live-user/confirmValidPassword';
 import submitAnyForm from '../support/action/submitAnyForm';
 import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
-import checkProfileEmail from '../support/check/checkProfileEmail';
+import checkProfileAttribute from '../support/check/checkProfileAttribute';
 import { UserHome } from '../support/selectors';
-import checkProfileName from '../support/check/context-enabled/checkProfileName';
 import ActionContext from '../support/context';
 import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticatorOptions';
 import waitForDisplayed from '../support/wait/waitForDisplayed';
-import { camelize } from '../util';
 
 Then(
   /^User can verify their profile data$/,
@@ -225,16 +223,8 @@ Then(
 );
 
 Then(
-  'the cell for the value of {string} is shown and contains her email',
-  async function(this: ActionContext, attribute: string) {
-    const key = camelize(attribute);
-    await checkProfileEmail(this, (UserHome as any)[key]);
-  }
-);
-
-Then(
-  /^the cell for the value of "name" is shown and contains her first name and last name$/,
-  checkProfileName
+  'the cell for the value of {string} is shown and contains her {string}',
+  checkProfileAttribute
 );
 
 Then(

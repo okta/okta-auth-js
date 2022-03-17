@@ -21,6 +21,8 @@ class UserHome implements Page {
   get name() { return '#claim-name'; }
   get email() { return '#claim-email'; }
   get primaryEmail() { return '#primary-email'; }
+  get firstName() { return 'input[name="firstName"'; }
+  get lastName() { return 'input[name="lastName"'; }
   get logoutButton() { return '#logout-button'; }
   get profileButton() { return '#profile-button'; }
   get editButton() { return '#edit-button'; }

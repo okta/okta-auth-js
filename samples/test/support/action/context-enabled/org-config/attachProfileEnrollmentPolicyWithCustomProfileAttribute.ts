@@ -14,5 +14,6 @@ export default async function (this: ActionContext, propertyName: string) {
   if (policy) {
     await addAppToPolicy(policy.id, clientId as string);
     this.useProfileEnrollPolicy = true;
-  }
+    this.customAttribute = propertyName;
+  };
 }

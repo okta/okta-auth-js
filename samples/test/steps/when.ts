@@ -333,8 +333,11 @@ When(
 
 When(
   'she logs in to the app',
-  async function() {
+  async function(this: ActionContext) {
     await clickElement('click', 'selector', Home.loginButton);
-    await loginDirect({});
+    await loginDirect({
+      username: this.credentials.emailAddress,
+      password: this.credentials.password
+    });
   }
 );
