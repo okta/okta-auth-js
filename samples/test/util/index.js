@@ -12,6 +12,7 @@
 
 
 import toQueryString from './toQueryString';
+import camelize from './camelize';
 
 export * from './configUtils';
 export * from './appUtils';
@@ -19,3 +20,4 @@ export * from './loginUtils';
 export * from './browserUtils';
 export * from './selectorUtils';
 export { toQueryString };
+export { camelize };

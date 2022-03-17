@@ -31,6 +31,7 @@ import checkProfileName from '../support/check/context-enabled/checkProfileName'
 import ActionContext from '../support/context';
 import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticatorOptions';
 import waitForDisplayed from '../support/wait/waitForDisplayed';
+import { camelize } from '../util';
 
 Then(
   /^User can verify their profile data$/,
@@ -75,7 +76,7 @@ Then(
 Then(
   /^she is redirected to the ([\s\w]+)$/,
   async function(this: ActionContext, pageName: string) {
-    await checkIsOnPage(pageName, this.disableEmailVerification);
+    await checkIsOnPage(pageName);
   }
 );
 
@@ -224,8 +225,11 @@ Then(
 );
 
 Then(
-  /^the cell for the value of "email" is shown and contains her email$/,
-  checkProfileEmail
+  'the cell for the value of {string} is shown and contains her email',
+  async function(this: ActionContext, attribute: string) {
+    const key = camelize(attribute);
+    await checkProfileEmail(this, (UserHome as any)[key]);
+  }
 );
 
 Then(
@@ -251,13 +255,6 @@ Then(
 Then(
   /^the screen changes to challenge the Security Question$/,
   () => checkIsOnPage('Challenge Security Question')
-);
-
-Then(
-  'the cell for the value of "primary email" is shown and contains her primary email',
-  async function(this: ActionContext) {
-    await checkProfileEmail(this, UserHome.primaryEmail);
-  }
 );
 
 Then(

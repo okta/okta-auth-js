@@ -12,11 +12,9 @@
 
 
 import checkEqualsText from './checkEqualsText';
-import UserHome from '../selectors/UserHome';
 import ActionContext from '../context';
 
-export default async function(context: ActionContext, selector?: string) {
+export default async function(context: ActionContext, selector: string) {
   const userName = context?.credentials?.emailAddress || process.env.USERNAME;
-  selector = selector || UserHome.email;
   await checkEqualsText('element', selector, false, userName as string);
 }

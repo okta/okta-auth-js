@@ -10,6 +10,6 @@ Feature: View Profile Information
     Given Mary is on the Root View in an UNAUTHENTICATED state
     When she logs in to the app
     Then she sees a table with her profile info
-    And the cell for the value of "primary email" is shown and contains her primary email
+    And the cell for the value of "primary email" is shown and contains her email
     #And the cell for the value of "name" is shown and contains her first name and last name
     And she sees an "Edit" button incidating she can update her profile
