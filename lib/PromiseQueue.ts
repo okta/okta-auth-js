@@ -24,13 +24,18 @@ interface QueueItem {
   reject: (reason?: unknown) => void;
 }
 
+interface PromiseQueueOptions {
+  quiet?: boolean; // if false, concurrrency warnings will not be logged
+}
 class PromiseQueue {
   queue: QueueItem[];
   running: boolean;
+  options: PromiseQueueOptions;
 
-  constructor() {
+  constructor(options: PromiseQueueOptions = { quiet: false }) {
     this.queue = [];
     this.running = false;
+    this.options = options;
   }
 
   // Returns a promise
@@ -38,7 +43,7 @@ class PromiseQueue {
   // If the method returns a promise, it will resolve (or reject) with the value from the method's promise
   push(method: () => void, thisObject: object, ...args: any[]) {
     return new Promise((resolve, reject) => {
-      if (this.queue.length > 0) {
+      if (this.queue.length > 0 && this.options.quiet !== false) {
         warn(
           'Async method is being called but another async method is already running. ' +
           'The new method will be delayed until the previous method completes.'

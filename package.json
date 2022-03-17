@@ -31,7 +31,7 @@
     "clean": "yarn clean:build",
     "clean:build": "rimraf build && rimraf build2",
     "dev:esm": "NODE_ENV=development yarn build:esm --watch",
-    "dev:web": "cross-env NODE_ENV=development webpack --config webpack.dev.config.js",
+    "dev:web": "cross-env NODE_ENV=development webpack --config webpack.config.js --watch",
     "lint": "eslint --ext .js,.ts,.jsx .",
     "tsd": "tsd",
     "lint:report": "eslint -f checkstyle -o ./build2/reports/lint/eslint-checkstyle-result.xml .",

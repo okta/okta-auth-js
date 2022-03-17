@@ -18,6 +18,7 @@ import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from '.';
 import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
+import PromiseQueue from './PromiseQueue';
 
 export const INITIAL_AUTH_STATE = null;
 const DEFAULT_PENDING = {
@@ -40,6 +41,7 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
     && prevState.error === state.error;
 };
 
+
 export class AuthStateManager {
   _sdk: OktaAuth;
   _pending: { 
@@ -49,6 +51,9 @@ export class AuthStateManager {
   _authState: AuthState | null;
   _prevAuthState: AuthState | null;
   _logOptions: AuthStateLogOptions;
+  _updateQueue: PromiseQueue;
+
+  updateAuthState: () => Promise<AuthState>;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
@@ -60,7 +65,16 @@ export class AuthStateManager {
     this._authState = INITIAL_AUTH_STATE;
     this._logOptions = {};
     this._prevAuthState = null;
- 
+    this._updateQueue = new PromiseQueue({
+      quiet: true
+    });
+
+    // Put updateAuthState into a queue so that only one update is running at a time
+    this.updateAuthState = async () => {
+      const res = await this._updateQueue.push(this._updateAuthState, this);
+      return res as unknown as AuthState;
+    };
+
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process
     // Only listen on "added" event to update auth state
@@ -86,7 +100,7 @@ export class AuthStateManager {
     return this._prevAuthState;
   }
 
-  async updateAuthState(): Promise<AuthState> {
+  async _updateAuthState(): Promise<AuthState> {
     const { transformAuthState, devMode } = this._sdk.options;
 
     const log = (status) => {

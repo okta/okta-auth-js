@@ -14,6 +14,12 @@ function shouldRedirectToGetTokens(authState) {
       return false;
     }
 
+    // AuthState error. This can happen when an exception is thrown inside transformAuthState.
+    // Return false to break a potential infinite loop
+    if (authState.error) {
+      return false;
+    }
+
     // Call Okta to get tokens. Okta will redirect back to this app
     // The callback is handled by `handleLoginRedirect` which will call `renderApp` again
     return true;
