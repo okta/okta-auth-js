@@ -34,8 +34,13 @@ function runNextTask() {
 }
 
 function runWithConfig(sampleConfig) {
-  const { name } = sampleConfig;
+  const { name, specs, features } = sampleConfig;
   const port = sampleConfig.port || 8080;
+
+  // exit early if no spec is available
+  if ((process.env.RUN_CUCUMBER_TESTS && !features.length) || (!process.env.RUN_CUCUMBER_TESTS && !specs.length)) {
+    process.exit(0);
+  }
 
   // 1. start the sample's web server
   const server = spawn('yarn', [
