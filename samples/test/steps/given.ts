@@ -122,7 +122,7 @@ Given(
 );
 
 Given(
-  /^([^/s]+) has an authenticated session$/,
+  'Mary has an authenticated session',
   navigateToLoginAndAuthenticate
 );
 
