@@ -21,7 +21,8 @@ import {
 import OktaLogin from '../pageobjects/OktaLogin';
 
 describe('auth required', () => {
-  it('can redirect to sign-in page only on initial load and if document is visible, otherwise show UI to sign-in again', async () => {
+  it('can redirect to sign-in page only for initial load and doc is visible, otherwise show UI to sign-in again', 
+  async () => {
     // Open protected page for the first time in unauthenticated state
     // Expected: auto redirect to sign-in page
     await openPKCE({});

@@ -12,7 +12,6 @@
 
 
 import assert from 'assert';
-import OktaLogin from '../pageobjects/OktaLogin';
 import TestApp from '../pageobjects/TestApp';
 import { openPKCE } from '../util/appUtils';
 import { loginDirect } from '../util/loginUtils';
