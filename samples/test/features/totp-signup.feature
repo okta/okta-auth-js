@@ -30,8 +30,8 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she selects "Skip"
     Then she is redirected to the Root View
       And she sees a table with her profile info
-      And the cell for the value of "email" is shown and contains her email
-      And the cell for the value of "name" is shown and contains her first name and last name
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"
 
   Scenario: Mary signs up for an account with Password, setups up required Google Authenticator by entering a shared secret
     Given Mary navigates to the Self Service Registration View
@@ -58,5 +58,5 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she selects "Skip"
     Then she is redirected to the Root View
       And she sees a table with her profile info
-      And the cell for the value of "email" is shown and contains her email
-      And the cell for the value of "name" is shown and contains her first name and last name
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"
