@@ -34,7 +34,7 @@ export default function Home() {
       <TopNav />
       <Box className={classes.homePageContainer} margin="l" display="flex" flexDirection="column">
         <Heading level="1">Welcome {userInfo && userInfo.name}</Heading>
-        { authState?.isAuthenticated && <Infobox heading="You're signed in" variant="success" /> }
+        { authState?.isAuthenticated && <Infobox id="sign-in-info-box" heading="You're signed in" variant="success" /> }
         <Box display="flex" className="pure-g">
           <Box paddingRight="s" className="pure-u-1 pure-u-md-1-2">
             <InfoBox 
@@ -62,8 +62,8 @@ export default function Home() {
               <Box marginTop="s">
                 <Text>Give it a try:</Text>
                 <Box display="flex" margin="s">
-                  <Button variant="primary" onClick={startIdxFlow('authenticate')}>Sign In</Button>
-                  <Button variant="secondary" onClick={startIdxFlow('register')}>Sign Up</Button>
+                  <Button id="login-button" variant="primary" onClick={startIdxFlow('authenticate')}>Sign In</Button>
+                  <Button id="register-button" variant="secondary" onClick={startIdxFlow('register')}>Sign Up</Button>
                 </Box>
               </Box>
             )}

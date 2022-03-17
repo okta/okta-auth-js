@@ -12,51 +12,36 @@
 
 
 import { Given } from '@cucumber/cucumber';
-
-// import checkContainsAnyText from '../support/check/checkContainsAnyText';
-// import checkIsEmpty from '../support/check/checkIsEmpty';
-// import checkContainsText from '../support/check/checkContainsText';
-// import checkCookieContent from '../support/check/checkCookieContent';
-// import checkCookieExists from '../support/check/checkCookieExists';
-// import checkElementExists from '../support/check/checkElementExists';
-// import checkEqualsText from '../support/check/checkEqualsText';
-// import checkModal from '../support/check/checkModal';
-// import checkOffset from '../support/check/checkOffset';
-// import checkProperty from '../support/check/checkProperty';
-// import checkSelected from '../support/check/checkSelected';
-// import checkTitle from '../support/check/checkTitle';
-// import checkUrl from '../support/check/checkURL';
-// import closeAllButFirstTab from '../support/action/closeAllButFirstTab';
-// import compareText from '../support/check/compareText';
-// import isEnabled from '../support/check/isEnabled';
-// import isDisplayed from '../support/check/isDisplayed';
-// import openWebsite from '../support/action/openWebsite';
-// import setWindowSize from '../support/action/setWindowSize';
-
-
 import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/context-enabled/live-user/navigateToLoginAndAuthenticate';
-import createContextUserAndCredentials from
-  '../support/action/context-enabled/live-user/createContextUserAndCredentials';
+import createContextUserAndCredentials from '../support/action/context-enabled/live-user/createContextUserAndCredentials';
 import createContextCredentials from '../support/action/context-enabled/live-user/createContextCredentials';
 import activateContextUserSms from '../support/action/context-enabled/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
-import attachSSRPolicy from
-  '../support/action/context-enabled/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
+import attachSSRPolicy from '../support/action/context-enabled/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
 import createContextUser from '../support/action/context-enabled/live-user/createContextUser';
-import activateContextUserActivationToken from 
-  '../support/action/context-enabled/live-user/activateContextUserActivationToken';
+import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
+import Home from '../support/selectors/Home';
+import startApp from '../support/action/startApp';
+import noop from '../support/action/noop';
+
+// NOTE: noop function is used for predefined settings
 
 Given(
-  /^^a Profile Enrollment policy defined .* (?=by .* and a random property *.).*/,
+  /^a Profile defined assigning new users to the Everyone Group$/,
+  noop
+);
+
+Given(
+  /^a Profile Enrollment policy defined .* (?=by .* and a random property *.).*/,
   attachSSRPolicy
 );
 
 Given(
   // eslint-disable-next-line max-len
-  /^^a Profile Enrollment policy defined assigning new users to the Everyone Group and (?!by .* and a random property *.).*/,
-  () => ({}) // no-op - self-enrollment is preconfigured for the org
+  /^a Profile Enrollment policy defined assigning new users to the Everyone Group and (?!by .* and a random property *.).*/,
+  noop
 );
 
 Given(
@@ -81,16 +66,16 @@ Given(
   setEnvironment
 );
 
+// 1. Org has preconfigured MFA policy "Google Authenticator Required Policy"
+//    for group "Google Authenticator Enrollment Required"
+// 2. App has preconfigured sign-on policy "MFA Required" for group "MFA Required"
+// 3. App has preconfigured profile enrollment policy "Google Authenticator Policy"
+//    for group "Google Authenticator Enrollment Required"
+// 4. App should be changed with environment "Password and Google Authenticator Required"
+//    (see next line)
 Given(
   /^configured Authenticators are Password \(required\), and Google Authenticator \(required\)$/,
-  () => ({}) // no-op
-  // 1. Org has preconfigured MFA policy "Google Authenticator Required Policy"
-  //    for group "Google Authenticator Enrollment Required"
-  // 2. App has preconfigured sign-on policy "MFA Required" for group "MFA Required"
-  // 3. App has preconfigured profile enrollment policy "Google Authenticator Policy"
-  //    for group "Google Authenticator Enrollment Required"
-  // 4. App should be changed with environment "Password and Google Authenticator Required"
-  //    (see next line)
+  noop
 );
 
 Given(
@@ -107,7 +92,7 @@ Given(
 
 Given(
   /[^/s]+ does not have account in the org/,
-  () => ({}) // no-op
+  noop
 );
 
 Given(
@@ -160,7 +145,7 @@ Given(
 
 Given(
   /^an Authenticator Enrollment Policy that has PHONE as optional and EMAIL as required for the Everyone Group$/,
-  () => ({}) // no-op
+  noop
 );
 
 Given(
@@ -177,106 +162,10 @@ Given(
 
 Given(
   /^she is not enrolled in any authenticators$/,
-  () => ({}) // no-op
+  noop
 );
 
-
-// Given(
-//     /^I open the (url|site) "([^"]*)?"$/,
-//     openWebsite
-// );
-
-// Given(
-//     /^the element "([^"]*)?" is( not)* displayed$/,
-//     isDisplayed
-// );
-
-// Given(
-//     /^the element "([^"]*)?" is( not)* enabled$/,
-//     isEnabled
-// );
-
-// Given(
-//     /^the element "([^"]*)?" is( not)* selected$/,
-//     checkSelected
-// );
-
-// Given(
-//     /^the checkbox "([^"]*)?" is( not)* checked$/,
-//     checkSelected
-// );
-
-// Given(
-//     /^there is (an|no) element "([^"]*)?" on the page$/,
-//     checkElementExists
-// );
-
-// Given(
-//     /^the title is( not)* "([^"]*)?"$/,
-//     checkTitle
-// );
-
-// Given(
-//     /^the element "([^"]*)?" contains( not)* the same text as element "([^"]*)?"$/,
-//     compareText
-// );
-
-// Given(
-//     /^the (button|element) "([^"]*)?"( not)* matches the text "([^"]*)?"$/,
-//     checkEqualsText
-// );
-
-// Given(
-//     /^the (button|element|container) "([^"]*)?"( not)* contains the text "([^"]*)?"$/,
-//     checkContainsText
-// );
-
-// Given(
-//     /^the (button|element) "([^"]*)?"( not)* contains any text$/,
-//     checkContainsAnyText
-// );
-
-// Given(
-//     /^the (button|element) "([^"]*)?" is( not)* empty$/,
-//     checkIsEmpty
-// );
-
-// Given(
-//     /^the page url is( not)* "([^"]*)?"$/,
-//     checkUrl
-// );
-
-// Given(
-//     /^the( css)* attribute "([^"]*)?" from element "([^"]*)?" is( not)* "([^"]*)?"$/,
-//     checkProperty
-// );
-
-// Given(
-//     /^the cookie "([^"]*)?" contains( not)* the value "([^"]*)?"$/,
-//     checkCookieContent
-// );
-
-// Given(
-//     /^the cookie "([^"]*)?" does( not)* exist$/,
-//     checkCookieExists
-// );
-
-// Given(
-//     /^the element "([^"]*)?" is( not)* positioned at ([\d]+)px on the (x|y) axis$/,
-//     checkOffset
-// );
-
-// Given(
-//     /^I have a screen that is ([\d]+) by ([\d]+) pixels$/,
-//     setWindowSize
-// );
-
-// Given(
-//     /^I have closed all but the first (window|tab)$/,
-//     closeAllButFirstTab
-// );
-
-// Given(
-//     /^a (alertbox|confirmbox|prompt) is( not)* opened$/,
-//     checkModal
-// );
+Given(
+  'Mary is on the Root View in an UNAUTHENTICATED state',
+  async () => await startApp(Home.path)
+);

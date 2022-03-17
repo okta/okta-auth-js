@@ -25,8 +25,10 @@ const IdentifiersSection = () => {
       setEmails(emails.map(email => {
         if (email.roles.includes('PRIMARY')) {
           email.label = 'Primary email';
+          email.selectorId='primary-email';
         } else {
           email.label = 'Secondary email';
+          email.selectorId='secondary-email';
         }
         return email;
       }));
@@ -149,7 +151,7 @@ const IdentifiersSection = () => {
                   )}
                 </Box>
                 <Box paddingTop="s">
-                  <Text>{email.profile.email}</Text>
+                  <Text id={email.selectorId}>{email.profile.email}</Text>
                 </Box>
               </Box>
             ))}

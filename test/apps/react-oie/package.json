@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "start": "vite",
+    "prestart": "vite build",
+    "start": "vite preview --port 8080",
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview"

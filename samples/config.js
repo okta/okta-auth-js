@@ -108,6 +108,13 @@ const samples = [
     ],
     useEnv: true
   },
+  {
+    name: '@okta/test.app.react-oie',
+    features: [
+      'progressive-profiling-view-profile'
+    ],
+    useEnv: true
+  },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {
     throw new Error('sample "name" is required');

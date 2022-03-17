@@ -75,7 +75,7 @@ const ProfileSection = () => {
             <Button onClick={handleUpdateProfiles}>Save</Button>
           </Box>
         ) : (
-          <Button variant="secondary" onClick={handleEditNames}>Edit</Button>
+          <Button id="edit-button" variant="secondary" onClick={handleEditNames}>Edit</Button>
         )}
       </Box>
 

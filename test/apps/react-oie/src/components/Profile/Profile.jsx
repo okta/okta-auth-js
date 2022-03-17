@@ -4,7 +4,7 @@ import IdentifiersSection from './IdentifiersSection';
 
 const Profile = () => {
   return (
-    <Box padding="s" borderColor="display" borderRadius="base">
+    <Box id="profile-table" padding="s" borderColor="display" borderRadius="base">
       <ProfileSection />
       <Box marginTop="m" marginBottom="m" borderColor="display" />
       <IdentifiersSection />
