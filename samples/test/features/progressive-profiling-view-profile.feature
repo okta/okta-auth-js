@@ -3,7 +3,7 @@ Feature: View Profile Information
   Background:
     Given a Profile Enrollment policy defined assigning new users to the Everyone Group
     And by collecting "First Name", "Last Name", "Email"
-    And a property named "age" is allowed and assigned to a SPA, WEB APP or MOBILE application
+    # And a property named "age" is allowed and assigned to a SPA, WEB APP or MOBILE application
     And a user named "Mary"
     And Mary has an account in the org
     
