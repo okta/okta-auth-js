@@ -49,6 +49,21 @@ else
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_totp_client_secret TOTP_CLIENT_SECRET
 fi
 
+cp $OKTA_HOME/$REPO/_testenv.yml $OKTA_HOME/$REPO/testenv.yml
+sed -i "s|REPLACE_ISSUER|"$ISSUER"|g"                              $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_DEFAULT_CLIENT_ID|"$CLIENT_ID"|g"                $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_DEFAULT_CLIENT_SECRET|"$CLIENT_SECRET"|g"        $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_USERNAME|"$USERNAME"|g"                          $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_PASSWORD|"$PASSWORD"|g"                          $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_A18N_API_KEY|"$A18N_API_KEY"|g"                  $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_OKTA_API_KEY|"$OKTA_API_KEY"|g"                  $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_MFA_CLIENT_ID|"$MFA_CLIENT_ID"|g"                $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_MFA_CLIENT_SECRET|"$MFA_CLIENT_SECRET"|g"        $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_CUSTOM_CLIENT_ID|"$CUSTOM_CLIENT_ID"|g"          $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_CUSTOM_CLIENT_SECRET|"$CUSTOM_CLIENT_SECRET"|g"  $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_TOTP_CLIENT_ID|"$TOTP_CLIENT_ID"|g"              $OKTA_HOME/$REPO/testenv.yml 
+sed -i "s|REPLACE_TOTP_CLIENT_SECRET|"$TOTP_CLIENT_SECRET"|g"      $OKTA_HOME/$REPO/testenv.yml 
+
 # Run the tests
 if ! yarn test:samples; then
   echo "tests failed! Exiting..."

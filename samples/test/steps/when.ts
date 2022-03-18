@@ -332,6 +332,13 @@ When(
 );
 
 When(
+  'she clicks the login button',
+  async function() {
+    await clickElement('click', 'selector', Home.loginButton);
+  }
+);
+
+When(
   'she logs in to the app',
   async function(this: ActionContext) {
     await clickElement('click', 'selector', Home.loginButton);
