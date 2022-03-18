@@ -11,7 +11,7 @@
  */
 
 
-/* eslint-disable no-console */
+/* eslint-disable no-console, complexity */
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 
@@ -40,6 +40,7 @@ function runWithConfig(sampleConfig) {
   // exit early if no spec is available
   if ((process.env.RUN_CUCUMBER_TESTS && (!features || !features.length)) 
       || (!process.env.RUN_CUCUMBER_TESTS && (!specs || !specs.length))) {
+    // eslint-disable-next-line no-process-exit
     process.exit(0);
   }
 

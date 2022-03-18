@@ -21,15 +21,17 @@ const FEATURE_GROUPS_MAP = {
   'TOTP Support (Google Authenticator) Sign Up': ['MFA Required', 'Google Authenticator Enrollment Required']
 };
 
+type CreateContextUserOptions = { 
+  firstName: string; 
+  assignToGroups?: string[]; 
+  activate?: boolean; 
+};
+
 export default async function (this: ActionContext, {
   firstName, 
   assignToGroups, 
   activate = true
-} : { 
-  firstName: string; 
-  assignToGroups?: string[]; 
-  activate?: boolean; 
-}): Promise<void> {
+}: CreateContextUserOptions): Promise<void> {
   // Scenario 10.1.3
   if (this.isCurrentScenario(Scenario.TOTP_SIGN_IN_REUSE_SHARED_SECRET)) {
     // reuse context

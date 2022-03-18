@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/* eslint-disable complexity, max-statements */
+
 
 import { Client, Group, User } from '@okta/okta-sdk-nodejs';
 import { getConfig } from '../../util';

@@ -9,5 +9,5 @@ export default async function (this: ActionContext, policyName: string) {
   if (policy) {
     await addAppToPolicy(policy.id, clientId as string);
     this.useProfileEnrollPolicy = true;
-  };
+  }
 }

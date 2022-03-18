@@ -13,8 +13,6 @@
 import { Selectors } from './types';
 import { Page } from './Page';
 
-
-const loginForm = '#login-form';
 const username = 'input[name="username"]';
 const password = 'input[name="password"]';
 const submit = 'button[type="submit"]';
