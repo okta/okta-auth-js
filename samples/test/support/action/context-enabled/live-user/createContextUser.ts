@@ -17,8 +17,8 @@ import ActionContext, { getReusedContext } from '../../../context';
 import { Scenario } from '../../../scenario';
 
 const FEATURE_GROUPS_MAP = {
-  'TOTP Support (Google Authenticator) Sign In': ['MFA Required'],
-  'TOTP Support (Google Authenticator) Sign Up': ['Google Authenticator Enrollment Required']
+  'TOTP Support (Google Authenticator) Sign In': ['MFA Required', 'Google Authenticator Enrollment Required'],
+  'TOTP Support (Google Authenticator) Sign Up': ['MFA Required', 'Google Authenticator Enrollment Required']
 };
 
 export default async function (this: ActionContext, {

@@ -19,7 +19,7 @@ import createContextUserAndCredentials from '../support/action/context-enabled/l
 import createContextCredentials from '../support/action/context-enabled/live-user/createContextCredentials';
 import activateContextUserSms from '../support/action/context-enabled/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
-import attachSSRPolicy from '../support/action/context-enabled/org-config/attachProfileEnrollmentPolicyWithCustomProfileAttribute';
+import attachPolicy from '../support/action/context-enabled/org-config/attachPolicy';
 import createContextUser from '../support/action/context-enabled/live-user/createContextUser';
 import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
 import Home from '../support/selectors/Home';
@@ -40,7 +40,14 @@ Given(
 
 Given(
   'a property named {string} is allowed and assigned to a SPA, WEB APP or MOBILE application',
-  attachSSRPolicy
+  async function(this: ActionContext, propertyName: string) {
+    const PROPERTY_POLICY_MAP = {
+      customAttribute: 'Custom Attribute Policy',
+      age: 'Age Attribute Policy'
+    };
+    await attachPolicy.call(this, (PROPERTY_POLICY_MAP as any)[propertyName]);
+    this.customAttribute = propertyName;
+  }
 );
 
 Given(
@@ -74,7 +81,9 @@ Given(
 //    (see next line)
 Given(
   /^configured Authenticators are Password \(required\), and Google Authenticator \(required\)$/,
-  noop
+  async function(this: ActionContext) {
+    await attachPolicy.call(this, 'Google Authenticator Policy');
+  }
 );
 
 Given(
