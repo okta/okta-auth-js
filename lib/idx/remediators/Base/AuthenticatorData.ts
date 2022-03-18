@@ -78,9 +78,10 @@ export class AuthenticatorData extends Remediator {
      methodType = authenticator?.methodType;
     }
     
+    const { id, enrollmentId } = this.authenticator;
     const data = { 
-      // key: this.authenticator.key, 
-      id: this.authenticator.id,
+      id,
+      enrollmentId,
       ...(authenticatorData && authenticatorData),
       ...(methodType && { methodType }) 
     };

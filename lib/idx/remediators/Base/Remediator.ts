@@ -15,7 +15,7 @@
 /* eslint-disable complexity */
 import { NextStep, IdxMessage, Authenticator, Input, IdxOptions, RemediateOptions } from '../../types';
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
-import { getAllValues, getRequiredValues, titleCase } from '../util';
+import { getAllValues, getRequiredValues, titleCase, getAuthenticatorFromRemediation } from '../util';
 import { formatAuthenticator, compareAuthenticators } from '../../authenticator/util';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
@@ -210,6 +210,29 @@ export class Remediator {
   }
 
   protected getAuthenticator(): IdxAuthenticator | undefined {
-    return this.remediation.relatesTo?.value;
+    // relatesTo value may be an authenticator or an authenticatorEnrollment
+    const relatesTo = this.remediation.relatesTo?.value;
+    if (!relatesTo) {
+      return;
+    }
+
+    const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
+    if (!authenticatorFromRemediation) {
+      // Hopefully value is an authenticator
+      return relatesTo;
+    }
+
+    // If relatesTo is an authenticatorEnrollment, the id is actually the enrollmentId
+    // Let's get the correct authenticator id from the form value
+    const id = authenticatorFromRemediation.form!.value
+      .find(({ name }) => name === 'id')!.value as string;
+    const enrollmentId = authenticatorFromRemediation.form!.value
+      .find(({ name }) => name === 'enrollmentId')?.value as string;
+
+    return {
+      ...relatesTo,
+      id,
+      enrollmentId
+    };
   }
 }

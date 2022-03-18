@@ -80,6 +80,7 @@ export interface IdxAuthenticator {
     challengeData?: ChallengeData;
   };
   credentialId?: string;
+  enrollmentId?: string;
 }
 
 export interface IdxForm {
