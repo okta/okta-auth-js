@@ -26,6 +26,9 @@ export default defineConfig({
     port: 8080
   },
   build: {
+    // Minimize transpile in development
+    target: process.env.NODE_ENV === 'development' ? 'esnext' : 'modules',
+    sourcemap: true,
     rollupOptions: {
       plugins: [visualizer({
         filename: 'dist/stats.html',
