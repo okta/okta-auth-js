@@ -303,17 +303,18 @@ export async function run(
     interactionCode
   } = data;
 
-  if (idxResponse) {
-    // Save intermediate idx response in storage to reduce introspect call
-    authClient.transactionManager.saveIdxResponse(idxResponse.rawIdxState);
-  }
-
   if (shouldClearTransaction) {
     authClient.transactionManager.clear({ clearSharedStorage });
   }
-  else if (meta?.state) {
+  else {
     // ensures state is saved to sessionStorage
     saveTransactionMeta(authClient, { ...meta });
+
+    if (idxResponse) {
+      // Save intermediate idx response in storage to reduce introspect call
+      authClient.transactionManager.saveIdxResponse(idxResponse.rawIdxState);
+    }
+
   }
   
   // from idx-js, used by the widget
