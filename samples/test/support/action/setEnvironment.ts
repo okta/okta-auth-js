@@ -26,6 +26,11 @@ export default async (envName: string) => {
   env.setEnvironmentVarsFromTestEnvYaml(envName, __dirname);
 
   // update variables for server process
-  await startApp('/', { testenv: envName });
+  const { issuer, clientId, clientSecret } = process.env;
+  await startApp('/', {
+    ...(issuer && { issuer }),
+    ...(clientId && { clientId }),
+    ...(clientSecret && { clientSecret }),
+  });
   await waitForDisplayed(Home.serverConfig, false);
 };

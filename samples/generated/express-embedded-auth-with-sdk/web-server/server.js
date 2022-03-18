@@ -22,7 +22,7 @@ const {
   userContext, 
   authTransaction,
   flowStates,
-  testEnv
+  oidcConfig,
 } = require('./middlewares');
 
 const templateDir = path.join(__dirname, '', 'views');
@@ -36,7 +36,6 @@ const app = express();
 module.exports = app;
 
 app.use(express.urlencoded({ extended: true }));
-app.use(testEnv);
 app.use(session({ 
   secret: 'this-should-be-very-random', 
   resave: true, 
@@ -44,22 +43,7 @@ app.use(session({
 }));
 app.use(flowStates);
 app.use(authTransaction);
-
-// Provide the configuration to the view layer because we show it on the homepage
-app.use((req, res, next) => {
-  const { oidc } = getConfig().webServer;
-  const displayConfig = Object.assign(
-    {},
-    oidc,
-    {
-      clientSecret: '****' + oidc.clientSecret.substr(oidc.clientSecret.length - 4, 4)
-    }
-  );
-  
-  app.locals.oidcConfig = displayConfig;
-  next();
-});
-
+app.use(oidcConfig)
 
 // This server uses mustache templates located in views/ and css assets in assets/
 app.use('/assets', express.static(frontendDir));

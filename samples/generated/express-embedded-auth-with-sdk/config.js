@@ -24,8 +24,6 @@ module.exports = function () {
     APP_BASE_URL = `http://localhost:${APP_PORT}`,
     REDIRECT_URI = `http://localhost:${APP_PORT}/login/callback`,
     POST_LOGOUT_REDIRECT_URI = `http://localhost:${APP_PORT}`,
-    RESOURCE_SERVER_PORT = 8000,
-    MESSAGES_URL = `http://localhost:${RESOURCE_SERVER_PORT}/api/messages`
   } = process.env;
 
   return {
@@ -43,23 +41,6 @@ module.exports = function () {
           disableHttpsCheck: OKTA_TESTING_DISABLEHTTPSCHECK
         }
       },
-      resourceServer: {
-        messagesUrl: MESSAGES_URL,
-      },
-    },
-    resourceServer: {
-      port: RESOURCE_SERVER_PORT,
-      oidc: {
-        clientId: CLIENT_ID,
-        issuer: ISSUER,
-        testing: {
-          disableHttpsCheck: OKTA_TESTING_DISABLEHTTPSCHECK
-        }
-      },
-      assertClaims: {
-        aud: 'api://default',
-        cid: CLIENT_ID
-      }
     }
   };
 };

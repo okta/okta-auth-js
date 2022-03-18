@@ -13,10 +13,10 @@
 
 const userContext = require('./userContext');
 const authTransaction = require('./authTransaction');
-const testEnv = require('./testEnv');
+const oidcConfig = require('./oidcConfig');
 
 module.exports = {
   userContext,
   authTransaction,
-  testEnv
+  oidcConfig
 };
