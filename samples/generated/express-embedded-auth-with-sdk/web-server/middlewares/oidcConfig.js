@@ -20,4 +20,4 @@ module.exports = function oidcConfig(req, res, next) {
   };
 
   next();
-}
+};

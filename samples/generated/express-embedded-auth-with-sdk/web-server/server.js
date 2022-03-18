@@ -43,7 +43,7 @@ app.use(session({
 }));
 app.use(flowStates);
 app.use(authTransaction);
-app.use(oidcConfig)
+app.use(oidcConfig);
 
 // This server uses mustache templates located in views/ and css assets in assets/
 app.use('/assets', express.static(frontendDir));
