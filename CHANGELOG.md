@@ -1,9 +1,27 @@
 # Changelog
+
 ## 6.3.0
+
+### Features
+
+- [#1090](https://github.com/okta/okta-auth-js/pull/1090)
+  - An `authenticator` can be provided to IDX methods as either a string (representing the authenticator key) or an authenticator object
+  - IDX functions will accept the "canonical" name for inputs (as defined by server response). For example a `credentials` object can be passed to satisfy an "identify" remediation instead of `username` and `password`
+  - `idx.proceed` will continue without saved transaction meta if a `stateHandle` is available
+  - Unknown remediations/values will proceed if the proper data is supplied by the caller
+  - IDX response object has a new field `requestDidSucceed` which will be false if the XHR was returned with a non-2xx HTTP status
 
 ### Fixes
 
+- [#1090](https://github.com/okta/okta-auth-js/pull/1090)
+  - Fixes concurrency issue with `transformAuthState`. Concurrent auth state updates will now enqueue calls to `transformAuthState` so that they execute sequentially
+  - Fixes issue with in-memory storage provider, where storage was shared between AuthJS instances in the same page/process. In-memory storage will now be unique per AuthJS instance.
+  - Fixes issue with the `step` option in IDX flows: it will only be used for a single remediation cycle
 - [#1136](https://github.com/okta/okta-auth-js/pull/1136) Fixes typo in security question enrollment
+
+### Other
+
+- [#1090](https://github.com/okta/okta-auth-js/pull/1090) Removes runtime regenerator for development builds
 
 ## 6.2.0
 
