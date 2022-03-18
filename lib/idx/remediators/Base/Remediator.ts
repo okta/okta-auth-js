@@ -152,11 +152,14 @@ export class Remediator {
 
   // Get inputs for the next step
   private getInputs(): Input[] {
-    const inputs = [];
+    const inputs: Input[] = [];
     const inputsFromRemediation = this.remediation.value || [];
-    inputsFromRemediation.map(inputFromRemediation => {
+    inputsFromRemediation.forEach(inputFromRemediation => {
       let input;
-      let { name, type } = inputFromRemediation;
+      let { name, type, visible } = inputFromRemediation;
+      if (visible === false) {
+        return; // Filter out invisible inputs, like stateHandle
+      }
       if (typeof this[`getInput${titleCase(name)}`] === 'function') {
         input = this[`getInput${titleCase(name)}`](inputFromRemediation);
       } else if (type !== 'object') {
@@ -175,12 +178,11 @@ export class Remediator {
       }
       if (!input) {
         input = inputFromRemediation;
-        // throw new AuthSdkError(`Missing custom getInput${titleCase(name)} method in Remediator: ${this.getName()}`);
       }
       if (Array.isArray(input)) {
-        input.forEach(i => inputs.push(i as never));
+        input.forEach(i => inputs.push(i));
       } else {
-        inputs.push(input as never);
+        inputs.push(input);
       }
     });
     return inputs;
@@ -190,9 +192,9 @@ export class Remediator {
     if (!remediation.value) {
       return;
     }
-    return remediation.value[0]?.form?.value.reduce((messages, field) => {
+    return remediation.value[0]?.form?.value.reduce((messages: IdxMessage[], field) => {
       if (field.messages) {
-        messages = [...messages, ...field.messages.value] as never;
+        messages = [...messages, ...field.messages.value];
       }
       return messages;
     }, []);
