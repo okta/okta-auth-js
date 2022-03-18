@@ -82,9 +82,7 @@ Given(
 //    (see next line)
 Given(
   /^configured Authenticators are Password \(required\), and Google Authenticator \(required\)$/,
-  async function(this: ActionContext) {
-    await attachPolicy.call(this, 'Google Authenticator Policy');
-  }
+  noop
 );
 
 Given(
