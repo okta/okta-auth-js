@@ -156,7 +156,7 @@ export class Remediator {
     const inputsFromRemediation = this.remediation.value || [];
     inputsFromRemediation.forEach(inputFromRemediation => {
       let input;
-      let { name, type, visible } = inputFromRemediation;
+      let { name, type, visible, messages } = inputFromRemediation;
       if (visible === false) {
         return; // Filter out invisible inputs, like stateHandle
       }
@@ -182,6 +182,10 @@ export class Remediator {
       if (Array.isArray(input)) {
         input.forEach(i => inputs.push(i));
       } else {
+        // guarantees field-level messages are passed back
+        if (messages) {
+          input.messages = messages;
+        }
         inputs.push(input);
       }
     });

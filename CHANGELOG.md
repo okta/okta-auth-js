@@ -1,5 +1,21 @@
 # Changelog
 
+## 6.4
+
+### Fixes
+
+- [#1145](https://github.com/okta/okta-auth-js/pull/1145)
+  - IDX: form field-level messages are now passed through via idxState
+  - Type Fixes:
+    * IdxContent: `user` property now optional
+    * Input: added missing `key` property
+
+### Other
+
+- [#1145](https://github.com/okta/okta-auth-js/pull/1145)
+  - refactor: IDX methods now use auth-js http client
+  - refactor: idx-js methods have been refactored to idxState
+
 ## 6.3.0
 
 ### Features

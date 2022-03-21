@@ -11,7 +11,7 @@
  */
 
 
-import { parseNonRemediations, parseIdxResponse } from '../../../../../../lib/idx/idx-js/v1/idxResponseParser';
+import { parseNonRemediations, parseIdxResponse } from '../../../../../../lib/idx/idxState/v1/idxResponseParser';
 
 const mockIdxResponse = require('../../mocks/challenge-password');
 const mockAuthenticatorVerificationSelectAuthenticator = require('../../mocks/authenticator-verification-select-authenticator');
@@ -22,14 +22,14 @@ const mockTerminalIdxResponse = require('../../mocks/terminal-return-email');
 const mockMessageIdxResponse = require('../../mocks/unknown-user');
 const mockSuccessIdxResponse = require('../../mocks/success');
 
-jest.mock('../../../../../../lib/idx/idx-js/v1/generateIdxAction');
-jest.mock('../../../../../../lib/idx/idx-js/v1/remediationParser');
-jest.mock('../../../../../../lib/idx/idx-js/v1/actionParser');
+jest.mock('../../../../../../lib/idx/idxState/v1/generateIdxAction');
+jest.mock('../../../../../../lib/idx/idxState/v1/remediationParser');
+jest.mock('../../../../../../lib/idx/idxState/v1/actionParser');
 
 // imports to target for mockery
-import { generateRemediationFunctions } from '../../../../../../lib/idx/idx-js/v1/remediationParser';
-import { divideActionParamsByMutability } from '../../../../../../lib/idx/idx-js/v1/actionParser';
-import generateIdxAction from '../../../../../../lib/idx/idx-js/v1/generateIdxAction';
+import { generateRemediationFunctions } from '../../../../../../lib/idx/idxState/v1/remediationParser';
+import { divideActionParamsByMutability } from '../../../../../../lib/idx/idxState/v1/actionParser';
+import generateIdxAction from '../../../../../../lib/idx/idxState/v1/generateIdxAction';
 
 generateIdxAction.mockReturnValue('generated function');
 generateRemediationFunctions.mockReturnValue('generated collection of functions');
@@ -39,7 +39,7 @@ describe('idxResponseParser', () => {
   describe('parseNonRemediations', () => {
 
     it('copies simple context items', () => {
-      const { context } = parseNonRemediations( mockIdxResponse );
+      const { context } = parseNonRemediations( {}, mockIdxResponse );
       expect( context ).toEqual({
         expiresAt: mockIdxResponse.expiresAt,
         step: mockIdxResponse.step,
@@ -59,33 +59,33 @@ describe('idxResponseParser', () => {
     });
 
     it('copies terminal messages', () => {
-      const { context } = parseNonRemediations( mockTerminalIdxResponse );
+      const { context } = parseNonRemediations( {}, mockTerminalIdxResponse );
       expect( context.terminal ).toEqual( mockTerminalIdxResponse.terminal );
     });
 
     it('copies non-terminal messages', () => {
-      const { context } = parseNonRemediations( mockMessageIdxResponse );
+      const { context } = parseNonRemediations( {}, mockMessageIdxResponse );
       expect( context.messages ).toEqual( mockMessageIdxResponse.messages );
     });
 
     it('copies token info', () => {
-      const { context } = parseNonRemediations( mockSuccessIdxResponse );
+      const { context } = parseNonRemediations( {}, mockSuccessIdxResponse );
       expect( context.success ).toMatchObject( mockSuccessIdxResponse.success );
     });
 
     it('handles missing simple context items', () => {
-      const { context } = parseNonRemediations( mockSmallIdxResponse );
+      const { context } = parseNonRemediations( {}, mockSmallIdxResponse );
       expect(mockSmallIdxResponse.user).not.toBeDefined();
       expect(context.user).not.toBeDefined();
     });
 
     it('translates simple actions', () => {
-      const { actions } = parseNonRemediations( mockIdxResponse );
+      const { actions } = parseNonRemediations( {}, mockIdxResponse );
       expect( actions.cancel ).toBe('generated function');
     });
 
     it('pulls apart complicated actions/context', () => {
-      const { context, actions } = parseNonRemediations( mockIdxResponse );
+      const { context, actions } = parseNonRemediations( {}, mockIdxResponse );
       expect( actions['factor-recover'] ).toBe('generated function');
       expect( context.factor ).toStrictEqual({
         type: 'object',
@@ -98,7 +98,7 @@ describe('idxResponseParser', () => {
     });
 
     it('handles multiple actions in a complex context field', () => {
-      const { context, actions } = parseNonRemediations( mockComplexContextIdxResponse );
+      const { context, actions } = parseNonRemediations( {}, mockComplexContextIdxResponse );
       expect( actions['factor-send'] ).toBe('generated function');
       expect( actions['factor-poll'] ).toBe('generated function');
       expect( context.factor ).toStrictEqual({
@@ -118,16 +118,16 @@ describe('idxResponseParser', () => {
   describe('parseIdxResponse', () => {
 
     it('builds remediation functions', () => {
-      const { remediations } = parseIdxResponse( mockIdxResponse );
+      const { remediations } = parseIdxResponse( {}, mockIdxResponse );
       expect( generateRemediationFunctions.mock.calls.length ).toBe(1);
-      expect( generateRemediationFunctions.mock.calls[0] ).toMatchObject( [mockIdxResponse.remediation.value, {}] );
+      expect( generateRemediationFunctions.mock.calls[0] ).toMatchObject( [{}, mockIdxResponse.remediation.value, {}] );
       expect( remediations[0].name ).toBe('challenge-factor');
       expect( remediations[0].href ).toBe('https://dev-550580.okta.com/idp/idx/challenge/answer');
       expect( remediations[0].method ).toBe('POST');
     });
 
     it('builds context and actions', () => {
-      const { context, actions } = parseIdxResponse( mockIdxResponse );
+      const { context, actions } = parseIdxResponse( {}, mockIdxResponse );
       expect( context ).toStrictEqual({
         expiresAt: mockIdxResponse.expiresAt,
         step: mockIdxResponse.step,
@@ -149,18 +149,18 @@ describe('idxResponseParser', () => {
 
     it('builds remediation for authenticator-verify-select-authenticator', () => {
       const toPersist = {};
-      const { remediations } = parseIdxResponse( mockAuthenticatorVerificationSelectAuthenticator, toPersist );
+      const { remediations } = parseIdxResponse( {}, mockAuthenticatorVerificationSelectAuthenticator, toPersist );
       expect( generateRemediationFunctions.mock.calls.length ).toBe(1);
-      expect( generateRemediationFunctions.mock.calls[0] ).toMatchObject( [ mockAuthenticatorVerificationSelectAuthenticator.remediation.value, toPersist ] );
+      expect( generateRemediationFunctions.mock.calls[0] ).toMatchObject( [{}, mockAuthenticatorVerificationSelectAuthenticator.remediation.value, toPersist ] );
       expect( remediations[0] ).toMatchSnapshot();
     });
 
     it('builds remediation functions for authenticator-verify-password', () => {
       const toPersist = {};
-      const { remediations } = parseIdxResponse( mockAuthenticatorVerificationPassword, toPersist );
+      const { remediations } = parseIdxResponse( {}, mockAuthenticatorVerificationPassword, toPersist );
       expect( generateRemediationFunctions.mock.calls.length ).toBe(2);
-      expect( generateRemediationFunctions.mock.calls[0] ).toMatchObject( [ [mockAuthenticatorVerificationPassword.remediation.value[0]], toPersist ] );
-      expect( generateRemediationFunctions.mock.calls[1] ).toMatchObject( [ [mockAuthenticatorVerificationPassword.remediation.value[1]], toPersist ] );
+      expect( generateRemediationFunctions.mock.calls[0] ).toMatchObject( [ {}, [mockAuthenticatorVerificationPassword.remediation.value[0]], toPersist ] );
+      expect( generateRemediationFunctions.mock.calls[1] ).toMatchObject( [ {}, [mockAuthenticatorVerificationPassword.remediation.value[1]], toPersist ] );
       expect( remediations[0]).toMatchSnapshot();
     });
 

@@ -124,7 +124,6 @@ import {
   parseEmailVerifyCallback,
   isEmailVerifyCallbackError
 } from './idx';
-import { createGlobalRequestInterceptor, setGlobalRequestInterceptor } from './idx/headers';
 import { OktaUserAgent } from './OktaUserAgent';
 import { parseOAuthResponseFromUrl } from './oidc/parseFromUrl';
 import {
@@ -335,8 +334,6 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       canProceed: canProceed.bind(null, this),
       unlockAccount: unlockAccount.bind(null, this),
     };
-
-    setGlobalRequestInterceptor(createGlobalRequestInterceptor(this)); // to pass custom headers to IDX endpoints
 
     // HTTP
     this.http = {

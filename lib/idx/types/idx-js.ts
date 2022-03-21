@@ -155,7 +155,7 @@ export interface IdxContext {
     type: string;
     value: IdxAuthenticator;
   };
-  user: {
+  user?: {
     type: string;
     value: Record<string, unknown>;
   };

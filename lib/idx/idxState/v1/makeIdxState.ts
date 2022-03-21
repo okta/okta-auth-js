@@ -10,12 +10,18 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { IdxResponse, RawIdxResponse } from '../../types/idx-js';
+import { IdxResponse } from '../../types/idx-js';
+import { OktaAuthInterface, RawIdxResponse } from '../../../types';    // auth-js/types
 import { parseIdxResponse } from './idxResponseParser';
 
-export function makeIdxState( idxResponse: RawIdxResponse, toPersist, requestDidSucceed: boolean ): IdxResponse {
+export function makeIdxState( 
+  authClient: OktaAuthInterface,
+  idxResponse: RawIdxResponse,
+  toPersist,
+  requestDidSucceed: boolean
+): IdxResponse {
   const rawIdxResponse =  idxResponse;
-  const { remediations, context, actions } = parseIdxResponse( idxResponse, toPersist );
+  const { remediations, context, actions } = parseIdxResponse( authClient, idxResponse, toPersist );
   const neededToProceed = [...remediations];
 
   const proceed: IdxResponse['proceed'] = async function( remediationChoice, paramsFromUser = {} ) {

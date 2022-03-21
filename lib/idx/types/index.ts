@@ -70,6 +70,7 @@ export enum AuthenticatorKey {
 
 export type Input = {
   name: string;
+  key?: string;
   type?: string;
   label?: string;
   value?: string | {form: IdxForm};

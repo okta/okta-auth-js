@@ -13,11 +13,11 @@
 
 import { interact } from '../../../lib/idx/interact';
 
-jest.mock('../../../lib/idx/idx-js', () => {
-  const actual = jest.requireActual('../../../lib/idx/idx-js').default;
+jest.mock('../../../lib/http', () => {
+  const actual = jest.requireActual('../../../lib/http');
   return {
-    client: actual.client,
-    interact: () => {}
+    ...actual,
+    httpRequest: () => {}
   };
 });
 
@@ -26,17 +26,21 @@ jest.mock('../../../lib/idx/transactionMeta', () => {
   return {
     ...actual,
     getSavedTransactionMeta: () => {},
-    saveTransactionMeta: () => {}
+    saveTransactionMeta: () => {},
+    // createTransactionMeta: () => {},
   };
 });
 
 const mocked = {
-  idx: require('../../../lib/idx/idx-js'),
+  http: require('../../../lib/http'),
   transactionMeta: require('../../../lib/idx/transactionMeta')
 };
 
+import { OktaAuth } from '@okta/okta-auth-js';
+
 describe('idx/interact', () => {
   let testContext;
+
   beforeEach(() => {
     const transactionMeta = {
       state: 'meta-state',
@@ -46,7 +50,7 @@ describe('idx/interact', () => {
       codeChallengeMethod: 'meta-codeChallengeMethod'
     };
     const authParams = {
-      issuer: 'authClient-issuer',
+      issuer: 'https://auth-js-test.okta.com',
       state: 'authClient-state',
       scopes: ['authClient'],
       clientId: 'authClient-clientId',
@@ -62,19 +66,18 @@ describe('idx/interact', () => {
       responseType: 'tp-responseType'
     };
 
+    const authClient = new OktaAuth(authParams);
+
     jest.spyOn(mocked.transactionMeta, 'createTransactionMeta').mockImplementation((authClient, options) => {
       return Object.assign({}, tokenParams, authParams, options);
     });
-    jest.spyOn(mocked.idx, 'interact').mockResolvedValue('idx-interactionHandle');
+    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue({interaction_handle: 'idx-interactionHandle'});
 
     testContext = {
       transactionMeta,
-      authClient: {
-        options: authParams,
-        token: {
-          prepareTokenParams: () => Promise.resolve(tokenParams)
-        },
-      }
+      authClient,
+      tokenParams,
+      authParams
     };
   });
 
@@ -89,20 +92,26 @@ describe('idx/interact', () => {
         const { authClient, transactionMeta } = testContext;
         jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
         const res = await interact(authClient, { state: 'fn-state', scopes: ['fn']});
-        expect(mocked.idx.interact).toHaveBeenCalledWith({
-          'clientId': 'authClient-clientId',
-          'baseUrl': 'authClient-issuer/oauth2',
-          'codeChallenge': 'meta-codeChallenge',
-          'codeChallengeMethod': 'meta-codeChallengeMethod',
-          'redirectUri': 'authClient-redirectUri',
-          'scopes': ['fn'],
-          'state': 'fn-state',
+        expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+          url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          args: ({
+            client_id: 'authClient-clientId',
+            scope: 'fn',
+            redirect_uri: 'authClient-redirectUri',
+            code_challenge: 'meta-codeChallenge',
+            code_challenge_method: 'meta-codeChallengeMethod',
+            state: 'fn-state',
+          })
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
           'meta': {
             'clientId': 'authClient-clientId',
-            'issuer': 'authClient-issuer',
+            'issuer': 'https://auth-js-test.okta.com',
             'redirectUri': 'authClient-redirectUri',
             'codeChallenge': 'meta-codeChallenge',
             'codeChallengeMethod': 'meta-codeChallengeMethod',
@@ -121,20 +130,26 @@ describe('idx/interact', () => {
       it('if no state/scopes in function option, uses values from meta', async () => {
         const { authClient } = testContext;
         const res = await interact(authClient, {});
-        expect(mocked.idx.interact).toHaveBeenCalledWith({
-          'clientId': 'authClient-clientId',
-          'baseUrl': 'authClient-issuer/oauth2',
-          'codeChallenge': 'meta-codeChallenge',
-          'codeChallengeMethod': 'meta-codeChallengeMethod',
-          'redirectUri': 'authClient-redirectUri',
-          'scopes': ['meta'],
-          'state': 'meta-state',
+        expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+          url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          args: ({
+            client_id: 'authClient-clientId',
+            scope: 'meta',
+            redirect_uri: 'authClient-redirectUri',
+            code_challenge: 'meta-codeChallenge',
+            code_challenge_method: 'meta-codeChallengeMethod',
+            state: 'meta-state',
+          })
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
           'meta': {
             'clientId': 'authClient-clientId',
-            'issuer': 'authClient-issuer',
+            'issuer': 'https://auth-js-test.okta.com',
             'redirectUri': 'authClient-redirectUri',
             'codeChallenge': 'meta-codeChallenge',
             'codeChallengeMethod': 'meta-codeChallengeMethod',
@@ -156,20 +171,26 @@ describe('idx/interact', () => {
       it('uses state/scopes from function options', async () => {
         const { authClient } = testContext;
         const res = await interact(authClient, { state: 'fn-state', scopes: ['fn']});
-        expect(mocked.idx.interact).toHaveBeenCalledWith({
-          'clientId': 'authClient-clientId',
-          'baseUrl': 'authClient-issuer/oauth2',
-          'codeChallenge': 'tp-codeChallenge',
-          'codeChallengeMethod': 'tp-codeChallengeMethod',
-          'redirectUri': 'authClient-redirectUri',
-          'scopes': ['fn'],
-          'state': 'fn-state',
+        expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+          url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          args: ({
+            client_id: 'authClient-clientId',
+            scope: 'fn',
+            redirect_uri: 'authClient-redirectUri',
+            code_challenge: 'tp-codeChallenge',
+            code_challenge_method: 'tp-codeChallengeMethod',
+            state: 'fn-state',
+          })
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
           'meta': {
             'clientId': 'authClient-clientId',
-            'issuer': 'authClient-issuer',
+            'issuer': 'https://auth-js-test.okta.com',
             'redirectUri': 'authClient-redirectUri',
             'codeChallenge': 'tp-codeChallenge',
             'codeChallengeMethod': 'tp-codeChallengeMethod',
@@ -188,20 +209,26 @@ describe('idx/interact', () => {
       it('if no state/scopes in function option, uses values from authClient.options', async () => {
         const { authClient } = testContext;
         const res = await interact(authClient, {});
-        expect(mocked.idx.interact).toHaveBeenCalledWith({
-          'clientId': 'authClient-clientId',
-          'baseUrl': 'authClient-issuer/oauth2',
-          'codeChallenge': 'tp-codeChallenge',
-          'codeChallengeMethod': 'tp-codeChallengeMethod',
-          'redirectUri': 'authClient-redirectUri',
-          'scopes': ['authClient'],
-          'state': 'authClient-state',
+        expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+          url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          args: ({
+            client_id: 'authClient-clientId',
+            scope: 'authClient',
+            redirect_uri: 'authClient-redirectUri',
+            code_challenge: 'tp-codeChallenge',
+            code_challenge_method: 'tp-codeChallengeMethod',
+            state: 'authClient-state',
+          })
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
           'meta': {
             'clientId': 'authClient-clientId',
-            'issuer': 'authClient-issuer',
+            'issuer': 'https://auth-js-test.okta.com',
             'redirectUri': 'authClient-redirectUri',
             'codeChallenge': 'tp-codeChallenge',
             'codeChallengeMethod': 'tp-codeChallengeMethod',
@@ -218,24 +245,30 @@ describe('idx/interact', () => {
       });
   
       it('if no state/scopes in function option or authClient.options, uses values from default token params', async () => {
-        const { authClient } = testContext;
-        delete authClient.options.state;
-        delete authClient.options.scopes;
+        const { authClient, tokenParams } = testContext;
+        // mocks `authParams` and `client.options` not existing
+        jest.spyOn(mocked.transactionMeta, 'createTransactionMeta').mockImplementation(() => ({...tokenParams}));
         const res = await interact(authClient, {});
-        expect(mocked.idx.interact).toHaveBeenCalledWith({
-          'clientId': 'authClient-clientId',
-          'baseUrl': 'authClient-issuer/oauth2',
-          'codeChallenge': 'tp-codeChallenge',
-          'codeChallengeMethod': 'tp-codeChallengeMethod',
-          'redirectUri': 'authClient-redirectUri',
-          'scopes': ['tp-scopes'],
-          'state': 'tp-state',
+        expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+          url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          args: ({
+            client_id: 'authClient-clientId',
+            scope: 'tp-scopes',
+            redirect_uri: 'authClient-redirectUri',
+            code_challenge: 'tp-codeChallenge',
+            code_challenge_method: 'tp-codeChallengeMethod',
+            state: 'tp-state',
+          })
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
           'meta': {
             'clientId': 'authClient-clientId',
-            'issuer': 'authClient-issuer',
+            'issuer': 'https://auth-js-test.okta.com',
             'redirectUri': 'authClient-redirectUri',
             'codeChallenge': 'tp-codeChallenge',
             'codeChallengeMethod': 'tp-codeChallengeMethod',
@@ -252,25 +285,37 @@ describe('idx/interact', () => {
       });
   
       describe('activationToken', () => {
+        beforeEach(() => {
+          const { authParams } = testContext;
+          authParams.activationToken = 'sdk-activationToken';
+          const authClient = new OktaAuth(authParams);
+          testContext.authClient = authClient;
+        });
+
         it('uses activationToken from sdk options', async () => {
           const { authClient } = testContext;
-          authClient.options.activationToken = 'sdk-activationToken';
           const res = await interact(authClient);
-          expect(mocked.idx.interact).toHaveBeenCalledWith({
-            'clientId': 'authClient-clientId',
-            'baseUrl': 'authClient-issuer/oauth2',
-            'codeChallenge': 'tp-codeChallenge',
-            'codeChallengeMethod': 'tp-codeChallengeMethod',
-            'redirectUri': 'authClient-redirectUri',
-            'scopes': ['authClient'],
-            'state': 'authClient-state',
-            'activationToken': 'sdk-activationToken'
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'authClient',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'authClient-state',
+              activation_token: 'sdk-activationToken'
+            })
           });
           expect(res).toEqual({
             'interactionHandle': 'idx-interactionHandle',
             'meta': {
               'clientId': 'authClient-clientId',
-              'issuer': 'authClient-issuer',
+              'issuer': 'https://auth-js-test.okta.com',
               'redirectUri': 'authClient-redirectUri',
               'codeChallenge': 'tp-codeChallenge',
               'codeChallengeMethod': 'tp-codeChallengeMethod',
@@ -288,23 +333,28 @@ describe('idx/interact', () => {
         });
         it('uses activationToken from function options (overrides sdk option)', async () => {
           const { authClient } = testContext;
-          authClient.options.activationToken = 'sdk-activationToken';
           const res = await interact(authClient, { activationToken: 'fn-activationToken' });
-          expect(mocked.idx.interact).toHaveBeenCalledWith({
-            'clientId': 'authClient-clientId',
-            'baseUrl': 'authClient-issuer/oauth2',
-            'codeChallenge': 'tp-codeChallenge',
-            'codeChallengeMethod': 'tp-codeChallengeMethod',
-            'redirectUri': 'authClient-redirectUri',
-            'scopes': ['authClient'],
-            'state': 'authClient-state',
-            'activationToken': 'fn-activationToken'
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'authClient',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'authClient-state',
+              activation_token: 'fn-activationToken'
+            })
           });
           expect(res).toEqual({
             'interactionHandle': 'idx-interactionHandle',
             'meta': {
               'clientId': 'authClient-clientId',
-              'issuer': 'authClient-issuer',
+              'issuer': 'https://auth-js-test.okta.com',
               'redirectUri': 'authClient-redirectUri',
               'codeChallenge': 'tp-codeChallenge',
               'codeChallengeMethod': 'tp-codeChallengeMethod',
@@ -323,25 +373,37 @@ describe('idx/interact', () => {
       });
 
       describe('recoveryToken', () => {
+        beforeEach(() => {
+          const { authParams } = testContext;
+          authParams.recoveryToken = 'sdk-recoveryToken';
+          const authClient = new OktaAuth(authParams);
+          testContext.authClient = authClient;
+        });
+        
         it('uses recoveryToken from sdk options', async () => {
           const { authClient } = testContext;
-          authClient.options.recoveryToken = 'sdk-recoveryToken';
-          const res = await interact(authClient, { recoveryToken: 'sdk-recoveryToken' });
-          expect(mocked.idx.interact).toHaveBeenCalledWith({
-            'clientId': 'authClient-clientId',
-            'baseUrl': 'authClient-issuer/oauth2',
-            'codeChallenge': 'tp-codeChallenge',
-            'codeChallengeMethod': 'tp-codeChallengeMethod',
-            'redirectUri': 'authClient-redirectUri',
-            'scopes': ['authClient'],
-            'state': 'authClient-state',
-            'recoveryToken': 'sdk-recoveryToken'
+          const res = await interact(authClient);
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'authClient',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'authClient-state',
+              recovery_token: 'sdk-recoveryToken'
+            })
           });
           expect(res).toEqual({
             'interactionHandle': 'idx-interactionHandle',
             'meta': {
               'clientId': 'authClient-clientId',
-              'issuer': 'authClient-issuer',
+              'issuer': 'https://auth-js-test.okta.com',
               'redirectUri': 'authClient-redirectUri',
               'codeChallenge': 'tp-codeChallenge',
               'codeChallengeMethod': 'tp-codeChallengeMethod',
@@ -359,23 +421,28 @@ describe('idx/interact', () => {
         });
         it('uses recoveryToken from function options (overrides sdk option)', async () => {
           const { authClient } = testContext;
-          authClient.options.recoveryToken = 'sdk-recoveryToken';
           const res = await interact(authClient, { recoveryToken: 'fn-recoveryToken' });
-          expect(mocked.idx.interact).toHaveBeenCalledWith({
-            'clientId': 'authClient-clientId',
-            'baseUrl': 'authClient-issuer/oauth2',
-            'codeChallenge': 'tp-codeChallenge',
-            'codeChallengeMethod': 'tp-codeChallengeMethod',
-            'redirectUri': 'authClient-redirectUri',
-            'scopes': ['authClient'],
-            'state': 'authClient-state',
-            'recoveryToken': 'fn-recoveryToken'
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'authClient',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'authClient-state',
+              recovery_token: 'fn-recoveryToken'
+            })
           });
           expect(res).toEqual({
             'interactionHandle': 'idx-interactionHandle',
             'meta': {
               'clientId': 'authClient-clientId',
-              'issuer': 'authClient-issuer',
+              'issuer': 'https://auth-js-test.okta.com',
               'redirectUri': 'authClient-redirectUri',
               'codeChallenge': 'tp-codeChallenge',
               'codeChallengeMethod': 'tp-codeChallengeMethod',
@@ -393,28 +460,41 @@ describe('idx/interact', () => {
         });
       });
 
+      // TODO: mock well-known endpoint???
       describe('clientSecret', () => {
         beforeEach(() => {
           // use original createTransactionMeta implementation
           jest.spyOn(mocked.transactionMeta, 'createTransactionMeta').mockRestore();
           jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+
+          const { authParams, tokenParams } = testContext;
+          authParams.clientSecret = 'sdk-clientSecret';
+          const authClient = new OktaAuth(authParams);
+          testContext.authClient = authClient;
+
+          // mock `prepareTokenParams`
+          testContext.authClient.token.prepareTokenParams = () => Promise.resolve(tokenParams);
         });
 
         it('uses clientSecret from sdk options', async () => {
           const { authClient } = testContext;
-          authClient.options.clientSecret = 'sdk-clientSecret';
           await interact(authClient, {});
-          expect(mocked.idx.interact).toHaveBeenCalled();
-          const interactArg = mocked.idx.interact.mock.calls[0][0];
-          expect(interactArg).toMatchObject({
-            'clientId': 'authClient-clientId',
-            'baseUrl': 'authClient-issuer/oauth2',
-            'codeChallenge': 'tp-codeChallenge',
-            'codeChallengeMethod': 'tp-codeChallengeMethod',
-            'redirectUri': 'authClient-redirectUri',
-            'scopes': ['tp-scopes'],
-            'state': 'tp-state',
-            'clientSecret': 'sdk-clientSecret'
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'tp-scopes',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'tp-state',
+              client_secret: 'sdk-clientSecret'
+            }),
+            withCredentials: true
           });
           expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, {
             'clientId': 'authClient-clientId',
@@ -423,7 +503,7 @@ describe('idx/interact', () => {
             'codeVerifier': 'tp-codeVerifier',
             'flow': 'default',
             'interactionHandle': 'idx-interactionHandle',
-            'issuer': 'authClient-issuer',
+            'issuer': 'https://auth-js-test.okta.com',
             'redirectUri': 'authClient-redirectUri',
             'responseType': 'tp-responseType',
             'scopes': ['tp-scopes'],
@@ -434,19 +514,23 @@ describe('idx/interact', () => {
         });
         it('uses clientSecret from function options (overrides sdk option)', async () => {
           const { authClient } = testContext;
-          authClient.options.clientSecret = 'sdk-clientSecret';
           await interact(authClient, { clientSecret: 'fn-clientSecret' });
-          expect(mocked.idx.interact).toHaveBeenCalled();
-          const functionArg = mocked.idx.interact.mock.calls[0][0];
-          expect(functionArg).toMatchObject({
-            'clientId': 'authClient-clientId',
-            'baseUrl': 'authClient-issuer/oauth2',
-            'codeChallenge': 'tp-codeChallenge',
-            'codeChallengeMethod': 'tp-codeChallengeMethod',
-            'redirectUri': 'authClient-redirectUri',
-            'scopes': ['tp-scopes'],
-            'state': 'tp-state',
-            'clientSecret': 'fn-clientSecret'
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'tp-scopes',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'tp-state',
+              client_secret: 'fn-clientSecret'
+            }),
+            withCredentials: true
           });
           expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, {
             'clientId': 'authClient-clientId',
@@ -455,7 +539,7 @@ describe('idx/interact', () => {
             'codeVerifier': 'tp-codeVerifier',
             'flow': 'default',
             'interactionHandle': 'idx-interactionHandle',
-            'issuer': 'authClient-issuer',
+            'issuer': 'https://auth-js-test.okta.com',
             'redirectUri': 'authClient-redirectUri',
             'responseType': 'tp-responseType',
             'scopes': ['tp-scopes'],
@@ -472,7 +556,7 @@ describe('idx/interact', () => {
         await interact(authClient);
         expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, {
           'clientId': 'authClient-clientId',
-          'issuer': 'authClient-issuer',
+          'issuer': 'https://auth-js-test.okta.com',
           'redirectUri': 'authClient-redirectUri',
           'codeChallenge': 'tp-codeChallenge',
           'codeChallengeMethod': 'tp-codeChallengeMethod',
@@ -496,10 +580,10 @@ describe('idx/interact', () => {
       jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
     });
 
-    it('should not call idx.interact', async () => {
+    it('should not make an /interact network call', async () => {
       const { authClient } = testContext;
       await interact(authClient);
-      expect(mocked.idx.interact).not.toHaveBeenCalled();
+      expect(mocked.http.httpRequest).not.toHaveBeenCalled();
     });
 
     it('returns saved meta', async () => {
