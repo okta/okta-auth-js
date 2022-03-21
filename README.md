@@ -277,6 +277,14 @@ if (!userInfo) {
 }
 ```
 
+#### Usage with Typescript < 3.6 and Angular < 9
+
+Typescript versions prior to 3.6 (used in Angular prior to v9) has no types for WebAuthn. 
+Support for WebAuthn in IDX API was introduced in `OktaAuth 6.1.0`. 
+To solve this issue please install package `@types/webappsec-credential-management` version `^0.5.1`. 
+For Angular 8 and below please also add `webappsec-credential-management` into `types` of `compilerOptions` in `tsconfig.json`. 
+See [okta-angular sample app for Angular 7](https://github.com/okta/okta-angular/tree/master/test/apps/angular-v7). 
+
 ### Strategies for Obtaining Tokens
 
 #### Authorization Code flow for web and native client types
