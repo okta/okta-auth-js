@@ -13,11 +13,9 @@
 import { Selectors } from './types';
 import { Page } from './Page';
 
-
-const loginForm = '#login-form';
-const username = `${loginForm} #username`;
-const password = `${loginForm} #password`;
-const submit = `${loginForm} #submit-login-form`;
+const username = 'input[name="username"]';
+const password = 'input[name="password"]';
+const submit = 'button[type="submit"]';
 const formMessages = `#form-messages li`;
 const formMessage = `${formMessages}:first-child`;
 const facebookButton = '#idp-buttons #facebook';

@@ -10,7 +10,7 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
-      And she fills out her Age
+      #And she fills out her Age
       And she submits the registration form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option
@@ -30,15 +30,15 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she selects "Skip"
     Then she is redirected to the Root View
       And she sees a table with her profile info
-      And the cell for the value of "email" is shown and contains her email
-      And the cell for the value of "name" is shown and contains her first name and last name
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"
 
   Scenario: Mary signs up for an account with Password, setups up required Google Authenticator by entering a shared secret
     Given Mary navigates to the Self Service Registration View
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
-      And she fills out her Age
+      #And she fills out her Age
       And she submits the registration form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option
@@ -58,5 +58,5 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she selects "Skip"
     Then she is redirected to the Root View
       And she sees a table with her profile info
-      And the cell for the value of "email" is shown and contains her email
-      And the cell for the value of "name" is shown and contains her first name and last name
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"

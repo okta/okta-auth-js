@@ -12,11 +12,10 @@
 
 
 const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
-const getConfig = require('../../config');
 
 module.exports = function getAuthClient(req, options = {}) {
   const { transactionId } = req; // set by authTransaction middleware
-  const { oidc } = getConfig().webServer;
+  const { oidcConfig: oidc } = req.session;
   const storageProvider = {
     getItem: function(key) {
       let val = req.session[key] || null;

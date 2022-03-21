@@ -9,7 +9,7 @@ By default the app server runs at `http://localhost:{{ port }}`.
 
 ## Commands
 
-If running from the workspace directory: `yarn workspace {{ pkgName }} start`
+If running from the workspace directory: `yarn workspace {{ name }} start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |

@@ -13,8 +13,8 @@ Feature: Direct Auth Basic Login with Password Factor
       And she submits the Login form
       Then she is redirected to the Root View
         And she sees a table with her profile info
-        And the cell for the value of "email" is shown and contains her email
-        And the cell for the value of "name" is shown and contains her first name and last name
+        And the cell for the value of "email" is shown and contains her "email"
+        And the cell for the value of "name" is shown and contains her "first name and last name"
 
     Scenario: Mary clicks on the "Forgot Password Link"
       Given Mary navigates to the Basic Login View

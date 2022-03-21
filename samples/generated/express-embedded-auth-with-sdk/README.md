@@ -49,7 +49,7 @@ CLIENT_SECRET=456xxx
 
 ### Commands
 
-If running from the workspace directory: `yarn workspace @okta/samples.express.embedded-auth-with-sdk start`
+If running from the workspace directory: `yarn workspace @okta/samples.express-embedded-auth-with-sdk start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |

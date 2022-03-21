@@ -14,6 +14,7 @@ import { Page } from './Page';
 
 
 class Home implements Page {
+  get path() { return '/'; }
   get isDisplayedElementSelector() { return this.serverConfig; }
 
   get serverConfig() { return '#server-config'; }

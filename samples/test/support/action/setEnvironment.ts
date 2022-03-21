@@ -22,10 +22,20 @@ import Home from '../selectors/Home';
 import startApp from './startApp';
 
 export default async (envName: string) => {
+  envName = {
+    'that defines MFA with Password and Email as required': 'Password + Another Factor',
+    'that defines MFA with Password and SMS as required': 'Password + Another Factor'
+  }[envName] || envName;
+
   // update variables for runner process
   env.setEnvironmentVarsFromTestEnvYaml(envName, __dirname);
 
   // update variables for server process
-  await startApp('/', { testenv: envName });
+  const { issuer, clientId, clientSecret } = process.env;
+  await startApp('/', {
+    ...(issuer && { issuer }),
+    ...(clientId && { clientId }),
+    ...(clientSecret && { clientSecret }),
+  });
   await waitForDisplayed(Home.serverConfig, false);
 };

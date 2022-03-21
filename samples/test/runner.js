@@ -11,7 +11,7 @@
  */
 
 
-/* eslint-disable no-console */
+/* eslint-disable no-console, complexity */
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 
@@ -34,13 +34,20 @@ function runNextTask() {
 }
 
 function runWithConfig(sampleConfig) {
-  const { pkgName } = sampleConfig;
+  const { name, specs, features } = sampleConfig;
   const port = sampleConfig.port || 8080;
+
+  // exit early if no spec is available
+  if ((process.env.RUN_CUCUMBER_TESTS && (!features || !features.length)) 
+      || (!process.env.RUN_CUCUMBER_TESTS && (!specs || !specs.length))) {
+    // eslint-disable-next-line no-process-exit
+    process.exit(0);
+  }
 
   // 1. start the sample's web server
   const server = spawn('yarn', [
     'workspace',
-    pkgName,
+    name,
     'start'
   ], { stdio: 'inherit' });
 

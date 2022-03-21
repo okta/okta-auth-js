@@ -1,5 +1,5 @@
 {
-  "name": "@okta/samples.express.embedded-sign-in-widget",
+  "name": "@okta/samples.express-embedded-sign-in-widget",
   "private": true,
   "version": "1.0.0",
   "main": "index.js",
@@ -7,8 +7,8 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "SIW_VERSION=${SIW_VERSION-6.1.1} node ./web-server/server.js",
-    "dev": "SIW_VERSION=${SIW_VERSION-6.1.1} nodemon ./web-server/server.js --watch ../../../build/cjs"
+    "start": "SIW_VERSION=${SIW_VERSION-6.1.2} node ./web-server/server.js",
+    "dev": "SIW_VERSION=${SIW_VERSION-6.1.2} nodemon ./web-server/server.js --watch ../../../build/cjs"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -24,6 +24,6 @@
     "concurrently": "^6.0.1"
   },
   "peerDependencies": {
-    "@okta/okta-signin-widget": "^6.1.1"
+    "@okta/okta-signin-widget": "^6.1.2"
   }
 }

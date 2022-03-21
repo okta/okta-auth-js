@@ -22,8 +22,8 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And She selects "Verify"
     Then she is redirected to the Root View
       And she sees a table with her profile info
-      And the cell for the value of "email" is shown and contains her email
-      And the cell for the value of "name" is shown and contains her first name and last name
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"
 
   Scenario: Mary signs in to an account and enrolls in Password and Google Authenticator by entering a Secret Key
      Given Mary navigates to the Basic Login View
@@ -40,8 +40,8 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And She selects "Verify"
     Then she is redirected to the Root View
       And she sees a table with her profile info
-      And the cell for the value of "email" is shown and contains her email
-      And the cell for the value of "name" is shown and contains her first name and last name
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"
 
   Scenario: Mary Signs in to the Sample App with Password and Google Authenticator
     Given Mary navigates to the Basic Login View
@@ -56,5 +56,5 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And She selects "Verify"
     Then she is redirected to the Root View
       And she sees a table with her profile info
-      And the cell for the value of "email" is shown and contains her email
-      And the cell for the value of "name" is shown and contains her first name and last name
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"

@@ -1,7 +1,8 @@
 Feature: Add another Required Attribute to the Profile Enrollment Policy
 
   Background:
-    Given a Profile Enrollment policy defined assigning new users to the Everyone Group and by collecting "First Name", "Last Name", and "Email", is allowed and assigned to a SPA, WEB APP or MOBILE application
+    Given a Profile Enrollment policy defined assigning new users to the Everyone Group 
+    And by collecting "First Name", "Last Name", "Email" is allowed and assigned to a SPA, WEB APP or MOBILE application
     And a User named "Mary" is created in staged state
  
   Scenario: Mary signs up for an account using activation token

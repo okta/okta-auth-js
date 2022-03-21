@@ -1,7 +1,8 @@
 Feature: Self Service Registration with Email Activation and optional SMS
 
 Background:
-  Given a Profile Enrollment policy defined assigning new users to the Everyone Group and by collecting "First Name", "Last Name", and "Email", is allowed and assigned to a SPA, WEB APP or MOBILE application
+  Given a Profile Enrollment policy defined assigning new users to the Everyone Group 
+  And by collecting "First Name", "Last Name", "Email" is allowed and assigned to a SPA, WEB APP or MOBILE application
   #And "Required before access is granted" is selected for Email Verification under Profile Enrollment in Security > Profile Enrollment
   #And configured Authenticators are Password (required), Email (required), and SMS (optional)
   And a user named "Mary"
@@ -29,8 +30,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   Then she is redirected to the Root View
   And an application session is created
   And she sees a table with her profile info
-  And the cell for the value of "email" is shown and contains her email
-  And the cell for the value of "name" is shown and contains her first name and last name
+  And the cell for the value of "email" is shown and contains her "email"
+  And the cell for the value of "name" is shown and contains her "first name and last name"
 
 Scenario: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
   Given Mary navigates to the Self Service Registration View

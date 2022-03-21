@@ -34,8 +34,8 @@ const urls = new Map<Page, string>([
   [Registration, '/register'],
 ]);
 
-function getContext(formName: string) {
-  const page = pages[formName];
+function getContext(pageName: string) {
+  const page = pages[pageName];
   const selector = page?.isDisplayedElementSelector;
   const url = urls.get(page);
   let queryParams = { flow: 'form' };
@@ -45,21 +45,20 @@ function getContext(formName: string) {
   }
 
   if (!selector) {
-    throw new Error(`Unknown form "${formName}"`);
+    throw new Error(`Unknown page "${pageName}"`);
   }
 
   if (!url) {
-    throw new Error(`Form "${formName}" has no associated URL`);
+    throw new Error(`Page "${pageName}" has no associated URL`);
   }
 
   return { url, selector, queryParams };
 }
 
 export default async (
-  userName: string,
-  formName: string
+  page: string
 ) => {
-  const { url, queryParams, selector } = getContext(formName);
+  const { url, queryParams, selector } = getContext(page);
   await startApp(url, queryParams);
   await waitForDisplayed(selector);
 };

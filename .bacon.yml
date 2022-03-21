@@ -20,13 +20,6 @@ test_suites:
       script_name: integration
       criteria: MERGE
       queue_name: small
-    - name: validate-bundles
-      script_path: ../okta-auth-js/scripts
-      sort_order: '2'
-      timeout: '10'
-      script_name: validate-bundles
-      criteria: MERGE
-      queue_name: small
     - name: e2e
       script_path: ../okta-auth-js/scripts
       sort_order: '3'
@@ -55,16 +48,58 @@ test_suites:
       script_name: e2e-oie
       criteria: MERGE
       queue_name: small
-    - name: e2e-samples
+    - name: e2e-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts
       sort_order: '7'
       timeout: '20'
-      script_name: e2e-samples
+      script_name: e2e-express-embedded-auth-with-sdk
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-express-web-no-oidc
+      script_path: ../okta-auth-js/scripts
+      sort_order: '8'
+      timeout: '10'
+      script_name: e2e-express-web-no-oidc
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-express-web-with-oidc
+      script_path: ../okta-auth-js/scripts
+      sort_order: '9'
+      timeout: '10'
+      script_name: e2e-express-web-with-oidc
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-static-spa
+      script_path: ../okta-auth-js/scripts
+      sort_order: '11'
+      timeout: '10'
+      script_name: e2e-static-spa
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-webpack-spa
+      script_path: ../okta-auth-js/scripts
+      sort_order: '12'
+      timeout: '10'
+      script_name: e2e-webpack-spa
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-express-embedded-sign-in-widget
+      script_path: ../okta-auth-js/scripts
+      sort_order: '13'
+      timeout: '10'
+      script_name: e2e-express-embedded-sign-in-widget
+      criteria: MERGE
+      queue_name: small
+    - name: e2e-react-oie
+      script_path: ../okta-auth-js/scripts
+      sort_order: '14'
+      timeout: '10'
+      script_name: e2e-react-oie
       criteria: MERGE
       queue_name: small
     - name: publish
       script_path: ../okta-auth-js/scripts
-      sort_order: '9'
+      sort_order: '15'
       timeout: '60'
       script_name: publish
       criteria: MERGE

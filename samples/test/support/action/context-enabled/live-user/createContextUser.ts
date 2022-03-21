@@ -16,8 +16,22 @@ import createUser from '../../../management-api/createUser';
 import ActionContext, { getReusedContext } from '../../../context';
 import { Scenario } from '../../../scenario';
 
-export default async function 
-  (this: ActionContext, firstName: string, assignToGroups?: string[], activate = true): Promise<void> {
+const FEATURE_GROUPS_MAP = {
+  'TOTP Support (Google Authenticator) Sign In': ['MFA Required', 'Google Authenticator Enrollment Required'],
+  'TOTP Support (Google Authenticator) Sign Up': ['MFA Required', 'Google Authenticator Enrollment Required']
+};
+
+type CreateContextUserOptions = { 
+  firstName: string; 
+  assignToGroups?: string[]; 
+  activate?: boolean; 
+};
+
+export default async function (this: ActionContext, {
+  firstName, 
+  assignToGroups, 
+  activate = true
+}: CreateContextUserOptions): Promise<void> {
   // Scenario 10.1.3
   if (this.isCurrentScenario(Scenario.TOTP_SIGN_IN_REUSE_SHARED_SECRET)) {
     // reuse context
@@ -26,8 +40,14 @@ export default async function
     this.userName = getReusedContext().userName;
   } else {
     // don't create a18n profile and don't save credentials in context
+    assignToGroups = assignToGroups || (FEATURE_GROUPS_MAP as any)[this.featureName];
     const credentials = this.credentials || await createCredentials(firstName, this.featureName, false);
-    const user = await createUser(credentials, assignToGroups, activate);
+    const user = await createUser({ 
+      credentials, 
+      assignToGroups, 
+      activate,
+      customAttribute: this.customAttribute
+    });
     this.user = user;
   }
 } 
