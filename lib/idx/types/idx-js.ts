@@ -193,6 +193,8 @@ export interface RawIdxResponse {
     value: IdxRemediation[];
   };
   messages?: IdxMessages;
+  success?: boolean;
+  successWithInteractionCode?: boolean;
 }
 
 export function isRawIdxResponse(obj: any): obj is RawIdxResponse {

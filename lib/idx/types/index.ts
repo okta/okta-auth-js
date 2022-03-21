@@ -28,7 +28,15 @@ import {
 } from './idx-js';
 import { FlowIdentifier } from './FlowIdentifier';
 
-export { IdxMessage, ChallengeData, ActivationData } from './idx-js';
+export {
+  IdxMessage,
+  IdxMessages,
+  ChallengeData,
+  ActivationData,
+  IdxResponse,
+  IdxContext,
+  RawIdxResponse
+} from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
 export { RegistrationOptions } from '../register';
 export { PasswordRecoveryOptions } from '../recoverPassword';
