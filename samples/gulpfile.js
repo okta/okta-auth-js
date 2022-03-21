@@ -81,6 +81,7 @@ function generateSampleTaskFactory(options) {
 
     // skip task if no template is available
     if (!template) {
+      console.log(`No template is provided from sample ${name}, skip the task.`);
       return Promise.resolve();
     }
 
