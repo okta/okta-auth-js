@@ -10,7 +10,6 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
-      And she fills out her Age
       And she submits the registration form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option
@@ -38,7 +37,6 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
-      And she fills out her Age
       And she submits the registration form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option
