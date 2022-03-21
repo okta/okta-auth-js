@@ -11,23 +11,30 @@
  */
 
 
-import { makeIdxState } from '../../../../../../lib/idx/idx-js/v1/makeIdxState';
+import { makeIdxState } from '../../../../../../lib/idx/idxState/v1/makeIdxState';
 const mockIdxResponse = require('../../mocks/request-identifier');
 const mockIdxResponseWithIdps = require('../../mocks/request-identifier-with-idps');
 
-jest.mock('cross-fetch');
-import fetch from 'cross-fetch'; // import to target for mockery
-const { Response } = jest.requireActual('cross-fetch');
+jest.mock('../../../../../../lib/http', () => {
+  const actual = jest.requireActual('../../../../../../lib/http');
+  return {
+    ...actual,
+    httpRequest: () => {}
+  };
+});
 
-const setFetchMock = (mock) =>
-  fetch.mockImplementation(() =>
-    Promise.resolve(new Response(JSON.stringify(mock)))
-  );
+const mocked = {
+  http: require('../../../../../../lib/http'),
+};
+
 
 describe('makeIdxState', () => {
+  beforeEach(() => {
+    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(mockIdxResponse);
+  });
+
   it('returns an idxState', () => {
-    setFetchMock(mockIdxResponse);
-    const idxState = makeIdxState(mockIdxResponse);
+    const idxState = makeIdxState({}, mockIdxResponse);
     expect(idxState).toBeDefined();
     expect(idxState.context).toBeDefined();
     expect(typeof idxState.proceed).toBe('function');
@@ -36,8 +43,7 @@ describe('makeIdxState', () => {
   });
 
   it('populates neededToProceed with Ion data', () => {
-    setFetchMock(mockIdxResponse);
-    const idxState = makeIdxState(mockIdxResponse);
+    const idxState = makeIdxState({}, mockIdxResponse);
     expect(typeof idxState.neededToProceed[0].action).toBe('function');
     expect(idxState.neededToProceed[0].value).toEqual([
       { label: 'Username', name: 'identifier' },
@@ -54,8 +60,8 @@ describe('makeIdxState', () => {
   });
 
   it('populates neededToProceed with redirect remediation objects and Ion data', () => {
-    setFetchMock(mockIdxResponseWithIdps);
-    const idxState = makeIdxState(mockIdxResponseWithIdps);
+    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(mockIdxResponseWithIdps);
+    const idxState = makeIdxState({}, mockIdxResponseWithIdps);
     expect(idxState.neededToProceed.length).toBe(4);
 
     expect(typeof idxState.neededToProceed[0].action).toBe('function');
@@ -119,15 +125,13 @@ describe('makeIdxState', () => {
   });
 
   it('populates proceed to run remediation functions', () => {
-    setFetchMock(mockIdxResponse);
-    const idxState = makeIdxState(mockIdxResponse);
+    const idxState = makeIdxState({}, mockIdxResponse);
     expect(typeof idxState.proceed).toBe('function');
   });
 
   describe('idxState.proceed', () => {
     it('rejects if called with an invalid remediationChoice', async () => {
-      setFetchMock(mockIdxResponse);
-      const idxState = makeIdxState(mockIdxResponse);
+      const idxState = makeIdxState({}, mockIdxResponse);
       return idxState
         .proceed('DOES_NOT_EXIST')
         .then(() => {
@@ -139,10 +143,9 @@ describe('makeIdxState', () => {
     });
 
     it('returns a new idxState', async () => {
-      setFetchMock(mockIdxResponse);
-      const idxState = makeIdxState(mockIdxResponse);
+      const idxState = makeIdxState({}, mockIdxResponse);
       const mockFollowup = { ...mockIdxResponse, remediations: [] };
-      setFetchMock(mockFollowup);
+      jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(mockFollowup);
       return idxState
         .proceed('identify')
         .then((result) => {
@@ -162,17 +165,13 @@ describe('makeIdxState', () => {
           expect(result.context).toBeDefined();
           expect(typeof result.proceed).toBe('function');
           expect(typeof result.actions.cancel).toBe('function');
-        })
-        .finally(() => {
-          setFetchMock(mockIdxResponse); // test cleanup
         });
     });
   });
 
   describe('idxState.actions', () => {
     it('return a new idxState', async () => {
-      setFetchMock(mockIdxResponse);
-      const idxState = makeIdxState(mockIdxResponse);
+      const idxState = makeIdxState({}, mockIdxResponse);
       return idxState.actions.cancel().then((result) => {
         // Note: cancel won't return this data
         // this is verifying the parsing happens on mock data

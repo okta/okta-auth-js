@@ -24,18 +24,6 @@ jest.mock('../../../lib/features', () => {
   };
 });
 
-jest.mock('../../../lib/idx/headers', () => {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ...jest.requireActual('../../../lib/idx/headers') as any,
-    setGlobalRequestInterceptor: jest.fn()
-  };
-});
-
-const mocked = {
-  features: require('../../../lib/features'),
-  idxHeaders: require('../../../lib/idx/headers')
-};
 
 describe('OktaAuth (constructor)', () => {
   const apiUrlOptions = [
@@ -166,13 +154,6 @@ describe('OktaAuth (constructor)', () => {
       const oa = new OktaAuth(config);
       expect(oa.authStateManager).toBeDefined();
     });
-  });
-
-  it('sets global headers for idx requests', () => {
-    const config = { issuer: 'http://fake' };
-    // eslint-disable-next-line no-new
-    new OktaAuth(config);
-    expect(mocked.idxHeaders.setGlobalRequestInterceptor).toHaveBeenCalled();
   });
 
 });

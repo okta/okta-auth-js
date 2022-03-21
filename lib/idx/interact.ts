@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 /* eslint complexity:[0,8] */
-import idx from './idx-js';
 import { OktaAuthInterface, IdxTransactionMeta } from '../types';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';
 import { createTransactionMeta } from '.';
 import { removeNils } from '../util';
+import { httpRequest } from '../http';
 
 export interface InteractOptions {
   withCredentials?: boolean;
@@ -34,6 +34,20 @@ export interface InteractResponse {
   interactionHandle: string;
   meta: IdxTransactionMeta;
 }
+
+/* eslint-disable camelcase */
+export interface InteractParams {
+  client_id: string;
+  scope: string;
+  redirect_uri: string;
+  code_challenge: string;
+  code_challenge_method: string;
+  state: string;
+  activation_token?: string;
+  recovery_token?: string;
+  client_secret?: string;
+}
+/* eslint-enable camelcase */
 
 function getResponse(meta: IdxTransactionMeta): InteractResponse {
   return {
@@ -73,31 +87,43 @@ export async function interact (
   } = meta as IdxTransactionMeta;
   const clientSecret = options.clientSecret || authClient.options.clientSecret;
 
-  const interactionHandle = await idx.interact({
-    withCredentials,
-
-    // OAuth
-    clientId, 
-    baseUrl,
-    scopes,
+  /* eslint-disable camelcase */
+  const url = `${baseUrl}/v1/interact`;
+  const params = {
+    client_id: clientId,
+    scope: scopes.join(' '),
+    redirect_uri: redirectUri,
+    code_challenge: codeChallenge,
+    code_challenge_method: codeChallengeMethod,
     state,
-    redirectUri,
+  } as InteractParams;
+  if (activationToken) {
+    params.activation_token = activationToken;
+  }
+  if (recoveryToken) {
+    params.recovery_token = recoveryToken;
+  }
+  if (clientSecret) {
+  // X-Device-Token header need to pair with `client_secret`
+  // eslint-disable-next-line max-len
+  // https://oktawiki.atlassian.net/wiki/spaces/eng/pages/2445902453/Support+Device+Binding+in+interact#Scenario-1%3A-Non-User-Agent-with-Confidential-Client-(top-priority)
+    params.client_secret = clientSecret;
+  }
+  /* eslint-enable camelcase */
 
-    // PKCE
-    codeChallenge,
-    codeChallengeMethod,
+  const headers = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
 
-    // Activation
-    activationToken,
-    
-    // Recovery
-    recoveryToken,
-
-    // X-Device-Token header need to pair with `client_secret`
-    // eslint-disable-next-line max-len
-    // https://oktawiki.atlassian.net/wiki/spaces/eng/pages/2445902453/Support+Device+Binding+in+interact#Scenario-1%3A-Non-User-Agent-with-Confidential-Client-(top-priority)
-    clientSecret
+  const resp = await httpRequest(authClient, {
+    method: 'POST',
+    url,
+    headers,
+    withCredentials,
+    args: params
   });
+  const interactionHandle = resp.interaction_handle;
+
   const newMeta = {
     ...meta,
     interactionHandle,

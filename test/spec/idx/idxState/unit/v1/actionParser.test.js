@@ -11,7 +11,7 @@
  */
 
 
-import { divideActionParamsByMutability } from '../../../../../../lib/idx/idx-js/v1/actionParser';
+import { divideActionParamsByMutability } from '../../../../../../lib/idx/idxState/v1/actionParser';
 
 const mockIdxResponse = require('../../mocks/request-identifier');
 

@@ -10,48 +10,64 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* eslint-disable max-len */
+/* eslint-disable max-len, complexity */
 // @ts-nocheck
-import { request } from '../client';
+import { httpRequest } from '../../../http';
+import { OktaAuthInterface } from '../../../types';    // auth-js/types
 import { divideActionParamsByMutability } from './actionParser';
 import { makeIdxState } from './makeIdxState';
+import AuthApiError from '../../../errors/AuthApiError';
 
-const generateDirectFetch = function generateDirectFetch({ 
+const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthInterface, { 
   actionDefinition, 
   defaultParamsForAction = {}, 
   immutableParamsForAction = {}, 
-  toPersist 
+  toPersist = {}
 }) {
   const target = actionDefinition.href;
   return async function(params) {
     const headers = {
-      'content-type': 'application/json',
-      'accept': actionDefinition.accepts || 'application/ion+json',
+      'Content-Type': 'application/json',
+      'Accept': actionDefinition.accepts || 'application/ion+json',
     };
     const body = JSON.stringify({
       ...defaultParamsForAction,
       ...params,
       ...immutableParamsForAction
     });
-    const credentials = toPersist && toPersist.withCredentials === false ? 'omit' : 'include';
-    const response = await request(target, { method: actionDefinition.method, headers, body, credentials });
-    const responseJSON = await response.json();
-    const requestDidSucceed = response.ok;
-    const idxResponse = makeIdxState(responseJSON, toPersist, requestDidSucceed);
-    if (response.status === 401 && response.headers.get('WWW-Authenticate') === 'Oktadevicejwt realm="Okta Device"') {
-      // Okta server responds 401 status code with WWW-Authenticate header and new remediation
-      // so that the iOS/MacOS credential SSO extension (Okta Verify) can intercept
-      // the response reaches here when Okta Verify is not installed
-      // set `stepUp` to true if flow should be continued without showing any errors
-      idxResponse.stepUp = true;
+
+    try {
+      const response = await httpRequest(authClient, {
+        url: target,
+        method: actionDefinition.method,
+        headers,
+        args: body,
+        withCredentials: toPersist?.withCredentials ?? true
+      });
+
+      return makeIdxState(authClient, { ...response }, toPersist, true);
     }
+    catch (err) {
+      if (!(err instanceof AuthApiError) || !err?.xhr) {
+        throw err;
+      }
 
-     // Throw IDX response if request did not succeed. This behavior will be removed in version 7.0: OKTA-481844
-     if (!requestDidSucceed) {
-       throw idxResponse;
-     }
+      const response = err.xhr;
+      const payload = response.responseJSON || JSON.parse(response.responseText);
+      const wwwAuthHeader = response.headers['WWW-Authenticate'] || response.headers['www-authenticate'];
 
-    return idxResponse;
+      const idxResponse = makeIdxState(authClient, { ...payload }, toPersist, false);
+      if (response.status === 401 && wwwAuthHeader === 'Oktadevicejwt realm="Okta Device"') {
+        // Okta server responds 401 status code with WWW-Authenticate header and new remediation
+        // so that the iOS/MacOS credential SSO extension (Okta Verify) can intercept
+        // the response reaches here when Okta Verify is not installed
+        // set `stepUp` to true if flow should be continued without showing any errors
+        idxResponse.stepUp = true;
+      }
+
+      // Throw IDX response if request did not succeed. This behavior will be removed in version 7.0: OKTA-481844
+      throw idxResponse;
+    }
   };
 };
 
@@ -68,17 +84,17 @@ const generateDirectFetch = function generateDirectFetch({
 //       body: JSON.stringify({ ...defaultParamsForAction, ...params, ...immutableParamsForAction })
 //     })
 //       .then( response => response.ok ? response.json() : response.json().then( err => Promise.reject(err)) )
-//       .then( idxResponse => makeIdxState(idxResponse) );
+//       .then( idxResponse => makeIdxState(authClient, idxResponse) );
 //   };
 // };
 
-const generateIdxAction = function generateIdxAction( actionDefinition, toPersist ) {
+const generateIdxAction = function generateIdxAction( authClient: OktaAuthInterface, actionDefinition, toPersist ) {
   // TODO: leaving this here to see where the polling is EXPECTED to drop into the code, but removing any accidental trigger of incomplete code
   // const generator =  actionDefinition.refresh ? generatePollingFetch : generateDirectFetch;
   const generator = generateDirectFetch;
   const { defaultParams, neededParams, immutableParams } = divideActionParamsByMutability( actionDefinition );
 
-  const action = generator( {
+  const action = generator(authClient, {
     actionDefinition,
     defaultParamsForAction: defaultParams[actionDefinition.name],
     immutableParamsForAction: immutableParams[actionDefinition.name],
