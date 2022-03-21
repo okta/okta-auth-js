@@ -12,7 +12,6 @@
 
 
 import assert from 'assert';
-import OktaLogin from '../pageobjects/OktaLogin';
 import TestApp from '../pageobjects/TestApp';
 import { openPKCE } from '../util/appUtils';
 import { loginDirect } from '../util/loginUtils';
@@ -102,8 +101,8 @@ describe('cross tabs AuthState update', () => {
         // the first tab show sign buttons
         await TestApp.assertLoggedOut();
       } else {
-        // other tabs show okta hosted login page
-        await OktaLogin.waitForLoad();
+        // other tabs ask to sign-in again
+        await TestApp.assertAuthStatusText('Sign-in again');
       }
     }
   });

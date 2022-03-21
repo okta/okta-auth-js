@@ -16,7 +16,9 @@ import util from '@okta/test.support/util';
 
 jest.mock('broadcast-channel', () => {
   const actual = jest.requireActual('broadcast-channel');
-  class FakeBroadcastChannel {}
+  class FakeBroadcastChannel {
+    close() {}
+  }
   return {
     createLeaderElection: actual.createLeaderElection,
     BroadcastChannel: FakeBroadcastChannel
@@ -125,6 +127,19 @@ describe('ServiceManager', () => {
     jest.runAllTimers();
     await Promise.resolve();
     expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
+    client.serviceManager.stop();
+  });
+
+  it('can restart', async () => {
+    const options = {
+      services: { syncStorage: true }
+    };
+    util.disableLeaderElection();
+    const client = createAuth(options);
+    client.serviceManager.start();
+    client.serviceManager.stop();
+    client.serviceManager.start();
+    expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
     client.serviceManager.stop();
   });
 

@@ -24,7 +24,6 @@ import {
   isAuthorizationCodeError,
   IdxStatus,
   IdxTransaction,
-  AuthState,
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -127,9 +126,6 @@ const Toolbar = `
       </li>
       <li class="pure-menu-item">
         <a id="subscribe-token-events" onclick="subscribeToTokenEvents(event)" class="pure-menu-link">Subscribe to TokenManager events</a>
-      </li>
-      <li class="pure-menu-item">
-        <a id="cross-tab-token-renew" onclick="simulateCrossTabTokenRenew(event)" class="pure-menu-link">Simulate cross-tab token renew</a>
       </li>
   </div>
 `;
@@ -318,37 +314,79 @@ class TestApp {
     document.getElementById('token-error').innerText = error as string;
   }
 
-  async bootstrapProtected(): Promise<void> {
-    this.getSDKInstance();
-    const { idToken, accessToken } = this.oktaAuth.tokenManager.getTokensSync();
+  appProtectedHTML(): string {
+    const authState = this.oktaAuth.authStateManager.getAuthState();
     let content;
-    if (idToken || accessToken) {
+    if (authState?.isAuthenticated) {
       content = `
         ${homeLink(this)}
         ${logoutLink(this)}
         <hr/>
-        <strong>You are authenticated</strong>
+        <strong id="auth-status-text">You are authenticated</strong>
       `;
     } else {
-      content = `
-        ${homeLink(this)}
-        <hr/>
-        <strong>You are NOT authenticated. Login using one of these methods:</strong>
-        ${loginLinks(this, true)}
-      `;
+      if (this.isAppInitialization()) {
+        content = `
+          ${homeLink(this)}
+          <hr/>
+          <strong id="auth-status-text">You are NOT authenticated.<br />You are being redirected to sign-in page automatically...</strong>
+          ${loginLinks(this, true)}
+        `;
+      } else {
+        content = `
+          ${homeLink(this)}
+          <hr/>
+          <strong id="auth-status-text">You are NOT authenticated.<br />Sign-in again using one of these methods:</strong>
+          ${loginLinks(this, true)}
+        `;
+      }
       this.config.state = 'protected-route-' + Math.round(Math.random() * 1000);
       this.oktaAuth.setOriginalUri(this.protectedUrl, this.config.state);
     }
+    return content;
+  }
+
+  async bootstrapProtected(): Promise<void> {
+    this.getSDKInstance();
 
     // simulate SecureRoute behaviour
-    this.oktaAuth.authStateManager.subscribe((authState: AuthState) => {
-      if (!authState.isAuthenticated) {
-        this.oktaAuth.signInWithRedirect();
-      }
+    this.oktaAuth.authStateManager.subscribe(() => {
+      this.checkAuthRequired();
+    });
+    document.addEventListener('visibilitychange', () => {
+      this.checkAuthRequired();
     });
 
-    this._setContent(content);
+    this.oktaAuth.authStateManager.updateAuthState();
+    this.render();
     this._afterRender('protected');
+  }
+
+  isAppInitialization(): boolean {
+    const previousAuthState = this.oktaAuth.authStateManager.getPreviousAuthState();
+    const authState = this.oktaAuth.authStateManager.getAuthState();
+    return !previousAuthState && !authState?.isAuthenticated;
+  }
+
+  checkAuthRequired(): void {
+    const authState = this.oktaAuth.authStateManager.getAuthState();
+    if (!authState.isAuthenticated) {
+      document.title = 'Protected: Auth required';
+    } else {
+      document.title = 'Protected';
+    }
+
+    if (document.visibilityState === 'visible') {
+      this.render();
+    }
+
+    if (document.visibilityState === 'visible' && this.isAppInitialization()) {
+      // App initialization stage
+      // Sign in with redirect automatically
+      setTimeout(() => {
+        this.oktaAuth.signInWithRedirect();
+      }, 500);
+    }
   }
 
   async bootstrapRenew(): Promise<void> {
@@ -395,7 +433,6 @@ class TestApp {
       clearInterval(renewTimer);
     });
   }
-
 
   async renderRenewStatus(): Promise<void> {
     const tokenStorage = await this.oktaAuth.tokenManager.getTokens();
@@ -810,6 +847,7 @@ class TestApp {
         document.getElementById('token-msg').innerHTML = 'concurrent test passed';
       });
   }
+    
 
   // To test this, open another tab and logout from the Okta session
   // The token renew should fail, triggering an error event.
@@ -842,6 +880,10 @@ class TestApp {
   }
 
   appHTML(props: Tokens): string {
+    if (window.location.pathname.includes('/protected')) {
+      return this.appProtectedHTML();
+    }
+
     const { idToken, accessToken, refreshToken } = props || {};
     if (idToken || accessToken) {
       // Authenticated user home page
@@ -880,6 +922,9 @@ class TestApp {
                 </li>
                 <li class="pure-menu-item">
                   <a id="test-concurrent-login-via-token-renew-failure" href="/" onclick="testConcurrentLoginViaTokenRenewFailure(event)" class="pure-menu-link pure-menu-item">Test Concurrent login via token renew failure</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="cross-tab-token-renew" onclick="simulateCrossTabTokenRenew(event)" class="pure-menu-link">Simulate cross-tab token renew</a>
                 </li>
                 ${protectedLink(this)}
               </ul>

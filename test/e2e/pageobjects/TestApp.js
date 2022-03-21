@@ -38,6 +38,7 @@ class TestApp {
 
   get tokenError() { return $('#token-error'); }
   get tokenMsg() { return $('#token-msg'); }
+  get authStatusText() { return $('#auth-status-text'); }
   
   // Unauthenticated landing
   get loginWidgetBtn() { return $('#login-widget'); }
@@ -339,6 +340,15 @@ class TestApp {
     }, 10000, 'wait for token message');
     const txt = await this.tokenMsg.then(el => el.getText());
     assert(txt === msg);
+  }
+
+  async assertAuthStatusText(msg) {
+    await browser.waitUntil(async () => {
+      const txt = await this.authStatusText.then(el => el.getText());
+      return txt !== '';
+    }, 10000, 'wait for auth status text');
+    const txt = await this.authStatusText.then(el => el.getText());
+    assert(txt.includes(msg));
   }
 
   async assertIssuer(issuer) {

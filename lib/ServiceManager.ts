@@ -126,7 +126,6 @@ export class ServiceManager implements ServiceManagerInterface {
     for (const srv of this.services.values()) {
       srv.stop();
     }
-    this.services = new Map();
   }
 
   private startElector() {
@@ -148,6 +147,8 @@ export class ServiceManager implements ServiceManagerInterface {
     if (this.elector) {
       this.elector?.die();
       this.elector = undefined;
+      this.channel?.close();
+      this.channel = undefined;
     }
   }
 
