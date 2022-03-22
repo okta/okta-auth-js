@@ -11,6 +11,12 @@
  */
 
 
-import * as remediators from '../remediators';
+import { RemediateOptions } from '../remediate';
+import { RemediationValues } from '../remediators';
+import { IdxRemediation } from '../types/idx-js';
 
-export type RemediationFlow = Record<string, typeof remediators.Remediator>;
+type RemediationConstructor = {
+  new<T extends RemediationValues>(remediation: IdxRemediation, values?: T, options?: RemediateOptions): any;
+}
+
+export type RemediationFlow = Record<string, RemediationConstructor>;

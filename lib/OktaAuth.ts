@@ -146,10 +146,10 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   idx: IdxAPI;
   session: SessionAPI;
   pkce: PkceAPI;
-  static features: FeaturesAPI;
-  static crypto: CryptoAPI;
-  static webauthn: WebauthnAPI;
-  features!: FeaturesAPI;
+  static features: FeaturesAPI = features;
+  static crypto: CryptoAPI = crypto;
+  static webauthn: WebauthnAPI = webauthn;
+  features: FeaturesAPI = features;
   token: TokenAPI;
   _tokenQueue: PromiseQueue;
   emitter: any;
@@ -778,14 +778,8 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   }
 }
 
-// Hoist feature detection functions to static type
+// Hoist feature detection functions to prototype & static type
 OktaAuth.features = OktaAuth.prototype.features = features;
-
-// Hoist crypto utils to static type
-OktaAuth.crypto = crypto;
-
-// Hoist webauthn utils to static type
-OktaAuth.webauthn = webauthn;
 
 // Also hoist constants for CommonJS users
 Object.assign(OktaAuth, {

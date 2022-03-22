@@ -20,10 +20,8 @@ export type EnrollmentChannelDataValues = RemediationValues & {
   phoneNumber?: string;
 };
 
-export class EnrollmentChannelData extends Remediator {
+export class EnrollmentChannelData extends Remediator<EnrollmentChannelDataValues> {
   static remediationName = 'enrollment-channel-data';
-
-  values!: EnrollmentChannelDataValues;
 
   getInputEmail() {
     return [

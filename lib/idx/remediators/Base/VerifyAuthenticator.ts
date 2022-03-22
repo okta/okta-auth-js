@@ -19,10 +19,9 @@ import { NextStep } from '../../types';
 export type VerifyAuthenticatorValues = AuthenticatorValues & RemediationValues;
 
 // Base class - DO NOT expose static remediationName
-export class VerifyAuthenticator extends Remediator {
+export class VerifyAuthenticator extends Remediator<VerifyAuthenticatorValues> {
 
   authenticator: Authenticator<VerifyAuthenticatorValues>;
-  values!: VerifyAuthenticatorValues;
 
   constructor(remediation: IdxRemediation, values: VerifyAuthenticatorValues = {}) {
     super(remediation, values);

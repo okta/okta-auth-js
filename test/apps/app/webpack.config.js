@@ -18,7 +18,10 @@ const webpack = require('webpack');
 const PORT = process.env.PORT || 8080;
 
 const babelOptions = {
-  presets: ['@babel/env'],
+  presets: [
+    '@babel/env',
+    '@babel/preset-typescript'
+  ],
   plugins: ['@babel/plugin-transform-runtime'],
   sourceType: 'unambiguous'
 };
@@ -52,28 +55,15 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.[jt]s$/,
         use: ['source-map-loader'],
         enforce: 'pre'
       },
       {
-        test: /\.js$/,
+        test: /\.[jt]s$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
         options: babelOptions
-      },
-      {
-        test: /\.ts$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: babelOptions
-          },
-          {
-            loader: 'ts-loader'
-          }
-        ]
       }
     ]
   }

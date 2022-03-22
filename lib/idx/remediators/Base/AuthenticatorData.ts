@@ -22,8 +22,7 @@ export type AuthenticatorDataValues = RemediationValues & {
 };
 
 // Base class - DO NOT expose static remediationName
-export class AuthenticatorData extends Remediator {
-  values!: AuthenticatorDataValues;
+export class AuthenticatorData extends Remediator<AuthenticatorDataValues> {
   authenticator: IdxAuthenticator;
 
   constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}) {

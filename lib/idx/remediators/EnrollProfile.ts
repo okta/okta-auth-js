@@ -21,10 +21,8 @@ export interface EnrollProfileValues extends RemediationValues {
   email?: string;
 }
 
-export class EnrollProfile extends Remediator {
+export class EnrollProfile extends Remediator<EnrollProfileValues> {
   static remediationName = 'enroll-profile';
-
-  values!: EnrollProfileValues;
 
   canRemediate() {
     const userProfileFromValues = this.getData().userProfile;

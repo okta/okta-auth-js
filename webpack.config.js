@@ -11,7 +11,7 @@ var commonConfig = require('./webpack.common.config');
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 
 module.exports = _.extend({}, _.cloneDeep(commonConfig), {
-  mode: 'production',
+  mode: (process.env.NODE_ENV === 'development') ? 'development' : 'production',
   entry: './lib/',
   output: {
     path: path.join(__dirname, 'build', 'dist'),

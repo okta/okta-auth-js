@@ -29,17 +29,17 @@ export interface RemediationValues extends IdxOptions {
 }
 
 // Base class - DO NOT expose static remediationName
-export class Remediator {
+export class Remediator<ValuesType extends RemediationValues = RemediationValues> {
   static remediationName: string;
 
   remediation: IdxRemediation;
-  values: RemediationValues;
+  values: ValuesType;
   options: RemediateOptions;
   map?: IdxToRemediationValueMap;
 
   constructor(remediation: IdxRemediation, values: RemediationValues = {}, options: RemediateOptions = {}) {
     // assign fields to the instance
-    this.values = { ...values };
+    this.values = { ...values } as ValuesType;
     this.options = { ...options };
     this.formatAuthenticators();
     this.remediation = remediation;

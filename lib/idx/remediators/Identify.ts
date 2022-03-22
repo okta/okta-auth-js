@@ -20,10 +20,8 @@ export interface IdentifyValues extends RemediationValues {
   credentials?: Credentials;
 }
 
-export class Identify extends Remediator {
+export class Identify extends Remediator<IdentifyValues> {
   static remediationName = 'identify';
-
-  values!: IdentifyValues;
 
   map = {
     'identifier': ['username']

@@ -19,10 +19,8 @@ export interface EnrollPollValues extends RemediationValues {
   startPolling?: boolean;
 }
 
-export class EnrollPoll extends Remediator {
+export class EnrollPoll extends Remediator<EnrollPollValues> {
   static remediationName = 'enroll-poll';
-
-  values!: EnrollPollValues;
 
   canRemediate() {
     return !!this.values.startPolling || this.options.step === 'enroll-poll';

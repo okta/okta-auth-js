@@ -28,7 +28,7 @@ import {
 } from './idx-js';
 import { FlowIdentifier } from './FlowIdentifier';
 
-export {
+export type {
   IdxMessage,
   IdxMessages,
   ChallengeData,
@@ -37,18 +37,18 @@ export {
   IdxContext,
   RawIdxResponse
 } from './idx-js';
-export { AuthenticationOptions } from '../authenticate';
-export { RegistrationOptions } from '../register';
-export { PasswordRecoveryOptions } from '../recoverPassword';
-export { AccountUnlockOptions } from '../unlockAccount';
-export { ProceedOptions } from '../proceed';
-export { CancelOptions } from '../cancel';
-export { RemediateOptions } from '../remediate';
-export { FlowIdentifier };
-export { IdxAuthenticator };
-export { EmailVerifyCallbackResponse } from '../emailVerify';
-export { WebauthnEnrollValues } from '../authenticator/WebauthnEnrollment';
-export { WebauthnVerificationValues } from '../authenticator/WebauthnVerification';
+export type { AuthenticationOptions } from '../authenticate';
+export type { RegistrationOptions } from '../register';
+export type { PasswordRecoveryOptions } from '../recoverPassword';
+export type { AccountUnlockOptions } from '../unlockAccount';
+export type { ProceedOptions } from '../proceed';
+export type { CancelOptions } from '../cancel';
+export type { RemediateOptions } from '../remediate';
+export type { FlowIdentifier };
+export type { IdxAuthenticator };
+export type { EmailVerifyCallbackResponse } from '../emailVerify';
+export type { WebauthnEnrollValues } from '../authenticator/WebauthnEnrollment';
+export type { WebauthnVerificationValues } from '../authenticator/WebauthnVerification';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
