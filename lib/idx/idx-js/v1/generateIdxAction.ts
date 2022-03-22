@@ -45,6 +45,12 @@ const generateDirectFetch = function generateDirectFetch({
       // set `stepUp` to true if flow should be continued without showing any errors
       idxResponse.stepUp = true;
     }
+
+     // Throw IDX response if request did not succeed. This behavior will be removed in version 7.0: OKTA-481844
+     if (!requestDidSucceed) {
+       throw idxResponse;
+     }
+
     return idxResponse;
   };
 };
