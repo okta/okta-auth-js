@@ -1,10 +1,16 @@
 Feature: Multi-Factor Authentication with Password and SMS
 
   Background:
-	  Given a SPA, WEB APP or MOBILE Policy that defines MFA with Password and SMS as required
-	    And an Authenticator Enrollment Policy that has PHONE as optional and EMAIL as required for the Everyone Group
-	    And a User named "Mary" created that HAS NOT yet enrolled in the SMS factor
-
+    Given a Group
+      And an App
+      And a Policy that defines "Authentication"
+      And with a Policy Rule that defines "Password + Another Factor"
+      And a Policy that defines "MFA Enrollment with password and phone as required authenticator"
+      And with a Policy Rule that defines "MFA Enrollment Challenge"
+      And a user named "Mary"
+      And she has an account with "active" state in the org
+      And she is assigned to the created group
+	  
   Scenario: Enroll in SMS Factor prompt when authenticating
     Given Mary navigates to the Basic Login View
       And she has inserted her username

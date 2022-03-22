@@ -13,11 +13,35 @@
 
 import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
-import deleteUserAndCredentials from '../support/action/context-enabled/live-user/deleteUserAndCredentials';
+import a18nClient from '../support/management-api/a18nClient';
+import deleteSelfEnrolledUser from '../support/management-api/deleteSelfEnrolledUser';
 import deleteTestPolicies from '../support/action/context-enabled/org-config/deleteTestPolicies';
 
-After(deleteUserAndCredentials);
+
 After(deleteTestPolicies);
+
+After(async function(this: ActionContext) {
+  if (this.app && !this.app.predefined) {
+    await this.app.deactivate();
+    await this.app.delete();
+  }
+  if (this.policies) {
+    for (const policy of this.policies) {
+      await policy.delete();
+    }
+  }
+  if (this.group) {
+    await this.group.delete();
+  }
+  if(this.user) {
+    await this.user.deactivate();
+    await this.user.delete();
+  }
+  if (this.credentials) {
+    await deleteSelfEnrolledUser(this.credentials.emailAddress);
+    await a18nClient.deleteProfile(this.credentials.profileId);
+  }
+});
 
 After(() => browser.deleteCookies());
 

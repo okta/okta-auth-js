@@ -50,6 +50,7 @@ const templateDefaults = {
 const samples = [
   {
     name: '@okta/samples.static-spa',
+    appType: 'browser',
     template: 'static-spa',
     generateType: GENERATE_TYPE_FULL,
     specs: ['spa-app'],
@@ -57,6 +58,7 @@ const samples = [
   },
   {
     name: '@okta/samples.webpack-spa',
+    appType: 'browser',
     template: 'webpack-spa',
     generateType: GENERATE_TYPE_FULL,
     specs: ['spa-app'],
@@ -64,6 +66,7 @@ const samples = [
   },
   {
     name: '@okta/samples.express-web-no-oidc',
+    appType: 'web',
     template: 'express-web',
     generateType: GENERATE_TYPE_FULL,
     specs: ['web-app'],
@@ -71,12 +74,14 @@ const samples = [
   },
   {
     name: '@okta/samples.express-web-with-oidc',
+    appType: 'web',
     template: 'express-web',
     generateType: GENERATE_TYPE_FULL,
     specs: ['web-app']
   },
   {
     name: '@okta/samples.express-embedded-auth-with-sdk',
+    appType: 'web',
     template: 'express-embedded-auth-with-sdk',
     generateType: GENERATE_TYPE_OVERWRITE,
     specs: ['express-embedded-auth-with-sdk'],
@@ -88,6 +93,7 @@ const samples = [
       'self-service-registration-custom-attribute',
       'self-service-registration-activation-token',
       'mfa-password-and-email',
+      'mfa-password-and-email-magic-link',
       'mfa-password-and-sms',
       'social-login-mfa',
       'social-idp',
@@ -95,10 +101,10 @@ const samples = [
       'totp-signin',
     ],
     useEnv: true,
-    express: true,
   },
   {
     name: '@okta/samples.express-embedded-sign-in-widget',
+    appType: 'web',
     template: 'express-embedded-sign-in-widget',
     generateType: GENERATE_TYPE_OVERWRITE,
     specs: [],
@@ -110,6 +116,7 @@ const samples = [
   },
   {
     name: '@okta/test.app.react-oie',
+    appType: 'browser',
     features: [
       'progressive-profiling-view-profile'
     ],

@@ -11,13 +11,17 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
+import { User, Application, Policy, Group } from '@okta/okta-sdk-nodejs';
 import {UserCredentials} from './management-api/createCredentials';
 import { Scenario } from './scenario';
 
 interface ActionContext {
   credentials: UserCredentials;
   user: User;
+  app: Application;
+  policies: Policy[];
+  group: Group;
+  enrolledFactor: any;
   featureName: string;
   scenarioName: string;
   currentTestCaseId: string;
