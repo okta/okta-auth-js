@@ -17,7 +17,6 @@ jest.mock('cross-fetch');
 import fetch from 'cross-fetch'; // import to target for mockery
 
 const mockIdxResponse = require('../mocks/request-identifier');
-const mockErrorResponse = require('../mocks/error-authenticator-enroll');
 const { Response } = jest.requireActual('cross-fetch');
 
 let domain = 'http://okta.example.com';
@@ -33,10 +32,7 @@ describe('introspect', () => {
     fetch.mockImplementation( () => Promise.resolve( new Response(JSON.stringify( mockIdxResponse )) ) );
     return introspect({ domain, stateHandle, version })
       .then( result => {
-        expect(result).toEqual({
-          ...mockIdxResponse,
-          requestDidSucceed: true
-        });
+        expect(result).toEqual(mockIdxResponse);
       });
   });
 
@@ -72,17 +68,6 @@ describe('introspect', () => {
             'accept': 'application/ion+json; okta-version=1.0.0',
           },
           method: 'POST'
-        });
-      });
-  });
-
-  it('sets `requestDidSucceed` to `false` if the XHR request returned an HTTP error status', async () => {
-    fetch.mockImplementation( () => Promise.resolve( new Response(JSON.stringify( mockErrorResponse ), { status: 500 }) ) );
-    return introspect({ domain, stateHandle, version })
-      .then( err => {
-        expect(err).toEqual({
-          ...mockErrorResponse,
-          requestDidSucceed: false
         });
       });
   });

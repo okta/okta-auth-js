@@ -52,6 +52,7 @@ describe('idx/run', () => {
       neededToProceed: [
         IdentifyRemediationFactory.build(),
       ],
+      requestDidSucceed: true
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
 
@@ -226,7 +227,10 @@ describe('idx/run', () => {
     remediateResponse.nextStep = 'has-next-step';
     jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
     await run(authClient);
-    expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith(idxResponse.rawIdxState);
+    expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+      rawIdxResponse: idxResponse.rawIdxState,
+      requestDidSucceed: true
+    });
   });
 
   it('returns messages in transaction', async () => {

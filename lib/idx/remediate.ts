@@ -109,6 +109,7 @@ function handleIdxError(e, remediator?): RemediationResponse {
     // Thrown error terminates the interaction with idx
     throw e;
   }
+  idxResponse.requestDidSucceed = false;
   const terminal = isTerminalResponse(idxResponse);
   const messages = getMessagesFromResponse(idxResponse);
   if (terminal) {
@@ -169,6 +170,7 @@ export async function remediate(
       if (typeof idxResponse.actions[action] === 'function') {
         try {
           idxResponse = await idxResponse.actions[action]();
+          idxResponse.requestDidSucceed = true;
         } catch (e) {
           return handleIdxError(e, remediators);
         }
@@ -183,6 +185,7 @@ export async function remediate(
       if (remediationAction) {
         try {
           idxResponse = await idxResponse.proceed(action, {});
+          idxResponse.requestDidSucceed = true;
         }
         catch (e) {
           return handleIdxError(e, remediators);
@@ -197,8 +200,13 @@ export async function remediate(
   if (!remediator) {
     if (options.step) {
       values = filterValuesForRemediation(idxResponse, values); // include only requested values
-      idxResponse = await idxResponse.proceed(options.step, values);
-      return { idxResponse };
+      try {
+        idxResponse = await idxResponse.proceed(options.step, values);
+        idxResponse.requestDidSucceed = true;
+        return { idxResponse };
+      } catch(e) {
+        return handleIdxError(e);
+      }
     }
     if (flow === 'default') {
       return { idxResponse };
@@ -224,7 +232,7 @@ export async function remediate(
   const data = remediator.getData();
   try {
     idxResponse = await idxResponse.proceed(name, data);
-
+    idxResponse.requestDidSucceed = true;
     // We may want to trim the values bag for the next remediation
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValuesAfterProceed();

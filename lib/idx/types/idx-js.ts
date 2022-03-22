@@ -194,7 +194,7 @@ export interface RawIdxResponse {
   };
   messages?: IdxMessages;
   success?: boolean;
-  successWithInteractionCode?: boolean;
+  successWithInteractionCode?: IdxRemediation;
 }
 
 export function isRawIdxResponse(obj: any): obj is RawIdxResponse {
@@ -203,10 +203,10 @@ export function isRawIdxResponse(obj: any): obj is RawIdxResponse {
 
 
 export interface IdxActions {
-  [key: string]: Function;
+  [key: string]: () => Promise<IdxResponse>;
 }
 
-// Object returned from idx-js
+// Object returned from auth-js
 export interface IdxResponse {
   proceed: (remediationName: string, params: unknown) => Promise<IdxResponse>;
   neededToProceed: IdxRemediation[];
@@ -217,6 +217,7 @@ export interface IdxResponse {
     interactionHandle?: string;
   };
   context?: IdxContext;
+  requestDidSucceed?: boolean;
 }
 
 export function isIdxResponse(obj: any): obj is IdxResponse {

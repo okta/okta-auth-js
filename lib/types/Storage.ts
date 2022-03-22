@@ -51,9 +51,13 @@ export interface TransactionStorage extends StorageProvider {
   getStorage(): TransactionMeta;
 }
 
+export interface SavedIdxResponse {
+  rawIdxResponse: RawIdxResponse;
+  requestDidSucceed?: boolean;
+}
 export interface IdxResponseStorage extends StorageProvider {
-  setStorage(obj: RawIdxResponse): void;
-  getStorage(): RawIdxResponse;
+  setStorage(obj: SavedIdxResponse): void;
+  getStorage(): SavedIdxResponse;
 }
 
 export interface StorageOptions extends CookieOptions {

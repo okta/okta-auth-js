@@ -37,7 +37,7 @@ const generateDirectFetch = function generateDirectFetch({
     const response = await request(target, { method: actionDefinition.method, headers, body, credentials });
     const responseJSON = await response.json();
     const requestDidSucceed = response.ok;
-    const idxResponse = makeIdxState({ ...responseJSON, requestDidSucceed }, toPersist);
+    const idxResponse = makeIdxState(responseJSON, toPersist, requestDidSucceed);
     if (response.status === 401 && response.headers.get('WWW-Authenticate') === 'Oktadevicejwt realm="Okta Device"') {
       // Okta server responds 401 status code with WWW-Authenticate header and new remediation
       // so that the iOS/MacOS credential SSO extension (Okta Verify) can intercept

@@ -1641,7 +1641,11 @@ describe('idx/authenticate', () => {
           const pollForPushResponse = IdxResponseFactory.build({
             actions: {
               'currentAuthenticator-resend': () => Promise.resolve(
-                ChallengePollRemediationFactory.build()
+                  IdxResponseFactory.build({
+                    neededToProceed: [
+                      ChallengePollRemediationFactory.build()
+                    ]
+                  })
               )
             } as IdxActions,
             neededToProceed: [

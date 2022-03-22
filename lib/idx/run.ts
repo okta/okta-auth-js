@@ -312,7 +312,11 @@ export async function run(
 
     if (idxResponse) {
       // Save intermediate idx response in storage to reduce introspect call
-      authClient.transactionManager.saveIdxResponse(idxResponse.rawIdxState);
+      const { rawIdxState: rawIdxResponse, requestDidSucceed } = idxResponse;
+      authClient.transactionManager.saveIdxResponse({
+        rawIdxResponse,
+        requestDidSucceed
+      });
     }
 
   }
