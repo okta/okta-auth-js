@@ -5,6 +5,7 @@ Background:
     And the app is assigned to "Everyone" group
     And a Policy that defines "Authentication"
     And with a Policy Rule that defines "Password as the only factor"
+    # And a prefined user Mary with an active account
     # And Okta OIDC IdP predefined
     # And an IDP routing rule defined to allow users in the Sample App to use the IDP
 	
