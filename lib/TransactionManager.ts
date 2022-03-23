@@ -23,9 +23,10 @@ import {
   OAuthTransactionMeta,
   TransactionMetaOptions,
   TransactionManagerOptions,
-  CookieStorage
+  CookieStorage,
+  SavedIdxResponse
 } from './types';
-import { RawIdxResponse, isRawIdxResponse } from './idx/types/idx-js';
+import { isRawIdxResponse } from './idx/types/idx-js';
 import { warn } from './util';
 import {
   clearTransactionFromSharedStorage,
@@ -306,7 +307,7 @@ export default class TransactionManager {
     // throw new AuthSdkError('Unable to parse the ' + REDIRECT_OAUTH_PARAMS_NAME + ' value from storage');
   }
 
-  saveIdxResponse(idxResponse: RawIdxResponse): void {
+  saveIdxResponse({ rawIdxResponse, requestDidSucceed }: SavedIdxResponse): void {
     if (!this.saveLastResponse) {
       return;
     }
@@ -314,10 +315,10 @@ export default class TransactionManager {
     if (!storage) {
       return;
     }
-    storage.setStorage(idxResponse);
+    storage.setStorage({ rawIdxResponse, requestDidSucceed });
   }
 
-  loadIdxResponse(): RawIdxResponse | null {
+  loadIdxResponse(): SavedIdxResponse | null {
     if (!this.saveLastResponse) {
       return null;
     }

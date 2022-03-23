@@ -3,17 +3,24 @@ var webpack = require('webpack');
 var SDK_VERSION = require('./package.json').version;
 
 var babelOptions = {
-  presets: ['@babel/preset-env'],
-  plugins: [
-    '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-transform-runtime'
-  ],
+  configFile: false, // do not load from babel.config.js
+  babelrc: false, // do not load from .babelrc
+  presets: [],
+  plugins: [],
   sourceType: 'unambiguous',
   // the banners should only be added at the end of the build process
   // ignore all comments during transpiling
   shouldPrintComment: () => false 
 };
 
+// Keep source files untransformed for local development
+if (process.env.NODE_ENV !== 'development') {
+  babelOptions.presets.push('@babel/preset-env');
+  babelOptions.plugins = babelOptions.plugins.concat([
+    '@babel/plugin-proposal-class-properties',
+    '@babel/plugin-transform-runtime'
+  ]);
+}
 var babelExclude = /node_modules\/(?!p-cancelable)/;
 
 module.exports = {

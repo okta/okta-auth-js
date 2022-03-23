@@ -41,11 +41,9 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
   }
 
   mapAuthenticator() {
-    const authenticatorData = this.getAuthenticatorData();
-    const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
-
     // auto proceed with the only methodType option
     if (this.shouldProceedWithEmailAuthenticator) {
+      const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
       return authenticatorFromRemediation.form?.value.reduce((acc, curr) => {
         if (curr.value) {
           acc[curr.name] = curr.value;
@@ -58,14 +56,7 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
       }, {});
     }
 
-    // return based on user selection
-    return { 
-      id: authenticatorFromRemediation.form!.value
-        .find(({ name }) => name === 'id')!.value,
-      enrollmentId: authenticatorFromRemediation.form!.value
-        .find(({ name }) => name === 'enrollmentId')?.value,
-      methodType: authenticatorData?.methodType,
-    };
+    return this.getAuthenticatorData();
   }
 
   getInputAuthenticator() {
@@ -80,4 +71,9 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
     return inputs;
   }
 
+  getValuesAfterProceed(): AuthenticatorVerificationDataValues {
+    this.values = super.getValuesAfterProceed();
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'authenticator');
+    return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
+  }
 }

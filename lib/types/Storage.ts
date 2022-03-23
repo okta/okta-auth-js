@@ -51,9 +51,13 @@ export interface TransactionStorage extends StorageProvider {
   getStorage(): TransactionMeta;
 }
 
+export interface SavedIdxResponse {
+  rawIdxResponse: RawIdxResponse;
+  requestDidSucceed?: boolean;
+}
 export interface IdxResponseStorage extends StorageProvider {
-  setStorage(obj: RawIdxResponse): void;
-  getStorage(): RawIdxResponse;
+  setStorage(obj: SavedIdxResponse): void;
+  getStorage(): SavedIdxResponse;
 }
 
 export interface StorageOptions extends CookieOptions {
@@ -83,7 +87,7 @@ export interface BrowserStorageUtil extends StorageUtil {
   getCookieStorage(options?: StorageOptions): CookieStorage;
   testStorage(storage: any): boolean;
   storage: Cookies;
-  inMemoryStore: { string? : string };
+  inMemoryStore: Record<string, unknown>;
 
   // will be removed in next version. OKTA-362589
   getHttpCache(options?: StorageOptions): StorageProvider;

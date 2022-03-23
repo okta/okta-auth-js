@@ -1,1 +1,0 @@
-The unit tests in test/unit/legacy and the mocks in test/mocks/legacy are to ensure the behavior from IDX M1 for the okta-hosted widget continues without change.  The only changes should be to add behaviors that weren't adequately tested and to remove errors that no longer occur. 

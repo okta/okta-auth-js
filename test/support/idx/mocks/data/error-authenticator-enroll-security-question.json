@@ -1,0 +1,442 @@
+{
+  "version":"1.0.0",
+  "stateHandle":"02TvDrcK6Lo-NiM0JqqE5-wCo8v1UVoD8TyCI4L6Vy",
+  "expiresAt":"2021-05-07T23:10:08.000Z",
+  "intent":"LOGIN",
+  "remediation":{
+    "type":"array",
+    "value":[
+      {
+        "rel":[
+          "create-form"
+        ],
+        "name":"enroll-authenticator",
+        "relatesTo":[
+          "$.currentAuthenticator"
+        ],
+        "href":"http://localhost:3000/idp/idx/challenge/answer",
+        "method":"POST",
+        "produces":"application/ion+json; okta-version=1.0.0",
+        "value":[
+          {
+            "name":"credentials",
+            "type":"object",
+            "required":true,
+            "options":[
+              {
+                "label":"Choose a security question",
+                "value":{
+                  "form":{
+                    "value":[
+                      {
+                        "name":"questionKey",
+                        "type":"string",
+                        "label":"Choose a security question",
+                        "required":true,
+                        "options":[
+                          {
+                            "label":"What is the food you least liked as a child?",
+                            "value":"disliked_food"
+                          },
+                          {
+                            "label":"What is the name of your first stuffed animal?",
+                            "value":"name_of_first_plush_toy"
+                          },
+                          {
+                            "label":"What did you earn your first medal or award for?",
+                            "value":"first_award"
+                          },
+                          {
+                            "label":"What is your favorite security question?",
+                            "value":"favorite_security_question"
+                          },
+                          {
+                            "label":"What is the toy/stuffed animal you liked the most as a kid?",
+                            "value":"favorite_toy"
+                          },
+                          {
+                            "label":"What was the first computer game you played?",
+                            "value":"first_computer_game"
+                          },
+                          {
+                            "label":"What is your favorite movie quote?",
+                            "value":"favorite_movie_quote"
+                          },
+                          {
+                            "label":"What was the mascot of the first sports team you played on?",
+                            "value":"first_sports_team_mascot"
+                          },
+                          {
+                            "label":"What music album or song did you first purchase?",
+                            "value":"first_music_purchase"
+                          },
+                          {
+                            "label":"What is your favorite piece of art?",
+                            "value":"favorite_art_piece"
+                          },
+                          {
+                            "label":"What was your grandmother's favorite dessert?",
+                            "value":"grandmother_favorite_desert"
+                          },
+                          {
+                            "label":"What was the first thing you learned to cook?",
+                            "value":"first_thing_cooked"
+                          },
+                          {
+                            "label":"What was your dream job as a child?",
+                            "value":"childhood_dream_job"
+                          },
+                          {
+                            "label":"Where did you meet your spouse/significant other?",
+                            "value":"place_where_significant_other_was_met"
+                          },
+                          {
+                            "label":"Where did you go for your favorite vacation?",
+                            "value":"favorite_vacation_location"
+                          },
+                          {
+                            "label":"Where were you on New Year's Eve in the year 2000?",
+                            "value":"new_years_two_thousand"
+                          },
+                          {
+                            "label":"Who is your favorite speaker/orator?",
+                            "value":"favorite_speaker_actor"
+                          },
+                          {
+                            "label":"Who is your favorite book/movie character?",
+                            "value":"favorite_book_movie_character"
+                          },
+                          {
+                            "label":"Who is your favorite sports player?",
+                            "value":"favorite_sports_player"
+                          }
+                        ]
+                      },
+                      {
+                        "name":"answer",
+                        "label":"Answer",
+                        "required":true,
+                        "messages":{
+                          "type":"array",
+                          "value":[
+                            {
+                              "message":"The security question answer must be at least 4 characters in length",
+                              "i18n":{
+                                "key":"securityQuestion.answer.tooShort.arg",
+                                "params":[
+                                  4
+                                ]
+                              },
+                              "class":"ERROR"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "label":"Create my own security question",
+                "value":{
+                  "form":{
+                    "value":[
+                      {
+                        "name":"questionKey",
+                        "required":true,
+                        "value":"custom",
+                        "mutable":false
+                      },
+                      {
+                        "name":"question",
+                        "label":"Create a security question",
+                        "required":true
+                      },
+                      {
+                        "name":"answer",
+                        "label":"Answer",
+                        "required":true,
+                        "messages":{
+                          "type":"array",
+                          "value":[
+                            {
+                              "message":"The security question answer must be at least 4 characters in length",
+                              "i18n":{
+                                "key":"securityQuestion.answer.tooShort.arg",
+                                "params":[
+                                  4
+                                ]
+                              },
+                              "class":"ERROR"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name":"stateHandle",
+            "required":true,
+            "value":"02TvDrcK6Lo-NiM0JqqE5-wCo8v1UVoD8TyCI4L6Vy",
+            "visible":false,
+            "mutable":false
+          }
+        ],
+        "accepts":"application/json; okta-version=1.0.0"
+      },
+      {
+        "rel":[
+          "create-form"
+        ],
+        "name":"select-authenticator-enroll",
+        "href":"http://localhost:3000/idp/idx/credential/enroll",
+        "method":"POST",
+        "produces":"application/ion+json; okta-version=1.0.0",
+        "value":[
+          {
+            "name":"authenticator",
+            "type":"object",
+            "options":[
+              {
+                "label":"Security Question",
+                "value":{
+                  "form":{
+                    "value":[
+                      {
+                        "name":"id",
+                        "required":true,
+                        "value":"aut2adqTWq8ux94AY0g4",
+                        "mutable":false
+                      },
+                      {
+                        "name":"methodType",
+                        "required":false,
+                        "value":"security_question",
+                        "mutable":false
+                      }
+                    ]
+                  }
+                },
+                "relatesTo":"$.authenticators.value[0]"
+              }
+            ]
+          },
+          {
+            "name":"stateHandle",
+            "required":true,
+            "value":"02TvDrcK6Lo-NiM0JqqE5-wCo8v1UVoD8TyCI4L6Vy",
+            "visible":false,
+            "mutable":false
+          }
+        ],
+        "accepts":"application/json; okta-version=1.0.0"
+      }
+    ]
+  },
+  "currentAuthenticator":{
+    "type":"object",
+    "value":{
+      "contextualData":{
+        "questionKeys":[
+          "favorite_vacation_location",
+          "first_music_purchase",
+          "favorite_toy",
+          "grandmother_favorite_desert",
+          "favorite_sports_player",
+          "custom",
+          "disliked_food",
+          "favorite_movie_quote",
+          "favorite_book_movie_character",
+          "first_computer_game",
+          "first_thing_cooked",
+          "first_award",
+          "name_of_first_plush_toy",
+          "place_where_significant_other_was_met",
+          "favorite_art_piece",
+          "childhood_dream_job",
+          "new_years_two_thousand",
+          "favorite_security_question",
+          "favorite_speaker_actor",
+          "first_sports_team_mascot"
+        ],
+        "questions":[
+          {
+            "questionKey":"disliked_food",
+            "question":"What is the food you least liked as a child?"
+          },
+          {
+            "questionKey":"name_of_first_plush_toy",
+            "question":"What is the name of your first stuffed animal?"
+          },
+          {
+            "questionKey":"first_award",
+            "question":"What did you earn your first medal or award for?"
+          },
+          {
+            "questionKey":"favorite_security_question",
+            "question":"What is your favorite security question?"
+          },
+          {
+            "questionKey":"favorite_toy",
+            "question":"What is the toy/stuffed animal you liked the most as a kid?"
+          },
+          {
+            "questionKey":"first_computer_game",
+            "question":"What was the first computer game you played?"
+          },
+          {
+            "questionKey":"favorite_movie_quote",
+            "question":"What is your favorite movie quote?"
+          },
+          {
+            "questionKey":"first_sports_team_mascot",
+            "question":"What was the mascot of the first sports team you played on?"
+          },
+          {
+            "questionKey":"first_music_purchase",
+            "question":"What music album or song did you first purchase?"
+          },
+          {
+            "questionKey":"favorite_art_piece",
+            "question":"What is your favorite piece of art?"
+          },
+          {
+            "questionKey":"grandmother_favorite_desert",
+            "question":"What was your grandmother's favorite dessert?"
+          },
+          {
+            "questionKey":"first_thing_cooked",
+            "question":"What was the first thing you learned to cook?"
+          },
+          {
+            "questionKey":"childhood_dream_job",
+            "question":"What was your dream job as a child?"
+          },
+          {
+            "questionKey":"place_where_significant_other_was_met",
+            "question":"Where did you meet your spouse/significant other?"
+          },
+          {
+            "questionKey":"favorite_vacation_location",
+            "question":"Where did you go for your favorite vacation?"
+          },
+          {
+            "questionKey":"new_years_two_thousand",
+            "question":"Where were you on New Year's Eve in the year 2000?"
+          },
+          {
+            "questionKey":"favorite_speaker_actor",
+            "question":"Who is your favorite speaker/orator?"
+          },
+          {
+            "questionKey":"favorite_book_movie_character",
+            "question":"Who is your favorite book/movie character?"
+          },
+          {
+            "questionKey":"favorite_sports_player",
+            "question":"Who is your favorite sports player?"
+          }
+        ]
+      },
+      "type":"security_question",
+      "key":"security_question",
+      "id":"aut2adqTWq8ux94AY0g4",
+      "displayName":"Okta Security Question"
+    }
+  },
+  "authenticators":{
+    "type":"array",
+    "value":[
+      {
+        "type":"security_question",
+        "key":"security_question",
+        "id":"aut2adqTWq8ux94AY0g4",
+        "displayName":"Security Question",
+        "methods":[
+          {
+            "type":"security_question"
+          }
+        ]
+      }
+    ]
+  },
+  "authenticatorEnrollments":{
+    "type":"array",
+    "value":[
+      {
+        "type":"email",
+        "key":"okta_email",
+        "id":"eae2gfy5rda5j4KJS0g4",
+        "displayName":"Email",
+        "methods":[
+          {
+            "type":"email"
+          }
+        ]
+      },
+      {
+        "type":"password",
+        "key":"okta_password",
+        "id":"laeb9zwwTWxOZemCX0g3",
+        "displayName":"Password",
+        "methods":[
+          {
+            "type":"password"
+          }
+        ]
+      }
+    ]
+  },
+  "enrollmentAuthenticator":{
+    "type":"object",
+    "value":{
+      "type":"security_question",
+      "key":"security_question",
+      "id":"aut2adqTWq8ux94AY0g4",
+      "displayName":"Security Question",
+      "methods":[
+        {
+          "type":"security_question"
+        }
+      ]
+    }
+  },
+  "user":{
+    "type":"object",
+    "value":{
+      "id":"00u2gfx9yzlUWyfSR0g4",
+      "identifier": "testUser@okta.com"
+    }
+  },
+  "cancel":{
+    "rel":[
+      "create-form"
+    ],
+    "name":"cancel",
+    "href":"http://localhost:3000/idp/idx/cancel",
+    "method":"POST",
+    "produces":"application/ion+json; okta-version=1.0.0",
+    "value":[
+      {
+        "name":"stateHandle",
+        "required":true,
+        "value":"02TvDrcK6Lo-NiM0JqqE5-wCo8v1UVoD8TyCI4L6Vy",
+        "visible":false,
+        "mutable":false
+      }
+    ],
+    "accepts":"application/json; okta-version=1.0.0"
+  },
+  "app":{
+    "type":"object",
+    "value":{
+      "name":"okta_enduser",
+      "label":"Okta Dashboard",
+      "id":"DEFAULT_APP"
+    }
+  }
+}

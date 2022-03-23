@@ -18,6 +18,7 @@ import { AuthState, AuthStateLogOptions } from './types';
 import { OktaAuth } from '.';
 import { getConsole } from './util';
 import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
+import PromiseQueue from './PromiseQueue';
 
 export const INITIAL_AUTH_STATE = null;
 const DEFAULT_PENDING = {
@@ -40,6 +41,7 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
     && prevState.error === state.error;
 };
 
+
 export class AuthStateManager {
   _sdk: OktaAuth;
   _pending: { 
@@ -49,6 +51,7 @@ export class AuthStateManager {
   _authState: AuthState | null;
   _prevAuthState: AuthState | null;
   _logOptions: AuthStateLogOptions;
+  _transformQueue: PromiseQueue;
 
   constructor(sdk: OktaAuth) {
     if (!sdk.emitter) {
@@ -60,7 +63,10 @@ export class AuthStateManager {
     this._authState = INITIAL_AUTH_STATE;
     this._logOptions = {};
     this._prevAuthState = null;
- 
+    this._transformQueue = new PromiseQueue({
+      quiet: true
+    });
+
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process
     // Only listen on "added" event to update auth state
@@ -169,8 +175,10 @@ export class AuthStateManager {
             refreshToken,
             isAuthenticated: !!(accessToken && idToken)
           };
+
+          // Enqueue transformAuthState so that it does not run concurrently
           const promise: Promise<AuthState> = transformAuthState
-            ? transformAuthState(this._sdk, authState)
+            ? this._transformQueue.push(transformAuthState, null, this._sdk, authState) as Promise<AuthState>
             : Promise.resolve(authState);
 
           promise

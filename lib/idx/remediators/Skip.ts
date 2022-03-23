@@ -22,12 +22,8 @@ export class Skip extends Remediator {
 
   values!: SkipValues;
 
-  map = {
-    skip: ['skip']
-  }
-
   canRemediate() {
-    return !!this.values.skip;
+    return !!this.values.skip || this.options.step === 'skip';
   }
 
 }

@@ -222,15 +222,15 @@ describe('/idx/unlockAccout', () => {
       status: IdxStatus.PENDING,
       nextStep: {
         name: 'select-authenticator-unlock-account',
-        inputs: [
+        inputs: [ // inputs are in the same order as specified in the remediation's form
+          {
+            label: 'Username',
+            name: 'username'
+          },
           {
             key: 'string',
             name: 'authenticator'
           },
-          {
-            label: 'Username',
-            name: 'username'
-          }
         ],
         options: [
           {

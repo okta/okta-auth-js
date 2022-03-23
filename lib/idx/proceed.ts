@@ -35,25 +35,25 @@ export type ProceedOptions = AuthenticationOptions
   & SelectEnrollmentChannelOptions
   & { step?: string };
 
-export function canProceed(authClient: OktaAuthInterface, options?: { state?: string }) {
+export function canProceed(authClient: OktaAuthInterface, options: ProceedOptions = {}): boolean {
   const meta = getSavedTransactionMeta(authClient, options);
-  return !!meta;
+  return !!(meta || options.stateHandle);
 }
 
 export async function proceed(
   authClient: OktaAuthInterface,
   options: ProceedOptions = {}
 ): Promise<IdxTransaction> {
-  const { state } = options;
-  const meta = getSavedTransactionMeta(authClient, { state });
 
-  // Proceed always needs saved transaction meta
-  if (!meta) {
+  if (!canProceed(authClient, options)) {
     throw new AuthSdkError('Unable to proceed: saved transaction could not be loaded');
   }
 
-  // Determine the flow specification based on the saved flow
-  const flow = meta?.flow;
+  let { flow, state } = options;
+  if (!flow) {
+    const meta = getSavedTransactionMeta(authClient, { state });
+    flow = meta?.flow;
+  }
 
   return run(authClient, { 
     ...options, 

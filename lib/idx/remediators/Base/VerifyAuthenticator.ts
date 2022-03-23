@@ -24,10 +24,6 @@ export class VerifyAuthenticator extends Remediator {
   authenticator: Authenticator<VerifyAuthenticatorValues>;
   values!: VerifyAuthenticatorValues;
 
-  map = {
-    'credentials': []
-  };
-
   constructor(remediation: IdxRemediation, values: VerifyAuthenticatorValues = {}) {
     super(remediation, values);
     this.authenticator = getAuthenticator(remediation);
@@ -55,4 +51,9 @@ export class VerifyAuthenticator extends Remediator {
     return this.authenticator.getInputs(input);
   }
 
+  getValuesAfterProceed(): VerifyAuthenticatorValues {
+    this.values = super.getValuesAfterProceed();
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'credentials');
+    return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
+  }
 }

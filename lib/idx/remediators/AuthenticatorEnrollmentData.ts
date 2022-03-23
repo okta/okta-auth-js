@@ -47,12 +47,14 @@ export class AuthenticatorEnrollmentData extends AuthenticatorData {
     data = super.mapAuthenticatorDataFromValues(data);
     // add phoneNumber to authenticator if it exists in values
     const { phoneNumber } = this.values;
-    data = { 
+    if (!data && !phoneNumber) {
+      return;
+    }
+
+    return { 
       ...(data && data), 
       ...(phoneNumber && { phoneNumber }) 
     };
-
-    return (data.phoneNumber && data.methodType) ? data : null;
   }
 
 }

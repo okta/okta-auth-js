@@ -57,11 +57,15 @@ describe('idx/introspect', () => {
     const { authClient, introspectOptions } = testContext;
     jest.spyOn(mocked.idx, 'introspect');
     const rawIdxResponse = RawIdxResponseFactory.build();
-    authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue(rawIdxResponse);
+    authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue({
+      rawIdxResponse,
+      requestDidSucceed: false
+    });
     const res = await introspect(authClient, introspectOptions);
     expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
     expect(mocked.idx.introspect).not.toHaveBeenCalled();
     expect(res.rawIdxState).toEqual(rawIdxResponse);
+    expect(res.requestDidSucceed).toBe(false);
   });
 
   it('calls idx.introspect when idx states not in storage', async () => {
@@ -77,6 +81,7 @@ describe('idx/introspect', () => {
       version: '1.0.0',
     });
     expect(res.rawIdxState).toEqual(rawIdxResponse);
+    expect(res.requestDidSucceed).toBe(true);
   });
 
   it('on IDX error, calls makeIdxState to return a wrapped idxResponse', async () => {
@@ -94,6 +99,7 @@ describe('idx/introspect', () => {
     });
     expect(mocked.idx.makeIdxState).toHaveBeenCalled();
     expect(res.rawIdxState).toEqual(rawIdxResponse);
+    expect(res.requestDidSucceed).toBe(false);
   });
 
   it('on non-IDX error, the error is thrown', async () => {

@@ -17,7 +17,6 @@ jest.mock('cross-fetch');
 import fetch from 'cross-fetch'; // import to target for mockery
 
 const mockIdxResponse = require('../mocks/request-identifier');
-const mockErrorResponse = require('../mocks/error-response');
 const { Response } = jest.requireActual('cross-fetch');
 
 let domain = 'http://okta.example.com';
@@ -69,23 +68,6 @@ describe('introspect', () => {
             'accept': 'application/ion+json; okta-version=1.0.0',
           },
           method: 'POST'
-        });
-      });
-  });
-
-  it('rejects if the idxResponse is an error', async () => {
-    fetch.mockImplementation( () => Promise.resolve( new Response(JSON.stringify( mockErrorResponse ), { status: 500 }) ) );
-    return introspect({ domain, stateHandle, version })
-      .then( () => {
-        fail('expected introspect to reject when fetch call returns an HTTP error code');
-      })
-      .catch( err => {
-        expect(err).toEqual({
-          errorCode: 'E0000068',
-          errorSummary: 'Invalid Token',
-          errorLink: 'E0000068',
-          errorId: 'oaeEtqUk5zeRVSlSM-jiw7GFA',
-          errorCauses: [ { errorSummary: 'Authentication failed' } ]
         });
       });
   });

@@ -12,8 +12,11 @@ export class WebauthnVerification extends Authenticator<WebauthnVerificationValu
     return !!(clientData && authenticatorData && signatureData);
   }
 
-  mapCredentials(values: WebauthnVerificationValues): Credentials {
+  mapCredentials(values: WebauthnVerificationValues): Credentials | undefined {
     const { authenticatorData, clientData, signatureData } = values;
+    if (!authenticatorData && !clientData && !signatureData) {
+      return;
+    }
     return {
       authenticatorData,
       clientData,

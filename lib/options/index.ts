@@ -15,14 +15,16 @@ import { assertValidConfig } from '../builderUtil';
 import { OktaAuthOptions } from '../types';
 
 import fetchRequest from '../fetch/fetchRequest';
-import { storage, STORAGE_MANAGER_OPTIONS, enableSharedStorage, getCookieSettings } from './node';
+import { getStorage, STORAGE_MANAGER_OPTIONS, enableSharedStorage, getCookieSettings } from './node';
 import { isHTTPS } from '../features';
 
 export function getDefaultOptions(): OktaAuthOptions {
+
+  
   const options = {
     devMode: false,
     httpRequestClient: fetchRequest,
-    storageUtil: storage,
+    storageUtil: getStorage(),
     storageManager: STORAGE_MANAGER_OPTIONS,
     transactionManager: {
       enableSharedStorage

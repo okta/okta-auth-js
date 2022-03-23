@@ -14,7 +14,7 @@
 import { SelectAuthenticator, SelectAuthenticatorValues } from './Base/SelectAuthenticator';
 import { getAuthenticatorFromRemediation } from './util';
 import { IdxRemediation } from '../types/idx-js';
-import { AuthenticatorKey, Authenticator } from '../types';
+import { AuthenticatorKey, Authenticator, RemediateOptions } from '../types';
 
 export type SelectAuthenticatorAuthenticateValues = SelectAuthenticatorValues & {
   password?: string;
@@ -24,13 +24,14 @@ export class SelectAuthenticatorAuthenticate extends SelectAuthenticator {
   static remediationName = 'select-authenticator-authenticate';
   values!: SelectAuthenticatorAuthenticateValues;
 
-  constructor(remediation: IdxRemediation, values: SelectAuthenticatorValues = {}) {
-    super(remediation, values);
+  constructor(remediation: IdxRemediation, values: SelectAuthenticatorValues = {}, options: RemediateOptions = {}) {
+    super(remediation, values, options);
 
     // Preset password authenticator to trigger recover action
+    const isRecoveryFlow = this.options.flow === 'recoverPassword';
     const hasPasswordInOptions = getAuthenticatorFromRemediation(remediation)
       .options?.some(({ relatesTo }) => relatesTo?.key === AuthenticatorKey.OKTA_PASSWORD);
-    if (hasPasswordInOptions && (this.values.flow === 'recoverPassword' || this.values.password)) {
+    if (hasPasswordInOptions && (isRecoveryFlow || this.values.password)) {
       this.values.authenticators = [
         ...this.values.authenticators || [],
         { key: AuthenticatorKey.OKTA_PASSWORD }

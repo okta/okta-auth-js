@@ -28,13 +28,22 @@ import {
 } from './idx-js';
 import { FlowIdentifier } from './FlowIdentifier';
 
-export { IdxMessage, ChallengeData, ActivationData } from './idx-js';
+export {
+  IdxMessage,
+  IdxMessages,
+  ChallengeData,
+  ActivationData,
+  IdxResponse,
+  IdxContext,
+  RawIdxResponse
+} from './idx-js';
 export { AuthenticationOptions } from '../authenticate';
 export { RegistrationOptions } from '../register';
 export { PasswordRecoveryOptions } from '../recoverPassword';
 export { AccountUnlockOptions } from '../unlockAccount';
 export { ProceedOptions } from '../proceed';
 export { CancelOptions } from '../cancel';
+export { RemediateOptions } from '../remediate';
 export { FlowIdentifier };
 export { IdxAuthenticator };
 export { EmailVerifyCallbackResponse } from '../emailVerify';
@@ -102,7 +111,7 @@ export interface IdxTransaction {
   tokens?: Tokens;
   nextStep?: NextStep;
   messages?: IdxMessage[];
-  error?: APIError;
+  error?: APIError | IdxResponse;
   meta?: IdxTransactionMeta;
   enabledFeatures?: IdxFeature[];
   availableSteps?: NextStep[];
@@ -120,6 +129,7 @@ export type IdxOptions = InteractOptions & IntrospectOptions & {
   flow?: FlowIdentifier;
   exchangeCodeForTokens?: boolean;
   autoRemediate?: boolean;
+  step?: string;
 };
 
 export interface IdxPollOptions {
@@ -128,7 +138,12 @@ export interface IdxPollOptions {
 }
 
 export type Authenticator = {
-  key: string;
+  id?: string;
+  key?: string;
   methodType?: string;
   phoneNumber?: string;
 };
+
+export function isAuthenticator(obj: any): obj is Authenticator {
+  return obj && (obj.key || obj.id);
+}

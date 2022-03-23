@@ -4,16 +4,24 @@ export interface SecurityQuestionEnrollValues {
   questionKey?: string;
   question?: string;
   answer?: string;
+  credentials?: Credentials;
 }
 
 export class SecurityQuestionEnrollment extends Authenticator<SecurityQuestionEnrollValues> {
   canVerify(values: SecurityQuestionEnrollValues) {
+    const { credentials } = values;
+    if (credentials && credentials.questionKey && credentials.answer) {
+      return true;
+    }
     const { questionKey, question, answer } = values;
     return !!(questionKey && answer) || !!(question && answer);
   }
 
-  mapCredentials(values: SecurityQuestionEnrollValues): Credentials {
+  mapCredentials(values: SecurityQuestionEnrollValues): Credentials | undefined {
     const { questionKey, question, answer } = values;
+    if (!questionKey && !question && !answer) {
+      return;
+    }
     return {
       questionKey: question ? 'custom' : questionKey,
       question,

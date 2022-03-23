@@ -395,7 +395,7 @@ function renderAuthenticated(authState) {
 }
 
 function renderUserInfo(authState) {
-  const obj = appState.userInfo || authState.userInfo;
+  const obj = appState.userInfo || authState.userInfo || {};
   const attributes = Object.keys(obj);
   const rows = attributes.map((key) => {
     return `
@@ -505,7 +505,9 @@ function showRedirectButton() {
 function logout(e) {
   e.preventDefault();
   appState = {};
-  authClient.signOut();
+  // Normally tokens are cleared after redirect. For in-memory storage we should clear before.
+  const clearTokensBeforeRedirect = config.storage === 'memory';
+  authClient.signOut({ clearTokensBeforeRedirect });
 }
 window._logout = logout;
 
@@ -543,6 +545,12 @@ function shouldRedirectToGetTokens(authState) {
     // If the callback has errored, it means there is no Okta session and we should begin a new auth flow
     // This condition breaks a potential infinite rediret loop
     if (config.error === 'login_required') {
+      return false;
+    }
+
+    // AuthState error. This can happen when an exception is thrown inside transformAuthState.
+    // Return false to break a potential infinite loop
+    if (authState.error) {
       return false;
     }
 

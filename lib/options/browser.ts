@@ -11,10 +11,17 @@
  */
 
 /* eslint-disable complexity */
-import { StorageManagerOptions, OktaAuthOptions } from '../types';
+import { StorageManagerOptions, OktaAuthOptions, StorageUtil } from '../types';
 import { warn } from '../util';
 
-export { default as storage } from '../browser/browserStorage';
+import { default as browserStorage } from '../browser/browserStorage';
+
+export function getStorage(): StorageUtil {
+  const storageUtil = Object.assign({}, browserStorage, {
+    inMemoryStore: {} // create unique storage for this instance
+  });
+  return storageUtil;
+}
 
 export const STORAGE_MANAGER_OPTIONS: StorageManagerOptions = {
   token: {

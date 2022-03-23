@@ -26,12 +26,11 @@ export class EnrollProfile extends Remediator {
 
   values!: EnrollProfileValues;
 
-  map = {
-    'userProfile': []
-  };
-
   canRemediate() {
     const userProfileFromValues = this.getData().userProfile;
+    if (!userProfileFromValues) {
+      return false;
+    }
     // eslint-disable-next-line max-len
     const userProfileFromRemediation = this.remediation.value!.find(({ name }) => name === 'userProfile') as IdxRemediationValue;
     return userProfileFromRemediation.form!.value.reduce((canRemediate, curr) => {
@@ -44,11 +43,15 @@ export class EnrollProfile extends Remediator {
 
   mapUserProfile({form: { value: profileAttributes }}) {
     const attributeNames = profileAttributes.map(({name}) => name);
-    return attributeNames.reduce((attributeValues, attributeName) => (
+    const data = attributeNames.reduce((attributeValues, attributeName) => (
       this.values[attributeName] ? {
       ...attributeValues,
       [attributeName]: this.values[attributeName]
     } : attributeValues), {});
+    if (Object.keys(data).length === 0) {
+      return;
+    }
+    return data;
   }
 
   getInputUserProfile(input) {

@@ -6,7 +6,11 @@ interface TotpCredentials extends Credentials {
 }
 
 export class OktaVerifyTotp extends VerificationCodeAuthenticator {
-  mapCredentials(values): TotpCredentials {
-    return { totp: values.verificationCode };
+  mapCredentials(values): TotpCredentials | undefined {
+    const { verificationCode } = values;
+    if (!verificationCode) {
+      return;
+    }
+    return { totp: verificationCode };
   }
 }

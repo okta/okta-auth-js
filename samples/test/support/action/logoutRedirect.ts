@@ -13,9 +13,10 @@
 
 import { UserHome, Unauth } from  '../selectors';
 import waitForDisplayed from '../wait/waitForDisplayed';
-
+import clickElement
+ from './clickElement';
 export default async () => {
-  const el = await waitForDisplayed(UserHome.logoutRedirect, false);
-  await el.click();
+  await waitForDisplayed(UserHome.logoutRedirect, false);
+  await clickElement('click', 'selector', UserHome.logoutRedirect);
   await waitForDisplayed(Unauth.body);
 };

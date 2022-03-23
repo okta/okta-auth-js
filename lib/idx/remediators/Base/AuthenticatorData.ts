@@ -14,6 +14,8 @@
 
 import { Remediator, RemediationValues } from './Remediator';
 import { IdxRemediationValue, IdxOption, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
+import { isAuthenticator } from '../../types';
+import { compareAuthenticators } from '../../authenticator/util';
 
 export type AuthenticatorDataValues = RemediationValues & {
   methodType?: string;
@@ -21,11 +23,6 @@ export type AuthenticatorDataValues = RemediationValues & {
 
 // Base class - DO NOT expose static remediationName
 export class AuthenticatorData extends Remediator {
-
-  map = {
-    'authenticator': []
-  };
-
   values!: AuthenticatorDataValues;
   authenticator: IdxAuthenticator;
 
@@ -42,7 +39,7 @@ export class AuthenticatorData extends Remediator {
     const authenticatorData = this.getAuthenticatorData();
     if (authenticatorData) {
       this.values.authenticatorsData = this.values.authenticatorsData!.map(data => {
-        if (data.key === this.authenticator.key) {
+        if (compareAuthenticators(this.authenticator, data)) {
           return this.mapAuthenticatorDataFromValues(data);
         }
         return data;
@@ -57,12 +54,12 @@ export class AuthenticatorData extends Remediator {
 
   protected getAuthenticatorData() {
     return this.values.authenticatorsData!
-      .find(({ key }) => key === this.authenticator.key);
+      .find((data) => compareAuthenticators(this.authenticator, data));
   }
 
   canRemediate() {
     return this.values.authenticatorsData!
-      .some(data => data.key === this.authenticator.key);
+      .some(data => compareAuthenticators(this.authenticator, data));
   }
 
   getNextStep() {
@@ -76,9 +73,15 @@ export class AuthenticatorData extends Remediator {
 
   protected mapAuthenticatorDataFromValues(authenticatorData?) {
     // add methodType to authenticatorData if it exists in values
-    const { methodType } = this.values;
+    let { methodType, authenticator } = this.values;
+    if (!methodType && isAuthenticator(authenticator)) {
+     methodType = authenticator?.methodType;
+    }
+    
+    const { id, enrollmentId } = this.authenticator;
     const data = { 
-      key: this.authenticator.key, 
+      id,
+      enrollmentId,
       ...(authenticatorData && authenticatorData),
       ...(methodType && { methodType }) 
     };
@@ -101,7 +104,7 @@ export class AuthenticatorData extends Remediator {
     this.values = super.getValuesAfterProceed();
     // remove used authenticatorData
     const authenticatorsData = this.values.authenticatorsData!
-      .filter(data => data.key !== this.authenticator.key);
+      .filter(data => compareAuthenticators(this.authenticator, data) !== true);
     return { ...this.values, authenticatorsData };
   }
 }

@@ -10,10 +10,14 @@ export class SecurityQuestionVerification extends Authenticator<SecurityQuestion
     return !!values.answer;
   }
 
-  mapCredentials(values: SecurityQuestionVerificationValues): Credentials {
+  mapCredentials(values: SecurityQuestionVerificationValues): Credentials | undefined {
+    const { answer } = values;
+    if (!answer) {
+      return;
+    }
     return {
       questionKey: this.meta.contextualData!.enrolledQuestion!.questionKey,
-      answer: values.answer
+      answer
     };
   }
 

@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { RawIdxResponse } from '../types';
 import { request } from './client';
 import { validateVersionConfig } from './util';
 
@@ -21,15 +22,13 @@ export interface IntrospectOptions {
   version?: string;
 }
 
-const parseAndReject = response => response.json().then( err => Promise.reject(err) );
-
 const introspect = async function introspect({
   withCredentials,
   domain,
   interactionHandle,
   stateHandle,
   version,
-}: IntrospectOptions) {
+}: IntrospectOptions): Promise<RawIdxResponse> {
   validateVersionConfig(version);
   const target = `${domain}/idp/idx/introspect`;
   const body = stateHandle ? { stateToken: stateHandle } : { interactionHandle };
@@ -38,8 +37,15 @@ const introspect = async function introspect({
     accept: `application/ion+json; okta-version=${version}`,
   };
   const credentials = withCredentials === false ? 'omit' : 'include';
-  return request(target, { credentials, headers, body: JSON.stringify(body) })
-    .then( response => response.ok ? response.json() : parseAndReject( response ) );
+  const response = await request(target, { credentials, headers, body: JSON.stringify(body) });
+  const requestDidSucceed = response.ok;
+  const rawIdxResponse = await response.json();
+
+  // Throw IDX response if request did not succeed. This behavior will be removed in version 7.0: OKTA-481844
+  if (!requestDidSucceed) {
+    throw rawIdxResponse;
+  }
+  return rawIdxResponse;
 };
 
 export default introspect;

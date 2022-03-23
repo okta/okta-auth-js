@@ -70,6 +70,7 @@ export const PasswordAuthenticatorFactory = IdxAuthenticatorFactory.params({
 
 export const OktaVerifyAuthenticatorFactory = IdxAuthenticatorFactory.params({
   displayName: 'Okta Verify',
+  id: 'id-okta-verify-authenticator',
   key: 'okta_verify',
   type: 'app',
   methods: [

@@ -156,7 +156,7 @@ function renderAuthenticated(authState) {
 }
 
 function renderUserInfo(authState) {
-  const obj = appState.userInfo || authState.userInfo;
+  const obj = appState.userInfo || authState.userInfo || {};
   const attributes = Object.keys(obj);
   const rows = attributes.map((key) => {
     return `
@@ -291,7 +291,9 @@ function showRedirectButton() {
 function logout(e) {
   e.preventDefault();
   appState = {};
-  authClient.signOut();
+  // Normally tokens are cleared after redirect. For in-memory storage we should clear before.
+  const clearTokensBeforeRedirect = config.storage === 'memory';
+  authClient.signOut({ clearTokensBeforeRedirect });
 }
 window._logout = logout;
 

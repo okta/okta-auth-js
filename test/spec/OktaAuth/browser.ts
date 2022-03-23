@@ -56,6 +56,19 @@ describe('OktaAuth (browser)', function() {
   });
 
   describe('options', function() {
+    describe('storageUtil', function() {
+      it('creates unique in-memory storage', () => {
+        const auth1 = new OktaAuth({ issuer });
+        const memStorage1 = auth1.options!.storageUtil!.getStorageByType('memory');
+        memStorage1.setItem('foo', 'bar');
+        expect(memStorage1.getItem('foo')).toBe('bar');
+  
+        const auth2 = new OktaAuth({ issuer });
+        const memStorage2 = auth2.options!.storageUtil!.getStorageByType('memory');
+        expect(memStorage2.getItem('foo')).toBe(undefined);
+      });
+    });
+
     describe('cookies', () => {
 
       it('"secure" is true by default on HTTPS', () => {

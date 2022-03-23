@@ -27,18 +27,27 @@ export async function introspect (
   authClient: OktaAuthInterface, 
   options: IntrospectOptions = {}
 ): Promise<IdxResponse> {
+  let rawIdxResponse;
+  let requestDidSucceed;
+
   // try load from storage first
-  let rawIdxResponse = authClient.transactionManager.loadIdxResponse();
-  
+  const savedIdxResponse = authClient.transactionManager.loadIdxResponse();
+  if (savedIdxResponse) {
+    rawIdxResponse = savedIdxResponse.rawIdxResponse;
+    requestDidSucceed = savedIdxResponse.requestDidSucceed;
+  }
+
   // call idx.introspect if no existing idx response available in storage
   if (!rawIdxResponse) {
     const version = options.version || IDX_API_VERSION;
     const domain = getOAuthDomain(authClient);
     try {
       rawIdxResponse = await idx.introspect({ domain, ...options, version });
+      requestDidSucceed = true;
     } catch (err) {
       if (isRawIdxResponse(err)) {
         rawIdxResponse = err;
+        requestDidSucceed = false;
       } else {
         throw err;
       }
@@ -46,5 +55,5 @@ export async function introspect (
   }
 
   const { withCredentials } = options;
-  return idx.makeIdxState(rawIdxResponse, { withCredentials });
+  return idx.makeIdxState(rawIdxResponse, { withCredentials }, requestDidSucceed);
 }

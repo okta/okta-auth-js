@@ -33,6 +33,9 @@ if ! npm publish --registry ${REGISTRY}; then
   exit ${PUBLISH_ARTIFACTORY_FAILURE}
 fi
 
+FINAL_PUBLISHED_VERSIONS=$(echo "console.log(require('./package.json').version)" | node -)
+log_custom_message "Published Version" "${FINAL_PUBLISHED_VERSIONS}"
+
 popd
 
 exit ${SUCCESS}

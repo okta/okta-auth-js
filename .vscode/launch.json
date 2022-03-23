@@ -159,6 +159,25 @@
       "env": {
         "DEBUG": "1"
       }
+    },
+
+    {
+      "type": "node",
+      "protocol": "inspector",
+      "request": "launch",
+      "name": "Debug Webpack",
+      "program": "${workspaceRoot}/node_modules/.bin/webpack",
+      "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v12.13.0/bin/node",
+      "args": [
+          "--config",
+          "${workspaceRoot}/webpack.dev.config.js"
+      ],
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}",
+      "env": {
+        "NODE_ENV": "development"
+      }
     }
   ]
 }

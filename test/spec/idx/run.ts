@@ -13,7 +13,7 @@
 
 import { run, RunOptions } from '../../../lib/idx/run';
 import { IdxStatus } from '../../../lib/idx/types';
-import { IdxResponseFactory } from '@okta/test.support/idx';
+import { IdxResponseFactory, IdentifyRemediationFactory } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
   return {
@@ -48,14 +48,17 @@ describe('idx/run', () => {
       state: transactionMeta.state
     });
 
-    const idxResponse = IdxResponseFactory.build();
+    const idxResponse = IdxResponseFactory.build({
+      neededToProceed: [
+        IdentifyRemediationFactory.build(),
+      ],
+      requestDidSucceed: true
+    });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
 
     const remediateResponse = {
       idxResponse,
-      nextStep: 'remediate-nextStep',
-      messages: undefined,
-      terminal: false
+      nextStep: 'remediate-nextStep'
     };
     jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue(remediateResponse);
 
@@ -94,6 +97,25 @@ describe('idx/run', () => {
       authClient,
       interactOptions
     };
+  });
+
+  describe('with stateHandle', () => {
+    it('will call introspect', async () => {
+      const { authClient } = testContext;
+      const stateHandle = 'abc';
+      await run(authClient, { stateHandle });
+      expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, {
+        withCredentials: true,
+        stateHandle
+      });
+    });
+
+    it('does not call interact', async () => {
+      const { authClient } = testContext;
+      const stateHandle = 'abc';
+      await run(authClient, { stateHandle });
+      expect(mocked.interact.interact).not.toHaveBeenCalled();
+    });
   });
 
   describe('flow', () => {
@@ -178,6 +200,7 @@ describe('idx/run', () => {
     const { authClient } = testContext;
     await run(authClient);
     expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, { 
+      withCredentials: true,
       interactionHandle: 'meta-interactionHandle'
     });
   });
@@ -185,9 +208,12 @@ describe('idx/run', () => {
   it('calls remediate, passing options and values through', async () => {
     const { authClient, idxResponse } = testContext;
     const flow = 'register';
-    const options: RunOptions = { username: 'x', flow };
+    const username = 'x';
+    const password = 'y';
+    const options: RunOptions = { username, password, flow };
     const values = { 
-      ...options, 
+      username,
+      password, 
       stateHandle: idxResponse.rawIdxState.stateHandle 
     };
     const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow);
@@ -201,11 +227,16 @@ describe('idx/run', () => {
     remediateResponse.nextStep = 'has-next-step';
     jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
     await run(authClient);
-    expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith(idxResponse.rawIdxState);
+    expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+      rawIdxResponse: idxResponse.rawIdxState,
+      requestDidSucceed: true
+    });
   });
 
   it('returns messages in transaction', async () => {
-    testContext.remediateResponse.messages = ['remediate-message-1'];
+    testContext.idxResponse.rawIdxState.messages = {
+      value: ['remediate-message-1']
+    };
     const { authClient } = testContext;
     const res = await run(authClient);
     expect(res).toMatchObject({
@@ -217,8 +248,7 @@ describe('idx/run', () => {
 
   describe('response is not terminal', () => {
     beforeEach(() => {
-      const { remediateResponse, transactionMeta } = testContext;
-      remediateResponse.terminal = false;
+      const { transactionMeta } = testContext;
       // load from saved transaction
       transactionMeta.interactionHandle = 'fake';
       jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
@@ -247,8 +277,8 @@ describe('idx/run', () => {
 
   describe('response is terminal', () => {
     beforeEach(() => {
-      const { remediateResponse, transactionMeta } = testContext;
-      remediateResponse.terminal = true;
+      const { idxResponse, transactionMeta } = testContext;
+      idxResponse.neededToProceed = [];
       // load from saved transaction
       transactionMeta.interactionHandle = 'fake';
       jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
@@ -268,7 +298,7 @@ describe('idx/run', () => {
 
   describe('response contains interactionCode', () => {
     beforeEach(() => {
-      testContext.remediateResponse.idxResponse.interactionCode = 'idx-interactionCode';
+      testContext.idxResponse.interactionCode = 'idx-interactionCode';
     });
 
     it('calls exchangeCodeForTokens and returns tokens', async () => {

@@ -10,9 +10,13 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { StorageManagerOptions, OktaAuthOptions } from '../types';
+import { StorageManagerOptions, OktaAuthOptions, StorageUtil } from '../types';
 
-export { default as storage } from '../server/serverStorage';
+import { default as storage } from '../server/serverStorage';
+
+export function getStorage(): StorageUtil {
+  return storage;
+}
 
 export const STORAGE_MANAGER_OPTIONS: StorageManagerOptions = {
   token: {
