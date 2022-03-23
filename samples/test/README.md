@@ -29,6 +29,16 @@ WEB_CLIENT_ID=123xxxx
 WEB_CLIENT_SECRET=sOmeSecretString
 ```
 
+## Reproduce test locally
+
+Most cucumber tests setup org configs dynamiclly via management api and tear down the created app/polices/user after each test. It might make it difficult to repro the test with the exact org config after a failure, here are some approaches to persist the created org config during a test:
+
+* Comment out the org context deletion part in `./steps/after.ts`. **Note:** the changes should not be commited.
+
+* Add a break point at the end of `Given` step, so configs can be grabbed from the test org, then you can target to the generated test app for local manual debugging. See the `sample: test feature` section in `launch.json`.
+
+* Use `await browser.debug()` to pause the test process.
+
 ## Commands
 
 If running from the workspace directory: `yarn workspace @okta/test.e2e.samples start`
