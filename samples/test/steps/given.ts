@@ -13,11 +13,9 @@
 /* eslint-disable max-len */
 
 import { Given } from '@cucumber/cucumber';
-import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/context-enabled/live-user/navigateToLoginAndAuthenticate';
 import ActionContext from '../support/context';
-import attachPolicy from '../support/action/context-enabled/org-config/attachPolicy';
 import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
 import Home from '../support/selectors/Home';
 import startApp from '../support/action/startApp';
@@ -32,6 +30,9 @@ import addAppToGroup from '../support/management-api/addAppToGroup';
 import addUserToGroup from '../support/management-api/addUserToGroup';
 import createCredentials from '../support/management-api/createCredentials';
 import enrollFactor from '../support/management-api/enrollFactor';
+import { Action } from 'webdriverio';
+import grantConsentToScope from '../support/management-api/grantConsentToScope';
+import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
 
 // NOTE: noop function is used for predefined settings
 
@@ -61,8 +62,6 @@ Given('an App', async function(this: ActionContext) {
   });
 });
 
-Given('a predefined App that defines {string}', setEnvironment);
-
 Given(
   'the app is assigned to {string} group', 
   async function(this: ActionContext, groupName: string) {
@@ -84,6 +83,22 @@ Given(
 );
 
 Given(
+  'the app is granted {string} scope',
+  async function(this: ActionContext, scopeId: string) {
+    await grantConsentToScope(this.app.id, scopeId);
+  }
+);
+
+Given(
+  'the app has Email Verification callback uri defined',
+  async function(this: ActionContext) {
+    await updateAppOAuthClient(this.app, { 
+      email_magic_link_redirect_uri: 'http://localhost:8080/login/callback'
+    });
+  }
+)
+
+Given(
   'a Policy that defines {string}',
   async function(this: ActionContext, policyDescription: string) {
     this.policies = this.policies || [];
@@ -94,9 +109,7 @@ Given(
     this.policies.push(policy);
     try {
       await addAppToPolicy(policy.id, this.app.id);
-    } catch(err) {
-      console.info('Not all policies can map to an app, ignore the error.');
-    }
+    } catch(err) {/* do nothing */}
   }
 );
 
@@ -173,16 +186,6 @@ Given(
     });
     this.sharedSecret = this.enrolledFactor._embedded?.activation?.sharedSecret;
   }
-);
-
-Given(
-  /^a SPA, WEB APP or MOBILE Policy (.*)$/,
-  setEnvironment
-);
-
-Given(
-  /^the Application Sign on Policy is set to "(.*)"$/,
-  setEnvironment
 );
 
 Given(

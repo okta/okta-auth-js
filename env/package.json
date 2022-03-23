@@ -4,7 +4,6 @@
   "main": "index.js",
   "private": true,
   "dependencies": {
-    "dotenv": "^8.2.0",
-    "js-yaml": "^4.1.0"
+    "dotenv": "^8.2.0"
   }
 }

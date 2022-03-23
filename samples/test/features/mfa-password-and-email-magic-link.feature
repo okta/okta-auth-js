@@ -1,9 +1,10 @@
 Feature: Multi-Factor Authentication with Password and Email Magic Link
 
   Background:
-    # Email Verification callback uri cannot be configed via management API
-    # Use predefined org for now
-	  Given a predefined App that defines "MFA with Password and Email as required"
+    Given an App
+      And the app has Email Verification callback uri defined
+      And a Policy that defines "Authentication"
+      And with a Policy Rule that defines "Password + Another Factor"
       And a user named "Mary"
       And she has an account with "active" state in the org
 

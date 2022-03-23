@@ -23,12 +23,21 @@ import { Transaction } from './TransactionContext';
 import oidcConfig from './config';
 
 const oktaAuth = (() => {
-  const { state, recoveryToken } = urlParamsToObject(window.location.search);
+  const { 
+    state, 
+    recoveryToken, 
+    issuer,
+    clientId
+   } = urlParamsToObject(window.location.search);
   return new OktaAuth(Object.assign({}, oidcConfig, {
     state,
-    recoveryToken
+    recoveryToken,
+    ...(issuer && { issuer }),
+    ...(clientId && { clientId })
   }));
 })();
+
+console.log(oktaAuth);
 
 const restoreOriginalUri = () => {};
 

@@ -11,12 +11,10 @@
  */
 
 const dotenv = require('dotenv');
-const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
 
 const TESTENV_FILE = 'testenv';
-const TESTENV_YAML = 'testenv.yml';
 
 function setEnvironmentVars(envConfig) {
   Object.keys(envConfig).forEach((k) => {
@@ -47,20 +45,6 @@ function setEnvironmentVarsFromTestEnv(currDir) {
   setEnvironmentVars(envConfig);
 }
 
-function getEnvironmentVarsFromTestEnvYaml(name, currDir) {
-  const testEnvPath = getPath(TESTENV_YAML, currDir);
-  if (!testEnvPath) {
-    return;
-  }
-  const doc = yaml.load(fs.readFileSync(testEnvPath, 'utf8'));
-  if (!doc) {
-    console.log(`Can't load testenv.yml`);
-    return;
-  }
-  return doc[name];
-}
-
 module.exports = {
-  setEnvironmentVarsFromTestEnv,
-  getEnvironmentVarsFromTestEnvYaml
+  setEnvironmentVarsFromTestEnv
 };
