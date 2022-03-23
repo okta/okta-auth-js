@@ -95,7 +95,7 @@ Given(
     try {
       await addAppToPolicy(policy.id, this.app.id);
     } catch(err) {
-      console.info('Not all policies can map to an app, ignore the error.', err)
+      console.info('Not all policies can map to an app, ignore the error.');
     }
   }
 );
@@ -168,7 +168,8 @@ Given(
   async function(this: ActionContext, factorType: string) {
     this.enrolledFactor = await enrollFactor({
       userId: this.user.id,
-      factorType
+      factorType,
+      phoneNumber: this.credentials.phoneNumber
     });
     this.sharedSecret = this.enrolledFactor._embedded?.activation?.sharedSecret;
   }

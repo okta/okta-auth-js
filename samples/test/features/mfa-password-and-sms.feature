@@ -28,7 +28,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And an application session is created
 
   Scenario: Mary enters a wrong verification code on verify
-    Given Mary has enrolled in the SMS factor
+    Given she has enrolled in the "SMS" factor
       And Mary navigates to the Basic Login View
       And she has inserted her username
       And she has inserted her password
@@ -55,7 +55,7 @@ Feature: Multi-Factor Authentication with Password and SMS
 
 
   Scenario: 2FA Login with SMS
-    Given Mary has enrolled in the SMS factor
+    Given she has enrolled in the "SMS" factor
       And Mary navigates to the Basic Login View
       And she has inserted her username
       And she has inserted her password
