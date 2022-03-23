@@ -1,8 +1,6 @@
 import { generateState } from '@okta/okta-auth-js';
 import { getUrl } from './APIUtils';
 
-const OKTA_VERSION = '1.0.0';
-
 const makeRequest = async (oktaAuth, options) => {
   const replaceLinksWithFns = (item) => {
     const newItem = Object.entries(item._links)
