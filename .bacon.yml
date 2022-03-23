@@ -51,7 +51,7 @@ test_suites:
     - name: e2e-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts
       sort_order: '7'
-      timeout: '20'
+      timeout: '30'
       script_name: e2e-express-embedded-auth-with-sdk
       criteria: MERGE
       queue_name: small
@@ -90,14 +90,13 @@ test_suites:
       script_name: e2e-express-embedded-sign-in-widget
       criteria: MERGE
       queue_name: small
-    # disable due to request cors issue
-    # - name: e2e-react-oie
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '14'
-    #   timeout: '10'
-    #   script_name: e2e-react-oie
-    #   criteria: MERGE
-    #   queue_name: small
+    - name: e2e-react-oie
+      script_path: ../okta-auth-js/scripts
+      sort_order: '14'
+      timeout: '10'
+      script_name: e2e-react-oie
+      criteria: MERGE
+      queue_name: small
     - name: publish
       script_path: ../okta-auth-js/scripts
       sort_order: '15'

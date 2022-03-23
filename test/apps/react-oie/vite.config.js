@@ -23,7 +23,14 @@ export default defineConfig({
     'process.env': env
   },
   server: {
-    port: 8080
+    port: 8080,
+    proxy: {
+      '/myaccount': {
+        target: process.env.ISSUER,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/myaccount/, '')
+      }
+    }
   },
   build: {
     // Minimize transpile in development

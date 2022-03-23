@@ -34,7 +34,7 @@ const makeRequest = async (oktaAuth, options) => {
   
   const { url, method, data } = options;
   return oktaAuth.invokeApiMethod({
-    headers: { 'okta-version': OKTA_VERSION },
+    headers: { 'Accept': '*/*;okta-version=1.0.0' },
     url,
     method,
     args: data
