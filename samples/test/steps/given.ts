@@ -176,18 +176,6 @@ Given(
 );
 
 Given(
-  'a property named {string} is allowed and assigned to a SPA, WEB APP or MOBILE application',
-  async function(this: ActionContext, propertyName: string) {
-    const PROPERTY_POLICY_MAP = {
-      customAttribute: 'Custom Attribute Policy',
-      age: 'Age Attribute Policy'
-    };
-    await attachPolicy.call(this, (PROPERTY_POLICY_MAP as any)[propertyName]);
-    this.customAttribute = propertyName;
-  }
-);
-
-Given(
   /^a SPA, WEB APP or MOBILE Policy (.*)$/,
   setEnvironment
 );
