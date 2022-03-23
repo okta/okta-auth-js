@@ -1,8 +1,6 @@
 import { generateState } from '@okta/okta-auth-js';
 import { getUrl } from './APIUtils';
 
-const OKTA_VERSION = '1.0.0';
-
 const makeRequest = async (oktaAuth, options) => {
   const replaceLinksWithFns = (item) => {
     const newItem = Object.entries(item._links)
@@ -34,7 +32,7 @@ const makeRequest = async (oktaAuth, options) => {
   
   const { url, method, data } = options;
   return oktaAuth.invokeApiMethod({
-    headers: { 'okta-version': OKTA_VERSION },
+    headers: { 'Accept': '*/*;okta-version=1.0.0' },
     url,
     method,
     args: data
