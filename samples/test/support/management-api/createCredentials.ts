@@ -31,6 +31,8 @@ export default async function (
   return Object.assign({}, a18nProfile, {
     firstName,
     lastName: lastName || `Mc${firstName}face`,
-    password: crypto.randomBytes(16).toString('base64')
+    password: crypto.randomBytes(16).toString('base64'),
+    username: a18nProfile.emailAddress,
+    email: a18nProfile.emailAddress,
   });
 }

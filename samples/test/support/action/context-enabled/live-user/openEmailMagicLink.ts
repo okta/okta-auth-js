@@ -15,5 +15,5 @@ import ActionContext from '../../../context';
 
 export default async function (this: ActionContext) {
   const emailMagicLink = await a18nClient.getEmailMagicLink(this.credentials.profileId);
-  browser.url(emailMagicLink);
+  await browser.url(emailMagicLink);
 }

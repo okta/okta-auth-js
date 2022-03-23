@@ -57,7 +57,7 @@ function getConfig() {
     issuer,
     orgUrl,
     orgName,
-    clientId: sampleConfig.express ? webClientId : clientId,
+    clientId: sampleConfig.appType === 'web' ? webClientId : clientId,
     username,
     password,
     fbUsername,

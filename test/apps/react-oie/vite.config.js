@@ -11,7 +11,7 @@ const env = {};
 // List of environment variables made available to the app
 ['ISSUER', 'SPA_CLIENT_ID'].forEach((key) => {
   if (!process.env[key]) {
-    throw new Error(`Environment variable ${key} must be set. See README.md`);
+    console.warn(`Environment variable ${key} should be set for development. See README.md`);
   }
   env[key] = process.env[key];
 });

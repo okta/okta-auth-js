@@ -1,13 +1,13 @@
 Feature: Add another Required Attribute to the Profile Enrollment Policy
 
   Background:
-    Given a Profile Enrollment policy defined assigning new users to the Everyone Group 
-    And by collecting "First Name", "Last Name", "Email"
-    And a property named "customAttribute" is allowed and assigned to a SPA, WEB APP or MOBILE application
-    # And "Required before access is granted" is selected for Email Verification under Profile Enrollment in Security > Profile Enrollment
-    # And configured Authenticators are Password (required), Email (required), and SMS (optional)
-    And a user named "Mary"
-    # And Mary does not have an account in the org
+    Given a Group
+      And an App
+      # And the app is assigned to "Everyone" group
+      And a Policy that defines "Profile Enrollment"
+      And with a Policy Rule that defines 'collecting default attributes and a required "customAttribute"'
+      And a user named "Mary"
+      And she does not have account in the org
  
   Scenario: Mary signs up for an account with a random property
     Given Mary navigates to the Self Service Registration View

@@ -13,26 +13,30 @@
 
 import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
-import deleteUserAndCredentials from '../support/action/context-enabled/live-user/deleteUserAndCredentials';
-import deleteTestPolicies from '../support/action/context-enabled/org-config/deleteTestPolicies';
+import a18nClient from '../support/management-api/a18nClient';
+import deleteSelfEnrolledUser from '../support/management-api/deleteSelfEnrolledUser';
 
-After(deleteUserAndCredentials);
-After(deleteTestPolicies);
-
-After(() => browser.deleteCookies());
-
-After(async function (this: ActionContext) {
-  switch (this.featureName) {
-    case 'Direct Auth Social Login with 1 Social IDP': 
-    case 'Direct Auth with Self Hosted Sign In Widget Social Login with 1 Social IDP': {
-      const url = 'https://facebook.com';
-      await browser.url(url);
-      await browser.deleteCookies();
-      break;
+After(async function(this: ActionContext) {
+  if (this.app) {
+    await this.app.deactivate();
+    await this.app.delete();
+  }
+  if (this.policies) {
+    for (const policy of this.policies) {
+      await policy.delete();
     }
-    default: {
-      break;
-    }
+  }
+  if (this.group) {
+    await this.group.delete();
+  }
+  if(this.user) {
+    await this.user.deactivate();
+    await this.user.delete();
+  }
+  if (this.credentials) {
+    await deleteSelfEnrolledUser(this.credentials.emailAddress);
+    await a18nClient.deleteProfile(this.credentials.profileId);
   }
 });
 
+After(() => browser.deleteCookies());

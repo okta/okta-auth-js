@@ -11,26 +11,13 @@
  */
 
 
-import { UserHome } from '../selectors';
-import isDisplayed from './isDisplayed';
+import waitForDisplayed from '../wait/waitForDisplayed';
+import buttons from '../selectors/maps/buttons';
 
-/**
- * Check if the given element is (not) visible
- * @param  {String}  objectName as defined in bdd steps
- */
-export default async(objectName: string) => {
-    /**
-     * Visible state of the give element
-     * @type {String}
-     */
-    switch (objectName) {
-        case 'logout': {
-            await isDisplayed(UserHome.logoutButton, false);
-            break;
-        }
-
-        default: {
-            throw new Error(`Unknown object "${objectName}"`);
-        }
-    }
+export default async(buttonName: string) => {
+  const button = (buttons as any)[buttonName];
+  if (!button) {
+    throw new Error(`No button can match name ${buttonName}`);
+  }
+  await waitForDisplayed(`button[name="${button}"]`);
 };

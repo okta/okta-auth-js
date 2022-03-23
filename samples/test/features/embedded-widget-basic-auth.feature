@@ -1,10 +1,11 @@
 Feature: Basic Login with Embedded Sign In Widget
 
   Background:
-    Given a SPA, WEB APP or MOBILE Policy that defines Password as required and the only factor for login
-    #AND the list of Authenticators contains Email and Password
-    And a user named "Mary"
-    And Mary has an account in the org
+    Given an App
+      And a Policy that defines "Authentication"
+      And with a Policy Rule that defines "Password as the only factor"
+      And a user named "Mary"
+      And she has an account with "active" state in the org
 
   Scenario: Mary logs in with a Password
 	  When she clicks the login button

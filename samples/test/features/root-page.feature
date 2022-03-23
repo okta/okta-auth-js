@@ -1,8 +1,11 @@
 Feature: Root page for Direct Auth Demo Application
 
   Background:
-	  Given an APP Sign On Policy that defines Password as required and the only factor for login
-    And Mary is a user with a verified email and a set password
+	  Given an App
+      And a Policy that defines "Authentication"
+      And with a Policy Rule that defines "Password as the only factor"
+      And a user named "Mary"
+      And she has an account with "active" state in the org
 
   Scenario: Mary visits the Root View WITHOUT an authentcation session (no tokens)
     Given Mary navigates to the Root View

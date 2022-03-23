@@ -1,9 +1,11 @@
 Feature: Direct Auth Password Recovery
 
 Background:
-  Given an org with an ORG Policy that defines Authenticators with Password and Email as required
-  And a user named "Mary"
-  And Mary is a user with a verified email and a set password
+  Given an App
+    And a Policy that defines "Authentication"
+    And with a Policy Rule that defines "Password as the only factor"
+    And a user named "Mary"
+    And she has an account with "active" state in the org
 
   Scenario: Mary resets her password
     Given Mary navigates to the Self Service Password Reset View
@@ -23,7 +25,8 @@ Background:
     Then she is redirected to the Root Page
 
   Scenario: Mary tries to reset a password with the wrong email
-    Given Mary navigates to the Self Service Password Reset View
+    Given the app is assigned to "Everyone" group
+      And Mary navigates to the Self Service Password Reset View
     When she inputs an Email that doesn't exist
     And she submits the form
     Then she should see the message "There is no account with the Username test_with_really_invalid_email@invalidemail.com."

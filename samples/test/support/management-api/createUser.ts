@@ -18,19 +18,23 @@ import { getConfig } from '../../util';
 import deleteUser from './deleteUser';
 import { UserCredentials } from './createCredentials';
 
-const userGroup = 'Basic Auth Web';
-
-export default async ({
-  credentials,
-  assignToGroups = [userGroup], 
-  activate = true,
-  customAttribute
-}: {
+type CreateUserOptions = {
+  appId: string;
   credentials: UserCredentials;
   assignToGroups?: string[];
   activate?: boolean;
   customAttribute?: string;
-}): 
+}
+
+const userGroup = 'Basic Auth Web';
+
+export default async ({
+  appId,
+  credentials,
+  assignToGroups = [userGroup], 
+  activate = true,
+  customAttribute
+}: CreateUserOptions): 
   Promise<User> => {
   const config = getConfig();
   const oktaClient = new Client({
@@ -88,7 +92,7 @@ export default async ({
       });
     }
 
-    await oktaClient.assignUserToApplication(config.clientId as string, {
+    await oktaClient.assignUserToApplication(appId, {
       id: user.id
     });
     

@@ -1,16 +1,19 @@
 Feature: TOTP Support (Google Authenticator) Sign Up
   Background:
-    Given configured Authenticators are Password (required), and Google Authenticator (required)
-    And the Application Sign on Policy is set to "Password and Google Authenticator Required"
-    And a user named "Mary"
-    And Mary does not have account in the org
-
+    Given a Group
+      And an App
+      And a Policy that defines "Profile Enrollment"
+      And with a Policy Rule that defines "collecting default attributes and emailVerification is not required"
+      And a Policy that defines "MFA Enrollment with Password and Google Authenticator as required authenticators"
+      And with a Policy Rule that defines "MFA Enrollment Challenge"
+      And a user named "Mary"
+      And she does not have account in the org
+    
   Scenario: Mary signs up for an account with Password, setups up required Google Authenticator by scanning a QR Code
     Given Mary navigates to the Self Service Registration View
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
-      #And she fills out her Age
       And she submits the registration form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option
@@ -38,7 +41,6 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
-      #And she fills out her Age
       And she submits the registration form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option

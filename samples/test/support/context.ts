@@ -11,30 +11,22 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
-import { Scenario } from './scenario';
+import { User, Application, Policy, Group } from '@okta/okta-sdk-nodejs';
+import { UserCredentials } from './management-api/createCredentials';
 
 interface ActionContext {
   credentials: UserCredentials;
   user: User;
+  app: Application;
+  policies: Policy[];
+  group: Group;
+  enrolledFactor: any;
   featureName: string;
   scenarioName: string;
   currentTestCaseId: string;
   userName?: string;
   sharedSecret?: string;
-  disableEmailVerification?: boolean;
-  useProfileEnrollPolicy: boolean;
   customAttribute: string;
-  isCurrentScenario: (scenario: Scenario) => boolean;
 }
-
-let reusedContext: ActionContext;
-export const getReusedContext = () => {
-  return reusedContext;
-};
-export const reuseContext = (context: ActionContext) => {
-  reusedContext = context;
-};
 
 export default ActionContext;

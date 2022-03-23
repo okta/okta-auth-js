@@ -11,16 +11,8 @@
  */
 
 
-import createCredentials from '../../../management-api/createCredentials';
-import ActionContext, { getReusedContext } from '../../../context';
-import { Scenario } from '../../../scenario';
+import clickElement from './clickElement';
 
-export default async function (this: ActionContext, firstName: string): Promise<void> {
-  if (this.isCurrentScenario(Scenario.TOTP_SIGN_IN_REUSE_SHARED_SECRET)) {
-    this.credentials = getReusedContext().credentials;
-    this.sharedSecret = getReusedContext().sharedSecret;
-    this.userName = getReusedContext().userName;
-  } else {
-    this.credentials = await createCredentials(firstName, this.featureName);
-  }
-}
+export default async () => {
+  await clickElement('click', 'selector', 'form button[type=submit]');
+};

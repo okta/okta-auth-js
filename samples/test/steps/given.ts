@@ -13,111 +13,179 @@
 /* eslint-disable max-len */
 
 import { Given } from '@cucumber/cucumber';
-import setEnvironment from '../support/action/setEnvironment';
 import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/context-enabled/live-user/navigateToLoginAndAuthenticate';
-import createContextUserAndCredentials from '../support/action/context-enabled/live-user/createContextUserAndCredentials';
-import createContextCredentials from '../support/action/context-enabled/live-user/createContextCredentials';
-import activateContextUserSms from '../support/action/context-enabled/live-user/activateContextUserSms';
 import ActionContext from '../support/context';
-import attachPolicy from '../support/action/context-enabled/org-config/attachPolicy';
-import createContextUser from '../support/action/context-enabled/live-user/createContextUser';
 import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
 import Home from '../support/selectors/Home';
 import startApp from '../support/action/startApp';
 import noop from '../support/action/noop';
+import createApp from '../support/management-api/createApp';
+import createPolicy from '../support/management-api/createPolicy';
+import upsertPolicyRule from '../support/management-api/upsertPolicyRule';
+import addAppToPolicy from '../support/management-api/addAppToPolicy';
+import createUser from '../support/management-api/createUser';
+import createGroup from '../support/management-api/createGroup';
+import addAppToGroup from '../support/management-api/addAppToGroup';
+import addUserToGroup from '../support/management-api/addUserToGroup';
+import createCredentials from '../support/management-api/createCredentials';
+import enrollFactor from '../support/management-api/enrollFactor';
+import grantConsentToScope from '../support/management-api/grantConsentToScope';
+import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
 
 // NOTE: noop function is used for predefined settings
 
-Given(
-  'a Profile Enrollment policy defined assigning new users to the Everyone Group', 
-  noop
-);
+Given('a Group', async function(this: ActionContext) {
+  this.group = await createGroup();
+});
+
+Given('an App', async function(this: ActionContext) {
+  this.app = await createApp();
+  const { 
+    credentials: {
+      oauthClient: {
+        client_id: clientId,
+        client_secret: clientSecret
+      }
+    } 
+  } = this.app;
+
+  if (this.group) {
+    await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
+  }
+
+  // update test app with new oauthClient info
+  startApp('/', {
+    ...(clientId && { clientId }),
+    ...(clientSecret && { clientSecret }),
+  });
+});
 
 Given(
-  /^by collecting "First Name", "Last Name", "Email"(?: is allowed and assigned to a SPA, WEB APP or MOBILE application)?$/, 
-  noop
-);
-
-Given(
-  'a property named {string} is allowed and assigned to a SPA, WEB APP or MOBILE application',
-  async function(this: ActionContext, propertyName: string) {
-    const PROPERTY_POLICY_MAP = {
-      customAttribute: 'Custom Attribute Policy',
-      age: 'Age Attribute Policy'
-    };
-    await attachPolicy.call(this, (PROPERTY_POLICY_MAP as any)[propertyName]);
-    this.customAttribute = propertyName;
+  'the app is assigned to {string} group', 
+  async function(this: ActionContext, groupName: string) {
+    if (!this.app) {
+      throw new Error('Application should be predefined');
+    }
+    await addAppToGroup({ appId: this.app.id, groupName });
   }
 );
 
 Given(
-  /^an APP$/,
-  async function() {
-    return await setEnvironment('default');
+  'the app is assigned to the created group',
+  async function(this: ActionContext) {
+    if (!this.group) {
+      throw new Error('Group should be predefined');
+    }
+    await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
   }
 );
 
 Given(
-  /^an APP Sign On Policy (.*)$/,
-  setEnvironment
-);
-
-Given(
-  /^an org with (.*)$/,
-  setEnvironment
-);
-
-Given(
-  /^a SPA, WEB APP or MOBILE Policy (.*)$/,
-  setEnvironment
-);
-
-// 1. Org has preconfigured MFA policy "Google Authenticator Required Policy"
-//    for group "Google Authenticator Enrollment Required"
-// 2. App has preconfigured sign-on policy "MFA Required" for group "MFA Required"
-// 3. App has preconfigured profile enrollment policy "Google Authenticator Policy"
-//    for group "Google Authenticator Enrollment Required"
-// 4. App should be changed with environment "Password and Google Authenticator Required"
-//    (see next line)
-Given(
-  /^configured Authenticators are Password \(required\), and Google Authenticator \(required\)$/,
-  noop
-);
-
-Given(
-  /^the Application Sign on Policy is set to "(.*)"$/,
-  setEnvironment
-);
-
-Given(
-  /([^/s]+) has an account in the org/,
-  async function(this: ActionContext, firstName: string) {
-    await createContextUser.call(this, { firstName });
+  'the app is granted {string} scope',
+  async function(this: ActionContext, scopeId: string) {
+    await grantConsentToScope(this.app.id, scopeId);
   }
 );
 
 Given(
-  /[^/s]+ does not have account in the org/,
-  noop
-);
-
-Given(
-  /^a User named "([^/w]+)" exists, and this user has already setup email and password factors$/,
-  async function(this: ActionContext, firstName: string) {
-    await createContextUserAndCredentials.call(this, firstName);
+  'the app has Email Verification callback uri defined',
+  async function(this: ActionContext) {
+    // Update app settings via internal API, public API should be used once available
+    await updateAppOAuthClient(this.app, { 
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      email_magic_link_redirect_uri: 'http://localhost:8080/login/callback'
+    });
   }
 );
 
 Given(
-  'a user named {string}',
-  createContextCredentials
+  'a Policy that defines {string}',
+  async function(this: ActionContext, policyDescription: string) {
+    this.policies = this.policies || [];
+    const policy = await createPolicy({ 
+      policyDescription, 
+      groupId: this.group?.id
+    });
+    this.policies.push(policy);
+    try {
+      await addAppToPolicy(policy.id, this.app.id);
+    } catch(err) {/* do nothing */}
+  }
 );
 
 Given(
-  /^([^/s]+) is a user with a verified email and a set password$/,
-  async function(this: ActionContext, firstName: string) {
-    await createContextUserAndCredentials.call(this, firstName);
+  'with a Policy Rule that defines {string}',
+  async function(this: ActionContext, policyRuleDescription: string) {
+    const lastPolicy = this.policies[this.policies.length - 1];
+    await upsertPolicyRule({ 
+      policyId: lastPolicy.id, 
+      policyType: lastPolicy.type,
+      policyRuleDescription,
+      groupId: this.group?.id
+    });
+  }
+);
+
+Given('a user named {string}', async function(this: ActionContext, firstName: string) {
+  this.credentials = await createCredentials(firstName, this.featureName);
+});
+
+Given(
+  'she has an account with {string} state in the org',
+  async function(this: ActionContext, accountState: string) {
+    if (!this.credentials) {
+      throw new Error('Context credentials has not been created!');
+    }
+    const activate = (() => {
+      switch (accountState) {
+        case 'active':
+          return true;
+        default:
+          return false;
+      }
+    })();
+    this.user = await createUser({
+      // use predefined app when features are not available via management api
+      appId: this.app?.id || process.env.CLIENT_ID,
+      credentials: this.credentials,
+      activate
+    });
+  }
+);
+
+Given(
+  'she is assigned to the created group', 
+  async function(this: ActionContext) {
+    if (!this.group) {
+      throw new Error('Group has not been created');
+    }
+    if (!this.user) {
+      throw new Error('User has not been created');
+    }
+    await addUserToGroup({ 
+      userId: this.user.id, 
+      groupId: this.group.id
+    });
+  }
+);
+
+Given('she does not have account in the org', noop);
+
+Given(
+  'she has an authenticated session',
+  navigateToLoginAndAuthenticate
+);
+
+Given(
+  'she has enrolled in the {string} factor',
+  async function(this: ActionContext, factorType: string) {
+    this.enrolledFactor = await enrollFactor({
+      userId: this.user.id,
+      factorType,
+      phoneNumber: this.credentials.phoneNumber
+    });
+    this.sharedSecret = this.enrolledFactor._embedded?.activation?.sharedSecret;
   }
 );
 
@@ -134,20 +202,6 @@ Given(
 );
 
 Given(
-  /^a User named "([^/s]+)" created in the admin interface with a Password only$/,
-  async function(this: ActionContext, firstName: string) {
-    await createContextUserAndCredentials.call(this, firstName, ['MFA Required']);
-  }
-);
-
-Given(
-  /^a User named "([^/s]+)" is created in staged state$/,
-  async function(this: ActionContext, firstName: string) {
-    await createContextUserAndCredentials.call(this, firstName, ['MFA Required'], false);
-  }
-);
-
-Given(
   /^Mary opens the Self Service Registration View with activation token/,
   activateContextUserActivationToken
 );
@@ -155,18 +209,6 @@ Given(
 Given(
   /^an Authenticator Enrollment Policy that has PHONE as optional and EMAIL as required for the Everyone Group$/,
   noop
-);
-
-Given(
-  /^a User named "([^/s]+)" created that HAS NOT yet enrolled in the SMS factor$/,
-  async function(this: ActionContext, firstName: string) {
-    await createContextUserAndCredentials.call(this, firstName, ['Phone Enrollment Required', 'MFA Required']);
-  }
-);
-
-Given(
-  /^Mary has enrolled in the SMS factor$/,
-  activateContextUserSms
 );
 
 Given(

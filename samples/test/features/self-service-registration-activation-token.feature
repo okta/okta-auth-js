@@ -1,9 +1,12 @@
 Feature: Add another Required Attribute to the Profile Enrollment Policy
 
   Background:
-    Given a Profile Enrollment policy defined assigning new users to the Everyone Group 
-    And by collecting "First Name", "Last Name", "Email" is allowed and assigned to a SPA, WEB APP or MOBILE application
-    And a User named "Mary" is created in staged state
+    Given an App
+      And the app is assigned to "Everyone" group
+      And a Policy that defines "Profile Enrollment"
+      And with a Policy Rule that defines "collecting default attributes"
+      And a user named "Mary"
+      And she has an account with "staged" state in the org
  
   Scenario: Mary signs up for an account using activation token
     Given Mary opens the Self Service Registration View with activation token

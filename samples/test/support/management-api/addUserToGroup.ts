@@ -10,15 +10,23 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/* eslint-disable complexity, max-statements */
 
-import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
-import setInputField from '../setInputField';
-import ActionContext from '../../context';
-const totp = require('totp-generator');
 
-export default async function (this: ActionContext) {
-  const token = totp(this.sharedSecret || '', {
-    timestamp: Date.now() - 30 * 1000
+import { Client } from '@okta/okta-sdk-nodejs';
+import { getConfig } from '../../util';
+
+type Options = {
+  userId: string;
+  groupId: string;
+}
+
+export default async function({ userId, groupId }: Options) {
+  const config = getConfig();
+  const oktaClient = new Client({
+    orgUrl: config.orgUrl,
+    token: config.oktaAPIKey,
   });
-  await setInputField('set', token, EnrollGoogleAuthenticator.code);
+
+  await oktaClient.addUserToGroup(groupId, userId);
 }
