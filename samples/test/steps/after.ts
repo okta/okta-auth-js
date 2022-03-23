@@ -21,7 +21,7 @@ import deleteTestPolicies from '../support/action/context-enabled/org-config/del
 After(deleteTestPolicies);
 
 After(async function(this: ActionContext) {
-  if (this.app && !this.app.predefined) {
+  if (this.app) {
     await this.app.deactivate();
     await this.app.delete();
   }

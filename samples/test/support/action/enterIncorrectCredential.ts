@@ -15,6 +15,6 @@ import setInputField from './setInputField';
 
 export default async function (credName: string) {
   const selector = `input[name="${credName}"]`;
-  const value = '!incorrect!'
+  const value = '!incorrect!';
   await setInputField('set', value, selector);
 }

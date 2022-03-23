@@ -27,15 +27,13 @@ export default async (envName: string) => {
     'MFA with Password and SMS as required': 'Password + Another Factor'
   }[envName] || envName;
 
-  // update variables for runner process
-  env.setEnvironmentVarsFromTestEnvYaml(envName, __dirname);
-
-  // update variables for server process
   const { 
     ISSUER: issuer, 
     CLIENT_ID: clientId, 
     CLIENT_SECRET: clientSecret 
-  } = process.env;
+  } = env.getEnvironmentVarsFromTestEnvYaml(envName, __dirname);
+
+  // update variables for server process
   await startApp('/', {
     ...(issuer && { issuer }),
     ...(clientId && { clientId }),

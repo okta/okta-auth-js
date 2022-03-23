@@ -47,7 +47,7 @@ function setEnvironmentVarsFromTestEnv(currDir) {
   setEnvironmentVars(envConfig);
 }
 
-function setEnvironmentVarsFromTestEnvYaml(name, currDir) {
+function getEnvironmentVarsFromTestEnvYaml(name, currDir) {
   const testEnvPath = getPath(TESTENV_YAML, currDir);
   if (!testEnvPath) {
     return;
@@ -57,19 +57,10 @@ function setEnvironmentVarsFromTestEnvYaml(name, currDir) {
     console.log(`Can't load testenv.yml`);
     return;
   }
-
-  if (doc.default) {
-    console.log(`Loading environment variables from testenv.yml: "default"`);
-    setEnvironmentVars(doc.default);
-  }
-
-  if (doc[name]) {
-    console.log(`Loading environment variables from testenv.yml: "${name}"`);
-    setEnvironmentVars(doc[name]);
-  }
+  return doc[name];
 }
 
 module.exports = {
   setEnvironmentVarsFromTestEnv,
-  setEnvironmentVarsFromTestEnvYaml
+  getEnvironmentVarsFromTestEnvYaml
 };

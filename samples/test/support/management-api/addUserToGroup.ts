@@ -29,4 +29,4 @@ export default async function({ userId, groupId }: Options) {
   });
 
   await oktaClient.addUserToGroup(groupId, userId);
-};
+}

@@ -1,5 +1,4 @@
 import { Client } from '@okta/okta-sdk-nodejs';
-import fetchGroup from './fetchGroup';
 import { getConfig, randomStr } from '../../util';
 
 type Options = {
@@ -12,42 +11,42 @@ type Options = {
 const getAccessPolicyActions = (description: string) => {
   return ({
     'Password as the only factor': {
-      "actions": {
-        "appSignOn": {
-          "access": "ALLOW",
-          "verificationMethod": {
-            "factorMode": "1FA",
-            "reauthenticateIn": "PT2H",
-            "constraints": [
+      'actions': {
+        'appSignOn': {
+          'access': 'ALLOW',
+          'verificationMethod': {
+            'factorMode': '1FA',
+            'reauthenticateIn': 'PT2H',
+            'constraints': [
               {
-                "knowledge": {
-                  "types": [
-                    "password"
+                'knowledge': {
+                  'types': [
+                    'password'
                   ]
                 }
               }
             ],
-            "type": "ASSURANCE"
+            'type': 'ASSURANCE'
           }
         }
       }
     },
 
     'Password + Another Factor': {
-      "actions": {
-        "appSignOn": {
-          "access": "ALLOW",
-          "verificationMethod": {
-            "factorMode": "2FA",
-            "type": "ASSURANCE",
-            "reauthenticateIn": "PT2H",
-            "constraints": [
+      'actions': {
+        'appSignOn': {
+          'access': 'ALLOW',
+          'verificationMethod': {
+            'factorMode': '2FA',
+            'type': 'ASSURANCE',
+            'reauthenticateIn': 'PT2H',
+            'constraints': [
               {
-                "knowledge": {
-                  "types": [
-                    "password"
+                'knowledge': {
+                  'types': [
+                    'password'
                   ],
-                  "reauthenticateIn": "PT2H"
+                  'reauthenticateIn': 'PT2H'
                 }
               }
             ]
@@ -56,28 +55,28 @@ const getAccessPolicyActions = (description: string) => {
       },
 
       'Any one factor': {
-        "actions": {
-          "appSignOn": {
-            "access": "ALLOW",
-            "verificationMethod": {
-              "factorMode": "1FA",
-              "type": "ASSURANCE",
-              "reauthenticateIn": "PT43800H"
+        'actions': {
+          'appSignOn': {
+            'access': 'ALLOW',
+            'verificationMethod': {
+              'factorMode': '1FA',
+              'type': 'ASSURANCE',
+              'reauthenticateIn': 'PT43800H'
             }
           }
         },
 
       }
     }
-  } as any)[description]
+  } as any)[description];
 };
 
 const getMFAEnrollPolicyActions = (description: string) => {
   return ({
     'MFA Enrollment Challenge': {
-      "actions": {
-        "enroll": {
-          "self": "CHALLENGE"
+      'actions': {
+        'enroll': {
+          'self': 'CHALLENGE'
         }
       }
     }
@@ -87,59 +86,59 @@ const getMFAEnrollPolicyActions = (description: string) => {
 const getProfileEnrollmentPolicyActions = (description: string) => {
   return ({
     'collecting default attributes': {
-      "actions": {
-        "profileEnrollment": {
-          "access": "ALLOW",
-          "unknownUserAction": "REGISTER",
-          "activationRequirements": {
-            "emailVerification": true
+      'actions': {
+        'profileEnrollment': {
+          'access': 'ALLOW',
+          'unknownUserAction': 'REGISTER',
+          'activationRequirements': {
+            'emailVerification': true
           },
-          "profileAttributes": [
+          'profileAttributes': [
             {
-              "name": "email",
-              "label": "Email",
-              "required": true
+              'name': 'email',
+              'label': 'Email',
+              'required': true
             }
           ],
         }
       }
     },
     'collecting default attributes and emailVerification is not required': {
-      "actions": {
-        "profileEnrollment": {
-          "access": "ALLOW",
-          "unknownUserAction": "REGISTER",
-          "activationRequirements": {
-            "emailVerification": false
+      'actions': {
+        'profileEnrollment': {
+          'access': 'ALLOW',
+          'unknownUserAction': 'REGISTER',
+          'activationRequirements': {
+            'emailVerification': false
           },
-          "profileAttributes": [
+          'profileAttributes': [
             {
-              "name": "email",
-              "label": "Email",
-              "required": true
+              'name': 'email',
+              'label': 'Email',
+              'required': true
             }
           ],
         }
       }
     },
     'collecting default attributes and a required "customAttribute"': {
-      "actions": {
-        "profileEnrollment": {
-          "access": "ALLOW",
-          "unknownUserAction": "REGISTER",
-          "activationRequirements": {
-            "emailVerification": true
+      'actions': {
+        'profileEnrollment': {
+          'access': 'ALLOW',
+          'unknownUserAction': 'REGISTER',
+          'activationRequirements': {
+            'emailVerification': true
           },
-          "profileAttributes": [
+          'profileAttributes': [
             {
-              "name": "email",
-              "label": "Email",
-              "required": true
+              'name': 'email',
+              'label': 'Email',
+              'required': true
             },
             {
-              "name": "customAttribute",
-              "label": "Custom Attribute",
-              "required": true
+              'name': 'customAttribute',
+              'label': 'Custom Attribute',
+              'required': true
             },
           ]
         }

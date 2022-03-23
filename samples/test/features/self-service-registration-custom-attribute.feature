@@ -3,6 +3,7 @@ Feature: Add another Required Attribute to the Profile Enrollment Policy
   Background:
     Given a Group
       And an App
+      # And the app is assigned to "Everyone" group
       And a Policy that defines "Profile Enrollment"
       And with a Policy Rule that defines 'collecting default attributes and a required "customAttribute"'
       And a user named "Mary"

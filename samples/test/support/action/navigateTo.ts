@@ -22,6 +22,7 @@ import PasswordRecover from '../selectors/PasswordRecover';
 import Registration from '../selectors/Registration';
 import OktaSignInOIEFacebookIdp from '../selectors/OktaSignInOIEFacebookIdp';
 import OktaSignInOIEOktaIdp from '../selectors/OktaSignInOIEOktaIdp';
+import { toQueryString } from '../../util';
 
 
 const urls = new Map<Page, string>([
@@ -59,6 +60,6 @@ export default async (
   page: string
 ) => {
   const { url, queryParams, selector } = getContext(page);
-  await startApp(url, queryParams);
+  await browser.url(url + toQueryString(queryParams));
   await waitForDisplayed(selector);
 };

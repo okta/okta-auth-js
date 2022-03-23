@@ -36,7 +36,7 @@ const enrollSMS = async (options: Options) => {
     profile: {
       phoneNumber: options.phoneNumber
     }
-  }
+  };
   const res = await getOktaClient().enrollFactor(
     options.userId, 
     factorObject,

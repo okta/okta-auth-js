@@ -7,4 +7,4 @@ export default async function checkLink(linkName: string) {
     throw new Error(`No link can match name ${linkName}`);
   }
   await waitForDisplayed(`a[href="${link}"]`);
-};
+}

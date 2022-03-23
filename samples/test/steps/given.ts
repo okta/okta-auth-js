@@ -188,16 +188,6 @@ Given(
 );
 
 Given(
-  /^an APP Sign On Policy (.*)$/,
-  setEnvironment
-);
-
-Given(
-  /^an org with (.*)$/,
-  setEnvironment
-);
-
-Given(
   /^a SPA, WEB APP or MOBILE Policy (.*)$/,
   setEnvironment
 );
