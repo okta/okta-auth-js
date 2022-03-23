@@ -15,7 +15,6 @@ import waitForDisplayed from '../wait/waitForDisplayed';
 import LoginForm from '../selectors/LoginForm';
 import OktaSignInOIE, { OktaSignInOIE as WidgetForm } from '../selectors/OktaSignInOIE';
 import Home from '../selectors/Home';
-import startApp from './startApp';
 import { pages } from '../selectors';
 import { Page } from '../selectors/Page';
 import PasswordRecover from '../selectors/PasswordRecover';

@@ -30,7 +30,6 @@ import addAppToGroup from '../support/management-api/addAppToGroup';
 import addUserToGroup from '../support/management-api/addUserToGroup';
 import createCredentials from '../support/management-api/createCredentials';
 import enrollFactor from '../support/management-api/enrollFactor';
-import { Action } from 'webdriverio';
 import grantConsentToScope from '../support/management-api/grantConsentToScope';
 import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
 
@@ -92,11 +91,13 @@ Given(
 Given(
   'the app has Email Verification callback uri defined',
   async function(this: ActionContext) {
+    // Update app settings via internal API, public API should be used once available
     await updateAppOAuthClient(this.app, { 
+      // eslint-disable-next-line @typescript-eslint/camelcase
       email_magic_link_redirect_uri: 'http://localhost:8080/login/callback'
     });
   }
-)
+);
 
 Given(
   'a Policy that defines {string}',

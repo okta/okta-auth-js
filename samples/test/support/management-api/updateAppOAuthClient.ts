@@ -16,9 +16,8 @@ export default async function(app: Application, options: any) {
     ...options,
     label: app.label
   };
-  const res = await oktaClient.http.postJson(url, {
-    // @ts-ignore
-    body
-  });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const res = await oktaClient.http.postJson(url, { body });
   return res;
 }
