@@ -13,13 +13,9 @@
 
 import { Before } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
-import { matchScenario, Scenario } from '../support/scenario';
 
 Before(function (this: ActionContext, scenario: any) {
   this.featureName = scenario?.gherkinDocument?.feature?.name;
   this.scenarioName = scenario?.pickle?.name;
   this.currentTestCaseId = `TESTCASEID-${scenario?.testCaseStartedId}`;
-  this.isCurrentScenario = function (scenario: Scenario) {
-    return matchScenario(scenario, this.featureName, this.scenarioName);
-  };
 });

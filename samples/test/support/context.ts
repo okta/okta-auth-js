@@ -12,8 +12,7 @@
 
 
 import { User, Application, Policy, Group } from '@okta/okta-sdk-nodejs';
-import {UserCredentials} from './management-api/createCredentials';
-import { Scenario } from './scenario';
+import { UserCredentials } from './management-api/createCredentials';
 
 interface ActionContext {
   credentials: UserCredentials;
@@ -30,15 +29,6 @@ interface ActionContext {
   disableEmailVerification?: boolean;
   useProfileEnrollPolicy: boolean;
   customAttribute: string;
-  isCurrentScenario: (scenario: Scenario) => boolean;
 }
-
-let reusedContext: ActionContext;
-export const getReusedContext = () => {
-  return reusedContext;
-};
-export const reuseContext = (context: ActionContext) => {
-  reusedContext = context;
-};
 
 export default ActionContext;
