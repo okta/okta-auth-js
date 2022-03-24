@@ -148,3 +148,11 @@ export type Authenticator = {
 export function isAuthenticator(obj: any): obj is Authenticator {
   return obj && (obj.key || obj.id);
 }
+
+export interface RemediationResponse {
+  idxResponse: IdxResponse;
+  nextStep?: NextStep;
+  messages?: IdxMessage[];
+  terminal?: boolean;
+  canceled?: boolean;
+}

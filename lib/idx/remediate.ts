@@ -13,31 +13,21 @@
 
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
-import { Remediator, RemediationValues } from './remediators';
-import { NextStep, IdxMessage, FlowIdentifier } from './types';
+import { RemediationValues } from './remediators';
+import { FlowIdentifier, RemediationResponse } from './types';
 import { RemediationFlow } from './flow';
 import { 
-  IdxResponse,  
-  IdxRemediation,
-  isIdxResponse,
+  IdxResponse,
   IdxActionParams, 
 } from './types/idx-js';
 import {
-  canResendFn,
-  canSkipFn,
   getMessagesFromResponse,
   isTerminalResponse,
-  filterValuesForRemediation
+  filterValuesForRemediation,
+  getRemediator,
+  getNextStep,
+  handleIdxError
 } from './util';
-import { warn } from '../util';
-
-interface RemediationResponse {
-  idxResponse: IdxResponse;
-  nextStep?: NextStep;
-  messages?: IdxMessage[];
-  terminal?: boolean;
-  canceled?: boolean;
-}
 
 export interface RemediateActionWithOptionalParams {
   name: string;
@@ -52,95 +42,30 @@ export interface RemediateOptions {
   step?: string;
 }
 
-// Return first match idxRemediation in allowed remediators
-export function getRemediator(
-  idxRemediations: IdxRemediation[],
-  values: RemediationValues,
-  options: RemediateOptions,
-): Remediator | undefined {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const remediators = options.remediators!;
 
-  let remediator: Remediator;
-  // remediation name specified by caller - fast-track remediator lookup 
-  if (options.step) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const remediation = idxRemediations.find(({ name }) => name === options.step)!;
-    if (remediation) {
-      const T = remediation ? remediators[remediation.name] : undefined;
-      return T ? new T(remediation, values, options) : undefined;
-    } else {
-      // step was specified, but remediation was not found. This is unexpected!
-      warn(`step "${options.step}" did not match any remediations`);
-      return;
-    }
-  }
-
-  const remediatorCandidates: Remediator[] = [];
-  for (let remediation of idxRemediations) {
-    const isRemeditionInFlow = Object.keys(remediators).includes(remediation.name);
-    if (!isRemeditionInFlow) {
-      continue;
-    }
-
-    const T = remediators[remediation.name];
-    remediator = new T(remediation, values, options);
-    if (remediator.canRemediate()) {
-      // found the remediator
-      return remediator;
-    }
-    // remediator cannot handle the current values
-    // maybe return for next step
-    remediatorCandidates.push(remediator);  
-  }
-  
-  return remediatorCandidates[0];
-}
-
-function getNextStep(
-  remediator: Remediator, idxResponse: IdxResponse
-): NextStep {
-  const nextStep = remediator.getNextStep(idxResponse.context);
-  const canSkip = canSkipFn(idxResponse);
-  const canResend = canResendFn(idxResponse);
-  return {
-    ...nextStep,
-    ...(canSkip && {canSkip}),
-    ...(canResend && {canResend}),
-  };
-}
-
-function handleIdxError(e, remediator?): RemediationResponse {
-  // Handle idx messages
-  const idxResponse = isIdxResponse(e) ? e : null;
-  if (!idxResponse) {
-    // Thrown error terminates the interaction with idx
-    throw e;
-  }
-  idxResponse.requestDidSucceed = false;
-  const terminal = isTerminalResponse(idxResponse);
-  const messages = getMessagesFromResponse(idxResponse);
-  if (terminal) {
-    return { idxResponse, terminal, messages };
-  } else {
-    const nextStep = remediator && getNextStep(remediator, idxResponse);
-    return { 
-      idxResponse,
-      messages, 
-      ...(nextStep && { nextStep }) 
-    };
-  }
-}
-
-function getActionFromValues(values, idxResponse: IdxResponse): string | undefined {
+function getActionFromValues(values: RemediationValues, idxResponse: IdxResponse): string | undefined {
   // Currently support resend actions only
   return Object.keys(idxResponse.actions).find(action => !!values.resend && action.includes('-resend'));
 }
 
-function removeActionFromValues(values) {
+function removeActionFromValues(values: RemediationValues): RemediationValues {
   // Currently support resend actions only
-  values.resend = undefined;
-  return values;
+  return {
+    ...values,
+    resend: undefined
+  };
+}
+
+function removeActionFromOptions(options: RemediateOptions, actionName: string): RemediateOptions {
+  let actions = options.actions || [];
+  actions = actions.filter(entry => {
+    if (typeof entry === 'string') {
+      return entry !== actionName;
+    }
+    return entry.name !== actionName;
+  });
+
+  return { ...options, actions };
 }
 
 // This function is called recursively until it reaches success or cannot be remediated
@@ -175,18 +100,19 @@ export async function remediate(
   ];
   if (actions) {
     for (let action of actions) {
-      let params: IdxActionParams | undefined;
       // Action can either be specified as a string, or as an object with name and optional params
+      let params: IdxActionParams = {};
       if (typeof action !== 'string') {
-        params = action.params;
+        params = action.params || {};
         action = action.name;
       }
       let valuesWithoutExecutedAction = removeActionFromValues(values);
-      let optionsWithoutExecutedAction = { ...options, actions: actionFromOptions.filter(entry => entry !== action) };
+      let optionsWithoutExecutedAction = removeActionFromOptions(options, action);
+
       if (typeof idxResponse.actions[action] === 'function') {
         try {
           idxResponse = await idxResponse.actions[action](params);
-          idxResponse.requestDidSucceed = true;
+          idxResponse = { ...idxResponse, requestDidSucceed: true };
         } catch (e) {
           return handleIdxError(e, remediator);
         }
@@ -200,8 +126,8 @@ export async function remediate(
       const remediationAction = neededToProceed.find(({ name }) => name === action);
       if (remediationAction) {
         try {
-          idxResponse = await idxResponse.proceed(action, {});
-          idxResponse.requestDidSucceed = true;
+          idxResponse = await idxResponse.proceed(action, params);
+          idxResponse = { ...idxResponse, requestDidSucceed: true };
         }
         catch (e) {
           return handleIdxError(e, remediator);
@@ -217,7 +143,7 @@ export async function remediate(
       values = filterValuesForRemediation(idxResponse, values); // include only requested values
       try {
         idxResponse = await idxResponse.proceed(options.step, values);
-        idxResponse.requestDidSucceed = true;
+        idxResponse = { ...idxResponse, requestDidSucceed: true };
         return { idxResponse };
       } catch(e) {
         return handleIdxError(e);
@@ -247,11 +173,11 @@ export async function remediate(
   const data = remediator.getData();
   try {
     idxResponse = await idxResponse.proceed(name, data);
-    idxResponse.requestDidSucceed = true;
+    idxResponse = { ...idxResponse, requestDidSucceed: true };
     // We may want to trim the values bag for the next remediation
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValuesAfterProceed();
-    delete options.step; // do not re-use the step
+    options = { ...options, step: undefined }; // do not re-use the step
     return remediate(idxResponse, values, options); // recursive call
   } catch (e) {
     return handleIdxError(e, remediator);

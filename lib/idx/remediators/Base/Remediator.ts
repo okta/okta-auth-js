@@ -26,6 +26,11 @@ export interface RemediationValues extends IdxOptions {
   authenticators?: (Authenticator | string)[];
   authenticator?: string | Authenticator;
   authenticatorsData?: Authenticator[];
+  resend?: boolean;
+}
+
+export interface RemediatorConstructor {
+  new<T extends RemediationValues>(remediation: IdxRemediation, values?: T, options?: RemediateOptions): any;
 }
 
 // Base class - DO NOT expose static remediationName

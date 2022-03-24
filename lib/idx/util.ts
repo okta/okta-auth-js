@@ -1,7 +1,8 @@
+import { warn } from '../util';
 import * as remediators from './remediators';
-import { RemediationValues } from './remediators';
-import { IdxFeature, NextStep } from './types';
-import { IdxMessage, IdxRemediationValue, IdxResponse } from './types/idx-js';
+import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
+import { IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
+import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
@@ -102,20 +103,21 @@ export function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
 }
 
 export function getAvailableSteps(idxResponse: IdxResponse): NextStep[] {
-  const res = [];
+  const res: NextStep[] = [];
 
-  const remediatorMap = Object.values(remediators).reduce((map, remediatorClass) => {
-    // Only add concrete subclasses to the map
-    if (remediatorClass.remediationName) {
-      map[remediatorClass.remediationName] = remediatorClass;
-    }
-    return map;
-  }, {});
+  const remediatorMap: Record<string, RemediatorConstructor> = Object.values(remediators)
+    .reduce((map, remediatorClass) => {
+      // Only add concrete subclasses to the map
+      if (remediatorClass.remediationName) {
+        map[remediatorClass.remediationName] = remediatorClass;
+      }
+      return map;
+    }, {});
 
   for (let remediation of idxResponse.neededToProceed) {
     const T = remediatorMap[remediation.name];
     if (T) {
-      const remediator = new T(remediation);
+      const remediator: Remediator = new T(remediation);
       res.push (remediator.getNextStep(idxResponse.context) as never);
     }
   }
@@ -131,4 +133,89 @@ export function filterValuesForRemediation(idxResponse: IdxResponse, values: Rem
     return res;
   }, {});
   return valuesForRemediation;
+}
+
+// Return first match idxRemediation in allowed remediators
+// eslint-disable-next-line complexity
+export function getRemediator(
+  idxRemediations: IdxRemediation[],
+  values: RemediationValues,
+  options: RemediateOptions,
+): Remediator | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const remediators = options.remediators!;
+
+  let remediator: Remediator;
+  // remediation name specified by caller - fast-track remediator lookup 
+  if (options.step) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const remediation = idxRemediations.find(({ name }) => name === options.step)!;
+    if (remediation) {
+      const T = remediation ? remediators[remediation.name] : undefined;
+      return T ? new T(remediation, values, options) : undefined;
+    } else {
+      // step was specified, but remediation was not found. This is unexpected!
+      warn(`step "${options.step}" did not match any remediations`);
+      return;
+    }
+  }
+
+  const remediatorCandidates: Remediator[] = [];
+  for (let remediation of idxRemediations) {
+    const isRemeditionInFlow = Object.keys(remediators as object).includes(remediation.name);
+    if (!isRemeditionInFlow) {
+      continue;
+    }
+
+    const T = remediators[remediation.name];
+    remediator = new T(remediation, values, options);
+    if (remediator.canRemediate()) {
+      // found the remediator
+      return remediator;
+    }
+    // remediator cannot handle the current values
+    // maybe return for next step
+    remediatorCandidates.push(remediator);  
+  }
+  
+  return remediatorCandidates[0];
+}
+
+
+export function getNextStep(
+  remediator: Remediator, idxResponse: IdxResponse
+): NextStep {
+  const nextStep = remediator.getNextStep(idxResponse.context);
+  const canSkip = canSkipFn(idxResponse);
+  const canResend = canResendFn(idxResponse);
+  return {
+    ...nextStep,
+    ...(canSkip && {canSkip}),
+    ...(canResend && {canResend}),
+  };
+}
+
+export function handleIdxError(e, remediator?): RemediationResponse {
+  // Handle idx messages
+  let idxResponse = isIdxResponse(e) ? e : null;
+  if (!idxResponse) {
+    // Thrown error terminates the interaction with idx
+    throw e;
+  }
+  idxResponse = {
+    ...idxResponse,
+    requestDidSucceed: false
+  };
+  const terminal = isTerminalResponse(idxResponse);
+  const messages = getMessagesFromResponse(idxResponse);
+  if (terminal) {
+    return { idxResponse, terminal, messages };
+  } else {
+    const nextStep = remediator && getNextStep(remediator, idxResponse);
+    return { 
+      idxResponse,
+      messages, 
+      ...(nextStep && { nextStep }) 
+    };
+  }
 }
