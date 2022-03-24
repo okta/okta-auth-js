@@ -19,7 +19,8 @@ import { RemediationFlow } from './flow';
 import { 
   IdxResponse,  
   IdxRemediation,
-  isIdxResponse, 
+  isIdxResponse,
+  IdxActionParams, 
 } from './types/idx-js';
 import {
   canResendFn,
@@ -37,9 +38,16 @@ interface RemediationResponse {
   terminal?: boolean;
   canceled?: boolean;
 }
+
+export interface RemediateActionWithOptionalParams {
+  name: string;
+  params?: IdxActionParams;
+}
+
+export type RemediateAction = string | RemediateActionWithOptionalParams;
 export interface RemediateOptions {
   remediators?: RemediationFlow;
-  actions?: string[];
+  actions?: RemediateAction[];
   flow?: FlowIdentifier;
   step?: string;
 }
@@ -142,7 +150,7 @@ export async function remediate(
   options: RemediateOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
-  const { remediators, flow } = options;
+  const { flow } = options;
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -156,6 +164,8 @@ export async function remediate(
     return { idxResponse, terminal, messages };
   }
   
+  const remediator = getRemediator(neededToProceed, values, options);
+
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
   const actionFromOptions = options.actions || [];
@@ -165,14 +175,20 @@ export async function remediate(
   ];
   if (actions) {
     for (let action of actions) {
+      let params: IdxActionParams | undefined;
+      // Action can either be specified as a string, or as an object with name and optional params
+      if (typeof action !== 'string') {
+        params = action.params;
+        action = action.name;
+      }
       let valuesWithoutExecutedAction = removeActionFromValues(values);
       let optionsWithoutExecutedAction = { ...options, actions: actionFromOptions.filter(entry => entry !== action) };
       if (typeof idxResponse.actions[action] === 'function') {
         try {
-          idxResponse = await idxResponse.actions[action]();
+          idxResponse = await idxResponse.actions[action](params);
           idxResponse.requestDidSucceed = true;
         } catch (e) {
-          return handleIdxError(e, remediators);
+          return handleIdxError(e, remediator);
         }
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
@@ -188,7 +204,7 @@ export async function remediate(
           idxResponse.requestDidSucceed = true;
         }
         catch (e) {
-          return handleIdxError(e, remediators);
+          return handleIdxError(e, remediator);
         }
 
         return remediate(idxResponse, values, optionsWithoutExecutedAction); // recursive call
@@ -196,7 +212,6 @@ export async function remediate(
     }
   }
 
-  const remediator = getRemediator(neededToProceed, values, options);
   if (!remediator) {
     if (options.step) {
       values = filterValuesForRemediation(idxResponse, values); // include only requested values

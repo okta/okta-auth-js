@@ -201,9 +201,12 @@ export function isRawIdxResponse(obj: any): obj is RawIdxResponse {
   return obj && obj.version;
 }
 
+export interface IdxActionParams {
+  [key: string]: string | boolean | number;
+}
 
 export interface IdxActions {
-  [key: string]: () => Promise<IdxResponse>;
+  [key: string]: (params?: IdxActionParams) => Promise<IdxResponse>;
 }
 
 // Object returned from auth-js
