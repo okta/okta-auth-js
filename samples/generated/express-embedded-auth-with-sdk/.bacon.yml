@@ -1,0 +1,8 @@
+test_suites:
+    - name: publish
+      script_path: ../okta-auth-js/scripts
+      sort_order: '15'
+      timeout: '60'
+      script_name: publish-sample
+      criteria: MERGE
+      queue_name: small
