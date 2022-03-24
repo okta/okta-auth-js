@@ -16,7 +16,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she has inserted her username
       And she has inserted her password
       And her password is correct
-    When she clicks Login
+    When she submits the form
     Then she is presented with a list of factors
     When She selects SMS from the list
       And She inputs a valid phone number
@@ -33,7 +33,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she has inserted her username
       And she has inserted her password
       And her password is correct
-    When she clicks Login
+    When she submits the form
     Then she is presented with an option to select SMS to verify
     When She selects SMS from the list of methods
     Then the screen changes to receive an input for a code to verify
@@ -46,7 +46,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she has inserted her username
       And she has inserted her password
       And her password is correct
-    When she clicks Login
+    When she submits the form
     Then she is presented with an option to select SMS to enroll
     When She selects SMS from the list
       And She inputs a invalid phone number
@@ -60,7 +60,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she has inserted her username
       And she has inserted her password
       And her password is correct
-    When she clicks Login
+    When she submits the form
     Then she is presented with an option to select SMS to verify
     When She selects SMS from the list of methods
       And She selects "Receive a Code"

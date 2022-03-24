@@ -117,11 +117,6 @@ When(
 //   submitForm
 // );
 
-// When(
-//   /^she clicks Login$/,
-//   submitForm
-// );
-
 When(
   /^she clicks the "Login with Facebook" button in the embedded Sign In Widget$/,
   clickLoginWithFacebookInWidget

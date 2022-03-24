@@ -14,7 +14,7 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And she has inserted her username
       And she has inserted her password
       And her password is correct
-    When she clicks Login
+    When she submits the form
     Then she sees the list of required factors (Google Authenticator) to enroll
     When She selects Google Authenticator from the list
       And She scans a QR Code
@@ -32,7 +32,7 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And she has inserted her username
       And she has inserted her password
       And her password is correct
-    When she clicks Login
+    When she submits the form
     Then she sees the list of required factors (Google Authenticator) to enroll
     When She selects Google Authenticator from the list
       And She enters the shared Secret Key into the Google Authenticator App
@@ -51,7 +51,7 @@ Feature: TOTP Support (Google Authenticator) Sign In
     When she has inserted her username
       And she has inserted her password
       And her password is correct
-      And she clicks Login
+      And she submits the form
     # Then she is presented with an option to select Google Authenticator to verify
     # When She selects Google Authenticator from the list
     Then the screen changes to receive an input for a code

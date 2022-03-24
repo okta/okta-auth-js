@@ -11,7 +11,7 @@ Feature: Multi-Factor Authentication with Password and Email
     Given Mary navigates to the Basic Login View
     When she fills in her username
       And she fills in her correct password
-      And she clicks Login
+      And she submits the form
     Then She sees a list of factors
     When She has selected Email from the list of factors
       And She inputs the incorrect code from the email
@@ -22,7 +22,7 @@ Feature: Multi-Factor Authentication with Password and Email
       And she has inserted her username
       And she has inserted her password
       And her password is correct
-    When she clicks Login
+    When she submits the form
     Then she is presented with an option to select Email to verify
     When She selects Email from the list
       And She selects "Receive a Code"
