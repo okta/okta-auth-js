@@ -25,7 +25,8 @@ Feature: Multi-Factor Authentication with Password and SMS
     When She inputs the correct code from the SMS
       And She selects "Verify"
     Then she is redirected to the Root View
-      And an application session is created
+      And she sees a table with her profile info
+      And the cell for the value of "email" is shown and contains her "email"
 
   Scenario: Mary enters a wrong verification code on verify
     Given she has enrolled in the "SMS" factor
@@ -68,4 +69,5 @@ Feature: Multi-Factor Authentication with Password and SMS
     When She inputs the correct code from the SMS
       And She selects "Verify"
     Then she is redirected to the Root View
-      And an application session is created 
+      And she sees a table with her profile info
+      And the cell for the value of "email" is shown and contains her "email"

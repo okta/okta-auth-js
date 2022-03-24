@@ -14,8 +14,6 @@
 /* eslint-disable max-len */
 import { Then } from '@cucumber/cucumber';
 
-import checkProfile from '../support/check/checkProfile';
-import checkNoProfile from '../support/check/checkNoProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkGuest from '../support/check/checkGuest';
 import checkButton from '../support/check/checkButton';
@@ -34,21 +32,6 @@ import waitForDisplayed from '../support/wait/waitForDisplayed';
 Then('she is redirected to the {string} page', checkIsOnPage);
 
 Then(
-  /^User can verify their profile data$/,
-  checkProfile
-);
-
-Then(
-  /^a page loads with all of Mary's Profile information$/,
-  checkProfile
-);
-
-Then(
-  /^an application session is created$/,
-  checkProfile
-);
-
-Then(
   /^she should see (?:a message on the Login form|the message|a message|an error message) "(?<message>.+?)"$/,
   checkFormMessage
 );
@@ -56,11 +39,6 @@ Then(
 Then(
   /^the Root Page shows links to the Entry Points$/,
   checkGuest
-);
-
-Then(
-  /table with the claims from the \/userinfo response$/,
-  checkProfile
 );
 
 Then(
@@ -83,11 +61,6 @@ Then(
 Then(
   /^Mary sees login, registration buttons$/,
   checkGuest
-);
-
-Then(
-  /^she sees that claims from \/userinfo are disappeared$/,
-  checkNoProfile
 );
   
 Then(

@@ -10,15 +10,24 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import checkEqualsText from './checkEqualsText';
-import waitForDisplayed from '../wait/waitForDisplayed';
 import UserHome from '../selectors/UserHome';
 import ActionContext from '../context';
 
 export default async function(this: ActionContext) {
   // verify profile info
-  await waitForDisplayed(UserHome.email, false);
   const userName = this?.credentials?.emailAddress || this?.userName || process.env.USERNAME;
-  await checkEqualsText('element', UserHome.email, false, userName as string);
+  await browser.waitUntil(async () => {
+    const selectors = UserHome.email;
+    for (const selector of selectors) {
+      const el = await $(selector);
+      const text = await el?.getText();
+      if (text === userName) {
+        return true;
+      }
+    }
+    return false;
+  }, {
+    timeout: 5000,
+    timeoutMsg: 'wait for profile'
+  });
 }

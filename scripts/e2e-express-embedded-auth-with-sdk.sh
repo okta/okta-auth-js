@@ -23,7 +23,7 @@ get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 # If this script is run as a bacon task, run against trexcloud environment
 if [[ "${BACON_TASK}" == true ]]; then
   echo "Running tests against trexcloud org"
-  export ISSUER=https://javascript-idx-sdk.trexcloud.com/oauth2/default
+  export ISSUER=https://javascript-idx-sdk.trexcloud.com
   export CLIENT_ID=0oa3r1keeeFFb7VMG0g7
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_client_secret CLIENT_SECRET
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_org_api_key OKTA_API_KEY
@@ -33,7 +33,7 @@ if [[ "${BACON_TASK}" == true ]]; then
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_secret CUSTOM_CLIENT_SECRET
 else
   echo "Running tests against production (ok12) org"
-  export ISSUER=https://javascript-idx-sdk.okta.com/oauth2/default
+  export ISSUER=https://javascript-idx-sdk.okta.com
   export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret CLIENT_SECRET
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key OKTA_API_KEY
@@ -44,21 +44,6 @@ else
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_totp_client_id TOTP_CLIENT_ID
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_totp_client_secret TOTP_CLIENT_SECRET
 fi
-
-cp $OKTA_HOME/$REPO/_testenv.yml $OKTA_HOME/$REPO/testenv.yml
-sed -i "s|REPLACE_ISSUER|"$ISSUER"|g"                              $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_DEFAULT_CLIENT_ID|"$CLIENT_ID"|g"                $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_DEFAULT_CLIENT_SECRET|"$CLIENT_SECRET"|g"        $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_USERNAME|"$USERNAME"|g"                          $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_PASSWORD|"$PASSWORD"|g"                          $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_A18N_API_KEY|"$A18N_API_KEY"|g"                  $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_OKTA_API_KEY|"$OKTA_API_KEY"|g"                  $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_MFA_CLIENT_ID|"$MFA_CLIENT_ID"|g"                $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_MFA_CLIENT_SECRET|"$MFA_CLIENT_SECRET"|g"        $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_CUSTOM_CLIENT_ID|"$CUSTOM_CLIENT_ID"|g"          $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_CUSTOM_CLIENT_SECRET|"$CUSTOM_CLIENT_SECRET"|g"  $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_TOTP_CLIENT_ID|"$TOTP_CLIENT_ID"|g"              $OKTA_HOME/$REPO/testenv.yml 
-sed -i "s|REPLACE_TOTP_CLIENT_SECRET|"$TOTP_CLIENT_SECRET"|g"      $OKTA_HOME/$REPO/testenv.yml 
 
 # Run the tests
 if ! yarn test:samples; then

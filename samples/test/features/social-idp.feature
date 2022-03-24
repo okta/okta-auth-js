@@ -8,17 +8,11 @@ Background:
     # And a prefined user Mary with an active account
     # And Okta OIDC IdP predefined
     # And an IDP routing rule defined to allow users in the Sample App to use the IDP
-	
-# Scenario: Mary Logs in with Social IDP
-#    Given Mary navigates to the Login View
-#    When she clicks the "Login with Facebook" button
-#      And logs in to Facebook
-#    Then she is redirected to the Root View
-#      And an application session is created
 
 Scenario: Mary Logs in with Okta OIDC IDP
     Given Mary navigates to the Login View
     When she clicks the "Login with Okta OIDC IDP" button
       And logs in to Okta OIDC IDP
     Then she is redirected to the Root View
-      And an application session is created
+      And she sees a table with her profile info
+      And the cell for the value of "email" is shown and contains her "email"

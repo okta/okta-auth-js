@@ -56,7 +56,7 @@ import noop from '../support/action/noop';
 import clickButton from '../support/action/clickButton';
 import clickLink from '../support/action/clickLink';
 
-When('she clicks {string} button', clickButton);
+When('she clicks the {string} button', clickButton);
 
 When('she clicks the {string} link', clickLink);
 

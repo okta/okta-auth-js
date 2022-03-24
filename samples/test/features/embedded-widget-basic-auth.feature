@@ -12,7 +12,7 @@ Feature: Basic Login with Embedded Sign In Widget
     Then she is redirected to the Embedded Widget View
 	  When she fills in her correct username
 	    And she fills in her correct password
-	    And she submits the Login form
+	    And she submits the form
     Then she is redirected to the Root View
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

@@ -11,8 +11,9 @@ Feature: View Profile Information
     
   Scenario: Mary views her profile
     Given Mary is on the Root View in an UNAUTHENTICATED state
-    When she logs in to the app
-    Then she sees a table with her profile info
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+      And she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"
       And the cell for the value of "last name" is shown and contains her "last name"

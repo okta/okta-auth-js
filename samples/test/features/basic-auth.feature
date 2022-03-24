@@ -10,7 +10,7 @@ Feature: Direct Auth Basic Login with Password Factor
 
     Scenario: Mary logs in with a Password
       Given she has an account with "active" state in the org
-      When she clicks "login" button
+      When she clicks the "login" button
       Then she is redirected to the "Login" page
       When she fills in her username
         And she fills in her correct password
@@ -20,7 +20,7 @@ Feature: Direct Auth Basic Login with Password Factor
         #And the cell for the value of "name" is shown and contains her "first name and last name"
 
     Scenario: Mary clicks on the "Forgot Password Link"
-      When she clicks "login" button
+      When she clicks the "login" button
       Then she is redirected to the "Login" page
       When she clicks the "Forgot Password" link
       Then she is redirected to the "Self Service Password Reset" page
@@ -28,7 +28,7 @@ Feature: Direct Auth Basic Login with Password Factor
     Scenario: Mary doesn't know her username
       Given she does not have account in the org
         And the app is assigned to "Everyone" group
-      When she clicks "login" button
+      When she clicks the "login" button
       Then she is redirected to the "Login" page
       When she fills in her incorrect username
         And she fills in her password
@@ -37,7 +37,7 @@ Feature: Direct Auth Basic Login with Password Factor
 
     Scenario: Mary doesn't know her password
       Given she has an account with "active" state in the org
-      When she clicks "login" button
+      When she clicks the "login" button
       Then she is redirected to the "Login" page
       When she fills in her correct username
         And she fills in her incorrect password

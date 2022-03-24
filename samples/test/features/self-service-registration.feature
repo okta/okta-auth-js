@@ -28,10 +28,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   Then she sees a list of factors to register
   When she selects "Skip" on SMS
   Then she is redirected to the Root View
-  And an application session is created
   And she sees a table with her profile info
   And the cell for the value of "email" is shown and contains her "email"
-  And the cell for the value of "name" is shown and contains her "first name and last name"
 
 Scenario: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
   Given Mary navigates to the Self Service Registration View
@@ -59,7 +57,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   When She inputs the correct code from her SMS
     And She selects "Verify"
   Then she is redirected to the Root View
-    And an application session is created
+    And she sees a table with her profile info
+    And the cell for the value of "email" is shown and contains her "email"
 
 Scenario: Mary signs up with an invalid Email
   Given Mary navigates to the Self Service Registration View

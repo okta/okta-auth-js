@@ -14,8 +14,9 @@ Feature: Root page for Direct Auth Demo Application
   Scenario: Mary visits the Root View and WITH an authentication session
     Given Mary has an authenticated session
     When Mary navigates to the Root View
-    Then Mary sees a table with the claims from the /userinfo response
-    And Mary sees a logout button
+    Then she sees a table with her profile info
+      And the cell for the value of "email" is shown and contains her "email"
+      And Mary sees a logout button
 
   Scenario: Mary logs out of the app
     Given Mary has an authenticated session
@@ -23,4 +24,4 @@ Feature: Root page for Direct Auth Demo Application
     When Mary clicks the logout button
     Then she is redirected back to the Root View
       And Mary sees login, registration buttons
-      And she sees that claims from /userinfo are disappeared
+      #And she sees that claims from /userinfo are disappeared
