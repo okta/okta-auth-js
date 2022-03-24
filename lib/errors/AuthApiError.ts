@@ -12,6 +12,7 @@
 
 import CustomError from './CustomError';
 import { APIError, HttpResponse } from '../types';
+
 export default class AuthApiError extends CustomError implements APIError {
   errorSummary: string;
   errorCode?: string;

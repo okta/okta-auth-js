@@ -19,10 +19,8 @@ export type AuthenticatorEnrollmentDataValues =  AuthenticatorDataValues & {
   phoneNumber?: string;
   resend?: boolean; // resend is not a remediator value - revise when IdxResponse structure is updated
 }
-export class AuthenticatorEnrollmentData extends AuthenticatorData {
+export class AuthenticatorEnrollmentData extends AuthenticatorData<AuthenticatorEnrollmentDataValues> {
   static remediationName = 'authenticator-enrollment-data';
-
-  values!: AuthenticatorEnrollmentDataValues;
 
   mapAuthenticator() {
     const authenticatorData = this.getAuthenticatorData();

@@ -15,7 +15,6 @@ import { VerifyAuthenticator, VerifyAuthenticatorValues } from './Base/VerifyAut
 
 export type ResetAuthenticatorValues = VerifyAuthenticatorValues;
 
-export class ResetAuthenticator extends VerifyAuthenticator {
+export class ResetAuthenticator extends VerifyAuthenticator<ResetAuthenticatorValues> {
   static remediationName = 'reset-authenticator';
-  values!: ResetAuthenticatorValues;
 }

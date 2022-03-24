@@ -62,7 +62,14 @@ declare interface RunData {
 
 function initializeValues(options: RunOptions) {
   // remove known options, everything else is assumed to be a value
-  const knownOptions = ['flow', 'remediators', 'actions', 'withCredentials', 'step'];
+  const knownOptions = [
+    'flow', 
+    'remediators', 
+    'actions', 
+    'withCredentials', 
+    'step', 
+    'shouldProceedWithEmailAuthenticator'
+  ];
   const values = { ...options };
   knownOptions.forEach(option => {
     delete values[option];
@@ -111,15 +118,12 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
   } = options;
 
   let idxResponse;
-  let meta;
+  let meta = getSavedTransactionMeta(authClient, { state, recoveryToken, activationToken }); // may be undefined
 
   if (stateHandle) {
     idxResponse = await introspect(authClient, { withCredentials, version, stateHandle });
   } else {
-    // Try to resume saved transaction
-    meta = getSavedTransactionMeta(authClient, { state, recoveryToken, activationToken });
     let interactionHandle = meta?.interactionHandle; // may be undefined
-
     if (!interactionHandle) {
       // start a new transaction
       authClient.transactionManager.clear();
@@ -153,6 +157,7 @@ async function getDataFromRemediate(data: RunData): Promise<RunData> {
     actions,
     flow,
     step,
+    shouldProceedWithEmailAuthenticator, // will be removed in next major version
   } = options;
   
   const shouldRemediate = (autoRemediate !== false && (remediators || actions || step));
@@ -170,7 +175,13 @@ async function getDataFromRemediate(data: RunData): Promise<RunData> {
     idxResponse: idxResponseFromRemediation, 
     nextStep,
     canceled,
-  } = await remediate(idxResponse!, values, { remediators, actions, flow, step });
+  } = await remediate(idxResponse!, values, {
+    remediators,
+    actions,
+    flow,
+    step,
+    shouldProceedWithEmailAuthenticator, // will be removed in next major version
+  });
   idxResponse = idxResponseFromRemediation;
 
   return { ...data, idxResponse, nextStep, canceled };
@@ -322,7 +333,7 @@ export async function run(
   }
   
   // from idx-js, used by the widget
-  const { actions, context, neededToProceed, proceed, rawIdxState } = idxResponse || {};
+  const { actions, context, neededToProceed, proceed, rawIdxState, requestDidSucceed } = idxResponse || {};
   return {
     status: status!,
     ...(meta && { meta }),
@@ -340,5 +351,6 @@ export async function run(
     neededToProceed: neededToProceed!,
     proceed: proceed!,
     rawIdxState: rawIdxState!,
+    requestDidSucceed
   };
 }

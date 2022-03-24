@@ -26,20 +26,25 @@ export interface RemediationValues extends IdxOptions {
   authenticators?: (Authenticator | string)[];
   authenticator?: string | Authenticator;
   authenticatorsData?: Authenticator[];
+  resend?: boolean;
+}
+
+export interface RemediatorConstructor {
+  new<T extends RemediationValues>(remediation: IdxRemediation, values?: T, options?: RemediateOptions): any;
 }
 
 // Base class - DO NOT expose static remediationName
-export class Remediator<ValuesType extends RemediationValues = RemediationValues> {
+export class Remediator<T extends RemediationValues = RemediationValues> {
   static remediationName: string;
 
   remediation: IdxRemediation;
-  values: ValuesType;
+  values: T;
   options: RemediateOptions;
   map?: IdxToRemediationValueMap;
 
-  constructor(remediation: IdxRemediation, values: RemediationValues = {}, options: RemediateOptions = {}) {
+  constructor(remediation: IdxRemediation, values: T = {} as T, options: RemediateOptions = {}) {
     // assign fields to the instance
-    this.values = { ...values } as ValuesType;
+    this.values = { ...values };
     this.options = { ...options };
     this.formatAuthenticators();
     this.remediation = remediation;
@@ -207,8 +212,14 @@ export class Remediator<ValuesType extends RemediationValues = RemediationValues
   // Prepare values for the next remediation
   // In general, remove used values from inputs for the current remediation
   // Override this method if special cases need be handled
-  getValuesAfterProceed(): RemediationValues {
-    const inputs = this.getInputs();
+  getValuesAfterProceed(): T {
+    const inputsFromRemediation = this.remediation.value || []; // "raw" inputs from server response
+    const inputsFromRemediator = this.getInputs(); // "aliased" inputs from SDK remediator
+    const inputs = [
+      ...inputsFromRemediation,
+      ...inputsFromRemediator
+    ];
+    // scrub all values related to this remediation
     for (const input of inputs) {
       delete this.values[input.name];
     }

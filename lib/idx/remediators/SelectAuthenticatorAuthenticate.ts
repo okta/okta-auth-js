@@ -20,9 +20,8 @@ export type SelectAuthenticatorAuthenticateValues = SelectAuthenticatorValues & 
   password?: string;
 };
 
-export class SelectAuthenticatorAuthenticate extends SelectAuthenticator {
+export class SelectAuthenticatorAuthenticate extends SelectAuthenticator<SelectAuthenticatorAuthenticateValues> {
   static remediationName = 'select-authenticator-authenticate';
-  values!: SelectAuthenticatorAuthenticateValues;
 
   constructor(remediation: IdxRemediation, values: SelectAuthenticatorValues = {}, options: RemediateOptions = {}) {
     super(remediation, values, options);

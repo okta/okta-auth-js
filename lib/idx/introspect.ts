@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /*!
  * Copyright (c) 2021, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -16,6 +17,7 @@ import { IdxResponse, isRawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
 import { httpRequest } from '../http';
+import { isAuthApiError } from '../errors';
 
 export interface IntrospectOptions {
   withCredentials?: boolean;
@@ -60,8 +62,8 @@ export async function introspect (
         args: body
       });
     } catch (err) {
-      if (isRawIdxResponse(err)) {
-        rawIdxResponse = err;
+      if (isAuthApiError(err) && err.xhr && isRawIdxResponse(err.xhr.responseJSON)) {
+        rawIdxResponse = err.xhr.responseJSON;
         requestDidSucceed = false;
       } else {
         throw err;

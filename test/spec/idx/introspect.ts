@@ -12,6 +12,8 @@
 
 
 import { RawIdxResponseFactory } from '@okta/test.support/idx';
+import { AuthApiError } from '../../../lib/errors';
+import { APIError, HttpResponse } from '../../../lib/types';
 import { introspect } from '../../../lib/idx/introspect';
 
 jest.mock('../../../lib/http', () => {
@@ -99,7 +101,7 @@ describe('idx/introspect', () => {
   it('on IDX error, calls makeIdxState to return a wrapped idxResponse', async () => {
     const { authClient, introspectOptions } = testContext;
     const rawIdxResponse = RawIdxResponseFactory.build();
-    jest.spyOn(mocked.http, 'httpRequest').mockRejectedValueOnce(rawIdxResponse);
+    jest.spyOn(mocked.http, 'httpRequest').mockRejectedValueOnce(new AuthApiError({} as APIError, { responseJSON: rawIdxResponse } as unknown as HttpResponse));
     jest.spyOn(mocked.idxState, 'makeIdxState');
     authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue(null);
     const res = await introspect(authClient, introspectOptions);

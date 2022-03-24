@@ -116,6 +116,15 @@ describe('idx/run', () => {
       await run(authClient, { stateHandle });
       expect(mocked.interact.interact).not.toHaveBeenCalled();
     });
+
+    it('will preserve transaction meta, if it exists', async () => {
+      const { authClient, transactionMeta } = testContext;
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+      jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+      const stateHandle = 'abc';
+      await run(authClient, { stateHandle });
+      expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, transactionMeta);
+    });
   });
 
   describe('flow', () => {
@@ -187,6 +196,7 @@ describe('idx/run', () => {
     expect(res).toMatchObject({
       status: IdxStatus.PENDING,
       nextStep: 'remediate-nextStep',
+      requestDidSucceed: true
     });
   });
 
@@ -210,7 +220,13 @@ describe('idx/run', () => {
     const flow = 'register';
     const username = 'x';
     const password = 'y';
-    const options: RunOptions = { username, password, flow };
+    const shouldProceedWithEmailAuthenticator = false;
+    const options: RunOptions = {
+      username,
+      password,
+      flow,
+      shouldProceedWithEmailAuthenticator // will be removed in next major version
+    };
     const values = { 
       username,
       password, 
@@ -219,7 +235,13 @@ describe('idx/run', () => {
     const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow);
     const { remediators, actions, flowMonitor } = flowSpec;
     await run(authClient, options);
-    expect(mocked.remediate.remediate).toHaveBeenCalledWith(idxResponse, values, { remediators, actions, flow, flowMonitor });
+    expect(mocked.remediate.remediate).toHaveBeenCalledWith(idxResponse, values, {
+      remediators,
+      actions,
+      flow,
+      flowMonitor,
+      shouldProceedWithEmailAuthenticator // will be removed in next major version
+    });
   });
 
   it('saves idxResponse when nextStep is avaiable', async () => {

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -16,12 +17,20 @@ export default class OAuthError extends CustomError {
   errorCode: string;
   errorSummary: string;
 
+  // for widget / idx-js backward compatibility
+  error: string;
+  error_description: string;
+
   constructor(errorCode: string, summary: string) {
     super(summary);
 
     this.name = 'OAuthError';
     this.errorCode = errorCode;
     this.errorSummary = summary;
+
+    // for widget / idx-js backward compatibility
+    this.error = errorCode;
+    this.error_description = summary;
   }
 }
 

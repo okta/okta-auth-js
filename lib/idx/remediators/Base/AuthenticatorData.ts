@@ -22,10 +22,10 @@ export type AuthenticatorDataValues = RemediationValues & {
 };
 
 // Base class - DO NOT expose static remediationName
-export class AuthenticatorData extends Remediator<AuthenticatorDataValues> {
+export class AuthenticatorData<T extends AuthenticatorDataValues = AuthenticatorDataValues> extends Remediator<T> {
   authenticator: IdxAuthenticator;
 
-  constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}) {
+  constructor(remediation: IdxRemediation, values: T = {} as T) {
     super(remediation, values);
 
     // set before other data calculation
@@ -99,7 +99,7 @@ export class AuthenticatorData extends Remediator<AuthenticatorDataValues> {
     return authenticator.form!.value.find(({ name }) => name === 'methodType')?.options as IdxOption[];
   }
 
-  getValuesAfterProceed(): RemediationValues {
+  getValuesAfterProceed(): T {
     this.values = super.getValuesAfterProceed();
     // remove used authenticatorData
     const authenticatorsData = this.values.authenticatorsData!
