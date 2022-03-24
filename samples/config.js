@@ -118,6 +118,7 @@ const samples = [
     name: '@okta/test.app.react-oie',
     appType: 'browser',
     features: [
+      'basic-auth',
       'progressive-profiling-view-profile'
     ],
     useEnv: true

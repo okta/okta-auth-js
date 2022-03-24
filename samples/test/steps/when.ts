@@ -19,8 +19,7 @@ import enterCredential from '../support/action/context-enabled/enterCredential';
 import enterValidPassword from '../support/action/enterValidPassword';
 import enterCorrectCode from '../support/action/context-enabled/live-user/enterCorrectCode';
 import enterLiveUserEmail from '../support/action/context-enabled/live-user/enterEmail';
-import submitAnyForm from '../support/action/submitAnyForm';
-import submitForm from '../support/action/context-enabled/submitForm';
+import submitForm from '../support/action/submitForm';
 import clickLogout from '../support/action/clickLogout';
 import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
 import selectAuthenticator from '../support/action/selectAuthenticator';
@@ -54,7 +53,14 @@ import ActionContext from '../support/context';
 import loginDirect from '../support/action/loginDirect';
 import Home from '../support/selectors/Home';
 import noop from '../support/action/noop';
+import clickButton from '../support/action/clickButton';
+import clickLink from '../support/action/clickLink';
 
+When('she clicks {string} button', clickButton);
+
+When('she clicks the {string} link', clickLink);
+
+When('she submits the form', submitForm);
 
 When(
   /^User enters (username|password) into the form$/,
@@ -88,7 +94,7 @@ When(
 
 When(
   /^she submits the registration form$/,
-  submitAnyForm
+  submitForm
 );
 
 When(
@@ -96,25 +102,25 @@ When(
   enterCredential
 );
 
-When(
-  /^User submits the form$/,
-  submitForm
-);
+// When(
+//   /^User submits the form$/,
+//   submitForm
+// );
 
 When(
   /^Mary clicks the logout button$/,
   clickLogout
 );
 
-When(
-  /^she submits the Login form(?: with blank fields)?$/,
-  submitForm
-);
+// When(
+//   /^she submits the Login form(?: with blank fields)?$/,
+//   submitForm
+// );
 
-When(
-  /^she clicks Login$/,
-  submitForm
-);
+// When(
+//   /^she clicks Login$/,
+//   submitForm
+// );
 
 When(
   /^she clicks the "Login with Facebook" button in the embedded Sign In Widget$/,
@@ -152,11 +158,6 @@ When(
 );
 
 When(
-  /^she clicks on the "Forgot Password Link"$/,
-  clickElement.bind(null, 'click', 'link', '/recover-password')
-);
-
-When(
   /^she submits the recovery form$/,
   submitPasswordRecoverForm
 );
@@ -183,12 +184,12 @@ When(
 
 When(
   /^She selects "Receive a Code"$/,
-  submitAnyForm
+  submitForm
 );
 
 When(
   /^She selects "Verify"$/,
-  submitAnyForm
+  submitForm
 );
 
 When(
@@ -197,13 +198,8 @@ When(
 );
 
 When(
-  /^she submits the form$/,
-  submitAnyForm
-);
-
-When(
   /^submits the enrollment form$/,
-  submitAnyForm
+  submitForm
 );
 
 When(
@@ -329,13 +325,6 @@ When(
 When(
   /^She inputs the correct code from her Google Authenticator App$/,
   enterCorrectGoogleAuthenticatorCode
-);
-
-When(
-  'she clicks the login button',
-  async function() {
-    await clickElement('click', 'selector', Home.loginButton);
-  }
 );
 
 When(

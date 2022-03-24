@@ -23,13 +23,15 @@ import waitForURLPath from '../support/wait/waitForURLPath';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import enterValidPassword from '../support/action/context-enabled/live-user/enterValidPassword';
 import confirmValidPassword from '../support/action/context-enabled/live-user/confirmValidPassword';
-import submitAnyForm from '../support/action/submitAnyForm';
+import submitForm from '../support/action/submitForm';
 import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
 import checkProfileAttribute from '../support/check/checkProfileAttribute';
 import { UserHome } from '../support/selectors';
 import ActionContext from '../support/context';
 import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticatorOptions';
 import waitForDisplayed from '../support/wait/waitForDisplayed';
+
+Then('she is redirected to the {string} page', checkIsOnPage);
 
 Then(
   /^User can verify their profile data$/,
@@ -182,7 +184,7 @@ Then(
 
 Then(
   /^she submits the set new password form$/,
-  submitAnyForm
+  submitForm
 );
 
 Then(

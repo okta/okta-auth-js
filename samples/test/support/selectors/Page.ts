@@ -1,10 +1,10 @@
 export interface Page {
   isDisplayedElementSelector: string;
-  isDisplayedElementText?: string;
+  isDisplayedElementText?: string | string[];
 }
 
 export abstract class PageWithTitle implements Page {
-  title = '';
+  title: string | string[] = '';
 
   get pageTitle() { return '#page-title-header'; }
   get isDisplayedElementSelector() { return this.pageTitle; }

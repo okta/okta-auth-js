@@ -62,8 +62,8 @@ export default function Home() {
               <Box marginTop="s">
                 <Text>Give it a try:</Text>
                 <Box display="flex" margin="s">
-                  <Button id="login-button" variant="primary" onClick={startIdxFlow('authenticate')}>Sign In</Button>
-                  <Button id="register-button" variant="secondary" onClick={startIdxFlow('register')}>Sign Up</Button>
+                  <Button name="signin" variant="primary" onClick={startIdxFlow('authenticate')}>Sign In</Button>
+                  <Button name="signup" variant="secondary" onClick={startIdxFlow('register')}>Sign Up</Button>
                 </Box>
               </Box>
             )}

@@ -16,6 +16,7 @@ import ActionContext from '../support/context';
 import a18nClient from '../support/management-api/a18nClient';
 import deleteSelfEnrolledUser from '../support/management-api/deleteSelfEnrolledUser';
 
+// Comment out this after hook to persist test context
 After(async function(this: ActionContext) {
   if (this.app) {
     await this.app.deactivate();
@@ -39,4 +40,7 @@ After(async function(this: ActionContext) {
   }
 });
 
-After(() => browser.deleteCookies());
+After(async () => {
+  await browser.deleteCookies();
+  await browser.reloadSession();
+});

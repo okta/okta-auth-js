@@ -38,17 +38,20 @@ import OktaSignInOIEFacebookIdp from './OktaSignInOIEFacebookIdp';
 import OktaSignInOIEOktaIdp from './OktaSignInOIEOktaIdp';
 
 const pages: { [key: string]: Page } = {
+  'Login': LoginForm,
   'Login View': LoginForm,
   'Basic Login View': LoginForm,
   'Login with Username and Password': LoginForm,
   'Basic Social Login View': LoginForm,
   'Self Service Registration View': Registration,
   'Self Service Password Reset View': PasswordRecover,
+  'Self Service Password Reset': PasswordRecover,
   'Select authenticator': SelectAuthenticator,
   'Enter Code': ChallengeEmailAuthenticator,
   'Challenge email authenticator': ChallengeEmailAuthenticator,
   'Enroll Factor: Enter SMS Code': EnrollPhoneAuthenticator,
   'Reset Password': PasswordReset,
+  'Root': Home,
   'Root Page': Home,
   'Root View': Home,
   'Set up Password': PasswordSetup,

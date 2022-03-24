@@ -37,8 +37,6 @@ const oktaAuth = (() => {
   }));
 })();
 
-console.log(oktaAuth);
-
 const restoreOriginalUri = () => {};
 
 function App() {

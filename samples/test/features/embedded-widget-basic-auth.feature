@@ -8,7 +8,7 @@ Feature: Basic Login with Embedded Sign In Widget
       And she has an account with "active" state in the org
 
   Scenario: Mary logs in with a Password
-	  When she clicks the login button
+	  When she clicks the "login" button
     Then she is redirected to the Embedded Widget View
 	  When she fills in her correct username
 	    And she fills in her correct password

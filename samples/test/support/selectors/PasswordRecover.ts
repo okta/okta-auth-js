@@ -14,7 +14,7 @@ import { PageWithTitle } from './Page';
 
 
 class PasswordRecover extends PageWithTitle {
-  title = 'Recover password';
+  title = ['Recover password', 'Identify Recovery'];
 
   get username() { return '#password-recover-form #username'; }
   get submit() { return '#password-recover-form #submit-button'; }

@@ -16,7 +16,7 @@ import { Page } from './Page';
 const username = 'input[name="username"]';
 const password = 'input[name="password"]';
 const submit = 'button[type="submit"]';
-const formMessages = `#form-messages li`;
+const formMessages = `#form-messages`;
 const formMessage = `${formMessages}:first-child`;
 const facebookButton = '#idp-buttons #facebook';
 const googleButton = '#idp-buttons #google';

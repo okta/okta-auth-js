@@ -14,5 +14,5 @@
 import clickElement from './clickElement';
 
 export default async () => {
-  await clickElement('click', 'selector', 'form button[type=submit]');
+  await clickElement('click', 'selector', 'button[type="submit"]');
 };
