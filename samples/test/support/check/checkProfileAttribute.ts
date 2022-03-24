@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars, complexity */
 
 import checkEqualsText from './checkEqualsText';
 import ActionContext from '../context';
@@ -47,7 +47,7 @@ export default async function(this: ActionContext, attribute: string, _: string)
   }
   
   if (!selector) {
-    throw new Error(`Selector not found for ${attribute}`)
+    throw new Error(`Selector not found for ${attribute}`);
   }
   
   await checkEqualsText('element', selector, false, expectedValue);

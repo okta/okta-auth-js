@@ -10,14 +10,21 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import waitForDisplayed from '../wait/waitForDisplayed';
 import buttons from '../selectors/maps/buttons';
 
 export default async(buttonName: string) => {
-  const button = (buttons as any)[buttonName];
-  if (!button) {
-    throw new Error(`No button can match name ${buttonName}`);
-  }
-  await waitForDisplayed(`button[name="${button}"]`);
+  await browser.waitUntil(async () => {
+    const names = (buttons as any)[buttonName];
+    for (const name of names) {
+      const el = await $(`button[name=${name}]`);
+      const isDisplayed = await el?.isDisplayed();
+      if (isDisplayed) {
+        return true;
+      }
+    }
+    return false;
+  }, {
+    timeout: 5000,
+    timeoutMsg: `wait for button: ${buttonName}`
+  });
 };

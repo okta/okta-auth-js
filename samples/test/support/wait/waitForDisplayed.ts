@@ -24,7 +24,7 @@ import type { Selector } from 'webdriverio';
 export default async (
   selector: Selector, 
   falseCase: any = false, 
-  ms: number = 10000
+  ms = 10000
 ) => {
   const el = await $(selector);
   await el.waitForDisplayed({

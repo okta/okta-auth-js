@@ -17,7 +17,6 @@ import navigateTo from '../support/action/navigateTo';
 import navigateToLoginAndAuthenticate from '../support/action/context-enabled/live-user/navigateToLoginAndAuthenticate';
 import ActionContext from '../support/context';
 import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
-import Home from '../support/selectors/Home';
 import startApp from '../support/action/startApp';
 import noop from '../support/action/noop';
 import createApp from '../support/management-api/createApp';
@@ -32,6 +31,9 @@ import createCredentials from '../support/management-api/createCredentials';
 import enrollFactor from '../support/management-api/enrollFactor';
 import grantConsentToScope from '../support/management-api/grantConsentToScope';
 import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
+import clickButton from '../support/action/clickButton';
+import checkIsOnPage from '../support/check/checkIsOnPage';
+import loginDirect from '../support/action/loginDirect';
 
 // NOTE: noop function is used for predefined settings
 
@@ -172,6 +174,20 @@ Given(
 
 Given('she does not have account in the org', noop);
 
+Given('Mary is on the Root View in an UNAUTHENTICATED state', noop);
+
+Given(
+  'Mary is on the Root View in an AUTHENTICATED state', 
+  async function(this: ActionContext) {
+    await clickButton('login');
+    await checkIsOnPage('Root');
+    await loginDirect({
+      username: this.credentials.emailAddress,
+      password: this.credentials.password
+    });
+  }
+);
+
 Given(
   'she has an authenticated session',
   navigateToLoginAndAuthenticate
@@ -214,9 +230,4 @@ Given(
 Given(
   /^she is not enrolled in any authenticators$/,
   noop
-);
-
-Given(
-  'Mary is on the Root View in an UNAUTHENTICATED state',
-  async () => await startApp(Home.path)
 );

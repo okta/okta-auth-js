@@ -60,6 +60,8 @@ When('she clicks the {string} button', clickButton);
 
 When('she clicks the {string} link', clickLink);
 
+When('she clicks the Login with Okta OIDC IDP button', clickOIDCIdPButton);
+
 When('she submits the form', submitForm);
 
 When(
@@ -137,11 +139,6 @@ When(
 When(
   /^she clicks the "Login with Okta OIDC IDP" button in the embedded Sign In Widget$/,
   clickLoginWithOktaOIDCIdPInWidget
-);
-
-When(
-  /^she clicks the "Login with Okta OIDC IDP" button$/,
-  clickOIDCIdPButton
 );
 
 When(

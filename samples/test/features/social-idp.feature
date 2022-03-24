@@ -11,7 +11,7 @@ Background:
 
 Scenario: Mary Logs in with Okta OIDC IDP
     Given Mary navigates to the Login View
-    When she clicks the "Login with Okta OIDC IDP" button
+    When she clicks the Login with Okta OIDC IDP button
       And logs in to Okta OIDC IDP
     Then she is redirected to the Root View
       And she sees a table with her profile info
