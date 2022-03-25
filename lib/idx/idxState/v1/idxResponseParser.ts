@@ -12,6 +12,7 @@
 
 /* eslint-disable max-len */
 // @ts-nocheck
+import { OktaAuthInterface } from '../../../types';    // auth-js/types
 import { generateRemediationFunctions } from './remediationParser';
 import generateIdxAction from './generateIdxAction';
 import { JSONPath } from 'jsonpath-plus';
@@ -21,7 +22,7 @@ const SKIP_FIELDS = Object.fromEntries([
   'context', // the API response of 'context' isn't externally useful.  We ignore it and put all non-action (contextual) info into idxState.context
 ].map( (field) => [ field, !!'skip this field' ] ));
 
-export const parseNonRemediations = function parseNonRemediations( idxResponse, toPersist = {} ) {
+export const parseNonRemediations = function parseNonRemediations( authClient: OktaAuthInterface, idxResponse, toPersist = {} ) {
   const actions = {};
   const context = {};
 
@@ -38,7 +39,7 @@ export const parseNonRemediations = function parseNonRemediations( idxResponse, 
 
       if ( idxResponse[field].rel ) {
         // top level actions
-        actions[idxResponse[field].name] = generateIdxAction(idxResponse[field], toPersist);
+        actions[idxResponse[field].name] = generateIdxAction(authClient, idxResponse[field], toPersist);
         return;
       }
 
@@ -57,7 +58,7 @@ export const parseNonRemediations = function parseNonRemediations( idxResponse, 
         .forEach( ([subField, value]) => {
           if (value.rel) { // is [field].value[subField] an action?
             // add any "action" value subfields to actions
-            actions[`${field}-${subField.name || subField}`] = generateIdxAction(value, toPersist);
+            actions[`${field}-${subField.name || subField}`] = generateIdxAction(authClient, value, toPersist);
           } else {
             // add non-action value subfields to context
             context[field].value[subField] = value;
@@ -87,8 +88,8 @@ const expandRelatesTo = (idxResponse, value) => {
   });
 };
 
-const convertRemediationAction = (remediation, toPersist) => {
-  const remediationActions = generateRemediationFunctions( [remediation], toPersist );
+const convertRemediationAction = (authClient: OktaAuthInterface, remediation, toPersist) => {
+  const remediationActions = generateRemediationFunctions( authClient, [remediation], toPersist );
   const actionFn = remediationActions[remediation.name];
   return {
     ...remediation,
@@ -96,7 +97,7 @@ const convertRemediationAction = (remediation, toPersist) => {
   };
 };
 
-export const parseIdxResponse = function parseIdxResponse( idxResponse, toPersist = {} ): {
+export const parseIdxResponse = function parseIdxResponse( authClient: OktaAuthInterface, idxResponse, toPersist = {} ): {
   remediations: IdxRemediation[];
   context: IdxContext;
   actions: IdxActions;
@@ -107,9 +108,9 @@ export const parseIdxResponse = function parseIdxResponse( idxResponse, toPersis
     remediation => expandRelatesTo(idxResponse, remediation)
   );
 
-  const remediations = remediationData.map(remediation => convertRemediationAction( remediation, toPersist ));
+  const remediations = remediationData.map(remediation => convertRemediationAction( authClient, remediation, toPersist ));
 
-  const { context, actions } = parseNonRemediations( idxResponse, toPersist );
+  const { context, actions } = parseNonRemediations( authClient, idxResponse, toPersist );
 
   return {
     remediations,

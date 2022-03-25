@@ -11,42 +11,53 @@
  */
 
 
-import { generateRemediationFunctions } from '../../../../../../lib/idx/idx-js/v1/remediationParser';
+import { generateRemediationFunctions } from '../../../../../../lib/idx/idxState/v1/remediationParser';
 
 // imports to target for mockery
-import fetch from 'cross-fetch';
-import generateIdxAction from '../../../../../../lib/idx/idx-js/v1/generateIdxAction';
+import generateIdxAction from '../../../../../../lib/idx/idxState/v1/generateIdxAction';
 
-jest.mock('cross-fetch');
+jest.mock('../../../../../../lib/http', () => {
+  const actual = jest.requireActual('../../../../../../lib/http');
+  return {
+    ...actual,
+    httpRequest: () => {}
+  };
+});
 /*
   Doing a jest.mock('../../src/generateIdxAction') has problems with jest.mock causing the test to hang
   and spikes up the CPU usage for the current node process.
   Alternative mocking approach: https://jestjs.io/docs/en/es6-class-mocks
 */
 const mockGenerateIdxAction = jest.fn();
-jest.mock('../../../../../../lib/idx/idx-js/v1/generateIdxAction', () => {
+jest.mock('../../../../../../lib/idx/idxState/v1/generateIdxAction', () => {
   return jest.fn().mockImplementation(() => {
     return {generateIdxAction: mockGenerateIdxAction};
   });
 });
 
-const { Response } = jest.requireActual('cross-fetch');
 const mockRequestIdentity = require('../../mocks/request-identifier');
 const mockIdxResponse = mockRequestIdentity;
 
-fetch.mockImplementation( () => Promise.resolve( new Response(JSON.stringify( mockRequestIdentity )) ) );
+const mocked = {
+  http: require('../../../../../../lib/http')
+};
+
 generateIdxAction.mockImplementation( () => 'generated');
 
 describe('remediationParser', () => {
+
+  beforeEach(() => {
+    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(mockRequestIdentity);
+  });
 
   describe('generateRemediationFunctions', () => {
 
     it('builds a collection of generated functions', async () => {
       const toPersist = {};
-      const remediationFunctions = generateRemediationFunctions(mockIdxResponse.remediation.value);
+      const remediationFunctions = generateRemediationFunctions({}, mockIdxResponse.remediation.value);
       expect( Object.keys(remediationFunctions) ).toEqual( ['identify', 'select-enroll-profile'] );
-      expect(generateIdxAction.mock.calls[0]).toEqual([mockIdxResponse.remediation.value[0], toPersist]);
-      expect(generateIdxAction.mock.calls[1]).toEqual([mockIdxResponse.remediation.value[1], toPersist]);
+      expect(generateIdxAction.mock.calls[0]).toEqual([{}, mockIdxResponse.remediation.value[0], toPersist]);
+      expect(generateIdxAction.mock.calls[1]).toEqual([{}, mockIdxResponse.remediation.value[1], toPersist]);
       expect(remediationFunctions['identify']).toBe('generated');
       expect(remediationFunctions['select-enroll-profile']).toBe('generated');
     });

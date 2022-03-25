@@ -108,5 +108,3 @@ export function getLink(obj, linkName, altName?) {
   }
 }
 
-
-

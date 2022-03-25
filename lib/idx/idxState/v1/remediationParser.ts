@@ -11,14 +11,18 @@
  */
 
 // @ts-nocheck
+import { OktaAuthInterface } from '../../../types';    // auth-js/types
 import generateIdxAction from './generateIdxAction';
 
-export const generateRemediationFunctions = function generateRemediationFunctions( remediationValue, toPersist = {} ) {
-
+export const generateRemediationFunctions = function generateRemediationFunctions(
+  authClient: OktaAuthInterface,
+  remediationValue,
+  toPersist = {}
+) {
   return Object.fromEntries( remediationValue.map( remediation => {
     return [
       remediation.name,
-      generateIdxAction(remediation, toPersist),
+      generateIdxAction(authClient, remediation, toPersist),
     ];
   }) );
 };

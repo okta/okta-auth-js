@@ -13,6 +13,9 @@
 import crossFetch from 'cross-fetch';
 import { FetchOptions, HttpResponse } from '../types';
 
+// content-type = application/json OR application/ion+json
+const appJsonContentTypeRegex = /application\/\w*\+?json/;
+
 function readData(response: Response): Promise<object | string> {
   if (response.headers.get('Content-Type') &&
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -54,10 +57,18 @@ function fetchRequest(method: string, url: string, args: FetchOptions) {
   var headers = args.headers || {};
   var contentType = (headers['Content-Type'] || headers['content-type'] || '');
 
-  // JSON encode body (if appropriate)
-  if (contentType === 'application/json' && body && typeof body !== 'string') {
-    body = JSON.stringify(body);
+  if (body && typeof body !== 'string') {
+    // JSON encode body (if appropriate)
+    if (appJsonContentTypeRegex.test(contentType)) {
+      body = JSON.stringify(body);
+    }
+    else if (contentType === 'application/x-www-form-urlencoded') {
+      body = Object.entries(body)
+      .map( ([param, value]) => `${param}=${encodeURIComponent(value)}` )
+      .join('&');
+    }
   }
+
   var fetch = global.fetch || crossFetch;
   var fetchPromise = fetch(url, {
     method: method,
