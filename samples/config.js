@@ -119,7 +119,8 @@ const samples = [
     appType: 'browser',
     features: [
       'basic-auth',
-      'progressive-profiling-view-profile'
+      'progressive-profiling-view-profile',
+      'progressive-profiling-update-profile-info',
     ],
     useEnv: true
   },

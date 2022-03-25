@@ -10,19 +10,26 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { camelize } from '../../util';
 import buttons from '../selectors/maps/buttons';
 
 export default async(buttonName: string) => {
+  buttonName = camelize(buttonName);
   await browser.waitUntil(async () => {
     const names = (buttons as any)[buttonName];
-    for (const name of names) {
-      const el = await $(`button[name=${name}]`);
-      const isDisplayed = await el?.isDisplayed();
-      if (isDisplayed) {
-        return true;
+    if (names) {
+      for (const name of names) {
+        const el = await $(`button[name=${name}]`);
+        const isDisplayed = await el?.isDisplayed();
+        if (isDisplayed) {
+          return true;
+        }
       }
+      return false;
+    } else {
+      const el = await $(`button[name=${buttonName}]`);
+      return await el?.isDisplayed();
     }
-    return false;
   }, {
     timeout: 5000,
     timeoutMsg: `wait for button: ${buttonName}`

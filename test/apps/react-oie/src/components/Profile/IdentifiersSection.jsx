@@ -100,12 +100,13 @@ const IdentifiersSection = () => {
   };
 
   return (
-    <Box display="flex" className="pure-g">
+    <Box display="flex" className="pure-g" padding="m">
       <Box 
         className="pure-u-1 pure-u-sm-1-2" 
         paddingRight="s" 
         display="flex" 
         flexDirection="column"
+        marginTop="s" 
       >
         {emails ? (
           <Box>
@@ -215,7 +216,7 @@ const IdentifiersSection = () => {
           </Box>
         </Box>
       </Box>
-      <Box className="pure-u-1 pure-u-sm-1-2">
+      <Box className="pure-u-1 pure-u-sm-1-2" marginTop="s">
         <InfoBox 
           heading="Tip" 
           icon="information-circle-filled" 

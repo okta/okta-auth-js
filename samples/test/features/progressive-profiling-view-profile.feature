@@ -13,8 +13,13 @@ Feature: View Profile Information
     Given Mary is on the Root View in an UNAUTHENTICATED state
     When she clicks the "login" button
     Then she is redirected to the "Login" page
+    When she fills in her username
+      And she fills in her correct password
+      And she submits the form
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"
       And the cell for the value of "last name" is shown and contains her "last name"
-      And she sees an "Edit" button incidating she can update her profile
+      And she sees the "edit profile" button
+      # incidating she can update her profile

@@ -28,8 +28,39 @@ import { UserHome } from '../support/selectors';
 import ActionContext from '../support/context';
 import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticatorOptions';
 import waitForDisplayed from '../support/wait/waitForDisplayed';
+import checkMessage from '../support/check/checkMessage';
+import checkEqualsText from '../support/check/checkEqualsText';
+import { camelize } from '../util';
 
 Then('she is redirected to the {string} page', checkIsOnPage);
+
+Then(
+  'the {string} field is available for input', 
+  async (fieldName: string) => {
+    fieldName = camelize(fieldName);
+    const el = await $(`input[name=${fieldName}]`);
+    const isEnabled = await el.isEnabled();
+    expect(isEnabled).toEqual(true);
+  }
+);
+
+Then(
+  'she sees a banner message that {string}', 
+  checkMessage.bind(null, '#profile-messages-container')
+);
+
+Then(
+  'the {string} field shows {string} in disabled state', 
+  async (fieldName: string, value: string) => {
+    fieldName = camelize(fieldName);
+    const el = await $(`input[name=${fieldName}]`);
+    const isEnabled = await el.isEnabled();
+    expect(isEnabled).toEqual(false);
+    await checkEqualsText('element', `input[name=${fieldName}]`, false, value);
+  }
+);
+
+Then('she sees the {string} button', checkButton);
 
 Then(
   /^she should see (?:a message on the Login form|the message|a message|an error message) "(?<message>.+?)"$/,
@@ -39,11 +70,6 @@ Then(
 Then(
   /^the Root Page shows links to the Entry Points$/,
   checkGuest
-);
-
-Then(
-  /sees a (.*) button$/,
-  checkButton
 );
 
 Then(
@@ -220,11 +246,4 @@ Then(
 Then(
   /^the screen changes to challenge the Security Question$/,
   () => checkIsOnPage('Challenge Security Question')
-);
-
-Then(
-  'she sees an "Edit" button incidating she can update her profile',
-  async function() {
-    await waitForDisplayed(UserHome.editButton);
-  }
 );

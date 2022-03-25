@@ -6,7 +6,7 @@ const Profile = () => {
   return (
     <Box id="profile-table" padding="s" borderColor="display" borderRadius="base">
       <ProfileSection />
-      <Box marginTop="m" marginBottom="m" borderColor="display" />
+      <Box borderColor="display" />
       <IdentifiersSection />
     </Box>
   );

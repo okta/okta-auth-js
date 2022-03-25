@@ -152,7 +152,7 @@ export const config: WebdriverIO.Config = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 1, // all tests use the same user and local storage. they must run in series
+        maxInstances: 10, // all tests use the same user and local storage. they must run in series
         //
         browserName: 'chrome',
         'goog:chromeOptions': chromeOptions

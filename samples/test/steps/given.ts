@@ -34,6 +34,7 @@ import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient
 import clickButton from '../support/action/clickButton';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import loginDirect from '../support/action/loginDirect';
+import addUserProfileSchemaToApp from '../support/management-api/addUserProfileSchemaToApp';
 
 // NOTE: noop function is used for predefined settings
 
@@ -87,6 +88,13 @@ Given(
   'the app is granted {string} scope',
   async function(this: ActionContext, scopeId: string) {
     await grantConsentToScope(this.app.id, scopeId);
+  }
+);
+
+Given(
+  'the app has a custom User Profile Schema named {string}',
+  async function(this: ActionContext, schemaName: string) {
+    await addUserProfileSchemaToApp(this.app.id, schemaName);
   }
 );
 

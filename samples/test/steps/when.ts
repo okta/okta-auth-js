@@ -55,6 +55,8 @@ import Home from '../support/selectors/Home';
 import noop from '../support/action/noop';
 import clickButton from '../support/action/clickButton';
 import clickLink from '../support/action/clickLink';
+import setInputField from '../support/action/setInputField';
+import { camelize } from '../util';
 
 When('she clicks the {string} button', clickButton);
 
@@ -63,6 +65,14 @@ When('she clicks the {string} link', clickLink);
 When('she clicks the Login with Okta OIDC IDP button', clickOIDCIdPButton);
 
 When('she submits the form', submitForm);
+
+When(
+  'she changes the {string} field to {string}', 
+  async (fieldName: string, value: string) => {
+    fieldName = camelize(fieldName);
+    await setInputField('set', value, `input[name=${fieldName}]`);
+  }
+);
 
 When(
   /^User enters (username|password) into the form$/,
