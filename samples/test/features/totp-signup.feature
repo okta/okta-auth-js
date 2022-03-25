@@ -27,7 +27,7 @@ Feature: TOTP Support (Google Authenticator) Sign Up
       And She scans a QR Code
       And She selects "Next"
     Then the screen changes to receive an input for a code
-    When She inputs the correct code from her Google Authenticator App
+    When she inputs the correct code from her Google Authenticator App for "enrollment"
       And She selects "Verify"
     Then she sees a list of available factors to setup
     When she selects "Skip"
@@ -54,7 +54,7 @@ Feature: TOTP Support (Google Authenticator) Sign Up
       And She enters the shared Secret Key into the Google Authenticator App
       And She selects "Next" on the screen which is showing the QR code
     Then the screen changes to receive an input for a code
-    When She inputs the correct code from her Google Authenticator App
+    When she inputs the correct code from her Google Authenticator App for "enrollment"
       And She selects "Verify"
     Then she sees a list of available factors to setup
     When she selects "Skip"

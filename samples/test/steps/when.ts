@@ -75,6 +75,11 @@ When(
 );
 
 When(
+  'she inputs the correct code from her Google Authenticator App for {string}',
+  enterCorrectGoogleAuthenticatorCode
+);
+
+When(
   /^User enters (username|password) into the form$/,
   enterCredential
 );
@@ -114,20 +119,10 @@ When(
   enterCredential
 );
 
-// When(
-//   /^User submits the form$/,
-//   submitForm
-// );
-
 When(
   /^Mary clicks the logout button$/,
   clickLogout
 );
-
-// When(
-//   /^she submits the Login form(?: with blank fields)?$/,
-//   submitForm
-// );
 
 When(
   /^she clicks the "Login with Facebook" button in the embedded Sign In Widget$/,
@@ -322,20 +317,4 @@ When(
 When(
   /^She selects "Next"/,
   noop
-);
-
-When(
-  /^She inputs the correct code from her Google Authenticator App$/,
-  enterCorrectGoogleAuthenticatorCode
-);
-
-When(
-  'she logs in to the app',
-  async function(this: ActionContext) {
-    await clickElement('click', 'selector', Home.loginButton);
-    await loginDirect({
-      username: this.credentials.emailAddress,
-      password: this.credentials.password
-    });
-  }
 );

@@ -20,7 +20,7 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And She scans a QR Code
       And She selects "Next"
     Then the screen changes to receive an input for a code
-    When She inputs the correct code from her Google Authenticator App
+    When she inputs the correct code from her Google Authenticator App for "enrollment"
       And She selects "Verify"
     Then she is redirected to the Root View
       And she sees a table with her profile info
@@ -38,7 +38,7 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And She enters the shared Secret Key into the Google Authenticator App
       And She selects "Next" on the screen which is showing the QR code
     Then the screen changes to receive an input for a code
-    When She inputs the correct code from her Google Authenticator App
+    When she inputs the correct code from her Google Authenticator App for "enrollment"
       And She selects "Verify"
     Then she is redirected to the Root View
       And she sees a table with her profile info
@@ -55,7 +55,7 @@ Feature: TOTP Support (Google Authenticator) Sign In
     # Then she is presented with an option to select Google Authenticator to verify
     # When She selects Google Authenticator from the list
     Then the screen changes to receive an input for a code
-    When She inputs the correct code from her Google Authenticator App
+    When she inputs the correct code from her Google Authenticator App for "authentication"
       And She selects "Verify"
     Then she is redirected to the Root View
       And she sees a table with her profile info
