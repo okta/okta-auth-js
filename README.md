@@ -277,6 +277,12 @@ if (!userInfo) {
 }
 ```
 
+#### Usage with Typescript < 3.6
+
+Typescript versions prior to 3.6 have no type definitions for WebAuthn. 
+Support for WebAuthn in IDX API was introduced in `OktaAuth 6.1.0`. 
+To solve this issue please install package `@types/webappsec-credential-management` version `^0.5.1`. 
+
 ### Strategies for Obtaining Tokens
 
 #### Authorization Code flow for web and native client types
