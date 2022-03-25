@@ -14,5 +14,18 @@
 import clickElement from './clickElement';
 
 export default async () => {
-  await clickElement('click', 'selector', 'button[type="submit"]');
+  const tagNames = ['button', 'input'];
+  let tagName;
+  for (const name of tagNames) {
+    const el = await $(`${name}[type=submit]`);
+    const isDisplayed = await el?.isDisplayed();
+    if (isDisplayed) {
+      tagName = name;
+      break;
+    }
+  }
+  if (!tagName) {
+    throw new Error('Failed to find the submit button');
+  }
+  await clickElement('click', 'selector', `${tagName}[type="submit"]`);
 };
