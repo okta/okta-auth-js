@@ -124,6 +124,7 @@ const ProfileSection = () => {
           )}
           {!!error && error.errorCauses.map(cause => (
             <Infobox 
+              key={cause.errorSummary}
               variant="danger"
               content={cause.errorSummary} />
           ))}

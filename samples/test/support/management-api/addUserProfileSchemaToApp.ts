@@ -15,25 +15,25 @@ import { getConfig } from '../../util';
 
 const MAP = {
   age: {
-    "definitions": {
-      "custom": {
-        "id": "#custom",
-        "type": "object",
-        "properties": {
-          "age": {
-            "title": "Age",
-            "description": "age",
-            "type": "number",
-            "required": false,
-            "minimum": 0,
-            "maximum": 200
+    'definitions': {
+      'custom': {
+        'id': '#custom',
+        'type': 'object',
+        'properties': {
+          'age': {
+            'title': 'Age',
+            'description': 'age',
+            'type': 'number',
+            'required': false,
+            'minimum': 0,
+            'maximum': 200
           }
         },
-        "required": []
+        'required': []
       }
     }
   }
-}
+};
 
 export default async function(appId: string, schemaName: string) {
   const config = getConfig();
