@@ -16,7 +16,7 @@ Feature: Root page for Direct Auth Demo Application
     When Mary navigates to the Root View
     Then she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"
-      And Mary sees the "logout" button
+      And she sees the "logout" button
 
   Scenario: Mary logs out of the app
     Given Mary has an authenticated session
