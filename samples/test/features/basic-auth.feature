@@ -4,6 +4,8 @@ Feature: Direct Auth Basic Login with Password Factor
 	  Given an App
       And the app is granted "okta.myAccount.read" scope
       And the app is granted "okta.myAccount.manage" scope
+      And the app is granted "okta.myAccount.email.manage" scope
+      And the app is granted "okta.myAccount.phone.manage" scope
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password as the only factor"
       And a user named "Mary"
