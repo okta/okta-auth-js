@@ -45,8 +45,11 @@ Then(
 );
 
 Then(
-  'she sees a banner message that {string}', 
-  checkMessage.bind(null, '#profile-messages-container')
+  'she sees a banner message for {string} that {string}', 
+  async (messageContainerName: string, expectedMessage: string) => {
+    const selector = `#${camelize(messageContainerName)}-messages-container`;
+    await checkMessage(selector, expectedMessage);
+  }
 );
 
 Then(
@@ -61,6 +64,57 @@ Then(
 );
 
 Then('she sees the {string} button', checkButton);
+
+Then(
+  'the {string} field shows the previous profile value',
+  async function(this: ActionContext, fieldName: string) {
+    fieldName = camelize(fieldName);
+    const expectedValue = (this.user.profile as any)[fieldName];
+    await browser.waitUntil(async () => {
+      const el = await $(`input[name=${fieldName}]`);
+      const value = await el?.getValue();
+      return value === expectedValue || +value === expectedValue;
+    });
+  }
+);
+
+Then(
+  'she sees a modal popup to {string}',
+  async (modalName: string) => {
+    const modalId = `${camelize(modalName)}-modal`;
+    await waitForDisplayed(`#${modalId}`);
+  }
+);
+
+Then(
+  'her {string} is updated to the new email address',
+  async function(this: ActionContext, fieldName: string) {
+    const selector = `#${fieldName.split(' ').join('-')}`;
+    const expectedValue = this.secondCredentials.emailAddress;
+    await browser.waitUntil(async () => {
+      const el = await $(selector);
+      const text = await el?.getText();
+      return expectedValue === text;
+    }, {
+      timeout: 5000,
+      interval: 500,
+      timeoutMsg: `wait for ${fieldName} update`
+    });
+  }
+);
+
+Then(
+  'the form changes to receive an input for a Email code',
+  async () => {
+    await browser.waitUntil(async () => {
+      const el = await $('#form-title');
+      const text = await el?.getText();
+      return text === 'Enter Code';
+    }, {
+      timeoutMsg: 'wait for form title to change'
+    });
+  }
+);
 
 Then(
   /^she should see (?:a message on the Login form|the message|a message|an error message) "(?<message>.+?)"$/,

@@ -13,11 +13,11 @@
 
 import { When } from '@cucumber/cucumber';
 
-import clickElement from '../support/action/clickElement';
 import confirmValidPassword from '../support/action/confirmValidPassword';
 import enterCredential from '../support/action/context-enabled/enterCredential';
 import enterValidPassword from '../support/action/enterValidPassword';
-import enterCorrectCode from '../support/action/context-enabled/live-user/enterCorrectCode';
+import enterCode from '../support/action/enterCode';
+import enterCorrectCode from '../support/action/enterCorrectCode';
 import enterLiveUserEmail from '../support/action/context-enabled/live-user/enterEmail';
 import submitForm from '../support/action/submitForm';
 import clickLogout from '../support/action/clickLogout';
@@ -50,8 +50,6 @@ import getSharedSecret from '../support/action/context-enabled/getSharedSecret';
 import enterCorrectGoogleAuthenticatorCode from '../support/action/context-enabled/enterCorrectGoogleAuthenticatorCode';
 import openEmailMagicLink from '../support/action/context-enabled/live-user/openEmailMagicLink';
 import ActionContext from '../support/context';
-import loginDirect from '../support/action/loginDirect';
-import Home from '../support/selectors/Home';
 import noop from '../support/action/noop';
 import clickButton from '../support/action/clickButton';
 import clickLink from '../support/action/clickLink';
@@ -75,8 +73,27 @@ When(
 );
 
 When(
+  'she changes her email to a different valid email address',
+  async function(this: ActionContext) {
+    await setInputField('set', this.secondCredentials.emailAddress, `input[name=editPrimaryEmail]`);
+  }
+);
+
+When(
   'she inputs the correct code from her Google Authenticator App for {string}',
   enterCorrectGoogleAuthenticatorCode
+);
+
+When(
+  'she inputs the correct code from the new Email address',
+  async function(this: ActionContext) {
+    await enterCorrectCode(this.secondCredentials.profileId);
+  }
+);
+
+When(
+  'she inputs the incorrect code from the new Email address',
+  async () => await enterCode('!incorrect!')
 );
 
 When(
@@ -161,12 +178,16 @@ When(
 
 When(
   /^she fills in the correct code$/,
-  enterCorrectCode
+  async function(this: ActionContext) {
+    await enterCorrectCode(this.credentials.profileId);
+  }
 );
 
 When(
   /^she inputs the correct code from her email$/,
-  enterCorrectCode
+  async function(this: ActionContext) {
+    await enterCorrectCode(this.credentials.profileId);
+  }
 );
 
 When(
@@ -296,7 +317,9 @@ When(
 
 When(
   /^She inputs the correct code from the Email$/,
-  enterCorrectCode
+  async function(this: ActionContext) {
+    await enterCorrectCode(this.credentials.profileId);
+  }
 );
 
 When(

@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/* eslint-disable complexity */
 
 import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
@@ -37,6 +38,9 @@ After(async function(this: ActionContext) {
   if (this.credentials) {
     await deleteSelfEnrolledUser(this.credentials.emailAddress);
     await a18nClient.deleteProfile(this.credentials.profileId);
+  }
+  if (this.secondCredentials) {
+    await a18nClient.deleteProfile(this.secondCredentials.profileId);
   }
 });
 

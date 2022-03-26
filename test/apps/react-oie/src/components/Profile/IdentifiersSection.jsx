@@ -13,6 +13,7 @@ import {
   getEmails, 
   getPhones 
 } from '../../api/MyAccountAPI';
+import { capitalizeFirstLetter } from '../../util';
 
 const IdentifiersSection = () => {
   const { oktaAuth } = useOktaAuth();
@@ -30,6 +31,14 @@ const IdentifiersSection = () => {
           email.label = 'Secondary email';
           email.selectorId='secondary-email';
         }
+        email.selectorId = email.label
+          .split(' ')
+          .map(str => str.toLowerCase())
+          .join('-');
+        email.selectorHint = email.label
+          .split(' ')
+          .map(capitalizeFirstLetter)
+          .join('');
         return email;
       }));
     };
@@ -111,55 +120,58 @@ const IdentifiersSection = () => {
         {emails ? (
           <Box>
             {emails.map(email => (
-              <Box key={email.id} display="flex" flexDirection="column" paddingBottom="s">
-                <Box display="flex" alignItems="center" justifyContent="flex-start">
-                  <Text as="strong">{email.label}</Text>
-                  {email.status === 'VERIFIED' ? (
-                    <Box marginLeft="s">
-                      <AddAttributeButton 
-                        heading="Edit Email"
-                        initInputLabel="Email"
-                        onStartTransaction={startUpdateEmailTransaction.bind(null, email)} 
-                        onFinishTransaction={finishEmailTransaction}
-                      >
-                        Edit
-                      </AddAttributeButton>
-                    </Box>
-                  ) : (
-                    <>
-                    <Box marginLeft="s">
-                      <AddAttributeButton 
-                        heading="Verify Email"
-                        initInputLabel="Verification Code"
-                        autoStartTransaction
-                        onStartTransaction={startEmailVerificationTransaction.bind(null, email)} 
-                        onFinishTransaction={finishEmailTransaction}
-                      >
-                        Verify
-                      </AddAttributeButton>
-                    </Box>
-                    <Box marginLeft="s">
-                      <RemoveButton 
-                        heading="Are you sure you want to remove this email?" 
-                        description={email.profile.email}
-                        onStartTransaction={handleRemoveEmail.bind(null, email.id)}
-                        onFinishTransaction={finishEmailTransaction}
-                      >
-                        Remove
-                      </RemoveButton>
-                    </Box>
-                    </>
-                  )}
+                <Box key={email.id} display="flex" flexDirection="column" paddingBottom="s">
+                  <Box display="flex" alignItems="center" justifyContent="flex-start">
+                    <Text as="strong">{email.label}</Text>
+                    {email.status === 'VERIFIED' ? (
+                      <Box marginLeft="s">
+                        <AddAttributeButton 
+                          heading={`Edit ${email.label}`}
+                          initInputLabel="Email"
+                          selectorHint={`edit${email.selectorHint}`}
+                          onStartTransaction={startUpdateEmailTransaction.bind(null, email)} 
+                          onFinishTransaction={finishEmailTransaction}
+                        >
+                          Edit
+                        </AddAttributeButton>
+                      </Box>
+                    ) : (
+                      <>
+                      <Box marginLeft="s">
+                        <AddAttributeButton 
+                          heading="Verify Email"
+                          initInputLabel="Verification Code"
+                          selectorHint={`verify${email.selectorHint}`}
+                          autoStartTransaction
+                          onStartTransaction={startEmailVerificationTransaction.bind(null, email)} 
+                          onFinishTransaction={finishEmailTransaction}
+                        >
+                          Verify
+                        </AddAttributeButton>
+                      </Box>
+                      <Box marginLeft="s">
+                        <RemoveButton 
+                          heading="Are you sure you want to remove this email?" 
+                          description={email.profile.email}
+                          onStartTransaction={handleRemoveEmail.bind(null, email.id)}
+                          onFinishTransaction={finishEmailTransaction}
+                        >
+                          Remove
+                        </RemoveButton>
+                      </Box>
+                      </>
+                    )}
+                  </Box>
+                  <Box paddingTop="s">
+                    <Text id={email.selectorId}>{email.profile.email}</Text>
+                  </Box>
                 </Box>
-                <Box paddingTop="s">
-                  <Text id={email.selectorId}>{email.profile.email}</Text>
-                </Box>
-              </Box>
-            ))}
+              ))}
             {!emails.some(email => email.roles.includes('SECONDARY')) && (
               <AddAttributeButton 
                 heading="Add secondary email" 
                 initInputLabel="Email"
+                selectorHint="addSecondaryEmail"
                 onStartTransaction={startAddSecondaryEmailTransaction} 
                 onFinishTransaction={finishEmailTransaction}
               >
@@ -208,6 +220,7 @@ const IdentifiersSection = () => {
             <AddAttributeButton 
               heading="Add Phone Number"
               initInputLabel="Phone Number"
+              selectorHint="addPhoneNumber"
               onStartTransaction={startAddPhoneTransaction} 
               onFinishTransaction={finishPhoneTransaction}
             >

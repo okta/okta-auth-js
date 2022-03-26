@@ -107,7 +107,7 @@ const GeneralForm = () => {
           })}
         </Form.Main>
         <Box display="flex" flexDirection="column">
-          {canSkip && <Button type="button" onClick={handleSkip}>Skip</Button>}
+          {canSkip && <Button variant="secondary" type="button" onClick={handleSkip}>Skip</Button>}
           <Box paddingTop="s" paddingBottom="s">
             <Button wide type="submit" disabled={processing}>Submit</Button>
           </Box>

@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
-  Button, 
-  TextInput, 
-  Modal, 
-  Form, 
   Infobox,
-  Text
+  Modal, 
+  Form,
+  Heading,
+  TextInput,
+  Text,
+  Button
 } from '@okta/odyssey-react';
 import LinkButton from './LinkButton';
 import { useTransaction } from '../TransactionContext';
@@ -14,6 +15,7 @@ import { useTransaction } from '../TransactionContext';
 const AddAttributeButton = ({ 
   heading, 
   initInputLabel,
+  selectorHint,
   autoStartTransaction,
   onStartTransaction, 
   onFinishTransaction,
@@ -21,8 +23,11 @@ const AddAttributeButton = ({
 }) => {
   const { myAccountTransaction, setMyAccountTransaction } = useTransaction();
   const [inputLabel, setInputLabel] = useState(initInputLabel);
+  const [inputName, setInputName] = useState(selectorHint);
+  const [headingText, setHeadingText] = useState(heading);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
+  const [message, setMessage] = useState('Change this attribute will require additional verification');
   const [error, setError] = useState(null);
 
   const handleFinishTransaction = useCallback(() => {
@@ -38,7 +43,9 @@ const AddAttributeButton = ({
       handleFinishTransaction();
     }
     if (myAccountTransaction?.status === 'UNVERIFIED') {
+      setHeadingText('Enter Code')
       setInputLabel('Verification Code');
+      setInputName('verificationCode');
     }
   }, [myAccountTransaction, handleFinishTransaction]);
 
@@ -80,6 +87,7 @@ const AddAttributeButton = ({
         setMyAccountTransaction(transaction);
       }
       setValue('');
+      setMessage('');
       setError(null);
     } catch (err) {
       setError(err);
@@ -88,33 +96,49 @@ const AddAttributeButton = ({
 
   return (
     <>
-    <Modal open={open} onClose={handleFinishTransaction}>
-      <Form heading={heading} onSubmit={handleSubmit}>
-        <Form.Error>
-          {error && (
-            <Infobox 
-              variant="danger" 
-              content={error.errorCauses.map(({errorSummary}) => 
-                <Text key={errorSummary}>{errorSummary}</Text>)} 
-            />
-          )}
-        </Form.Error>
-        <Form.Main>
-          <TextInput 
-            type="text" 
-            label={inputLabel} 
-            value={value} 
-            onChange={handleChange} 
-          />
-        </Form.Main>
-        <Form.Actions>
-          <Button variant="clear" onClick={handleCancel}>Cancel</Button>
-          <Button type="submit">Continue</Button> 
-        </Form.Actions>
-      </Form>
-    </Modal>
+    {open && (
+      <Modal id={`${selectorHint}-modal`} open={open} onClose={handleFinishTransaction}>
+        <Box paddingBottom="s">
+          <Form onSubmit={handleSubmit}>
+            <Heading id="form-title" level="1" visualLevel="3">
+              {headingText}
+            </Heading>
+            {!!(message || error) && (
+              <Box id={`${selectorHint}-messages-container`}>
+                {!!message && (
+                  <Infobox
+                    variant="caution" 
+                    content={message}
+                    />
+                )}
+                {error && (
+                  <Infobox 
+                    variant="danger" 
+                    content={error.errorCauses?.map(({errorSummary}) => 
+                      <Text key={errorSummary}>{errorSummary}</Text>)} 
+                  />)}
+              </Box>
+            )}
+            <Form.Main>
+              <TextInput 
+                type="text" 
+                name={inputName}
+                label={inputLabel} 
+                value={value} 
+                onChange={handleChange} 
+              />
+            </Form.Main>
+            <Form.Actions>
+              <Button variant="clear" name="cancel" onClick={handleCancel}>Cancel</Button>
+              <Button type="submit">Continue</Button> 
+            </Form.Actions>
+          </Form>
+        </Box>
+      </Modal>
+    )}
+    
     <Box>
-      <LinkButton onClick={handleButtonClick}>
+      <LinkButton name={selectorHint} onClick={handleButtonClick}>
         {children}
       </LinkButton>
     </Box>

@@ -50,7 +50,7 @@ Given('an App', async function(this: ActionContext) {
         client_id: clientId,
         client_secret: clientSecret
       }
-    } 
+    }
   } = this.app;
 
   if (this.group) {
@@ -141,6 +141,10 @@ Given('a user named {string}', async function(this: ActionContext, firstName: st
   this.credentials = await createCredentials(firstName, this.featureName);
 });
 
+Given('she has a second credential', async function(this: ActionContext) {
+  this.secondCredentials = await createCredentials('MaryNew', this.featureName);
+});
+
 Given(
   'she has an account with {string} state in the org',
   async function(this: ActionContext, accountState: string) {
@@ -157,9 +161,24 @@ Given(
     })();
     this.user = await createUser({
       // use predefined app when features are not available via management api
-      appId: this.app?.id || process.env.CLIENT_ID,
+      appId: (this.app?.id || process.env.CLIENT_ID) as string,
       credentials: this.credentials,
       activate
+    });
+  }
+);
+
+Given(
+  'she has an account with active state in the org and her {string} is {string}',
+  async function(this: ActionContext, attrName: string, attrValue: string) {
+    this.user = await createUser({
+      // use predefined app when features are not available via management api
+      appId: (this.app?.id || process.env.CLIENT_ID) as string,
+      credentials: this.credentials,
+      activate: true,
+      customAttributes: {
+        [attrName]: attrValue
+      }
     });
   }
 );
@@ -182,10 +201,10 @@ Given(
 
 Given('she does not have account in the org', noop);
 
-Given('Mary is on the Root View in an UNAUTHENTICATED state', noop);
+Given('she is on the Root View in an UNAUTHENTICATED state', noop);
 
 Given(
-  'Mary is on the Root View in an AUTHENTICATED state', 
+  'she is on the Root View in an AUTHENTICATED state', 
   async function(this: ActionContext) {
     await clickButton('login');
     await checkIsOnPage('Root');

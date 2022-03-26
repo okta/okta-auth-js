@@ -4,13 +4,15 @@ Feature: View Profile Information
     Given an App
       And the app is granted "okta.myAccount.read" scope
       And the app is granted "okta.myAccount.manage" scope
+      And the app is granted "okta.myAccount.email.manage" scope
+      And the app is granted "okta.myAccount.phone.manage" scope
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password as the only factor"
       And a user named "Mary"
       And she has an account with "active" state in the org
     
   Scenario: Mary views her profile
-    Given Mary is on the Root View in an UNAUTHENTICATED state
+    Given she is on the Root View in an UNAUTHENTICATED state
     When she clicks the "login" button
     Then she is redirected to the "Login" page
     When she fills in her username

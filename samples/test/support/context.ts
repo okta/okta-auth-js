@@ -16,6 +16,7 @@ import { UserCredentials } from './management-api/createCredentials';
 
 interface ActionContext {
   credentials: UserCredentials;
+  secondCredentials: UserCredentials;
   user: User;
   app: Application;
   policies: Policy[];

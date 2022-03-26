@@ -9,7 +9,8 @@ const makeRequest = async (oktaAuth, options) => {
           value.hints.allow.forEach(method => {
             acc[method.toLowerCase()] = async (options) => {
               return makeRequest(oktaAuth, {
-                url: value.href,
+                url: value.href.replace(oktaAuth.options.issuer, '/myaccount'),
+                // url: value.href,
                 method,
                 ...options
               });
@@ -18,7 +19,8 @@ const makeRequest = async (oktaAuth, options) => {
         } else {
           acc[key] = async (options) => {
             return makeRequest(oktaAuth, {
-              url: value.href,
+              url: value.href.replace(oktaAuth.options.issuer, '/myaccount'),
+              // url: value.href,
               method: value.hints.allow[0],
               ...options
             });

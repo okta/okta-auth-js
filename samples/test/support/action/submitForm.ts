@@ -18,8 +18,8 @@ export default async () => {
   let tagName;
   for (const name of tagNames) {
     const el = await $(`${name}[type=submit]`);
-    const isDisplayed = await el?.isDisplayed();
-    if (isDisplayed) {
+    const isClickable = await el?.isClickable();
+    if (isClickable) {
       tagName = name;
       break;
     }
