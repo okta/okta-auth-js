@@ -10,15 +10,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* eslint-disable max-len */
-
 import { Given } from '@cucumber/cucumber';
-import crypto from 'crypto';
 import ActionContext from '../support/context';
-import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
-import startApp from '../support/action/startApp';
 import noop from '../support/action/noop';
-import createApp from '../support/management-api/createApp';
 import createPolicy from '../support/management-api/createPolicy';
 import upsertPolicyRule from '../support/management-api/upsertPolicyRule';
 import addAppToPolicy from '../support/management-api/addAppToPolicy';
@@ -32,46 +26,9 @@ import clickButton from '../support/action/clickButton';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import loginDirect from '../support/action/loginDirect';
 import addUserProfileSchemaToApp from '../support/management-api/addUserProfileSchemaToApp';
-
+import openRegisterWithActivationToken from '../support/action/openRegisterWithActivationToken';
 
 // NOTE: noop function is used for predefined settings
-
-Given(
-  'a Group', noop
-  // async function(this: ActionContext) {
-  //   this.group = await createGroup();
-  // }
-);
-
-Given(
-  'an App', noop
-//   async function(this: ActionContext) {
-//   this.app = await createApp();
-//   const { 
-//     credentials: {
-//       oauthClient: {
-//         client_id: clientId,
-//         client_secret: clientSecret
-//       }
-//     }
-//   } = this.app;
-
-//   if (this.group) {
-//     await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
-//   }
-
-//   // update test app with new oauthClient info
-//   const { sampleConfig: { appType } } = getConfig();
-//   startApp('/', {
-//     ...(clientId && { clientId }),
-//     ...(clientSecret && { clientSecret }),
-//     // attach org config to web app transaction
-//     ...(appType === 'web' && {
-//       transactionId: crypto.randomBytes(16).toString('hex')
-//     })
-//   });
-// }
-);
 
 Given(
   'the app is assigned to {string} group', 
@@ -188,10 +145,6 @@ Given(
   }
 );
 
-Given('she does not have account in the org', noop);
-
-Given('she is on the Root View in an UNAUTHENTICATED state', noop);
-
 Given(
   'she is on the Root View in an AUTHENTICATED state', 
   async function(this: ActionContext) {
@@ -217,11 +170,14 @@ Given(
 );
 
 Given(
-  /^Mary opens the Self Service Registration View with activation token/,
-  activateContextUserActivationToken
+  'Mary opens the Self Service Registration View with activation token',
+  async function(this: ActionContext) {
+    await openRegisterWithActivationToken(this.user);
+  }
 );
 
-Given(
-  /^she is not enrolled in any authenticators$/,
-  noop
-);
+Given('she does not have account in the org', noop);
+
+Given('she is on the Root View in an UNAUTHENTICATED state', noop);
+
+Given('she is not enrolled in any authenticators', noop);

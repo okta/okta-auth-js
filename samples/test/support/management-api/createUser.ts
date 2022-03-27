@@ -12,7 +12,7 @@
 
 /* eslint-disable complexity, max-statements */
 
-import { Client, Group, User } from '@okta/okta-sdk-nodejs';
+import { Client, User } from '@okta/okta-sdk-nodejs';
 import { getConfig } from '../../util';
 import deleteUser from './deleteUser';
 import { UserCredentials } from './createCredentials';
