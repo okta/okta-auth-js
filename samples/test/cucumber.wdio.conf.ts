@@ -357,9 +357,10 @@ export const config: WebdriverIO.Config = {
      * @param {<Object>} results object containing test results
      */
     onComplete: async function() {
-      const outputFile = path.join(__dirname, '../../build2/reports/e2e', 'junit-results.xml');
+      const outputDir = path.join(__dirname, '../../build2/reports/e2e');
+      fs.mkdirSync(outputDir, { recursive: true });
       const reportsDir = path.resolve(__dirname, 'reports');
-      await mergeFiles(outputFile, ['./reports/*.xml']);
+      await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
       fs.rmdirSync(reportsDir, { recursive: true });
     },
     /**
