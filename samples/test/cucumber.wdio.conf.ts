@@ -155,7 +155,7 @@ export const config: WebdriverIO.Config = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 5, // a18n api has very limited capacity, leave space for parallel CI/local processes
+        maxInstances: 3, // a18n api has very limited capacity, leave space for parallel CI/local processes
         //
         browserName: 'chrome',
         'goog:chromeOptions': chromeOptions
@@ -356,7 +356,8 @@ export const config: WebdriverIO.Config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    onComplete: async function() {
+    /* eslint-disable-next-line jsdoc/check-param-names */
+    onComplete: async function(exitCode, config, capabilities, results) {
       const outputDir = path.join(__dirname, '../../build2/reports/e2e');
       fs.mkdirSync(outputDir, { recursive: true });
       const reportsDir = path.resolve(__dirname, 'reports');
