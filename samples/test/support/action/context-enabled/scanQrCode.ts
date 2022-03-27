@@ -14,9 +14,11 @@
 import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
 import ActionContext from '../../context';
 import jsqr from 'jsqr';
-const {PNG} = require('pngjs');
+import waitForDisplayed from '../../wait/waitForDisplayed';
+const { PNG } = require('pngjs');
 
 export default async function (this: ActionContext) {
+  await waitForDisplayed(EnrollGoogleAuthenticator.qrCode);
   const el = await $(EnrollGoogleAuthenticator.qrCode);
   const dataUri = await el.getAttribute('src');
   const png = PNG.sync.read(Buffer.from(dataUri.slice('data:image/png;base64,'.length), 'base64'));

@@ -31,12 +31,14 @@ After(async function(this: ActionContext) {
   if (this.group) {
     await this.group.delete();
   }
-  if(this.user) {
+  if(this.user && this.user.profile.email !== process.env.USERNAME) {
     await this.user.deactivate();
     await this.user.delete();
   }
   if (this.credentials) {
-    await deleteSelfEnrolledUser(this.credentials.emailAddress);
+    if (this.credentials.emailAddress !== process.env.USERNAME) {
+      await deleteSelfEnrolledUser(this.credentials.emailAddress);
+    }
     await a18nClient.deleteProfile(this.credentials.profileId);
   }
   if (this.secondCredentials) {

@@ -18,7 +18,7 @@ import upsertPolicyRule from '../support/management-api/upsertPolicyRule';
 import addAppToPolicy from '../support/management-api/addAppToPolicy';
 import createUser from '../support/management-api/createUser';
 import addAppToGroup from '../support/management-api/addAppToGroup';
-import createCredentials from '../support/management-api/createCredentials';
+import createCredentials, { UserCredentials } from '../support/management-api/createCredentials';
 import enrollFactor from '../support/management-api/enrollFactor';
 import grantConsentToScope from '../support/management-api/grantConsentToScope';
 import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
@@ -27,11 +27,13 @@ import checkIsOnPage from '../support/check/checkIsOnPage';
 import loginDirect from '../support/action/loginDirect';
 import addUserProfileSchemaToApp from '../support/management-api/addUserProfileSchemaToApp';
 import openRegisterWithActivationToken from '../support/action/openRegisterWithActivationToken';
+import fetchUser from '../support/management-api/fetchUser';
 
 // NOTE: noop function is used for predefined settings
 
 Given(
   'the app is assigned to {string} group', 
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, groupName: string) {
     if (!this.app) {
       throw new Error('Application should be predefined');
@@ -42,6 +44,7 @@ Given(
 
 Given(
   'the app is granted {string} scope',
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, scopeId: string) {
     await grantConsentToScope(this.app.id, scopeId);
   }
@@ -49,6 +52,7 @@ Given(
 
 Given(
   'the app has a custom User Profile Schema named {string}',
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, schemaName: string) {
     await addUserProfileSchemaToApp(this.app.id, schemaName);
   }
@@ -56,6 +60,7 @@ Given(
 
 Given(
   'the app has Email Verification callback uri defined',
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext) {
     // Update app settings via internal API, public API should be used once available
     await updateAppOAuthClient(this.app, { 
@@ -67,6 +72,7 @@ Given(
 
 Given(
   'a Policy that defines {string}',
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, policyDescription: string) {
     this.policies = this.policies || [];
     const policy = await createPolicy({ 
@@ -82,6 +88,7 @@ Given(
 
 Given(
   'with a Policy Rule that defines {string}',
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, policyRuleDescription: string) {
     const lastPolicy = this.policies[this.policies.length - 1];
     await upsertPolicyRule({ 
@@ -103,6 +110,7 @@ Given('she has a second credential', async function(this: ActionContext) {
 
 Given(
   'she has an account with {string} state in the org',
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, accountState: string) {
     if (!this.credentials) {
       throw new Error('Context credentials has not been created!');
@@ -129,6 +137,7 @@ Given(
 
 Given(
   'she has an account with active state in the org and her {string} is {string}',
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, attrName: string, attrValue: string) {
     this.user = await createUser({
       // use predefined app when features are not available via management api
@@ -146,6 +155,21 @@ Given(
 );
 
 Given(
+  'a predefined user named Mary with an account in the org', 
+  {  wrapperOptions: { retry: 1 } },
+  async function(this: ActionContext) {
+    this.credentials = {
+      emailAddress: process.env.USERNAME,
+      email: process.env.USERNAME,
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD,
+    } as unknown as UserCredentials;
+    this.user = await fetchUser(this.credentials.emailAddress);
+    (this.user as any).predefined = true;
+  }
+);
+
+Given(
   'she is on the Root View in an AUTHENTICATED state', 
   async function(this: ActionContext) {
     await clickButton('login');
@@ -159,6 +183,7 @@ Given(
 
 Given(
   'she has enrolled in the {string} factor',
+  {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, factorType: string) {
     this.enrolledFactor = await enrollFactor({
       userId: this.user.id,
