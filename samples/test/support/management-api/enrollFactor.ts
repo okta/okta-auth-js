@@ -37,20 +37,12 @@ const enrollSMS = async (options: Options) => {
     }
   };
   const oktaClient = getOktaClient();
-  try {
-    const res = await oktaClient.enrollFactor(
-      options.userId, 
-      factorObject,
-      { activate: true }
-    );
-    return res;
-  } catch (err) {
-    await oktaClient.listPolicies({ type: 'MFA_ENROLL' }).each(policy => {
-      console.log(policy);
-    });
-    throw err;
-  }
-  
+  const res = await oktaClient.enrollFactor(
+    options.userId, 
+    factorObject,
+    { activate: true }
+  );
+  return res;
 };
 
 const enrollGoogleAuthenticator = async (options: Options) => {
