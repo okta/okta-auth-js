@@ -1,8 +1,6 @@
 Feature: TOTP Support (Google Authenticator) Sign Up
   Background:
-    Given a Group
-      And an App
-      And a Policy that defines "Profile Enrollment"
+    Given a Policy that defines "Profile Enrollment"
       And with a Policy Rule that defines "collecting default attributes and emailVerification is not required"
       And a Policy that defines "MFA Enrollment with Password and Google Authenticator as required authenticators"
       And with a Policy Rule that defines "MFA Enrollment Challenge"

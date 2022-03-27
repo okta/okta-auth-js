@@ -1,9 +1,7 @@
 Feature: Multi-Factor Authentication with Password and Email Magic Link
 
   Background:
-    Given a Group
-      And an App
-      And the app has Email Verification callback uri defined
+    Given the app has Email Verification callback uri defined
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password + Another Factor"
       And a user named "Mary"

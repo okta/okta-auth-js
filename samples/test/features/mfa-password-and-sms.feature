@@ -1,9 +1,7 @@
 Feature: Multi-Factor Authentication with Password and SMS
 
   Background:
-    Given a Group
-      And an App
-      And a Policy that defines "Authentication"
+    Given a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password + Another Factor"
       And a Policy that defines "MFA Enrollment with password and phone as required authenticator"
       And with a Policy Rule that defines "MFA Enrollment Challenge"

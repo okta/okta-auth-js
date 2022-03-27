@@ -1,8 +1,7 @@
 Feature: Direct Auth with Self Hosted Sign In Widget Social Login with 1 Social IDP
 
   Background:
-		Given an App
-    	And the app is assigned to "Everyone" group
+		Given the app is assigned to "Everyone" group
     	And a Policy that defines "Authentication"
     	And with a Policy Rule that defines "Password as the only factor"
 		

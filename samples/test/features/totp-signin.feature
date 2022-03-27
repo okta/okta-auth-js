@@ -1,9 +1,7 @@
 Feature: TOTP Support (Google Authenticator) Sign In
 
   Background:
-    Given a Group
-	    And an App
-      And a Policy that defines "MFA Enrollment with Password and Google Authenticator as required authenticators"
+    Given a Policy that defines "MFA Enrollment with Password and Google Authenticator as required authenticators"
       And with a Policy Rule that defines "MFA Enrollment Challenge"
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password + Another Factor"

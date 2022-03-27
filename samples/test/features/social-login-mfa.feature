@@ -1,9 +1,7 @@
 Feature: Direct Auth Social Login with MFA
   
   Background:
-    Given a Group
-      And an App
-      And a Policy that defines "Authentication"
+    Given a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password + Another Factor"
       And a user named "Mary"
       And she has an account with "active" state in the org

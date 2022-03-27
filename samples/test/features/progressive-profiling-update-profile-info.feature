@@ -1,8 +1,7 @@
 Feature: Update Profile Information
 
   Background:
-    Given an App
-      And the app is granted "okta.myAccount.read" scope
+    Given the app is granted "okta.myAccount.read" scope
       And the app is granted "okta.myAccount.manage" scope
       And the app is granted "okta.myAccount.email.manage" scope
       And the app is granted "okta.myAccount.phone.manage" scope
