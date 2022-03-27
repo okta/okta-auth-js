@@ -42,7 +42,7 @@ Before(async function(this: ActionContext) {
 
   // update test app with new oauthClient info
   const { sampleConfig: { appType } } = getConfig();
-  startApp('/', {
+  await startApp('/', {
     ...(clientId && { clientId }),
     ...(clientSecret && { clientSecret }),
     // attach org config to web app transaction

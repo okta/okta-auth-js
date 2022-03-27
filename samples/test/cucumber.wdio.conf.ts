@@ -155,7 +155,7 @@ export const config: WebdriverIO.Config = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 3, // a18n api has very limited capacity, leave space for parallel CI/local processes
+        maxInstances: 2, // a18n api has very limited capacity, leave space for parallel CI/local processes
         //
         browserName: 'chrome',
         'goog:chromeOptions': chromeOptions
@@ -232,7 +232,7 @@ export const config: WebdriverIO.Config = {
     cucumberOpts,
     //
     // The number of times to retry the entire specfile when it fails as a whole
-    specFileRetries: 1,
+    // specFileRetries: 1,
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
@@ -356,7 +356,7 @@ export const config: WebdriverIO.Config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    /* eslint-disable-next-line jsdoc/check-param-names */
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     onComplete: async function(exitCode, config, capabilities, results) {
       const outputDir = path.join(__dirname, '../../build2/reports/e2e');
       fs.mkdirSync(outputDir, { recursive: true });
