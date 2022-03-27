@@ -19,7 +19,24 @@ function uniqueId() {
 
 module.exports = function authTransaction(req, res, next) {
   const { transactionId, state } = req.query;
-  req.transactionId = transactionId || state || uniqueId();
+  const id = transactionId || state || uniqueId();
+
+  // initial transactions in session
+  req.session.transactions = req.session.transactions || {};
+  // remove empty transactions
+  Object.keys(req.session.transactions).forEach(id => {
+    const value = req.session.transactions[id];
+    if (!Object.keys(value).length) {
+      delete req.session.transactions[id];
+    }
+  });
+  // add new transaction to session
+  if (!req.session.transactions[id]) {
+    req.session.transactions[id] = {};
+  }
+
+  // attach transactionId to req
+  req.transactionId = id;
 
   next();
 };

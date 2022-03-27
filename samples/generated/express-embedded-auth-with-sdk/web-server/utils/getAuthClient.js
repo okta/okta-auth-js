@@ -15,7 +15,17 @@ const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 
 module.exports = function getAuthClient(req, options = {}) {
   const { transactionId } = req; // set by authTransaction middleware
-  const { oidcConfig: oidc } = req.session;
+  const { oidcConfig: oidc } = req.session.transactions[transactionId];
+
+  if (process.env.NODE_ENV === 'test' 
+      && oidc.clientId === process.env.CLIENT_ID 
+      && !['/', '/logout'].includes(req.url)) {
+    console.group('\x1b[36m%s\x1b[0m', 'TEST_ENV CLIENT LEAK DETECTED');
+    console.log('ClientID:', oidc.clientId); 
+    console.log('Request Url:', req.url);
+    console.groupEnd();
+  }
+  
   const storageProvider = {
     getItem: function(key) {
       let val = req.session[key] || null;

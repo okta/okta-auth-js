@@ -15,6 +15,7 @@ const renderMessages = require('./renderMessages');
 const getFormActionPath = require('./getFormActionPath');
 
 module.exports = function renderTemplate(req, res, template, options = {}) {
+  const { transactionId } = req;
   const { 
     idx: { 
       messages,
@@ -39,7 +40,8 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     contextualData,
     activationData,
     challengeData,
-    authenticatorEnrollments: authenticatorEnrollmentsJSON
+    authenticatorEnrollments: authenticatorEnrollmentsJSON,
+    transactionId
   };
   
   if (messages && messages.length) {

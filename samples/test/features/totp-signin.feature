@@ -1,7 +1,8 @@
 Feature: TOTP Support (Google Authenticator) Sign In
 
   Background:
-	  Given an App
+    Given a Group
+	    And an App
       And a Policy that defines "MFA Enrollment with Password and Google Authenticator as required authenticators"
       And with a Policy Rule that defines "MFA Enrollment Challenge"
       And a Policy that defines "Authentication"
@@ -10,8 +11,9 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And she has an account with "active" state in the org
 
   Scenario: Mary signs in to an account and enrolls in Password and Google Authenticator by scanning a QR Code 
-    Given Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form
@@ -28,8 +30,9 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And the cell for the value of "name" is shown and contains her "first name and last name"
 
   Scenario: Mary signs in to an account and enrolls in Password and Google Authenticator by entering a Secret Key
-     Given Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form
@@ -47,7 +50,8 @@ Feature: TOTP Support (Google Authenticator) Sign In
 
   Scenario: Mary Signs in to the Sample App with Password and Google Authenticator
     Given she has enrolled in the "Google Authenticator" factor
-      And Mary navigates to the Basic Login View
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
     When she has inserted her username
       And she has inserted her password
       And her password is correct

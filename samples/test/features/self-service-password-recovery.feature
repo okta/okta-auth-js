@@ -8,7 +8,10 @@ Background:
     And she has an account with "active" state in the org
 
   Scenario: Mary resets her password
-    Given Mary navigates to the Self Service Password Reset View
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she clicks the "Forgot Password" link
+    Then she is redirected to the "Self Service Password Reset" page
     When she inputs her correct Email
     And she submits the recovery form
     Then she sees a page to select authenticator
@@ -26,7 +29,10 @@ Background:
 
   Scenario: Mary tries to reset a password with the wrong email
     Given the app is assigned to "Everyone" group
-      And Mary navigates to the Self Service Password Reset View
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she clicks the "Forgot Password" link
+    Then she is redirected to the "Self Service Password Reset" page
     When she inputs an Email that doesn't exist
     And she submits the form
     Then she should see the message "There is no account with the Username test_with_really_invalid_email@invalidemail.com."

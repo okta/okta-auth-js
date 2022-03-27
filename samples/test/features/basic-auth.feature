@@ -21,12 +21,6 @@ Feature: Direct Auth Basic Login with Password Factor
         And the cell for the value of "email" is shown and contains her "email"
         #And the cell for the value of "name" is shown and contains her "first name and last name"
 
-    Scenario: Mary clicks on the "Forgot Password Link"
-      When she clicks the "login" button
-      Then she is redirected to the "Login" page
-      When she clicks the "Forgot Password" link
-      Then she is redirected to the "Self Service Password Reset" page
-
     Scenario: Mary doesn't know her username
       Given she does not have account in the org
         And the app is assigned to "Everyone" group

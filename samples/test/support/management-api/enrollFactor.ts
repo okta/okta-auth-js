@@ -36,12 +36,21 @@ const enrollSMS = async (options: Options) => {
       phoneNumber: options.phoneNumber
     }
   };
-  const res = await getOktaClient().enrollFactor(
-    options.userId, 
-    factorObject,
-    { activate: true }
-  );
-  return res;
+  const oktaClient = getOktaClient();
+  try {
+    const res = await oktaClient.enrollFactor(
+      options.userId, 
+      factorObject,
+      { activate: true }
+    );
+    return res;
+  } catch (err) {
+    await oktaClient.listPolicies({ type: 'MFA_ENROLL' }).each(policy => {
+      console.log(policy);
+    });
+    throw err;
+  }
+  
 };
 
 const enrollGoogleAuthenticator = async (options: Options) => {

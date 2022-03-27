@@ -58,13 +58,13 @@
 
         {{#canRecoverPassword}}
         <div class="ui messages row">
-          <a name="forgotPassword" href="/recover-password">Forgot your password?</a>
+          <a name="forgotPassword" href="/recover-password?transactionId={{transactionId}}">Forgot your password?</a>
         </div>
         {{/canRecoverPassword}}
 
         {{#canSignup}}
         <div class="ui messages row">
-          <a href="/register">Sign Up</a>
+          <a href="/register?transactionId={{transactionId}}">Sign Up</a>
         </div>
         {{/canSignup}}
         

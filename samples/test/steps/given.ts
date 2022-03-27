@@ -13,8 +13,7 @@
 /* eslint-disable max-len */
 
 import { Given } from '@cucumber/cucumber';
-import navigateTo from '../support/action/navigateTo';
-import navigateToLoginAndAuthenticate from '../support/action/context-enabled/live-user/navigateToLoginAndAuthenticate';
+import crypto from 'crypto';
 import ActionContext from '../support/context';
 import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
 import startApp from '../support/action/startApp';
@@ -24,9 +23,7 @@ import createPolicy from '../support/management-api/createPolicy';
 import upsertPolicyRule from '../support/management-api/upsertPolicyRule';
 import addAppToPolicy from '../support/management-api/addAppToPolicy';
 import createUser from '../support/management-api/createUser';
-import createGroup from '../support/management-api/createGroup';
 import addAppToGroup from '../support/management-api/addAppToGroup';
-import addUserToGroup from '../support/management-api/addUserToGroup';
 import createCredentials from '../support/management-api/createCredentials';
 import enrollFactor from '../support/management-api/enrollFactor';
 import grantConsentToScope from '../support/management-api/grantConsentToScope';
@@ -36,33 +33,45 @@ import checkIsOnPage from '../support/check/checkIsOnPage';
 import loginDirect from '../support/action/loginDirect';
 import addUserProfileSchemaToApp from '../support/management-api/addUserProfileSchemaToApp';
 
+
 // NOTE: noop function is used for predefined settings
 
-Given('a Group', async function(this: ActionContext) {
-  this.group = await createGroup();
-});
+Given(
+  'a Group', noop
+  // async function(this: ActionContext) {
+  //   this.group = await createGroup();
+  // }
+);
 
-Given('an App', async function(this: ActionContext) {
-  this.app = await createApp();
-  const { 
-    credentials: {
-      oauthClient: {
-        client_id: clientId,
-        client_secret: clientSecret
-      }
-    }
-  } = this.app;
+Given(
+  'an App', noop
+//   async function(this: ActionContext) {
+//   this.app = await createApp();
+//   const { 
+//     credentials: {
+//       oauthClient: {
+//         client_id: clientId,
+//         client_secret: clientSecret
+//       }
+//     }
+//   } = this.app;
 
-  if (this.group) {
-    await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
-  }
+//   if (this.group) {
+//     await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
+//   }
 
-  // update test app with new oauthClient info
-  startApp('/', {
-    ...(clientId && { clientId }),
-    ...(clientSecret && { clientSecret }),
-  });
-});
+//   // update test app with new oauthClient info
+//   const { sampleConfig: { appType } } = getConfig();
+//   startApp('/', {
+//     ...(clientId && { clientId }),
+//     ...(clientSecret && { clientSecret }),
+//     // attach org config to web app transaction
+//     ...(appType === 'web' && {
+//       transactionId: crypto.randomBytes(16).toString('hex')
+//     })
+//   });
+// }
+);
 
 Given(
   'the app is assigned to {string} group', 
@@ -71,16 +80,6 @@ Given(
       throw new Error('Application should be predefined');
     }
     await addAppToGroup({ appId: this.app.id, groupName });
-  }
-);
-
-Given(
-  'the app is assigned to the created group',
-  async function(this: ActionContext) {
-    if (!this.group) {
-      throw new Error('Group should be predefined');
-    }
-    await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
   }
 );
 
@@ -163,7 +162,10 @@ Given(
       // use predefined app when features are not available via management api
       appId: (this.app?.id || process.env.CLIENT_ID) as string,
       credentials: this.credentials,
-      activate
+      activate,
+      ...(this.group && {
+        assignToGroups: [this.group.id]
+      })
     });
   }
 );
@@ -176,25 +178,12 @@ Given(
       appId: (this.app?.id || process.env.CLIENT_ID) as string,
       credentials: this.credentials,
       activate: true,
+      ...(this.group && {
+        assignToGroups: [this.group.id]
+      }),
       customAttributes: {
         [attrName]: attrValue
       }
-    });
-  }
-);
-
-Given(
-  'she is assigned to the created group', 
-  async function(this: ActionContext) {
-    if (!this.group) {
-      throw new Error('Group has not been created');
-    }
-    if (!this.user) {
-      throw new Error('User has not been created');
-    }
-    await addUserToGroup({ 
-      userId: this.user.id, 
-      groupId: this.group.id
     });
   }
 );
@@ -216,11 +205,6 @@ Given(
 );
 
 Given(
-  'she has an authenticated session',
-  navigateToLoginAndAuthenticate
-);
-
-Given(
   'she has enrolled in the {string} factor',
   async function(this: ActionContext, factorType: string) {
     this.enrolledFactor = await enrollFactor({
@@ -233,25 +217,8 @@ Given(
 );
 
 Given(
-  /^([^/s]+) navigates to (?:the )?(.*)$/,
-  async function(this: ActionContext, firstName, pageName) {
-    await navigateTo(pageName);
-  }
-);
-
-Given(
-  'Mary has an authenticated session',
-  navigateToLoginAndAuthenticate
-);
-
-Given(
   /^Mary opens the Self Service Registration View with activation token/,
   activateContextUserActivationToken
-);
-
-Given(
-  /^an Authenticator Enrollment Policy that has PHONE as optional and EMAIL as required for the Everyone Group$/,
-  noop
 );
 
 Given(

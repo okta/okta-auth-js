@@ -72,22 +72,8 @@ export default async ({
     }); 
     user = await user.update();
     
-    for (const groupName of assignToGroups) {
-      // TODO: create test group and attach password recovery policy during test run when API supports it
-      let {value: testGroup} = await oktaClient.listGroups({
-        q: groupName
-      }).next();
-
-      if (!testGroup) {
-        const group = {
-          profile: {
-            name: groupName
-          }
-        };
-        testGroup = await oktaClient.createGroup(group);
-      }
-
-      await oktaClient.addUserToGroup((testGroup as Group).id, user.id);
+    for (const groupId of assignToGroups) {
+      await oktaClient.addUserToGroup(groupId, user.id);
     }
 
     return user;

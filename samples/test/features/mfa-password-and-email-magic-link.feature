@@ -1,7 +1,8 @@
 Feature: Multi-Factor Authentication with Password and Email Magic Link
 
   Background:
-    Given an App
+    Given a Group
+      And an App
       And the app has Email Verification callback uri defined
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password + Another Factor"
@@ -9,8 +10,9 @@ Feature: Multi-Factor Authentication with Password and Email Magic Link
       And she has an account with "active" state in the org
 
   Scenario: 2FA Login with Email Magic Link on the same browser
-    Given Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form

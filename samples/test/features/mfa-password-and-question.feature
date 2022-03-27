@@ -5,8 +5,9 @@ Feature: Multi-Factor Authentication with Password and Security Question
 	  #And a User named "Mary" created in the admin interface with a Password only
 
   Scenario: 2FA Login with Security Question
-    Given Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form

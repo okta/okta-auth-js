@@ -24,7 +24,6 @@ interface ActionContext {
   enrolledFactor: any;
   featureName: string;
   scenarioName: string;
-  currentTestCaseId: string;
   userName?: string;
   sharedSecret?: string;
   customAttribute: string;

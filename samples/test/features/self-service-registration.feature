@@ -1,15 +1,16 @@
 Feature: Self Service Registration with Email Activation and optional SMS
 
 Background:
-  Given an App
-    And the app is assigned to "Everyone" group
+  Given a Group
+    And an App
     And a Policy that defines "Profile Enrollment"
     And with a Policy Rule that defines "collecting default attributes"
     And a user named "Mary"
     And she does not have account in the org
 
 Scenario: Mary signs up for an account with Password, setups up required Email factor, then skips optional SMS
-  Given Mary navigates to the Self Service Registration View
+  When she clicks the 'signup' button
+  Then she is redirected to the "Self Service Registration" page
   When she fills out her First Name
   And she fills out her Last Name
   And she fills out her Email
@@ -32,7 +33,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And the cell for the value of "email" is shown and contains her "email"
 
 Scenario: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
-  Given Mary navigates to the Self Service Registration View
+  When she clicks the 'signup' button
+  Then she is redirected to the "Self Service Registration" page
   When she fills out her First Name
     And she fills out her Last Name
     And she fills out her Email
@@ -61,7 +63,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
     And the cell for the value of "email" is shown and contains her "email"
 
 Scenario: Mary signs up with an invalid Email
-  Given Mary navigates to the Self Service Registration View
+  When she clicks the 'signup' button
+  Then she is redirected to the "Self Service Registration" page
   When she fills out her First Name
   And she fills out her Last Name
   And she fills out her Email with an invalid email format
@@ -70,7 +73,8 @@ Scenario: Mary signs up with an invalid Email
   And she sees an error message "Provided value for property 'Email' does not match required pattern"
 
 Scenario: Mary signs up for an account with Password, sets up required Email factor, And sets up optional SMS with an invalid phone number
-  Given Mary navigates to the Self Service Registration View
+  When she clicks the 'signup' button
+  Then she is redirected to the "Self Service Registration" page
   When she fills out her First Name
   And she fills out her Last Name
   And she fills out her Email

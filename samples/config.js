@@ -94,9 +94,9 @@ const samples = [
       'self-service-registration-activation-token',
       'mfa-password-and-email',
       'mfa-password-and-email-magic-link',
-      'mfa-password-and-sms',
       'social-login-mfa',
       'social-idp',
+      'mfa-password-and-sms',
       'totp-signup',
       'totp-signin',
     ],
@@ -121,6 +121,7 @@ const samples = [
       'basic-auth',
       'progressive-profiling-view-profile',
       'progressive-profiling-update-profile-info',
+      'progressive-profiling-update-email-address',
     ],
     useEnv: true
   },

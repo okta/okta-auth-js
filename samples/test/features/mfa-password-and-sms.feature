@@ -9,11 +9,11 @@ Feature: Multi-Factor Authentication with Password and SMS
       And with a Policy Rule that defines "MFA Enrollment Challenge"
       And a user named "Mary"
       And she has an account with "active" state in the org
-      And she is assigned to the created group
 	  
   Scenario: Enroll in SMS Factor prompt when authenticating
-    Given Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form
@@ -30,8 +30,9 @@ Feature: Multi-Factor Authentication with Password and SMS
 
   Scenario: Mary enters a wrong verification code on verify
     Given she has enrolled in the "SMS" factor
-      And Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form
@@ -43,8 +44,9 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she sees a field to re-enter another code
 
   Scenario: Enroll with Invalid Phone Number
-    Given Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form
@@ -57,8 +59,9 @@ Feature: Multi-Factor Authentication with Password and SMS
 
   Scenario: 2FA Login with SMS
     Given she has enrolled in the "SMS" factor
-      And Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form

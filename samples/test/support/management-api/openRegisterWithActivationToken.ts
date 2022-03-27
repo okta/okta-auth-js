@@ -17,8 +17,11 @@ export default async function(user: User): Promise<void> {
   const sendEmail = { sendEmail : false };
   const token = await user.activate(sendEmail);
 
+  const queryStr = (await browser.getUrl()).split('?')[1];
+  const params = new URLSearchParams(queryStr);
+  const state = params.get('transactionId') || params.get('state');
   const baseUrl = browser.options.baseUrl;
-  const registerWithActivationTokenUrl = `${baseUrl}/register?activationToken=${token.activationToken}`;
-  browser.url(registerWithActivationTokenUrl);
+  const registerWithActivationTokenUrl = `${baseUrl}/register?activationToken=${token.activationToken}&state=${state}`;
+  await browser.url(registerWithActivationTokenUrl);
 }
 

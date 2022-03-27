@@ -33,9 +33,9 @@
             </p>
 
             <div class="row">
-              <button id="register-button" name="signup" class="ui primary basic button" onclick="location.href='/register'">Register</button>
-              <button id="account-unlock-button" name="unlock-account" class="ui primary basic button" onclick="location.href='/unlock-account'">Unlock Account</button>
-              <button id="login-button" name="signin" class="ui primary basic button" onclick="location.href='/login'">Login</button>
+              <button id="register-button" name="signup" class="ui primary basic button" onclick="location.href='/register?transactionId={{transactionId}}'">Register</button>
+              <button id="account-unlock-button" name="unlock-account" class="ui primary basic button" onclick="location.href='/unlock-account?transactionId={{transactionId}}'">Unlock Account</button>
+              <button id="login-button" name="signin" class="ui primary basic button" onclick="location.href='/login?transactionId={{transactionId}}'">Login</button>
             </div>
           {{/isLoggedIn}}
 

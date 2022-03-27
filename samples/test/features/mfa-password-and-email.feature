@@ -1,14 +1,16 @@
 Feature: Multi-Factor Authentication with Password and Email
 
   Background:
-	  Given an App
+    Given a Group
+	    And an App
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password + Another Factor"
       And a user named "Mary"
       And she has an account with "active" state in the org
 
   Scenario: Mary enters a wrong verification code
-    Given Mary navigates to the Basic Login View
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
     When she fills in her username
       And she fills in her correct password
       And she submits the form
@@ -18,8 +20,9 @@ Feature: Multi-Factor Authentication with Password and Email
     Then the sample shows an error message "Invalid code. Try again." on the Sample App
 
   Scenario: 2FA Login with Email
-    Given Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
     When she submits the form

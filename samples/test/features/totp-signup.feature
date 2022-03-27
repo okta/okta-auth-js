@@ -10,7 +10,8 @@ Feature: TOTP Support (Google Authenticator) Sign Up
       And she does not have account in the org
     
   Scenario: Mary signs up for an account with Password, setups up required Google Authenticator by scanning a QR Code
-    Given Mary navigates to the Self Service Registration View
+    When she clicks the 'signup' button
+    Then she is redirected to the "Self Service Registration" page
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
@@ -37,7 +38,8 @@ Feature: TOTP Support (Google Authenticator) Sign Up
       And the cell for the value of "name" is shown and contains her "first name and last name"
 
   Scenario: Mary signs up for an account with Password, setups up required Google Authenticator by entering a shared secret
-    Given Mary navigates to the Self Service Registration View
+    When she clicks the 'signup' button
+    Then she is redirected to the "Self Service Registration" page
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email

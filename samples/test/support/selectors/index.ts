@@ -43,6 +43,7 @@ const pages: { [key: string]: Page } = {
   'Basic Login View': LoginForm,
   'Login with Username and Password': LoginForm,
   'Basic Social Login View': LoginForm,
+  'Self Service Registration': Registration,
   'Self Service Registration View': Registration,
   'Self Service Password Reset View': PasswordRecover,
   'Self Service Password Reset': PasswordRecover,
@@ -62,6 +63,7 @@ const pages: { [key: string]: Page } = {
   'Enroll Google Authenticator':  EnrollGoogleAuthenticator,
   'Challenge Google Authenticator':  ChallengeGoogleAuthenticator,
   // SIW form
+  'Embedded Widget': OktaSignInOIE,
   'Embedded Widget View': OktaSignInOIE,
   'Login with Social IDP': OktaSignInOIEFacebookIdp,
   'Login with Okta OIDC IDP': OktaSignInOIEOktaIdp,
