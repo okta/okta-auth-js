@@ -16,28 +16,11 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And her password is correct
     When she submits the form
     Then she sees the list of required factors (Google Authenticator) to enroll
-    When She selects Google Authenticator from the list
-      And She scans a QR Code
+    When she selects Google Authenticator from the list
+    Then she sees a QR Code and a Secret Key on the screen
+      And the QR code represents the same key as the Secret Key
+    When She scans a QR Code
       And She selects "Next"
-    Then the screen changes to receive an input for a code
-    When she inputs the correct code from her Google Authenticator App for "enrollment"
-      And She selects "Verify"
-    Then she is redirected to the Root View
-      And she sees a table with her profile info
-      And the cell for the value of "email" is shown and contains her "email"
-      And the cell for the value of "name" is shown and contains her "first name and last name"
-
-  Scenario: Mary signs in to an account and enrolls in Password and Google Authenticator by entering a Secret Key
-    When she clicks the "login" button
-    Then she is redirected to the "Login" page
-    When she has inserted her username
-      And she has inserted her password
-      And her password is correct
-    When she submits the form
-    Then she sees the list of required factors (Google Authenticator) to enroll
-    When She selects Google Authenticator from the list
-      And She enters the shared Secret Key into the Google Authenticator App
-      And She selects "Next" on the screen which is showing the QR code
     Then the screen changes to receive an input for a code
     When she inputs the correct code from her Google Authenticator App for "enrollment"
       And She selects "Verify"

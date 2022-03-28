@@ -31,6 +31,8 @@ import waitForDisplayed from '../support/wait/waitForDisplayed';
 import checkMessage from '../support/check/checkMessage';
 import checkEqualsText from '../support/check/checkEqualsText';
 import { camelize } from '../util';
+import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
+import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
 
 Then('she is redirected to the {string} page', checkIsOnPage);
 
@@ -300,4 +302,21 @@ Then(
 Then(
   /^the screen changes to challenge the Security Question$/,
   () => checkIsOnPage('Challenge Security Question')
+);
+
+Then(
+  'she sees a QR Code and a Secret Key on the screen',
+  async () => {
+    await waitForDisplayed('#authenticator-shared-secret');
+    await waitForDisplayed('#authenticator-qr-code');
+  }
+);
+
+Then(
+  'the QR code represents the same key as the Secret Key',
+  async () => {
+    const secretFromQRCode = await getSecretFromQrCode();
+    const secretFromSharedSecret = await getSecretFromSharedSecret();
+    expect(secretFromQRCode).toEqual(secretFromSharedSecret);
+  }
 );

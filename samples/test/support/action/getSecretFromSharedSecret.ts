@@ -11,11 +11,10 @@
  */
 
 
-import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
-import getText from '../getText';
-import ActionContext from '../../context';
+import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
+import getText from './getText';
 
-export default async function (this: ActionContext) {
-  const sharedSecret = await getText( EnrollGoogleAuthenticator.sharedSecret );
-  this.sharedSecret = sharedSecret;
+export default async function() {
+  const sharedSecret = await getText(EnrollGoogleAuthenticator.sharedSecret);
+  return sharedSecret;
 }

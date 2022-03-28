@@ -11,18 +11,15 @@
  */
 
 
-import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
-import ActionContext from '../../context';
+import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
 import jsqr from 'jsqr';
-import waitForDisplayed from '../../wait/waitForDisplayed';
 const { PNG } = require('pngjs');
 
-export default async function (this: ActionContext) {
-  await waitForDisplayed(EnrollGoogleAuthenticator.qrCode);
+export default async function () {
   const el = await $(EnrollGoogleAuthenticator.qrCode);
   const dataUri = await el.getAttribute('src');
   const png = PNG.sync.read(Buffer.from(dataUri.slice('data:image/png;base64,'.length), 'base64'));
   const result = jsqr(Uint8ClampedArray.from(png.data), png.width, png.height);
   const sharedSecret = result?.data?.match(/\?secret=(\w+)&/)?.[1];
-  this.sharedSecret = sharedSecret;
+  return sharedSecret;
 }

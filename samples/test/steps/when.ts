@@ -45,8 +45,8 @@ import clickLoginWithOktaOIDCIdPInWidget from '../support/action/clickLoginWithO
 import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
 import loginWidget from '../support/action/loginWidget';
 import enterCorrectQuestionAnswer from '../support/action/enterCorrectQuestionAnswer';
-import scanQrCode from '../support/action/context-enabled/scanQrCode';
-import getSharedSecret from '../support/action/context-enabled/getSharedSecret';
+import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
+import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
 import enterCorrectGoogleAuthenticatorCode from '../support/action/context-enabled/enterCorrectGoogleAuthenticatorCode';
 import openEmailMagicLink from '../support/action/context-enabled/live-user/openEmailMagicLink';
 import ActionContext from '../support/context';
@@ -311,7 +311,7 @@ When(
 );
 
 When(
-  /^She selects Google Authenticator from the list$/,
+  /^she selects Google Authenticator from the list$/,
   selectGoogleAuthenticator
 );
 
@@ -329,12 +329,16 @@ When(
 
 When(
   /^She scans a QR Code$/,
-  scanQrCode
+  async function(this: ActionContext) {
+    this.sharedSecret = await getSecretFromQrCode();
+  }
 );
 
 When(
-  /^She enters the shared Secret Key into the Google Authenticator App$/,
-  getSharedSecret
+  'She enters the shared Secret Key into the Google Authenticator App',
+  async function(this: ActionContext) {
+    this.sharedSecret = await getSecretFromSharedSecret();
+  }
 );
 
 When(
