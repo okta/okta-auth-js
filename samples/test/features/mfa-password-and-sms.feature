@@ -3,7 +3,9 @@ Feature: Multi-Factor Authentication with Password and SMS
   Background:
     Given a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password + Another Factor"
-      And a Policy that defines "MFA Enrollment with password and phone as required authenticator"
+      And a Policy that defines "MFA Enrollment" with properties
+        | okta_password | REQUIRED |
+        | phone_number  | REQUIRED |
       And with a Policy Rule that defines "MFA Enrollment Challenge"
       And a user named "Mary"
       And she has an account with "active" state in the org

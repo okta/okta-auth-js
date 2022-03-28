@@ -71,12 +71,29 @@ Given(
 );
 
 Given(
+  'a Policy that defines {string} with properties',
+  {  wrapperOptions: { retry: 1 } },
+  async function(this: ActionContext, policyDescription: string, dataTable) {
+    this.policies = this.policies || [];
+    const policy = await createPolicy({ 
+      policyDescription,
+      groupId: this.group?.id,
+      dataTable
+    });
+    this.policies.push(policy);
+    try {
+      await addAppToPolicy(policy.id, this.app.id);
+    } catch(err) {/* do nothing */}
+  }
+);
+
+Given(
   'a Policy that defines {string}',
   {  wrapperOptions: { retry: 1 } },
   async function(this: ActionContext, policyDescription: string) {
     this.policies = this.policies || [];
     const policy = await createPolicy({ 
-      policyDescription, 
+      policyDescription,
       groupId: this.group?.id
     });
     this.policies.push(policy);

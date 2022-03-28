@@ -4,93 +4,65 @@ import { randomStr, getConfig } from '../../util';
 type Options = {
   policyDescription: string;
   groupId?: string;
+  dataTable?:{
+    rawTable: [string, string][];
+  } 
 }
 
-const POLICY_MAP = {
-  'Authentication': {
-    type: 'ACCESS_POLICY',
-  },
-  'Profile Enrollment': { 
-    type: 'PROFILE_ENROLLMENT'
-  },
-  'MFA Enrollment with password and email as required authenticators and phone as optional authenticator': {
-    type: 'MFA_ENROLL',
-    settings: {
-      type: 'AUTHENTICATORS',
-      authenticators: [
-        {
-          key: 'okta_password',
-          enroll: { self: 'REQUIRED' }
-        },
-        {
-          key: 'okta_email',
-          enroll: { self: 'REQUIRED' }
-        },
-        {
-          key: 'phone_number',
-          enroll: { self: 'OPTIONAL' }
-        },
-      ]
-    }
-  },
-  'MFA Enrollment with password and phone as required authenticator': {
-    type: 'MFA_ENROLL',
-    settings: {
-      type: 'AUTHENTICATORS',
-      authenticators: [
-        {
-          key: 'okta_password',
-          enroll: { self: 'REQUIRED' }
-        },
-        {
-          key: 'phone_number',
-          enroll: { self: 'REQUIRED' }
-        },
-      ]
-    }
-  },
-  'MFA Enrollment with Password and Google Authenticator as required authenticators': {
-    type: 'MFA_ENROLL',
-    settings: {
-      type: 'AUTHENTICATORS',
-      authenticators: [
-        {
-          key: 'okta_password',
-          enroll: { self: 'REQUIRED' }
-        },
-        {
-          key: 'google_otp',
-          enroll: { self: 'REQUIRED' }
-        },
-      ]
-    }
-  } 
+const getAuthenticationPolicy = () => {
+  return { type: 'ACCESS_POLICY' };
 };
 
-export default async function({ 
-  policyDescription,
-  groupId
-}: Options) {
+const getProfileEnrollmentPolicy = () => {
+  return { type: 'PROFILE_ENROLLMENT' };
+};
+
+const getMFAEnrollmentPolicy = (options: Options) => {
+  const authenticators = options.dataTable?.rawTable
+    .reduce((acc: any, [key, value]) => {
+      acc.push({
+        key,
+        enroll: { self: value }
+      });
+      return acc;
+    }, []);
+  return {
+    type: 'MFA_ENROLL',
+    settings: {
+      type: 'AUTHENTICATORS',
+      authenticators
+    },
+    conditions: {
+      people: {
+        groups: {
+          include: [options.groupId]
+        }
+      }
+    }
+  };
+};
+
+export default async function(options: Options) {
   const config = getConfig();
   const oktaClient = new Client({
     orgUrl: config.orgUrl,
     token: config.oktaAPIKey,
   });
 
-  const policyObject = (POLICY_MAP as any)[policyDescription];
+  let policyObject;
+  const { policyDescription } = options;
+  if (policyDescription === 'Authentication') {
+    policyObject = getAuthenticationPolicy();
+  } else if (policyDescription === 'MFA Enrollment') {
+    policyObject = getMFAEnrollmentPolicy(options);
+  } else if (policyDescription === 'Profile Enrollment') {
+    policyObject = getProfileEnrollmentPolicy();
+  } else {
+    throw new Error(`Unknow policy ${policyDescription}`);
+  }
+
   const policy = await oktaClient.createPolicy({
     ...policyObject,
-    ...(groupId 
-        && policyDescription.includes('MFA Enrollment')
-        && {
-      conditions: {
-        people: {
-          groups: {
-            include: [groupId]
-          }
-        }
-      }
-    }),
     name: `${policyObject.type}-${randomStr(6)}`
   });
   return policy;

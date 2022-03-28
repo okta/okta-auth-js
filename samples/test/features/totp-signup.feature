@@ -2,7 +2,9 @@ Feature: TOTP Support (Google Authenticator) Sign Up
   Background:
     Given a Policy that defines "Profile Enrollment"
       And with a Policy Rule that defines "collecting default attributes and emailVerification is not required"
-      And a Policy that defines "MFA Enrollment with Password and Google Authenticator as required authenticators"
+      And a Policy that defines "MFA Enrollment" with properties
+        | okta_password | REQUIRED |
+        | google_otp    | REQUIRED |
       And with a Policy Rule that defines "MFA Enrollment Challenge"
       And a user named "Mary"
       And she does not have account in the org
