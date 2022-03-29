@@ -111,15 +111,12 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
   } = options;
 
   let idxResponse;
-  let meta;
+  let meta = getSavedTransactionMeta(authClient, { state, recoveryToken, activationToken }); // may be undefined
 
   if (stateHandle) {
     idxResponse = await introspect(authClient, { withCredentials, version, stateHandle });
   } else {
-    // Try to resume saved transaction
-    meta = getSavedTransactionMeta(authClient, { state, recoveryToken, activationToken });
     let interactionHandle = meta?.interactionHandle; // may be undefined
-
     if (!interactionHandle) {
       // start a new transaction
       authClient.transactionManager.clear();

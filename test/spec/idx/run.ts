@@ -116,6 +116,15 @@ describe('idx/run', () => {
       await run(authClient, { stateHandle });
       expect(mocked.interact.interact).not.toHaveBeenCalled();
     });
+
+    it('will preserve transaction meta, if it exists', async () => {
+      const { authClient, transactionMeta } = testContext;
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+      jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+      const stateHandle = 'abc';
+      await run(authClient, { stateHandle });
+      expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, transactionMeta);
+    });
   });
 
   describe('flow', () => {
