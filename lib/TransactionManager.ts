@@ -326,11 +326,11 @@ export default class TransactionManager {
     if (!storage) {
       return null;
     }
-    const idxResponse = storage.getStorage();
-    if (!isRawIdxResponse(idxResponse)) {
+    const storedValue = storage.getStorage();
+    if (!storedValue || !isRawIdxResponse(storedValue.rawIdxResponse)) {
       return null;
     }
-    return idxResponse;
+    return storedValue;
   }
 
   clearIdxResponse(): void {
