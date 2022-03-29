@@ -36,6 +36,13 @@ Object {
       },
     },
   },
+  "_http": Object {
+    "headers": Object {
+      "Content-Type": "application/json",
+      "X-Rate-Limit-Limit": 1000,
+    },
+    "status": 200,
+  },
   "_links": Object {
     "cancel": Object {
       "hints": Object {

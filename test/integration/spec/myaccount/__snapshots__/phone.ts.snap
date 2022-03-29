@@ -1,0 +1,77 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MyAccount Phone API Manage with SDK methods can manage phone with SDK methods 1`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 201,
+  },
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "phoneNumber": Any<String>,
+  },
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Phone API Manage with SDK methods can manage phone with SDK methods 2`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 200,
+  },
+}
+`;
+
+exports[`MyAccount Phone API Manage with SDK methods can manage phone with SDK methods 3`] = `"Api validation failed: factorId and/or verificationCode"`;
+
+exports[`MyAccount Phone API Manage with Transaction functions can manage phone with transaction functions 1`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 201,
+  },
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "phoneNumber": Any<String>,
+  },
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Phone API Manage with Transaction functions can manage phone with transaction functions 2`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 200,
+  },
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "phoneNumber": Any<String>,
+  },
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Phone API Manage with Transaction functions can manage phone with transaction functions 3`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 200,
+  },
+}
+`;
+
+exports[`MyAccount Phone API Manage with Transaction functions can manage phone with transaction functions 4`] = `"Api validation failed: factorId and/or verificationCode"`;

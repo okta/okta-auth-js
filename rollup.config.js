@@ -76,40 +76,63 @@ const getPlugins = (env) => {
   ];
 };
 
-export default [
+const getBrowserBundleConfigs = (entries) => {
+  return entries.map(({ input, output }) => {
+    return {
+      input,
+      external,
+      plugins: getPlugins('browser'),
+      output: [
+        {
+          format: 'esm',
+          file: 'build/esm/browser/' + output,
+          exports: 'named',
+          sourcemap: true
+        },
+        // not emit test bundle for development
+        (process.env.NODE_ENV !== 'development' && {
+          // generate ems bundle for jest test, ".mjs" extension should be used
+          // this bundle is excluded from the release package
+          format: 'esm',
+          file: 'build/bundles-for-validation/esm/browser/' + output.replace('.js', '.mjs'),
+          exports: 'named',
+          sourcemap: true
+        })
+      ]  
+    };
+  });
+};
+
+const getNodeBundleConfigs = (entries) => {
+  return entries.map(({ input, output }) => {
+    return {
+      input,
+      external,
+      plugins: getPlugins('node'),
+      output: [
+        {
+          format: 'esm',
+          file: 'build/esm/node/' + output.replace('.js', '.mjs'),
+          exports: 'named',
+          sourcemap: true
+        }
+      ]
+    };
+  });
+};
+
+const entries = [
   {
     input: 'lib/index.ts',
-    external,
-    plugins: getPlugins('browser'),
-    output: [
-      {
-        format: 'esm',
-        file: 'build/esm/esm.browser.js',
-        exports: 'named',
-        sourcemap: true
-      },
-      // not emit test bundle for development
-      (process.env.NODE_ENV !== 'development' && {
-        // generate ems bundle for jest test, ".mjs" extension should be used
-        // this bundle is excluded from the release package
-        format: 'esm',
-        file: 'build/bundles-for-validation/esm/esm.browser.mjs',
-        exports: 'named',
-        sourcemap: true
-      })
-    ]
+    output: 'index.js'
   },
   {
-    input: 'lib/index.ts',
-    external,
-    plugins: getPlugins('node'),
-    output: [
-      {
-        format: 'esm',
-        file: 'build/esm/esm.node.mjs',
-        exports: 'named',
-        sourcemap: true
-      }
-    ]
+    input: 'lib/myaccount/index.ts',
+    output: 'myaccount.js'
   }
+];
+
+export default [
+  ...getBrowserBundleConfigs(entries),
+  ...getNodeBundleConfigs(entries),
 ];

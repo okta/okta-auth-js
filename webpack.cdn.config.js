@@ -34,8 +34,8 @@ function addBabelPlugins(rule) {
 baseConfig.module.rules.forEach(addBabelPlugins);
 
 module.exports = _.extend({}, baseConfig, {
-  mode: 'production',
-  entry: './lib/OktaAuth', // only export OktaAuth constructor
+  mode: 'development',
+  entry: './lib/entry.ts', // only export OktaAuth constructor
   output: {
     path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.min.js',

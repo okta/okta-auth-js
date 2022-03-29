@@ -35,6 +35,10 @@ describe('token.getUserInfo', function() {
   util.itMakesCorrectRequestResponse({
     title: 'allows retrieving UserInfo with accessTokenObject and idTokenObject',
     setup: () => {
+      responseXHR.response._http = {
+        status: 200,
+        headers: expect.any(Object)
+      };
       return {
         request: {
           uri: '/oauth2/v1/userinfo',
@@ -60,6 +64,10 @@ describe('token.getUserInfo', function() {
   util.itMakesCorrectRequestResponse({
     title: 'allows retrieving UserInfo with no arguments if valid tokens exist in token manager',
     setup: () => {
+      responseXHR.response._http = {
+        status: 200,
+        headers: expect.any(Object)
+      };
       return {
         request: {
           uri: '/oauth2/v1/userinfo',
@@ -87,6 +95,10 @@ describe('token.getUserInfo', function() {
     title: 'allows retrieving UserInfo using authorization server',
     setup: () => {
       responseXHR.response.sub = tokens.authServerIdTokenParsed.claims.sub;
+      responseXHR.response._http = {
+        status: 200,
+        headers: expect.any(Object)
+      };
       return {
         request: {
           uri: '/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',

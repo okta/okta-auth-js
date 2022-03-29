@@ -13,8 +13,11 @@
 //Jest doc: https://jestjs.io/docs/ecmascript-modules
 
 const OktaAuth = process.env.BUNDLE_ENV === 'browser' ? 
-  `<rootDir>/build/bundles-for-validation/esm/esm.browser.mjs` : 
-  `<rootDir>/build/esm/esm.node.mjs`;
+  `<rootDir>/build/bundles-for-validation/esm/browser/index.mjs` : 
+  `<rootDir>/build/esm/node/index.mjs`;
+const MyaccountEntry = process.env.BUNDLE_ENV === 'browser' ? 
+  `<rootDir>/build/bundles-for-validation/esm/browser/myaccount.mjs` : 
+  `<rootDir>/build/esm/node/myaccount.mjs`;
 const testEnvironment = process.env.BUNDLE_ENV === 'browser' ? 'jsdom' : 'node';
 
 export default {
@@ -28,7 +31,8 @@ export default {
   transform: {},
   restoreMocks: true,
   moduleNameMapper: {
-    '^@okta/okta-auth-js$': OktaAuth
+    '^@okta/okta-auth-js$': OktaAuth,
+    '^@okta/okta-auth-js/myaccount$': MyaccountEntry,
   },
   extensionsToTreatAsEsm: ['.ts'],
   testPathIgnorePatterns: [],

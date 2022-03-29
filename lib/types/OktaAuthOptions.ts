@@ -12,7 +12,7 @@
 
 import { StorageManagerOptions, StorageUtil, SimpleStorage } from './Storage';
 import { CookieOptions } from './Cookies';
-import { HttpRequestClient } from './http';
+import { HttpRequestClient, RequestOptions } from './http';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
 import { FlowIdentifier } from '../idx/types';
@@ -60,6 +60,7 @@ export interface OktaAuthOptions extends CustomUrls {
   storageUtil?: StorageUtil;
   ajaxRequest?: object;
   httpRequestClient?: HttpRequestClient;
+  httpRequestInterceptors?: ((request: RequestOptions) => void)[];
   cookies?: CookieOptions;
   transformErrorXHR?: (xhr: object) => any;
   headers?: object;

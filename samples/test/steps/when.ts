@@ -70,14 +70,15 @@ When(
 When(
   'she changes her email to a different valid email address',
   async function(this: ActionContext) {
-    await setInputField('set', this.secondCredentials.emailAddress, `input[name=editPrimaryEmail]`);
+    await setInputField('set', this.secondCredentials.emailAddress, `input[name=primaryEmail]`);
   }
 );
 
 When(
-  'she fills in her phone number',
-  async function(this: ActionContext) {
-    await setInputField('set', this.credentials.phoneNumber, `input[name=addPhoneNumber]`);
+  'she fills in her {string}',
+  async function(this: ActionContext, inputName: string) {
+    inputName = camelize(inputName);
+    await setInputField('set', (this.credentials as any)[inputName], `input[name=${inputName}]`);
   }
 );
 

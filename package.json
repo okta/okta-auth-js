@@ -10,14 +10,26 @@
   "browser": "build/dist/okta-auth-js.umd.js",
   "types": "build/lib/index.d.ts",
   "exports": {
-    "node": {
-      "import": "./build/esm/esm.node.mjs",
-      "require": "./build/cjs/index.js"
+    ".": {
+      "node": {
+        "import": "./build/esm/esm.node.mjs",
+        "require": "./build/cjs/index.js"
+      },
+      "browser": {
+        "import": "./build/esm/browser/index.js"
+      },
+      "default": "./build/dist/okta-auth-js.umd.js"
     },
-    "browser": {
-      "import": "./build/esm/esm.browser.js"
-    },
-    "default": "./build/dist/okta-auth-js.umd.js"
+    "./myaccount": {
+      "node": {
+        "import": "./build/esm/node/myaccount.mjs",
+        "require": "./build/cjs/myaccount/index.js"
+      },
+      "browser": {
+        "import": "./build/esm/browser/myaccount.js"
+      },
+      "default": "./build/dist/myaccount.umd.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -46,7 +58,7 @@
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
     "test:samples": "yarn workspace @okta/test.e2e.samples start",
-    "test:integration": "jest --config ./jest.integration.js",
+    "test:integration": "jest --runInBand --config ./jest.integration.js",
     "test:bundle:esm:browser": "cross-env BUNDLE_ENV=browser NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:esm:node": "cross-env BUNDLE_ENV=node NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:cjs": "cross-env BUNDLE_ENV=node jest --config ./jest.cjs.js",

@@ -7,8 +7,8 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "SIW_VERSION=${SIW_VERSION-6.1.2} node ./web-server/server.js",
-    "dev": "SIW_VERSION=${SIW_VERSION-6.1.2} nodemon ./web-server/server.js --watch ../../../build/cjs"
+    "start": "SIW_VERSION=${SIW_VERSION-6.2.0} node ./web-server/server.js",
+    "dev": "SIW_VERSION=${SIW_VERSION-6.2.0} nodemon ./web-server/server.js --watch ../../../build/cjs"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -24,6 +24,6 @@
     "concurrently": "^6.0.1"
   },
   "peerDependencies": {
-    "@okta/okta-signin-widget": "^6.1.2"
+    "@okta/okta-signin-widget": "^6.2.0"
   }
 }

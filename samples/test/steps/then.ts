@@ -164,11 +164,11 @@ Then(
   'the form changes to receive an input for the verification code',
   async () => {
     await browser.waitUntil(async () => {
-      const el = await $('#form-title');
-      const text = await el?.getText();
-      return text === 'Enter Code';
+      const el = await $('input[name=verificationCode]');
+      const isDisplayed = await el.isDisplayed();
+      return isDisplayed;
     }, {
-      timeoutMsg: 'wait for form title to change'
+      timeoutMsg: 'wait for input to change'
     });
   }
 );

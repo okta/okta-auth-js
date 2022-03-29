@@ -63,6 +63,7 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
 
     // Internal options
     httpRequestClient: args.httpRequestClient,
+    httpRequestInterceptors: args.httpRequestInterceptors,
     transformErrorXHR: args.transformErrorXHR,
     transformAuthState: args.transformAuthState,
     restoreOriginalUri: args.restoreOriginalUri,
