@@ -17,7 +17,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she is presented with a list of factors
+    Then she is redirected to the "Select Authenticator" page
     When She selects SMS from the list
       And She inputs a valid phone number
       And she submits the form
@@ -51,7 +51,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she is presented with an option to select SMS to enroll
+    Then she is redirected to the "Select Authenticator" page
     When She selects SMS from the list
       And She inputs a invalid phone number
       And she submits the form

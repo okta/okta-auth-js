@@ -13,9 +13,9 @@ Background:
     Then she is redirected to the "Self Service Password Reset" page
     When she inputs her correct Email
     And she submits the form
-    Then she sees a page to select authenticator
+    Then she is redirected to the "Select Authenticator" page
     And password authenticator is not in options
-    When she selects email authenticator
+    When she selects the "Email" factor
     And she submits the form
     Then she sees a page to challenge her email authenticator
     When she inputs the correct code from her "Email"

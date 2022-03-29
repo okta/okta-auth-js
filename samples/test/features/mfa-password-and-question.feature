@@ -11,7 +11,7 @@ Feature: Multi-Factor Authentication with Password and Security Question
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she is presented with an option to select Security Question to verify
+    Then she is redirected to the "Select Authenticator" page
     When She selects Security Question from the list
     Then the screen changes to challenge the Security Question
     When She inputs the correct answer for the Question

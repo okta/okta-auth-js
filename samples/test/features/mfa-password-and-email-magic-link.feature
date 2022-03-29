@@ -14,8 +14,8 @@ Feature: Multi-Factor Authentication with Password and Email Magic Link
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she is presented with an option to select Email to verify
-    When She selects Email from the list
+    Then she is redirected to the "Select Authenticator" page
+    When she selects the "Email" factor
       And she submits the form
       And she clicks the Email magic link
     Then she is redirected to the Root View

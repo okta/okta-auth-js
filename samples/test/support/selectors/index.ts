@@ -47,7 +47,7 @@ const pages: { [key: string]: Page } = {
   'Self Service Registration View': Registration,
   'Self Service Password Reset View': PasswordRecover,
   'Self Service Password Reset': PasswordRecover,
-  'Select authenticator': SelectAuthenticator,
+  'Select Authenticator': SelectAuthenticator,
   'Enter Code': ChallengeEmailAuthenticator,
   'Challenge email authenticator': ChallengeEmailAuthenticator,
   'Enroll Factor: Enter SMS Code': EnrollPhoneAuthenticator,

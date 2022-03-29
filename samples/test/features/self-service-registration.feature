@@ -13,18 +13,20 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she fills out her Last Name
   And she fills out her Email
   And she submits the form
-  Then she sees the Select Authenticator page with password as the only option
-  When she chooses password factor option
+  Then she is redirected to the "Select Authenticator" page
+  When she selects the "Password" factor
+  And she submits the form
   Then she sees the set new password form
   And she fills out her Password
   And she confirms her Password
-  And she submits the set new password form
-  Then she sees a list of available factors to setup
-  When she selects Email
+  And she submits the form
+  Then she is redirected to the "Select Authenticator" page
+  When she selects the "Email" factor
+  And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
   And she submits the form
-  Then she sees a list of factors to register
+  Then she is redirected to the "Select Authenticator" page
   When she selects "Skip" on SMS
   Then she is redirected to the Root View
   And she sees a table with her profile info
@@ -37,19 +39,20 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
     And she fills out her Last Name
     And she fills out her Email
     And she submits the form
-  Then she sees the Select Authenticator page with password as the only option
-  When she chooses password factor option
-    # And she submits the select authenticator form
+  Then she is redirected to the "Select Authenticator" page
+  When she selects the "Password" factor
+    And she submits the form
   Then she sees the set new password form
     And she fills out her Password
     And she confirms her Password
-    And she submits the set new password form
-  Then she sees a list of available factors to setup
-  When she selects Email
+    And she submits the form
+  Then she is redirected to the "Select Authenticator" page
+  When she selects the "Email" factor
+    And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
     And she submits the form
-  Then she sees a list of factors to register
+  Then she is redirected to the "Select Authenticator" page
   When She selects Phone from the list
     And She inputs a valid phone number
     And she submits the form
@@ -77,19 +80,20 @@ Scenario: Mary signs up for an account with Password, sets up required Email fac
   And she fills out her Last Name
   And she fills out her Email
     And she submits the form
-  Then she sees the Select Authenticator page with password as the only option
-  When she chooses password factor option
-  # And she submits the select authenticator form
+  Then she is redirected to the "Select Authenticator" page
+  When she selects the "Password" factor
+    And she submits the form
   Then she sees the set new password form
   And she fills out her Password
   And she confirms her Password
   And she submits the form
-  Then she sees a list of available factors to setup
-  When she selects Email
+  Then she is redirected to the "Select Authenticator" page
+  When she selects the "Email" factor
+    And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
     And she submits the form
-  Then she sees a list of factors to register
+  Then she is redirected to the "Select Authenticator" page
   When She selects Phone from the list
   And she inputs an invalid phone number
   And she submits the form

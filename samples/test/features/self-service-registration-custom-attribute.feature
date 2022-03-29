@@ -15,4 +15,4 @@ Feature: Add another Required Attribute to the Profile Enrollment Policy
     And she fills out another property
     And she submits the form
     # Then her user is created in the "Staged" state 
-    And she sees the Select Authenticator page with password as the only option
+    Then she is redirected to the "Select Authenticator" page

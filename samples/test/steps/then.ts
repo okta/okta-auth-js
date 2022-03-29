@@ -202,36 +202,6 @@ Then(
   /^Mary sees login, registration buttons$/,
   checkGuest
 );
-  
-Then(
-  /^She sees a list of factors$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees a list of available factors to setup$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees a list of factors to register$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees the list of required factors \(Google Authenticator\) to enroll$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees the Select Authenticator page with password as the only option$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees a page to select authenticator/,
-  () => checkIsOnPage('Select authenticator')
-);
 
 Then(
   /^the sample shows an error message "(?<message>.+?)" on the Sample App$/,
@@ -264,11 +234,6 @@ Then(
 );
 
 Then(
-  /^she is presented with a list of factors$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
   /^the screen changes to receive an input for a code$/,
   async function(this: ActionContext) {
     let pageName;
@@ -296,23 +261,8 @@ Then(
 );
 
 Then(
-  /^she submits the set new password form$/,
-  submitForm
-);
-
-Then(
   /^she is presented with an option to select SMS to verify$/,
   () => checkIsOnPage('Verify using phone authenticator')
-);
-
-Then(
-  /^she is presented with an option to select Email to verify$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she is presented with an option to select Security Question to verify$/,
-  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
@@ -345,11 +295,6 @@ Then(
 Then(
   /^she sees an error message "(?<message>.+?)"$/,
   checkFormContainsMessage
-);
-
-Then(
-  /^she is presented with an option to select SMS to enroll$/,
-  () => checkIsOnPage('Select authenticator')
 );
 
 Then(

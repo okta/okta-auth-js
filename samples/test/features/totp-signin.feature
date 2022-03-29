@@ -17,8 +17,9 @@ Feature: TOTP Support (Google Authenticator) Sign In
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she sees the list of required factors (Google Authenticator) to enroll
-    When she selects Google Authenticator from the list
+    Then she is redirected to the "Select Authenticator" page
+    When she selects the "Google Authenticator" factor
+      And she submits the form
     Then she sees a QR Code and a Secret Key on the screen
       And the QR code represents the same key as the Secret Key
     When She scans a QR Code

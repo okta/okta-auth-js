@@ -12,9 +12,11 @@ Feature: Multi-Factor Authentication with Password and Email
     When she fills in her username
       And she fills in her correct password
       And she submits the form
-    Then She sees a list of factors
-    When She has selected Email from the list of factors
-      And she inputs an incorrect code
+    Then she is redirected to the "Select Authenticator" page
+    When she selects the "Email" factor
+      And she submits the form
+    Then she is redirected to the "Challenge email authenticator" page
+    When she inputs an incorrect code
       And she submits the form
     Then the sample shows an error message "Invalid code. Try again." on the Sample App
 
@@ -25,8 +27,8 @@ Feature: Multi-Factor Authentication with Password and Email
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she is presented with an option to select Email to verify
-    When She selects Email from the list
+    Then she is redirected to the "Select Authenticator" page
+    When she selects the "Email" factor
       And she submits the form
     Then the screen changes to receive an input for a Email code
     When she inputs the correct code from her "Email"

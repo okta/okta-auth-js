@@ -119,6 +119,27 @@ When(
 );
 
 When(
+  'she selects the {string} factor',
+  async (authenticator: string) => {
+    let authenticatorKey;
+    if (authenticator === 'Email') {
+      authenticatorKey = 'okta_email';
+    } else if (authenticator === 'Password') {
+      authenticatorKey = 'okta_password';
+    } else if (authenticator === 'Phone') {
+      authenticatorKey = 'phone_number'
+    } else if (authenticator === 'Google Authenticator') {
+      authenticatorKey = 'google_otp';
+    } else if (authenticatorKey === 'Security Question') {
+      authenticatorKey = 'question';
+    } else {
+      throw new Error(`Unknown authenticator ${authenticator}`);
+    }
+    await selectAuthenticator(authenticatorKey);
+  }
+)
+
+When(
   /^User enters (username|password) into the form$/,
   enterCredential
 );
@@ -202,35 +223,10 @@ When(
   /^she confirms that password$/,
   confirmValidPassword
 );
-  
-When(
-  /^She has selected Email from the list of factors$/,
-  selectEmailAuthenticator
-);
-
-When(
-  /^she selects Email$/,
-  selectEmailAuthenticator
-);
-
-When(
-  /^she selects email authenticator$/,
-  selectAuthenticator.bind(null, 'okta_email')
-);
-
-When(
-  /^She selects Security Question from the list$/,
-  selectSecurityQuestionAuthenticator
-);
 
 When(
   /^She selects Phone from the list$/,
   selectPhoneAuthenticator
-);
-
-When(
-  /^she chooses password factor option$/,
-  selectPasswordAuthenticator
 );
 
 When (
@@ -261,16 +257,6 @@ When(
 When(
   /^she inputs an invalid phone number$/,
   enterIncorrectPhoneNumberFormat
-);
-
-When(
-  /^She selects Email from the list$/,
-  selectEmailAuthenticator
-);
-
-When(
-  /^she selects Google Authenticator from the list$/,
-  selectGoogleAuthenticator
 );
 
 When(

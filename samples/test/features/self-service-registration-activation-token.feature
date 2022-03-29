@@ -8,4 +8,4 @@ Feature: Add another Required Attribute to the Profile Enrollment Policy
  
   Scenario: Mary signs up for an account using activation token
     Given Mary opens the Self Service Registration View with activation token
-    And she sees the Select Authenticator page with password as the only option
+    Then she is redirected to the "Select Authenticator" page
