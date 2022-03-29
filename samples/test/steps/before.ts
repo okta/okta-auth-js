@@ -65,10 +65,9 @@ Before(async function(this: ActionContext) {
     if (this.group) {
       await this.group.delete();
     }
-
     // pause the process before retry
     await browser.pause(3 * 1000);
-
+    // retry one more time
     await hook();
   }
 });
