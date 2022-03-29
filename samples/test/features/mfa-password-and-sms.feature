@@ -24,7 +24,7 @@ Feature: Multi-Factor Authentication with Password and SMS
     Then the screen changes to receive an input for a code
     When she inputs the correct code from her "SMS"
       And she submits the form
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"
 
@@ -36,7 +36,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she is presented with an option to select SMS to verify
+    Then she is redirected to the "Verify Phone" page
     When She selects SMS from the list of methods
     Then the screen changes to receive an input for a code to verify
     When she inputs an incorrect code
@@ -66,12 +66,12 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she is presented with an option to select SMS to verify
+    Then she is redirected to the "Verify Phone" page
     When She selects SMS from the list of methods
       And she submits the form
     Then the screen changes to receive an input for a code to verify
     When she inputs the correct code from her "SMS"
       And she submits the form
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

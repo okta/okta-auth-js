@@ -11,4 +11,4 @@ Feature: Direct Auth with Self Hosted Sign In Widget Social Login with 1 Social 
 		Then she is redirected to the "Embedded Widget" page
 	  When she clicks the "Login with Okta OIDC IDP" button in the embedded Sign In Widget
 	  	And logs in to Okta OIDC IDP
-	  Then she is redirected back to the Sample App
+	  Then she is redirected to the "Root" page

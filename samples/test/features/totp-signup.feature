@@ -35,7 +35,7 @@ Feature: TOTP Support (Google Authenticator) Sign Up
       And she submits the form
     Then she is redirected to the "Select Authenticator" page
     When she selects "Skip"
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"
       And the cell for the value of "name" is shown and contains her "first name and last name"

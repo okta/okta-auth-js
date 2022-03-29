@@ -20,11 +20,11 @@ Background:
     Then she sees a page to challenge her email authenticator
     When she inputs the correct code from her "Email"
     And she submits the form
-    Then she sees a page to set her password
+    Then she is redirected to the "Reset Password" page
     When she fills a password that fits within the password policy
     And she confirms that password
     And she submits the form
-    Then she is redirected to the Root Page
+    Then she is redirected to the "Root" page
 
   Scenario: Mary tries to reset a password with the wrong email
     Given the app is assigned to "Everyone" group

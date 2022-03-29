@@ -33,6 +33,6 @@ Feature: Multi-Factor Authentication with Password and Email
     Then the screen changes to receive an input for a Email code
     When she inputs the correct code from her "Email"
       And she submits the form
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

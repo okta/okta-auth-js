@@ -15,13 +15,10 @@
 import { Then } from '@cucumber/cucumber';
 
 import checkFormMessage from '../support/check/checkFormMessage';
-import checkGuest from '../support/check/checkGuest';
 import checkButton from '../support/check/checkButton';
-import waitForURLPath from '../support/wait/waitForURLPath';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import enterValidPassword from '../support/action/context-enabled/live-user/enterValidPassword';
 import confirmValidPassword from '../support/action/context-enabled/live-user/confirmValidPassword';
-import submitForm from '../support/action/submitForm';
 import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
 import checkProfileAttribute from '../support/check/checkProfileAttribute';
 import { UserHome } from '../support/selectors';
@@ -30,9 +27,9 @@ import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticat
 import waitForDisplayed from '../support/wait/waitForDisplayed';
 import checkMessage from '../support/check/checkMessage';
 import checkEqualsText from '../support/check/checkEqualsText';
-import { camelize } from '../util';
 import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
 import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
+import { camelize } from '../util';
 
 Then('she is redirected to the {string} page', checkIsOnPage);
 
@@ -182,28 +179,6 @@ Then(
 );
 
 Then(
-  /^the Root Page shows links to the Entry Points$/,
-  checkGuest
-);
-
-Then(
-  /^she is redirected back to the (?:Root View|Sample App)$/,
-  () => waitForURLPath(false, '/', true)
-);
-
-Then(
-  /^she is redirected to the ([\s\w]+)$/,
-  async function(this: ActionContext, pageName: string) {
-    await checkIsOnPage(pageName);
-  }
-);
-
-Then(
-  /^Mary sees login, registration buttons$/,
-  checkGuest
-);
-
-Then(
   /^the sample shows an error message "(?<message>.+?)" on the Sample App$/,
   checkFormMessage
 );
@@ -221,11 +196,6 @@ Then(
 Then(
   /^she sees a page to input a code for email authenticator enrollment$/,
   () => checkIsOnPage('Enroll email authenticator')
-);
-
-Then(
-  /^she sees a page to set her password$/,
-  () => checkIsOnPage('Reset Password')
 );
 
 Then(
@@ -258,11 +228,6 @@ Then(
 Then(
   /^she confirms her Password$/,
   confirmValidPassword
-);
-
-Then(
-  /^she is presented with an option to select SMS to verify$/,
-  () => checkIsOnPage('Verify using phone authenticator')
 );
 
 Then(

@@ -18,6 +18,6 @@ Feature: Multi-Factor Authentication with Password and Email Magic Link
     When she selects the "Email" factor
       And she submits the form
       And she clicks the Email magic link
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

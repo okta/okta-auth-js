@@ -27,7 +27,7 @@ Feature: TOTP Support (Google Authenticator) Sign In
     Then the screen changes to receive an input for a code
     When she inputs the correct code from her Google Authenticator App for "enrollment"
       And she submits the form
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"
       And the cell for the value of "name" is shown and contains her "first name and last name"
@@ -45,7 +45,7 @@ Feature: TOTP Support (Google Authenticator) Sign In
     Then the screen changes to receive an input for a code
     When she inputs the correct code from her Google Authenticator App for "authentication"
       And she submits the form
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"
       And the cell for the value of "name" is shown and contains her "first name and last name"

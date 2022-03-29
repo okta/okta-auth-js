@@ -13,6 +13,6 @@ Scenario: Mary Logs in with Okta OIDC IDP
   Then she is redirected to the "Login" page
   When she clicks the Login with Okta OIDC IDP button
     And logs in to Okta OIDC IDP
-  Then she is redirected to the Root View
+  Then she is redirected to the "Root" page
     And she sees a table with her profile info
     And the cell for the value of "email" is shown and contains her "email"

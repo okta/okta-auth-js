@@ -8,7 +8,8 @@ Feature: Root page for Direct Auth Demo Application
 
   Scenario: Mary visits the Root View WITHOUT an authentcation session (no tokens)
     # Given Mary navigates to the Root View
-    Then the Root Page shows links to the Entry Points
+    Then she sees the "signin" button
+      And she sees the "signup" button
     
   Scenario: Mary visits the Root View and WITH an authentication session
     Given she is on the Root View in an AUTHENTICATED state
@@ -21,6 +22,7 @@ Feature: Root page for Direct Auth Demo Application
     Given she is on the Root View in an AUTHENTICATED state
       # And Mary navigates to the Root View
     When she clicks the "logout" button
-    Then she is redirected back to the Root View
-      And Mary sees login, registration buttons
+    Then she is redirected to the "Root" page
+      And she sees the "signin" button
+      And she sees the "signup" button
       #And she sees that claims from /userinfo are disappeared

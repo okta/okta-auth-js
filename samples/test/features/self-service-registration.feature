@@ -28,7 +28,7 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she submits the form
   Then she is redirected to the "Select Authenticator" page
   When she selects "Skip" on SMS
-  Then she is redirected to the Root View
+  Then she is redirected to the "Root" page
   And she sees a table with her profile info
   And the cell for the value of "email" is shown and contains her "email"
 
@@ -53,13 +53,15 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   When she inputs the correct code from her "Email"
     And she submits the form
   Then she is redirected to the "Select Authenticator" page
-  When She selects Phone from the list
-    And She inputs a valid phone number
+  When she selects the "Phone" factor
+    And she submits the form
+  Then she is redirected to the "Enroll Phone Authenticator" page
+  When She inputs a valid phone number
     And she submits the form
   Then the screen changes to receive an input for a code
   When she inputs the correct code from her "SMS"
     And she submits the form
-  Then she is redirected to the Root View
+  Then she is redirected to the "Root" page
     And she sees a table with her profile info
     And the cell for the value of "email" is shown and contains her "email"
 
@@ -94,7 +96,9 @@ Scenario: Mary signs up for an account with Password, sets up required Email fac
   When she inputs the correct code from her "Email"
     And she submits the form
   Then she is redirected to the "Select Authenticator" page
-  When She selects Phone from the list
+  When she selects the "Phone" factor
+    And she submits the form
+  Then she is redirected to the "Enroll Phone Authenticator" page
   And she inputs an invalid phone number
   And she submits the form
   Then she should see an error message "Invalid Phone Number."

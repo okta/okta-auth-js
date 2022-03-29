@@ -12,7 +12,7 @@ Feature: Basic Login with Embedded Sign In Widget
 	  When she fills in her correct username
 	    And she fills in her correct password
 	    And she submits the form
-    Then she is redirected to the Root View
+    Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"
       #And the cell for the value of "name" is shown and contains her "first name and last name"

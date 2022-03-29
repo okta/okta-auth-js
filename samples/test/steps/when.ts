@@ -20,13 +20,8 @@ import enterCode from '../support/action/enterCode';
 import enterLiveUserEmail from '../support/action/context-enabled/live-user/enterEmail';
 import submitForm from '../support/action/submitForm';
 import selectAuthenticator from '../support/action/selectAuthenticator';
-import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
-import selectGoogleAuthenticator from '../support/action/selectGoogleAuthenticator';
-import selectSecurityQuestionAuthenticator from '../support/action/selectSecurityQuestionAuthenticator';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
 import enterRegistrationField from '../support/action/context-enabled/live-user/enterRegistrationField';
-import selectPasswordAuthenticator from '../support/action/selectPasswordAuthenticator';
-import selectPhoneAuthenticator from '../support/action/selectPhoneAuthenticator';
 import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/context-enabled/live-user/enterCorrectPhoneNumber';
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
@@ -222,11 +217,6 @@ When(
 When(
   /^she confirms that password$/,
   confirmValidPassword
-);
-
-When(
-  /^She selects Phone from the list$/,
-  selectPhoneAuthenticator
 );
 
 When (
