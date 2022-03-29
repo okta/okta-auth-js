@@ -30,6 +30,7 @@ const logLevel = LOG || 'warn';
 const chromeOptions = {
     args: []
 };
+const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
 
 if (CI) {
     chromeOptions.args = chromeOptions.args.concat([
@@ -155,7 +156,7 @@ export const config: WebdriverIO.Config = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 2, // a18n api has very limited capacity, leave space for parallel CI/local processes
+        maxInstances, // a18n api has very limited capacity, leave space for parallel CI/local processes
         //
         browserName: 'chrome',
         'goog:chromeOptions': chromeOptions

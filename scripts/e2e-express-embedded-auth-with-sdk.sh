@@ -12,7 +12,7 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # Configuration
 # Remember to set this while running tests locally 
-export NODE_ENV=test
+export MAX_INSTANCES=3
 export SAMPLE_NAME=@okta/samples.express-embedded-auth-with-sdk
 export ORG_OIE_ENABLED=true 
 export USERNAME=mary@acme.com
