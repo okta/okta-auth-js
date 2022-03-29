@@ -19,30 +19,41 @@ import deleteSelfEnrolledUser from '../support/management-api/deleteSelfEnrolled
 
 // Comment out this after hook to persist test context
 After(async function(this: ActionContext) {
-  if (this.app) {
-    await this.app.deactivate();
-    await this.app.delete();
-  }
-  if (this.policies) {
-    for (const policy of this.policies) {
-      await policy.delete();
+  const clearContext = async () => {
+    if (this.app) {
+      await this.app.deactivate();
+      await this.app.delete();
     }
-  }
-  if (this.group) {
-    await this.group.delete();
-  }
-  if(this.user && this.user.profile.email !== process.env.USERNAME) {
-    await this.user.deactivate();
-    await this.user.delete();
-  }
-  if (this.credentials) {
-    if (this.credentials.emailAddress !== process.env.USERNAME) {
-      await deleteSelfEnrolledUser(this.credentials.emailAddress);
+    if (this.policies) {
+      for (const policy of this.policies) {
+        await policy.delete();
+      }
     }
-    await a18nClient.deleteProfile(this.credentials.profileId);
-  }
-  if (this.secondCredentials) {
-    await a18nClient.deleteProfile(this.secondCredentials.profileId);
+    if (this.group) {
+      await this.group.delete();
+    }
+    if(this.user && this.user.profile.email !== process.env.USERNAME) {
+      await this.user.deactivate();
+      await this.user.delete();
+    }
+    if (this.credentials) {
+      if (this.credentials.emailAddress !== process.env.USERNAME) {
+        await deleteSelfEnrolledUser(this.credentials.emailAddress);
+      }
+      await a18nClient.deleteProfile(this.credentials.profileId);
+    }
+    if (this.secondCredentials) {
+      await a18nClient.deleteProfile(this.secondCredentials.profileId);
+    }
+  };
+
+  try {
+    await clearContext();
+  } catch (err) {
+    console.warn('Failed to clear test context, retry one more time', err);
+    // pause the process before retry
+    await browser.pause(3 * 1000);
+    await clearContext();
   }
 });
 
