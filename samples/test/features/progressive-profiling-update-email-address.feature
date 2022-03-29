@@ -29,17 +29,17 @@ Feature: Update Email Address
   
   Scenario: Mary Updates her email address through her profile using an OTP
     Given she is on the Root View in an AUTHENTICATED state
-    And she sees a table with her profile info
+      And she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"
       And the cell for the value of "last name" is shown and contains her "last name"
+      And she sees a tip message for "identifiers" that "User identifiers are separated because changes require verification."
     When she clicks the "edit primary email" button
     Then she sees a modal popup to "edit primary email"
-      And she sees a banner message for "edit primary email" that "Change this attribute will require additional verification"
     When she changes her email to a different valid email address
       And she submits the form
-    Then the form changes to receive an input for a Email code
-    When she inputs the correct code from the new Email address
+    Then the form changes to receive an input for the verification code
+    When she inputs the correct code from her "Updated Email"
       And she submits the form
     Then her "primary email" is updated to the new email address 
 
@@ -65,12 +65,12 @@ Feature: Update Email Address
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"
       And the cell for the value of "last name" is shown and contains her "last name"
+      And she sees a tip message for "identifiers" that "User identifiers are separated because changes require verification."
     When she clicks the "edit primary email" button
     Then she sees a modal popup to "edit primary email"
-      And she sees a banner message for "edit primary email" that "Change this attribute will require additional verification"
     When she changes her email to a different valid email address
       And she submits the form
-    Then the form changes to receive an input for a Email code
-    When she inputs the incorrect code from the new Email address
+    Then the form changes to receive an input for the verification code
+    When she inputs an incorrect code
       And she submits the form
     Then she sees a banner message for "edit primary email" that "User is not authorized."

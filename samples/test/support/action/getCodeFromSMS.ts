@@ -11,12 +11,18 @@
  */
 
 
-import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
-import setInputField from './setInputField';
+import a18nClient from '../management-api/a18nClient';
 import clickElement from './clickElement';
 
-export default async function () {
-  const code = '!incorrect!';
-  await setInputField('set', code, ChallengeAuthenticator.code);
-  await clickElement('click', 'selector', ChallengeAuthenticator.submit);
+export default async function (profileId: string) {
+  let retryResend = 3;
+  let code = await a18nClient.getSMSCode(profileId);
+  while (!code && retryResend-- > 0) {
+    await clickElement('click', 'selector', 'button[name=resend]');
+    code = await a18nClient.getSMSCode(profileId);
+  }
+  if (!code) {
+    throw new Error('Failed to get sms code');
+  }
+  return code;
 }

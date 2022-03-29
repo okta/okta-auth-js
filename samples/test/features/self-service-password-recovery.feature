@@ -12,13 +12,13 @@ Background:
     When she clicks the "Forgot Password" link
     Then she is redirected to the "Self Service Password Reset" page
     When she inputs her correct Email
-    And she submits the recovery form
+    And she submits the form
     Then she sees a page to select authenticator
     And password authenticator is not in options
     When she selects email authenticator
     And she submits the form
     Then she sees a page to challenge her email authenticator
-    When she fills in the correct code
+    When she inputs the correct code from her "Email"
     And she submits the form
     Then she sees a page to set her password
     When she fills a password that fits within the password policy

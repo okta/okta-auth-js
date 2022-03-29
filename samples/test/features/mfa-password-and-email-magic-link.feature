@@ -16,7 +16,7 @@ Feature: Multi-Factor Authentication with Password and Email Magic Link
     When she submits the form
     Then she is presented with an option to select Email to verify
     When She selects Email from the list
-      And She selects "Receive a Code"
+      And she submits the form
       And she clicks the Email magic link
     Then she is redirected to the Root View
       And she sees a table with her profile info

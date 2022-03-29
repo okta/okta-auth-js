@@ -20,10 +20,10 @@ Feature: Multi-Factor Authentication with Password and SMS
     Then she is presented with a list of factors
     When She selects SMS from the list
       And She inputs a valid phone number
-      And She selects "Receive a Code"
+      And she submits the form
     Then the screen changes to receive an input for a code
-    When She inputs the correct code from the SMS
-      And She selects "Verify"
+    When she inputs the correct code from her "SMS"
+      And she submits the form
     Then she is redirected to the Root View
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"
@@ -39,7 +39,8 @@ Feature: Multi-Factor Authentication with Password and SMS
     Then she is presented with an option to select SMS to verify
     When She selects SMS from the list of methods
     Then the screen changes to receive an input for a code to verify
-    When She inputs the incorrect code from the SMS
+    When she inputs an incorrect code
+      And she submits the form
     Then the sample show as error message "Invalid code. Try again." on the SMS Challenge page
       And she sees a field to re-enter another code
 
@@ -53,7 +54,7 @@ Feature: Multi-Factor Authentication with Password and SMS
     Then she is presented with an option to select SMS to enroll
     When She selects SMS from the list
       And She inputs a invalid phone number
-      And She selects "Receive a Code"
+      And she submits the form
     Then she should see a message "Invalid Phone Number."
 
 
@@ -67,10 +68,10 @@ Feature: Multi-Factor Authentication with Password and SMS
     When she submits the form
     Then she is presented with an option to select SMS to verify
     When She selects SMS from the list of methods
-      And She selects "Receive a Code"
+      And she submits the form
     Then the screen changes to receive an input for a code to verify
-    When She inputs the correct code from the SMS
-      And She selects "Verify"
+    When she inputs the correct code from her "SMS"
+      And she submits the form
     Then she is redirected to the Root View
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

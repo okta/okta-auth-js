@@ -17,21 +17,16 @@ import confirmValidPassword from '../support/action/confirmValidPassword';
 import enterCredential from '../support/action/context-enabled/enterCredential';
 import enterValidPassword from '../support/action/enterValidPassword';
 import enterCode from '../support/action/enterCode';
-import enterCorrectCode from '../support/action/enterCorrectCode';
 import enterLiveUserEmail from '../support/action/context-enabled/live-user/enterEmail';
 import submitForm from '../support/action/submitForm';
-import clickLogout from '../support/action/clickLogout';
-import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
 import selectAuthenticator from '../support/action/selectAuthenticator';
 import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
 import selectGoogleAuthenticator from '../support/action/selectGoogleAuthenticator';
 import selectSecurityQuestionAuthenticator from '../support/action/selectSecurityQuestionAuthenticator';
-import enterIncorrectCode from '../support/action/enterIncorrectCode';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
 import enterRegistrationField from '../support/action/context-enabled/live-user/enterRegistrationField';
 import selectPasswordAuthenticator from '../support/action/selectPasswordAuthenticator';
 import selectPhoneAuthenticator from '../support/action/selectPhoneAuthenticator';
-import enterCorrectSMSCode from '../support/action/context-enabled/live-user/enterCorrectSMSCode';
 import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/context-enabled/live-user/enterCorrectPhoneNumber';
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
@@ -55,8 +50,13 @@ import clickButton from '../support/action/clickButton';
 import clickLink from '../support/action/clickLink';
 import setInputField from '../support/action/setInputField';
 import { camelize } from '../util';
+import getCodeFromSMS from '../support/action/getCodeFromSMS';
+import a18nClient from '../support/management-api/a18nClient';
 
-When('she clicks the {string} button', clickButton);
+When(
+  'she clicks the {string} button', 
+  async (buttonName: string) => await clickButton(buttonName)
+);
 
 When('she clicks the {string} link', clickLink);
 
@@ -80,20 +80,42 @@ When(
 );
 
 When(
+  'she fills in her phone number',
+  async function(this: ActionContext) {
+    await setInputField('set', this.credentials.phoneNumber, `input[name=addPhoneNumber]`);
+  }
+);
+
+When(
+  'she inputs the correct code from her {string}',
+  async function(this: ActionContext, type: string) {
+    let code = '';
+    if (type === 'SMS') {
+      code = await getCodeFromSMS(this.credentials.profileId);
+    } else if (type === 'Email') {
+      code = await a18nClient.getEmailCode(this.credentials.profileId);
+    } else if (type === 'Updated Email') {
+      code = await a18nClient.getEmailCode(this.secondCredentials.profileId);
+    }
+    await enterCode(code);
+  }
+);
+
+When(
   'she inputs the correct code from her Google Authenticator App for {string}',
   enterCorrectGoogleAuthenticatorCode
 );
 
 When(
-  'she inputs the correct code from the new Email address',
-  async function(this: ActionContext) {
-    await enterCorrectCode(this.secondCredentials.profileId);
-  }
+  'she inputs an incorrect code',
+  async () => await enterCode('000000')
 );
 
 When(
-  'she inputs the incorrect code from the new Email address',
-  async () => await enterCode('!incorrect!')
+  'she clicks the {string} button in {string} section',
+  async (buttonName: string, sectionName: string) => {
+    await clickButton(buttonName, `#${sectionName}-section`);
+  }
 );
 
 When(
@@ -127,18 +149,8 @@ When(
 );
 
 When(
-  /^she submits the registration form$/,
-  submitForm
-);
-
-When(
   /^her (password) is correct$/,
   enterCredential
-);
-
-When(
-  /^Mary clicks the logout button$/,
-  clickLogout
 );
 
 When(
@@ -172,25 +184,6 @@ When(
 );
 
 When(
-  /^she submits the recovery form$/,
-  submitPasswordRecoverForm
-);
-
-When(
-  /^she fills in the correct code$/,
-  async function(this: ActionContext) {
-    await enterCorrectCode(this.credentials.profileId);
-  }
-);
-
-When(
-  /^she inputs the correct code from her email$/,
-  async function(this: ActionContext) {
-    await enterCorrectCode(this.credentials.profileId);
-  }
-);
-
-When(
   /^She inputs a valid phone number$/,
   enterCorrectPhoneNumber
 );
@@ -198,26 +191,6 @@ When(
 When(
   /^She inputs the correct answer for the Question$/,
   enterCorrectQuestionAnswer
-);
-
-When(
-  /^She selects "Receive a Code"$/,
-  submitForm
-);
-
-When(
-  /^She selects "Verify"$/,
-  submitForm
-);
-
-When(
-  /^She inputs the correct code from her SMS$/,
-  enterCorrectSMSCode
-);
-
-When(
-  /^submits the enrollment form$/,
-  submitForm
 );
 
 When(
@@ -260,11 +233,6 @@ When(
   selectPasswordAuthenticator
 );
 
-When(
-  /^She inputs the incorrect code from the email$/,
-  enterIncorrectCode
-);
-
 When (
   /^she inputs an Email that doesn't exist$/,
   inputInvalidEmail
@@ -276,18 +244,8 @@ When(
 );
 
 When(
-  /^She inputs the correct code from the SMS$/,
-  enterCorrectSMSCode
-);
-
-When(
   /^She selects SMS from the list of methods$/,
   selectVerifyBySms
-);
-
-When(
-  /^She inputs the incorrect code from the SMS$/,
-  enterIncorrectCode
 );
 
 When(
@@ -316,19 +274,12 @@ When(
 );
 
 When(
-  /^She inputs the correct code from the Email$/,
-  async function(this: ActionContext) {
-    await enterCorrectCode(this.credentials.profileId);
-  }
-);
-
-When(
   /^she clicks the Email magic link$/,
   openEmailMagicLink
 );
 
 When(
-  /^She scans a QR Code$/,
+  'She scans a QR Code',
   async function(this: ActionContext) {
     this.sharedSecret = await getSecretFromQrCode();
   }

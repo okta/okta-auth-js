@@ -4,9 +4,9 @@ import { randomStr, getConfig } from '../../util';
 type Options = {
   policyDescription: string;
   groupId?: string;
-  dataTable?:{
-    rawTable: [string, string][];
-  } 
+  dataTable?: {
+    rawTable: string[][];
+  }; 
 }
 
 const getAuthenticationPolicy = () => {

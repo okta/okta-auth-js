@@ -15,7 +15,7 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
-      And she submits the registration form
+      And she submits the form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option
       # And she submits the select authenticator form
@@ -31,7 +31,7 @@ Feature: TOTP Support (Google Authenticator) Sign Up
       And She selects "Next"
     Then the screen changes to receive an input for a code
     When she inputs the correct code from her Google Authenticator App for "enrollment"
-      And She selects "Verify"
+      And she submits the form
     Then she sees a list of available factors to setup
     When she selects "Skip"
     Then she is redirected to the Root View

@@ -27,7 +27,6 @@ const AddAttributeButton = ({
   const [headingText, setHeadingText] = useState(heading);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
-  const [message, setMessage] = useState('Change this attribute will require additional verification');
   const [error, setError] = useState(null);
 
   const handleFinishTransaction = useCallback(() => {
@@ -70,6 +69,12 @@ const AddAttributeButton = ({
     handleFinishTransaction();
   };
 
+  const handleResend = async (e) => {
+    e.preventDefault();
+    const transaction = await myAccountTransaction.challenge({ data: { method: 'SMS' } });
+    setMyAccountTransaction(transaction);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -87,7 +92,6 @@ const AddAttributeButton = ({
         setMyAccountTransaction(transaction);
       }
       setValue('');
-      setMessage('');
       setError(null);
     } catch (err) {
       setError(err);
@@ -103,14 +107,8 @@ const AddAttributeButton = ({
             <Heading id="form-title" level="1" visualLevel="3">
               {headingText}
             </Heading>
-            {!!(message || error) && (
-              <Box id={`${selectorHint}-messages-container`}>
-                {!!message && (
-                  <Infobox
-                    variant="caution" 
-                    content={message}
-                    />
-                )}
+            {!!error && (
+              <Box id={`${selectorHint}-messages-container`} paddingTop="m" paddingBottom="m">
                 {error && (
                   <Infobox 
                     variant="danger" 
@@ -127,6 +125,12 @@ const AddAttributeButton = ({
                 value={value} 
                 onChange={handleChange} 
               />
+              {!!myAccountTransaction?.challenge && (
+                <Box display="flex" flexDirection="row" justifyContent="flex-end" alignItems="center" padding="s">
+                  <Text>Not receive the code?</Text>
+                  <Button variant="clear" name="resend" onClick={handleResend}>Resend</Button>
+                </Box>
+              )}
             </Form.Main>
             <Form.Actions>
               <Button variant="clear" name="cancel" onClick={handleCancel}>Cancel</Button>

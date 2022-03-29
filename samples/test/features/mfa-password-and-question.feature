@@ -15,7 +15,7 @@ Feature: Multi-Factor Authentication with Password and Security Question
     When She selects Security Question from the list
     Then the screen changes to challenge the Security Question
     When She inputs the correct answer for the Question
-      And She selects "Verify"
+      And she submits the form
     Then she is redirected to the Root View
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

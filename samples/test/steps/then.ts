@@ -55,6 +55,14 @@ Then(
 );
 
 Then(
+  'she sees a tip message for {string} that {string}', 
+  async (messageContainerName: string, expectedMessage: string) => {
+    const selector = `#${camelize(messageContainerName)}-tip p`;
+    await checkMessage(selector, expectedMessage);
+  }
+);
+
+Then(
   'the {string} field shows {string} in disabled state', 
   async (fieldName: string, value: string) => {
     fieldName = camelize(fieldName);
@@ -65,7 +73,17 @@ Then(
   }
 );
 
-Then('she sees the {string} button', checkButton);
+Then(
+  'she sees the {string} button', 
+  async (buttonName: string) => await checkButton(buttonName)
+);
+
+Then(
+  'she sees the {string} button in {string} section', 
+  async (buttonName: string, sectionName: string) => {
+    await checkButton(buttonName, `#${sectionName}-section`);
+  }
+);
 
 Then(
   'the {string} field shows the previous profile value',
@@ -89,6 +107,16 @@ Then(
 );
 
 Then(
+  'she sees a confirmation dialog to {string} with {string}',
+  async (modalName: string ,expectedMessage: string) => {
+    const selector = `#${camelize(modalName)}-modal`;
+    await waitForDisplayed(selector);
+    const text = await (await $(`${selector} h1`)).getText();
+    expect(text).toEqual(expectedMessage);
+  }
+);
+
+Then(
   'her {string} is updated to the new email address',
   async function(this: ActionContext, fieldName: string) {
     const selector = `#${fieldName.split(' ').join('-')}`;
@@ -106,7 +134,37 @@ Then(
 );
 
 Then(
-  'the form changes to receive an input for a Email code',
+  'the page confirms her phone has been added',
+  async function(this: ActionContext) {
+    await browser.waitUntil(async () => {
+      const el = await $(`.phone-number=${this.credentials.phoneNumber}`);
+      return await el.isDisplayed();
+    }, { timeoutMsg: 'wait for phone number' });
+  }
+);
+
+Then(
+  'she sees her phone number',
+  async function(this: ActionContext) {
+    await browser.waitUntil(async () => {
+      const el = await $(`.phone-number=${this.credentials.phoneNumber}`);
+      return await el.isDisplayed();
+    }, { timeoutMsg: 'wait for phone number' });
+  }
+);
+
+Then(
+  'the page should render without the desired phone number',
+  async function(this: ActionContext) {
+    await browser.waitUntil(async () => {
+      const el = await $(`.phone-number=${this.credentials.phoneNumber}`);
+      return !(await el.isDisplayed());
+    }, { timeoutMsg: 'wait for phone number to be deleted' });
+  }
+);
+
+Then(
+  'the form changes to receive an input for the verification code',
   async () => {
     await browser.waitUntil(async () => {
       const el = await $('#form-title');

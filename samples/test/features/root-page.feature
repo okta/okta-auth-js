@@ -20,7 +20,7 @@ Feature: Root page for Direct Auth Demo Application
   Scenario: Mary logs out of the app
     Given she is on the Root View in an AUTHENTICATED state
       # And Mary navigates to the Root View
-    When Mary clicks the logout button
+    When she clicks the "logout" button
     Then she is redirected back to the Root View
       And Mary sees login, registration buttons
       #And she sees that claims from /userinfo are disappeared

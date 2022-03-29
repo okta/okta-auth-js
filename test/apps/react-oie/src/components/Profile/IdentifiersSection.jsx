@@ -182,11 +182,11 @@ const IdentifiersSection = () => {
         ) : (
           <Spinner />
         )}
-        <Box>
+        <Box id="phone-section">
           <Text as="strong">Phone number</Text>
           {phones ? phones.map(phone => (
             <Box key={phone.id} display="flex" alignItems="center" paddingTop="s">
-              <Box>
+              <Box className='phone-number'>
                 <Text>{phone.profile.phoneNumber}</Text>
               </Box>
               {phone.status === 'UNVERIFIED' && (
@@ -204,6 +204,7 @@ const IdentifiersSection = () => {
               )}
               <Box marginLeft="s">
                 <RemoveButton 
+                  selectorHint="removePhoneNumber"
                   heading="Are you sure you want to remove this phone number?" 
                   description={phone.profile.phoneNumber}
                   onStartTransaction={handleRemovePhone.bind(null, phone.id)}
@@ -231,6 +232,7 @@ const IdentifiersSection = () => {
       </Box>
       <Box className="pure-u-1 pure-u-sm-1-2" marginTop="s">
         <InfoBox 
+          id="identifiers-tip"
           heading="Tip" 
           icon="information-circle-filled" 
           renderInfo={() => (

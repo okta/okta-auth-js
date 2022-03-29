@@ -147,6 +147,7 @@ const ProfileSection = () => {
         </Box>
         <Box className="pure-u-1 pure-u-sm-1-2">
           <InfoBox 
+            id="profile-tip"
             heading="Tip" 
             icon="information-circle-filled" 
             renderInfo={() => (

@@ -122,6 +122,7 @@ const samples = [
       'progressive-profiling-view-profile',
       'progressive-profiling-update-profile-info',
       'progressive-profiling-update-email-address',
+      'progressive-profiling-manage-phone-numbers',
     ],
     useEnv: true
   },

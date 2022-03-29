@@ -11,12 +11,10 @@
  */
 
 
-import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
 import setInputField from './setInputField';
 
 export default async function (code: string) {
   const selectorCandidates = [
-    ChallengeAuthenticator.code,
     `input[name=code]`,
     `input[name=verificationCode]`,
   ];

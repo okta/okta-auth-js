@@ -3,6 +3,7 @@ import { Modal, Heading, Box, Button, Text } from '@okta/odyssey-react';
 import LinkButton from './LinkButton';
 
 const RemoveButton = ({ 
+  selectorHint,
   heading, 
   description,
   onStartTransaction, 
@@ -27,17 +28,17 @@ const RemoveButton = ({
   
   return (
     <>
-    <Modal open={open} onClose={handleClose}>
+    <Modal id={`${selectorHint}-modal`} open={open} onClose={handleClose}>
       <Box display="flex" flexDirection="column" padding="m">
         <Heading>{heading}</Heading>
         <Text as="p">{description}</Text>
         <Box display="flex" justifyContent="flex-end">
-          <Button variant="clear" onClick={handleClose}>Cancel</Button>
-          <Button variant="danger" onClick={handleConfirm}>Remove</Button>
+          <Button name="cancel" variant="clear" onClick={handleClose}>Cancel</Button>
+          <Button name="remove" variant="danger" onClick={handleConfirm}>Remove</Button>
         </Box>
       </Box>
     </Modal>
-    <LinkButton onClick={handleButtonClick}>{children}</LinkButton>
+    <LinkButton name={selectorHint} onClick={handleButtonClick}>{children}</LinkButton>
     </>
   );
 };
