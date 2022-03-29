@@ -86,17 +86,21 @@ const samples = [
     generateType: GENERATE_TYPE_OVERWRITE,
     specs: ['express-embedded-auth-with-sdk'],
     features: [
+      // group sms related specs together, so they do not run in parallel
+      // this spec takes time to finish, run it first
+      [
+        'self-service-registration',
+        'mfa-password-and-sms',
+      ],
       'root-page', 
       'basic-auth', 
       'self-service-password-recovery', 
-      'self-service-registration',
       'self-service-registration-custom-attribute',
       'self-service-registration-activation-token',
       'mfa-password-and-email',
       'mfa-password-and-email-magic-link',
       'social-login-mfa',
       'social-idp',
-      'mfa-password-and-sms',
       'totp-signup',
       'totp-signin',
     ],
@@ -118,11 +122,15 @@ const samples = [
     name: '@okta/test.app.react-oie',
     appType: 'browser',
     features: [
+      // group sms related specs together, so they do not run in parallel
+      // this spec takes time to finish, run it first
+      [
+        'progressive-profiling-manage-phone-numbers',
+      ],
       'basic-auth',
       'progressive-profiling-view-profile',
       'progressive-profiling-update-profile-info',
       'progressive-profiling-update-email-address',
-      'progressive-profiling-manage-phone-numbers',
     ],
     useEnv: true
   },

@@ -31,9 +31,12 @@ import fetchUser from '../support/management-api/fetchUser';
 
 // NOTE: noop function is used for predefined settings
 
+// Extend the hook timeout to fight against org rate limit
+const timeout = 3 * 60 * 10000;
+
 Given(
   'the app is assigned to {string} group', 
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, groupName: string) {
     if (!this.app) {
       throw new Error('Application should be predefined');
@@ -44,7 +47,7 @@ Given(
 
 Given(
   'the app is granted {string} scope',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, scopeId: string) {
     await grantConsentToScope(this.app.id, scopeId);
   }
@@ -52,7 +55,7 @@ Given(
 
 Given(
   'the app has a custom User Profile Schema named {string}',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, schemaName: string) {
     await addUserProfileSchemaToApp(this.app.id, schemaName);
   }
@@ -60,7 +63,7 @@ Given(
 
 Given(
   'the app has Email Verification callback uri defined',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext) {
     // Update app settings via internal API, public API should be used once available
     await updateAppOAuthClient(this.app, { 
@@ -72,7 +75,7 @@ Given(
 
 Given(
   'a Policy that defines {string} with properties',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, policyDescription: string, dataTable) {
     this.policies = this.policies || [];
     const policy = await createPolicy({ 
@@ -89,7 +92,7 @@ Given(
 
 Given(
   'a Policy that defines {string}',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, policyDescription: string) {
     this.policies = this.policies || [];
     const policy = await createPolicy({ 
@@ -105,7 +108,7 @@ Given(
 
 Given(
   'with a Policy Rule that defines {string}',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, policyRuleDescription: string) {
     const lastPolicy = this.policies[this.policies.length - 1];
     await upsertPolicyRule({ 
@@ -117,17 +120,9 @@ Given(
   }
 );
 
-Given('a user named {string}', async function(this: ActionContext, firstName: string) {
-  this.credentials = await createCredentials(firstName, this.featureName);
-});
-
-Given('she has a second credential', async function(this: ActionContext) {
-  this.secondCredentials = await createCredentials('MaryNew', this.featureName);
-});
-
 Given(
   'she has an account with {string} state in the org',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, accountState: string) {
     if (!this.credentials) {
       throw new Error('Context credentials has not been created!');
@@ -154,7 +149,7 @@ Given(
 
 Given(
   'she has an account with active state in the org and her {string} is {string}',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, attrName: string, attrValue: string) {
     this.user = await createUser({
       // use predefined app when features are not available via management api
@@ -173,7 +168,7 @@ Given(
 
 Given(
   'a predefined user named Mary with an account in the org', 
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext) {
     this.credentials = {
       emailAddress: process.env.USERNAME,
@@ -187,20 +182,8 @@ Given(
 );
 
 Given(
-  'she is on the Root View in an AUTHENTICATED state', 
-  async function(this: ActionContext) {
-    await clickButton('login');
-    await checkIsOnPage('Root');
-    await loginDirect({
-      username: this.credentials.emailAddress,
-      password: this.credentials.password
-    });
-  }
-);
-
-Given(
   'she has enrolled in the {string} factor',
-  {  wrapperOptions: { retry: 1 } },
+  { timeout },
   async function(this: ActionContext, factorType: string) {
     this.enrolledFactor = await enrollFactor({
       userId: this.user.id,
@@ -215,6 +198,26 @@ Given(
   'Mary opens the Self Service Registration View with activation token',
   async function(this: ActionContext) {
     await openRegisterWithActivationToken(this.user);
+  }
+);
+
+Given('a user named {string}', async function(this: ActionContext, firstName: string) {
+  this.credentials = await createCredentials(firstName, this.featureName);
+});
+
+Given('she has a second credential', async function(this: ActionContext) {
+  this.secondCredentials = await createCredentials('MaryNew', this.featureName);
+});
+
+Given(
+  'she is on the Root View in an AUTHENTICATED state', 
+  async function(this: ActionContext) {
+    await clickButton('login');
+    await checkIsOnPage('Root');
+    await loginDirect({
+      username: this.credentials.emailAddress,
+      password: this.credentials.password
+    });
   }
 );
 

@@ -22,6 +22,9 @@ function getSampleConfig() {
 function getSampleSpecs() {
   const sampleConfig = getSampleConfig();
   const specs = (sampleConfig.specs || []).map(spec => {
+    if (Array.isArray(spec)) {
+      return spec.map(s => `specs/${s}.js`);
+    }
     return `specs/${spec}.js`;
   });
   return specs;
@@ -30,6 +33,9 @@ function getSampleSpecs() {
 function getSampleFeatures() {
   const sampleConfig = getSampleConfig();
   const specs = (sampleConfig.features || []).map(feature => {
+    if (Array.isArray(feature)) {
+      return feature.map(f => `features/${f}.feature`);
+    }
     return `features/${feature}.feature`;
   });
   return specs;

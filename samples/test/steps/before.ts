@@ -26,48 +26,28 @@ Before(function (this: ActionContext, scenario: any) {
 });
 
 // prepare app and group for all scenarios
-Before(async function(this: ActionContext) {
-  const hook = async () => {
-    this.group = await createGroup();
-    this.app = await createApp();
-    const { 
-      credentials: {
-        oauthClient: {
-          client_id: clientId,
-          client_secret: clientSecret
-        }
+// Extend the hook timeout to fight against org rate limit
+Before({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
+  this.group = await createGroup();
+  this.app = await createApp();
+  const { 
+    credentials: {
+      oauthClient: {
+        client_id: clientId,
+        client_secret: clientSecret
       }
-    } = this.app;
-    await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
-  
-    // update test app with new oauthClient info
-    const { sampleConfig: { appType } } = getConfig();
-    await startApp('/', {
-      ...(clientId && { clientId }),
-      ...(clientSecret && { clientSecret }),
-      // attach org config to web app transaction
-      ...(appType === 'web' && {
-        transactionId: crypto.randomBytes(16).toString('hex')
-      })
-    });
-  };
-
-  try {
-    await hook();
-  } catch (err) {
-    console.log('Failed to create test context, retry one more time', err);
-
-    // clear created context
-    if (this.app) {
-      await this.app.deactivate();
-      await this.app.delete();
     }
-    if (this.group) {
-      await this.group.delete();
-    }
-    // pause the process before retry
-    await browser.pause(3 * 1000);
-    // retry one more time
-    await hook();
-  }
+  } = this.app;
+  await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
+
+  // update test app with new oauthClient info
+  const { sampleConfig: { appType } } = getConfig();
+  await startApp('/', {
+    ...(clientId && { clientId }),
+    ...(clientSecret && { clientSecret }),
+    // attach org config to web app transaction
+    ...(appType === 'web' && {
+      transactionId: crypto.randomBytes(16).toString('hex')
+    })
+  });
 });
