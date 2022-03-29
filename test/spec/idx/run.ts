@@ -196,6 +196,7 @@ describe('idx/run', () => {
     expect(res).toMatchObject({
       status: IdxStatus.PENDING,
       nextStep: 'remediate-nextStep',
+      requestDidSucceed: true
     });
   });
 

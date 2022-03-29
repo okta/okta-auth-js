@@ -116,6 +116,7 @@ export interface IdxTransaction {
   meta?: IdxTransactionMeta;
   enabledFeatures?: IdxFeature[];
   availableSteps?: NextStep[];
+  requestDidSucceed?: boolean;
 
   // from idx-js, used by signin widget
   proceed: (remediationName: string, params: unknown) => Promise<IdxResponse>;

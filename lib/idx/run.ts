@@ -319,7 +319,7 @@ export async function run(
   }
   
   // from idx-js, used by the widget
-  const { actions, context, neededToProceed, proceed, rawIdxState } = idxResponse || {};
+  const { actions, context, neededToProceed, proceed, rawIdxState, requestDidSucceed } = idxResponse || {};
   return {
     status: status!,
     ...(meta && { meta }),
@@ -337,5 +337,6 @@ export async function run(
     neededToProceed: neededToProceed!,
     proceed: proceed!,
     rawIdxState: rawIdxState!,
+    requestDidSucceed
   };
 }
