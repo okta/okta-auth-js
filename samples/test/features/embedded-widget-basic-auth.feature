@@ -8,7 +8,7 @@ Feature: Basic Login with Embedded Sign In Widget
 
   Scenario: Mary logs in with a Password
 	  When she clicks the "login" button
-    Then she is redirected to the Embedded Widget View
+    Then she is redirected to the "Embedded Widget" page
 	  When she fills in her correct username
 	    And she fills in her correct password
 	    And she submits the form

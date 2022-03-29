@@ -122,7 +122,7 @@ When(
     } else if (authenticator === 'Password') {
       authenticatorKey = 'okta_password';
     } else if (authenticator === 'Phone') {
-      authenticatorKey = 'phone_number'
+      authenticatorKey = 'phone_number';
     } else if (authenticator === 'Google Authenticator') {
       authenticatorKey = 'google_otp';
     } else if (authenticatorKey === 'Security Question') {
@@ -132,7 +132,7 @@ When(
     }
     await selectAuthenticator(authenticatorKey);
   }
-)
+);
 
 When(
   /^User enters (username|password) into the form$/,

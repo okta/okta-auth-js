@@ -65,7 +65,6 @@ const pages: { [key: string]: Page } = {
   'Challenge Google Authenticator':  ChallengeGoogleAuthenticator,
   // SIW form
   'Embedded Widget': OktaSignInOIE,
-  'Embedded Widget View': OktaSignInOIE,
   'Login with Social IDP': OktaSignInOIEFacebookIdp,
   'Login with Okta OIDC IDP': OktaSignInOIEOktaIdp,
 };
