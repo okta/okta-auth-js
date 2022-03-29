@@ -1,0 +1,154 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MyAccount Email API Email Management can manage email with SDK methods 1`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 201,
+  },
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "roles": Array [
+    "SECONDARY",
+  ],
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Email API Email Management can manage email with SDK methods 2`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 201,
+  },
+  "expiresAt": Any<String>,
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "poll": [Function],
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "status": "UNVERIFIED",
+  "verify": [Function],
+}
+`;
+
+exports[`MyAccount Email API Email Management can manage email with Transaction functions 1`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 201,
+  },
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "roles": Array [
+    "SECONDARY",
+  ],
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Email API Email Management can manage email with Transaction functions 2`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 200,
+  },
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "roles": Array [
+    "SECONDARY",
+  ],
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Email API Email Management can manage email with Transaction functions 3`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 201,
+  },
+  "expiresAt": Any<String>,
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "poll": [Function],
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "status": "UNVERIFIED",
+  "verify": [Function],
+}
+`;
+
+exports[`MyAccount Email API Email Management can manage email with Transaction functions 4`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 200,
+  },
+  "expiresAt": Any<String>,
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Email API getEmail/s can get email/s 1`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 200,
+  },
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "roles": Any<Array>,
+  "status": Any<String>,
+}
+`;
+
+exports[`MyAccount Email API getEmail/s can get email/s 2`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 200,
+  },
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "roles": Any<Array>,
+  "status": Any<String>,
+}
+`;

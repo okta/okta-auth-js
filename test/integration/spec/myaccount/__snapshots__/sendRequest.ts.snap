@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`lower level sendRequest function against "/idp/myaccount/emails" endpoint can get emails with "okta.myAccount.email.read" token scope 1`] = `
+Object {
+  "_http": Object {
+    "headers": Any<Object>,
+    "status": 200,
+  },
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "email": Any<String>,
+  },
+  "roles": Any<Array>,
+  "status": Any<String>,
+}
+`;

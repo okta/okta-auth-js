@@ -869,6 +869,7 @@ This is accomplished by selecting a single tab to handle the network requests to
   * [session.get](#sessionget)
   * [session.refresh](#sessionrefresh)
 * [idx](#idx)
+* [myaccount](#myaccount)
 * [token](#token)
   * [token.getWithoutPrompt](#tokengetwithoutpromptoptions)
   * [token.getWithPopup](#tokengetwithpopupoptions)
@@ -1255,6 +1256,11 @@ authClient.session.refresh()
 ### `idx`
 
 See detail in [IDX README](docs/idx.md)
+
+### `myaccount`
+
+See detail in [MyAccount API README](docs/myaccount/README.md)
+
 
 ### `token`
 

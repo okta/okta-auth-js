@@ -20,6 +20,13 @@ import { AuthApiError, OAuthError } from '../errors';
 
 export function httpRequest(sdk: OktaAuthInterface, options: RequestOptions): Promise<any> {
   options = options || {};
+
+  if (sdk.options.httpRequestInterceptors) {
+    for (const interceptor of sdk.options.httpRequestInterceptors) {
+      interceptor(options);
+    }
+  }
+
   var url = options.url,
       method = options.method,
       args = options.args,
@@ -63,8 +70,16 @@ export function httpRequest(sdk: OktaAuthInterface, options: RequestOptions): Pr
       res = resp.responseText;
       if (res && isString(res)) {
         res = JSON.parse(res);
+        // Deprecated: this logic may cause confliction, use "_http" field instead 
+        // Remove in the next major version - OKTA-485317
         if (res && typeof res === 'object' && !res.headers) {
-          res.headers = resp.headers;
+          if (Array.isArray(res)) {
+            res.forEach(item => {
+              item.headers = resp.headers;
+            });
+          } else {
+            res.headers = resp.headers;
+          }
         }
       }
 
@@ -83,6 +98,23 @@ export function httpRequest(sdk: OktaAuthInterface, options: RequestOptions): Pr
           expiresAt: Math.floor(Date.now()/1000) + DEFAULT_CACHE_DURATION,
           response: res
         });
+      }
+
+      // Attach http related info to response
+      // Only apply to empty or object response
+      if (Array.isArray(res)) {
+        res.forEach(item => {
+          item._http = {
+            headers: resp.headers,
+            status: resp.status
+          };
+        });
+      } else if (!res || typeof res === 'object') {
+        res = res || {};
+        res._http = {
+          headers: resp.headers,
+          status: resp.status
+        };
       }
 
       return res;

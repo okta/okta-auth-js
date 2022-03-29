@@ -5,6 +5,7 @@ source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 setup_service java 1.8.222
 setup_service google-chrome-stable 89.0.4389.72-1
 
+export TEST_NAME=@okta/test.app.react-mfa-v1
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 
@@ -18,7 +19,7 @@ export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # This client has MFA (security question) enabled
-export CLIENT_ID=0oa41zpqqxar7OFl84x7
+export SPA_CLIENT_ID=0oa41zpqqxar7OFl84x7
 export MFA_ENABLED=true
 
 # Run the tests

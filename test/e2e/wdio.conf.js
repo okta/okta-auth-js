@@ -44,7 +44,7 @@ const drivers = {
 };
 
 exports.config = {
-    jasmineNodeOpts: {
+    jasmineOpts: {
         defaultTimeoutInterval,
         stopSpecOnExpectationFailure: true
     },
