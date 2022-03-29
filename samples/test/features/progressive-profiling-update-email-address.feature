@@ -2,8 +2,8 @@ Feature: Update Email Address
 
   Background:
     Given an App that assigned to a test group
-      And the app is granted "okta.myAccount.read" scope
-      And the app is granted "okta.myAccount.manage" scope
+      And the app is granted "okta.myAccount.profile.read" scope
+      And the app is granted "okta.myAccount.profile.manage" scope
       And the app is granted "okta.myAccount.email.manage" scope
       And the app is granted "okta.myAccount.phone.manage" scope
       And a Policy that defines "Authentication"

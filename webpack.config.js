@@ -8,14 +8,17 @@ var fs      = require('fs');
 var _ = require('lodash');
 var commonConfig = require('./webpack.common.config');
 
-var license = fs.readFileSync('lib/license-header.txt', 'utf8');
+var license = fs.readFileSync('lib/license-header.txt', 'utf8'); 
 
 module.exports = _.extend({}, _.cloneDeep(commonConfig), {
   mode: (process.env.NODE_ENV === 'development') ? 'development' : 'production',
-  entry: './lib/',
+  entry: {
+    'okta-auth-js': './lib/index.ts',
+    'myaccount': './lib/myaccount/index.ts'
+  },
   output: {
     path: path.join(__dirname, 'build', 'dist'),
-    filename: 'okta-auth-js.umd.js',
+    filename: '[name].umd.js',
     library: 'OktaAuth',
     libraryTarget: 'umd'
   },

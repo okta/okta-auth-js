@@ -193,8 +193,10 @@ export interface ParseFromUrlInterface extends ParseFromUrlFunction {
 
 export type GetWithRedirectFunction = (params?: TokenParams) => Promise<void>;
 
+export type SetLocationFunction = (loc: string) => void;
+
 export interface GetWithRedirectAPI extends GetWithRedirectFunction {
-  _setLocation: (loc: string) => void;
+  _setLocation: SetLocationFunction;
 }
 
 export interface BaseTokenAPI {

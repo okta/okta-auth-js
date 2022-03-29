@@ -25,3 +25,4 @@ export * from './Token';
 export * from './TokenManager';
 export * from './Service';
 export * from './UserClaims';
+export * from '../myaccount/types';

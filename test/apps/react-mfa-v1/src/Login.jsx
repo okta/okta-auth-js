@@ -31,6 +31,6 @@ const Login = () => {
       <button id="submit-login-form" type="submit">Login</button>
     </form>
   );
-}
+};
 
 export default Login;

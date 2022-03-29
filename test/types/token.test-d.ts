@@ -21,7 +21,8 @@ import {
   TokenResponse,
   JWTObject,
   RefreshToken,
-  OktaAuth
+  OktaAuth,
+  JWTPayload,
 } from '../../build/lib/index.d';
 import { expectType, expectAssignable, expectError } from 'tsd';
 
@@ -95,7 +96,7 @@ const tokens = {
 
   const decodedToken = authClient.token.decode('ID_TOKEN_JWT');
   expectType<JWTObject>(decodedToken);
-  expectType<UserClaims>(decodedToken.payload);
+  expectType<JWTPayload>(decodedToken.payload);
   expectType<string>(decodedToken.header.alg);
   expectType<string>(decodedToken.signature);
 

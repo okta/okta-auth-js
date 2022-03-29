@@ -2,8 +2,8 @@ Feature: Update Profile Information
 
   Background:
     Given an App that assigned to a test group
-      And the app is granted "okta.myAccount.read" scope
-      And the app is granted "okta.myAccount.manage" scope
+      And the app is granted "okta.myAccount.profile.read" scope
+      And the app is granted "okta.myAccount.profile.manage" scope
       And the app is granted "okta.myAccount.email.manage" scope
       And the app is granted "okta.myAccount.phone.manage" scope
       # And the app has a custom User Profile Schema named "age" // predefined in User (default)
@@ -40,6 +40,6 @@ Feature: Update Profile Information
       And the "age" field is available for input
     When she changes the "age" field to "Thirty"
       And she clicks the "save profile" button
-    Then she sees a banner message for "profile" that "Invalid value data type for property 'age'"
+    Then she sees a banner message for "profile" that "Api validation failed: forUpdate"
       And the "age" field shows the previous profile value
     

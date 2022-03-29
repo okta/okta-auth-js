@@ -6,7 +6,7 @@ export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/unit"
 
 export CI=true
-export ISSUER=https://oie-signin-widget.okta.com/oauth2/default
+export ISSUER=https://oie-signin-widget.okta.com
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 

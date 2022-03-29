@@ -293,7 +293,14 @@ util.itMakesCorrectRequestResponse = function (options) {
           test.trans = res;
           resp = test.responseBody;
           if (resp && typeof resp === 'object') {
-            resp = {...resp, headers: test.headers};
+            resp = {
+              ...resp, 
+              headers: test.headers,
+              _http: expect.objectContaining({
+                status: expect.any(Number),
+                headers: test.headers
+              })
+            };
           }
         }
         if (options.expectations) {

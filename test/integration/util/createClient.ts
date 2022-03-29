@@ -11,7 +11,7 @@ afterEach(() => {
 
 export function createClient(options) {
   const issuer = process.env.ISSUER;
-  const clientId = process.env.CLIENT_ID;
+  const clientId = process.env.SPA_CLIENT_ID || process.env.CLIENT_ID;
   const redirectUri = 'http://localhost:8080/login/callback';
   options = Object.assign({
     issuer,

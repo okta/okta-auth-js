@@ -12,13 +12,14 @@
 
 import { StorageManagerOptions, StorageUtil, SimpleStorage } from './Storage';
 import { CookieOptions } from './Cookies';
-import { HttpRequestClient } from './http';
+import { HttpRequestClient, RequestOptions } from './http';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
 import { IdxTransactionMeta, RunOptions } from '../idx/types';
 import { ServiceManagerOptions } from './Service';
 import OktaAuth from '../OktaAuth';
 import { OAuthResponseMode, OAuthResponseType } from './OAuth';
+import { SetLocationFunction } from './api';
 
 
 export interface IsAuthenticatedOptions {
@@ -101,6 +102,7 @@ export interface OktaAuthOptions extends
   storageUtil?: StorageUtil;
   ajaxRequest?: object;
   httpRequestClient?: HttpRequestClient;
+  httpRequestInterceptors?: ((request: RequestOptions) => void)[];
   cookies?: CookieOptions;
   transformErrorXHR?: (xhr: object) => any;
   headers?: object;
@@ -119,4 +121,5 @@ export interface OktaAuthOptions extends
   
   // For server-side web applications ONLY!
   clientSecret?: string;
+  setLocation?: SetLocationFunction;
 }

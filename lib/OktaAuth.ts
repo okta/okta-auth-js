@@ -250,7 +250,11 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     const getWithRedirectApi: GetWithRedirectAPI = Object.assign(getWithRedirectFn, {
       // This is exposed so we can set window.location in our tests
       _setLocation: function(url) {
-        window.location = url;
+        if (options.setLocation) {
+          options.setLocation(url);
+        } else {
+          window.location = url;
+        }
       }
     });
     // eslint-disable-next-line max-len
