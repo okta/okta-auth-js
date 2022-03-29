@@ -628,19 +628,23 @@ describe('TransactionManager', () => {
     beforeEach(() => {
       createInstance();
       const setStorage = jest.fn();
-      const meta = {};
+      const rawIdxResponse = RawIdxResponseFactory.build();
+      const savedResponse = {
+        rawIdxResponse,
+        requestDidSucceed: true
+      };
       Object.assign(testContext, {
         setStorage,
-        meta
+        savedResponse
       });
     });
     it('saves to idxResponse storage', () => {
-      const { storageManager, setStorage, meta, transactionManager } = testContext;
+      const { storageManager, setStorage, savedResponse, transactionManager } = testContext;
       jest.spyOn(storageManager, 'getIdxResponseStorage').mockReturnValue({
         setStorage
       });
-      transactionManager.saveIdxResponse(meta);
-      expect(setStorage).toHaveBeenCalledWith(meta);
+      transactionManager.saveIdxResponse(savedResponse);
+      expect(setStorage).toHaveBeenCalledWith(savedResponse);
     });
   });
 
@@ -651,10 +655,16 @@ describe('TransactionManager', () => {
     it('loads from idxResponse storage', () => {
       const { transactionManager, idxResponseStorage } = testContext;
       const rawIdxResponse = RawIdxResponseFactory.build();
-      idxResponseStorage.getStorage.mockReturnValue(rawIdxResponse);
+      idxResponseStorage.getStorage.mockReturnValue({
+        rawIdxResponse,
+        requestDidSucceed: true
+      });
       const res = transactionManager.loadIdxResponse();
       expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-      expect(res).toEqual(rawIdxResponse);
+      expect(res).toEqual({
+        rawIdxResponse,
+        requestDidSucceed: true
+      });
     });
     it('returns null if idxResponse is not valid', () => {
       const { transactionManager, idxResponseStorage } = testContext;
