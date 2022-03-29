@@ -826,7 +826,7 @@ In version `6.X`, the `autoRenew` configuration was set in `config.tokenManager`
 When `tokenManager.autoRenew` is `true` both renew strategies are enabled. To disable the `active` strategy, set `tokenManager.autoRenew` to `true` and `services.autoRenew` to `false`. To disable both renew strategies set either `tokenManager.autoRenew` or `services.autoRenew` to `false`
 
 #### `autoRemove`
-By default, the library will attempt to remove expired tokens when `autoRenew` is `false`. If you wish to disable auto removal of tokens, set `autoRemove` to `false`.
+By default, the library will attempt to remove expired tokens when `autoRemove` is `true`. If you wish to disable auto removal of tokens, set `autoRemove` to `false`.
 
 #### `syncStorage`
 Automatically syncs tokens across browser tabs when token storage is `localStorage`. To disable this behavior, set `syncStorage` to false.
