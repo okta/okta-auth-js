@@ -10,24 +10,28 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import UserHome from '../selectors/UserHome';
-import ActionContext from '../context';
 
-export default async function(this: ActionContext) {
-  // verify profile info
-  const userName = this?.credentials?.emailAddress || this?.userName || process.env.USERNAME;
+import setInputField from './setInputField';
+
+export default async function (code: string) {
+  const selectorCandidates = [
+    `input[name=code]`,
+    `input[name=verificationCode]`,
+  ];
+  let selector = '';
   await browser.waitUntil(async () => {
-    const selectors = UserHome.email;
-    for (const selector of selectors) {
-      const el = await $(selector);
-      const text = await el?.getText();
-      if (text === userName) {
+    for (const selectorCandidate of selectorCandidates) {
+      const el = await $(selectorCandidate);
+      const isDisplayed = await el?.isDisplayed();
+      if (isDisplayed) {
+        selector = selectorCandidate;
         return true;
       }
     }
     return false;
   }, {
-    timeout: 5000,
-    timeoutMsg: 'wait for profile'
+    timeout: 3000,
+    timeoutMsg: 'wait for correct selector'
   });
+  await setInputField('set', code, selector);
 }

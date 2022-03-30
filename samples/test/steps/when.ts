@@ -13,26 +13,15 @@
 
 import { When } from '@cucumber/cucumber';
 
-import clickElement from '../support/action/clickElement';
 import confirmValidPassword from '../support/action/confirmValidPassword';
 import enterCredential from '../support/action/context-enabled/enterCredential';
 import enterValidPassword from '../support/action/enterValidPassword';
-import enterCorrectCode from '../support/action/context-enabled/live-user/enterCorrectCode';
+import enterCode from '../support/action/enterCode';
 import enterLiveUserEmail from '../support/action/context-enabled/live-user/enterEmail';
-import submitAnyForm from '../support/action/submitAnyForm';
-import submitForm from '../support/action/context-enabled/submitForm';
-import clickLogout from '../support/action/clickLogout';
-import submitPasswordRecoverForm from '../support/action/submitPasswordRecoverForm';
+import submitForm from '../support/action/submitForm';
 import selectAuthenticator from '../support/action/selectAuthenticator';
-import selectEmailAuthenticator from '../support/action/selectEmailAuthenticator';
-import selectGoogleAuthenticator from '../support/action/selectGoogleAuthenticator';
-import selectSecurityQuestionAuthenticator from '../support/action/selectSecurityQuestionAuthenticator';
-import enterIncorrectCode from '../support/action/enterIncorrectCode';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
 import enterRegistrationField from '../support/action/context-enabled/live-user/enterRegistrationField';
-import selectPasswordAuthenticator from '../support/action/selectPasswordAuthenticator';
-import selectPhoneAuthenticator from '../support/action/selectPhoneAuthenticator';
-import enterCorrectSMSCode from '../support/action/context-enabled/live-user/enterCorrectSMSCode';
 import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/context-enabled/live-user/enterCorrectPhoneNumber';
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
@@ -46,15 +35,104 @@ import clickLoginWithOktaOIDCIdPInWidget from '../support/action/clickLoginWithO
 import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
 import loginWidget from '../support/action/loginWidget';
 import enterCorrectQuestionAnswer from '../support/action/enterCorrectQuestionAnswer';
-import scanQrCode from '../support/action/context-enabled/scanQrCode';
-import getSharedSecret from '../support/action/context-enabled/getSharedSecret';
+import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
+import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
 import enterCorrectGoogleAuthenticatorCode from '../support/action/context-enabled/enterCorrectGoogleAuthenticatorCode';
 import openEmailMagicLink from '../support/action/context-enabled/live-user/openEmailMagicLink';
 import ActionContext from '../support/context';
-import loginDirect from '../support/action/loginDirect';
-import Home from '../support/selectors/Home';
 import noop from '../support/action/noop';
+import clickButton from '../support/action/clickButton';
+import clickLink from '../support/action/clickLink';
+import setInputField from '../support/action/setInputField';
+import { camelize } from '../util';
+import getCodeFromSMS from '../support/action/getCodeFromSMS';
+import a18nClient from '../support/management-api/a18nClient';
 
+When(
+  'she clicks the {string} button', 
+  async (buttonName: string) => await clickButton(buttonName)
+);
+
+When('she clicks the {string} link', clickLink);
+
+When('she clicks the Login with Okta OIDC IDP button', clickOIDCIdPButton);
+
+When('she submits the form', submitForm);
+
+When(
+  'she changes the {string} field to {string}', 
+  async (fieldName: string, value: string) => {
+    fieldName = camelize(fieldName);
+    await setInputField('set', value, `input[name=${fieldName}]`);
+  }
+);
+
+When(
+  'she changes her email to a different valid email address',
+  async function(this: ActionContext) {
+    await setInputField('set', this.secondCredentials.emailAddress, `input[name=editPrimaryEmail]`);
+  }
+);
+
+When(
+  'she fills in her phone number',
+  async function(this: ActionContext) {
+    await setInputField('set', this.credentials.phoneNumber, `input[name=addPhoneNumber]`);
+  }
+);
+
+When(
+  'she inputs the correct code from her {string}',
+  async function(this: ActionContext, type: string) {
+    let code = '';
+    if (type === 'SMS') {
+      code = await getCodeFromSMS(this.credentials.profileId);
+    } else if (type === 'Email') {
+      code = await a18nClient.getEmailCode(this.credentials.profileId);
+    } else if (type === 'Updated Email') {
+      code = await a18nClient.getEmailCode(this.secondCredentials.profileId);
+    }
+    await enterCode(code);
+  }
+);
+
+When(
+  'she inputs the correct code from her Google Authenticator App for {string}',
+  enterCorrectGoogleAuthenticatorCode
+);
+
+When(
+  'she inputs an incorrect code',
+  async () => await enterCode('000000')
+);
+
+When(
+  'she clicks the {string} button in {string} section',
+  async (buttonName: string, sectionName: string) => {
+    await clickButton(buttonName, `#${sectionName}-section`);
+  }
+);
+
+When(
+  'she selects the {string} factor',
+  async (authenticator: string) => {
+    let authenticatorKey;
+    if (authenticator === 'Email') {
+      authenticatorKey = 'okta_email';
+    } else if (authenticator === 'Password') {
+      authenticatorKey = 'okta_password';
+    } else if (authenticator === 'Phone') {
+      authenticatorKey = 'phone_number';
+    } else if (authenticator === 'Google Authenticator') {
+      authenticatorKey = 'google_otp';
+    } else if (authenticatorKey === 'Security Question') {
+      authenticatorKey = 'question';
+    } else {
+      throw new Error(`Unknown authenticator ${authenticator}`);
+    }
+    await selectAuthenticator(authenticatorKey);
+  }
+);
 
 When(
   /^User enters (username|password) into the form$/,
@@ -87,33 +165,8 @@ When(
 );
 
 When(
-  /^she submits the registration form$/,
-  submitAnyForm
-);
-
-When(
   /^her (password) is correct$/,
   enterCredential
-);
-
-When(
-  /^User submits the form$/,
-  submitForm
-);
-
-When(
-  /^Mary clicks the logout button$/,
-  clickLogout
-);
-
-When(
-  /^she submits the Login form(?: with blank fields)?$/,
-  submitForm
-);
-
-When(
-  /^she clicks Login$/,
-  submitForm
 );
 
 When(
@@ -139,36 +192,11 @@ When(
 );
 
 When(
-  /^she clicks the "Login with Okta OIDC IDP" button$/,
-  clickOIDCIdPButton
-);
-
-When(
   /^logs in to Okta OIDC IDP$/,
   async function() {
     // Login to Okta OIDC org with standard username, password (same user exists in OIDC IdP org)
     await loginWidget();
   }
-);
-
-When(
-  /^she clicks on the "Forgot Password Link"$/,
-  clickElement.bind(null, 'click', 'link', '/recover-password')
-);
-
-When(
-  /^she submits the recovery form$/,
-  submitPasswordRecoverForm
-);
-
-When(
-  /^she fills in the correct code$/,
-  enterCorrectCode
-);
-
-When(
-  /^she inputs the correct code from her email$/,
-  enterCorrectCode
 );
 
 When(
@@ -182,31 +210,6 @@ When(
 );
 
 When(
-  /^She selects "Receive a Code"$/,
-  submitAnyForm
-);
-
-When(
-  /^She selects "Verify"$/,
-  submitAnyForm
-);
-
-When(
-  /^She inputs the correct code from her SMS$/,
-  enterCorrectSMSCode
-);
-
-When(
-  /^she submits the form$/,
-  submitAnyForm
-);
-
-When(
-  /^submits the enrollment form$/,
-  submitAnyForm
-);
-
-When(
   /^she fills a password that fits within the password policy$/,
   enterValidPassword
 );
@@ -214,41 +217,6 @@ When(
 When(
   /^she confirms that password$/,
   confirmValidPassword
-);
-  
-When(
-  /^She has selected Email from the list of factors$/,
-  selectEmailAuthenticator
-);
-
-When(
-  /^she selects Email$/,
-  selectEmailAuthenticator
-);
-
-When(
-  /^she selects email authenticator$/,
-  selectAuthenticator.bind(null, 'okta_email')
-);
-
-When(
-  /^She selects Security Question from the list$/,
-  selectSecurityQuestionAuthenticator
-);
-
-When(
-  /^She selects Phone from the list$/,
-  selectPhoneAuthenticator
-);
-
-When(
-  /^she chooses password factor option$/,
-  selectPasswordAuthenticator
-);
-
-When(
-  /^She inputs the incorrect code from the email$/,
-  enterIncorrectCode
 );
 
 When (
@@ -262,18 +230,8 @@ When(
 );
 
 When(
-  /^She inputs the correct code from the SMS$/,
-  enterCorrectSMSCode
-);
-
-When(
   /^She selects SMS from the list of methods$/,
   selectVerifyBySms
-);
-
-When(
-  /^She inputs the incorrect code from the SMS$/,
-  enterIncorrectCode
 );
 
 When(
@@ -292,59 +250,25 @@ When(
 );
 
 When(
-  /^She selects Email from the list$/,
-  selectEmailAuthenticator
-);
-
-When(
-  /^She selects Google Authenticator from the list$/,
-  selectGoogleAuthenticator
-);
-
-When(
-  /^She inputs the correct code from the Email$/,
-  enterCorrectCode
-);
-
-When(
   /^she clicks the Email magic link$/,
   openEmailMagicLink
 );
 
 When(
-  /^She scans a QR Code$/,
-  scanQrCode
+  'She scans a QR Code',
+  async function(this: ActionContext) {
+    this.sharedSecret = await getSecretFromQrCode();
+  }
 );
 
 When(
-  /^She enters the shared Secret Key into the Google Authenticator App$/,
-  getSharedSecret
+  'She enters the shared Secret Key into the Google Authenticator App',
+  async function(this: ActionContext) {
+    this.sharedSecret = await getSecretFromSharedSecret();
+  }
 );
 
 When(
   /^She selects "Next"/,
   noop
-);
-
-When(
-  /^She inputs the correct code from her Google Authenticator App$/,
-  enterCorrectGoogleAuthenticatorCode
-);
-
-When(
-  'she clicks the login button',
-  async function() {
-    await clickElement('click', 'selector', Home.loginButton);
-  }
-);
-
-When(
-  'she logs in to the app',
-  async function(this: ActionContext) {
-    await clickElement('click', 'selector', Home.loginButton);
-    await loginDirect({
-      username: this.credentials.emailAddress,
-      password: this.credentials.password
-    });
-  }
 );

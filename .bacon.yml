@@ -15,91 +15,77 @@ test_suites:
       queue_name: small
     - name: integration
       script_path: ../okta-auth-js/scripts
-      sort_order: '2'
+      sort_order: '3'
       timeout: '10'
       script_name: integration
       criteria: MERGE
       queue_name: small
-    - name: e2e
-      script_path: ../okta-auth-js/scripts
-      sort_order: '3'
-      timeout: '15'
-      script_name: e2e
-      criteria: MERGE
-      queue_name: small
-    - name: e2e-refresh-token
-      script_path: ../okta-auth-js/scripts
-      sort_order: '4'
-      timeout: '10'
-      script_name: e2e-refresh-token
-      criteria: MERGE
-      queue_name: small
     - name: e2e-mfa
       script_path: ../okta-auth-js/scripts
-      sort_order: '5'
+      sort_order: '4'
       timeout: '10'
       script_name: e2e-mfa
       criteria: MERGE
       queue_name: small
-    - name: e2e-oie
+    - name: e2e
       script_path: ../okta-auth-js/scripts
-      sort_order: '6'
+      sort_order: '5'
       timeout: '15'
-      script_name: e2e-oie
+      script_name: e2e
       criteria: MERGE
       queue_name: small
     - name: e2e-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts
-      sort_order: '7'
-      timeout: '30'
+      sort_order: '6'
+      timeout: '20'
       script_name: e2e-express-embedded-auth-with-sdk
       criteria: MERGE
       queue_name: small
     - name: e2e-express-web-no-oidc
       script_path: ../okta-auth-js/scripts
-      sort_order: '8'
+      sort_order: '7'
       timeout: '10'
       script_name: e2e-express-web-no-oidc
       criteria: MERGE
       queue_name: small
     - name: e2e-express-web-with-oidc
       script_path: ../okta-auth-js/scripts
-      sort_order: '9'
+      sort_order: '8'
       timeout: '10'
       script_name: e2e-express-web-with-oidc
       criteria: MERGE
       queue_name: small
     - name: e2e-static-spa
       script_path: ../okta-auth-js/scripts
-      sort_order: '11'
+      sort_order: '9'
       timeout: '10'
       script_name: e2e-static-spa
       criteria: MERGE
       queue_name: small
     - name: e2e-webpack-spa
       script_path: ../okta-auth-js/scripts
-      sort_order: '12'
+      sort_order: '10'
       timeout: '10'
       script_name: e2e-webpack-spa
       criteria: MERGE
       queue_name: small
     - name: e2e-express-embedded-sign-in-widget
       script_path: ../okta-auth-js/scripts
-      sort_order: '13'
+      sort_order: '11'
       timeout: '10'
       script_name: e2e-express-embedded-sign-in-widget
       criteria: MERGE
       queue_name: small
     - name: e2e-react-oie
       script_path: ../okta-auth-js/scripts
-      sort_order: '14'
-      timeout: '10'
+      sort_order: '12'
+      timeout: '20'
       script_name: e2e-react-oie
       criteria: MERGE
       queue_name: small
     - name: publish
       script_path: ../okta-auth-js/scripts
-      sort_order: '15'
+      sort_order: '13'
       timeout: '60'
       script_name: publish
       criteria: MERGE

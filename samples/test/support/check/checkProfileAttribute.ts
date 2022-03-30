@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars, complexity */
 
 import checkEqualsText from './checkEqualsText';
 import ActionContext from '../context';
@@ -30,6 +30,25 @@ export default async function(this: ActionContext, attribute: string, _: string)
     throw new Error('Failed to find attribute in credentials');
   }
 
-  const selector = (UserHome as any)[key];
+  let selector;
+  const selectorFromPageObject = (UserHome as any)[key];
+  if (Array.isArray(selectorFromPageObject)) {
+    const selectorCandidates = (UserHome as any)[key];
+    for (const selectorCandidate of selectorCandidates) {
+      const el = await $(selectorCandidate);
+      try {
+        await el.waitForDisplayed({ timeout: 3000 });
+        selector = selectorCandidate;
+        break;
+      } catch { /* do nothing */ }
+    }
+  } else if (typeof selectorFromPageObject === 'string') {
+    selector = selectorFromPageObject;
+  }
+  
+  if (!selector) {
+    throw new Error(`Selector not found for ${attribute}`);
+  }
+  
   await checkEqualsText('element', selector, false, expectedValue);
 }

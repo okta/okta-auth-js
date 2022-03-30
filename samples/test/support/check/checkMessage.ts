@@ -11,12 +11,10 @@
  */
 
 
-import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
-import setInputField from './setInputField';
-import clickElement from './clickElement';
+import waitForDisplayed from '../wait/waitForDisplayed';
+import checkEqualsText from './checkEqualsText';
 
-export default async function () {
-  const code = '!incorrect!';
-  await setInputField('set', code, ChallengeAuthenticator.code);
-  await clickElement('click', 'selector', ChallengeAuthenticator.submit);
-}
+export default async (selector: string, expectedMessage: string) => {
+  await waitForDisplayed(selector, false);
+  await checkEqualsText('element', selector, false, expectedMessage);
+};

@@ -10,13 +10,16 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/* eslint-disable complexity */
 
 import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
 import a18nClient from '../support/management-api/a18nClient';
 import deleteSelfEnrolledUser from '../support/management-api/deleteSelfEnrolledUser';
 
-After(async function(this: ActionContext) {
+// Comment out this after hook to persist test context
+// Extend the hook timeout to fight against org rate limit
+After({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
   if (this.app) {
     await this.app.deactivate();
     await this.app.delete();
@@ -29,14 +32,22 @@ After(async function(this: ActionContext) {
   if (this.group) {
     await this.group.delete();
   }
-  if(this.user) {
+  if(this.user && this.user.profile.email !== process.env.USERNAME) {
     await this.user.deactivate();
     await this.user.delete();
   }
   if (this.credentials) {
-    await deleteSelfEnrolledUser(this.credentials.emailAddress);
+    if (this.credentials.emailAddress !== process.env.USERNAME) {
+      await deleteSelfEnrolledUser(this.credentials.emailAddress);
+    }
     await a18nClient.deleteProfile(this.credentials.profileId);
+  }
+  if (this.secondCredentials) {
+    await a18nClient.deleteProfile(this.secondCredentials.profileId);
   }
 });
 
-After(() => browser.deleteCookies());
+After(async () => {
+  await browser.deleteCookies();
+  await browser.reloadSession();
+});

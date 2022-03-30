@@ -11,14 +11,18 @@
  */
 
 
-import { User } from '@okta/okta-sdk-nodejs';
+import a18nClient from '../management-api/a18nClient';
+import clickElement from './clickElement';
 
-export default async function(user: User): Promise<void> {
-  const sendEmail = { sendEmail : false };
-  const token = await user.activate(sendEmail);
-
-  const baseUrl = browser.options.baseUrl;
-  const registerWithActivationTokenUrl = `${baseUrl}/register?activationToken=${token.activationToken}`;
-  browser.url(registerWithActivationTokenUrl);
+export default async function (profileId: string) {
+  let retryResend = 3;
+  let code = await a18nClient.getSMSCode(profileId);
+  while (!code && retryResend-- > 0) {
+    await clickElement('click', 'selector', 'button[name=resend]');
+    code = await a18nClient.getSMSCode(profileId);
+  }
+  if (!code) {
+    throw new Error('Failed to get sms code');
+  }
+  return code;
 }
-

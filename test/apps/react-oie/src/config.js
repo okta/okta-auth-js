@@ -12,7 +12,9 @@ export default {
     'email', 
     'offline_access', 
     'okta.myAccount.read', 
-    'okta.myAccount.manage'
+    'okta.myAccount.manage',
+    'okta.myAccount.email.manage',
+    'okta.myAccount.phone.manage'
   ],
   pkce: true
 };

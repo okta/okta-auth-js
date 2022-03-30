@@ -49,8 +49,9 @@ class A18nClient {
       --retryAttemptsRemaining;
     }
 
-    const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/) ||
-      response?.content?.match(/enter this code: <b>(?<code>\d+)<\/b>/);
+    const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/) 
+      || response?.content?.match(/enter this code: <b>(?<code>\d+)<\/b>/)
+      || response?.content?.match(/please contact your system administrator immediately.[\s\S]\s*(?<code>\d+)/);
     const code = match?.groups?.code;
     if (!code) {
       throw new Error('Unable to retrieve code from email.');

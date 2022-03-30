@@ -56,7 +56,7 @@ const FlowPage = () => {
         </Box>
       </Box>
       <Box display="flex" justifyContent="center">
-        <Box backgroundColor="default">
+        <Box className={classes.formContainer} backgroundColor="default">
           <FormComponent />
         </Box>
       </Box>

@@ -10,6 +10,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+const fs = require('fs');
+const path = require('path');
+const { mergeFiles } = require('junit-report-merger');
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 require('@babel/register'); // Allows use of import module syntax
@@ -27,6 +30,7 @@ const logLevel = LOG || 'warn';
 const chromeOptions = {
     args: []
 };
+const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
 
 if (CI) {
     chromeOptions.args = chromeOptions.args.concat([
@@ -152,7 +156,7 @@ export const config: WebdriverIO.Config = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 1, // all tests use the same user and local storage. they must run in series
+        maxInstances, // a18n api has very limited capacity, leave space for parallel CI/local processes
         //
         browserName: 'chrome',
         'goog:chromeOptions': chromeOptions
@@ -237,10 +241,10 @@ export const config: WebdriverIO.Config = {
     reporters: [
       'spec',
       ['junit', {
-          outputDir: '../../build2/reports/e2e',
-          outputFileFormat: function() { // optional
-              return 'junit-results.xml';
-          }
+        outputDir: './reports',
+        outputFileFormat(options: { cid: string }) {
+          return `results-${options.cid}.xml`;
+        }
       }]
     ],
 
@@ -353,8 +357,14 @@ export const config: WebdriverIO.Config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    // onComplete: function(exitCode, config, capabilities, results) {
-    // },
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    onComplete: async function(exitCode, config, capabilities, results) {
+      const outputDir = path.join(__dirname, '../../build2/reports/e2e');
+      fs.mkdirSync(outputDir, { recursive: true });
+      const reportsDir = path.resolve(__dirname, 'reports');
+      await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
+      fs.rmdirSync(reportsDir, { recursive: true });
+    },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session

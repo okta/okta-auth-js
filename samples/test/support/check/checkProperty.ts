@@ -23,7 +23,7 @@ import type { Selector } from 'webdriverio';
  *                                  attribute matches or not
  * @param  {String}   expectedValue The value to match against
  */
-export default (
+export default async (
     isCSS: boolean,
     attrName: string,
     selector: Selector,
@@ -46,7 +46,8 @@ export default (
      * The actual attribute value
      * @type {Mixed}
      */
-    let attributeValue = $(selector)[command](attrName);
+    const el = await $(selector);
+    let attributeValue = await el[command](attrName);
 
     // eslint-disable-next-line
     expectedValue = isFinite(expectedValue as number) ?

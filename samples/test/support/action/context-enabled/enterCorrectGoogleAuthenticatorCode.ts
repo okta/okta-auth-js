@@ -14,11 +14,9 @@
 import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
 import setInputField from '../setInputField';
 import ActionContext from '../../context';
-const totp = require('totp-generator');
+import { getTotp } from '../../../util';
 
-export default async function (this: ActionContext) {
-  const token = totp(this.sharedSecret || '', {
-    timestamp: Date.now() - 30 * 1000
-  });
+export default async function (this: ActionContext, totpType: string) {
+  const token = getTotp(this.sharedSecret, totpType);
   await setInputField('set', token, EnrollGoogleAuthenticator.code);
 }

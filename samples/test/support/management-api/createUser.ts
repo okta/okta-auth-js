@@ -12,8 +12,7 @@
 
 /* eslint-disable complexity, max-statements */
 
-
-import { Client, Group, User } from '@okta/okta-sdk-nodejs';
+import { Client, User } from '@okta/okta-sdk-nodejs';
 import { getConfig } from '../../util';
 import deleteUser from './deleteUser';
 import { UserCredentials } from './createCredentials';
@@ -23,95 +22,58 @@ type CreateUserOptions = {
   credentials: UserCredentials;
   assignToGroups?: string[];
   activate?: boolean;
-  customAttribute?: string;
+  customAttributes?: Record<string, string|number>;
 }
-
-const userGroup = 'Basic Auth Web';
 
 export default async ({
   appId,
   credentials,
-  assignToGroups = [userGroup], 
+  assignToGroups = [], 
   activate = true,
-  customAttribute
+  customAttributes
 }: CreateUserOptions): 
   Promise<User> => {
   const config = getConfig();
   const oktaClient = new Client({
+    scopes: ['okta.users.manage'],
     orgUrl: config.orgUrl,
     token: config.oktaAPIKey,
   });
 
-  let user;
-
-  const basicAuthGroup = {
-    profile: {
-      name: userGroup
-    }
-  };
+  let user: User;
 
   try {
-    // Create basic auth group if it doesn't exist
-    let {value: testGroup} = await oktaClient.listGroups({
-      q: userGroup
-    }).next();
-
-    if (!testGroup) {
-      testGroup = await oktaClient.createGroup(basicAuthGroup);
-    }
-
     const profile = {
       firstName: credentials.firstName,
       lastName: credentials.lastName,
       email: credentials.emailAddress,
-      login: credentials.emailAddress
+      login: credentials.emailAddress,
     };
-    if (customAttribute) {
-      if (customAttribute === 'age') {
-        (profile as any).age = Math.floor(Math.random() * 100);
-      } else {
-        throw new Error(`Unsupported customAttribute: ${customAttribute}`);
-      }
-    }
 
-    if (activate === false) {
-      // Create user without password
-      user = await oktaClient.createUser({
-        profile
-      }, {
-        activate: activate
-      });
-    } else {
-      user = await oktaClient.createUser({
-        profile,
+    user = await oktaClient.createUser({
+      profile,
+      ...(activate && {
         credentials: {
           password : { value: credentials.password }
         }
-      }, {
-        activate: activate
-      });
-    }
+      })
+    }, { activate });
 
     await oktaClient.assignUserToApplication(appId, {
       id: user.id
     });
-    
-    for (const groupName of assignToGroups) {
-      // TODO: create test group and attach password recovery policy during test run when API supports it
-      let {value: testGroup} = await oktaClient.listGroups({
-        q: groupName
-      }).next();
 
-      if (!testGroup) {
-        const group = {
-          profile: {
-            name: groupName
-          }
-        };
-        testGroup = await oktaClient.createGroup(group);
+    // update user with custom attributes after assigning to app
+    Object.entries(customAttributes || {}).forEach(([key, value]) => {
+      if (key === 'age') {
+        value = +value;
       }
-
-      await oktaClient.addUserToGroup((testGroup as Group).id, user.id);
+      (user.profile as any)[key] = value;
+    }); 
+    user = await user.update();
+    
+    for (const groupId of assignToGroups) {
+      await oktaClient.addUserToGroup(groupId, user.id);
     }
 
     return user;

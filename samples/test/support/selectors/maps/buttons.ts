@@ -1,5 +1,5 @@
 export default {
-  login: 'signin',
-  register: 'signup',
-  logout: 'signout'
+  login: ['signin', 'login'],
+  register: ['signup', 'register'],
+  logout: ['signout', 'logout']
 };

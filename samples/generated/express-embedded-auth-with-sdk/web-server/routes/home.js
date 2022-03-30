@@ -12,6 +12,7 @@
 
 
 const express = require('express');
+const { renderTemplate } = require('../utils');
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.get('/', (req, res) => {
   // collect attrs for render
   const userinfo = req.userContext && req.userContext.userinfo;
   const attributes = userinfo ? Object.entries(userinfo) : [];
-  res.render('home', {
+  renderTemplate(req, res, 'home', {
     isLoggedIn: !!userinfo,
     userinfo,
     attributes

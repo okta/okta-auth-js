@@ -11,12 +11,10 @@
  */
 
 
-import ChallengeAuthenticator from '../../../selectors/ChallengeAuthenticator';
-import a18nClient from '../../../management-api/a18nClient';
-import setInputField from '../../setInputField';
-import ActionContext from '../../../context';
+import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
+import getText from './getText';
 
-export default async function (this: ActionContext) {
-  const code = await a18nClient.getEmailCode(this.credentials.profileId);
-  await setInputField('set', code, ChallengeAuthenticator.code);
+export default async function() {
+  const sharedSecret = await getText(EnrollGoogleAuthenticator.sharedSecret);
+  return sharedSecret;
 }

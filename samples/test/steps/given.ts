@@ -10,59 +10,33 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* eslint-disable max-len */
-
 import { Given } from '@cucumber/cucumber';
-import navigateTo from '../support/action/navigateTo';
-import navigateToLoginAndAuthenticate from '../support/action/context-enabled/live-user/navigateToLoginAndAuthenticate';
 import ActionContext from '../support/context';
-import activateContextUserActivationToken from '../support/action/context-enabled/live-user/activateContextUserActivationToken';
-import Home from '../support/selectors/Home';
-import startApp from '../support/action/startApp';
 import noop from '../support/action/noop';
-import createApp from '../support/management-api/createApp';
 import createPolicy from '../support/management-api/createPolicy';
 import upsertPolicyRule from '../support/management-api/upsertPolicyRule';
 import addAppToPolicy from '../support/management-api/addAppToPolicy';
 import createUser from '../support/management-api/createUser';
-import createGroup from '../support/management-api/createGroup';
 import addAppToGroup from '../support/management-api/addAppToGroup';
-import addUserToGroup from '../support/management-api/addUserToGroup';
-import createCredentials from '../support/management-api/createCredentials';
+import createCredentials, { UserCredentials } from '../support/management-api/createCredentials';
 import enrollFactor from '../support/management-api/enrollFactor';
 import grantConsentToScope from '../support/management-api/grantConsentToScope';
 import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
+import clickButton from '../support/action/clickButton';
+import checkIsOnPage from '../support/check/checkIsOnPage';
+import loginDirect from '../support/action/loginDirect';
+import addUserProfileSchemaToApp from '../support/management-api/addUserProfileSchemaToApp';
+import openRegisterWithActivationToken from '../support/action/openRegisterWithActivationToken';
+import fetchUser from '../support/management-api/fetchUser';
 
 // NOTE: noop function is used for predefined settings
 
-Given('a Group', async function(this: ActionContext) {
-  this.group = await createGroup();
-});
-
-Given('an App', async function(this: ActionContext) {
-  this.app = await createApp();
-  const { 
-    credentials: {
-      oauthClient: {
-        client_id: clientId,
-        client_secret: clientSecret
-      }
-    } 
-  } = this.app;
-
-  if (this.group) {
-    await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
-  }
-
-  // update test app with new oauthClient info
-  startApp('/', {
-    ...(clientId && { clientId }),
-    ...(clientSecret && { clientSecret }),
-  });
-});
+// Extend the hook timeout to fight against org rate limit
+const timeout = 3 * 60 * 10000;
 
 Given(
   'the app is assigned to {string} group', 
+  { timeout },
   async function(this: ActionContext, groupName: string) {
     if (!this.app) {
       throw new Error('Application should be predefined');
@@ -72,24 +46,24 @@ Given(
 );
 
 Given(
-  'the app is assigned to the created group',
-  async function(this: ActionContext) {
-    if (!this.group) {
-      throw new Error('Group should be predefined');
-    }
-    await addAppToGroup({ appId: this.app.id, groupId: this.group.id });
-  }
-);
-
-Given(
   'the app is granted {string} scope',
+  { timeout },
   async function(this: ActionContext, scopeId: string) {
     await grantConsentToScope(this.app.id, scopeId);
   }
 );
 
 Given(
+  'the app has a custom User Profile Schema named {string}',
+  { timeout },
+  async function(this: ActionContext, schemaName: string) {
+    await addUserProfileSchemaToApp(this.app.id, schemaName);
+  }
+);
+
+Given(
   'the app has Email Verification callback uri defined',
+  { timeout },
   async function(this: ActionContext) {
     // Update app settings via internal API, public API should be used once available
     await updateAppOAuthClient(this.app, { 
@@ -100,11 +74,29 @@ Given(
 );
 
 Given(
+  'a Policy that defines {string} with properties',
+  { timeout },
+  async function(this: ActionContext, policyDescription: string, dataTable) {
+    this.policies = this.policies || [];
+    const policy = await createPolicy({ 
+      policyDescription,
+      groupId: this.group?.id,
+      dataTable
+    });
+    this.policies.push(policy);
+    try {
+      await addAppToPolicy(policy.id, this.app.id);
+    } catch(err) {/* do nothing */}
+  }
+);
+
+Given(
   'a Policy that defines {string}',
+  { timeout },
   async function(this: ActionContext, policyDescription: string) {
     this.policies = this.policies || [];
     const policy = await createPolicy({ 
-      policyDescription, 
+      policyDescription,
       groupId: this.group?.id
     });
     this.policies.push(policy);
@@ -116,6 +108,7 @@ Given(
 
 Given(
   'with a Policy Rule that defines {string}',
+  { timeout },
   async function(this: ActionContext, policyRuleDescription: string) {
     const lastPolicy = this.policies[this.policies.length - 1];
     await upsertPolicyRule({ 
@@ -127,12 +120,9 @@ Given(
   }
 );
 
-Given('a user named {string}', async function(this: ActionContext, firstName: string) {
-  this.credentials = await createCredentials(firstName, this.featureName);
-});
-
 Given(
   'she has an account with {string} state in the org',
+  { timeout },
   async function(this: ActionContext, accountState: string) {
     if (!this.credentials) {
       throw new Error('Context credentials has not been created!');
@@ -147,38 +137,53 @@ Given(
     })();
     this.user = await createUser({
       // use predefined app when features are not available via management api
-      appId: this.app?.id || process.env.CLIENT_ID,
+      appId: (this.app?.id || process.env.CLIENT_ID) as string,
       credentials: this.credentials,
-      activate
+      activate,
+      ...(this.group && {
+        assignToGroups: [this.group.id]
+      })
     });
   }
 );
 
 Given(
-  'she is assigned to the created group', 
+  'she has an account with active state in the org and her {string} is {string}',
+  { timeout },
+  async function(this: ActionContext, attrName: string, attrValue: string) {
+    this.user = await createUser({
+      // use predefined app when features are not available via management api
+      appId: (this.app?.id || process.env.CLIENT_ID) as string,
+      credentials: this.credentials,
+      activate: true,
+      ...(this.group && {
+        assignToGroups: [this.group.id]
+      }),
+      customAttributes: {
+        [attrName]: attrValue
+      }
+    });
+  }
+);
+
+Given(
+  'a predefined user named Mary with an account in the org', 
+  { timeout },
   async function(this: ActionContext) {
-    if (!this.group) {
-      throw new Error('Group has not been created');
-    }
-    if (!this.user) {
-      throw new Error('User has not been created');
-    }
-    await addUserToGroup({ 
-      userId: this.user.id, 
-      groupId: this.group.id
-    });
+    this.credentials = {
+      emailAddress: process.env.USERNAME,
+      email: process.env.USERNAME,
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD,
+    } as unknown as UserCredentials;
+    this.user = await fetchUser(this.credentials.emailAddress);
+    (this.user as any).predefined = true;
   }
-);
-
-Given('she does not have account in the org', noop);
-
-Given(
-  'she has an authenticated session',
-  navigateToLoginAndAuthenticate
 );
 
 Given(
   'she has enrolled in the {string} factor',
+  { timeout },
   async function(this: ActionContext, factorType: string) {
     this.enrolledFactor = await enrollFactor({
       userId: this.user.id,
@@ -190,33 +195,34 @@ Given(
 );
 
 Given(
-  /^([^/s]+) navigates to (?:the )?(.*)$/,
-  async function(this: ActionContext, firstName, pageName) {
-    await navigateTo(pageName);
+  'Mary opens the Self Service Registration View with activation token',
+  async function(this: ActionContext) {
+    await openRegisterWithActivationToken(this.user);
   }
 );
 
-Given(
-  'Mary has an authenticated session',
-  navigateToLoginAndAuthenticate
-);
+Given('a user named {string}', async function(this: ActionContext, firstName: string) {
+  this.credentials = await createCredentials(firstName, this.featureName);
+});
+
+Given('she has a second credential', async function(this: ActionContext) {
+  this.secondCredentials = await createCredentials('MaryNew', this.featureName);
+});
 
 Given(
-  /^Mary opens the Self Service Registration View with activation token/,
-  activateContextUserActivationToken
+  'she is on the Root View in an AUTHENTICATED state', 
+  async function(this: ActionContext) {
+    await clickButton('login');
+    await checkIsOnPage('Root');
+    await loginDirect({
+      username: this.credentials.emailAddress,
+      password: this.credentials.password
+    });
+  }
 );
 
-Given(
-  /^an Authenticator Enrollment Policy that has PHONE as optional and EMAIL as required for the Everyone Group$/,
-  noop
-);
+Given('she does not have account in the org', noop);
 
-Given(
-  /^she is not enrolled in any authenticators$/,
-  noop
-);
+Given('she is on the Root View in an UNAUTHENTICATED state', noop);
 
-Given(
-  'Mary is on the Root View in an UNAUTHENTICATED state',
-  async () => await startApp(Home.path)
-);
+Given('she is not enrolled in any authenticators', noop);

@@ -12,8 +12,7 @@
 
 
 import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util';
-const totp = require('totp-generator');
+import { getConfig, getTotp, TOTP_TYPES } from '../../util';
 
 type Options = {
   userId: string;
@@ -37,7 +36,8 @@ const enrollSMS = async (options: Options) => {
       phoneNumber: options.phoneNumber
     }
   };
-  const res = await getOktaClient().enrollFactor(
+  const oktaClient = getOktaClient();
+  const res = await oktaClient.enrollFactor(
     options.userId, 
     factorObject,
     { activate: true }
@@ -52,9 +52,10 @@ const enrollGoogleAuthenticator = async (options: Options) => {
   };
   const client = getOktaClient();
   const enrollRes = await client.enrollFactor(options.userId, factorObject);
-  const passCode = totp((enrollRes._embedded.activation as any).sharedSecret, {
-    timestamp: Date.now()
-  });
+  const passCode = getTotp(
+    (enrollRes._embedded.activation as any).sharedSecret,
+    TOTP_TYPES.ENROLL
+  );
   await enrollRes.activate(options.userId, {
     passCode
   });

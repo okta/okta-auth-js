@@ -14,108 +14,168 @@
 /* eslint-disable max-len */
 import { Then } from '@cucumber/cucumber';
 
-import checkProfile from '../support/check/checkProfile';
-import checkNoProfile from '../support/check/checkNoProfile';
 import checkFormMessage from '../support/check/checkFormMessage';
-import checkGuest from '../support/check/checkGuest';
 import checkButton from '../support/check/checkButton';
-import waitForURLPath from '../support/wait/waitForURLPath';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import enterValidPassword from '../support/action/context-enabled/live-user/enterValidPassword';
 import confirmValidPassword from '../support/action/context-enabled/live-user/confirmValidPassword';
-import submitAnyForm from '../support/action/submitAnyForm';
 import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
 import checkProfileAttribute from '../support/check/checkProfileAttribute';
 import { UserHome } from '../support/selectors';
 import ActionContext from '../support/context';
 import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticatorOptions';
 import waitForDisplayed from '../support/wait/waitForDisplayed';
+import checkMessage from '../support/check/checkMessage';
+import checkEqualsText from '../support/check/checkEqualsText';
+import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
+import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
+import { camelize } from '../util';
+
+Then('she is redirected to the {string} page', checkIsOnPage);
 
 Then(
-  /^User can verify their profile data$/,
-  checkProfile
+  'the {string} field is available for input', 
+  async (fieldName: string) => {
+    fieldName = camelize(fieldName);
+    const el = await $(`input[name=${fieldName}]`);
+    const isEnabled = await el.isEnabled();
+    expect(isEnabled).toEqual(true);
+  }
 );
 
 Then(
-  /^a page loads with all of Mary's Profile information$/,
-  checkProfile
+  'she sees a banner message for {string} that {string}', 
+  async (messageContainerName: string, expectedMessage: string) => {
+    const selector = `#${camelize(messageContainerName)}-messages-container`;
+    await checkMessage(selector, expectedMessage);
+  }
 );
 
 Then(
-  /^an application session is created$/,
-  checkProfile
+  'she sees a tip message for {string} that {string}', 
+  async (messageContainerName: string, expectedMessage: string) => {
+    const selector = `#${camelize(messageContainerName)}-tip p`;
+    await checkMessage(selector, expectedMessage);
+  }
+);
+
+Then(
+  'the {string} field shows {string} in disabled state', 
+  async (fieldName: string, value: string) => {
+    fieldName = camelize(fieldName);
+    const el = await $(`input[name=${fieldName}]`);
+    const isEnabled = await el.isEnabled();
+    expect(isEnabled).toEqual(false);
+    await checkEqualsText('element', `input[name=${fieldName}]`, false, value);
+  }
+);
+
+Then(
+  'she sees the {string} button', 
+  async (buttonName: string) => await checkButton(buttonName)
+);
+
+Then(
+  'she sees the {string} button in {string} section', 
+  async (buttonName: string, sectionName: string) => {
+    await checkButton(buttonName, `#${sectionName}-section`);
+  }
+);
+
+Then(
+  'the {string} field shows the previous profile value',
+  async function(this: ActionContext, fieldName: string) {
+    fieldName = camelize(fieldName);
+    const expectedValue = (this.user.profile as any)[fieldName];
+    await browser.waitUntil(async () => {
+      const el = await $(`input[name=${fieldName}]`);
+      const value = await el?.getValue();
+      return value === expectedValue || +value === expectedValue;
+    });
+  }
+);
+
+Then(
+  'she sees a modal popup to {string}',
+  async (modalName: string) => {
+    const modalId = `${camelize(modalName)}-modal`;
+    await waitForDisplayed(`#${modalId}`);
+  }
+);
+
+Then(
+  'she sees a confirmation dialog to {string} with {string}',
+  async (modalName: string ,expectedMessage: string) => {
+    const selector = `#${camelize(modalName)}-modal`;
+    await waitForDisplayed(selector);
+    const text = await (await $(`${selector} h1`)).getText();
+    expect(text).toEqual(expectedMessage);
+  }
+);
+
+Then(
+  'her {string} is updated to the new email address',
+  async function(this: ActionContext, fieldName: string) {
+    const selector = `#${fieldName.split(' ').join('-')}`;
+    const expectedValue = this.secondCredentials.emailAddress;
+    await browser.waitUntil(async () => {
+      const el = await $(selector);
+      const text = await el?.getText();
+      return expectedValue === text;
+    }, {
+      timeout: 5000,
+      interval: 500,
+      timeoutMsg: `wait for ${fieldName} update`
+    });
+  }
+);
+
+Then(
+  'the page confirms her phone has been added',
+  async function(this: ActionContext) {
+    await browser.waitUntil(async () => {
+      const el = await $(`.phone-number=${this.credentials.phoneNumber}`);
+      return await el.isDisplayed();
+    }, { timeoutMsg: 'wait for phone number' });
+  }
+);
+
+Then(
+  'she sees her phone number',
+  async function(this: ActionContext) {
+    await browser.waitUntil(async () => {
+      const el = await $(`.phone-number=${this.credentials.phoneNumber}`);
+      return await el.isDisplayed();
+    }, { timeoutMsg: 'wait for phone number' });
+  }
+);
+
+Then(
+  'the page should render without the desired phone number',
+  async function(this: ActionContext) {
+    await browser.waitUntil(async () => {
+      const el = await $(`.phone-number=${this.credentials.phoneNumber}`);
+      return !(await el.isDisplayed());
+    }, { timeoutMsg: 'wait for phone number to be deleted' });
+  }
+);
+
+Then(
+  'the form changes to receive an input for the verification code',
+  async () => {
+    await browser.waitUntil(async () => {
+      const el = await $('#form-title');
+      const text = await el?.getText();
+      return text === 'Enter Code';
+    }, {
+      timeoutMsg: 'wait for form title to change'
+    });
+  }
 );
 
 Then(
   /^she should see (?:a message on the Login form|the message|a message|an error message) "(?<message>.+?)"$/,
   checkFormMessage
-);
-
-Then(
-  /^the Root Page shows links to the Entry Points$/,
-  checkGuest
-);
-
-Then(
-  /table with the claims from the \/userinfo response$/,
-  checkProfile
-);
-
-Then(
-  /sees a (.*) button$/,
-  checkButton
-);
-
-Then(
-  /^she is redirected back to the (?:Root View|Sample App)$/,
-  () => waitForURLPath(false, '/', true)
-);
-
-Then(
-  /^she is redirected to the ([\s\w]+)$/,
-  async function(this: ActionContext, pageName: string) {
-    await checkIsOnPage(pageName);
-  }
-);
-
-Then(
-  /^Mary sees login, registration buttons$/,
-  checkGuest
-);
-
-Then(
-  /^she sees that claims from \/userinfo are disappeared$/,
-  checkNoProfile
-);
-  
-Then(
-  /^She sees a list of factors$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees a list of available factors to setup$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees a list of factors to register$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees the list of required factors \(Google Authenticator\) to enroll$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees the Select Authenticator page with password as the only option$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she sees a page to select authenticator/,
-  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
@@ -139,18 +199,8 @@ Then(
 );
 
 Then(
-  /^she sees a page to set her password$/,
-  () => checkIsOnPage('Reset Password')
-);
-
-Then(
   /^she sees the set new password form$/,
   () => checkIsOnPage('Set up Password')
-);
-
-Then(
-  /^she is presented with a list of factors$/,
-  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
@@ -178,26 +228,6 @@ Then(
 Then(
   /^she confirms her Password$/,
   confirmValidPassword
-);
-
-Then(
-  /^she submits the set new password form$/,
-  submitAnyForm
-);
-
-Then(
-  /^she is presented with an option to select SMS to verify$/,
-  () => checkIsOnPage('Verify using phone authenticator')
-);
-
-Then(
-  /^she is presented with an option to select Email to verify$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
-  /^she is presented with an option to select Security Question to verify$/,
-  () => checkIsOnPage('Select authenticator')
 );
 
 Then(
@@ -233,11 +263,6 @@ Then(
 );
 
 Then(
-  /^she is presented with an option to select SMS to enroll$/,
-  () => checkIsOnPage('Select authenticator')
-);
-
-Then(
   /^the screen changes to receive an input for a Email code$/,
   () => checkIsOnPage('Enter Code')
 );
@@ -248,8 +273,18 @@ Then(
 );
 
 Then(
-  'she sees an "Edit" button incidating she can update her profile',
-  async function() {
-    await waitForDisplayed(UserHome.editButton);
+  'she sees a QR Code and a Secret Key on the screen',
+  async () => {
+    await waitForDisplayed('#authenticator-shared-secret');
+    await waitForDisplayed('#authenticator-qr-code');
+  }
+);
+
+Then(
+  'the QR code represents the same key as the Secret Key',
+  async () => {
+    const secretFromQRCode = await getSecretFromQrCode();
+    const secretFromSharedSecret = await getSecretFromSharedSecret();
+    expect(secretFromQRCode).toEqual(secretFromSharedSecret);
   }
 );

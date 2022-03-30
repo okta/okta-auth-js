@@ -42,7 +42,8 @@ export default async function() {
           'interaction_code',
           'refresh_token'
         ],
-        'application_type': appType
+        'application_type': appType,
+        'consent_method': 'REQUIRED'
       }
     }
   };

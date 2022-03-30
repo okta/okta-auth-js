@@ -19,10 +19,10 @@ class UserHome implements Page {
   get logoutRedirect() { return '#logout-redirect'; }
   get profileTable() { return '#profile-table'; }
   get name() { return '#claim-name'; }
-  get email() { return '#claim-email'; }
+  get email() { return ['#claim-email', '#primary-email']; }
   get primaryEmail() { return '#primary-email'; }
-  get firstName() { return 'input[name="firstName"'; }
-  get lastName() { return 'input[name="lastName"'; }
+  get firstName() { return 'input[name="firstName"]'; }
+  get lastName() { return 'input[name="lastName"]'; }
   get logoutButton() { return '#logout-button'; }
   get profileButton() { return '#profile-button'; }
   get editButton() { return '#edit-button'; }

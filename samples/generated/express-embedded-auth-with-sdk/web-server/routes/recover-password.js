@@ -23,6 +23,7 @@ const router = express.Router();
 
 // entry route
 router.get('/recover-password', async (req, res, next) => {
+  const { transactionId } = req;
   req.setFlowStates({
     entry: '/recover-password'
   });
@@ -40,7 +41,7 @@ router.get('/recover-password', async (req, res, next) => {
   }
 
   renderTemplate(req, res, 'recover-password', {
-    action: '/recover-password'
+    action: `/recover-password?state=${transactionId}`
   });
 });
 
@@ -57,11 +58,12 @@ router.post('/recover-password', async (req, res, next) => {
 
 // Handle reset password
 router.get('/reset-password', (req, res) => {
+  const { transactionId } = req;
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'enroll-or-reset-password-authenticator', {
       title: 'Reset password',
-      action: '/reset-password'
+      action: `/reset-password?state=${transactionId}`
     })
   });
 });

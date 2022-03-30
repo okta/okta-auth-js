@@ -10,23 +10,38 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* eslint-disable complexity, max-statements */
-
-
 import { Client } from '@okta/okta-sdk-nodejs';
 import { getConfig } from '../../util';
 
-type Options = {
-  userId: string;
-  groupId: string;
-}
+const MAP = {
+  age: {
+    'definitions': {
+      'custom': {
+        'id': '#custom',
+        'type': 'object',
+        'properties': {
+          'age': {
+            'title': 'Age',
+            'description': 'age',
+            'type': 'number',
+            'required': false,
+            'minimum': 0,
+            'maximum': 200
+          }
+        },
+        'required': []
+      }
+    }
+  }
+};
 
-export default async function({ userId, groupId }: Options) {
+export default async function(appId: string, schemaName: string) {
   const config = getConfig();
   const oktaClient = new Client({
     orgUrl: config.orgUrl,
     token: config.oktaAPIKey,
   });
 
-  await oktaClient.addUserToGroup(groupId, userId);
+  const res = await oktaClient.updateApplicationUserProfile(appId, MAP[schemaName]);
+  return res;
 }

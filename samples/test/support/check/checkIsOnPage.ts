@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import waitForDisplayed from '../wait/waitForDisplayed';
 import { pages } from '../selectors';
 
 
@@ -25,10 +24,24 @@ export default async (pageName?: string) => {
     throw new Error(`Unknown form "${pageName}"`);
   }
 
-  await waitForDisplayed(page.isDisplayedElementSelector);
-
-  if(page.isDisplayedElementText) {
-    const currentPageText = await (await $(page.isDisplayedElementSelector)).getText();
-    expect(currentPageText).toEqual(page.isDisplayedElementText);
-  }
+  await browser.waitUntil(async () => {
+    const el = await $(page.isDisplayedElementSelector);
+    if (Array.isArray(page.isDisplayedElementText)) {
+      for (const expectedText of page.isDisplayedElementText) {
+        const text = await el?.getText();
+        if (text === expectedText) {
+          return true;
+        }
+      }
+      return false;
+    } else if (page.isDisplayedElementText) {
+      const text = await el?.getText();
+      return text === page.isDisplayedElementText;
+    } else {
+      return !!el;
+    }
+  }, { 
+    timeout: 5000,
+    timeoutMsg: `wait for page ${pageName} to load`
+  });
 };

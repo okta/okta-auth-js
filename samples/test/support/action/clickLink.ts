@@ -1,10 +1,12 @@
 import clickElement from './clickElement';
 import links from '../selectors/maps/links';
+import { camelize } from '../../util';
 
 export default async (linkName: string) => {
-  const link = (links as any)[linkName];
-  if (!link) {
+  linkName = camelize(linkName);
+  const name = (links as any)[linkName] || linkName;
+  if (!name) {
     throw new Error(`No link can match name ${linkName}`);
   }
-  await clickElement('click', 'link', link);
+  await clickElement('click', 'selector', `a[name=${name}]`);
 };

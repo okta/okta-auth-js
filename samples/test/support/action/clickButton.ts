@@ -1,7 +1,6 @@
-import clickElement from './clickElement';
-import buttons from '../selectors/maps/buttons';
+import checkButton from '../check/checkButton';
 
-export default async (buttonName: string) => {
-  const name = (buttons as any)[buttonName] || buttonName;
-  await clickElement('click', 'selector', `button[name="${name}"]`);
+export default async (buttonName: string, containerSelector?: string) => {
+  const el = await checkButton(buttonName, containerSelector);
+  await el.click();
 };

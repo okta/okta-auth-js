@@ -10,14 +10,49 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/* eslint-disable max-depth, @typescript-eslint/no-non-null-assertion */
 
-import waitForDisplayed from '../wait/waitForDisplayed';
+import { camelize } from '../../util';
 import buttons from '../selectors/maps/buttons';
 
-export default async(buttonName: string) => {
-  const button = (buttons as any)[buttonName];
-  if (!button) {
-    throw new Error(`No button can match name ${buttonName}`);
+const getSelector = (tagCandidate: string, name: string, containerSelector?: string) => {
+  if (containerSelector) {
+    return `${containerSelector} ${tagCandidate}[name=${name}]`;
+  } else {
+    return `${tagCandidate}[name=${name}]`; 
   }
-  await waitForDisplayed(`button[name="${button}"]`);
+};
+
+export default async(buttonName: string, containerSelector?: string): Promise<WebdriverIO.Element> => {
+  let button: WebdriverIO.Element;
+  buttonName = camelize(buttonName);
+  await browser.waitUntil(async () => {
+    const names = (buttons as any)[buttonName];
+    for (const tagCandidate of ['button', 'input', 'a']) {
+      if (names) {
+        for (const name of names) {
+          const selector = getSelector(tagCandidate, name, containerSelector);
+          const el = await $(selector);
+          const isDisplayed = await el?.isDisplayed();
+          if (isDisplayed) {
+            button = el;
+            return true;
+          }
+        }
+      } else {
+        const selector = getSelector(tagCandidate, buttonName, containerSelector);
+        const el = await $(selector);
+        const isDisplayed = await el?.isDisplayed();
+        if (isDisplayed) {
+          button = el;
+          return true;
+        }
+      }
+    }
+    return false;
+  }, {
+    timeout: 5000,
+    timeoutMsg: `wait for button: ${buttonName}`
+  });
+  return button!;
 };

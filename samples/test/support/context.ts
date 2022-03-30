@@ -16,6 +16,7 @@ import { UserCredentials } from './management-api/createCredentials';
 
 interface ActionContext {
   credentials: UserCredentials;
+  secondCredentials: UserCredentials;
   user: User;
   app: Application;
   policies: Policy[];
@@ -23,7 +24,6 @@ interface ActionContext {
   enrolledFactor: any;
   featureName: string;
   scenarioName: string;
-  currentTestCaseId: string;
   userName?: string;
   sharedSecret?: string;
   customAttribute: string;

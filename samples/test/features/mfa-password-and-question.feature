@@ -5,15 +5,17 @@ Feature: Multi-Factor Authentication with Password and Security Question
 	  #And a User named "Mary" created in the admin interface with a Password only
 
   Scenario: 2FA Login with Security Question
-    Given Mary navigates to the Basic Login View
-      And she has inserted her username
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
       And she has inserted her password
       And her password is correct
-    When she clicks Login
-    Then she is presented with an option to select Security Question to verify
+    When she submits the form
+    Then she is redirected to the "Select Authenticator" page
     When She selects Security Question from the list
     Then the screen changes to challenge the Security Question
     When She inputs the correct answer for the Question
-      And She selects "Verify"
-    Then she is redirected to the Root View
-      And an application session is created
+      And she submits the form
+    Then she is redirected to the "Root" page
+      And she sees a table with her profile info
+      And the cell for the value of "email" is shown and contains her "email"
