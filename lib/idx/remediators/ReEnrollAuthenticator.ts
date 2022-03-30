@@ -17,10 +17,8 @@ export interface ReEnrollAuthenticatorValues extends RemediationValues {
   newPassword?: string;
 }
 
-export class ReEnrollAuthenticator extends Remediator {
+export class ReEnrollAuthenticator extends Remediator<ReEnrollAuthenticatorValues> {
   static remediationName = 'reenroll-authenticator';
-
-  values!: ReEnrollAuthenticatorValues;
 
   mapCredentials() {
     const { newPassword } = this.values;

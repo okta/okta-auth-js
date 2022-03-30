@@ -23,8 +23,7 @@ export type SelectAuthenticatorValues = RemediationValues & {
 };
 
 // Base class - DO NOT expose static remediationName
-export class SelectAuthenticator extends Remediator {
-  values!: SelectAuthenticatorValues;
+export class SelectAuthenticator extends Remediator<SelectAuthenticatorValues> {
   selectedAuthenticator?: Authenticator;
   selectedOption?: any;
 

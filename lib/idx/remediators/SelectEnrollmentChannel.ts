@@ -21,10 +21,8 @@ export type SelectEnrollmentChannelValues = RemediationValues & {
   channel?: string;
 };
 
-export class SelectEnrollmentChannel extends Remediator {
+export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelValues> {
   static remediationName = 'select-enrollment-channel';
-
-  values!: SelectEnrollmentChannelValues;
 
   canRemediate() {
     return Boolean(this.values.channel);

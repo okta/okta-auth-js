@@ -53,7 +53,7 @@ export function getRemediator(
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const remediators = options.remediators!;
 
-  let remediator;
+  let remediator: Remediator;
   // remediation name specified by caller - fast-track remediator lookup 
   if (options.step) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -68,9 +68,9 @@ export function getRemediator(
     }
   }
 
-  const remediatorCandidates = [];
+  const remediatorCandidates: Remediator[] = [];
   for (let remediation of idxRemediations) {
-    const isRemeditionInFlow = Object.keys(remediators as object).includes(remediation.name);
+    const isRemeditionInFlow = Object.keys(remediators).includes(remediation.name);
     if (!isRemeditionInFlow) {
       continue;
     }
@@ -83,7 +83,7 @@ export function getRemediator(
     }
     // remediator cannot handle the current values
     // maybe return for next step
-    remediatorCandidates.push(remediator as never);  
+    remediatorCandidates.push(remediator);  
   }
   
   return remediatorCandidates[0];

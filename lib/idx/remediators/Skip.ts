@@ -17,10 +17,8 @@ export interface SkipValues extends RemediationValues {
   skip?: boolean;
 }
 
-export class Skip extends Remediator {
+export class Skip extends Remediator<SkipValues> {
   static remediationName = 'skip';
-
-  values!: SkipValues;
 
   canRemediate() {
     return !!this.values.skip || this.options.step === 'skip';
