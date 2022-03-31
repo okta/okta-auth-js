@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.3.1
+
+### Fixes
+
+- [#1160](https://github.com/okta/okta-auth-js/pull/1160) Fixes error handling for IDX actions
+
 ## 6.3.0
 
 ### Features
