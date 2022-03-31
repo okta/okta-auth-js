@@ -102,7 +102,7 @@ function getNextStep(
   };
 }
 
-function handleIdxError(e, remediator?): RemediationResponse {
+function handleIdxError(e, remediator?: Remediator): RemediationResponse {
   // Handle idx messages
   const idxResponse = isIdxResponse(e) ? e : null;
   if (!idxResponse) {
@@ -142,7 +142,7 @@ export async function remediate(
   options: RemediateOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
-  const { remediators, flow } = options;
+  const { flow } = options;
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -155,6 +155,8 @@ export async function remediate(
   if (terminal) {
     return { idxResponse, terminal, messages };
   }
+
+  const remediator = getRemediator(neededToProceed, values, options);
   
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
@@ -172,7 +174,7 @@ export async function remediate(
           idxResponse = await idxResponse.actions[action]();
           idxResponse.requestDidSucceed = true;
         } catch (e) {
-          return handleIdxError(e, remediators);
+          return handleIdxError(e, remediator);
         }
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
@@ -188,7 +190,7 @@ export async function remediate(
           idxResponse.requestDidSucceed = true;
         }
         catch (e) {
-          return handleIdxError(e, remediators);
+          return handleIdxError(e, remediator);
         }
 
         return remediate(idxResponse, values, optionsWithoutExecutedAction); // recursive call
@@ -196,7 +198,6 @@ export async function remediate(
     }
   }
 
-  const remediator = getRemediator(neededToProceed, values, options);
   if (!remediator) {
     if (options.step) {
       values = filterValuesForRemediation(idxResponse, values); // include only requested values
