@@ -16,6 +16,14 @@
   - refactor: IDX methods now use auth-js http client
   - refactor: idx-js methods have been refactored to idxState
 
+## 6.3.1
+
+### Fixes
+
+- [#1160](https://github.com/okta/okta-auth-js/pull/1160)
+  - Fixes error handling for IDX actions
+  - Fixes saved IDX transaction
+
 ## 6.3.0
 
 ### Features
