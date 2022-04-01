@@ -133,7 +133,7 @@ export class ServiceManager implements ServiceManagerInterface {
     if (ServiceManager.canUseLeaderElection()) {
       if (!this.channel) {
         const { broadcastChannelName } = this.options;
-        this.channel = new BroadcastChannel(broadcastChannelName as string);
+        this.channel = new BroadcastChannel(broadcastChannelName || this.sdk.options.clientId!);
       }
       if (!this.elector) {
         this.elector = createLeaderElection(this.channel);
