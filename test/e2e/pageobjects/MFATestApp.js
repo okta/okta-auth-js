@@ -19,7 +19,7 @@ class MFATestApp {
   }
 
   async waitFor(element) {
-    return browser.waitUntil(async () => element.then(el => el.isDisplayed()), 5000, 'wait for login button');
+    await browser.waitUntil(async () => element.then(el => el.isDisplayed()), 5000, 'wait for login button');
   }
 
   async startLoginForm() {
