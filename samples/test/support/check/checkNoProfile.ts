@@ -16,5 +16,5 @@ import UserHome from '../selectors/UserHome';
 
 export default async () => {
   // verify no profile info
-  await checkElementExists('no', UserHome.email);
+  await checkElementExists('no', UserHome.primaryEmail);
 };
