@@ -18,7 +18,7 @@ export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # This client has MFA (security question) enabled
-export CLIENT_ID=0oa41zpqqxar7OFl84x7
+export SPA_CLIENT_ID=0oa41zpqqxar7OFl84x7
 export MFA_ENABLED=true
 
 # Run the tests
