@@ -16,7 +16,15 @@ var babelOptions = {
 };
 
 // Keep source files untransformed for local development
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV === 'development') {
+  // In local development, we would prefer not to include any babel transforms as they make debugging more difficult
+  // However, there is an issue with testcafe which requires the optional chaining transform for SIW compatibility
+  // https://github.com/DevExpress/testcafe-hammerhead/issues/2714
+  babelOptions.plugins = babelOptions.plugins.concat([
+    '@babel/plugin-proposal-optional-chaining',
+    '@babel/plugin-proposal-nullish-coalescing-operator'
+  ]);
+} else {
   babelOptions.presets.unshift('@babel/preset-env'); // must run after preset-typescript
   babelOptions.plugins = babelOptions.plugins.concat([
     '@babel/plugin-proposal-class-properties',

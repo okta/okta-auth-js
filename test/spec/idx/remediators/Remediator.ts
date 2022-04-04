@@ -68,7 +68,7 @@ describe('remediators/Base/Remediator', () => {
     it('adds authenticator (string) to the list of authenticators', () => {
       const remediation = IdentifyRemediationFactory.build();
       const authenticator = 'okta_password';
-      const r = new Remediator(remediation, { authenticator });
+      const r = new Remediator(remediation, { authenticator } as RemediationValues);
       expect(r.values.authenticators).toEqual([{
         key: 'okta_password'
       }]);
@@ -79,7 +79,7 @@ describe('remediators/Base/Remediator', () => {
       const authenticator = {
         key: 'okta_password'
       };
-      const r = new Remediator(remediation, { authenticator });
+      const r = new Remediator(remediation, { authenticator } as RemediationValues);
       expect(r.values.authenticators).toEqual([{
         key: 'okta_password'
       }]);

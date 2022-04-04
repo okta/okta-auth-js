@@ -21,9 +21,8 @@ export type SelectAuthenticatorUnlockAccountValues = SelectAuthenticatorValues &
   methodType?: string;
 };
 
-export class SelectAuthenticatorUnlockAccount extends SelectAuthenticator {
+export class SelectAuthenticatorUnlockAccount extends SelectAuthenticator<SelectAuthenticatorUnlockAccountValues> {
   static remediationName = 'select-authenticator-unlock-account';
-  values!: SelectAuthenticatorUnlockAccountValues;
   authenticator?: Authenticator;
 
   map = {

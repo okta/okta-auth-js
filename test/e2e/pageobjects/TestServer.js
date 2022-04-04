@@ -45,6 +45,10 @@ class TestServer {
   }
 
   async assertLoginSuccess() {
+    await browser.waitUntil(async () => {
+      const txt = await this.status.then(el => el.getText());
+      return !!txt;
+    });
     await this.status.then(el => el.getText()).then(txt => {
       assert(txt.trim() === 'SUCCESS');
     });
@@ -57,6 +61,10 @@ class TestServer {
   }
 
   async assertLoginFailure() {
+    await browser.waitUntil(async () => {
+      const txt = await this.error.then(el => el.getText());
+      return !!txt;
+    });
     await this.status.then(el => el.getText()).then(txt => {
       assert(txt.trim() === '');
     });

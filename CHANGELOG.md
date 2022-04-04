@@ -2,6 +2,13 @@
 
 ## 6.4
 
+### Features
+
+- [#1161](https://github.com/okta/okta-auth-js/pull/1161)
+  - IDX actions accept optional/additional parameters
+  - `requestDidSucceed` is returned on `IdxTransaction`
+  - adds IDX option `shouldProceedWithEmailAuthenticator` to disable email authenticator auto-selection
+
 ### Fixes
 
 - [#1145](https://github.com/okta/okta-auth-js/pull/1145)
@@ -9,6 +16,9 @@
   - Type Fixes:
     - IdxContent: `user` property now optional
     - Input: added missing `key` property
+
+- [#1161](https://github.com/okta/okta-auth-js/pull/1161)
+  - fixes for stateToken flow
 
 ### Other
 

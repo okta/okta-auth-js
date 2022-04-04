@@ -15,26 +15,27 @@
 import { AuthSdkError } from '../../errors';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 import { IdxRemediation } from '../types/idx-js';
+import { RemediateOptions } from '../remediate';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 
-export class AuthenticatorVerificationData extends AuthenticatorData {
+export class AuthenticatorVerificationData extends AuthenticatorData<AuthenticatorVerificationDataValues> {
   static remediationName = 'authenticator-verification-data';
 
-  values!: AuthenticatorVerificationDataValues;
-  shouldProceedWithEmailAuthenticator: boolean;
+  shouldProceedWithEmailAuthenticator: boolean; // will be removed in next major version
 
-  constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}) {
+  constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}, options: RemediateOptions = {}) {
     super(remediation, values);
 
-    // TODO: extend this feature to all authenticators
-    this.shouldProceedWithEmailAuthenticator = this.authenticator.methods.length === 1 
+    // will be removed in next major version
+    this.shouldProceedWithEmailAuthenticator = options.shouldProceedWithEmailAuthenticator !== false
+      && this.authenticator.methods.length === 1 
       && this.authenticator.methods[0].type === 'email';
   }
 
   canRemediate() {
-    // auto proceed if there is only one method
-    if (this.shouldProceedWithEmailAuthenticator) {
+    // auto proceed if there is only one method (will be removed in next major version)
+    if (this.shouldProceedWithEmailAuthenticator !== false) {
       return true;
     }
     return super.canRemediate();
@@ -42,7 +43,7 @@ export class AuthenticatorVerificationData extends AuthenticatorData {
 
   mapAuthenticator() {
     // auto proceed with the only methodType option
-    if (this.shouldProceedWithEmailAuthenticator) {
+    if (this.shouldProceedWithEmailAuthenticator !== false) {
       const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
       return authenticatorFromRemediation.form?.value.reduce((acc, curr) => {
         if (curr.value) {

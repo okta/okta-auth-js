@@ -14,7 +14,6 @@ import { VerifyAuthenticator, VerifyAuthenticatorValues } from './Base/VerifyAut
 
 export type ChallengeAuthenticatorValues = VerifyAuthenticatorValues;
 
-export class ChallengeAuthenticator extends VerifyAuthenticator {
+export class ChallengeAuthenticator extends VerifyAuthenticator<ChallengeAuthenticatorValues> {
   static remediationName = 'challenge-authenticator';
-  values!: ChallengeAuthenticatorValues;
 }

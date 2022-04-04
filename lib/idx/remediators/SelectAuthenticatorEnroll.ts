@@ -15,7 +15,6 @@ import { SelectAuthenticator, SelectAuthenticatorValues } from './Base/SelectAut
 
 export type SelectAuthenticatorEnrollValues = SelectAuthenticatorValues;
 
-export class SelectAuthenticatorEnroll extends SelectAuthenticator {
+export class SelectAuthenticatorEnroll extends SelectAuthenticator<SelectAuthenticatorEnrollValues> {
   static remediationName = 'select-authenticator-enroll';
-  values!: SelectAuthenticatorEnrollValues;
 }

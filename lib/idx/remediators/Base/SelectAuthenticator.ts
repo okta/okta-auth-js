@@ -23,7 +23,8 @@ export type SelectAuthenticatorValues = RemediationValues & {
 };
 
 // Base class - DO NOT expose static remediationName
-export class SelectAuthenticator extends Remediator<SelectAuthenticatorValues> {
+export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAuthenticatorValues>
+  extends Remediator<T> {
   selectedAuthenticator?: Authenticator;
   selectedOption?: any;
 
@@ -99,7 +100,7 @@ export class SelectAuthenticator extends Remediator<SelectAuthenticatorValues> {
     return { name: 'authenticator', key: 'string' };
   }
 
-  getValuesAfterProceed(): RemediationValues {
+  getValuesAfterProceed(): T {
     this.values = super.getValuesAfterProceed();
     // remove used authenticators
     const authenticators = (this.values.authenticators as Authenticator[])

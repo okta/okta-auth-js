@@ -15,7 +15,6 @@ import { VerifyAuthenticator, VerifyAuthenticatorValues } from './Base/VerifyAut
 
 export type EnrollAuthenticatorValues = VerifyAuthenticatorValues;
 
-export class EnrollAuthenticator extends VerifyAuthenticator {
+export class EnrollAuthenticator extends VerifyAuthenticator<EnrollAuthenticatorValues> {
   static remediationName = 'enroll-authenticator';
-  values!: EnrollAuthenticatorValues;
 }

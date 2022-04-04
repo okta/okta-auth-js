@@ -14,9 +14,9 @@
 
 /* eslint-disable complexity */
 import { isString, clone, isAbsoluteUrl, removeNils } from '../util';
-import AuthApiError from '../errors/AuthApiError';
 import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION } from '../constants';
 import { OktaAuthInterface, RequestOptions, FetchOptions, RequestData } from '../types';
+import { AuthApiError, OAuthError } from '../errors';
 
 export function httpRequest(sdk: OktaAuthInterface, options: RequestOptions): Promise<any> {
   options = options || {};
@@ -107,7 +107,11 @@ export function httpRequest(sdk: OktaAuthInterface, options: RequestOptions): Pr
         resp = sdk.options.transformErrorXHR(clone(resp));
       }
 
-      err = new AuthApiError(serverErr, resp);
+      if (serverErr.error && serverErr.error_description) {
+        err = new OAuthError(serverErr.error, serverErr.error_description);
+      } else {
+        err = new AuthApiError(serverErr, resp);
+      }
 
       if (err.errorCode === 'E0000011') {
         storage.delete(STATE_TOKEN_KEY_NAME);

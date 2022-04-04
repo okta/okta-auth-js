@@ -1,4 +1,12 @@
-import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from '../../../lib/idx/util';
+import {
+  getAvailableSteps,
+  getEnabledFeatures,
+  getMessagesFromResponse,
+  isTerminalResponse,
+  getRemediator,
+  getNextStep,
+  handleIdxError
+} from '../../../lib/idx/util';
 import {
   IdxResponseFactory,
   IdentifyRemediationFactory,
@@ -13,7 +21,8 @@ import {
   PasscodeValueFactory,
   IdxErrorPasscodeInvalidFactory
 } from '@okta/test.support/idx';
-import { IdxFeature } from '../../../lib/idx/types';
+import { IdxFeature, IdxResponse, } from '../../../lib/idx/types';
+import { Remediator } from '../../../lib/idx/remediators';
 
 describe('idx/util', () => {
   describe('getAvailableSteps', () => {
@@ -168,6 +177,233 @@ describe('idx/util', () => {
       });
       const res = isTerminalResponse(idxResponse);
       expect(res).toBe(false);
+    });
+  });
+
+  describe('getRemediator', () => {
+    let testContext;
+    beforeEach(() => {
+      const FooRemediator = jest.fn();
+      const BarRemediator = jest.fn();
+      const remediators = {
+        foo: FooRemediator,
+        bar: BarRemediator
+      };
+      const options = { remediators };
+      const values = {};
+      testContext = {
+        FooRemediator,
+        BarRemediator,
+        remediators,
+        options,
+        values
+      };
+    });
+
+    describe('A Remediator exists that matches one of the idx remediations', () => {
+      beforeEach(() => {
+        const idxRemediations = [{
+          name: 'foo'
+        }, {
+          name: 'bar'
+        }];
+        testContext = {
+          ...testContext,
+          idxRemediations
+        };
+      });
+
+      it('if first Remediator can remediate, returns the first Remediator instance', () => {
+        const { idxRemediations, values, options, FooRemediator } = testContext;
+        FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(true);
+        expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(FooRemediator);
+        expect(FooRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+      });
+
+      it('if first matched Remediator cannot remediate, but 2nd Remediator can, returns the 2nd Remediator', () => {
+        const { idxRemediations, values, options, FooRemediator, BarRemediator } = testContext;
+        FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
+        BarRemediator.prototype.canRemediate = jest.fn().mockReturnValue(true);
+        expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(BarRemediator);
+        expect(BarRemediator).toHaveBeenCalledWith(idxRemediations[1], values, options);
+      });
+      it('if no Remediator can remediate, returns the first matching Remediator instance', () => {
+        const { idxRemediations, values, options, FooRemediator, BarRemediator } = testContext;
+        FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
+        BarRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
+        expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(FooRemediator);
+        expect(FooRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+      });
+
+      describe('with options.step', () => {
+
+        it('returns a remediator instance if a Remediator exists that matches the idx remediation with the given step name', () => {
+          const { idxRemediations, values, options, BarRemediator } = testContext;
+          options.step = 'bar';
+          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(BarRemediator);
+          expect(BarRemediator).toHaveBeenCalledWith(idxRemediations[1], values, options);
+        });
+        it('returns undefined if no Remediator could be found matching the idx remediation with the given step name', () => {
+          const { idxRemediations, values, options } = testContext;
+          options.step = 'bar';
+          options.remediators = {
+            'other': jest.fn()
+          };
+          expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
+        });
+        it('returns undefined if no idx remediation is found matching the given step name', () => {
+          const { values, options } = testContext;
+          options.step = 'bar';
+          const idxRemediations = [{
+            name: 'other'
+          }];
+          expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
+        });
+      });
+    });
+
+    it('returns undefined if no Remediator exists that matches the idx remediations', () => {
+      const { values, options } = testContext;
+      const idxRemediations = [{
+        name: 'unknown'
+      }];
+      options.remediators = {
+        other: jest.fn()
+      };
+      expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
+    });
+  });
+
+  describe('getNextStep', () => {
+    let testContext;
+    beforeEach(() => {
+      const nextStep = { fake: true };
+      const remediator: Remediator = {
+        getNextStep: jest.fn().mockReturnValue(nextStep)
+      } as unknown as Remediator;
+      const context = {
+         foo: 'bar'
+      };
+      const neededToProceed = [{
+        name: 'unknown-remediation'
+      }];
+      const actions = {
+        'some-action': jest.fn()
+      };
+      const idxResponse: IdxResponse = {
+        context,
+        neededToProceed,
+        actions
+      } as unknown as IdxResponse;
+      testContext = {
+        nextStep,
+        remediator,
+        context,
+        neededToProceed,
+        actions,
+        idxResponse
+      };
+    });
+
+    it('calls getNextStep() on the Remediator, passing the context from the idxResponse', () => {
+      const { remediator, context, idxResponse, nextStep } = testContext;
+      const res = getNextStep(remediator, idxResponse);
+      expect(remediator.getNextStep).toHaveBeenCalledWith(context);
+      expect(res).toEqual(nextStep);
+    });
+
+    it('adds canSkip to the response if neededToProceed includes skip remediation', () => {
+      const { remediator, context, idxResponse, nextStep, neededToProceed } = testContext;
+      neededToProceed.push({ name: 'skip' });
+      const res = getNextStep(remediator, idxResponse);
+      expect(remediator.getNextStep).toHaveBeenCalledWith(context);
+      expect(res).toEqual({
+        ...nextStep,
+        canSkip: true
+      });
+    });
+
+    it('adds canResend to the response if actions includes an action name with a resend suffix', () => {
+      const { remediator, context, idxResponse, nextStep, actions } = testContext;
+      actions['someaction-resend'] = jest.fn();
+      const res = getNextStep(remediator, idxResponse);
+      expect(remediator.getNextStep).toHaveBeenCalledWith(context);
+      expect(res).toEqual({
+        ...nextStep,
+        canResend: true
+      });
+    });
+  });
+
+  describe('handleIdxError', () => {
+    let testContext;
+    beforeEach(() => {
+      const idxResponse = {
+        neededToProceed: [],
+        actions: {},
+        rawIdxState: {
+          version: 'fake'
+        }
+      } as unknown as IdxResponse;
+      testContext = {
+        idxResponse
+      };
+    });
+
+    it('By default, it will throw unrecognized errors', () => {
+      const error = new Error('my test error');
+      const fn = () => {
+        handleIdxError(error);
+      };
+      expect(fn).toThrowError(error);
+    });
+    it('For terminal IDX responses, it augments the object with requestDidSucceed = false and returns it', () => {
+      const { idxResponse } = testContext;
+      const res = handleIdxError(idxResponse);
+      expect(res).toEqual({
+        idxResponse: {
+          ...idxResponse,
+          requestDidSucceed: false
+        },
+        terminal: true,
+        messages: []
+      });
+    });
+    it('non-terminal IDX responses, no remediator: it augments the object with requestDidSucceed = false and returns it', () => {
+      const { idxResponse } = testContext;
+      idxResponse.neededToProceed.push({
+        name: 'some-remediation'
+      });
+      const res = handleIdxError(idxResponse);
+      expect(res).toEqual({
+        idxResponse: {
+          ...idxResponse,
+          requestDidSucceed: false
+        },
+        messages: []
+      });
+    });
+    it('non-terminal IDX response and a remediator: it augments the object with requestDidSucceed = false and returns it along with next step info', () => {
+      const { idxResponse } = testContext;
+      const context = { fake: true };
+      idxResponse.context = context;
+      idxResponse.neededToProceed.push({
+        name: 'some-remediation'
+      });
+      const nextStep = { fake: true };
+      const remediator = {
+        getNextStep: jest.fn().mockReturnValue(nextStep)
+      };
+      const res = handleIdxError(idxResponse, remediator);
+      expect(res).toEqual({
+        idxResponse: {
+          ...idxResponse,
+          requestDidSucceed: false
+        },
+        messages: [],
+        nextStep
+      });
+      expect(remediator.getNextStep).toHaveBeenCalledWith(context);
     });
   });
 });

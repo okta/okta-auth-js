@@ -19,11 +19,12 @@ import { NextStep } from '../../types';
 export type VerifyAuthenticatorValues = AuthenticatorValues & RemediationValues;
 
 // Base class - DO NOT expose static remediationName
-export class VerifyAuthenticator extends Remediator<VerifyAuthenticatorValues> {
+export class VerifyAuthenticator<T extends VerifyAuthenticatorValues = VerifyAuthenticatorValues>
+  extends Remediator<T> {
 
   authenticator: Authenticator<VerifyAuthenticatorValues>;
 
-  constructor(remediation: IdxRemediation, values: VerifyAuthenticatorValues = {}) {
+  constructor(remediation: IdxRemediation, values: T = {} as T) {
     super(remediation, values);
     this.authenticator = getAuthenticator(remediation);
   }
@@ -50,9 +51,9 @@ export class VerifyAuthenticator extends Remediator<VerifyAuthenticatorValues> {
     return this.authenticator.getInputs(input);
   }
 
-  getValuesAfterProceed(): VerifyAuthenticatorValues {
+  getValuesAfterProceed(): T {
     this.values = super.getValuesAfterProceed();
     let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'credentials');
-    return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
+    return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {} as T);
   }
 }
