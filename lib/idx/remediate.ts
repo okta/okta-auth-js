@@ -159,11 +159,6 @@ export async function remediate(
     `);
   }
 
-  // if (messages.length) {
-  //   const nextStep = getNextStep(remediator, idxResponse);
-  //   return { idxResponse, nextStep, messages };
-  // }
-
   // Return next step to the caller
   if (!remediator.canRemediate()) {
     const nextStep = getNextStep(remediator, idxResponse);
