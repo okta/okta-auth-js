@@ -91,8 +91,6 @@ export async function remediate(
   }
 
   const remediator = getRemediator(neededToProceed, values, options);
-  
-  const remediator = getRemediator(neededToProceed, values, options);
 
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
