@@ -18,7 +18,7 @@
     "webpack": "^4.46.0"
   },
   "scripts": {
-    "start": "SKIP_PREFLIGHT_CHECK=true PORT=8080 react-app-rewired start",
+    "start": "BROWSER=none SKIP_PREFLIGHT_CHECK=true PORT=8080 react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
