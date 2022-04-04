@@ -14,47 +14,53 @@ class MFATestApp {
 
   async open() {
     await browser.url('/');
-    await browser.waitUntil(async () => 
-      this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
+    await browser.waitUntil(async () => {
+      const el = await this.readySelector;
+      const isExisting = await el.isExisting();
+      return isExisting;
+    }, 5000, 'wait for ready selector');
   }
 
   async waitFor(element) {
-    await browser.waitUntil(async () => element.then(el => el.isDisplayed()), 5000, 'wait for login button');
+    await browser.waitUntil(async () => {
+      const isDisplayed = await element.isDisplayed();
+      return isDisplayed;
+    }, 5000, 'wait for login button');
   }
 
   async startLoginForm() {
-    await this.waitFor(this.loginBtn);
-    await this.loginBtn.then(el => el.click());
+    const el = await this.loginBtn;
+    await this.waitFor(el);
+    await el.click();
   }
 
   async login(username, password) {
-    await this.username.then(el => el.setValue(username));
-    await this.password.then(el => el.setValue(password));
-    await this.submitBtn.then(el => el.click());
+    await (await this.username).setValue(username);
+    await (await this.password).setValue(password);
+    await (await this.submitBtn).click();
   }
 
   async logout() {
-    await this.logoutBtn.then(el => el.click());
-    await this.waitFor(this.loginBtn);
+    await (await this.logoutBtn).click();
+    await this.waitFor((await this.loginBtn));
   }
 
   async selectAuthenticator(value) {
-    await this.waitFor(this.authenticatorOptions);
-    await this.authenticatorOptions.then(el => el.selectByAttribute('value', value));
-    await this.submitBtn.then(el => el.click());
+    await this.waitFor(await this.authenticatorOptions);
+    await (await this.authenticatorOptions).selectByAttribute('value', value);
+    await (await this.submitBtn).click();
   }
 
   async verifyAnswer(answer) {
-    await this.waitFor(this.challengeAuthenticatorForm);
-    await this.answer.then(el => el.setValue(answer));
-    await this.submitBtn.then(el => el.click());
+    await this.waitFor(await this.challengeAuthenticatorForm);
+    await (await this.answer).setValue(answer);
+    await (await this.submitBtn).click();
   }
 
   async assertUserInfo() {
-    await this.waitFor(this.userInfo);
-    await this.userInfo.then(el => el.getText()).then(txt => {
-      assert(txt.indexOf('email') > 0);
-    });
+    await this.waitFor(await this.userInfo);
+    const txt = await (await this.userInfo).getText();
+    assert(txt.indexOf('email') > 0);
   }
 
 }
