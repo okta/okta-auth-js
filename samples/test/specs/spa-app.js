@@ -53,7 +53,7 @@ describe('spa-app: ' + sampleConfig.name, () => {
   });
 
   // TODO: fix this flaky test OKTA-464122
-  // [UPDATE 3/8/22] could not get test to fail when attempt to repro. Re-enabling
+  // [UPDATE 4/4/22] Re-enabling
   it('can use memory token storage', async () => {
     await startApp('/', { authMethod: 'redirect', requireUserSession: true, storage: 'memory' });
     await loginRedirect();
