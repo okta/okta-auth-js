@@ -14,11 +14,11 @@ class MFATestApp {
 
   async open() {
     await browser.url('/');
-    await browser.waitUntil(async () => {
-      const el = await this.readySelector;
-      const isExisting = await el.isExisting();
-      return isExisting;
-    }, 5000, 'wait for ready selector');
+    // await browser.waitUntil(async () => {
+    //   const el = await $('#oidc-config');
+    //   const isExisting = await el.isExisting();
+    //   return isExisting;
+    // }, 5000, 'wait for ready selector');
   }
 
   async waitFor(element) {
