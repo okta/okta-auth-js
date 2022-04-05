@@ -11,7 +11,7 @@ const config = [
     exclude: [
       'mfa.js'
     ],
-    flags: [ORG_OIE_ENABLED]
+    flags: [ORG_OIE_ENABLED, REFRESH_TOKEN]
   },
   {
     app: '@okta/test.app.react-mfa-v1',
