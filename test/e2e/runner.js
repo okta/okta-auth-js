@@ -81,11 +81,7 @@ const tasks = config
       ? ({ name }) => name === process.env.TEST_NAME
       : () => true
   )
-  .reduce((tasks, config) => {
-    const task = getTask(config);
-    tasks.push(task);
-    return tasks;
-  }, []);
+  .map(config => getTask(config));
 
 // track process returnCode for each task
 const codes = [];
