@@ -6,40 +6,10 @@ const config = [
   {
     app: '@okta/test.app',
     spec: [
-      '**/*.js'
-    ],
-    exclude: [
-      'refreshTokens.js',
-      'mfa.js'
-    ],
-    flags: []
-  },
-  {
-    app: '@okta/test.app',
-    spec: [
-      '**/*.js'
+      '**/login.js'
     ],
     exclude: [
       'mfa.js'
-    ],
-    flags: [ORG_OIE_ENABLED, REFRESH_TOKEN]
-  },
-  {
-    app: '@okta/test.app',
-    spec: [
-      'refreshTokens.js',
-      'crossTabs.js',
-      'proxy.js'
-    ],
-    flags: [REFRESH_TOKEN]
-  },
-  {
-    app: '@okta/test.app',
-    spec: [
-      'login.js',
-      'sso.js',
-      'interactionFlow.js',
-      'server.js'
     ],
     flags: [ORG_OIE_ENABLED]
   },
