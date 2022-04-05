@@ -58,7 +58,7 @@ describe('idx/util', () => {
     it('returns feature PASSWORD_RECOVERY if "currentAuthenticator-recover" action exists', () => {
       const idxResponse = IdxResponseFactory.build({
         actions: {
-          'currentAuthenticator-recover': function() {} as Function
+          'currentAuthenticator-recover': function() {}
         }
       });
       const res = getEnabledFeatures(idxResponse);

@@ -18,7 +18,7 @@
  */
 
  /* eslint-disable camelcase */
-export type UserClaims<T = {}> = T & {
+export type UserClaims<T = Record<string, string | boolean | number>> = T & {
   auth_time?: number;
   aud?: string;
   email?: string;

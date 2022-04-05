@@ -26,6 +26,7 @@ interface PostToTransactionParams {
   updatePhone?: boolean;
 }
 
+// eslint-disable-next-line no-use-before-define
 type AuthTransactionFunction = (obj?: any) => Promise<AuthTransaction>;
 
 interface AuthTransactionFunctions {

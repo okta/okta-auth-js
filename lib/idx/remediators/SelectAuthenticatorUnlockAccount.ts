@@ -27,7 +27,7 @@ export class SelectAuthenticatorUnlockAccount extends SelectAuthenticator<Select
 
   map = {
     identifier: ['username']
-  }
+  };
 
   canRemediate() {
     const identifier = this.getData('identifier');

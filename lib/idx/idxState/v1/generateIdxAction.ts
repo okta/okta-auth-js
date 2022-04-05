@@ -11,6 +11,7 @@
  */
 
 /* eslint-disable max-len, complexity */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { httpRequest } from '../../../http';
 import { OktaAuthInterface } from '../../../types';    // auth-js/types

@@ -31,7 +31,10 @@ import {
   TokenManagerErrorEventHandler,
   TokenManagerEventHandler,
   TokenManagerInterface,
-  RefreshToken
+  RefreshToken,
+  AccessTokenCallback,
+  IDTokenCallback,
+  RefreshTokenCallback
 } from './types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
 
@@ -295,9 +298,9 @@ export class TokenManager implements TokenManagerInterface {
   setTokens(
     tokens: Tokens,
     // TODO: callbacks can be removed in the next major version OKTA-407224
-    accessTokenCb?: Function, 
-    idTokenCb?: Function,
-    refreshTokenCb?: Function
+    accessTokenCb?: AccessTokenCallback, 
+    idTokenCb?: IDTokenCallback,
+    refreshTokenCb?: RefreshTokenCallback
   ): void {
     const handleTokenCallback = (key, token) => {
       const type = this.getTokenType(token);

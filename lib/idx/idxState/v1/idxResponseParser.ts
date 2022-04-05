@@ -11,6 +11,7 @@
  */
 
 /* eslint-disable max-len */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { OktaAuthInterface } from '../../../types';    // auth-js/types
 import { generateRemediationFunctions } from './remediationParser';

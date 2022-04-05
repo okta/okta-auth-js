@@ -67,7 +67,7 @@ Given(
   async function(this: ActionContext) {
     // Update app settings via internal API, public API should be used once available
     await updateAppOAuthClient(this.app, { 
-      // eslint-disable-next-line @typescript-eslint/camelcase
+      // eslint-disable-next-line camelcase
       email_magic_link_redirect_uri: 'http://localhost:8080/login/callback'
     });
   }

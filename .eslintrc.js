@@ -1,8 +1,8 @@
 module.exports = {
   extends: [
     "eslint:recommended",
-    "plugin:node/recommended-script",
     "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:node/recommended-script",
     "plugin:@typescript-eslint/recommended",
     "plugin:jsdoc/recommended"
   ],
@@ -28,6 +28,25 @@ module.exports = {
     }
   },
   overrides: [
+    {
+      files: ["*.ts"],
+      plugins: [
+        "@typescript-eslint"
+      ],
+      parser: "@typescript-eslint/parser",
+      rules: {
+        // https://typescript-eslint.io/docs/linting/troubleshooting/#i-am-using-a-rule-from-eslint-core-and-it-doesnt-work-correctly-with-typescript-code
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "error",
+      }
+    },
+    {
+      files: ["samples/generated/**/*"],
+      rules: {
+        "@typescript-eslint/ban-ts-comment": "off"
+      }
+    },
     {
       files: ["polyfill/**/*", "build/polyfill/**/*"],
       env: {

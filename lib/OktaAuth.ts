@@ -134,6 +134,7 @@ import {
   clearTransactionMeta,
   isTransactionMetaValid
 } from './idx/transactionMeta';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore 
 // Do not use this type in code, so it won't be emitted in the declaration output
 import Emitter from 'tiny-emitter';

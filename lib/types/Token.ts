@@ -32,7 +32,6 @@ export interface RefreshToken extends AbstractToken {
   issuer: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IDToken extends AbstractToken {
   idToken: string;
   claims: UserClaims;

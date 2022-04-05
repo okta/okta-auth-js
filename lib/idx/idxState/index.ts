@@ -32,7 +32,7 @@ export function validateVersionConfig(version) {
 export function makeIdxState ( 
   authClient: OktaAuthInterface,
   rawIdxResponse: RawIdxResponse,
-  toPersist: {} = {},
+  toPersist: Record<string, unknown> = {},
   requestDidSucceed: boolean,
 ): IdxResponse {
   const version = rawIdxResponse?.version ?? IDX_API_VERSION;

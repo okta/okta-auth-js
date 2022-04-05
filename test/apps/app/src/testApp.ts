@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable max-depth */
 /*
  * Copyright (c) 2019, Okta, Inc. and/or its affiliates. All rights reserved.
