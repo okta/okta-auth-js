@@ -1,41 +1,31 @@
-const REFRESH_TOKEN = 'REFRESH_TOKEN';
-const MFA_ENABLED = 'MFA_ENABLED';
-const ORG_OIE_ENABLED = 'ORG_OIE_ENABLED';
-
 const config = [
   {
-    app: '@okta/test.app',
+    name: '@okta/test.app',
     spec: [
-      '**/login.js'
-    ],
-    exclude: [
-      'mfa.js'
-    ],
-    flags: [ORG_OIE_ENABLED, REFRESH_TOKEN]
+      'authRequired.js',
+      'concurrent.js',
+      'crossTabs.js',
+      'interactionFlow.js',
+      'login.js',
+      'logout.js',
+      'originalUri.js',
+      'proxy.js',
+      'refreshToken.js',
+      'server.js',
+      'sso.js',
+      'static.js',
+      'tokens.js',
+      'transactionStorage.js'
+    ]
   },
   {
-    app: '@okta/test.app.react-mfa-v1',
-    spec: ['mfa.js'],
-    flags: [MFA_ENABLED]
+    name: '@okta/test.app.react-mfa-v1',
+    spec: [
+      'mfa.js'
+    ]
   },
 ];
 
-const configPredicate = config => {
-  // returns true when config.flags and envrionment variable flags can match
-  const flags = [REFRESH_TOKEN, MFA_ENABLED, ORG_OIE_ENABLED];
-  while (flags.length) {
-    const flag = flags.pop();
-    if (!process.env[flag] && config.flags.includes(flag)) {
-      return false;
-    }
-    if (process.env[flag] && !config.flags.includes(flag)) {
-      return false;
-    }
-  }
-  return true;
-};
-
 module.exports = {
-  config,
-  configPredicate
+  config
 };
