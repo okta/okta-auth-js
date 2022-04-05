@@ -80,6 +80,12 @@ export type Input = {
   required?: boolean;
 }
 
+
+export interface IdxPollOptions {
+  required?: boolean;
+  refresh?: number;
+}
+
 export type NextStep = {
   name: string;
   authenticator?: IdxAuthenticator;
@@ -133,11 +139,6 @@ export type IdxOptions = InteractOptions & IntrospectOptions & {
   autoRemediate?: boolean;
   step?: string;
 };
-
-export interface IdxPollOptions {
-  required?: boolean;
-  refresh?: number;
-}
 
 export type Authenticator = {
   id?: string;

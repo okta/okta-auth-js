@@ -60,6 +60,7 @@ export interface IdxResponseStorage extends StorageProvider {
   getStorage(): SavedIdxResponse;
 }
 
+export type StorageType = 'memory' | 'sessionStorage' | 'localStorage' | 'cookie' | 'custom' | 'auto';
 export interface StorageOptions extends CookieOptions {
   storageType?: StorageType;
   storageTypes?: StorageType[];
@@ -68,13 +69,17 @@ export interface StorageOptions extends CookieOptions {
   useSeparateCookies?: boolean;
 }
 
-export type StorageType = 'memory' | 'sessionStorage' | 'localStorage' | 'cookie' | 'custom' | 'auto';
-
 export interface StorageUtil {
   storage: TxStorage;
   testStorageType(storageType: StorageType): boolean;
   getStorageByType(storageType: StorageType, options?: StorageOptions): SimpleStorage;
   findStorageType(types: StorageType[]): StorageType;
+}
+
+export interface CookieStorage extends SimpleStorage {
+  setItem(key: string, value: any, expiresAt?: string | null): void; // can customize expiresAt
+  getItem(key?: string): any; // if no key is passed, all cookies are returned
+  removeItem(key: string); // remove a cookie
 }
 
 export interface BrowserStorageUtil extends StorageUtil {
@@ -98,12 +103,6 @@ export interface NodeStorageUtil extends StorageUtil {
   // will be removed in next version. OKTA-362589
   getHttpCache(options?: StorageOptions): StorageProvider;
   getStorage(): SimpleStorage;
-}
-
-export interface CookieStorage extends SimpleStorage {
-  setItem(key: string, value: any, expiresAt?: string | null): void; // can customize expiresAt
-  getItem(key?: string): any; // if no key is passed, all cookies are returned
-  removeItem(key: string); // remove a cookie
 }
 
 // type StorageBuilder = (storage: Storage | SimpleStorage, name: string) => StorageProvider;

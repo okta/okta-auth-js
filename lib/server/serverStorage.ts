@@ -11,6 +11,7 @@
  *
  */
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore 
 // Do not use this type in code, so it won't be emitted in the declaration output
 import NodeCache from 'node-cache';

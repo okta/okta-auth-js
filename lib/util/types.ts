@@ -22,7 +22,7 @@ export function isNumber(obj: any): obj is number {
   return Object.prototype.toString.call(obj) === '[object Number]';
 }
 
-export function isFunction(fn: any): fn is Function {
+export function isFunction(fn: any): fn is (...any: any[]) => any {
   return !!fn && {}.toString.call(fn) === '[object Function]';
 }
 

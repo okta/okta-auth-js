@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { OktaAuthInterface } from '../../../types';    // auth-js/types
 import generateIdxAction from './generateIdxAction';

@@ -30,10 +30,10 @@ declare global {
 
 declare class OktaSignIn {
   constructor(options: any);
-  renderEl(options: any, successFn: Function, errorFn: Function): void;
+  renderEl(options: any, successFn: (...args: any[]) => any, errorFn: (...args: any[]) => any): void;
   showSignInToGetTokens(options: any): void;
   remove(): void;
-  on(event: string, fn: Function): void;
+  on(event: string, fn: (...args: any[]) => any): void;
 }
 
 let widgetInstance: OktaSignIn; // static variable. Only one widget instance is allowed to exist at a time

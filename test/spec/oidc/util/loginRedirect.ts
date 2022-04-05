@@ -61,7 +61,7 @@ describe('util/loginRedirect', function() {
     expect(hasTokensInHash(window.location.search)).toBe(false);
   }
 
-  function addBaselineTests(options = { useFragment: false }) {
+  function addBaselineTests(options: TestOptions = { useFragment: false }) {
     function mockHashOrSearch(value) {
       if (options.useFragment) {
         return mockHash(value);

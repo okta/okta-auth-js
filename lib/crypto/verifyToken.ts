@@ -30,6 +30,7 @@ export function verifyToken(idToken, key) {
   // It's not necessary to properly verify the jwt's signature.
   delete key.use;
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return webcrypto.subtle.importKey(
     format,

@@ -167,7 +167,7 @@ describe('idx/startTransaction', () => {
   it('has password-recovery feature enabled with currentAuthenticator-recover action', async () => {
     const idxResponse = IdxResponseFactory.build({
       actions: { 
-        'currentAuthenticator-recover': (() => {}) as Function
+        'currentAuthenticator-recover': (() => {})
       }
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);

@@ -61,7 +61,7 @@ describe('getWithRedirect', () => {
 
   it('throws an error if more than 2 parameters are passed', async () => {
     const { sdk } = testContext;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     const promise = getWithRedirect.apply(null, [sdk, {}, {}]);
     await expect(promise).rejects.toThrow('As of version 3.0, "getWithRedirect" takes only a single set of options');
