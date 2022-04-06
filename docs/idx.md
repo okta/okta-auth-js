@@ -179,7 +179,7 @@ This field indicates the status of the current flow.
 
 ###### `nextStep?`
 
-This field contains information to proceed with the next step. It's avaiable when in `IdxStatus.PENDING` status.
+This field contains information to proceed with the next step. It's available when in `IdxStatus.PENDING` status.
 
 - `name`: The identifier of the next step.
 - `type?`: The type of the authenticator that the step belongs to.
@@ -221,7 +221,7 @@ It indicates what features are available based on the app / org policy configura
 
 ###### `availableSteps?`
 
-It provides information for avaiable next steps.
+It provides information for available next steps.
 
 ### API Reference
 
