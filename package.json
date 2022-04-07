@@ -19,16 +19,6 @@
         "import": "./build/esm/browser/index.js"
       },
       "default": "./build/dist/okta-auth-js.umd.js"
-    },
-    "./myaccount": {
-      "node": {
-        "import": "./build/esm/node/myaccount.mjs",
-        "require": "./build/cjs/myaccount/index.js"
-      },
-      "browser": {
-        "import": "./build/esm/browser/myaccount.js"
-      },
-      "default": "./build/dist/myaccount.umd.js"
     }
   },
   "repository": {
@@ -204,8 +194,6 @@
     }
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx,cjs,mjs}": ["eslint --fix"],
-    "lib/myaccount/**/*": ["yarn docs:myaccount", "git add docs/myaccount"],
-    "typedoc.js": ["yarn docs:myaccount", "git add docs/myaccount"]
+    "*.{js,ts,jsx,tsx,cjs,mjs}": ["eslint --fix"]
   }
 }

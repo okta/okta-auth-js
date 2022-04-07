@@ -7,3 +7,7 @@ ci-scripts
 webpack*config.js
 scripts
 bundles-for-validation
+
+cjs/myaccount/**/*
+dist/myaccount.*
+esm/**/myaccount.*
