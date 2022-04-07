@@ -27,10 +27,7 @@ const ConfirmationForm = ({
       await onStart();
       onFinish();
     } catch (err) {
-      // insufficient_authentication_context error is handled in SDK layer
-      if (err.xhr?.status !== 403) {
-        setError(err);
-      }
+      setError(err);
     }
   };
 

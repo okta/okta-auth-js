@@ -75,12 +75,8 @@ const InputForm = ({
         // success verification will lead to the end state
         handleFinishTransaction();
       }
-      setError(null);
     } catch (err) {
-      // insufficient_authentication_context error is handled in SDK layer
-      if (err.xhr?.status !== 403) {
-        setError(err);
-      }
+      setError(err);
     }
 
     setValue('');
