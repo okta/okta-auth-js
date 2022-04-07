@@ -105,7 +105,8 @@ describe('idx/interact', () => {
             code_challenge: 'meta-codeChallenge',
             code_challenge_method: 'meta-codeChallengeMethod',
             state: 'fn-state',
-          })
+          }),
+          withCredentials: true
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
@@ -122,6 +123,48 @@ describe('idx/interact', () => {
               'fn',
             ],
             'state': 'fn-state',
+            'withCredentials': true,
+          },
+          'state': 'fn-state',
+        });
+      });
+
+      it('uses `withCredentials` from function options', async () => {
+        const { authClient, transactionMeta } = testContext;
+        jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+        const res = await interact(authClient, { state: 'fn-state', scopes: ['fn'], withCredentials: false});
+        expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+          url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          args: ({
+            client_id: 'authClient-clientId',
+            scope: 'fn',
+            redirect_uri: 'authClient-redirectUri',
+            code_challenge: 'meta-codeChallenge',
+            code_challenge_method: 'meta-codeChallengeMethod',
+            state: 'fn-state',
+          }),
+          withCredentials: false
+        });
+        expect(res).toEqual({
+          'interactionHandle': 'idx-interactionHandle',
+          'meta': {
+            'clientId': 'authClient-clientId',
+            'issuer': 'https://auth-js-test.okta.com',
+            'redirectUri': 'authClient-redirectUri',
+            'codeChallenge': 'meta-codeChallenge',
+            'codeChallengeMethod': 'meta-codeChallengeMethod',
+            'codeVerifier': 'meta-codeVerifier',
+            'interactionHandle': 'idx-interactionHandle',
+            'responseType': 'tp-responseType',
+            'scopes': [
+              'fn',
+            ],
+            'state': 'fn-state',
+            'withCredentials': false,
           },
           'state': 'fn-state',
         });
@@ -143,7 +186,8 @@ describe('idx/interact', () => {
             code_challenge: 'meta-codeChallenge',
             code_challenge_method: 'meta-codeChallengeMethod',
             state: 'meta-state',
-          })
+          }),
+          withCredentials: true
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
@@ -160,6 +204,7 @@ describe('idx/interact', () => {
               'meta',
             ],
             'state': 'meta-state',
+            'withCredentials': true,
           },
           'state': 'meta-state',
         });
@@ -184,7 +229,8 @@ describe('idx/interact', () => {
             code_challenge: 'tp-codeChallenge',
             code_challenge_method: 'tp-codeChallengeMethod',
             state: 'fn-state',
-          })
+          }),
+          withCredentials: true
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
@@ -201,6 +247,7 @@ describe('idx/interact', () => {
               'fn',
             ],
             'state': 'fn-state',
+            'withCredentials': true,
           },
           'state': 'fn-state',
         });
@@ -222,7 +269,8 @@ describe('idx/interact', () => {
             code_challenge: 'tp-codeChallenge',
             code_challenge_method: 'tp-codeChallengeMethod',
             state: 'authClient-state',
-          })
+          }),
+          withCredentials: true
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
@@ -239,6 +287,7 @@ describe('idx/interact', () => {
               'authClient',
             ],
             'state': 'authClient-state',
+            'withCredentials': true,
           },
           'state': 'authClient-state',
         });
@@ -262,7 +311,8 @@ describe('idx/interact', () => {
             code_challenge: 'tp-codeChallenge',
             code_challenge_method: 'tp-codeChallengeMethod',
             state: 'tp-state',
-          })
+          }),
+          withCredentials: true
         });
         expect(res).toEqual({
           'interactionHandle': 'idx-interactionHandle',
@@ -279,6 +329,7 @@ describe('idx/interact', () => {
               'tp-scopes',
             ],
             'state': 'tp-state',
+            'withCredentials': true,
           },
           'state': 'tp-state',
         });
@@ -309,7 +360,8 @@ describe('idx/interact', () => {
               code_challenge_method: 'tp-codeChallengeMethod',
               state: 'authClient-state',
               activation_token: 'sdk-activationToken'
-            })
+            }),
+            withCredentials: true,
           });
           expect(res).toEqual({
             'interactionHandle': 'idx-interactionHandle',
@@ -326,7 +378,8 @@ describe('idx/interact', () => {
                 'authClient',
               ],
               'state': 'authClient-state',
-              'activationToken': 'sdk-activationToken'
+              'activationToken': 'sdk-activationToken',
+              'withCredentials': true,
             },
             'state': 'authClient-state',
           });
@@ -348,7 +401,8 @@ describe('idx/interact', () => {
               code_challenge_method: 'tp-codeChallengeMethod',
               state: 'authClient-state',
               activation_token: 'fn-activationToken'
-            })
+            }),
+            withCredentials: true
           });
           expect(res).toEqual({
             'interactionHandle': 'idx-interactionHandle',
@@ -365,7 +419,8 @@ describe('idx/interact', () => {
                 'authClient',
               ],
               'state': 'authClient-state',
-              'activationToken': 'fn-activationToken'
+              'activationToken': 'fn-activationToken',
+              'withCredentials': true,
             },
             'state': 'authClient-state',
           });
@@ -397,7 +452,8 @@ describe('idx/interact', () => {
               code_challenge_method: 'tp-codeChallengeMethod',
               state: 'authClient-state',
               recovery_token: 'sdk-recoveryToken'
-            })
+            }),
+            withCredentials: true
           });
           expect(res).toEqual({
             'interactionHandle': 'idx-interactionHandle',
@@ -414,7 +470,8 @@ describe('idx/interact', () => {
                 'authClient',
               ],
               'state': 'authClient-state',
-              'recoveryToken': 'sdk-recoveryToken'
+              'recoveryToken': 'sdk-recoveryToken',
+              'withCredentials': true,
             },
             'state': 'authClient-state',
           });
@@ -436,7 +493,8 @@ describe('idx/interact', () => {
               code_challenge_method: 'tp-codeChallengeMethod',
               state: 'authClient-state',
               recovery_token: 'fn-recoveryToken'
-            })
+            }),
+            withCredentials: true
           });
           expect(res).toEqual({
             'interactionHandle': 'idx-interactionHandle',
@@ -453,7 +511,8 @@ describe('idx/interact', () => {
                 'authClient',
               ],
               'state': 'authClient-state',
-              'recoveryToken': 'fn-recoveryToken'
+              'recoveryToken': 'fn-recoveryToken',
+              'withCredentials': true,
             },
             'state': 'authClient-state',
           });
@@ -564,7 +623,8 @@ describe('idx/interact', () => {
           'interactionHandle': 'idx-interactionHandle',
           'responseType': 'tp-responseType',
           'scopes': ['authClient'],
-          'state': 'authClient-state'
+          'state': 'authClient-state',
+          'withCredentials': true,
         });
       });
     });

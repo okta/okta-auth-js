@@ -44,7 +44,8 @@ export async function introspect (
   if (!rawIdxResponse) {
     const version = options.version || IDX_API_VERSION;
     const domain = getOAuthDomain(authClient);
-    const { withCredentials, interactionHandle, stateHandle } = options;
+    const { interactionHandle, stateHandle } = options;
+    const withCredentials = options.withCredentials ?? true;
     try {
       requestDidSucceed = true;
       validateVersionConfig(version);
