@@ -1,5 +1,5 @@
 import OktaAuth from './OktaAuth';
-import { getProfile } from './myaccount';
+import * as MyAccountMethods from './myaccount';
 import { OktaAuthOptions } from './types';
 
 class OktaAuthCDN extends OktaAuth {
@@ -8,9 +8,12 @@ class OktaAuthCDN extends OktaAuth {
   constructor(args: OktaAuthOptions) {
     super(args);
 
-    this.myaccount = {
-      getProfile: getProfile.bind(null, this)
-    };
+    this.myaccount = Object.entries(MyAccountMethods)
+      .filter(([ name ]) => name !== 'default')
+      .reduce((acc, [name, fn]) => {
+        acc[name] = (fn as any).bind(null, this);
+        return acc;
+      }, {});
   }
 }
 
