@@ -130,6 +130,7 @@ export interface IdxTransaction {
   rawIdxState: RawIdxResponse;
   interactionCode?: string;
   actions: IdxActions;
+  uiActions: Record<string, Function>;
   context: IdxContext;
 }
 

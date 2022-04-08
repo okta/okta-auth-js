@@ -13,7 +13,7 @@
 
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
-import { RemediationValues } from './remediators';
+import { RemediationValues, Remediator } from './remediators';
 import { FlowIdentifier, RemediationResponse } from './types';
 import { RemediationFlow } from './flow';
 import { 
@@ -151,7 +151,9 @@ export async function remediate(
       }
     }
     if (flow === 'default') {
-      return { idxResponse };
+      const remediator = new Remediator(neededToProceed[0]);
+      const nextStep = getNextStep(remediator, idxResponse);
+      return { idxResponse, nextStep };
     }
     throw new AuthSdkError(`
       No remediation can match current flow, check policy settings in your org.

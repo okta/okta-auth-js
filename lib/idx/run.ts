@@ -334,6 +334,11 @@ export async function run(
   
   // from idx-js, used by the widget
   const { actions, context, neededToProceed, proceed, rawIdxState, requestDidSucceed } = idxResponse || {};
+  const uiActions = Object.entries(actions!)
+    .reduce((acc, [name]) => {
+      acc[name] = async () => run(authClient, { actions: [name] });
+      return acc;
+    }, {});
   return {
     status: status!,
     ...(meta && { meta }),
@@ -347,6 +352,7 @@ export async function run(
 
     // from idx-js
     actions: actions!,
+    uiActions,
     context: context!,
     neededToProceed: neededToProceed!,
     proceed: proceed!,

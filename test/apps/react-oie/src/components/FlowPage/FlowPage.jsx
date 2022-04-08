@@ -15,9 +15,9 @@ const FlowPage = () => {
   const { transaction, setTransaction } = useTransaction();
 
   const startFlow = useCallback(async () => {
-    const newTransaction = flow === 'idp' 
-      ? await oktaAuth.idx.startTransaction() 
-      : await oktaAuth.idx[flow]();
+    const newTransaction = flow === 'register' 
+      ? await oktaAuth.idx.register()
+      : await oktaAuth.idx.startTransaction();
     setTransaction(newTransaction);
   }, [oktaAuth, flow, setTransaction]);
 

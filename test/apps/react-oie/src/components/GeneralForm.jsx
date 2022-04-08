@@ -44,10 +44,10 @@ const GeneralForm = () => {
     setTransaction(newTransaction);
   };
 
-  const handleRecoverPassword = async (e) => {
+  const handleAction = actionFn => async (e) => {
     e.preventDefault();
     setProcessing(true);
-    const newTransaction = await oktaAuth.idx.recoverPassword();
+    const newTransaction = await actionFn();
     setTransaction(newTransaction);
     setProcessing(false);
   };
@@ -56,9 +56,9 @@ const GeneralForm = () => {
     return <Spinner />;
   }
 
-  const { nextStep, messages, actions, availableSteps } = transaction;
+  const { nextStep, messages, uiActions, availableSteps } = transaction;
   const { name, canSkip } = nextStep;
-  const canRecoverPassword = !!actions?.['currentAuthenticator-recover'];
+  const recoverPasswordFn = uiActions?.['currentAuthenticator-recover'];
   const idps = availableSteps.filter(step => step.name === 'redirect-idp');
   const form = formTransformer(nextStep)({} /* initial form value */);
   const { inputs, select, text, image } = form;
@@ -111,9 +111,11 @@ const GeneralForm = () => {
           <Box paddingTop="s" paddingBottom="s">
             <Button wide type="submit" disabled={processing}>Submit</Button>
           </Box>
-          {canRecoverPassword && (
+          {!!recoverPasswordFn && (
             <Box paddingTop="s" paddingBottom="s">
-              <Link href="#" name="forgotPassword" onClick={handleRecoverPassword}>Forgot password</Link>
+              <Link href="#" name="forgotPassword" onClick={handleAction(recoverPasswordFn)}>
+                Forgot password
+              </Link>
             </Box>
           )}
           {idps.length > 0 && (
