@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.3.2
+
+- [#1169](https://github.com/okta/okta-auth-js/pull/1169) Removes deleted file which was inadvertently added back in a merge
+
 ## 6.3.1
 
 ### Fixes
