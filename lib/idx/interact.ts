@@ -86,6 +86,7 @@ export async function interact (
     recoveryToken,
   } = meta as IdxTransactionMeta;
   const clientSecret = options.clientSecret || authClient.options.clientSecret;
+  withCredentials = withCredentials ?? true;
 
   /* eslint-disable camelcase */
   const url = `${baseUrl}/v1/interact`;

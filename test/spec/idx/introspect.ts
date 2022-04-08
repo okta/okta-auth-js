@@ -92,7 +92,31 @@ describe('idx/introspect', () => {
       },
       args: {
         interactionHandle: 'interaction-handle',
-      }
+      },
+      withCredentials: true
+    });
+    expect(res.rawIdxState).toEqual(rawIdxResponse);
+    expect(res.requestDidSucceed).toBe(true);
+  });
+
+  it('calls idx.introspect with `withCredentials` passed via options', async () => {
+    const { authClient, introspectOptions } = testContext;
+    const rawIdxResponse = RawIdxResponseFactory.build();
+    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(rawIdxResponse);
+    authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue(null);
+    const res = await introspect(authClient, {...introspectOptions, withCredentials: false});
+    expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
+    expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+      url: 'mock-domain/idp/idx/introspect',
+      method: 'POST',
+      headers: {
+        'Accept': 'application/ion+json; okta-version=1.0.0',
+        'Content-Type': 'application/ion+json; okta-version=1.0.0'
+      },
+      args: {
+        interactionHandle: 'interaction-handle',
+      },
+      withCredentials: false
     });
     expect(res.rawIdxState).toEqual(rawIdxResponse);
     expect(res.requestDidSucceed).toBe(true);
@@ -115,7 +139,8 @@ describe('idx/introspect', () => {
       },
       args: {
         interactionHandle: 'interaction-handle',
-      }
+      },
+      withCredentials: true
     });
     expect(mocked.idxState.makeIdxState).toHaveBeenCalled();
     expect(res.rawIdxState).toEqual(rawIdxResponse);
@@ -139,7 +164,8 @@ describe('idx/introspect', () => {
       },
       args: {
         interactionHandle: 'interaction-handle',
-      }
+      },
+      withCredentials: true
     });
     expect(mocked.idxState.makeIdxState).not.toHaveBeenCalled();
   });
