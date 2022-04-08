@@ -1,0 +1,48 @@
+body {
+  margin: 0;
+  display: flex;
+}
+
+#root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.navbar.ui.menu {
+  border-radius: 0;
+  height: 50px;
+}
+
+.content {
+  padding: 0 1rem;
+  display: flex !important;
+  flex: 1;
+  flex-direction: column;
+}
+
+.side-panel {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  width: 250px;
+}
+
+.side-panel .menu {
+  border-radius: 0;
+  flex: 1;
+}
+
+.main-panel {
+  margin-left: 250px;
+  /* display: 'flex';
+  flex: 1; */
+}
+
+/* https://github.com/mac-s-g/react-json-view/issues/244 */
+.react-json-view {
+  word-break: break-all;
+}
