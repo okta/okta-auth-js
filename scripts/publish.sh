@@ -38,4 +38,14 @@ log_custom_message "Published Version" "${FINAL_PUBLISHED_VERSIONS}"
 
 popd
 
+
+# upload artifact version to eng prod s3 to be used by downstream jobs
+artifact_version="$(ci-pkginfo -t pkgname)@$(ci-pkginfo -t pkgsemver)"
+if upload_job_data global artifact_version ${artifact_version}; then
+  echo "Upload okta-auth-js job data artifact_version=${artifact_version} to s3!"
+else
+  # only echo the info since the upload is not crucial
+  echo "Fail to upload okta-auth-js job data artifact_version=${artifact_version} to s3!" >&2
+fi
+
 exit ${SUCCESS}
