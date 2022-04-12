@@ -9,6 +9,7 @@ export TEST_SUITE_TYPE="build"
 # Install required dependencies
 export PATH="${PATH}:$(yarn global bin)"
 yarn global add @okta/ci-append-sha
+yarn global add @okta/ci-pkginfo
 
 if [ -n "${action_branch}" ];
 then
