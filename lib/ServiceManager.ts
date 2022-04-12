@@ -93,7 +93,7 @@ export class ServiceManager implements ServiceManagerInterface {
 
   start() {
     if (this.started) {
-      this.stop();
+      return;     // noop if services are already started
     }
     // only start election if a leader is required
     if (this.isLeaderRequired()) {
