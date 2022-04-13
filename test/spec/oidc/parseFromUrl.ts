@@ -36,7 +36,7 @@ describe('token.parseFromUrl', function() {
     var redirectUri = 'https://example.com/redirect';
   
     spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-    spyOn(TransactionManager.prototype, 'loadLegacyPKCE').and.returnValue({
+    spyOn(TransactionManager.prototype, 'load').and.returnValue({
       codeVerifier,
       redirectUri
     });
@@ -677,7 +677,7 @@ describe('token.parseFromUrl', function() {
     });
   });
 
-  it('throws an error if no transaction meta and legacyWidgetSupport is false', () => {
+  it('throws an error if no transaction meta', () => {
     const error = {
       name: 'AuthSdkError',
       message: 'Unable to retrieve OAuth redirect params from storage',
@@ -688,11 +688,6 @@ describe('token.parseFromUrl', function() {
       errorCauses: []
     };
     return oauthUtil.setupParseUrl({
-      oktaAuthArgs: {
-        transactionManager: {
-          legacyWidgetSupport: false
-        }
-      },
       shouldClearTransaction: false,
       willFail: true,
       hashMock: '#id_token=' + tokens.standardIdToken +

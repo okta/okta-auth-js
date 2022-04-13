@@ -95,8 +95,6 @@ export async function parseFromUrl(sdk, options?: string | ParseFromUrlOptions):
   const res: OAuthResponse = parseOAuthResponseFromUrl(sdk, options);
   const state = res.state;
   const oauthParams: TransactionMeta = sdk.transactionManager.load({
-    oauth: true,
-    pkce: sdk.options.pkce,
     state
   });
   if (!oauthParams) {

@@ -18,7 +18,6 @@ import { FlowIdentifier, IdxTransactionMeta } from '../idx/types';
 export interface TransactionManagerOptions {
   storageManager?: StorageManager;
   enableSharedStorage?: boolean; // default true
-  legacyWidgetSupport?: boolean; // default true
   saveNonceCookie?: boolean; // default true
   saveStateCookie?: boolean; // default true
   saveParamsCookie?: boolean; // default true
@@ -26,8 +25,6 @@ export interface TransactionManagerOptions {
 }
 
 export interface TransactionMetaOptions {
-  pkce?: boolean;
-  oauth?: boolean;
   muteWarning?: boolean;
   state?: string;
   flow?: FlowIdentifier;

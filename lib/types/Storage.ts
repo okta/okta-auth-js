@@ -34,18 +34,6 @@ export interface StorageProvider extends SimpleStorage {
   updateStorage(key: string, value: any): void;
 }
 
-// will be removed in next version. OKTA-362589
-export interface PKCEMeta {
-  codeVerifier: string;
-  redirectUri: string;
-}
-
-// will be removed in next version. OKTA-362589
-export interface PKCEStorage extends StorageProvider {
-  setStorage(obj: PKCEMeta): void;
-  getStorage(): PKCEMeta;
-}
-
 export interface TransactionStorage extends StorageProvider {
   setStorage(obj: TransactionMeta): void;
   getStorage(): TransactionMeta;
@@ -93,16 +81,6 @@ export interface BrowserStorageUtil extends StorageUtil {
   testStorage(storage: any): boolean;
   storage: Cookies;
   inMemoryStore: Record<string, unknown>;
-
-  // will be removed in next version. OKTA-362589
-  getHttpCache(options?: StorageOptions): StorageProvider;
-  getPKCEStorage(options?: StorageOptions): PKCEStorage;
-}
-
-export interface NodeStorageUtil extends StorageUtil {
-  // will be removed in next version. OKTA-362589
-  getHttpCache(options?: StorageOptions): StorageProvider;
-  getStorage(): SimpleStorage;
 }
 
 // type StorageBuilder = (storage: Storage | SimpleStorage, name: string) => StorageProvider;
