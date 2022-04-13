@@ -9,6 +9,7 @@ export TEST_SUITE_TYPE="build"
 # Install required dependencies
 export PATH="${PATH}:$(yarn global bin)"
 yarn global add @okta/ci-append-sha
+yarn global add @okta/ci-pkginfo
 
 if [ -n "${action_branch}" ];
 then
@@ -33,8 +34,17 @@ if ! npm publish --registry ${REGISTRY}; then
   exit ${PUBLISH_ARTIFACTORY_FAILURE}
 fi
 
-FINAL_PUBLISHED_VERSIONS=$(echo "console.log(require('./package.json').version)" | node -)
-log_custom_message "Published Version" "${FINAL_PUBLISHED_VERSIONS}"
+FINAL_PUBLISHED_VERSION="$(ci-pkginfo -t pkgsemver)"
+log_custom_message "Published Version" "${FINAL_PUBLISHED_VERSION}"
+
+# upload artifact version to eng prod s3 to be used by downstream jobs
+artifact_version="$(ci-pkginfo -t pkgname)@$(ci-pkginfo -t pkgsemver)"
+if upload_job_data global artifact_version ${artifact_version}; then
+  echo "Upload okta-auth-js job data artifact_version=${artifact_version} to s3!"
+else
+  # only echo the info since the upload is not crucial
+  echo "Fail to upload okta-auth-js job data artifact_version=${artifact_version} to s3!" >&2
+fi
 
 popd
 
