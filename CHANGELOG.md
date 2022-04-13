@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.4.1
+
+### Fixes
+
+[#1177](https://github.com/okta/okta-auth-js/pull/1177) - fixes issue with repeated calls to `oktaAuth.start()`
+
 ## 6.4
 
 ### Features
