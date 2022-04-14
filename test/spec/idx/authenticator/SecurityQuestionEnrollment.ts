@@ -33,7 +33,7 @@ describe('idx/authenticator/SecurityQuestionEnrollment', () => {
       const { authenticator } = testContext;
       expect(authenticator.canVerify({ answer: 'foo', questionKey: 'bar' })).toBe(true);
     });
-    it('canv erify using "answer" and "question"', () => {
+    it('can verify using "answer" and "question"', () => {
       const { authenticator } = testContext;
       expect(authenticator.canVerify({ answer: 'foo', question: 'bar' })).toBe(true);
     });
