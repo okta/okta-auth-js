@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.0.0
+
+### Breaking Changes
+
+- [#1181](https://github.com/okta/okta-auth-js/pull/1181) - Removes legacy PKCE/OAuth storage
+
 ## 6.9
 
 - [#1307](https://github.com/okta/okta-auth-js/pull/1307) Adds `nonce` param to `idx.interact` (and `idx.start`) 
