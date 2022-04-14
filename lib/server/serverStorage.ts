@@ -88,11 +88,6 @@ class ServerStorage implements StorageUtil {
     return 'memory';
   }
 
-  // will be removed in next version. OKTA-362589
-  getHttpCache() {
-    return null; // stubbed in server.js
-  }
-
   // shared in-memory using node cache
   getStorage(): SimpleStorage {
     return {
