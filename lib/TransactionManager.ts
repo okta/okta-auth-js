@@ -11,7 +11,6 @@
  */
 
 
-import { REDIRECT_NONCE_COOKIE_NAME, REDIRECT_OAUTH_PARAMS_NAME, REDIRECT_STATE_COOKIE_NAME } from './constants';
 import { StorageManager } from './StorageManager';
 import {
   StorageProvider,
@@ -19,7 +18,6 @@ import {
   isTransactionMeta,
   TransactionMetaOptions,
   TransactionManagerOptions,
-  CookieStorage,
   SavedIdxResponse
 } from './types';
 import { isRawIdxResponse } from './idx/types/idx-js';
@@ -37,18 +35,12 @@ export interface ClearTransactionMetaOptions extends TransactionMetaOptions {
 export default class TransactionManager {
   options: TransactionManagerOptions;
   storageManager: StorageManager;
-  saveNonceCookie: boolean;
-  saveStateCookie: boolean;
-  saveParamsCookie: boolean;
   enableSharedStorage: boolean;
   saveLastResponse: boolean;
 
   constructor(options: TransactionManagerOptions) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.storageManager = options.storageManager!;
-    this.saveNonceCookie = options.saveNonceCookie === false ? false : true;
-    this.saveStateCookie = options.saveStateCookie === false ? false : true;
-    this.saveParamsCookie = options.saveParamsCookie === false ? false : true;
     this.enableSharedStorage = options.enableSharedStorage === false ? false : true;
     this.saveLastResponse = options.saveLastResponse === false ? false : true;
     this.options = options;
@@ -95,48 +87,6 @@ export default class TransactionManager {
     // Shared storage allows continuation of transaction in another tab
     if (this.enableSharedStorage && meta.state) {
       saveTransactionToSharedStorage(this.storageManager, meta.state, meta);
-    }
-
-    if (!options.oauth) {
-      return;
-    }
-  
-    // For server-side web apps using AuthJS to perform redirect on client-side.
-    // Nonce/state will be validated by backend.
-    if (this.saveNonceCookie || this.saveStateCookie || this.saveParamsCookie) {
-      const cookieStorage: CookieStorage = this.storageManager.getStorage({ storageType: 'cookie' }) as CookieStorage;
-
-      if (this.saveParamsCookie) {
-        const { 
-          responseType,
-          state,
-          nonce,
-          scopes,
-          clientId,
-          urls,
-          ignoreSignature
-        } = meta;
-        const oauthParams = {
-          responseType,
-          state,
-          nonce,
-          scopes,
-          clientId,
-          urls,
-          ignoreSignature
-        };
-        cookieStorage.setItem(REDIRECT_OAUTH_PARAMS_NAME, JSON.stringify(oauthParams), null);
-      }
-
-      if (this.saveNonceCookie && meta.nonce) {
-        // Set nonce cookie for servers to validate nonce in id_token
-        cookieStorage.setItem(REDIRECT_NONCE_COOKIE_NAME, meta.nonce, null);
-      }
-
-      if (this.saveStateCookie && meta.state) {
-        // Set state cookie for servers to validate state
-        cookieStorage.setItem(REDIRECT_STATE_COOKIE_NAME, meta.state, null);
-      }
     }
   }
 
