@@ -5,7 +5,14 @@ import { SecurityQuestionVerification } from '../../../../lib/idx/authenticator'
 describe('idx/authenticator/SecurityQuestionVerification', () => {
   let testContext;
   beforeEach(() => {
-    const idxAuthenticator: IdxAuthenticator = SecurityQuestionAuthenticatorFactory.build();
+    const idxAuthenticator: IdxAuthenticator = SecurityQuestionAuthenticatorFactory.build({
+      contextualData: {
+        enrolledQuestion: {
+          questionKey: 'custom',
+          question: 'social'
+        }
+      }
+    });
     const authenticator = new SecurityQuestionVerification(idxAuthenticator);
     testContext = {
       idxAuthenticator,
