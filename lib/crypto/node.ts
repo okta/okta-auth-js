@@ -39,7 +39,7 @@ export { b as btoa };
 
 const crypto = (async () => {
   try {
-    return await import('crypto');
+    return await require('crypto');
   } catch (err) {
     // this environment has no crypto module!
     return undefined;
