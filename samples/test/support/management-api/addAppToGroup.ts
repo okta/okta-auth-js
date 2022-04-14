@@ -1,5 +1,4 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util/configUtils';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
 type Options = {
   appId: string;
@@ -7,17 +6,12 @@ type Options = {
   groupName?: string ;
 };
 
-export default async function({ 
+export default async function(config: OktaClientConfig, { 
   appId, 
   groupId = '', 
   groupName 
 }: Options) {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
-
+  const oktaClient = getOktaClient(config);
   if (groupName) {
     const { value: group } = await oktaClient.listGroups({
       q: groupName

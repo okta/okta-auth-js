@@ -1,17 +1,14 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig, randomStr } from '../../util';
+import { randomStr } from '../../util';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
-export default async function() {
-  const { 
-    orgUrl, 
-    oktaAPIKey, 
-    sampleConfig: { appType } 
-  } = getConfig();
-  const oktaClient = new Client({
-    orgUrl,
-    token: oktaAPIKey,
-  });
+type Options = {
+  appType: string;
+}
 
+export default async function(config: OktaClientConfig, options: Options) {
+  const oktaClient = getOktaClient(config);
+
+  const { appType } = options;
   const testApp = {
     'name': 'oidc_client',
     'label': `Generated E2E Test Client - ${randomStr(6)}`,

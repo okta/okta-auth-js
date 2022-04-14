@@ -10,8 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
+
+type Options = {
+  appId: string; 
+  schemaName: string;
+}
 
 const MAP = {
   age: {
@@ -35,13 +39,9 @@ const MAP = {
   }
 };
 
-export default async function(appId: string, schemaName: string) {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
-
-  const res = await oktaClient.updateApplicationUserProfile(appId, MAP[schemaName]);
+export default async function(config: OktaClientConfig, options: Options) {
+  const oktaClient = getOktaClient(config);
+  const { appId, schemaName } = options;
+  const res = await oktaClient.updateApplicationUserProfile(appId, (MAP as any)[schemaName]);
   return res;
 }

@@ -11,6 +11,7 @@
  */
 
 import { Given } from '@cucumber/cucumber';
+import crypto from 'crypto';
 import ActionContext from '../support/context';
 import noop from '../support/action/noop';
 import createPolicy from '../support/management-api/createPolicy';
@@ -28,11 +29,72 @@ import loginDirect from '../support/action/loginDirect';
 import addUserProfileSchemaToApp from '../support/management-api/addUserProfileSchemaToApp';
 import openRegisterWithActivationToken from '../support/action/openRegisterWithActivationToken';
 import fetchUser from '../support/management-api/fetchUser';
+import A18nClient from '../support/management-api/a18nClient';
+import createGroup from '../support/management-api/createGroup';
+import createApp from '../support/management-api/createApp';
+import startApp from '../support/action/startApp';
+import { getConfig } from '../util/configUtils';
 
 // NOTE: noop function is used for predefined settings
 
 // Extend the hook timeout to fight against org rate limit
 const timeout = 3 * 60 * 10000;
+
+Given(
+  'a org with Global Session Policy that defines the Primary factor as {string}',
+  { timeout },
+  async function(this: ActionContext, policyDescription: string) {
+    let issuer, oktaAPIKey;
+    if (policyDescription === 'Password / IDP / any factor allowed by app sign on rules') {
+      issuer = process.env.ISSUER_IDFIRST;
+      oktaAPIKey = process.env.OKTA_API_KEY_IDFIRST;
+    }
+
+    this.config = {
+      ...this.config,
+      ...(issuer && { issuer }),
+      ...(oktaAPIKey && { oktaAPIKey }),
+    };
+  }
+);
+
+Given(
+  'an App that assigned to a test group',
+  { timeout },
+  async function(this: ActionContext) {
+    const { issuer } = this.config;
+    const { sampleConfig: { appType } } = getConfig();
+
+    this.group = await createGroup(this.config);
+    this.app = await createApp(this.config, { appType });
+    const { 
+      credentials: {
+        oauthClient: {
+          client_id: clientId,
+          client_secret: clientSecret
+        }
+      }
+    } = this.app;
+    await addAppToGroup(this.config, { 
+      appId: this.app.id, 
+      groupId: this.group.id 
+    });
+
+    // attach a18n client to test context
+    this.a18nClient = new A18nClient({ a18nAPIKey: this.config.a18nAPIKey });
+  
+    // update test app with new oauthClient info
+    await startApp('/', {
+      ...(issuer && { issuer }),
+      ...(clientId && { clientId }),
+      ...(clientSecret && { clientSecret }),
+      // attach org config to web app transaction
+      ...(appType === 'web' && {
+        transactionId: crypto.randomBytes(16).toString('hex')
+      })
+    });
+  }
+);
 
 Given(
   'the app is assigned to {string} group', 
@@ -41,7 +103,7 @@ Given(
     if (!this.app) {
       throw new Error('Application should be predefined');
     }
-    await addAppToGroup({ appId: this.app.id, groupName });
+    await addAppToGroup(this.config, { appId: this.app.id, groupName });
   }
 );
 
@@ -49,7 +111,10 @@ Given(
   'the app is granted {string} scope',
   { timeout },
   async function(this: ActionContext, scopeId: string) {
-    await grantConsentToScope(this.app.id, scopeId);
+    await grantConsentToScope(this.config, {
+      appId: this.app.id, 
+      scopeId
+    });
   }
 );
 
@@ -57,7 +122,10 @@ Given(
   'the app has a custom User Profile Schema named {string}',
   { timeout },
   async function(this: ActionContext, schemaName: string) {
-    await addUserProfileSchemaToApp(this.app.id, schemaName);
+    await addUserProfileSchemaToApp(this.config, { 
+      appId: this.app.id, 
+      schemaName
+    });
   }
 );
 
@@ -66,9 +134,12 @@ Given(
   { timeout },
   async function(this: ActionContext) {
     // Update app settings via internal API, public API should be used once available
-    await updateAppOAuthClient(this.app, { 
-      // eslint-disable-next-line camelcase
-      email_magic_link_redirect_uri: 'http://localhost:8080/login/callback'
+    await updateAppOAuthClient(this.config, { 
+      app: this.app,
+      settings: {
+        // eslint-disable-next-line camelcase
+        email_magic_link_redirect_uri: 'http://localhost:8080/login/callback'  
+      }
     });
   }
 );
@@ -78,14 +149,17 @@ Given(
   { timeout },
   async function(this: ActionContext, policyDescription: string, dataTable) {
     this.policies = this.policies || [];
-    const policy = await createPolicy({ 
+    const policy = await createPolicy(this.config, { 
       policyDescription,
       groupId: this.group?.id,
       dataTable
     });
     this.policies.push(policy);
     try {
-      await addAppToPolicy(policy.id, this.app.id);
+      await addAppToPolicy(this.config, {
+        policyId: policy.id, 
+        appId: this.app.id 
+      });
     } catch(err) {/* do nothing */}
   }
 );
@@ -95,13 +169,16 @@ Given(
   { timeout },
   async function(this: ActionContext, policyDescription: string) {
     this.policies = this.policies || [];
-    const policy = await createPolicy({ 
+    const policy = await createPolicy(this.config, { 
       policyDescription,
       groupId: this.group?.id
     });
     this.policies.push(policy);
     try {
-      await addAppToPolicy(policy.id, this.app.id);
+      await addAppToPolicy(this.config, { 
+        policyId: policy.id, 
+        appId: this.app.id
+      });
     } catch(err) {/* do nothing */}
   }
 );
@@ -111,7 +188,7 @@ Given(
   { timeout },
   async function(this: ActionContext, policyRuleDescription: string) {
     const lastPolicy = this.policies[this.policies.length - 1];
-    await upsertPolicyRule({ 
+    await upsertPolicyRule(this.config, { 
       policyId: lastPolicy.id, 
       policyType: lastPolicy.type,
       policyRuleDescription,
@@ -135,7 +212,7 @@ Given(
           return false;
       }
     })();
-    this.user = await createUser({
+    this.user = await createUser(this.config, {
       // use predefined app when features are not available via management api
       appId: (this.app?.id || process.env.CLIENT_ID) as string,
       credentials: this.credentials,
@@ -151,7 +228,7 @@ Given(
   'she has an account with active state in the org and her {string} is {string}',
   { timeout },
   async function(this: ActionContext, attrName: string, attrValue: string) {
-    this.user = await createUser({
+    this.user = await createUser(this.config, {
       // use predefined app when features are not available via management api
       appId: (this.app?.id || process.env.CLIENT_ID) as string,
       credentials: this.credentials,
@@ -176,7 +253,9 @@ Given(
       username: process.env.USERNAME,
       password: process.env.PASSWORD,
     } as unknown as UserCredentials;
-    this.user = await fetchUser(this.credentials.emailAddress);
+    this.user = await fetchUser(this.config, { 
+      username: this.credentials.emailAddress 
+    });
     (this.user as any).predefined = true;
   }
 );
@@ -185,7 +264,7 @@ Given(
   'she has enrolled in the {string} factor',
   { timeout },
   async function(this: ActionContext, factorType: string) {
-    this.enrolledFactor = await enrollFactor({
+    this.enrolledFactor = await enrollFactor(this.config, {
       userId: this.user.id,
       factorType,
       phoneNumber: this.credentials.phoneNumber
@@ -202,11 +281,11 @@ Given(
 );
 
 Given('a user named {string}', async function(this: ActionContext, firstName: string) {
-  this.credentials = await createCredentials(firstName, this.featureName);
+  this.credentials = await createCredentials(this.a18nClient, firstName, this.featureName);
 });
 
 Given('she has a second credential', async function(this: ActionContext) {
-  this.secondCredentials = await createCredentials('MaryNew', this.featureName);
+  this.secondCredentials = await createCredentials(this.a18nClient, 'MaryNew', this.featureName);
 });
 
 Given(

@@ -1,18 +1,16 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util/configUtils';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
+type Options = {
+  policyId: string; 
+  appId: string;
+}
 
-export default async function(policyId: string, appId: string) {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
-
+export default async function(config: OktaClientConfig, options: Options) {
+  const oktaClient = getOktaClient(config);
+  const { appId, policyId } = options;
   try {
-    const orgUrl = config.issuer?.replace('/oauth2/default', '');
     let policy = await oktaClient.getPolicy(policyId);
-    let assignAppToPolicyUrl = `${orgUrl}/api/v1/apps/${appId}/policies/${policyId}`;
+    let assignAppToPolicyUrl = `${oktaClient.baseUrl}/api/v1/apps/${appId}/policies/${policyId}`;
     await oktaClient.http.put(assignAppToPolicyUrl);
     return policy;
   } catch (err) {

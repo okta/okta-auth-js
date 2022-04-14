@@ -14,5 +14,6 @@ junit.xml
 junit-results.xml
 yarn-error.*
 coverage
+dist
 
 !.gitkeep

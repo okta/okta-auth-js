@@ -14,7 +14,6 @@
 
 import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
-import a18nClient from '../support/management-api/a18nClient';
 import deleteSelfEnrolledUser from '../support/management-api/deleteSelfEnrolledUser';
 
 // Comment out this after hook to persist test context
@@ -38,12 +37,14 @@ After({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
   }
   if (this.credentials) {
     if (this.credentials.emailAddress !== process.env.USERNAME) {
-      await deleteSelfEnrolledUser(this.credentials.emailAddress);
+      await deleteSelfEnrolledUser(this.config, { 
+        username: this.credentials.emailAddress 
+      });
     }
-    await a18nClient.deleteProfile(this.credentials.profileId);
+    await this.a18nClient.deleteProfile(this.credentials.profileId);
   }
   if (this.secondCredentials) {
-    await a18nClient.deleteProfile(this.secondCredentials.profileId);
+    await this.a18nClient.deleteProfile(this.secondCredentials.profileId);
   }
 });
 

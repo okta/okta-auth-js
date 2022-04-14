@@ -12,7 +12,8 @@
 
 
 import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig, getTotp, TOTP_TYPES } from '../../util';
+import { getTotp, TOTP_TYPES } from '../../util';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
 type Options = {
   userId: string;
@@ -20,15 +21,7 @@ type Options = {
   phoneNumber?: string;
 };
 
-const getOktaClient = () => {
-  const config = getConfig();
-  return new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
-};
-
-const enrollSMS = async (options: Options) => {
+const enrollSMS = async (client: Client, options: Options) => {
   const factorObject = {
     factorType: 'sms',
     provider: 'OKTA',
@@ -36,8 +29,7 @@ const enrollSMS = async (options: Options) => {
       phoneNumber: options.phoneNumber
     }
   };
-  const oktaClient = getOktaClient();
-  const res = await oktaClient.enrollFactor(
+  const res = await client.enrollFactor(
     options.userId, 
     factorObject,
     { activate: true }
@@ -45,12 +37,11 @@ const enrollSMS = async (options: Options) => {
   return res;
 };
 
-const enrollGoogleAuthenticator = async (options: Options) => {
+const enrollGoogleAuthenticator = async (client: Client, options: Options) => {
   const factorObject = {
     factorType: 'token:software:totp',
     provider: 'GOOGLE'
   };
-  const client = getOktaClient();
   const enrollRes = await client.enrollFactor(options.userId, factorObject);
   const passCode = getTotp(
     (enrollRes._embedded.activation as any).sharedSecret,
@@ -62,12 +53,13 @@ const enrollGoogleAuthenticator = async (options: Options) => {
   return enrollRes;
 };
 
-export default async function(options: Options) {
+export default async function(config: OktaClientConfig, options: Options) {
   let res;
+  const client = getOktaClient(config);
   if (options.factorType === 'SMS') {
-    res = await enrollSMS(options);
+    res = await enrollSMS(client, options);
   } else if (options.factorType === 'Google Authenticator') {
-    res = await enrollGoogleAuthenticator(options);
+    res = await enrollGoogleAuthenticator(client, options);
   } else {
     throw new Error(`Unknown factorType: ${options.factorType}`);
   }

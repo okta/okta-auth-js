@@ -12,10 +12,10 @@
 
 /* eslint-disable complexity, max-statements */
 
-import { Client, User } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util';
+import { User } from '@okta/okta-sdk-nodejs';
 import deleteUser from './deleteUser';
 import { UserCredentials } from './createCredentials';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
 type CreateUserOptions = {
   appId: string;
@@ -25,7 +25,7 @@ type CreateUserOptions = {
   customAttributes?: Record<string, string|number>;
 }
 
-export default async ({
+export default async (config: OktaClientConfig, {
   appId,
   credentials,
   assignToGroups = [], 
@@ -33,12 +33,7 @@ export default async ({
   customAttributes
 }: CreateUserOptions): 
   Promise<User> => {
-  const config = getConfig();
-  const oktaClient = new Client({
-    scopes: ['okta.users.manage'],
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
+  const oktaClient = getOktaClient({ ...config, scopes: ['okta.users.manage'] });
 
   let user: User;
 

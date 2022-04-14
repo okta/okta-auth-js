@@ -12,7 +12,7 @@
 
 
 import crypto = require('crypto');
-import a18nClient, { A18nProfile } from './a18nClient';
+import A18nClient, { A18nProfile } from './a18nClient';
 
 export declare interface UserCredentials extends A18nProfile {
   firstName: string;
@@ -21,13 +21,12 @@ export declare interface UserCredentials extends A18nProfile {
 }
 
 export default async function (
-  firstName: string, lastName = '', createA18nProfile = true
+  a18nClient: A18nClient,
+  firstName: string, 
+  lastName = ''
 ): Promise<UserCredentials> {
   lastName = lastName.substring(0, 32);
-  const a18nProfile = createA18nProfile ? await a18nClient.createProfile() : {
-    emailAddress: 'fake_'+crypto.randomBytes(4).toString('hex')+'@acme.com',
-  } as A18nProfile;
-  
+  const a18nProfile = await a18nClient.createProfile();
   return Object.assign({}, a18nProfile, {
     firstName,
     lastName: lastName || `Mc${firstName}face`,

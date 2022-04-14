@@ -1,8 +1,14 @@
 Feature: Multi-Factor Authentication with Password and Security Question
 
   Background:
-	  Given a SPA, WEB APP or MOBILE Policy that defines MFA with Password and Security Question as required
-	  #And a User named "Mary" created in the admin interface with a Password only
+    Given an App that assigned to a test group
+	    And a Policy that defines "Authentication"
+      And with a Policy Rule that defines "Password + Another Factor"
+      And a Policy that defines "MFA Enrollment" with properties
+        | okta_password | REQUIRED |
+        | security_question  | REQUIRED |
+      And a user named "Mary"
+      And she has an account with "active" state in the org
 
   Scenario: 2FA Login with Security Question
     When she clicks the "login" button

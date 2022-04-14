@@ -11,17 +11,17 @@
  */
 
 
-import { Client} from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util';
 import deleteUser from './deleteUser';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
-export default async (username: string): Promise<void> => {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
+type Options = {
+  username: string;
+}
 
+export default async (config: OktaClientConfig, options: Options): Promise<void> => {
+  const oktaClient = getOktaClient(config);
+
+  const { username } = options;
   try {
     const {value: user} = await oktaClient.listUsers({
       q: username

@@ -16,7 +16,7 @@ module.exports = function getNextRouteFromTransaction ({ nextStep }) {
   let nextRoute;
 
   const { name, authenticator } = nextStep;
-  const { key, type } = authenticator || {};
+  const { key } = authenticator || {};
 
   switch (name) {
     // authentication
@@ -36,7 +36,7 @@ module.exports = function getNextRouteFromTransaction ({ nextStep }) {
       nextRoute = '/select-authenticator';
       break;
     case 'challenge-authenticator':
-      nextRoute = type === 'password' ? '/login' : `/challenge-authenticator/${key}`;
+      nextRoute = `/challenge-authenticator/${key}`;
       break;
     case 'authenticator-verification-data':
       nextRoute = `/verify-authenticator/${key}`;

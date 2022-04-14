@@ -1,24 +1,20 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util/configUtils';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
-export default async function(policyName: string, policyType: string) {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
+type Options = {
+  policyName: string; 
+  policyType: string;
+}
 
+export default async function(config: OktaClientConfig, options: Options) {
+  const oktaClient = getOktaClient(config);
+
+  const { policyType, policyName } = options;
   let policy;
-  try {
-    for await (let p of oktaClient.listPolicies({type: policyType})) {
-      if (p?.name === policyName) {
-        policy = p;
-        break;
-      }
+  for await (let p of oktaClient.listPolicies({type: policyType})) {
+    if (p?.name === policyName) {
+      policy = p;
+      break;
     }
-    return policy;
-  } catch (err) {
-    console.warn('Unable to retrieve policy:', policyName);
-    throw err;
   }
+  return policy;
 }

@@ -27,6 +27,7 @@ import { Page } from './Page';
 import VerifyPhone from './VerifyPhone';
 import EnrollGoogleAuthenticator from './EnrollGoogleAuthenticator';
 import ChallengeEmailAuthenticator from './ChallengeEmailAuthenticator';
+import ChallengePasswordAuthenticator from './ChallengePasswordAuthenticator';
 import EnrollPhoneAuthenticator from './EnrollPhoneAuthenticator';
 import EnrollEmailAuthenticator from './EnrollEmailAuthenticator';
 import ChallengePhoneAuthenticator from './ChallengePhoneAuthenticator';
@@ -50,6 +51,7 @@ const pages: { [key: string]: Page } = {
   'Select Authenticator': SelectAuthenticator,
   'Enter Code': ChallengeEmailAuthenticator,
   'Challenge email authenticator': ChallengeEmailAuthenticator,
+  'Challenge Password Authenticator': ChallengePasswordAuthenticator,
   'Enroll Factor: Enter SMS Code': EnrollPhoneAuthenticator,
   'Enroll Phone Authenticator': EnrollPhoneAuthenticator,
   'Reset Password': PasswordReset,

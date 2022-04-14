@@ -10,10 +10,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import a18nClient from '../../../management-api/a18nClient';
 import ActionContext from '../../../context';
 
 export default async function (this: ActionContext) {
-  const emailMagicLink = await a18nClient.getEmailMagicLink(this.credentials.profileId);
+  const emailMagicLink = await this.a18nClient.getEmailMagicLink(this.credentials.profileId);
   await browser.url(emailMagicLink);
 }

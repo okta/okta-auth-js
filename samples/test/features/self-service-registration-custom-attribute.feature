@@ -1,7 +1,8 @@
 Feature: Add another Required Attribute to the Profile Enrollment Policy
 
   Background:
-    Given a Policy that defines "Profile Enrollment"
+    Given an App that assigned to a test group
+      And a Policy that defines "Profile Enrollment"
       And with a Policy Rule that defines 'collecting default attributes and a required "customAttribute"'
       And a user named "Mary"
       And she does not have account in the org

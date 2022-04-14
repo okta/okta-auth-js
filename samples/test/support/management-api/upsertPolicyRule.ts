@@ -1,5 +1,5 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig, randomStr } from '../../util';
+import { randomStr } from '../../util';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
 type Options = {
   policyId: string;
@@ -54,19 +54,22 @@ const getAccessPolicyActions = (description: string) => {
         }
       },
 
-      'Any one factor': {
-        'actions': {
-          'appSignOn': {
-            'access': 'ALLOW',
-            'verificationMethod': {
-              'factorMode': '1FA',
-              'type': 'ASSURANCE',
-              'reauthenticateIn': 'PT43800H'
-            }
-          }
-        },
 
-      }
+    },
+    'Any one factor': {
+      'status': 'ACTIVE',
+      'actions': {
+        'appSignOn': {
+          'access': 'ALLOW',
+          'verificationMethod': {
+            'factorMode': '1FA',
+            'type': 'ASSURANCE',
+            'reauthenticateIn': 'PT1M',
+            'constraints': []
+          }
+        }
+      },
+
     }
   } as any)[description];
 };
@@ -147,17 +150,36 @@ const getProfileEnrollmentPolicyActions = (description: string) => {
   } as any)[description];
 };
 
-export default async function ({
+const getGlobalSessionPolicyActions = (description: string) => {
+  return ({
+    'Primary factor as Password / IDP / any factor allowed by app sign on rules': {
+      'type': 'SIGN_ON',
+      'status': 'ACTIVE',
+      'actions': {
+        'signon': {
+          'access': 'ALLOW',
+          'requireFactor': false,
+          'primaryFactor': 'PASSWORD_IDP_ANY_FACTOR',
+          'rememberDeviceByDefault': false,
+          'session': {
+            'usePersistentCookie': false,
+            'maxSessionIdleMinutes': 120,
+            'maxSessionLifetimeMinutes': 0
+          }
+        }
+      }
+    },
+
+  } as any)[description];
+};
+
+export default async function (config: OktaClientConfig, {
   policyId,
   policyType,
   policyRuleDescription,
   groupId
 }: Options) {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
+  const oktaClient = getOktaClient(config);
 
   let actions;
   switch (policyType) {
@@ -172,6 +194,9 @@ export default async function ({
       if (groupId) {
         actions.actions.profileEnrollment.targetGroupIds = [groupId];
       }
+      break;
+    case 'OKTA_SIGN_ON':
+      actions = getGlobalSessionPolicyActions(policyRuleDescription);
       break;
     default:
       throw new Error(`No actions is found with ${policyType} ${policyRuleDescription}`);

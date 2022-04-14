@@ -1,7 +1,8 @@
 Feature: Self Service Registration with Email Activation and optional SMS
 
 Background:
-  Given a Policy that defines "Profile Enrollment"
+  Given an App that assigned to a test group
+    And a Policy that defines "Profile Enrollment"
     And with a Policy Rule that defines "collecting default attributes"
     And a user named "Mary"
     And she does not have account in the org
