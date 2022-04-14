@@ -34,26 +34,10 @@ import oauthUtil from '@okta/test.support/oauthUtil';
 import * as token from '../../../lib/oidc';
 const pkce = token.pkce;
 
-// Expected settings when testing on HTTP protocol
-var insecureCookieSettings = {
-  secure: false,
-  sameSite: 'lax'
-};
-
-// Expected settings when testing on HTTPS protocol
-var secureCookieSettings = {
-  secure: true,
-  sameSite: 'none'
-};
-
 // eslint-disable-next-line max-statements
 describe('token.getWithRedirect', function() {
   var codeChallengeMethod = 'S256';
   var codeChallenge = 'fake';
-  var defaultUrls;
-  var customUrls;
-  var nonceCookie;
-  var stateCookie;
   var originalLocation;
 
   afterEach(() => {
@@ -70,23 +54,6 @@ describe('token.getWithRedirect', function() {
       protocol: 'https:',
       hostname: 'somesite.local'
     } as Location;
-
-    defaultUrls = {
-      issuer: 'https://auth-js-test.okta.com',
-      authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-      userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo',
-      tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
-      revokeUrl: 'https://auth-js-test.okta.com/oauth2/v1/revoke',
-      logoutUrl: 'https://auth-js-test.okta.com/oauth2/v1/logout',
-    };
-    customUrls = {
-      issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
-      authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
-      userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo',
-      tokenUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/token',
-      revokeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/revoke',
-      logoutUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/logout',
-    };
   });
   
   afterEach(() => {
