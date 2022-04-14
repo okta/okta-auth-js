@@ -8,7 +8,7 @@ module.exports = {
       'targets': {
         'node': 11
       },
-      'modules': false
+      'modules': 'commonjs'
     }
   ]],
   'plugins': [
