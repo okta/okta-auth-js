@@ -503,26 +503,13 @@ oauthUtil.setupParseUrl = function(opts) {
     });
   }
 
-  util.mockGetCookie(opts.oauthParams);
-  var deleteCookieMock = util.mockDeleteCookie();
-
-  jest.spyOn(storageUtil, 'getSessionStorage')
-    .mockImplementation(() => ({
-      getItem: jest.fn().mockReturnValue(opts.oauthParams || ''),
-      removeItem: jest.fn()
-    }));
-  jest.spyOn(storageUtil, 'browserHasSessionStorage')
-    .mockImplementation(() => !!opts.hasSessionStorage);
-  
+  jest.spyOn(client.transactionManager, 'load').mockReturnValue(opts.savedTransaction);
   jest.spyOn(client.transactionManager, 'clear');
 
   return client.token.parseFromUrl(opts.parseFromUrlArgs)
     .then(function(res) {
       var expectedResp = opts.expectedResp;
       validateResponse(res, expectedResp);
-
-      // The cookie should be deleted
-      expect(deleteCookieMock).toHaveBeenCalledWith('okta-oauth-redirect-params');
 
       if (opts.parseFromUrlArgs && (typeof opts.parseFromUrlArgs === 'string' || opts.parseFromUrlArgs.url)) {
         expect(setLocationHashSpy).not.toHaveBeenCalled();

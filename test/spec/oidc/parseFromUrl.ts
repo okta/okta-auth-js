@@ -36,7 +36,7 @@ describe('token.parseFromUrl', function() {
     var redirectUri = 'https://example.com/redirect';
   
     spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-    spyOn(TransactionManager.prototype, 'loadLegacyPKCE').and.returnValue({
+    spyOn(TransactionManager.prototype, 'load').and.returnValue({
       codeVerifier,
       redirectUri
     });
@@ -53,7 +53,7 @@ describe('token.parseFromUrl', function() {
       },
       searchMock: '?code=fake' +
       '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['code'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -64,7 +64,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         code: 'fake',
         state: oauthUtil.mockedState,
@@ -78,7 +78,7 @@ describe('token.parseFromUrl', function() {
       parseFromUrlArgs: 'http://example.com#id_token=' + tokens.standardIdToken +
         '&access_token=' + tokens.standardAccessToken +
         '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -89,7 +89,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -107,7 +107,7 @@ describe('token.parseFromUrl', function() {
           '&access_token=' + tokens.standardAccessToken +    
           '&state=' + oauthUtil.mockedState,
       },
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -118,7 +118,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -140,7 +140,8 @@ describe('token.parseFromUrl', function() {
       },
       searchMock: '?code=fake' + 
         '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
+        codeVerifier: 'foo',
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -151,7 +152,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       calls: [
         {
           request: {
@@ -185,7 +186,8 @@ describe('token.parseFromUrl', function() {
       },
       hashMock: '#code=fake' + 
         '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
+        codeVerifier: 'foo',
         responseType: ['token', 'id_token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -196,7 +198,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         code: 'fake',
         state: oauthUtil.mockedState,
@@ -220,7 +222,8 @@ describe('token.parseFromUrl', function() {
       },
       hashMock: '#code=fake' +
       '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
+        codeVerifier: 'foo',
         responseType: ['token', 'id_token'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -231,7 +234,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         code: 'fake',
         state: oauthUtil.mockedState,
@@ -252,7 +255,7 @@ describe('token.parseFromUrl', function() {
       noHistory: true,
       hashMock: '#id_token=' + tokens.standardIdToken +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: 'id_token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -263,7 +266,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -282,7 +285,7 @@ describe('token.parseFromUrl', function() {
     return oauthUtil.setupParseUrl({
       hashMock: '#id_token=' + tokens.standardIdToken +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: 'id_token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -293,7 +296,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -312,7 +315,7 @@ describe('token.parseFromUrl', function() {
     return oauthUtil.setupParseUrl({
       hashMock: '#id_token=' + tokens.authServerIdToken +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: 'id_token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -323,7 +326,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -340,7 +343,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: 'token',
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -351,7 +354,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -368,7 +371,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: 'token',
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -379,7 +382,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -397,7 +400,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['id_token', 'token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -408,7 +411,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -427,7 +430,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['id_token', 'token'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -438,7 +441,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'
         }
-      }),
+      },
       expectedResp: {
         state: oauthUtil.mockedState,
         tokens: {
@@ -463,7 +466,7 @@ describe('token.parseFromUrl', function() {
       willFail: true,
       shouldClearTransaction: false,
       hashMock: '',
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['id_token', 'token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -474,38 +477,12 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      })
+      }
     })
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
     });
 
-  });
-
-  it('throws an error if no oauth redirect params are set', () => {
-    const error = {
-      name: 'AuthSdkError',
-      message: 'Unable to retrieve OAuth redirect params from storage',
-      errorCode: 'INTERNAL',
-      errorSummary: 'Unable to retrieve OAuth redirect params from storage',
-      errorLink: 'INTERNAL',
-      errorId: 'INTERNAL',
-      errorCauses: []
-    };
-
-    return oauthUtil.setupParseUrl({
-      willFail: true,
-      shouldClearTransaction: false,
-      hashMock: '#access_token=' + tokens.standardAccessToken +
-                '&id_token=' + tokens.standardIdToken +
-                '&expires_in=3600' +
-                '&token_type=Bearer' +
-                '&state=' + oauthUtil.mockedState,
-      oauthParams: ''
-    })
-    .catch(function(e) {
-      util.expectErrorToEqual(e, error);
-    });
   });
 
   it('throws an error if state doesn\'t match', () => {
@@ -526,7 +503,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['id_token', 'token'],
         state: 'mismatchedState',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -537,7 +514,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      })
+      }
     })
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
@@ -561,7 +538,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['id_token', 'token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'mismatchedNonce',
@@ -572,7 +549,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      })
+      }
     })
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
@@ -595,7 +572,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['id_token', 'token'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -606,7 +583,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      })
+      }
     })
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
@@ -629,7 +606,7 @@ describe('token.parseFromUrl', function() {
                 '&expires_in=3600' +
                 '&token_type=Bearer' +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['id_token', 'token'],
         state: oauthUtil.mockedState,
         nonce: oauthUtil.mockedNonce,
@@ -640,7 +617,7 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      })
+      }
     })
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
@@ -659,7 +636,7 @@ describe('token.parseFromUrl', function() {
     return oauthUtil.setupParseUrl({
       willFail: true,
       hashMock: '#error=fake_error&error_description=fake_description',
-      oauthParams: JSON.stringify({
+      savedTransaction: {
         responseType: ['id_token', 'token'],
         state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -670,14 +647,14 @@ describe('token.parseFromUrl', function() {
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
         }
-      })
+      }
     })
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
     });
   });
 
-  it('throws an error if no transaction meta and legacyWidgetSupport is false', () => {
+  it('throws an error if no transaction meta', () => {
     const error = {
       name: 'AuthSdkError',
       message: 'Unable to retrieve OAuth redirect params from storage',
@@ -688,27 +665,34 @@ describe('token.parseFromUrl', function() {
       errorCauses: []
     };
     return oauthUtil.setupParseUrl({
+      shouldClearTransaction: false,
+      willFail: true,
+      hashMock: '#id_token=' + tokens.standardIdToken +
+                '&state=' + oauthUtil.mockedState,
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+  });
+
+  it('PKCE: throws an error if no transaction meta', () => {
+    const error = {
+      name: 'AuthSdkError',
+      message: 'Could not load PKCE codeVerifier from storage. This may indicate the auth flow has already completed or multiple auth flows are executing concurrently.',
+      errorCode: 'INTERNAL',
+      errorSummary: 'Could not load PKCE codeVerifier from storage. This may indicate the auth flow has already completed or multiple auth flows are executing concurrently.',
+      errorLink: 'INTERNAL',
+      errorId: 'INTERNAL',
+      errorCauses: []
+    };
+    return oauthUtil.setupParseUrl({
       oktaAuthArgs: {
-        transactionManager: {
-          legacyWidgetSupport: false
-        }
+        pkce: true
       },
       shouldClearTransaction: false,
       willFail: true,
       hashMock: '#id_token=' + tokens.standardIdToken +
                 '&state=' + oauthUtil.mockedState,
-      oauthParams: JSON.stringify({
-        responseType: 'id_token',
-        state: oauthUtil.mockedState,
-        nonce: oauthUtil.mockedNonce,
-        scopes: ['openid', 'email'],
-        urls: {
-          issuer: 'https://auth-js-test.okta.com',
-          tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
-          authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
-          userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-        }
-      }),
     })
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
@@ -729,7 +713,7 @@ describe('token.parseFromUrl', function() {
         willFail: true,
         shouldClearTransaction: false,
         hashMock: '#error=interaction_required&error_description=fake_description',
-        oauthParams: JSON.stringify({
+        savedTransaction: {
           responseType: ['id_token', 'token'],
           state: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           nonce: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -740,7 +724,7 @@ describe('token.parseFromUrl', function() {
             authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
             userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
           }
-        })
+        }
       })
       .catch(function(e) {
         util.expectErrorToEqual(e, error);
