@@ -15,9 +15,7 @@
 import Cookies from 'js-cookie';
 import AuthSdkError from '../errors/AuthSdkError';
 import {
-  StorageProvider,
   StorageOptions,
-  PKCEStorage,
   CookieOptions,
   SimpleStorage,
   StorageType,
@@ -29,15 +27,6 @@ import { isIE11OrLess } from '../features';
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil: BrowserStorageUtil = {
-
-  // These are shimmed in `OktaAuthBase.ts`
-  getHttpCache(): StorageProvider {
-    return null as never as StorageProvider;
-  },
-
-  getPKCEStorage(): PKCEStorage {
-    return null as never as PKCEStorage;
-  },
 
   // IE11 bug that Microsoft doesn't plan to fix
   // https://connect.microsoft.com/IE/Feedback/Details/1496040
