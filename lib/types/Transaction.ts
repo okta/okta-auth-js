@@ -18,7 +18,6 @@ import { IdxTransactionMeta } from '../idx/types';
 export interface TransactionManagerOptions {
   storageManager?: StorageManager;
   enableSharedStorage?: boolean; // default true
-  legacyWidgetSupport?: boolean; // default true
   saveNonceCookie?: boolean; // default true
   saveStateCookie?: boolean; // default true
   saveParamsCookie?: boolean; // default true
@@ -63,7 +62,6 @@ export type TransactionMeta =
 
 export interface TransactionMetaOptions extends
   Pick<IdxTransactionMeta,
-    'pkce' |
     'state' |
     'codeChallenge' |
     'codeChallengeMethod' |
@@ -73,7 +71,6 @@ export interface TransactionMetaOptions extends
     'recoveryToken'
   >
 {
-  oauth?: boolean;
   muteWarning?: boolean;
 }
 
