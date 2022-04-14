@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.4.2
+
+### Fixes
+
+- [#1180](https://github.com/okta/okta-auth-js/pull/1180) Fixes commonjs bundle `dynamic import` transpiling issue
+
 ## 6.4.1
 
 ### Fixes
