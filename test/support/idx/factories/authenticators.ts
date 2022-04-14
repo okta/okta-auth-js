@@ -134,7 +134,14 @@ export const SecurityQuestionAuthenticatorFactory = IdxAuthenticatorFactory.para
   type: 'security_question',
   methods: [
     { type: 'security_question' }
-  ]
+  ],
+  // if already enrolled, contextualData will be set
+  // contextualData: {
+  //   enrolledQuestion: {
+  //     questionKey: 'custom',
+  //     question: 'social'
+  //   }
+  // }
 });
 
 export const WebauthnAuthenticatorFactory = IdxAuthenticatorFactory.params({

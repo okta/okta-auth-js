@@ -19,7 +19,7 @@ export class SecurityQuestionEnrollment extends Authenticator<SecurityQuestionEn
 
   mapCredentials(values: SecurityQuestionEnrollValues): Credentials | undefined {
     const { questionKey, question, answer } = values;
-    if (!questionKey && !question && !answer) {
+    if (!answer || (!questionKey && !question)) {
       return;
     }
     return {
