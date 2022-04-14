@@ -675,6 +675,30 @@ describe('token.parseFromUrl', function() {
     });
   });
 
+  it('PKCE: throws an error if no transaction meta', () => {
+    const error = {
+      name: 'AuthSdkError',
+      message: 'Could not load PKCE codeVerifier from storage. This may indicate the auth flow has already completed or multiple auth flows are executing concurrently.',
+      errorCode: 'INTERNAL',
+      errorSummary: 'Could not load PKCE codeVerifier from storage. This may indicate the auth flow has already completed or multiple auth flows are executing concurrently.',
+      errorLink: 'INTERNAL',
+      errorId: 'INTERNAL',
+      errorCauses: []
+    };
+    return oauthUtil.setupParseUrl({
+      oktaAuthArgs: {
+        pkce: true
+      },
+      shouldClearTransaction: false,
+      willFail: true,
+      hashMock: '#id_token=' + tokens.standardIdToken +
+                '&state=' + oauthUtil.mockedState,
+    })
+    .catch(function(e) {
+      util.expectErrorToEqual(e, error);
+    });
+  });
+
   describe('interaction code flow', () => {
     it('Does not clear storage when "error" param is "interaction_required"', () => {
       const error = {

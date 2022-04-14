@@ -98,7 +98,11 @@ export async function parseFromUrl(sdk, options?: string | ParseFromUrlOptions):
     state
   });
   if (!oauthParams) {
-    return Promise.reject(new AuthSdkError('Unable to retrieve OAuth redirect params from storage'));
+    if (sdk.options.pkce) {
+      // eslint-disable-next-line max-len
+      throw new AuthSdkError('Could not load PKCE codeVerifier from storage. This may indicate the auth flow has already completed or multiple auth flows are executing concurrently.', undefined);
+    }
+    throw new AuthSdkError('Unable to retrieve OAuth redirect params from storage');
   }
   const urls: CustomUrls = oauthParams.urls as CustomUrls;
   delete oauthParams.urls;
