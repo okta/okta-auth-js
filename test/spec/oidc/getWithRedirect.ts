@@ -73,12 +73,12 @@ describe('getWithRedirect', () => {
       jest.spyOn(sdk.transactionManager, 'save');
     });
     
-    it('saves using the oauth option', async () => {
+    it('saves the transaction meta', async () => {
       const { sdk, meta } = testContext;
       const issuer = 'http://fake';
       sdk.options.issuer = issuer;
       await getWithRedirect(sdk, {});
-      expect(sdk.transactionManager.save).toHaveBeenCalledWith(meta, { oauth: true });
+      expect(sdk.transactionManager.save).toHaveBeenCalledWith(meta);
     });
 
   });
