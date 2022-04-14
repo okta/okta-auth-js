@@ -3,11 +3,17 @@ import { Authenticator, Credentials } from './Authenticator';
 
 export interface SecurityQuestionVerificationValues {
   answer?: string;
+  credentials?: Credentials;
 }
 
 export class SecurityQuestionVerification extends Authenticator<SecurityQuestionVerificationValues> {
   canVerify(values: SecurityQuestionVerificationValues) {
-    return !!values.answer;
+    const { credentials } = values;
+    if (credentials && credentials.answer) {
+      return true;
+    }
+    const { answer } = values;
+    return !!answer;
   }
 
   mapCredentials(values: SecurityQuestionVerificationValues): Credentials | undefined {
