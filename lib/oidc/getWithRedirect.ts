@@ -27,6 +27,6 @@ export async function getWithRedirect(sdk: OktaAuthInterface, options?: TokenPar
   const tokenParams = await prepareTokenParams(sdk, options);
   const meta = createOAuthMeta(sdk, tokenParams);
   const requestUrl = meta.urls.authorizeUrl + buildAuthorizeParams(tokenParams);
-  sdk.transactionManager.save(meta, { oauth: true });
+  sdk.transactionManager.save(meta);
   sdk.token.getWithRedirect._setLocation(requestUrl);
 }

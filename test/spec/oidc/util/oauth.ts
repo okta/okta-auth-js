@@ -170,9 +170,6 @@ describe('getOAuthUrls', function() {
   });
   it('allows token requested with only authorizeUrl and userinfoUrl', function() {
     setupOAuthUrls({
-      oauthParams: {
-        responseType: 'token'
-      },
       options: {
         authorizeUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
         userinfoUrl: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/userinfo'

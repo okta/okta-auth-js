@@ -13,20 +13,17 @@
 
 
 import {
-  PKCE_STORAGE_NAME,
   TOKEN_STORAGE_NAME,
   TRANSACTION_STORAGE_NAME,
   SHARED_TRANSACTION_STORAGE_NAME,
   ORIGINAL_URI_STORAGE_NAME,
   IDX_RESPONSE_STORAGE_NAME,
   CACHE_STORAGE_NAME,
-  REDIRECT_OAUTH_PARAMS_NAME
 } from './constants';
 import {
   StorageUtil,
   StorageProvider,
   StorageOptions,
-  PKCEStorage,
   CookieOptions,
   TransactionStorage,
   IdxResponseStorage,
@@ -76,7 +73,9 @@ export class StorageManager {
       options.sessionCookie = true;
     }
 
-    // Maintain compatibility. Automatically fallback. May change in next major version. OKTA-362589
+    // If both storageType and storageTypes are specified, then storageType will be used first
+    // If storageType cannot be used but it matches an entry in storageTypes, subsequent entries may be used as fallback
+    // if storageType does not match an entry in storageTypes then storageType is used with no fallback.
     if (storageType && storageTypes) {
       const idx = storageTypes.indexOf(storageType);
       if (idx >= 0) {
@@ -187,18 +186,4 @@ export class StorageManager {
     return new SavedObject(storage, storageKey);
   }
 
-  // Will be removed in an upcoming major version. OKTA-362589
-  getLegacyPKCEStorage(options?: StorageOptions): PKCEStorage {
-    options = this.getOptionsForSection('legacy-pkce', options);
-    const storage = this.getStorage(options);
-    const storageKey = options.storageKey || PKCE_STORAGE_NAME;
-    return new SavedObject(storage, storageKey);
-  }
-
-  getLegacyOAuthParamsStorage(options?: StorageOptions): StorageProvider {
-    options = this.getOptionsForSection('legacy-oauth-params', options);
-    const storage = this.getStorage(options);
-    const storageKey = options.storageKey || REDIRECT_OAUTH_PARAMS_NAME;
-    return new SavedObject(storage, storageKey);
-  }
 }
