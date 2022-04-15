@@ -60,3 +60,8 @@ export interface WellKnownResponse {
   scopes_supported: string[];
   claims_supported: string[];
 }
+
+
+export type OAuthResponseMode ='okta_post_message' |'fragment' |'query' |'form_post';
+
+export type OAuthResponseType ='code' |'token' |'id_token';

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { CustomUrls, OAuthResponse, OktaAuthInterface, TokenParams, TokenResponse } from '../types';
+import { CustomUrls, OAuthResponse, OAuthResponseType, OktaAuthInterface, TokenParams, TokenResponse } from '../types';
 import { getOAuthUrls, getDefaultTokenParams } from './util';
 import { clone } from '../util';
 import { postToTokenEndpoint } from './endpoints/token';
@@ -49,7 +49,7 @@ export function exchangeCodeForTokens(sdk: OktaAuthInterface, tokenParams: Token
       // `handleOAuthResponse` hanadles responses from both `/authorize` and `/token` endpoints
       // Here we modify the response from `/token` so that it more closely matches a response from `/authorize`
       // `responseType` is used to validate that the expected tokens were returned
-      const responseType = ['token']; // an accessToken will always be returned
+      const responseType: OAuthResponseType[] = ['token']; // an accessToken will always be returned
       if (scopes!.indexOf('openid') !== -1) {
         responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
       }

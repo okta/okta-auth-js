@@ -11,29 +11,13 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 /* eslint complexity:[0,8] */
-import { OktaAuthInterface, IdxTransactionMeta } from '../types';
+import { OktaAuthInterface, IdxTransactionMeta, InteractOptions, InteractResponse } from '../types';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';
 import { createTransactionMeta } from '.';
 import { removeNils } from '../util';
 import { httpRequest } from '../http';
 
-export interface InteractOptions {
-  withCredentials?: boolean;
-  state?: string;
-  scopes?: string[];
-  codeChallenge?: string;
-  codeChallengeMethod?: string;
-  activationToken?: string;
-  recoveryToken?: string;
-  clientSecret?: string;
-}
-
-export interface InteractResponse {
-  state?: string;
-  interactionHandle: string;
-  meta: IdxTransactionMeta;
-}
 
 /* eslint-disable camelcase */
 export interface InteractParams {
@@ -92,7 +76,7 @@ export async function interact (
   const url = `${baseUrl}/v1/interact`;
   const params = {
     client_id: clientId,
-    scope: scopes.join(' '),
+    scope: scopes!.join(' '),
     redirect_uri: redirectUri,
     code_challenge: codeChallenge,
     code_challenge_method: codeChallengeMethod,

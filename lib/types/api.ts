@@ -15,7 +15,7 @@ import { AuthTransaction } from '../tx/AuthTransaction';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { UserClaims } from './UserClaims';
-import { CustomUrls, OktaAuthOptions } from './OktaAuthOptions';
+import { CustomUrls, OktaAuthOptions, TokenParams } from './OktaAuthOptions';
 import { StorageManager } from '../StorageManager';
 import TransactionManager from '../TransactionManager';
 import { TokenManagerInterface } from './TokenManager';
@@ -28,7 +28,6 @@ import {
   AccountUnlockOptions,
   ProceedOptions,
   CancelOptions,
-  IdxOptions,
   IdxTransaction,
   IdxTransactionMeta,
   EmailVerifyCallbackResponse,
@@ -38,11 +37,13 @@ import {
   WebauthnEnrollValues,
   WebauthnVerificationValues,
   FlowIdentifier, 
-  IdxPollOptions
+  IdxPollOptions,
+  IdxResponse,
+  IntrospectOptions,
+  InteractOptions,
+  InteractResponse,
+  StartOptions
 } from '../idx/types';
-import { InteractOptions, InteractResponse } from '../idx/interact';
-import { IntrospectOptions } from '../idx/introspect';
-import { IdxResponse } from '../idx/types/idx-js';
 import { TransactionMetaOptions } from './Transaction';
 export interface OktaAuthInterface {
   options: OktaAuthOptions;
@@ -62,12 +63,20 @@ export interface OktaAuthInterface {
   token: TokenAPI;
 }
 
+export interface FieldError {
+  errorSummary: string;
+  reason?: string;
+  location?: string;
+  locationType?: string;
+  domain?: string;
+}
+
 export interface APIError {
   errorSummary: string;
   errorCode?: string;
   errorLink?: string;
   errorId?: string;
-  errorCauses?: string[];
+  errorCauses?: Array<FieldError>;
 }
 
 // HTTP API
@@ -109,34 +118,6 @@ export interface SessionAPI {
   get: () => Promise<SessionObject>;
   refresh: () => Promise<object>;
   setCookieAndRedirect: (sessionToken?: string, redirectUri?: string) => void;
-}
-
-export interface TokenParams extends CustomUrls {
-  pkce?: boolean;
-  clientId?: string;
-  redirectUri?: string;
-  responseType?: string | string[];
-  responseMode?: string;
-  state?: string;
-  nonce?: string;
-  scopes?: string[];
-  display?: string;
-  ignoreSignature?: boolean;
-  codeVerifier?: string;
-  authorizationCode?: string;
-  codeChallenge?: string;
-  codeChallengeMethod?: string;
-  interactionCode?: string;
-  idp?: string;
-  idpScope?: string | string[];
-  loginHint?: string;
-  maxAge?: string | number;
-  prompt?: string;
-  sessionToken?: string;
-  timeout?: number;
-  extraParams?: { [propName: string]: string }; // custom authorize query params
-  // TODO: remove in the next major version
-  popupTitle?: string;
 }
 
 export interface PopupParams {
@@ -307,7 +288,7 @@ export interface IdxAPI {
   poll: (options?: IdxPollOptions) => Promise<IdxTransaction>;
 
   // flow control
-  start: (options?: IdxOptions) => Promise<IdxTransaction>;
+  start: (options?: StartOptions) => Promise<IdxTransaction>;
   canProceed(options?: ProceedOptions): boolean;
   proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
@@ -315,7 +296,7 @@ export interface IdxAPI {
   setFlow(flow: FlowIdentifier): void;
 
   // call `start` instead of `startTransaction`. `startTransaction` will be removed in next major version (7.0)
-  startTransaction: (options?: IdxOptions) => Promise<IdxTransaction>;
+  startTransaction: (options?: StartOptions) => Promise<IdxTransaction>;
 
   // redirect callbacks
   isInteractionRequired: (hashOrSearch?: string) => boolean;

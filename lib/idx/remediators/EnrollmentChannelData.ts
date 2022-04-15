@@ -56,7 +56,7 @@ export class EnrollmentChannelData extends Remediator<EnrollmentChannelDataValue
     };
   }
 
-  getValuesAfterProceed() {
+  getValuesAfterProceed(): EnrollmentChannelDataValues {
     let trimmedValues = Object.keys(this.values).filter(valueKey => !['email', 'phoneNumber'].includes(valueKey));
     return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
   }

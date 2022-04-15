@@ -12,8 +12,8 @@
 
 
 import { StorageManager } from '../StorageManager';
-import { CustomUrls } from './OktaAuthOptions';
-import { FlowIdentifier, IdxTransactionMeta } from '../idx/types';
+import { CustomUrls, TokenParams } from './OktaAuthOptions';
+import { IdxTransactionMeta } from '../idx/types';
 
 export interface TransactionManagerOptions {
   storageManager?: StorageManager;
@@ -25,39 +25,33 @@ export interface TransactionManagerOptions {
   saveLastResponse?: boolean; // default true
 }
 
-export interface TransactionMetaOptions {
-  pkce?: boolean;
-  oauth?: boolean;
-  muteWarning?: boolean;
-  state?: string;
-  flow?: FlowIdentifier;
-  codeVerifier?: string;
-  codeChallenge?: string;
-  codeChallengeMethod?: string;
-  activationToken?: string;
-  recoveryToken?: string;
-}
-
 // formerly known as "Redirect OAuth Params"
-export interface OAuthTransactionMeta {
-  issuer: string;
-  redirectUri: string;
-  state: string;
-  nonce: string;
-  responseType: string | string [];
-  responseMode?: string;
-  scopes: string[];
-  clientId: string;
+export interface OAuthTransactionMeta extends
+  Pick<TokenParams,
+    'issuer' |
+    'clientId' |
+    'redirectUri' |
+    'responseType' |
+    'responseMode' |
+    'scopes' |
+    'state' |
+    'pkce' |
+    'ignoreSignature' |
+    'nonce'
+  >
+{
   urls: CustomUrls;
-  ignoreSignature: boolean;
   originalUri?: string;
 }
 
-export interface PKCETransactionMeta extends OAuthTransactionMeta {
-  codeVerifier: string;
-  codeChallengeMethod: string;
-  codeChallenge: string;
-}
+export interface PKCETransactionMeta extends
+  OAuthTransactionMeta,
+  Pick<TokenParams,
+    'codeChallenge' |
+    'codeChallengeMethod' |
+    'codeVerifier'
+  >
+{}
 
 export type CustomAuthTransactionMeta = Record<string, string | undefined>;
 
@@ -66,6 +60,22 @@ export type TransactionMeta =
   PKCETransactionMeta |
   OAuthTransactionMeta |
   CustomAuthTransactionMeta;
+
+export interface TransactionMetaOptions extends
+  Pick<IdxTransactionMeta,
+    'pkce' |
+    'state' |
+    'codeChallenge' |
+    'codeChallengeMethod' |
+    'codeVerifier' |
+    'flow' |
+    'activationToken' |
+    'recoveryToken'
+  >
+{
+  oauth?: boolean;
+  muteWarning?: boolean;
+}
 
 function isObjectWithProperties(obj) {
   if (!obj || typeof obj !== 'object' || Object.values(obj).length === 0) {

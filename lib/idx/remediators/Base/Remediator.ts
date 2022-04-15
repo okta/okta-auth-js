@@ -13,7 +13,7 @@
 
 
 /* eslint-disable complexity */
-import { NextStep, IdxMessage, Authenticator, Input, IdxOptions, RemediateOptions } from '../../types';
+import { NextStep, IdxMessage, Authenticator, Input, RemediateOptions } from '../../types';
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase, getAuthenticatorFromRemediation } from '../util';
 import { formatAuthenticator, compareAuthenticators } from '../../authenticator/util';
@@ -21,7 +21,7 @@ import { formatAuthenticator, compareAuthenticators } from '../../authenticator/
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[]>;
 
-export interface RemediationValues extends IdxOptions {
+export interface RemediationValues {
   stateHandle?: string;
   authenticators?: (Authenticator | string)[];
   authenticator?: string | Authenticator;

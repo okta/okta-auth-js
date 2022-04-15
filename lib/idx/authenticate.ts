@@ -13,29 +13,11 @@
 
 import { 
   OktaAuthInterface,
-  IdxOptions,
   IdxTransaction,
-  AuthenticatorKey
+  AuthenticatorKey,
+  AuthenticationOptions
 } from '../types';
 import { run } from './run';
-import { 
-  IdentifyValues,
-  SelectAuthenticatorAuthenticateValues,
-  ChallengeAuthenticatorValues,
-  ReEnrollAuthenticatorValues,
-  AuthenticatorEnrollmentDataValues,
-  SelectAuthenticatorEnrollValues,
-  EnrollAuthenticatorValues,
-} from './remediators';
-
-export type AuthenticationOptions = IdxOptions 
-  & IdentifyValues 
-  & SelectAuthenticatorAuthenticateValues 
-  & SelectAuthenticatorEnrollValues
-  & ChallengeAuthenticatorValues 
-  & ReEnrollAuthenticatorValues
-  & AuthenticatorEnrollmentDataValues
-  & EnrollAuthenticatorValues;
 
 export async function authenticate(
   authClient: OktaAuthInterface, options: AuthenticationOptions = {}

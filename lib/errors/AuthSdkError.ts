@@ -11,14 +11,14 @@
  */
 
 import CustomError from './CustomError';
-import { APIError } from '../types';
+import { APIError, FieldError } from '../types';
 
 export default class AuthSdkError extends CustomError implements APIError {
   errorSummary: string;
   errorCode: string;
   errorLink: string;
   errorId: string;
-  errorCauses: string[];
+  errorCauses: Array<FieldError>;
   xhr?: XMLHttpRequest;
 
   constructor(msg: string, xhr?: XMLHttpRequest) {
