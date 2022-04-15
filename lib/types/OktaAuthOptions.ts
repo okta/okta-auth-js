@@ -15,9 +15,10 @@ import { CookieOptions } from './Cookies';
 import { HttpRequestClient } from './http';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
-import { FlowIdentifier } from '../idx/types';
+import { IdxTransactionMeta } from '../idx/types';
 import { ServiceManagerOptions } from './Service';
 import OktaAuth from '../OktaAuth';
+import { OAuthResponseMode, OAuthResponseType } from './OAuth';
 
 
 export interface IsAuthenticatedOptions {
@@ -44,16 +45,57 @@ export interface CustomUrls {
   revokeUrl?: string;
   logoutUrl?: string;
 }
-export interface OktaAuthOptions extends CustomUrls {
+
+export interface TokenParams extends CustomUrls {
   pkce?: boolean;
   clientId?: string;
   redirectUri?: string;
-  useInteractionCodeFlow?: boolean;
-  responseType?: string | string[];
-  responseMode?: string;
-  scopes?: string[];
+  responseType?: OAuthResponseType | OAuthResponseType[];
+  responseMode?: OAuthResponseMode;
   state?: string;
+  nonce?: string;
+  scopes?: string[];
+  display?: string;
   ignoreSignature?: boolean;
+  codeVerifier?: string;
+  authorizationCode?: string;
+  codeChallenge?: string;
+  codeChallengeMethod?: string;
+  interactionCode?: string;
+  idp?: string;
+  idpScope?: string | string[];
+  loginHint?: string;
+  maxAge?: string | number;
+  prompt?: string;
+  sessionToken?: string;
+  timeout?: number;
+  extraParams?: { [propName: string]: string }; // custom authorize query params
+  // TODO: remove in the next major version
+  popupTitle?: string;
+}
+
+export interface OktaAuthOptions extends
+  CustomUrls,
+  Pick<TokenParams,
+    'issuer' |
+    'clientId' |
+    'redirectUri' |
+    'responseType' |
+    'responseMode' |
+    'scopes' |
+    'state' |
+    'pkce' |
+    'ignoreSignature' |
+    'codeChallenge' |
+    'codeChallengeMethod'
+  >,
+  Pick<IdxTransactionMeta,
+    'flow' |
+    'activationToken' |
+    'recoveryToken'
+  >
+{
+  useInteractionCodeFlow?: boolean;
   ignoreLifetime?: boolean;
   tokenManager?: TokenManagerOptions;
   postLogoutRedirectUri?: string;
@@ -70,11 +112,6 @@ export interface OktaAuthOptions extends CustomUrls {
   storageManager?: StorageManagerOptions;
   services?: ServiceManagerOptions;
   transactionManager?: TransactionManagerOptions;
-  flow?: FlowIdentifier;
-  codeChallenge?: string;
-  codeChallengeMethod?: string;
-  recoveryToken?: string;
-  activationToken?: string;
   
   // For server-side web applications ONLY!
   clientSecret?: string;

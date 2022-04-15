@@ -11,23 +11,8 @@
  */
 
 
-import { InteractOptions } from '../interact';
-import { IntrospectOptions } from '../introspect';
-import { APIError, Tokens } from '../../types';
-import { PKCETransactionMeta } from '../../types/Transaction';
-import { 
-  IdxActions, 
-  IdxAuthenticator, 
-  IdxContext,
-  IdxForm,
-  IdxMessage, 
-  IdxOption, 
-  IdxRemediation, 
-  IdxResponse, 
-  RawIdxResponse 
-} from './idx-js';
-import { FlowIdentifier } from './FlowIdentifier';
-
+export * from './api';
+export * from './options';
 export type {
   IdxMessage,
   IdxMessages,
@@ -35,126 +20,11 @@ export type {
   ActivationData,
   IdxResponse,
   IdxContext,
-  RawIdxResponse
+  RawIdxResponse,
+  IdxRemediation,
+  IdxAuthenticator
 } from './idx-js';
-export type { AuthenticationOptions } from '../authenticate';
-export type { RegistrationOptions } from '../register';
-export type { PasswordRecoveryOptions } from '../recoverPassword';
-export type { AccountUnlockOptions } from '../unlockAccount';
-export type { ProceedOptions } from '../proceed';
-export type { CancelOptions } from '../cancel';
-export type { RemediateOptions } from '../remediate';
-export type { FlowIdentifier };
-export type { IdxAuthenticator };
+export type { FlowIdentifier } from './FlowIdentifier';
 export type { EmailVerifyCallbackResponse } from '../emailVerify';
 export type { WebauthnEnrollValues } from '../authenticator/WebauthnEnrollment';
 export type { WebauthnVerificationValues } from '../authenticator/WebauthnVerification';
-
-export enum IdxStatus {
-  SUCCESS = 'SUCCESS',
-  PENDING = 'PENDING',
-  FAILURE = 'FAILURE',
-  TERMINAL = 'TERMINAL',
-  CANCELED = 'CANCELED',
-}
-
-export enum AuthenticatorKey {
-  OKTA_PASSWORD = 'okta_password',
-  OKTA_EMAIL = 'okta_email',
-  PHONE_NUMBER = 'phone_number',
-  GOOGLE_AUTHENTICATOR = 'google_otp',
-  SECURITY_QUESTION = 'security_question',
-  OKTA_VERIFY = 'okta_verify',
-  WEBAUTHN = 'webauthn',
-}
-
-export type Input = {
-  name: string;
-  key?: string;
-  type?: string;
-  label?: string;
-  value?: string | {form: IdxForm};
-  minLength?: number;
-  maxLength?: number;
-  secret?: boolean;
-  required?: boolean;
-}
-
-
-export interface IdxPollOptions {
-  required?: boolean;
-  refresh?: number;
-}
-
-export type NextStep = {
-  name: string;
-  authenticator?: IdxAuthenticator;
-  canSkip?: boolean;
-  canResend?: boolean;
-  inputs?: Input[];
-  options?: IdxOption[];
-  poll?: IdxPollOptions;
-  authenticatorEnrollments?: IdxAuthenticator[];
-}
-
-export enum IdxFeature {
-  PASSWORD_RECOVERY = 'recover-password',
-  REGISTRATION = 'enroll-profile',
-  SOCIAL_IDP = 'redirect-idp',
-  ACCOUNT_UNLOCK = 'unlock-account',
-}
-
-export interface IdxTransactionMeta extends PKCETransactionMeta {
-  interactionHandle?: string;
-  remediations?: string[];
-  flow?: FlowIdentifier;
-  withCredentials?: boolean;
-  activationToken?: string;
-  recoveryToken?: string;
-}
-
-export interface IdxTransaction {
-  status: IdxStatus;
-  tokens?: Tokens;
-  nextStep?: NextStep;
-  messages?: IdxMessage[];
-  error?: APIError | IdxResponse;
-  meta?: IdxTransactionMeta;
-  enabledFeatures?: IdxFeature[];
-  availableSteps?: NextStep[];
-  requestDidSucceed?: boolean;
-
-  // from idx-js, used by signin widget
-  proceed: (remediationName: string, params: unknown) => Promise<IdxResponse>;
-  neededToProceed: IdxRemediation[];
-  rawIdxState: RawIdxResponse;
-  interactionCode?: string;
-  actions: IdxActions;
-  context: IdxContext;
-}
-
-export type IdxOptions = InteractOptions & IntrospectOptions & {
-  flow?: FlowIdentifier;
-  exchangeCodeForTokens?: boolean;
-  autoRemediate?: boolean;
-  step?: string;
-};
-
-export type Authenticator = {
-  id?: string;
-  key?: string;
-  methodType?: string;
-  phoneNumber?: string;
-};
-
-export function isAuthenticator(obj: any): obj is Authenticator {
-  return obj && (obj.key || obj.id);
-}
-
-export interface RemediationResponse {
-  idxResponse: IdxResponse;
-  nextStep?: NextStep;
-  messages?: IdxMessage[];
-  terminal?: boolean;
-  canceled?: boolean;
-}

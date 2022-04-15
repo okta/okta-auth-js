@@ -15,8 +15,8 @@
 /* eslint-disable max-statements, complexity, max-depth */
 import { interact } from './interact';
 import { introspect } from './introspect';
-import { remediate, RemediateOptions } from './remediate';
-import { getFlowSpecification, RemediationFlow } from './flow';
+import { remediate } from './remediate';
+import { getFlowSpecification } from './flow';
 import * as remediators from './remediators';
 import { 
   OktaAuthInterface,
@@ -24,23 +24,14 @@ import {
   IdxTransaction,
   IdxFeature,
   NextStep,
-  FlowIdentifier,
+  RunOptions,
   IdxTransactionMeta,
   Tokens,
   APIError,
 } from '../types';
 import { IdxMessage, IdxResponse, isIdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
-import { ProceedOptions } from './proceed';
 import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
-
-export type RunOptions = ProceedOptions & RemediateOptions & {
-  flow?: FlowIdentifier;
-  remediators?: RemediationFlow;
-  actions?: string[];
-  withCredentials?: boolean;
-}
-
 declare interface RunData {
   options: RunOptions;
   values: remediators.RemediationValues;

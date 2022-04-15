@@ -5,6 +5,7 @@
 ### Fixes
 
 - [#1182](https://github.com/okta/okta-auth-js/pull/1182) Fixes security question verification to accept `credentials.answer`
+- [#1184](https://github.com/okta/okta-auth-js/pull/1184) Fixes type declarations: `ApiError`, `responseType`, `responseMode`
 
 ## 6.4.2
 

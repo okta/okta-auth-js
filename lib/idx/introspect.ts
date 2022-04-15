@@ -12,19 +12,12 @@
  */
 
 import { makeIdxState, validateVersionConfig } from './idxState';
-import { OktaAuthInterface } from '../types';
+import { IntrospectOptions, OktaAuthInterface } from '../types';
 import { IdxResponse, isRawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
 import { httpRequest } from '../http';
 import { isAuthApiError } from '../errors';
-
-export interface IntrospectOptions {
-  withCredentials?: boolean;
-  interactionHandle?: string;
-  stateHandle?: string;
-  version?: string;
-}
 
 export async function introspect (
   authClient: OktaAuthInterface, 

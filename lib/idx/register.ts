@@ -14,27 +14,13 @@
 import { run } from './run';
 import { hasSavedInteractionHandle } from './transactionMeta';
 import { startTransaction } from './startTransaction';
-import { 
-  EnrollProfileValues,
-  SelectAuthenticatorEnrollValues,
-  EnrollAuthenticatorValues,
-  AuthenticatorEnrollmentDataValues,
-  SkipValues,
-} from './remediators';
 import { AuthSdkError } from '../errors';
 import { 
-  IdxOptions, 
+  RegistrationOptions, 
   IdxTransaction, 
   OktaAuthInterface, 
   IdxFeature,
 } from '../types';
-
-export type RegistrationOptions = IdxOptions 
-  & EnrollProfileValues 
-  & SelectAuthenticatorEnrollValues 
-  & EnrollAuthenticatorValues 
-  & AuthenticatorEnrollmentDataValues 
-  & SkipValues;
 
 export async function register(
   authClient: OktaAuthInterface, options: RegistrationOptions = {}
