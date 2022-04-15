@@ -62,6 +62,6 @@ export interface WellKnownResponse {
 }
 
 
-export type OAuthResponseMode ='okta_post_message' |'fragment' |'query' |'form_post';
+export type OAuthResponseMode = 'okta_post_message' |'fragment' |'query' |'form_post';
 
-export type OAuthResponseType ='code' |'token' |'id_token';
+export type OAuthResponseType = 'code' |'token' |'id_token' | 'refresh_token';

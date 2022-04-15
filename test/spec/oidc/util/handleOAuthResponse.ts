@@ -18,7 +18,7 @@ const verifyToken = jest.fn();
 jest.mock('../../../../lib/oidc/verifyToken', () => { return { verifyToken }; });
 
 import { handleOAuthResponse } from '../../../../lib/oidc';
-import { CustomUrls } from '../../../../lib/types';
+import { CustomUrls, TokenParams } from '../../../../lib/types';
 
 describe('handleOAuthResponse', () => {
   let sdk;
@@ -63,7 +63,7 @@ describe('handleOAuthResponse', () => {
         expect(res.tokens.refreshToken!.refreshToken).toBe('foo');
       });
       it('returns all tokens from the response', async () => {
-        const tokenParams = { responseType: ['token', 'id_token', 'refresh_token'] };
+        const tokenParams: TokenParams = { responseType: ['token', 'id_token', 'refresh_token'] };
         const oauthRes = { id_token: 'foo', access_token: 'blar', refresh_token: 'bloo' };
         const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined as unknown as CustomUrls);
         expect(res.tokens).toBeTruthy();
@@ -75,7 +75,7 @@ describe('handleOAuthResponse', () => {
         expect(res.tokens.refreshToken!.refreshToken).toBe('bloo');
       });
       it('prefers "scope" value from endpoint response over method parameter', async () => {
-        const tokenParams = { responseType: ['token', 'id_token', 'refresh_token'], scopes: ['profile'] };
+        const tokenParams: TokenParams = { responseType: ['token', 'id_token', 'refresh_token'], scopes: ['profile'] };
         const oauthRes = { id_token: 'foo', access_token: 'blar', refresh_token: 'bloo', scope: 'openid offline_access' };
         const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined as unknown as CustomUrls);
         expect(res.tokens.accessToken!.scopes).toEqual(['openid', 'offline_access']);
@@ -112,7 +112,7 @@ describe('handleOAuthResponse', () => {
           let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, {}, { error: 'error code', error_description: 'error description' }, undefined  as unknown as CustomUrls);
-          } catch (err) {
+          } catch (err: any) {
             errorThrown = true;
             expect(err.name).toBe('OAuthError');
             expect(err.errorCode).toBe('error code');
@@ -125,7 +125,7 @@ describe('handleOAuthResponse', () => {
           let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, { state: 'bar' }, { state: 'foo' }, undefined as unknown as CustomUrls);
-          } catch (err) {
+          } catch (err: any) {
             errorThrown = true;
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorSummary).toBe(`OAuth flow response state doesn't match request state`);
@@ -136,7 +136,7 @@ describe('handleOAuthResponse', () => {
           let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { access_token: 'foo' }, undefined as unknown as CustomUrls);
-          } catch (err) {
+          } catch (err: any) {
             errorThrown = true;
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
@@ -148,7 +148,7 @@ describe('handleOAuthResponse', () => {
           let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { id_token: 'foo' }, undefined as unknown as CustomUrls);
-          } catch (err) {
+          } catch (err: any) {
             errorThrown = true;
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
@@ -160,7 +160,7 @@ describe('handleOAuthResponse', () => {
           let errorThrown = false;
           try {
             await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'] }, { }, undefined as unknown as CustomUrls);
-          } catch (err) {
+          } catch (err: any) {
             errorThrown = true;
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');

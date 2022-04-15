@@ -67,14 +67,14 @@ describe('getDefaultTokenParams', () => {
       expect(getDefaultTokenParams({ options: {} } as OktaAuthInterface).responseType).toEqual(['token', 'id_token']);
     });
     it('uses values from sdk.options', () => {
-      const sdk = { options: { responseType: 'abc' } } as OktaAuthInterface;
-      expect(getDefaultTokenParams(sdk).responseType).toBe('abc');
+      const sdk = { options: { responseType: 'code' } } as OktaAuthInterface;
+      expect(getDefaultTokenParams(sdk).responseType).toBe('code');
     });
   });
 
   it('`responseMode`: uses value from sdk.options', () => {
-    const sdk = { options: { responseMode: 'abc' } } as OktaAuthInterface;
-    expect(getDefaultTokenParams(sdk).responseMode).toBe('abc');
+    const sdk = { options: { responseMode: 'fragment' } } as OktaAuthInterface;
+    expect(getDefaultTokenParams(sdk).responseMode).toBe('fragment');
   });
 
   describe('`state`: ', () => {

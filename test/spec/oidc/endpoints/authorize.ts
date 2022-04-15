@@ -12,6 +12,7 @@
 
 import { buildAuthorizeParams } from '../../../../lib/oidc/endpoints';
 import { AuthSdkError } from '../../../../lib/errors';
+import { OAuthResponseType } from '../../../../lib/types';
 
 describe('authorize endpoint', () => {
 
@@ -24,7 +25,7 @@ describe('authorize endpoint', () => {
     it('throws if multiple response types are specified as string', () => {
       expect(() => buildAuthorizeParams({
         clientId: 'fakeClientId',
-        responseType: 'id_token token'
+        responseType: 'id_token token' as OAuthResponseType
       })).toThrow(new AuthSdkError('Multiple OAuth responseTypes must be defined as an array'));
     });
 

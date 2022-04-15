@@ -11,8 +11,8 @@
  */
 
 
-import { run, RunOptions } from '../../../lib/idx/run';
-import { IdxStatus } from '../../../lib/idx/types';
+import { run } from '../../../lib/idx/run';
+import { AuthenticationOptions, IdxStatus } from '../../../lib/idx/types';
 import { IdxResponseFactory, IdentifyRemediationFactory } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
@@ -221,7 +221,7 @@ describe('idx/run', () => {
     const username = 'x';
     const password = 'y';
     const shouldProceedWithEmailAuthenticator = false;
-    const options: RunOptions = {
+    const options: AuthenticationOptions = {
       username,
       password,
       flow,
