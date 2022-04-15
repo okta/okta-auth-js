@@ -27,7 +27,7 @@ export async function introspect (
   let requestDidSucceed;
 
   // try load from storage first
-  const savedIdxResponse = authClient.transactionManager.loadIdxResponse();
+  const savedIdxResponse = authClient.transactionManager.loadIdxResponse(options);
   if (savedIdxResponse) {
     rawIdxResponse = savedIdxResponse.rawIdxResponse;
     requestDidSucceed = savedIdxResponse.requestDidSucceed;

@@ -117,7 +117,8 @@ describe('idx/register', () => {
         clear: () => {},
         save: () => {},
         saveIdxResponse: () => {},
-        loadIdxResponse: () => {}
+        loadIdxResponse: () => {},
+        clearIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)

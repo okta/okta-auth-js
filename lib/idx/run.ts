@@ -311,16 +311,17 @@ export async function run(
   else {
     // ensures state is saved to sessionStorage
     saveTransactionMeta(authClient, { ...meta });
+  }
 
-    if (idxResponse) {
-      // Save intermediate idx response in storage to reduce introspect call
-      const { rawIdxState: rawIdxResponse, requestDidSucceed } = idxResponse;
-      authClient.transactionManager.saveIdxResponse({
-        rawIdxResponse,
-        requestDidSucceed
-      });
-    }
-
+  if (idxResponse) {
+    // Save intermediate idx response in storage to reduce introspect call
+    const { rawIdxState: rawIdxResponse, requestDidSucceed } = idxResponse;
+    authClient.transactionManager.saveIdxResponse({
+      rawIdxResponse,
+      requestDidSucceed,
+      stateHandle: idxResponse.context?.stateHandle,
+      interactionHandle: meta?.interactionHandle
+    });
   }
   
   // from idx-js, used by the widget

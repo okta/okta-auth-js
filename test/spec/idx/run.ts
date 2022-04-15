@@ -48,11 +48,13 @@ describe('idx/run', () => {
       state: transactionMeta.state
     });
 
+    const stateHandle = 'abc';
     const idxResponse = IdxResponseFactory.build({
       neededToProceed: [
         IdentifyRemediationFactory.build(),
       ],
-      requestDidSucceed: true
+      requestDidSucceed: true,
+      context: { stateHandle }
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
 
@@ -251,7 +253,22 @@ describe('idx/run', () => {
     await run(authClient);
     expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
       rawIdxResponse: idxResponse.rawIdxState,
-      requestDidSucceed: true
+      requestDidSucceed: true,
+      stateHandle: idxResponse.context.stateHandle
+    });
+  });
+
+  it('saves idxResponse with interactionHandle if available', async () => {
+    const { authClient, idxResponse, remediateResponse, transactionMeta } = testContext;
+    transactionMeta.interactionHandle = '1234';
+    remediateResponse.nextStep = 'has-next-step';
+    jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+    await run(authClient);
+    expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+      rawIdxResponse: idxResponse.rawIdxState,
+      requestDidSucceed: true,
+      stateHandle: idxResponse.context.stateHandle,
+      interactionHandle: transactionMeta.interactionHandle
     });
   });
 
@@ -316,6 +333,19 @@ describe('idx/run', () => {
         status: IdxStatus.TERMINAL,
       });
     });
+
+    it('saves idxResponse', async () => {
+      const { authClient, idxResponse, transactionMeta } = testContext;
+      jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+      await run(authClient);
+      expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+        rawIdxResponse: idxResponse.rawIdxState,
+        requestDidSucceed: true,
+        stateHandle: idxResponse.context.stateHandle,
+        interactionHandle: transactionMeta.interactionHandle
+      });
+    });
+
   });
 
   describe('response contains interactionCode', () => {
