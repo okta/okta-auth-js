@@ -313,7 +313,7 @@ export async function run(
     saveTransactionMeta(authClient, { ...meta });
   }
 
-  if (idxResponse) {
+  if (idxResponse && (idxResponse.requestDidSucceed || idxResponse.stepUp)) {
     // Save intermediate idx response in storage to reduce introspect call
     const { rawIdxState: rawIdxResponse, requestDidSucceed } = idxResponse;
     authClient.transactionManager.saveIdxResponse({
