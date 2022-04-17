@@ -226,7 +226,8 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
 
   if (terminal) {
     status = IdxStatus.TERMINAL;
-    shouldClearTransaction = true;
+     // terminal errors do no clear the transaction. User may choose "cancel" or "skip" from previous remediation
+    shouldClearTransaction = idxResponse?.requestDidSucceed ===  true;
     clearSharedStorage = false;
   } else if (canceled) {
     status = IdxStatus.CANCELED;
@@ -307,21 +308,22 @@ export async function run(
 
   if (shouldClearTransaction) {
     authClient.transactionManager.clear({ clearSharedStorage });
+    authClient.transactionManager.clearIdxResponse();
   }
   else {
     // ensures state is saved to sessionStorage
     saveTransactionMeta(authClient, { ...meta });
-  }
 
-  if (idxResponse && (idxResponse.requestDidSucceed || idxResponse.stepUp)) {
-    // Save intermediate idx response in storage to reduce introspect call
-    const { rawIdxState: rawIdxResponse, requestDidSucceed } = idxResponse;
-    authClient.transactionManager.saveIdxResponse({
-      rawIdxResponse,
-      requestDidSucceed,
-      stateHandle: idxResponse.context?.stateHandle,
-      interactionHandle: meta?.interactionHandle
-    });
+    if (idxResponse && (idxResponse.requestDidSucceed || idxResponse.stepUp)) {
+      // Save intermediate idx response in storage to reduce introspect call
+      const { rawIdxState: rawIdxResponse, requestDidSucceed } = idxResponse;
+      authClient.transactionManager.saveIdxResponse({
+        rawIdxResponse,
+        requestDidSucceed,
+        stateHandle: idxResponse.context?.stateHandle,
+        interactionHandle: meta?.interactionHandle
+      });
+    }
   }
   
   // from idx-js, used by the widget
