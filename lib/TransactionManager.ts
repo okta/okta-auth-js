@@ -38,6 +38,7 @@ import {
 
 export interface ClearTransactionMetaOptions extends TransactionMetaOptions {
   clearSharedStorage?: boolean; // true by default
+  clearIdxResponse?: boolean; // true by default
 }
 export default class TransactionManager {
   options: TransactionManagerOptions;
@@ -77,6 +78,10 @@ export default class TransactionManager {
       }
     }
 
+    if (options.clearIdxResponse !== false) {
+      this.clearIdxResponse();
+    }
+    
     if (!this.legacyWidgetSupport) {
       return;
     }

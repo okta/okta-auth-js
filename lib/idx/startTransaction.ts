@@ -19,7 +19,6 @@ export async function startTransaction(
   options: StartOptions = {}
 ): Promise<IdxTransaction> {
   // Clear IDX response cache and saved transaction meta (if any)
-  authClient.transactionManager.clearIdxResponse();
   authClient.transactionManager.clear();
 
   return run(authClient, {

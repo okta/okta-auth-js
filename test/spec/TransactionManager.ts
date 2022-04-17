@@ -101,11 +101,18 @@ describe('TransactionManager', () => {
       transactionManager.clear();
       expect(transactionStorage.clearStorage).toHaveBeenCalledWith();
     });
-    it('does NOT clear idxResponse storage', () => {
+    it('clears idxResponse storage', () => {
       const { transactionManager, idxResponseStorage } = testContext;
       transactionManager.clear();
-      expect(idxResponseStorage.clearStorage).not.toHaveBeenCalledWith();
+      expect(idxResponseStorage.clearStorage).toHaveBeenCalledWith();
     });
+
+    it('does not clear idxResponse storage if `clearIdxResponse` is false', () => {
+      const { transactionManager, idxResponseStorage } = testContext;
+      transactionManager.clear({ clearIdxResponse: false });
+      expect(idxResponseStorage.clearStorage).not.toHaveBeenCalled();
+    });
+
     // This is for compatibility with older versions of the signin widget. OKTA-304806
     it('pkce: clears legacy PKCE meta', () => {
       const { storageManager, transactionManager, legacyPKCEStorage } = testContext;

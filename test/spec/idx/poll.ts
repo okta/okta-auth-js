@@ -65,7 +65,8 @@ describe('idx/poll', () => {
         clear: () => {},
         save: () => {},
         saveIdxResponse: () => {},
-        loadIdxResponse: () => {}
+        loadIdxResponse: () => {},
+        clearIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
@@ -238,7 +239,7 @@ describe('idx/poll', () => {
     });
     try {
       await poll(authClient, { refresh: 100 });
-    } catch (err) {
+    } catch (err: any) {
       expect(err.message).toEqual('Storage Error');
     }
   });

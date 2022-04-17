@@ -98,14 +98,7 @@ describe('idx/startTransaction', () => {
     const { authClient } = testContext;
     jest.spyOn(authClient.transactionManager, 'clear');
     await startTransaction(authClient);
-    expect(authClient.transactionManager.clear).toHaveBeenCalled();
-  });
-
-  it('clears IDX response', async () => {
-    const { authClient } = testContext;
-    jest.spyOn(authClient.transactionManager, 'clearIdxResponse');
-    await startTransaction(authClient);
-    expect(authClient.transactionManager.clearIdxResponse).toHaveBeenCalled();
+    expect(authClient.transactionManager.clear).toHaveBeenCalledWith();
   });
 
   it('calls interact, introspect, and remediate', async () => {

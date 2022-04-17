@@ -308,7 +308,6 @@ export async function run(
 
   if (shouldClearTransaction) {
     authClient.transactionManager.clear({ clearSharedStorage });
-    authClient.transactionManager.clearIdxResponse();
   }
   else {
     // ensures state is saved to sessionStorage

@@ -393,7 +393,7 @@ describe('idx/run', () => {
           status: IdxStatus.TERMINAL,
         });
         expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
-        expect(authClient.transactionManager.clearIdxResponse).toHaveBeenCalledTimes(1);
+        expect(authClient.transactionManager.clear).toHaveBeenNthCalledWith(1, { clearSharedStorage: false });
       });
       // terminal response is not saved, everything should be cleared
       it('does not save the idxResponse', async () =>{

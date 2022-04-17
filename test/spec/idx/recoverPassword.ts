@@ -71,7 +71,8 @@ describe('idx/recoverPassword', () => {
         load: () => transactionMeta,
         clear: () => {},
         save: () => {},
-        saveIdxResponse: () => {}
+        saveIdxResponse: () => {},
+        clearIdxResponse: () => {}
       },
       idx: {
         setFlow: () => {}
