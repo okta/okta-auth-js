@@ -415,4 +415,28 @@ describe('idx/run', () => {
     });
   });
 
+  describe('requestDidSucceed = false', () =>{
+
+    it('does not save the idxResponse if requestDidSucceed = false', async () =>{
+      const { authClient, idxResponse } = testContext;
+      idxResponse.requestDidSucceed = false;
+      jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+      await run(authClient);
+      expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
+    });
+
+    it('does save the idxResponse if stepUp is true', async () =>{
+      const { authClient, idxResponse, transactionMeta } = testContext;
+      idxResponse.requestDidSucceed = false;
+      idxResponse.stepUp = true;
+      jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+      await run(authClient);
+      expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+        rawIdxResponse: idxResponse.rawIdxState,
+        requestDidSucceed: false,
+        stateHandle: idxResponse.context.stateHandle,
+        interactionHandle: transactionMeta.interactionHandle
+      });
+    });
+  });
 });
