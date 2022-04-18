@@ -34,6 +34,7 @@ export interface InteractOptions extends IdxOptions {
   activationToken?: string;
   recoveryToken?: string;
   clientSecret?: string;
+  maxAge?: string | number;
 }
 
 export interface IntrospectOptions extends IdxOptions {
