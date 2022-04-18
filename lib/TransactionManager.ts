@@ -24,7 +24,8 @@ import {
   TransactionMetaOptions,
   TransactionManagerOptions,
   CookieStorage,
-  SavedIdxResponse
+  SavedIdxResponse,
+  IntrospectOptions
 } from './types';
 import { isRawIdxResponse } from './idx/types/idx-js';
 import { warn } from './util';
@@ -36,7 +37,8 @@ import {
 } from './util/sharedStorage';
 
 export interface ClearTransactionMetaOptions extends TransactionMetaOptions {
-  clearSharedStorage?: boolean;
+  clearSharedStorage?: boolean; // true by default
+  clearIdxResponse?: boolean; // true by default
 }
 export default class TransactionManager {
   options: TransactionManagerOptions;
@@ -68,9 +70,6 @@ export default class TransactionManager {
     // Clear primary storage (by default, sessionStorage on browser)
     transactionStorage.clearStorage();
 
-    // clear IDX response storage
-    this.clearIdxResponse();
-
     // Usually we want to also clear shared storage unless another tab may need it to continue/complete a flow
     if (this.enableSharedStorage && options.clearSharedStorage !== false) {
       const state = options.state || meta?.state;
@@ -78,7 +77,11 @@ export default class TransactionManager {
         clearTransactionFromSharedStorage(this.storageManager, state);
       }
     }
-  
+
+    if (options.clearIdxResponse !== false) {
+      this.clearIdxResponse();
+    }
+    
     if (!this.legacyWidgetSupport) {
       return;
     }
@@ -307,7 +310,7 @@ export default class TransactionManager {
     // throw new AuthSdkError('Unable to parse the ' + REDIRECT_OAUTH_PARAMS_NAME + ' value from storage');
   }
 
-  saveIdxResponse({ rawIdxResponse, requestDidSucceed }: SavedIdxResponse): void {
+  saveIdxResponse(data: SavedIdxResponse): void {
     if (!this.saveLastResponse) {
       return;
     }
@@ -315,10 +318,11 @@ export default class TransactionManager {
     if (!storage) {
       return;
     }
-    storage.setStorage({ rawIdxResponse, requestDidSucceed });
+    storage.setStorage(data);
   }
 
-  loadIdxResponse(): SavedIdxResponse | null {
+  // eslint-disable-next-line complexity
+  loadIdxResponse(options?: IntrospectOptions): SavedIdxResponse | null {
     if (!this.saveLastResponse) {
       return null;
     }
@@ -330,6 +334,17 @@ export default class TransactionManager {
     if (!storedValue || !isRawIdxResponse(storedValue.rawIdxResponse)) {
       return null;
     }
+
+    if (options) {
+      const { stateHandle, interactionHandle } = options;
+      if (stateHandle && storedValue.stateHandle !== stateHandle) {
+        return null;
+      }
+      if (interactionHandle && storedValue.interactionHandle !== interactionHandle) {
+        return null;
+      }
+    }
+
     return storedValue;
   }
 

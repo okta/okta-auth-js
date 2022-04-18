@@ -12,28 +12,12 @@
 
 
 import { run } from './run';
-import {
-  IdentifyValues,
-  SelectAuthenticatorAuthenticateValues,
-  ChallengeAuthenticatorValues,
-  AuthenticatorVerificationDataValues,
-  ResetAuthenticatorValues,
-  ReEnrollAuthenticatorValues,
-} from './remediators';
 import { getFlowSpecification } from './flow';
 import { 
   OktaAuthInterface, 
-  IdxOptions, 
+  PasswordRecoveryOptions, 
   IdxTransaction,
 } from '../types';
-
-export type PasswordRecoveryOptions = IdxOptions 
-  & IdentifyValues 
-  & SelectAuthenticatorAuthenticateValues 
-  & ChallengeAuthenticatorValues 
-  & ResetAuthenticatorValues
-  & AuthenticatorVerificationDataValues
-  & ReEnrollAuthenticatorValues;
 
 export async function recoverPassword(
   authClient: OktaAuthInterface, options: PasswordRecoveryOptions = {}

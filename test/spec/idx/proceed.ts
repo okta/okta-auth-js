@@ -50,7 +50,6 @@ describe('idx/proceed', () => {
         load: () => transactionMeta,
         clear: () => {},
         save: () => {},
-        clearIdxResponse: () => {}
       },
       idx: {
         setFlow: () => {}

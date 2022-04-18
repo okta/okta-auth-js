@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.4.3
+
+### Fixes
+
+- [#1182](https://github.com/okta/okta-auth-js/pull/1182) Fixes security question verification to accept `credentials.answer`
+- [#1184](https://github.com/okta/okta-auth-js/pull/1184) Fixes type declarations: `ApiError`, `responseType`, `responseMode`
+- [#1185](https://github.com/okta/okta-auth-js/pull/1185) Fixes "cancel" and "skip" action called after receiving a terminal or error response
+
 ## 6.4.2
 
 ### Fixes

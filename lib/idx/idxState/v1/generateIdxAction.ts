@@ -11,11 +11,9 @@
  */
 
 /* eslint-disable max-len, complexity */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { httpRequest } from '../../../http';
 import { OktaAuthInterface } from '../../../types';    // auth-js/types
-import { IdxActionParams } from '../../types/idx-js';
+import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
 import { makeIdxState } from './makeIdxState';
 import AuthApiError from '../../../errors/AuthApiError';
@@ -24,8 +22,8 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthInt
   actionDefinition, 
   defaultParamsForAction = {}, 
   immutableParamsForAction = {}, 
-  toPersist = {}
-}) {
+  toPersist = {} as IdxToPersist
+}): IdxActionFunction {
   const target = actionDefinition.href;
   return async function(params: IdxActionParams = {}): Promise<IdxResponse> {
     const headers = {
@@ -90,7 +88,7 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthInt
 //   };
 // };
 
-const generateIdxAction = function generateIdxAction( authClient: OktaAuthInterface, actionDefinition, toPersist ) {
+const generateIdxAction = function generateIdxAction( authClient: OktaAuthInterface, actionDefinition, toPersist ): IdxActionFunction {
   // TODO: leaving this here to see where the polling is EXPECTED to drop into the code, but removing any accidental trigger of incomplete code
   // const generator =  actionDefinition.refresh ? generatePollingFetch : generateDirectFetch;
   const generator = generateDirectFetch;

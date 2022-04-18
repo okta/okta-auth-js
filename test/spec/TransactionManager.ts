@@ -106,6 +106,13 @@ describe('TransactionManager', () => {
       transactionManager.clear();
       expect(idxResponseStorage.clearStorage).toHaveBeenCalledWith();
     });
+
+    it('does not clear idxResponse storage if `clearIdxResponse` is false', () => {
+      const { transactionManager, idxResponseStorage } = testContext;
+      transactionManager.clear({ clearIdxResponse: false });
+      expect(idxResponseStorage.clearStorage).not.toHaveBeenCalled();
+    });
+
     // This is for compatibility with older versions of the signin widget. OKTA-304806
     it('pkce: clears legacy PKCE meta', () => {
       const { storageManager, transactionManager, legacyPKCEStorage } = testContext;
@@ -651,26 +658,72 @@ describe('TransactionManager', () => {
   describe('loadIdxResponse', () => {
     beforeEach(() => {
       createInstance();
+      const rawIdxResponse = RawIdxResponseFactory.build();
+      const requestDidSucceed = true;
+      const savedResponse = {
+        rawIdxResponse,
+        requestDidSucceed
+      };
+      testContext = {
+        ...testContext,
+        savedResponse
+      };
     });
     it('loads from idxResponse storage', () => {
-      const { transactionManager, idxResponseStorage } = testContext;
-      const rawIdxResponse = RawIdxResponseFactory.build();
-      idxResponseStorage.getStorage.mockReturnValue({
-        rawIdxResponse,
-        requestDidSucceed: true
-      });
+      const { transactionManager, idxResponseStorage, savedResponse } = testContext;
+      idxResponseStorage.getStorage.mockReturnValue(savedResponse);
       const res = transactionManager.loadIdxResponse();
       expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-      expect(res).toEqual({
-        rawIdxResponse,
-        requestDidSucceed: true
-      });
+      expect(res).toEqual(savedResponse);
     });
-    it('returns null if idxResponse is not valid', () => {
+    it('returns null if storage is empty', () => {
       const { transactionManager, idxResponseStorage } = testContext;
+      idxResponseStorage.getStorage.mockReturnValue(undefined);
       const res = transactionManager.loadIdxResponse();
       expect(idxResponseStorage.getStorage).toHaveBeenCalled();
       expect(res).toBeNull();
+    });
+    it('returns null if idxResponse is not valid', () => {
+      const { transactionManager, idxResponseStorage } = testContext;
+      const savedResponse = { foo: 'bar' };
+      idxResponseStorage.getStorage.mockReturnValue(savedResponse);
+      const res = transactionManager.loadIdxResponse();
+      expect(idxResponseStorage.getStorage).toHaveBeenCalled();
+      expect(res).toBeNull();
+    });
+    describe('with options.stateHandle', () => {
+      it('returns null if options.stateHandle does not match saved stateHandle', () => {
+        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
+        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
+        const res = transactionManager.loadIdxResponse({ stateHandle: 'a' });
+        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
+        expect(res).toBeNull();
+      });
+      it('returns data if options.stateHandle matches saved stateHandle', () => {
+        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
+        savedResponse.stateHandle = 'a';
+        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
+        const res = transactionManager.loadIdxResponse({ stateHandle: 'a' });
+        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
+        expect(res).toBe(savedResponse);
+      });
+    });
+    describe('with options.interactionHandle', () => {
+      it('returns null if options.interactionHandle does not match saved stateHandle', () => {
+        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
+        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
+        const res = transactionManager.loadIdxResponse({ interactionHandle: 'a' });
+        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
+        expect(res).toBeNull();
+      });
+      it('returns data if options.interactionHandle matches saved interactionHandle', () => {
+        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
+        savedResponse.interactionHandle = 'a';
+        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
+        const res = transactionManager.loadIdxResponse({ interactionHandle: 'a' });
+        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
+        expect(res).toBe(savedResponse);
+      });
     });
   });
 
@@ -678,7 +731,7 @@ describe('TransactionManager', () => {
     beforeEach(() => {
       createInstance();
     });
-    it('clears idxResponse storage', () => {
+    it('by default, clears idxResponse storage', () => {
       const { transactionManager, idxResponseStorage } = testContext;
       transactionManager.clearIdxResponse();
       expect(idxResponseStorage.clearStorage).toHaveBeenCalledWith();

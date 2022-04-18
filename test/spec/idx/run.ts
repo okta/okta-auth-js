@@ -11,8 +11,8 @@
  */
 
 
-import { run, RunOptions } from '../../../lib/idx/run';
-import { IdxStatus } from '../../../lib/idx/types';
+import { run } from '../../../lib/idx/run';
+import { AuthenticationOptions, IdxStatus } from '../../../lib/idx/types';
 import { IdxResponseFactory, IdentifyRemediationFactory } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
@@ -48,11 +48,13 @@ describe('idx/run', () => {
       state: transactionMeta.state
     });
 
+    const stateHandle = 'abc';
     const idxResponse = IdxResponseFactory.build({
       neededToProceed: [
         IdentifyRemediationFactory.build(),
       ],
-      requestDidSucceed: true
+      requestDidSucceed: true,
+      context: { stateHandle }
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
 
@@ -72,7 +74,6 @@ describe('idx/run', () => {
         load: () => transactionMeta,
         clear: () => {},
         saveIdxResponse: () => {},
-        clearIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
@@ -221,7 +222,7 @@ describe('idx/run', () => {
     const username = 'x';
     const password = 'y';
     const shouldProceedWithEmailAuthenticator = false;
-    const options: RunOptions = {
+    const options: AuthenticationOptions = {
       username,
       password,
       flow,
@@ -251,7 +252,22 @@ describe('idx/run', () => {
     await run(authClient);
     expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
       rawIdxResponse: idxResponse.rawIdxState,
-      requestDidSucceed: true
+      requestDidSucceed: true,
+      stateHandle: idxResponse.context.stateHandle
+    });
+  });
+
+  it('saves idxResponse with interactionHandle if available', async () => {
+    const { authClient, idxResponse, remediateResponse, transactionMeta } = testContext;
+    transactionMeta.interactionHandle = '1234';
+    remediateResponse.nextStep = 'has-next-step';
+    jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+    await run(authClient);
+    expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+      rawIdxResponse: idxResponse.rawIdxState,
+      requestDidSucceed: true,
+      stateHandle: idxResponse.context.stateHandle,
+      interactionHandle: transactionMeta.interactionHandle
     });
   });
 
@@ -276,27 +292,83 @@ describe('idx/run', () => {
       jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
     });
 
-    it('does not clear transaction storage', async () => {
-      const { authClient } = testContext;
-
-      jest.spyOn(authClient.transactionManager, 'clear');
-      const res = await run(authClient);
-      expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
-      expect(res).toMatchObject({
-        nextStep: 'remediate-nextStep',
-        status: IdxStatus.PENDING,
+    describe('requestDidSucceed = true', () => {
+      it('does not clear transaction storage', async () => {
+        const { authClient } = testContext;
+        jest.spyOn(authClient.transactionManager, 'clear');
+        const res = await run(authClient);
+        expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
+        expect(res).toMatchObject({
+          nextStep: 'remediate-nextStep',
+          status: IdxStatus.PENDING,
+        });
+      });
+  
+      it('saves `state` in transaction meta', async () => {
+        const { authClient, transactionMeta } = testContext;
+        jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+        await run(authClient);
+        expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, transactionMeta);
+      });
+  
+      it('saves idxResponse', async () => {
+        const { authClient, idxResponse, transactionMeta } = testContext;
+        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+        await run(authClient);
+        expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+          rawIdxResponse: idxResponse.rawIdxState,
+          requestDidSucceed: true,
+          stateHandle: idxResponse.context.stateHandle,
+          interactionHandle: transactionMeta.interactionHandle
+        });
       });
     });
 
-    it('saves `state` in transaction meta', async () => {
-      const { authClient, transactionMeta } = testContext;
+    describe('requestDidSucceed = false', () =>{
+      beforeEach(() => {
+        const { idxResponse } = testContext;
+        idxResponse.requestDidSucceed = false;
+      });
+  
+      // Do not save the failed response. Use previous saved IDX resposne to continue
+      it('does not save the idxResponse', async () =>{
+        const { authClient, idxResponse } = testContext;
+        idxResponse.requestDidSucceed = false;
+        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+        await run(authClient);
+        expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
+      });
+  
+      // an error response does not clear the transaction. options may be valid on previous response
+      it('does not clear the last transaction or idx response', async () => {
+        const { authClient } = testContext;
+        jest.spyOn(authClient.transactionManager, 'clear');
+        const res = await run(authClient);
+        expect(res).toMatchObject({
+          nextStep: 'remediate-nextStep',
+          status: IdxStatus.PENDING,
+        });
+        expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
+      });
 
-      jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
-      await run(authClient);
-      expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, transactionMeta);
+      // Special case of an error response that can be continued
+      it('does save the idxResponse if stepUp is true', async () =>{
+        const { authClient, idxResponse, transactionMeta } = testContext;
+        idxResponse.requestDidSucceed = false;
+        idxResponse.stepUp = true;
+        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+        await run(authClient);
+        expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+          rawIdxResponse: idxResponse.rawIdxState,
+          requestDidSucceed: false,
+          stateHandle: idxResponse.context.stateHandle,
+          interactionHandle: transactionMeta.interactionHandle
+        });
+      });
     });
   });
 
+  // terminal can be error or non-error
   describe('response is terminal', () => {
     beforeEach(() => {
       const { idxResponse, transactionMeta } = testContext;
@@ -306,14 +378,192 @@ describe('idx/run', () => {
       jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
     });
 
-    it('clears transaction storage', async () => {
-      const { authClient } = testContext;
-      jest.spyOn(authClient.transactionManager, 'clear');
-      const res = await run(authClient);
-      expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
-      expect(res).toMatchObject({
-        nextStep: 'remediate-nextStep',
-        status: IdxStatus.TERMINAL,
+    describe('requestDidSucceed = true', () => {
+
+      describe('no actions, no messages', () => {
+        // a terminal success is the end of the transaction. there are no more options for the user.
+        it('clears transaction storage and last idx reponse', async () => {
+          const { authClient } = testContext;
+          jest.spyOn(authClient.transactionManager, 'clear');
+          const res = await run(authClient);
+          expect(res).toMatchObject({
+            nextStep: 'remediate-nextStep',
+            status: IdxStatus.TERMINAL,
+          });
+          expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
+          expect(authClient.transactionManager.clear).toHaveBeenNthCalledWith(1, { clearSharedStorage: false });
+        });
+        // terminal response is not saved, everything should be cleared
+        it('does not save the idxResponse', async () =>{
+          const { authClient } = testContext;
+          jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+          await run(authClient);
+          expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('no actions, has info messages', () => {
+        // a terminal response with no actions and only info messages is considered a success state
+        beforeEach(() => {
+          const { idxResponse } = testContext;
+          idxResponse.rawIdxState.messages = {
+            value: [{
+              message: 'foo',
+              class: 'INFO'
+            }]
+          };
+        });
+        it('clears transaction storage and last idx reponse', async () => {
+          const { authClient } = testContext;
+          jest.spyOn(authClient.transactionManager, 'clear');
+          const res = await run(authClient);
+          expect(res).toMatchObject({
+            nextStep: 'remediate-nextStep',
+            status: IdxStatus.TERMINAL,
+          });
+          expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
+          expect(authClient.transactionManager.clear).toHaveBeenNthCalledWith(1, { clearSharedStorage: false });
+        });
+        // terminal response is not saved, everything should be cleared
+        it('does not save the idxResponse', async () =>{
+          const { authClient } = testContext;
+          jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+          await run(authClient);
+          expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('no actions, has error messages', () => {
+        // a terminal response with error messages should not be saved.
+        // However the transaction is not cleared either as the previous response may have available actions
+        beforeEach(() => {
+          const { idxResponse } = testContext;
+          idxResponse.rawIdxState.messages = {
+            value: [{
+              message: 'foo',
+              class: 'ERROR'
+            }]
+          };
+        });
+
+        // leave previous response in place. This response may only contain an error message.
+        it('does not clear the last transaction or idx response', async () => {
+          const { authClient } = testContext;
+          jest.spyOn(authClient.transactionManager, 'clear');
+          const res = await run(authClient);
+          expect(res).toMatchObject({
+            nextStep: 'remediate-nextStep',
+            status: IdxStatus.TERMINAL,
+          });
+          expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
+        });
+
+        it('does not save the idxResponse', async () =>{
+          const { authClient } = testContext;
+          jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+          await run(authClient);
+          expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
+        });
+
+      });
+
+      describe('has actions, no messages', () => {
+        // a terminal response with available actions behaves similar to a pending status. it does not clear the transaction.
+        beforeEach(() => {
+          const { idxResponse } = testContext;
+          idxResponse.actions = {
+            cancel: () => {}
+          };
+        });
+
+        it('does not clear the last transaction or idx response', async () => {
+          const { authClient } = testContext;
+          jest.spyOn(authClient.transactionManager, 'clear');
+          const res = await run(authClient);
+          expect(res).toMatchObject({
+            nextStep: 'remediate-nextStep',
+            status: IdxStatus.TERMINAL,
+          });
+          expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
+        });
+
+        // actions are available. save the IDX response so they can be used.
+        it('does save the idxResponse', async () =>{
+          const { authClient, idxResponse, transactionMeta } = testContext;
+          jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+          await run(authClient);
+          expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+            rawIdxResponse: idxResponse.rawIdxState,
+            requestDidSucceed: true,
+            stateHandle: idxResponse.context.stateHandle,
+            interactionHandle: transactionMeta.interactionHandle
+          });
+        });
+      });
+
+      describe('has actions, error messages', () => {
+        // a terminal response with available actions behaves similar to a pending status. it does not clear the transaction.
+        beforeEach(() => {
+          const { idxResponse } = testContext;
+          idxResponse.actions = {
+            cancel: () => {}
+          };
+          idxResponse.rawIdxState.messages = {
+            value: [{
+              message: 'foo',
+              class: 'ERROR'
+            }]
+          };
+        });
+
+        it('does not clear the last transaction or idx response', async () => {
+          const { authClient } = testContext;
+          jest.spyOn(authClient.transactionManager, 'clear');
+          const res = await run(authClient);
+          expect(res).toMatchObject({
+            nextStep: 'remediate-nextStep',
+            status: IdxStatus.TERMINAL,
+          });
+          expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
+        });
+
+        // actions are available. save the IDX response so they can be used.
+        it('does save the idxResponse', async () =>{
+          const { authClient, idxResponse, transactionMeta } = testContext;
+          jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+          await run(authClient);
+          expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+            rawIdxResponse: idxResponse.rawIdxState,
+            requestDidSucceed: true,
+            stateHandle: idxResponse.context.stateHandle,
+            interactionHandle: transactionMeta.interactionHandle
+          });
+        });
+      });
+    });
+
+    describe('requestDidSucceed = false', () => {
+      beforeEach(() => {
+        const { idxResponse } = testContext;
+        idxResponse.requestDidSucceed = false;
+      });
+      // a terminal error does not clear the transaction. cancel/skip may be valid on previous response
+      it('does not clear the last transaction or idx response', async () => {
+        const { authClient } = testContext;
+        jest.spyOn(authClient.transactionManager, 'clear');
+        const res = await run(authClient);
+        expect(res).toMatchObject({
+          nextStep: 'remediate-nextStep',
+          status: IdxStatus.TERMINAL,
+        });
+        expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
+      });
+      // a terminal error response is not saved. previous idxResponse may be used to cancel/skip
+      it('does not save the idxResponse', async () =>{
+        const { authClient } = testContext;
+        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+        await run(authClient);
+        expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
       });
     });
   });

@@ -14,8 +14,7 @@
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
 import { RemediationValues } from './remediators';
-import { FlowIdentifier, RemediationResponse } from './types';
-import { RemediationFlow } from './flow';
+import { RemediateOptions, RemediationResponse } from './types';
 import { 
   IdxResponse,
   IdxActionParams, 
@@ -35,13 +34,6 @@ export interface RemediateActionWithOptionalParams {
 }
 
 export type RemediateAction = string | RemediateActionWithOptionalParams;
-export interface RemediateOptions {
-  remediators?: RemediationFlow;
-  actions?: RemediateAction[];
-  flow?: FlowIdentifier;
-  step?: string;
-  shouldProceedWithEmailAuthenticator?: boolean; // will be removed in next major version
-}
 
 
 function getActionFromValues(values: RemediationValues, idxResponse: IdxResponse): string | undefined {
@@ -81,13 +73,6 @@ export async function remediate(
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
     return { idxResponse };
-  }
-
-  // Reach to terminal state
-  const terminal = isTerminalResponse(idxResponse);
-  const messages = getMessagesFromResponse(idxResponse);
-  if (terminal) {
-    return { idxResponse, terminal, messages };
   }
 
   const remediator = getRemediator(neededToProceed, values, options);
@@ -137,6 +122,13 @@ export async function remediate(
         return remediate(idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
+  }
+
+  // Do not attempt to remediate if response is in terminal state
+  const terminal = isTerminalResponse(idxResponse);
+  const messages = getMessagesFromResponse(idxResponse);
+  if (terminal) {
+    return { idxResponse, terminal, messages };
   }
 
   if (!remediator) {

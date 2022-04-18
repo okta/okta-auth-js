@@ -433,20 +433,20 @@ describe('OktaAuth (api)', function() {
 
   describe('hasResponseType', () => {
     it('returns true if responseType is a string', () => {
-      auth = new OktaAuth({ issuer, responseType: 'fake' });
-      expect(auth.hasResponseType('fake')).toBe(true);
+      auth = new OktaAuth({ issuer, responseType: 'token' });
+      expect(auth.hasResponseType('token')).toBe(true);
     });
     it('returns true if responseType is an array', () => {
-      auth = new OktaAuth({ issuer, responseType: ['fake', 'alsofake'] });
-      expect(auth.hasResponseType('fake')).toBe(true);
+      auth = new OktaAuth({ issuer, responseType: ['token', 'id_token'] });
+      expect(auth.hasResponseType('token')).toBe(true);
     });
     it('returns false if responseType does not match string', () => {
-      auth = new OktaAuth({ issuer, responseType: 'abc' });
-      expect(auth.hasResponseType('fake')).toBe(false);
+      auth = new OktaAuth({ issuer, responseType: 'token' });
+      expect(auth.hasResponseType('id_token')).toBe(false);
     });
     it('returns false if responseType does not match entry in array', () => {
-      auth = new OktaAuth({ issuer, responseType: ['abc', 'def'] });
-      expect(auth.hasResponseType('fake')).toBe(false);
+      auth = new OktaAuth({ issuer, responseType: ['token', 'id_token'] });
+      expect(auth.hasResponseType('code')).toBe(false);
     });
   });
 
@@ -464,7 +464,7 @@ describe('OktaAuth (api)', function() {
       expect(auth.isAuthorizationCodeFlow()).toBe(true);
     });
     it('will be true if responseType is [..., "code"]', () => {
-      auth = new OktaAuth({ issuer, pkce: false, responseType: ['abc', 'code'] });
+      auth = new OktaAuth({ issuer, pkce: false, responseType: ['token', 'code'] });
       expect(auth.isAuthorizationCodeFlow()).toBe(true);
     });
   });

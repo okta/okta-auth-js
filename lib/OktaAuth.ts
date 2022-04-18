@@ -51,6 +51,7 @@ import {
   GetWithRedirectFunction,
   RequestOptions,
   IsAuthenticatedOptions,
+  OAuthResponseType,
 } from './types';
 import {
   transactionStatus,
@@ -729,7 +730,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     return !!this.options.pkce;
   }
 
-  hasResponseType(responseType: string): boolean {
+  hasResponseType(responseType: OAuthResponseType): boolean {
     let hasResponseType = false;
     if (Array.isArray(this.options.responseType) && this.options.responseType.length) {
       hasResponseType = this.options.responseType.indexOf(responseType) >= 0;

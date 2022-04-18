@@ -14,27 +14,13 @@
 import { run } from './run';
 import { hasSavedInteractionHandle } from './transactionMeta';
 import { startTransaction } from './startTransaction';
-import {
-  IdentifyValues,
-  SelectAuthenticatorUnlockAccountValues,
-  SelectAuthenticatorAuthenticateValues,
-  ChallengeAuthenticatorValues,
-  AuthenticatorVerificationDataValues
-} from './remediators';
 import { AuthSdkError } from '../errors';
 import { 
   OktaAuthInterface, 
-  IdxOptions, 
+  AccountUnlockOptions, 
   IdxTransaction,
   IdxFeature,
 } from '../types';
-
-export type AccountUnlockOptions = IdxOptions
-  & IdentifyValues
-  & SelectAuthenticatorUnlockAccountValues
-  & SelectAuthenticatorAuthenticateValues
-  & ChallengeAuthenticatorValues
-  & AuthenticatorVerificationDataValues;
 
 export async function unlockAccount(
   authClient: OktaAuthInterface, options: AccountUnlockOptions = {}

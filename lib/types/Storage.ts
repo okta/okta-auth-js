@@ -13,6 +13,7 @@
 import { TransactionMeta } from './Transaction';
 import { Cookies, CookieOptions } from './Cookies';
 import { RawIdxResponse } from '../idx/types/idx-js';
+import { IntrospectOptions } from '.';
 
 // for V1 authn interface: tx.resume()
 export interface TxStorage {
@@ -51,7 +52,12 @@ export interface TransactionStorage extends StorageProvider {
   getStorage(): TransactionMeta;
 }
 
-export interface SavedIdxResponse {
+export interface SavedIdxResponse extends
+  Pick<IntrospectOptions,
+    'stateHandle' |
+    'interactionHandle'
+  >
+{
   rawIdxResponse: RawIdxResponse;
   requestDidSucceed?: boolean;
 }
