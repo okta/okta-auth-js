@@ -570,6 +570,7 @@ describe('idx/interact', () => {
             'urls': expect.any(Object),
             'withCredentials': true,
           });
+
         });
         it('uses clientSecret from function options (overrides sdk option)', async () => {
           const { authClient } = testContext;
@@ -605,6 +606,100 @@ describe('idx/interact', () => {
             'state': 'tp-state',
             'urls': expect.any(Object),
             'withCredentials': true,
+          });
+        });
+
+      });
+
+      describe('maxAge', () => {
+        beforeEach(() => {
+          const { authParams } = testContext;
+          authParams.maxAge = 600;
+          const authClient = new OktaAuth(authParams);
+          testContext.authClient = authClient;
+        });
+
+        it('uses maxAge from SDK options', async () => {
+          const { authClient } = testContext;
+          const res = await interact(authClient);
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'authClient',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'authClient-state',
+              max_age: 600,
+            }),
+            withCredentials: true
+          });
+          expect(res).toEqual({
+            'interactionHandle': 'idx-interactionHandle',
+            'meta': {
+              'clientId': 'authClient-clientId',
+              'issuer': 'https://auth-js-test.okta.com',
+              'redirectUri': 'authClient-redirectUri',
+              'codeChallenge': 'tp-codeChallenge',
+              'codeChallengeMethod': 'tp-codeChallengeMethod',
+              'codeVerifier': 'tp-codeVerifier',
+              'interactionHandle': 'idx-interactionHandle',
+              'responseType': 'tp-responseType',
+              'scopes': [
+                'authClient',
+              ],
+              'state': 'authClient-state',
+              'maxAge': 600,
+              'withCredentials': true
+            },
+            'state': 'authClient-state',
+          });
+        });
+  
+        it('uses maxAge from function options (overrides sdk option)', async () => {
+          const { authClient } = testContext;
+          const res = await interact(authClient, { maxAge: 900 });
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'authClient',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'authClient-state',
+              max_age: 900,
+            }),
+            withCredentials: true
+          });
+          expect(res).toEqual({
+            'interactionHandle': 'idx-interactionHandle',
+            'meta': {
+              'clientId': 'authClient-clientId',
+              'issuer': 'https://auth-js-test.okta.com',
+              'redirectUri': 'authClient-redirectUri',
+              'codeChallenge': 'tp-codeChallenge',
+              'codeChallengeMethod': 'tp-codeChallengeMethod',
+              'codeVerifier': 'tp-codeVerifier',
+              'interactionHandle': 'idx-interactionHandle',
+              'responseType': 'tp-responseType',
+              'scopes': [
+                'authClient',
+              ],
+              'state': 'authClient-state',
+              'maxAge': 900,
+              'withCredentials': true
+            },
+            'state': 'authClient-state',
           });
         });
       });

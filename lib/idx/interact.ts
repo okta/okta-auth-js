@@ -30,6 +30,7 @@ export interface InteractParams {
   activation_token?: string;
   recovery_token?: string;
   client_secret?: string;
+  max_age?: string | number;
 }
 /* eslint-enable camelcase */
 
@@ -68,6 +69,7 @@ export async function interact (
     codeChallengeMethod,
     activationToken,
     recoveryToken,
+    maxAge
   } = meta as IdxTransactionMeta;
   const clientSecret = options.clientSecret || authClient.options.clientSecret;
   withCredentials = withCredentials ?? true;
@@ -81,19 +83,14 @@ export async function interact (
     code_challenge: codeChallenge,
     code_challenge_method: codeChallengeMethod,
     state,
+    ...(activationToken && { activation_token: activationToken }),
+    ...(recoveryToken && { recovery_token: recoveryToken }),
+    // X-Device-Token header need to pair with `client_secret`
+    // eslint-disable-next-line max-len
+    // https://oktawiki.atlassian.net/wiki/spaces/eng/pages/2445902453/Support+Device+Binding+in+interact#Scenario-1%3A-Non-User-Agent-with-Confidential-Client-(top-priority)
+    ...(clientSecret && { client_secret: clientSecret }),
+    ...(maxAge && { max_age: maxAge })
   } as InteractParams;
-  if (activationToken) {
-    params.activation_token = activationToken;
-  }
-  if (recoveryToken) {
-    params.recovery_token = recoveryToken;
-  }
-  if (clientSecret) {
-  // X-Device-Token header need to pair with `client_secret`
-  // eslint-disable-next-line max-len
-  // https://oktawiki.atlassian.net/wiki/spaces/eng/pages/2445902453/Support+Device+Binding+in+interact#Scenario-1%3A-Non-User-Agent-with-Confidential-Client-(top-priority)
-    params.client_secret = clientSecret;
-  }
   /* eslint-enable camelcase */
 
   const headers = {

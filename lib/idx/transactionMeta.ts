@@ -27,6 +27,7 @@ export async function createTransactionMeta(
     withCredentials = true,
     activationToken = undefined,
     recoveryToken = undefined,
+    maxAge = undefined,
   } = { ...authClient.options, ...options }; // local options override SDK options
 
   const meta: IdxTransactionMeta = {
@@ -35,6 +36,7 @@ export async function createTransactionMeta(
     withCredentials,
     activationToken,
     recoveryToken,
+    maxAge
   };
   return meta;
 }
