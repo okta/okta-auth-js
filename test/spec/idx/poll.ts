@@ -66,7 +66,6 @@ describe('idx/poll', () => {
         save: () => {},
         saveIdxResponse: () => {},
         loadIdxResponse: () => {},
-        clearIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)

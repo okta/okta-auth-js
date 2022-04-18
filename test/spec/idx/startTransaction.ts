@@ -58,7 +58,6 @@ describe('idx/startTransaction', () => {
         load: () => transactionMeta,
         clear: () => {},
         save: () => {},
-        clearIdxResponse: () => {},
         saveIdxResponse: () => {}
       },
       idx: {

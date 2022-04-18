@@ -112,7 +112,6 @@ describe('idx/authenticate', () => {
         clear: () => {},
         save: () => {},
         saveIdxResponse: () => {},
-        clearIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)

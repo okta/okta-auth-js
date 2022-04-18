@@ -96,7 +96,6 @@ describe('/idx/unlockAccout', () => {
         save: () => {},
         saveIdxResponse: () => {},
         loadIdxResponse: () => {},
-        clearIdxResponse: () => {}
       },
       token: {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)

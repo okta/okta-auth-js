@@ -731,7 +731,7 @@ describe('TransactionManager', () => {
     beforeEach(() => {
       createInstance();
     });
-    it('clears idxResponse storage', () => {
+    it('by default, clears idxResponse storage', () => {
       const { transactionManager, idxResponseStorage } = testContext;
       transactionManager.clearIdxResponse();
       expect(idxResponseStorage.clearStorage).toHaveBeenCalledWith();
