@@ -43,8 +43,6 @@ function getSampleFeatures() {
 
 function getConfig() {
   const issuer = process.env.ISSUER;
-  const orgName = issuer?.replace('https://', '').split('.').shift();
-  const orgUrl = issuer.indexOf('/oauth2') > 0 ? issuer.substring(0, issuer.indexOf('/oauth2')) : issuer;
   const clientId = process.env.SPA_CLIENT_ID || process.env.CLIENT_ID;
   const username = process.env.USERNAME;
   const password = process.env.PASSWORD;
@@ -52,8 +50,6 @@ function getConfig() {
   const clientSecret = process.env.WEB_CLIENT_SECRET || process.env.CLIENT_SECRET;
   const a18nAPIKey = process.env.A18N_API_KEY;
   const oktaAPIKey = process.env.OKTA_API_KEY;
-  const fbUsername = process.env.FB_USERNAME;
-  const fbPassword = process.env.FB_PASSWORD;
 
   const sampleName = process.env.SAMPLE_NAME;
   const sampleConfig = getSampleConfig();
@@ -61,13 +57,9 @@ function getConfig() {
     sampleName,
     sampleConfig,
     issuer,
-    orgUrl,
-    orgName,
     clientId: sampleConfig.appType === 'web' ? webClientId : clientId,
     username,
     password,
-    fbUsername,
-    fbPassword,
     clientSecret,
     a18nAPIKey,
     oktaAPIKey,

@@ -13,7 +13,6 @@
 
 
 import fetch from 'cross-fetch';
-import { getConfig } from '../../util/configUtils';
 import waitForOneSecond from '../wait/waitForOneSecond';
 
 const PROFILE_URL = 'https://api.a18n.help/v1/profile';
@@ -29,12 +28,16 @@ export declare interface A18nProfile {
   errorDescription?: string;
 }
 
-class A18nClient {
-  apiKey: string | undefined;
+export type A18nConfig = {
+  a18nAPIKey?: string;
+}
 
-  constructor() {
-    const { a18nAPIKey } = getConfig();
-    this.apiKey = a18nAPIKey ;
+export default class A18nClient {
+  apiKey?: string;
+
+  constructor(config: A18nConfig) {
+    const { a18nAPIKey } = config;
+    this.apiKey = a18nAPIKey;
     if (!this.apiKey) {
       throw new Error('A18N_API_KEY env variable is not defined');
     }
@@ -91,9 +94,8 @@ class A18nClient {
   }
 
   async createProfile(profileName?: string): Promise<A18nProfile|never> {
-    const { orgName } = getConfig();
     const profile = await this.postToURL(PROFILE_URL, {
-      displayName: profileName || `${orgName}`
+      displayName: profileName || 'javascript-idx-sdk'
     }, true) as unknown as A18nProfile;
 
     if (profile.errorDescription) {
@@ -156,5 +158,3 @@ class A18nClient {
     }
   }
 }
-
-export default new A18nClient();

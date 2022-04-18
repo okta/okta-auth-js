@@ -11,10 +11,10 @@
  */
 
 
-import a18nClient from '../management-api/a18nClient';
+import A18nClient from '../management-api/a18nClient';
 import clickElement from './clickElement';
 
-export default async function (profileId: string) {
+export default async function (a18nClient: A18nClient, profileId: string) {
   let retryResend = 3;
   let code = await a18nClient.getSMSCode(profileId);
   while (!code && retryResend-- > 0) {

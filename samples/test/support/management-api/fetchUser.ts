@@ -1,16 +1,13 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util/configUtils';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
-export default async function(username: string) {
-  const { 
-    orgUrl, 
-    oktaAPIKey,
-  } = getConfig();
-  const oktaClient = new Client({
-    orgUrl,
-    token: oktaAPIKey,
-  });
+type Options = {
+  username: string;
+}
 
+export default async function(config: OktaClientConfig, options: Options) {
+  const oktaClient = getOktaClient(config);
+
+  const { username } = options;
   const { value: user } = await oktaClient.listUsers({
     q: username
   }).next();

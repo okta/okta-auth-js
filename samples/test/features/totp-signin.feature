@@ -1,7 +1,8 @@
 Feature: TOTP Support (Google Authenticator) Sign In
 
   Background:
-    Given a Policy that defines "MFA Enrollment" with properties
+    Given an App that assigned to a test group
+      And a Policy that defines "MFA Enrollment" with properties
       | okta_password | REQUIRED |
       | google_otp    | REQUIRED |
       And with a Policy Rule that defines "MFA Enrollment Challenge"

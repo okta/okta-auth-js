@@ -25,9 +25,11 @@ get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 if [[ "${BACON_TASK}" == true ]]; then
   echo "Running tests against trexcloud org"
   export ISSUER=https://javascript-idx-sdk.trexcloud.com
+  export ISSUER_IDFIRST=https://javascript-idx-sdk-idfirst.trexcloud.com
   export CLIENT_ID=0oa3r1keeeFFb7VMG0g7
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_client_secret CLIENT_SECRET
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_org_api_key OKTA_API_KEY
+  get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_id MFA_CLIENT_ID
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_secret MFA_CLIENT_SECRET
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_id CUSTOM_CLIENT_ID
@@ -35,9 +37,11 @@ if [[ "${BACON_TASK}" == true ]]; then
 else
   echo "Running tests against production (ok12) org"
   export ISSUER=https://javascript-idx-sdk.okta.com
+  export ISSUER_IDFIRST=https://javascript-idx-sdk-idfirst.okta.com
   export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret CLIENT_SECRET
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key OKTA_API_KEY
+  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_mfa_client_id MFA_CLIENT_ID
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_mfa_client_secret MFA_CLIENT_SECRET
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_custom_client_id CUSTOM_CLIENT_ID

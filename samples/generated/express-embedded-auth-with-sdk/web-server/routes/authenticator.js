@@ -122,6 +122,29 @@ router.post('/enroll-authenticator/okta_email', async (req, res, next) => {
   handleTransaction({ req, res, next, authClient, transaction });
 });
 
+// Handle challenge authenticator -- password
+
+router.get('/challenge-authenticator/okta_password', (req, res) => {
+  renderPage({
+    req, res,
+    render: () => renderTemplate(req, res, 'authenticator', {
+      title: 'Enter your password',
+      input: {
+        type: 'password',
+        name: 'password',
+      },
+      action: '/challenge-authenticator/okta_password',
+    })
+  });
+});
+
+router.post('/challenge-authenticator/okta_password', async (req, res, next) => {
+  const { password } = req.body;
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ password });
+  handleTransaction({ req, res, next, authClient, transaction });
+});  
+
 // Handle enroll authenticator -- password
 router.get('/enroll-authenticator/okta_password', (req, res) => {
   renderPage({

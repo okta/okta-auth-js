@@ -1,13 +1,13 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util/configUtils';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
-export default async function(groupName: string) {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
+type Options = {
+  groupName: string;
+}
 
+export default async function(config: OktaClientConfig, options: Options) {
+  const oktaClient = getOktaClient(config);
+
+  const { groupName } = options;
   const { value: group } = await oktaClient.listGroups({
     q: groupName
   }).next();

@@ -1,5 +1,5 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { randomStr, getConfig } from '../../util';
+import { randomStr } from '../../util';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
 type Options = {
   policyDescription: string;
@@ -42,12 +42,21 @@ const getMFAEnrollmentPolicy = (options: Options) => {
   };
 };
 
-export default async function(options: Options) {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
+const getGlobalSessionPolicy = (options: Options) => {
+  return { 
+    type: 'OKTA_SIGN_ON',
+    conditions: {
+      people: {
+        groups: {
+          include: [options.groupId]
+        }
+      }
+    }
+  };
+};
+
+export default async function(config: OktaClientConfig, options: Options) {
+  const oktaClient = getOktaClient(config);
 
   let policyObject;
   const { policyDescription } = options;
@@ -57,6 +66,8 @@ export default async function(options: Options) {
     policyObject = getMFAEnrollmentPolicy(options);
   } else if (policyDescription === 'Profile Enrollment') {
     policyObject = getProfileEnrollmentPolicy();
+  } else if (policyDescription === 'Global Session') {
+    policyObject = getGlobalSessionPolicy(options);
   } else {
     throw new Error(`Unknow policy ${policyDescription}`);
   }

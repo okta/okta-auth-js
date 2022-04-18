@@ -1,19 +1,19 @@
-import { Application, Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util/configUtils';
+import { Application } from '@okta/okta-sdk-nodejs';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
+type Options = {
+  app: Application;
+  settings: Record<string, string>;
+}
 
-export default async function(app: Application, options: any) {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
+export default async function(config: OktaClientConfig, options: Options) {
+  const oktaClient = getOktaClient(config);
 
-  const orgUrl = config.issuer?.replace('/oauth2/default', '');
-  const url = `${orgUrl}/api/v1/internal/apps/${app.id}/settings/oidc`;
+  const { app, settings } = options;
+  const url = `${oktaClient.baseUrl}/api/v1/internal/apps/${app.id}/settings/oidc`;
   const body = {
     ...(app.settings as any).oauthClient,
-    ...options,
+    ...settings,
     label: app.label
   };
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

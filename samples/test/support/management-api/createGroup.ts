@@ -1,13 +1,8 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig, randomStr } from '../../util';
+import { randomStr } from '../../util';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
-export default async () => {
-  const config = getConfig();
-  const oktaClient = new Client({
-    orgUrl: config.orgUrl,
-    token: config.oktaAPIKey,
-  });
-
+export default async (config: OktaClientConfig) => {
+  const oktaClient = getOktaClient(config);
   const group = await oktaClient.createGroup({
     profile: {
       name: `TestGroup-${randomStr(6)}`

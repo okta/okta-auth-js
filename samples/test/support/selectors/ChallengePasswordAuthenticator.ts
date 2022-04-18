@@ -10,13 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { ChallengeAuthenticator } from './ChallengeAuthenticator';
 
-import ChallengeAuthenticator from '../../../selectors/ChallengeAuthenticator';
-import a18nClient from '../../../management-api/a18nClient';
-import setInputField from '../../setInputField';
-import ActionContext from '../../../context';
 
-export default async function (this: ActionContext) {
-  const code = await a18nClient.getEmailCode(this.credentials.profileId);
-  await setInputField('set', code, ChallengeAuthenticator.code);
+class ChallengePasswordAuthenticator extends ChallengeAuthenticator {
+  title = 'Enter your password';
 }
+
+export default new ChallengePasswordAuthenticator();

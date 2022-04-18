@@ -1,7 +1,8 @@
 Feature: Direct Auth Basic Login with Password Factor
 
   Background:
-    Given the app is granted "okta.myAccount.read" scope
+    Given an App that assigned to a test group
+      And the app is granted "okta.myAccount.read" scope
       And the app is granted "okta.myAccount.manage" scope
       And the app is granted "okta.myAccount.email.manage" scope
       And the app is granted "okta.myAccount.phone.manage" scope

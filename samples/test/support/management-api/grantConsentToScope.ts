@@ -1,13 +1,15 @@
-import { Client } from '@okta/okta-sdk-nodejs';
-import { getConfig } from '../../util';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
-export default async function(appId: string, scopeId: string) {
-  const { issuer, orgUrl, oktaAPIKey } = getConfig();
-  const oktaClient = new Client({
-    orgUrl,
-    token: oktaAPIKey,
-  });
+type Options = {
+  appId: string; 
+  scopeId: string;
+}
 
+export default async function(config: OktaClientConfig, options: Options) {
+  const { issuer } = config;
+  const oktaClient = getOktaClient(config);
+
+  const { appId, scopeId } = options;
   await oktaClient.grantConsentToScope(appId, {
     issuer, scopeId
   });

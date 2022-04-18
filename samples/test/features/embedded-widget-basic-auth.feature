@@ -1,7 +1,8 @@
 Feature: Basic Login with Embedded Sign In Widget
 
   Background:
-    Given the app is assigned to "Everyone" group
+    Given an App that assigned to a test group
+      And the app is assigned to "Everyone" group
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password as the only factor"
       And a predefined user named Mary with an account in the org

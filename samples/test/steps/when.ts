@@ -30,7 +30,6 @@ import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
 import enterIncorrectPhoneNumberFormat from '../support/action/enterIncorrectPhoneNumberFormat';
 import clickFacebookButton from '../support/action/clickFacebookButton';
 import clickLoginWithFacebookInWidget from '../support/action/clickLoginWithFacebookInWidget';
-import signInIntoFacebook from '../support/action/context-enabled/signInIntoFacebook';
 import clickLoginWithOktaOIDCIdPInWidget from '../support/action/clickLoginWithOktaOIDCIdPInWidget';
 import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
 import loginWidget from '../support/action/loginWidget';
@@ -46,7 +45,6 @@ import clickLink from '../support/action/clickLink';
 import setInputField from '../support/action/setInputField';
 import { camelize } from '../util';
 import getCodeFromSMS from '../support/action/getCodeFromSMS';
-import a18nClient from '../support/management-api/a18nClient';
 
 When(
   'she clicks the {string} button', 
@@ -86,11 +84,11 @@ When(
   async function(this: ActionContext, type: string) {
     let code = '';
     if (type === 'SMS') {
-      code = await getCodeFromSMS(this.credentials.profileId);
+      code = await getCodeFromSMS(this.a18nClient, this.credentials.profileId);
     } else if (type === 'Email') {
-      code = await a18nClient.getEmailCode(this.credentials.profileId);
+      code = await this.a18nClient.getEmailCode(this.credentials.profileId);
     } else if (type === 'Updated Email') {
-      code = await a18nClient.getEmailCode(this.secondCredentials.profileId);
+      code = await this.a18nClient.getEmailCode(this.secondCredentials.profileId);
     }
     await enterCode(code);
   }
@@ -177,13 +175,6 @@ When(
 When(
   /^she clicks the "Login with Facebook" button$/,
   clickFacebookButton
-);
-
-When(
-  /^logs in to Facebook$/,
-  async function(this: ActionContext) {
-    await signInIntoFacebook.call(this);
-  }
 );
 
 When(
