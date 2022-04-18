@@ -46,6 +46,7 @@ declare interface RunData {
   idxResponse?: IdxResponse;
   canceled?: boolean;
   interactionCode?: string;
+  shouldSaveResponse?: boolean;
   shouldClearTransaction?: boolean;
   clearSharedStorage?: boolean;
   terminal?: boolean;
@@ -208,6 +209,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
     status,
   } = data;
   const { exchangeCodeForTokens } = options;
+  let shouldSaveResponse = false;
   let shouldClearTransaction = false;
   let clearSharedStorage = true;
   let interactionCode;
@@ -218,6 +220,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
   let terminal;
 
   if (idxResponse) {
+    shouldSaveResponse = !!(idxResponse.requestDidSucceed || idxResponse.stepUp);
     enabledFeatures = getEnabledFeatures(idxResponse);
     availableSteps = getAvailableSteps(idxResponse);
     messages = getMessagesFromResponse(idxResponse);
@@ -226,7 +229,21 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
 
   if (terminal) {
     status = IdxStatus.TERMINAL;
-    shouldClearTransaction = true;
+
+    // In most cases a terminal response should not clear transaction data. The user should cancel or skip to continue.
+    // A terminal "success" is a non-error response with no further actions available.
+    // In these narrow cases, saved transaction data should be cleared.
+    // One example of a terminal success is when the email verify flow is continued in another tab
+    const hasActions = Object.keys(idxResponse!.actions).length > 0;
+    const hasErrors = !!messages.find(msg => msg.class === 'ERROR');
+    const isTerminalSuccess = !hasActions && !hasErrors && idxResponse!.requestDidSucceed === true;
+    if (isTerminalSuccess) {
+      shouldClearTransaction = true;
+    } else {
+      // only save response if there are actions available (ignore messages)
+      shouldSaveResponse = shouldSaveResponse && hasActions;
+    }
+    // leave shared storage intact so the transaction can be continued in another tab
     clearSharedStorage = false;
   } else if (canceled) {
     status = IdxStatus.CANCELED;
@@ -247,6 +264,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
     status,
     interactionCode,
     tokens,
+    shouldSaveResponse,
     shouldClearTransaction,
     clearSharedStorage,
     enabledFeatures,
@@ -293,6 +311,7 @@ export async function run(
   const {
     idxResponse,
     meta,
+    shouldSaveResponse,
     shouldClearTransaction,
     clearSharedStorage,
     status,
@@ -312,15 +331,16 @@ export async function run(
     // ensures state is saved to sessionStorage
     saveTransactionMeta(authClient, { ...meta });
 
-    if (idxResponse) {
+    if (shouldSaveResponse) {
       // Save intermediate idx response in storage to reduce introspect call
-      const { rawIdxState: rawIdxResponse, requestDidSucceed } = idxResponse;
+      const { rawIdxState: rawIdxResponse, requestDidSucceed } = idxResponse!;
       authClient.transactionManager.saveIdxResponse({
         rawIdxResponse,
-        requestDidSucceed
+        requestDidSucceed,
+        stateHandle: idxResponse!.context?.stateHandle,
+        interactionHandle: meta?.interactionHandle
       });
     }
-
   }
   
   // from idx-js, used by the widget

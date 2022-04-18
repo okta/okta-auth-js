@@ -75,13 +75,6 @@ export async function remediate(
     return { idxResponse };
   }
 
-  // Reach to terminal state
-  const terminal = isTerminalResponse(idxResponse);
-  const messages = getMessagesFromResponse(idxResponse);
-  if (terminal) {
-    return { idxResponse, terminal, messages };
-  }
-
   const remediator = getRemediator(neededToProceed, values, options);
 
   // Try actions in idxResponse first
@@ -129,6 +122,13 @@ export async function remediate(
         return remediate(idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
+  }
+
+  // Do not attempt to remediate if response is in terminal state
+  const terminal = isTerminalResponse(idxResponse);
+  const messages = getMessagesFromResponse(idxResponse);
+  if (terminal) {
+    return { idxResponse, terminal, messages };
   }
 
   if (!remediator) {

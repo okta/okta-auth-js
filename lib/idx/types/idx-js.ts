@@ -210,18 +210,26 @@ export interface IdxActions {
   [key: string]: (params?: IdxActionParams) => Promise<IdxResponse>;
 }
 
-// Object returned from auth-js
+export interface IdxToPersist {
+  interactionHandle?: string;
+  withCredentials?: boolean;
+}
+
+export interface IdxActionFunction {
+  (params: IdxActionParams): Promise<IdxResponse>;
+  neededParams?: Array<Array<IdxRemediationValue>>;
+}
+
 export interface IdxResponse {
   proceed: (remediationName: string, params: unknown) => Promise<IdxResponse>;
   neededToProceed: IdxRemediation[];
   rawIdxState: RawIdxResponse;
   interactionCode?: string;
   actions: IdxActions;
-  toPersist: {
-    interactionHandle?: string;
-  };
+  toPersist: IdxToPersist;
   context?: IdxContext;
   requestDidSucceed?: boolean;
+  stepUp?: boolean;
 }
 
 export function isIdxResponse(obj: any): obj is IdxResponse {

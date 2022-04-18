@@ -46,7 +46,7 @@ describe('idx/remediate', () => {
     const messages = ['fake'];
     jest.spyOn(util, 'isTerminalResponse').mockReturnValue(true);
     jest.spyOn(util, 'getMessagesFromResponse').mockReturnValue(messages);
-    const idxResponse = { fake: true } as unknown as IdxResponse;
+    const idxResponse = { fake: true, actions: {} } as unknown as IdxResponse;
     const res = await remediate(idxResponse, {}, {});
     expect(res).toEqual({
       idxResponse,
