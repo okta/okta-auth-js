@@ -2,21 +2,19 @@ import { Header, List, Divider, Button } from 'semantic-ui-react';
 import { useIdx } from '../IdxContext';
 
 export default function RemediationList () {
-  const { currentTransaction: curr, client, proceedWith } = useIdx();
+  const { currentTransaction: curr, proceedWithAction, proceedWithRem } = useIdx();
 
   const handleAction = (key) => {
-    if (curr) {
-      proceedWith(`actions.${key}`, curr.actions[key]);
-    }
+    proceedWithAction(key);
   };
 
   const handleRemediation = (name) => {
-    proceedWith(name, client.idx.proceed, [{step: name}]);
+    proceedWithRem(name);
   };
 
   const renderRemediationList = () => (
     <List>
-      {curr.neededToProceed.map(rem => (
+      {(curr.availableSteps || []).map(rem => (
         <List.Item key={rem.name}>
           <List.Content floated='right'>
             <Button size='mini' onClick={() => handleRemediation(rem.name)}>Proceed</Button>

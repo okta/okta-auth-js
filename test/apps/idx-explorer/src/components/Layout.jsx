@@ -2,6 +2,7 @@ import { Grid, Menu, Header, Button, Loader, Dimmer, Container, List, Divider, L
 import RemediationList from './RemediationList';
 import NetworkResponse from './NetworkResponse';
 import TransactionDisplay from './TransactionDisplay';
+import IdxForm from './IdxForm';
 
 import { useIdx } from '../IdxContext';
 
@@ -63,21 +64,23 @@ function MainPanel ({ loading }) {
       <Grid celled style={{height: '100%'}}>
         <Grid.Row>
           <Grid.Column width={3}>
-            <RemediationList />
+            Placeholder
           </Grid.Column>
           <Grid.Column width={8}>
+            <Header size='small' dividing>IdxTransaction</Header>
             <TransactionDisplay />
           </Grid.Column>
           <Grid.Column width={5}>
+            <Header size='small' dividing>Network Response</Header>
             <NetworkResponse />
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
-        <Grid.Column width={4}>
-            Form
+          <Grid.Column width={6}>
+            <RemediationList />
           </Grid.Column>
-          <Grid.Column>
-            JS
+          <Grid.Column width={6}>
+            <IdxForm />
           </Grid.Column>
         </Grid.Row>
       </Grid>
