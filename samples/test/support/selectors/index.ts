@@ -30,6 +30,7 @@ import ChallengeEmailAuthenticator from './ChallengeEmailAuthenticator';
 import ChallengePasswordAuthenticator from './ChallengePasswordAuthenticator';
 import EnrollPhoneAuthenticator from './EnrollPhoneAuthenticator';
 import EnrollEmailAuthenticator from './EnrollEmailAuthenticator';
+import EnrollSecurityQuestion from './EnrollSecurityQuestion';
 import ChallengePhoneAuthenticator from './ChallengePhoneAuthenticator';
 import ChallengeSecurityQuestion from './ChallengeSecurityQuestion';
 import ChallengeGoogleAuthenticator from './ChallengeGoogleAuthenticator';
@@ -54,6 +55,7 @@ const pages: { [key: string]: Page } = {
   'Challenge Password Authenticator': ChallengePasswordAuthenticator,
   'Enroll Factor: Enter SMS Code': EnrollPhoneAuthenticator,
   'Enroll Phone Authenticator': EnrollPhoneAuthenticator,
+  'Enroll security question authenticator': EnrollSecurityQuestion,
   'Reset Password': PasswordReset,
   'Root': Home,
   'Root Page': Home,

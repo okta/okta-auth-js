@@ -146,6 +146,29 @@ const getProfileEnrollmentPolicyActions = (description: string) => {
           ]
         }
       }
+    },
+    'collecting default attributes and a required "Age" and emailVerification is not required': {
+      'actions': {
+        'profileEnrollment': {
+          'access': 'ALLOW',
+          'unknownUserAction': 'REGISTER',
+          'activationRequirements': {
+            'emailVerification': false
+          },
+          'profileAttributes': [
+            {
+              'name': 'email',
+              'label': 'Email',
+              'required': true
+            },
+            {
+              'name': 'age',
+              'label': 'Age',
+              'required': true
+            },
+          ]
+        }
+      }
     }
   } as any)[description];
 };
