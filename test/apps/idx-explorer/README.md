@@ -1,4 +1,4 @@
-# Embedded Auth with SDKs React Sample Application
+# IDX Explorer Test App
 
 ## Introduction
 
@@ -32,50 +32,13 @@ These values must exist as environment variables. They can be exported in the sh
 
 ```ini
 ISSUER=https:///oauth2/default
-CLIENT_ID=123xxxxx123
+SPA_CLIENT_ID=123xxxxx123
 ```
 
 ### Commands
 
-If running from the workspace directory: `yarn workspace @okta/test.app.react-oie start`
+If running from the workspace directory: `yarn workspace @okta/test.app.idx-explorer start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
 | `yarn start`          | Starts the app server          |
-
-#### IDX Flow
-
-This sample only exposes limited idx flows from the UI, but you can still start flows with any idx public method that exposed from okta-auth-js by adding the `flowMethod` in url path.
-
-```
-http://localhost:8080/flow/{flowMethod}
-```
-
-
-### Develop The Sample Application
-
-#### Dependencies
-
-* @okta/okta-auth-js
-* @okta/okta-react
-* @okta/odyssey-react
-
-#### IDX State Machine
-
-`App.jsx` is the entry point of the whole app, it manages the transaction state of the whole app and shares it via React context. Based on the current transaction status, it also redirects the app to the proper routes.
-
-#### Profile Management
-
-The profile section can be accessed after user login, it's managed with `/myaccount` api.
-
-Required scopes:
-
-```
-okta.myAccount.read 
-
-okta.myAccount.manage
-```
-
-#### Support Other Authenticators/Remediations
-
-Form related UIs are dynamically rendered based on the transaction object. `GeneralForm.jsx` can handle most simple scenarios, you can opt-opt by changing `getFormComponent` method to render a custom form to handle some specific remediations.
