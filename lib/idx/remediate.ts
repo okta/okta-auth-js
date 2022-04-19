@@ -14,6 +14,7 @@
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
 import { RemediationValues } from './remediators';
+import { GenericRemediator } from './remediators/GenericRemediator';
 import { RemediateOptions, RemediationResponse } from './types';
 import { 
   IdxResponse,
@@ -75,7 +76,8 @@ export async function remediate(
     return { idxResponse };
   }
 
-  const remediator = getRemediator(neededToProceed, values, options);
+  // const remediator = getRemediator(neededToProceed, values, options);
+  const remediator = new GenericRemediator(neededToProceed[0], values);
 
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);

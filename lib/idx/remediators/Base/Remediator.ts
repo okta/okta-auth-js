@@ -156,7 +156,7 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
   }
 
   // Get inputs for the next step
-  private getInputs(): Input[] {
+  getInputs(): Input[] {
     const inputs: Input[] = [];
     const inputsFromRemediation = this.remediation.value || [];
     inputsFromRemediation.forEach(inputFromRemediation => {

@@ -35,3 +35,10 @@ export function getAuthenticatorFromRemediation(
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return remediation.value!.find(({ name }) => name === 'authenticator') as IdxRemediationValue;
 }
+
+// some remediation value is missing "required" field from idx response
+// mapper function to add "required" field for remediation value that missing it in the idx response
+// export function addRequiredField(value: IdxRemediationValue): IdxRemediationValue {
+//   const requiredValues = ['authenticator']
+//   if ()
+// }
