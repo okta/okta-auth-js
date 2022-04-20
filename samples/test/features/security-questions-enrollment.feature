@@ -2,7 +2,7 @@ Feature: Security Questions
 
   Background:
     Given a Policy that defines "Profile Enrollment"
-      And with a Policy Rule that defines 'collecting default attributes and a required "Age" and emailVerification is not required'
+      And with a Policy Rule that defines 'collecting default attributes and emailVerification is not required'
       And a Policy that defines "MFA Enrollment" with properties
         | okta_password     | REQUIRED |
         | security_question | REQUIRED |
@@ -16,19 +16,18 @@ Feature: Security Questions
     When she fills out her First Name
       And she fills out her Last Name
       And she fills out her Email
-      And she fills out her Age
       And she submits the form
     Then she is redirected to the "Select Authenticator" page
     When she selects the "Password" factor
       And she submits the form
-    Then she sees the set new password form
+    Then she is redirected to the "Set up Password" page
       And she fills out her Password
       And she confirms her Password
       And she submits the form
     Then she is redirected to the "Select Authenticator" page
     When she selects the "Security Question" factor
       And she submits the form
-    Then she sees a screen to "Set up security question"
+    Then she is redirected to the "Enroll security question authenticator" page
       And she sees a radio option to "Choose a Security Question" or "Create my own security question"
       And the option "Choose a Security Question" is selected
     When she selects the radio option to "Create my own security question"

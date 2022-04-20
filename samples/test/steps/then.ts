@@ -204,22 +204,17 @@ Then(
 );
 
 Then(
-  /^she sees a screen to "Set up security question"$/,
-  () => checkIsOnPage('Enroll security question authenticator')
-);
-
-Then(
   /^she sees the set new password form$/,
   () => checkIsOnPage('Set up Password')
 );
 
 Then(
-  /^she sees a radio option to "(?<option1>.+?)" or "(?<option2>.+?)"$/,
+  'she sees a radio option to {string} or {string}',
   (option1: string, option2: string) => checkEnrollMethods([option1, option2])
 );
 
 Then(
-  /^the option "(?<option>.+?)" is selected$/,
+  'the option {string} is selected',
   (option: string) => checkSelectedEnrollMethod(option)
 );
 
@@ -229,12 +224,12 @@ Then(
 );
 
 Then(
-  /^she enters "(?<text>.+?)" in the question$/,
+  'she enters {string} in the question',
   (text: string) => enterCustomQuestion(text)
 );
 
 Then(
-  /^she enters "(?<text>.+?)" in the answer$/,
+  'she enters {string} in the answer',
   (text: string) => enterQuestionAnswer(text)
 );
 

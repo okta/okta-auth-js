@@ -96,7 +96,7 @@ When(
 );
 
 When(
-  /^she selects the radio option to "(?<option>.+?)"$/,
+  'she selects the radio option to {string}',
   (option: string) => selectEnrollMethod(option)
 );
 
