@@ -29,9 +29,11 @@ const FlowPage = () => {
   }, [flow, transaction, startFlow]);
 
   const backToHomePage = async () => {
+    // clear `flow` param to break the transaction update loop
+    history.replace('/');
+
     await oktaAuth.idx.cancel();
     setTransaction(null);
-    history.replace('/');
   };
 
   const getFormComponent = () => {

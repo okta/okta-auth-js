@@ -429,7 +429,7 @@ describe('idx/authenticate', () => {
           name: 'identify',
           inputs: [{
             name: 'username',
-            label: 'Username'
+            label: 'Username',
           }]
         });
 
@@ -444,8 +444,12 @@ describe('idx/authenticate', () => {
             value: 'okta_password' 
           }],
           inputs: [{
-            key: 'string',
-            name: 'authenticator'
+            type: 'string',
+            name: 'authenticator',
+            options: [{ 
+              label: 'Password',
+              value: 'okta_password' 
+            }]
           }]
         });
 
@@ -712,7 +716,15 @@ describe('idx/authenticate', () => {
                 type: 'phone',
               },
               inputs: [
-                { name: 'methodType', type: 'string', required: true }
+                { 
+                  name: 'methodType', 
+                  type: 'string', 
+                  required: true,
+                  options: [
+                    { label: 'SMS', value: 'sms' },
+                    { label: 'Voice call', value: 'voice' },
+                  ]
+                }
               ],
               options: [
                 { label: 'SMS', value: 'sms' },
@@ -976,7 +988,15 @@ describe('idx/authenticate', () => {
                 type: 'phone',
               },
               inputs: [
-                { name: 'methodType', type: 'string', required: true },
+                { 
+                  name: 'methodType', 
+                  type: 'string', 
+                  required: true,
+                  options: [
+                    { label: 'SMS', value: 'sms' },
+                    { label: 'Voice call', value: 'voice' },
+                  ]
+                },
                 { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
               ],
               options: [
@@ -1066,7 +1086,15 @@ describe('idx/authenticate', () => {
                 type: 'phone',
               },
               inputs: [
-                { name: 'methodType', type: 'string', required: true },
+                { 
+                  name: 'methodType', 
+                  type: 'string', 
+                  required: true, 
+                  options: [
+                    { label: 'SMS', value: 'sms' },
+                    { label: 'Voice call', value: 'voice' }
+                  ], 
+                },
                 { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
               ],
               options: [
@@ -2095,6 +2123,14 @@ describe('idx/authenticate', () => {
       expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', expect.any(Object));
       expect(response.nextStep).toMatchObject({
         name: 'select-authenticator-enroll',
+        inputs: [{
+          name: 'authenticator',
+          type: 'string',
+          options: [{
+            label: 'Email',
+            value: AuthenticatorKey.OKTA_EMAIL
+          }],  
+        }],
         options: [{
           label: 'Email',
           value: AuthenticatorKey.OKTA_EMAIL

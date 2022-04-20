@@ -61,6 +61,7 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
       .some(data => compareAuthenticators(this.authenticator, data));
   }
 
+  // TODO: remove this override method in the next major version - OKTA-491236
   getNextStep() {
     const common = super.getNextStep();
     const options = this.getMethodTypes();

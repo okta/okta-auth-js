@@ -195,7 +195,9 @@ This field contains information to proceed with the next step. It's available wh
   const transaction = await authClient.idx.authenticate({ username: 'from user input' });
   ```
 
-- `options?`: This field is available in response when the input is a selection. It can also provide information for how to build UI for the next step.
+- `options?` (**deprecated**): 
+**warning: This field has been deprecated and will be removed in the next major version (v7). `input` related options can still be found within `input`'s scope.**
+This field is available in response when the input is a selection. It can also provide information for how to build UI for the next step.
 
 ###### `tokens?`
 

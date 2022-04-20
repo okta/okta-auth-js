@@ -252,7 +252,15 @@ describe('idx/recoverPassword', () => {
         nextStep: {
           name: 'select-authenticator-authenticate',
           inputs: [
-            { key: 'string', name: 'authenticator' }
+            { 
+              type: 'string', 
+              name: 'authenticator',
+              options: [
+                { label: 'Okta Verify', value: 'okta_verify' },
+                { label: 'Phone', value: 'phone_number' },
+                { label: 'Email', value: 'okta_email' }
+              ] 
+            }
           ],
           options: [
             { label: 'Okta Verify', value: 'okta_verify' },
@@ -530,7 +538,15 @@ describe('idx/recoverPassword', () => {
         nextStep: {
           name: 'select-authenticator-authenticate',
           inputs: [
-            { key: 'string', name: 'authenticator' }
+            { 
+              type: 'string', 
+              name: 'authenticator',
+              options: [
+                { label: 'Okta Verify', value: 'okta_verify' },
+                { label: 'Phone', value: 'phone_number' },
+                { label: 'Email', value: 'okta_email' }
+              ]    
+            }
           ],
           options: [
             { label: 'Okta Verify', value: 'okta_verify' },

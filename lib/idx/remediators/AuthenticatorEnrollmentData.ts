@@ -33,11 +33,14 @@ export class AuthenticatorEnrollmentData extends AuthenticatorData<Authenticator
     };
   }
 
-  getInputAuthenticator() {
+  getInputAuthenticator(remediation) {
     return [
-      { name: 'methodType', type: 'string', required: true },
-      { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
-    ];
+      { name: 'methodType', type: 'string' }, 
+      { name: 'phoneNumber', label: 'Phone Number', type: 'string' }
+    ].map(item => {
+      const value = remediation.form.value.find(val => val.name === item.name);
+      return { ...value, ...item };
+    });
   }
 
   protected mapAuthenticatorDataFromValues(data?) {
