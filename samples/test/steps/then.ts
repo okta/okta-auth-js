@@ -219,7 +219,7 @@ Then(
 );
 
 Then(
-  /^she sees the dropdown list change to an input box to "Create my own security question"$/,
+  'she sees the dropdown list change to an input box to "Create my own security question"',
   () => checkCustomSecurityQuestion()
 );
 
