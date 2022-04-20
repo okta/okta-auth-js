@@ -2130,7 +2130,7 @@ describe('idx/register', () => {
       expect(enrollmentChannelDataSmsResponse.proceed).toHaveBeenCalled();
     });
 
-    it.only('can enroll via email link', async () => {
+    it('can enroll via email link', async () => {
       const {
         authClient,
         selectAuthenticatorResponse,
