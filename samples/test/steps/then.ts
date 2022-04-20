@@ -30,6 +30,11 @@ import checkEqualsText from '../support/check/checkEqualsText';
 import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
 import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
 import { camelize } from '../util';
+import checkEnrollMethods from '../support/check/checkEnrollMethods';
+import checkSelectedEnrollMethod from '../support/check/checkSelectedEnrollMethod';
+import checkCustomSecurityQuestion from '../support/check/checkCustomSecurityQuestion';
+import enterCustomQuestion from '../support/action/enterCustomQuestion';
+import enterQuestionAnswer from '../support/action/enterQuestionAnswer';
 
 Then('she is redirected to the {string} page', checkIsOnPage);
 
@@ -201,6 +206,31 @@ Then(
 Then(
   /^she sees the set new password form$/,
   () => checkIsOnPage('Set up Password')
+);
+
+Then(
+  'she sees a radio option to {string} or {string}',
+  (option1: string, option2: string) => checkEnrollMethods([option1, option2])
+);
+
+Then(
+  'the option {string} is selected',
+  (option: string) => checkSelectedEnrollMethod(option)
+);
+
+Then(
+  'she sees the dropdown list change to an input box to "Create my own security question"',
+  () => checkCustomSecurityQuestion()
+);
+
+Then(
+  'she enters {string} in the question',
+  (text: string) => enterCustomQuestion(text)
+);
+
+Then(
+  'she enters {string} in the answer',
+  (text: string) => enterQuestionAnswer(text)
 );
 
 Then(
