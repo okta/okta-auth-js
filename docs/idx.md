@@ -196,7 +196,7 @@ This field contains information to proceed with the next step. It's available wh
   ```
 
 - `options?` (**deprecated**): 
-**warning: This field has been deprecated and will be removed in the next major version (v7). `input` related options can still be found within `input`'s scope.**
+**warning: This field has been deprecated and will be removed in the next major version (v7). Current options can still be found within related input's scope.**
 This field is available in response when the input is a selection. It can also provide information for how to build UI for the next step.
 
 ###### `tokens?`
