@@ -5,6 +5,7 @@
 ### Features
 
 - [#1186](https://github.com/okta/okta-auth-js/pull/1186) Supports `maxAge` param in interaction code flow. This parameter can be passed in from either SDK level options or `idx.interact` options.
+- [#1189](https://github.com/okta/okta-auth-js/pull/1189) IDX: includes `options` field in `inputs` scope, and deprecated top level `options` from `nextStep` field of the response (removal will happen in the next major version).
 
 ## 6.4.3
 
