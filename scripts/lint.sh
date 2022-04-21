@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
@@ -13,6 +13,14 @@ fi
 if ! yarn lint:report; then
   echo "lint failed! Exiting..."
   exit ${TEST_FAILURE}
+fi
+
+mkdir -p ${TEST_RESULT_FILE_DIR}
+if ! yarn verify:package 2> ${TEST_RESULT_FILE_DIR}/verify-package-error.log; then
+  echo "verify package failed! Exiting..."
+  value=`cat ${TEST_RESULT_FILE_DIR}/verify-package-error.log`
+  log_custom_message "Verification Failed" "${value}"
+  exit ${PUBLISH_TYPE_AND_RESULT_DIR_BUT_ALWAYS_FAIL}
 fi
 
 echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}

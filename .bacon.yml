@@ -1,7 +1,14 @@
 test_suites:
-    - name: lint
+    - name: publish
       script_path: ../okta-auth-js/scripts
       sort_order: '1'
+      timeout: '60'
+      script_name: publish
+      criteria: MERGE
+      queue_name: small
+    - name: lint
+      script_path: ../okta-auth-js/scripts
+      sort_order: '2'
       timeout: '60'
       script_name: lint
       criteria: MERGE
@@ -81,13 +88,6 @@ test_suites:
       sort_order: '12'
       timeout: '20'
       script_name: e2e-react-oie
-      criteria: MERGE
-      queue_name: small
-    - name: publish
-      script_path: ../okta-auth-js/scripts
-      sort_order: '13'
-      timeout: '60'
-      script_name: publish
       criteria: MERGE
       queue_name: small
     # Sauce labs tests are flaky due to the free account we are currently using
