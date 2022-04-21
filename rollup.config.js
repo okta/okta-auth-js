@@ -50,19 +50,19 @@ const getPlugins = (env) => {
       }
     }),
     // not add @babel/runtime import for development
-    (process.env.NODE_ENV !== 'development' && babel({
-      babelHelpers: 'runtime',
-      presets: [
-        '@babel/preset-env'
-      ],
-      plugins: [
-        // https://babeljs.io/docs/en/babel-plugin-transform-runtime#corejs
-        ['@babel/plugin-transform-runtime', { 
-          corejs: 3 
-        }],
-      ],
-      extensions
-    })),
+    // (process.env.NODE_ENV !== 'development' && babel({
+    //   babelHelpers: 'runtime',
+    //   presets: [
+    //     '@babel/preset-env'
+    //   ],
+    //   plugins: [
+    //     // https://babeljs.io/docs/en/babel-plugin-transform-runtime#corejs
+    //     ['@babel/plugin-transform-runtime', { 
+    //       corejs: 3 
+    //     }],
+    //   ],
+    //   extensions
+    // })),
     cleanup({ 
       extensions,
       comments: 'none'
@@ -85,9 +85,10 @@ export default [
     output: [
       {
         format: 'esm',
-        file: 'build/esm/esm.browser.js',
+        dir: 'build/esm/browser',
         exports: 'named',
-        sourcemap: true
+        sourcemap: true,
+        preserveModules: true,
       },
       // not emit test bundle for development
       (process.env.NODE_ENV !== 'development' && {
@@ -107,9 +108,10 @@ export default [
     output: [
       {
         format: 'esm',
-        file: 'build/esm/esm.node.mjs',
+        dir: 'build/esm/node',
         exports: 'named',
-        sourcemap: true
+        sourcemap: true,
+        preserveModules: true,
       }
     ]
   }

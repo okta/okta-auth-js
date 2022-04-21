@@ -6,16 +6,16 @@
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "build/cjs/index.js",
-  "module": "build/esm/esm.node.mjs",
+  "module": "build/esm/node",
   "browser": "build/dist/okta-auth-js.umd.js",
   "types": "build/lib/index.d.ts",
   "exports": {
     "node": {
-      "import": "./build/esm/esm.node.mjs",
+      "import": "./build/esm/node/index.js",
       "require": "./build/cjs/index.js"
     },
     "browser": {
-      "import": "./build/esm/esm.browser.js"
+      "import": "./build/esm/browser/index.js"
     },
     "default": "./build/dist/okta-auth-js.umd.js"
   },
