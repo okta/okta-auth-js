@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
@@ -19,7 +19,7 @@ if ! yarn verify:package 2> ${TEST_RESULT_FILE_DIR}/verify-package-error.log; th
   echo "verify package failed! Exiting..."
   value=`cat ${TEST_RESULT_FILE_DIR}/verify-package-error.log`
   log_custom_message "Verification Failed" "${value}"
-  exit ${TEST_FAILURE}
+  exit ${PUBLISH_TYPE_AND_RESULT_DIR_BUT_ALWAYS_FAIL}
 fi
 
 echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
