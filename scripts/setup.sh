@@ -1,5 +1,10 @@
 #!/bin/bash -xe
 
+# Can be used to run a canary build against a beta AuthJS version that has been published to artifactory.
+# This is available from the "downstream artifact" menu on any okta-auth-js build in Bacon.
+# DO NOT MERGE ANY CHANGES TO THIS LINE!!
+export WIDGET_VERSION=""
+
 # Add yarn to the $PATH so npm cli commands do not fail
 export PATH="${PATH}:$(yarn global bin)"
 
@@ -9,6 +14,18 @@ NODE_VERSION="${1:-v12.22.0}"
 setup_service node $NODE_VERSION
 
 cd ${OKTA_HOME}/${REPO}
+
+if [ ! -z "$WIDGET_VERSION" ]; then
+  echo "Installing WIDGET_VERSION: ${WIDGET_VERSION}"
+  npm config set strict-ssl false
+
+  if ! yarn add -DW --force https://artifacts.aue1d.saasure.com/artifactory/npm-topic/@okta/okta-signin-widget/-/@okta/okta-signin-widget-${WIDGET_VERSION}.tgz ; then
+    echo "WIDGET_VERSION could not be installed: ${WIDGET_VERSION}"
+    exit ${FAILED_SETUP}
+  fi
+  
+  echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
+fi
 
 # Yarn does not utilize the npmrc/yarnrc registry configuration
 # if a lockfile is present. This results in `yarn install` problems
