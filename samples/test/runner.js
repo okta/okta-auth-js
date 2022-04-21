@@ -51,9 +51,9 @@ function runWithConfig(sampleConfig) {
     'start'
   ], { 
     stdio: 'inherit',
-    env: {
+    env: Object.assign({}, process.env, {
       SELF_HOSTED_WIDGET: '1' // ensure we are testing beta widgets if installed
-    }
+    })
   });
 
   waitOn({
