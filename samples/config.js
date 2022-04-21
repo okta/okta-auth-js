@@ -106,6 +106,7 @@ const samples = [
       'totp-signup',
       'totp-signin',
       'security-questions-enrollment',
+      'self-service-registration-password-optional',
     ],
     useEnv: true,
   },
