@@ -59,7 +59,7 @@
     "build:types": "tsc --emitDeclarationOnly",
     "generate:samples": "yarn workspace @okta/samples build && yarn install --ignore-scripts",
     "dev:samples": "yarn workspace @okta/samples dev",
-    "prepare": "yarn build",
+    "prepare": "yarn build && husky install",
     "start": "yarn workspace @okta/test.app start --open",
     "stop": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true"
   },
@@ -133,11 +133,13 @@
     "eslint-plugin-jsdoc": "^25.4.2",
     "eslint-plugin-node": "^11.1.0",
     "globby": "^6.1.0",
+    "husky": ">=6",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-ajax": "^4.0.0",
     "jest": "^27.5.1",
     "jest-junit": "^13.0.0",
     "json-loader": "0.5.4",
+    "lint-staged": ">=10",
     "lodash": "4.17.20",
     "rollup": "^2.59.0",
     "rollup-plugin-cleanup": "^3.2.1",
@@ -185,5 +187,8 @@
         ]
       }
     }
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx,cjs,mjs}": ["eslint --fix"]
   }
 }

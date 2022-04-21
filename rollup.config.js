@@ -37,7 +37,6 @@ const getPlugins = (env) => {
       ]
     })),
     typescript({
-      // eslint-disable-next-line node/no-unpublished-require
       typescript: require('typescript'),
       tsconfigOverride: {
         compilerOptions: {
