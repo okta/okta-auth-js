@@ -12,6 +12,8 @@ export PATH="${PATH}:$(yarn global bin)"
 export NVM_DIR="/root/.nvm"
 NODE_VERSION="${1:-v12.22.0}"
 setup_service node $NODE_VERSION
+# Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
+setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
 
 cd ${OKTA_HOME}/${REPO}
 
@@ -27,29 +29,11 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
 fi
 
-# Yarn does not utilize the npmrc/yarnrc registry configuration
-# if a lockfile is present. This results in `yarn install` problems
-# for private registries. Until yarn@2.0.0 is released, this is our current
-# workaround.
-#
-# Related issues:
-#  - https://github.com/yarnpkg/yarn/issues/5892
-#  - https://github.com/yarnpkg/yarn/issues/3330
-
-YARN_REGISTRY=https://registry.yarnpkg.com
-OKTA_REGISTRY=${ARTIFACTORY_URL}/api/npm/npm-okta-master
-
-# Replace yarn artifactory with Okta's
-sed -i "s#${YARN_REGISTRY}#${OKTA_REGISTRY}#g" yarn.lock
-
 # Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
 if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
-
-# Revert the original change
-sed -i "s#${OKTA_REGISTRY}#${YARN_REGISTRY}#" yarn.lock
 
 # Build
 if ! yarn build; then

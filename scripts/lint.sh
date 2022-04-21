@@ -15,6 +15,13 @@ if ! yarn lint:report; then
   exit ${TEST_FAILURE}
 fi
 
+if ! yarn verify:package 2> ${TEST_RESULT_FILE_DIR}/verify-package-error.log; then
+  echo "verify package failed! Exiting..."
+  value=`cat ${TEST_RESULT_FILE_DIR}/verify-package-error.log`
+  log_custom_message "Verification Failed" "${value}"
+  exit ${TEST_FAILURE}
+fi
+
 echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
 echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
 exit ${PUBLISH_TYPE_AND_RESULT_DIR_BUT_SUCCEED_IF_NO_RESULTS}
