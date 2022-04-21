@@ -5,6 +5,11 @@ Feature: Login with Identifier First
       And an App that assigned to a test group
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Any one factor"
+      And a Policy that defines "Profile Enrollment"
+      And with a Policy Rule that defines "collecting default attributes and emailVerification is not required"
+      And a Policy that defines "MFA Enrollment" with properties
+        | okta_password | OPTIONAL |
+        | okta_email    | REQUIRED |
       And a user named "Mary"
       And she has an account with "active" state in the org
 
