@@ -401,7 +401,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Password',
+              value: AuthenticatorKey.OKTA_PASSWORD
+            }]
           }],
           options: [{
             label: 'Password',
@@ -460,7 +464,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Password',
+              value: AuthenticatorKey.OKTA_PASSWORD
+            }]
           }],
           options: [{
             label: 'Password',
@@ -511,7 +519,26 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }, {
+              label: 'Email',
+              value: AuthenticatorKey.OKTA_EMAIL
+            }, {
+              label: 'Google Authenticator',
+              value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+            }, {
+              label: 'Security Question',
+              value: AuthenticatorKey.SECURITY_QUESTION
+            }, {
+              label: 'Okta Verify',
+              value: AuthenticatorKey.OKTA_VERIFY
+            }, {
+              label: 'Security Key or Biometric',
+              value: AuthenticatorKey.WEBAUTHN
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -562,7 +589,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Password',
+              value: AuthenticatorKey.OKTA_PASSWORD
+            }]
           }],
           options: [{
             label: 'Password',
@@ -587,7 +618,26 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }, {
+              label: 'Email',
+              value: AuthenticatorKey.OKTA_EMAIL
+            }, {
+              label: 'Google Authenticator',
+              value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+            }, {
+              label: 'Security Question',
+              value: AuthenticatorKey.SECURITY_QUESTION
+            }, {
+              label: 'Okta Verify',
+              value: AuthenticatorKey.OKTA_VERIFY
+            }, {
+              label: 'Security Key or Biometric',
+              value: AuthenticatorKey.WEBAUTHN
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -687,7 +737,26 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }, {
+              label: 'Email',
+              value: AuthenticatorKey.OKTA_EMAIL
+            }, {
+              label: 'Google Authenticator',
+              value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+            }, {
+              label: 'Security Question',
+              value: AuthenticatorKey.SECURITY_QUESTION
+            }, {
+              label: 'Okta Verify',
+              value: AuthenticatorKey.OKTA_VERIFY
+            }, {
+              label: 'Security Key or Biometric',
+              value: AuthenticatorKey.WEBAUTHN
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -803,7 +872,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -1057,7 +1130,15 @@ describe('idx/register', () => {
             type: 'phone',
           },
           inputs: [
-            { name: 'methodType', type: 'string', required: true },
+            { 
+              name: 'methodType', 
+              type: 'string', 
+              required: true,
+              options: [
+                { label: 'SMS', value: 'sms' },
+                { label: 'Voice call', value: 'voice' },
+              ]
+            },
             { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
           ],
           options: [
@@ -1262,7 +1343,15 @@ describe('idx/register', () => {
             type: 'phone',
           },
           inputs: [
-            { name: 'methodType', type: 'string', required: true },
+            { 
+              name: 'methodType', 
+              type: 'string', 
+              required: true,
+              options: [
+                { label: 'SMS', value: 'sms' },
+                { label: 'Voice call', value: 'voice' },
+              ]
+            },
             { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' }
           ],
           options: [
@@ -1354,7 +1443,26 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }, {
+              label: 'Email',
+              value: AuthenticatorKey.OKTA_EMAIL
+            }, {
+              label: 'Google Authenticator',
+              value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+            }, {
+              label: 'Security Question',
+              value: AuthenticatorKey.SECURITY_QUESTION
+            }, {
+              label: 'Okta Verify',
+              value: AuthenticatorKey.OKTA_VERIFY
+            }, {
+              label: 'Security Key or Biometric',
+              value: AuthenticatorKey.WEBAUTHN
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -1481,7 +1589,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -1584,7 +1696,26 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }, {
+              label: 'Email',
+              value: AuthenticatorKey.OKTA_EMAIL
+            }, {
+              label: 'Google Authenticator',
+              value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+            }, {
+              label: 'Security Question',
+              value: AuthenticatorKey.SECURITY_QUESTION
+            }, {
+              label: 'Okta Verify',
+              value: AuthenticatorKey.OKTA_VERIFY
+            }, {
+              label: 'Security Key or Biometric',
+              value: AuthenticatorKey.WEBAUTHN
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -1735,7 +1866,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -1820,7 +1955,11 @@ describe('idx/register', () => {
           name: 'select-authenticator-enroll',
           inputs: [{
             name: 'authenticator',
-            key: 'string',
+            type: 'string',
+            options: [{
+              label: 'Phone',
+              value: AuthenticatorKey.PHONE_NUMBER
+            }]
           }],
           options: [{
             label: 'Phone',
@@ -2143,7 +2282,26 @@ describe('idx/register', () => {
         name: 'select-authenticator-enroll',
         inputs: [{
           name: 'authenticator',
-          key: 'string',
+          type: 'string',
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }, {
+            label: 'Email',
+            value: AuthenticatorKey.OKTA_EMAIL
+          }, {
+            label: 'Google Authenticator',
+            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
+          }, {
+            label: 'Security Question',
+            value: AuthenticatorKey.SECURITY_QUESTION
+          }, {
+            label: 'Okta Verify',
+            value: AuthenticatorKey.OKTA_VERIFY
+          }, {
+            label: 'Security Key or Biometric',
+            value: AuthenticatorKey.WEBAUTHN
+          }]
         }],
         options: [{
           label: 'Phone',
@@ -2293,7 +2451,11 @@ describe('idx/register', () => {
         name: 'select-authenticator-enroll',
         inputs: [{
           name: 'authenticator',
-          key: 'string',
+          type: 'string',
+          options: [{
+            label: 'Phone',
+            value: AuthenticatorKey.PHONE_NUMBER
+          }]
         }],
         options: [{
           label: 'Phone',
@@ -2329,7 +2491,13 @@ describe('idx/register', () => {
           inputs: [
             {
               name: 'authenticator',
-              key: 'string',
+              type: 'string',
+              options: [
+                { 
+                  label: 'Phone', 
+                  value: AuthenticatorKey.PHONE_NUMBER 
+                }
+              ],
             },
           ],
           name: 'select-authenticator-enroll',

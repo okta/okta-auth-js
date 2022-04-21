@@ -24,19 +24,21 @@ const inputTransformer = nextStep => form => {
 };
 
 const selectTransformer = nextStep => form => {
-  const { inputs, options } = nextStep;
+  const { inputs } = nextStep;
   
-  if (!options) {
-    return form;
-  }
-
-  return {
-    ...form,
-    select: {
-      name: inputs[0].name,
-      options: options.map(({ label, value }) => ({ key: value, value, label }))
+  return inputs.reduce((acc, { name, options }) => {
+    if (!options) {
+      return acc;
     }
-  };
+    if (!acc.selects) {
+      acc.selects = [];
+    }
+    acc.selects.push({
+      name,
+      options: options.map(({ label, value }) => ({ key: value, value, label }))
+    });
+    return acc;
+  }, form);
 };
 
 const securityQuestionTransformer = nextStep => form => {

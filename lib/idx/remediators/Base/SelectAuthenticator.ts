@@ -64,6 +64,7 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     return false;
   }
 
+  // TODO: remove this override method in the next major version - OKTA-491236
   getNextStep() {
     const common = super.getNextStep();
     const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
@@ -96,8 +97,14 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     };
   }
 
-  getInputAuthenticator() {
-    return { name: 'authenticator', key: 'string' };
+  getInputAuthenticator(remediation) {
+    const options = remediation.options.map(({ label, relatesTo }) => {
+      return {
+        label,
+        value: relatesTo.key
+      };
+    });
+    return { name: 'authenticator', type: 'string', options };
   }
 
   getValuesAfterProceed(): T {

@@ -64,7 +64,12 @@ export class AuthenticatorVerificationData extends AuthenticatorData<Authenticat
     const methodType = authenticator.form!.value.find(({ name }) => name === 'methodType');
     // if has methodType in form, let user select the methodType
     if (methodType && methodType.options) {
-      return { name: 'methodType', type: 'string', required: true };
+      return { 
+        name: 'methodType', 
+        type: 'string', 
+        required: true, 
+        options: methodType.options 
+      };
     }
     // no methodType, then return form values
     const inputs = [...authenticator.form!.value];
