@@ -32,13 +32,20 @@ export default defineConfig({
       }
     }
   },
+  optimizeDeps: {
+    exclude: [
+      '@peculiar/webcrypto'
+    ]
+  },
   build: {
     sourcemap: true,
     rollupOptions: {
-      plugins: [visualizer({
-        filename: 'dist/stats.html',
-        gzipSize: true
-      })]
+      plugins: [
+        visualizer({
+          filename: 'dist/stats.html',
+          gzipSize: true
+        })
+      ]
     }
   }
 });
