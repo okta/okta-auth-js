@@ -28,7 +28,7 @@ const output = {
   exports: 'named',
   sourcemap: true,
   preserveModules: true,
-  entryFileNames: '[name].mjs'
+  // entryFileNames: '[name].mjs'
 };
 
 const getPlugins = (env) => {

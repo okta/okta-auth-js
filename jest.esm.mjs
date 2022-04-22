@@ -13,8 +13,8 @@
 //Jest doc: https://jestjs.io/docs/ecmascript-modules
 
 const OktaAuth = process.env.BUNDLE_ENV === 'browser' ? 
-  `<rootDir>/build/esm/browser/index.mjs` : 
-  `<rootDir>/build/esm/node/index.mjs`;
+  `<rootDir>/build/esm/browser/index.js` : 
+  `<rootDir>/build/esm/node/index.js`;
 const testEnvironment = process.env.BUNDLE_ENV === 'browser' ? 'jsdom' : 'node';
 
 export default {
