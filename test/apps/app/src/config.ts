@@ -11,7 +11,7 @@
  */
 
 
-import { OktaAuthOptions } from '@okta/okta-auth-js';
+import { OAuthResponseMode, OAuthResponseType, OktaAuthOptions } from '@okta/okta-auth-js';
 import { LOGIN_CALLBACK_PATH, STORAGE_KEY } from './constants';
 const HOST = window.location.host;
 const PROTO = window.location.protocol;
@@ -72,8 +72,8 @@ export function getConfigFromUrl(): Config {
   const pkce = url.searchParams.get('pkce') !== 'false'; // On by default
   const defaultScopes = url.searchParams.get('defaultScopes') === 'true';
   const scopes = (url.searchParams.get('scopes') || 'openid,email,offline_access').split(',');
-  const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',');
-  const responseMode = url.searchParams.get('responseMode') || undefined;
+  const responseType = (url.searchParams.get('responseType') || 'id_token,token').split(',') as OAuthResponseType[];
+  const responseMode = url.searchParams.get('responseMode') as OAuthResponseMode || undefined;
   const storage = url.searchParams.get('storage') || undefined;
   const expireEarlySeconds = +url.searchParams.get('expireEarlySeconds') || undefined;
   const secureCookies = url.searchParams.get('secure') !== 'false'; // On by default

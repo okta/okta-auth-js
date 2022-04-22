@@ -61,7 +61,8 @@
     "dev:samples": "yarn workspace @okta/samples dev",
     "prepare": "yarn build",
     "start": "yarn workspace @okta/test.app start --open",
-    "stop": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true"
+    "stop": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true",
+    "verify:package": "node scripts/verify-package.js"
   },
   "author": "Okta",
   "keywords": [

@@ -49,7 +49,12 @@ function runWithConfig(sampleConfig) {
     'workspace',
     name,
     'start'
-  ], { stdio: 'inherit' });
+  ], { 
+    stdio: 'inherit',
+    env: Object.assign({}, process.env, {
+      SELF_HOSTED_WIDGET: '1' // ensure we are testing beta widgets if installed
+    })
+  });
 
   waitOn({
     resources: [
