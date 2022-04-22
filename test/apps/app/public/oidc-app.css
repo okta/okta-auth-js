@@ -112,3 +112,31 @@ a:active, a.clicked, .pure-menu-link:hover {
 .hidden {
   display: none;
 }
+
+
+/* OVERRIDE MONTSERRAT FONT */
+@font-face {
+  font-family: 'montserrat';
+  src: url('./COMIC.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'montserrat';
+  src: url('./COMIC.TTF') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+#font-test {
+  position: fixed;
+  z-index: 1;
+  top: 0px;
+  left: 20px;
+  background: white;
+  border: red 4px solid;
+  padding: 20px;
+  font-family: 'montserrat';
+}
+/* END OVERRIDES */

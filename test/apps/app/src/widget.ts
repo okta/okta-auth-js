@@ -75,6 +75,20 @@ export async function injectWidgetCSS(widgetVersion = ''): Promise<void> {
   });
 }
 
+export async function injectWidgetOverrideCSS(): Promise<void> {
+  const baseUrl = window.location.origin;
+  return new Promise((resolve, reject) => {
+      // inject CSS
+      const link = document.createElement('link');
+      link.type='text/css';
+      link.rel='stylesheet';
+      document.getElementsByTagName('head')[0].appendChild(link);
+      link.onload = (): void => { resolve(); };
+      link.onerror = (e): void => { reject(e); };
+      link.href = `${baseUrl}/widget-override.css`;
+  });
+}
+
 export async function injectWidgetScript(widgetVersion: string): Promise<void> {
   return new Promise((resolve, reject) => {
     // inject script
@@ -87,8 +101,18 @@ export async function injectWidgetScript(widgetVersion: string): Promise<void> {
   }); 
 }
 
+async function showAlert(): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      alert('Can see that font was overwritten by SIW CSS. Click OK to load fix CSS');
+      resolve();
+    }, 1000);
+  });
+}
 export async function injectWidgetFromCDN(widgetVersion: string): Promise<void> {
   await injectWidgetCSS(widgetVersion);
+  // await showAlert();
+  await injectWidgetOverrideCSS();
   await injectWidgetScript(widgetVersion);
 }
 

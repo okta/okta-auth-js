@@ -1,0 +1,47 @@
+/* Reset Montserrat font */
+@font-face {
+  font-family: 'montserrat';
+  src: url('./COMIC.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'montserrat';
+  src: url('./COMIC.TTF') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Overrides for widget styles */
+
+@font-face {
+  font-family: "montserrat-okta";
+  src: url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-light-webfont.eot");
+  src: url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-light-webfont.eot?#iefix") format("embedded-opentype"), url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-light-webfont.woff") format("woff"), url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-light-webfont.ttf") format("truetype"), url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-light-webfont.svg#Montserrat-Light") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "montserrat-okta";
+  src: url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-regular-webfont.eot");
+  src: url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-regular-webfont.eot?#iefix") format("embedded-opentype"), url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-regular-webfont.woff") format("woff"), url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-regular-webfont.ttf") format("truetype"), url("https://global.oktacdn.com/okta-signin-widget/6.2.1/font/montserrat-regular-webfont.svg#Montserrat-SemiBold") format("svg");
+  font-weight: bold;
+  font-style: normal;
+}
+
+#okta-sign-in,
+.chzn-container-active,
+.skip-to-content-link,
+#okta-sign-in.auth-container.main-container,
+#okta-sign-in.auth-container input[type=submit],
+#okta-sign-in.auth-container input[type=button],
+#okta-sign-in.auth-container .okta-form-input-field input::-webkit-input-placeholder,
+#okta-sign-in.auth-container .okta-form-input-field input::-moz-placeholder,
+#okta-sign-in.auth-container .okta-form-input-field input:-ms-input-placeholder,
+#okta-sign-in.auth-container .okta-form-input-field input[type=password]:placeholder-shown,
+#okta-sign-in.auth-container .okta-form-input-field placeholder,
+.okta-tooltip.qtip-custom,
+.okta-sign-in-security-image-tooltip.qtip-custom
+{
+  font-family: "proxima nova", "montserrat-okta", Arial, Helvetica, sans-serif;
+}
