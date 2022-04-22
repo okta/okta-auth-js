@@ -28,6 +28,7 @@ const output = {
   exports: 'named',
   sourcemap: true,
   preserveModules: true,
+  // not using .mjs extension because it causes issues with Vite
   // entryFileNames: '[name].mjs'
 };
 

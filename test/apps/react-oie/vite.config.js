@@ -32,11 +32,6 @@ export default defineConfig({
       }
     }
   },
-  optimizeDeps: {
-    exclude: [
-      '@peculiar/webcrypto'
-    ]
-  },
   build: {
     sourcemap: true,
     rollupOptions: {
