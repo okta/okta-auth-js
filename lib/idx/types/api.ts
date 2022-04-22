@@ -11,7 +11,8 @@ import {
   IdxOption,
   IdxRemediation,
   IdxResponse,
-  RawIdxResponse
+  RawIdxResponse,
+  IdxActionParams
 } from './idx-js';
 
 export enum IdxStatus {
@@ -37,7 +38,7 @@ export type Input = {
   key?: string;
   type?: string;
   label?: string;
-  value?: string | {form: IdxForm};
+  value?: string | {form: IdxForm} | Input[];
   minLength?: number;
   maxLength?: number;
   secret?: boolean;
@@ -59,6 +60,7 @@ export type NextStep = {
   options?: IdxOption[];
   poll?: IdxPollOptions;
   authenticatorEnrollments?: IdxAuthenticator[];
+  action?: (params?: IdxActionParams) => Promise<IdxTransaction>;
 }
 
 export enum IdxFeature {

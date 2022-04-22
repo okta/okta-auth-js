@@ -16,6 +16,7 @@ import { Remediator, RemediationValues } from './Remediator';
 import { IdxRemediationValue, IdxOption, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
 import { isAuthenticator } from '../../types';
 import { compareAuthenticators } from '../../authenticator/util';
+import { OktaAuthInterface } from '../../../types';
 
 export type AuthenticatorDataValues = RemediationValues & {
   methodType?: string;
@@ -25,8 +26,8 @@ export type AuthenticatorDataValues = RemediationValues & {
 export class AuthenticatorData<T extends AuthenticatorDataValues = AuthenticatorDataValues> extends Remediator<T> {
   authenticator: IdxAuthenticator;
 
-  constructor(remediation: IdxRemediation, values: T = {} as T) {
-    super(remediation, values);
+  constructor(authClient: OktaAuthInterface, remediation: IdxRemediation, values: T = {} as T) {
+    super(authClient, remediation, values);
 
     // set before other data calculation
     this.authenticator = this.getAuthenticator()!;

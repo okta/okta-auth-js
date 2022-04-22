@@ -132,7 +132,10 @@ export interface IdxRemediation {
   method?: string;
   type?: string;
   accepts?: string;
+  produces?: string;
   refresh?: number;
+  rel?: string[];
+  action?: (payload?: IdxActionParams) => Promise<IdxResponse>;
 }
 
 export interface IdxContext {
@@ -203,7 +206,7 @@ export function isRawIdxResponse(obj: any): obj is RawIdxResponse {
 }
 
 export interface IdxActionParams {
-  [key: string]: string | boolean | number;
+  [key: string]: string | boolean | number | object;
 }
 
 export interface IdxActions {

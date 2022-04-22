@@ -1,8 +1,10 @@
 import { warn } from '../util';
 import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
-import { IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
+import { GenericRemediator } from './remediators/GenericRemediator';
+import { FlowIdentifier, IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
+import { proceed } from './proceed';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
@@ -102,7 +104,7 @@ export function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
   return res;
 }
 
-export function getAvailableSteps(idxResponse: IdxResponse): NextStep[] {
+export function getAvailableSteps(authClient, idxResponse: IdxResponse, flow?: FlowIdentifier): NextStep[] {
   const res: NextStep[] = [];
 
   const remediatorMap: Record<string, RemediatorConstructor> = Object.values(remediators)
@@ -115,11 +117,22 @@ export function getAvailableSteps(idxResponse: IdxResponse): NextStep[] {
     }, {});
 
   for (let remediation of idxResponse.neededToProceed) {
-    const T = remediatorMap[remediation.name];
+    const T = getRemediatorClass(remediation, { flow, remediators: remediatorMap })
     if (T) {
-      const remediator: Remediator = new T(remediation);
+      const remediator: Remediator = new T(authClient, remediation);
       res.push (remediator.getNextStep(idxResponse.context) as never);
     }
+  }
+
+  for (const [name] of Object.entries((idxResponse.actions || {}))) {
+    res.push({ 
+      name, 
+      action: async (params?) => {
+        return proceed(authClient, { 
+          actions: [{ name, params }] 
+        });
+      }
+    });
   }
 
   return res;
@@ -151,15 +164,31 @@ export function filterValuesForRemediation(
   return valuesForRemediation;
 }
 
+function getRemediatorClass(remediation: IdxRemediation, options: RemediateOptions) {
+  const { flow, remediators } = options;
+  
+  if (!remediation) {
+    return undefined;
+  }
+
+  if (flow === 'default') {
+    return GenericRemediator;
+  }
+
+  return remediators![remediation.name];
+}
+
 // Return first match idxRemediation in allowed remediators
 // eslint-disable-next-line complexity
 export function getRemediator(
+  authClient,
   idxRemediations: IdxRemediation[],
   values: RemediationValues,
   options: RemediateOptions,
 ): Remediator | undefined {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const remediators = options.remediators!;
+  const flow = options.flow;
 
   let remediator: Remediator;
   // remediation name specified by caller - fast-track remediator lookup 
@@ -167,8 +196,8 @@ export function getRemediator(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const remediation = idxRemediations.find(({ name }) => name === options.step)!;
     if (remediation) {
-      const T = remediation ? remediators[remediation.name] : undefined;
-      return T ? new T(remediation, values, options) : undefined;
+      const T = getRemediatorClass(remediation, options);
+      return T ? new T(authClient, remediation, values, options) : undefined;
     } else {
       // step was specified, but remediation was not found. This is unexpected!
       warn(`step "${options.step}" did not match any remediations`);
@@ -183,8 +212,8 @@ export function getRemediator(
       continue;
     }
 
-    const T = remediators[remediation.name];
-    remediator = new T(remediation, values, options);
+    const T = getRemediatorClass(remediation, options)!;
+    remediator = new T(authClient, remediation, values, options);
     if (remediator.canRemediate()) {
       // found the remediator
       return remediator;
@@ -192,6 +221,11 @@ export function getRemediator(
     // remediator cannot handle the current values
     // maybe return for next step
     remediatorCandidates.push(remediator);  
+  }
+
+  // If no remedition is picked, use the first one with GenericRemeditor for default flow
+  if (!remediatorCandidates.length && !!idxRemediations.length && flow === 'default') {
+    return new GenericRemediator(authClient, idxRemediations[0], values, options);
   }
   
   return remediatorCandidates[0];

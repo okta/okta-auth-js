@@ -15,6 +15,7 @@
 import { AuthSdkError } from '../../errors';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 import { IdxRemediation, RemediateOptions } from '../types';
+import { OktaAuthInterface } from '../../types';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 
@@ -23,8 +24,8 @@ export class AuthenticatorVerificationData extends AuthenticatorData<Authenticat
 
   shouldProceedWithEmailAuthenticator: boolean; // will be removed in next major version
 
-  constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}, options: RemediateOptions = {}) {
-    super(remediation, values);
+  constructor(authClient: OktaAuthInterface, remediation: IdxRemediation, values: AuthenticatorDataValues = {}, options: RemediateOptions = {}) {
+    super(authClient, remediation, values);
 
     // will be removed in next major version
     this.shouldProceedWithEmailAuthenticator = options.shouldProceedWithEmailAuthenticator !== false

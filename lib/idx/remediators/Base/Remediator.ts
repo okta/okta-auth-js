@@ -17,6 +17,7 @@ import { NextStep, IdxMessage, Authenticator, Input, RemediateOptions } from '..
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase, getAuthenticatorFromRemediation } from '../util';
 import { formatAuthenticator, compareAuthenticators } from '../../authenticator/util';
+import { OktaAuthInterface } from '../../../types';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[]>;
@@ -30,20 +31,27 @@ export interface RemediationValues {
 }
 
 export interface RemediatorConstructor {
-  new<T extends RemediationValues>(remediation: IdxRemediation, values?: T, options?: RemediateOptions): any;
+  new<T extends RemediationValues>(
+    authClient: OktaAuthInterface, 
+    remediation: IdxRemediation, 
+    values?: T, 
+    options?: RemediateOptions
+  ): any;
 }
 
 // Base class - DO NOT expose static remediationName
 export class Remediator<T extends RemediationValues = RemediationValues> {
   static remediationName: string;
 
+  authClient: OktaAuthInterface;
   remediation: IdxRemediation;
   values: T;
   options: RemediateOptions;
   map?: IdxToRemediationValueMap;
 
-  constructor(remediation: IdxRemediation, values: T = {} as T, options: RemediateOptions = {}) {
+  constructor(authClient: OktaAuthInterface, remediation: IdxRemediation, values: T = {} as T, options: RemediateOptions = {}) {
     // assign fields to the instance
+    this.authClient = authClient;
     this.values = { ...values };
     this.options = { ...options };
     this.formatAuthenticators();

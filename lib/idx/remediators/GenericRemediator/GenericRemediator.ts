@@ -1,0 +1,64 @@
+import { IdxContext, NextStep, Input } from '../../types';
+import { Remediator } from '../Base/Remediator';
+import { unwrapFormValue, hasValidInputValue } from './util';
+import { proceed } from '../../proceed';
+
+export class GenericRemediator extends Remediator {
+  canRemediate(): boolean {
+    if (typeof this.remediation.action !== 'function') {
+      return false;
+    }
+
+    const inputs = this.getInputs();
+    const res = inputs.reduce((acc, input) => {
+      return acc && hasValidInputValue(input, this.values);
+    }, true);
+    return res;
+  }
+
+  getData() {
+    const data = this.getInputs().reduce((acc, { name }) => {
+      acc[name] = this.values[name];
+      return acc;
+    }, {});
+    return data;
+  }
+
+  getNextStep(_context?: IdxContext): NextStep {
+    const name = this.getName();
+    const inputs = this.getInputs();
+    // excludes transformed fields
+    const { 
+      // http metas have been transformed to action
+      href, 
+      method, 
+      rel, 
+      accepts, 
+      produces, 
+      // value has been transform to inputs
+      value,
+      // will be transformed to a function that resolves IdxTransaction
+      action,
+      ...rest 
+    } = this.remediation;
+    return { 
+      ...rest,
+      ...(!!inputs.length && { inputs }),
+      ...(action && { 
+        action: async (params?) => {
+          return proceed(this.authClient, {
+            step: name,
+            ...params
+          })
+        }
+      })
+    };
+  }
+
+  getInputs(): Input[] {
+    return (this.remediation.value || [])
+      .filter(({ name }) => name !== 'stateHandle')
+      .map(unwrapFormValue);
+  }
+
+}

@@ -12,9 +12,9 @@
 
 
 /* eslint-disable max-statements, max-depth, complexity */
+import { OktaAuthInterface } from 'lib';
 import { AuthSdkError } from '../errors';
 import { RemediationValues } from './remediators';
-import { GenericRemediator } from './remediators/GenericRemediator';
 import { RemediateOptions, RemediationResponse } from './types';
 import { 
   IdxResponse,
@@ -64,6 +64,7 @@ function removeActionFromOptions(options: RemediateOptions, actionName: string):
 
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
+  authClient: OktaAuthInterface,
   idxResponse: IdxResponse,
   values: RemediationValues,
   options: RemediateOptions
@@ -76,8 +77,7 @@ export async function remediate(
     return { idxResponse };
   }
 
-  // const remediator = getRemediator(neededToProceed, values, options);
-  const remediator = new GenericRemediator(neededToProceed[0], values);
+  const remediator = getRemediator(authClient, neededToProceed, values, options);
 
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
@@ -107,7 +107,7 @@ export async function remediate(
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
         }
-        return remediate(idxResponse, valuesWithoutExecutedAction, optionsWithoutExecutedAction); // recursive call
+        return remediate(authClient, idxResponse, valuesWithoutExecutedAction, optionsWithoutExecutedAction); // recursive call
       }
 
       // search for action in remediation list
@@ -121,7 +121,7 @@ export async function remediate(
           return handleIdxError(e, remediator);
         }
 
-        return remediate(idxResponse, values, optionsWithoutExecutedAction); // recursive call
+        return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
   }
@@ -172,7 +172,7 @@ export async function remediate(
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValuesAfterProceed();
     options = { ...options, step: undefined }; // do not re-use the step
-    return remediate(idxResponse, values, options); // recursive call
+    return remediate(authClient, idxResponse, values, options); // recursive call
   } catch (e) {
     return handleIdxError(e, remediator);
   }
