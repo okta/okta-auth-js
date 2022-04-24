@@ -459,7 +459,7 @@ util.assertAuthSdkError = function (err, message) {
 };
 
 util.disableLeaderElection = function() {
-  jest.spyOn(ServiceManager, 'canUseLeaderElection').mockReturnValue(false);
+  jest.spyOn(ServiceManager.prototype, 'isLeaderRequired').mockReturnValue(false);
 };
 
 util.mockLeader = function() {
