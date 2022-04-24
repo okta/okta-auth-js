@@ -24,7 +24,7 @@ export interface SyncStorageServiceOptions {
 }
 
 export interface LeaderElectionServiceOptions {
-  broadcastChannelName?: string;
+  electionChannelName?: string;
 }
 
 export type ServiceManagerOptions = AutoRenewServiceOptions &

@@ -41,7 +41,7 @@ export class ServiceManager implements ServiceManagerInterface {
     const { autoRenew, autoRemove, syncStorage } = sdk.tokenManager.getOptions();
     this.options = Object.assign({}, 
       ServiceManager.defaultOptions,
-      { autoRenew, autoRemove, syncStorage, broadcastChannelName: sdk.options.clientId },
+      { autoRenew, autoRemove, syncStorage, electionChannelName: sdk.options.clientId },
       options
     );
 

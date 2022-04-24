@@ -55,8 +55,8 @@ export class LeaderElectionService implements ServiceInterface {
     this.stop();
     if (this.canStart()) {
       if (!this.channel) {
-        const { broadcastChannelName } = this.options;
-        this.channel = new BroadcastChannel(broadcastChannelName as string);
+        const { electionChannelName } = this.options;
+        this.channel = new BroadcastChannel(electionChannelName as string);
       }
       if (!this.elector) {
         this.elector = createLeaderElection(this.channel);
