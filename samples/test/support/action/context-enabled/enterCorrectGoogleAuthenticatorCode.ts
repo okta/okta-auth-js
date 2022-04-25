@@ -12,11 +12,10 @@
 
 
 import EnrollGoogleAuthenticator from '../../selectors/EnrollGoogleAuthenticator';
-import setInputField from '../setInputField';
 import ActionContext from '../../context';
 import { getTotp } from '../../../util';
 
 export default async function (this: ActionContext, totpType: string) {
   const token = getTotp(this.sharedSecret, totpType);
-  await setInputField('set', token, EnrollGoogleAuthenticator.code);
+  await (await $(EnrollGoogleAuthenticator.code)).setValue(token);
 }

@@ -13,7 +13,6 @@
 
 import { getConfig } from '../../util/configUtils';
 import waitForDisplayed from '../wait/waitForDisplayed';
-import setInputField from './setInputField';
 import clickElement from './clickElement';
 import { getOktaSignInForm } from  '../../util';
 
@@ -33,7 +32,8 @@ export default async (
     throw new Error('PASSWORD was not set');
   }
 
-  await setInputField('set', username, OktaSignIn.signinUsername);
-  await setInputField('set', password, OktaSignIn.signinPassword);
+  await (await $(OktaSignIn.signinUsername)).setValue(username);
+  await (await $(OktaSignIn.signinPassword)).setValue(password);
+
   await clickElement('click', 'selector', OktaSignIn.signinSubmitBtn);
 };

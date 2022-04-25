@@ -14,8 +14,8 @@ Feature: Direct Auth Basic Login with Password Factor
       Given she has an account with "active" state in the org
       When she clicks the "login" button
       Then she is redirected to the "Login" page
-      When she fills in her username
-        And she fills in her correct password
+      When she fills in her "username"
+        And she fills in her "password"
         And she submits the form
       Then she sees a table with her profile info
         And the cell for the value of "email" is shown and contains her "email"
@@ -26,8 +26,8 @@ Feature: Direct Auth Basic Login with Password Factor
         And the app is assigned to "Everyone" group
       When she clicks the "login" button
       Then she is redirected to the "Login" page
-      When she fills in her incorrect username
-        And she fills in her password
+      When she fills in an incorrect "username" with value "Mory"
+        And she fills in her "password"
         And she submits the form
       Then she should see a message on the Login form "There is no account with the Username Mory."
 
@@ -35,7 +35,7 @@ Feature: Direct Auth Basic Login with Password Factor
       Given she has an account with "active" state in the org
       When she clicks the "login" button
       Then she is redirected to the "Login" page
-      When she fills in her correct username
-        And she fills in her incorrect password
+      When she fills in her "username"
+        And she fills in an incorrect "password"
         And she submits the form
       Then she should see the message "Authentication failed"

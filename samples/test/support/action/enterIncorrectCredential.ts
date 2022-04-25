@@ -10,11 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import setInputField from './setInputField';
-
 export default async function (credName: string) {
   const selector = `input[name="${credName}"]`;
   const value = '!incorrect!';
-  await setInputField('set', value, selector);
+  await (await $(selector)).setValue(value);
 }

@@ -10,9 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import setInputField from './setInputField';
-
 export default async () => {
-  await setInputField('set', `_H|/nt3r_2_`, '#confirm-password');
+  await (await $('#confirm-password')).setValue(`_H|/nt3r_2_`);
 };
