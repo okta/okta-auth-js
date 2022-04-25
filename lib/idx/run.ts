@@ -242,7 +242,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
   if (idxResponse) {
     shouldSaveResponse = !!(idxResponse.requestDidSucceed || idxResponse.stepUp);
     enabledFeatures = getEnabledFeatures(idxResponse);
-    availableSteps = getAvailableSteps(authClient, idxResponse, options.flow);
+    availableSteps = getAvailableSteps(authClient, idxResponse, options.useGenericRemediator);
     messages = getMessagesFromResponse(idxResponse);
     terminal = isTerminalResponse(idxResponse);
   }

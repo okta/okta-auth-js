@@ -93,7 +93,7 @@ export interface OktaAuthOptions extends
     'flow' |
     'activationToken' |
     'recoveryToken' |
-    'useGenericRemediator'
+    'useGenericRemediator' // beta
   >
 {
   useInteractionCodeFlow?: boolean;

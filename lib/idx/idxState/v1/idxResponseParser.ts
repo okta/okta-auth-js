@@ -90,6 +90,7 @@ const expandRelatesTo = (idxResponse, value) => {
 };
 
 const convertRemediationAction = (authClient: OktaAuthInterface, remediation, toPersist) => {
+  // Only remediation that has `rel` field (indicator for form submission) can have http action
   if (remediation.rel) {
     const remediationActions = generateRemediationFunctions( authClient, [remediation], toPersist );
     const actionFn = remediationActions[remediation.name];

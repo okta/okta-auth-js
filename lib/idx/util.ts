@@ -104,7 +104,7 @@ export function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
   return res;
 }
 
-export function getAvailableSteps(authClient, idxResponse: IdxResponse, flow?: FlowIdentifier): NextStep[] {
+export function getAvailableSteps(authClient, idxResponse: IdxResponse, useGenericRemediator?: boolean): NextStep[] {
   const res: NextStep[] = [];
 
   const remediatorMap: Record<string, RemediatorConstructor> = Object.values(remediators)
@@ -117,7 +117,7 @@ export function getAvailableSteps(authClient, idxResponse: IdxResponse, flow?: F
     }, {});
 
   for (let remediation of idxResponse.neededToProceed) {
-    const T = getRemediatorClass(remediation, { flow, remediators: remediatorMap });
+    const T = getRemediatorClass(remediation, { useGenericRemediator, remediators: remediatorMap });
     if (T) {
       const remediator: Remediator = new T(authClient, remediation);
       res.push (remediator.getNextStep(idxResponse.context) as never);
