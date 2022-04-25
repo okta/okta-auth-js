@@ -12,7 +12,6 @@ const getInputTypeFromMeta = meta => {
 };
 
 const inputTransformer = ({ inputs = [] }) => form => {
-  console.log(inputs);
   return { 
     ...form,
     inputs: inputs.reduce((acc, input) => {

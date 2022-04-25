@@ -117,7 +117,7 @@ export function getAvailableSteps(authClient, idxResponse: IdxResponse, flow?: F
     }, {});
 
   for (let remediation of idxResponse.neededToProceed) {
-    const T = getRemediatorClass(remediation, { flow, remediators: remediatorMap })
+    const T = getRemediatorClass(remediation, { flow, remediators: remediatorMap });
     if (T) {
       const remediator: Remediator = new T(authClient, remediation);
       res.push (remediator.getNextStep(idxResponse.context) as never);
@@ -171,10 +171,11 @@ function getRemediatorClass(remediation: IdxRemediation, options: RemediateOptio
     return undefined;
   }
 
-  if (flow === 'default') {
+  if (flow === 'generic') {
     return GenericRemediator;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return remediators![remediation.name];
 }
 
@@ -212,6 +213,7 @@ export function getRemediator(
       continue;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const T = getRemediatorClass(remediation, options)!;
     remediator = new T(authClient, remediation, values, options);
     if (remediator.canRemediate()) {
@@ -224,7 +226,7 @@ export function getRemediator(
   }
 
   // If no remedition is picked, use the first one with GenericRemeditor for default flow
-  if (!remediatorCandidates.length && !!idxRemediations.length && flow === 'default') {
+  if (!remediatorCandidates.length && !!idxRemediations.length && flow === 'generic') {
     return new GenericRemediator(authClient, idxRemediations[0], values, options);
   }
   

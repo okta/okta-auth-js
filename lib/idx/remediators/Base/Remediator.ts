@@ -49,7 +49,12 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
   options: RemediateOptions;
   map?: IdxToRemediationValueMap;
 
-  constructor(authClient: OktaAuthInterface, remediation: IdxRemediation, values: T = {} as T, options: RemediateOptions = {}) {
+  constructor(
+    authClient: OktaAuthInterface, 
+    remediation: IdxRemediation, 
+    values: T = {} as T, 
+    options: RemediateOptions = {}
+  ) {
     // assign fields to the instance
     this.authClient = authClient;
     this.values = { ...values };

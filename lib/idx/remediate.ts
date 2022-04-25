@@ -12,7 +12,7 @@
 
 
 /* eslint-disable max-statements, max-depth, complexity */
-import { OktaAuthInterface } from 'lib';
+import { OktaAuthInterface } from '../types';
 import { AuthSdkError } from '../errors';
 import { RemediationValues } from './remediators';
 import { RemediateOptions, RemediationResponse } from './types';
@@ -107,7 +107,12 @@ export async function remediate(
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
         }
-        return remediate(authClient, idxResponse, valuesWithoutExecutedAction, optionsWithoutExecutedAction); // recursive call
+        return remediate(
+          authClient, 
+          idxResponse, 
+          valuesWithoutExecutedAction, 
+          optionsWithoutExecutedAction
+        ); // recursive call
       }
 
       // search for action in remediation list

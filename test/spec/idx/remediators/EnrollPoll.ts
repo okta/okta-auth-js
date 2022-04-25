@@ -19,12 +19,14 @@ import { EnrollPoll } from '../../../../lib/idx/remediators/EnrollPoll';
 describe('EnrollPoll remediator', () => {
   let testContext;
   beforeEach(() => {
+    const authClient = {};
     const enrollPollRemediation = EnrollPollRemediationFactory.build();
     const values: RemediationValues = {
       authenticators: [],
       authenticatorsData: []
     };
     testContext = {
+      authClient,
       enrollPollRemediation,
       values
     };
@@ -44,10 +46,10 @@ describe('EnrollPoll remediator', () => {
 
   describe('getValuesAfterProceed', () => {
     it('removes `startPolling` from the values', () => {
-      const { enrollPollRemediation, values } = testContext;
+      const { authClient, enrollPollRemediation, values } = testContext;
       values.foo = 'bar';
       values.startPolling = 'omgyes';
-      const remediator: EnrollPoll = new EnrollPoll(enrollPollRemediation, values);
+      const remediator: EnrollPoll = new EnrollPoll(authClient, enrollPollRemediation, values);
       const newValues: RemediationValues = remediator.getValuesAfterProceed();
       expect(newValues).toEqual({
         authenticators: [],

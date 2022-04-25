@@ -236,7 +236,7 @@ describe('idx/run', () => {
     const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow);
     const { remediators, actions, flowMonitor } = flowSpec;
     await run(authClient, options);
-    expect(mocked.remediate.remediate).toHaveBeenCalledWith(idxResponse, values, {
+    expect(mocked.remediate.remediate).toHaveBeenCalledWith(authClient, idxResponse, values, {
       remediators,
       actions,
       flow,

@@ -27,6 +27,8 @@ export class GenericRemediator extends Remediator {
   getNextStep(_context?: IdxContext): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
+    
+    /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
     // excludes transformed fields
     const { 
       // http metas have been transformed to action
@@ -41,6 +43,8 @@ export class GenericRemediator extends Remediator {
       action,
       ...rest 
     } = this.remediation;
+    /* eslint-enable no-unused-vars, @typescript-eslint/no-unused-vars */
+
     return { 
       ...rest,
       ...(!!inputs.length && { inputs }),
@@ -49,7 +53,7 @@ export class GenericRemediator extends Remediator {
           return proceed(this.authClient, {
             step: name,
             ...params
-          })
+          });
         }
       })
     };

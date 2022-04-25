@@ -60,6 +60,7 @@ export type NextStep = {
   options?: IdxOption[];
   poll?: IdxPollOptions;
   authenticatorEnrollments?: IdxAuthenticator[];
+  // eslint-disable-next-line no-use-before-define
   action?: (params?: IdxActionParams) => Promise<IdxTransaction>;
 }
 

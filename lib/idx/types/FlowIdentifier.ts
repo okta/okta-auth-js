@@ -12,4 +12,7 @@ export type FlowIdentifier = 'default'
   | 'recoverPassword'
   | 'resetPassword'
 // idx.unlockAccount
-  | 'unlockAccount';
+  | 'unlockAccount'
+// BETA - flow to use GenericRemediator
+// This flow identifier is subject to change in the current major version
+  | 'generic';

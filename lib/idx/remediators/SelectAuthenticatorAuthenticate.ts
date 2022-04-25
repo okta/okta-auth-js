@@ -24,7 +24,12 @@ export type SelectAuthenticatorAuthenticateValues = SelectAuthenticatorValues & 
 export class SelectAuthenticatorAuthenticate extends SelectAuthenticator<SelectAuthenticatorAuthenticateValues> {
   static remediationName = 'select-authenticator-authenticate';
 
-  constructor(authClient: OktaAuthInterface, remediation: IdxRemediation, values: SelectAuthenticatorValues = {}, options: RemediateOptions = {}) {
+  constructor(
+    authClient: OktaAuthInterface, 
+    remediation: IdxRemediation, 
+    values: SelectAuthenticatorValues = {}, 
+    options: RemediateOptions = {}
+  ) {
     super(authClient ,remediation, values, options);
 
     // Preset password authenticator to trigger recover action

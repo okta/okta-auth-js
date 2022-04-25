@@ -91,7 +91,6 @@ const GeneralForm = () => {
   const { nextStep, messages, availableSteps } = transaction;
   const { name, canSkip } = nextStep;
   const recoverPasswordFn = availableSteps.find(step => step.name === 'currentAuthenticator-recover')?.action;
-  console.log(recoverPasswordFn)
   const idps = availableSteps.filter(step => step.name === 'redirect-idp');
   const form = formTransformer(nextStep)({} /* initial form value */);
   const { inputs, selects, text, image } = form;

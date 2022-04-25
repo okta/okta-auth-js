@@ -81,7 +81,6 @@ describe('makeIdxState', () => {
     expect(idxState.neededToProceed[1]).toMatchInlineSnapshot(
       `
       Object {
-        "action": [Function],
         "href": "https://dev-550580.okta.com/sso/idps/0oa2sykfl6Fnb9ZMN0g4?stateToken=02Yi84bXNZ3STdPKisJIV0vQ7pY4hkyFHs6a9c12Fw",
         "idp": Object {
           "id": "0oa2sykfl6Fnb9ZMN0g4",
@@ -97,7 +96,6 @@ describe('makeIdxState', () => {
     expect(idxState.neededToProceed[2]).toMatchInlineSnapshot(
       `
       Object {
-        "action": [Function],
         "href": "https://dev-550580.okta.com/sso/idps/0oa2szc1K1YPgz1pe0g4?stateToken=02Yi84bXNZ3STdPKisJIV0vQ7pY4hkyFHs6a9c12Fw",
         "idp": Object {
           "id": "0oa2szc1K1YPgz1pe0g4",
