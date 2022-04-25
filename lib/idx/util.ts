@@ -165,13 +165,13 @@ export function filterValuesForRemediation(
 }
 
 function getRemediatorClass(remediation: IdxRemediation, options: RemediateOptions) {
-  const { flow, remediators } = options;
+  const { useGenericRemediator, remediators } = options;
   
   if (!remediation) {
     return undefined;
   }
 
-  if (flow === 'generic') {
+  if (useGenericRemediator) {
     return GenericRemediator;
   }
 
@@ -189,7 +189,7 @@ export function getRemediator(
 ): Remediator | undefined {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const remediators = options.remediators!;
-  const flow = options.flow;
+  const useGenericRemediator = options.useGenericRemediator;
 
   let remediator: Remediator;
   // remediation name specified by caller - fast-track remediator lookup 
@@ -226,7 +226,7 @@ export function getRemediator(
   }
 
   // If no remedition is picked, use the first one with GenericRemeditor for default flow
-  if (!remediatorCandidates.length && !!idxRemediations.length && flow === 'generic') {
+  if (!remediatorCandidates.length && !!idxRemediations.length && useGenericRemediator) {
     return new GenericRemediator(authClient, idxRemediations[0], values, options);
   }
   

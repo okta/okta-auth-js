@@ -241,7 +241,8 @@ describe('idx/run', () => {
       actions,
       flow,
       flowMonitor,
-      shouldProceedWithEmailAuthenticator // will be removed in next major version
+      shouldProceedWithEmailAuthenticator, // will be removed in next major version
+      useGenericRemediator: false
     });
   });
 

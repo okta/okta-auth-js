@@ -75,7 +75,8 @@ function initializeData(authClient, data: RunData): RunData {
     flow,
     withCredentials,
     remediators,
-    actions
+    actions,
+    useGenericRemediator
   } = options;
 
   const status = IdxStatus.PENDING;
@@ -90,9 +91,19 @@ function initializeData(authClient, data: RunData): RunData {
     remediators = remediators || flowSpec.remediators;
     actions = actions || flowSpec.actions;
   }
+
+  useGenericRemediator = useGenericRemediator || authClient.options.useGenericRemediator || false;
+
   return { 
     ...data,
-    options: { ...options, flow, withCredentials, remediators, actions },
+    options: { 
+      ...options, 
+      flow, 
+      withCredentials, 
+      remediators, 
+      actions,
+      useGenericRemediator
+    },
     status
   };
 }
@@ -152,6 +163,7 @@ async function getDataFromRemediate(authClient, data: RunData): Promise<RunData>
     flow,
     step,
     shouldProceedWithEmailAuthenticator, // will be removed in next major version
+    useGenericRemediator,
   } = options;
   
   const shouldRemediate = (autoRemediate !== false && (remediators || actions || step));
@@ -179,6 +191,7 @@ async function getDataFromRemediate(authClient, data: RunData): Promise<RunData>
       flow,
       step,
       shouldProceedWithEmailAuthenticator, // will be removed in next major version
+      useGenericRemediator,
     }
   );
   idxResponse = idxResponseFromRemediation;

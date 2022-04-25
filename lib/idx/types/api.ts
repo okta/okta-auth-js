@@ -79,6 +79,7 @@ export interface IdxTransactionMeta extends PKCETransactionMeta {
   activationToken?: string;
   recoveryToken?: string;
   maxAge?: string | number;
+  useGenericRemediator?: boolean;
 }
 
 export interface IdxTransaction {

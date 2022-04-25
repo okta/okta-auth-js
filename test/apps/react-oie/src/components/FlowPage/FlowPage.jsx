@@ -25,7 +25,7 @@ const FlowPage = () => {
     } else if (flow === 'unlockAccount') {
       newTransaction = await oktaAuth.idx.unlockAccount();
     } else {
-      newTransaction = await oktaAuth.idx.start({ flow: 'generic' });
+      newTransaction = await oktaAuth.idx.start();
     }
     setTransaction(newTransaction);
   }, [oktaAuth, flow, setTransaction]);

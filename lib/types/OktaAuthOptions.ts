@@ -92,7 +92,8 @@ export interface OktaAuthOptions extends
   Pick<IdxTransactionMeta,
     'flow' |
     'activationToken' |
-    'recoveryToken'
+    'recoveryToken' |
+    'useGenericRemediator'
   >
 {
   useInteractionCodeFlow?: boolean;
