@@ -21,6 +21,7 @@ export interface AutoRenewServiceOptions {
 
 export interface SyncStorageServiceOptions {
   syncStorage?: boolean;
+  syncChannelName?: string;
 }
 
 export interface LeaderElectionServiceOptions {

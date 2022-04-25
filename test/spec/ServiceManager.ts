@@ -14,20 +14,30 @@
 import { OktaAuth } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 
-jest.mock('broadcast-channel', () => {
-  const actual = jest.requireActual('broadcast-channel');
-  class FakeBroadcastChannel {
-    async close() {}
+
+jest.mock('../../lib/services/LeaderElectionService', () => {  
+  class FakeLeaderElectionService {
+    private _isLeader = false;
+    private started = false;
+    private options;
+    constructor(options = {}) {
+      this.options = options;
+    }
+    canStart() { return true; }
+    isStarted() { return this.started; }
+    start() { this.started = true; }
+    stop() { this.started = false; }
+    isLeader() { return this._isLeader; }
+    _setLeader() { this._isLeader = true; }
+    public onLeader() {
+      (this.options as any).onLeader?.();
+    }
   }
   return {
-    createLeaderElection: actual.createLeaderElection,
-    BroadcastChannel: FakeBroadcastChannel
+    LeaderElectionService: FakeLeaderElectionService,
   };
 });
 
-const mocked = {
-  broadcastChannel: require('broadcast-channel'),
-};
 
 function createAuth(options) {
   options = options || {};
@@ -106,26 +116,16 @@ describe('ServiceManager', () => {
   });
 
   it('starts autoRenew service after becoming leader (for syncStorage == true)', async () => {
-    // Become leader in 100ms
-    const mockedElector = {
-      isLeader: false,
-      awaitLeadership: () => new Promise(resolve => {
-        setTimeout(() => {
-          mockedElector.isLeader = true;
-          resolve();
-        }, 100);
-      }) as Promise<void>,
-      die: () => Promise.resolve(undefined),
-    };
-
     const options = { tokenManager: { syncStorage: true, autoRenew: true } };
     let client = createAuth(options);
-    jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(mockedElector);
-    await client.serviceManager.start();
+    client.serviceManager.start();
+    expect(client.serviceManager.isLeader()).toBeFalsy();
     expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
     expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
-    jest.runAllTimers();
-    await Promise.resolve();
+    expect(client.serviceManager.getService('leaderElection')?.isStarted()).toBeTruthy();
+    (client.serviceManager.getService('leaderElection') as any)?._setLeader();
+    (client.serviceManager.getService('leaderElection') as any)?.onLeader();
+    expect(client.serviceManager.isLeader()).toBeTruthy();
     expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
     await client.serviceManager.stop();
   });

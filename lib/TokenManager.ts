@@ -13,7 +13,7 @@
 import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
 import { validateToken  } from './oidc/util';
-import { isLocalhost, isIE11OrLess } from './features';
+import { isLocalhost } from './features';
 import SdkClock from './clock';
 import {
   EventEmitter,
@@ -47,8 +47,7 @@ const DEFAULT_OPTIONS = {
   clearPendingRemoveTokens: true,
   storage: undefined, // will use value from storageManager config
   expireEarlySeconds: 30,
-  storageKey: TOKEN_STORAGE_NAME,
-  _storageEventDelay: 0
+  storageKey: TOKEN_STORAGE_NAME
 };
 export const EVENT_EXPIRED = 'expired';
 export const EVENT_RENEWED = 'renewed';
@@ -86,9 +85,6 @@ export class TokenManager implements TokenManagerInterface {
     }
     
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
-    if (isIE11OrLess()) {
-      options._storageEventDelay = options._storageEventDelay || 1000;
-    }
     if (!isLocalhost()) {
       options.expireEarlySeconds = DEFAULT_OPTIONS.expireEarlySeconds;
     }
@@ -158,25 +154,6 @@ export class TokenManager implements TokenManagerInterface {
   
   emitError(error) {
     this.emitter.emit(EVENT_ERROR, error);
-  }
-  
-  emitEventsForCrossTabsStorageUpdate(newValue, oldValue) {
-    const oldTokens = this.getTokensFromStorageValue(oldValue);
-    const newTokens = this.getTokensFromStorageValue(newValue);
-    Object.keys(newTokens).forEach(key => {
-      const oldToken = oldTokens[key];
-      const newToken = newTokens[key];
-      if (JSON.stringify(oldToken) !== JSON.stringify(newToken)) {
-        this.emitAdded(key, newToken);
-      }
-    });
-    Object.keys(oldTokens).forEach(key => {
-      const oldToken = oldTokens[key];
-      const newToken = newTokens[key];
-      if (!newToken) {
-        this.emitRemoved(key, oldToken);
-      }
-    });
   }
   
   clearExpireEventTimeout(key) {
@@ -446,16 +423,6 @@ export class TokenManager implements TokenManagerInterface {
        this.remove(key);
       }
     });
-  }
-  
-  getTokensFromStorageValue(value) {
-    let tokens;
-    try {
-      tokens = JSON.parse(value) || {};
-    } catch (e) {
-      tokens = {};
-    }
-    return tokens;
   }
 
   updateRefreshToken(token: RefreshToken) {

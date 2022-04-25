@@ -19,18 +19,18 @@ import {
 } from 'broadcast-channel';
 import { isBrowser } from '../features';
 
-type OnLeaderHandler = (() => void);
-type Options = ServiceManagerOptions & {
+declare type OnLeaderHandler = (() => void);
+declare type ServiceOptions = ServiceManagerOptions & {
   onLeader?: OnLeaderHandler;
 };
 
 export class LeaderElectionService implements ServiceInterface {
-  private options: Options;
+  private options: ServiceOptions;
   private channel?: BroadcastChannel;
   private elector?: LeaderElector;
   private started = false;
 
-  constructor(options: Options = {}) {
+  constructor(options: ServiceOptions = {}) {
     this.options = options;
     this.onLeaderDuplicate = this.onLeaderDuplicate.bind(this);
     this.onLeader = this.onLeader.bind(this);
@@ -54,15 +54,11 @@ export class LeaderElectionService implements ServiceInterface {
   start() {
     this.stop();
     if (this.canStart()) {
-      if (!this.channel) {
-        const { electionChannelName } = this.options;
-        this.channel = new BroadcastChannel(electionChannelName as string);
-      }
-      if (!this.elector) {
-        this.elector = createLeaderElection(this.channel);
-        this.elector.onduplicate = this.onLeaderDuplicate;
-        this.elector.awaitLeadership().then(this.onLeader);
-      }
+      const { electionChannelName } = this.options;
+      this.channel = new BroadcastChannel(electionChannelName as string);
+      this.elector = createLeaderElection(this.channel);
+      this.elector.onduplicate = this.onLeaderDuplicate;
+      this.elector.awaitLeadership().then(this.onLeader);
       this.started = true;
     }
   }

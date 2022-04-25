@@ -34,7 +34,6 @@ export interface TokenManagerOptions {
   storageKey?: string;
   expireEarlySeconds?: number;
   syncStorage?: boolean;
-  _storageEventDelay?: number;
 }
 
 export interface CustomUrls {

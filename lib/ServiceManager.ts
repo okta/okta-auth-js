@@ -19,13 +19,17 @@ import {
 import { OktaAuth } from '.';
 import { AutoRenewService, SyncStorageService, LeaderElectionService } from './services';
 
+const AUTO_RENEW = 'autoRenew';
+const SYNC_STORAGE = 'syncStorage';
+const LEADER_ELECTION = 'leaderElection';
+
 export class ServiceManager implements ServiceManagerInterface {
   private sdk: OktaAuth;
   private options: ServiceManagerOptions;
   private services: Map<string, ServiceInterface>;
   private started: boolean;
 
-  private static knownServices = ['autoRenew', 'syncStorage', 'leaderElection'];
+  private static knownServices = [AUTO_RENEW, SYNC_STORAGE, LEADER_ELECTION];
 
   private static defaultOptions = {
     autoRenew: true,
@@ -41,7 +45,11 @@ export class ServiceManager implements ServiceManagerInterface {
     const { autoRenew, autoRemove, syncStorage } = sdk.tokenManager.getOptions();
     this.options = Object.assign({}, 
       ServiceManager.defaultOptions,
-      { autoRenew, autoRemove, syncStorage, electionChannelName: sdk.options.clientId },
+      { autoRenew, autoRemove, syncStorage }, 
+      {
+        electionChannelName: `${sdk.options.clientId}-election`,
+        syncChannelName: `${sdk.options.clientId}-sync`,
+      },
       options
     );
 
@@ -64,11 +72,11 @@ export class ServiceManager implements ServiceManagerInterface {
   }
 
   isLeader() {
-    return (this.getService('leaderElection') as LeaderElectionService)?.isLeader();
+    return (this.getService(LEADER_ELECTION) as LeaderElectionService)?.isLeader();
   }
 
   isLeaderRequired() {
-    return [...this.services.values()].some(srv => srv.requiresLeadership());
+    return [...this.services.values()].some(srv => srv.canStart() && srv.requiresLeadership());
   }
 
   async start() {
@@ -106,7 +114,7 @@ export class ServiceManager implements ServiceManagerInterface {
   private canStartService(name: string, srv: ServiceInterface): boolean {
     let canStart = srv.canStart() && !srv.isStarted();
     // only start election if a leader is required
-    if (name == 'leaderElection') {
+    if (name === LEADER_ELECTION) {
       canStart &&= this.isLeaderRequired();
     } else if (srv.requiresLeadership()) {
       canStart &&= this.isLeader();
@@ -119,13 +127,13 @@ export class ServiceManager implements ServiceManagerInterface {
 
     let service: ServiceInterface | undefined;
     switch (name) {
-      case 'leaderElection':
+      case LEADER_ELECTION:
         service = new LeaderElectionService({...this.options, onLeader: this.onLeader});
         break;
-      case 'autoRenew':
+      case AUTO_RENEW:
         service = new AutoRenewService(tokenManager, {...this.options});
         break;
-      case 'syncStorage':
+      case SYNC_STORAGE:
         service = new SyncStorageService(tokenManager, {...this.options});
         break;
       default:

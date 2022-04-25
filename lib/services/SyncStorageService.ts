@@ -10,48 +10,30 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-/* global window */
-import { TokenManager } from '../TokenManager';
+import { TokenManager, EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED } from '../TokenManager';
+import { BroadcastChannel } from 'broadcast-channel';
 import { isBrowser } from '../features';
-import { ServiceManagerOptions, ServiceInterface } from '../types';
+import { ServiceManagerOptions, ServiceInterface, Token } from '../types';
 
-
+export type SyncMessage = {
+  type: string;
+  key: string;
+  token: Token;
+  oldToken?: Token;
+};
 export class SyncStorageService implements ServiceInterface {
   private tokenManager: TokenManager;
   private options: ServiceManagerOptions;
-  private syncTimeout: unknown;
+  private channel?: BroadcastChannel<SyncMessage>;
   private started = false;
 
   constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
     this.tokenManager = tokenManager;
     this.options = options;
-    this.storageListener = this.storageListener.bind(this);
-  }
-
-  // Sync authState cross multiple tabs when localStorage is used as the storageProvider
-  // A StorageEvent is sent to a window when a storage area it has access to is changed 
-  // within the context of another document.
-  // https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent
-  private storageListener({ key, newValue, oldValue }: StorageEvent) {
-    const opts = this.tokenManager.getOptions();
-
-    const handleCrossTabsStorageChange = () => {
-      this.tokenManager.resetExpireEventTimeoutAll();
-      this.tokenManager.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-    };
-
-    // Skip if:
-    // not from localStorage.clear (event.key is null)
-    // event.key is not the storageKey
-    // oldValue === newValue
-    if (key && (key !== opts.storageKey || newValue === oldValue)) {
-      return;
-    }
-
-    // LocalStorage cross tabs update is not synced in IE, set a 1s timer by default to read latest value
-    // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
-    this.syncTimeout = setTimeout(() => handleCrossTabsStorageChange(), opts._storageEventDelay);
+    this.onTokenAddedHandler = this.onTokenAddedHandler.bind(this);
+    this.onTokenRemovedHandler = this.onTokenRemovedHandler.bind(this);
+    this.onTokenRenewedHandler = this.onTokenRenewedHandler.bind(this);
+    this.onSyncMessageHandler = this.onSyncMessageHandler.bind(this);
   }
 
   requiresLeadership() {
@@ -69,16 +51,68 @@ export class SyncStorageService implements ServiceInterface {
   start() {
     if (this.canStart()) {
       this.stop();
-      window.addEventListener('storage', this.storageListener);
+      const { syncChannelName } = this.options;
+      this.channel = new BroadcastChannel(syncChannelName as string);
+      this.tokenManager.on(EVENT_ADDED, this.onTokenAddedHandler);
+      this.tokenManager.on(EVENT_REMOVED, this.onTokenRemovedHandler);
+      this.tokenManager.on(EVENT_RENEWED, this.onTokenRenewedHandler);
+      this.channel.addEventListener('message', this.onSyncMessageHandler);
       this.started = true;
+    }
+  }
+
+  private onTokenAddedHandler(key: string, token: Token) {
+    this.channel?.postMessage({
+      type: EVENT_ADDED,
+      key,
+      token
+    });
+  }
+
+  private onTokenRemovedHandler(key: string, token: Token) {
+    this.channel?.postMessage({
+      type: EVENT_REMOVED,
+      key,
+      token
+    });
+  }
+
+  private onTokenRenewedHandler(key: string, token: Token, oldToken?: Token) {
+    this.channel?.postMessage({
+      type: EVENT_RENEWED,
+      key,
+      token,
+      oldToken
+    });
+  }
+
+  private onSyncMessageHandler(msg: SyncMessage) {
+    switch (msg.type) {
+      case EVENT_ADDED:
+        this.tokenManager.emitAdded(msg.key, msg.token);
+        this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
+        break;
+      case EVENT_REMOVED:
+        this.tokenManager.clearExpireEventTimeout(msg.key);
+        this.tokenManager.emitRemoved(msg.key, msg.token);
+        break;
+      case EVENT_RENEWED:
+        this.tokenManager.clearExpireEventTimeout(msg.key);
+        this.tokenManager.emitRenewed(msg.key, msg.token, msg.oldToken);
+        this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
+        break;
+      default:
+        throw new Error(`Unknown message type ${msg.type}`);
     }
   }
 
   stop() {
     if (this.started) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      window.removeEventListener('storage', this.storageListener!);
-      clearTimeout(this.syncTimeout as any);
+      this.tokenManager.off(EVENT_ADDED, this.onTokenAddedHandler);
+      this.tokenManager.off(EVENT_REMOVED, this.onTokenRemovedHandler);
+      this.channel?.removeEventListener('message', this.onSyncMessageHandler);
+      this.channel?.close();
+      this.channel = undefined;
       this.started = false;
     }
   }
