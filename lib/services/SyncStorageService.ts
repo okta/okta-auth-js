@@ -109,28 +109,29 @@ export class SyncStorageService implements ServiceInterface {
   }
 
   private onSyncMessageHandler(msg: SyncMessage) {
+    // Use `enablePostMessage` flag here to prevent sync message loop
     switch (msg.type) {
       case EVENT_ADDED:
         this.enablePostMessage = false;
-        this.tokenManager.emitAdded(msg.key, msg.token);
-        this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
+        this.tokenManager.add(msg.key, msg.token);
         this.enablePostMessage = true;
         break;
       case EVENT_REMOVED:
         this.enablePostMessage = false;
-        this.tokenManager.clearExpireEventTimeout(msg.key);
-        this.tokenManager.emitRemoved(msg.key, msg.token);
+        this.tokenManager.remove(msg.key);
         this.enablePostMessage = true;
         break;
       case EVENT_RENEWED:
         this.enablePostMessage = false;
-        this.tokenManager.clearExpireEventTimeout(msg.key);
+        this.tokenManager.remove(msg.key);
+        this.tokenManager.add(msg.key, msg.token);
         this.tokenManager.emitRenewed(msg.key, msg.token, msg.oldToken);
-        this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
         this.enablePostMessage = true;
         break;
       default:
         throw new Error(`Unknown message type ${msg.type}`);
     }
+
+
   }
 } 
