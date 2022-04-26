@@ -175,14 +175,6 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     }, options.transactionManager));
     this._oktaUserAgent = new OktaUserAgent();
 
-    // Enable `syncStorage` only if token storage type is `localStorage` or `cookie`
-    const syncableStorageTypes = ['localStorage', 'cookie'];
-    const canSyncStorage = typeof args.tokenManager?.storage === 'string' 
-      && syncableStorageTypes.includes(args.tokenManager.storage);
-    if (!canSyncStorage) {
-      args.services = { ...args.services, syncStorage: false };
-    }
-
     this.tx = {
       status: transactionStatus.bind(null, this),
       resume: resumeTransaction.bind(null, this),
