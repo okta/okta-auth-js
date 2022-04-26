@@ -62,7 +62,12 @@ export class GenericRemediator extends Remediator {
   getInputs(): Input[] {
     return (this.remediation.value || [])
       .filter(({ name }) => name !== 'stateHandle')
-      .map(unwrapFormValue);
+      .map(unwrapFormValue)
+      .map(input => {
+        // use string as default input type
+        input.type = input.type || 'string';
+        return input;
+      })
   }
 
 }

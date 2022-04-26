@@ -554,4 +554,8 @@ describe('idx/remediate', () => {
       });
     });
   });
+
+  describe('use generic remediator', () => {
+
+  });
 });

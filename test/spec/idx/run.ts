@@ -236,13 +236,22 @@ describe('idx/run', () => {
     const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow);
     const { remediators, actions, flowMonitor } = flowSpec;
     await run(authClient, options);
-    expect(mocked.remediate.remediate).toHaveBeenCalledWith(authClient, idxResponse, values, {
+    await run(authClient, { ...options, useGenericRemediator: true });
+    expect(mocked.remediate.remediate).toHaveBeenNthCalledWith(1, authClient, idxResponse, values, {
       remediators,
       actions,
       flow,
       flowMonitor,
       shouldProceedWithEmailAuthenticator, // will be removed in next major version
       useGenericRemediator: false
+    });
+    expect(mocked.remediate.remediate).toHaveBeenNthCalledWith(2, authClient, idxResponse, values, {
+      remediators,
+      actions,
+      flow,
+      flowMonitor,
+      shouldProceedWithEmailAuthenticator, // will be removed in next major version
+      useGenericRemediator: true
     });
   });
 
