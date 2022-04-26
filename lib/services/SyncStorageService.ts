@@ -26,6 +26,7 @@ export class SyncStorageService implements ServiceInterface {
   private options: ServiceManagerOptions;
   private channel?: BroadcastChannel<SyncMessage>;
   private started = false;
+  private enablePostMessage = true;
 
   constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
     this.tokenManager = tokenManager;
@@ -61,7 +62,22 @@ export class SyncStorageService implements ServiceInterface {
     }
   }
 
+  stop() {
+    if (this.started) {
+      this.tokenManager.off(EVENT_ADDED, this.onTokenAddedHandler);
+      this.tokenManager.off(EVENT_REMOVED, this.onTokenRemovedHandler);
+      this.tokenManager.off(EVENT_RENEWED, this.onTokenRenewedHandler);
+      this.channel?.removeEventListener('message', this.onSyncMessageHandler);
+      this.channel?.close();
+      this.channel = undefined;
+      this.started = false;
+    }
+  }
+
   private onTokenAddedHandler(key: string, token: Token) {
+    if (!this.enablePostMessage) {
+      return;
+    }
     this.channel?.postMessage({
       type: EVENT_ADDED,
       key,
@@ -70,6 +86,9 @@ export class SyncStorageService implements ServiceInterface {
   }
 
   private onTokenRemovedHandler(key: string, token: Token) {
+    if (!this.enablePostMessage) {
+      return;
+    }
     this.channel?.postMessage({
       type: EVENT_REMOVED,
       key,
@@ -78,6 +97,9 @@ export class SyncStorageService implements ServiceInterface {
   }
 
   private onTokenRenewedHandler(key: string, token: Token, oldToken?: Token) {
+    if (!this.enablePostMessage) {
+      return;
+    }
     this.channel?.postMessage({
       type: EVENT_RENEWED,
       key,
@@ -89,31 +111,26 @@ export class SyncStorageService implements ServiceInterface {
   private onSyncMessageHandler(msg: SyncMessage) {
     switch (msg.type) {
       case EVENT_ADDED:
+        this.enablePostMessage = false;
         this.tokenManager.emitAdded(msg.key, msg.token);
         this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
+        this.enablePostMessage = true;
         break;
       case EVENT_REMOVED:
+        this.enablePostMessage = false;
         this.tokenManager.clearExpireEventTimeout(msg.key);
         this.tokenManager.emitRemoved(msg.key, msg.token);
+        this.enablePostMessage = true;
         break;
       case EVENT_RENEWED:
+        this.enablePostMessage = false;
         this.tokenManager.clearExpireEventTimeout(msg.key);
         this.tokenManager.emitRenewed(msg.key, msg.token, msg.oldToken);
         this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
+        this.enablePostMessage = true;
         break;
       default:
         throw new Error(`Unknown message type ${msg.type}`);
-    }
-  }
-
-  stop() {
-    if (this.started) {
-      this.tokenManager.off(EVENT_ADDED, this.onTokenAddedHandler);
-      this.tokenManager.off(EVENT_REMOVED, this.onTokenRemovedHandler);
-      this.channel?.removeEventListener('message', this.onSyncMessageHandler);
-      this.channel?.close();
-      this.channel = undefined;
-      this.started = false;
     }
   }
 } 
