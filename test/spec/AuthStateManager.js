@@ -143,7 +143,7 @@ describe('AuthStateManager', () => {
         await channel.postMessage({
           type: 'added',
           key: 'idToken',
-          token: 'fake_id_token'
+          token: tokens.standardIdToken2Parsed
         });
         expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
         auth.tokenManager.stop();

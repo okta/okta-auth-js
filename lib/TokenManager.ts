@@ -110,6 +110,10 @@ export class TokenManager implements TokenManagerInterface {
     this.off = this.emitter.off.bind(this.emitter);
   }
 
+  hasSharedStorage() {
+    return this.storage.isSharedStorage();
+  }
+
   start() {
     if (this.options.clearPendingRemoveTokens) {
       this.clearPendingRemoveTokens();

@@ -367,6 +367,11 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     // AuthStateManager
     this.authStateManager = new AuthStateManager(this);
 
+    // Enable `syncStorage` only if token storage is shared across tabs (type is `localStorage` or `cookie`)
+    if (!this.tokenManager.hasSharedStorage()) {
+      args.services = { ...args.services, syncStorage: false };
+    }
+
     // ServiceManager
     this.serviceManager = new ServiceManager(this, args.services);
   }

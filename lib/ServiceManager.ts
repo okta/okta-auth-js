@@ -52,14 +52,6 @@ export class ServiceManager implements ServiceManagerInterface {
       },
       options
     );
-    // Enable `syncStorage` only if token storage type is `localStorage` or `cookie`
-    const syncableStorageTypes = ['localStorage', 'cookie'];
-    const storageType = sdk.tokenManager.getOptions().storage;
-    const canSyncStorage = typeof storageType === 'string'
-      && syncableStorageTypes.includes(storageType);
-    if (!canSyncStorage) {
-      this.options.syncStorage = false;
-    }
 
     this.started = false;
     this.services = new Map();

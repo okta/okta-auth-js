@@ -150,7 +150,8 @@ var storageUtil: BrowserStorageUtil = {
       },
       removeItem: (key) => {
         this.storage.delete(key);
-      }
+      },
+      isSharedStorage: () => true
     };
 
     if (!options!.useSeparateCookies) {
@@ -191,7 +192,8 @@ var storageUtil: BrowserStorageUtil = {
         Object.keys(existingValues).forEach(k => {
           storage.removeItem(key + '_' + k);
         });
-      }
+      },
+      isSharedStorage: () => true
     };
   },
 
@@ -204,7 +206,8 @@ var storageUtil: BrowserStorageUtil = {
       },
       setItem: (key, value) => {
         this.inMemoryStore[key] = value;
-      }
+      },
+      isSharedStorage: () => false
     };
   },
 

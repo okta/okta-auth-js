@@ -13,6 +13,7 @@
 
 /* eslint-disable max-statements */
 
+import tokens from '@okta/test.support/tokens';
 import { TokenManager } from '../../../lib/TokenManager';
 import { SyncStorageService } from '../../../lib/services/SyncStorageService';
 import * as features from '../../../lib/features';
@@ -25,17 +26,24 @@ describe('SyncStorageService', () => {
   let instance;
   let channel;
   let service;
+  let storage;
+  let tokenStorage;
   beforeEach(function() {
     instance = null;
     channel = null;
     service = null;
     const emitter = new Emitter();
+    storage = {
+      idToken: tokens.standardIdTokenParsed
+    };
+    tokenStorage = {
+        getStorage: jest.fn().mockImplementation(() => storage),
+        setStorage: jest.fn().mockImplementation(() => {})
+    };
     sdkMock = {
       options: {},
       storageManager: {
-        getTokenStorage: jest.fn().mockReturnValue({
-          getStorage: jest.fn().mockReturnValue({})
-        }),
+        getTokenStorage: jest.fn().mockReturnValue(tokenStorage),
         getOptionsForSection: jest.fn().mockReturnValue({})
       },
       emitter
@@ -72,9 +80,9 @@ describe('SyncStorageService', () => {
     await channel.postMessage({
       type: 'added',
       key: 'idToken',
-      token: 'fake-idToken'
+      token: tokens.standardIdTokenParsed
     });
-    expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', 'fake-idToken');
+    expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', tokens.standardIdTokenParsed);
   });
 
   it('should emit "renewed" event if token is changed', async () => {
@@ -83,10 +91,10 @@ describe('SyncStorageService', () => {
     await channel.postMessage({
       type: 'renewed',
       key: 'idToken',
-      token: 'fake-idToken',
-      oldToken: 'old-fake-idToken'
+      token: tokens.standardIdToken2Parsed,
+      oldToken: tokens.standardIdTokenParsed
     });
-    expect(sdkMock.emitter.emit).toHaveBeenCalledWith('renewed', 'idToken', 'fake-idToken', 'old-fake-idToken');
+    expect(sdkMock.emitter.emit).toHaveBeenCalledWith('renewed', 'idToken', tokens.standardIdToken2Parsed, tokens.standardIdTokenParsed);
   });
 
   it('should emit "removed" event if token is removed', async () => {
@@ -95,9 +103,9 @@ describe('SyncStorageService', () => {
     await channel.postMessage({
       type: 'removed',
       key: 'idToken',
-      token: 'fake-idToken'
+      token: tokens.standardIdTokenParsed
     });
-    expect(sdkMock.emitter.emit).toHaveBeenCalledWith('removed', 'idToken', 'fake-idToken');
+    expect(sdkMock.emitter.emit).toHaveBeenCalledWith('removed', 'idToken', tokens.standardIdTokenParsed);
   });
 
 });

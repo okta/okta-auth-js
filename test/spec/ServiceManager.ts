@@ -24,6 +24,7 @@ jest.mock('../../lib/services/LeaderElectionService', () => {
       this.options = options;
     }
     canStart() { return true; }
+    requiresLeadership() { return false; }
     isStarted() { return this.started; }
     start() { this.started = true; }
     stop() { this.started = false; }

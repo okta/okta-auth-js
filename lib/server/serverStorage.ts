@@ -99,7 +99,8 @@ class ServerStorage implements StorageUtil {
       getItem: this.nodeCache.get,
       setItem: (key, value) => {
         this.nodeCache.set(key, value, '2200-01-01T00:00:00.000Z');
-      }
+      },
+      isSharedStorage: () => true
     };
   }
 }
