@@ -43,6 +43,7 @@ export type Input = {
   maxLength?: number;
   secret?: boolean;
   required?: boolean;
+  options?: IdxOption[];
 }
 
 
