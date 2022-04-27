@@ -44,6 +44,7 @@ describe('idx/util', () => {
         inputs: [{
           label: 'Username',
           name: 'username',
+          required: true,
         }],
         name: 'identify'
       }]);

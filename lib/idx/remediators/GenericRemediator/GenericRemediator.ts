@@ -5,6 +5,7 @@ import { proceed } from '../../proceed';
 
 export class GenericRemediator extends Remediator {
   canRemediate(): boolean {
+    // only handle remediations that are able to submit form (xhr)
     if (typeof this.remediation.action !== 'function') {
       return false;
     }
@@ -67,7 +68,7 @@ export class GenericRemediator extends Remediator {
         // use string as default input type
         input.type = input.type || 'string';
         return input;
-      })
+      });
   }
 
 }

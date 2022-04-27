@@ -141,7 +141,8 @@ describe('idx/startTransaction', () => {
         availableSteps: [{
           inputs: [{
             label: 'Username',
-            name: 'username'
+            name: 'username',
+            required: true,
           }],
           name: 'identify'
         }],
@@ -225,7 +226,11 @@ describe('idx/startTransaction', () => {
     expect(res.availableSteps).toEqual([
       {
         inputs: [
-          { label: 'Username', name: 'username' }
+          { 
+            label: 'Username', 
+            name: 'username',
+            required: true,
+          }
         ], 
         name: 'identify'
       }, 

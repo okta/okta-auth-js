@@ -2,7 +2,7 @@ import { warn } from '../util';
 import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
-import { FlowIdentifier, IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
+import { IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
 import { proceed } from './proceed';
 

@@ -23,7 +23,8 @@ export const IdxValueFactory = Factory.define<IdxRemediationValue>(() => {
 
 export const UsernameValueFactory = IdxValueFactory.params({
   name: 'identifier',
-  label: 'Username'
+  label: 'Username',
+  required: true
 });
 
 export const CredentialsValueFactory = IdxValueFactory.params({
@@ -162,5 +163,13 @@ export const OktaVerifyPushOnlyMethodTypeValueFactory = IdxValueFactory.params({
       value: 'push'
     },
   ]
+});
+
+export const StateHandleValueFactory = IdxValueFactory.params({
+  name: 'stateHandle',
+  required: true,
+  value: '02CqFbzJ_zMGCqXut-1CNXfafiTkh9wGlbFqi9Xupt',
+  visible: false,
+  mutable: false
 });
 

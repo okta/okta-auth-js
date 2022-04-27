@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { Input } from './api';
+
 
 // TODO: remove when idx-js provides type information
 
@@ -89,7 +91,7 @@ export interface IdxForm {
 }
 
 export interface IdxOption {
-  value: string | { form: IdxForm };
+  value: string | {form: IdxForm} | Input[];
   label: string;
   relatesTo?: IdxAuthenticator;
 }
