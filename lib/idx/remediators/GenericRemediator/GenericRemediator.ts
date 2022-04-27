@@ -46,18 +46,23 @@ export class GenericRemediator extends Remediator {
     } = this.remediation;
     /* eslint-enable no-unused-vars, @typescript-eslint/no-unused-vars */
 
-    return { 
-      ...rest,
-      ...(!!inputs.length && { inputs }),
-      ...(action && { 
+    // step to handle form submission
+    if (action) {
+      return { 
+        ...rest,
+        ...(!!inputs.length && { inputs }),
         action: async (params?) => {
           return proceed(this.authClient, {
             step: name,
             ...params
           });
         }
-      })
-    };
+      };
+    }
+
+    // return whole remediation data for other steps, eg "redirect-idp"
+    return { ...this.remediation } as NextStep;
+    
   }
 
   getInputs(): Input[] {

@@ -48,6 +48,7 @@ import {
 interface MockedIdxRemediation extends IdxRemediation {
   _authenticator?: IdxAuthenticator;
   _form?: IdxForm;
+  [key: string]: any;
 }
 
 export const IdxRemediationFactory = Factory.define<MockedIdxRemediation>(() => {

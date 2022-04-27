@@ -12,7 +12,8 @@ import {
   IdxRemediation,
   IdxResponse,
   RawIdxResponse,
-  IdxActionParams
+  IdxActionParams,
+  IdpConfig,
 } from './idx-js';
 
 export enum IdxStatus {
@@ -63,6 +64,8 @@ export type NextStep = {
   authenticatorEnrollments?: IdxAuthenticator[];
   // eslint-disable-next-line no-use-before-define
   action?: (params?: IdxActionParams) => Promise<IdxTransaction>;
+  idp?: IdpConfig;
+  href?: string;
 }
 
 export enum IdxFeature {

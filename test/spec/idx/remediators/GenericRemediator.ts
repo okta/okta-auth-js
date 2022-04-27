@@ -147,9 +147,9 @@ describe('remediators/GenericRemediator', () => {
   });
 
   describe('Override getNextStep', () => {
-    let remediation;
-    beforeAll(() => {
-      remediation = IdxRemediationFactory.build({
+
+    it('returns mapped fields for form submission remediation', async () => {
+      const remediation = IdxRemediationFactory.build({
         href: 'http://fake.com', 
         method: 'POST', 
         rel: ['create-form'], 
@@ -162,9 +162,6 @@ describe('remediators/GenericRemediator', () => {
         ],
         action: jest.fn()
       });
-    });
-
-    it('returns with correct fields', async () => {
       const remediator = new GenericRemediator(authClient, remediation, {});
       const nextStep = remediator.getNextStep();
       expect(nextStep).toMatchObject({
@@ -206,6 +203,28 @@ describe('remediators/GenericRemediator', () => {
       expect(mocked.proceed.proceed).toHaveBeenCalledWith(authClient, {
         step: 'foo',
         foobar: 'foobar'
+      });
+    });
+
+    it('returns all original fields for non form submission remediation', () => {
+      const remediation = IdxRemediationFactory.build({
+        href: 'http://fake.com', 
+        name: 'foo',
+        meta: {
+          fake1: 'fake1',
+          fake2: 'fake2'
+        }
+      });
+      const remediator = new GenericRemediator(authClient, remediation, {});
+      const nextStep = remediator.getNextStep();
+      expect(nextStep).toEqual({
+        href: 'http://fake.com', 
+        name: 'foo',
+        meta: {
+          fake1: 'fake1',
+          fake2: 'fake2'
+        },
+        value: []
       });
     });
 
