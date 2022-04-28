@@ -93,8 +93,8 @@ describe('idx/remediate', () => {
             nextStep: {}
           });
           expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, authClient, idxResponse.neededToProceed, { resend: true }, {});
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, authClient, responseFromAction.neededToProceed, {}, { actions: []});
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse.neededToProceed, { resend: true }, {});
+          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromAction.neededToProceed, {}, { actions: []});
         });
 
         it('will handle exceptions', async () => {
@@ -111,7 +111,7 @@ describe('idx/remediate', () => {
           } as unknown as IdxResponse;
           const res = await remediate(authClient, idxResponse, { resend: true }, {});
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
         });
       });
 
@@ -146,8 +146,8 @@ describe('idx/remediate', () => {
             nextStep: {}
           });
           expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, authClient, idxResponse.neededToProceed, {}, { actions: ['some-action'] });
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, authClient, responseFromAction.neededToProceed, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse.neededToProceed, {}, { actions: ['some-action'] });
+          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromAction.neededToProceed, {}, { actions: [] });
         });
         it('will handle exceptions', async () => {
           const { authClient, remediator, errorResponse } = testContext;
@@ -163,7 +163,7 @@ describe('idx/remediate', () => {
           } as unknown as IdxResponse;
           const res = await remediate(authClient, idxResponse, { resend: true }, { actions: ['some-action']});
           expect(res).toEqual(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
         });
       });
 
@@ -192,8 +192,8 @@ describe('idx/remediate', () => {
             nextStep: {}
           });
           expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, authClient, idxResponse.neededToProceed, { }, { actions: ['some-remediation'] });
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, authClient, responseFromRemediation.neededToProceed, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse.neededToProceed, { }, { actions: ['some-remediation'] });
+          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromRemediation.neededToProceed, {}, { actions: [] });
         });
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
@@ -208,7 +208,7 @@ describe('idx/remediate', () => {
           } as unknown as IdxResponse;
           const res = await remediate(authClient, idxResponse, {}, { actions: ['some-remediation']});
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
         });
       });
 
@@ -274,8 +274,8 @@ describe('idx/remediate', () => {
             nextStep: {}
           });
           expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, authClient, idxResponse.neededToProceed, {}, { actions: [action] });
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, authClient, responseFromAction.neededToProceed, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse.neededToProceed, {}, { actions: [action] });
+          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromAction.neededToProceed, {}, { actions: [] });
         });
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
@@ -297,7 +297,7 @@ describe('idx/remediate', () => {
           };
           const res = await remediate(authClient, idxResponse, {}, { actions: [action]});
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
           expect(actionFn).toHaveBeenCalledWith({ foo: 'bar' });
         });
       });
@@ -330,8 +330,8 @@ describe('idx/remediate', () => {
             nextStep: {}
           });
           expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, authClient, idxResponse.neededToProceed, { }, { actions: [action] });
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, authClient, responseFromRemediation.neededToProceed, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse.neededToProceed, { }, { actions: [action] });
+          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromRemediation.neededToProceed, {}, { actions: [] });
         });
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
@@ -349,7 +349,7 @@ describe('idx/remediate', () => {
           };
           const res = await remediate(authClient, idxResponse, {}, { actions: [action]});
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
         });
       });
 
@@ -420,7 +420,7 @@ describe('idx/remediate', () => {
           },
         });
         expect(util.getRemediator).toHaveBeenCalledTimes(1);
-        expect(util.getRemediator).toHaveBeenNthCalledWith(1, authClient, idxResponse.neededToProceed, { }, { step: 'some-remediation' });
+        expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse.neededToProceed, { }, { step: 'some-remediation' });
         expect(idxResponse.proceed).toHaveBeenCalledWith('some-remediation', {});
       });
       it('will handle exceptions', async () => {
@@ -439,7 +439,7 @@ describe('idx/remediate', () => {
           } as unknown as IdxResponse;
           const res = await remediate(authClient, idxResponse, {}, { step: 'some-remediation' });
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(error);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error);
           expect(idxResponse.proceed).toHaveBeenCalledWith('some-remediation', {});
       });
     });
@@ -530,8 +530,8 @@ describe('idx/remediate', () => {
         });
         expect(idxResponse.proceed).toHaveBeenCalledWith(name, data);
         expect(util.getRemediator).toHaveBeenCalledTimes(2);
-        expect(util.getRemediator).toHaveBeenNthCalledWith(1, authClient, idxResponse.neededToProceed, {}, {});
-        expect(util.getRemediator).toHaveBeenNthCalledWith(2, authClient, responseFromProceed.neededToProceed, valuesAfterProceed, {});
+        expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse.neededToProceed, {}, {});
+        expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromProceed.neededToProceed, valuesAfterProceed, {});
 
       });
 

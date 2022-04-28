@@ -20,11 +20,10 @@ const mocked = {
 };
 
 describe('remediators/GenericRemediator', () => {
-  let authClient = {} as OktaAuthInterface;
 
   it('extends Base Remediator', () => {
     const remediation = {} as IdxRemediation;
-    const remediator = new GenericRemediator(authClient, remediation);
+    const remediator = new GenericRemediator(remediation);
     expect(remediator).toBeInstanceOf(Remediator);
   });
 
@@ -45,7 +44,7 @@ describe('remediators/GenericRemediator', () => {
         const values = {
           identifier: 'fake-identifier'
         } as RemediationValues;
-        const remediator = new GenericRemediator(authClient, remediation, values);
+        const remediator = new GenericRemediator(remediation, values);
         expect(remediator.canRemediate()).toBe(true);
       });
 
@@ -53,7 +52,7 @@ describe('remediators/GenericRemediator', () => {
         const values = {
           identifier: undefined
         } as RemediationValues;
-        const remediator = new GenericRemediator(authClient, remediation, values);
+        const remediator = new GenericRemediator(remediation, values);
         expect(remediator.canRemediate()).toBe(false);
       });
     });
@@ -78,7 +77,7 @@ describe('remediators/GenericRemediator', () => {
             passcode: 'abcd'
           }
         } as RemediationValues;
-        const remediator = new GenericRemediator(authClient, remediation, values);
+        const remediator = new GenericRemediator(remediation, values);
         expect(remediator.canRemediate()).toBe(true);
       });
 
@@ -92,14 +91,14 @@ describe('remediators/GenericRemediator', () => {
             passcode: undefined
           }
         } as RemediationValues;
-        remediator = new GenericRemediator(authClient, remediation, values);
+        remediator = new GenericRemediator(remediation, values);
         expect(remediator.canRemediate()).toBe(false);
 
         // missing value from top level
         values = {
           identifier: 'fake-identifier',
         } as RemediationValues;
-        remediator = new GenericRemediator(authClient, remediation, values);
+        remediator = new GenericRemediator(remediation, values);
         expect(remediator.canRemediate()).toBe(false);
       });
     });
@@ -125,7 +124,7 @@ describe('remediators/GenericRemediator', () => {
         },
         foo: 'bar'
       } as RemediationValues;
-      const remediator = new GenericRemediator(authClient, remediation, values);
+      const remediator = new GenericRemediator(remediation, values);
       expect(remediator.getData()).toEqual({
         identifier: 'fake-identifier',
         credentials: {
@@ -139,7 +138,7 @@ describe('remediators/GenericRemediator', () => {
         identifier: 'fake-identifier',
         foo: 'bar'
       } as RemediationValues;
-      const remediator = new GenericRemediator(authClient, remediation, values);
+      const remediator = new GenericRemediator(remediation, values);
       expect(remediator.getData()).toEqual({
         identifier: 'fake-identifier',
       });
@@ -162,8 +161,9 @@ describe('remediators/GenericRemediator', () => {
         ],
         action: jest.fn()
       });
-      const remediator = new GenericRemediator(authClient, remediation, {});
-      const nextStep = remediator.getNextStep();
+      const authClient = {} as OktaAuthInterface;
+      const remediator = new GenericRemediator(remediation, {});
+      const nextStep = remediator.getNextStep(authClient);
       expect(nextStep).toMatchObject({
         name: 'foo',
         inputs: [
@@ -215,8 +215,9 @@ describe('remediators/GenericRemediator', () => {
           fake2: 'fake2'
         }
       });
-      const remediator = new GenericRemediator(authClient, remediation, {});
-      const nextStep = remediator.getNextStep();
+      const authClient = {} as OktaAuthInterface;
+      const remediator = new GenericRemediator(remediation, {});
+      const nextStep = remediator.getNextStep(authClient);
       expect(nextStep).toEqual({
         href: 'http://fake.com', 
         name: 'foo',
@@ -250,7 +251,7 @@ describe('remediators/GenericRemediator', () => {
 
     it('returns correct input', () => {
       jest.spyOn(mocked.util, 'unwrapFormValue');
-      const remediator = new GenericRemediator(authClient, remediation);
+      const remediator = new GenericRemediator(remediation);
       const inputs = remediator.getInputs();
       expect(inputs).toEqual([
         {

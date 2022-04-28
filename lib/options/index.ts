@@ -77,7 +77,12 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     codeChallengeMethod: args.codeChallengeMethod,
     recoveryToken: args.recoveryToken,
     activationToken: args.activationToken,
-    useGenericRemediator: args.useGenericRemediator,
+    idx: {
+      flow: args.idx?.flow,
+      activationToken: args.idx?.activationToken,
+      recoveryToken: args.idx?.recoveryToken,
+      useGenericRemediator: !!args.idx?.useGenericRemediator,
+    },
 
     // Give the developer the ability to disable token signature validation.
     ignoreSignature: !!args.ignoreSignature,

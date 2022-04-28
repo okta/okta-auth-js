@@ -25,13 +25,13 @@ export class VerifyAuthenticator<T extends VerifyAuthenticatorValues = VerifyAut
 
   authenticator: Authenticator<VerifyAuthenticatorValues>;
 
-  constructor(authClient: OktaAuthInterface, remediation: IdxRemediation, values: T = {} as T) {
-    super(authClient, remediation, values);
+  constructor(remediation: IdxRemediation, values: T = {} as T) {
+    super(remediation, values);
     this.authenticator = getAuthenticator(remediation);
   }
 
-  getNextStep(context?: IdxContext): NextStep {
-    const nextStep = super.getNextStep(context);
+  getNextStep(authClient: OktaAuthInterface, context?: IdxContext): NextStep {
+    const nextStep = super.getNextStep(authClient, context);
     const authenticatorEnrollments = context?.authenticatorEnrollments?.value;
 
     return {

@@ -25,12 +25,11 @@ export class AuthenticatorVerificationData extends AuthenticatorData<Authenticat
   shouldProceedWithEmailAuthenticator: boolean; // will be removed in next major version
 
   constructor(
-    authClient: OktaAuthInterface, 
     remediation: IdxRemediation, 
     values: AuthenticatorDataValues = {}, 
     options: RemediateOptions = {}
   ) {
-    super(authClient, remediation, values);
+    super(remediation, values);
 
     // will be removed in next major version
     this.shouldProceedWithEmailAuthenticator = options.shouldProceedWithEmailAuthenticator !== false

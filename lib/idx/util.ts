@@ -2,9 +2,10 @@ import { warn } from '../util';
 import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
+import { proceed } from './proceed';
 import { IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
-import { proceed } from './proceed';
+import { OktaAuthInterface } from '../types';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
@@ -104,7 +105,11 @@ export function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
   return res;
 }
 
-export function getAvailableSteps(authClient, idxResponse: IdxResponse, useGenericRemediator?: boolean): NextStep[] {
+export function getAvailableSteps(
+  authClient: OktaAuthInterface, 
+  idxResponse: IdxResponse, 
+  useGenericRemediator?: boolean
+): NextStep[] {
   const res: NextStep[] = [];
 
   const remediatorMap: Record<string, RemediatorConstructor> = Object.values(remediators)
@@ -119,8 +124,8 @@ export function getAvailableSteps(authClient, idxResponse: IdxResponse, useGener
   for (let remediation of idxResponse.neededToProceed) {
     const T = getRemediatorClass(remediation, { useGenericRemediator, remediators: remediatorMap });
     if (T) {
-      const remediator: Remediator = new T(authClient, remediation);
-      res.push (remediator.getNextStep(idxResponse.context) as never);
+      const remediator: Remediator = new T(remediation);
+      res.push (remediator.getNextStep(authClient, idxResponse.context) as never);
     }
   }
 
@@ -182,7 +187,6 @@ function getRemediatorClass(remediation: IdxRemediation, options: RemediateOptio
 // Return first match idxRemediation in allowed remediators
 // eslint-disable-next-line complexity
 export function getRemediator(
-  authClient,
   idxRemediations: IdxRemediation[],
   values: RemediationValues,
   options: RemediateOptions,
@@ -198,7 +202,7 @@ export function getRemediator(
     const remediation = idxRemediations.find(({ name }) => name === options.step)!;
     if (remediation) {
       const T = getRemediatorClass(remediation, options);
-      return T ? new T(authClient, remediation, values, options) : undefined;
+      return T ? new T(remediation, values, options) : undefined;
     } else {
       // step was specified, but remediation was not found. This is unexpected!
       warn(`step "${options.step}" did not match any remediations`);
@@ -215,7 +219,7 @@ export function getRemediator(
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const T = getRemediatorClass(remediation, options)!;
-    remediator = new T(authClient, remediation, values, options);
+    remediator = new T(remediation, values, options);
     if (remediator.canRemediate()) {
       // found the remediator
       return remediator;
@@ -227,7 +231,7 @@ export function getRemediator(
 
   // If no remedition is picked, use the first one with GenericRemeditor for default flow
   if (!remediatorCandidates.length && !!idxRemediations.length && useGenericRemediator) {
-    return new GenericRemediator(authClient, idxRemediations[0], values, options);
+    return new GenericRemediator(idxRemediations[0], values, options);
   }
   
   return remediatorCandidates[0];
@@ -235,9 +239,9 @@ export function getRemediator(
 
 
 export function getNextStep(
-  remediator: Remediator, idxResponse: IdxResponse
+  authClient: OktaAuthInterface, remediator: Remediator, idxResponse: IdxResponse
 ): NextStep {
-  const nextStep = remediator.getNextStep(idxResponse.context);
+  const nextStep = remediator.getNextStep(authClient, idxResponse.context);
   const canSkip = canSkipFn(idxResponse);
   const canResend = canResendFn(idxResponse);
   return {
@@ -247,7 +251,7 @@ export function getNextStep(
   };
 }
 
-export function handleIdxError(e, remediator?): RemediationResponse {
+export function handleIdxError(authClient: OktaAuthInterface, e, remediator?): RemediationResponse {
   // Handle idx messages
   let idxResponse = isIdxResponse(e) ? e : null;
   if (!idxResponse) {
@@ -263,7 +267,7 @@ export function handleIdxError(e, remediator?): RemediationResponse {
   if (terminal) {
     return { idxResponse, terminal, messages };
   } else {
-    const nextStep = remediator && getNextStep(remediator, idxResponse);
+    const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
     return { 
       idxResponse,
       messages, 

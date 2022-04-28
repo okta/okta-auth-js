@@ -246,6 +246,44 @@ describe('idx/run', () => {
     });
   });
 
+  it('calls remediate, passing SDK level options through', async () => {
+    const authClient = { 
+      ...testContext.authClient, 
+      options: {
+        idx: {
+          useGenericRemediator: true // beta
+        }
+      } 
+    };
+    const { idxResponse } = testContext;
+    const flow = 'register';
+    const username = 'x';
+    const password = 'y';
+    const shouldProceedWithEmailAuthenticator = false;
+    const options: AuthenticationOptions = {
+      username,
+      password,
+      flow,
+      shouldProceedWithEmailAuthenticator // will be removed in next major version
+    };
+    const values = { 
+      username,
+      password, 
+      stateHandle: idxResponse.rawIdxState.stateHandle 
+    };
+    const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow);
+    const { remediators, actions, flowMonitor } = flowSpec;
+    await run(authClient, options);
+    expect(mocked.remediate.remediate).toHaveBeenCalledWith(authClient, idxResponse, values, {
+      remediators,
+      actions,
+      flow,
+      flowMonitor,
+      shouldProceedWithEmailAuthenticator, // will be removed in next major version
+      useGenericRemediator: true,
+    });
+  });
+
   it('saves idxResponse when nextStep is avaiable', async () => {
     const { authClient, idxResponse, remediateResponse } = testContext;
     remediateResponse.nextStep = 'has-next-step';

@@ -26,8 +26,8 @@ export type AuthenticatorDataValues = RemediationValues & {
 export class AuthenticatorData<T extends AuthenticatorDataValues = AuthenticatorDataValues> extends Remediator<T> {
   authenticator: IdxAuthenticator;
 
-  constructor(authClient: OktaAuthInterface, remediation: IdxRemediation, values: T = {} as T) {
-    super(authClient, remediation, values);
+  constructor(remediation: IdxRemediation, values: T = {} as T) {
+    super(remediation, values);
 
     // set before other data calculation
     this.authenticator = this.getAuthenticator()!;
@@ -63,8 +63,8 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
   }
 
   // TODO: remove this override method in the next major version - OKTA-491236
-  getNextStep() {
-    const common = super.getNextStep();
+  getNextStep(authClient: OktaAuthInterface) {
+    const common = super.getNextStep(authClient);
     const options = this.getMethodTypes();
     return { 
       ...common, 

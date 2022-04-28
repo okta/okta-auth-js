@@ -77,7 +77,7 @@ export async function remediate(
     return { idxResponse };
   }
 
-  const remediator = getRemediator(authClient, neededToProceed, values, options);
+  const remediator = getRemediator(neededToProceed, values, options);
 
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
@@ -102,7 +102,7 @@ export async function remediate(
           idxResponse = await idxResponse.actions[action](params);
           idxResponse = { ...idxResponse, requestDidSucceed: true };
         } catch (e) {
-          return handleIdxError(e, remediator);
+          return handleIdxError(authClient, e, remediator);
         }
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
@@ -123,7 +123,7 @@ export async function remediate(
           idxResponse = { ...idxResponse, requestDidSucceed: true };
         }
         catch (e) {
-          return handleIdxError(e, remediator);
+          return handleIdxError(authClient, e, remediator);
         }
 
         return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
@@ -146,7 +146,7 @@ export async function remediate(
         idxResponse = { ...idxResponse, requestDidSucceed: true };
         return { idxResponse };
       } catch(e) {
-        return handleIdxError(e);
+        return handleIdxError(authClient, e);
       }
     }
     if (flow === 'default') {
@@ -160,7 +160,7 @@ export async function remediate(
 
   // Return next step to the caller
   if (!remediator.canRemediate()) {
-    const nextStep = getNextStep(remediator, idxResponse);
+    const nextStep = getNextStep(authClient, remediator, idxResponse);
     return {
       idxResponse,
       nextStep,
@@ -179,6 +179,6 @@ export async function remediate(
     options = { ...options, step: undefined }; // do not re-use the step
     return remediate(authClient, idxResponse, values, options); // recursive call
   } catch (e) {
-    return handleIdxError(e, remediator);
+    return handleIdxError(authClient, e, remediator);
   }
 }

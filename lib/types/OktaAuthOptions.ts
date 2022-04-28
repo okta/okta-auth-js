@@ -89,11 +89,11 @@ export interface OktaAuthOptions extends
     'codeChallenge' |
     'codeChallengeMethod'
   >,
+  // TODO: remove in v7 - OKTA-494032
   Pick<IdxTransactionMeta,
     'flow' |
     'activationToken' |
-    'recoveryToken' |
-    'useGenericRemediator' // beta
+    'recoveryToken'
   >
 {
   useInteractionCodeFlow?: boolean;
@@ -113,6 +113,12 @@ export interface OktaAuthOptions extends
   storageManager?: StorageManagerOptions;
   services?: ServiceManagerOptions;
   transactionManager?: TransactionManagerOptions;
+  idx?: Pick<IdxTransactionMeta,
+    'flow' |
+    'activationToken' |
+    'recoveryToken' |
+    'useGenericRemediator' // beta
+  >;
   
   // For server-side web applications ONLY!
   clientSecret?: string;

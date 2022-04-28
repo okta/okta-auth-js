@@ -32,7 +32,6 @@ export interface RemediationValues {
 
 export interface RemediatorConstructor {
   new<T extends RemediationValues>(
-    authClient: OktaAuthInterface, 
     remediation: IdxRemediation, 
     values?: T, 
     options?: RemediateOptions
@@ -43,20 +42,17 @@ export interface RemediatorConstructor {
 export class Remediator<T extends RemediationValues = RemediationValues> {
   static remediationName: string;
 
-  authClient: OktaAuthInterface;
   remediation: IdxRemediation;
   values: T;
   options: RemediateOptions;
   map?: IdxToRemediationValueMap;
 
   constructor(
-    authClient: OktaAuthInterface, 
     remediation: IdxRemediation, 
     values: T = {} as T, 
     options: RemediateOptions = {}
   ) {
     // assign fields to the instance
-    this.authClient = authClient;
     this.values = { ...values };
     this.options = { ...options };
     this.formatAuthenticators();
@@ -153,7 +149,7 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
     return !!this.getData(key);
   }
 
-  getNextStep(_context?: IdxContext): NextStep {
+  getNextStep(authClient: OktaAuthInterface, _context?: IdxContext): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
     const authenticator = this.getAuthenticator();

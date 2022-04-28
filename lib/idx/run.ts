@@ -92,7 +92,7 @@ function initializeData(authClient, data: RunData): RunData {
     actions = actions || flowSpec.actions;
   }
 
-  useGenericRemediator = useGenericRemediator || authClient.options.useGenericRemediator || false;
+  useGenericRemediator = useGenericRemediator || authClient.options.idx?.useGenericRemediator || false;
 
   return { 
     ...data,
