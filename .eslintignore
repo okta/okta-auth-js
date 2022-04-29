@@ -12,3 +12,5 @@ node_modules
 /samples/generated/express-direct-auth-dynamic
 .eslintrc.js
 dist
+/test/apps/app/public/oidc-app.js
+/test/apps/app/target
