@@ -109,9 +109,6 @@ describe('generateIdxAction', () => {
     const actionFunction = generateIdxAction( {}, mockIdxResponse.remediation.value[0]);
     return actionFunction()
       .then( result => {
-        fail('mock call should have failed', result);
-      })
-      .catch( result => {
         expect( http.mock.calls.length ).toBe(1);
         expect( http.mock.calls[0][0] ).toEqual( {} );
         expect( http.mock.calls[0][1] ).toEqual( {

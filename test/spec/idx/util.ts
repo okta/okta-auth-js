@@ -358,14 +358,11 @@ describe('idx/util', () => {
       };
     });
 
-    it('For terminal IDX responses, it augments the object with requestDidSucceed = false and returns it', () => {
+    it('For terminal IDX responses, it returns it with terminal flag', () => {
       const { authClient, idxResponse } = testContext;
       const res = handleFailedResponse(authClient, idxResponse);
       expect(res).toEqual({
-        idxResponse: {
-          ...idxResponse,
-          requestDidSucceed: false
-        },
+        idxResponse,
         terminal: true,
         messages: []
       });

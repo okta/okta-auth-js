@@ -87,8 +87,7 @@ describe('idx/remediate', () => {
           const res = await remediate(authClient, idxResponse, { resend: true }, {});
           expect(res).toEqual({
             idxResponse: {
-              ...responseFromAction,
-              requestDidSucceed: true
+              ...responseFromAction
             },
             nextStep: {}
           });
@@ -145,8 +144,7 @@ describe('idx/remediate', () => {
           const res = await remediate(authClient, idxResponse, {}, { actions: ['some-action'] });
           expect(res).toEqual({
             idxResponse: {
-              ...responseFromAction,
-              requestDidSucceed: true
+              ...responseFromAction
             },
             nextStep: {}
           });
@@ -196,8 +194,7 @@ describe('idx/remediate', () => {
           const res = await remediate(authClient, idxResponse, {}, { actions: ['some-remediation'] });
           expect(res).toEqual({
             idxResponse: {
-              ...responseFromRemediation,
-              requestDidSucceed: true
+              ...responseFromRemediation
             },
             nextStep: {}
           });
@@ -282,8 +279,7 @@ describe('idx/remediate', () => {
           expect(actionFn).toHaveBeenCalledWith({ foo: 'bar' });
           expect(res).toEqual({
             idxResponse: {
-              ...responseFromAction,
-              requestDidSucceed: true
+              ...responseFromAction
             },
             nextStep: {}
           });
@@ -342,8 +338,7 @@ describe('idx/remediate', () => {
           const res = await remediate(authClient, idxResponse, {}, { actions: [action] });
           expect(res).toEqual({
             idxResponse: {
-              ...responseFromRemediation,
-              requestDidSucceed: true
+              ...responseFromRemediation
             },
             nextStep: {}
           });
@@ -437,8 +432,7 @@ describe('idx/remediate', () => {
         const res = await remediate(authClient, idxResponse, {}, { step: 'some-remediation' });
         expect(res).toEqual({
           idxResponse: {
-            ...responseFromRemediation,
-            requestDidSucceed: true
+            ...responseFromRemediation
           },
         });
         expect(util.getRemediator).toHaveBeenCalledTimes(1);
@@ -548,8 +542,7 @@ describe('idx/remediate', () => {
         const res = await remediate(authClient, idxResponse, {}, {});
         expect(res).toEqual({
           idxResponse: {
-            ...responseFromProceed,
-            requestDidSucceed: true
+            ...responseFromProceed
           },
           messages: ['hello'],
           nextStep: {}
@@ -561,8 +554,8 @@ describe('idx/remediate', () => {
 
       });
 
-      it('handles thrown exceptions', async () => {
-        let { authClient, idxResponse, remediator, errorResponse } = testContext;
+      it('will bubble up thrown exceptions', async () => {
+        let { authClient, idxResponse, remediator } = testContext;
         jest.spyOn(util, 'isTerminalResponse');
         const name = 'fubar';
         const data = { foo: 'bar' };
@@ -573,8 +566,13 @@ describe('idx/remediate', () => {
         remediator.getValuesAfterProceed.mockReturnValue(valuesAfterProceed);
         const errorFromProceed = new Error('test error');
         idxResponse.proceed.mockRejectedValue(errorFromProceed);
-        const res = await remediate(authClient, idxResponse, {}, {});
-        expect(res).toEqual(errorResponse);
+        let errorThrown;
+        try {
+          await remediate(authClient, idxResponse, {}, {});
+        } catch (e) {
+          errorThrown = e;
+        }
+        expect(errorThrown).toBe(errorFromProceed);
         expect(idxResponse.proceed).toHaveBeenCalledWith(name, data);
         expect(util.isTerminalResponse).toHaveBeenCalledTimes(1);
       });
