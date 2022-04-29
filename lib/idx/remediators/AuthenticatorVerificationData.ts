@@ -23,7 +23,11 @@ export class AuthenticatorVerificationData extends AuthenticatorData<Authenticat
 
   shouldProceedWithEmailAuthenticator: boolean; // will be removed in next major version
 
-  constructor(remediation: IdxRemediation, values: AuthenticatorDataValues = {}, options: RemediateOptions = {}) {
+  constructor(
+    remediation: IdxRemediation, 
+    values: AuthenticatorDataValues = {}, 
+    options: RemediateOptions = {}
+  ) {
     super(remediation, values);
 
     // will be removed in next major version

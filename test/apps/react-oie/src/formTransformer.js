@@ -1,25 +1,45 @@
 const compose = (...functions) => args => functions.reduceRight((arg, fn) => fn(arg), args);
 
-const inputTransformer = nextStep => form => {
-  // only process UI inputs
-  const inputs = nextStep.inputs?.filter(input => !!input.label);
-  
-  if (!inputs?.length) {
-    return form;
+const getInputTypeFromMeta = meta => {
+  const { secret, type } = meta;
+  let res = 'text';
+  if (secret) {
+    res = 'password';
+  } else if (type === 'boolean') {
+    res = 'checkbox';
   }
+  return res;
+};
 
+const inputTransformer = ({ inputs = [] }) => form => {
   return { 
     ...form,
-    inputs: inputs.map(({ label, name, type, secret, required }) => {
-      if (secret) {
-        type = 'password';
-      } else if (type === 'string') {
-        type = 'text';
-      } else if (type === 'boolean') {
-        type = 'checkbox';
+    inputs: inputs.reduce((acc, input) => {
+      let { label, name, value, type, required } = input;
+      if (Array.isArray(value)) {
+        for (const val of value) {
+          const type = getInputTypeFromMeta(val);
+          if (type) {
+            acc.push({
+              ...input,
+              ...val,
+              name: `${name}.${val.name}`,
+              type
+            });
+          }
+        }
+      } else if (type === 'object') {
+        // cannot be handle as input, wait for later transform to process
+        // do nothing
+      } else {
+        const type = getInputTypeFromMeta(input);
+        if (type) {
+          acc.push({ label, name, type, required });
+        }
       }
-      return { label, name, type, required };
-    })
+
+      return acc;
+    }, [])
   };
 };
 
@@ -33,10 +53,7 @@ const selectTransformer = nextStep => form => {
     if (!acc.selects) {
       acc.selects = [];
     }
-    acc.selects.push({
-      name,
-      options: options.map(({ label, value }) => ({ key: value, value, label }))
-    });
+    acc.selects.push({ name, options });
     return acc;
   }, form);
 };

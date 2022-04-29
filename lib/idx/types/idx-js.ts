@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { Input } from './api';
+
 
 // TODO: remove when idx-js provides type information
 
@@ -89,7 +91,7 @@ export interface IdxForm {
 }
 
 export interface IdxOption {
-  value: string | { form: IdxForm };
+  value: string | {form: IdxForm} | Input[];
   label: string;
   relatesTo?: IdxAuthenticator;
 }
@@ -132,7 +134,10 @@ export interface IdxRemediation {
   method?: string;
   type?: string;
   accepts?: string;
+  produces?: string;
   refresh?: number;
+  rel?: string[];
+  action?: (payload?: IdxActionParams) => Promise<IdxResponse>;
 }
 
 export interface IdxContext {
@@ -203,7 +208,7 @@ export function isRawIdxResponse(obj: any): obj is RawIdxResponse {
 }
 
 export interface IdxActionParams {
-  [key: string]: string | boolean | number;
+  [key: string]: string | boolean | number | object;
 }
 
 export interface IdxActions {

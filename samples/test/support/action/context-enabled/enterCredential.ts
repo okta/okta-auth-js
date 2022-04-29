@@ -11,7 +11,6 @@
  */
 
 
-import setInputField from '../setInputField';
 import getLoginForm from '../../lib/getLoginForm';
 import { getConfig } from '../../../util/configUtils';
 import ActionContext from '../../context';
@@ -56,5 +55,5 @@ export default async function (
   if (!value) {
     throw new Error(`No value set for credential "${credName}"`);
   }
-  await setInputField('set', value, selector);
+  await (await $(selector)).setValue(value);
 }

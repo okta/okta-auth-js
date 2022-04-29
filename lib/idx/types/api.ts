@@ -11,7 +11,9 @@ import {
   IdxOption,
   IdxRemediation,
   IdxResponse,
-  RawIdxResponse
+  RawIdxResponse,
+  IdxActionParams,
+  IdpConfig,
 } from './idx-js';
 
 export enum IdxStatus {
@@ -37,11 +39,12 @@ export type Input = {
   key?: string;
   type?: string;
   label?: string;
-  value?: string | {form: IdxForm};
+  value?: string | {form: IdxForm} | Input[];
   minLength?: number;
   maxLength?: number;
   secret?: boolean;
   required?: boolean;
+  options?: IdxOption[];
 }
 
 
@@ -59,6 +62,10 @@ export type NextStep = {
   options?: IdxOption[];
   poll?: IdxPollOptions;
   authenticatorEnrollments?: IdxAuthenticator[];
+  // eslint-disable-next-line no-use-before-define
+  action?: (params?: IdxActionParams) => Promise<IdxTransaction>;
+  idp?: IdpConfig;
+  href?: string;
 }
 
 export enum IdxFeature {
@@ -76,6 +83,7 @@ export interface IdxTransactionMeta extends PKCETransactionMeta {
   activationToken?: string;
   recoveryToken?: string;
   maxAge?: string | number;
+  useGenericRemediator?: boolean;
 }
 
 export interface IdxTransaction {

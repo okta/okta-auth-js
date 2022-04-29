@@ -10,10 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import setInputField from '../../setInputField';
 import ActionContext from '../../../context';
 
 export default async function (this: ActionContext) {
-  await setInputField('set', this.credentials.password, '#confirm-password');
+  await (await $('#confirm-password')).setValue(this.credentials.password);
 }

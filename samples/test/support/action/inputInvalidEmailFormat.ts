@@ -10,12 +10,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import setInputField from './setInputField';
 import Registration from '../selectors/Registration';
 
 export default async (
 ) => {
   const invalidEmailFormat = '3.14e2';
-  await setInputField('set', invalidEmailFormat, Registration.email);
+  await (await $(Registration.email)).setValue(invalidEmailFormat);
 };

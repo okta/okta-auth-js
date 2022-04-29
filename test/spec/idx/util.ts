@@ -23,25 +23,29 @@ import {
 } from '@okta/test.support/idx';
 import { IdxFeature, IdxResponse, } from '../../../lib/idx/types';
 import { Remediator } from '../../../lib/idx/remediators';
+import { OktaAuthInterface } from '../../../lib/types';
 
 describe('idx/util', () => {
   describe('getAvailableSteps', () => {
     it('returns an empty array if there are no remediations', () => {
+      const authClient = {} as OktaAuthInterface;
       const idxResponse = IdxResponseFactory.build();
-      const res = getAvailableSteps(idxResponse);
+      const res = getAvailableSteps(authClient, idxResponse);
       expect(res.length).toBe(0);
     });
     it('returns next step for identify remediation', () => {
+      const authClient = {} as OktaAuthInterface;
       const idxResponse = IdxResponseFactory.build({
         neededToProceed: [
           IdentifyRemediationFactory.build()
         ]
       });
-      const res = getAvailableSteps(idxResponse);
+      const res = getAvailableSteps(authClient, idxResponse);
       expect(res).toEqual([{
         inputs: [{
           label: 'Username',
           name: 'username',
+          required: true,
         }],
         name: 'identify'
       }]);
@@ -196,7 +200,7 @@ describe('idx/util', () => {
         BarRemediator,
         remediators,
         options,
-        values
+        values,
       };
     });
 
@@ -281,6 +285,7 @@ describe('idx/util', () => {
       const remediator: Remediator = {
         getNextStep: jest.fn().mockReturnValue(nextStep)
       } as unknown as Remediator;
+      const authClient = {} as OktaAuthInterface;
       const context = {
          foo: 'bar'
       };
@@ -296,6 +301,7 @@ describe('idx/util', () => {
         actions
       } as unknown as IdxResponse;
       testContext = {
+        authClient,
         nextStep,
         remediator,
         context,
@@ -306,17 +312,17 @@ describe('idx/util', () => {
     });
 
     it('calls getNextStep() on the Remediator, passing the context from the idxResponse', () => {
-      const { remediator, context, idxResponse, nextStep } = testContext;
-      const res = getNextStep(remediator, idxResponse);
-      expect(remediator.getNextStep).toHaveBeenCalledWith(context);
+      const { authClient, remediator, context, idxResponse, nextStep } = testContext;
+      const res = getNextStep(authClient, remediator, idxResponse);
+      expect(remediator.getNextStep).toHaveBeenCalledWith(authClient, context);
       expect(res).toEqual(nextStep);
     });
 
     it('adds canSkip to the response if neededToProceed includes skip remediation', () => {
-      const { remediator, context, idxResponse, nextStep, neededToProceed } = testContext;
+      const { authClient, remediator, context, idxResponse, nextStep, neededToProceed } = testContext;
       neededToProceed.push({ name: 'skip' });
-      const res = getNextStep(remediator, idxResponse);
-      expect(remediator.getNextStep).toHaveBeenCalledWith(context);
+      const res = getNextStep(authClient, remediator, idxResponse);
+      expect(remediator.getNextStep).toHaveBeenCalledWith(authClient, context);
       expect(res).toEqual({
         ...nextStep,
         canSkip: true
@@ -324,10 +330,10 @@ describe('idx/util', () => {
     });
 
     it('adds canResend to the response if actions includes an action name with a resend suffix', () => {
-      const { remediator, context, idxResponse, nextStep, actions } = testContext;
+      const { authClient, remediator, context, idxResponse, nextStep, actions } = testContext;
       actions['someaction-resend'] = jest.fn();
-      const res = getNextStep(remediator, idxResponse);
-      expect(remediator.getNextStep).toHaveBeenCalledWith(context);
+      const res = getNextStep(authClient, remediator, idxResponse);
+      expect(remediator.getNextStep).toHaveBeenCalledWith(authClient, context);
       expect(res).toEqual({
         ...nextStep,
         canResend: true
@@ -338,6 +344,7 @@ describe('idx/util', () => {
   describe('handleIdxError', () => {
     let testContext;
     beforeEach(() => {
+      const authClient = {} as OktaAuthInterface;
       const idxResponse = {
         neededToProceed: [],
         actions: {},
@@ -346,20 +353,22 @@ describe('idx/util', () => {
         }
       } as unknown as IdxResponse;
       testContext = {
+        authClient,
         idxResponse
       };
     });
 
     it('By default, it will throw unrecognized errors', () => {
+      const { authClient } = testContext;
       const error = new Error('my test error');
       const fn = () => {
-        handleIdxError(error);
+        handleIdxError(authClient, error);
       };
       expect(fn).toThrowError(error);
     });
     it('For terminal IDX responses, it augments the object with requestDidSucceed = false and returns it', () => {
-      const { idxResponse } = testContext;
-      const res = handleIdxError(idxResponse);
+      const { authClient, idxResponse } = testContext;
+      const res = handleIdxError(authClient, idxResponse);
       expect(res).toEqual({
         idxResponse: {
           ...idxResponse,
@@ -370,11 +379,11 @@ describe('idx/util', () => {
       });
     });
     it('non-terminal IDX responses, no remediator: it augments the object with requestDidSucceed = false and returns it', () => {
-      const { idxResponse } = testContext;
+      const { authClient, idxResponse } = testContext;
       idxResponse.neededToProceed.push({
         name: 'some-remediation'
       });
-      const res = handleIdxError(idxResponse);
+      const res = handleIdxError(authClient, idxResponse);
       expect(res).toEqual({
         idxResponse: {
           ...idxResponse,
@@ -384,7 +393,7 @@ describe('idx/util', () => {
       });
     });
     it('non-terminal IDX response and a remediator: it augments the object with requestDidSucceed = false and returns it along with next step info', () => {
-      const { idxResponse } = testContext;
+      const { authClient, idxResponse } = testContext;
       const context = { fake: true };
       idxResponse.context = context;
       idxResponse.neededToProceed.push({
@@ -394,7 +403,7 @@ describe('idx/util', () => {
       const remediator = {
         getNextStep: jest.fn().mockReturnValue(nextStep)
       };
-      const res = handleIdxError(idxResponse, remediator);
+      const res = handleIdxError(authClient, idxResponse, remediator);
       expect(res).toEqual({
         idxResponse: {
           ...idxResponse,
@@ -403,7 +412,7 @@ describe('idx/util', () => {
         messages: [],
         nextStep
       });
-      expect(remediator.getNextStep).toHaveBeenCalledWith(context);
+      expect(remediator.getNextStep).toHaveBeenCalledWith(authClient, context);
     });
   });
 });

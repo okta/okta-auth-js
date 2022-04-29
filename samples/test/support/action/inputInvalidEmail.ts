@@ -10,12 +10,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import setInputField from './setInputField';
 import PasswordRecover from '../selectors/PasswordRecover';
 
 export default async (
 ) => {
   const invalidEmail = 'test_with_really_invalid_email@invalidemail.com';
-  await setInputField('set', invalidEmail, PasswordRecover.username);
+  await (await $(PasswordRecover.username)).setValue(invalidEmail);
 };

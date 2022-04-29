@@ -23,7 +23,8 @@ import {
   EnrollAuthenticator,
   AuthenticatorVerificationData,
   EnrollPoll,
-  ChallengePoll, Skip
+  ChallengePoll, 
+  Skip
 } from '../remediators';
 
 export const AuthenticationFlow: RemediationFlow = {

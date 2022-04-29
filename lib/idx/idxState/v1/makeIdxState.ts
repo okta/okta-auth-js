@@ -36,6 +36,11 @@ export function makeIdxState(
       return Promise.reject(`Unknown remediation choice: [${remediationChoice}]`);
     }
 
+    const actionFn = remediationChoiceObject.action;
+    if (typeof actionFn !== 'function') {
+      return Promise.reject(`Current remediation cannot make form submit action: [${remediationChoice}]`);
+    }
+
     return remediationChoiceObject.action(paramsFromUser);
   };
 

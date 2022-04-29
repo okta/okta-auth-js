@@ -1,3 +1,4 @@
+# This feature is not enabled in test, re-enable it - OKTA-492723
 Feature: Multi-Factor Authentication with Password and Security Question
 
   Background:

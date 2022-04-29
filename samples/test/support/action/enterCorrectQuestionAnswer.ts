@@ -12,12 +12,11 @@
 
 
 import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
-import setInputField from './setInputField';
 import ActionContext from '../context';
 import { getConfig } from '../../util/configUtils';
 
 export default async function (this: ActionContext) {
   const config = getConfig();
-  const answer = config.securityQuestionAnswer || '';
-  await setInputField('set', answer, ChallengeAuthenticator.answer);
+  const answer = (config as any).securityQuestionAnswer || '';
+  await (await $(ChallengeAuthenticator.answer)).setValue(answer);
 }

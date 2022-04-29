@@ -109,6 +109,7 @@ describe('idx/startTransaction', () => {
       interactionHandle: 'meta-interactionHandle' 
     });
     expect(mocked.remediate.remediate).toHaveBeenCalledWith(
+      authClient,
       // IDX response
       idxResponse,
       // values
@@ -133,18 +134,20 @@ describe('idx/startTransaction', () => {
     it('returns a transaction object', async () => {
       const { authClient, idxResponse, transactionMeta } = testContext;
       const res = await startTransaction(authClient);
-      expect(res).toEqual(Object.assign({}, idxResponse, {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { toPersist, ...rest } = idxResponse;
+      expect(res).toEqual(Object.assign({}, rest, {
         status: 'PENDING',
         availableSteps: [{
           inputs: [{
             label: 'Username',
-            name: 'username'
+            name: 'username',
+            required: true,
           }],
           name: 'identify'
         }],
         enabledFeatures: [],
         meta: transactionMeta,
-        toPersist: undefined
       }));
     });
     it('exposes transaction meta in the response', async () => {
@@ -223,12 +226,16 @@ describe('idx/startTransaction', () => {
     expect(res.availableSteps).toEqual([
       {
         inputs: [
-          { label: 'Username', name: 'username' }
+          { 
+            label: 'Username', 
+            name: 'username',
+            required: true,
+          }
         ], 
         name: 'identify'
       }, 
       {
-        inputs: [], 
+        inputs: [],
         name: 'select-enroll-profile'
       }
     ]);

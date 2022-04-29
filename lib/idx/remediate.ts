@@ -12,6 +12,7 @@
 
 
 /* eslint-disable max-statements, max-depth, complexity */
+import { OktaAuthInterface } from '../types';
 import { AuthSdkError } from '../errors';
 import { RemediationValues } from './remediators';
 import { RemediateOptions, RemediationResponse } from './types';
@@ -63,6 +64,7 @@ function removeActionFromOptions(options: RemediateOptions, actionName: string):
 
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
+  authClient: OktaAuthInterface,
   idxResponse: IdxResponse,
   values: RemediationValues,
   options: RemediateOptions
@@ -100,12 +102,17 @@ export async function remediate(
           idxResponse = await idxResponse.actions[action](params);
           idxResponse = { ...idxResponse, requestDidSucceed: true };
         } catch (e) {
-          return handleIdxError(e, remediator);
+          return handleIdxError(authClient, e, remediator);
         }
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
         }
-        return remediate(idxResponse, valuesWithoutExecutedAction, optionsWithoutExecutedAction); // recursive call
+        return remediate(
+          authClient, 
+          idxResponse, 
+          valuesWithoutExecutedAction, 
+          optionsWithoutExecutedAction
+        ); // recursive call
       }
 
       // search for action in remediation list
@@ -116,10 +123,10 @@ export async function remediate(
           idxResponse = { ...idxResponse, requestDidSucceed: true };
         }
         catch (e) {
-          return handleIdxError(e, remediator);
+          return handleIdxError(authClient, e, remediator);
         }
 
-        return remediate(idxResponse, values, optionsWithoutExecutedAction); // recursive call
+        return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
   }
@@ -139,7 +146,7 @@ export async function remediate(
         idxResponse = { ...idxResponse, requestDidSucceed: true };
         return { idxResponse };
       } catch(e) {
-        return handleIdxError(e);
+        return handleIdxError(authClient, e);
       }
     }
     if (flow === 'default') {
@@ -153,7 +160,7 @@ export async function remediate(
 
   // Return next step to the caller
   if (!remediator.canRemediate()) {
-    const nextStep = getNextStep(remediator, idxResponse);
+    const nextStep = getNextStep(authClient, remediator, idxResponse);
     return {
       idxResponse,
       nextStep,
@@ -170,8 +177,8 @@ export async function remediate(
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValuesAfterProceed();
     options = { ...options, step: undefined }; // do not re-use the step
-    return remediate(idxResponse, values, options); // recursive call
+    return remediate(authClient, idxResponse, values, options); // recursive call
   } catch (e) {
-    return handleIdxError(e, remediator);
+    return handleIdxError(authClient, e, remediator);
   }
 }

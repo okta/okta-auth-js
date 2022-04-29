@@ -17,6 +17,7 @@ import { getAuthenticatorFromRemediation } from '../util';
 import { IdxOption, IdxRemediationValue } from '../../types/idx-js';
 import { Authenticator, isAuthenticator } from '../../types';
 import { compareAuthenticators, findMatchedOption} from '../../authenticator/util';
+import { OktaAuthInterface } from '../../../types';
 
 export type SelectAuthenticatorValues = RemediationValues & {
   authenticator?: string | Authenticator;
@@ -65,8 +66,8 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
   }
 
   // TODO: remove this override method in the next major version - OKTA-491236
-  getNextStep() {
-    const common = super.getNextStep();
+  getNextStep(authClient: OktaAuthInterface) {
+    const common = super.getNextStep(authClient);
     const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
     const options = authenticatorFromRemediation.options!.map(option => {
       const { 

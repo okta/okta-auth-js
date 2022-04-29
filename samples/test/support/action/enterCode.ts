@@ -10,9 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import setInputField from './setInputField';
-
 export default async function (code: string) {
   const selectorCandidates = [
     `input[name=code]`,
@@ -33,5 +30,5 @@ export default async function (code: string) {
     timeout: 3000,
     timeoutMsg: 'wait for correct selector'
   });
-  await setInputField('set', code, selector);
+  await (await $(selector)).setValue(code);
 }

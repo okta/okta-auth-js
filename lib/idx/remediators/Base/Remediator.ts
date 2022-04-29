@@ -17,6 +17,7 @@ import { NextStep, IdxMessage, Authenticator, Input, RemediateOptions } from '..
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase, getAuthenticatorFromRemediation } from '../util';
 import { formatAuthenticator, compareAuthenticators } from '../../authenticator/util';
+import { OktaAuthInterface } from '../../../types';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[]>;
@@ -30,7 +31,11 @@ export interface RemediationValues {
 }
 
 export interface RemediatorConstructor {
-  new<T extends RemediationValues>(remediation: IdxRemediation, values?: T, options?: RemediateOptions): any;
+  new<T extends RemediationValues>(
+    remediation: IdxRemediation, 
+    values?: T, 
+    options?: RemediateOptions
+  ): any;
 }
 
 // Base class - DO NOT expose static remediationName
@@ -42,7 +47,11 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
   options: RemediateOptions;
   map?: IdxToRemediationValueMap;
 
-  constructor(remediation: IdxRemediation, values: T = {} as T, options: RemediateOptions = {}) {
+  constructor(
+    remediation: IdxRemediation, 
+    values: T = {} as T, 
+    options: RemediateOptions = {}
+  ) {
     // assign fields to the instance
     this.values = { ...values };
     this.options = { ...options };
@@ -140,7 +149,7 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
     return !!this.getData(key);
   }
 
-  getNextStep(_context?: IdxContext): NextStep {
+  getNextStep(_authClient: OktaAuthInterface, _context?: IdxContext): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
     const authenticator = this.getAuthenticator();
@@ -156,7 +165,7 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
   }
 
   // Get inputs for the next step
-  private getInputs(): Input[] {
+  getInputs(): Input[] {
     const inputs: Input[] = [];
     const inputsFromRemediation = this.remediation.value || [];
     inputsFromRemediation.forEach(inputFromRemediation => {

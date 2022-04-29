@@ -112,6 +112,10 @@ export interface OktaAuthOptions extends
   storageManager?: StorageManagerOptions;
   services?: ServiceManagerOptions;
   transactionManager?: TransactionManagerOptions;
+  // BETA WARNING: configs in this section are subject to change without a breaking change notice
+  idx?: Pick<IdxTransactionMeta,
+    'useGenericRemediator' 
+  >;
   
   // For server-side web applications ONLY!
   clientSecret?: string;

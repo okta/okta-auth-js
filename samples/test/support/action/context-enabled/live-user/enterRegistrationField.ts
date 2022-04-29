@@ -12,7 +12,6 @@
 
 
 import Registration from '../../../selectors/Registration';
-import setInputField from '../../setInputField';
 import ActionContext from '../../../context';
 
 export default async function (this: ActionContext, fieldName: string) {
@@ -41,6 +40,6 @@ export default async function (this: ActionContext, fieldName: string) {
     default: 
       throw new Error(`Unknown credential "${fieldName}"`);
   }
-  await setInputField('set', value, selector);
+  await (await $(selector)).setValue(value);
 
 }

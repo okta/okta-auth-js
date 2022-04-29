@@ -15,9 +15,18 @@ const FlowPage = () => {
   const { transaction, setTransaction } = useTransaction();
 
   const startFlow = useCallback(async () => {
-    const newTransaction = flow === 'idp' 
-      ? await oktaAuth.idx.startTransaction() 
-      : await oktaAuth.idx[flow]();
+    let newTransaction;
+    if (flow === 'authenticate') {
+      newTransaction = await oktaAuth.idx.authenticate();
+    } else if (flow === 'register') {
+      newTransaction = await oktaAuth.idx.register();
+    } else if (flow === 'recoverPassword') {
+      newTransaction = await oktaAuth.idx.register();
+    } else if (flow === 'unlockAccount') {
+      newTransaction = await oktaAuth.idx.unlockAccount();
+    } else {
+      newTransaction = await oktaAuth.idx.start();
+    }
     setTransaction(newTransaction);
   }, [oktaAuth, flow, setTransaction]);
 

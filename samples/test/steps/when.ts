@@ -62,21 +62,21 @@ When(
   'she changes the {string} field to {string}', 
   async (fieldName: string, value: string) => {
     fieldName = camelize(fieldName);
-    await setInputField('set', value, `input[name=${fieldName}]`);
+    await setInputField(fieldName, value);
   }
 );
 
 When(
   'she changes her email to a different valid email address',
   async function(this: ActionContext) {
-    await setInputField('set', this.secondCredentials.emailAddress, `input[name=editPrimaryEmail]`);
+    await setInputField('editPrimaryEmail', this.secondCredentials.emailAddress);
   }
 );
 
 When(
   'she fills in her phone number',
   async function(this: ActionContext) {
-    await setInputField('set', this.credentials.phoneNumber, `input[name=addPhoneNumber]`);
+    await setInputField('addPhoneNumber', this.credentials.phoneNumber);
   }
 );
 
@@ -92,6 +92,28 @@ When(
       code = await this.a18nClient.getEmailCode(this.secondCredentials.profileId);
     }
     await enterCode(code);
+  }
+);
+
+When(
+  'she fills in her {string}',
+  async function(this: ActionContext, fieldName: string) {
+    const value = (this.credentials as any)[fieldName];
+    await setInputField(fieldName, value);
+  }
+);
+
+When(
+  'she fills in an incorrect {string}',
+  async function(this: ActionContext, fieldName: string) {
+    await setInputField(fieldName, '!incorrect!');
+  }
+);
+
+When(
+  'she fills in an incorrect {string} with value {string}',
+  async function(this: ActionContext, fieldName: string, value: string) {
+    await setInputField(fieldName, value);
   }
 );
 

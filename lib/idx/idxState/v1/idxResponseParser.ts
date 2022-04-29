@@ -90,12 +90,17 @@ const expandRelatesTo = (idxResponse, value) => {
 };
 
 const convertRemediationAction = (authClient: OktaAuthInterface, remediation, toPersist) => {
-  const remediationActions = generateRemediationFunctions( authClient, [remediation], toPersist );
-  const actionFn = remediationActions[remediation.name];
-  return {
-    ...remediation,
-    action: actionFn,
-  };
+  // Only remediation that has `rel` field (indicator for form submission) can have http action
+  if (remediation.rel) {
+    const remediationActions = generateRemediationFunctions( authClient, [remediation], toPersist );
+    const actionFn = remediationActions[remediation.name];
+    return {
+      ...remediation,
+      action: actionFn,
+    };
+  }
+  
+  return remediation;
 };
 
 export const parseIdxResponse = function parseIdxResponse( authClient: OktaAuthInterface, idxResponse, toPersist = {} ): {

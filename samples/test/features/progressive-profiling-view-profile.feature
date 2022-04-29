@@ -15,8 +15,8 @@ Feature: View Profile Information
     Given she is on the Root View in an UNAUTHENTICATED state
     When she clicks the "login" button
     Then she is redirected to the "Login" page
-    When she fills in her username
-      And she fills in her correct password
+    When she fills in her "username"
+      And she fills in her "password"
       And she submits the form
     Then she is redirected to the "Root" page
       And she sees a table with her profile info

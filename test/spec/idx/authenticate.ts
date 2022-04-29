@@ -152,7 +152,8 @@ describe('idx/authenticate', () => {
         name: 'identify',
         inputs: [{
           name: 'username',
-          label: 'Username'
+          label: 'Username',
+          required: true,
         }]
       }
     });
@@ -181,7 +182,8 @@ describe('idx/authenticate', () => {
           name: 'identify',
           inputs: [{
             name: 'username',
-            label: 'Username'
+            label: 'Username',
+            required: true,
           }]
         });
         expect(res.messages).toEqual([{
@@ -218,7 +220,8 @@ describe('idx/authenticate', () => {
           name: 'identify',
           inputs: [{
             name: 'username',
-            label: 'Username'
+            label: 'Username',
+            required: true,
           }]
         });
         expect(res.messages).toEqual([{
@@ -430,6 +433,7 @@ describe('idx/authenticate', () => {
           inputs: [{
             name: 'username',
             label: 'Username',
+            required: true,
           }]
         });
 
@@ -568,7 +572,8 @@ describe('idx/authenticate', () => {
           name: 'identify',
           inputs: [{
             name: 'username',
-            label: 'Username'
+            label: 'Username',
+            required: true,
           }, {
             name: 'password',
             label: 'Password',

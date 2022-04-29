@@ -22,7 +22,8 @@ export type {
   IdxContext,
   RawIdxResponse,
   IdxRemediation,
-  IdxAuthenticator
+  IdxAuthenticator,
+  IdxActionParams,
 } from './idx-js';
 export type { FlowIdentifier } from './FlowIdentifier';
 export type { EmailVerifyCallbackResponse } from '../emailVerify';

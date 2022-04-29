@@ -12,8 +12,7 @@
 
 
 import EnrollSecurityQuestion from '../selectors/EnrollSecurityQuestion';
-import setInputField from './setInputField';
 
 export default async function (customQuestion: string) {
-  await setInputField('set', customQuestion, EnrollSecurityQuestion.customQuestion);
+  await (await $(EnrollSecurityQuestion.customQuestion)).setValue(customQuestion);
 }

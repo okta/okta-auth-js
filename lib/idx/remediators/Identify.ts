@@ -27,7 +27,7 @@ export class Identify extends Remediator<IdentifyValues> {
     'identifier': ['username']
   };
 
-  canRemediate() {
+  canRemediate(): boolean {
     const { identifier } = this.getData();
     return !!identifier;
   }

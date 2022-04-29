@@ -32,6 +32,9 @@ const oktaAuth = (() => {
   return new OktaAuth(Object.assign({}, oidcConfig, {
     state,
     recoveryToken,
+    idx: { // configs in this section are still in beta
+      useGenericRemediator: false,
+    },
     ...(issuer && { issuer }),
     ...(clientId && { clientId })
   }));

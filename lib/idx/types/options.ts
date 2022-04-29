@@ -47,6 +47,7 @@ export interface RemediateOptions extends IdxOptions {
   remediators?: RemediationFlow;
   actions?: RemediateAction[];
   shouldProceedWithEmailAuthenticator?: boolean; // will be removed in next major version
+  useGenericRemediator?: boolean; // beta
 }
 
 export interface RunOptions extends RemediateOptions, InteractOptions, IntrospectOptions {}

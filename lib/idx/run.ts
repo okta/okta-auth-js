@@ -75,7 +75,8 @@ function initializeData(authClient, data: RunData): RunData {
     flow,
     withCredentials,
     remediators,
-    actions
+    actions,
+    useGenericRemediator
   } = options;
 
   const status = IdxStatus.PENDING;
@@ -90,9 +91,19 @@ function initializeData(authClient, data: RunData): RunData {
     remediators = remediators || flowSpec.remediators;
     actions = actions || flowSpec.actions;
   }
+
+  useGenericRemediator = useGenericRemediator || authClient.options.idx?.useGenericRemediator || false;
+
   return { 
     ...data,
-    options: { ...options, flow, withCredentials, remediators, actions },
+    options: { 
+      ...options, 
+      flow, 
+      withCredentials, 
+      remediators, 
+      actions,
+      useGenericRemediator
+    },
     status
   };
 }
@@ -138,7 +149,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
   return { ...data, idxResponse, meta };
 }
 
-async function getDataFromRemediate(data: RunData): Promise<RunData> {
+async function getDataFromRemediate(authClient, data: RunData): Promise<RunData> {
   let {
     idxResponse,
     options,
@@ -152,6 +163,7 @@ async function getDataFromRemediate(data: RunData): Promise<RunData> {
     flow,
     step,
     shouldProceedWithEmailAuthenticator, // will be removed in next major version
+    useGenericRemediator,
   } = options;
   
   const shouldRemediate = (autoRemediate !== false && (remediators || actions || step));
@@ -169,13 +181,19 @@ async function getDataFromRemediate(data: RunData): Promise<RunData> {
     idxResponse: idxResponseFromRemediation, 
     nextStep,
     canceled,
-  } = await remediate(idxResponse!, values, {
-    remediators,
-    actions,
-    flow,
-    step,
-    shouldProceedWithEmailAuthenticator, // will be removed in next major version
-  });
+  } = await remediate(
+    authClient,
+    idxResponse!, 
+    values, 
+    {
+      remediators,
+      actions,
+      flow,
+      step,
+      shouldProceedWithEmailAuthenticator, // will be removed in next major version
+      useGenericRemediator,
+    }
+  );
   idxResponse = idxResponseFromRemediation;
 
   return { ...data, idxResponse, nextStep, canceled };
@@ -224,7 +242,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
   if (idxResponse) {
     shouldSaveResponse = !!(idxResponse.requestDidSucceed || idxResponse.stepUp);
     enabledFeatures = getEnabledFeatures(idxResponse);
-    availableSteps = getAvailableSteps(idxResponse);
+    availableSteps = getAvailableSteps(authClient, idxResponse, options.useGenericRemediator);
     messages = getMessagesFromResponse(idxResponse);
     terminal = isTerminalResponse(idxResponse);
   }
@@ -304,7 +322,7 @@ export async function run(
   data = initializeData(authClient, data);
   try {
     data = await getDataFromIntrospect(authClient, data);
-    data = await getDataFromRemediate(data);
+    data = await getDataFromRemediate(authClient, data);
   } catch (err) {
     data = handleError(err, data);
   }

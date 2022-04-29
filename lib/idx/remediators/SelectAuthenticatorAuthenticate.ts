@@ -23,7 +23,11 @@ export type SelectAuthenticatorAuthenticateValues = SelectAuthenticatorValues & 
 export class SelectAuthenticatorAuthenticate extends SelectAuthenticator<SelectAuthenticatorAuthenticateValues> {
   static remediationName = 'select-authenticator-authenticate';
 
-  constructor(remediation: IdxRemediation, values: SelectAuthenticatorValues = {}, options: RemediateOptions = {}) {
+  constructor(
+    remediation: IdxRemediation, 
+    values: SelectAuthenticatorValues = {}, 
+    options: RemediateOptions = {}
+  ) {
     super(remediation, values, options);
 
     // Preset password authenticator to trigger recover action
