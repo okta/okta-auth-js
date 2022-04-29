@@ -4,7 +4,7 @@ import { RemediationValues, Remediator, RemediatorConstructor } from './remediat
 import { GenericRemediator } from './remediators/GenericRemediator';
 import { proceed } from './proceed';
 import { IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
-import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
+import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';
 import { OktaAuthInterface } from '../types';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {

@@ -29,7 +29,7 @@ import {
   Tokens,
   APIError,
 } from '../types';
-import { IdxMessage, IdxResponse, isIdxResponse } from './types/idx-js';
+import { IdxMessage, IdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
 declare interface RunData {
