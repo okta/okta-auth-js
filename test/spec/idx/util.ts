@@ -5,7 +5,7 @@ import {
   isTerminalResponse,
   getRemediator,
   getNextStep,
-  handleIdxError
+  handleFailedResponse
 } from '../../../lib/idx/util';
 import {
   IdxResponseFactory,
@@ -341,7 +341,7 @@ describe('idx/util', () => {
     });
   });
 
-  describe('handleIdxError', () => {
+  describe('handleFailedResponse', () => {
     let testContext;
     beforeEach(() => {
       const authClient = {} as OktaAuthInterface;
@@ -358,17 +358,9 @@ describe('idx/util', () => {
       };
     });
 
-    it('By default, it will throw unrecognized errors', () => {
-      const { authClient } = testContext;
-      const error = new Error('my test error');
-      const fn = () => {
-        handleIdxError(authClient, error);
-      };
-      expect(fn).toThrowError(error);
-    });
     it('For terminal IDX responses, it augments the object with requestDidSucceed = false and returns it', () => {
       const { authClient, idxResponse } = testContext;
-      const res = handleIdxError(authClient, idxResponse);
+      const res = handleFailedResponse(authClient, idxResponse);
       expect(res).toEqual({
         idxResponse: {
           ...idxResponse,
@@ -378,21 +370,18 @@ describe('idx/util', () => {
         messages: []
       });
     });
-    it('non-terminal IDX responses, no remediator: it augments the object with requestDidSucceed = false and returns it', () => {
+    it('non-terminal IDX responses, no remediator: it returns it', () => {
       const { authClient, idxResponse } = testContext;
       idxResponse.neededToProceed.push({
         name: 'some-remediation'
       });
-      const res = handleIdxError(authClient, idxResponse);
+      const res = handleFailedResponse(authClient, idxResponse);
       expect(res).toEqual({
-        idxResponse: {
-          ...idxResponse,
-          requestDidSucceed: false
-        },
+        idxResponse,
         messages: []
       });
     });
-    it('non-terminal IDX response and a remediator: it augments the object with requestDidSucceed = false and returns it along with next step info', () => {
+    it('non-terminal IDX response and a remediator: returns it along with next step info', () => {
       const { authClient, idxResponse } = testContext;
       const context = { fake: true };
       idxResponse.context = context;
@@ -402,13 +391,10 @@ describe('idx/util', () => {
       const nextStep = { fake: true };
       const remediator = {
         getNextStep: jest.fn().mockReturnValue(nextStep)
-      };
-      const res = handleIdxError(authClient, idxResponse, remediator);
+      } as unknown as Remediator;
+      const res = handleFailedResponse(authClient, idxResponse, remediator);
       expect(res).toEqual({
-        idxResponse: {
-          ...idxResponse,
-          requestDidSucceed: false
-        },
+        idxResponse,
         messages: [],
         nextStep
       });

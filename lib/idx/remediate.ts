@@ -26,7 +26,7 @@ import {
   filterValuesForRemediation,
   getRemediator,
   getNextStep,
-  handleIdxError
+  handleFailedResponse
 } from './util';
 
 export interface RemediateActionWithOptionalParams {
@@ -98,11 +98,9 @@ export async function remediate(
       let optionsWithoutExecutedAction = removeActionFromOptions(options, action);
 
       if (typeof idxResponse.actions[action] === 'function') {
-        try {
-          idxResponse = await idxResponse.actions[action](params);
-          idxResponse = { ...idxResponse, requestDidSucceed: true };
-        } catch (e) {
-          return handleIdxError(authClient, e, remediator);
+        idxResponse = await idxResponse.actions[action](params);
+        if (idxResponse.requestDidSucceed === false) {
+          return handleFailedResponse(authClient, idxResponse, remediator);
         }
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
@@ -118,14 +116,10 @@ export async function remediate(
       // search for action in remediation list
       const remediationAction = neededToProceed.find(({ name }) => name === action);
       if (remediationAction) {
-        try {
-          idxResponse = await idxResponse.proceed(action, params);
-          idxResponse = { ...idxResponse, requestDidSucceed: true };
+        idxResponse = await idxResponse.proceed(action, params);
+        if (idxResponse.requestDidSucceed === false) {
+          return handleFailedResponse(authClient, idxResponse, remediator);
         }
-        catch (e) {
-          return handleIdxError(authClient, e, remediator);
-        }
-
         return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
@@ -139,16 +133,17 @@ export async function remediate(
   }
 
   if (!remediator) {
+    // With options.step, remediator is not required
     if (options.step) {
       values = filterValuesForRemediation(idxResponse, options.step, values); // include only requested values
-      try {
-        idxResponse = await idxResponse.proceed(options.step, values);
-        idxResponse = { ...idxResponse, requestDidSucceed: true };
-        return { idxResponse };
-      } catch(e) {
-        return handleIdxError(authClient, e);
+      idxResponse = await idxResponse.proceed(options.step, values);
+      if (idxResponse.requestDidSucceed === false) {
+        return handleFailedResponse(authClient, idxResponse);
       }
+      return { idxResponse };
     }
+
+    // With default flow, remediator is not required
     if (flow === 'default') {
       return { idxResponse };
     }
@@ -170,15 +165,13 @@ export async function remediate(
 
   const name = remediator.getName();
   const data = remediator.getData();
-  try {
-    idxResponse = await idxResponse.proceed(name, data);
-    idxResponse = { ...idxResponse, requestDidSucceed: true };
-    // We may want to trim the values bag for the next remediation
-    // Let the remediator decide what the values should be (default to current values)
-    values = remediator.getValuesAfterProceed();
-    options = { ...options, step: undefined }; // do not re-use the step
-    return remediate(authClient, idxResponse, values, options); // recursive call
-  } catch (e) {
-    return handleIdxError(authClient, e, remediator);
+  idxResponse = await idxResponse.proceed(name, data);
+  if (idxResponse.requestDidSucceed === false) {
+    return handleFailedResponse(authClient, idxResponse, remediator);
   }
+  // We may want to trim the values bag for the next remediation
+  // Let the remediator decide what the values should be (default to current values)
+  values = remediator.getValuesAfterProceed();
+  options = { ...options, step: undefined }; // do not re-use the step
+  return remediate(authClient, idxResponse, values, options); // recursive call
 }

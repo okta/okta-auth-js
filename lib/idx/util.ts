@@ -251,17 +251,11 @@ export function getNextStep(
   };
 }
 
-export function handleIdxError(authClient: OktaAuthInterface, e, remediator?): RemediationResponse {
-  // Handle idx messages
-  let idxResponse = isIdxResponse(e) ? e : null;
-  if (!idxResponse) {
-    // Thrown error terminates the interaction with idx
-    throw e;
-  }
-  idxResponse = {
-    ...idxResponse,
-    requestDidSucceed: false
-  };
+export function handleFailedResponse(
+  authClient: OktaAuthInterface,
+  idxResponse: IdxResponse,
+  remediator?: Remediator
+): RemediationResponse {
   const terminal = isTerminalResponse(idxResponse);
   const messages = getMessagesFromResponse(idxResponse);
   if (terminal) {
