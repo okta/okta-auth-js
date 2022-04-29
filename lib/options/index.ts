@@ -77,10 +77,8 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     codeChallengeMethod: args.codeChallengeMethod,
     recoveryToken: args.recoveryToken,
     activationToken: args.activationToken,
+    // BETA WARNING: configs in this section are subject to change without a breaking change notice
     idx: {
-      flow: args.idx?.flow,
-      activationToken: args.idx?.activationToken,
-      recoveryToken: args.idx?.recoveryToken,
       useGenericRemediator: !!args.idx?.useGenericRemediator,
     },
 
