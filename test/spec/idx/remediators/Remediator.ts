@@ -2,7 +2,6 @@ import { RemediationValues, Remediator } from '../../../../lib/idx/remediators';
 import {
   IdentifyRemediationFactory,
 } from '@okta/test.support/idx';
-import { OktaAuthInterface } from '../../../../lib/types';
 
 describe('remediators/Base/Remediator', () => {
 

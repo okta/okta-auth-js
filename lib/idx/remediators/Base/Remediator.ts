@@ -149,7 +149,7 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
     return !!this.getData(key);
   }
 
-  getNextStep(authClient: OktaAuthInterface, _context?: IdxContext): NextStep {
+  getNextStep(_authClient: OktaAuthInterface, _context?: IdxContext): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
     const authenticator = this.getAuthenticator();

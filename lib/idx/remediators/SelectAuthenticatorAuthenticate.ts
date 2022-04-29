@@ -15,7 +15,6 @@ import { SelectAuthenticator, SelectAuthenticatorValues } from './Base/SelectAut
 import { getAuthenticatorFromRemediation } from './util';
 import { IdxRemediation } from '../types/idx-js';
 import { AuthenticatorKey, Authenticator, RemediateOptions } from '../types';
-import { OktaAuthInterface } from '../../types';
 
 export type SelectAuthenticatorAuthenticateValues = SelectAuthenticatorValues & {
   password?: string;

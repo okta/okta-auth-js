@@ -13,7 +13,7 @@
 
 import { Remediator, RemediationValues } from './Base/Remediator';
 import { IdxContext } from '../types/idx-js';
-import { OktaAuthInterface } from 'lib';
+import { OktaAuthInterface } from '../../types';
 
 
 export type EnrollmentChannelDataValues = RemediationValues & {

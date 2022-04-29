@@ -15,7 +15,6 @@
 import { AuthSdkError } from '../../errors';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 import { IdxRemediation, RemediateOptions } from '../types';
-import { OktaAuthInterface } from '../../types';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 

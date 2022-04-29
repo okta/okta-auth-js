@@ -23,7 +23,7 @@ import {
 } from '@okta/test.support/idx';
 import { IdxFeature, IdxResponse, } from '../../../lib/idx/types';
 import { Remediator } from '../../../lib/idx/remediators';
-import { OktaAuthInterface } from 'lib';
+import { OktaAuthInterface } from '../../../lib/types';
 
 describe('idx/util', () => {
   describe('getAvailableSteps', () => {
