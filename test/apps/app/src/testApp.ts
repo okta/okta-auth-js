@@ -881,7 +881,7 @@ class TestApp {
   }
 
   appHTML(props: Tokens): string {
-    if (window.location.pathname.includes('/protected')) {
+    if (window.location.pathname.indexOf('/protected') != -1) {
       return this.appProtectedHTML();
     }
 

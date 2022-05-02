@@ -12,7 +12,7 @@
 
 import { TokenManager, EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED } from '../TokenManager';
 import { BroadcastChannel } from 'broadcast-channel';
-import { isBrowser } from '../features';
+import { isBrowser, isIE11OrLess } from '../features';
 import { ServiceManagerOptions, ServiceInterface, Token } from '../types';
 
 export type SyncMessage = {
@@ -109,29 +109,38 @@ export class SyncStorageService implements ServiceInterface {
   }
 
   private onSyncMessageHandler(msg: SyncMessage) {
-    // Use `enablePostMessage` flag here to prevent sync message loop
+    // Notes:
+    // 1. Using `enablePostMessage` flag here to prevent sync message loop.
+    //    If this flag is on, tokenManager event handlers do not post sync message.
+    // 2. IE11 has known issue with synchronization of LocalStorage cross tabs.
+    //    One workaround is to set empty event handler for `window.onstorage`.
+    //    But it's not 100% working, sometimes you still get old value from LocalStorage.
+    //    Better approch is to explicitly udpate LocalStorage with tokenManager's add/remove.
+
+    this.enablePostMessage = false;
     switch (msg.type) {
       case EVENT_ADDED:
-        this.enablePostMessage = false;
-        this.tokenManager.add(msg.key, msg.token);
-        this.enablePostMessage = true;
+        if (!isIE11OrLess()) {
+          this.tokenManager.emitAdded(msg.key, msg.token);
+          this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
+        } else {
+          this.tokenManager.add(msg.key, msg.token);
+        }
         break;
       case EVENT_REMOVED:
-        this.enablePostMessage = false;
-        this.tokenManager.remove(msg.key);
-        this.enablePostMessage = true;
+        if (!isIE11OrLess()) {
+          this.tokenManager.clearExpireEventTimeout(msg.key);
+          this.tokenManager.emitRemoved(msg.key, msg.token);
+        } else {
+          this.tokenManager.remove(msg.key);
+        }
         break;
       case EVENT_RENEWED:
-        this.enablePostMessage = false;
-        this.tokenManager.remove(msg.key);
-        this.tokenManager.add(msg.key, msg.token);
         this.tokenManager.emitRenewed(msg.key, msg.token, msg.oldToken);
-        this.enablePostMessage = true;
         break;
       default:
-        throw new Error(`Unknown message type ${msg.type}`);
+        break;
     }
-
-
+    this.enablePostMessage = true;
   }
 } 

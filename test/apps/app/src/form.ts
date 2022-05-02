@@ -18,6 +18,7 @@ import { flattenConfig, Config, clearStorage } from './config';
 import { FormDataEvent } from './types';
 import { htmlString, makeClickHandler } from './util';
 import { DEFAULT_CROSS_TABS_COUNT } from './config';
+import { OktaAuth } from '@okta/okta-auth-js';
 
 const id = 'config-form';
 const Form = `
@@ -204,23 +205,47 @@ export function updateForm(origConfig: Config): void {
 // Keeps us in the same tab
 export function onSubmitForm(event: Event): void {
   event.preventDefault();
-  // eslint-disable-next-line no-new
-  new FormData(document.getElementById(id) as HTMLFormElement); // will fire formdata event
+  const form = document.getElementById(id) as HTMLFormElement;
+  if (OktaAuth.features.isIE11OrLess()) {
+    submitFormData(formDataObject(form));
+  } else {
+    // eslint-disable-next-line no-new
+    new FormData(form); // formdata event will be fired automatically
+  }
 }
 
 // Take the data from the form and update query parameters on the current page
 export function onFormData(event: FormDataEvent): void {
-
   const formData = event.formData;
   const params: any = {};
   formData.forEach((value, key) => {
     params[key] = value;
   });
+  submitFormData(params);
+}
+
+function formDataObject(form: HTMLFormElement) {
+  const params: any = {};
+  Array.prototype.slice.call(form.elements).forEach(function (field: any) {
+    if (!field.name || field.disabled) {
+      return;
+    }
+    if (['reset', 'submit', 'button'].indexOf(field.type) != -1) {
+      return;
+    }
+    if (['checkbox', 'radio'].indexOf(field.type) != -1 && !field.checked) {
+      return;
+    }
+    params[field.name] = field.value;
+  });
+  return params;
+}
+
+function submitFormData(params: any) {
   const query = '?' + Object.entries(params).map(([k, v]) => `${k}=${encodeURIComponent(v as string)}`).join('&');
   const newUri = window.location.origin + '/' + query;
   window.location.replace(newUri);
 }
-
 
 export function hideConfig(): void {
   const configArea = document.getElementById('config-dump');
