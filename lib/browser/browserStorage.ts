@@ -25,6 +25,7 @@ import {
   CookieStorage
 } from '../types';
 import { warn } from '../util';
+import { isIE11OrLess } from '../features';
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil: BrowserStorageUtil = {
@@ -123,6 +124,11 @@ var storageUtil: BrowserStorageUtil = {
   },
 
   getLocalStorage: function() {
+    // Workaound for synchronization issue of LocalStorage cross tabs in IE11
+    if (isIE11OrLess() && !window.onstorage) {
+      window.onstorage = function() {};
+    }
+    
     return localStorage;
   },
 
