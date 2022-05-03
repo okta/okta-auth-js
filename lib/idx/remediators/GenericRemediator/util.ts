@@ -41,21 +41,19 @@ export function unwrapFormValue(remediation): Input {
 export function hasValidInputValue(input, values) {
   const fn = (input, values, requiredTracker) => {
     const { name, value, required } = input;
-    const isRequired = required 
-      || requiredTracker 
-      // TODO: confirm with backend why `required` meta is missing for authenticator remediation
-      || name === 'authenticator';
-    if (!isRequired) {
-      return true;
-    }
+    const isRequired = required || requiredTracker;
 
     if (Array.isArray(value)) {
       return value.reduce((acc, item) => {
         return acc && fn(item, values[name], isRequired);
       }, true);
-    } else {
-      return !!(values && values[name]);
     }
+
+    if (!isRequired) {
+      return true;
+    }
+      
+    return !!(values && values[name]);
   };
 
   return fn(input, values, false);
