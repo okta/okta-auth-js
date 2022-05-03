@@ -20,6 +20,9 @@
 ### Fixes
 
 - [#1189](https://github.com/okta/okta-auth-js/pull/1189) IDX: fixes `input` type indicator's field name for `username` and `authenticator`. Before the indicator was named as `key`, now it's fixed to `type` to follow input metadata with all other inputs.
+## 6.4.4
+
+- [#1199](https://github.com/okta/okta-auth-js/pull/1199) Fixes webauthn enrollment/verification to accept `credentials` object
 
 ## 6.4.3
 
