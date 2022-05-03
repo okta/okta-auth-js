@@ -8,7 +8,7 @@ const VALID_CREDS = {
   signatureData:'foo',
 };
 
-describe('idx/authenticator/WebauthnEnrollment', () => {
+describe('idx/authenticator/WebauthnVerification', () => {
   let testContext;
   beforeEach(() => {
     const idxAuthenticator: IdxAuthenticator = WebauthnAuthenticatorFactory.build();

@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.4
+
+- [#1199](https://github.com/okta/okta-auth-js/pull/1199) Fixes webauthn enrollment/verification to accept `credentials` object
+
 ## 6.4.3
 
 ### Fixes
