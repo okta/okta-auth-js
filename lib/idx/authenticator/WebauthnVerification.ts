@@ -4,24 +4,27 @@ export interface WebauthnVerificationValues {
   clientData?: string;
   authenticatorData?: string;
   signatureData?: string;
+  credentials?: Credentials;
 }
 
 export class WebauthnVerification extends Authenticator<WebauthnVerificationValues> {
   canVerify(values: WebauthnVerificationValues) {
-    const { clientData, authenticatorData, signatureData } = values;
+    const { credentials } = values;
+    const obj = credentials || values;
+    const { clientData, authenticatorData, signatureData } = obj;
     return !!(clientData && authenticatorData && signatureData);
   }
 
   mapCredentials(values: WebauthnVerificationValues): Credentials | undefined {
-    const { authenticatorData, clientData, signatureData } = values;
-    if (!authenticatorData && !clientData && !signatureData) {
+    const { credentials, authenticatorData, clientData, signatureData } = values;
+    if (!credentials && !authenticatorData && !clientData && !signatureData) {
       return;
     }
-    return {
+    return credentials || ({
       authenticatorData,
       clientData,
       signatureData
-    };
+    });
   }
 
   getInputs() {

@@ -3,23 +3,26 @@ import { Authenticator, Credentials } from './Authenticator';
 export interface WebauthnEnrollValues {
   clientData?: string;
   attestation?: string;
+  credentials?: Credentials;
 }
 
 export class WebauthnEnrollment extends Authenticator<WebauthnEnrollValues> {
   canVerify(values: WebauthnEnrollValues) {
-    const { clientData, attestation } = values;
+    const { credentials } = values;
+    const obj = credentials || values;
+    const { clientData, attestation } = obj;
     return !!(clientData && attestation);
   }
 
   mapCredentials(values: WebauthnEnrollValues): Credentials | undefined {
-    const { clientData, attestation } = values;
-    if (!clientData && !attestation) {
+    const { credentials, clientData, attestation } = values;
+    if (!credentials && !clientData && !attestation) {
       return;
     }
-    return {
+    return credentials || ({
       clientData,
       attestation
-    };
+    });
   }
 
   getInputs() {
