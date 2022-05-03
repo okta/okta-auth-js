@@ -1,5 +1,6 @@
 /test/support/xhr
 /test/app/public
+/test/apps/app/public
 node_modules
 /build/dist
 /build/lib
