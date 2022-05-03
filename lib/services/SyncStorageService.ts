@@ -10,16 +10,17 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { TokenManager, EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED } from '../TokenManager';
+import { TokenManager, EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED, EVENT_SET_STORAGE } from '../TokenManager';
 import { BroadcastChannel } from 'broadcast-channel';
-import { isBrowser, isIE11OrLess } from '../features';
-import { ServiceManagerOptions, ServiceInterface, Token } from '../types';
+import { isBrowser } from '../features';
+import { ServiceManagerOptions, ServiceInterface, Token, Tokens } from '../types';
 
 export type SyncMessage = {
   type: string;
-  key: string;
-  token: Token;
+  key?: string;
+  token?: Token;
   oldToken?: Token;
+  storage?: Tokens;
 };
 export class SyncStorageService implements ServiceInterface {
   private tokenManager: TokenManager;
@@ -34,6 +35,7 @@ export class SyncStorageService implements ServiceInterface {
     this.onTokenAddedHandler = this.onTokenAddedHandler.bind(this);
     this.onTokenRemovedHandler = this.onTokenRemovedHandler.bind(this);
     this.onTokenRenewedHandler = this.onTokenRenewedHandler.bind(this);
+    this.onSetStorageHandler = this.onSetStorageHandler.bind(this);
     this.onSyncMessageHandler = this.onSyncMessageHandler.bind(this);
   }
 
@@ -57,6 +59,7 @@ export class SyncStorageService implements ServiceInterface {
       this.tokenManager.on(EVENT_ADDED, this.onTokenAddedHandler);
       this.tokenManager.on(EVENT_REMOVED, this.onTokenRemovedHandler);
       this.tokenManager.on(EVENT_RENEWED, this.onTokenRenewedHandler);
+      this.tokenManager.on(EVENT_SET_STORAGE, this.onSetStorageHandler);
       this.channel.addEventListener('message', this.onSyncMessageHandler);
       this.started = true;
     }
@@ -67,6 +70,7 @@ export class SyncStorageService implements ServiceInterface {
       this.tokenManager.off(EVENT_ADDED, this.onTokenAddedHandler);
       this.tokenManager.off(EVENT_REMOVED, this.onTokenRemovedHandler);
       this.tokenManager.off(EVENT_RENEWED, this.onTokenRenewedHandler);
+      this.tokenManager.off(EVENT_SET_STORAGE, this.onSetStorageHandler);
       this.channel?.removeEventListener('message', this.onSyncMessageHandler);
       this.channel?.close();
       this.channel = undefined;
@@ -108,6 +112,14 @@ export class SyncStorageService implements ServiceInterface {
     });
   }
 
+  private onSetStorageHandler(storage: Tokens) {
+    this.channel?.postMessage({
+      type: EVENT_SET_STORAGE,
+      storage
+    });
+  }
+
+  /* eslint-disable complexity */
   private onSyncMessageHandler(msg: SyncMessage) {
     // Notes:
     // 1. Using `enablePostMessage` flag here to prevent sync message loop.
@@ -115,25 +127,20 @@ export class SyncStorageService implements ServiceInterface {
     // 2. IE11 has known issue with synchronization of LocalStorage cross tabs.
     //    One workaround is to set empty event handler for `window.onstorage`.
     //    But it's not 100% working, sometimes you still get old value from LocalStorage.
-    //    Better approch is to explicitly udpate LocalStorage with tokenManager's add/remove.
+    //    Better approch is to explicitly udpate LocalStorage with `setStorage`.
 
     this.enablePostMessage = false;
     switch (msg.type) {
+      case EVENT_SET_STORAGE:
+        this.tokenManager.getStorage().setStorage(msg.storage);
+        break;
       case EVENT_ADDED:
-        if (!isIE11OrLess()) {
-          this.tokenManager.emitAdded(msg.key, msg.token);
-          this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
-        } else {
-          this.tokenManager.add(msg.key, msg.token);
-        }
+        this.tokenManager.emitAdded(msg.key, msg.token);
+        this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
         break;
       case EVENT_REMOVED:
-        if (!isIE11OrLess()) {
-          this.tokenManager.clearExpireEventTimeout(msg.key);
-          this.tokenManager.emitRemoved(msg.key, msg.token);
-        } else {
-          this.tokenManager.remove(msg.key);
-        }
+        this.tokenManager.clearExpireEventTimeout(msg.key);
+        this.tokenManager.emitRemoved(msg.key, msg.token);
         break;
       case EVENT_RENEWED:
         this.tokenManager.emitRenewed(msg.key, msg.token, msg.oldToken);

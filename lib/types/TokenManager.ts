@@ -11,7 +11,8 @@ export interface TokenManagerError {
 
 export declare type TokenManagerErrorEventHandler = (error: TokenManagerError) => void;
 export declare type TokenManagerEventHandler = (key: string, token: Token, oldtoken?: Token) => void;
-
+export declare type TokenManagerSetStorageEventHandler = (storage: Tokens) => void;
+export declare type TokenManagerAnyEventHandler = TokenManagerEventHandler | TokenManagerErrorEventHandler | TokenManagerSetStorageEventHandler;
 
 export declare type AccessTokenCallback = (key: string, token: AccessToken) => void;
 export declare type IDTokenCallback = (key: string, token: IDToken) => void;
@@ -19,8 +20,8 @@ export declare type RefreshTokenCallback = (key: string, token: RefreshToken) =>
 
 // only add methods needed internally
 export interface TokenManagerInterface {
-  on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
-  off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
+  on: (event: string, handler: TokenManagerAnyEventHandler, context?: object) => void;
+  off: (event: string, handler?: TokenManagerAnyEventHandler) => void;
   getTokensSync(): Tokens;
   setTokens({ accessToken, idToken, refreshToken }: Tokens, accessTokenCb?: AccessTokenCallback, idTokenCb?: IDTokenCallback, refreshTokenCb?: RefreshTokenCallback): void;
   getStorageKeyByType(type: TokenType): string;

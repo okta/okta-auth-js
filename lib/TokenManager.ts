@@ -13,7 +13,7 @@
 import { removeNils, clone } from './util';
 import { AuthSdkError } from './errors';
 import { validateToken  } from './oidc/util';
-import { isLocalhost } from './features';
+import { isLocalhost, isIE11OrLess } from './features';
 import SdkClock from './clock';
 import {
   EventEmitter,
@@ -28,8 +28,7 @@ import {
   StorageType,
   OktaAuthInterface,
   StorageProvider,
-  TokenManagerErrorEventHandler,
-  TokenManagerEventHandler,
+  TokenManagerAnyEventHandler,
   TokenManagerInterface,
   RefreshToken,
   AccessTokenCallback,
@@ -54,6 +53,7 @@ export const EVENT_RENEWED = 'renewed';
 export const EVENT_ADDED = 'added';
 export const EVENT_REMOVED = 'removed';
 export const EVENT_ERROR = 'error';
+export const EVENT_SET_STORAGE = 'set_storage';
 
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
@@ -73,8 +73,8 @@ export class TokenManager implements TokenManagerInterface {
   private state: TokenManagerState;
   private options: TokenManagerOptions;
 
-  on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
-  off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
+  on: (event: string, handler: TokenManagerAnyEventHandler, context?: object) => void;
+  off: (event: string, handler?: TokenManagerAnyEventHandler) => void;
 
   // eslint-disable-next-line complexity
   constructor(sdk: OktaAuthInterface, options: TokenManagerOptions = {}) {
@@ -219,6 +219,7 @@ export class TokenManager implements TokenManagerInterface {
     validateToken(token);
     tokenStorage[key] = token;
     this.storage.setStorage(tokenStorage);
+    this.emitSetStorageEvent();
     this.emitAdded(key, token);
     this.setExpireEventTimeout(key, token);
   }
@@ -276,6 +277,19 @@ export class TokenManager implements TokenManagerInterface {
     throw new AuthSdkError('Unknown token type');
   }
 
+  // for synchronization of LocalStorage cross tabs for IE11
+  private emitSetStorageEvent() {
+    if (isIE11OrLess()) {
+      const storage = this.storage.getStorage();
+      this.emitter.emit(EVENT_SET_STORAGE, storage);
+    }
+  }
+
+  // used in `SyncStorageService` for synchronization of LocalStorage cross tabs for IE11
+  public getStorage() {
+    return this.storage;
+  }
+
   setTokens(
     tokens: Tokens,
     // TODO: callbacks can be removed in the next major version OKTA-407224
@@ -331,7 +345,8 @@ export class TokenManager implements TokenManagerInterface {
       return storage;
     }, {});
     this.storage.setStorage(storage);
-  
+    this.emitSetStorageEvent();
+
     // emit event and start expiration timer
     types.forEach(type => {
       const newToken = tokens[type];
@@ -358,6 +373,7 @@ export class TokenManager implements TokenManagerInterface {
     var removedToken = tokenStorage[key];
     delete tokenStorage[key];
     this.storage.setStorage(tokenStorage);
+    this.emitSetStorageEvent();
   
     this.emitRemoved(key, removedToken);
   }
@@ -437,6 +453,7 @@ export class TokenManager implements TokenManagerInterface {
     validateToken(token);
     tokenStorage[key] = token;
     this.storage.setStorage(tokenStorage);
+    this.emitSetStorageEvent();
   }
 
   removeRefreshToken () {
