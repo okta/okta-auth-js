@@ -10,10 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "react-json-view": "^1.21.3",
-    "@okta/okta-react": "^6.4.3",
     "@okta/okta-auth-js": "*",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.1.2"
