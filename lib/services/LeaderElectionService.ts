@@ -68,6 +68,8 @@ export class LeaderElectionService implements ServiceInterface {
       this.elector?.die();
       this.elector = undefined;
       this.channel?.close();
+      // Workaround to fix error `Failed to execute 'postMessage' on 'BroadcastChannel': Channel is closed`
+      (this.channel as any).postInternal = () => Promise.resolve();
       this.channel = undefined;
       this.started = false;
     }
