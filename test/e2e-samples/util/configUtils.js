@@ -11,7 +11,7 @@
  */
 
 
-const samplesConfig = require('../../config');
+const samplesConfig = require('@okta/samples/config');
 
 function getSampleConfig() {
   const sampleName = process.env.SAMPLE_NAME;

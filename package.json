@@ -161,6 +161,7 @@
       "env",
       "test/apps/*",
       "test/e2e",
+      "test/e2e-samples",
       "test/support",
       "samples",
       "samples/test",
