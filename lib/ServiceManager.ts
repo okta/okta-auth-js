@@ -125,7 +125,7 @@ export class ServiceManager implements ServiceManagerInterface {
   private createService(name: string): ServiceInterface {
     const tokenManager = this.sdk.tokenManager;
 
-    let service: ServiceInterface | undefined;
+    let service: ServiceInterface;
     switch (name) {
       case LEADER_ELECTION:
         service = new LeaderElectionService({...this.options, onLeader: this.onLeader});

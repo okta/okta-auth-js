@@ -52,13 +52,20 @@ describe('LeaderElectionService', () => {
       ...options,
       electionChannelName: 'electionChannel'
     });
-    service.start();
     channel = new BroadcastChannel('electionChannel');
     return service;
   }
 
-  it('can await leadership and then call onLeader', async () => {
-    // Become leader in 100ms
+  function createElectorWithLeadership() {
+    return {
+      isLeader: true,
+      awaitLeadership: () => new Promise(() => {}),
+      die: jest.fn(),
+    };
+  }
+
+  // Become leader in 100ms
+  function createElectorWithDelayedLeadership() {
     const mockedElector = {
       isLeader: false,
       awaitLeadership: () => new Promise(resolve => {
@@ -69,16 +76,63 @@ describe('LeaderElectionService', () => {
       }) as Promise<void>,
       die: () => {},
     };
+    return mockedElector;
+  }
 
-    const onLeader = jest.fn();
-    jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(mockedElector);
-    const service = createService({ onLeader });
-    await Promise.resolve();
-    expect(onLeader).toHaveBeenCalledTimes(0);
-    expect(service.isLeader()).toBeFalsy();
-    jest.runAllTimers();
-    await Promise.resolve();
-    expect(onLeader).toHaveBeenCalledTimes(1);
-    expect(service.isLeader()).toBeTruthy();
+
+  describe('start', () => {
+    it('stops service if already started', async () => {
+      const elector = createElectorWithLeadership();
+      jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
+      const service = createService();
+      service.start();
+      service.start();
+      expect(service.isStarted()).toBeTruthy();
+      expect(elector.die).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('stop', () => {
+    it('can be called twice without error', async () => {
+      const elector = createElectorWithLeadership();
+      jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
+      const service = createService();
+      service.start();
+      expect(service.isStarted()).toBeTruthy();
+      await Promise.race([
+        service.stop(),
+        service.stop()
+      ]);
+      expect(service.isStarted()).toBeFalsy();
+      expect(elector.die).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('isLeader', () => {
+    it('returns true if elected as leader', () => {
+      const elector = createElectorWithLeadership();
+      jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
+      const service = createService();
+      expect(service.isLeader()).toBeFalsy();
+      service.start();
+      expect(service.isLeader()).toBeTruthy();
+    });
+  });
+
+  describe('options.onLeader', () => {
+    it('is called after obtaining leadership', async () => {
+      const onLeader = jest.fn();
+      const elector = createElectorWithDelayedLeadership();
+      jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
+      const service = createService({ onLeader });
+      service.start();
+      await Promise.resolve();
+      expect(onLeader).toHaveBeenCalledTimes(0);
+      expect(service.isLeader()).toBeFalsy();
+      jest.runAllTimers();
+      await Promise.resolve();
+      expect(onLeader).toHaveBeenCalledTimes(1);
+      expect(service.isLeader()).toBeTruthy();
+    });
   });
 });
