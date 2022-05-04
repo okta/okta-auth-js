@@ -12,7 +12,6 @@
 
 
 import { LeaderElectionService } from '../../../lib/services/LeaderElectionService';
-import { BroadcastChannel } from 'broadcast-channel';
 
 jest.mock('broadcast-channel', () => {
   const actual = jest.requireActual('broadcast-channel');
@@ -30,20 +29,15 @@ const mocked = {
 };
 
 describe('LeaderElectionService', () => {
-  let channel;
   let service;
   beforeEach(function() {
     jest.useFakeTimers();
-    channel = null;
     service = null;
   });
   afterEach(() => {
     jest.useRealTimers();
     if (service) {
       service.stop();
-    }
-    if (channel) {
-      channel.close();
     }
   });
 
@@ -52,14 +46,13 @@ describe('LeaderElectionService', () => {
       ...options,
       electionChannelName: 'electionChannel'
     });
-    channel = new BroadcastChannel('electionChannel');
     return service;
   }
 
   function createElectorWithLeadership() {
     return {
       isLeader: true,
-      awaitLeadership: () => new Promise(() => {}),
+      awaitLeadership: jest.fn().mockReturnValue(new Promise(() => {})),
       die: jest.fn(),
     };
   }
@@ -81,6 +74,16 @@ describe('LeaderElectionService', () => {
 
 
   describe('start', () => {
+    it('creates elector and awaits leadership', () => {
+      const elector = createElectorWithLeadership();
+      jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
+      const service = createService();
+      service.start();
+      expect(service.isStarted()).toBeTruthy();
+      expect((service as any).elector).toStrictEqual(elector);
+      expect(elector.awaitLeadership).toHaveBeenCalledTimes(1);
+    });
+
     it('stops service if already started', async () => {
       const elector = createElectorWithLeadership();
       jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
@@ -93,6 +96,16 @@ describe('LeaderElectionService', () => {
   });
 
   describe('stop', () => {
+    it('should kill elector', () => {
+      const elector = createElectorWithLeadership();
+      jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
+      const service = createService();
+      service.start();
+      service.stop();
+      expect(service.isStarted()).toBeFalsy();
+      expect(elector.die).toHaveBeenCalledTimes(1);
+    });
+
     it('can be called twice without error', async () => {
       const elector = createElectorWithLeadership();
       jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
@@ -109,7 +122,7 @@ describe('LeaderElectionService', () => {
   });
 
   describe('isLeader', () => {
-    it('returns true if elected as leader', () => {
+    it('returns true if current tab is elected as leader', () => {
       const elector = createElectorWithLeadership();
       jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
       const service = createService();
