@@ -12,7 +12,7 @@
 
 
 /* eslint-disable no-console, complexity */
-const env = require('@okta/env');
+const env = require('@okta/test.support/env');
 const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
 const { config, configPredicate } = require('./config');

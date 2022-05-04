@@ -14,7 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const { mergeFiles } = require('junit-report-merger');
 
-require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
+require('@okta/test.support/env').setEnvironmentVarsFromTestEnv(__dirname);
 require('@babel/register'); // Allows use of import module syntax
 require('regenerator-runtime'); // Allows use of async/await
 

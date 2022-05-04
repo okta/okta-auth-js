@@ -189,7 +189,7 @@ module.exports = {
     "node/no-extraneous-require": ["error", {
       allowModules: [
         "@okta/okta-auth-js",
-        "@okta/env"
+        "@okta/test.support/env"
       ]
     }]
   },

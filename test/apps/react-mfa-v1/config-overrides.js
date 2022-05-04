@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 
-const envModule = require('@okta/env');
+const envModule = require('@okta/test.support/env');
 envModule.setEnvironmentVarsFromTestEnv(__dirname);
 
 const env = {};

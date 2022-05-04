@@ -1,6 +1,6 @@
 const SDK_VERSION = require('./package.json').version;
 const USER_AGENT = `okta-auth-js/${SDK_VERSION} nodejs/${process.versions.node}`;
-const baseConfig = require('./test/support/jest/jest.config.unit');
+const baseConfig = require('@okta/test.support/jest/jest.config.unit');
 const config = Object.assign({}, baseConfig, {
   testEnvironment: 'node',
   setupFiles: baseConfig.setupFiles.concat([

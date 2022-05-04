@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { visualizer } from 'rollup-plugin-visualizer';
 // TODD: handle with it's own env module when move to samples folder
 // eslint-disable-next-line node/no-extraneous-import
-import envModule from '@okta/env';
+import envModule from '@okta/test.support/env';
 
 envModule.setEnvironmentVarsFromTestEnv(__dirname);
 
