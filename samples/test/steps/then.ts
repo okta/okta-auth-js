@@ -33,8 +33,10 @@ import { camelize } from '../util';
 import checkEnrollMethods from '../support/check/checkEnrollMethods';
 import checkSelectedEnrollMethod from '../support/check/checkSelectedEnrollMethod';
 import checkCustomSecurityQuestion from '../support/check/checkCustomSecurityQuestion';
+import checkQuestionAnswerDisplayed from '../support/check/checkQuestionAnswerDisplayed';
 import enterCustomQuestion from '../support/action/enterCustomQuestion';
 import enterQuestionAnswer from '../support/action/enterQuestionAnswer';
+import selectSecurityQuestion from '../support/action/selectSecurityQuestion';
 
 Then('she is redirected to the {string} page', checkIsOnPage);
 
@@ -221,6 +223,16 @@ Then(
 Then(
   'she sees the dropdown list change to an input box to "Create my own security question"',
   () => checkCustomSecurityQuestion()
+);
+
+Then(
+  'she sees dropdown list of questions with the question {string} is selected',
+  (option: string) => selectSecurityQuestion(option)
+);
+
+Then(
+  'she sees an input box to enter her answer',
+  () => checkQuestionAnswerDisplayed()
 );
 
 Then(

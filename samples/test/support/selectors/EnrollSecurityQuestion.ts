@@ -19,6 +19,7 @@ class EnrollSecurityQuestion extends PageWithTitle {
   get createQuestion() { return 'input[name="enroll-method"][value="create-question"]'; }
   get chooseQuestion() { return 'input[name="enroll-method"][value="choose-question"]'; }
   get customQuestion() { return '#security-question-question'; }
+  get predefinedQuestions() { return 'select[name="questionKey"]'; }
   get answer() { return '#security-question-answer'; }  
   get submit() { return '#submit-button';}
 
