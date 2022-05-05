@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.5
+
+- [#1240](https://github.com/okta/okta-auth-js/pull/1204) Fixes Apple SSO flow: includes `stepUp` on returned `IdxTransaction`
+
 ## 6.4.4
 
 - [#1199](https://github.com/okta/okta-auth-js/pull/1199) Fixes webauthn enrollment/verification to accept `credentials` object
