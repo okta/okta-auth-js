@@ -343,8 +343,8 @@ export async function run(
     }
   }
   
-  // from idx-js, used by the widget
-  const { actions, context, neededToProceed, proceed, rawIdxState, requestDidSucceed } = idxResponse || {};
+  // copy all fields from idxResponse which are needed by the widget
+  const { actions, context, neededToProceed, proceed, rawIdxState, requestDidSucceed, stepUp } = idxResponse || {};
   return {
     status: status!,
     ...(meta && { meta }),
@@ -354,6 +354,7 @@ export async function run(
     ...(nextStep && { nextStep }),
     ...(messages && messages.length && { messages }),
     ...(error && { error }),
+    ...(stepUp && { stepUp }),
     interactionCode, // if options.exchangeCodeForTokens is false
 
     // from idx-js
