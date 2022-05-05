@@ -105,7 +105,7 @@ describe('SyncStorageService', () => {
     });
   });
 
-  describe('handling sync message', () => {
+  describe('handling sync messages', () => {
     it('should emit "added" event if new token is added from another tab', async () => {
       createInstance();
       jest.spyOn(sdkMock.emitter, 'emit');
@@ -217,17 +217,72 @@ describe('SyncStorageService', () => {
       jest.spyOn(features, 'isIE11OrLess').mockReturnValue(true);
     });
 
-    it('should post "set_storage" event on any storage change', () => {
+    it('should post "set_storage" event when new token is added', () => {
       createInstance();
       const serviceChannel = (service as any).channel;
       jest.spyOn(serviceChannel, 'postMessage');
       tokenManager.add('idToken', tokens.standardIdToken2Parsed);
-      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(2); // ""set_storage" + "added"
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(2);
       expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
         type: 'set_storage',
         storage: {
           idToken: tokens.standardIdToken2Parsed
         },
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'added',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed
+      });
+    });
+
+    it('should post "set_storage" event when token is removed', () => {
+      createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.remove('idToken');
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(2);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'set_storage',
+        storage: {
+        },
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should post "set_storage" event when token is chnaged', () => {
+      createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.setTokens({
+        idToken: tokens.standardIdToken2Parsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(4);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'set_storage',
+        storage: {
+          idToken: tokens.standardIdToken2Parsed
+        },
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(3, {
+        type: 'added',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(4, {
+        type: 'renewed',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed,
+        oldToken: tokens.standardIdTokenParsed
       });
     });
 
