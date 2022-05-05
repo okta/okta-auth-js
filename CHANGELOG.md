@@ -20,7 +20,15 @@
 ### Fixes
 
 - [#1189](https://github.com/okta/okta-auth-js/pull/1189) IDX: fixes `input` type indicator's field name for `username` and `authenticator`. Before the indicator was named as `key`, now it's fixed to `type` to follow input metadata with all other inputs.
+## 6.4.5
+
+### Fixes
+
+- [#1240](https://github.com/okta/okta-auth-js/pull/1204) Fixes Apple SSO flow: includes `stepUp` on returned `IdxTransaction`
+
 ## 6.4.4
+
+### Fixes
 
 - [#1199](https://github.com/okta/okta-auth-js/pull/1199) Fixes webauthn enrollment/verification to accept `credentials` object
 

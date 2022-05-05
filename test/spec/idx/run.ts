@@ -390,20 +390,39 @@ describe('idx/run', () => {
         expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
       });
 
-      // Special case of an error response that can be continued
-      it('does save the idxResponse if stepUp is true', async () =>{
-        const { authClient, idxResponse, transactionMeta } = testContext;
-        idxResponse.requestDidSucceed = false;
-        idxResponse.stepUp = true;
-        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
-        await run(authClient);
-        expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
-          rawIdxResponse: idxResponse.rawIdxState,
-          requestDidSucceed: false,
-          stateHandle: idxResponse.context.stateHandle,
-          interactionHandle: transactionMeta.interactionHandle
-        });
+      it('does not include "stepUp" on the returned transaction', async () => {
+        const { authClient } = testContext;
+        const res = await run(authClient);
+        expect(res.stepUp).toBe(undefined);
       });
+
+      // Special case of an error response that can be continued
+      describe('stepUp', () => {
+        beforeEach(() => {
+          const { idxResponse } = testContext;
+          idxResponse.stepUp = true;
+        });
+
+        it('does save the idxResponse', async () =>{
+          const { authClient, idxResponse, transactionMeta } = testContext;
+          jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+          await run(authClient);
+          expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
+            rawIdxResponse: idxResponse.rawIdxState,
+            requestDidSucceed: false,
+            stateHandle: idxResponse.context.stateHandle,
+            interactionHandle: transactionMeta.interactionHandle
+          });
+        });
+
+        it('includes "stepUp" on the returned transaction', async () => {
+          const { authClient } = testContext;
+          const res = await run(authClient);
+          expect(res.stepUp).toBe(true);
+        });
+
+      });
+
     });
   });
 
