@@ -11,7 +11,7 @@
  */
 
 
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 describe('RECOVERY_CHALLENGE', function () {
   describe('no _links', function () {

@@ -14,26 +14,27 @@ import { Given } from '@cucumber/cucumber';
 import crypto from 'crypto';
 import ActionContext from '../support/context';
 import noop from '../support/action/noop';
-import createPolicy from '../support/management-api/createPolicy';
-import upsertPolicyRule from '../support/management-api/upsertPolicyRule';
-import addAppToPolicy from '../support/management-api/addAppToPolicy';
-import createUser from '../support/management-api/createUser';
-import addAppToGroup from '../support/management-api/addAppToGroup';
-import createCredentials, { UserCredentials } from '../support/management-api/createCredentials';
-import enrollFactor from '../support/management-api/enrollFactor';
-import grantConsentToScope from '../support/management-api/grantConsentToScope';
-import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
 import clickButton from '../support/action/clickButton';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import loginDirect from '../support/action/loginDirect';
-import addUserProfileSchemaToApp from '../support/management-api/addUserProfileSchemaToApp';
 import openRegisterWithActivationToken from '../support/action/openRegisterWithActivationToken';
-import fetchUser from '../support/management-api/fetchUser';
-import A18nClient from '../support/management-api/a18nClient';
-import createGroup from '../support/management-api/createGroup';
-import createApp from '../support/management-api/createApp';
 import startApp from '../support/action/startApp';
 import { getConfig } from '../util/configUtils';
+import createPolicy from '@okta/test.support/management-api/createPolicy';
+import upsertPolicyRule from '@okta/test.support/management-api/upsertPolicyRule';
+import addAppToPolicy from '@okta/test.support/management-api/addAppToPolicy';
+import createUser from '@okta/test.support/management-api/createUser';
+import addAppToGroup from '@okta/test.support/management-api/addAppToGroup';
+import createCredentials, { UserCredentials } from '@okta/test.support/management-api/createCredentials';
+import enrollFactor from '@okta/test.support/management-api/enrollFactor';
+import grantConsentToScope from '@okta/test.support/management-api/grantConsentToScope';
+import updateAppOAuthClient from '@okta/test.support/management-api/updateAppOAuthClient';
+import addUserProfileSchemaToApp from '@okta/test.support/management-api/addUserProfileSchemaToApp';
+import fetchUser from '@okta/test.support/management-api/fetchUser';
+import A18nClient from '@okta/test.support/management-api/a18nClient';
+import createGroup from '@okta/test.support/management-api/createGroup';
+import createApp from '@okta/test.support/management-api/createApp';
+
 
 // NOTE: noop function is used for predefined settings
 

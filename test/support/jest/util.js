@@ -17,8 +17,8 @@ import _ from 'lodash';
 
 import { OktaAuth } from '@okta/okta-auth-js';
 
-import browserStorage from '../../lib/browser/browserStorage';
-import { ServiceManager } from '../../lib/ServiceManager';
+import browserStorage from '../../../lib/browser/browserStorage';
+import { ServiceManager } from '../../../lib/ServiceManager';
 const cookies = browserStorage.storage;
 
 var util = {};
@@ -72,7 +72,7 @@ function generateXHRPair(request, response, uri, responseVars) {
     responseVars.uri = responseVars.uri || uri;
 
     // Import the desired xhr
-    var responseXHR = typeof response === 'object' ? response : require('./xhr/' + response);
+    var responseXHR = typeof response === 'object' ? response : require('@okta/test.support/xhr/' + response);
     responseXHR = {...responseXHR};
 
     // Change the request uri to include the domain

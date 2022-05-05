@@ -18,7 +18,7 @@ import { AuthStateManager, INITIAL_AUTH_STATE } from '../../lib/AuthStateManager
 import { AuthSdkError } from '../../lib/errors';
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 function createAuth() {
   return new OktaAuth({

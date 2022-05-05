@@ -22,7 +22,7 @@ import {
 import tokens from '@okta/test.support/tokens';
 import {postToTransaction} from '../../../lib/tx';
 import { APIError, isAccessToken, isIDToken } from '../../../lib/types';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 describe('OktaAuth (api)', function() {
   let auth;

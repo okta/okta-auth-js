@@ -13,7 +13,7 @@
 
 import { OktaAuth, AccessToken, IDToken } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 const _ = require('lodash');
 

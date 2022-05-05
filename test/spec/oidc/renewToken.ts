@@ -12,7 +12,7 @@
 
 
 import tokens from '@okta/test.support/tokens';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 
 describe('token.renew', function() {

@@ -11,7 +11,7 @@
  */
 
 
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 describe('webfinger', function () {
   describe('webfinger response', function () {

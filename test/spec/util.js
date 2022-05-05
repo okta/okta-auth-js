@@ -12,7 +12,7 @@
 
 
 import * as util from '../../lib/util';
-import testUtil from '@okta/test.support/util';
+import testUtil from '@okta/test.support/jest/util';
 
 describe('util', function() {
   let console;

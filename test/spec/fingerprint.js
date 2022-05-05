@@ -14,7 +14,7 @@
 /* global window, document */
 
 import { OktaAuth } from '@okta/okta-auth-js';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 import packageJson from '../../package.json';
 
 describe('fingerprint', function() {

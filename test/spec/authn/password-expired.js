@@ -11,7 +11,7 @@
  */
 
 
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 describe('PASSWORD_EXPIRED', function () {
   describe('trans.changePassword', function () {

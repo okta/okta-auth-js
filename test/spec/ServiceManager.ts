@@ -12,7 +12,7 @@
 
 
 import { OktaAuth } from '@okta/okta-auth-js';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 jest.mock('broadcast-channel', () => {
   const actual = jest.requireActual('broadcast-channel');

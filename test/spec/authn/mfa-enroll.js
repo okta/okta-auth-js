@@ -11,7 +11,7 @@
  */
 
 
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 import _ from 'lodash';
 
 describe('MFA_ENROLL', function () {

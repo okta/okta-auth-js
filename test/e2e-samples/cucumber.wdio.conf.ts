@@ -357,8 +357,7 @@ export const config: WebdriverIO.Config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    onComplete: async function(exitCode, config, capabilities, results) {
+    onComplete: async function(_exitCode, _config, _capabilities, _results) {
       const outputDir = path.join(__dirname, '../../build2/reports/e2e');
       fs.mkdirSync(outputDir, { recursive: true });
       const reportsDir = path.resolve(__dirname, 'reports');

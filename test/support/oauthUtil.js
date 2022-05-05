@@ -14,7 +14,7 @@
 /* global window, document, Storage */
 /* eslint-disable complexity, max-statements */
 var URL = require('url').URL;
-import util from './util';
+import util from '@okta/test.support/jest/util';
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from './tokens';
 import EventEmitter from 'tiny-emitter';
