@@ -432,8 +432,14 @@ export class TokenManager implements TokenManagerInterface {
   }
   
   clear() {
+    const tokens = this.getTokensSync();
     this.clearExpireEventTimeoutAll();
     this.storage.clearStorage();
+    this.emitSetStorageEvent();
+
+    Object.keys(tokens).forEach(key => {
+      this.emitRemoved(key, tokens[key]);
+    });
   }
 
   clearPendingRemoveTokens() {

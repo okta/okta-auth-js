@@ -40,7 +40,10 @@ describe('SyncStorageService', () => {
       getStorage: jest.fn().mockImplementation(() => storage),
       setStorage: jest.fn().mockImplementation((newStorage) => {
         storage = newStorage;
-      })
+      }),
+      clearStorage: jest.fn().mockImplementation(() => {
+        storage = {};
+      }),
     };
     sdkMock = {
       options: {},
@@ -140,7 +143,7 @@ describe('SyncStorageService', () => {
       expect(sdkMock.emitter.emit).toHaveBeenCalledWith('renewed', 'idToken', tokens.standardIdToken2Parsed, tokens.standardIdTokenParsed);
     });
 
-    it('should not post "sync message" to other tabs', async () => {
+    it('should not post sync message to other tabs', async () => {
       createInstance();
       const serviceChannel = (service as any).channel;
       jest.spyOn(serviceChannel, 'postMessage');
@@ -203,6 +206,19 @@ describe('SyncStorageService', () => {
       });
     });
 
+    it('should post "remove" events when token storage is cleared', () => {
+      createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.clear();
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(1);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+    });
+
     it('should not post "set_storage" event on storage change (for non-IE)', () => {
       createInstance();
       const serviceChannel = (service as any).channel;
@@ -241,6 +257,24 @@ describe('SyncStorageService', () => {
       const serviceChannel = (service as any).channel;
       jest.spyOn(serviceChannel, 'postMessage');
       tokenManager.remove('idToken');
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(2);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'set_storage',
+        storage: {
+        },
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should post "set_storage" event when token storage is cleared', () => {
+      createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.clear();
       expect(serviceChannel.postMessage).toHaveBeenCalledTimes(2);
       expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
         type: 'set_storage',
