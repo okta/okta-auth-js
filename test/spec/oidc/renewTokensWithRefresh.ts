@@ -18,7 +18,7 @@ import * as tokenEndpoint from '../../../lib/oidc/endpoints/token';
 import * as renewTokensWithRefreshTokenModule from '../../../lib/oidc/renewTokensWithRefresh';
 import * as getWithoutPromptModule from '../../../lib/oidc/getWithoutPrompt';
 import oauthUtil from '@okta/test.support/oauthUtil';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 describe('renewTokensWithRefresh', function () {
   let testContext;

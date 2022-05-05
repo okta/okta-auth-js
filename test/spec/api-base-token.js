@@ -13,7 +13,7 @@
 
 /* global USER_AGENT, fetch */
 
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import oauthUtil from '@okta/test.support/oauthUtil';

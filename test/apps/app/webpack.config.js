@@ -11,7 +11,7 @@
  */
 
 
-require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
+require('@okta/test.support/env').setEnvironmentVarsFromTestEnv(__dirname);
 
 const path = require('path');
 const webpack = require('webpack');

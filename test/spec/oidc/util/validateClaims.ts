@@ -13,7 +13,7 @@
 
 import { OktaAuth, TokenVerifyParams, UserClaims } from '@okta/okta-auth-js';
 import { validateClaims } from '../../../../lib/oidc/util';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 describe('validateClaims', function () {
   var sdk;

@@ -26,7 +26,7 @@ const mocked = {
 };
 
 import { OktaAuth, AccessToken } from '@okta/okta-auth-js';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 function setupSync(options?) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);

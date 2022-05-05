@@ -16,7 +16,7 @@ jest.mock('../../../lib/util/misc', () => {
     delay: () => { return Promise.resolve(); }
   };
 });
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 describe('MFA_CHALLENGE', function () {
 

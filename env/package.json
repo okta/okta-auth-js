@@ -1,9 +1,0 @@
-{
-  "name": "@okta/env",
-  "version": "1.0.0",
-  "main": "index.js",
-  "private": true,
-  "dependencies": {
-    "dotenv": "^8.2.0"
-  }
-}

@@ -12,7 +12,7 @@
 
 
 import _ from 'lodash';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 
 describe('General Errors', function () {
   util.itErrorsCorrectly({

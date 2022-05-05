@@ -24,7 +24,7 @@ const mocked = {
 };
 
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 import { postToTokenEndpoint } from '../../../../lib/oidc/endpoints/token';
 import factory from '@okta/test.support/factory';
 import { CustomUrls } from '../../../../lib/types';

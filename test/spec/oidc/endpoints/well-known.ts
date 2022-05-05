@@ -26,7 +26,7 @@ jest.mock('../../../../lib/features', () => {
 
 import { getWellKnown, getKey } from '../../../../lib/oidc/endpoints/well-known';
 import oauthUtilHelpers from '@okta/test.support/oauthUtil';
-import util from '@okta/test.support/util';
+import util from '@okta/test.support/jest/util';
 import wellKnown from '@okta/test.support/xhr/well-known';
 import keys from '@okta/test.support/xhr/keys';
 import tokens from '@okta/test.support/tokens';
