@@ -117,7 +117,7 @@ describe('SyncStorageService', () => {
       expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', tokens.standardIdToken2Parsed);
     });
   
-    it('should emit "removed" event if new token is removed from another tab', async () => {
+    it('should emit "removed" event if token is removed from another tab', async () => {
       createInstance();
       jest.spyOn(sdkMock.emitter, 'emit');
       await channel.postMessage({
@@ -128,7 +128,7 @@ describe('SyncStorageService', () => {
       expect(sdkMock.emitter.emit).toHaveBeenCalledWith('removed', 'idToken', tokens.standardIdTokenParsed);
     });
   
-    it('should emit "renewed" event if new token is chnaged from another tab', async () => {
+    it('should emit "renewed" event if token is chnaged from another tab', async () => {
       createInstance();
       jest.spyOn(sdkMock.emitter, 'emit');
       await channel.postMessage({
@@ -140,7 +140,7 @@ describe('SyncStorageService', () => {
       expect(sdkMock.emitter.emit).toHaveBeenCalledWith('renewed', 'idToken', tokens.standardIdToken2Parsed, tokens.standardIdTokenParsed);
     });
 
-    it('should not post sync message to other tabs', async () => {
+    it('should not post "sync message" to other tabs', async () => {
       createInstance();
       const serviceChannel = (service as any).channel;
       jest.spyOn(serviceChannel, 'postMessage');
@@ -154,7 +154,7 @@ describe('SyncStorageService', () => {
   });
 
   describe('posting sync messages', () => {
-    it('should post "added" sync message', () => {
+    it('should post "added" sync message when new token is added', () => {
       createInstance();
       const serviceChannel = (service as any).channel;
       jest.spyOn(serviceChannel, 'postMessage');
@@ -166,7 +166,44 @@ describe('SyncStorageService', () => {
       });
     });
 
-    it('should not post set_storage event on storage change (for non-IE)', () => {
+    it('should post "removed" sync message when token is removed', () => {
+      createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.remove('idToken');
+      expect(serviceChannel.postMessage).toHaveBeenCalledWith({
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should post "removed", "added", "renewed" sync messages when token is changed', () => {
+      createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.setTokens({
+        idToken: tokens.standardIdToken2Parsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'added',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(3, {
+        type: 'renewed',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed,
+        oldToken: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should not post "set_storage" event on storage change (for non-IE)', () => {
       createInstance();
       const serviceChannel = (service as any).channel;
       jest.spyOn(serviceChannel, 'postMessage');
