@@ -17,13 +17,10 @@ import confirmValidPassword from '../support/action/confirmValidPassword';
 import enterCredential from '../support/action/context-enabled/enterCredential';
 import enterValidPassword from '../support/action/enterValidPassword';
 import enterCode from '../support/action/enterCode';
-import enterLiveUserEmail from '../support/action/context-enabled/live-user/enterEmail';
 import submitForm from '../support/action/submitForm';
 import selectAuthenticator from '../support/action/selectAuthenticator';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
-import enterRegistrationField from '../support/action/context-enabled/live-user/enterRegistrationField';
 import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
-import enterCorrectPhoneNumber from '../support/action/context-enabled/live-user/enterCorrectPhoneNumber';
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
 import skipForm from '../support/action/skipForm';
 import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
@@ -37,7 +34,6 @@ import enterCorrectQuestionAnswer from '../support/action/enterCorrectQuestionAn
 import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
 import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
 import enterCorrectGoogleAuthenticatorCode from '../support/action/context-enabled/enterCorrectGoogleAuthenticatorCode';
-import openEmailMagicLink from '../support/action/context-enabled/live-user/openEmailMagicLink';
 import ActionContext from '../support/context';
 import noop from '../support/action/noop';
 import clickButton from '../support/action/clickButton';
@@ -46,6 +42,9 @@ import setInputField from '../support/action/setInputField';
 import { camelize } from '../util';
 import getCodeFromSMS from '../support/action/getCodeFromSMS';
 import selectEnrollMethod from '../support/action/selectEnrollMethod';
+import EnrollPhoneAuthenticator from '../support/selectors/EnrollPhoneAuthenticator';
+import PasswordRecover from '../support/selectors/PasswordRecover';
+import Registration from '../support/selectors/Registration';
 
 When(
   'she clicks the {string} button', 
@@ -177,12 +176,43 @@ When(
 
 When(
   /^she inputs her correct Email$/,
-  enterLiveUserEmail
+  async function(this: ActionContext) {
+    await (await $(PasswordRecover.username)).setValue(this.user.profile.email);
+  }
 );
 
 When(
   /^she fills out (?:her\s)?(First Name|Last Name|Email|another property|Age)$/,
-  enterRegistrationField
+  async function (this: ActionContext, fieldName: string) {
+    let value, selector;
+    switch (fieldName) {
+      case 'First Name':
+        value = this.credentials.firstName;
+        selector = Registration.firstName;
+        break;
+      case 'Last Name':
+        value = this.credentials.lastName;
+        selector = Registration.lastName;
+        break;
+      case 'Email':
+        value = this.credentials.emailAddress;
+        selector = Registration.email;
+        break;
+      case 'Age':
+        value = '99';
+        selector = Registration.getCustomAttribute('age');
+        break;
+      case 'another property':
+        value = 'random value';
+        selector = Registration.getCustomAttribute('customAttribute');
+        break;
+      default: 
+        throw new Error(`Unknown credential "${fieldName}"`);
+    }
+    await (await $(selector)).setValue(value);
+
+  }
+
 );
 
 When(
@@ -220,7 +250,9 @@ When(
 
 When(
   /^She inputs a valid phone number$/,
-  enterCorrectPhoneNumber
+  async function (this: ActionContext) {
+    await (await $(EnrollPhoneAuthenticator.phoneNumber)).setValue(this.credentials.phoneNumber);
+  }
 );
 
 When(
@@ -270,7 +302,10 @@ When(
 
 When(
   /^she clicks the Email magic link$/,
-  openEmailMagicLink
+  async function (this: ActionContext) {
+    const emailMagicLink = await this.a18nClient.getEmailMagicLink(this.credentials.profileId);
+    await browser.url(emailMagicLink);
+  }
 );
 
 When(

@@ -17,8 +17,6 @@ import { Then } from '@cucumber/cucumber';
 import checkFormMessage from '../support/check/checkFormMessage';
 import checkButton from '../support/check/checkButton';
 import checkIsOnPage from '../support/check/checkIsOnPage';
-import enterValidPassword from '../support/action/context-enabled/live-user/enterValidPassword';
-import confirmValidPassword from '../support/action/context-enabled/live-user/confirmValidPassword';
 import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
 import checkProfileAttribute from '../support/check/checkProfileAttribute';
 import { UserHome } from '../support/selectors';
@@ -252,12 +250,16 @@ Then(
 
 Then(
   /^she fills out her Password$/,
-  enterValidPassword
+  async function (this: ActionContext) {
+    await (await $('#password')).setValue(this.credentials.password);
+  }
 );
 
 Then(
   /^she confirms her Password$/,
-  confirmValidPassword
+  async function (this: ActionContext) {
+    await (await $('#confirm-password')).setValue(this.credentials.password);
+  }
 );
 
 Then(
