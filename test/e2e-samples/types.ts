@@ -12,11 +12,11 @@
 
 
 import { User, Application, Policy, Group } from '@okta/okta-sdk-nodejs';
-import A18nClient, { A18nConfig } from './management-api/a18nClient';
-import { UserCredentials } from './management-api/createCredentials';
-import { OktaClientConfig } from './management-api/util/getOktaClient';
+import A18nClient, { A18nConfig } from '@okta/test.support/management-api/a18nClient';
+import { UserCredentials } from '@okta/test.support/management-api/createCredentials';
+import { OktaClientConfig } from '@okta/test.support/management-api/util/getOktaClient';
 
-interface ActionContext {
+export interface ActionContext {
   credentials: UserCredentials;
   secondCredentials: UserCredentials;
   user: User;
@@ -33,4 +33,3 @@ interface ActionContext {
   a18nClient: A18nClient;
 }
 
-export default ActionContext;

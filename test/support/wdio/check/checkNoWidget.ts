@@ -11,16 +11,10 @@
  */
 
 
-import LoginForm from '../selectors/LoginForm';
-import OktaSignInOIE from '../selectors/OktaSignInOIE';
+import checkElementExists from './checkElementExists';
+import { getOktaSignInForm } from  '../lib/getOktaSignInForm';
 
-const getLoginForm = (featureName: string) => {
-  switch (featureName) {
-    case 'Basic Login with Embedded Sign In Widget':
-      return OktaSignInOIE;
-    default:
-      return LoginForm;
-  }
+export default async () => {
+  const OktaSignIn = getOktaSignInForm();
+  await checkElementExists('no', OktaSignIn.signinSubmitBtn);
 };
-
-export default getLoginForm;

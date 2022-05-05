@@ -19,10 +19,10 @@ import {
   Selectors,
   Unauth,
   UserHome,
-} from  '../support/selectors';
-import waitForDisplayed from '../support/wait/waitForDisplayed';
-import clickElement from '../support/action/clickElement';
-import checkEqualsText from '../support/check/checkEqualsText';
+} from  '@okta/test.support/wdio/selectors';
+import checkEqualsText from '@okta/test.support/wdio/check/checkEqualsText';
+import clickElement from '@okta/test.support/wdio/action/clickElement';
+import waitForDisplayed from '@okta/test.support/wdio/wait/waitForDisplayed';
 
 
 // Selectors

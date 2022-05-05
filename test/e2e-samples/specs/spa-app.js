@@ -15,16 +15,17 @@ import {
   getSampleConfig,
   getConfig,
 } from '../util';
-import startApp from '../support/action/startApp';
+import startApp from '@okta/test.support/wdio/action/startApp';
+import clickProfile from '@okta/test.support/wdio/action/clickProfile';
+import loginWidget from '@okta/test.support/wdio/action/loginWidget';
+import loginRedirect from '@okta/test.support/wdio/action/loginRedirect';
+import logoutRedirect from '@okta/test.support/wdio/action/logoutRedirect';
+import openRedirectUrl from '@okta/test.support/wdio/action/openRedirectUrl';
+
 import checkProfile from '../support/check/checkProfile';
 import checkNoProfile from '../support/check/checkNoProfile';
 import checkNoWidget from '../support/check/checkNoWidget';
-import clickProfile from '../support/action/clickProfile';
 import { default as _loginDirect } from '../support/action/loginDirect';
-import loginWidget from '../support/action/loginWidget';
-import loginRedirect from '../support/action/loginRedirect';
-import logoutRedirect from '../support/action/logoutRedirect';
-import openRedirectUrl from '../support/action/openRedirectUrl';
 import checkSocialLoginButton from '../support/check/checkSocialLoginButton';
 import SpaApp from '../pageobjects/SpaApp';
 
@@ -82,7 +83,10 @@ describe('spa-app: ' + sampleConfig.name, () => {
   if (sampleConfig.signinWidget) {
     it('can login using an embedded widget', async () => {
       await startApp('/', { authMethod: 'widget' });
-      await loginWidget();
+      await loginWidget({
+        username: config.username,
+        password: config.password
+      });
       await checkProfile();
       await logoutRedirect();
     });
@@ -108,7 +112,10 @@ describe('spa-app: ' + sampleConfig.name, () => {
         authMethod: 'widget'
       });
 
-      await loginWidget();
+      await loginWidget({
+        username: config.username,
+        password: config.password
+      });
       await checkProfile();
       await logoutRedirect();
     });

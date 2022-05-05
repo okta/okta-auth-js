@@ -1,6 +1,6 @@
 import clickElement from './clickElement';
 import links from '../selectors/maps/links';
-import { camelize } from '../../util';
+import { camelize } from '@okta/test.support/util/camelize';
 
 export default async (linkName: string) => {
   linkName = camelize(linkName);

@@ -1,4 +1,4 @@
-import { getCurrentUrl } from '../../util';
+import { getCurrentUrl } from '../../../e2e-samples/util';
 
 /**
  * Wait for the current URL path matches the given path

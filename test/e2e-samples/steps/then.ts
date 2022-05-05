@@ -14,25 +14,27 @@
 /* eslint-disable max-len */
 import { Then } from '@cucumber/cucumber';
 
-import checkFormMessage from '../support/check/checkFormMessage';
-import checkButton from '../support/check/checkButton';
-import checkIsOnPage from '../support/check/checkIsOnPage';
-import checkFormContainsMessage from '../support/check/checkFormContainsMessage';
-import checkProfileAttribute from '../support/check/checkProfileAttribute';
-import { UserHome } from '../support/selectors';
-import ActionContext from '../support/context';
-import checkIsInAuthenticatorOptions from '../support/check/checkIsInAuthenticatorOptions';
-import waitForDisplayed from '../support/wait/waitForDisplayed';
-import checkMessage from '../support/check/checkMessage';
-import checkEqualsText from '../support/check/checkEqualsText';
-import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
-import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
+import { ActionContext } from '../types';
+import checkFormMessage from '@okta/test.support/wdio/check/checkFormMessage';
+import checkButton from '@okta/test.support/wdio/check/checkButton';
+import checkIsOnPage from '@okta/test.support/wdio/check/checkIsOnPage';
+import checkFormContainsMessage from '@okta/test.support/wdio/check/checkFormContainsMessage';
+import checkProfileAttribute from '@okta/test.support/wdio/check/checkProfileAttribute';
+import checkIsInAuthenticatorOptions from '@okta/test.support/wdio/check/checkIsInAuthenticatorOptions';
+import checkMessage from '@okta/test.support/wdio/check/checkMessage';
+import checkEqualsText from '@okta/test.support/wdio/check/checkEqualsText';
+import checkEnrollMethods from '@okta/test.support/wdio/check/checkEnrollMethods';
+import checkSelectedEnrollMethod from '@okta/test.support/wdio/check/checkSelectedEnrollMethod';
+import checkCustomSecurityQuestion from '@okta/test.support/wdio/check/checkCustomSecurityQuestion';
+import { UserHome } from '@okta/test.support/wdio/selectors';
+
+import waitForDisplayed from '@okta/test.support/wdio/wait/waitForDisplayed';
+import getSecretFromQrCode from '@okta/test.support/wdio/action/getSecretFromQrCode';
+import getSecretFromSharedSecret from '@okta/test.support/wdio/action/getSecretFromSharedSecret';
+import enterCustomQuestion from '@okta/test.support/wdio/action/enterCustomQuestion';
+import enterQuestionAnswer from '@okta/test.support/wdio/action/enterQuestionAnswer';
+
 import { camelize } from '../util';
-import checkEnrollMethods from '../support/check/checkEnrollMethods';
-import checkSelectedEnrollMethod from '../support/check/checkSelectedEnrollMethod';
-import checkCustomSecurityQuestion from '../support/check/checkCustomSecurityQuestion';
-import enterCustomQuestion from '../support/action/enterCustomQuestion';
-import enterQuestionAnswer from '../support/action/enterQuestionAnswer';
 
 Then('she is redirected to the {string} page', checkIsOnPage);
 

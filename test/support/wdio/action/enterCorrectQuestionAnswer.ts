@@ -11,27 +11,11 @@
  */
 
 
-import deleteUser from './deleteUser';
-import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
+import ChallengeAuthenticator from '../selectors/ChallengeAuthenticator';
+import { getConfig } from '../../util/configUtils';
 
-type Options = {
-  username: string;
+export default async function () {
+  const config = getConfig();
+  const answer = (config as any).securityQuestionAnswer || '';
+  await (await $(ChallengeAuthenticator.answer)).setValue(answer);
 }
-
-export default async (config: OktaClientConfig, options: Options): Promise<void> => {
-  const oktaClient = getOktaClient(config);
-
-  const { username } = options;
-  try {
-    const {value: user} = await oktaClient.listUsers({
-      q: username
-    }).next();
-
-    if (user) {
-      await deleteUser(user);
-    }
-
-  } catch (err) {
-    console.log(`An error occured during self-enrolled user cleanup: ${err}`);
-  }
-};

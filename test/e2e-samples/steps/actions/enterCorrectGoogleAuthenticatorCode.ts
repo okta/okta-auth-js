@@ -11,10 +11,11 @@
  */
 
 
+import EnrollGoogleAuthenticator from '@okta/test.support/wdio/selectors/EnrollGoogleAuthenticator';
+import { getTotp } from '@okta/test.support/util/getTotp';
+import { ActionContext } from '../../types';
 
-import { User } from '@okta/okta-sdk-nodejs';
-
-export default async function(user: User): Promise<void> {
-  await user.deactivate();
-  await user.delete();
+export default async function (this: ActionContext, totpType: string) {
+  const token = getTotp(this.sharedSecret, totpType);
+  await (await $(EnrollGoogleAuthenticator.code)).setValue(token);
 }

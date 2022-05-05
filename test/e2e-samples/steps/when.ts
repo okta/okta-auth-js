@@ -13,38 +13,41 @@
 
 import { When } from '@cucumber/cucumber';
 
-import confirmValidPassword from '../support/action/confirmValidPassword';
-import enterCredential from '../support/action/context-enabled/enterCredential';
-import enterValidPassword from '../support/action/enterValidPassword';
-import enterCode from '../support/action/enterCode';
-import submitForm from '../support/action/submitForm';
-import selectAuthenticator from '../support/action/selectAuthenticator';
-import inputInvalidEmail from '../support/action/inputInvalidEmail';
-import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
-import selectVerifyBySms from '../support/action/selectVerifyBySms';
-import skipForm from '../support/action/skipForm';
-import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
-import enterIncorrectPhoneNumberFormat from '../support/action/enterIncorrectPhoneNumberFormat';
-import clickFacebookButton from '../support/action/clickFacebookButton';
-import clickLoginWithFacebookInWidget from '../support/action/clickLoginWithFacebookInWidget';
-import clickLoginWithOktaOIDCIdPInWidget from '../support/action/clickLoginWithOktaOIDCIdPInWidget';
-import clickOIDCIdPButton from '../support/action/clickOIDCIdPButton';
-import loginWidget from '../support/action/loginWidget';
-import enterCorrectQuestionAnswer from '../support/action/enterCorrectQuestionAnswer';
-import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
-import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
-import enterCorrectGoogleAuthenticatorCode from '../support/action/context-enabled/enterCorrectGoogleAuthenticatorCode';
-import ActionContext from '../support/context';
-import noop from '../support/action/noop';
-import clickButton from '../support/action/clickButton';
-import clickLink from '../support/action/clickLink';
-import setInputField from '../support/action/setInputField';
-import { camelize } from '../util';
-import getCodeFromSMS from '../support/action/getCodeFromSMS';
-import selectEnrollMethod from '../support/action/selectEnrollMethod';
-import EnrollPhoneAuthenticator from '../support/selectors/EnrollPhoneAuthenticator';
-import PasswordRecover from '../support/selectors/PasswordRecover';
-import Registration from '../support/selectors/Registration';
+import confirmValidPassword from '@okta/test.support/wdio/action/confirmValidPassword';
+import enterValidPassword from '@okta/test.support/wdio/action/enterValidPassword';
+import enterCode from '@okta/test.support/wdio/action/enterCode';
+import submitForm from '@okta/test.support/wdio/action/submitForm';
+import selectAuthenticator from '@okta/test.support/wdio/action/selectAuthenticator';
+import inputInvalidEmail from '@okta/test.support/wdio/action/inputInvalidEmail';
+import selectSmsAuthenticator from '@okta/test.support/wdio/action/selectSmsAuthenticator';
+import selectVerifyBySms from '@okta/test.support/wdio/action/selectVerifyBySms';
+import skipForm from '@okta/test.support/wdio/action/skipForm';
+import inputInvalidEmailFormat from '@okta/test.support/wdio/action/inputInvalidEmailFormat';
+import enterIncorrectPhoneNumberFormat from '@okta/test.support/wdio/action/enterIncorrectPhoneNumberFormat';
+import clickFacebookButton from '@okta/test.support/wdio/action/clickFacebookButton';
+import clickLoginWithFacebookInWidget from '@okta/test.support/wdio/action/clickLoginWithFacebookInWidget';
+import clickLoginWithOktaOIDCIdPInWidget from '@okta/test.support/wdio/action/clickLoginWithOktaOIDCIdPInWidget';
+import clickOIDCIdPButton from '@okta/test.support/wdio/action/clickOIDCIdPButton';
+import loginWidget from '@okta/test.support/wdio/action/loginWidget';
+import enterCorrectQuestionAnswer from '@okta/test.support/wdio/action/enterCorrectQuestionAnswer';
+import getSecretFromQrCode from '@okta/test.support/wdio/action/getSecretFromQrCode';
+import getSecretFromSharedSecret from '@okta/test.support/wdio/action/getSecretFromSharedSecret';
+import noop from '@okta/test.support/wdio/action/noop';
+import clickButton from '@okta/test.support/wdio/action/clickButton';
+import clickLink from '@okta/test.support/wdio/action/clickLink';
+import setInputField from '@okta/test.support/wdio/action/setInputField';
+import getCodeFromSMS from '@okta/test.support/wdio/action/getCodeFromSMS';
+import selectEnrollMethod from '@okta/test.support/wdio/action/selectEnrollMethod';
+
+import EnrollPhoneAuthenticator from '@okta/test.support/wdio/selectors/EnrollPhoneAuthenticator';
+import PasswordRecover from '@okta/test.support/wdio/selectors/PasswordRecover';
+import Registration from '@okta/test.support/wdio/selectors/Registration';
+
+import enterCredential from './actions/enterCredential';
+import enterCorrectGoogleAuthenticatorCode from './actions/enterCorrectGoogleAuthenticatorCode';
+
+import { ActionContext } from '../types';
+import { camelize, getConfig } from '../util';
 
 When(
   'she clicks the {string} button', 
@@ -244,7 +247,11 @@ When(
   /^logs in to Okta OIDC IDP$/,
   async function() {
     // Login to Okta OIDC org with standard username, password (same user exists in OIDC IdP org)
-    await loginWidget();
+    const config = getConfig();
+    await loginWidget({
+      username: config.username,
+      password: config.password
+    });
   }
 );
 

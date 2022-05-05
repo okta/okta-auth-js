@@ -11,9 +11,10 @@
  */
 
 
-import getLoginForm from '../../lib/getLoginForm';
-import { getConfig } from '../../../util/configUtils';
-import ActionContext from '../../context';
+import LoginForm from '@okta/test.support/wdio/selectors/LoginForm';
+import OktaSignInOIE from '@okta/test.support/wdio/selectors/OktaSignInOIE';
+import { getConfig } from '../../util/configUtils';
+import ActionContext from '../../types';
 
 /* eslint complexity:[0,8] */
 export default async function (
@@ -24,7 +25,14 @@ export default async function (
   let selector = null;
   let value;
   const isLiveProfile = !!this.credentials;
-  const loginForm = getLoginForm(this.featureName);
+  const loginForm = ((featureName: string) => {
+    switch (featureName) {
+      case 'Basic Login with Embedded Sign In Widget':
+        return OktaSignInOIE;
+      default:
+        return LoginForm;
+    }
+  })(this.featureName);
   switch (credName) {
     case 'incorrect username': {
       selector = loginForm.username;

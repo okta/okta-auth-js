@@ -10,11 +10,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import { getConfig } from '../../util/configUtils';
 import waitForDisplayed from '../wait/waitForDisplayed';
 import clickElement from './clickElement';
-import { getOktaSignInForm } from  '../../util';
+import { getOktaSignInForm } from  '../lib/getOktaSignInForm';
 
 export default async (
   options: Record<string, string> = {}
@@ -22,12 +20,11 @@ export default async (
   const OktaSignIn = getOktaSignInForm();
   await waitForDisplayed(OktaSignIn.signinSubmitBtn);
 
-  const config = getConfig();
-  const username = options.username || config.username;
+  const username = options.username;
   if (!username) {
     throw new Error('USERNAME was not set');
   }
-  const password = options.password || config.password;
+  const password = options.password;
   if (!password) {
     throw new Error('PASSWORD was not set');
   }
