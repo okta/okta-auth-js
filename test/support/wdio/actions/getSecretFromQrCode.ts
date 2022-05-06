@@ -11,19 +11,15 @@
  */
 
 
-import { Before } from '@cucumber/cucumber';
-import { ActionContext } from '../types';
+import EnrollGoogleAuthenticator from '../selectors/EnrollGoogleAuthenticator';
+import jsqr from 'jsqr';
+const { PNG } = require('pngjs');
 
-Before(function (this: ActionContext, scenario: any) {
-  this.featureName = scenario?.gherkinDocument?.feature?.name;
-  this.scenarioName = scenario?.pickle?.name;
-});
-
-// Extend the hook timeout to fight against org rate limit
-Before({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
-  this.config = {
-    a18nAPIKey: process.env.A18N_API_KEY,
-    issuer: process.env.ISSUER,
-    oktaAPIKey: process.env.OKTA_API_KEY
-  };
-});
+export const getSecretFromQrCode = async () => {
+  const el = await $(EnrollGoogleAuthenticator.qrCode);
+  const dataUri = await el.getAttribute('src');
+  const png = PNG.sync.read(Buffer.from(dataUri.slice('data:image/png;base64,'.length), 'base64'));
+  const result = jsqr(Uint8ClampedArray.from(png.data), png.width, png.height);
+  const sharedSecret = result?.data?.match(/\?secret=(\w+)&/)?.[1];
+  return sharedSecret;
+};

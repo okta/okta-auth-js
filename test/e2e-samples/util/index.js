@@ -18,7 +18,6 @@ export * from './configUtils';
 export * from './appUtils';
 export * from './loginUtils';
 export * from './browserUtils';
-export * from '@okta/test.support/wdio/lib/selectorUtils';
 export { toQueryString };
 export { camelize };
 export * from './random';

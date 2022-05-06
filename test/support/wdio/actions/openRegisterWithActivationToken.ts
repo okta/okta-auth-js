@@ -11,19 +11,17 @@
  */
 
 
-import { Before } from '@cucumber/cucumber';
-import { ActionContext } from '../types';
+import { User } from '@okta/okta-sdk-nodejs';
 
-Before(function (this: ActionContext, scenario: any) {
-  this.featureName = scenario?.gherkinDocument?.feature?.name;
-  this.scenarioName = scenario?.pickle?.name;
-});
+export const openRegisterWithActivationToken = async (user: User): Promise<void> => {
+  const sendEmail = { sendEmail : false };
+  const token = await user.activate(sendEmail);
 
-// Extend the hook timeout to fight against org rate limit
-Before({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
-  this.config = {
-    a18nAPIKey: process.env.A18N_API_KEY,
-    issuer: process.env.ISSUER,
-    oktaAPIKey: process.env.OKTA_API_KEY
-  };
-});
+  const queryStr = (await browser.getUrl()).split('?')[1];
+  const params = new URLSearchParams(queryStr);
+  const state = params.get('transactionId') || params.get('state');
+  const baseUrl = browser.options.baseUrl;
+  const registerWithActivationTokenUrl = `${baseUrl}/register?activationToken=${token.activationToken}&state=${state}`;
+  await browser.url(registerWithActivationTokenUrl);
+}
+

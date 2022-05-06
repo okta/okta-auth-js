@@ -10,23 +10,25 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
+import {
+  clickProfile,
+  loginWidget,
+  loginRedirect,
+  logoutRedirect,
+  openRedirectUrl,
+  loginDirect as _loginDirect
+} from '@okta/test.support/wdio/actions';
+import { 
+  checkNoProfile, 
+  checkNoWidget,
+  checkSocialLoginButton
+} from '@okta/test.support/wdio/check';
 import {
   getSampleConfig,
   getConfig,
 } from '../util';
-import startApp from '@okta/test.support/wdio/action/startApp';
-import clickProfile from '@okta/test.support/wdio/action/clickProfile';
-import loginWidget from '@okta/test.support/wdio/action/loginWidget';
-import loginRedirect from '@okta/test.support/wdio/action/loginRedirect';
-import logoutRedirect from '@okta/test.support/wdio/action/logoutRedirect';
-import openRedirectUrl from '@okta/test.support/wdio/action/openRedirectUrl';
-
-import checkProfile from '../support/check/checkProfile';
-import checkNoProfile from '../support/check/checkNoProfile';
-import checkNoWidget from '../support/check/checkNoWidget';
-import { default as _loginDirect } from '../support/action/loginDirect';
-import checkSocialLoginButton from '../support/check/checkSocialLoginButton';
+import startApp from '../actions/startApp';
+import checkProfile from '../checks/checkProfile';
 import SpaApp from '../pageobjects/SpaApp';
 
 const sampleConfig = getSampleConfig();
@@ -74,7 +76,10 @@ describe('spa-app: ' + sampleConfig.name, () => {
   if (sampleConfig.signinForm) {
     it('can login directly, calling signin() with username and password', async () => {
       await startApp('/', { authMethod: 'form', requireUserSession: true });
-      await loginDirect();
+      await loginDirect({
+        username: config.username,
+        password: config.password
+      });
       await checkProfile();
       await logoutRedirect();
     });

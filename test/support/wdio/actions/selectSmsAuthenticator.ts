@@ -11,19 +11,13 @@
  */
 
 
-import { Before } from '@cucumber/cucumber';
-import { ActionContext } from '../types';
+import checkIsOnPage from '../check/checkIsOnPage';
+import SelectAuthenticator from '../selectors/SelectAuthenticator';
+import { clickElement } from './clickElement';
+import { selectOption } from './selectOption';
 
-Before(function (this: ActionContext, scenario: any) {
-  this.featureName = scenario?.gherkinDocument?.feature?.name;
-  this.scenarioName = scenario?.pickle?.name;
-});
-
-// Extend the hook timeout to fight against org rate limit
-Before({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
-  this.config = {
-    a18nAPIKey: process.env.A18N_API_KEY,
-    issuer: process.env.ISSUER,
-    oktaAPIKey: process.env.OKTA_API_KEY
-  };
-});
+export const selectSmsAuthenticator = async () => {
+  await selectOption('value', 'phone_number', SelectAuthenticator.options);
+  await clickElement('click', 'selector', SelectAuthenticator.submit);
+  await checkIsOnPage('Enroll Factor: Enter SMS Code');
+};

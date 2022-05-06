@@ -14,12 +14,10 @@
 /* eslint-disable max-len */
 import { Then } from '@cucumber/cucumber';
 
-import { ActionContext } from '../types';
 import checkFormMessage from '@okta/test.support/wdio/check/checkFormMessage';
 import checkButton from '@okta/test.support/wdio/check/checkButton';
 import checkIsOnPage from '@okta/test.support/wdio/check/checkIsOnPage';
 import checkFormContainsMessage from '@okta/test.support/wdio/check/checkFormContainsMessage';
-import checkProfileAttribute from '@okta/test.support/wdio/check/checkProfileAttribute';
 import checkIsInAuthenticatorOptions from '@okta/test.support/wdio/check/checkIsInAuthenticatorOptions';
 import checkMessage from '@okta/test.support/wdio/check/checkMessage';
 import checkEqualsText from '@okta/test.support/wdio/check/checkEqualsText';
@@ -29,12 +27,18 @@ import checkCustomSecurityQuestion from '@okta/test.support/wdio/check/checkCust
 import { UserHome } from '@okta/test.support/wdio/selectors';
 
 import waitForDisplayed from '@okta/test.support/wdio/wait/waitForDisplayed';
-import getSecretFromQrCode from '@okta/test.support/wdio/action/getSecretFromQrCode';
-import getSecretFromSharedSecret from '@okta/test.support/wdio/action/getSecretFromSharedSecret';
-import enterCustomQuestion from '@okta/test.support/wdio/action/enterCustomQuestion';
-import enterQuestionAnswer from '@okta/test.support/wdio/action/enterQuestionAnswer';
 
-import { camelize } from '../util';
+import {
+  getSecretFromQrCode,
+  getSecretFromSharedSecret,
+  enterCustomQuestion,
+  enterQuestionAnswer
+} from '@okta/test.support/wdio/actions';
+
+import { camelize } from '@okta/test.support/util';
+
+import checkProfileAttribute from '../checks/checkProfileAttribute';
+import { ActionContext } from '../types';
 
 Then('she is redirected to the {string} page', checkIsOnPage);
 

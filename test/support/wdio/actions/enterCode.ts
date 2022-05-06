@@ -10,20 +10,25 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import { Before } from '@cucumber/cucumber';
-import { ActionContext } from '../types';
-
-Before(function (this: ActionContext, scenario: any) {
-  this.featureName = scenario?.gherkinDocument?.feature?.name;
-  this.scenarioName = scenario?.pickle?.name;
-});
-
-// Extend the hook timeout to fight against org rate limit
-Before({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
-  this.config = {
-    a18nAPIKey: process.env.A18N_API_KEY,
-    issuer: process.env.ISSUER,
-    oktaAPIKey: process.env.OKTA_API_KEY
-  };
-});
+export const enterCode = async (code: string) => {
+  const selectorCandidates = [
+    `input[name=code]`,
+    `input[name=verificationCode]`,
+  ];
+  let selector = '';
+  await browser.waitUntil(async () => {
+    for (const selectorCandidate of selectorCandidates) {
+      const el = await $(selectorCandidate);
+      const isDisplayed = await el?.isDisplayed();
+      if (isDisplayed) {
+        selector = selectorCandidate;
+        return true;
+      }
+    }
+    return false;
+  }, {
+    timeout: 3000,
+    timeoutMsg: 'wait for correct selector'
+  });
+  await (await $(selector)).setValue(code);
+}

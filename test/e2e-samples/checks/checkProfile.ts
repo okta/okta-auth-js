@@ -10,20 +10,24 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import { Before } from '@cucumber/cucumber';
+import UserHome from '@okta/test.support/wdio/selectors/UserHome';
 import { ActionContext } from '../types';
 
-Before(function (this: ActionContext, scenario: any) {
-  this.featureName = scenario?.gherkinDocument?.feature?.name;
-  this.scenarioName = scenario?.pickle?.name;
-});
-
-// Extend the hook timeout to fight against org rate limit
-Before({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
-  this.config = {
-    a18nAPIKey: process.env.A18N_API_KEY,
-    issuer: process.env.ISSUER,
-    oktaAPIKey: process.env.OKTA_API_KEY
-  };
-});
+export default async function(this: ActionContext) {
+  // verify profile info
+  const userName = this?.credentials?.emailAddress || this?.userName || process.env.USERNAME;
+  await browser.waitUntil(async () => {
+    const selectors = UserHome.email;
+    for (const selector of selectors) {
+      const el = await $(selector);
+      const text = await el?.getText();
+      if (text === userName) {
+        return true;
+      }
+    }
+    return false;
+  }, {
+    timeout: 5000,
+    timeoutMsg: 'wait for profile'
+  });
+}

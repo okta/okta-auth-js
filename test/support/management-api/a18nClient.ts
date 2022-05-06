@@ -13,7 +13,7 @@
 
 
 import fetch from 'cross-fetch';
-import { wait } from '@okta/test.support/util/wait';
+import { wait } from '@okta/test.support/util';
 
 const PROFILE_URL = 'https://api.a18n.help/v1/profile';
 const LATEST_EMAIL_URL = `https://api.a18n.help/v1/profile/:profileId/email/latest`;

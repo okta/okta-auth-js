@@ -12,7 +12,7 @@
 
 
 import { Client } from '@okta/okta-sdk-nodejs';
-import { getTotp, TOTP_TYPES } from '@okta/test.support/util/getTotp';
+import { getTotp, TOTP_TYPES } from '../util/getTotp';
 import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
 type Options = {

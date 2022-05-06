@@ -13,8 +13,8 @@
 /* eslint-disable complexity */
 
 import { After } from '@cucumber/cucumber';
-import ActionContext from '../support/context';
 import deleteSelfEnrolledUser from '@okta/test.support/management-api/deleteSelfEnrolledUser';
+import { ActionContext } from '../types';
 
 // Comment out this after hook to persist test context
 // Extend the hook timeout to fight against org rate limit

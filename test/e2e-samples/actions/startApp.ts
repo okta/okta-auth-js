@@ -11,19 +11,14 @@
  */
 
 
-import { Before } from '@cucumber/cucumber';
-import { ActionContext } from '../types';
+import { getAppUrl } from '../util/appUtils';
 
-Before(function (this: ActionContext, scenario: any) {
-  this.featureName = scenario?.gherkinDocument?.feature?.name;
-  this.scenarioName = scenario?.pickle?.name;
-});
-
-// Extend the hook timeout to fight against org rate limit
-Before({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
-  this.config = {
-    a18nAPIKey: process.env.A18N_API_KEY,
-    issuer: process.env.ISSUER,
-    oktaAPIKey: process.env.OKTA_API_KEY
-  };
-});
+export default async (
+  url = '/',
+  queryParams: Record<string, string> = {}
+) => {
+  if (queryParams.authMethod === 'widget' && !process.env.ORG_OIE_ENABLED) {
+    queryParams.useInteractionCodeFlow = 'false';
+  }
+  await browser.url(getAppUrl(url, queryParams));
+};

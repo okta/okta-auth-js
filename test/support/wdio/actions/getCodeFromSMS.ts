@@ -11,19 +11,18 @@
  */
 
 
-import { Before } from '@cucumber/cucumber';
-import { ActionContext } from '../types';
+import A18nClient from '../../management-api/a18nClient';
+import { clickElement } from './clickElement';
 
-Before(function (this: ActionContext, scenario: any) {
-  this.featureName = scenario?.gherkinDocument?.feature?.name;
-  this.scenarioName = scenario?.pickle?.name;
-});
-
-// Extend the hook timeout to fight against org rate limit
-Before({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
-  this.config = {
-    a18nAPIKey: process.env.A18N_API_KEY,
-    issuer: process.env.ISSUER,
-    oktaAPIKey: process.env.OKTA_API_KEY
-  };
-});
+export const getCodeFromSMS = async (a18nClient: A18nClient, profileId: string) => {
+  let retryResend = 3;
+  let code = await a18nClient.getSMSCode(profileId);
+  while (!code && retryResend-- > 0) {
+    await clickElement('click', 'selector', 'button[name=resend]');
+    code = await a18nClient.getSMSCode(profileId);
+  }
+  if (!code) {
+    throw new Error('Failed to get sms code');
+  }
+  return code;
+}

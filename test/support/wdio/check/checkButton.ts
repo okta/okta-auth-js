@@ -12,8 +12,7 @@
 
 /* eslint-disable max-depth, @typescript-eslint/no-non-null-assertion */
 
-import { camelize } from '@okta/test.support/util/camelize';
-import WebdriverIO from 'webdriverio';
+import { camelize } from '@okta/test.support/util';
 import buttons from '../selectors/maps/buttons';
 
 const getSelector = (tagCandidate: string, name: string, containerSelector?: string) => {

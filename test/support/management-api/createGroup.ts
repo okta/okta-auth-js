@@ -1,4 +1,4 @@
-import { randomStr } from '@okta/test.support/util/random';
+import { randomStr } from '../util/random';
 import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
 export default async (config: OktaClientConfig) => {
