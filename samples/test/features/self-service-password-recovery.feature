@@ -7,7 +7,6 @@ Background:
     And a user named "Mary"
     And she has an account with "active" state in the org
 
-
   Scenario: Mary resets her password
     When she clicks the "login" button
     Then she is redirected to the "Login" page
@@ -15,10 +14,11 @@ Background:
     Then she is redirected to the "Self Service Password Reset" page
     When she inputs her correct Email
     And she submits the form
-    Then she is redirected to the "Select Authenticator" page
-    And password authenticator is not in options
-    When she selects the "Email" factor
-    And she submits the form
+    # ENG_REMEMBER_LAST_USED_FACTOR_OIE feature avoids these steps
+    # Then she is redirected to the "Select Authenticator" page
+    # And password authenticator is not in options
+    # When she selects the "Email" factor
+    # And she submits the form
     Then she sees a page to challenge her email authenticator
     When she inputs the correct code from her "Email"
     And she submits the form

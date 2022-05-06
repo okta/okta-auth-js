@@ -100,6 +100,7 @@ const samples = [
       'self-service-registration-activation-token',
       'mfa-password-and-email',
       'mfa-password-and-email-magic-link',
+      'mfa-password-and-question',
       // This feature is not well defined and introduce flakiness, disable it
       // 'social-login-mfa',
       'social-idp',

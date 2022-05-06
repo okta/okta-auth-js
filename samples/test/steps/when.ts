@@ -23,6 +23,7 @@ import selectAuthenticator from '../support/action/selectAuthenticator';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
 import enterRegistrationField from '../support/action/context-enabled/live-user/enterRegistrationField';
 import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
+import selectSecurityQuestionAuthenticator from '../support/action/selectSecurityQuestionAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/context-enabled/live-user/enterCorrectPhoneNumber';
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
 import skipForm from '../support/action/skipForm';
@@ -290,4 +291,9 @@ When(
 When(
   /^She selects "Next"/,
   noop
+);
+
+When(
+  /^She selects Security Question from the list$/,
+  selectSecurityQuestionAuthenticator
 );

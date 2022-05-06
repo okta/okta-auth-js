@@ -16,10 +16,8 @@ export MAX_INSTANCES=2
 export SAMPLE_NAME=@okta/samples.express-embedded-auth-with-sdk
 export ORG_OIE_ENABLED=true 
 export USERNAME=mary@acme.com
-get_secret prod/okta-sdk-vars/password PASSWORD
+get_vault_secret_key devex/prod-js-idx-sdk-vars password PASSWORD
 get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
-export FB_USERNAME=js_ekdtypn_user@tfbnw.net
-get_secret prod/okta-sdk-vars/fb_password FB_PASSWORD
 
 # If this script is run as a bacon task, run against trexcloud environment
 if [[ "${BACON_TASK}" == true ]]; then
@@ -30,24 +28,14 @@ if [[ "${BACON_TASK}" == true ]]; then
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_client_secret CLIENT_SECRET
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_org_api_key OKTA_API_KEY
   get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
-  get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_id MFA_CLIENT_ID
-  get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_secret MFA_CLIENT_SECRET
-  get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_id CUSTOM_CLIENT_ID
-  get_vault_secret_key devex/trex-js-idx-sdk-vars trex_mfa_client_secret CUSTOM_CLIENT_SECRET
 else
-  echo "Running tests against production (ok12) org"
-  export ISSUER=https://javascript-idx-sdk.okta.com
+  echo "Running tests against production (ok14) org"
+  export ISSUER=https://javascript-idx-sdk-new.okta.com
   export ISSUER_IDFIRST=https://javascript-idx-sdk-idfirst.okta.com
-  export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
-  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret CLIENT_SECRET
-  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key OKTA_API_KEY
+  export CLIENT_ID=0oax3dcx0sak1KKb9696
+  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret_new CLIENT_SECRET
+  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key_new OKTA_API_KEY
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
-  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_mfa_client_id MFA_CLIENT_ID
-  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_mfa_client_secret MFA_CLIENT_SECRET
-  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_custom_client_id CUSTOM_CLIENT_ID
-  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_custom_client_secret CUSTOM_CLIENT_SECRET
-  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_totp_client_id TOTP_CLIENT_ID
-  get_vault_secret_key devex/prod-js-idx-sdk-vars prod_totp_client_secret TOTP_CLIENT_SECRET
 fi
 
 # Run the tests
