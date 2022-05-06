@@ -20,7 +20,7 @@ import {
   Unauth,
   UserHome,
 } from  '@okta/test.support/wdio/selectors';
-import checkEqualsText from '@okta/test.support/wdio/check/checkEqualsText';
+import { checkEqualsText } from '@okta/test.support/wdio/checks';
 import { clickElement } from '@okta/test.support/wdio/actions';
 import waitForDisplayed from '@okta/test.support/wdio/wait/waitForDisplayed';
 

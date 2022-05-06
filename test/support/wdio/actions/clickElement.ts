@@ -13,7 +13,7 @@
 
 import { Selector } from 'webdriverio';
 
-import checkIfElementExists from '../lib/checkIfElementExists';
+import { checkIfElementExists } from '../checks/checkIfElementExists';
 
 /**
  * Perform an click action on the given element

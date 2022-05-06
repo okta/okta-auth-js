@@ -35,7 +35,7 @@ import {
   createGroup,
   createApp
 } from '@okta/test.support/management-api';
-import checkIsOnPage from '@okta/test.support/wdio/check/checkIsOnPage';
+import { checkIsOnPage } from '@okta/test.support/wdio/checks';
 
 import { ActionContext } from '../types';
 import startApp from '../actions/startApp';

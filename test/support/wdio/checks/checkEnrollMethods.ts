@@ -11,10 +11,13 @@
  */
 
 
-import SelectAuthenticator from '../selectors/SelectAuthenticator';
+import EnrollSecurityQuestion from '../selectors/EnrollSecurityQuestion';
+import isDisplayed from './isDisplayed';
 
-export default async (optionValue: string, expectedValue: boolean) => {
-  const option = await $(`${SelectAuthenticator.options} option[value=${optionValue}]`);
-  const isExisting = await option.isExisting();
-  expect(isExisting).toBe(expectedValue);
+export const checkEnrollMethods = async (expectedLabels: string[]) => {
+  await Promise.all(expectedLabels.map(async label => {
+    const selector = EnrollSecurityQuestion.enrollMethods[label];
+    expect(selector).toBeDefined();
+    await isDisplayed(selector, false);
+  }));
 };

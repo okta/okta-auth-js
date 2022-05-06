@@ -23,7 +23,10 @@ const getSelector = (tagCandidate: string, name: string, containerSelector?: str
   }
 };
 
-export default async(buttonName: string, containerSelector?: string): Promise<WebdriverIO.Element> => {
+export const checkButton = async (
+  buttonName: string, 
+  containerSelector?: string
+): Promise<WebdriverIO.Element> => {
   let button: WebdriverIO.Element;
   buttonName = camelize(buttonName);
   await browser.waitUntil(async () => {

@@ -12,7 +12,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, complexity */
 
-import checkEqualsText from '@okta/test.support/wdio/check/checkEqualsText';
+import { checkEqualsText } from '@okta/test.support/wdio/checks';
 import { ActionContext } from '../types';
 import { camelize } from '@okta/test.support/util';
 import { UserHome } from '@okta/test.support/wdio/selectors';

@@ -13,26 +13,24 @@
 
 import type { Selector } from 'webdriverio';
 
+import { checkIfElementExists } from './checkIfElementExists';
+
 /**
- * Check the selected state of the given element
+ * Check if the given element exists
+ * @param  {String}   isExisting Whether the element should be existing or not
+ *                               (an or no)
  * @param  {String}   selector   Element selector
- * @param  {String}   falseCase Whether to check if the element is elected or
- *                              not
  */
-export default (selector: Selector, falseCase: boolean) => {
+export const checkElementExists = async (isExisting: string, selector: Selector) => {
     /**
-     * The selected state
+     * Falsecase assertion
      * @type {Boolean}
      */
-    const isSelected = $(selector).isSelected();
+    let falseCase = true;
 
-    if (falseCase) {
-        expect(isSelected)
-            // @ts-expect-error
-            .not.toEqual(true, `"${selector}" should not be selected`);
-    } else {
-        expect(isSelected)
-            // @ts-expect-error
-            .toEqual(true, `"${selector}" should be selected`);
+    if (isExisting === 'an') {
+        falseCase = false;
     }
+
+    await checkIfElementExists(selector, falseCase);
 };

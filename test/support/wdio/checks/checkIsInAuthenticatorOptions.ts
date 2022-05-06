@@ -11,11 +11,10 @@
  */
 
 
-import waitForDisplayed from '../wait/waitForDisplayed';
+import SelectAuthenticator from '../selectors/SelectAuthenticator';
 
-import checkContainsText from './checkContainsText';
-
-export default async (expectedMessage: string) => {
-  await waitForDisplayed('#form-messages', false);
-  await checkContainsText('button', '#form-messages', '', expectedMessage);
+export const checkIsInAuthenticatorOptions = async (optionValue: string, expectedValue: boolean) => {
+  const option = await $(`${SelectAuthenticator.options} option[value=${optionValue}]`);
+  const isExisting = await option.isExisting();
+  expect(isExisting).toBe(expectedValue);
 };

@@ -11,10 +11,10 @@
  */
 
 
-import checkElementExists from './checkElementExists';
-import { getOktaSignInForm } from  '../lib/getOktaSignInForm';
+import waitForDisplayed from '../wait/waitForDisplayed';
+import { checkContainsText } from './checkContainsText';
 
-export default async () => {
-  const OktaSignIn = getOktaSignInForm();
-  await checkElementExists('no', OktaSignIn.signinSubmitBtn);
+export const checkFormContainsMessage = async (expectedMessage: string) => {
+  await waitForDisplayed('#form-messages', false);
+  await checkContainsText('button', '#form-messages', '', expectedMessage);
 };

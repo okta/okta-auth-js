@@ -22,7 +22,7 @@ import {
   checkNoProfile, 
   checkNoWidget,
   checkSocialLoginButton
-} from '@okta/test.support/wdio/check';
+} from '@okta/test.support/wdio/checks';
 import {
   getSampleConfig,
   getConfig,

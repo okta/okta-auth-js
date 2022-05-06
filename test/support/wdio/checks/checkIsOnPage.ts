@@ -17,7 +17,7 @@ import { pages } from '../selectors';
  * Check if browser has navigated to expected page
  * @param  {String}   pageName       Expected page title
  */
-export default async (pageName?: string) => {
+export const checkIsOnPage = async (pageName?: string) => {
   const page = pageName && pages[pageName];
 
   if (!page) {

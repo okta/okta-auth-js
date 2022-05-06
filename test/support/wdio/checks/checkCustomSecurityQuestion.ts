@@ -11,22 +11,10 @@
  */
 
 
-import type { Selector } from 'webdriverio';
+import EnrollSecurityQuestion from '../selectors/EnrollSecurityQuestion';
+import { isDisplayed } from './isDisplayed';
 
-import checkContainsAnyText from './checkContainsAnyText';
-
-export default (
-    elementType: 'button' | 'element',
-    element: Selector,
-    falseCase: ' not'
-) => {
-    let newFalseCase = true;
-
-    if (typeof falseCase === 'function') {
-        newFalseCase = false;
-    } else if (falseCase === ' not') {
-        newFalseCase = false;
-    }
-
-    checkContainsAnyText(elementType, element, newFalseCase);
+export const checkCustomSecurityQuestion = async () => {
+  const selector = EnrollSecurityQuestion.customQuestion;
+  await isDisplayed(selector, false);
 };

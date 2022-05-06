@@ -20,7 +20,7 @@ import type { Selector } from 'webdriverio';
  * @param  {String}   falseCase     Whether to check if the content contains
  *                                  text or not
  */
-export default (
+export const checkContainsAnyText = (
     elementType: 'element' | 'button',
     selector: Selector,
     falseCase?: any

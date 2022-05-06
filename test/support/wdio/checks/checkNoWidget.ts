@@ -11,10 +11,10 @@
  */
 
 
-import waitForDisplayed from '../wait/waitForDisplayed';
-import checkEqualsText from './checkEqualsText';
+import { checkElementExists } from './checkElementExists';
+import { getOktaSignInForm } from  '../lib/getOktaSignInForm';
 
-export default async (selector: string, expectedMessage: string) => {
-  await waitForDisplayed(selector, false);
-  await checkEqualsText('element', selector, false, expectedMessage);
+export const checkNoWidget = async () => {
+  const OktaSignIn = getOktaSignInForm();
+  await checkElementExists('no', OktaSignIn.signinSubmitBtn);
 };

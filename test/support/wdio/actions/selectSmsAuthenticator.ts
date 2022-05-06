@@ -11,7 +11,7 @@
  */
 
 
-import checkIsOnPage from '../check/checkIsOnPage';
+import { checkIsOnPage } from '../checks/checkIsOnPage';
 import SelectAuthenticator from '../selectors/SelectAuthenticator';
 import { clickElement } from './clickElement';
 import { selectOption } from './selectOption';

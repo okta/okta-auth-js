@@ -11,30 +11,32 @@
  */
 
 
-/**
- * Check if a cookie with the given name exists
- * @param  {[type]}   name      The name of the cookie
- * @param  {[type]}   falseCase Whether or not to check if the cookie exists or
- *                              not
- */
-export default (name: string, falseCase: boolean) => {
-    /**
-     * The cookie as retrieved from the browser
-     * @type {Object}
-     */
-    const cookie = browser.getCookies(name);
+import type { Selector } from 'webdriverio';
 
+/**
+ * Check if the given element is (not) visible
+ * @param  {String}   selector   Element selector
+ * @param  {String}   falseCase Check for a visible or a hidden element
+ */
+export const isDisplayed = async (selector: Selector, falseCase: boolean) => {
+    /**
+     * Visible state of the give element
+     * @type {String}
+     */
+ 
+    const isDisplayed = await (await $(selector)).isDisplayed();
+    
     if (falseCase) {
-        expect(cookie.length).toBe(
-            0,
+        expect(isDisplayed).not.toEqual(
+            true,
             // @ts-expect-error
-            `Expected cookie "${name}" not to exists but it does`
+            `Expected element "${selector}" not to be displayed`
         );
     } else {
-        expect(cookie.length).not.toBe(
-            0,
+        expect(isDisplayed).toEqual(
+            true,
             // @ts-expect-error
-            `Expected cookie "${name}" to exists but it does not`
+            `Expected element "${selector}" to be displayed`
         );
     }
 };

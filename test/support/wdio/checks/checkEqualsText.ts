@@ -21,7 +21,7 @@ import type { Selector } from 'webdriverio';
  *                                  given text or not
  * @param  {String}   expectedText  The text to validate against
  */
-export default async (
+export const checkEqualsText = async (
     elementType: 'element' | 'button',
     selector: Selector,
     falseCase: boolean,

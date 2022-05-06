@@ -11,10 +11,11 @@
  */
 
 
-import EnrollSecurityQuestion from '../selectors/EnrollSecurityQuestion';
+import { checkEqualsText } from './checkEqualsText';
+import waitForDisplayed from '../wait/waitForDisplayed';
+import LoginForm from '../selectors/LoginForm';
 
-export default async (expectedLabel: string) => {
-  const selector = EnrollSecurityQuestion.enrollMethods[expectedLabel];
-  expect(selector).toBeDefined();
-  expect(await $(selector)).toBeSelected();
+export const checkFormMessage = async (expectedMessage: string) => {
+  await waitForDisplayed(LoginForm.formMessage, false);
+  await checkEqualsText('button', LoginForm.formMessage, false, expectedMessage);
 };

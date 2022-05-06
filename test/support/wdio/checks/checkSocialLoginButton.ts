@@ -11,10 +11,12 @@
  */
 
 
-import checkElementExists from './checkElementExists';
-import UserHome from '../selectors/UserHome';
+import { checkIfElementExists } from './checkIfElementExists';
 
-export default async () => {
-  // verify no profile info
-  await checkElementExists('no', UserHome.primaryEmail);
+export const checkSocialLoginButton = async (
+  className: string,
+  idpId: string
+) => {
+  const selector = `.${className}[href*="/sso/idps/${idpId}"]`;
+  await checkIfElementExists(selector);
 };

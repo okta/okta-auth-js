@@ -12,9 +12,9 @@
 
 
 import EnrollSecurityQuestion from '../selectors/EnrollSecurityQuestion';
-import isDisplayed from './isDisplayed';
 
-export default async () => {
-  const selector = EnrollSecurityQuestion.customQuestion;
-  await isDisplayed(selector, false);
+export const checkSelectedEnrollMethod = async (expectedLabel: string) => {
+  const selector = EnrollSecurityQuestion.enrollMethods[expectedLabel];
+  expect(selector).toBeDefined();
+  expect(await $(selector)).toBeSelected();
 };

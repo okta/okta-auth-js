@@ -11,13 +11,10 @@
  */
 
 
-import EnrollSecurityQuestion from '../selectors/EnrollSecurityQuestion';
-import isDisplayed from './isDisplayed';
+import waitForDisplayed from '../wait/waitForDisplayed';
+import { checkEqualsText } from './checkEqualsText';
 
-export default async (expectedLabels: string[]) => {
-  await Promise.all(expectedLabels.map(async label => {
-    const selector = EnrollSecurityQuestion.enrollMethods[label];
-    expect(selector).toBeDefined();
-    await isDisplayed(selector, false);
-  }));
+export const checkMessage = async (selector: string, expectedMessage: string) => {
+  await waitForDisplayed(selector, false);
+  await checkEqualsText('element', selector, false, expectedMessage);
 };

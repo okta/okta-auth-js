@@ -21,7 +21,7 @@ import type { Selector } from 'webdriverio';
  *                                  the given text or not
  * @param  {String}   expectedText  The text to check against
  */
-export default async (
+export const checkContainsText = async (
     elementType: 'element' | 'button',
     selector: Selector,
     falseCase: '' | ' not',

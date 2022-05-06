@@ -23,7 +23,7 @@ import waitForDisplayed from '../wait/waitForDisplayed';
  * @param  {Number}  exactly   Check if the element exists exactly this number
  *                             of times
  */
-export default async (
+export const checkIfElementExists = async (
     selector: Selector,
     falseCase?: boolean,
     exactly?: string | number
