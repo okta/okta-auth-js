@@ -376,13 +376,13 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     this.serviceManager = new ServiceManager(this, args.services);
   }
 
-  async start() {
+  start() {
+    this.serviceManager.start();
     // TODO: review tokenManager.start
     this.tokenManager.start();
     if (!this.token.isLoginRedirect()) {
       this.authStateManager.updateAuthState();
     }
-    await this.serviceManager.start();
   }
 
   async stop() {

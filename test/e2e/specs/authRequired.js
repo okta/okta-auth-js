@@ -42,6 +42,7 @@ describe('auth required', () => {
     await openPKCE({}, true);
     await switchToSecondWindow();
     await TestApp.waitForLogoutBtn();
+    await TestApp.startService();
     await TestApp.logoutRedirect();
     await TestApp.assertLoggedOut();
     await browser.closeWindow();
