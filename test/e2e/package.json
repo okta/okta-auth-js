@@ -26,7 +26,6 @@
     "@wdio/sauce-service": "^6.6.0",
     "@wdio/selenium-standalone-service": "^6.6.5",
     "@wdio/spec-reporter": "^6.6.0",
-    "wait-on": "^3.3.0",
-    "webpack": "^3.0.0"
+    "wait-on": "^3.3.0"
   }
 }
