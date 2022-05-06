@@ -10,6 +10,7 @@ Feature: Login with Identifier First
       And a Policy that defines "MFA Enrollment" with properties
         | okta_password | OPTIONAL |
         | okta_email    | REQUIRED |
+      And with a Policy Rule that defines "MFA Enrollment Challenge"
       And a user named "Mary"
       And she has an account with "active" state in the org
 

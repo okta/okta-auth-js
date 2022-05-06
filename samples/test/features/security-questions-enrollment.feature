@@ -67,8 +67,6 @@ Feature: Security Questions
       And she enters "Atko" in the question
       And she enters "Okta" in the answer
       And she submits the form
-    Then she is redirected to the "Select Authenticator" page
-    When she selects "Skip" on Email
     Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

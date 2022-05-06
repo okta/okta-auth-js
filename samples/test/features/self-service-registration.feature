@@ -21,9 +21,6 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she fills out her Password
   And she confirms her Password
   And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
-  And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
   And she submits the form
@@ -47,9 +44,6 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
     And she fills out her Password
     And she confirms her Password
     And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
-    And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
     And she submits the form
@@ -62,6 +56,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   Then the screen changes to receive an input for a code
   When she inputs the correct code from her "SMS"
     And she submits the form
+  Then she is redirected to the "Select Authenticator" page
+  When she selects "Skip"
   Then she is redirected to the "Root" page
     And she sees a table with her profile info
     And the cell for the value of "email" is shown and contains her "email"
@@ -90,9 +86,6 @@ Scenario: Mary signs up for an account with Password, sets up required Email fac
   And she fills out her Password
   And she confirms her Password
   And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
-    And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
     And she submits the form
