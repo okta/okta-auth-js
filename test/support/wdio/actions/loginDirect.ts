@@ -13,7 +13,7 @@
 
 import { LoginForm, Selectors } from  '../selectors';
 import { clickElement } from './clickElement';
-import setInputField from './setInputField';
+import { setInputField } from './setInputField';
 
 interface LoginDirectOptions {
   username?: string;

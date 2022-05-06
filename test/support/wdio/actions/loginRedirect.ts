@@ -13,7 +13,7 @@
 
 import { Unauth } from  '../selectors';
 import waitForDisplayed from '../wait/waitForDisplayed';
-import loginWidget from './loginWidget';
+import { loginWidget } from './loginWidget';
 
 export const loginRedirect = async (
   options: Record<string, string> = {}

@@ -12,7 +12,7 @@
 
 
 import SelectAuthenticator from '../selectors/SelectAuthenticator';
-import selectOption from './selectOption';
+import { selectOption } from './selectOption';
 
 export const selectAuthenticator = async (authenticatorKey: string) => {
   await selectOption('value', authenticatorKey, SelectAuthenticator.options);

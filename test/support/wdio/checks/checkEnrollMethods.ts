@@ -12,7 +12,7 @@
 
 
 import EnrollSecurityQuestion from '../selectors/EnrollSecurityQuestion';
-import isDisplayed from './isDisplayed';
+import { isDisplayed } from './isDisplayed';
 
 export const checkEnrollMethods = async (expectedLabels: string[]) => {
   await Promise.all(expectedLabels.map(async label => {
