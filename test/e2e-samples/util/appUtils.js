@@ -12,7 +12,7 @@
 
 
 import { getConfig } from './configUtils';
-import toQueryString from './toQueryString';
+import { toQueryString } from '@okta/test.support/util';
 
 async function startApp(App, options) {
   await App.open(Object.assign({}, getConfig(), options));

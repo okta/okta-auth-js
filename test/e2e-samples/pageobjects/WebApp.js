@@ -12,7 +12,7 @@
 
 
 import assert from 'assert';
-import toQueryString from '../util/toQueryString';
+import { toQueryString } from '@okta/test.support/util';
 
 /* eslint-disable max-len */
 class WebApp {

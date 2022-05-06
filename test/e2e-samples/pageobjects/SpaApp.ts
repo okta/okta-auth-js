@@ -13,7 +13,7 @@
 /* eslint-disable max-len */
 
 import assert from 'assert';
-import toQueryString from '../util/toQueryString';
+import { toQueryString } from '@okta/test.support/util';
 import {
   Nav,
   Selectors,
