@@ -39,7 +39,7 @@ const MAP = {
   }
 };
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const addUserProfileSchemaToApp = async (config: OktaClientConfig, options: Options) => {
   const oktaClient = getOktaClient(config);
   const { appId, schemaName } = options;
   const res = await oktaClient.updateApplicationUserProfile(appId, (MAP as any)[schemaName]);

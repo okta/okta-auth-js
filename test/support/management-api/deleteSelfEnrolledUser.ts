@@ -11,14 +11,14 @@
  */
 
 
-import deleteUser from './deleteUser';
+import { deleteUser } from './deleteUser';
 import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 
 type Options = {
   username: string;
 }
 
-export default async (config: OktaClientConfig, options: Options): Promise<void> => {
+export const deleteSelfEnrolledUser = async (config: OktaClientConfig, options: Options): Promise<void> => {
   const oktaClient = getOktaClient(config);
 
   const { username } = options;

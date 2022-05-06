@@ -4,7 +4,7 @@ type Options = {
   username: string;
 }
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const fetchUser = async (config: OktaClientConfig, options: Options) => {
   const oktaClient = getOktaClient(config);
 
   const { username } = options;

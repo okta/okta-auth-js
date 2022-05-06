@@ -173,12 +173,15 @@ const getGlobalSessionPolicyActions = (description: string) => {
   } as any)[description];
 };
 
-export default async function (config: OktaClientConfig, {
-  policyId,
-  policyType,
-  policyRuleDescription,
-  groupId
-}: Options) {
+export const upsertPolicyRule = async (
+  config: OktaClientConfig, 
+  {
+    policyId,
+    policyType,
+    policyRuleDescription,
+    groupId
+  }: Options
+) => {
   const oktaClient = getOktaClient(config);
 
   let actions;

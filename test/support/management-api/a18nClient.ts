@@ -32,7 +32,7 @@ export type A18nConfig = {
   a18nAPIKey?: string;
 }
 
-export default class A18nClient {
+export class A18nClient {
   apiKey?: string;
 
   constructor(config: A18nConfig) {

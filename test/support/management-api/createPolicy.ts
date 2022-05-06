@@ -55,7 +55,7 @@ const getGlobalSessionPolicy = (options: Options) => {
   };
 };
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const createPolicy = async (config: OktaClientConfig, options: Options) => {
   const oktaClient = getOktaClient(config);
 
   let policyObject;

@@ -6,11 +6,14 @@ type Options = {
   groupName?: string ;
 };
 
-export default async function(config: OktaClientConfig, { 
-  appId, 
-  groupId = '', 
-  groupName 
-}: Options) {
+export const addAppToGroup = async (
+  config: OktaClientConfig, 
+  { 
+    appId, 
+    groupId = '', 
+    groupName 
+  }: Options
+) => {
   const oktaClient = getOktaClient(config);
   if (groupName) {
     const { value: group } = await oktaClient.listGroups({

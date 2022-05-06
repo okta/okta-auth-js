@@ -11,7 +11,7 @@
  */
 
 
-import A18nClient from '../../management-api/a18nClient';
+import { A18nClient } from '@okta/test.support/management-api';
 import { clickElement } from './clickElement';
 
 export const getCodeFromSMS = async (a18nClient: A18nClient, profileId: string) => {

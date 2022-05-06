@@ -13,7 +13,7 @@
 /* eslint-disable complexity */
 
 import { After } from '@cucumber/cucumber';
-import deleteSelfEnrolledUser from '@okta/test.support/management-api/deleteSelfEnrolledUser';
+import { deleteSelfEnrolledUser } from '@okta/test.support/management-api';
 import { ActionContext } from '../types';
 
 // Comment out this after hook to persist test context

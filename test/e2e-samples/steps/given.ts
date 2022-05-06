@@ -12,33 +12,34 @@
 
 import { Given } from '@cucumber/cucumber';
 import crypto from 'crypto';
-import { ActionContext } from '../types';
-import startApp from '../actions/startApp';
-import { getConfig } from '../util/configUtils';
-
 import {
   noop,
   clickButton,
   loginDirect,
   openRegisterWithActivationToken
 } from '@okta/test.support/wdio/actions';
-
+import {
+  createPolicy,
+  upsertPolicyRule,
+  addAppToPolicy,
+  createUser,
+  addAppToGroup,
+  createCredentials, 
+  UserCredentials,
+  enrolledFactor,
+  grantConsentToScope,
+  updateAppOAuthClient,
+  addUserProfileSchemaToApp,
+  fetchUser,
+  A18nClient,
+  createGroup,
+  createApp
+} from '@okta/test.support/management-api';
 import checkIsOnPage from '@okta/test.support/wdio/check/checkIsOnPage';
 
-import createPolicy from '@okta/test.support/management-api/createPolicy';
-import upsertPolicyRule from '@okta/test.support/management-api/upsertPolicyRule';
-import addAppToPolicy from '@okta/test.support/management-api/addAppToPolicy';
-import createUser from '@okta/test.support/management-api/createUser';
-import addAppToGroup from '@okta/test.support/management-api/addAppToGroup';
-import createCredentials, { UserCredentials } from '@okta/test.support/management-api/createCredentials';
-import enrollFactor from '@okta/test.support/management-api/enrollFactor';
-import grantConsentToScope from '@okta/test.support/management-api/grantConsentToScope';
-import updateAppOAuthClient from '@okta/test.support/management-api/updateAppOAuthClient';
-import addUserProfileSchemaToApp from '@okta/test.support/management-api/addUserProfileSchemaToApp';
-import fetchUser from '@okta/test.support/management-api/fetchUser';
-import A18nClient from '@okta/test.support/management-api/a18nClient';
-import createGroup from '@okta/test.support/management-api/createGroup';
-import createApp from '@okta/test.support/management-api/createApp';
+import { ActionContext } from '../types';
+import startApp from '../actions/startApp';
+import { getConfig } from '../util/configUtils';
 
 
 // NOTE: noop function is used for predefined settings
@@ -270,7 +271,7 @@ Given(
   'she has enrolled in the {string} factor',
   { timeout },
   async function(this: ActionContext, factorType: string) {
-    this.enrolledFactor = await enrollFactor(this.config, {
+    this.enrolledFactor = await enrolledFactor(this.config, {
       userId: this.user.id,
       factorType,
       phoneNumber: this.credentials.phoneNumber

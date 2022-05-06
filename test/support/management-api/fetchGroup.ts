@@ -4,7 +4,7 @@ type Options = {
   groupName: string;
 }
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const fetchGroup = async (config: OktaClientConfig, options: Options) => {
   const oktaClient = getOktaClient(config);
 
   const { groupName } = options;

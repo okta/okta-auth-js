@@ -5,7 +5,7 @@ type Options = {
   appId: string;
 }
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const addAppToPolicy = async (config: OktaClientConfig, options: Options) => {
   const oktaClient = getOktaClient(config);
   const { appId, policyId } = options;
   try {

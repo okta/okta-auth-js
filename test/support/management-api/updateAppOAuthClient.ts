@@ -6,7 +6,10 @@ type Options = {
   settings: Record<string, string>;
 }
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const updateAppOAuthClient = async (
+  config: OktaClientConfig, 
+  options: Options
+) => {
   const oktaClient = getOktaClient(config);
 
   const { app, settings } = options;

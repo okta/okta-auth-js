@@ -5,7 +5,10 @@ type Options = {
   scopeId: string;
 }
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const grantConsentToScope = async (
+  config: OktaClientConfig, 
+  options: Options
+) => {
   const { issuer } = config;
   const oktaClient = getOktaClient(config);
 

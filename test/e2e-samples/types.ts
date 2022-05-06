@@ -12,9 +12,12 @@
 
 
 import { User, Application, Policy, Group } from '@okta/okta-sdk-nodejs';
-import A18nClient, { A18nConfig } from '@okta/test.support/management-api/a18nClient';
-import { UserCredentials } from '@okta/test.support/management-api/createCredentials';
-import { OktaClientConfig } from '@okta/test.support/management-api/util/getOktaClient';
+import { 
+  A18nClient, 
+  A18nConfig,
+  UserCredentials,
+  OktaClientConfig 
+} from '@okta/test.support/management-api';
 
 export interface ActionContext {
   credentials: UserCredentials;

@@ -53,7 +53,7 @@ const enrollGoogleAuthenticator = async (client: Client, options: Options) => {
   return enrollRes;
 };
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const enrolledFactor = async (config: OktaClientConfig, options: Options) => {
   let res;
   const client = getOktaClient(config);
   if (options.factorType === 'SMS') {

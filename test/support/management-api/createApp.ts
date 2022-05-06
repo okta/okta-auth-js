@@ -5,7 +5,7 @@ type Options = {
   appType: string;
 }
 
-export default async function(config: OktaClientConfig, options: Options) {
+export const createApp = async (config: OktaClientConfig, options: Options) => {
   const oktaClient = getOktaClient(config);
 
   const { appType } = options;
