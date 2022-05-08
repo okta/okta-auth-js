@@ -211,27 +211,27 @@ export function getRemediator(
   }
 
   const remediatorCandidates: Remediator[] = [];
-  for (let remediation of idxRemediations) {
-    const isRemeditionInFlow = Object.keys(remediators as object).includes(remediation.name);
-    if (!isRemeditionInFlow) {
-      continue;
-    }
+  if (useGenericRemediator) {
+    // always pick the first remediation for when use GenericRemediator
+    remediatorCandidates.push(new GenericRemediator(idxRemediations[0], values, options));
+  } else {
+    for (let remediation of idxRemediations) {
+      const isRemeditionInFlow = Object.keys(remediators as object).includes(remediation.name);
+      if (!isRemeditionInFlow) {
+        continue;
+      }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const T = getRemediatorClass(remediation, options)!;
-    remediator = new T(remediation, values, options);
-    if (remediator.canRemediate()) {
-      // found the remediator
-      return remediator;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const T = getRemediatorClass(remediation, options)!;
+      remediator = new T(remediation, values, options);
+      if (remediator.canRemediate()) {
+        // found the remediator
+        return remediator;
+      }
+      // remediator cannot handle the current values
+      // maybe return for next step
+      remediatorCandidates.push(remediator);  
     }
-    // remediator cannot handle the current values
-    // maybe return for next step
-    remediatorCandidates.push(remediator);  
-  }
-
-  // If no remedition is picked, use the first one with GenericRemeditor for default flow
-  if (!remediatorCandidates.length && !!idxRemediations.length && useGenericRemediator) {
-    return new GenericRemediator(idxRemediations[0], values, options);
   }
   
   return remediatorCandidates[0];
