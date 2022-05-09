@@ -106,7 +106,8 @@ const samples = [
       'social-idp',
       'totp-signup',
       'totp-signin',
-      'security-questions-enrollment',
+      // TODO: re-enable - OKTA-497098
+      // 'security-questions-enrollment',
       'self-service-registration-password-optional',
     ],
     useEnv: true,
