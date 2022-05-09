@@ -1,5 +1,16 @@
 # Changelog
 
+## 6.5.1
+
+### Fixes
+
+- [#1200](https://github.com/okta/okta-auth-js/pull/1200) Fixes `canRemediate` logic in GenericRemediator (beta) to handle nested fields
+- [1207](https://github.com/okta/okta-auth-js/pull/1207) Fixes `canRemediate` logic in GenericRemediator (beta) to handle `options` fields
+
+### Other
+
+- [#1200](https://github.com/okta/okta-auth-js/pull/1200) Adds missing fields to `Input` type in `idx` module
+
 ## 6.5.0
 
 ### Features

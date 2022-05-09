@@ -22,8 +22,10 @@ import {
   IdxErrorPasscodeInvalidFactory
 } from '@okta/test.support/idx';
 import { IdxFeature, IdxResponse, } from '../../../lib/idx/types';
-import { Remediator } from '../../../lib/idx/remediators';
+import { Remediator, GenericRemediator } from '../../../lib/idx/remediators';
 import { OktaAuthInterface } from '../../../lib/types';
+
+jest.mock('../../../lib/idx/remediators/GenericRemediator');
 
 describe('idx/util', () => {
   describe('getAvailableSteps', () => {
@@ -276,6 +278,68 @@ describe('idx/util', () => {
       };
       expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
     });
+
+    describe('with options.useGenericRemediator', () => {
+      beforeEach(() => {
+        const options = { 
+          ...testContext.options, 
+          useGenericRemediator: true 
+        };
+        const idxRemediations = [{
+          name: 'foo'
+        }, {
+          name: 'bar'
+        }];
+        testContext = {
+          ...testContext,
+          idxRemediations,
+          options
+        };
+      });
+
+      describe('with options.step', () => {
+        it('returns GenericRemediator instance if one idx remediation can match the given step name', () => {
+          const { idxRemediations, values, options } = testContext;
+          options.step = 'bar';
+          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(GenericRemediator);
+          expect(GenericRemediator).toHaveBeenCalledWith(idxRemediations[1], values, options);
+        });
+        it('returns undefined if no idx remediation is found matching the given step name', () => {
+          const { values, options } = testContext;
+          options.step = 'bar';
+          const idxRemediations = [{
+            name: 'other'
+          }];
+          expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
+        });
+      });
+
+      describe('without options.step', () => {
+        it('if first Remediator can remediate, returns the first Remediator instance', () => {
+          const { idxRemediations, values, options, FooRemediator } = testContext;
+          FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(true);
+          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(GenericRemediator);
+          expect(GenericRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+        });
+
+        it('if first matched Remediator cannot remediate, but 2nd Remediator can, returns the first Remediator instance', () => {
+          const { idxRemediations, values, options, FooRemediator, BarRemediator } = testContext;
+          FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
+          BarRemediator.prototype.canRemediate = jest.fn().mockReturnValue(true);
+          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(GenericRemediator);
+          expect(GenericRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+        });
+        it('if no Remediator can remediate, returns the first Remediator instance', () => {
+          const { idxRemediations, values, options, FooRemediator, BarRemediator } = testContext;
+          FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
+          BarRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
+          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(GenericRemediator);
+          expect(GenericRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+        });
+      });
+
+    });
+
   });
 
   describe('getNextStep', () => {

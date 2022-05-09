@@ -45,6 +45,9 @@ export type Input = {
   secret?: boolean;
   required?: boolean;
   options?: IdxOption[];
+  relatesTo?: IdxAuthenticator;
+  mutable?: boolean;
+  visible?: boolean;
 }
 
 
