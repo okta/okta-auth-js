@@ -3,7 +3,7 @@ import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
 import { IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
-import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
+import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';
 import { OktaAuthIdxInterface } from '../types';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
@@ -275,17 +275,11 @@ export function getNextStep(
   };
 }
 
-export function handleIdxError(authClient: OktaAuthIdxInterface, e, options = {}): RemediationResponse {
-  // Handle idx messages
-  let idxResponse = isIdxResponse(e) ? e : null;
-  if (!idxResponse) {
-    // Thrown error terminates the interaction with idx
-    throw e;
-  }
-  idxResponse = {
-    ...idxResponse,
-    requestDidSucceed: false
-  };
+export function handleFailedResponse(
+  authClient: OktaAuthIdxInterface,
+  idxResponse: IdxResponse,
+  options = {}
+): RemediationResponse {
   const terminal = isTerminalResponse(idxResponse);
   const messages = getMessagesFromResponse(idxResponse, options);
   if (terminal) {
