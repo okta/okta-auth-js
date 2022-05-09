@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+import { AuthSdkError } from '../../../errors';
 import { Input } from '../../types';
 
 export function unwrapFormValue(remediation): Input { 
@@ -40,15 +41,55 @@ export function unwrapFormValue(remediation): Input {
 // TODO: support SDK layer type based input validation
 export function hasValidInputValue(input, values) {
   const fn = (input, values, requiredTracker) => {
-    const { name, value, required } = input;
+    const { name, value, type, options, required } = input;
     const isRequired = required || requiredTracker;
 
+    // handle nested value - all required fields should be avaiable in values 
     if (Array.isArray(value)) {
       return value.reduce((acc, item) => {
-        return acc && fn(item, values[name], isRequired);
+        return acc && fn(item, values[name], isRequired); // recursive call
       }, true);
     }
 
+    // handle options field
+    // 1. object type options - check if each object field is required and value can be found from the selectedOption
+    // 2. primitive options - required field is avaiable from top level
+    if (options) {
+      // object type options
+      if (type === 'object') {
+        const selectedOption = values[name];
+        if (!selectedOption?.id) {
+         return false;
+        }
+        const optionSchema = options.find((option) => {
+          const idSchema = option.value.find(({ name }) => name === 'id' );
+          return idSchema.value === selectedOption.id;
+        });
+        if (!optionSchema) {
+          return false;
+        }
+        return optionSchema.value
+          .filter(({ required }) => !!required)
+          .reduce((acc, { name }) => {
+            return acc && !!selectedOption[name];
+          }, true);
+      }
+
+      // primitive options, not required - always valid
+      if (required === false) {
+        return true;
+      }
+
+      // primitive options, required - check if value is available
+      if (required === true) {
+        return !!values[name];
+      }
+
+      // unknown options, throw
+      throw new AuthSdkError(`Unknown options type, ${JSON.stringify(input)}`);
+    }
+
+    // base case
     if (!isRequired) {
       return true;
     }

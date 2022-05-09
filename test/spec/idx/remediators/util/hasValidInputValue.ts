@@ -2,7 +2,7 @@ import { hasValidInputValue } from '../../../../../lib/idx/remediators/GenericRe
 
 describe('hasValidInputValue - validate each input with inputValues', () => {
 
-  describe('primitive input', () => {
+  describe('value - primitive input', () => {
     describe('value can be found', () => {
       it('returns true when field is required', () => {
         const input = { name: 'identifier', required: true };
@@ -36,7 +36,7 @@ describe('hasValidInputValue - validate each input with inputValues', () => {
     });
   });
 
-  describe('object type with required field at top level', () => {
+  describe('value - object type with required field at top level', () => {
     describe('value can be found', () => {
       it('returns true when field is required', () => {
         const input = {
@@ -158,7 +158,7 @@ describe('hasValidInputValue - validate each input with inputValues', () => {
     });
   });
 
-  describe('nested fields with required', () => {
+  describe('value - nested fields with required', () => {
 
     describe('value can be found', () => {
       it('all fields are required - returns true', () => {
@@ -313,6 +313,142 @@ describe('hasValidInputValue - validate each input with inputValues', () => {
         });
       });
 
+    });
+
+  });
+
+  describe('options', () => {
+    describe('object type', () => {
+      const input = {
+        name: 'authenticator',
+        type: 'object',
+        options: [
+          {
+            label: 'Email',
+            value: [
+              {
+                'name': 'id',
+                'required': true,
+                'value': 'aut41wnl0irhAgO6C5d7',
+                'mutable': false
+              },
+              {
+                'name': 'methodType',
+                'required': false,
+                'value': 'email',
+                'mutable': false
+              }
+            ]
+          },
+          {
+            label: 'Phone',
+            value: [
+              {
+                'name': 'id',
+                'required': true,
+                'value': 'aut41wnl0jzrilXNz5d7',
+                'mutable': false
+              },
+              {
+                'name': 'methodType',
+                'type': 'string',
+                'required': false,
+                'options': [
+                  {
+                    'label': 'SMS',
+                    'value': 'sms'
+                  }
+                ]
+              },
+              {
+                'name': 'enrollmentId',
+                'required': true,
+                'value': 'sms4bvjioge7Sdu3p5d7',
+                'mutable': false
+              }
+            ]
+          },
+        ]
+      };
+
+      describe('returns false', () => {
+        it('when no selected options in values', () => {
+          const values = {
+            authenticator: undefined
+          };
+          const res = hasValidInputValue(input, values);
+          expect(res).toBe(false);
+        });
+
+        it('when missing required value', () => {
+          // enrollmentId is required
+          expect(
+            hasValidInputValue(input, {
+              authenticator: {
+                id: 'aut41wnl0jzrilXNz5d7'
+              }
+            })
+          ).toBe(false);
+        });
+      });
+
+
+      it('returns true when selected option has all required values', () => {
+        // email option - only id is required
+        expect(
+          hasValidInputValue(input, {
+            authenticator: {
+              id: 'aut41wnl0irhAgO6C5d7'
+            }
+          })
+        ).toBe(true);
+
+        // phone option - id and enrollmentId are required
+        expect(
+          hasValidInputValue(input, {
+            authenticator: {
+              id: 'aut41wnl0jzrilXNz5d7',
+              enrollmentId: 'sms4bvjioge7Sdu3p5d7'
+            }
+          })
+        ).toBe(true);
+      });
+    });
+
+    describe('primitive type', () => {
+      describe('not required', () => {
+        it('returns true', () => {
+          const input = {
+            name: 'methodType',
+            type: 'string',
+            required: false,
+            options: [{ label: 'SMS', value: 'sms' }]
+          };
+          expect(hasValidInputValue(input, { methodType: undefined })).toBe(true);
+          expect(hasValidInputValue(input, { methodType: 'sms' })).toBe(true);
+        });
+      });
+
+      describe('required', () => {
+        it('returns false when value is not available', () => {
+          const input = {
+            name: 'methodType',
+            type: 'string',
+            required: true,
+            options: [{ label: 'SMS', value: 'sms' }]
+          };
+          expect(hasValidInputValue(input, { methodType: undefined })).toBe(false);
+        });
+        it('returns true when value is available', () => {
+          const input = {
+            name: 'methodType',
+            type: 'string',
+            required: true,
+            options: [{ label: 'SMS', value: 'sms' }]
+          };
+          expect(hasValidInputValue(input, { methodType: 'sms' })).toBe(true);
+        });
+      });
     });
 
   });
