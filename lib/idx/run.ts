@@ -29,7 +29,7 @@ import {
   Tokens,
   APIError,
 } from '../types';
-import { IdxMessage, IdxResponse, isIdxResponse } from './types/idx-js';
+import { IdxMessage, IdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
 declare interface RunData {
@@ -296,22 +296,6 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
   };
 }
 
-function handleError(err, data: RunData): RunData {
-  let { error, status, shouldClearTransaction } = data;
-
-  // current version of idx-js will throw/reject IDX responses. Handle these differently than regular errors
-  if (isIdxResponse(err)) {
-    error = err;
-    status = IdxStatus.FAILURE;
-    shouldClearTransaction = true;
-  } else {
-    // error is not an IDX response, throw it like a regular error
-    throw err;
-  }
-
-  return { ...data, error, status, shouldClearTransaction };
-}
-
 export async function run(
   authClient: OktaAuthIdxInterface, 
   options: RunOptions = {},
@@ -322,12 +306,8 @@ export async function run(
   };
 
   data = initializeData(authClient, data);
-  try {
-    data = await getDataFromIntrospect(authClient, data);
-    data = await getDataFromRemediate(authClient, data);
-  } catch (err) {
-    data = handleError(err, data);
-  }
+  data = await getDataFromIntrospect(authClient, data);
+  data = await getDataFromRemediate(authClient, data);
   data = await finalizeData(authClient, data);
 
   const {
