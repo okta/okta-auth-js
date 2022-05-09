@@ -115,6 +115,7 @@ describe('idx/poll', () => {
     });
 
     const sessionExpiredResponse = IdxResponseFactory.build({
+      requestDidSucceed: false,
       rawIdxState: RawIdxResponseFactory.build({
         messages: IdxMessagesFactory.build({
           value: [
@@ -222,10 +223,10 @@ describe('idx/poll', () => {
     ]);
     jest.spyOn(mocked.introspect, 'introspect')
       .mockResolvedValueOnce(enrollPollResponse)
-      .mockRejectedValueOnce(sessionExpiredResponse);
+      .mockResolvedValueOnce(sessionExpiredResponse);
 
     const transaction = await poll(authClient, { refresh: 100 });
-    expect(transaction.status).toEqual(IdxStatus.FAILURE);
+    expect(transaction.status).toEqual(IdxStatus.TERMINAL);
   });
 
   it('propagates other errors', async () => {

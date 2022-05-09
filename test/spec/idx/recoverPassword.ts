@@ -373,6 +373,7 @@ describe('idx/recoverPassword', () => {
       } = testContext;
       
       const idxError = IdxResponseFactory.build({
+        requestDidSucceed: false,
         rawIdxState: RawIdxResponseFactory.build({
           messages: IdxMessagesFactory.build({
             value: [
@@ -382,7 +383,7 @@ describe('idx/recoverPassword', () => {
         })
       });
   
-      jest.spyOn(identifyRecoveryResponse, 'proceed').mockRejectedValue(idxError);
+      jest.spyOn(identifyRecoveryResponse, 'proceed').mockResolvedValue(idxError);
       jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(identifyResponse);
   

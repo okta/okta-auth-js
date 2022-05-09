@@ -64,8 +64,7 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
         idxResponse.stepUp = true;
       }
 
-      // Throw IDX response if request did not succeed. This behavior will be removed in version 7.0: OKTA-481844
-      throw idxResponse;
+      return idxResponse;
     }
   };
 };
