@@ -22,9 +22,5 @@
     "through2": "^4.0.2",
     "yargs": "^16.0.3"
   },
-  "dependencies": {},
-  "resolutions": {
-    "chokidar": "^3.5.3",
-    "glob-parent": "^6.0.2"
-  }
+  "dependencies": {}
 }

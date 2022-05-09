@@ -156,7 +156,8 @@
     "webpack-cli": "^4.9.1"
   },
   "resolutions": {
-    "gulp/**/glob-parent": "^6.0.2"
+    "glob-parent": "^6.0.2",
+    "follow-redirects": "^1.14.9"
   },
   "jest-junit": {
     "outputDirectory": "./build2/reports/unit/",
