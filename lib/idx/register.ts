@@ -34,14 +34,10 @@ export async function register(
       autoRemediate: false
     });
     if (!options.activationToken && enabledFeatures && !enabledFeatures.includes(IdxFeature.REGISTRATION)) {
-      const error = new AuthSdkError('Registration is not supported based on your current org configuration.');
-      throw error;
-    // return { status: IdxStatus.FAILURE, error } as unknown as IdxTransaction; // TODO: wny not just throw the error?
+      throw new AuthSdkError('Registration is not supported based on your current org configuration.');
     }
     if (options.activationToken && availableSteps?.some(({ name }) => name === 'identify')) {
-      const error = new AuthSdkError('activationToken is not supported based on your current org configuration.');
-      throw error;
-    // return { status: IdxStatus.FAILURE, error } as unknown as IdxTransaction; // TODO: wny not just throw the error?
+      throw new AuthSdkError('activationToken is not supported based on your current org configuration.');
     }
   }
 
