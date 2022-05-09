@@ -505,7 +505,9 @@ function showRedirectButton() {
 
 function logout(e) {
   e.preventDefault();
-  appState = {};
+  appState = {
+    signedOut: true
+  };
   // Normally tokens are cleared after redirect. For in-memory storage we should clear before.
   const clearTokensBeforeRedirect = config.storage === 'memory';
   authClient.signOut({ clearTokensBeforeRedirect });
@@ -552,6 +554,11 @@ function shouldRedirectToGetTokens(authState) {
     // AuthState error. This can happen when an exception is thrown inside transformAuthState.
     // Return false to break a potential infinite loop
     if (authState.error) {
+      return false;
+    }
+
+    // Don't acquire tokens during signing out
+    if (appState.signedOut) {
       return false;
     }
 
