@@ -13,3 +13,5 @@ node_modules
 .eslintrc.js
 dist
 target
+/test/apps/app/public/oidc-app.js
+/test/apps/app/target
