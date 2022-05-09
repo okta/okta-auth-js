@@ -1281,6 +1281,7 @@ describe('idx/register', () => {
       } = testContext;
 
       const errorResponse = IdxResponseFactory.build({
+        requestDidSucceed: false,
         rawIdxState: RawIdxResponseFactory.build({
           messages: IdxMessagesFactory.build({
             value: [
@@ -1293,7 +1294,7 @@ describe('idx/register', () => {
         ]
       });
 
-      jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockRejectedValue(errorResponse);
+      jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockResolvedValue(errorResponse);
       jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValueOnce(phoneEnrollmentDataResponse);
 

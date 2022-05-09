@@ -242,6 +242,7 @@ describe('idx/authenticate', () => {
     it('returns terminal error when invalid password is provided', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxResponseFactory.build({
+        requestDidSucceed: false,
         rawIdxState: RawIdxResponseFactory.build({
           messages: IdxMessagesFactory.build({
             value: [
@@ -252,7 +253,7 @@ describe('idx/authenticate', () => {
       });
 
       const identifyResponse = IdentifyResponseFactory.build();
-      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+      identifyResponse.proceed = jest.fn().mockResolvedValue(errorResponse);
       jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
       const res = await authenticate(authClient, { username: 'myuser', password: 'invalid-password' });
@@ -269,6 +270,7 @@ describe('idx/authenticate', () => {
     it('returns terminal error when user account is deactivated or is not assigned to the application', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxResponseFactory.build({
+        requestDidSucceed: false,
         rawIdxState: RawIdxResponseFactory.build({
           messages: IdxMessagesFactory.build({
             value: [
@@ -278,7 +280,7 @@ describe('idx/authenticate', () => {
         })
       });
       const identifyResponse = IdentifyResponseFactory.build();
-      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+      identifyResponse.proceed = jest.fn().mockResolvedValue(errorResponse);
       jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
       const res = await authenticate(authClient, { username: 'myuser' });
@@ -302,6 +304,7 @@ describe('idx/authenticate', () => {
         })
       });
       const idxResponse = IdxResponseFactory.build({
+        requestDidSucceed: false,
         rawIdxState: errorResponse
       });
       jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
@@ -320,6 +323,7 @@ describe('idx/authenticate', () => {
     it('returns terminal error when user account is locked or suspeneded', async () => {
       const { authClient } = testContext;
       const errorResponse = IdxResponseFactory.build({
+        requestDidSucceed: false,
         rawIdxState: RawIdxResponseFactory.build({
           messages: IdxMessagesFactory.build({
             value: [
@@ -329,7 +333,7 @@ describe('idx/authenticate', () => {
         })
       });
       const identifyResponse = IdentifyResponseFactory.build();
-      identifyResponse.proceed = jest.fn().mockRejectedValue(errorResponse);
+      identifyResponse.proceed = jest.fn().mockResolvedValue(errorResponse);
       jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
 
       const res = await authenticate(authClient, { username: 'myuser' });
@@ -682,6 +686,7 @@ describe('idx/authenticate', () => {
             ]
           });
           const errorInvalidCodeResponse = IdxResponseFactory.build({
+            requestDidSucceed: false,
             neededToProceed: [
               challengeAuthenticatorRemediation
             ],
@@ -799,7 +804,7 @@ describe('idx/authenticate', () => {
             verifyPhoneResponse,
             errorInvalidCodeResponse
           } = testContext;
-          jest.spyOn(verifyPhoneResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(verifyPhoneResponse, 'proceed').mockResolvedValue(errorInvalidCodeResponse);
           jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyPhoneResponse);
           const verificationCode = 'invalid-test-code';
           const res = await authenticate(authClient, {
@@ -870,6 +875,7 @@ describe('idx/authenticate', () => {
             ]
           });
           const errorInvalidPhoneResponse = IdxResponseFactory.build({
+            requestDidSucceed: false,
             neededToProceed: [
               PhoneAuthenticatorEnrollmentDataRemediationFactory.build()
             ],
@@ -1058,7 +1064,7 @@ describe('idx/authenticate', () => {
             errorInvalidPhoneResponse
           } = testContext;
 
-          jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockRejectedValue(errorInvalidPhoneResponse);
+          jest.spyOn(phoneEnrollmentDataResponse, 'proceed').mockResolvedValueOnce(errorInvalidPhoneResponse);
           jest.spyOn(mocked.introspect, 'introspect')
             .mockResolvedValueOnce(phoneEnrollmentDataResponse);
 
@@ -1166,6 +1172,7 @@ describe('idx/authenticate', () => {
             ]
           });
           const errorInvalidCodeResponse = IdxResponseFactory.build({
+            requestDidSucceed: false,
             neededToProceed: [
               challengeAuthenticatorRemediation
             ],
@@ -1241,7 +1248,7 @@ describe('idx/authenticate', () => {
             verifyEmailResponse,
             errorInvalidCodeResponse
           } = testContext;
-          jest.spyOn(verifyEmailResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(verifyEmailResponse, 'proceed').mockResolvedValue(errorInvalidCodeResponse);
           jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyEmailResponse);
           const verificationCode = 'invalid-test-code';
           const res = await authenticate(authClient, {
@@ -1312,6 +1319,7 @@ describe('idx/authenticate', () => {
             ]
           });
           const errorInvalidCodeResponse = IdxResponseFactory.build({
+            requestDidSucceed: false,
             rawIdxState: RawIdxResponseFactory.build({
               messages: IdxMessagesFactory.build({
                 value: [
@@ -1415,7 +1423,7 @@ describe('idx/authenticate', () => {
             verifyAuthenticatorResponse,
             errorInvalidCodeResponse
           } = testContext;
-          jest.spyOn(verifyAuthenticatorResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(verifyAuthenticatorResponse, 'proceed').mockResolvedValue(errorInvalidCodeResponse);
           jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
           const verificationCode = 'invalid-test-code';
           const res = await authenticate(authClient, {
@@ -1487,6 +1495,7 @@ describe('idx/authenticate', () => {
             ]
           });
           const errorInvalidCodeResponse = IdxResponseFactory.build({
+            requestDidSucceed: false,
             rawIdxState: RawIdxResponseFactory.build({
               messages: IdxMessagesFactory.build({
                 value: [
@@ -1568,7 +1577,7 @@ describe('idx/authenticate', () => {
             errorInvalidCodeResponse
           } = testContext;
 
-          jest.spyOn(enrollGoogleAuthenticatorResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(enrollGoogleAuthenticatorResponse, 'proceed').mockResolvedValue(errorInvalidCodeResponse);
           jest.spyOn(mocked.introspect, 'introspect')
             .mockResolvedValueOnce(enrollGoogleAuthenticatorResponse);
 
@@ -1761,6 +1770,7 @@ describe('idx/authenticate', () => {
             verifyAuthenticatorResponse,
           } = testContext;
           const errorInvalidCodeResponse = IdxResponseFactory.build({
+            requestDidSucceed: false,
             rawIdxState: RawIdxResponseFactory.build({
               messages: IdxMessagesFactory.build({
                 value: [
@@ -1772,7 +1782,7 @@ describe('idx/authenticate', () => {
               VerifyOktaVerifyAuthenticatorRemediationFactory.build(),
             ]
           });
-          jest.spyOn(verifyAuthenticatorResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
+          jest.spyOn(verifyAuthenticatorResponse, 'proceed').mockResolvedValue(errorInvalidCodeResponse);
           jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
           const verificationCode = 'invalid-test-code';
           const res = await authenticate(authClient, {
