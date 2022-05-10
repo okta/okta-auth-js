@@ -18,6 +18,7 @@ import {
 } from './types';
 import { OktaAuth } from '.';
 import { AutoRenewService, SyncStorageService, LeaderElectionService } from './services';
+import { removeNils } from './util';
 
 const AUTO_RENEW = 'autoRenew';
 const SYNC_STORAGE = 'syncStorage';
@@ -43,6 +44,7 @@ export class ServiceManager implements ServiceManagerInterface {
 
     // TODO: backwards compatibility, remove in next major version - OKTA-473815
     const { autoRenew, autoRemove, syncStorage } = sdk.tokenManager.getOptions();
+    options.electionChannelName = options.broadcastChannelName;
     this.options = Object.assign({}, 
       ServiceManager.defaultOptions,
       { autoRenew, autoRemove, syncStorage }, 
@@ -50,7 +52,7 @@ export class ServiceManager implements ServiceManagerInterface {
         electionChannelName: `${sdk.options.clientId}-election`,
         syncChannelName: `${sdk.options.clientId}-sync`,
       },
-      options
+      removeNils(options)
     );
 
     this.started = false;

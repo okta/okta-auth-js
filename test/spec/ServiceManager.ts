@@ -205,6 +205,7 @@ describe('ServiceManager', () => {
     await client.serviceManager.stop();
   });
 
+  // TODO: remove in next major version - OKTA-473815
   describe('Backwards Compatibility', () => {
     it('`services` will supersede `tokenManager` configurations', async () => {
       const options = {
@@ -215,6 +216,15 @@ describe('ServiceManager', () => {
       util.disableLeaderElection();
       await client.serviceManager.start();
       expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
+    });
+
+    it('`services` supports `broadcastChannelName` as old name for `electionChannelName`', () => {
+      const options = {
+        services: { broadcastChannelName: 'test-channel' }
+      };
+      const client = createAuth(options);
+      const serviceManagerOptions = (client.serviceManager as any).options;
+      expect(serviceManagerOptions.electionChannelName).toEqual('test-channel');
     });
   });
 

@@ -26,6 +26,8 @@ export interface SyncStorageServiceOptions {
 
 export interface LeaderElectionServiceOptions {
   electionChannelName?: string;
+  // TODO: remove in next major version - OKTA-473815
+  broadcastChannelName?: string;
 }
 
 export type ServiceManagerOptions = AutoRenewServiceOptions &
