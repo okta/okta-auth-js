@@ -77,28 +77,35 @@ describe('TokenManager renew', () => {
       accessToken: { ...tokens.standardAccessTokenParsed }
     };
 
-    let authClient: OktaAuth;
-    beforeEach(() => {
-      const mockTokenStore = {};
-      const storageProvider = {
-        getItem: (key) => mockTokenStore[key],
-        setItem: (key, val) => mockTokenStore[key] = val
-      };
-      authClient = new OktaAuth({
+    let mockTokenStore = {};
+    const storageProvider = {
+      getItem: (key) => mockTokenStore[key],
+      setItem: (key, val) => mockTokenStore[key] = val,
+    };
+  
+    const buildAuthClient = (tokenManagerOptions = {}) => {
+      const authClient = new OktaAuth({
         pkce: false,
         issuer: 'https://auth-js-test.okta.com',
         clientId: 'NPSfOkH5eZrTy8PMDlvx',
         redirectUri: 'https://example.com/redirect',
         tokenManager: {
           autoRenew: false,
-          storage: storageProvider
+          storage: storageProvider,
+          ...tokenManagerOptions
         },
       });
-      // preset expired token in storage
-      storageProvider.setItem(TOKEN_STORAGE_NAME, JSON.stringify(expiredTokens));
       // mock functions
       jest.spyOn(authClient.token, 'renewTokens').mockResolvedValue(freshTokens);
       jest.spyOn(authClient.tokenManager, 'hasExpired').mockImplementation(token => !!token.expired);
+      return authClient;
+    };
+  
+    let authClient: OktaAuth;
+    beforeEach(() => {
+      authClient = buildAuthClient();
+      // preset expired token in storage
+      storageProvider.setItem(TOKEN_STORAGE_NAME, JSON.stringify(expiredTokens));
     });
 
     it('produce consistent isAuthenticated state when renew happens in sequence', async () => {
@@ -132,6 +139,53 @@ describe('TokenManager renew', () => {
         idToken: freshTokens.idToken,
         isAuthenticated: true
       });
+    });
+
+    it('should not remove fresh token obtained from another client with shared storage (another browser tab)', async () => {
+      const errorHandler = jest.fn();
+      const renewedHandler = jest.fn();
+      const authClient1 = buildAuthClient();
+      const authClient2 = buildAuthClient();
+      authClient1.tokenManager.on('error', errorHandler);
+      authClient1.tokenManager.on('renewed', renewedHandler);
+      authClient2.tokenManager.on('error', errorHandler);
+      authClient2.tokenManager.on('renewed', renewedHandler);
+  
+      // Renew will be performed for client 1 successfully
+      // Renew for client 2 will result in error
+      // But it can get fresh tokens from shared storage and reuse (instead of removing and producing error)
+      jest.spyOn(authClient1.token, 'renewTokens').mockResolvedValue(freshTokens);
+      jest.spyOn(authClient2.token, 'renewTokens').mockImplementation(() => new Promise(function(_resolve, reject) {
+        setTimeout(() => reject(new Error('HTTP 429')), 50);
+      }));
+  
+      await Promise.all([
+        authClient1.tokenManager.renew('accessToken'),
+        authClient2.tokenManager.renew('accessToken'),
+      ]);
+  
+      expect(errorHandler).toHaveBeenCalledTimes(0);
+      expect(renewedHandler).toHaveBeenCalledTimes(4); // 2 for each client (1 for access token, 1 for id token)
+    });
+
+    it('should not try passive token renew when active renew resulted in error', async () => {
+      const errorHandler = jest.fn();
+      const authClient = buildAuthClient({
+        autoRenew: true,
+        autoRemove: false,
+      });
+      authClient.tokenManager.on('error', errorHandler);
+      const renewTokensMock = jest.spyOn(authClient.token, 'renewTokens').mockRejectedValue(new Error('HTTP 429'));
+      
+      expect.assertions(3);
+      try {
+        await authClient.tokenManager.renew('accessToken');
+      } catch(e) {
+        expect(e).toBeInstanceOf(Error);
+      }
+
+      expect(errorHandler).toHaveBeenCalledTimes(1);
+      expect(renewTokensMock).toHaveBeenCalledTimes(1);
     });
 
   });
