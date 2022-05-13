@@ -147,7 +147,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
     idxResponse = await introspect(authClient, { withCredentials, version, interactionHandle });
 
     // when loading interactionHandle from meta and /introspect call fails
-    // abandon interactionHandle, so flow is restarted on subsequent call(s)
+    // abandon interactionHandle, so flow is restarted on subsequent call(s) s
     if (meta?.interactionHandle && !idxResponse?.requestDidSucceed) {
       meta.interactionHandle = undefined;
     }
