@@ -50,7 +50,8 @@ export const IdxResponseFactory = Factory.define<IdxResponse, MockedIdxResponseT
     }),
     actions: {},
     toPersist: {},
-    context: {} as IdxContext
+    context: {} as IdxContext,
+    requestDidSucceed: true
   };
 });
 
