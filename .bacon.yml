@@ -41,13 +41,14 @@ test_suites:
       script_name: e2e
       criteria: MERGE
       queue_name: small
-    - name: e2e-express-embedded-auth-with-sdk
-      script_path: ../okta-auth-js/scripts
-      sort_order: '6'
-      timeout: '20'
-      script_name: e2e-express-embedded-auth-with-sdk
-      criteria: MERGE
-      queue_name: small
+    # TODO: DO NOT MERGE THIS - DISABLING FOR TESTING
+    # - name: e2e-express-embedded-auth-with-sdk
+    #   script_path: ../okta-auth-js/scripts
+    #   sort_order: '6'
+    #   timeout: '20'
+    #   script_name: e2e-express-embedded-auth-with-sdk
+    #   criteria: MERGE
+    #   queue_name: small
     - name: e2e-express-web-no-oidc
       script_path: ../okta-auth-js/scripts
       sort_order: '7'
