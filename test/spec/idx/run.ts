@@ -176,6 +176,21 @@ describe('idx/run', () => {
       await run(authClient);
       expect(mocked.interact.interact).not.toHaveBeenCalled();
     });
+    it('if saved meta has interactionHandle and introspect fails, clear interactionHandle', async () => {
+      const { authClient, transactionMeta } = testContext;
+      transactionMeta.interactionHandle = 'fake';
+      const expiredInteractionHandleResponse = IdxResponseFactory.build({
+        neededToProceed: [],
+        requestDidSucceed: false,
+        context: { stateHandle: 'efg' }
+      });
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(expiredInteractionHandleResponse);
+      const spy = jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+      const res = await run(authClient);
+      expect(mocked.interact.interact).not.toHaveBeenCalled();
+      expect(spy).toBeCalledWith(expect.anything(), expect.objectContaining({interactionHandle: undefined}));
+      expect(res.meta?.interactionHandle).toBeUndefined();
+    });
   });
 
   describe('no saved transaction', () => {
