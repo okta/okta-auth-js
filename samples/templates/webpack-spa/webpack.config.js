@@ -36,15 +36,15 @@ module.exports = {
     publicPath: '/'
   },
   devServer: {
-    contentBase: [
+    static: [
       path.join(__dirname, 'public'),
       SIW_DIR
     ],
     port: PORT,
-    before: function(app) {
-      app.get('{{ redirectPath }}', redirectToOrigin);
-      app.get('/login', redirectToOrigin);
-      app.get('/profile', redirectToOrigin);
+    onBeforeSetupMiddleware: function(devServer) {
+      devServer.app.get('/login/callback', redirectToOrigin);
+      devServer.app.get('/login', redirectToOrigin);
+      devServer.app.get('/profile', redirectToOrigin);
     }
   },
   devtool: 'source-map',
