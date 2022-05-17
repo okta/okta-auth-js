@@ -52,6 +52,7 @@ import {
   RequestOptions,
   IsAuthenticatedOptions,
   OAuthResponseType,
+  CustomUserClaims,
 } from './types';
 import {
   transactionStatus,
@@ -273,7 +274,12 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       renew: renewToken.bind(null, this),
       renewTokensWithRefresh: renewTokensWithRefresh.bind(null, this),
       renewTokens: renewTokens.bind(null, this),
-      getUserInfo: getUserInfo.bind(null, this),
+      getUserInfo: <C extends CustomUserClaims = CustomUserClaims>(
+        accessTokenObject: AccessToken,
+        idTokenObject: IDToken
+      ): Promise<UserClaims<C>> => {
+        return getUserInfo(this, accessTokenObject, idTokenObject);
+      },
       verify: verifyToken.bind(null, this),
       isLoginRedirect: isLoginRedirect.bind(null, this)
     };
@@ -614,7 +620,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     return !!(accessToken && idToken);
   }
 
-  async getUser(): Promise<UserClaims> {
+  async getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>> {
     const { idToken, accessToken } = this.tokenManager.getTokensSync();
     return this.token.getUserInfo(accessToken, idToken);
   }

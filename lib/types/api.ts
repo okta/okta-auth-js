@@ -14,7 +14,7 @@
 import { AuthTransaction } from '../tx/AuthTransaction';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
-import { UserClaims } from './UserClaims';
+import { CustomUserClaims, UserClaims } from './UserClaims';
 import { CustomUrls, OktaAuthOptions, TokenParams } from './OktaAuthOptions';
 import { StorageManager } from '../StorageManager';
 import TransactionManager from '../TransactionManager';
@@ -157,7 +157,10 @@ export interface BaseTokenAPI {
 }
 
 export interface TokenAPI extends BaseTokenAPI {
-  getUserInfo(accessToken?: AccessToken, idToken?: IDToken): Promise<UserClaims>;
+  getUserInfo<S extends CustomUserClaims = CustomUserClaims>(
+    accessToken?: AccessToken,
+    idToken?: IDToken
+  ): Promise<UserClaims<S>>;
   getWithRedirect: GetWithRedirectAPI;
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;

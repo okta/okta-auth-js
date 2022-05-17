@@ -10,6 +10,11 @@ if ! yarn test:unit; then
   exit ${TEST_FAILURE}
 fi
 
+if ! yarn test:types; then
+  echo "tsd test failed! Exiting..."
+  exit ${TEST_FAILURE}
+fi
+
 if ! yarn test:bundle:esm:browser; then
   echo "validate ESM browser bundle failed! Exiting..."
   exit ${TEST_FAILURE}

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { SessionObject, OktaAuth } from '@okta/okta-auth-js';
+import { SessionObject, OktaAuth } from '../../build/lib/index.d';
 import { expectType } from 'tsd';
 
 const authClient = new OktaAuth({});
