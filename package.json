@@ -158,7 +158,8 @@
   "resolutions": {
     "glob-parent": "^6.0.2",
     "follow-redirects": "^1.14.9",
-    "set-value": "^4.1.0"
+    "set-value": "^4.1.0",
+    "ansi-regex": "^6.0.1"
   },
   "jest-junit": {
     "outputDirectory": "./build2/reports/unit/",
