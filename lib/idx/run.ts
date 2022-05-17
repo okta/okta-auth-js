@@ -59,7 +59,9 @@ function initializeValues(options: RunOptions) {
     'remediators', 
     'actions', 
     'withCredentials', 
-    'step', 
+    'step',
+    'useGenericRemediator',
+    'exchangeCodeForTokens',
     'shouldProceedWithEmailAuthenticator'
   ];
   const values = { ...options };
@@ -70,13 +72,16 @@ function initializeValues(options: RunOptions) {
 }
 
 function initializeData(authClient, data: RunData): RunData {
-  const { options } = data;
+  let { options } = data;
+  options = {
+    ...authClient.options.idx,
+    ...options
+  };
   let {
     flow,
     withCredentials,
     remediators,
     actions,
-    useGenericRemediator
   } = options;
 
   const status = IdxStatus.PENDING;
@@ -92,8 +97,6 @@ function initializeData(authClient, data: RunData): RunData {
     actions = actions || flowSpec.actions;
   }
 
-  useGenericRemediator = useGenericRemediator || authClient.options.idx?.useGenericRemediator || false;
-
   return { 
     ...data,
     options: { 
@@ -102,7 +105,6 @@ function initializeData(authClient, data: RunData): RunData {
       withCredentials, 
       remediators, 
       actions,
-      useGenericRemediator
     },
     status
   };

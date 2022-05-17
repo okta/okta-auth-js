@@ -226,6 +226,7 @@ describe('idx/run', () => {
       username,
       password,
       flow,
+      useGenericRemediator: true,
       shouldProceedWithEmailAuthenticator // will be removed in next major version
     };
     const values = { 
@@ -241,8 +242,8 @@ describe('idx/run', () => {
       actions,
       flow,
       flowMonitor,
+      useGenericRemediator: true,
       shouldProceedWithEmailAuthenticator, // will be removed in next major version
-      useGenericRemediator: false,
     });
   });
 
@@ -689,6 +690,31 @@ describe('idx/run', () => {
       },
       {
         'authorizeUrl': 'meta-authorizeUrl'
+      });
+    });
+
+    it('can disable call to `exchangeCodeForTokens` with `exchangeCodeForTokens` option passed directly', async () => {
+      const { authClient } = testContext;
+      jest.spyOn(authClient.token, 'exchangeCodeForTokens');
+      const res = await run(authClient, { exchangeCodeForTokens: false });
+      expect(authClient.token.exchangeCodeForTokens).not.toHaveBeenCalled();
+      expect(res).toMatchObject({
+        nextStep: 'remediate-nextStep',
+        status: IdxStatus.SUCCESS,
+        interactionCode: 'idx-interactionCode'
+      });
+    });
+
+    it('can disable call to `exchangeCodeForTokens` with `exchangeCodeForTokens` option passed to SDK', async () => {
+      const { authClient } = testContext;
+      authClient.options = { idx: { exchangeCodeForTokens: false }};
+      jest.spyOn(authClient.token, 'exchangeCodeForTokens');
+      const res = await run(authClient);
+      expect(authClient.token.exchangeCodeForTokens).not.toHaveBeenCalled();
+      expect(res).toMatchObject({
+        nextStep: 'remediate-nextStep',
+        status: IdxStatus.SUCCESS,
+        interactionCode: 'idx-interactionCode'
       });
     });
   });
