@@ -32,6 +32,7 @@ import {
 import { IdxMessage, IdxResponse, isIdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
+
 declare interface RunData {
   options: RunOptions;
   values: remediators.RemediationValues;
@@ -257,9 +258,15 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
     const hasActions = Object.keys(idxResponse!.actions).length > 0;
     const hasErrors = !!messages.find(msg => msg.class === 'ERROR');
     const isTerminalSuccess = !hasActions && !hasErrors && idxResponse!.requestDidSucceed === true;
+    const isTerminalFailure = !hasActions && hasErrors && idxResponse!.requestDidSucceed === false;
     if (isTerminalSuccess) {
       shouldClearTransaction = true;
-    } else {
+    }
+    else if (isTerminalFailure) {
+      shouldClearTransaction = true;
+      status = IdxStatus.FAILURE;
+    }
+    else {
       // only save response if there are actions available (ignore messages)
       shouldSaveResponse = shouldSaveResponse && hasActions;
     }
@@ -279,6 +286,12 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
       shouldClearTransaction = true;
     }
   }
+
+  if (status === IdxStatus.FAILURE) {
+    clearSharedStorage = true;
+    shouldClearTransaction = true;
+  }
+
   return {
     ...data,
     status,
