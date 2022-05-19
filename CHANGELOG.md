@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.5.2
+
+### Fixes
+
+- [#1215](https://github.com/okta/okta-auth-js/pull/1215) Fixes polling issue in GenericRemediator (beta)
+
 ## 6.5.1
 
 ### Fixes

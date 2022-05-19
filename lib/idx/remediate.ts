@@ -177,6 +177,20 @@ export async function remediate(
     // Let the remediator decide what the values should be (default to current values)
     values = remediator.getValuesAfterProceed();
     options = { ...options, step: undefined }; // do not re-use the step
+
+    // generic remediator should not auto proceed in pending status
+    // return nextStep directly
+    if (options.useGenericRemediator && !idxResponse.interactionCode) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const gr = getRemediator(idxResponse.neededToProceed, values, options)!;
+      const nextStep = getNextStep(authClient, gr, idxResponse);
+      return {
+        idxResponse,
+        nextStep,
+        messages: messages.length ? messages: undefined
+      };
+    }
+    
     return remediate(authClient, idxResponse, values, options); // recursive call
   } catch (e) {
     return handleIdxError(authClient, e, remediator);
