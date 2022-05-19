@@ -2,7 +2,6 @@ import { warn } from '../util';
 import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
-import { proceed } from './proceed';
 import { IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
 import { OktaAuthInterface } from '../types';
@@ -133,7 +132,7 @@ export function getAvailableSteps(
     res.push({ 
       name, 
       action: async (params?) => {
-        return proceed(authClient, { 
+        return authClient.idx.proceed({ 
           actions: [{ name, params }] 
         });
       }

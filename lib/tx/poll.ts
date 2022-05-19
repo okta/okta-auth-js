@@ -17,7 +17,6 @@ import { DEFAULT_POLLING_DELAY } from '../constants';
 import AuthSdkError from '../errors/AuthSdkError';
 import AuthPollStopError from '../errors/AuthPollStopError';
 import { TransactionState } from './TransactionState';
-import { AuthTransaction } from './AuthTransaction';
 import { getStateToken } from './util';
 
 export interface PollOptions {
@@ -115,7 +114,7 @@ export function getPollFn(sdk, res: TransactionState, ref) {
             // Any non-waiting result, even if polling was stopped
             // during a request, will return
             ref.isPolling = false;
-            return new AuthTransaction(sdk, pollRes);
+            return sdk.tx.createTransaction(pollRes);
           }
         })
         .catch(function(err) {

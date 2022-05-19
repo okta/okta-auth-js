@@ -8,12 +8,14 @@ import pkg from './package.json';
 
 const path = require('path');
 
-const makeExternalPredicate = () => {
+const makeExternalPredicate = (env) => {
   const externalArr = [
     ...Object.keys(pkg.peerDependencies || {}),
     ...Object.keys(pkg.dependencies || {}),
   ];
-
+  if (env === 'node') {
+    externalArr.push('crypto');
+  }
   if (externalArr.length === 0) {
     return () => false;
   }
@@ -22,7 +24,6 @@ const makeExternalPredicate = () => {
 };
 
 const extensions = ['js', 'ts'];
-const external = makeExternalPredicate();
 
 const getPlugins = (env) => {
   return [
@@ -79,7 +80,7 @@ const getPlugins = (env) => {
 export default [
   {
     input: 'lib/index.ts',
-    external,
+    external: makeExternalPredicate('browser'),
     plugins: getPlugins('browser'),
     output: [
       {
@@ -101,7 +102,7 @@ export default [
   },
   {
     input: 'lib/index.ts',
-    external,
+    external: makeExternalPredicate('node'),
     plugins: getPlugins('node'),
     output: [
       {

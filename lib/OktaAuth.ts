@@ -53,6 +53,7 @@ import {
   IsAuthenticatedOptions,
   OAuthResponseType,
   CustomUserClaims,
+  RequestData,
 } from './types';
 import {
   transactionStatus,
@@ -60,7 +61,8 @@ import {
   transactionExists,
   introspectAuthn,
   postToTransaction,
-  AuthTransaction
+  AuthTransaction,
+  TransactionState
 } from './tx';
 import PKCE from './oidc/util/pkce';
 import {
@@ -140,6 +142,7 @@ import {
 // @ts-ignore 
 // Do not use this type in code, so it won't be emitted in the declaration output
 import Emitter from 'tiny-emitter';
+import { makeIdxState } from './idx/idxState';
 
 class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   options: OktaAuthOptions;
@@ -182,7 +185,13 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
           return storage.get(name);
         }
       }),
-      introspect: introspectAuthn.bind(null, this)
+      introspect: introspectAuthn.bind(null, this),
+      createTransaction: (res?: TransactionState) => {
+        return new AuthTransaction(res);
+      },
+      postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => {
+        return postToTransaction(this, url, args, options);
+      }
     };
 
     this.pkce = {
@@ -305,6 +314,8 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     this.idx = {
       interact: interact.bind(null, this),
       introspect: introspect.bind(null, this),
+      makeIdxResponse: makeIdxState.bind(null, this),
+      
       authenticate: authenticate.bind(null, this),
       register: register.bind(null, this),
       start: boundStartTransaction,

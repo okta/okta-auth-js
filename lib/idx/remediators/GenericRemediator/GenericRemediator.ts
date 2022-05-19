@@ -1,7 +1,6 @@
 import { IdxContext, NextStep, Input } from '../../types';
 import { Remediator } from '../Base/Remediator';
 import { unwrapFormValue, hasValidInputValue } from './util';
-import { proceed } from '../../proceed';
 import { OktaAuthInterface } from '../../../types';
 
 export class GenericRemediator extends Remediator {
@@ -53,7 +52,7 @@ export class GenericRemediator extends Remediator {
         ...rest,
         ...(!!inputs.length && { inputs }),
         action: async (params?) => {
-          return proceed(authClient, {
+          return authClient.idx.proceed({
             step: name,
             ...params
           });

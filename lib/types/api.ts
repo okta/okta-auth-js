@@ -12,6 +12,7 @@
  */
 
 import { AuthTransaction } from '../tx/AuthTransaction';
+import { TransactionState } from '../tx/TransactionState';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { CustomUserClaims, UserClaims } from './UserClaims';
@@ -45,6 +46,9 @@ import {
   StartOptions
 } from '../idx/types';
 import { TransactionMetaOptions } from './Transaction';
+import { RequestData, RequestOptions } from './http';
+import { IdxToPersist, RawIdxResponse } from '../idx/types/idx-js';
+
 export interface OktaAuthInterface {
   options: OktaAuthOptions;
   getIssuerOrigin(): string;
@@ -91,11 +95,14 @@ export interface TransactionExists extends TransactionExistsFunction {
   _get: (key: string) => string;
 }
 
+// Authn (classic) api
 export interface TransactionAPI {
   exists: TransactionExists;
   status: (args?: object) => Promise<object>;
   resume: (args?: object) => Promise<AuthTransaction>;
   introspect: (args?: object) => Promise<AuthTransaction>;
+  createTransaction: (res?: TransactionState) => AuthTransaction;
+  postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => Promise<AuthTransaction>;
 }
 
 // Fingerprint
@@ -282,6 +289,7 @@ export interface IdxAPI {
   // lowest level api
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
+  makeIdxResponse: (rawIdxResponse: RawIdxResponse, toPersist: IdxToPersist, requestDidSucceed: boolean) => IdxResponse;
 
   // flow entrypoints
   authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;

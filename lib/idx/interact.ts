@@ -12,9 +12,8 @@
  */
 /* eslint complexity:[0,8] */
 import { OktaAuthInterface, IdxTransactionMeta, InteractOptions, InteractResponse } from '../types';
-import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
+import { getSavedTransactionMeta, saveTransactionMeta, createTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';
-import { createTransactionMeta } from '.';
 import { removeNils } from '../util';
 import { httpRequest } from '../http';
 

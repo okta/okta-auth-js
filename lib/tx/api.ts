@@ -16,7 +16,6 @@ import { post } from '../http';
 import AuthSdkError from '../errors/AuthSdkError';
 import { STATE_TOKEN_KEY_NAME } from '../constants';
 import { addStateToken } from './util';
-import { AuthTransaction } from './AuthTransaction';
 
 export function transactionStatus(sdk, args) {
   args = addStateToken(sdk, args);
@@ -36,7 +35,7 @@ export function resumeTransaction(sdk, args) {
   }
   return sdk.tx.status(args)
     .then(function(res) {
-      return new AuthTransaction(sdk, res);
+      return sdk.tx.createTransaction(res);
     });
 }
 
@@ -53,7 +52,7 @@ export function introspectAuthn (sdk, args) {
   }
   return transactionStep(sdk, args)
     .then(function (res) {
-      return new AuthTransaction(sdk, res);
+      return sdk.tx.createTransaction(res);
     });
 }
 
@@ -72,6 +71,6 @@ export function postToTransaction(sdk, url, args, options?) {
   options = Object.assign({ withCredentials: true }, options);
   return post(sdk, url, args, options)
     .then(function(res) {
-      return new AuthTransaction(sdk, res);
+      return sdk.tx.createTransaction(res);
     });
 }

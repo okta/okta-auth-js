@@ -10,14 +10,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { IdxResponse } from '../../types/idx-js';
+import { IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { OktaAuthInterface, RawIdxResponse } from '../../../types';    // auth-js/types
 import { parseIdxResponse } from './idxResponseParser';
 
 export function makeIdxState( 
   authClient: OktaAuthInterface,
   idxResponse: RawIdxResponse,
-  toPersist,
+  toPersist: IdxToPersist,
   requestDidSucceed: boolean
 ): IdxResponse {
   const rawIdxResponse =  idxResponse;
