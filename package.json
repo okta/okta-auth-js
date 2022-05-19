@@ -155,12 +155,6 @@
     "webpack": "^5.60.0",
     "webpack-cli": "^4.9.1"
   },
-  "resolutions": {
-    "glob-parent": "^6.0.2",
-    "follow-redirects": "^1.14.9",
-    "set-value": "^4.1.0",
-    "ansi-regex": "^6.0.1"
-  },
   "jest-junit": {
     "outputDirectory": "./build2/reports/unit/",
     "outputName": "junit-result.xml"
@@ -177,8 +171,7 @@
       "samples/generated/*"
     ],
     "nohoist": [
-      "**/@wdio/**",
-      "**/gulp/**"
+      "**/@wdio/**"
     ]
   },
   "tsd": {
