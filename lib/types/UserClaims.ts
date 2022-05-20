@@ -18,7 +18,11 @@
  */
 
  /* eslint-disable camelcase */
-export type UserClaims<T = Record<string, string | boolean | number>> = T & {
+export type CustomUserClaimValue = string | boolean | number;
+
+export type CustomUserClaims = Record<string, CustomUserClaimValue | CustomUserClaimValue[]>;
+
+export type UserClaims<T extends CustomUserClaims = CustomUserClaims> = T & {
   auth_time?: number;
   aud?: string;
   email?: string;

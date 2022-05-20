@@ -22,8 +22,8 @@ import {
   JWTObject,
   RefreshToken,
   OktaAuth
-} from '@okta/okta-auth-js';
-import { expectType, expectAssignable } from 'tsd';
+} from '../../build/lib/index.d';
+import { expectType, expectAssignable, expectError } from 'tsd';
 
 const authClient = new OktaAuth({});
 
@@ -110,4 +110,25 @@ const tokens = {
   expectType<IDToken>(await authClient.token.verify(idTokenExample, validationOptions));
 
   expectType<TokenParams>(await authClient.token.prepareTokenParams(authorizeOptions));
+})();
+
+// UserClaims
+(async () => {
+
+  const basicUserClaims = await authClient.getUser();
+  expectType<UserClaims>(basicUserClaims);
+
+  type MyCustomClaims = {
+    groups: string[];
+    isAdmin: boolean;
+    age: number;
+  };
+
+  const customUserClaims = await authClient.getUser<MyCustomClaims>();
+  expectType<UserClaims<MyCustomClaims>>(customUserClaims);
+
+  expectError(() => {
+    type InvalidCustomClaims = UserClaims<{ func: () => boolean }>;
+  });
+
 })();

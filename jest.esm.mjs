@@ -28,7 +28,8 @@ export default {
   transform: {},
   restoreMocks: true,
   moduleNameMapper: {
-    '^@okta/okta-auth-js$': OktaAuth
+    '^@okta/okta-auth-js$': OktaAuth,
+    '^broadcast-channel$': '<rootDir>/node_modules/broadcast-channel/dist/es5node/index.js'
   },
   extensionsToTreatAsEsm: ['.ts'],
   testPathIgnorePatterns: [],

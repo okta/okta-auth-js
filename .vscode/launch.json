@@ -178,6 +178,22 @@
       "env": {
         "NODE_ENV": "development"
       }
-    }
+    },
+
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug TSD",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": [
+        "--runInBand",
+        "--no-cache",
+        "--collectCoverage=false",
+        "--config=jest.tsd.js",
+        "--testTimeout=120000"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
   ]
 }
