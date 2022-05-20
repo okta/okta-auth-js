@@ -26,6 +26,6 @@
     "webpack-dev-server": "^4.9.0"
   },
   "peerDependencies": {
-    "@okta/okta-signin-widget": "^6.3.2"
+    "@okta/okta-signin-widget": "^6.3.3"
   }
 }
