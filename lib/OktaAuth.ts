@@ -254,7 +254,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       }
     });
     // eslint-disable-next-line max-len
-    const parseFromUrlFn = useQueue(parseFromUrl.bind(null, this)) as ParseFromUrlInterface;
+    const parseFromUrlFn = parseFromUrl.bind(null, this);
     const parseFromUrlApi: ParseFromUrlInterface = Object.assign(parseFromUrlFn, {
       // This is exposed so we can mock getting window.history in our tests
       _getHistory: function() {
@@ -293,16 +293,17 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       isLoginRedirect: isLoginRedirect.bind(null, this)
     };
     // Wrap all async token API methods using MethodQueue to avoid issues with concurrency
-    const syncMethods = [
+    const doNotWrap = [
       // sync methods
       'decode',
       'isLoginRedirect',
       // already bound
       'getWithRedirect',
-      'parseFromUrl'
+      // does not call API directly
+      'parseFromUrl',
     ];
     Object.keys(this.token).forEach(key => {
-      if (syncMethods.indexOf(key) >= 0) { // sync methods should not be wrapped
+      if (doNotWrap.indexOf(key) >= 0) { // sync methods should not be wrapped
         return;
       }
       var method = this.token[key];
