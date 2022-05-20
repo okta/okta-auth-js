@@ -13,7 +13,7 @@
 
 import { Remediator, RemediationValues } from './Base/Remediator';
 import { IdxContext } from '../types/idx-js';
-import { OktaAuthInterface } from '../../types';
+import { OktaAuthIdxInterface } from '../../types';
 
 
 export type EnrollmentChannelDataValues = RemediationValues & {
@@ -40,7 +40,7 @@ export class EnrollmentChannelData extends Remediator<EnrollmentChannelDataValue
     return Boolean(this.values.email || this.values.phoneNumber);
   }
 
-  getNextStep(authClient: OktaAuthInterface, context: IdxContext) {
+  getNextStep(authClient: OktaAuthIdxInterface, context: IdxContext) {
     const common = super.getNextStep(authClient, context);
     const authenticator = context.currentAuthenticator.value;
     return {

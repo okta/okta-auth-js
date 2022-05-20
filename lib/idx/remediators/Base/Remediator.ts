@@ -17,7 +17,7 @@ import { NextStep, IdxMessage, Authenticator, Input, RemediateOptions } from '..
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase, getAuthenticatorFromRemediation } from '../util';
 import { formatAuthenticator, compareAuthenticators } from '../../authenticator/util';
-import { OktaAuthInterface } from '../../../types';
+import { OktaAuthIdxInterface } from '../../../types';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[]>;
@@ -149,7 +149,7 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
     return !!this.getData(key);
   }
 
-  getNextStep(_authClient: OktaAuthInterface, _context?: IdxContext): NextStep {
+  getNextStep(_authClient: OktaAuthIdxInterface, _context?: IdxContext): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
     const authenticator = this.getAuthenticator();

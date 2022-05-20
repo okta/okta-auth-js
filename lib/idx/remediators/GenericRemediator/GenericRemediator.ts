@@ -1,7 +1,7 @@
 import { IdxContext, NextStep, Input } from '../../types';
 import { Remediator } from '../Base/Remediator';
 import { unwrapFormValue, hasValidInputValue } from './util';
-import { OktaAuthInterface } from '../../../types';
+import { OktaAuthIdxInterface } from '../../../types';
 
 export class GenericRemediator extends Remediator {
   canRemediate(): boolean {
@@ -25,7 +25,7 @@ export class GenericRemediator extends Remediator {
     return data;
   }
 
-  getNextStep(authClient: OktaAuthInterface, _context?: IdxContext): NextStep {
+  getNextStep(authClient: OktaAuthIdxInterface, _context?: IdxContext): NextStep {
     const name = this.getName();
     const inputs = this.getInputs();
     

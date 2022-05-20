@@ -4,7 +4,7 @@ import { RemediationValues, Remediator, RemediatorConstructor } from './remediat
 import { GenericRemediator } from './remediators/GenericRemediator';
 import { IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
-import { OktaAuthInterface } from '../types';
+import { OktaAuthIdxInterface } from '../types';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
@@ -105,7 +105,7 @@ export function getEnabledFeatures(idxResponse: IdxResponse): IdxFeature[] {
 }
 
 export function getAvailableSteps(
-  authClient: OktaAuthInterface, 
+  authClient: OktaAuthIdxInterface, 
   idxResponse: IdxResponse, 
   useGenericRemediator?: boolean
 ): NextStep[] {
@@ -238,7 +238,7 @@ export function getRemediator(
 
 
 export function getNextStep(
-  authClient: OktaAuthInterface, remediator: Remediator, idxResponse: IdxResponse
+  authClient: OktaAuthIdxInterface, remediator: Remediator, idxResponse: IdxResponse
 ): NextStep {
   const nextStep = remediator.getNextStep(authClient, idxResponse.context);
   const canSkip = canSkipFn(idxResponse);
@@ -250,7 +250,7 @@ export function getNextStep(
   };
 }
 
-export function handleIdxError(authClient: OktaAuthInterface, e, remediator?): RemediationResponse {
+export function handleIdxError(authClient: OktaAuthIdxInterface, e, remediator?): RemediationResponse {
   // Handle idx messages
   let idxResponse = isIdxResponse(e) ? e : null;
   if (!idxResponse) {

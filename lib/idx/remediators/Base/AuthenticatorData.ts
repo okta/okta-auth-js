@@ -16,7 +16,7 @@ import { Remediator, RemediationValues } from './Remediator';
 import { IdxRemediationValue, IdxOption, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
 import { isAuthenticator } from '../../types';
 import { compareAuthenticators } from '../../authenticator/util';
-import { OktaAuthInterface } from '../../../types';
+import { OktaAuthIdxInterface } from '../../../types';
 
 export type AuthenticatorDataValues = RemediationValues & {
   methodType?: string;
@@ -63,7 +63,7 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
   }
 
   // TODO: remove this override method in the next major version - OKTA-491236
-  getNextStep(authClient: OktaAuthInterface) {
+  getNextStep(authClient: OktaAuthIdxInterface) {
     const common = super.getNextStep(authClient);
     const options = this.getMethodTypes();
     return { 

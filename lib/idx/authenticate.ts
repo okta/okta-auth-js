@@ -12,7 +12,7 @@
 
 
 import { 
-  OktaAuthInterface,
+  OktaAuthIdxInterface,
   IdxTransaction,
   AuthenticatorKey,
   AuthenticationOptions
@@ -20,7 +20,7 @@ import {
 import { run } from './run';
 
 export async function authenticate(
-  authClient: OktaAuthInterface, options: AuthenticationOptions = {}
+  authClient: OktaAuthIdxInterface, options: AuthenticationOptions = {}
 ): Promise<IdxTransaction> {
   if (options.password && !options.authenticator) {
     options.authenticator = AuthenticatorKey.OKTA_PASSWORD;

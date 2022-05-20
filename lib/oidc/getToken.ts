@@ -22,7 +22,7 @@ import {
 import AuthSdkError from '../errors/AuthSdkError';
 
 import {
-  OktaAuthInterface,
+  OktaAuthOIDCInterface,
   TokenParams,
   PopupParams,
   OAuthResponse,
@@ -81,7 +81,7 @@ import { handleOAuthResponse } from './handleOAuthResponse';
  * @param {String} [options.popupTitle] Title dispayed in the popup.
  *                                      Defaults to 'External Identity Provider User Authentication'
  */
-export function getToken(sdk: OktaAuthInterface, options: TokenParams & PopupParams) {
+export function getToken(sdk: OktaAuthOIDCInterface, options: TokenParams & PopupParams) {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getToken" takes only a single set of options'));
   }

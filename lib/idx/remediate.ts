@@ -12,7 +12,7 @@
 
 
 /* eslint-disable max-statements, max-depth, complexity */
-import { OktaAuthInterface } from '../types';
+import { OktaAuthIdxInterface } from '../types';
 import { AuthSdkError } from '../errors';
 import { RemediationValues } from './remediators';
 import { RemediateOptions, RemediationResponse } from './types';
@@ -64,7 +64,7 @@ function removeActionFromOptions(options: RemediateOptions, actionName: string):
 
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
-  authClient: OktaAuthInterface,
+  authClient: OktaAuthIdxInterface,
   idxResponse: IdxResponse,
   values: RemediationValues,
   options: RemediateOptions

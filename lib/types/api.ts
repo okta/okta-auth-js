@@ -49,22 +49,62 @@ import { TransactionMetaOptions } from './Transaction';
 import { RequestData, RequestOptions } from './http';
 import { IdxToPersist, RawIdxResponse } from '../idx/types/idx-js';
 
-export interface OktaAuthInterface {
+export interface OktaAuthOptionsInterface {
   options: OktaAuthOptions;
   getIssuerOrigin(): string;
+}
+
+export interface OktaAuthStorageInterface {
+  storageManager: StorageManager;
+
+}
+export interface OktaAuthHttpInterface extends 
+  OktaAuthOptionsInterface,
+  OktaAuthStorageInterface
+{
+  _oktaUserAgent: OktaUserAgent;
+}
+
+export interface OktaAuthFeaturesInterface {
+  // Functional on browser only
+  features: FeaturesAPI;
+}
+
+export interface OktaAuthTransactionInterface {
+  transactionManager: TransactionManager;
+}
+
+export interface OktaAuthOIDCInterface extends
+  OktaAuthOptionsInterface,
+  OktaAuthHttpInterface,
+  OktaAuthFeaturesInterface,
+  OktaAuthTransactionInterface
+{
+  token: TokenAPI;
+  tokenManager: TokenManagerInterface;
+}
+
+export interface OktaAuthIdxInterface extends
+  OktaAuthHttpInterface,
+  OktaAuthTransactionInterface,
+  Pick<OktaAuthOIDCInterface, 'token'>
+{
+  idx: IdxAPI;
+}
+
+export interface OktaAuthInterface extends
+  OktaAuthOptionsInterface,
+  OktaAuthStorageInterface,
+  OktaAuthFeaturesInterface,
+  OktaAuthHttpInterface,
+  OktaAuthTransactionInterface,
+  OktaAuthIdxInterface,
+  OktaAuthOIDCInterface
+{
   getOriginalUri(): string | undefined;
   
-  _oktaUserAgent: OktaUserAgent;
-  storageManager: StorageManager;
-  transactionManager: TransactionManager;
-  tokenManager: TokenManagerInterface;
+  
   serviceManager: ServiceManagerInterface;
-
-  idx: IdxAPI;
-
-  // Browser only
-  features: FeaturesAPI;
-  token: TokenAPI;
 }
 
 export interface FieldError {

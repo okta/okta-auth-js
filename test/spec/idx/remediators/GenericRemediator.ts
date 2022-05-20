@@ -1,5 +1,5 @@
 import { GenericRemediator, RemediationValues, Remediator } from '../../../../lib/idx/remediators';
-import { OktaAuthInterface } from '../../../../lib/types';
+import { OktaAuthIdxInterface } from '../../../../lib/types';
 import { IdxRemediation } from '../../../../lib/idx/types/idx-js';
 import { 
   IdxRemediationFactory,
@@ -158,7 +158,7 @@ describe('remediators/GenericRemediator', () => {
         idx: {
           proceed: jest.fn()
         }
-      } as unknown as OktaAuthInterface;
+      } as unknown as OktaAuthIdxInterface;
       const remediator = new GenericRemediator(remediation, {});
       const nextStep = remediator.getNextStep(authClient);
       expect(nextStep).toMatchObject({
@@ -212,7 +212,7 @@ describe('remediators/GenericRemediator', () => {
           fake2: 'fake2'
         }
       });
-      const authClient = {} as OktaAuthInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const remediator = new GenericRemediator(remediation, {});
       const nextStep = remediator.getNextStep(authClient);
       expect(nextStep).toEqual({
