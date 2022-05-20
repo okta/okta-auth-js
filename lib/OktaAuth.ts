@@ -187,7 +187,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       }),
       introspect: introspectAuthn.bind(null, this),
       createTransaction: (res?: TransactionState) => {
-        return new AuthTransaction(res);
+        return new AuthTransaction(this, res);
       },
       postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => {
         return postToTransaction(this, url, args, options);

@@ -8,14 +8,7 @@ import {
   StateHandleValueFactory
 } from '@okta/test.support/idx';
 
-jest.mock('../../../../lib/idx/proceed', () => {
-  return {
-    proceed: jest.fn()
-  };
-});
-
 const mocked = {
-  proceed: require('../../../../lib/idx/proceed'),
   util: require('../../../../lib/idx/remediators/GenericRemediator/util'),
 };
 
@@ -161,7 +154,11 @@ describe('remediators/GenericRemediator', () => {
         ],
         action: jest.fn()
       });
-      const authClient = {} as OktaAuthInterface;
+      const authClient = {
+        idx: {
+          proceed: jest.fn()
+        }
+      } as unknown as OktaAuthInterface;
       const remediator = new GenericRemediator(remediation, {});
       const nextStep = remediator.getNextStep(authClient);
       expect(nextStep).toMatchObject({
@@ -200,7 +197,7 @@ describe('remediators/GenericRemediator', () => {
 
       // calls proceed in the attached action function
       await nextStep.action!({ foobar: 'foobar' });
-      expect(mocked.proceed.proceed).toHaveBeenCalledWith(authClient, {
+      expect(authClient.idx.proceed).toHaveBeenCalledWith({
         step: 'foo',
         foobar: 'foobar'
       });
