@@ -13,6 +13,7 @@ var config = {
   {{#if signinWidget}}
   idps: '',
   {{/if}}
+  idpDisplay: 'popup'
 };
 
 /* eslint-disable max-statements,complexity */
@@ -39,6 +40,7 @@ function loadConfig() {
   var scopes;
   var useInteractionCodeFlow;
   var useDynamicForm;
+  var idpDisplay;
 
   {{#if signinWidget}}
   var idps;
@@ -66,6 +68,7 @@ function loadConfig() {
     {{#if signinWidget}}
     idps = state.idps;
     {{/if}}
+    idpDisplay = state.idpDisplay;
   } else {
     // Read individually named parameters from URL, or use defaults
     // Note that "uniq" is not read from the URL to prevent stale state
@@ -82,6 +85,7 @@ function loadConfig() {
     {{#if signinWidget}}
     idps = url.searchParams.get('idps') || config.idps;
     {{/if}}
+    idpDisplay = url.searchParams.get('idpDisplay') || config.idpDisplay;
   }
   // Create a canonical app URI that allows clean reloading with this config
   appUri = window.location.origin + '/' + '?' + Object.entries({
@@ -97,6 +101,7 @@ function loadConfig() {
     {{#if signinWidget}}
     idps,
     {{/if}}
+    idpDisplay
   }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
   // Add all app options to the state, to preserve config across redirects
   state = {
@@ -113,6 +118,7 @@ function loadConfig() {
     {{#if signinWidget}}
     idps,
     {{/if}}
+    idpDisplay
   };
   var newConfig = {};
   Object.assign(newConfig, state);
@@ -180,6 +186,11 @@ function showForm() {
     document.getElementById('useDynamicForm-off').checked = true;
   }
 
+  if (config.idpDisplay === 'page') {
+    document.getElementById('idpDisplay-page').checked = true;
+  } else {
+    document.getElementById('idpDisplay-popup').checked = true;
+  }
 
   // Show the form
   document.getElementById('config-form').style.display = 'block'; // show form

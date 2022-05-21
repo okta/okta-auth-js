@@ -66,8 +66,16 @@ function submitStaticSigninForm() {
 }
 window._submitStaticSigninForm = bindClick(submitStaticSigninForm);
 
+function openPopup(src, options) {
+  var title = options.popupTitle || 'External Identity Provider User Authentication';
+  var appearance = 'toolbar=no, scrollbars=yes, resizable=yes, ' +
+    'top=100, left=500, width=600, height=600';
+  return window.open(src, title, appearance);
+}
+
 function renderDynamicSigninForm(transaction) {
-  document.getElementById('dynamic-signin-form').style.display = 'block';
+  const formElem = document.getElementById('dynamic-signin-form');
+  formElem.style.display = 'block';
   [
     '.field-username',
     '.field-password',
@@ -86,6 +94,33 @@ function renderDynamicSigninForm(transaction) {
   if (inputs.some(input => input.name === 'password')) {
     document.querySelector('#dynamic-signin-form .field-password').style.display = 'block';
   }
+
+  const idps = transaction.availableSteps.filter(step => step.name === 'redirect-idp');
+  if (idps.length > 0) {
+    const idpContainer = document.createElement('div');
+    idpContainer.className = 'pure-controls idps';
+    idps.forEach(idp => {
+      const idpElem = document.createElement('div');
+      idpElem.className = 'pure-control-group idp-type-' + idp.type;
+      const idpLink = document.createElement('a');
+      idpLink.className = 'pure-button';
+      idpLink.href = idp.href;
+      if (config.idpDisplay === 'popup') {
+        idpLink.onclick = function(event) {
+          event.preventDefault();
+          openPopup(idp.href, {
+            popupTitle: 'Signin using ' + idp.idp.name
+          });
+        }
+      }
+      idpLink.innerText = idp.idp.name;
+      idpElem.appendChild(idpLink);
+      idpContainer.appendChild(idpElem);
+    });
+    const formControls = document.querySelector('#dynamic-signin-form .pure-controls');
+    formElem.insertBefore(idpContainer, formControls);
+  }
+
   if (transaction.enabledFeatures.includes('recover-password')) {
     document.querySelector('#dynamic-signin-form .link-recover-password').style.display = 'inline-block';
   }

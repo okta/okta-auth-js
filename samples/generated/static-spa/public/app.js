@@ -53,6 +53,7 @@ var config = {
   useDynamicForm: false,
   uniq: Date.now() + Math.round(Math.random() * 1000), // to guarantee a unique state
   idps: '',
+  idpDisplay: 'popup'
 };
 
 /* eslint-disable max-statements,complexity */
@@ -79,6 +80,7 @@ function loadConfig() {
   var scopes;
   var useInteractionCodeFlow;
   var useDynamicForm;
+  var idpDisplay;
 
   var idps;
 
@@ -102,6 +104,7 @@ function loadConfig() {
     useDynamicForm = state.useDynamicForm;
     config.uniq = state.uniq;
     idps = state.idps;
+    idpDisplay = state.idpDisplay;
   } else {
     // Read individually named parameters from URL, or use defaults
     // Note that "uniq" is not read from the URL to prevent stale state
@@ -116,6 +119,7 @@ function loadConfig() {
     useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true' || config.useInteractionCodeFlow;
     useDynamicForm = url.searchParams.get('useDynamicForm') === 'true' || config.useDynamicForm;
     idps = url.searchParams.get('idps') || config.idps;
+    idpDisplay = url.searchParams.get('idpDisplay') || config.idpDisplay;
   }
   // Create a canonical app URI that allows clean reloading with this config
   appUri = window.location.origin + '/' + '?' + Object.entries({
@@ -129,6 +133,7 @@ function loadConfig() {
     useInteractionCodeFlow,
     useDynamicForm,
     idps,
+    idpDisplay
   }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
   // Add all app options to the state, to preserve config across redirects
   state = {
@@ -143,6 +148,7 @@ function loadConfig() {
     useInteractionCodeFlow,
     useDynamicForm,
     idps,
+    idpDisplay
   };
   var newConfig = {};
   Object.assign(newConfig, state);
@@ -206,6 +212,11 @@ function showForm() {
     document.getElementById('useDynamicForm-off').checked = true;
   }
 
+  if (config.idpDisplay === 'page') {
+    document.getElementById('idpDisplay-page').checked = true;
+  } else {
+    document.getElementById('idpDisplay-popup').checked = true;
+  }
 
   // Show the form
   document.getElementById('config-form').style.display = 'block'; // show form
@@ -265,6 +276,7 @@ function createAuthClient() {
       tokenManager: {
         storage: config.storage
       },
+      state: JSON.stringify(config.state),
       transformAuthState,
       recoveryToken: config.recoveryToken
     });
@@ -392,6 +404,7 @@ function renderAuthenticated(authState) {
   document.body.classList.remove('unauth');
   document.getElementById('auth').style.display = 'block';
   document.getElementById('accessToken').innerText = stringify(authState.accessToken);
+  hideSigninForm();
   renderUserInfo(authState);
 }
 
@@ -437,15 +450,28 @@ function renderUnauthenticated() {
   return beginAuthFlow();
 }
 
-function handleLoginRedirect() {
-  if (authClient.idx.isInteractionRequired()) {
+window.handleLoginFromPopup = function(search) {
+  handleLoginRedirect(search);
+}
+
+function handleLoginRedirect(search) {
+  if (!search) {
+    search = window.location.search;
+  }
+  if (config.idpDisplay === 'popup' && window.opener) {
+    window.opener.handleLoginFromPopup(search);
+    window.close();
+    return;
+  }
+
+  if (authClient.idx.isInteractionRequired(search)) {
     beginAuthFlow(); // widget will resume transaction
     return Promise.resolve();
   }
   
 
   // If the URL contains a code, `parseFromUrl` will grab it and exchange the code for tokens
-  return authClient.token.parseFromUrl().then(function (res) {
+  return authClient.token.parseFromUrl(search).then(function (res) {
     endAuthFlow(res.tokens); // save tokens
   }).catch(function(error) {
     showError(error);
@@ -678,8 +704,16 @@ function submitStaticSigninForm() {
 }
 window._submitStaticSigninForm = bindClick(submitStaticSigninForm);
 
+function openPopup(src, options) {
+  var title = options.popupTitle || 'External Identity Provider User Authentication';
+  var appearance = 'toolbar=no, scrollbars=yes, resizable=yes, ' +
+    'top=100, left=500, width=600, height=600';
+  return window.open(src, title, appearance);
+}
+
 function renderDynamicSigninForm(transaction) {
-  document.getElementById('dynamic-signin-form').style.display = 'block';
+  const formElem = document.getElementById('dynamic-signin-form');
+  formElem.style.display = 'block';
   [
     '.field-username',
     '.field-password',
@@ -698,6 +732,33 @@ function renderDynamicSigninForm(transaction) {
   if (inputs.some(input => input.name === 'password')) {
     document.querySelector('#dynamic-signin-form .field-password').style.display = 'block';
   }
+
+  const idps = transaction.availableSteps.filter(step => step.name === 'redirect-idp');
+  if (idps.length > 0) {
+    const idpContainer = document.createElement('div');
+    idpContainer.className = 'pure-controls idps';
+    idps.forEach(idp => {
+      const idpElem = document.createElement('div');
+      idpElem.className = 'pure-control-group idp-type-' + idp.type;
+      const idpLink = document.createElement('a');
+      idpLink.className = 'pure-button';
+      idpLink.href = idp.href;
+      if (config.idpDisplay === 'popup') {
+        idpLink.onclick = function(event) {
+          event.preventDefault();
+          openPopup(idp.href, {
+            popupTitle: 'Signin using ' + idp.idp.name
+          });
+        }
+      }
+      idpLink.innerText = idp.idp.name;
+      idpElem.appendChild(idpLink);
+      idpContainer.appendChild(idpElem);
+    });
+    const formControls = document.querySelector('#dynamic-signin-form .pure-controls');
+    formElem.insertBefore(idpContainer, formControls);
+  }
+
   if (transaction.enabledFeatures.includes('recover-password')) {
     document.querySelector('#dynamic-signin-form .link-recover-password').style.display = 'inline-block';
   }

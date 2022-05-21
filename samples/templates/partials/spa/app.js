@@ -25,6 +25,7 @@ function createAuthClient() {
       tokenManager: {
         storage: config.storage
       },
+      state: JSON.stringify(config.state),
       transformAuthState,
       recoveryToken: config.recoveryToken
     });
@@ -152,6 +153,9 @@ function renderAuthenticated(authState) {
   document.body.classList.remove('unauth');
   document.getElementById('auth').style.display = 'block';
   document.getElementById('accessToken').innerText = stringify(authState.accessToken);
+  {{#if signinForm}}
+  hideSigninForm();
+  {{/if}}
   renderUserInfo(authState);
 }
 
@@ -197,15 +201,28 @@ function renderUnauthenticated() {
   return beginAuthFlow();
 }
 
-function handleLoginRedirect() {
-  if (authClient.idx.isInteractionRequired()) {
+window.handleLoginFromPopup = function(search) {
+  handleLoginRedirect(search);
+}
+
+function handleLoginRedirect(search) {
+  if (!search) {
+    search = window.location.search;
+  }
+  if (config.idpDisplay === 'popup' && window.opener) {
+    window.opener.handleLoginFromPopup(search);
+    window.close();
+    return;
+  }
+
+  if (authClient.idx.isInteractionRequired(search)) {
     beginAuthFlow(); // widget will resume transaction
     return Promise.resolve();
   }
   
   {{#if emailVerify}}
-  if (authClient.idx.isEmailVerifyCallback(window.location.search)) {
-    return authClient.idx.parseEmailVerifyCallback(window.location.search).then(function(res) {
+  if (authClient.idx.isEmailVerifyCallback(search)) {
+    return authClient.idx.parseEmailVerifyCallback(search).then(function(res) {
       switch (config.authMethod) {
         {{#if signinWidget}}
         case 'widget':
@@ -226,7 +243,7 @@ function handleLoginRedirect() {
   {{/if}}
 
   // If the URL contains a code, `parseFromUrl` will grab it and exchange the code for tokens
-  return authClient.token.parseFromUrl().then(function (res) {
+  return authClient.token.parseFromUrl(search).then(function (res) {
     endAuthFlow(res.tokens); // save tokens
   }).catch(function(error) {
     showError(error);

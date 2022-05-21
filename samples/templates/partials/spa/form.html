@@ -63,6 +63,12 @@
   </div>
   {{/if}}
 
+  <div class="pure-control-group">
+    <label for="idpDisplay">IDP display</label>
+    <input id="idpDisplay-page" name="idpDisplay" type="radio" value="page"/> PAGE
+    <input id="idpDisplay-popup" name="idpDisplay" type="radio" value="popup"/> POPUP
+  </div>
+
   <div class="pure-controls">
     <input id="login-submit" type="submit" value="Update Config" class="pure-button pure-button-primary"/>
     <a href="/" onclick="_returnHome(event)" class="pure-button">Cancel</a>
