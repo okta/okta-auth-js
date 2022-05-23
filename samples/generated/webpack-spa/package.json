@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "yarn build",
     "build": "webpack",
-    "start": "npx webpack serve",
+    "start": "webpack serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

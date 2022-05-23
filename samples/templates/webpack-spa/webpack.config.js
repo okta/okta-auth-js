@@ -42,7 +42,7 @@ module.exports = {
     ],
     port: PORT,
     onBeforeSetupMiddleware: function(devServer) {
-      devServer.app.get('/login/callback', redirectToOrigin);
+      devServer.app.get('{{ redirectPath }}', redirectToOrigin);
       devServer.app.get('/login', redirectToOrigin);
       devServer.app.get('/profile', redirectToOrigin);
     }

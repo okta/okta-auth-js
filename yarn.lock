@@ -2674,11 +2674,6 @@
   resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-4.3.5.tgz#0e0669bbd82a399a06c825c22dc63d56debe70a2"
   integrity sha512-Xwxv8bIwyI3ggPz9bwoWEoiaz79MJs+VGf27S1N2tapfDVo60Lz741j5diL9RwszZSXt6IkTAuw7Lai7jSXRJg==
 
-"@types/aria-query@^4.2.1":
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-4.2.1.tgz#78b5433344e2f92e8b306c06a5622c50c245bf6b"
-  integrity sha512-S6oPal772qJZHoRZLFc/XoZW2gFvwXusYUmXPXkgxJLuEk2vOt7jc4Yo6z/vtI0EBkbPBVrJJ0B+prLIKiWqHg==
-
 "@types/aria-query@^5.0.0":
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-5.0.0.tgz#df2d64b5cc73cca0d75e2a7793d6b5c199c2f7b2"
