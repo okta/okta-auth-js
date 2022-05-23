@@ -205,6 +205,31 @@ describe('ServiceManager', () => {
     await client.serviceManager.stop();
   });
 
+  it('sets default channel names', () => {
+    const client = createAuth({});
+    const serviceManagerOptions = (client.serviceManager as any).options;
+    expect(serviceManagerOptions.electionChannelName).toEqual('NPSfOkH5eZrTy8PMDlvx-election');
+    expect(serviceManagerOptions.syncChannelName).toEqual('NPSfOkH5eZrTy8PMDlvx-sync');
+  });
+
+  it('can set channel name for leader election with `services.electionChannelName`', () => {
+    const options = {
+      services: { electionChannelName: 'test-election-channel' }
+    };
+    const client = createAuth(options);
+    const serviceManagerOptions = (client.serviceManager as any).options;
+    expect(serviceManagerOptions.electionChannelName).toEqual('test-election-channel');
+  });
+
+  it('can set channel name for sync service with `services.syncChannelName`', () => {
+    const options = {
+      services: { syncChannelName: 'test-sync-channel' }
+    };
+    const client = createAuth(options);
+    const serviceManagerOptions = (client.serviceManager as any).options;
+    expect(serviceManagerOptions.syncChannelName).toEqual('test-sync-channel');
+  });
+
   // TODO: remove in next major version - OKTA-473815
   describe('Backwards Compatibility', () => {
     it('`services` will supersede `tokenManager` configurations', async () => {

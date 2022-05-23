@@ -44,7 +44,7 @@ export class ServiceManager implements ServiceManagerInterface {
 
     // TODO: backwards compatibility, remove in next major version - OKTA-473815
     const { autoRenew, autoRemove, syncStorage } = sdk.tokenManager.getOptions();
-    options.electionChannelName = options.broadcastChannelName;
+    options.electionChannelName = options.electionChannelName || options.broadcastChannelName;
     this.options = Object.assign({}, 
       ServiceManager.defaultOptions,
       { autoRenew, autoRemove, syncStorage }, 
