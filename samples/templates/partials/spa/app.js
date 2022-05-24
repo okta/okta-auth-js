@@ -156,6 +156,9 @@ function renderAuthenticated(authState) {
   {{#if signinForm}}
   hideSigninForm();
   {{/if}}
+  {{#if signinWidget}}
+  hideSigninWidget();
+  {{/if}}
   renderUserInfo(authState);
 }
 

@@ -40,6 +40,13 @@ function stringify(obj) {
   }
   return JSON.stringify(obj, null, 2);
 }
+
+function openPopup(src, options) {
+  var title = options.popupTitle || 'External Identity Provider User Authentication';
+  var appearance = 'toolbar=no, scrollbars=yes, resizable=yes, ' +
+    'top=100, left=500, width=600, height=600';
+  return window.open(src, title, appearance);
+}
 // Default config. Properties here match the names of query parameters in the URL
 var config = {
   issuer: '',
@@ -405,6 +412,7 @@ function renderAuthenticated(authState) {
   document.getElementById('auth').style.display = 'block';
   document.getElementById('accessToken').innerText = stringify(authState.accessToken);
   hideSigninForm();
+  hideSigninWidget();
   renderUserInfo(authState);
 }
 
@@ -603,6 +611,8 @@ function redirectToLogin(additionalParams) {
   }, additionalParams));
 }
 window._loginRedirect = bindClick(redirectToLogin);
+var signIn;
+
 function showSigninWidget(options) {
   // Create widget options
   options = Object.assign({
@@ -624,14 +634,28 @@ function showSigninWidget(options) {
   }, options);
 
   // Create an instance of the signin widget
-  var signIn = new OktaSignIn(options);
+  signIn = new OktaSignIn(options);
+
+  // Custom logic for opening IDP in popup
+  if (config.idpDisplay === 'popup') {
+    signIn.on('afterRender', function() {
+      document.querySelectorAll('.okta-idps-container .social-auth-button').forEach(function (el) {
+        el.onclick = function(event) {
+          event.preventDefault();
+          openPopup(el.href, {
+            popupTitle: el.innerText
+          });
+        }
+      });
+    });
+  }
+
 
   signIn.showSignIn({
     el: '#signin-widget'
   })
   .then(function(response) {
-    document.getElementById('authMethod-widget').style.display = 'none';
-    signIn.remove();
+    hideSigninWidget();
     endAuthFlow(response.tokens);
   })
   .catch(function(error) {
@@ -640,6 +664,12 @@ function showSigninWidget(options) {
 
   document.getElementById('authMethod-widget').style.display = 'block'; // show login UI
 }
+
+function hideSigninWidget() {
+  document.getElementById('authMethod-widget').style.display = 'none';
+  signIn && signIn.remove();
+}
+
 function resumeTransaction(options) {
   if (!config.useInteractionCodeFlow) {
     // Authn
@@ -703,13 +733,6 @@ function submitStaticSigninForm() {
 
 }
 window._submitStaticSigninForm = bindClick(submitStaticSigninForm);
-
-function openPopup(src, options) {
-  var title = options.popupTitle || 'External Identity Provider User Authentication';
-  var appearance = 'toolbar=no, scrollbars=yes, resizable=yes, ' +
-    'top=100, left=500, width=600, height=600';
-  return window.open(src, title, appearance);
-}
 
 function renderDynamicSigninForm(transaction) {
   const formElem = document.getElementById('dynamic-signin-form');

@@ -66,13 +66,6 @@ function submitStaticSigninForm() {
 }
 window._submitStaticSigninForm = bindClick(submitStaticSigninForm);
 
-function openPopup(src, options) {
-  var title = options.popupTitle || 'External Identity Provider User Authentication';
-  var appearance = 'toolbar=no, scrollbars=yes, resizable=yes, ' +
-    'top=100, left=500, width=600, height=600';
-  return window.open(src, title, appearance);
-}
-
 function renderDynamicSigninForm(transaction) {
   const formElem = document.getElementById('dynamic-signin-form');
   formElem.style.display = 'block';

@@ -1,3 +1,5 @@
+var signIn;
+
 function showSigninWidget(options) {
   // Create widget options
   options = Object.assign({
@@ -19,14 +21,28 @@ function showSigninWidget(options) {
   }, options);
 
   // Create an instance of the signin widget
-  var signIn = new OktaSignIn(options);
+  signIn = new OktaSignIn(options);
+
+  // Custom logic for opening IDP in popup
+  if (config.idpDisplay === 'popup') {
+    signIn.on('afterRender', function() {
+      document.querySelectorAll('.okta-idps-container .social-auth-button').forEach(function (el) {
+        el.onclick = function(event) {
+          event.preventDefault();
+          openPopup(el.href, {
+            popupTitle: el.innerText
+          });
+        }
+      });
+    });
+  }
+
 
   signIn.showSignIn({
     el: '#signin-widget'
   })
   .then(function(response) {
-    document.getElementById('authMethod-widget').style.display = 'none';
-    signIn.remove();
+    hideSigninWidget();
     endAuthFlow(response.tokens);
   })
   .catch(function(error) {
@@ -34,4 +50,9 @@ function showSigninWidget(options) {
   });
 
   document.getElementById('authMethod-widget').style.display = 'block'; // show login UI
+}
+
+function hideSigninWidget() {
+  document.getElementById('authMethod-widget').style.display = 'none';
+  signIn && signIn.remove();
 }
