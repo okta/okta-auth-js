@@ -122,6 +122,22 @@ const tokens = {
     groups: string[];
     isAdmin: boolean;
     age: number;
+    applicationProfile: {
+      companyId: string;
+      family_name: string;
+      given_name: string;
+      locale: string;
+      name: string;
+      userId: number;
+      userName: string;
+      zoneinfo: string;
+    };
+    optional?: string;
+    pair: [{
+      foo: string
+    }, {
+      bar: boolean
+    }]
   };
 
   const customUserClaims = await authClient.getUser<MyCustomClaims>();
