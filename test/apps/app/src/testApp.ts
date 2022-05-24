@@ -281,10 +281,14 @@ class TestApp {
   }
 
   subscribeToTokenEvents(): void {
-    ['expired', 'added', 'removed'].forEach(event => {
-      this.oktaAuth.tokenManager.on(event, (arg1: unknown) => {
-        console.log(`TokenManager::${event}`, arg1);
-      });
+    this.oktaAuth.tokenManager.on('added', (arg1: unknown) => {
+      console.log(`TokenManager::added`, arg1);
+    });
+    this.oktaAuth.tokenManager.on('removed', (arg1: unknown) => {
+      console.log(`TokenManager::removed`, arg1);
+    });
+    this.oktaAuth.tokenManager.on('expired', (arg1: unknown) => {
+      console.log(`TokenManager::expired`, arg1);
     });
     this.oktaAuth.tokenManager.on('renewed', (arg1: unknown, arg2: unknown) => {
       console.log(`TokenManager::renewed`, arg1, arg2);
