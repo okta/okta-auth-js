@@ -28,12 +28,23 @@ import {
   StorageType,
   OktaAuthInterface,
   StorageProvider,
-  TokenManagerAnyEventHandler,
+  TokenManagerErrorEventHandler,
+  TokenManagerSetStorageEventHandler,
+  TokenManagerRenewEventHandler,
+  TokenManagerEventHandler,
   TokenManagerInterface,
   RefreshToken,
   AccessTokenCallback,
   IDTokenCallback,
-  RefreshTokenCallback
+  RefreshTokenCallback,
+  EVENT_RENEWED,
+  EVENT_ADDED,
+  EVENT_ERROR,
+  EVENT_EXPIRED,
+  EVENT_REMOVED,
+  EVENT_SET_STORAGE,
+  TokenManagerAnyEventHandler,
+  TokenManagerAnyEvent
 } from './types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
 
@@ -48,12 +59,6 @@ const DEFAULT_OPTIONS = {
   expireEarlySeconds: 30,
   storageKey: TOKEN_STORAGE_NAME
 };
-export const EVENT_EXPIRED = 'expired';
-export const EVENT_RENEWED = 'renewed';
-export const EVENT_ADDED = 'added';
-export const EVENT_REMOVED = 'removed';
-export const EVENT_ERROR = 'error';
-export const EVENT_SET_STORAGE = 'set_storage';
 
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
@@ -73,8 +78,31 @@ export class TokenManager implements TokenManagerInterface {
   private state: TokenManagerState;
   private options: TokenManagerOptions;
 
-  on: (event: string, handler: TokenManagerAnyEventHandler, context?: object) => void;
-  off: (event: string, handler?: TokenManagerAnyEventHandler) => void;
+  on(event: typeof EVENT_RENEWED, handler: TokenManagerRenewEventHandler, context?: object): void;
+  on(event: typeof EVENT_ERROR, handler: TokenManagerErrorEventHandler, context?: object): void;
+  on(event: typeof EVENT_SET_STORAGE, handler: TokenManagerSetStorageEventHandler, context?: object): void;
+  on(event: typeof EVENT_EXPIRED | typeof EVENT_ADDED | typeof EVENT_REMOVED, 
+    handler: TokenManagerEventHandler, context?: object): void;
+  on(event: TokenManagerAnyEvent, handler: TokenManagerAnyEventHandler, context?: object): void {
+    if (context) {
+      this.emitter.on(event, handler, context);
+    } else {
+      this.emitter.on(event, handler);
+    }
+  }
+
+  off(event: typeof EVENT_RENEWED, handler?: TokenManagerRenewEventHandler): void;
+  off(event: typeof EVENT_ERROR, handler?: TokenManagerErrorEventHandler): void;
+  off(event: typeof EVENT_SET_STORAGE, handler?: TokenManagerSetStorageEventHandler): void;
+  off(event: typeof EVENT_EXPIRED | typeof EVENT_ADDED | typeof EVENT_REMOVED, 
+    handler?: TokenManagerEventHandler): void;
+  off(event: TokenManagerAnyEvent, handler?: TokenManagerAnyEventHandler): void {
+    if (handler) {
+      this.emitter.off(event, handler);
+    } else {
+      this.emitter.off(event);
+    }
+  }
 
   // eslint-disable-next-line complexity
   constructor(sdk: OktaAuthInterface, options: TokenManagerOptions = {}) {
@@ -105,9 +133,6 @@ export class TokenManager implements TokenManagerInterface {
     this.storage = sdk.storageManager.getTokenStorage({...storageOptions, useSeparateCookies: true});
     this.clock = SdkClock.create(/* sdk, options */);
     this.state = defaultState();
-
-    this.on = this.emitter.on.bind(this.emitter);
-    this.off = this.emitter.off.bind(this.emitter);
   }
 
   hasSharedStorage() {

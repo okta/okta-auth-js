@@ -15,10 +15,9 @@
 // Do not use this type in code, so it won't be emitted in the declaration output
 import PCancelable from 'p-cancelable';
 import { AuthSdkError } from './errors';
-import { AuthState, AuthStateLogOptions } from './types';
+import { AuthState, AuthStateLogOptions, EVENT_ADDED, EVENT_REMOVED } from './types';
 import { OktaAuth } from '.';
 import { getConsole } from './util';
-import { EVENT_ADDED, EVENT_REMOVED } from './TokenManager';
 import PromiseQueue from './PromiseQueue';
 
 export const INITIAL_AUTH_STATE = null;

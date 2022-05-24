@@ -10,10 +10,13 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { TokenManager, EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED, EVENT_SET_STORAGE } from '../TokenManager';
+import { TokenManager } from '../TokenManager';
 import { BroadcastChannel } from 'broadcast-channel';
 import { isBrowser } from '../features';
-import { ServiceManagerOptions, ServiceInterface, Token, Tokens } from '../types';
+import {
+  ServiceManagerOptions, ServiceInterface, Token, Tokens, 
+  EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED, EVENT_SET_STORAGE
+} from '../types';
 
 export type SyncMessage = {
   type: string;
