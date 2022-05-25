@@ -14,9 +14,6 @@ get_secret prod/okta-sdk-vars/password PASSWORD
 get_vault_secret_key devex/auth-js-sdk-vars security_question_answer SECURITY_QUESTION_ANSWER
 get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
 
-echo "SECURITY_QUESTION_ANSWER"
-echo $SECURITY_QUESTION_ANSWER
-
 export CI=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
