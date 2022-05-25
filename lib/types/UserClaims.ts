@@ -19,8 +19,8 @@
 
  /* eslint-disable camelcase */
 export type CustomUserClaimValue = string | boolean | number;
-
-export type CustomUserClaims = Record<string, CustomUserClaimValue | CustomUserClaimValue[]>;
+export type CustomUserClaim = CustomUserClaimValue | Record<string, CustomUserClaimValue>;
+export type CustomUserClaims = Record<string, CustomUserClaim | CustomUserClaim[]>;
 
 export type UserClaims<T extends CustomUserClaims = CustomUserClaims> = T & {
   auth_time?: number;
