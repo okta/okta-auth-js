@@ -302,7 +302,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       'renewTokensWithRefresh',
       'renewTokens'
     ];
-    Object.keys(toWrap).forEach(key => {
+    toWrap.forEach(key => {
       this.token[key] = useQueue(this.token[key]);
     });
 
