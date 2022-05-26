@@ -15,7 +15,7 @@ import { Remediator, RemediationValues } from './Remediator';
 import { getAuthenticator, Authenticator, AuthenticatorValues } from '../../authenticator';
 import { IdxRemediation, IdxContext } from '../../types/idx-js';
 import { NextStep } from '../../types';
-import { OktaAuthInterface } from '../../../types';
+import { OktaAuthIdxInterface } from '../../../types';
 
 export type VerifyAuthenticatorValues = AuthenticatorValues & RemediationValues;
 
@@ -30,7 +30,7 @@ export class VerifyAuthenticator<T extends VerifyAuthenticatorValues = VerifyAut
     this.authenticator = getAuthenticator(remediation);
   }
 
-  getNextStep(authClient: OktaAuthInterface, context?: IdxContext): NextStep {
+  getNextStep(authClient: OktaAuthIdxInterface, context?: IdxContext): NextStep {
     const nextStep = super.getNextStep(authClient, context);
     const authenticatorEnrollments = context?.authenticatorEnrollments?.value;
 

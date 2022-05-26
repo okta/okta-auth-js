@@ -31,7 +31,6 @@
         "--collectCoverage=false",
         "--testTimeout=120000",
         "--config=jest.browser.js",
-        "--testTimeout=120000",
         "${relativeFile}"
       ],
       "console": "integratedTerminal",
@@ -48,7 +47,6 @@
         "--collectCoverage=false",
         "--testTimeout=120000",
         "--config=jest.server.js",
-        "--testTimeout=120000",
         "${relativeFile}"
       ],
       "console": "integratedTerminal",

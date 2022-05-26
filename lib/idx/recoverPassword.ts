@@ -14,13 +14,13 @@
 import { run } from './run';
 import { getFlowSpecification } from './flow';
 import { 
-  OktaAuthInterface, 
+  OktaAuthIdxInterface, 
   PasswordRecoveryOptions, 
   IdxTransaction,
 } from '../types';
 
 export async function recoverPassword(
-  authClient: OktaAuthInterface, options: PasswordRecoveryOptions = {}
+  authClient: OktaAuthIdxInterface, options: PasswordRecoveryOptions = {}
 ): Promise<IdxTransaction> {
   const flowSpec = getFlowSpecification(authClient, 'recoverPassword');
   return run(

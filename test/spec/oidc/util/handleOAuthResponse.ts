@@ -10,10 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-const exchangeCodeForTokens = jest.fn();
-jest.mock('../../../../lib/oidc/exchangeCodeForTokens', () => { return { exchangeCodeForTokens }; });
-
 const verifyToken = jest.fn();
 jest.mock('../../../../lib/oidc/verifyToken', () => { return { verifyToken }; });
 
@@ -36,7 +32,8 @@ describe('handleOAuthResponse', () => {
       token: {
         decode: jest.fn().mockReturnValue({
           payload: {}
-        })
+        }),
+        exchangeCodeForTokens: jest.fn()
       }
     };
   }
@@ -188,7 +185,7 @@ describe('handleOAuthResponse', () => {
         pkce: true
       });
       mockTokens = {};
-      exchangeCodeForTokens.mockResolvedValue(mockTokens);
+      sdk.token.exchangeCodeForTokens.mockResolvedValue(mockTokens);
     });
 
     addBaselineTests();
@@ -196,7 +193,7 @@ describe('handleOAuthResponse', () => {
     describe('Authorization code flow', () => {
       it('calls `exchangeCodeForTokens` if response contains "code"', async () => {
         const res = await handleOAuthResponse(sdk, {}, { code: 'blah' }, undefined as unknown as CustomUrls);
-        expect(exchangeCodeForTokens).toHaveBeenCalledWith(sdk, {
+        expect(sdk.token.exchangeCodeForTokens).toHaveBeenCalledWith({
           authorizationCode: 'blah',
           interactionCode: undefined
         }, undefined);
@@ -207,7 +204,7 @@ describe('handleOAuthResponse', () => {
     describe('Interaction code flow', () => {
       it('calls `exchangeCodeForTokens` if response contains "interaction_code"', async () => {
         const res = await handleOAuthResponse(sdk, {}, { 'interaction_code': 'blah' }, undefined as unknown as CustomUrls);
-        expect(exchangeCodeForTokens).toHaveBeenCalledWith(sdk, {
+        expect(sdk.token.exchangeCodeForTokens).toHaveBeenCalledWith({
           authorizationCode: undefined,
           interactionCode: 'blah'
         }, undefined);

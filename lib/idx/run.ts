@@ -19,7 +19,7 @@ import { remediate } from './remediate';
 import { getFlowSpecification } from './flow';
 import * as remediators from './remediators';
 import { 
-  OktaAuthInterface,
+  OktaAuthIdxInterface,
   IdxStatus,
   IdxTransaction,
   IdxFeature,
@@ -313,7 +313,7 @@ function handleError(err, data: RunData): RunData {
 }
 
 export async function run(
-  authClient: OktaAuthInterface, 
+  authClient: OktaAuthIdxInterface, 
   options: RunOptions = {},
 ): Promise<IdxTransaction> {
   let data: RunData = {

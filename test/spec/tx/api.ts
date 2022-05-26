@@ -20,11 +20,15 @@ import { postToTransaction } from '../../../lib/tx';
 describe('tx - api', () => {
   let auth;
   beforeEach(() => {
-    auth = {};
+    auth = {
+      tx: {
+        createTransaction() {}
+      }
+    };
   });
 
   describe('postToTransaction', () => {
-    it('sets default withCrednetials options as true', async () => {
+    it('sets default withCredentials options as true', async () => {
       const url = 'http://fake.domain.com/api';
       const args = { fake1: 'fake1' };
       const options = { fake2: 'fake2' };

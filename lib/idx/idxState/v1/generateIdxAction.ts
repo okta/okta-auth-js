@@ -12,13 +12,12 @@
 
 /* eslint-disable max-len, complexity */
 import { httpRequest } from '../../../http';
-import { OktaAuthInterface } from '../../../types';    // auth-js/types
+import { OktaAuthIdxInterface } from '../../../types';    // auth-js/types
 import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
-import { makeIdxState } from './makeIdxState';
 import AuthApiError from '../../../errors/AuthApiError';
 
-const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthInterface, { 
+const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdxInterface, { 
   actionDefinition, 
   defaultParamsForAction = {}, 
   immutableParamsForAction = {}, 
@@ -45,7 +44,7 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthInt
         withCredentials: toPersist?.withCredentials ?? true
       });
 
-      return makeIdxState(authClient, { ...response }, toPersist, true);
+      return authClient.idx.makeIdxResponse({ ...response }, toPersist, true);
     }
     catch (err) {
       if (!(err instanceof AuthApiError) || !err?.xhr) {
@@ -56,7 +55,7 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthInt
       const payload = response.responseJSON || JSON.parse(response.responseText);
       const wwwAuthHeader = response.headers['WWW-Authenticate'] || response.headers['www-authenticate'];
 
-      const idxResponse = makeIdxState(authClient, { ...payload }, toPersist, false);
+      const idxResponse = authClient.idx.makeIdxResponse({ ...payload }, toPersist, false);
       if (response.status === 401 && wwwAuthHeader === 'Oktadevicejwt realm="Okta Device"') {
         // Okta server responds 401 status code with WWW-Authenticate header and new remediation
         // so that the iOS/MacOS credential SSO extension (Okta Verify) can intercept
@@ -88,7 +87,7 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthInt
 //   };
 // };
 
-const generateIdxAction = function generateIdxAction( authClient: OktaAuthInterface, actionDefinition, toPersist ): IdxActionFunction {
+const generateIdxAction = function generateIdxAction( authClient: OktaAuthIdxInterface, actionDefinition, toPersist ): IdxActionFunction {
   // TODO: leaving this here to see where the polling is EXPECTED to drop into the code, but removing any accidental trigger of incomplete code
   // const generator =  actionDefinition.refresh ? generatePollingFetch : generateDirectFetch;
   const generator = generateDirectFetch;

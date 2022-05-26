@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuthInterface, CancelOptions, IdxTransactionMeta } from '../types';
+import { OktaAuthIdxInterface, CancelOptions, IdxTransactionMeta } from '../types';
 import { run } from './run';
 import { getFlowSpecification } from './flow';
 
-export async function cancel (authClient: OktaAuthInterface, options?: CancelOptions) {
+export async function cancel (authClient: OktaAuthIdxInterface, options?: CancelOptions) {
   const meta = authClient.transactionManager.load() as IdxTransactionMeta;
   const flowSpec = getFlowSpecification(authClient, meta.flow);
   return run(authClient, {

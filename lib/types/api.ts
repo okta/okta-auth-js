@@ -12,6 +12,7 @@
  */
 
 import { AuthTransaction } from '../tx/AuthTransaction';
+import { TransactionState } from '../tx/TransactionState';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { CustomUserClaims, UserClaims } from './UserClaims';
@@ -45,22 +46,65 @@ import {
   StartOptions
 } from '../idx/types';
 import { TransactionMetaOptions } from './Transaction';
-export interface OktaAuthInterface {
+import { RequestData, RequestOptions } from './http';
+import { IdxToPersist, RawIdxResponse } from '../idx/types/idx-js';
+
+export interface OktaAuthOptionsInterface {
   options: OktaAuthOptions;
   getIssuerOrigin(): string;
+}
+
+export interface OktaAuthStorageInterface {
+  storageManager: StorageManager;
+
+}
+export interface OktaAuthHttpInterface extends 
+  OktaAuthOptionsInterface,
+  OktaAuthStorageInterface
+{
+  _oktaUserAgent: OktaUserAgent;
+}
+
+export interface OktaAuthFeaturesInterface {
+  // Functional on browser only
+  features: FeaturesAPI;
+}
+
+export interface OktaAuthTransactionInterface {
+  transactionManager: TransactionManager;
+}
+
+export interface OktaAuthOIDCInterface extends
+  OktaAuthOptionsInterface,
+  OktaAuthHttpInterface,
+  OktaAuthFeaturesInterface,
+  OktaAuthTransactionInterface
+{
+  token: TokenAPI;
+  tokenManager: TokenManagerInterface;
+}
+
+export interface OktaAuthIdxInterface extends
+  OktaAuthHttpInterface,
+  OktaAuthTransactionInterface,
+  Pick<OktaAuthOIDCInterface, 'token'>
+{
+  idx: IdxAPI;
+}
+
+export interface OktaAuthInterface extends
+  OktaAuthOptionsInterface,
+  OktaAuthStorageInterface,
+  OktaAuthFeaturesInterface,
+  OktaAuthHttpInterface,
+  OktaAuthTransactionInterface,
+  OktaAuthIdxInterface,
+  OktaAuthOIDCInterface
+{
   getOriginalUri(): string | undefined;
   
-  _oktaUserAgent: OktaUserAgent;
-  storageManager: StorageManager;
-  transactionManager: TransactionManager;
-  tokenManager: TokenManagerInterface;
+  
   serviceManager: ServiceManagerInterface;
-
-  idx: IdxAPI;
-
-  // Browser only
-  features: FeaturesAPI;
-  token: TokenAPI;
 }
 
 export interface FieldError {
@@ -91,11 +135,14 @@ export interface TransactionExists extends TransactionExistsFunction {
   _get: (key: string) => string;
 }
 
+// Authn (classic) api
 export interface TransactionAPI {
   exists: TransactionExists;
   status: (args?: object) => Promise<object>;
   resume: (args?: object) => Promise<AuthTransaction>;
   introspect: (args?: object) => Promise<AuthTransaction>;
+  createTransaction: (res?: TransactionState) => AuthTransaction;
+  postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => Promise<AuthTransaction>;
 }
 
 // Fingerprint
@@ -282,6 +329,7 @@ export interface IdxAPI {
   // lowest level api
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
+  makeIdxResponse: (rawIdxResponse: RawIdxResponse, toPersist: IdxToPersist, requestDidSucceed: boolean) => IdxResponse;
 
   // flow entrypoints
   authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;
