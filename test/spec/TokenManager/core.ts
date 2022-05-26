@@ -703,4 +703,13 @@ describe('TokenManager', function() {
       expect(client.tokenManager.remove).toHaveBeenNthCalledWith(2, 'accessToken');
     });
   });
+
+  describe('removeRefreshToken', () => {
+    it('clears refresh token', () => {
+      setupSync({}, false);
+      jest.spyOn(client.tokenManager, 'remove');
+      client.tokenManager.removeRefreshToken();
+      expect(client.tokenManager.remove).toHaveBeenNthCalledWith(1, 'refreshToken');
+    });
+  });
 });

@@ -32,3 +32,14 @@ export function isAuthorizationCodeError(sdk: OktaAuthOptionsInterface, error: E
   const responseJSON = errorResponse?.responseJSON as Record<string, unknown>;
   return sdk.options.pkce && (responseJSON?.error as string === 'invalid_grant');
 }
+
+export function isRefreshTokenExpiredError(error: Error) {
+  // error: {"error":"invalid_grant","error_description":"The refresh token is invalid or expired."}
+  if (error.name !== 'OAuthError') {
+    return false;
+  }
+
+  const oauthError = error as OAuthError;
+  return oauthError.errorCode === 'invalid_grant' &&
+    oauthError.errorSummary === 'The refresh token is invalid or expired.'
+}

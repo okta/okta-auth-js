@@ -12,7 +12,7 @@
 
 
 import { OAuthError } from '../../../../lib/errors';
-import { isInteractionRequiredError } from '../../../../lib/oidc/util';
+import { isInteractionRequiredError, isRefreshTokenExpiredError } from '../../../../lib/oidc/util';
 
 describe('oidc/util/errors', () => {
 
@@ -30,6 +30,23 @@ describe('oidc/util/errors', () => {
     it('returns false for non OAuthError objects', () => {
       const error = new Error('something');
       expect(isInteractionRequiredError(error)).toBe(false);
+    });
+  });
+
+  describe('isRedirectTokenExpiredError', () => {
+    it('returns true for OAuthError objects with expected fields', () => {
+      const error = new OAuthError('invalid_grant', 'The refresh token is invalid or expired.');
+      expect(isRefreshTokenExpiredError(error)).toBe(true);
+    });
+
+    it('returns false for OAuthError objects without expected fields', () => {
+      const error = new OAuthError('something', 'description not matter');
+      expect(isRefreshTokenExpiredError(error)).toBe(false);
+    });
+
+    it('returns false for non OAuthError objects', () => {
+      const error = new Error('something');
+      expect(isRefreshTokenExpiredError(error)).toBe(false);
     });
   });
 });

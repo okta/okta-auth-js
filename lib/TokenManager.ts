@@ -468,6 +468,11 @@ export class TokenManager implements TokenManagerInterface {
     this.storage.setStorage(tokenStorage);
   }
 
+  removeRefreshToken () {
+    const key = this.getStorageKeyByType('refreshToken') || REFRESH_TOKEN_STORAGE_KEY;
+    this.remove(key);
+  }
+
   addPendingRemoveFlags() {
     const tokens = this.getTokensSync();
     Object.keys(tokens).forEach(key => {

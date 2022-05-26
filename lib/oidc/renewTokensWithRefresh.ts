@@ -16,6 +16,7 @@ import { isSameRefreshToken } from './util/refreshToken';
 import { OktaAuthOIDCInterface, TokenParams, RefreshToken, Tokens } from '../types';
 import { handleOAuthResponse } from './handleOAuthResponse';
 import { postRefreshToken } from './endpoints/token';
+import { isRefreshTokenExpiredError } from './util/errors';
 
 export async function renewTokensWithRefresh(
   sdk: OktaAuthOIDCInterface,
@@ -27,18 +28,27 @@ export async function renewTokensWithRefresh(
     throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to renew tokens');
   }
 
-  const renewTokenParams: TokenParams = Object.assign({}, tokenParams, {
-    clientId,
-  });
-  const tokenResponse = await postRefreshToken(sdk, renewTokenParams, refreshTokenObject);
-  const urls = getOAuthUrls(sdk, tokenParams);
-  const { tokens } = await handleOAuthResponse(sdk, renewTokenParams, tokenResponse, urls);
+  try {
+    const renewTokenParams: TokenParams = Object.assign({}, tokenParams, {
+      clientId,
+    });
+    const tokenResponse = await postRefreshToken(sdk, renewTokenParams, refreshTokenObject);
+    const urls = getOAuthUrls(sdk, tokenParams);
+    const { tokens } = await handleOAuthResponse(sdk, renewTokenParams, tokenResponse, urls);
 
-  // Support rotating refresh tokens
-  const { refreshToken } = tokens;
-  if (refreshToken && !isSameRefreshToken(refreshToken, refreshTokenObject)) {
-    sdk.tokenManager.updateRefreshToken(refreshToken);
+    // Support rotating refresh tokens
+    const { refreshToken } = tokens;
+    if (refreshToken && !isSameRefreshToken(refreshToken, refreshTokenObject)) {
+      sdk.tokenManager.updateRefreshToken(refreshToken);
+    }
+
+    return tokens;
   }
-
-  return tokens;
+  catch (err) {
+    if (isRefreshTokenExpiredError(err as Error)) {
+      // if the refresh token is expired, remove it from storage
+      sdk.tokenManager.removeRefreshToken();
+    }
+    throw err;
+  }
 }
