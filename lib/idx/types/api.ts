@@ -72,6 +72,7 @@ export type NextStep = {
     type?: string;
     value: IdxAuthenticator;
   };
+  refresh?: number;
 }
 
 export enum IdxFeature {
