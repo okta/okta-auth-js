@@ -18,8 +18,9 @@ import {
   Tokens,
   TokenManager,
   RefreshToken,
-  OktaAuth
-} from '@okta/okta-auth-js';
+  OktaAuth,
+  TokenManagerError
+} from '../../build/lib/index.d';
 import { expectType, expectAssignable } from 'tsd';
 
 const authClient = new OktaAuth({});
@@ -58,8 +59,9 @@ const authClient = new OktaAuth({});
     expectType<Token>(newToken);
     expectType<Token>(oldToken!);
   });
-  tokenManager.on('error', function (error) {
-    expectAssignable<object>(error);
+  tokenManager.on('error', function (error: TokenManagerError) {
+    expectType<TokenManagerError>(error);
+    expectAssignable<Error>(error);
   });
   tokenManager.off('error', () => {});
   tokenManager.off('error');

@@ -14,22 +14,22 @@ import {
   OktaAuth,
   OktaAuthOptions,
   toRelativeUrl
-} from '@okta/okta-auth-js';
+} from '../../build/lib/index.d';
 import { expectType } from 'tsd';
 
 // Custom storage provider
-const myMemoryStore = {};
+const myMemoryStore: Record<string, string> = {};
 const storageProvider = {
-  getItem: function(key) {
+  getItem: function(key: string): string {
     // custom get
     return myMemoryStore[key];
   },
-  setItem: function(key, val) {
+  setItem: function(key: string, val: string) {
     // custom set
     myMemoryStore[key] = val;
   },
   // optional
-  removeItem: function(key) {
+  removeItem: function(key: string) {
     delete myMemoryStore[key];
   }
 };

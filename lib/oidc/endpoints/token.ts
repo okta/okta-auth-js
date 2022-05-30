@@ -12,7 +12,7 @@
 
 
 import { AuthSdkError } from '../../errors';
-import { CustomUrls, OAuthParams, OAuthResponse, RefreshToken, TokenParams } from '../../types';
+import { CustomUrls, OAuthParams, OAuthResponse, OktaAuthHttpInterface, RefreshToken, TokenParams } from '../../types';
 import { removeNils, toQueryString } from '../../util';
 import { httpRequest } from '../../http';
 
@@ -76,7 +76,11 @@ export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls)
   });
 }
 
-export function postRefreshToken(sdk, options: TokenParams, refreshToken: RefreshToken): Promise<OAuthResponse> {
+export function postRefreshToken(
+  sdk: OktaAuthHttpInterface,
+  options: TokenParams,
+  refreshToken: RefreshToken
+): Promise<OAuthResponse> {
   return httpRequest(sdk, {
     url: refreshToken.tokenUrl,
     method: 'POST',

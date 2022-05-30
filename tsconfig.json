@@ -20,10 +20,13 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": false,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "rootDir": "./",
     "baseUrl": "./"
   },
+  "lib": [
+    "dom"
+  ],
   "files": [
     "package.json"
   ],

@@ -13,12 +13,12 @@
 import { AuthSdkError } from '../errors';
 import { getOAuthUrls } from './util/oauth';
 import { isSameRefreshToken } from './util/refreshToken';
-import { OktaAuthInterface, TokenParams, RefreshToken, Tokens } from '../types';
+import { OktaAuthOIDCInterface, TokenParams, RefreshToken, Tokens } from '../types';
 import { handleOAuthResponse } from './handleOAuthResponse';
 import { postRefreshToken } from './endpoints/token';
 
 export async function renewTokensWithRefresh(
-  sdk: OktaAuthInterface,
+  sdk: OktaAuthOIDCInterface,
   tokenParams: TokenParams,
   refreshTokenObject: RefreshToken
 ): Promise<Tokens> {

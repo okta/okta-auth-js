@@ -131,7 +131,10 @@ module.exports = {
       },
     },
     {
-      files: ["rollup.config.js"],
+      files: [
+        "rollup.config.js",
+        "jest.esm.mjs"
+      ],
       rules: {
         "node/no-unsupported-features/es-syntax": 0
       }

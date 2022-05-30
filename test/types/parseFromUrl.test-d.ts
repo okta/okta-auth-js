@@ -13,7 +13,7 @@
 
 import {
   OktaAuth, TokenResponse
-} from '@okta/okta-auth-js';
+} from '../../build/lib/index.d';
 import { expectType } from 'tsd';
 
 const authClient = new OktaAuth({});

@@ -23,20 +23,20 @@ import {
 } from '@okta/test.support/idx';
 import { IdxFeature, IdxResponse, } from '../../../lib/idx/types';
 import { Remediator, GenericRemediator } from '../../../lib/idx/remediators';
-import { OktaAuthInterface } from '../../../lib/types';
+import { OktaAuthIdxInterface } from '../../../lib/types';
 
 jest.mock('../../../lib/idx/remediators/GenericRemediator');
 
 describe('idx/util', () => {
   describe('getAvailableSteps', () => {
     it('returns an empty array if there are no remediations', () => {
-      const authClient = {} as OktaAuthInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const idxResponse = IdxResponseFactory.build();
       const res = getAvailableSteps(authClient, idxResponse);
       expect(res.length).toBe(0);
     });
     it('returns next step for identify remediation', () => {
-      const authClient = {} as OktaAuthInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const idxResponse = IdxResponseFactory.build({
         neededToProceed: [
           IdentifyRemediationFactory.build()
@@ -349,7 +349,7 @@ describe('idx/util', () => {
       const remediator: Remediator = {
         getNextStep: jest.fn().mockReturnValue(nextStep)
       } as unknown as Remediator;
-      const authClient = {} as OktaAuthInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const context = {
          foo: 'bar'
       };
@@ -408,7 +408,7 @@ describe('idx/util', () => {
   describe('handleIdxError', () => {
     let testContext;
     beforeEach(() => {
-      const authClient = {} as OktaAuthInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const idxResponse = {
         neededToProceed: [],
         actions: {},
