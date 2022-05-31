@@ -33,7 +33,9 @@ describe('oidc/util/errors', () => {
     });
   });
 
-  describe('isRedirectTokenExpiredError', () => {
+  describe('isRedirectTokenInvalidError', () => {
+    // error: {"error":"invalid_grant","error_description":"The refresh token is invalid or expired."}
+
     it('returns true for OAuthError objects with expected fields', () => {
       const error = new OAuthError('invalid_grant', 'The refresh token is invalid or expired.');
       expect(isRefreshTokenInvalidError(error)).toBe(true);
