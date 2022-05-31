@@ -12,7 +12,7 @@
 
 
 import { OktaAuthOptionsInterface } from '../../types';
-import { OAuthError, AuthApiError } from '../../errors';
+import { OAuthError, AuthApiError, isOAuthError } from '../../errors';
 
 export function isInteractionRequiredError(error: Error) {
   if (error.name !== 'OAuthError') {
@@ -33,13 +33,9 @@ export function isAuthorizationCodeError(sdk: OktaAuthOptionsInterface, error: E
   return sdk.options.pkce && (responseJSON?.error as string === 'invalid_grant');
 }
 
-export function isRefreshTokenExpiredError(error: Error) {
+export function isRefreshTokenExpiredError(error: unknown): boolean {
   // error: {"error":"invalid_grant","error_description":"The refresh token is invalid or expired."}
-  if (error.name !== 'OAuthError') {
-    return false;
-  }
-
-  const oauthError = error as OAuthError;
-  return oauthError.errorCode === 'invalid_grant' &&
-    oauthError.errorSummary === 'The refresh token is invalid or expired.'
+  return isOAuthError(error) &&
+    error.errorCode === 'invalid_grant' &&
+    error.errorSummary === 'The refresh token is invalid or expired.';
 }

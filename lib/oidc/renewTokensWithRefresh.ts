@@ -45,7 +45,7 @@ export async function renewTokensWithRefresh(
     return tokens;
   }
   catch (err) {
-    if (isRefreshTokenExpiredError(err as Error)) {
+    if (isRefreshTokenExpiredError(err)) {
       // if the refresh token is expired, remove it from storage
       sdk.tokenManager.removeRefreshToken();
     }

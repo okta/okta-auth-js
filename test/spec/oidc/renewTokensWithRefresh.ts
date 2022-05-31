@@ -153,7 +153,7 @@ describe('renewTokensWithRefresh', function () {
         testContext.refreshTokenExpiredError = refreshTokenExpiredError;
       });
 
-      it('clears refreshToken after token expired error is returned', async () => {
+      it('refreshToken is removed after token expired error is returned', async () => {
         const { authInstance, renewTokenSpy, refreshTokenExpiredError } = testContext;
         jest.spyOn(authInstance.tokenManager, 'remove');
 
@@ -164,7 +164,7 @@ describe('renewTokensWithRefresh', function () {
         await expect(await authInstance.tokenManager.get('refreshToken')).toBeUndefined();
       });
 
-      it('does NOT clear refreshToken after non token expired error is returned', async () => {
+      it('refreshToken is NOT removed after non-token expired error is returned', async () => {
         const error = new Error('something happened');
         jest.spyOn(tokenEndpoint, 'postRefreshToken').mockRejectedValue(error);
 
@@ -178,5 +178,5 @@ describe('renewTokensWithRefresh', function () {
         await expect(await authInstance.tokenManager.get('refreshToken')).toEqual(tokens.standardRefreshTokenParsed);
       });
     });
-  })
+  });
 });

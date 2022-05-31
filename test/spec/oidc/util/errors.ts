@@ -46,7 +46,7 @@ describe('oidc/util/errors', () => {
 
     it('returns false for non OAuthError objects', () => {
       const error = new Error('something');
-      expect(isRefreshTokenExpiredError(error)).toBe(false);
+      expect(isRefreshTokenExpiredError(error as unknown)).toBe(false);
     });
   });
 });
