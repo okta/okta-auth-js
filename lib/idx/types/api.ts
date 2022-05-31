@@ -45,7 +45,6 @@ export type Input = {
   secret?: boolean;
   required?: boolean;
   options?: IdxOption[];
-  relatesTo?: IdxAuthenticator;
   mutable?: boolean;
   visible?: boolean;
 }
@@ -69,6 +68,11 @@ export type NextStep = {
   action?: (params?: IdxActionParams) => Promise<IdxTransaction>;
   idp?: IdpConfig;
   href?: string;
+  relatesTo?: {
+    type?: string;
+    value: IdxAuthenticator;
+  };
+  refresh?: number;
 }
 
 export enum IdxFeature {
