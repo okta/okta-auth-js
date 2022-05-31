@@ -180,7 +180,7 @@ export async function remediate(
 
     // generic remediator should not auto proceed in pending status
     // return nextStep directly
-    if (options.useGenericRemediator && !idxResponse.interactionCode) {
+    if (options.useGenericRemediator && !idxResponse.interactionCode && !isTerminalResponse(idxResponse)) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const gr = getRemediator(idxResponse.neededToProceed, values, options)!;
       const nextStep = getNextStep(authClient, gr, idxResponse);

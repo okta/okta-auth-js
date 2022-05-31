@@ -556,14 +556,37 @@ describe('idx/remediate', () => {
   });
 
   describe('use generic remediator', () => {
-    it('does not auto proceed', async () => {
+    it('returns nextStep without auto proceeding in pending status', async () => {
       let { authClient, idxResponse, remediator } = testContext;
-      idxResponse = {
+      const idxResponseInput = {
         ...idxResponse,
         neededToProceed: [{
           name: 'some-remediation'
         }]
       };
+      // response in pending status
+      const responseFromProceed = {
+        ...idxResponse,
+        neededToProceed: [{
+          name: 'some-new-remediation'
+        }]
+      };
+      idxResponse.proceed.mockResolvedValue(responseFromProceed);
+      remediator.canRemediate.mockReturnValue(true);
+      await remediate(authClient, idxResponseInput, {}, { useGenericRemediator: true });
+      expect(idxResponse.proceed).toHaveBeenCalledTimes(1);
+      expect(remediator.getNextStep).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns terminal status with terminal response', async () => {
+      let { authClient, idxResponse, remediator } = testContext;
+      const idxResponseInput = {
+        ...idxResponse,
+        neededToProceed: [{
+          name: 'some-remediation'
+        }]
+      };
+      // response in terminal status
       const responseFromProceed = {
         ...idxResponse,
         rawIdxState: {
@@ -574,8 +597,17 @@ describe('idx/remediate', () => {
       };
       idxResponse.proceed.mockResolvedValue(responseFromProceed);
       remediator.canRemediate.mockReturnValue(true);
-      await remediate(authClient, idxResponse, {}, { useGenericRemediator: true });
+      const res = await remediate(authClient, idxResponseInput, {}, { useGenericRemediator: true });
       expect(idxResponse.proceed).toHaveBeenCalledTimes(1);
+      expect(remediator.getNextStep).toHaveBeenCalledTimes(0);
+      expect(res).toEqual({
+        idxResponse: {
+          ...responseFromProceed,
+          requestDidSucceed: true,
+        },
+        terminal: true,
+        messages: ['hello'],
+      })
     });
   });
 });
