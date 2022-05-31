@@ -11,23 +11,13 @@
  */
 
 
-import { run } from './run';
-import { getFlowSpecification } from './flow';
-import { 
-  OktaAuthIdxInterface, 
-  PasswordRecoveryOptions, 
-  IdxTransaction,
-} from '../types';
+import checkIsOnPage from '../check/checkIsOnPage';
+import SelectAuthenticator from '../selectors/SelectAuthenticator';
+import clickElement from './clickElement';
+import selectOption from './selectOption';
 
-export async function recoverPassword(
-  authClient: OktaAuthIdxInterface, options: PasswordRecoveryOptions = {}
-): Promise<IdxTransaction> {
-  const flowSpec = getFlowSpecification(authClient, 'recoverPassword');
-  return run(
-    authClient, 
-    { 
-      ...options,
-      ...flowSpec,
-    }
-  );
-}
+export default async () => {
+  await selectOption('value', 'security_question', SelectAuthenticator.options);
+  await clickElement('click', 'selector', SelectAuthenticator.submit);
+  await checkIsOnPage('Enroll security question authenticator');
+};

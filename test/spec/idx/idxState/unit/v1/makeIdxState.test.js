@@ -29,8 +29,20 @@ const mocked = {
 
 
 describe('makeIdxState', () => {
+  let testContext;
   beforeEach(() => {
     jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(mockIdxResponse);
+    let sdk;
+    // bit of a circular loop here
+    const makeIdxResponse = jest.fn().mockImplementation((rawResponse) => {
+      return makeIdxState(sdk, rawResponse);
+    });
+    sdk = {
+      idx: {
+        makeIdxResponse
+      }
+    };
+    testContext = { sdk };
   });
 
   it('returns an idxState', () => {
@@ -141,7 +153,8 @@ describe('makeIdxState', () => {
     });
 
     it('returns a new idxState', async () => {
-      const idxState = makeIdxState({}, mockIdxResponse);
+      const { sdk } = testContext;
+      const idxState = makeIdxState(sdk, mockIdxResponse);
       const mockFollowup = { ...mockIdxResponse, remediations: [] };
       jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(mockFollowup);
       return idxState
@@ -169,7 +182,8 @@ describe('makeIdxState', () => {
 
   describe('idxState.actions', () => {
     it('return a new idxState', async () => {
-      const idxState = makeIdxState({}, mockIdxResponse);
+      const { sdk } = testContext;
+      const idxState = makeIdxState(sdk, mockIdxResponse);
       return idxState.actions.cancel().then((result) => {
         // Note: cancel won't return this data
         // this is verifying the parsing happens on mock data

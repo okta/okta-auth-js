@@ -34,8 +34,6 @@ Feature: TOTP Support (Google Authenticator) Sign Up
     Then the screen changes to receive an input for a code
     When she inputs the correct code from her Google Authenticator App for "enrollment"
       And she submits the form
-    Then she is redirected to the "Select Authenticator" page
-    When she selects "Skip"
     Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

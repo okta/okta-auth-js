@@ -114,7 +114,6 @@ describe('idx/startTransaction', () => {
       idxResponse,
       // values
       {
-        exchangeCodeForTokens: false,
         stateHandle: 'unknown-stateHandle'
       },
       // flowMonitor

@@ -14,9 +14,12 @@
 import { isFunction } from '../util';
 import { AuthSdkError, OAuthError } from '../errors';
 import { httpRequest } from '../http';
-import { AccessToken, IDToken, UserClaims, isAccessToken, isIDToken } from '../types';
+import { AccessToken, IDToken, UserClaims, isAccessToken, isIDToken, CustomUserClaims } from '../types';
 
-export async function getUserInfo(sdk, accessTokenObject: AccessToken, idTokenObject: IDToken): Promise<UserClaims> {
+export async function getUserInfo<T extends CustomUserClaims = CustomUserClaims>(
+  sdk, accessTokenObject: AccessToken,
+  idTokenObject: IDToken
+): Promise<UserClaims<T>> {
   // If token objects were not passed, attempt to read from the TokenManager
   if (!accessTokenObject) {
     accessTokenObject = (await sdk.tokenManager.getTokens()).accessToken as AccessToken;

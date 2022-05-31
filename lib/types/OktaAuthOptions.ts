@@ -15,7 +15,7 @@ import { CookieOptions } from './Cookies';
 import { HttpRequestClient } from './http';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
-import { IdxTransactionMeta } from '../idx/types';
+import { IdxTransactionMeta, RunOptions } from '../idx/types';
 import { ServiceManagerOptions } from './Service';
 import OktaAuth from '../OktaAuth';
 import { OAuthResponseMode, OAuthResponseType } from './OAuth';
@@ -113,8 +113,9 @@ export interface OktaAuthOptions extends
   services?: ServiceManagerOptions;
   transactionManager?: TransactionManagerOptions;
   // BETA WARNING: configs in this section are subject to change without a breaking change notice
-  idx?: Pick<IdxTransactionMeta,
-    'useGenericRemediator' 
+  idx?: Pick<RunOptions,
+    'useGenericRemediator' |
+    'exchangeCodeForTokens'
   >;
   
   // For server-side web applications ONLY!

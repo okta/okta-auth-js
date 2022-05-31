@@ -30,7 +30,8 @@ module.exports = {
   'clearMocks': true,
   'moduleNameMapper': {
     '^@okta/okta-auth-js$': OktaAuth,
-    '^lib/(.*)$': '<rootDir>/lib/$1'
+    '^lib/(.*)$': '<rootDir>/lib/$1',
+    '^jsonpath-plus$': '<rootDir>/node_modules/jsonpath-plus/dist/index-browser-umd.cjs'
   },
   'testPathIgnorePatterns': [],
   'reporters': [

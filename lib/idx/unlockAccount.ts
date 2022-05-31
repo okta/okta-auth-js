@@ -16,14 +16,14 @@ import { hasSavedInteractionHandle } from './transactionMeta';
 import { startTransaction } from './startTransaction';
 import { AuthSdkError } from '../errors';
 import { 
-  OktaAuthInterface, 
+  OktaAuthIdxInterface, 
   AccountUnlockOptions, 
   IdxTransaction,
   IdxFeature,
 } from '../types';
 
 export async function unlockAccount(
-  authClient: OktaAuthInterface, options: AccountUnlockOptions = {}
+  authClient: OktaAuthIdxInterface, options: AccountUnlockOptions = {}
 ): Promise<IdxTransaction> {
   options.flow = 'unlockAccount';
 

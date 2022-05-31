@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuthInterface } from '../types';
+import { OktaAuthIdxInterface } from '../types';
 
 import CustomError from '../errors/CustomError';
 import { urlParamsToObject  } from '../oidc/util/urlParams';
@@ -47,7 +47,7 @@ export function parseEmailVerifyCallback(urlPath: string): EmailVerifyCallbackRe
   return urlParamsToObject(urlPath) as EmailVerifyCallbackResponse;
 }
 
-export async function handleEmailVerifyCallback(authClient: OktaAuthInterface, search: string) {
+export async function handleEmailVerifyCallback(authClient: OktaAuthIdxInterface, search: string) {
   if (isEmailVerifyCallback(search)) {
     const { state, otp } = parseEmailVerifyCallback(search);
     if (authClient.idx.canProceed({ state })) {

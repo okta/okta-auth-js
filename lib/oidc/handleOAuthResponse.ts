@@ -19,7 +19,7 @@ import {
 } from './util/oauth';
 import { AuthSdkError, OAuthError } from '../errors';
 import {
-  OktaAuthInterface,
+  OktaAuthOIDCInterface,
   TokenVerifyParams,
   IDToken,
   OAuthResponse,
@@ -28,7 +28,6 @@ import {
   CustomUrls,
   Tokens,
 } from '../types';
-import { exchangeCodeForTokens } from './exchangeCodeForTokens';
 import { verifyToken } from './verifyToken';
 import { getDefaultTokenParams } from './util';
 
@@ -43,7 +42,7 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
 }
 
 export async function handleOAuthResponse(
-  sdk: OktaAuthInterface,
+  sdk: OktaAuthOIDCInterface,
   tokenParams: TokenParams,
   res: OAuthResponse,
   urls?: CustomUrls
@@ -53,7 +52,7 @@ export async function handleOAuthResponse(
   // The result contains an authorization_code and PKCE is enabled 
   // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
   if (pkce && (res.code || res.interaction_code)) {
-    return exchangeCodeForTokens(sdk, Object.assign({}, tokenParams, {
+    return sdk.token.exchangeCodeForTokens(Object.assign({}, tokenParams, {
       authorizationCode: res.code,
       interactionCode: res.interaction_code
     }), urls);

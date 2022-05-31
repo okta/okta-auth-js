@@ -12,7 +12,7 @@
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
-import { NextStep, OktaAuthInterface } from '../../types';
+import { NextStep, OktaAuthIdxInterface } from '../../types';
 import { IdxContext } from '../types/idx-js';
 
 export interface EnrollPollValues extends RemediationValues {
@@ -26,7 +26,7 @@ export class EnrollPoll extends Remediator<EnrollPollValues> {
     return !!this.values.startPolling || this.options.step === 'enroll-poll';
   }
 
-  getNextStep(authClient: OktaAuthInterface, context?: IdxContext): NextStep {
+  getNextStep(authClient: OktaAuthIdxInterface, context?: IdxContext): NextStep {
     const common = super.getNextStep(authClient, context);
     let authenticator = this.getAuthenticator();
     if (!authenticator && context?.currentAuthenticator) {

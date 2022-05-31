@@ -11,10 +11,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 /* eslint complexity:[0,8] */
-import { OktaAuthInterface, IdxTransactionMeta, InteractOptions, InteractResponse } from '../types';
-import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
+import { OktaAuthIdxInterface, IdxTransactionMeta, InteractOptions, InteractResponse } from '../types';
+import { getSavedTransactionMeta, saveTransactionMeta, createTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';
-import { createTransactionMeta } from '.';
 import { removeNils } from '../util';
 import { httpRequest } from '../http';
 
@@ -44,7 +43,7 @@ function getResponse(meta: IdxTransactionMeta): InteractResponse {
 
 // Begin or resume a transaction. Returns an interaction handle
 export async function interact (
-  authClient: OktaAuthInterface, 
+  authClient: OktaAuthIdxInterface, 
   options: InteractOptions = {}
 ): Promise<InteractResponse> {
   options = removeNils(options);

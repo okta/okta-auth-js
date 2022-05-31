@@ -79,7 +79,8 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     activationToken: args.activationToken,
     // BETA WARNING: configs in this section are subject to change without a breaking change notice
     idx: {
-      useGenericRemediator: !!args.idx?.useGenericRemediator,
+      useGenericRemediator: !!args.idx?.useGenericRemediator, // false by default
+      exchangeCodeForTokens: args.idx?.exchangeCodeForTokens !== false // true by default
     },
 
     // Give the developer the ability to disable token signature validation.

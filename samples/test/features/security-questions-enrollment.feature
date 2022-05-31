@@ -11,6 +11,35 @@ Feature: Security Questions
       And a user named "Mary"
       And she does not have account in the org
 
+  Scenario: Mary signs up for an account and enrolls in Password and a predefined Security Question
+    When she clicks the 'signup' button
+    Then she is redirected to the "Self Service Registration" page
+    When she fills out her First Name
+      And she fills out her Last Name
+      And she fills out her Email
+      And she submits the form
+    Then she is redirected to the "Select Authenticator" page
+    When she selects the "Password" factor
+      And she submits the form
+    Then she is redirected to the "Set up Password" page
+      And she fills out her Password
+      And she confirms her Password
+      And she submits the form
+    Then she is redirected to the "Select Authenticator" page
+    When she selects the "Security Question" factor
+      And she submits the form
+    Then she is redirected to the "Enroll security question authenticator" page
+      And she sees a radio option to "Choose a Security Question" or "Create my own security question"
+      And the option "Choose a Security Question" is selected
+      And she sees dropdown list of questions with the question "What is the food you least liked as a child?" is selected 
+      And she sees an input box to enter her answer
+      And she enters "Okta" in the answer
+      And she submits the form
+    Then she is redirected to the "Root" page
+      And she sees a table with her profile info
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"
+
   Scenario: Mary signs up for an account and enrolls in Password and a custom Security Question
     When she clicks the 'signup' button
     Then she is redirected to the "Self Service Registration" page
@@ -36,8 +65,53 @@ Feature: Security Questions
       And she enters "Atko" in the question
       And she enters "Okta" in the answer
       And she submits the form
+    Then she is redirected to the "Root" page
+      And she sees a table with her profile info
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"
+
+  Scenario: Mary Logs into the Sample App and enrolls in a predefined Security Question
+    Given she has an account with "active" state in the org
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
+      And she has inserted her password
+      And her password is correct
+    When she submits the form
     Then she is redirected to the "Select Authenticator" page
-    When she selects "Skip" on Email
+    When she selects the "Security Question" factor
+      And she submits the form
+    Then she is redirected to the "Enroll security question authenticator" page
+      And she sees a radio option to "Choose a Security Question" or "Create my own security question"
+      And the option "Choose a Security Question" is selected
+      And she sees dropdown list of questions with the question "What is the food you least liked as a child?" is selected 
+      And she sees an input box to enter her answer
+      And she enters "Okta" in the answer
+      And she submits the form
+    Then she is redirected to the "Root" page
+      And she sees a table with her profile info
+      And the cell for the value of "email" is shown and contains her "email"
+      And the cell for the value of "name" is shown and contains her "first name and last name"
+
+  Scenario: Mary Logs into the Sample App and enrolls in a custom Security Question
+    Given she has an account with "active" state in the org
+    When she clicks the "login" button
+    Then she is redirected to the "Login" page
+    When she has inserted her username
+      And she has inserted her password
+      And her password is correct
+    When she submits the form
+    Then she is redirected to the "Select Authenticator" page
+    When she selects the "Security Question" factor
+      And she submits the form
+    Then she is redirected to the "Enroll security question authenticator" page
+      And she sees a radio option to "Choose a Security Question" or "Create my own security question"
+      And the option "Choose a Security Question" is selected
+    When she selects the radio option to "Create my own security question"
+    Then she sees the dropdown list change to an input box to "Create my own security question"
+      And she enters "Atko" in the question
+      And she enters "Okta" in the answer
+      And she submits the form
     Then she is redirected to the "Root" page
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"

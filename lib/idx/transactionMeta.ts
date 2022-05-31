@@ -11,13 +11,13 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuthInterface, IdxTransactionMeta, TransactionMetaOptions, PKCETransactionMeta } from '../types';
+import { OktaAuthIdxInterface, IdxTransactionMeta, TransactionMetaOptions, PKCETransactionMeta } from '../types';
 import { removeNils, warn } from '../util';
 import { createOAuthMeta } from '../oidc';
 
 // Calculate new values
 export async function createTransactionMeta(
-  authClient: OktaAuthInterface,
+  authClient: OktaAuthIdxInterface,
   options: TransactionMetaOptions = {}
 ): Promise<IdxTransactionMeta> {
   const tokenParams = await authClient.token.prepareTokenParams(options);
@@ -41,7 +41,7 @@ export async function createTransactionMeta(
   return meta;
 }
 
-export function hasSavedInteractionHandle(authClient: OktaAuthInterface, options?: TransactionMetaOptions): boolean {
+export function hasSavedInteractionHandle(authClient: OktaAuthIdxInterface, options?: TransactionMetaOptions): boolean {
   const savedMeta = getSavedTransactionMeta(authClient, options);
   if (savedMeta?.interactionHandle) {
     return true;
@@ -51,7 +51,7 @@ export function hasSavedInteractionHandle(authClient: OktaAuthInterface, options
 
 // Returns the saved transaction meta, if it exists and is valid
 export function getSavedTransactionMeta(
-  authClient: OktaAuthInterface,
+  authClient: OktaAuthIdxInterface,
   options?: TransactionMetaOptions
 ): IdxTransactionMeta | undefined {
   options = removeNils(options);
@@ -80,7 +80,7 @@ export function getSavedTransactionMeta(
 }
 
 export async function getTransactionMeta(
-  authClient: OktaAuthInterface,
+  authClient: OktaAuthIdxInterface,
   options?: TransactionMetaOptions
 ): Promise<IdxTransactionMeta> {
   options = removeNils(options);
@@ -94,11 +94,11 @@ export async function getTransactionMeta(
   return createTransactionMeta(authClient, options);
 }
 
-export function saveTransactionMeta (authClient: OktaAuthInterface, meta): void {
+export function saveTransactionMeta (authClient: OktaAuthIdxInterface, meta): void {
   authClient.transactionManager.save(meta, { muteWarning: true });
 }
 
-export function clearTransactionMeta (authClient: OktaAuthInterface): void {
+export function clearTransactionMeta (authClient: OktaAuthIdxInterface): void {
   authClient.transactionManager.clear();
 }
 

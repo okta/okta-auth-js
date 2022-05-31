@@ -98,7 +98,7 @@ export class AuthTransaction implements TransactionState, AuthTransactionFunctio
       // when OKTA-75434 is resolved
       if (res.status === 'RECOVERY_CHALLENGE' && !res._links) {
         this.cancel = function() {
-          return Promise.resolve(new AuthTransaction(sdk));
+          return Promise.resolve(sdk.tx.createTransaction());
         };
       }
     }
