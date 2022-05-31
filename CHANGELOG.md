@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.5.3
+
+- [#1224](https://github.com/okta/okta-auth-js/pull/1224) Fixes missing `relatesTo` type from `NextStep`
+
 ## 6.5.2
 
 ### Fixes
