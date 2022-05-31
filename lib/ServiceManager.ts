@@ -91,20 +91,20 @@ export class ServiceManager implements ServiceManagerInterface {
     return [...this.services.values()].some(srv => srv.requiresLeadership());
   }
 
-  start() {
+  async start() {
     if (this.started) {
       return;     // noop if services have already started
     }
     // only start election if a leader is required
     if (this.isLeaderRequired()) {
-      this.startElector();
+      await this.startElector();
     }
     this.startServices();
     this.started = true;
   }
   
-  stop() {
-    this.stopElector();
+  async stop() {
+    await this.stopElector();
     this.stopServices();
     this.started = false;
   }
@@ -128,8 +128,8 @@ export class ServiceManager implements ServiceManagerInterface {
     }
   }
 
-  private startElector() {
-    this.stopElector();
+  private async startElector() {
+    await this.stopElector();
     if (ServiceManager.canUseLeaderElection()) {
       if (!this.channel) {
         const { broadcastChannelName } = this.options;
@@ -143,11 +143,11 @@ export class ServiceManager implements ServiceManagerInterface {
     }
   }
 
-  private stopElector() {
+  private async stopElector() {
     if (this.elector) {
-      this.elector?.die();
+      await this.elector?.die();
       this.elector = undefined;
-      this.channel?.close();
+      await this.channel?.close();
       this.channel = undefined;
     }
   }
