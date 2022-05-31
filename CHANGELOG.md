@@ -2,7 +2,12 @@
 
 ## 6.6.0
 
+## Features
+
 - [#1225](https://github.com/okta/okta-auth-js/pull/1225) `oktaAuth.start`/`oktaAuth.stop` now return a `Promise`, ensures services have started/stopped before resolving
+### Fixes
+
+- [#1226](https://github.com/okta/okta-auth-js/pull/1226) Fixes idx terminal status response SDK level `undefined` error when use GenericRemediator (beta)
 
 ### Fixes
 
