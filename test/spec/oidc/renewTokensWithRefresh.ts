@@ -146,14 +146,14 @@ describe('renewTokensWithRefresh', function () {
   });
 
   describe('error handling', () => {
-    describe('refreshToken expired', () => {
+    describe('refreshToken is invalid (or expired)', () => {
       beforeEach(() => {
         const refreshTokenExpiredError = new OAuthError('invalid_grant', 'The refresh token is invalid or expired.');
         jest.spyOn(tokenEndpoint, 'postRefreshToken').mockRejectedValue(refreshTokenExpiredError);
         testContext.refreshTokenExpiredError = refreshTokenExpiredError;
       });
 
-      it('refreshToken is removed after token expired error is returned', async () => {
+      it('refreshToken is removed after token invalid error is returned', async () => {
         const { authInstance, renewTokenSpy, refreshTokenExpiredError } = testContext;
         jest.spyOn(authInstance.tokenManager, 'remove');
 
@@ -164,7 +164,7 @@ describe('renewTokensWithRefresh', function () {
         await expect(await authInstance.tokenManager.get('refreshToken')).toBeUndefined();
       });
 
-      it('refreshToken is NOT removed after non-token expired error is returned', async () => {
+      it('refreshToken is NOT removed after non-token invalid error is returned', async () => {
         const error = new Error('something happened');
         jest.spyOn(tokenEndpoint, 'postRefreshToken').mockRejectedValue(error);
 

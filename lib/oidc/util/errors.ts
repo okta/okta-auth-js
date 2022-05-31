@@ -33,7 +33,7 @@ export function isAuthorizationCodeError(sdk: OktaAuthOptionsInterface, error: E
   return sdk.options.pkce && (responseJSON?.error as string === 'invalid_grant');
 }
 
-export function isRefreshTokenExpiredError(error: unknown): boolean {
+export function isRefreshTokenInvalidError(error: unknown): boolean {
   // error: {"error":"invalid_grant","error_description":"The refresh token is invalid or expired."}
   return isOAuthError(error) &&
     error.errorCode === 'invalid_grant' &&

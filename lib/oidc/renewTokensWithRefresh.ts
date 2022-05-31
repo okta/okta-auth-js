@@ -16,7 +16,7 @@ import { isSameRefreshToken } from './util/refreshToken';
 import { OktaAuthOIDCInterface, TokenParams, RefreshToken, Tokens } from '../types';
 import { handleOAuthResponse } from './handleOAuthResponse';
 import { postRefreshToken } from './endpoints/token';
-import { isRefreshTokenExpiredError } from './util/errors';
+import { isRefreshTokenInvalidError } from './util/errors';
 
 export async function renewTokensWithRefresh(
   sdk: OktaAuthOIDCInterface,
@@ -45,8 +45,8 @@ export async function renewTokensWithRefresh(
     return tokens;
   }
   catch (err) {
-    if (isRefreshTokenExpiredError(err)) {
-      // if the refresh token is expired, remove it from storage
+    if (isRefreshTokenInvalidError(err)) {
+      // if the refresh token is invalid, remove it from storage
       sdk.tokenManager.removeRefreshToken();
     }
     throw err;
