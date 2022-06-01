@@ -21,8 +21,9 @@ describe('OktaAuth (api)', function() {
   });
 
   it('can updateAuthState', () => {
-    auth.authStateManager.updateAuthState();
+    const promise = auth.authStateManager.updateAuthState();
     expect(auth.authStateManager._pending.updateAuthStatePromise).toBeInstanceOf(PCancelable);
+    return promise;
   });
 
   describe('Storage', () => {
