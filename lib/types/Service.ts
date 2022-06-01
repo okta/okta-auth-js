@@ -9,8 +9,8 @@ export interface ServiceInterface {
 
 export interface ServiceManagerInterface {
   isLeader(): boolean;
-  start(): void;
-  stop(): void;
+  start(): Promise<void>;
+  stop(): Promise<void>;
   getService(name: string): ServiceInterface | undefined;
 }
 
