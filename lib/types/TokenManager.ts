@@ -26,4 +26,5 @@ export interface TokenManagerInterface {
   getStorageKeyByType(type: TokenType): string;
   add(key: any, token: Token): void;
   updateRefreshToken(token: RefreshToken);
+  removeRefreshToken(): void;
 }

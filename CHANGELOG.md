@@ -4,6 +4,10 @@
 
 - [#1225](https://github.com/okta/okta-auth-js/pull/1225) `oktaAuth.start`/`oktaAuth.stop` now return a `Promise`, ensures services have started/stopped before resolving
 
+### Fixes
+
+- [#1222](https://github.com/okta/okta-auth-js/pull/1222) Invalid (or expired) refresh tokens are now removed from storage when invalid token error occurs
+
 ## 6.5.3
 
 - [#1224](https://github.com/okta/okta-auth-js/pull/1224) Fixes missing `relatesTo` type from `NextStep`

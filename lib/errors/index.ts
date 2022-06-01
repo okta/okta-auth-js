@@ -20,8 +20,13 @@ function isAuthApiError(obj: any): obj is AuthApiError {
   return (obj instanceof AuthApiError);
 }
 
+function isOAuthError(obj: any): obj is OAuthError {
+  return (obj instanceof OAuthError);
+}
+
 export {
   isAuthApiError,
+  isOAuthError,
   AuthApiError,
   AuthPollStopError,
   AuthSdkError,

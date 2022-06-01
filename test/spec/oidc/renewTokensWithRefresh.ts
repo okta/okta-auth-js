@@ -17,6 +17,7 @@ import tokens from '@okta/test.support/tokens';
 import * as tokenEndpoint from '../../../lib/oidc/endpoints/token';
 import * as renewTokensWithRefreshTokenModule from '../../../lib/oidc/renewTokensWithRefresh';
 import * as getWithoutPromptModule from '../../../lib/oidc/getWithoutPrompt';
+import { OAuthError } from '../../../lib/errors';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import util from '@okta/test.support/util';
 
@@ -142,5 +143,40 @@ describe('renewTokensWithRefresh', function () {
     expect(authInstance.tokenManager.add).not.toHaveBeenCalled();
     refreshToken = await authInstance.tokenManager.get('refreshToken2');
     expect(refreshToken).toEqual(tokens.standardRefreshToken2Parsed);
+  });
+
+  describe('error handling', () => {
+    describe('refreshToken is invalid (or expired)', () => {
+      beforeEach(() => {
+        const refreshTokenExpiredError = new OAuthError('invalid_grant', 'The refresh token is invalid or expired.');
+        jest.spyOn(tokenEndpoint, 'postRefreshToken').mockRejectedValue(refreshTokenExpiredError);
+        testContext.refreshTokenExpiredError = refreshTokenExpiredError;
+      });
+
+      it('refreshToken is removed after token invalid error is returned', async () => {
+        const { authInstance, renewTokenSpy, refreshTokenExpiredError } = testContext;
+        jest.spyOn(authInstance.tokenManager, 'remove');
+
+        authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
+        await expect(authInstance.token.renewTokens()).rejects.toBe(refreshTokenExpiredError);
+        expect(renewTokenSpy).toHaveBeenCalled();
+        expect(authInstance.tokenManager.remove).toHaveBeenCalledWith('refreshToken');
+        await expect(await authInstance.tokenManager.get('refreshToken')).toBeUndefined();
+      });
+
+      it('refreshToken is NOT removed after non-token invalid error is returned', async () => {
+        const error = new Error('something happened');
+        jest.spyOn(tokenEndpoint, 'postRefreshToken').mockRejectedValue(error);
+
+        const { authInstance, renewTokenSpy } = testContext;
+        jest.spyOn(authInstance.tokenManager, 'remove');
+
+        authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
+        await expect(authInstance.token.renewTokens()).rejects.toBe(error);
+        expect(renewTokenSpy).toHaveBeenCalled();
+        expect(authInstance.tokenManager.remove).not.toHaveBeenCalledWith('refreshToken');
+        await expect(await authInstance.tokenManager.get('refreshToken')).toEqual(tokens.standardRefreshTokenParsed);
+      });
+    });
   });
 });
