@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.6.0
+
+- [#1225](https://github.com/okta/okta-auth-js/pull/1225) `oktaAuth.start`/`oktaAuth.stop` now return a `Promise`, ensures services have started/stopped before resolving
+
 ## 6.5.3
 
 - [#1224](https://github.com/okta/okta-auth-js/pull/1224) Fixes missing `relatesTo` type from `NextStep`
