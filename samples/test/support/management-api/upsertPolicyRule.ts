@@ -184,7 +184,7 @@ const getPasswordPolicyActions = (description: string) => {
       },
       'actions': {
         'passwordChange': {
-          'access': 'DENY'
+          'access': 'ACTIVE'
         },
         'selfServicePasswordReset': {
           'access': 'ALLOW',
