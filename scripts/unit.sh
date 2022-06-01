@@ -25,11 +25,6 @@ if ! yarn test:bundle:esm:node; then
   exit ${TEST_FAILURE}
 fi
 
-if ! yarn test:bundle:esm:node:app; then
-  echo "ESM node app failed to start! Exiting..."
-  exit ${TEST_FAILURE}
-fi
-
 if ! yarn test:bundle:cjs; then
   echo "validate cjs bundle failed! Exiting..."
   exit ${TEST_FAILURE}

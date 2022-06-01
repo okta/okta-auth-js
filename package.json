@@ -48,7 +48,6 @@
     "test:integration": "jest --config ./jest.integration.js",
     "test:bundle:esm:browser": "cross-env BUNDLE_ENV=browser NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:esm:node": "cross-env BUNDLE_ENV=node NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
-    "test:bundle:esm:node:app": "yarn workspace @okta/test.app.node-esm start",
     "test:bundle:cjs": "cross-env BUNDLE_ENV=node jest --config ./jest.cjs.js",
     "test:types": "jest --config ./jest.tsd.js --runInBand",
     "build": "node scripts/build.js",
