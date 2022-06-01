@@ -607,7 +607,7 @@ describe('idx/remediate', () => {
         },
         terminal: true,
         messages: ['hello'],
-      })
+      });
     });
   });
 });
