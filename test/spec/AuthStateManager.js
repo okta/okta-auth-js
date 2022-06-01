@@ -129,13 +129,13 @@ describe('AuthStateManager', () => {
       if (typeof window === 'undefined') {
         return;
       }
-      it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', () => {
+      it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', async () => {
         util.disableLeaderElection();
         jest.useFakeTimers();
         const auth = createAuth();
         auth.authStateManager.updateAuthState = jest.fn();
         auth.tokenManager.start(); // uses TokenService / crossTabs
-        auth.serviceManager.start();
+        await auth.serviceManager.start();
         // simulate localStorage change from other dom context
         window.dispatchEvent(new StorageEvent('storage', {
           key: 'okta-token-storage', 
@@ -146,7 +146,7 @@ describe('AuthStateManager', () => {
         expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
         jest.useRealTimers();
         auth.tokenManager.stop();
-        auth.serviceManager.stop();
+        await auth.serviceManager.stop();
       });
     });
 

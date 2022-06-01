@@ -69,7 +69,7 @@ describe('TokenManager (browser)', function() {
     });
   }
 
-  function setupSync(options = {}, start = false) {
+  async function setup(options = {}, start = false) {
     client = createAuth(options);
     // clear downstream listeners
     client.tokenManager.off('added');
@@ -78,7 +78,7 @@ describe('TokenManager (browser)', function() {
       util.disableLeaderElection();
       util.mockLeader();
       client.tokenManager.start();
-      client.serviceManager.start();
+      await client.serviceManager.start();
     }
     return client;
   }
@@ -89,21 +89,21 @@ describe('TokenManager (browser)', function() {
     sessionStorage.clear();
   });
   
-  afterEach(() => {
+  afterEach(async () => {
     client?.tokenManager?.stop();
-    client?.serviceManager?.stop();
+    await client?.serviceManager?.stop();
   });
 
   describe('options', () => {
-    it('defaults to localStorage', function() {
-      setupSync();
+    it('defaults to localStorage', async function() {
+      await setup();
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
       oauthUtil.expectTokenStorageToEqual(localStorage, {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
-    it('honors StorageManager configuration', function () {
-      setupSync({
+    it('honors StorageManager configuration', async function () {
+      await setup({
         storageManager: {
           token: {
             storageTypes: ['cookie'],
@@ -120,8 +120,8 @@ describe('TokenManager (browser)', function() {
         secureCookieSettings
       );
     });
-    it('favors token.storage configuration over storageManager.token', function () {
-      setupSync({
+    it('favors token.storage configuration over storageManager.token', async function () {
+      await setup({
         storageManager: {
           token: {
             storageTypes: ['cookie'],
@@ -136,11 +136,11 @@ describe('TokenManager (browser)', function() {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
-    it('defaults to sessionStorage if localStorage isn\'t available', function() {
+    it('defaults to sessionStorage if localStorage isn\'t available', async function () {
       const console = util.getConsole();
       jest.spyOn(console, 'warn');
       oauthUtil.mockLocalStorageError();
-      setupSync();
+      await setup();
       expect(console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support localStorage. Switching to sessionStorage.'
@@ -150,11 +150,11 @@ describe('TokenManager (browser)', function() {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
-    it('defaults to sessionStorage if localStorage cannot be written to', function() {
+    it('defaults to sessionStorage if localStorage cannot be written to', async function () {
       const console = util.getConsole();
       jest.spyOn(console, 'warn');
       oauthUtil.mockStorageSetItemError();
-      setupSync();
+      await setup();
       expect(console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support localStorage. Switching to sessionStorage.'
@@ -164,12 +164,12 @@ describe('TokenManager (browser)', function() {
         'test-idToken': tokens.standardIdTokenParsed
       });
     });
-    it('defaults to cookie-based storage if localStorage and sessionStorage are not available', function() {
+    it('defaults to cookie-based storage if localStorage and sessionStorage are not available', async function () {
       const console = util.getConsole();
       jest.spyOn(console, 'warn');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockSessionStorageError();
-      setupSync();
+      await setup();
       expect(console.warn).toHaveBeenCalledWith(
         '[okta-auth-sdk] WARN: This browser doesn\'t ' +
         'support sessionStorage. Switching to cookie.'
@@ -183,12 +183,12 @@ describe('TokenManager (browser)', function() {
         secureCookieSettings
       );
     });
-    it('defaults to cookie-based storage if sessionStorage cannot be written to', function() {
+    it('defaults to cookie-based storage if sessionStorage cannot be written to', async function () {
       const console = util.getConsole();
       jest.spyOn(console, 'warn');
       oauthUtil.mockLocalStorageError();
       oauthUtil.mockStorageSetItemError();
-      setupSync({
+      await setup({
         tokenManager: {
           storage: 'sessionStorage'
         }
@@ -206,18 +206,18 @@ describe('TokenManager (browser)', function() {
         secureCookieSettings
       );
     });
-    it('should be locked with default expireEarlySeconds for non-dev env', () => {
+    it('should be locked with default expireEarlySeconds for non-dev env', async() => {
       jest.spyOn(mocked.features, 'isLocalhost').mockReturnValue(false);
-      setupSync();
+      await setup();
       const options = {
         expireEarlySeconds: 60
       };
       const instance = new TokenManager(client, options);
       expect(instance.getOptions().expireEarlySeconds).toBe(30);
     });
-    it('should be able to set expireEarlySeconds for dev env', () => {
+    it('should be able to set expireEarlySeconds for dev env', async () => {
       jest.spyOn(mocked.features, 'isLocalhost').mockReturnValue(true);
-      setupSync();
+      await setup();
       const options = {
         expireEarlySeconds: 60
       };
@@ -227,9 +227,9 @@ describe('TokenManager (browser)', function() {
   });
 
   describe('renew', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.spyOn(mocked.features, 'isLocalhost').mockReturnValue(true);
-      setupSync({}, true);
+      await setup({}, true);
     });
 
     it('throws an errors when a token doesn\'t exist', () => {
@@ -352,7 +352,7 @@ describe('TokenManager (browser)', function() {
     let tokenManagerAddKeys;
     let postMessageSrc;
     let postMessageResp;
-    beforeEach(function() {
+    beforeEach(async function() {
       jest.spyOn(mocked.features, 'isLocalhost').mockReturnValue(true);
       tokenManagerAddKeys = {
         'test-accessToken': {
@@ -381,7 +381,7 @@ describe('TokenManager (browser)', function() {
         'token_type': 'Bearer',
         'state': oauthUtil.mockedState
       };
-      setupSync({
+      await setup({
         responseType: 'token',
         tokenManager: {
           autoRenew: true
@@ -454,8 +454,8 @@ describe('TokenManager (browser)', function() {
   });
 
   describe('errors', () => {
-    beforeEach(() => {
-      setupSync({
+    beforeEach(async () => {
+      await setup({
         tokenManager: {
           autoRenew: true
         }
@@ -632,8 +632,8 @@ describe('TokenManager (browser)', function() {
 
   describe('localStorage', function() {
 
-    beforeEach(() => {
-      setupSync({
+    beforeEach(async () => {
+      await setup({
         tokenManager: {
           storage: 'localStorage'
         }
@@ -689,8 +689,8 @@ describe('TokenManager (browser)', function() {
 
   describe('sessionStorage', function() {
 
-    beforeEach(() => {
-      setupSync({
+    beforeEach(async () => {
+      await setup({
         tokenManager: {
           storage: 'sessionStorage'
         }
@@ -746,8 +746,8 @@ describe('TokenManager (browser)', function() {
 
   describe('cookie', function() {
 
-    function cookieStorageSetup() {
-      setupSync({
+    async function cookieStorageSetup() {
+      await setup({
         tokenManager: {
           storage: 'cookie'
         }
@@ -755,8 +755,8 @@ describe('TokenManager (browser)', function() {
     }
 
     describe('add', function() {
-      it('adds a token', function() {
-        cookieStorageSetup();
+      it('adds a token', async function() {
+        await cookieStorageSetup();
         var setCookieMock = util.mockSetCookie();
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         expect(setCookieMock).toHaveBeenCalledWith(
@@ -770,12 +770,12 @@ describe('TokenManager (browser)', function() {
     });
 
     describe('get', function() {
-      it('returns a token', function() {
+      it('returns a token', async function() {
         const setCookieMock = util.mockSetCookie();
         const getCookieMock = util.mockGetCookie({
           'okta-token-storage_test-idToken': JSON.stringify(tokens.standardIdTokenParsed)
         });
-        cookieStorageSetup();
+        await cookieStorageSetup();
         util.warpToUnixTime(tokens.standardIdTokenClaims.iat); // token should not be expired
         return client.tokenManager.get('test-idToken')
         .then(function(token) {
@@ -785,12 +785,12 @@ describe('TokenManager (browser)', function() {
         });
       });
 
-      it('returns undefined for an expired token', function() {
+      it('returns undefined for an expired token', async function() {
         const setCookieMock = util.mockSetCookie();
         const getCookieMock = util.mockGetCookie(JSON.stringify({
           'test-idToken': tokens.standardIdTokenParsed
         }));
-        cookieStorageSetup();
+        await cookieStorageSetup();
         util.warpToUnixTime(tokens.standardIdTokenClaims.exp + 1); // token should be expired
         client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
         return client.tokenManager.get('test-idToken')
@@ -810,7 +810,7 @@ describe('TokenManager (browser)', function() {
     });
 
     describe('remove', function() {
-      it('removes a token', function() {
+      it('removes a token', async function() {
         util.mockGetCookie({
           'okta-token-storage_test-idToken': JSON.stringify(tokens.standardIdTokenParsed),
           'okta-token-storage_anotherKey': JSON.stringify(tokens.standardIdTokenParsed)
@@ -818,7 +818,7 @@ describe('TokenManager (browser)', function() {
         util.mockSetCookie({
           'okta-token-storage_anotherKey': JSON.stringify(tokens.standardIdTokenParsed)
         });
-        cookieStorageSetup();
+        await cookieStorageSetup();
         const deleteCookieMock = util.mockDeleteCookie();
         client.tokenManager.remove('test-idToken');
         expect(deleteCookieMock).toHaveBeenCalledWith('okta-token-storage_test-idToken');
@@ -826,12 +826,12 @@ describe('TokenManager (browser)', function() {
     });
 
     describe('clear', function() {
-      it('clears all tokens', function() {
+      it('clears all tokens', async function() {
         util.mockGetCookie({
           'okta-token-storage_test-idToken': JSON.stringify(tokens.standardIdTokenParsed),
           'okta-token-storage_anotherKey': JSON.stringify(tokens.standardIdTokenParsed)
         });
-        cookieStorageSetup();
+        await cookieStorageSetup();
         const deleteCookieMock = util.mockDeleteCookie();
         client.tokenManager.clear();
         expect(deleteCookieMock).toHaveBeenCalledTimes(2);
@@ -840,8 +840,8 @@ describe('TokenManager (browser)', function() {
   });
 
   describe('sessionCookie', function() {
-    it('Uses a fixed date by default', function() {
-      setupSync({
+    it('Uses a fixed date by default', async function() {
+      await setup({
         tokenManager: {
           storage: 'cookie'
         }
@@ -856,8 +856,8 @@ describe('TokenManager (browser)', function() {
       );
     });
 
-    it('Uses a session cookie when set', function() {
-      setupSync({
+    it('Uses a session cookie when set', async function() {
+      await setup({
         cookies: {
           sessionCookie: true
         },
