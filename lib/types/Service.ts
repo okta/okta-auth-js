@@ -1,7 +1,7 @@
 // only add methods needed internally
 export interface ServiceInterface {
-  start(): void;
-  stop(): void;
+  start(): Promise<void>;
+  stop(): Promise<void>;
   isStarted(): boolean;
   canStart(): boolean;
   requiresLeadership(): boolean;

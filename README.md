@@ -903,11 +903,15 @@ This is accomplished by selecting a single tab to handle the network requests to
 
 ### `start()`
 
+> :hourglass: async
+
 Starts the `OktaAuth` service. See [running as a service](#running-as-a-service) for more details.
 
 ### `stop()`
 
-Starts the `OktaAuth` service. See [running as a service](#running-as-a-service) for more details.
+> :hourglass: async
+
+Stops the `OktaAuth` service. See [running as a service](#running-as-a-service) for more details.
 
 ### `signIn(options)`
 

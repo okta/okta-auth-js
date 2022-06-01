@@ -137,7 +137,7 @@ describe('AuthStateManager', () => {
         const auth = createAuth();
         auth.authStateManager.updateAuthState = jest.fn();
         auth.tokenManager.start(); // uses TokenService / crossTabs
-        auth.serviceManager.start();
+        await auth.serviceManager.start();
         // simulate change from other dom context
         const channel = new BroadcastChannel('syncChannel');
         await channel.postMessage({

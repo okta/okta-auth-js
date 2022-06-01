@@ -19,7 +19,7 @@ import {
 } from 'broadcast-channel';
 import { isBrowser } from '../features';
 
-declare type OnLeaderHandler = (() => void);
+declare type OnLeaderHandler = (() => Promise<void>);
 declare type ServiceOptions = ServiceManagerOptions & {
   onLeader?: OnLeaderHandler;
 };
@@ -39,8 +39,8 @@ export class LeaderElectionService implements ServiceInterface {
   private onLeaderDuplicate() {
   }
 
-  private onLeader() {
-    this.options.onLeader?.();
+  private async onLeader() {
+    await this.options.onLeader?.();
   }
 
   isLeader() {
@@ -51,8 +51,8 @@ export class LeaderElectionService implements ServiceInterface {
     return !!this.elector?.hasLeader;
   }
 
-  start() {
-    this.stop();
+  async start() {
+    await this.stop();
     if (this.canStart()) {
       const { electionChannelName } = this.options;
       this.channel = new BroadcastChannel(electionChannelName as string);
@@ -63,14 +63,18 @@ export class LeaderElectionService implements ServiceInterface {
     }
   }
 
-  stop() {
+  async stop() {
     if (this.started) {
-      this.elector?.die();
-      this.elector = undefined;
-      this.channel?.close();
-      // Workaround to fix error `Failed to execute 'postMessage' on 'BroadcastChannel': Channel is closed`
-      (this.channel as any).postInternal = () => Promise.resolve();
-      this.channel = undefined;
+      if (this.elector) {
+        await this.elector.die();
+        this.elector = undefined;
+      }
+      if (this.channel) {
+        // Workaround to fix error `Failed to execute 'postMessage' on 'BroadcastChannel': Channel is closed`
+        (this.channel as any).postInternal = () => Promise.resolve();
+        await this.channel.close();
+        this.channel = undefined;
+      }
       this.started = false;
     }
   }

@@ -47,20 +47,20 @@ describe('OktaAuth (api)', function() {
     });
 
     describe('start', () => {
-      it('starts the token service', () => {
+      it('starts the token service', async () => {
         jest.spyOn(auth.tokenManager, 'start');
-        auth.start();
+        await auth.start();
         expect(auth.tokenManager.start).toHaveBeenCalled(); 
       });
-      it('updates auth state', () => {
+      it('updates auth state', async () => {
         jest.spyOn(auth.authStateManager, 'updateAuthState');
-        auth.start();
+        await auth.start();
         expect(auth.authStateManager.updateAuthState).toHaveBeenCalled(); 
       });
-      it('should not update auth state during login redirect', () => {
+      it('should not update auth state during login redirect', async () => {
         jest.spyOn(auth.authStateManager, 'updateAuthState');
         jest.spyOn(auth.token, 'isLoginRedirect').mockReturnValue(true);
-        auth.start();
+        await auth.start();
         expect(auth.authStateManager.updateAuthState).not.toHaveBeenCalled(); 
       });
     });

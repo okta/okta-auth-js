@@ -66,10 +66,10 @@ export class ServiceManager implements ServiceManagerInterface {
     });
   }
 
-  private onLeader() {
+  private async onLeader() {
     if (this.started) {
       // Start services that requires leadership
-      this.startServices();
+      await this.startServices();
     }
   }
 
@@ -85,12 +85,12 @@ export class ServiceManager implements ServiceManagerInterface {
     if (this.started) {
       return;     // noop if services have already started
     }
-    this.startServices();
+    await this.startServices();
     this.started = true;
   }
   
-  stop() {
-    this.stopServices();
+  async stop() {
+    await this.stopServices();
     this.started = false;
   }
 
@@ -98,17 +98,17 @@ export class ServiceManager implements ServiceManagerInterface {
     return this.services.get(name);
   }
 
-  private startServices() {
+  private async startServices() {
     for (const [name, srv] of this.services.entries()) {
       if (this.canStartService(name, srv)) {
-        srv.start();
+        await srv.start();
       }
     }
   }
 
-  private stopServices() {
+  private async stopServices() {
     for (const srv of this.services.values()) {
-      srv.stop();
+      await srv.stop();
     }
   }
 

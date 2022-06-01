@@ -54,9 +54,9 @@ export class SyncStorageService implements ServiceInterface {
     return !!this.options.syncStorage && isBrowser();
   }
 
-  start() {
+  async start() {
     if (this.canStart()) {
-      this.stop();
+      await this.stop();
       const { syncChannelName } = this.options;
       this.channel = new BroadcastChannel(syncChannelName as string);
       this.tokenManager.on(EVENT_ADDED, this.onTokenAddedHandler);
@@ -68,14 +68,14 @@ export class SyncStorageService implements ServiceInterface {
     }
   }
 
-  stop() {
+  async stop() {
     if (this.started) {
       this.tokenManager.off(EVENT_ADDED, this.onTokenAddedHandler);
       this.tokenManager.off(EVENT_REMOVED, this.onTokenRemovedHandler);
       this.tokenManager.off(EVENT_RENEWED, this.onTokenRenewedHandler);
       this.tokenManager.off(EVENT_SET_STORAGE, this.onSetStorageHandler);
       this.channel?.removeEventListener('message', this.onSyncMessageHandler);
-      this.channel?.close();
+      await this.channel?.close();
       this.channel = undefined;
       this.started = false;
     }

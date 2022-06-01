@@ -63,15 +63,15 @@ export class AutoRenewService implements ServiceInterface {
     return (!!this.options.autoRenew || !!this.options.autoRemove);
   }
 
-  start() {
+  async start() {
     if (this.canStart()) {
-      this.stop();
+      await this.stop();
       this.tokenManager.on(EVENT_EXPIRED, this.onTokenExpiredHandler);
       this.started = true;
     }
   }
 
-  stop() {
+  async stop() {
     if (this.started) {
       this.tokenManager.off(EVENT_EXPIRED, this.onTokenExpiredHandler);
       this.renewTimeQueue = [];
