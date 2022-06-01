@@ -173,6 +173,42 @@ const getGlobalSessionPolicyActions = (description: string) => {
   } as any)[description];
 };
 
+const getPasswordPolicyActions = (description: string) => {
+  return ({
+    'Account Unlock with Email or SMS': {
+      'type': 'PASSWORD',
+      'status': 'ACTIVE',
+      'conditions': {
+        'people': { 'users': { 'exclude': [] } },
+        'network': { 'connection': 'ANYWHERE' }
+      },
+      'actions': {
+        'passwordChange': {
+          'access': 'DENY'
+        },
+        'selfServicePasswordReset': {
+          'access': 'ALLOW',
+          'requirement': {
+            'primary': {
+              'methods': [
+                'email',
+                'sms'
+              ]
+            },
+            'stepUp': { 
+              'required': false
+            }
+          }
+        },
+        'selfServiceUnlock': {
+          'access': 'ALLOW',
+        }
+      }
+    }
+  } as any)[description];
+};
+
+/* eslint-disable complexity */
 export default async function (config: OktaClientConfig, {
   policyId,
   policyType,
@@ -197,6 +233,9 @@ export default async function (config: OktaClientConfig, {
       break;
     case 'OKTA_SIGN_ON':
       actions = getGlobalSessionPolicyActions(policyRuleDescription);
+      break;
+    case 'PASSWORD':
+      actions = getPasswordPolicyActions(policyRuleDescription);
       break;
     default:
       throw new Error(`No actions is found with ${policyType} ${policyRuleDescription}`);

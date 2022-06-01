@@ -55,6 +55,66 @@ const getGlobalSessionPolicy = (options: Options) => {
   };
 };
 
+const getPasswordPolicy = (options: Options) => {
+  return {
+    type: 'PASSWORD',
+    conditions: {
+      people: {
+        groups: {
+          include: [options.groupId]
+        }
+      },
+      authProvider: {
+        provider: 'OKTA'
+      }
+    },
+    settings: {
+      password: {
+        complexity: {
+          minLength: 8,
+          minLowerCase: 0,
+          minUpperCase: 0,
+          minNumber: 0,
+          minSymbol: 0,
+          excludeUsername: true,
+          dictionary: { common: { exclude: true } },
+          excludeAttributes: []
+        },
+        age: {
+          maxAgeDays: 0,
+          expireWarnDays: 0,
+          minAgeMinutes: 0,
+          historyCount: 4
+        },
+        lockout:  {
+          maxAttempts: 1, // important to lock user after incorrect passwod
+          autoUnlockMinutes: 0,
+          userLockoutNotificationChannels: [],
+          showLockoutFailures: true
+        }
+      },
+      recovery: {
+        factors: {
+          ['okta_email']: {
+            status: 'ACTIVE',
+            properties: {
+              recoveryToken: {
+                tokenLifetimeMinutes: 60
+              }
+            }
+          },
+          ['okta_sms']: {
+            status: 'ACTIVE'
+          },
+        }
+      },
+      delegation: {
+        options: { skipUnlock: false }
+      }
+    }
+  };
+};
+
 export default async function(config: OktaClientConfig, options: Options) {
   const oktaClient = getOktaClient(config);
 
@@ -68,6 +128,8 @@ export default async function(config: OktaClientConfig, options: Options) {
     policyObject = getProfileEnrollmentPolicy();
   } else if (policyDescription === 'Global Session') {
     policyObject = getGlobalSessionPolicy(options);
+  } else if (policyDescription === 'Account Recovery') {
+    policyObject = getPasswordPolicy(options);
   } else {
     throw new Error(`Unknow policy ${policyDescription}`);
   }
