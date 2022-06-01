@@ -23,13 +23,13 @@
     "babel-loader": "^8.0.6",
     "btoa": "^1.2.1",
     "express": "^4.17.1",
-    "http-proxy-middleware": "^2.0.1",
+    "http-proxy-middleware": "^2.0.6",
     "js-cookie": "2.2.1",
     "source-map-loader": "^0.2.4",
     "webpack": "^4.29.6",
     "webpack-cli": "^4.4.0",
     "webpack-dev-middleware": "^3.7.2",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^4.9.0"
   },
   "devDependencies": {
     "@types/js-cookie": "^2.2.6",
@@ -37,6 +37,9 @@
   },
   "peerDependencies": {
     "@okta/okta-signin-widget": "^6.0.0"
+  },
+  "resolutions": {
+    "follow-redirects": "^1.14.9"
   },
   "workspaces": {
     "nohoist": [

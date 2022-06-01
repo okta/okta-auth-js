@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "yarn build",
     "build": "webpack",
-    "start": "webpack-dev-server",
+    "start": "webpack serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -21,11 +21,11 @@
     "express": "^4.17.1",
     "source-map-loader": "^0.2.4",
     "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0",
+    "webpack-cli": "^4.9.2",
     "webpack-dev-middleware": "^3.7.2",
-    "webpack-dev-server": "^3.2.1"
+    "webpack-dev-server": "^4.9.0"
   },
   "peerDependencies": {
-    "@okta/okta-signin-widget": "^6.1.2"
+    "@okta/okta-signin-widget": "^6.3.3"
   }
 }
