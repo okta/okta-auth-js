@@ -8,9 +8,6 @@
 ### Fixes
 
 - [#1226](https://github.com/okta/okta-auth-js/pull/1226) Fixes idx terminal status response SDK level `undefined` error when use GenericRemediator (beta)
-
-### Fixes
-
 - [#1222](https://github.com/okta/okta-auth-js/pull/1222) Invalid (or expired) refresh tokens are now removed from storage when invalid token error occurs
 
 ## 6.5.3
