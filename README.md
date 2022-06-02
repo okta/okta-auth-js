@@ -234,12 +234,12 @@ var authClient = new OktaAuth(config);
 
 ### Running as a service
 
-By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method. To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
+By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method right after creation and before calling other methods like [handleLoginRedirect](#handleloginredirecttokens). To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
 
 ```javascript
   var authClient = new OktaAuth(config);
-  authClient.start(); // start the service
-  authClient.stop(); // stop the service
+  await authClient.start(); // start the service
+  await authClient.stop(); // stop the service
 ```
 
 Starting the service will also call [authStateManager.updateAuthState](#authstatemanagerupdateauthstate).
