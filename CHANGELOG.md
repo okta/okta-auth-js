@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.6.1
+
+### Fixes
+
+- [#1221](https://github.com/okta/okta-auth-js/pull/1221) Fixes ES module for Node.js by using latest `broadcast-channel`
+
 ## 6.6.0
 
 ## Features
