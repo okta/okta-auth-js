@@ -381,7 +381,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     // TODO: review tokenManager.start
     this.tokenManager.start();
     if (!this.token.isLoginRedirect()) {
-      this.authStateManager.updateAuthState();
+      await this.authStateManager.updateAuthState();
     }
   }
 
