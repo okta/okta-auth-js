@@ -700,7 +700,7 @@ describe('TokenManager', function() {
       jest.spyOn(client.tokenManager, 'emitRemoved');
       jest.spyOn(storageProvider, 'setItem');
       client.tokenManager.clearPendingRemoveTokens();
-      expect(storageProvider.setItem).toHaveBeenNthCalledWith(1, 'okta-token-storage', {});
+      expect(storageProvider.setItem).toHaveBeenNthCalledWith(1, 'okta-token-storage', '{}');
       expect(client.tokenManager.emitRemoved).toHaveBeenCalledTimes(2);
       expect(client.tokenManager.emitRemoved).toHaveBeenNthCalledWith(1, 'idToken', tokenStorage.idToken);
       expect(client.tokenManager.emitRemoved).toHaveBeenNthCalledWith(2, 'accessToken', tokenStorage.accessToken);
