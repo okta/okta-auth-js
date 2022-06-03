@@ -48,100 +48,98 @@ const templateDefaults = {
 };
 
 const samples = [
-  // {
-  //   name: '@okta/samples.static-spa',
-  //   appType: 'browser',
-  //   template: 'static-spa',
-  //   generateType: GENERATE_TYPE_FULL,
-  //   specs: ['spa-app'],
-  //   features: []
-  // },
-  // {
-  //   name: '@okta/samples.webpack-spa',
-  //   appType: 'browser',
-  //   template: 'webpack-spa',
-  //   generateType: GENERATE_TYPE_FULL,
-  //   specs: ['spa-app'],
-  //   features: []
-  // },
-  // {
-  //   name: '@okta/samples.express-web-no-oidc',
-  //   appType: 'web',
-  //   template: 'express-web',
-  //   generateType: GENERATE_TYPE_FULL,
-  //   specs: ['web-app'],
-  //   oidc: false
-  // },
-  // {
-  //   name: '@okta/samples.express-web-with-oidc',
-  //   appType: 'web',
-  //   template: 'express-web',
-  //   generateType: GENERATE_TYPE_FULL,
-  //   specs: ['web-app']
-  // },
+  {
+    name: '@okta/samples.static-spa',
+    appType: 'browser',
+    template: 'static-spa',
+    generateType: GENERATE_TYPE_FULL,
+    specs: ['spa-app'],
+    features: []
+  },
+  {
+    name: '@okta/samples.webpack-spa',
+    appType: 'browser',
+    template: 'webpack-spa',
+    generateType: GENERATE_TYPE_FULL,
+    specs: ['spa-app'],
+    features: []
+  },
+  {
+    name: '@okta/samples.express-web-no-oidc',
+    appType: 'web',
+    template: 'express-web',
+    generateType: GENERATE_TYPE_FULL,
+    specs: ['web-app'],
+    oidc: false
+  },
+  {
+    name: '@okta/samples.express-web-with-oidc',
+    appType: 'web',
+    template: 'express-web',
+    generateType: GENERATE_TYPE_FULL,
+    specs: ['web-app']
+  },
   {
     name: '@okta/samples.express-embedded-auth-with-sdk',
     appType: 'web',
     template: 'express-embedded-auth-with-sdk',
     generateType: GENERATE_TYPE_OVERWRITE,
-    specs: [
-      //'express-embedded-auth-with-sdk'
-    ],
+    specs: ['express-embedded-auth-with-sdk'],
     features: [
       // group sms related specs together, so they do not run in parallel
       // this spec takes time to finish, run it first
-      // [
-      //   'self-service-registration',
-      //   'mfa-password-and-sms',
-      // ],
-      // 'root-page', 
-      // 'basic-auth', 
-      // 'identifier-first-auth',
-      // 'self-service-password-recovery', 
-      // 'self-service-registration-custom-attribute',
-      // 'self-service-registration-activation-token',
-      // 'mfa-password-and-email',
-      // 'mfa-password-and-email-magic-link',
-      // 'mfa-password-and-question',
-      // // This feature is not well defined and introduce flakiness, disable it
-      // // 'social-login-mfa',
-      // 'social-idp',
-      // 'totp-signup',
-      // 'totp-signin',
-      // 'security-questions-enrollment',
-      // 'self-service-registration-password-optional',
+      [
+        'self-service-registration',
+        'mfa-password-and-sms',
+      ],
+      'root-page', 
+      'basic-auth', 
+      'identifier-first-auth',
+      'self-service-password-recovery', 
+      'self-service-registration-custom-attribute',
+      'self-service-registration-activation-token',
+      'mfa-password-and-email',
+      'mfa-password-and-email-magic-link',
+      'mfa-password-and-question',
+      // This feature is not well defined and introduce flakiness, disable it
+      // 'social-login-mfa',
+      'social-idp',
+      'totp-signup',
+      'totp-signin',
+      'security-questions-enrollment',
+      'self-service-registration-password-optional',
       'account-unlock'
     ],
     useEnv: true,
   },
-  // {
-  //   name: '@okta/samples.express-embedded-sign-in-widget',
-  //   appType: 'web',
-  //   template: 'express-embedded-sign-in-widget',
-  //   generateType: GENERATE_TYPE_OVERWRITE,
-  //   specs: [],
-  //   features: [
-  //     'embedded-widget-basic-auth',
-  //     'social-idp-with-widget'
-  //   ],
-  //   useEnv: true
-  // },
-  // {
-  //   name: '@okta/test.app.react-oie',
-  //   appType: 'browser',
-  //   features: [
-  //     // group sms related specs together, so they do not run in parallel
-  //     // this spec takes time to finish, run it first
-  //     [
-  //       'progressive-profiling-manage-phone-numbers',
-  //     ],
-  //     'basic-auth',
-  //     'progressive-profiling-view-profile',
-  //     'progressive-profiling-update-profile-info',
-  //     'progressive-profiling-update-email-address',
-  //   ],
-  //   useEnv: true
-  // },
+  {
+    name: '@okta/samples.express-embedded-sign-in-widget',
+    appType: 'web',
+    template: 'express-embedded-sign-in-widget',
+    generateType: GENERATE_TYPE_OVERWRITE,
+    specs: [],
+    features: [
+      'embedded-widget-basic-auth',
+      'social-idp-with-widget'
+    ],
+    useEnv: true
+  },
+  {
+    name: '@okta/test.app.react-oie',
+    appType: 'browser',
+    features: [
+      // group sms related specs together, so they do not run in parallel
+      // this spec takes time to finish, run it first
+      [
+        'progressive-profiling-manage-phone-numbers',
+      ],
+      'basic-auth',
+      'progressive-profiling-view-profile',
+      'progressive-profiling-update-profile-info',
+      'progressive-profiling-update-email-address',
+    ],
+    useEnv: true
+  },
 ].map(function(sampleConfig) {
   if (!sampleConfig.name) {
     throw new Error('sample "name" is required');
