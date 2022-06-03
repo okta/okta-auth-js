@@ -26,6 +26,7 @@ const config = Object.assign({}, baseConfig, {
     'oidc/renewTokens.ts',
     'TokenManager/browser',
     'SyncStorageService',
+    'LeaderElectionService',
     'ServiceManager'
   ])
 });

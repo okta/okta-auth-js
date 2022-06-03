@@ -1,7 +1,7 @@
 // only add methods needed internally
 export interface ServiceInterface {
-  start(): void;
-  stop(): void;
+  start(): Promise<void>;
+  stop(): Promise<void>;
   isStarted(): boolean;
   canStart(): boolean;
   requiresLeadership(): boolean;
@@ -21,10 +21,14 @@ export interface AutoRenewServiceOptions {
 
 export interface SyncStorageServiceOptions {
   syncStorage?: boolean;
+  syncChannelName?: string;
+}
+
+export interface LeaderElectionServiceOptions {
+  electionChannelName?: string;
+  // TODO: remove in next major version - OKTA-473815
+  broadcastChannelName?: string;
 }
 
 export type ServiceManagerOptions = AutoRenewServiceOptions &
-  SyncStorageServiceOptions & 
-  {
-    broadcastChannelName?: string;
-  };
+  SyncStorageServiceOptions & LeaderElectionServiceOptions;

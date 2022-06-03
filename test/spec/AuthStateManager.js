@@ -10,12 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-/* global window, StorageEvent */
+/* global window */
 
 import Emitter from 'tiny-emitter';
 import { AuthStateManager, INITIAL_AUTH_STATE } from '../../lib/AuthStateManager';
 import { AuthSdkError } from '../../lib/errors';
+import { BroadcastChannel } from 'broadcast-channel';
 import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
@@ -28,7 +28,10 @@ function createAuth() {
     redirectUri: 'https://example.com/redirect',
     tokenManager: {
       autoRenew: false,
-      autoRemove: false,
+      autoRemove: false
+    },
+    services: {
+      syncChannelName: 'syncChannel'
     }
   });
 }
@@ -131,20 +134,18 @@ describe('AuthStateManager', () => {
       }
       it('should only trigger authStateManager.updateAuthState once when localStorage changed from other dom', async () => {
         util.disableLeaderElection();
-        jest.useFakeTimers();
         const auth = createAuth();
         auth.authStateManager.updateAuthState = jest.fn();
         auth.tokenManager.start(); // uses TokenService / crossTabs
         await auth.serviceManager.start();
-        // simulate localStorage change from other dom context
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: 'okta-token-storage', 
-          newValue: '{"idToken": "fake_id_token"}',
-          oldValue: '{}'
-        }));
-        jest.runAllTimers();
+        // simulate change from other dom context
+        const channel = new BroadcastChannel('syncChannel');
+        await channel.postMessage({
+          type: 'added',
+          key: 'idToken',
+          token: tokens.standardIdToken2Parsed
+        });
         expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
-        jest.useRealTimers();
         auth.tokenManager.stop();
         await auth.serviceManager.stop();
       });

@@ -29,12 +29,22 @@ import {
   OktaAuthInterface,
   StorageProvider,
   TokenManagerErrorEventHandler,
+  TokenManagerSetStorageEventHandler,
+  TokenManagerRenewEventHandler,
   TokenManagerEventHandler,
   TokenManagerInterface,
   RefreshToken,
   AccessTokenCallback,
   IDTokenCallback,
-  RefreshTokenCallback
+  RefreshTokenCallback,
+  EVENT_RENEWED,
+  EVENT_ADDED,
+  EVENT_ERROR,
+  EVENT_EXPIRED,
+  EVENT_REMOVED,
+  EVENT_SET_STORAGE,
+  TokenManagerAnyEventHandler,
+  TokenManagerAnyEvent
 } from './types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from './constants';
 
@@ -47,14 +57,8 @@ const DEFAULT_OPTIONS = {
   clearPendingRemoveTokens: true,
   storage: undefined, // will use value from storageManager config
   expireEarlySeconds: 30,
-  storageKey: TOKEN_STORAGE_NAME,
-  _storageEventDelay: 0
+  storageKey: TOKEN_STORAGE_NAME
 };
-export const EVENT_EXPIRED = 'expired';
-export const EVENT_RENEWED = 'renewed';
-export const EVENT_ADDED = 'added';
-export const EVENT_REMOVED = 'removed';
-export const EVENT_ERROR = 'error';
 
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
@@ -74,8 +78,31 @@ export class TokenManager implements TokenManagerInterface {
   private state: TokenManagerState;
   private options: TokenManagerOptions;
 
-  on: (event: string, handler: TokenManagerErrorEventHandler | TokenManagerEventHandler, context?: object) => void;
-  off: (event: string, handler?: TokenManagerErrorEventHandler | TokenManagerEventHandler) => void;
+  on(event: typeof EVENT_RENEWED, handler: TokenManagerRenewEventHandler, context?: object): void;
+  on(event: typeof EVENT_ERROR, handler: TokenManagerErrorEventHandler, context?: object): void;
+  on(event: typeof EVENT_SET_STORAGE, handler: TokenManagerSetStorageEventHandler, context?: object): void;
+  on(event: typeof EVENT_EXPIRED | typeof EVENT_ADDED | typeof EVENT_REMOVED, 
+    handler: TokenManagerEventHandler, context?: object): void;
+  on(event: TokenManagerAnyEvent, handler: TokenManagerAnyEventHandler, context?: object): void {
+    if (context) {
+      this.emitter.on(event, handler, context);
+    } else {
+      this.emitter.on(event, handler);
+    }
+  }
+
+  off(event: typeof EVENT_RENEWED, handler?: TokenManagerRenewEventHandler): void;
+  off(event: typeof EVENT_ERROR, handler?: TokenManagerErrorEventHandler): void;
+  off(event: typeof EVENT_SET_STORAGE, handler?: TokenManagerSetStorageEventHandler): void;
+  off(event: typeof EVENT_EXPIRED | typeof EVENT_ADDED | typeof EVENT_REMOVED, 
+    handler?: TokenManagerEventHandler): void;
+  off(event: TokenManagerAnyEvent, handler?: TokenManagerAnyEventHandler): void {
+    if (handler) {
+      this.emitter.off(event, handler);
+    } else {
+      this.emitter.off(event);
+    }
+  }
 
   // eslint-disable-next-line complexity
   constructor(sdk: OktaAuthInterface, options: TokenManagerOptions = {}) {
@@ -86,9 +113,6 @@ export class TokenManager implements TokenManagerInterface {
     }
     
     options = Object.assign({}, DEFAULT_OPTIONS, removeNils(options));
-    if (isIE11OrLess()) {
-      options._storageEventDelay = options._storageEventDelay || 1000;
-    }
     if (!isLocalhost()) {
       options.expireEarlySeconds = DEFAULT_OPTIONS.expireEarlySeconds;
     }
@@ -109,9 +133,10 @@ export class TokenManager implements TokenManagerInterface {
     this.storage = sdk.storageManager.getTokenStorage({...storageOptions, useSeparateCookies: true});
     this.clock = SdkClock.create(/* sdk, options */);
     this.state = defaultState();
+  }
 
-    this.on = this.emitter.on.bind(this.emitter);
-    this.off = this.emitter.off.bind(this.emitter);
+  hasSharedStorage() {
+    return this.storage.isSharedStorage();
   }
 
   start() {
@@ -158,25 +183,6 @@ export class TokenManager implements TokenManagerInterface {
   
   emitError(error) {
     this.emitter.emit(EVENT_ERROR, error);
-  }
-  
-  emitEventsForCrossTabsStorageUpdate(newValue, oldValue) {
-    const oldTokens = this.getTokensFromStorageValue(oldValue);
-    const newTokens = this.getTokensFromStorageValue(newValue);
-    Object.keys(newTokens).forEach(key => {
-      const oldToken = oldTokens[key];
-      const newToken = newTokens[key];
-      if (JSON.stringify(oldToken) !== JSON.stringify(newToken)) {
-        this.emitAdded(key, newToken);
-      }
-    });
-    Object.keys(oldTokens).forEach(key => {
-      const oldToken = oldTokens[key];
-      const newToken = newTokens[key];
-      if (!newToken) {
-        this.emitRemoved(key, oldToken);
-      }
-    });
   }
   
   clearExpireEventTimeout(key) {
@@ -238,6 +244,7 @@ export class TokenManager implements TokenManagerInterface {
     validateToken(token);
     tokenStorage[key] = token;
     this.storage.setStorage(tokenStorage);
+    this.emitSetStorageEvent();
     this.emitAdded(key, token);
     this.setExpireEventTimeout(key, token);
   }
@@ -295,6 +302,19 @@ export class TokenManager implements TokenManagerInterface {
     throw new AuthSdkError('Unknown token type');
   }
 
+  // for synchronization of LocalStorage cross tabs for IE11
+  private emitSetStorageEvent() {
+    if (isIE11OrLess()) {
+      const storage = this.storage.getStorage();
+      this.emitter.emit(EVENT_SET_STORAGE, storage);
+    }
+  }
+
+  // used in `SyncStorageService` for synchronization of LocalStorage cross tabs for IE11
+  public getStorage() {
+    return this.storage;
+  }
+
   setTokens(
     tokens: Tokens,
     // TODO: callbacks can be removed in the next major version OKTA-407224
@@ -350,7 +370,8 @@ export class TokenManager implements TokenManagerInterface {
       return storage;
     }, {});
     this.storage.setStorage(storage);
-  
+    this.emitSetStorageEvent();
+
     // emit event and start expiration timer
     types.forEach(type => {
       const newToken = tokens[type];
@@ -377,6 +398,7 @@ export class TokenManager implements TokenManagerInterface {
     var removedToken = tokenStorage[key];
     delete tokenStorage[key];
     this.storage.setStorage(tokenStorage);
+    this.emitSetStorageEvent();
   
     this.emitRemoved(key, removedToken);
   }
@@ -435,27 +457,31 @@ export class TokenManager implements TokenManagerInterface {
   }
   
   clear() {
+    const tokens = this.getTokensSync();
     this.clearExpireEventTimeoutAll();
     this.storage.clearStorage();
+    this.emitSetStorageEvent();
+
+    Object.keys(tokens).forEach(key => {
+      this.emitRemoved(key, tokens[key]);
+    });
   }
 
   clearPendingRemoveTokens() {
-    const tokens = this.getTokensSync();
-    Object.keys(tokens).forEach(key => {
-      if (tokens[key].pendingRemove) {
-       this.remove(key);
+    const tokenStorage = this.storage.getStorage();
+    const removedTokens = {};
+    Object.keys(tokenStorage).forEach(key => {
+      if (tokenStorage[key].pendingRemove) {
+        removedTokens[key] = tokenStorage[key];
+        delete tokenStorage[key];
       }
     });
-  }
-  
-  getTokensFromStorageValue(value) {
-    let tokens;
-    try {
-      tokens = JSON.parse(value) || {};
-    } catch (e) {
-      tokens = {};
-    }
-    return tokens;
+    this.storage.setStorage(tokenStorage);
+    this.emitSetStorageEvent();
+    Object.keys(removedTokens).forEach(key => {
+      this.clearExpireEventTimeout(key);
+      this.emitRemoved(key, removedTokens[key]);
+    });
   }
 
   updateRefreshToken(token: RefreshToken) {
@@ -466,6 +492,7 @@ export class TokenManager implements TokenManagerInterface {
     validateToken(token);
     tokenStorage[key] = token;
     this.storage.setStorage(tokenStorage);
+    this.emitSetStorageEvent();
   }
 
   removeRefreshToken () {

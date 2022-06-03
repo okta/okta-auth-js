@@ -17,23 +17,20 @@ import {
   ServiceManagerOptions
 } from './types';
 import { OktaAuth } from '.';
-import {
-  BroadcastChannel,
-  createLeaderElection,
-  LeaderElector
-} from 'broadcast-channel';
-import { AutoRenewService, SyncStorageService } from './services';
-import { isBrowser } from './features';
+import { AutoRenewService, SyncStorageService, LeaderElectionService } from './services';
+import { removeNils } from './util';
+
+const AUTO_RENEW = 'autoRenew';
+const SYNC_STORAGE = 'syncStorage';
+const LEADER_ELECTION = 'leaderElection';
 
 export class ServiceManager implements ServiceManagerInterface {
   private sdk: OktaAuth;
   private options: ServiceManagerOptions;
   private services: Map<string, ServiceInterface>;
-  private channel?: BroadcastChannel;
-  private elector?: LeaderElector;
   private started: boolean;
 
-  private static knownServices = ['autoRenew', 'syncStorage'];
+  private static knownServices = [AUTO_RENEW, SYNC_STORAGE, LEADER_ELECTION];
 
   private static defaultOptions = {
     autoRenew: true,
@@ -43,19 +40,23 @@ export class ServiceManager implements ServiceManagerInterface {
 
   constructor(sdk: OktaAuth, options: ServiceManagerOptions = {}) {
     this.sdk = sdk;
+    this.onLeader = this.onLeader.bind(this);
 
     // TODO: backwards compatibility, remove in next major version - OKTA-473815
     const { autoRenew, autoRemove, syncStorage } = sdk.tokenManager.getOptions();
+    options.electionChannelName = options.electionChannelName || options.broadcastChannelName;
     this.options = Object.assign({}, 
       ServiceManager.defaultOptions,
-      { autoRenew, autoRemove, syncStorage },
-      options
+      { autoRenew, autoRemove, syncStorage }, 
+      {
+        electionChannelName: `${sdk.options.clientId}-election`,
+        syncChannelName: `${sdk.options.clientId}-sync`,
+      },
+      removeNils(options)
     );
 
     this.started = false;
     this.services = new Map();
-    this.onLeaderDuplicate = this.onLeaderDuplicate.bind(this);
-    this.onLeader = this.onLeader.bind(this);
 
     ServiceManager.knownServices.forEach(name => {
       const svc = this.createService(name);
@@ -65,47 +66,31 @@ export class ServiceManager implements ServiceManagerInterface {
     });
   }
 
-  public static canUseLeaderElection() {
-    return isBrowser();
-  }
-
-  private onLeader() {
+  private async onLeader() {
     if (this.started) {
       // Start services that requires leadership
-      this.startServices();
+      await this.startServices();
     }
   }
 
-  private onLeaderDuplicate() {
-  }
-
   isLeader() {
-    return !!this.elector?.isLeader;
-  }
-
-  hasLeader() {
-    return this.elector?.hasLeader;
+    return (this.getService(LEADER_ELECTION) as LeaderElectionService)?.isLeader();
   }
 
   isLeaderRequired() {
-    return [...this.services.values()].some(srv => srv.requiresLeadership());
+    return [...this.services.values()].some(srv => srv.canStart() && srv.requiresLeadership());
   }
 
   async start() {
     if (this.started) {
       return;     // noop if services have already started
     }
-    // only start election if a leader is required
-    if (this.isLeaderRequired()) {
-      await this.startElector();
-    }
-    this.startServices();
+    await this.startServices();
     this.started = true;
   }
   
   async stop() {
-    await this.stopElector();
-    this.stopServices();
+    await this.stopServices();
     this.started = false;
   }
 
@@ -113,54 +98,44 @@ export class ServiceManager implements ServiceManagerInterface {
     return this.services.get(name);
   }
 
-  private startServices() {
+  private async startServices() {
+    for (const [name, srv] of this.services.entries()) {
+      if (this.canStartService(name, srv)) {
+        await srv.start();
+      }
+    }
+  }
+
+  private async stopServices() {
     for (const srv of this.services.values()) {
-      const canStart = srv.canStart() && !srv.isStarted() && (srv.requiresLeadership() ? this.isLeader() : true);
-      if (canStart) {
-        srv.start();
-      }
+      await srv.stop();
     }
   }
 
-  private stopServices() {
-    for (const srv of this.services.values()) {
-      srv.stop();
+  // eslint-disable-next-line complexity
+  private canStartService(name: string, srv: ServiceInterface): boolean {
+    let canStart = srv.canStart() && !srv.isStarted();
+    // only start election if a leader is required
+    if (name === LEADER_ELECTION) {
+      canStart &&= this.isLeaderRequired();
+    } else if (srv.requiresLeadership()) {
+      canStart &&= this.isLeader();
     }
-  }
-
-  private async startElector() {
-    await this.stopElector();
-    if (ServiceManager.canUseLeaderElection()) {
-      if (!this.channel) {
-        const { broadcastChannelName } = this.options;
-        this.channel = new BroadcastChannel(broadcastChannelName as string);
-      }
-      if (!this.elector) {
-        this.elector = createLeaderElection(this.channel);
-        this.elector.onduplicate = this.onLeaderDuplicate;
-        this.elector.awaitLeadership().then(this.onLeader);
-      }
-    }
-  }
-
-  private async stopElector() {
-    if (this.elector) {
-      await this.elector?.die();
-      this.elector = undefined;
-      await this.channel?.close();
-      this.channel = undefined;
-    }
+    return canStart;
   }
 
   private createService(name: string): ServiceInterface {
     const tokenManager = this.sdk.tokenManager;
 
-    let service: ServiceInterface | undefined;
+    let service: ServiceInterface;
     switch (name) {
-      case 'autoRenew':
+      case LEADER_ELECTION:
+        service = new LeaderElectionService({...this.options, onLeader: this.onLeader});
+        break;
+      case AUTO_RENEW:
         service = new AutoRenewService(tokenManager, {...this.options});
         break;
-      case 'syncStorage':
+      case SYNC_STORAGE:
         service = new SyncStorageService(tokenManager, {...this.options});
         break;
       default:

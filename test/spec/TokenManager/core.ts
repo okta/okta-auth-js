@@ -684,23 +684,26 @@ describe('TokenManager', function() {
 
   describe('clearPendingRemoveTokens', () => {
     it('clears pending remove tokens', () => {
+      const tokenStorage = { 
+        idToken: { ...tokens.standardIdTokenParsed, pendingRemove: true },
+        accessToken: { ...tokens.standardAccessTokenParsed, pendingRemove: true } 
+      };
       const storageProvider = {
-        getItem: jest.fn().mockReturnValue(JSON.stringify({ 
-          idToken: { ...tokens.standardIdTokenParsed, pendingRemove: true },
-          accessToken: { ...tokens.standardAccessTokenParsed, pendingRemove: true } 
-        })),
-        setItem: jest.fn()
+        getItem: jest.fn().mockReturnValue(JSON.stringify(tokenStorage)),
+        setItem: jest.fn(),
       };
       setupSync({
         tokenManager: {
           storage: storageProvider
         }
       });
-      jest.spyOn(client.tokenManager, 'remove');
+      jest.spyOn(client.tokenManager, 'emitRemoved');
+      jest.spyOn(storageProvider, 'setItem');
       client.tokenManager.clearPendingRemoveTokens();
-      expect(client.tokenManager.remove).toHaveBeenCalledTimes(2);
-      expect(client.tokenManager.remove).toHaveBeenNthCalledWith(1, 'idToken');
-      expect(client.tokenManager.remove).toHaveBeenNthCalledWith(2, 'accessToken');
+      expect(storageProvider.setItem).toHaveBeenNthCalledWith(1, 'okta-token-storage', '{}');
+      expect(client.tokenManager.emitRemoved).toHaveBeenCalledTimes(2);
+      expect(client.tokenManager.emitRemoved).toHaveBeenNthCalledWith(1, 'idToken', tokenStorage.idToken);
+      expect(client.tokenManager.emitRemoved).toHaveBeenNthCalledWith(2, 'accessToken', tokenStorage.accessToken);
     });
   });
 

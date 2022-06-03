@@ -13,11 +13,18 @@
 
 // Polyfills objects needed to support IE 11+
 require('core-js/features/object/assign');
+require('core-js/features/object/keys');
 require('core-js/features/object/values');
 require('core-js/features/object/from-entries');
+require('core-js/features/object/entries');
+require('core-js/features/object/iterate-entries');
+require('core-js/features/object/iterate-keys');
+require('core-js/features/object/iterate-values');
+require('core-js/features/symbol/iterator');
 require('core-js/es/promise');
 require('core-js/es/typed-array/uint8-array');
 require('core-js/features/array/from');
+require('core-js/features/array/includes');
 require('core-js/web/url');
 require('webcrypto-shim');
 

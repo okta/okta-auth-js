@@ -20,6 +20,11 @@ function shouldRedirectToGetTokens(authState) {
       return false;
     }
 
+    // Don't acquire tokens during signing out
+    if (appState.signedOut) {
+      return false;
+    }
+
     // Call Okta to get tokens. Okta will redirect back to this app
     // The callback is handled by `handleLoginRedirect` which will call `renderApp` again
     return true;

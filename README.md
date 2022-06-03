@@ -234,12 +234,12 @@ var authClient = new OktaAuth(config);
 
 ### Running as a service
 
-By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method. To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
+By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method right after creation and before calling other methods like [handleLoginRedirect](#handleloginredirecttokens). To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
 
 ```javascript
   var authClient = new OktaAuth(config);
-  authClient.start(); // start the service
-  authClient.stop(); // stop the service
+  await authClient.start(); // start the service
+  await authClient.stop(); // stop the service
 ```
 
 Starting the service will also call [authStateManager.updateAuthState](#authstatemanagerupdateauthstate).
@@ -829,7 +829,7 @@ When `tokenManager.autoRenew` is `true` both renew strategies are enabled. To di
 By default, the library will attempt to remove expired tokens when `autoRemove` is `true`. If you wish to disable auto removal of tokens, set `autoRemove` to `false`.
 
 #### `syncStorage`
-Automatically syncs tokens across browser tabs when token storage is `localStorage`. To disable this behavior, set `syncStorage` to false.
+Automatically syncs tokens across browser tabs when token storage is `localStorage` or `cookie`. To disable this behavior, set `syncStorage` to false.
 
 This is accomplished by selecting a single tab to handle the network requests to refresh the tokens and broadcasting to the other tabs. This is done to avoid all tabs sending refresh requests simultaneously, which can cause rate limiting/throttling issues.
 
@@ -903,11 +903,15 @@ This is accomplished by selecting a single tab to handle the network requests to
 
 ### `start()`
 
+> :hourglass: async
+
 Starts the `OktaAuth` service. See [running as a service](#running-as-a-service) for more details.
 
 ### `stop()`
 
-Starts the `OktaAuth` service. See [running as a service](#running-as-a-service) for more details.
+> :hourglass: async
+
+Stops the `OktaAuth` service. See [running as a service](#running-as-a-service) for more details.
 
 ### `signIn(options)`
 

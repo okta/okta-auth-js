@@ -12,195 +12,322 @@
 
 
 /* eslint-disable max-statements */
-/* global window, localStorage, StorageEvent */
 
+import tokens from '@okta/test.support/tokens';
 import { TokenManager } from '../../../lib/TokenManager';
 import { SyncStorageService } from '../../../lib/services/SyncStorageService';
 import * as features from '../../../lib/features';
+import { BroadcastChannel } from 'broadcast-channel';
 
 const Emitter = require('tiny-emitter');
 
 describe('SyncStorageService', () => {
   let sdkMock;
-  let instance;
-  let syncInstance;
+  let tokenManager;
+  let channel;
+  let service;
+  let storage;
+  let tokenStorage;
   beforeEach(function() {
-    jest.useFakeTimers();
-    instance = null;
+    tokenManager = null;
+    channel = null;
+    service = null;
     const emitter = new Emitter();
+    storage = {
+      idToken: tokens.standardIdTokenParsed
+    };
+    tokenStorage = {
+      getStorage: jest.fn().mockImplementation(() => storage),
+      setStorage: jest.fn().mockImplementation((newStorage) => {
+        storage = newStorage;
+      }),
+      clearStorage: jest.fn().mockImplementation(() => {
+        storage = {};
+      }),
+    };
     sdkMock = {
       options: {},
       storageManager: {
-        getTokenStorage: jest.fn().mockReturnValue({
-          getStorage: jest.fn().mockReturnValue({})
-        }),
+        getTokenStorage: jest.fn().mockReturnValue(tokenStorage),
         getOptionsForSection: jest.fn().mockReturnValue({})
       },
       emitter
     };
-    jest.spyOn(features, 'isIE11OrLess').mockReturnValue(false);
     jest.spyOn(features, 'isLocalhost').mockReturnValue(true);
   });
   afterEach(() => {
-    jest.useRealTimers();
-    if (instance) {
-      instance.stop();
+    if (tokenManager) {
+      tokenManager.stop();
     }
-    if (syncInstance) {
-      syncInstance.stop();
+    if (service) {
+      service.stop();
+    }
+    if (channel) {
+      channel.close();
     }
   });
 
-  function createInstance(options?) {
-    instance = new TokenManager(sdkMock, options);
-    instance.start();
-    syncInstance = new SyncStorageService(instance, instance.getOptions());
-    syncInstance.start();
-    return instance;
+  async function createInstance(options?) {
+    tokenManager = new TokenManager(sdkMock, options);
+    tokenManager.start();
+    service = new SyncStorageService(tokenManager, {
+      ...tokenManager.getOptions(), 
+      syncChannelName: 'syncChannel'
+    });
+    await service.start();
+    // Create another channel with same name for communication
+    channel = new BroadcastChannel('syncChannel');
+    return tokenManager;
   }
 
-  it('should emit events and reset timeouts when storage event happen with token storage key', () => {
-    createInstance();
-    instance.resetExpireEventTimeoutAll = jest.fn();
-    instance.emitEventsForCrossTabsStorageUpdate = jest.fn();
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'okta-token-storage', 
-      newValue: 'fake_new_value',
-      oldValue: 'fake_old_value'
-    }));
-    jest.runAllTimers();
-    expect(instance.resetExpireEventTimeoutAll).toHaveBeenCalled();
-    expect(instance.emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
+  describe('start', () => {
+    it('stops service if already started, closes and recreates channel', async () => {
+      await createInstance();
+      const oldChannel = (service as any).channel;
+      jest.spyOn(oldChannel, 'close');
+      await service.start(); // restart
+      const newChannel = (service as any).channel;
+      expect(service.isStarted()).toBeTruthy();
+      expect(oldChannel.close).toHaveBeenCalledTimes(1);
+      expect(newChannel).not.toStrictEqual(oldChannel);
+    });
   });
-  it('should set options._storageEventDelay default to 1000 in isIE11OrLess env', () => {
-    jest.spyOn(features, 'isIE11OrLess').mockReturnValue(true);
-    createInstance();
-    expect(instance.getOptions()._storageEventDelay).toBe(1000);
+
+  describe('stop', () => {
+    it('can be called twice without error', async () => {
+      await createInstance();
+      await Promise.race([
+        service.stop(),
+        service.stop()
+      ]);
+      expect(service.isStarted()).toBeFalsy();
+      expect((service as any).channel).not.toBeDefined();
+    });
   });
-  it('should use options._storageEventDelay from passed options', () => {
-    createInstance({ _storageEventDelay: 100 });
-    expect(instance.getOptions()._storageEventDelay).toBe(100);
-  });
-  it('should use options._storageEventDelay from passed options in isIE11OrLess env', () => {
-    jest.spyOn(features, 'isIE11OrLess').mockReturnValue(true);
-    createInstance({ _storageEventDelay: 100 });
-    expect(instance.getOptions()._storageEventDelay).toBe(100);
-  });
-  it('should handle storage change based on _storageEventDelay option', () => {
-    jest.spyOn(window, 'setTimeout');
-    createInstance({ _storageEventDelay: 500 });
-    instance.resetExpireEventTimeoutAll = jest.fn();
-    instance.emitEventsForCrossTabsStorageUpdate = jest.fn();
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'okta-token-storage', 
-      newValue: 'fake_new_value',
-      oldValue: 'fake_old_value'
-    }));
-    expect(window.setTimeout).toHaveBeenCalledWith(expect.any(Function), 500);
-    jest.runAllTimers();
-    expect(instance.resetExpireEventTimeoutAll).toHaveBeenCalled();
-    expect(instance.emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith('fake_new_value', 'fake_old_value');
-  });
-  it('should emit events and reset timeouts when localStorage.clear() has been called from other tabs', () => {
-    createInstance();
-    instance.resetExpireEventTimeoutAll = jest.fn();
-    instance.emitEventsForCrossTabsStorageUpdate = jest.fn();
-    // simulate localStorage.clear()
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: null,
-      newValue: null,
-      oldValue: null
-    }));
-    jest.runAllTimers();
-    expect(instance.resetExpireEventTimeoutAll).toHaveBeenCalled();
-    expect(instance.emitEventsForCrossTabsStorageUpdate).toHaveBeenCalledWith(null, null);
-  });
-  it('should not call localStorage.setItem when token storage changed', () => {
-    createInstance();
-    // https://github.com/facebook/jest/issues/6798#issuecomment-440988627
-    jest.spyOn(window.localStorage.__proto__, 'setItem');
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'okta-token-storage', 
-      newValue: 'fake_new_value',
-      oldValue: 'fake_old_value'
-    }));
-    expect(localStorage.setItem).not.toHaveBeenCalled();
-  });
-  it('should not emit events or reset timeouts if the key is not token storage key', () => {
-    createInstance();
-    instance.resetExpireEventTimeoutAll = jest.fn();
-    instance.emitEventsForCrossTabsStorageUpdate = jest.fn();
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'fake-key', 
-      newValue: 'fake_new_value',
-      oldValue: 'fake_old_value'
-    }));
-    expect(instance.resetExpireEventTimeoutAll).not.toHaveBeenCalled();
-    expect(instance.emitEventsForCrossTabsStorageUpdate).not.toHaveBeenCalled();
-  });
-  it('should not emit events or reset timeouts if oldValue === newValue', () => {
-    createInstance();
-    instance.resetExpireEventTimeoutAll = jest.fn();
-    instance.emitEventsForCrossTabsStorageUpdate = jest.fn();
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'okta-token-storage', 
-      newValue: 'fake_unchanged_value',
-      oldValue: 'fake_unchanged_value'
-    }));
-    expect(instance.resetExpireEventTimeoutAll).not.toHaveBeenCalled();
-    expect(instance.emitEventsForCrossTabsStorageUpdate).not.toHaveBeenCalled();
-  });
+
+  describe('handling sync messages', () => {
+    it('should emit "added" event if new token is added from another tab', async () => {
+      await createInstance();
+      jest.spyOn(sdkMock.emitter, 'emit');
+      await channel.postMessage({
+        type: 'added',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed
+      });
+      expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', tokens.standardIdToken2Parsed);
+    });
   
-  describe('_emitEventsForCrossTabsStorageUpdate', () => {
-    it('should emit "added" event if new token is added', () => {
-      createInstance();
-      const newValue = '{"idToken": "fake-idToken"}';
-      const oldValue = null;
+    it('should emit "removed" event if token is removed from another tab', async () => {
+      await createInstance();
       jest.spyOn(sdkMock.emitter, 'emit');
-      instance.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-      expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', 'fake-idToken');
+      await channel.postMessage({
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+      expect(sdkMock.emitter.emit).toHaveBeenCalledWith('removed', 'idToken', tokens.standardIdTokenParsed);
     });
-    it('should emit "added" event if token is changed', () => {
-      createInstance();
-      const newValue = '{"idToken": "fake-idToken"}';
-      const oldValue = '{"idToken": "old-fake-idToken"}';
+  
+    it('should emit "renewed" event if token is chnaged from another tab', async () => {
+      await createInstance();
       jest.spyOn(sdkMock.emitter, 'emit');
-      instance.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-      expect(sdkMock.emitter.emit).toHaveBeenCalledWith('added', 'idToken', 'fake-idToken');
+      await channel.postMessage({
+        type: 'renewed',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed,
+        oldToken: tokens.standardIdTokenParsed
+      });
+      expect(sdkMock.emitter.emit).toHaveBeenCalledWith('renewed', 'idToken', tokens.standardIdToken2Parsed, tokens.standardIdTokenParsed);
     });
-    it('should emit two "added" event if two token are added', () => {
-      createInstance();
-      const newValue = '{"idToken": "fake-idToken", "accessToken": "fake-accessToken"}';
-      const oldValue = null;
-      jest.spyOn(sdkMock.emitter, 'emit');
-      instance.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-      expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(1, 'added', 'idToken', 'fake-idToken');
-      expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(2, 'added', 'accessToken', 'fake-accessToken');
-    });
-    it('should not emit "added" event if oldToken equal to newToken', () => {
-      createInstance();
-      const newValue = '{"idToken": "fake-idToken"}';
-      const oldValue = '{"idToken": "fake-idToken"}';
-      jest.spyOn(sdkMock.emitter, 'emit');
-      instance.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-      expect(sdkMock.emitter.emit).not.toHaveBeenCalled();
-    });
-    it('should emit "removed" event if token is removed', () => {
-      createInstance();
-      const newValue = null;
-      const oldValue = '{"idToken": "old-fake-idToken"}';
-      jest.spyOn(sdkMock.emitter, 'emit');
-      instance.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-      expect(sdkMock.emitter.emit).toHaveBeenCalledWith('removed', 'idToken', 'old-fake-idToken');
-    });
-    it('should emit two "removed" event if two token are removed', () => {
-      createInstance();
-      const newValue = null;
-      const oldValue = '{"idToken": "fake-idToken", "accessToken": "fake-accessToken"}';
-      jest.spyOn(sdkMock.emitter, 'emit');
-      instance.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-      expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(1, 'removed', 'idToken', 'fake-idToken');
-      expect(sdkMock.emitter.emit).toHaveBeenNthCalledWith(2, 'removed', 'accessToken', 'fake-accessToken');
+
+    it('should not post sync message to other tabs', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      await channel.postMessage({
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(0);
     });
   });
+
+  describe('posting sync messages', () => {
+    it('should post "added" sync message when new token is added', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.add('idToken', tokens.standardIdToken2Parsed);
+      expect(serviceChannel.postMessage).toHaveBeenCalledWith({
+        type: 'added',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed
+      });
+    });
+
+    it('should post "removed" sync message when token is removed', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.remove('idToken');
+      expect(serviceChannel.postMessage).toHaveBeenCalledWith({
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should post "removed", "added", "renewed" sync messages when token is changed', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.setTokens({
+        idToken: tokens.standardIdToken2Parsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'added',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(3, {
+        type: 'renewed',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed,
+        oldToken: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should post "remove" events when token storage is cleared', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.clear();
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(1);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should not post "set_storage" event on storage change (for non-IE)', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.add('idToken', tokens.standardIdTokenParsed);
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(1); // only "added"
+    });
+  });
+
+  describe('IE11', () => {
+    beforeEach(function() {
+      jest.spyOn(features, 'isIE11OrLess').mockReturnValue(true);
+    });
+
+    it('should post "set_storage" event when new token is added', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.add('idToken', tokens.standardIdToken2Parsed);
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(2);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'set_storage',
+        storage: {
+          idToken: tokens.standardIdToken2Parsed
+        },
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'added',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed
+      });
+    });
+
+    it('should post "set_storage" event when token is removed', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.remove('idToken');
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(2);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'set_storage',
+        storage: {
+        },
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should post "set_storage" event when token storage is cleared', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.clear();
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(2);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'set_storage',
+        storage: {
+        },
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should post "set_storage" event when token is chnaged', async () => {
+      await createInstance();
+      const serviceChannel = (service as any).channel;
+      jest.spyOn(serviceChannel, 'postMessage');
+      tokenManager.setTokens({
+        idToken: tokens.standardIdToken2Parsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenCalledTimes(4);
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(1, {
+        type: 'set_storage',
+        storage: {
+          idToken: tokens.standardIdToken2Parsed
+        },
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(2, {
+        type: 'removed',
+        key: 'idToken',
+        token: tokens.standardIdTokenParsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(3, {
+        type: 'added',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed
+      });
+      expect(serviceChannel.postMessage).toHaveBeenNthCalledWith(4, {
+        type: 'renewed',
+        key: 'idToken',
+        token: tokens.standardIdToken2Parsed,
+        oldToken: tokens.standardIdTokenParsed
+      });
+    });
+
+    it('should update storage excplicitly on "set_storage" event', async () => {
+      await createInstance();
+      const newStorage = {
+        idToken: tokens.standardIdToken2Parsed
+      };
+      await channel.postMessage({
+        type: 'set_storage',
+        storage: newStorage,
+      });
+      expect(storage).toEqual(newStorage);
+    });
+  });
+
 });

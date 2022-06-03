@@ -10,48 +10,36 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-/* global window */
 import { TokenManager } from '../TokenManager';
+import { BroadcastChannel } from 'broadcast-channel';
 import { isBrowser } from '../features';
-import { ServiceManagerOptions, ServiceInterface } from '../types';
+import {
+  ServiceManagerOptions, ServiceInterface, Token, Tokens, 
+  EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED, EVENT_SET_STORAGE
+} from '../types';
 
-
+export type SyncMessage = {
+  type: string;
+  key?: string;
+  token?: Token;
+  oldToken?: Token;
+  storage?: Tokens;
+};
 export class SyncStorageService implements ServiceInterface {
   private tokenManager: TokenManager;
   private options: ServiceManagerOptions;
-  private syncTimeout: unknown;
+  private channel?: BroadcastChannel<SyncMessage>;
   private started = false;
+  private enablePostMessage = true;
 
   constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
     this.tokenManager = tokenManager;
     this.options = options;
-    this.storageListener = this.storageListener.bind(this);
-  }
-
-  // Sync authState cross multiple tabs when localStorage is used as the storageProvider
-  // A StorageEvent is sent to a window when a storage area it has access to is changed 
-  // within the context of another document.
-  // https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent
-  private storageListener({ key, newValue, oldValue }: StorageEvent) {
-    const opts = this.tokenManager.getOptions();
-
-    const handleCrossTabsStorageChange = () => {
-      this.tokenManager.resetExpireEventTimeoutAll();
-      this.tokenManager.emitEventsForCrossTabsStorageUpdate(newValue, oldValue);
-    };
-
-    // Skip if:
-    // not from localStorage.clear (event.key is null)
-    // event.key is not the storageKey
-    // oldValue === newValue
-    if (key && (key !== opts.storageKey || newValue === oldValue)) {
-      return;
-    }
-
-    // LocalStorage cross tabs update is not synced in IE, set a 1s timer by default to read latest value
-    // https://stackoverflow.com/questions/24077117/localstorage-in-win8-1-ie11-does-not-synchronize
-    this.syncTimeout = setTimeout(() => handleCrossTabsStorageChange(), opts._storageEventDelay);
+    this.onTokenAddedHandler = this.onTokenAddedHandler.bind(this);
+    this.onTokenRemovedHandler = this.onTokenRemovedHandler.bind(this);
+    this.onTokenRenewedHandler = this.onTokenRenewedHandler.bind(this);
+    this.onSetStorageHandler = this.onSetStorageHandler.bind(this);
+    this.onSyncMessageHandler = this.onSyncMessageHandler.bind(this);
   }
 
   requiresLeadership() {
@@ -66,20 +54,103 @@ export class SyncStorageService implements ServiceInterface {
     return !!this.options.syncStorage && isBrowser();
   }
 
-  start() {
+  async start() {
     if (this.canStart()) {
-      this.stop();
-      window.addEventListener('storage', this.storageListener);
+      await this.stop();
+      const { syncChannelName } = this.options;
+      this.channel = new BroadcastChannel(syncChannelName as string);
+      this.tokenManager.on(EVENT_ADDED, this.onTokenAddedHandler);
+      this.tokenManager.on(EVENT_REMOVED, this.onTokenRemovedHandler);
+      this.tokenManager.on(EVENT_RENEWED, this.onTokenRenewedHandler);
+      this.tokenManager.on(EVENT_SET_STORAGE, this.onSetStorageHandler);
+      this.channel.addEventListener('message', this.onSyncMessageHandler);
       this.started = true;
     }
   }
 
-  stop() {
+  async stop() {
     if (this.started) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      window.removeEventListener('storage', this.storageListener!);
-      clearTimeout(this.syncTimeout as any);
+      this.tokenManager.off(EVENT_ADDED, this.onTokenAddedHandler);
+      this.tokenManager.off(EVENT_REMOVED, this.onTokenRemovedHandler);
+      this.tokenManager.off(EVENT_RENEWED, this.onTokenRenewedHandler);
+      this.tokenManager.off(EVENT_SET_STORAGE, this.onSetStorageHandler);
+      this.channel?.removeEventListener('message', this.onSyncMessageHandler);
+      await this.channel?.close();
+      this.channel = undefined;
       this.started = false;
     }
+  }
+
+  private onTokenAddedHandler(key: string, token: Token) {
+    if (!this.enablePostMessage) {
+      return;
+    }
+    this.channel?.postMessage({
+      type: EVENT_ADDED,
+      key,
+      token
+    });
+  }
+
+  private onTokenRemovedHandler(key: string, token: Token) {
+    if (!this.enablePostMessage) {
+      return;
+    }
+    this.channel?.postMessage({
+      type: EVENT_REMOVED,
+      key,
+      token
+    });
+  }
+
+  private onTokenRenewedHandler(key: string, token: Token, oldToken?: Token) {
+    if (!this.enablePostMessage) {
+      return;
+    }
+    this.channel?.postMessage({
+      type: EVENT_RENEWED,
+      key,
+      token,
+      oldToken
+    });
+  }
+
+  private onSetStorageHandler(storage: Tokens) {
+    this.channel?.postMessage({
+      type: EVENT_SET_STORAGE,
+      storage
+    });
+  }
+
+  /* eslint-disable complexity */
+  private onSyncMessageHandler(msg: SyncMessage) {
+    // Notes:
+    // 1. Using `enablePostMessage` flag here to prevent sync message loop.
+    //    If this flag is on, tokenManager event handlers do not post sync message.
+    // 2. IE11 has known issue with synchronization of LocalStorage cross tabs.
+    //    One workaround is to set empty event handler for `window.onstorage`.
+    //    But it's not 100% working, sometimes you still get old value from LocalStorage.
+    //    Better approch is to explicitly udpate LocalStorage with `setStorage`.
+
+    this.enablePostMessage = false;
+    switch (msg.type) {
+      case EVENT_SET_STORAGE:
+        this.tokenManager.getStorage().setStorage(msg.storage);
+        break;
+      case EVENT_ADDED:
+        this.tokenManager.emitAdded(msg.key, msg.token);
+        this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
+        break;
+      case EVENT_REMOVED:
+        this.tokenManager.clearExpireEventTimeout(msg.key);
+        this.tokenManager.emitRemoved(msg.key, msg.token);
+        break;
+      case EVENT_RENEWED:
+        this.tokenManager.emitRenewed(msg.key, msg.token, msg.oldToken);
+        break;
+      default:
+        break;
+    }
+    this.enablePostMessage = true;
   }
 } 

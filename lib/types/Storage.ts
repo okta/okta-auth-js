@@ -26,6 +26,7 @@ export interface SimpleStorage {
   getItem(key: string): any;
   setItem(key: string, value: any): void;
   removeItem?: (key: string) => void;
+  isSharedStorage?(): boolean;
 }
 
 export interface StorageProvider extends SimpleStorage {
@@ -33,6 +34,7 @@ export interface StorageProvider extends SimpleStorage {
   getStorage(): any;
   clearStorage(key?: string): void;
   updateStorage(key: string, value: any): void;
+  isSharedStorage(): boolean;
 }
 
 // will be removed in next version. OKTA-362589

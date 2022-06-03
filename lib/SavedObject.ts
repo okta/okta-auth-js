@@ -52,6 +52,11 @@ export default class SavedObject implements StorageProvider {
   // StorageProvider interface
   //
 
+  isSharedStorage() {
+    return typeof localStorage !== 'undefined' && this.storageProvider === localStorage as any 
+      || !!this.storageProvider.isSharedStorage?.();
+  }
+
   getStorage() {
     var storageString = this.storageProvider.getItem(this.storageName);
     storageString = storageString || '{}';

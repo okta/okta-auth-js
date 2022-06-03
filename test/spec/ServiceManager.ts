@@ -14,20 +14,31 @@
 import { OktaAuth } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 
-jest.mock('broadcast-channel', () => {
-  const actual = jest.requireActual('broadcast-channel');
-  class FakeBroadcastChannel {
-    async close() {}
+
+jest.mock('../../lib/services/LeaderElectionService', () => {  
+  class FakeLeaderElectionService {
+    private _isLeader = false;
+    private started = false;
+    private options;
+    constructor(options = {}) {
+      this.options = options;
+    }
+    canStart() { return true; }
+    requiresLeadership() { return false; }
+    isStarted() { return this.started; }
+    async start() { this.started = true; }
+    async stop() { this.started = false; }
+    isLeader() { return this._isLeader; }
+    _setLeader() { this._isLeader = true; }
+    async onLeader() {
+      await (this.options as any).onLeader?.();
+    }
   }
   return {
-    createLeaderElection: actual.createLeaderElection,
-    BroadcastChannel: FakeBroadcastChannel
+    LeaderElectionService: FakeLeaderElectionService,
   };
 });
 
-const mocked = {
-  broadcastChannel: require('broadcast-channel'),
-};
 
 function createAuth(options) {
   options = options || {};
@@ -41,6 +52,7 @@ function createAuth(options) {
       syncStorage: options.tokenManager.syncStorage || false,
       autoRenew: options.tokenManager.autoRenew || false,
       autoRemove: options.tokenManager.autoRemove || false,
+      ...options.tokenManager
     },
     services: options.services
   });
@@ -54,80 +66,130 @@ describe('ServiceManager', () => {
     jest.useRealTimers();
   });
 
-  it('starts syncStorage service for every tab, autoRenew service for leader tab (for syncStorage == true)', async () => {
-    const options = { tokenManager: { syncStorage: true, autoRenew: true } };
-    let client1 = createAuth(options);
-    let client2 = createAuth(options);
-    util.disableLeaderElection();
-    jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
-    jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
-    await client1.serviceManager.start();
-    await client2.serviceManager.start();
-    expect(client1.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
-    expect(client2.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
-    expect(client1.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
-    expect(client2.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
-    await client1.serviceManager.stop();
-    await client2.serviceManager.stop();
+  describe('syncStorage', () => {
+    it('allows syncStorage for storage type "cookie"', async () => {
+      const options = { tokenManager: { syncStorage: true, storage: 'cookie' } };
+      util.disableLeaderElection();
+      const client = createAuth(options);
+      await client.serviceManager.start();
+      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
+      await client.serviceManager.stop();
+    });
+  
+    it('allows syncStorage for storage type "localStorage"', async () => {
+      const options = { tokenManager: { syncStorage: true, storage: 'localStorage' } };
+      util.disableLeaderElection();
+      const client = createAuth(options);
+      await client.serviceManager.start();
+      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
+      await client.serviceManager.stop();
+    });
+  
+    it('NOT allows syncStorage for storage type "sessionStorage"', async () => {
+      const options = { tokenManager: { syncStorage: true, storage: 'sessionStorage' } };
+      util.disableLeaderElection();
+      const client = createAuth(options);
+      await client.serviceManager.start();
+      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
+      await client.serviceManager.stop();
+    });
+  
+    it('NOT allows syncStorage for storage type "memory"', async () => {
+      const options = { tokenManager: { syncStorage: true, storage: 'memory' } };
+      util.disableLeaderElection();
+      const client = createAuth(options);
+      await client.serviceManager.start();
+      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
+      await client.serviceManager.stop();
+    });
   });
 
-  it('starts autoRenew service for every tab (for syncStorage == false)', async () => {
-    const options = { tokenManager: { syncStorage: false, autoRenew: true } };
-    let client1 = createAuth(options);
-    let client2 = createAuth(options);
-    util.disableLeaderElection();
-    jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
-    jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
-    await client1.serviceManager.start();
-    await client2.serviceManager.start();
-    expect(client1.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
-    expect(client2.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
-    expect(client1.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
-    expect(client2.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
-    await client1.serviceManager.stop();
-    await client2.serviceManager.stop();
+  describe('leaderElection', () => {
+    it('doesn\'t start leaderElection service if other services don\'t require leadership', async () => {
+      const options = { tokenManager: { syncStorage: false, autoRenew: true } };
+      const client = createAuth(options);
+      await client.serviceManager.start();
+      expect(client.serviceManager.isLeaderRequired()).toBeFalsy();
+      expect(client.serviceManager.getService('leaderElection')?.isStarted()).toBeFalsy();
+      await client.serviceManager.stop();
+    });
+  
+    it('starts leaderElection service if any service (autoRenew) requires leadership', async () => {
+      const options = { tokenManager: { syncStorage: true, autoRenew: true } };
+      const client = createAuth(options);
+      await client.serviceManager.start();
+      expect(client.serviceManager.isLeaderRequired()).toBeTruthy();
+      expect(client.serviceManager.getService('leaderElection')?.isStarted()).toBeTruthy();
+      await client.serviceManager.stop();
+    });
   });
 
-  it('starts no services for syncStorage == false and autoRenew == false', async () => {
-    const options = { tokenManager: { syncStorage: false, autoRenew: false } };
-    let client1 = createAuth(options);
-    let client2 = createAuth(options);
-    util.disableLeaderElection();
-    jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
-    jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
-    await client1.serviceManager.start();
-    await client2.serviceManager.start();
-    expect(client1.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
-    expect(client2.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
-    expect(client1.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
-    expect(client2.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
-    await client1.serviceManager.stop();
-    await client2.serviceManager.stop();
-  });
-
-  it('starts autoRenew service after becoming leader (for syncStorage == true)', async () => {
-    // Become leader in 100ms
-    const mockedElector = {
-      isLeader: false,
-      awaitLeadership: () => new Promise(resolve => {
-        setTimeout(() => {
-          mockedElector.isLeader = true;
-          resolve();
-        }, 100);
-      }) as Promise<void>,
-      die: () => Promise.resolve(undefined),
-    };
-
-    const options = { tokenManager: { syncStorage: true, autoRenew: true } };
-    let client = createAuth(options);
-    jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(mockedElector);
-    await client.serviceManager.start();
-    expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
-    expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
-    jest.runAllTimers();
-    await Promise.resolve();
-    expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
-    await client.serviceManager.stop();
+  describe('autoRenew', () => {
+    it('starts syncStorage service for every tab, autoRenew service for leader tab (for syncStorage == true)', async () => {
+      const options = { tokenManager: { syncStorage: true, autoRenew: true } };
+      const client1 = createAuth(options);
+      const client2 = createAuth(options);
+      util.disableLeaderElection();
+      jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
+      jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
+      await client1.serviceManager.start();
+      await client2.serviceManager.start();
+      expect(client1.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
+      expect(client2.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
+      expect(client1.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
+      expect(client2.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
+      await client1.serviceManager.stop();
+      await client2.serviceManager.stop();
+    });
+  
+    it('starts autoRenew service for every tab (for syncStorage == false)', async () => {
+      const options = { tokenManager: { syncStorage: false, autoRenew: true } };
+      const client1 = createAuth(options);
+      const client2 = createAuth(options);
+      util.disableLeaderElection();
+      jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
+      jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
+      await client1.serviceManager.start();
+      await client2.serviceManager.start();
+      expect(client1.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
+      expect(client2.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
+      expect(client1.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
+      expect(client2.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
+      await client1.serviceManager.stop();
+      await client2.serviceManager.stop();
+    });
+  
+    it('starts no services for syncStorage == false and autoRenew == false', async () => {
+      const options = { tokenManager: { syncStorage: false, autoRenew: false } };
+      const client1 = createAuth(options);
+      const client2 = createAuth(options);
+      util.disableLeaderElection();
+      jest.spyOn(client1.serviceManager, 'isLeader').mockReturnValue(true);
+      jest.spyOn(client2.serviceManager, 'isLeader').mockReturnValue(false);
+      await client1.serviceManager.start();
+      await client2.serviceManager.start();
+      expect(client1.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
+      expect(client2.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
+      expect(client1.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
+      expect(client2.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
+      await client1.serviceManager.stop();
+      await client2.serviceManager.stop();
+    });
+  
+    it('starts autoRenew service after becoming leader (for syncStorage == true)', async () => {
+      const options = { tokenManager: { syncStorage: true, autoRenew: true } };
+      const client = createAuth(options);
+      await client.serviceManager.start();
+      expect(client.serviceManager.isLeader()).toBeFalsy();
+      expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
+      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
+      expect(client.serviceManager.getService('leaderElection')?.isStarted()).toBeTruthy();
+      (client.serviceManager.getService('leaderElection') as any)?._setLeader();
+      await (client.serviceManager.getService('leaderElection') as any)?.onLeader();
+      expect(client.serviceManager.isLeader()).toBeTruthy();
+      expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
+      await client.serviceManager.stop();
+    });
   });
 
   it('can restart', async () => {
@@ -143,6 +205,32 @@ describe('ServiceManager', () => {
     await client.serviceManager.stop();
   });
 
+  it('sets default channel names', () => {
+    const client = createAuth({});
+    const serviceManagerOptions = (client.serviceManager as any).options;
+    expect(serviceManagerOptions.electionChannelName).toEqual('NPSfOkH5eZrTy8PMDlvx-election');
+    expect(serviceManagerOptions.syncChannelName).toEqual('NPSfOkH5eZrTy8PMDlvx-sync');
+  });
+
+  it('can set channel name for leader election with `services.electionChannelName`', () => {
+    const options = {
+      services: { electionChannelName: 'test-election-channel' }
+    };
+    const client = createAuth(options);
+    const serviceManagerOptions = (client.serviceManager as any).options;
+    expect(serviceManagerOptions.electionChannelName).toEqual('test-election-channel');
+  });
+
+  it('can set channel name for sync service with `services.syncChannelName`', () => {
+    const options = {
+      services: { syncChannelName: 'test-sync-channel' }
+    };
+    const client = createAuth(options);
+    const serviceManagerOptions = (client.serviceManager as any).options;
+    expect(serviceManagerOptions.syncChannelName).toEqual('test-sync-channel');
+  });
+
+  // TODO: remove in next major version - OKTA-473815
   describe('Backwards Compatibility', () => {
     it('`services` will supersede `tokenManager` configurations', async () => {
       const options = {
@@ -153,6 +241,15 @@ describe('ServiceManager', () => {
       util.disableLeaderElection();
       await client.serviceManager.start();
       expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
+    });
+
+    it('`services` supports `broadcastChannelName` as old name for `electionChannelName`', () => {
+      const options = {
+        services: { broadcastChannelName: 'test-channel' }
+      };
+      const client = createAuth(options);
+      const serviceManagerOptions = (client.serviceManager as any).options;
+      expect(serviceManagerOptions.electionChannelName).toEqual('test-channel');
     });
   });
 
