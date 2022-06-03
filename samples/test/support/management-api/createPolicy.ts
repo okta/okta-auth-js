@@ -57,6 +57,7 @@ const getGlobalSessionPolicy = (options: Options) => {
 
 const getPasswordPolicy = (options: Options) => {
   return {
+    priority: 0,
     type: 'PASSWORD',
     conditions: {
       people: {
@@ -90,7 +91,7 @@ const getPasswordPolicy = (options: Options) => {
           maxAttempts: 1, // important to lock user after incorrect passwod
           autoUnlockMinutes: 0,
           userLockoutNotificationChannels: [],
-          showLockoutFailures: true
+          showLockoutFailures: false
         }
       },
       recovery: {

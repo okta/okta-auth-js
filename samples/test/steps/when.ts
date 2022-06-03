@@ -18,6 +18,7 @@ import enterCredential from '../support/action/context-enabled/enterCredential';
 import enterValidPassword from '../support/action/enterValidPassword';
 import enterCode from '../support/action/enterCode';
 import enterLiveUserEmail from '../support/action/context-enabled/live-user/enterEmail';
+import enterRecoveryEmail from '../support/action/context-enabled/live-user/enterRecoveyEmail';
 import submitForm from '../support/action/submitForm';
 import selectAuthenticator from '../support/action/selectAuthenticator';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
@@ -296,4 +297,9 @@ When(
 When(
   /^She selects Security Question from the list$/,
   selectSecurityQuestionAuthenticator
+);
+
+When(
+  /^she inputs her recovery email$/,
+  enterRecoveryEmail
 );

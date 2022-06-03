@@ -10,21 +10,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { PageWithTitle } from './Page';
 
-const unlockForm = '#select-authenticator-form';
-const username = `${unlockForm} #username`;
-const submit = `${unlockForm} button[type=submit]`;
-const options = `#authenticator-options`;
+import SelectAuthenticatorUnlockAccount from '../../../selectors/SelectAuthenticatorUnlockAccount';
+import ActionContext from '../../../context';
 
-class SelectAuthenticatorUnlockAccount extends PageWithTitle {
-  title = 'Select authenticator';
-
-  get pageTitle() {return '#select-authenticator-page-title-header';}
-
-  get options() { return options; }
-  get username() { return username; }
-  get submit() { return submit; }
+export default async function(this: ActionContext) {
+  await (await $(SelectAuthenticatorUnlockAccount.username)).setValue(this.user.profile.email);
 }
-
-export default new SelectAuthenticatorUnlockAccount(); 
