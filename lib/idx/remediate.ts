@@ -21,7 +21,6 @@ import {
   IdxActionParams, 
 } from './types/idx-js';
 import {
-  getMessagesFromResponse,
   isTerminalResponse,
   filterValuesForRemediation,
   getRemediator,
@@ -133,9 +132,8 @@ export async function remediate(
 
   // Do not attempt to remediate if response is in terminal state
   const terminal = isTerminalResponse(idxResponse);
-  const messages = getMessagesFromResponse(idxResponse);
   if (terminal) {
-    return { idxResponse, terminal, messages };
+    return { idxResponse, terminal };
   }
 
   if (!remediator) {
@@ -164,7 +162,6 @@ export async function remediate(
     return {
       idxResponse,
       nextStep,
-      messages: messages.length ? messages: undefined
     };
   }
 
@@ -187,7 +184,6 @@ export async function remediate(
       return {
         idxResponse,
         nextStep,
-        messages: messages.length ? messages: undefined
       };
     }
     

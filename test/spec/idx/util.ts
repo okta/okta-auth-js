@@ -439,7 +439,6 @@ describe('idx/util', () => {
           requestDidSucceed: false
         },
         terminal: true,
-        messages: []
       });
     });
     it('non-terminal IDX responses, no remediator: it augments the object with requestDidSucceed = false and returns it', () => {
@@ -453,7 +452,6 @@ describe('idx/util', () => {
           ...idxResponse,
           requestDidSucceed: false
         },
-        messages: []
       });
     });
     it('non-terminal IDX response and a remediator: it augments the object with requestDidSucceed = false and returns it along with next step info', () => {
@@ -473,7 +471,6 @@ describe('idx/util', () => {
           ...idxResponse,
           requestDidSucceed: false
         },
-        messages: [],
         nextStep
       });
       expect(remediator.getNextStep).toHaveBeenCalledWith(authClient, context);

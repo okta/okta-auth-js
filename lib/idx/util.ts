@@ -262,15 +262,10 @@ export function handleIdxError(authClient: OktaAuthIdxInterface, e, remediator?)
     requestDidSucceed: false
   };
   const terminal = isTerminalResponse(idxResponse);
-  const messages = getMessagesFromResponse(idxResponse);
-  if (terminal) {
-    return { idxResponse, terminal, messages };
-  } else {
-    const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
-    return { 
-      idxResponse,
-      messages, 
-      ...(nextStep && { nextStep }) 
-    };
-  }
+  const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
+  return {
+    idxResponse,
+    ...(terminal && { terminal }),
+    ...(!terminal && nextStep && { nextStep }) 
+  };
 }

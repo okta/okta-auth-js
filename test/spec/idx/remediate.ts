@@ -45,20 +45,16 @@ describe('idx/remediate', () => {
     expect(res).toEqual({ idxResponse });
   });
 
-  it('returns idxResponse, messages, terminal if the idxResponse is terminal', async () => {
+  it('returns idxResponse, terminal if the idxResponse is terminal', async () => {
     const { authClient } = testContext;
-    const messages = ['fake'];
     jest.spyOn(util, 'isTerminalResponse').mockReturnValue(true);
-    jest.spyOn(util, 'getMessagesFromResponse').mockReturnValue(messages);
     const idxResponse = { fake: true, actions: {} } as unknown as IdxResponse;
     const res = await remediate(authClient, idxResponse, {}, {});
     expect(res).toEqual({
       idxResponse,
       terminal: true,
-      messages
     });
     expect(util.isTerminalResponse).toHaveBeenCalledWith(idxResponse);
-    expect(util.getMessagesFromResponse).toHaveBeenCalledWith(idxResponse);
   });
 
   describe('actions', () => {
@@ -525,7 +521,6 @@ describe('idx/remediate', () => {
             ...responseFromProceed,
             requestDidSucceed: true
           },
-          messages: ['hello'],
           nextStep: {}
         });
         expect(idxResponse.proceed).toHaveBeenCalledWith(name, data);
@@ -606,7 +601,6 @@ describe('idx/remediate', () => {
           requestDidSucceed: true,
         },
         terminal: true,
-        messages: ['hello'],
       });
     });
   });
