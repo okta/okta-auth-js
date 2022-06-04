@@ -96,7 +96,7 @@ describe('idx/util', () => {
   describe('getMessagesFromResponse', () => {
     it('returns an empty array on a basic response', () => {
       const idxResponse = IdxResponseFactory.build();
-      const res = getMessagesFromResponse(idxResponse);
+      const res = getMessagesFromResponse(idxResponse, {});
       expect(res.length).toBe(0);
     });
 
@@ -111,7 +111,7 @@ describe('idx/util', () => {
       const idxResponse = IdxResponseFactory.build({
         rawIdxState
       });
-      const res = getMessagesFromResponse(idxResponse);
+      const res = getMessagesFromResponse(idxResponse, {});
       expect(res).toEqual([{
         class: 'ERROR',
         i18n: {
@@ -121,42 +121,53 @@ describe('idx/util', () => {
       }]);
     });
 
-    it('returns messages on a remediation form', () => {
-      const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
-        relatesTo: {
-          type: 'object',
-          value: PhoneAuthenticatorFactory.build()
-        },
-        value: [
-          CredentialsValueFactory.build({
-            form: {
-              value: [
-                PasscodeValueFactory.build({
-                  messages: IdxMessagesFactory.build({
-                    value: [
-                      IdxErrorPasscodeInvalidFactory.build()
-                    ]
+    describe('form level messages', () => {
+      let idxResponse;
+      beforeEach(() => {
+        const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+          relatesTo: {
+            type: 'object',
+            value: PhoneAuthenticatorFactory.build()
+          },
+          value: [
+            CredentialsValueFactory.build({
+              form: {
+                value: [
+                  PasscodeValueFactory.build({
+                    messages: IdxMessagesFactory.build({
+                      value: [
+                        IdxErrorPasscodeInvalidFactory.build()
+                      ]
+                    })
                   })
-                })
-              ]
-            }
-          })
-        ]
+                ]
+              }
+            })
+          ]
+        });
+        idxResponse = IdxResponseFactory.build({
+          neededToProceed: [challengeAuthenticatorRemediation]
+        });
       });
-      const idxResponse = IdxResponseFactory.build({
-        neededToProceed: [challengeAuthenticatorRemediation]
-      });
-      const res = getMessagesFromResponse(idxResponse);
-      expect(res).toEqual([{
-        class: 'ERROR',
-        i18n: {
-          key: 'api.authn.error.PASSCODE_INVALID',
-          params: []
-        },
-        message: 'Invalid code. Try again.'
-      }]);
-    });
 
+      it('returns messages on a remediation form', () => {
+        const res = getMessagesFromResponse(idxResponse, {});
+        expect(res).toEqual([{
+          class: 'ERROR',
+          i18n: {
+            key: 'api.authn.error.PASSCODE_INVALID',
+            params: []
+          },
+          message: 'Invalid code. Try again.'
+        }]);
+      });
+
+      it('not return messages on a remediation form when use generic remediator', () => {
+        const res = getMessagesFromResponse(idxResponse, { useGenericRemediator: true });
+        expect(res).toEqual([]);
+      });
+    });
+    
   });
 
   describe('isTerminalResponse', () => {

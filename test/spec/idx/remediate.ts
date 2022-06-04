@@ -462,20 +462,6 @@ describe('idx/remediate', () => {
         idxResponse
       };
     });
-    // This behavior is being removed
-    // xit('if there are messages on the remediation, it returns early, without evaluation by the Remediator', async () => {
-    //   const { idxResponse, remediator } = testContext;
-    //   const messages = ['fake'];
-    //   jest.spyOn(util, 'getMessagesFromResponse').mockReturnValue(messages);
-    //   const res = await remediate(idxResponse, {}, {});
-    //   expect(res).toEqual({
-    //     idxResponse,
-    //     messages,
-    //     nextStep: {}
-    //   });
-    //   expect(util.getMessagesFromResponse).toHaveBeenCalledWith(idxResponse);
-    //   expect(remediator.canRemediate).not.toHaveBeenCalled();
-    // });
     it('if the Remediator cannot remediate, it returns early with nextStep information', async () => {
       const { authClient, idxResponse, remediator } = testContext;
       remediator.canRemediate.mockReturnValue(false);
