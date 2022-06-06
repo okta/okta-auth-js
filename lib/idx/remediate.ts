@@ -101,7 +101,7 @@ export async function remediate(
           idxResponse = await idxResponse.actions[action](params);
           idxResponse = { ...idxResponse, requestDidSucceed: true };
         } catch (e) {
-          return handleIdxError(authClient, e, remediator);
+          return handleIdxError(authClient, e, options);
         }
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
@@ -122,7 +122,7 @@ export async function remediate(
           idxResponse = { ...idxResponse, requestDidSucceed: true };
         }
         catch (e) {
-          return handleIdxError(authClient, e, remediator);
+          return handleIdxError(authClient, e, options);
         }
 
         return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
@@ -144,7 +144,7 @@ export async function remediate(
         idxResponse = { ...idxResponse, requestDidSucceed: true };
         return { idxResponse };
       } catch(e) {
-        return handleIdxError(authClient, e);
+        return handleIdxError(authClient, e, options);
       }
     }
     if (flow === 'default') {
@@ -189,6 +189,6 @@ export async function remediate(
     
     return remediate(authClient, idxResponse, values, options); // recursive call
   } catch (e) {
-    return handleIdxError(authClient, e, remediator);
+    return handleIdxError(authClient, e, options);
   }
 }

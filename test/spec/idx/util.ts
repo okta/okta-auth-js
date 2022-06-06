@@ -167,7 +167,7 @@ describe('idx/util', () => {
         expect(res).toEqual([]);
       });
     });
-    
+
   });
 
   describe('isTerminalResponse', () => {
@@ -429,7 +429,7 @@ describe('idx/util', () => {
       } as unknown as IdxResponse;
       testContext = {
         authClient,
-        idxResponse
+        idxResponse,
       };
     });
 
@@ -457,7 +457,12 @@ describe('idx/util', () => {
       idxResponse.neededToProceed.push({
         name: 'some-remediation'
       });
-      const res = handleIdxError(authClient, idxResponse);
+      const FooRemediator = jest.fn();
+      const remediators = {
+        foo: FooRemediator,
+      };
+      const options = { remediators };
+      const res = handleIdxError(authClient, idxResponse, options);
       expect(res).toEqual({
         idxResponse: {
           ...idxResponse,
@@ -470,13 +475,21 @@ describe('idx/util', () => {
       const context = { fake: true };
       idxResponse.context = context;
       idxResponse.neededToProceed.push({
-        name: 'some-remediation'
+        name: 'foo'
       });
       const nextStep = { fake: true };
-      const remediator = {
-        getNextStep: jest.fn().mockReturnValue(nextStep)
+      const mockGetNextStep = jest.fn().mockReturnValue(nextStep);
+      const FooRemediator = jest.fn().mockImplementation(() => {
+        return {
+          canRemediate: jest.fn().mockReturnValue(true),
+          getNextStep: mockGetNextStep,
+        };
+      });
+      const remediators = {
+        foo: FooRemediator,
       };
-      const res = handleIdxError(authClient, idxResponse, remediator);
+      const options = { remediators };
+      const res = handleIdxError(authClient, idxResponse, options);
       expect(res).toEqual({
         idxResponse: {
           ...idxResponse,
@@ -484,7 +497,7 @@ describe('idx/util', () => {
         },
         nextStep
       });
-      expect(remediator.getNextStep).toHaveBeenCalledWith(authClient, context);
+      expect(mockGetNextStep).toHaveBeenCalledWith(authClient, context);
     });
   });
 });

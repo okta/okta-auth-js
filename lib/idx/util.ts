@@ -254,7 +254,7 @@ export function getNextStep(
   };
 }
 
-export function handleIdxError(authClient: OktaAuthIdxInterface, e, remediator?): RemediationResponse {
+export function handleIdxError(authClient: OktaAuthIdxInterface, e, options = {}): RemediationResponse {
   // Handle idx messages
   let idxResponse = isIdxResponse(e) ? e : null;
   if (!idxResponse) {
@@ -266,6 +266,7 @@ export function handleIdxError(authClient: OktaAuthIdxInterface, e, remediator?)
     requestDidSucceed: false
   };
   const terminal = isTerminalResponse(idxResponse);
+  const remediator = getRemediator(idxResponse.neededToProceed, {}, options);
   const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
   return {
     idxResponse,

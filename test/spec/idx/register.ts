@@ -1290,6 +1290,7 @@ describe('idx/register', () => {
           })
         }),
         neededToProceed: [
+          PhoneAuthenticatorEnrollmentDataRemediationFactory.build(),
           SelectAuthenticatorAuthenticateRemediationFactory.build({
             value: [
               AuthenticatorValueFactory.build({

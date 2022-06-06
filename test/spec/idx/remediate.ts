@@ -94,7 +94,7 @@ describe('idx/remediate', () => {
         });
 
         it('will handle exceptions', async () => {
-          const { authClient, remediator, errorResponse } = testContext;
+          const { authClient, errorResponse } = testContext;
           const error = new Error('my test error');
           const idxResponse = {
             neededToProceed: [{
@@ -107,7 +107,7 @@ describe('idx/remediate', () => {
           } as unknown as IdxResponse;
           const res = await remediate(authClient, idxResponse, { resend: true }, {});
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, {});
         });
       });
 
@@ -146,7 +146,7 @@ describe('idx/remediate', () => {
           expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromAction.neededToProceed, {}, { actions: [] });
         });
         it('will handle exceptions', async () => {
-          const { authClient, remediator, errorResponse } = testContext;
+          const { authClient, errorResponse } = testContext;
           const error = new Error('my test error');
           const idxResponse = {
             neededToProceed: [{
@@ -157,9 +157,10 @@ describe('idx/remediate', () => {
             },
             rawIdxState: {}
           } as unknown as IdxResponse;
-          const res = await remediate(authClient, idxResponse, { resend: true }, { actions: ['some-action'] });
+          const options = { actions: ['some-action'] };
+          const res = await remediate(authClient, idxResponse, { resend: true }, options);
           expect(res).toEqual(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, options);
         });
       });
 
@@ -193,7 +194,7 @@ describe('idx/remediate', () => {
         });
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
-          const { remediator, errorResponse } = testContext;
+          const { errorResponse } = testContext;
           const error = new Error('my test error');
           idxResponse = {
             ...idxResponse,
@@ -202,9 +203,10 @@ describe('idx/remediate', () => {
               name: 'some-remediation'
             }],
           } as unknown as IdxResponse;
-          const res = await remediate(authClient, idxResponse, {}, { actions: ['some-remediation'] });
+          const options = { actions: ['some-remediation'] };
+          const res = await remediate(authClient, idxResponse, {}, options);
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, options);
         });
       });
 
@@ -275,7 +277,7 @@ describe('idx/remediate', () => {
         });
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
-          const { remediator, errorResponse } = testContext;
+          const { errorResponse } = testContext;
           const error = new Error('my test error');
           const actionFn = jest.fn().mockRejectedValue(error);
           idxResponse = {
@@ -291,9 +293,10 @@ describe('idx/remediate', () => {
             name: 'some-action',
             params: { foo: 'bar' }
           };
-          const res = await remediate(authClient, idxResponse, {}, { actions: [action] });
+          const options = { actions: [action] };
+          const res = await remediate(authClient, idxResponse, {}, options);
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, options);
           expect(actionFn).toHaveBeenCalledWith({ foo: 'bar' });
         });
       });
@@ -331,7 +334,7 @@ describe('idx/remediate', () => {
         });
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
-          const { remediator, errorResponse } = testContext;
+          const { errorResponse } = testContext;
           const error = new Error('my test error');
           idxResponse = {
             ...idxResponse,
@@ -343,9 +346,10 @@ describe('idx/remediate', () => {
           const action = {
             name: 'some-remediation'
           };
-          const res = await remediate(authClient, idxResponse, {}, { actions: [action] });
+          const options = { actions: [action] };
+          const res = await remediate(authClient, idxResponse, {}, options);
           expect(res).toBe(errorResponse);
-          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, remediator);
+          expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, options);
         });
       });
 
@@ -433,9 +437,10 @@ describe('idx/remediate', () => {
             }]
           }],
         } as unknown as IdxResponse;
-        const res = await remediate(authClient, idxResponse, {}, { step: 'some-remediation' });
+        const options = { step: 'some-remediation' };
+        const res = await remediate(authClient, idxResponse, {}, options);
         expect(res).toBe(errorResponse);
-        expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error);
+        expect(util.handleIdxError).toHaveBeenCalledWith(authClient, error, options);
         expect(idxResponse.proceed).toHaveBeenCalledWith('some-remediation', {});
       });
     });
