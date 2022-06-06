@@ -45,7 +45,6 @@ import {
   IdxErrorInvalidLoginEmailFactory,
   IdxErrorDoesNotMatchPattern,
   IdxErrorEnrollmentInvalidPhoneFactory,
-  SelectAuthenticatorAuthenticateRemediationFactory,
   EnrollGoogleAuthenticatorRemediationFactory,
   GoogleAuthenticatorOptionFactory,
   SecurityQuestionAuthenticatorOptionFactory,
@@ -1291,15 +1290,6 @@ describe('idx/register', () => {
         }),
         neededToProceed: [
           PhoneAuthenticatorEnrollmentDataRemediationFactory.build(),
-          SelectAuthenticatorAuthenticateRemediationFactory.build({
-            value: [
-              AuthenticatorValueFactory.build({
-                options: [
-                  PhoneAuthenticatorOptionFactory.build(),
-                ]
-              })
-            ]
-          })
         ]
       });
 
