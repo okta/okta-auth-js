@@ -6,4 +6,3 @@ build2
 ci-scripts
 webpack*config.js
 scripts
-bundles-for-validation

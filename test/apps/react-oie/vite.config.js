@@ -35,10 +35,12 @@ export default defineConfig({
   build: {
     sourcemap: true,
     rollupOptions: {
-      plugins: [visualizer({
-        filename: 'dist/stats.html',
-        gzipSize: true
-      })]
+      plugins: [
+        visualizer({
+          filename: 'dist/stats.html',
+          gzipSize: true
+        })
+      ]
     }
   }
 });

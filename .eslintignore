@@ -7,7 +7,6 @@ node_modules
 /build/types
 /build/cjs
 /build/esm
-/build/bundles-for-validation
 /samples/templates
 /samples/generated/webpack-spa/public/*-bundle.*
 /samples/generated/express-direct-auth-dynamic

@@ -96,4 +96,10 @@ function removeBuildDir(val) {
 
 fs.writeFileSync(`${BUILD_DIR}/package.json`, JSON.stringify(packageJSON, null, 4));
 
+// Add an extra package.json underneath ESM to indicate module type
+// This helps tools like Jest identify this code as ESM
+fs.writeFileSync(`${BUILD_DIR}/esm/package.json`, JSON.stringify({
+  type: 'module'
+}, null, 4));
+
 shell.echo(chalk.green('End building'));
