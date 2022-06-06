@@ -25,6 +25,7 @@ import grantConsentToScope from '../support/management-api/grantConsentToScope';
 import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
 import clickButton from '../support/action/clickButton';
 import checkIsOnPage from '../support/check/checkIsOnPage';
+import checkFormMessage from '../support/check/checkFormMessage';
 import loginDirect from '../support/action/loginDirect';
 import addUserProfileSchemaToApp from '../support/management-api/addUserProfileSchemaToApp';
 import openRegisterWithActivationToken from '../support/action/openRegisterWithActivationToken';
@@ -305,3 +306,16 @@ Given('she does not have account in the org', noop);
 Given('she is on the Root View in an UNAUTHENTICATED state', noop);
 
 Given('she is not enrolled in any authenticators', noop);
+
+Given(
+  'Mary has entered an incorrect password to trigger an account lockout', 
+  async function(this: ActionContext) {
+    await clickButton('login');
+    await checkIsOnPage('Login');
+    await loginDirect({
+      username: this.credentials.emailAddress,
+      password: '!incorrect!'
+    });
+    await checkFormMessage('Authentication failed');
+  }
+);

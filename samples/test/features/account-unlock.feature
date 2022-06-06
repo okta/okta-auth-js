@@ -15,14 +15,7 @@ Feature: Account Unlock with Single factor (Email, Phone, Okta Verify Push)
      And she has an account with "active" state in the org
 
   Scenario: Mary recovers from a locked account with Email OTP
-    # Mary has entered an incorrect password to trigger an account lockout
-    When she clicks the "login" button
-    Then she is redirected to the "Login" page
-    When she fills in her "username"
-     And she fills in an incorrect "password"
-     And she submits the form
-    Then she should see the message "Authentication failed"
-    # Mary performs account lockout
+    Given Mary has entered an incorrect password to trigger an account lockout
     When she clicks the "Home" link
      And she clicks the "Unlock Account" button
     Then she is redirected to the "Unlock Account" page
@@ -38,14 +31,7 @@ Feature: Account Unlock with Single factor (Email, Phone, Okta Verify Push)
 
   Scenario: Mary recovers from a locked account with Phone SMS OTP
     Given she has enrolled in the "SMS" factor
-    # Mary has entered an incorrect password to trigger an account lockout
-    When she clicks the "login" button
-    Then she is redirected to the "Login" page
-    When she fills in her "username"
-     And she fills in an incorrect "password"
-     And she submits the form
-    Then she should see the message "Authentication failed"
-    # Mary performs account lockout
+     And Mary has entered an incorrect password to trigger an account lockout
     When she clicks the "Home" link
      And she clicks the "Unlock Account" button
     Then she is redirected to the "Unlock Account" page
