@@ -13,7 +13,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(null);
 
-  const proceedWith = useCallback((name, fn, args=[]) => {
+  const proceed = useCallback((name, fn, args=[]) => {
     (async function () {
       setLoading(true);
       const newTransaction = await fn(...args);
@@ -29,34 +29,25 @@ export default function App() {
     })();
   }, [transactions, setTransactions, setLoading, client]);
 
-  const proceedWithAction = useCallback((key, args=[]) => {
-    if (currentTransaction.actions[key]) {
-      proceedWith(key, currentTransaction.actions[key], args);
-    }
-  }, [proceedWith, currentTransaction]);
+  const proceedWithRem = useCallback((remediation, args=[]) => {
+    console.log(remediation);
 
-  const proceedWithRem = useCallback((stepName) => {
-    console.log(currentTransaction);
-    const steps = currentTransaction?.availableSteps;
-    if (!steps) {
-      // TODO: revisit
-      return; // noop
+    const { inputs, name, action } = remediation;
+
+    // action
+    if (action) {
+      return proceed(name, action, args);
     }
 
-    const stepObj = steps.find(({name}) => stepName === name);
-    if (!stepObj) {
-      //TODO: revisit
-      return; //noop
-    }
-
-    if (stepObj.inputs.length < 1) {
+    // remediation
+    if (inputs.length < 1) {
       // proceed with step when no inputs are required
-      proceedWith(stepName, client.idx.proceed, [{step: stepName}]);
+      proceed(name, client.idx.proceed, [{step: name}]);
     }
     else {
-      setStep(stepObj);
+      setStep(remediation);
     }
-  }, [currentTransaction, client, proceedWith, setStep]);
+  }, [client, proceed, setStep]);
 
   const submitForm = useCallback(data => {
     (async function () {
@@ -65,17 +56,17 @@ export default function App() {
       }
 
       const { name } = step;
-      proceedWith(name, client.idx.proceed, [{step: name, ...data}]);
+      proceed(name, client.idx.proceed, [{step: name, ...data}]);
     })();
-  }, [step, proceedWith]);
+  }, [step, proceed]);
 
   const start = useCallback(() => {
     (async function () {
       if (client) {
-        proceedWith('introspect (start)', client.idx.start);
+        proceed('introspect (start)', client.idx.start);
       }
     })();
-  }, [client, proceedWith]);
+  }, [client, proceed]);
 
   useEffect(() => {
     if (!client) {
@@ -95,7 +86,6 @@ export default function App() {
     transactions,
     config,
     currentTransaction,
-    proceedWithAction,
     proceedWithRem,
     start,
     step,

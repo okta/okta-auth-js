@@ -1,16 +1,18 @@
-import { Header, Form, Checkbox, Button } from 'semantic-ui-react';
+import { Header, Form, Checkbox, Button, Segment } from 'semantic-ui-react';
 import { useIdx } from '../IdxContext';
+import { capitalize } from '../util';
 
 const toUIOptions = opts => opts.map(opt => ({key: opt.value, text: opt.label, value: opt.value}));
 
-const renderInput = (input, options=[]) => {
-  const { type, label, name, key } = input;
+const renderInput = (input) => {
+  const { type, name, options } = input;
+  let label = input?.label || capitalize(input.name);
   let content = null;
 
   if (type === 'boolean') {
     content = (<Checkbox label={label} />);
   }
-  else if (!type && options.length > 0 && key) {
+  else if (!!options && options.length > 0) {
     content = (
       <Form.Select fluid label={label} options={toUIOptions(options)} />
     );
@@ -55,19 +57,24 @@ export default function IdxForm () {
   };
 
   if (!step) {
-    return (
-      <div>
-        <Header size='small'>No Remediation Selected</Header>
-      </div>
-    );
+    // return (
+    //   <div>
+    //     <Header size='small'>No Remediation Selected</Header>
+    //   </div>
+    // );
+    return;
   }
 
   return (
     <div>
-      <Header size='small' dividing>{step.name}</Header>
-      <Form onSubmit={handleSubmit}>
-        {step && step.inputs.map((input) => renderInput(input, step.options))}
-        <Button type='submit'>Submit</Button>
+      <Header size='small' dividing>Form: `{step.name}`</Header>
+      <Form as={Form} onSubmit={handleSubmit}>
+        <Segment secondary padded>
+          {step && step.inputs.map(renderInput)}
+        </Segment>
+        <Segment basic textAlign='center' style={{padding: 0}}>
+          <Button type='submit'>Proceed</Button>
+        </Segment>
       </Form>
     </div>
   );

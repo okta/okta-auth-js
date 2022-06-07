@@ -3,7 +3,7 @@ import RemediationList from './RemediationList';
 import NetworkResponse from './NetworkResponse';
 import TransactionDisplay from './TransactionDisplay';
 import MessagesPane from './MessagesPane';
-import IdxForm from './IdxForm';
+
 
 import { useIdx } from '../IdxContext';
 
@@ -64,11 +64,11 @@ function MainPanel ({ loading }) {
 
       <Grid celled style={{height: '100%'}}>
         <Grid.Row>
-          <Grid.Column width={3}>
-            <Header size='small' dividing>Messages</Header>
-            <MessagesPane />
+          <Grid.Column width={4}>
+            <Header size='small' dividing>Remediations</Header>
+            <RemediationList />
           </Grid.Column>
-          <Grid.Column width={8}>
+          <Grid.Column width={6}>
             <Header size='small' dividing>IdxTransaction</Header>
             <TransactionDisplay />
           </Grid.Column>
@@ -79,10 +79,11 @@ function MainPanel ({ loading }) {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={6}>
-            <RemediationList />
+            Placeholder
           </Grid.Column>
           <Grid.Column width={6}>
-            <IdxForm />
+            <Header size='small' dividing>Messages</Header>
+            <MessagesPane />
           </Grid.Column>
         </Grid.Row>
       </Grid>

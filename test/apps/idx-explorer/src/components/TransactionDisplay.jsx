@@ -28,6 +28,8 @@ export default function TransactionDisplay () {
         indentWidth={2}
         collapseStringsAfterLength={50}
         name={null}
+        displayDataTypes={false}
+        displayArrayKey={false}
       />
     </div>
   );
