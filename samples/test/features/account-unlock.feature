@@ -13,8 +13,7 @@ Feature: Account Unlock with Single factor (Email, Phone, Okta Verify Push)
 
   Scenario: Mary recovers from a locked account with Email OTP
     Given Mary has entered an incorrect password to trigger an account lockout
-    When she clicks the "Home" link
-     And she clicks the "Unlock Account" button
+    When she clicks the "Unlock Account" button
     Then she is redirected to the "Unlock Account" page
     When she submits the form
     Then she sees a page to input her user name and select Email, Phone, or Okta Verify to unlock her account
@@ -29,8 +28,7 @@ Feature: Account Unlock with Single factor (Email, Phone, Okta Verify Push)
   Scenario: Mary recovers from a locked account with Phone SMS OTP
     Given she has enrolled in the "SMS" factor
      And Mary has entered an incorrect password to trigger an account lockout
-    When she clicks the "Home" link
-     And she clicks the "Unlock Account" button
+    When she clicks the "Unlock Account" button
     Then she is redirected to the "Unlock Account" page
     When she submits the form
     Then she sees a page to input her user name and select Email, Phone, or Okta Verify to unlock her account

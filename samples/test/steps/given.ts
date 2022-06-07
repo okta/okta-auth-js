@@ -24,6 +24,7 @@ import enrollFactor from '../support/management-api/enrollFactor';
 import grantConsentToScope from '../support/management-api/grantConsentToScope';
 import updateAppOAuthClient from '../support/management-api/updateAppOAuthClient';
 import clickButton from '../support/action/clickButton';
+import clickLink from '../support/action/clickLink';
 import checkIsOnPage from '../support/check/checkIsOnPage';
 import checkFormMessage from '../support/check/checkFormMessage';
 import loginDirect from '../support/action/loginDirect';
@@ -351,5 +352,6 @@ Given(
       password: '!incorrect!'
     });
     await checkFormMessage('Authentication failed');
+    await clickLink('Home');
   }
 );
