@@ -1,5 +1,6 @@
 import { randomStr } from '../../util';
 import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
+import merge from 'deepmerge';
 
 type Options = {
   policyId: string;
@@ -175,7 +176,7 @@ const getGlobalSessionPolicyActions = (description: string) => {
 
 const getPasswordPolicyActions = (description: string) => {
   return ({
-    'Account Unlock with Email or SMS': {
+    '"Users can perform self-service" has "Unlock Account" checked': {
       'type': 'PASSWORD',
       'status': 'ACTIVE',
       'conditions': {
@@ -188,23 +189,40 @@ const getPasswordPolicyActions = (description: string) => {
         },
         'selfServicePasswordReset': {
           'access': 'ALLOW',
-          'requirement': {
-            'primary': {
-              'methods': [
-                'email',
-                'sms'
-              ]
-            },
-            'stepUp': { 
-              'required': false
-            }
-          }
         },
         'selfServiceUnlock': {
           'access': 'ALLOW',
         }
       }
-    }
+    },
+    '"Users can initiate Recovery with" has "Phone (SMS / Voice Call)" and "Email" checked': {
+      'actions': {
+        'selfServicePasswordReset': {
+          'requirement': {
+            'stepUp': {
+              'required': true
+            },
+            'primary': {
+              'methods': [
+                'email',
+                'sms'
+              ]
+            }
+          }
+        },
+      }
+    },
+    '"Additional Verification is" has "Not Required" checked': {
+      'actions': {
+        'selfServicePasswordReset': {
+          'requirement': {
+            'stepUp': {
+              'required': false
+            }
+          }
+        },
+      }
+    },
   } as any)[description];
 };
 
@@ -244,10 +262,7 @@ export default async function (config: OktaClientConfig, {
   let res;
   const { value: existingRule } = await oktaClient.listPolicyRules(policyId).next();
   if (existingRule) {
-    res = await oktaClient.updatePolicyRule(policyId, existingRule.id, {
-      ...existingRule,
-      ...actions
-    });
+    res = await oktaClient.updatePolicyRule(policyId, existingRule.id, merge(existingRule, actions));
   } else {
     res = await oktaClient.createPolicyRule(policyId, {
       name: `Test-Policy-Rule-${randomStr(6)}`,

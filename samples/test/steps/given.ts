@@ -185,6 +185,40 @@ Given(
 );
 
 Given(
+  'a Password Policy is set to Lock out user after {int} unsuccessful attempt',
+  { timeout },
+  async function(this: ActionContext, maxAttempts: number) {
+    this.policies = this.policies || [];
+    const policy = await createPolicy(this.config, { 
+      policyDescription: 'Password',
+      groupId: this.group?.id,
+      maxAttempts
+    });
+    this.policies.push(policy);
+    try {
+      await addAppToPolicy(this.config, { 
+        policyId: policy.id, 
+        appId: this.app.id
+      });
+    } catch(err) {/* do nothing */}
+  }
+);
+
+Given(
+  /^the Password Policy Rule (?<policyRuleDescription>.+?)$/,
+  { timeout },
+  async function(this: ActionContext, policyRuleDescription: string) {
+    const lastPolicy = this.policies[this.policies.length - 1];
+    await upsertPolicyRule(this.config, { 
+      policyId: lastPolicy.id, 
+      policyType: lastPolicy.type,
+      policyRuleDescription,
+      groupId: this.group?.id
+    });
+  }
+);
+
+Given(
   'with a Policy Rule that defines {string}',
   { timeout },
   async function(this: ActionContext, policyRuleDescription: string) {

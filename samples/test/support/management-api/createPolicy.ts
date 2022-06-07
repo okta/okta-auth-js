@@ -7,6 +7,7 @@ type Options = {
   dataTable?: {
     rawTable: string[][];
   }; 
+  maxAttempts?: number;
 }
 
 const getAuthenticationPolicy = () => {
@@ -88,7 +89,7 @@ const getPasswordPolicy = (options: Options) => {
           historyCount: 4
         },
         lockout:  {
-          maxAttempts: 1, // important to lock user after incorrect passwod
+          maxAttempts: options.maxAttempts || 1,
           autoUnlockMinutes: 0,
           userLockoutNotificationChannels: [],
           showLockoutFailures: false
@@ -129,7 +130,7 @@ export default async function(config: OktaClientConfig, options: Options) {
     policyObject = getProfileEnrollmentPolicy();
   } else if (policyDescription === 'Global Session') {
     policyObject = getGlobalSessionPolicy(options);
-  } else if (policyDescription === 'Account Recovery') {
+  } else if (policyDescription === 'Password') {
     policyObject = getPasswordPolicy(options);
   } else {
     throw new Error(`Unknow policy ${policyDescription}`);
