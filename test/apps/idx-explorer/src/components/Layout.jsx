@@ -3,6 +3,7 @@ import RemediationList from './RemediationList';
 import NetworkResponse from './NetworkResponse';
 import TransactionDisplay from './TransactionDisplay';
 import MessagesPane from './MessagesPane';
+import ParamsForm from './ParamsForm';
 
 
 import { useIdx } from '../IdxContext';
@@ -39,8 +40,8 @@ function SidePanel () {
           <Menu.Item>
             <Header size='small' inverted>Transactions</Header>
             <List bulleted inverted>
-              {transactions.map(t => (
-                  <List.Item key={t.name}>
+              {transactions.map((t, i) => (
+                  <List.Item key={t.name+i}>
                     <List.Content>
                       <List.Header>{t.name}</List.Header>
                     </List.Content>
@@ -78,10 +79,11 @@ function MainPanel ({ loading }) {
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
-          <Grid.Column width={6}>
-            Placeholder
+          <Grid.Column width={4}>
+            <Header size='small' dividing>Client Params</Header>
+            <ParamsForm />
           </Grid.Column>
-          <Grid.Column width={6}>
+          <Grid.Column width={8}>
             <Header size='small' dividing>Messages</Header>
             <MessagesPane />
           </Grid.Column>

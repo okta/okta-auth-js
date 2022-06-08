@@ -7,3 +7,14 @@ export function getMessageVariant(errorClass) {
     'ERROR': 'danger'
   }[errorClass];
 }
+
+export function formToObject(form) {
+  const formData = new FormData(form);
+  console.log(formData, formData.entries())
+  const data = {};
+  for (let [key, value] of formData.entries()) {
+    console.log(key, value)
+    data[key] = value;
+  }
+  return data;
+}

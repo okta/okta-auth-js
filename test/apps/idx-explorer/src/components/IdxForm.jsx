@@ -1,6 +1,6 @@
 import { Header, Form, Checkbox, Button, Segment } from 'semantic-ui-react';
 import { useIdx } from '../IdxContext';
-import { capitalize } from '../util';
+import { capitalize, formToObject } from '../util';
 
 const toUIOptions = opts => opts.map(opt => ({key: opt.value, text: opt.label, value: opt.value}));
 
@@ -45,11 +45,7 @@ export default function IdxForm () {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(e);
-    const formData = new FormData(e.currentTarget);
-    const data = {};
-    for (let [key, value] of formData.entries()) {
-      data[key] = value;
-    }
+    const data = formToObject(e.currentTarget);
     console.log(data);
     if (validateForm(data, step.inputs)) {
       submitForm(data);
@@ -68,7 +64,7 @@ export default function IdxForm () {
   return (
     <div>
       <Header size='small' dividing>Form: `{step.name}`</Header>
-      <Form as={Form} onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <Segment secondary padded>
           {step && step.inputs.map(renderInput)}
         </Segment>
