@@ -54,12 +54,17 @@ export function hasValidInputValue(input, values) {
     // handle options field
     // 1. object type options - check if each object field is required and value can be found from the selectedOption
     // 2. primitive options - required field is avaiable from top level
+    // 3. unknown format - pass to backend for validation
     if (options) {
       // object type options
       if (type === 'object') {
         const selectedOption = values[name];
-        if (!selectedOption?.id) {
-         return false;
+        if (!selectedOption) {
+          return false;
+        }
+        if (!selectedOption.id) {
+          // unknown option format, pass to backend for validation
+          return true;
         }
         const optionSchema = options.find((option) => {
           const idSchema = option.value.find(({ name }) => name === 'id' );

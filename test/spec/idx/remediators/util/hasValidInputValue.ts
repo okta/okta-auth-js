@@ -392,6 +392,15 @@ describe('hasValidInputValue - validate each input with inputValues', () => {
         });
       });
 
+      it('returns true when selected option is in unknown format', () => {
+        const values = {
+          authenticator: {
+            noId: 'fake'
+          }
+        };
+        const res = hasValidInputValue(input, values);
+        expect(res).toBe(true);
+      });
 
       it('returns true when selected option has all required values', () => {
         // email option - only id is required
