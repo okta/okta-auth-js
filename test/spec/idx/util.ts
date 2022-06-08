@@ -96,7 +96,7 @@ describe('idx/util', () => {
   describe('getMessagesFromResponse', () => {
     it('returns an empty array on a basic response', () => {
       const idxResponse = IdxResponseFactory.build();
-      const res = getMessagesFromResponse(idxResponse);
+      const res = getMessagesFromResponse(idxResponse, {});
       expect(res.length).toBe(0);
     });
 
@@ -111,7 +111,7 @@ describe('idx/util', () => {
       const idxResponse = IdxResponseFactory.build({
         rawIdxState
       });
-      const res = getMessagesFromResponse(idxResponse);
+      const res = getMessagesFromResponse(idxResponse, {});
       expect(res).toEqual([{
         class: 'ERROR',
         i18n: {
@@ -121,40 +121,51 @@ describe('idx/util', () => {
       }]);
     });
 
-    it('returns messages on a remediation form', () => {
-      const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
-        relatesTo: {
-          type: 'object',
-          value: PhoneAuthenticatorFactory.build()
-        },
-        value: [
-          CredentialsValueFactory.build({
-            form: {
-              value: [
-                PasscodeValueFactory.build({
-                  messages: IdxMessagesFactory.build({
-                    value: [
-                      IdxErrorPasscodeInvalidFactory.build()
-                    ]
+    describe('form level messages', () => {
+      let idxResponse;
+      beforeEach(() => {
+        const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+          relatesTo: {
+            type: 'object',
+            value: PhoneAuthenticatorFactory.build()
+          },
+          value: [
+            CredentialsValueFactory.build({
+              form: {
+                value: [
+                  PasscodeValueFactory.build({
+                    messages: IdxMessagesFactory.build({
+                      value: [
+                        IdxErrorPasscodeInvalidFactory.build()
+                      ]
+                    })
                   })
-                })
-              ]
-            }
-          })
-        ]
+                ]
+              }
+            })
+          ]
+        });
+        idxResponse = IdxResponseFactory.build({
+          neededToProceed: [challengeAuthenticatorRemediation]
+        });
       });
-      const idxResponse = IdxResponseFactory.build({
-        neededToProceed: [challengeAuthenticatorRemediation]
+
+      it('returns messages on a remediation form', () => {
+        const res = getMessagesFromResponse(idxResponse, {});
+        expect(res).toEqual([{
+          class: 'ERROR',
+          i18n: {
+            key: 'api.authn.error.PASSCODE_INVALID',
+            params: []
+          },
+          message: 'Invalid code. Try again.'
+        }]);
       });
-      const res = getMessagesFromResponse(idxResponse);
-      expect(res).toEqual([{
-        class: 'ERROR',
-        i18n: {
-          key: 'api.authn.error.PASSCODE_INVALID',
-          params: []
-        },
-        message: 'Invalid code. Try again.'
-      }]);
+
+      it('not return messages on a remediation form when use generic remediator', () => {
+        const res = getMessagesFromResponse(idxResponse, { useGenericRemediator: true });
+        expect(res).toEqual([]);
+      });
     });
 
   });
@@ -418,7 +429,7 @@ describe('idx/util', () => {
       } as unknown as IdxResponse;
       testContext = {
         authClient,
-        idxResponse
+        idxResponse,
       };
     });
 
@@ -439,7 +450,6 @@ describe('idx/util', () => {
           requestDidSucceed: false
         },
         terminal: true,
-        messages: []
       });
     });
     it('non-terminal IDX responses, no remediator: it augments the object with requestDidSucceed = false and returns it', () => {
@@ -447,13 +457,17 @@ describe('idx/util', () => {
       idxResponse.neededToProceed.push({
         name: 'some-remediation'
       });
-      const res = handleIdxError(authClient, idxResponse);
+      const FooRemediator = jest.fn();
+      const remediators = {
+        foo: FooRemediator,
+      };
+      const options = { remediators };
+      const res = handleIdxError(authClient, idxResponse, options);
       expect(res).toEqual({
         idxResponse: {
           ...idxResponse,
           requestDidSucceed: false
         },
-        messages: []
       });
     });
     it('non-terminal IDX response and a remediator: it augments the object with requestDidSucceed = false and returns it along with next step info', () => {
@@ -461,22 +475,29 @@ describe('idx/util', () => {
       const context = { fake: true };
       idxResponse.context = context;
       idxResponse.neededToProceed.push({
-        name: 'some-remediation'
+        name: 'foo'
       });
       const nextStep = { fake: true };
-      const remediator = {
-        getNextStep: jest.fn().mockReturnValue(nextStep)
+      const mockGetNextStep = jest.fn().mockReturnValue(nextStep);
+      const FooRemediator = jest.fn().mockImplementation(() => {
+        return {
+          canRemediate: jest.fn().mockReturnValue(true),
+          getNextStep: mockGetNextStep,
+        };
+      });
+      const remediators = {
+        foo: FooRemediator,
       };
-      const res = handleIdxError(authClient, idxResponse, remediator);
+      const options = { remediators };
+      const res = handleIdxError(authClient, idxResponse, options);
       expect(res).toEqual({
         idxResponse: {
           ...idxResponse,
           requestDidSucceed: false
         },
-        messages: [],
         nextStep
       });
-      expect(remediator.getNextStep).toHaveBeenCalledWith(authClient, context);
+      expect(mockGetNextStep).toHaveBeenCalledWith(authClient, context);
     });
   });
 });

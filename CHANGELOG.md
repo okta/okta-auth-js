@@ -9,6 +9,13 @@
   - Adds `LeaderElectionService` as separate service
   - Fixes error `Channel is closed` while stopping leader election
 
+## 6.6.2
+
+### Fixes
+
+- [#1231](https://github.com/okta/okta-auth-js/pull/1231) IDX: exposes field level error messages
+- [#1234](https://github.com/okta/okta-auth-js/pull/1234) IDX: passes unknown selected option to backend for validation when use GenericRemediator (beta)
+
 ## 6.6.1
 
 ### Fixes

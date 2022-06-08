@@ -2,7 +2,7 @@ import { warn } from '../util';
 import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
-import { IdxFeature, NextStep, RemediateOptions, RemediationResponse } from './types';
+import { IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, isIdxResponse } from './types/idx-js';
 import { OktaAuthIdxInterface } from '../types';
 
@@ -48,7 +48,7 @@ export function getMessagesFromIdxRemediationValue(
   }, []);
 }
 
-export function getMessagesFromResponse(idxResponse: IdxResponse): IdxMessage[] {
+export function getMessagesFromResponse(idxResponse: IdxResponse, options: RunOptions): IdxMessage[] {
   let messages: IdxMessage[] = [];
   const { rawIdxState, neededToProceed } = idxResponse;
 
@@ -59,10 +59,14 @@ export function getMessagesFromResponse(idxResponse: IdxResponse): IdxMessage[] 
   }
 
   // Handle field messages for current flow
-  for (let remediation of neededToProceed) {
-    const fieldMessages = getMessagesFromIdxRemediationValue(remediation.value);
-    if (fieldMessages) {
-      messages = [...messages, ...fieldMessages] as never;
+  // Preserve existing logic for general cases, remove in the next major version
+  // Follow ion response format for top level messages when useGenericRemediator is true
+  if (!options.useGenericRemediator) {
+    for (let remediation of neededToProceed) {
+      const fieldMessages = getMessagesFromIdxRemediationValue(remediation.value);
+      if (fieldMessages) {
+        messages = [...messages, ...fieldMessages] as never;
+      }
     }
   }
 
@@ -250,7 +254,7 @@ export function getNextStep(
   };
 }
 
-export function handleIdxError(authClient: OktaAuthIdxInterface, e, remediator?): RemediationResponse {
+export function handleIdxError(authClient: OktaAuthIdxInterface, e, options = {}): RemediationResponse {
   // Handle idx messages
   let idxResponse = isIdxResponse(e) ? e : null;
   if (!idxResponse) {
@@ -262,15 +266,11 @@ export function handleIdxError(authClient: OktaAuthIdxInterface, e, remediator?)
     requestDidSucceed: false
   };
   const terminal = isTerminalResponse(idxResponse);
-  const messages = getMessagesFromResponse(idxResponse);
-  if (terminal) {
-    return { idxResponse, terminal, messages };
-  } else {
-    const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
-    return { 
-      idxResponse,
-      messages, 
-      ...(nextStep && { nextStep }) 
-    };
-  }
+  const remediator = getRemediator(idxResponse.neededToProceed, {}, options);
+  const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
+  return {
+    idxResponse,
+    ...(terminal && { terminal }),
+    ...(!terminal && nextStep && { nextStep }) 
+  };
 }
