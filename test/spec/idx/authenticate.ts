@@ -38,6 +38,7 @@ import {
   GoogleAuthenticatorOptionFactory,
   SelectAuthenticatorEnrollRemediationFactory,
   ChallengeAuthenticatorRemediationFactory,
+  EnrollAuthenticatorRemediationFactory,
   CredentialsValueFactory,
   PasscodeValueFactory,
   IdxErrorPasscodeInvalidFactory,
@@ -648,7 +649,7 @@ describe('idx/authenticate', () => {
             ]
           });
 
-          const challengeAuthenticatorRemediation = ChallengeAuthenticatorRemediationFactory.build({
+          const challengeAuthenticatorRemediation = EnrollAuthenticatorRemediationFactory.build({
             relatesTo: {
               type: 'object',
               value: PhoneAuthenticatorFactory.build()
@@ -857,18 +858,9 @@ describe('idx/authenticate', () => {
               EnrollPhoneAuthenticatorRemediationFactory.build()
             ]
           });
-          const selectAuthenticatorRemediation = SelectAuthenticatorEnrollRemediationFactory.build({
-            value: [
-              AuthenticatorValueFactory.build({
-                options: [
-                  PhoneAuthenticatorOptionFactory.build(),
-                ]
-              })
-            ]
-          });
           const errorInvalidPhoneResponse = IdxResponseFactory.build({
             neededToProceed: [
-              selectAuthenticatorRemediation,
+              PhoneAuthenticatorEnrollmentDataRemediationFactory.build()
             ],
             rawIdxState: RawIdxResponseFactory.build({
               messages: IdxMessagesFactory.build({
@@ -879,7 +871,7 @@ describe('idx/authenticate', () => {
               remediation: {
                 type: 'array',
                 value: [
-                  selectAuthenticatorRemediation
+                  PhoneAuthenticatorEnrollmentDataRemediationFactory.build()
                 ]
               }
             })
@@ -1287,29 +1279,6 @@ describe('idx/authenticate', () => {
     });
 
     describe('google authenticator', () => {
-      let errorInvalidCodeResponse;
-      beforeEach(() => {
-        errorInvalidCodeResponse = IdxResponseFactory.build({
-          rawIdxState: RawIdxResponseFactory.build({
-            messages: IdxMessagesFactory.build({
-              value: [
-                IdxErrorGoogleAuthenticatorPasscodeInvalidFactory.build()
-              ]
-            })
-          }),
-          neededToProceed:[
-            SelectAuthenticatorEnrollRemediationFactory.build({
-              value: [
-                AuthenticatorValueFactory.build({
-                  options: [
-                    PhoneAuthenticatorOptionFactory.build(),
-                  ]
-                })
-              ]
-            })
-          ]
-        });
-      });
 
       describe('verification', () => {
         beforeEach(() => {
@@ -1328,6 +1297,18 @@ describe('idx/authenticate', () => {
           });
           const verifyAuthenticatorResponse = IdxResponseFactory.build({
             neededToProceed: [
+              VerifyGoogleAuthenticatorRemediationFactory.build()
+            ]
+          });
+          const errorInvalidCodeResponse = IdxResponseFactory.build({
+            rawIdxState: RawIdxResponseFactory.build({
+              messages: IdxMessagesFactory.build({
+                value: [
+                  IdxErrorGoogleAuthenticatorPasscodeInvalidFactory.build()
+                ]
+              })
+            }),
+            neededToProceed:[
               VerifyGoogleAuthenticatorRemediationFactory.build()
             ]
           });
@@ -1494,6 +1475,18 @@ describe('idx/authenticate', () => {
               EnrollGoogleAuthenticatorRemediationFactory.build()
             ]
           });
+          const errorInvalidCodeResponse = IdxResponseFactory.build({
+            rawIdxState: RawIdxResponseFactory.build({
+              messages: IdxMessagesFactory.build({
+                value: [
+                  IdxErrorGoogleAuthenticatorPasscodeInvalidFactory.build()
+                ]
+              })
+            }),
+            neededToProceed:[
+              EnrollGoogleAuthenticatorRemediationFactory.build()
+            ]
+          });
 
           Object.assign(testContext, {
             selectAuthenticatorResponse,
@@ -1619,29 +1612,6 @@ describe('idx/authenticate', () => {
     });
 
     describe('Okta Verify', () => {
-      let errorInvalidCodeResponse;
-      beforeEach(() => {
-        errorInvalidCodeResponse = IdxResponseFactory.build({
-          rawIdxState: RawIdxResponseFactory.build({
-            messages: IdxMessagesFactory.build({
-              value: [
-                IdxErrorOktaVerifyPasscodeInvalidFactory.build()
-              ]
-            })
-          }),
-          neededToProceed:[
-            SelectAuthenticatorEnrollRemediationFactory.build({
-              value: [
-                AuthenticatorValueFactory.build({
-                  options: [
-                    OktaVerifyAuthenticatorOptionFactory.build(),
-                  ]
-                })
-              ]
-            })
-          ]
-        });
-      });
 
       describe('verification', () => {
         beforeEach(() => {
@@ -1689,7 +1659,6 @@ describe('idx/authenticate', () => {
           Object.assign(testContext, {
             selectAuthenticatorResponse,
             verifyAuthenticatorResponse,
-            errorInvalidCodeResponse,
             verificationDataResponse,
             pollForPushResponse,
           });
@@ -1771,8 +1740,19 @@ describe('idx/authenticate', () => {
           const {
             authClient,
             verifyAuthenticatorResponse,
-            errorInvalidCodeResponse
           } = testContext;
+          const errorInvalidCodeResponse = IdxResponseFactory.build({
+            rawIdxState: RawIdxResponseFactory.build({
+              messages: IdxMessagesFactory.build({
+                value: [
+                  IdxErrorOktaVerifyPasscodeInvalidFactory.build()
+                ]
+              })
+            }),
+            neededToProceed:[
+              VerifyOktaVerifyAuthenticatorRemediationFactory.build(),
+            ]
+          });
           jest.spyOn(verifyAuthenticatorResponse, 'proceed').mockRejectedValue(errorInvalidCodeResponse);
           jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verifyAuthenticatorResponse);
           const verificationCode = 'invalid-test-code';

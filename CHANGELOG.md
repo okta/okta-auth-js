@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.6.2
+
+### Fixes
+
+- [#1231](https://github.com/okta/okta-auth-js/pull/1231) IDX: exposes field level error messages
+
 ## 6.6.1
 
 ### Fixes

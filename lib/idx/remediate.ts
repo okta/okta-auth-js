@@ -21,7 +21,6 @@ import {
   IdxActionParams, 
 } from './types/idx-js';
 import {
-  getMessagesFromResponse,
   isTerminalResponse,
   filterValuesForRemediation,
   getRemediator,
@@ -102,7 +101,7 @@ export async function remediate(
           idxResponse = await idxResponse.actions[action](params);
           idxResponse = { ...idxResponse, requestDidSucceed: true };
         } catch (e) {
-          return handleIdxError(authClient, e, remediator);
+          return handleIdxError(authClient, e, options);
         }
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
@@ -123,7 +122,7 @@ export async function remediate(
           idxResponse = { ...idxResponse, requestDidSucceed: true };
         }
         catch (e) {
-          return handleIdxError(authClient, e, remediator);
+          return handleIdxError(authClient, e, options);
         }
 
         return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
@@ -133,9 +132,8 @@ export async function remediate(
 
   // Do not attempt to remediate if response is in terminal state
   const terminal = isTerminalResponse(idxResponse);
-  const messages = getMessagesFromResponse(idxResponse);
   if (terminal) {
-    return { idxResponse, terminal, messages };
+    return { idxResponse, terminal };
   }
 
   if (!remediator) {
@@ -146,7 +144,7 @@ export async function remediate(
         idxResponse = { ...idxResponse, requestDidSucceed: true };
         return { idxResponse };
       } catch(e) {
-        return handleIdxError(authClient, e);
+        return handleIdxError(authClient, e, options);
       }
     }
     if (flow === 'default') {
@@ -164,7 +162,6 @@ export async function remediate(
     return {
       idxResponse,
       nextStep,
-      messages: messages.length ? messages: undefined
     };
   }
 
@@ -187,12 +184,11 @@ export async function remediate(
       return {
         idxResponse,
         nextStep,
-        messages: messages.length ? messages: undefined
       };
     }
     
     return remediate(authClient, idxResponse, values, options); // recursive call
   } catch (e) {
-    return handleIdxError(authClient, e, remediator);
+    return handleIdxError(authClient, e, options);
   }
 }
