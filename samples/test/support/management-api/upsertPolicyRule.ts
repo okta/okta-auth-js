@@ -1,5 +1,6 @@
 import { randomStr } from '../../util';
 import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
+import merge from 'deepmerge';
 
 type Options = {
   policyId: string;
@@ -173,6 +174,59 @@ const getGlobalSessionPolicyActions = (description: string) => {
   } as any)[description];
 };
 
+const getPasswordPolicyActions = (description: string) => {
+  return ({
+    '"Users can perform self-service" has "Unlock Account" checked': {
+      'type': 'PASSWORD',
+      'status': 'ACTIVE',
+      'conditions': {
+        'people': { 'users': { 'exclude': [] } },
+        'network': { 'connection': 'ANYWHERE' }
+      },
+      'actions': {
+        'passwordChange': {
+          'access': 'ALLOW'
+        },
+        'selfServicePasswordReset': {
+          'access': 'ALLOW',
+        },
+        'selfServiceUnlock': {
+          'access': 'ALLOW',
+        }
+      }
+    },
+    '"Users can initiate Recovery with" has "Phone (SMS / Voice Call)" and "Email" checked': {
+      'actions': {
+        'selfServicePasswordReset': {
+          'requirement': {
+            'stepUp': {
+              'required': true
+            },
+            'primary': {
+              'methods': [
+                'email',
+                'sms'
+              ]
+            }
+          }
+        },
+      }
+    },
+    '"Additional Verification is" has "Not Required" checked': {
+      'actions': {
+        'selfServicePasswordReset': {
+          'requirement': {
+            'stepUp': {
+              'required': false
+            }
+          }
+        },
+      }
+    },
+  } as any)[description];
+};
+
+/* eslint-disable complexity */
 export default async function (config: OktaClientConfig, {
   policyId,
   policyType,
@@ -198,6 +252,9 @@ export default async function (config: OktaClientConfig, {
     case 'OKTA_SIGN_ON':
       actions = getGlobalSessionPolicyActions(policyRuleDescription);
       break;
+    case 'PASSWORD':
+      actions = getPasswordPolicyActions(policyRuleDescription);
+      break;
     default:
       throw new Error(`No actions is found with ${policyType} ${policyRuleDescription}`);
   }
@@ -205,10 +262,7 @@ export default async function (config: OktaClientConfig, {
   let res;
   const { value: existingRule } = await oktaClient.listPolicyRules(policyId).next();
   if (existingRule) {
-    res = await oktaClient.updatePolicyRule(policyId, existingRule.id, {
-      ...existingRule,
-      ...actions
-    });
+    res = await oktaClient.updatePolicyRule(policyId, existingRule.id, merge(existingRule, actions));
   } else {
     res = await oktaClient.createPolicyRule(policyId, {
       name: `Test-Policy-Rule-${randomStr(6)}`,

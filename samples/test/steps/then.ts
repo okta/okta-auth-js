@@ -206,6 +206,11 @@ Then(
 );
 
 Then(
+  'she sees a page to input her user name and select Email, Phone, or Okta Verify to unlock her account',
+  () => checkIsOnPage('Select Authenticator Unlock Account')
+);
+
+Then(
   /^she sees the set new password form$/,
   () => checkIsOnPage('Set up Password')
 );

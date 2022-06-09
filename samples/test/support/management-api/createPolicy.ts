@@ -7,6 +7,7 @@ type Options = {
   dataTable?: {
     rawTable: string[][];
   }; 
+  maxAttempts?: number;
 }
 
 const getAuthenticationPolicy = () => {
@@ -55,6 +56,67 @@ const getGlobalSessionPolicy = (options: Options) => {
   };
 };
 
+const getPasswordPolicy = (options: Options) => {
+  return {
+    priority: 0,
+    type: 'PASSWORD',
+    conditions: {
+      people: {
+        groups: {
+          include: [options.groupId]
+        }
+      },
+      authProvider: {
+        provider: 'OKTA'
+      }
+    },
+    settings: {
+      password: {
+        complexity: {
+          minLength: 8,
+          minLowerCase: 0,
+          minUpperCase: 0,
+          minNumber: 0,
+          minSymbol: 0,
+          excludeUsername: true,
+          dictionary: { common: { exclude: true } },
+          excludeAttributes: []
+        },
+        age: {
+          maxAgeDays: 0,
+          expireWarnDays: 0,
+          minAgeMinutes: 0,
+          historyCount: 4
+        },
+        lockout:  {
+          maxAttempts: options.maxAttempts || 1,
+          autoUnlockMinutes: 0,
+          userLockoutNotificationChannels: [],
+          showLockoutFailures: false
+        }
+      },
+      recovery: {
+        factors: {
+          ['okta_email']: {
+            status: 'ACTIVE',
+            properties: {
+              recoveryToken: {
+                tokenLifetimeMinutes: 60
+              }
+            }
+          },
+          ['okta_sms']: {
+            status: 'ACTIVE'
+          },
+        }
+      },
+      delegation: {
+        options: { skipUnlock: false }
+      }
+    }
+  };
+};
+
 export default async function(config: OktaClientConfig, options: Options) {
   const oktaClient = getOktaClient(config);
 
@@ -68,6 +130,8 @@ export default async function(config: OktaClientConfig, options: Options) {
     policyObject = getProfileEnrollmentPolicy();
   } else if (policyDescription === 'Global Session') {
     policyObject = getGlobalSessionPolicy(options);
+  } else if (policyDescription === 'Password') {
+    policyObject = getPasswordPolicy(options);
   } else {
     throw new Error(`Unknow policy ${policyDescription}`);
   }

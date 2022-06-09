@@ -108,6 +108,7 @@ const samples = [
       'totp-signin',
       'security-questions-enrollment',
       'self-service-registration-password-optional',
+      'account-unlock'
     ],
     useEnv: true,
   },
