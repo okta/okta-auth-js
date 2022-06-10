@@ -93,6 +93,41 @@ export default class A18nClient {
     return code;
   }
 
+  async getOktaVerifyEnrollLinkFromSMS(profileId: string) {
+    let retryAttemptsRemaining = 30; // sms take some time to arrive, set maximum try to 30
+    let response;
+    while (!response?.content && retryAttemptsRemaining-- > 0) {
+      await waitForOneSecond();
+      response = await this.getOnURL(LATEST_SMS_URL.replace(':profileId', profileId)) as Record<string, string>;
+    }
+
+    const match = response?.content?.match(/Click here to enroll Okta Verify : (?<url>\S+)/);
+    const url = match?.groups?.url;
+    if (!url) {
+      throw new Error('Unable to retrieve Okta Verify Enroll link');
+    }
+
+    return url;
+  }
+
+  async getOktaVerifyEnrollLinkFromEmail(profileId: string) {
+    let retryAttemptsRemaining = 5;
+    let response;
+    while (!response?.content && retryAttemptsRemaining > 0) {
+      await waitForOneSecond();
+      response = await this.getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId)) as Record<string, string>;
+      --retryAttemptsRemaining;
+    }
+
+    const match = response?.content?.match(/<a id="push-verify-activation-link" href="(?<url>\S+)"/);
+    const url = match?.groups?.url;
+    if (!url) {
+      throw new Error('Unable to retrieve Okta Verify Enroll link');
+    }
+
+    return url;
+  }
+
   async createProfile(profileName?: string): Promise<A18nProfile|never> {
     const profile = await this.postToURL(PROFILE_URL, {
       displayName: profileName || 'javascript-idx-sdk'
