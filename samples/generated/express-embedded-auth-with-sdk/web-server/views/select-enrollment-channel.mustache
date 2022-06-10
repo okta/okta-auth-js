@@ -9,8 +9,8 @@
 
     <div class="okta-sign-in-form ui center aligned relaxed grid">
       <div class="row">
-        <div id="page-title-header" class="ui header">
-          <h2>{{title}}</h2>
+        <div id="select-enrollment-channel-page-title-header" class="ui header">
+          <h2>Select Enrollment Channel</h2>
         </div>
       </div>
 
@@ -22,7 +22,7 @@
         <form id="verify-form" class="ui large form" action="{{action}}" method="POST">
           <div class="field">
             <div class="default text">Please choose enrollment channel for this authenticator</div>
-            <select id="phone-authenticator-method-options" class="ui selection dropdown" name="channel">
+            <select id="enrollment-channel-method-options" class="ui selection dropdown" name="channel">
               {{#options}}
                 <option value="{{value}}">{{label}}</option>
               {{/options}}

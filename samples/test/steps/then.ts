@@ -37,6 +37,7 @@ import checkQuestionAnswerDisplayed from '../support/check/checkQuestionAnswerDi
 import enterCustomQuestion from '../support/action/enterCustomQuestion';
 import enterQuestionAnswer from '../support/action/enterQuestionAnswer';
 import selectSecurityQuestion from '../support/action/selectSecurityQuestion';
+import SelectEnrollmentChannel from '../support/selectors/SelectEnrollmentChannel';
 
 Then('she is redirected to the {string} page', checkIsOnPage);
 
@@ -328,6 +329,13 @@ Then(
 );
 
 Then(
+  'she sees a QR Code on the screen',
+  async () => {
+    await waitForDisplayed('#authenticator-qr-code');
+  }
+);
+
+Then(
   'the QR code represents the same key as the Secret Key',
   async () => {
     const secretFromQRCode = await getSecretFromQrCode();
@@ -335,3 +343,33 @@ Then(
     expect(secretFromQRCode).toEqual(secretFromSharedSecret);
   }
 );
+
+Then(
+  'she receives a {string} with a link to enroll in Okta Verify',
+  async function(this: ActionContext, type: string) {
+    let enrollLink = '';
+    if (type === 'SMS') {
+      enrollLink = await this.a18nClient.getOktaVerifyEnrollLinkFromSMS(this.credentials.profileId);
+    } else if (type === 'Email') {
+      enrollLink = await this.a18nClient.getOktaVerifyEnrollLinkFromEmail(this.credentials.profileId);
+    }
+    expect(enrollLink).toContain('/auth/push/link');
+  }
+);
+
+Then(
+  /^the screen changes to a waiting screen saying "(?<message>.+?)"$/,
+  async function(this: ActionContext, message: string) {
+    await waitForDisplayed(SelectEnrollmentChannel.screenMessage);
+    const text = await (await $(SelectEnrollmentChannel.screenMessage)).getText();
+
+    let expectedMessage ;
+    if (message.includes('{email_address}')) {
+      expectedMessage = message.replace('{email_address}', this.credentials.emailAddress);
+    } else if (message.includes('{phone_number}')) {
+      expectedMessage = message.replace('{phone_number}', this.credentials.phoneNumber);
+    }
+    expect(text).toEqual(expectedMessage);
+  }
+);
+

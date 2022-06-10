@@ -108,7 +108,8 @@ const samples = [
       'totp-signin',
       'security-questions-enrollment',
       'self-service-registration-password-optional',
-      'account-unlock'
+      'account-unlock',
+      'totp-okta-verify-signup',
     ],
     useEnv: true,
   },

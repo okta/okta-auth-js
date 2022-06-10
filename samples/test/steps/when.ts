@@ -21,11 +21,15 @@ import enterLiveUserEmail from '../support/action/context-enabled/live-user/ente
 import enterRecoveryEmail from '../support/action/context-enabled/live-user/enterRecoveyEmail';
 import submitForm from '../support/action/submitForm';
 import selectAuthenticator from '../support/action/selectAuthenticator';
+import selectEnrollmentChannel from '../support/action/selectEnrollmentChannel';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
 import enterRegistrationField from '../support/action/context-enabled/live-user/enterRegistrationField';
 import selectSmsAuthenticator from '../support/action/selectSmsAuthenticator';
 import selectSecurityQuestionAuthenticator from '../support/action/selectSecurityQuestionAuthenticator';
 import enterCorrectPhoneNumber from '../support/action/context-enabled/live-user/enterCorrectPhoneNumber';
+import enterCorrectPhoneNumberForOktaVerify from 
+  '../support/action/context-enabled/live-user/enterCorrectPhoneNumberForOktaVerify';
+import enterCorrectEmailForOktaVerify from '../support/action/context-enabled/live-user/enterCorrectEmailForOktaVerify';
 import selectVerifyBySms from '../support/action/selectVerifyBySms';
 import skipForm from '../support/action/skipForm';
 import inputInvalidEmailFormat from '../support/action/inputInvalidEmailFormat';
@@ -59,6 +63,8 @@ When('she clicks the {string} link', clickLink);
 When('she clicks the Login with Okta OIDC IDP button', clickOIDCIdPButton);
 
 When('she submits the form', submitForm);
+
+When('she selects "Enroll with another method"', submitForm);
 
 When(
   'she changes the {string} field to {string}', 
@@ -155,10 +161,29 @@ When(
       authenticatorKey = 'google_otp';
     } else if (authenticator === 'Security Question') {
       authenticatorKey = 'security_question';
+    } else if (authenticator === 'Okta Verify') {
+      authenticatorKey = 'okta_verify';
     } else {
       throw new Error(`Unknown authenticator ${authenticator}`);
     }
     await selectAuthenticator(authenticatorKey);
+  }
+);
+
+When(
+  'she selects the {string} enrollment method',
+  async (enrollmentMethod: string) => {
+    let enrollmentMethodKey;
+    if (enrollmentMethod === 'QRCode') {
+      enrollmentMethodKey = 'qrcode';
+    } else if (enrollmentMethod === 'Email') {
+      enrollmentMethodKey = 'email';
+    } else if (enrollmentMethod === 'SMS') {
+      enrollmentMethodKey = 'sms';
+    } else {
+      throw new Error(`Unknown authenticator ${enrollmentMethod}`);
+    }
+    await selectEnrollmentChannel(enrollmentMethodKey);
   }
 );
 
@@ -223,6 +248,16 @@ When(
 When(
   /^She inputs a valid phone number$/,
   enterCorrectPhoneNumber
+);
+
+When(
+  /^she inputs a valid phone number for Okta Verify$/,
+  enterCorrectPhoneNumberForOktaVerify
+);
+
+When(
+  /^she inputs a valid email for Okta Verify$/,
+  enterCorrectEmailForOktaVerify
 );
 
 When(
