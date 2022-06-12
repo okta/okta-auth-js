@@ -58,7 +58,6 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she submits the form
     Then she should see a message "Invalid Phone Number."
 
-
   Scenario: 2FA Login with SMS
     Given she has enrolled in the "SMS" factor
     When she clicks the "login" button

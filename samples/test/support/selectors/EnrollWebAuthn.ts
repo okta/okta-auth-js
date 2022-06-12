@@ -13,17 +13,15 @@
 import { PageWithTitle } from './Page';
 
 
-class SelectEnrollmentChannel extends PageWithTitle {
-  title = 'Select Enrollment Channel';
+class EnrollWebAuthn extends PageWithTitle {
+  title = 'Enroll WebAuthn';
 
-  get pageTitle() { return '#select-enrollment-channel-page-title-header'; }
+  get submit() { return '#challenge-authenticator-form button[type=submit]'; }
+  get credentialsId() { return '#credentials-id'; }
+  get credentialsClientData() { return '#credentials-clientData'; }
+  get credentialsAttestation() { return '#credentials-attestation'; }
+  get credentialsError() { return '#credentials-error'; }
 
-  get options() { return '#enrollment-channel-method-options';  }
-  get submit() { return '#verify-form button[type=submit]';}
-
-  get phoneNumber() { return '#phoneNumber'; }
-  get email() { return '#email'; }
-  get screenMessage() { return '.ui.positive.message'; }
 }
 
-export default new SelectEnrollmentChannel(); 
+export default new EnrollWebAuthn();

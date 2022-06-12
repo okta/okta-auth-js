@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
 import { When } from '@cucumber/cucumber';
 
 import confirmValidPassword from '../support/action/confirmValidPassword';
@@ -65,6 +64,8 @@ When('she clicks the Login with Okta OIDC IDP button', clickOIDCIdPButton);
 When('she submits the form', submitForm);
 
 When('she selects "Enroll with another method"', submitForm);
+
+When('she selects "Continue"', submitForm);
 
 When(
   'she changes the {string} field to {string}', 
@@ -149,25 +150,37 @@ When(
 
 When(
   'she selects the {string} factor',
+  /* eslint-disable complexity */
   async (authenticator: string) => {
     let authenticatorKey;
-    if (authenticator === 'Email') {
-      authenticatorKey = 'okta_email';
-    } else if (authenticator === 'Password') {
-      authenticatorKey = 'okta_password';
-    } else if (authenticator === 'Phone') {
-      authenticatorKey = 'phone_number';
-    } else if (authenticator === 'Google Authenticator') {
-      authenticatorKey = 'google_otp';
-    } else if (authenticator === 'Security Question') {
-      authenticatorKey = 'security_question';
-    } else if (authenticator === 'Okta Verify') {
-      authenticatorKey = 'okta_verify';
-    } else {
-      throw new Error(`Unknown authenticator ${authenticator}`);
+    switch(authenticator) {
+      case 'Email':
+        authenticatorKey = 'okta_email';
+        break;
+      case 'Password':
+        authenticatorKey = 'okta_password';
+        break;
+      case 'Phone':
+        authenticatorKey = 'phone_number';
+        break;
+      case 'Google Authenticator':
+        authenticatorKey = 'google_otp';
+        break;
+      case 'Security Question':
+        authenticatorKey = 'security_question';
+        break;
+      case 'Okta Verify':
+        authenticatorKey = 'okta_verify';
+        break;
+      case 'WebAuthn':
+        authenticatorKey = 'webauthn';
+        break;
+      default:
+        throw new Error(`Unknown authenticator ${authenticator}`);
     }
     await selectAuthenticator(authenticatorKey);
   }
+  /* eslint-enable complexity */
 );
 
 When(
@@ -337,4 +350,11 @@ When(
 When(
   /^she inputs her recovery email$/,
   enterRecoveryEmail
+);
+
+When(
+  /^she enrolls into webauthn$/,
+  async function(this: ActionContext) {
+    await browser.addVirtualAuthenticator('ctap2', 'internal', true, true, true, true);
+  }
 );

@@ -549,7 +549,7 @@ router.get('/enroll-authenticator/webauthn', async (req, res) => {
     req, res,
     render: () => renderTemplate(req, res, 'authenticator-webauthn-enroll', {
       req, res,
-      title: 'Enroll Webauthn',
+      title: 'Enroll WebAuthn',
       action: '/enroll-authenticator/webauthn',
     })
   });
