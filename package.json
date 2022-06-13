@@ -22,11 +22,11 @@
     },
     "./myaccount": {
       "node": {
-        "import": "./build/esm/node/myaccount.mjs",
+        "import": "./build/esm/node/myaccount/myaccount/index.js",
         "require": "./build/cjs/myaccount/index.js"
       },
       "browser": {
-        "import": "./build/esm/browser/myaccount.js"
+        "import": "./build/esm/browser/myaccount/myaccount/index.js"
       },
       "default": "./build/dist/myaccount.umd.js"
     }
@@ -158,11 +158,12 @@
     "jest-runner": "^28.1.0",
     "jest-runner-tsd": "^3.0.0",
     "json-loader": "0.5.4",
+    "lint-staged": ">=10",
     "lodash": "4.17.21",
     "rollup": "^2.70.2",
-    "lint-staged": ">=10",
     "rollup-plugin-cleanup": "^3.2.1",
     "rollup-plugin-license": "^2.6.0",
+    "rollup-plugin-multi-input": "^1.3.1",
     "rollup-plugin-typescript2": "^0.30.0",
     "shelljs": "0.8.4",
     "ts-jest": "^28.0.2",
@@ -196,8 +197,16 @@
     "directory": "test/types"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx,cjs,mjs}": ["eslint --fix"],
-    "lib/myaccount/**/*": ["yarn docs:myaccount", "git add docs/myaccount"],
-    "typedoc.js": ["yarn docs:myaccount", "git add docs/myaccount"]
+    "*.{js,ts,jsx,tsx,cjs,mjs}": [
+      "eslint --fix"
+    ],
+    "lib/myaccount/**/*": [
+      "yarn docs:myaccount",
+      "git add docs/myaccount"
+    ],
+    "typedoc.js": [
+      "yarn docs:myaccount",
+      "git add docs/myaccount"
+    ]
   }
 }

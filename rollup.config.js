@@ -3,6 +3,7 @@ import alias from '@rollup/plugin-alias';
 import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
 import license from 'rollup-plugin-license';
+import multiInput from 'rollup-plugin-multi-input';
 import pkg from './package.json';
 
 const path = require('path');
@@ -66,42 +67,25 @@ const getPlugins = (env) => {
           file: path.join(__dirname, 'scripts', 'license-template'),
         }
       }
-    })
+    }),
+    multiInput({ 
+      relative: 'lib/',
+    }),
   ];
 };
 
-export default [
-  // main
-  {
-    type: 'browser',
-    input: 'lib/index.ts',
-    outputDir: 'build/esm/browser',
-  },
-  {
-    type: 'node',
-    input: 'lib/index.ts',
-    outputDir: 'build/esm/node',
-  },
-  // myaccount module
-  {
-    type: 'browser',
-    input: 'lib/myaccount/index.ts',
-    outputDir: 'build/esm/browser/myaccount',
-  },
-  {
-    type: 'node',
-    input: 'lib/myaccount/index.ts',
-    outputDir: 'build/esm/node/myaccount',
-  }
-].map(({ input, type, outputDir }) => {
+export default ['browser', 'node'].map((type) => {
   return {
-    input,
+    input: [
+      'lib/index.ts', 
+      'lib/myaccount/index.ts'
+    ],
     external: makeExternalPredicate(type),
     plugins: getPlugins(type),
     output: [
       {
         ...output,
-        dir: outputDir
+        dir: `build/esm/${type}`,
       }
     ]
   };
