@@ -1,2 +1,2 @@
-import Profile from './Profile';
-export default Profile;
+import Main from './Main';
+export default Main;

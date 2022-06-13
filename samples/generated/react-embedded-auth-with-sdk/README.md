@@ -43,14 +43,6 @@ If running from the workspace directory: `yarn workspace @okta/test.app.react-oi
 | --------------------- | ------------------------------ |
 | `yarn start`          | Starts the app server          |
 
-#### IDX Flow
-
-This sample only exposes limited idx flows from the UI, but you can still start flows with any idx public method that exposed from okta-auth-js by adding the `flowMethod` in url path.
-
-```
-http://localhost:8080/flow/{flowMethod}
-```
-
 
 ### Develop The Sample Application
 
@@ -60,16 +52,8 @@ http://localhost:8080/flow/{flowMethod}
 * @okta/okta-react
 * @okta/odyssey-react
 
-#### IDX State Machine
-
-`App.jsx` is the entry point of the whole app, it manages the transaction state of the whole app and shares it via React context. Based on the current transaction status, it also redirects the app to the proper routes.
-
 #### Profile Management
 
 After login, end users can access/manage own profile via [MyAccount API](/docs/myaccount/README.md). 
 
 The MyAccount API provides user-scoped endpoints that don’t require admin tokens. End users only need an active user session to update their email and phone authenticators.
-
-#### Support Other Authenticators/Remediations
-
-Form related UIs are dynamically rendered based on the transaction object. `GeneralForm.jsx` can handle most simple scenarios, you can opt-opt by changing `getFormComponent` method to render a custom form to handle some specific remediations.

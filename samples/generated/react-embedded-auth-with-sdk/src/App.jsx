@@ -17,6 +17,7 @@ import ErrorPage from './components/ErrorPage';
 import CanceledPage from './components/CanceledPage';
 import TerminalPage from './components/TerminalPage';
 import FlowPage from './components/FlowPage';
+import WidgetPage from './components/WidgetPage';
 import LoginCallback from './components/LoginCallback';
 import Spinner from './components/Spinner';
 import { IdxTransaction } from './contexts';
@@ -99,6 +100,7 @@ function App() {
           <Route path="/terminal" component={TerminalPage} />
           <Route path="/canceled" component={CanceledPage} />
           <Route path="/flow/:flow" component={FlowPage} />
+          <Route path="/widget" component={WidgetPage} />
         </Switch>
       </IdxTransaction.Provider>
     </Security>

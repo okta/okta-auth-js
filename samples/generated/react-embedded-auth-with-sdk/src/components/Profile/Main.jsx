@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { getWithRedirect, decodeToken } from '@okta/okta-auth-js';
 import { useOktaAuth } from '@okta/okta-react';
 import {
@@ -16,6 +17,7 @@ import InfoBox from '../InfoBox';
 import { MyAccountContext, useIdxTransaction } from '../../contexts';
 
 const Profile = () => {
+  const history = useHistory();
   const { oktaAuth } = useOktaAuth();
   const { setTransaction: setIdxTransaction } = useIdxTransaction();
   const [error, setError] = useState(null);
@@ -26,12 +28,13 @@ const Profile = () => {
 
   const handleCancel = () => setError(null);
 
-  const handleReAuth = useCallback(async (e) => {
+  const handleReAuthentication = useCallback(async (e) => {
     e.preventDefault();
 
     const accessToken = oktaAuth.getAccessToken();
     const idToken = oktaAuth.getIdToken();
     const scopes = decodeToken(accessToken).payload.scp;
+    const maxAge = +error.meta.max_age; // Required for insufficient authentication scenario 
 
     if (approach === 'authorize') {
       // Re-auth with Okta-hosted login flow
@@ -39,19 +42,19 @@ const Profile = () => {
         oktaAuth,
         {
           prompt: 'login',
-          maxAge: +error.max_age, // Required for insufficient authentication scenario
+          maxAge,
           scopes,
           extraParams: {
             id_token_hint: idToken
           }
         }
       );
-    } else if (approach === 'interact') {
+    } else if (approach === 'interact-sdk') {
       // App will be redirected to FlowPage (/flow) once IdxTransaction is updated
-      const idxTransaction = await oktaAuth.idx.authenticate({ 
-        maxAge: error.meta.max_age // Required for insufficient authentication scenario
-      });
+      const idxTransaction = await oktaAuth.idx.authenticate({ maxAge });
       setIdxTransaction(idxTransaction);
+    } else if (approach === 'interact-widget') {
+      history.replace(`/widget?maxAge=${maxAge}`);
     }
   }, [oktaAuth, approach, error, setIdxTransaction]);
 
@@ -118,12 +121,16 @@ const Profile = () => {
                   onChange={handleApproachChange}
                 >
                   <Radio.Button
-                    label="Okta Hosted Re-Auth"
+                    label="Re-Authenticate with Okta Hosted Login flow"
                     value="authorize"
                   />
                   <Radio.Button
-                    label="Embedded Re-Auth"
-                    value="interact"
+                    label="Re-Authenticate with Embedded Auth with SDK"
+                    value="interact-sdk"
+                  />
+                  <Radio.Button
+                    label="Re-Authenticate with Embedded Widget"
+                    value="interact-widget"
                   />
                 </Radio.Group>
               </Form.Main>
@@ -131,7 +138,7 @@ const Profile = () => {
                 <Button variant="clear" name="cancel" onClick={handleCancel}>
                   Cancel
                 </Button>
-                <Button variant="primary" name="confirm" onClick={handleReAuth}>
+                <Button variant="primary" name="confirm" onClick={handleReAuthentication}>
                   Confirm
                 </Button>
               </Form.Actions>
