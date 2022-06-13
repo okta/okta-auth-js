@@ -1,4 +1,5 @@
 Feature: WebAuthn Sign Up
+  
   Background:
     Given an App that assigned to a test group
       And a Policy that defines "Profile Enrollment"

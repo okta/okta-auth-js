@@ -111,6 +111,7 @@ const samples = [
       'account-unlock',
       'totp-okta-verify-signup',
       'webauthn-signup',
+      'mfa-password-and-webauthn',
     ],
     useEnv: true,
   },
