@@ -71,30 +71,38 @@ const getPlugins = (env) => {
 };
 
 export default [
-  'lib/index.ts',
-  'lib/myaccount/index.ts',
-].reduce((acc, input) => {
-  acc.push({
-    input,
-    external: makeExternalPredicate('browser'),
-    plugins: getPlugins('browser'),
-    output: [
-      {
-        ...output,
-        dir: 'build/esm/browser'
-      }
-    ]
-  });
-  acc.push({
+  // main
+  {
+    type: 'browser',
     input: 'lib/index.ts',
-    external: makeExternalPredicate('node'),
-    plugins: getPlugins('node'),
+    outputDir: 'build/esm/browser',
+  },
+  {
+    type: 'node',
+    input: 'lib/index.ts',
+    outputDir: 'build/esm/node',
+  },
+  // myaccount module
+  {
+    type: 'browser',
+    input: 'lib/myaccount/index.ts',
+    outputDir: 'build/esm/browser/myaccount',
+  },
+  {
+    type: 'node',
+    input: 'lib/myaccount/index.ts',
+    outputDir: 'build/esm/node/myaccount',
+  }
+].map(({ input, type, outputDir }) => {
+  return {
+    input,
+    external: makeExternalPredicate(type),
+    plugins: getPlugins(type),
     output: [
       {
         ...output,
-        dir: 'build/esm/node',
+        dir: outputDir
       }
     ]
-  });
-  return acc;
-}, []);
+  };
+});
