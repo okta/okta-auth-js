@@ -1,7 +1,7 @@
 {
   "name": "@okta/test.app.react-mfa-v1",
+  "version": "0.1.0",
   "private": true,
-  "version": "1.0.0",
   "scripts": {
     "prestart": "vite build",
     "start": "vite preview --port 8080",
@@ -19,6 +19,18 @@
     "@vitejs/plugin-react": "^1.0.7",
     "vite": "^2.8.0",
     "rollup-plugin-visualizer": "^5.5.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "workspaces": {
     "nohoist": [
