@@ -110,6 +110,8 @@ const samples = [
       'self-service-registration-password-optional',
       'account-unlock',
       'totp-okta-verify-signup',
+      'webauthn-signup',
+      'mfa-password-and-webauthn',
     ],
     useEnv: true,
   },

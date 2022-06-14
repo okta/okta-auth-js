@@ -42,6 +42,7 @@ import UnlockAccount from './UnlockAccount';
 import SelectAuthenticatorUnlockAccount from './SelectAuthenticatorUnlockAccount';
 import EnrollOktaVerifyAuthenticator from './EnrollOktaVerifyAuthenticator';
 import SelectEnrollmentChannel from './SelectEnrollmentChannel';
+import EnrollWebAuthn from './EnrollWebAuthn';
 
 const pages: { [key: string]: Page } = {
   'Login': LoginForm,
@@ -75,6 +76,7 @@ const pages: { [key: string]: Page } = {
   'Select Authenticator Unlock Account': SelectAuthenticatorUnlockAccount,
   'Enroll Okta Verify': EnrollOktaVerifyAuthenticator,
   'Select Enrollment Channel': SelectEnrollmentChannel,
+  'Enroll WebAuthn': EnrollWebAuthn,
   // SIW form
   'Embedded Widget': OktaSignInOIE,
   'Login with Social IDP': OktaSignInOIEFacebookIdp,
