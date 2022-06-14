@@ -6,16 +6,16 @@
 
 ## Table of contents
 
-### Enumeration members
+### Enumeration Members
 
 - [PRIMARY](types.EmailRole.md#primary)
 - [SECONDARY](types.EmailRole.md#secondary)
 
-## Enumeration members
+## Enumeration Members
 
 ### PRIMARY
 
-• **PRIMARY** = `"PRIMARY"`
+• **PRIMARY**
 
 #### Defined in
 
@@ -25,7 +25,7 @@ ___
 
 ### SECONDARY
 
-• **SECONDARY** = `"SECONDARY"`
+• **SECONDARY**
 
 #### Defined in
 

@@ -125,7 +125,7 @@ const Profile = () => {
                     value="authorize"
                   />
                   <Radio.Button
-                    label="Re-Authenticate with Embedded Auth with SDK"
+                    label="Re-Authenticate with Embedded SDK"
                     value="interact-sdk"
                   />
                   <Radio.Button

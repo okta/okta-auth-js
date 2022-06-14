@@ -19,7 +19,7 @@
 - [ProfileSchemaTransaction](../classes/types.ProfileSchemaTransaction.md)
 - [ProfileTransaction](../classes/types.ProfileTransaction.md)
 
-### Type aliases
+### Type Aliases
 
 - [AddEmailPayload](types.md#addemailpayload)
 - [AddPhonePayload](types.md#addphonepayload)
@@ -31,7 +31,7 @@
 - [UpdateProfilePayload](types.md#updateprofilepayload)
 - [VerificationPayload](types.md#verificationpayload)
 
-## Type aliases
+## Type Aliases
 
 ### AddEmailPayload
 

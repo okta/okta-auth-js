@@ -5,7 +5,7 @@
 > :grey_exclamation: The use of this Sample uses an SDK that requires usage of the Okta Identity Engine. This functionality is in general availability but is being gradually rolled out to customers. If you want
 to request to gain access to the Okta Identity Engine, please reach out to your account manager. If you do not have an account manager, please reach out to oie@okta.com for more information.
 
-This Sample Application will show you the best practices for integrating Authentication into your app
+This Sample Application will show you the best practices for integrating Authentication and Profile management into your app
 using [Okta's Identity Engine][]. Specifically, this application will cover some basic needed use cases to get you up and running quickly with Okta.
 
 ## Installation & Running The App
@@ -37,23 +37,21 @@ CLIENT_ID=123xxxxx123
 
 ### Commands
 
-If running from the workspace directory: `yarn workspace @okta/test.app.react-oie start`
+If running from the workspace directory: `yarn workspace @okta/samples.react-embedded-auth-with-sdk start`
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
 | `yarn start`          | Starts the app server          |
 
 
-### Develop The Sample Application
+### Supported Features
 
-#### Dependencies
+#### Authentication
 
-* @okta/okta-auth-js
-* @okta/okta-react
-* @okta/odyssey-react
+This sample app demostrates the best practices for integrating Authentication into your React SAP via the embedded Auth SDK (@okta/okta-auth-js). It dynamically renders the form by following responses from [Okta's Identity Engine][]. Policy changes, like adding extra authenticator for MFA, can be reflected in this sample app with no code change.
 
 #### Profile Management
 
-After login, end users can access/manage own profile via [MyAccount API](/docs/myaccount/README.md). 
+MyAccount API provides user-scoped endpoints that don’t require admin tokens, which means profile management process can be finished within a single page app and end users only need an active user session to update their email and phone authenticators.
 
-The MyAccount API provides user-scoped endpoints that don’t require admin tokens. End users only need an active user session to update their email and phone authenticators.
+[MyAccount Scopes](/docs/myaccount/README.md#scopes) will be needed at top level [config](/README.md#configuration-reference) of @okta/okta-auth-js to acquire scoped tokens after authentication.

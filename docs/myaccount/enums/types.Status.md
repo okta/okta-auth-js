@@ -6,16 +6,16 @@
 
 ## Table of contents
 
-### Enumeration members
+### Enumeration Members
 
 - [UNVERIFIED](types.Status.md#unverified)
 - [VERIFIED](types.Status.md#verified)
 
-## Enumeration members
+## Enumeration Members
 
 ### UNVERIFIED
 
-• **UNVERIFIED** = `"UNVERIFIED"`
+• **UNVERIFIED**
 
 #### Defined in
 
@@ -25,7 +25,7 @@ ___
 
 ### VERIFIED
 
-• **VERIFIED** = `"VERIFIED"`
+• **VERIFIED**
 
 #### Defined in
 
