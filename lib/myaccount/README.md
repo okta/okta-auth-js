@@ -2,11 +2,11 @@
 
 ## Introduction
 
-MyAccount APIs enables everything needed for the customer's end user to manage one's account. The API assumes the access token is obtained through the OAuth2 either by the classic or IDX flow.
+MyAccount APIs enables end user account management in SPA applications. The API requires an access token obtained via OAuth flows with additional [scopes](#scopes).
 
 ## Scopes
 
-Certain token scopes will be needed to gain the permission to read/manage the account resources:
+The following scopes are required for permission to read/write the resources exposed by the MyAccount API:
 
 **profile:**
 ```
@@ -48,11 +48,11 @@ const { getEmails } = require('@okta/okta-auth-js/myaccount');
 
 The built library bundle is also available on our global CDN. Include the following script in your HTML file to load before your application script:
 
+> :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
+
 ```html
 <script src="https://global.oktacdn.com/okta-auth-js/6.7.0/okta-auth-js.min.js" type="text/javascript"></script>
 ```
-
-> :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
 
 Then you can create an instance of the `OktaAuth` object, available globally, then access MyAccount API methods under `myaccount` namespace.
 
@@ -65,9 +65,8 @@ const emails = await oktaAuth.myaccount.getEmails();
 
 ## Handling `insufficient_authentication_context` error
 
-Re-Authentication will be needed when request requires higher assurance than provided by the access token. MyAccount API methods throws `AuthApiError` with `insufficient_authentication_context` in `errorSummary` and `max_age` in `meta` field to indicate the downstream applications to start a re-authentication flow.
+For additional security, the MyAccount API requires a higher assurance level to protect the end user's account from being manipulated by malicious actors. If the `access token` provided does not meet the required assurance level, an error will be thrown to prompt the user to re-authenticate. Applications consuming the MyAccount API will need to handle this error condition. When this occurs, `myaccount` methods will throw an `AuthApiError` with `insufficient_authentication_context` in `errorSummary` and `max_age` in `meta` field, like so:
 
-### AuthApiError example:
 
 ```js
 {
@@ -82,7 +81,7 @@ Re-Authentication will be needed when request requires higher assurance than pro
 }
 ```
 
-Re-authentication Approaches:
+## Re-authentication Approaches:
 
 ### Re-Authenticate with Okta Hosted Login flow
 

@@ -48,7 +48,7 @@ If running from the workspace directory: `yarn workspace @okta/samples.react-emb
 
 #### Authentication
 
-This sample app demostrates the best practices for integrating Authentication into your React SAP via the embedded Auth SDK (@okta/okta-auth-js). It dynamically renders the form by following responses from [Okta's Identity Engine][]. Policy changes, like adding extra authenticator for MFA, can be reflected in this sample app with no code change.
+This sample app demonstrates the best practices for integrating Authentication into your React SPA via the embedded Auth SDK (@okta/okta-auth-js). It dynamically renders the form by following responses from [Okta's Identity Engine][]. Policy changes, like adding extra authenticator for MFA, can be reflected in this sample app with no code change.
 
 #### Profile Management
 
