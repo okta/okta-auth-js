@@ -55,6 +55,13 @@ export interface AuthnTransactionFunctions {
 
 export interface AuthnTransaction extends AuthnTransactionState, AuthnTransactionFunctions {
   sessionToken?: string;
+  user?: Record<string, any>;
+  factor?: Record<string, any>;
+  factors?: Array<Record<string, any> >;
+  policy?: Record<string, any>;
+  scopes?: Array<Record<string, any> >;
+  target?: Record<string, any>;
+  authentication?: Record<string, any>;
 }
 
 // Authn (classic) api
