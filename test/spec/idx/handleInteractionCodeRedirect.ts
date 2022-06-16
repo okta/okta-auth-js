@@ -89,7 +89,7 @@ describe('idx/handleInteractionCodeRedirect', () => {
       await handleInteractionCodeRedirect(authClient, url);
     } catch (err) {
       expect(err).toBeInstanceOf(AuthSdkError);
-      expect(err.message).toEqual('No transaction data was found in storage');
+      expect((err as AuthSdkError).message).toEqual('No transaction data was found in storage');
     }
   });
 
@@ -100,7 +100,7 @@ describe('idx/handleInteractionCodeRedirect', () => {
       await handleInteractionCodeRedirect(authClient, url);
     } catch (err) {
       expect(err).toBeInstanceOf(AuthSdkError);
-      expect(err.message).toEqual('State in redirect uri does not match with transaction state');
+      expect((err as AuthSdkError).message).toEqual('State in redirect uri does not match with transaction state');
     }
   });
 
@@ -111,7 +111,7 @@ describe('idx/handleInteractionCodeRedirect', () => {
       await handleInteractionCodeRedirect(authClient, url);
     } catch (err) {
       expect(err).toBeInstanceOf(AuthSdkError);
-      expect(err.message).toEqual('Unable to parse interaction_code from the url');
+      expect((err as AuthSdkError).message).toEqual('Unable to parse interaction_code from the url');
     }
   });
 
@@ -122,7 +122,7 @@ describe('idx/handleInteractionCodeRedirect', () => {
       await handleInteractionCodeRedirect(authClient, url);
     } catch (err) {
       expect(err).toBeInstanceOf(OAuthError);
-      expect(err.message).toEqual('fake_error_description');
+      expect((err as AuthSdkError).message).toEqual('fake_error_description');
     }
   });
 

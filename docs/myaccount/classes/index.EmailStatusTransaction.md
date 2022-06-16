@@ -1,12 +1,12 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [types](../modules/types.md) / EmailStatusTransaction
+[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [index](../modules/index.md) / EmailStatusTransaction
 
 # Class: EmailStatusTransaction
 
-[types](../modules/types.md).EmailStatusTransaction
+[index](../modules/index.md).EmailStatusTransaction
 
 ## Hierarchy
 
-- [`BaseTransaction`](types.BaseTransaction.md)
+- [`BaseTransaction`](index.BaseTransaction.md)
 
   ↳ **`EmailStatusTransaction`**
 
@@ -14,16 +14,16 @@
 
 ### Constructors
 
-- [constructor](types.EmailStatusTransaction.md#constructor)
+- [constructor](index.EmailStatusTransaction.md#constructor)
 
 ### Properties
 
-- [\_http](types.EmailStatusTransaction.md#_http)
-- [expiresAt](types.EmailStatusTransaction.md#expiresat)
-- [headers](types.EmailStatusTransaction.md#headers)
-- [id](types.EmailStatusTransaction.md#id)
-- [profile](types.EmailStatusTransaction.md#profile)
-- [status](types.EmailStatusTransaction.md#status)
+- [\_http](index.EmailStatusTransaction.md#_http)
+- [expiresAt](index.EmailStatusTransaction.md#expiresat)
+- [headers](index.EmailStatusTransaction.md#headers)
+- [id](index.EmailStatusTransaction.md#id)
+- [profile](index.EmailStatusTransaction.md#profile)
+- [status](index.EmailStatusTransaction.md#status)
 
 ## Constructors
 
@@ -40,7 +40,7 @@
 
 #### Overrides
 
-[BaseTransaction](types.BaseTransaction.md).[constructor](types.BaseTransaction.md#constructor)
+[BaseTransaction](index.BaseTransaction.md).[constructor](index.BaseTransaction.md#constructor)
 
 #### Defined in
 
@@ -54,7 +54,7 @@
 
 #### Inherited from
 
-[BaseTransaction](types.BaseTransaction.md).[_http](types.BaseTransaction.md#_http)
+[BaseTransaction](index.BaseTransaction.md).[_http](index.BaseTransaction.md#_http)
 
 #### Defined in
 
@@ -78,7 +78,7 @@ ___
 
 #### Inherited from
 
-[BaseTransaction](types.BaseTransaction.md).[headers](types.BaseTransaction.md#headers)
+[BaseTransaction](index.BaseTransaction.md).[headers](index.BaseTransaction.md#headers)
 
 #### Defined in
 

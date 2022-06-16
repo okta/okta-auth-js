@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[types.ts:25](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L25)
+[types.ts:20](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L20)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[types.ts:24](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L24)
+[types.ts:19](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L19)

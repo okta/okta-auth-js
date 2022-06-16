@@ -201,7 +201,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     };
 
     // Add shims for compatibility, these will be removed in next major version. OKTA-362589
-    Object.assign(this.options.storageUtil, {
+    Object.assign(this.options.storageUtil || {}, {
       getPKCEStorage: this.storageManager.getLegacyPKCEStorage.bind(this.storageManager),
       getHttpCache: this.storageManager.getHttpCache.bind(this.storageManager),
     });

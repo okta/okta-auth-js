@@ -1,12 +1,12 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [types](../modules/types.md) / EmailChallengeTransaction
+[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [index](../modules/index.md) / EmailChallengeTransaction
 
 # Class: EmailChallengeTransaction
 
-[types](../modules/types.md).EmailChallengeTransaction
+[index](../modules/index.md).EmailChallengeTransaction
 
 ## Hierarchy
 
-- [`BaseTransaction`](types.BaseTransaction.md)
+- [`BaseTransaction`](index.BaseTransaction.md)
 
   ↳ **`EmailChallengeTransaction`**
 
@@ -14,18 +14,18 @@
 
 ### Constructors
 
-- [constructor](types.EmailChallengeTransaction.md#constructor)
+- [constructor](index.EmailChallengeTransaction.md#constructor)
 
 ### Properties
 
-- [\_http](types.EmailChallengeTransaction.md#_http)
-- [expiresAt](types.EmailChallengeTransaction.md#expiresat)
-- [headers](types.EmailChallengeTransaction.md#headers)
-- [id](types.EmailChallengeTransaction.md#id)
-- [poll](types.EmailChallengeTransaction.md#poll)
-- [profile](types.EmailChallengeTransaction.md#profile)
-- [status](types.EmailChallengeTransaction.md#status)
-- [verify](types.EmailChallengeTransaction.md#verify)
+- [\_http](index.EmailChallengeTransaction.md#_http)
+- [expiresAt](index.EmailChallengeTransaction.md#expiresat)
+- [headers](index.EmailChallengeTransaction.md#headers)
+- [id](index.EmailChallengeTransaction.md#id)
+- [poll](index.EmailChallengeTransaction.md#poll)
+- [profile](index.EmailChallengeTransaction.md#profile)
+- [status](index.EmailChallengeTransaction.md#status)
+- [verify](index.EmailChallengeTransaction.md#verify)
 
 ## Constructors
 
@@ -42,11 +42,11 @@
 
 #### Overrides
 
-[BaseTransaction](types.BaseTransaction.md).[constructor](types.BaseTransaction.md#constructor)
+[BaseTransaction](index.BaseTransaction.md).[constructor](index.BaseTransaction.md#constructor)
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:19](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L19)
+[transactions/EmailChallengeTransaction.ts:20](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L20)
 
 ## Properties
 
@@ -56,7 +56,7 @@
 
 #### Inherited from
 
-[BaseTransaction](types.BaseTransaction.md).[_http](types.BaseTransaction.md#_http)
+[BaseTransaction](index.BaseTransaction.md).[_http](index.BaseTransaction.md#_http)
 
 #### Defined in
 
@@ -80,7 +80,7 @@ ___
 
 #### Inherited from
 
-[BaseTransaction](types.BaseTransaction.md).[headers](types.BaseTransaction.md#headers)
+[BaseTransaction](index.BaseTransaction.md).[headers](index.BaseTransaction.md#headers)
 
 #### Defined in
 
@@ -100,15 +100,15 @@ ___
 
 ### poll
 
-• **poll**: () => `Promise`<[`EmailStatusTransaction`](types.EmailStatusTransaction.md)\>
+• **poll**: () => `Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
 
 #### Type declaration
 
-▸ (): `Promise`<[`EmailStatusTransaction`](types.EmailStatusTransaction.md)\>
+▸ (): `Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
 
 ##### Returns
 
-`Promise`<[`EmailStatusTransaction`](types.EmailStatusTransaction.md)\>
+`Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
 
 #### Defined in
 
@@ -138,11 +138,11 @@ ___
 
 ### verify
 
-• **verify**: (`payload`: [`VerificationPayload`](../modules/types.md#verificationpayload)) => `Promise`<[`EmailChallengeTransaction`](types.EmailChallengeTransaction.md)\>
+• **verify**: (`payload`: [`VerificationPayload`](../modules/types.md#verificationpayload)) => `Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
 
 #### Type declaration
 
-▸ (`payload`): `Promise`<[`EmailChallengeTransaction`](types.EmailChallengeTransaction.md)\>
+▸ (`payload`): `Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
 
 ##### Parameters
 
@@ -152,8 +152,8 @@ ___
 
 ##### Returns
 
-`Promise`<[`EmailChallengeTransaction`](types.EmailChallengeTransaction.md)\>
+`Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:17](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L17)
+[transactions/EmailChallengeTransaction.ts:18](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L18)

@@ -1,35 +1,35 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [types](../modules/types.md) / BaseTransaction
+[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [index](../modules/index.md) / BaseTransaction
 
 # Class: BaseTransaction
 
-[types](../modules/types.md).BaseTransaction
+[index](../modules/index.md).BaseTransaction
 
 ## Hierarchy
 
 - **`BaseTransaction`**
 
-  ↳ [`EmailTransaction`](types.EmailTransaction.md)
+  ↳ [`EmailTransaction`](index.EmailTransaction.md)
 
-  ↳ [`EmailStatusTransaction`](types.EmailStatusTransaction.md)
+  ↳ [`EmailStatusTransaction`](index.EmailStatusTransaction.md)
 
-  ↳ [`EmailChallengeTransaction`](types.EmailChallengeTransaction.md)
+  ↳ [`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)
 
-  ↳ [`PhoneTransaction`](types.PhoneTransaction.md)
+  ↳ [`PhoneTransaction`](index.PhoneTransaction.md)
 
-  ↳ [`ProfileTransaction`](types.ProfileTransaction.md)
+  ↳ [`ProfileTransaction`](index.ProfileTransaction.md)
 
-  ↳ [`ProfileSchemaTransaction`](types.ProfileSchemaTransaction.md)
+  ↳ [`ProfileSchemaTransaction`](index.ProfileSchemaTransaction.md)
 
 ## Table of contents
 
 ### Constructors
 
-- [constructor](types.BaseTransaction.md#constructor)
+- [constructor](index.BaseTransaction.md#constructor)
 
 ### Properties
 
-- [\_http](types.BaseTransaction.md#_http)
-- [headers](types.BaseTransaction.md#headers)
+- [\_http](index.BaseTransaction.md#_http)
+- [headers](index.BaseTransaction.md#headers)
 
 ## Constructors
 

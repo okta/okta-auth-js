@@ -1,12 +1,12 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [types](../modules/types.md) / ProfileTransaction
+[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [index](../modules/index.md) / ProfileTransaction
 
 # Class: ProfileTransaction
 
-[types](../modules/types.md).ProfileTransaction
+[index](../modules/index.md).ProfileTransaction
 
 ## Hierarchy
 
-- [`BaseTransaction`](types.BaseTransaction.md)
+- [`BaseTransaction`](index.BaseTransaction.md)
 
   ↳ **`ProfileTransaction`**
 
@@ -14,15 +14,15 @@
 
 ### Constructors
 
-- [constructor](types.ProfileTransaction.md#constructor)
+- [constructor](index.ProfileTransaction.md#constructor)
 
 ### Properties
 
-- [\_http](types.ProfileTransaction.md#_http)
-- [createdAt](types.ProfileTransaction.md#createdat)
-- [headers](types.ProfileTransaction.md#headers)
-- [modifiedAt](types.ProfileTransaction.md#modifiedat)
-- [profile](types.ProfileTransaction.md#profile)
+- [\_http](index.ProfileTransaction.md#_http)
+- [createdAt](index.ProfileTransaction.md#createdat)
+- [headers](index.ProfileTransaction.md#headers)
+- [modifiedAt](index.ProfileTransaction.md#modifiedat)
+- [profile](index.ProfileTransaction.md#profile)
 
 ## Constructors
 
@@ -39,7 +39,7 @@
 
 #### Overrides
 
-[BaseTransaction](types.BaseTransaction.md).[constructor](types.BaseTransaction.md#constructor)
+[BaseTransaction](index.BaseTransaction.md).[constructor](index.BaseTransaction.md#constructor)
 
 #### Defined in
 
@@ -53,7 +53,7 @@
 
 #### Inherited from
 
-[BaseTransaction](types.BaseTransaction.md).[_http](types.BaseTransaction.md#_http)
+[BaseTransaction](index.BaseTransaction.md).[_http](index.BaseTransaction.md#_http)
 
 #### Defined in
 
@@ -77,7 +77,7 @@ ___
 
 #### Inherited from
 
-[BaseTransaction](types.BaseTransaction.md).[headers](types.BaseTransaction.md#headers)
+[BaseTransaction](index.BaseTransaction.md).[headers](index.BaseTransaction.md#headers)
 
 #### Defined in
 

@@ -7,6 +7,7 @@ export default class PhoneTransaction extends BaseTransaction {
   profile: PhoneProfile;
   status: Status;
 
+  // eslint-disable-next-line no-use-before-define
   get: () => Promise<PhoneTransaction>;
   delete: () => Promise<BaseTransaction>;
   challenge: (payload: ChallengePhonePayload) => Promise<BaseTransaction>;

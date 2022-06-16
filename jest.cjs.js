@@ -13,7 +13,7 @@
 //Jest doc: https://jestjs.io/docs/ecmascript-modules
 
 const OktaAuth = '<rootDir>/build/cjs/index.js';
-const MyaccountEntry = '<rootDir>/build/cjs/myaccount/index.js';
+const MyAccountEntry = '<rootDir>/build/cjs/myaccount/index.js';
 
 module.exports = {
   'roots': [
@@ -27,12 +27,12 @@ module.exports = {
   },
   'transformIgnorePatterns': [
     OktaAuth,
-    MyaccountEntry
+    MyAccountEntry
   ],
   'restoreMocks': true,
   'moduleNameMapper': {
     '^@okta/okta-auth-js$': OktaAuth,
-    '^@okta/okta-auth-js/myaccount$': MyaccountEntry,
+    '^@okta/okta-auth-js/myaccount$': MyAccountEntry,
   },
   'testPathIgnorePatterns': [],
   'reporters': [

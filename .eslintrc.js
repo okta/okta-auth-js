@@ -132,6 +132,17 @@ module.exports = {
       },
     },
     {
+      files: ["samples/generated/**/*.js"],
+      rules: {
+        'node/no-missing-import': ['error', {
+          allowModules: ['@okta/okta-auth-js']
+        }],
+        'node/no-missing-require': ['error', {
+          allowModules: ['@okta/okta-auth-js']
+        }]
+      }
+    },
+    {
       files: [
         "rollup.config.js",
         "**/*.mjs"

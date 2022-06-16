@@ -23,7 +23,7 @@ import {
   RefreshToken,
   OktaAuth,
   JWTPayload,
-} from '../../build/lib/index.d';
+} from '@okta/okta-auth-js';
 import { expectType, expectAssignable, expectError } from 'tsd';
 
 const authClient = new OktaAuth({});

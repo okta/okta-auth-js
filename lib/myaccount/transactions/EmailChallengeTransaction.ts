@@ -14,6 +14,7 @@ export default class EmailChallengeTransaction extends BaseTransaction {
   status: Status;
 
   poll: () => Promise<EmailStatusTransaction>;
+  // eslint-disable-next-line no-use-before-define
   verify: (payload: VerificationPayload) => Promise<EmailChallengeTransaction>;
 
   constructor(oktaAuth, options) {

@@ -28,7 +28,7 @@ okta.myaccount.phone.read
 okta.myaccount.phone.manage
 ```
 
-## How to access API methods
+## Accessing API methods
 
 ### Via NPM module
 
@@ -63,6 +63,24 @@ const oktaAuth = new OktaAuth({
   // config
 });
 const emails = await oktaAuth.myaccount.getEmails();
+```
+
+## Using types
+
+Types are exposed from both module level and SDK entries, for environment with typescript version 4.7 or above, you can import types from both module and SDK entries. But if you are with lower typescript versions, please import types from the main SDK entry.
+
+See [typescript release notes](https://devblogs.microsoft.com/typescript/announcing-typescript-4-7-rc/#package-json-exports-imports-and-self-referencing) for detailed information.
+
+**Import from module entry**
+
+```js
+import { getEmail } from '@okta/okta-auth-js/myaccount';
+```
+
+**Import from SDK entry**
+
+```js
+import { getEmail } from '@okta/okta-auth-js';
 ```
 
 ## Handling `insufficient_authentication_context` error

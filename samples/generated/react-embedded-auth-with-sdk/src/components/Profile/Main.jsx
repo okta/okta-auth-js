@@ -56,7 +56,7 @@ const Profile = () => {
     } else if (approach === 'interact-widget') {
       history.replace(`/widget?maxAge=${maxAge}`);
     }
-  }, [oktaAuth, approach, error, setIdxTransaction]);
+  }, [oktaAuth, approach, error, setIdxTransaction, history]);
 
   const handleApproachChange = event => {
     setApproach(event.target.value);

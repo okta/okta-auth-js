@@ -4,6 +4,30 @@
 
 ## Table of contents
 
+### References
+
+- [AddEmailPayload](index.md#addemailpayload)
+- [AddPhonePayload](index.md#addphonepayload)
+- [ChallengePhonePayload](index.md#challengephonepayload)
+- [EmailProfile](index.md#emailprofile)
+- [EmailRole](index.md#emailrole)
+- [IAPIFunction](index.md#iapifunction)
+- [MyAccountRequestOptions](index.md#myaccountrequestoptions)
+- [PhoneProfile](index.md#phoneprofile)
+- [Status](index.md#status)
+- [UpdateProfilePayload](index.md#updateprofilepayload)
+- [VerificationPayload](index.md#verificationpayload)
+
+### Classes
+
+- [BaseTransaction](../classes/index.BaseTransaction.md)
+- [EmailChallengeTransaction](../classes/index.EmailChallengeTransaction.md)
+- [EmailStatusTransaction](../classes/index.EmailStatusTransaction.md)
+- [EmailTransaction](../classes/index.EmailTransaction.md)
+- [PhoneTransaction](../classes/index.PhoneTransaction.md)
+- [ProfileSchemaTransaction](../classes/index.ProfileSchemaTransaction.md)
+- [ProfileTransaction](../classes/index.ProfileTransaction.md)
+
 ### Functions
 
 - [addEmail](index.md#addemail)
@@ -23,11 +47,77 @@
 - [verifyEmailChallenge](index.md#verifyemailchallenge)
 - [verifyPhoneChallenge](index.md#verifyphonechallenge)
 
+## References
+
+### AddEmailPayload
+
+Re-exports [AddEmailPayload](types.md#addemailpayload)
+
+___
+
+### AddPhonePayload
+
+Re-exports [AddPhonePayload](types.md#addphonepayload)
+
+___
+
+### ChallengePhonePayload
+
+Re-exports [ChallengePhonePayload](types.md#challengephonepayload)
+
+___
+
+### EmailProfile
+
+Re-exports [EmailProfile](types.md#emailprofile)
+
+___
+
+### EmailRole
+
+Re-exports [EmailRole](../enums/types.EmailRole.md)
+
+___
+
+### IAPIFunction
+
+Re-exports [IAPIFunction](types.md#iapifunction)
+
+___
+
+### MyAccountRequestOptions
+
+Re-exports [MyAccountRequestOptions](types.md#myaccountrequestoptions)
+
+___
+
+### PhoneProfile
+
+Re-exports [PhoneProfile](types.md#phoneprofile)
+
+___
+
+### Status
+
+Re-exports [Status](../enums/types.Status.md)
+
+___
+
+### UpdateProfilePayload
+
+Re-exports [UpdateProfilePayload](types.md#updateprofilepayload)
+
+___
+
+### VerificationPayload
+
+Re-exports [VerificationPayload](types.md#verificationpayload)
+
 ## Functions
 
 ### addEmail
 
-▸ **addEmail**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](../classes/types.EmailTransaction.md)\>
+▸ **addEmail**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](../classes/index.EmailTransaction.md)\>
 
 **`scope:`** okta.myaccount.email.manage
 
@@ -40,7 +130,7 @@
 
 #### Returns
 
-`Promise`<[`EmailTransaction`](../classes/types.EmailTransaction.md)\>
+`Promise`<[`EmailTransaction`](../classes/index.EmailTransaction.md)\>
 
 #### Defined in
 
@@ -50,7 +140,7 @@ ___
 
 ### addPhone
 
-▸ **addPhone**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](../classes/types.PhoneTransaction.md)\>
+▸ **addPhone**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](../classes/index.PhoneTransaction.md)\>
 
 **`scope:`** okta.myaccount.phone.manage
 
@@ -63,7 +153,7 @@ ___
 
 #### Returns
 
-`Promise`<[`PhoneTransaction`](../classes/types.PhoneTransaction.md)\>
+`Promise`<[`PhoneTransaction`](../classes/index.PhoneTransaction.md)\>
 
 #### Defined in
 
@@ -73,7 +163,7 @@ ___
 
 ### deleteEmail
 
-▸ **deleteEmail**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+▸ **deleteEmail**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 **`scope:`** okta.myaccount.email.manage
 
@@ -86,7 +176,7 @@ ___
 
 #### Returns
 
-`Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 #### Defined in
 
@@ -96,7 +186,7 @@ ___
 
 ### deletePhone
 
-▸ **deletePhone**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+▸ **deletePhone**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 **`scope:`** okta.myaccount.phone.manage
 
@@ -109,7 +199,7 @@ ___
 
 #### Returns
 
-`Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 #### Defined in
 
@@ -119,7 +209,7 @@ ___
 
 ### getEmail
 
-▸ **getEmail**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](../classes/types.EmailTransaction.md)\>
+▸ **getEmail**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](../classes/index.EmailTransaction.md)\>
 
 **`scope:`** okta.myaccount.email.read
 
@@ -132,7 +222,7 @@ ___
 
 #### Returns
 
-`Promise`<[`EmailTransaction`](../classes/types.EmailTransaction.md)\>
+`Promise`<[`EmailTransaction`](../classes/index.EmailTransaction.md)\>
 
 #### Defined in
 
@@ -142,7 +232,7 @@ ___
 
 ### getEmailChallenge
 
-▸ **getEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`EmailChallengeTransaction`](../classes/types.EmailChallengeTransaction.md)\>
+▸ **getEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`EmailChallengeTransaction`](../classes/index.EmailChallengeTransaction.md)\>
 
 **`scope:`** okta.myaccount.email.read
 
@@ -155,7 +245,7 @@ ___
 
 #### Returns
 
-`Promise`<[`EmailChallengeTransaction`](../classes/types.EmailChallengeTransaction.md)\>
+`Promise`<[`EmailChallengeTransaction`](../classes/index.EmailChallengeTransaction.md)\>
 
 #### Defined in
 
@@ -165,7 +255,7 @@ ___
 
 ### getEmails
 
-▸ **getEmails**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](../classes/types.EmailTransaction.md)[]\>
+▸ **getEmails**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](../classes/index.EmailTransaction.md)[]\>
 
 **`scope:`** okta.myaccount.email.read
 
@@ -178,7 +268,7 @@ ___
 
 #### Returns
 
-`Promise`<[`EmailTransaction`](../classes/types.EmailTransaction.md)[]\>
+`Promise`<[`EmailTransaction`](../classes/index.EmailTransaction.md)[]\>
 
 #### Defined in
 
@@ -188,7 +278,7 @@ ___
 
 ### getPhone
 
-▸ **getPhone**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](../classes/types.PhoneTransaction.md)\>
+▸ **getPhone**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](../classes/index.PhoneTransaction.md)\>
 
 **`scope:`** okta.myaccount.phone.read
 
@@ -201,7 +291,7 @@ ___
 
 #### Returns
 
-`Promise`<[`PhoneTransaction`](../classes/types.PhoneTransaction.md)\>
+`Promise`<[`PhoneTransaction`](../classes/index.PhoneTransaction.md)\>
 
 #### Defined in
 
@@ -211,7 +301,7 @@ ___
 
 ### getPhones
 
-▸ **getPhones**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](../classes/types.PhoneTransaction.md)[]\>
+▸ **getPhones**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](../classes/index.PhoneTransaction.md)[]\>
 
 **`scope:`** okta.myaccount.phone.read
 
@@ -224,7 +314,7 @@ ___
 
 #### Returns
 
-`Promise`<[`PhoneTransaction`](../classes/types.PhoneTransaction.md)[]\>
+`Promise`<[`PhoneTransaction`](../classes/index.PhoneTransaction.md)[]\>
 
 #### Defined in
 
@@ -234,7 +324,7 @@ ___
 
 ### getProfile
 
-▸ **getProfile**(`oktaAuth`, `options?`): `Promise`<[`ProfileTransaction`](../classes/types.ProfileTransaction.md)\>
+▸ **getProfile**(`oktaAuth`, `options?`): `Promise`<[`ProfileTransaction`](../classes/index.ProfileTransaction.md)\>
 
 **`scope:`** okta.myaccount.profile.read
 
@@ -247,7 +337,7 @@ ___
 
 #### Returns
 
-`Promise`<[`ProfileTransaction`](../classes/types.ProfileTransaction.md)\>
+`Promise`<[`ProfileTransaction`](../classes/index.ProfileTransaction.md)\>
 
 #### Defined in
 
@@ -257,7 +347,7 @@ ___
 
 ### getProfileSchema
 
-▸ **getProfileSchema**(`oktaAuth`, `options?`): `Promise`<[`ProfileSchemaTransaction`](../classes/types.ProfileSchemaTransaction.md)\>
+▸ **getProfileSchema**(`oktaAuth`, `options?`): `Promise`<[`ProfileSchemaTransaction`](../classes/index.ProfileSchemaTransaction.md)\>
 
 **`scope:`** okta.myaccount.profile.read
 
@@ -270,7 +360,7 @@ ___
 
 #### Returns
 
-`Promise`<[`ProfileSchemaTransaction`](../classes/types.ProfileSchemaTransaction.md)\>
+`Promise`<[`ProfileSchemaTransaction`](../classes/index.ProfileSchemaTransaction.md)\>
 
 #### Defined in
 
@@ -280,7 +370,7 @@ ___
 
 ### sendEmailChallenge
 
-▸ **sendEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`EmailChallengeTransaction`](../classes/types.EmailChallengeTransaction.md)\>
+▸ **sendEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`EmailChallengeTransaction`](../classes/index.EmailChallengeTransaction.md)\>
 
 **`scope:`** okta.myaccount.email.read
 
@@ -293,7 +383,7 @@ ___
 
 #### Returns
 
-`Promise`<[`EmailChallengeTransaction`](../classes/types.EmailChallengeTransaction.md)\>
+`Promise`<[`EmailChallengeTransaction`](../classes/index.EmailChallengeTransaction.md)\>
 
 #### Defined in
 
@@ -303,7 +393,7 @@ ___
 
 ### sendPhoneChallenge
 
-▸ **sendPhoneChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+▸ **sendPhoneChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 **`scope:`** okta.myaccount.phone.manage
 
@@ -316,7 +406,7 @@ ___
 
 #### Returns
 
-`Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 #### Defined in
 
@@ -326,7 +416,7 @@ ___
 
 ### updateProfile
 
-▸ **updateProfile**(`oktaAuth`, `options?`): `Promise`<[`ProfileTransaction`](../classes/types.ProfileTransaction.md)\>
+▸ **updateProfile**(`oktaAuth`, `options?`): `Promise`<[`ProfileTransaction`](../classes/index.ProfileTransaction.md)\>
 
 **`scope:`** okta.myaccount.profile.manage
 
@@ -339,7 +429,7 @@ ___
 
 #### Returns
 
-`Promise`<[`ProfileTransaction`](../classes/types.ProfileTransaction.md)\>
+`Promise`<[`ProfileTransaction`](../classes/index.ProfileTransaction.md)\>
 
 #### Defined in
 
@@ -349,7 +439,7 @@ ___
 
 ### verifyEmailChallenge
 
-▸ **verifyEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+▸ **verifyEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 **`scope:`** okta.myaccount.email.manage
 
@@ -362,7 +452,7 @@ ___
 
 #### Returns
 
-`Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 #### Defined in
 
@@ -372,7 +462,7 @@ ___
 
 ### verifyPhoneChallenge
 
-▸ **verifyPhoneChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+▸ **verifyPhoneChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 **`scope:`** okta.myaccount.phone.manage
 
@@ -385,7 +475,7 @@ ___
 
 #### Returns
 
-`Promise`<[`BaseTransaction`](../classes/types.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](../classes/index.BaseTransaction.md)\>
 
 #### Defined in
 

@@ -54,7 +54,7 @@ const WidgetPage = () => {
     );
 
     return () => widget.remove();
-  }, [oktaAuth]);
+  }, [oktaAuth, history, maxAge, otp, state]);
 
   return (
     <div>

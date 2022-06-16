@@ -10,11 +10,6 @@ export {
   BaseTransaction
 } from './transactions';
 
-export type IAPIFunction<T> = (
-  oktaAuth: OktaAuthInterface, 
-  options?: MyAccountRequestOptions
-) => Promise<T>;
-
 export enum EmailRole {
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY'
@@ -80,3 +75,8 @@ export type MyAccountRequestOptions = {
     | UpdateProfilePayload;
   accessToken?: string;
 }
+
+export type IAPIFunction<T> = (
+  oktaAuth: OktaAuthInterface, 
+  options?: MyAccountRequestOptions
+) => Promise<T>;

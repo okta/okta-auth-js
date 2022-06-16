@@ -9,6 +9,7 @@ export default class EmailTransaction extends BaseTransaction {
   roles: EmailRole[];
   status: Status;
 
+  // eslint-disable-next-line no-use-before-define
   get: () => Promise<EmailTransaction>;
   delete: () => Promise<BaseTransaction>;
   challenge: () => Promise<EmailChallengeTransaction>;

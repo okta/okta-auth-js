@@ -23,6 +23,8 @@ export function getNativeConsole() {
 
 export function getConsole() {
   var nativeConsole = getNativeConsole();
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   if (nativeConsole && nativeConsole.log) {
     return nativeConsole;
   }
