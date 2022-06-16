@@ -15,16 +15,18 @@
 import { post } from '../http';
 import AuthSdkError from '../errors/AuthSdkError';
 import { STATE_TOKEN_KEY_NAME } from '../constants';
-import { addStateToken } from './util';
+import { OktaAuthHttpInterface, OktaAuthOptionsInterface } from '../types/api';
+import { addStateToken } from './util/stateToken';
+import { AuthnTransactionAPI } from './types';
 
-export function transactionStatus(sdk, args) {
+export function transactionStatus(sdk: OktaAuthHttpInterface, args) {
   args = addStateToken(sdk, args);
   return post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn', args, { withCredentials: true });
 }
 
-export function resumeTransaction(sdk, args) {
+export function resumeTransaction(sdk: OktaAuthHttpInterface, tx: AuthnTransactionAPI, args) {
   if (!args || !args.stateToken) {
-    var stateToken = sdk.tx.exists._get(STATE_TOKEN_KEY_NAME);
+    var stateToken = getSavedStateToken(sdk);
     if (stateToken) {
       args = {
         stateToken: stateToken
@@ -33,15 +35,15 @@ export function resumeTransaction(sdk, args) {
       return Promise.reject(new AuthSdkError('No transaction to resume'));
     }
   }
-  return sdk.tx.status(args)
+  return transactionStatus(sdk, args)
     .then(function(res) {
-      return sdk.tx.createTransaction(res);
+      return tx.createTransaction(res);
     });
 }
 
-export function introspectAuthn (sdk, args) {
+export function introspectAuthn (sdk: OktaAuthHttpInterface, tx: AuthnTransactionAPI, args) {
   if (!args || !args.stateToken) {
-    var stateToken = sdk.tx.exists._get(STATE_TOKEN_KEY_NAME);
+    var stateToken = getSavedStateToken(sdk);
     if (stateToken) {
       args = {
         stateToken: stateToken
@@ -52,25 +54,31 @@ export function introspectAuthn (sdk, args) {
   }
   return transactionStep(sdk, args)
     .then(function (res) {
-      return sdk.tx.createTransaction(res);
+      return tx.createTransaction(res);
     });
 }
 
-export function transactionStep(sdk, args) {
+export function transactionStep(sdk: OktaAuthHttpInterface, args) {
   args = addStateToken(sdk, args);
   // v1 pipeline introspect API
   return post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn/introspect', args, { withCredentials: true });
 }
 
-export function transactionExists(sdk) {
+export function transactionExists(sdk: OktaAuthOptionsInterface) {
   // We have a cookie state token
-  return !!sdk.tx.exists._get(STATE_TOKEN_KEY_NAME);
+  return !!getSavedStateToken(sdk);
 }
 
-export function postToTransaction(sdk, url, args, options?) {
+export function postToTransaction(sdk: OktaAuthHttpInterface, tx, url, args, options?) {
   options = Object.assign({ withCredentials: true }, options);
   return post(sdk, url, args, options)
     .then(function(res) {
-      return sdk.tx.createTransaction(res);
+      return tx.createTransaction(res);
     });
+}
+
+export function getSavedStateToken(sdk: OktaAuthOptionsInterface) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const storage = sdk.options.storageUtil!.storage;
+    return storage.get(STATE_TOKEN_KEY_NAME);
 }

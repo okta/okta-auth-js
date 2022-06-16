@@ -11,8 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { AuthTransaction } from '../tx/AuthTransaction';
-import { TransactionState } from '../tx/TransactionState';
+import { AuthnTransaction, AuthnTransactionAPI } from '../tx/types';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { CustomUserClaims, UserClaims } from './UserClaims';
@@ -46,7 +45,6 @@ import {
   StartOptions
 } from '../idx/types';
 import { TransactionMetaOptions } from './Transaction';
-import { RequestData, RequestOptions } from './http';
 import { IdxToPersist, RawIdxResponse } from '../idx/types/idx-js';
 
 export interface OktaAuthOptionsInterface {
@@ -92,12 +90,19 @@ export interface OktaAuthIdxInterface extends
   idx: IdxAPI;
 }
 
+export interface OktaAuthTxInterface extends
+  OktaAuthHttpInterface
+{
+  tx: AuthnTransactionAPI;
+}
+
 export interface OktaAuthInterface extends
   OktaAuthOptionsInterface,
   OktaAuthStorageInterface,
   OktaAuthFeaturesInterface,
   OktaAuthHttpInterface,
   OktaAuthTransactionInterface,
+  OktaAuthTxInterface,
   OktaAuthIdxInterface,
   OktaAuthOIDCInterface
 {
@@ -128,22 +133,6 @@ export interface HttpAPI {
   setRequestHeader(name: string, value: string): void;
 }
 
-// Transaction API
-
-export type TransactionExistsFunction = () => boolean;
-export interface TransactionExists extends TransactionExistsFunction {
-  _get: (key: string) => string;
-}
-
-// Authn (classic) api
-export interface TransactionAPI {
-  exists: TransactionExists;
-  status: (args?: object) => Promise<object>;
-  resume: (args?: object) => Promise<AuthTransaction>;
-  introspect: (args?: object) => Promise<AuthTransaction>;
-  createTransaction: (res?: TransactionState) => AuthTransaction;
-  postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => Promise<AuthTransaction>;
-}
 
 // Fingerprint
 export interface FingerprintOptions {
@@ -288,8 +277,8 @@ export interface SigninWithCredentialsOptions extends SigninOptions {
 }
 
 export interface SigninAPI {
-  signIn(opts: SigninOptions): Promise<AuthTransaction>;
-  signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction>;
+  signIn(opts: SigninOptions): Promise<AuthnTransaction>;
+  signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthnTransaction>;
 }
 
 export interface SignoutRedirectUrlOptions {

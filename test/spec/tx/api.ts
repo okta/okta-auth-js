@@ -15,24 +15,25 @@ jest.mock('../../../lib/http', () => {
   return { post };
 });
 
-import { postToTransaction } from '../../../lib/tx';
+import { postToTransaction } from '../../../lib/tx/api';
 
 describe('tx - api', () => {
-  let auth;
+  let testContext;
   beforeEach(() => {
-    auth = {
-      tx: {
-        createTransaction() {}
-      }
+    const auth = {};
+    const tx = {
+      createTransaction() {},
     };
+    testContext = { auth, tx };
   });
 
   describe('postToTransaction', () => {
     it('sets default withCredentials options as true', async () => {
+      const { auth, tx } = testContext;
       const url = 'http://fake.domain.com/api';
       const args = { fake1: 'fake1' };
       const options = { fake2: 'fake2' };
-      await postToTransaction(auth, url, args, options);
+      await postToTransaction(auth, tx, url, args, options);
       expect(post).toHaveBeenCalledWith(auth, url, args, {
         fake2: 'fake2',
         withCredentials: true

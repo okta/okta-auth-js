@@ -11,54 +11,53 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-// import { AuthTransaction, OktaAuth, IdxStatus } from '../../build/lib/index.d';
-import { AuthTransaction, OktaAuth, IdxStatus } from '@okta/okta-auth-js';
+import { AuthnTransaction, OktaAuth, IdxStatus } from '../../build/lib/index.d';
 import { expectType } from 'tsd';
 
 const authClient = new OktaAuth({});
 
 (async () => {
   const tx = await authClient.tx.introspect();
-  expectType<AuthTransaction>(tx);
+  expectType<AuthnTransaction>(tx);
 
   expectType<boolean>(await authClient.tx.exists());
   expectType<object>(await authClient.tx.status());
   expectType<string | IdxStatus>(tx.status);
 
   // Manage transaction
-  expectType<AuthTransaction>(await authClient.tx.resume());
-  expectType<AuthTransaction>(await tx.verify!({
+  expectType<AuthnTransaction>(await authClient.tx.resume());
+  expectType<AuthnTransaction>(await tx.verify!({
     passCode: '123456',
     autoPush: true
   }));
-  expectType<AuthTransaction>(await tx.activate!({
+  expectType<AuthnTransaction>(await tx.activate!({
     passCode: '123456'
   }));
-  expectType<AuthTransaction>(await tx.cancel!());
-  expectType<AuthTransaction>(await tx.poll!({
+  expectType<AuthnTransaction>(await tx.cancel!());
+  expectType<AuthnTransaction>(await tx.poll!({
     autoPush: true
   }));
-  expectType<AuthTransaction>(await tx.prev!());
-  expectType<AuthTransaction>(await tx.skip!());
-  expectType<AuthTransaction>(await tx.changePassword!({
+  expectType<AuthnTransaction>(await tx.prev!());
+  expectType<AuthnTransaction>(await tx.skip!());
+  expectType<AuthnTransaction>(await tx.changePassword!({
     oldPassword: '0ldP4ssw0rd',
     newPassword: 'N3wP4ssw0rd'
   }));
-  expectType<AuthTransaction>(await tx.resetPassword!({
+  expectType<AuthnTransaction>(await tx.resetPassword!({
     newPassword: 'N3wP4ssw0rd'
   }));
-  expectType<AuthTransaction>(await tx.unlock!({
+  expectType<AuthnTransaction>(await tx.unlock!({
     username: 'dade.murphy@example.com',
     factorType: 'EMAIL',
     relayState: 'd3de23'
   }));
-  expectType<AuthTransaction>(await tx.answer!({
+  expectType<AuthnTransaction>(await tx.answer!({
     answer: 'My favorite recovery question answer'
   }));
-  expectType<AuthTransaction>(await tx.recovery!({
+  expectType<AuthnTransaction>(await tx.recovery!({
     recoveryToken: '00xdqXOE5qDZX8-PBR1bYv8AESqIFinDy3yul01tyh'
   }));
-  expectType<AuthTransaction>(await tx.resend!());
+  expectType<AuthnTransaction>(await tx.resend!());
 
   // Questions
   const questionFactor = tx.factors!.find(function(factor) {

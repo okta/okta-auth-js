@@ -11,8 +11,45 @@
  *
  */
 
-export * from './api';
-export * from './AuthTransaction';
-export * from './poll';
-export * from './TransactionState';
-export * from './util';
+import { OktaAuthHttpInterface, OktaAuthTxInterface } from '../types/api';
+import { RequestData, RequestOptions } from '../types/http';
+import {
+  introspectAuthn,
+  transactionStatus,
+  transactionExists,
+  resumeTransaction,
+  postToTransaction
+} from './api';
+import { AuthnTransactionImpl } from './AuthnTransactionImpl';
+import { AuthnTransactionAPI, AuthnTransactionState } from './types';
+
+export * from './types';
+
+// Factory
+export function createAuthnTransactionAPI(sdk: OktaAuthHttpInterface): AuthnTransactionAPI {
+  const tx: AuthnTransactionAPI = {
+    status: transactionStatus.bind(null, sdk),
+    resume(args) {
+      return resumeTransaction(sdk, tx, args);
+    },
+    exists: transactionExists.bind(null, sdk),
+    introspect(args) {
+      return introspectAuthn(sdk, tx, args);
+    },
+    createTransaction: (res?: AuthnTransactionState) => {
+      return new AuthnTransactionImpl(sdk, tx, res);
+    },
+    postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => {
+      return postToTransaction(sdk, tx, url, args, options);
+    }
+  };
+  return tx;
+}
+
+// Mixin
+export function useAuthnTransactionAPI(sdk: OktaAuthHttpInterface): OktaAuthTxInterface {
+  const tx: AuthnTransactionAPI = createAuthnTransactionAPI(sdk);
+  (sdk as OktaAuthTxInterface).tx = tx;
+  return sdk as OktaAuthTxInterface;
+}
+

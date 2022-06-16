@@ -12,10 +12,10 @@
  */
 
 
-import { TransactionState } from './TransactionState';
+import { AuthnTransactionState } from '../types';
 
 export function addStateToken(res, options?) {
-  var builtArgs = {} as TransactionState;
+  var builtArgs = {} as AuthnTransactionState;
   Object.assign(builtArgs, options);
 
   // Add the stateToken if one isn't passed and we have one
