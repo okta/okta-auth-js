@@ -11,5 +11,8 @@
  */
 
 
-export * from './api';
-export * from './types';
+// exports all public methods from myaccount module
+
+export * from './profileApi';
+export * from './emailApi';
+export * from './phoneApi';
