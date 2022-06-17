@@ -8,6 +8,7 @@
   - Changes implementation of `SyncStorageService` using `broadcast-channel` instead of using `StorageEvent`. Supports `localStorage` and `cookie` storage.
   - Adds `LeaderElectionService` as separate service
   - Fixes error `Channel is closed` while stopping leader election
+- [#1158](https://github.com/okta/okta-auth-js/pull/1158) Adds MyAccount API. See [MyAccount API DOC](/docs/myaccount/README.md) for detailed information.
 
 ## 6.6.2
 
