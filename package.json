@@ -82,8 +82,7 @@
     "prepare": "yarn build && husky install",
     "start": "yarn workspace @okta/test.app start --open",
     "stop": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true",
-    "verify:package": "node scripts/verify-package.js",
-    "lint-staged": "lint-staged"
+    "verify:package": "node scripts/verify-package.js"
   },
   "author": "Okta",
   "keywords": [
