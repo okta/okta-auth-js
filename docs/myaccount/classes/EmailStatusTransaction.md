@@ -1,12 +1,10 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [index](../modules/index.md) / EmailStatusTransaction
+[@okta/okta-auth-js/myaccount](../README.md) / [Exports](../modules.md) / EmailStatusTransaction
 
 # Class: EmailStatusTransaction
 
-[index](../modules/index.md).EmailStatusTransaction
-
 ## Hierarchy
 
-- [`BaseTransaction`](index.BaseTransaction.md)
+- [`BaseTransaction`](BaseTransaction.md)
 
   ↳ **`EmailStatusTransaction`**
 
@@ -14,16 +12,16 @@
 
 ### Constructors
 
-- [constructor](index.EmailStatusTransaction.md#constructor)
+- [constructor](EmailStatusTransaction.md#constructor)
 
 ### Properties
 
-- [\_http](index.EmailStatusTransaction.md#_http)
-- [expiresAt](index.EmailStatusTransaction.md#expiresat)
-- [headers](index.EmailStatusTransaction.md#headers)
-- [id](index.EmailStatusTransaction.md#id)
-- [profile](index.EmailStatusTransaction.md#profile)
-- [status](index.EmailStatusTransaction.md#status)
+- [\_http](EmailStatusTransaction.md#_http)
+- [expiresAt](EmailStatusTransaction.md#expiresat)
+- [headers](EmailStatusTransaction.md#headers)
+- [id](EmailStatusTransaction.md#id)
+- [profile](EmailStatusTransaction.md#profile)
+- [status](EmailStatusTransaction.md#status)
 
 ## Constructors
 
@@ -40,7 +38,7 @@
 
 #### Overrides
 
-[BaseTransaction](index.BaseTransaction.md).[constructor](index.BaseTransaction.md#constructor)
+[BaseTransaction](BaseTransaction.md).[constructor](BaseTransaction.md#constructor)
 
 #### Defined in
 
@@ -54,7 +52,7 @@
 
 #### Inherited from
 
-[BaseTransaction](index.BaseTransaction.md).[_http](index.BaseTransaction.md#_http)
+[BaseTransaction](BaseTransaction.md).[_http](BaseTransaction.md#_http)
 
 #### Defined in
 
@@ -78,7 +76,7 @@ ___
 
 #### Inherited from
 
-[BaseTransaction](index.BaseTransaction.md).[headers](index.BaseTransaction.md#headers)
+[BaseTransaction](BaseTransaction.md).[headers](BaseTransaction.md#headers)
 
 #### Defined in
 
@@ -98,7 +96,7 @@ ___
 
 ### profile
 
-• **profile**: [`EmailProfile`](../modules/types.md#emailprofile)
+• **profile**: [`EmailProfile`](../modules.md#emailprofile)
 
 #### Defined in
 
@@ -108,7 +106,7 @@ ___
 
 ### status
 
-• **status**: [`Status`](../enums/types.Status.md)
+• **status**: [`Status`](../enums/Status.md)
 
 #### Defined in
 

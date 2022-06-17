@@ -1,12 +1,10 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [index](../modules/index.md) / EmailTransaction
+[@okta/okta-auth-js/myaccount](../README.md) / [Exports](../modules.md) / EmailTransaction
 
 # Class: EmailTransaction
 
-[index](../modules/index.md).EmailTransaction
-
 ## Hierarchy
 
-- [`BaseTransaction`](index.BaseTransaction.md)
+- [`BaseTransaction`](BaseTransaction.md)
 
   ↳ **`EmailTransaction`**
 
@@ -14,21 +12,21 @@
 
 ### Constructors
 
-- [constructor](index.EmailTransaction.md#constructor)
+- [constructor](EmailTransaction.md#constructor)
 
 ### Properties
 
-- [\_http](index.EmailTransaction.md#_http)
-- [challenge](index.EmailTransaction.md#challenge)
-- [delete](index.EmailTransaction.md#delete)
-- [get](index.EmailTransaction.md#get)
-- [headers](index.EmailTransaction.md#headers)
-- [id](index.EmailTransaction.md#id)
-- [poll](index.EmailTransaction.md#poll)
-- [profile](index.EmailTransaction.md#profile)
-- [roles](index.EmailTransaction.md#roles)
-- [status](index.EmailTransaction.md#status)
-- [verify](index.EmailTransaction.md#verify)
+- [\_http](EmailTransaction.md#_http)
+- [challenge](EmailTransaction.md#challenge)
+- [delete](EmailTransaction.md#delete)
+- [get](EmailTransaction.md#get)
+- [headers](EmailTransaction.md#headers)
+- [id](EmailTransaction.md#id)
+- [poll](EmailTransaction.md#poll)
+- [profile](EmailTransaction.md#profile)
+- [roles](EmailTransaction.md#roles)
+- [status](EmailTransaction.md#status)
+- [verify](EmailTransaction.md#verify)
 
 ## Constructors
 
@@ -45,7 +43,7 @@
 
 #### Overrides
 
-[BaseTransaction](index.BaseTransaction.md).[constructor](index.BaseTransaction.md#constructor)
+[BaseTransaction](BaseTransaction.md).[constructor](BaseTransaction.md#constructor)
 
 #### Defined in
 
@@ -59,7 +57,7 @@
 
 #### Inherited from
 
-[BaseTransaction](index.BaseTransaction.md).[_http](index.BaseTransaction.md#_http)
+[BaseTransaction](BaseTransaction.md).[_http](BaseTransaction.md#_http)
 
 #### Defined in
 
@@ -69,15 +67,15 @@ ___
 
 ### challenge
 
-• **challenge**: () => `Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
+• **challenge**: () => `Promise`<[`EmailChallengeTransaction`](EmailChallengeTransaction.md)\>
 
 #### Type declaration
 
-▸ (): `Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
+▸ (): `Promise`<[`EmailChallengeTransaction`](EmailChallengeTransaction.md)\>
 
 ##### Returns
 
-`Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
+`Promise`<[`EmailChallengeTransaction`](EmailChallengeTransaction.md)\>
 
 #### Defined in
 
@@ -87,15 +85,15 @@ ___
 
 ### delete
 
-• **delete**: () => `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+• **delete**: () => `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Type declaration
 
-▸ (): `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+▸ (): `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 ##### Returns
 
-`Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Defined in
 
@@ -105,15 +103,15 @@ ___
 
 ### get
 
-• **get**: () => `Promise`<[`EmailTransaction`](index.EmailTransaction.md)\>
+• **get**: () => `Promise`<[`EmailTransaction`](EmailTransaction.md)\>
 
 #### Type declaration
 
-▸ (): `Promise`<[`EmailTransaction`](index.EmailTransaction.md)\>
+▸ (): `Promise`<[`EmailTransaction`](EmailTransaction.md)\>
 
 ##### Returns
 
-`Promise`<[`EmailTransaction`](index.EmailTransaction.md)\>
+`Promise`<[`EmailTransaction`](EmailTransaction.md)\>
 
 #### Defined in
 
@@ -127,7 +125,7 @@ ___
 
 #### Inherited from
 
-[BaseTransaction](index.BaseTransaction.md).[headers](index.BaseTransaction.md#headers)
+[BaseTransaction](BaseTransaction.md).[headers](BaseTransaction.md#headers)
 
 #### Defined in
 
@@ -147,15 +145,15 @@ ___
 
 ### poll
 
-• `Optional` **poll**: () => `Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
+• `Optional` **poll**: () => `Promise`<[`EmailStatusTransaction`](EmailStatusTransaction.md)\>
 
 #### Type declaration
 
-▸ (): `Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
+▸ (): `Promise`<[`EmailStatusTransaction`](EmailStatusTransaction.md)\>
 
 ##### Returns
 
-`Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
+`Promise`<[`EmailStatusTransaction`](EmailStatusTransaction.md)\>
 
 #### Defined in
 
@@ -165,7 +163,7 @@ ___
 
 ### profile
 
-• **profile**: [`EmailProfile`](../modules/types.md#emailprofile)
+• **profile**: [`EmailProfile`](../modules.md#emailprofile)
 
 #### Defined in
 
@@ -175,7 +173,7 @@ ___
 
 ### roles
 
-• **roles**: [`EmailRole`](../enums/types.EmailRole.md)[]
+• **roles**: [`EmailRole`](../enums/EmailRole.md)[]
 
 #### Defined in
 
@@ -185,7 +183,7 @@ ___
 
 ### status
 
-• **status**: [`Status`](../enums/types.Status.md)
+• **status**: [`Status`](../enums/Status.md)
 
 #### Defined in
 
@@ -195,21 +193,21 @@ ___
 
 ### verify
 
-• `Optional` **verify**: (`payload`: [`VerificationPayload`](../modules/types.md#verificationpayload)) => `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+• `Optional` **verify**: (`payload`: [`VerificationPayload`](../modules.md#verificationpayload)) => `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Type declaration
 
-▸ (`payload`): `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+▸ (`payload`): `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `payload` | [`VerificationPayload`](../modules/types.md#verificationpayload) |
+| `payload` | [`VerificationPayload`](../modules.md#verificationpayload) |
 
 ##### Returns
 
-`Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Defined in
 

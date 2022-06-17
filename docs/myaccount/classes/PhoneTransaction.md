@@ -1,12 +1,10 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [index](../modules/index.md) / PhoneTransaction
+[@okta/okta-auth-js/myaccount](../README.md) / [Exports](../modules.md) / PhoneTransaction
 
 # Class: PhoneTransaction
 
-[index](../modules/index.md).PhoneTransaction
-
 ## Hierarchy
 
-- [`BaseTransaction`](index.BaseTransaction.md)
+- [`BaseTransaction`](BaseTransaction.md)
 
   ↳ **`PhoneTransaction`**
 
@@ -14,19 +12,19 @@
 
 ### Constructors
 
-- [constructor](index.PhoneTransaction.md#constructor)
+- [constructor](PhoneTransaction.md#constructor)
 
 ### Properties
 
-- [\_http](index.PhoneTransaction.md#_http)
-- [challenge](index.PhoneTransaction.md#challenge)
-- [delete](index.PhoneTransaction.md#delete)
-- [get](index.PhoneTransaction.md#get)
-- [headers](index.PhoneTransaction.md#headers)
-- [id](index.PhoneTransaction.md#id)
-- [profile](index.PhoneTransaction.md#profile)
-- [status](index.PhoneTransaction.md#status)
-- [verify](index.PhoneTransaction.md#verify)
+- [\_http](PhoneTransaction.md#_http)
+- [challenge](PhoneTransaction.md#challenge)
+- [delete](PhoneTransaction.md#delete)
+- [get](PhoneTransaction.md#get)
+- [headers](PhoneTransaction.md#headers)
+- [id](PhoneTransaction.md#id)
+- [profile](PhoneTransaction.md#profile)
+- [status](PhoneTransaction.md#status)
+- [verify](PhoneTransaction.md#verify)
 
 ## Constructors
 
@@ -43,7 +41,7 @@
 
 #### Overrides
 
-[BaseTransaction](index.BaseTransaction.md).[constructor](index.BaseTransaction.md#constructor)
+[BaseTransaction](BaseTransaction.md).[constructor](BaseTransaction.md#constructor)
 
 #### Defined in
 
@@ -57,7 +55,7 @@
 
 #### Inherited from
 
-[BaseTransaction](index.BaseTransaction.md).[_http](index.BaseTransaction.md#_http)
+[BaseTransaction](BaseTransaction.md).[_http](BaseTransaction.md#_http)
 
 #### Defined in
 
@@ -67,21 +65,21 @@ ___
 
 ### challenge
 
-• **challenge**: (`payload`: [`ChallengePhonePayload`](../modules/types.md#challengephonepayload)) => `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+• **challenge**: (`payload`: [`ChallengePhonePayload`](../modules.md#challengephonepayload)) => `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Type declaration
 
-▸ (`payload`): `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+▸ (`payload`): `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `payload` | [`ChallengePhonePayload`](../modules/types.md#challengephonepayload) |
+| `payload` | [`ChallengePhonePayload`](../modules.md#challengephonepayload) |
 
 ##### Returns
 
-`Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Defined in
 
@@ -91,15 +89,15 @@ ___
 
 ### delete
 
-• **delete**: () => `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+• **delete**: () => `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Type declaration
 
-▸ (): `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+▸ (): `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 ##### Returns
 
-`Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Defined in
 
@@ -109,15 +107,15 @@ ___
 
 ### get
 
-• **get**: () => `Promise`<[`PhoneTransaction`](index.PhoneTransaction.md)\>
+• **get**: () => `Promise`<[`PhoneTransaction`](PhoneTransaction.md)\>
 
 #### Type declaration
 
-▸ (): `Promise`<[`PhoneTransaction`](index.PhoneTransaction.md)\>
+▸ (): `Promise`<[`PhoneTransaction`](PhoneTransaction.md)\>
 
 ##### Returns
 
-`Promise`<[`PhoneTransaction`](index.PhoneTransaction.md)\>
+`Promise`<[`PhoneTransaction`](PhoneTransaction.md)\>
 
 #### Defined in
 
@@ -131,7 +129,7 @@ ___
 
 #### Inherited from
 
-[BaseTransaction](index.BaseTransaction.md).[headers](index.BaseTransaction.md#headers)
+[BaseTransaction](BaseTransaction.md).[headers](BaseTransaction.md#headers)
 
 #### Defined in
 
@@ -151,7 +149,7 @@ ___
 
 ### profile
 
-• **profile**: [`PhoneProfile`](../modules/types.md#phoneprofile)
+• **profile**: [`PhoneProfile`](../modules.md#phoneprofile)
 
 #### Defined in
 
@@ -161,7 +159,7 @@ ___
 
 ### status
 
-• **status**: [`Status`](../enums/types.Status.md)
+• **status**: [`Status`](../enums/Status.md)
 
 #### Defined in
 
@@ -171,21 +169,21 @@ ___
 
 ### verify
 
-• `Optional` **verify**: (`payload`: [`VerificationPayload`](../modules/types.md#verificationpayload)) => `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+• `Optional` **verify**: (`payload`: [`VerificationPayload`](../modules.md#verificationpayload)) => `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Type declaration
 
-▸ (`payload`): `Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+▸ (`payload`): `Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `payload` | [`VerificationPayload`](../modules/types.md#verificationpayload) |
+| `payload` | [`VerificationPayload`](../modules.md#verificationpayload) |
 
 ##### Returns
 
-`Promise`<[`BaseTransaction`](index.BaseTransaction.md)\>
+`Promise`<[`BaseTransaction`](BaseTransaction.md)\>
 
 #### Defined in
 

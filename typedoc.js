@@ -11,7 +11,6 @@ const TypeDoc = require('typedoc');
     // typedoc options here
     entryPoints: [
       'lib/myaccount/index.ts',
-      'lib/myaccount/types.ts'
     ],
     name: '@okta/okta-auth-js/myaccount',
     readme: 'lib/myaccount/README.md',

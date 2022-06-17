@@ -1,15 +1,13 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [types](../modules/types.md) / Status
+[@okta/okta-auth-js/myaccount](../README.md) / [Exports](../modules.md) / Status
 
 # Enumeration: Status
-
-[types](../modules/types.md).Status
 
 ## Table of contents
 
 ### Enumeration Members
 
-- [UNVERIFIED](types.Status.md#unverified)
-- [VERIFIED](types.Status.md#verified)
+- [UNVERIFIED](Status.md#unverified)
+- [VERIFIED](Status.md#verified)
 
 ## Enumeration Members
 

@@ -149,4 +149,4 @@ const widget = new OktaSignIn({
 
 ## API reference documentation
 
-See [MyAccount API reference documentation](/docs/myaccount/modules/index.md) for detailed API definitions.
+See [MyAccount API reference documentation](/docs/myaccount/modules.md) for detailed API definitions.

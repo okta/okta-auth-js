@@ -1,12 +1,10 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [index](../modules/index.md) / EmailChallengeTransaction
+[@okta/okta-auth-js/myaccount](../README.md) / [Exports](../modules.md) / EmailChallengeTransaction
 
 # Class: EmailChallengeTransaction
 
-[index](../modules/index.md).EmailChallengeTransaction
-
 ## Hierarchy
 
-- [`BaseTransaction`](index.BaseTransaction.md)
+- [`BaseTransaction`](BaseTransaction.md)
 
   ↳ **`EmailChallengeTransaction`**
 
@@ -14,18 +12,18 @@
 
 ### Constructors
 
-- [constructor](index.EmailChallengeTransaction.md#constructor)
+- [constructor](EmailChallengeTransaction.md#constructor)
 
 ### Properties
 
-- [\_http](index.EmailChallengeTransaction.md#_http)
-- [expiresAt](index.EmailChallengeTransaction.md#expiresat)
-- [headers](index.EmailChallengeTransaction.md#headers)
-- [id](index.EmailChallengeTransaction.md#id)
-- [poll](index.EmailChallengeTransaction.md#poll)
-- [profile](index.EmailChallengeTransaction.md#profile)
-- [status](index.EmailChallengeTransaction.md#status)
-- [verify](index.EmailChallengeTransaction.md#verify)
+- [\_http](EmailChallengeTransaction.md#_http)
+- [expiresAt](EmailChallengeTransaction.md#expiresat)
+- [headers](EmailChallengeTransaction.md#headers)
+- [id](EmailChallengeTransaction.md#id)
+- [poll](EmailChallengeTransaction.md#poll)
+- [profile](EmailChallengeTransaction.md#profile)
+- [status](EmailChallengeTransaction.md#status)
+- [verify](EmailChallengeTransaction.md#verify)
 
 ## Constructors
 
@@ -42,7 +40,7 @@
 
 #### Overrides
 
-[BaseTransaction](index.BaseTransaction.md).[constructor](index.BaseTransaction.md#constructor)
+[BaseTransaction](BaseTransaction.md).[constructor](BaseTransaction.md#constructor)
 
 #### Defined in
 
@@ -56,7 +54,7 @@
 
 #### Inherited from
 
-[BaseTransaction](index.BaseTransaction.md).[_http](index.BaseTransaction.md#_http)
+[BaseTransaction](BaseTransaction.md).[_http](BaseTransaction.md#_http)
 
 #### Defined in
 
@@ -80,7 +78,7 @@ ___
 
 #### Inherited from
 
-[BaseTransaction](index.BaseTransaction.md).[headers](index.BaseTransaction.md#headers)
+[BaseTransaction](BaseTransaction.md).[headers](BaseTransaction.md#headers)
 
 #### Defined in
 
@@ -100,15 +98,15 @@ ___
 
 ### poll
 
-• **poll**: () => `Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
+• **poll**: () => `Promise`<[`EmailStatusTransaction`](EmailStatusTransaction.md)\>
 
 #### Type declaration
 
-▸ (): `Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
+▸ (): `Promise`<[`EmailStatusTransaction`](EmailStatusTransaction.md)\>
 
 ##### Returns
 
-`Promise`<[`EmailStatusTransaction`](index.EmailStatusTransaction.md)\>
+`Promise`<[`EmailStatusTransaction`](EmailStatusTransaction.md)\>
 
 #### Defined in
 
@@ -118,7 +116,7 @@ ___
 
 ### profile
 
-• **profile**: [`EmailProfile`](../modules/types.md#emailprofile)
+• **profile**: [`EmailProfile`](../modules.md#emailprofile)
 
 #### Defined in
 
@@ -128,7 +126,7 @@ ___
 
 ### status
 
-• **status**: [`Status`](../enums/types.Status.md)
+• **status**: [`Status`](../enums/Status.md)
 
 #### Defined in
 
@@ -138,21 +136,21 @@ ___
 
 ### verify
 
-• **verify**: (`payload`: [`VerificationPayload`](../modules/types.md#verificationpayload)) => `Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
+• **verify**: (`payload`: [`VerificationPayload`](../modules.md#verificationpayload)) => `Promise`<[`EmailChallengeTransaction`](EmailChallengeTransaction.md)\>
 
 #### Type declaration
 
-▸ (`payload`): `Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
+▸ (`payload`): `Promise`<[`EmailChallengeTransaction`](EmailChallengeTransaction.md)\>
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `payload` | [`VerificationPayload`](../modules/types.md#verificationpayload) |
+| `payload` | [`VerificationPayload`](../modules.md#verificationpayload) |
 
 ##### Returns
 
-`Promise`<[`EmailChallengeTransaction`](index.EmailChallengeTransaction.md)\>
+`Promise`<[`EmailChallengeTransaction`](EmailChallengeTransaction.md)\>
 
 #### Defined in
 

@@ -1,15 +1,13 @@
-[@okta/okta-auth-js/myaccount](../README.md) / [Modules](../modules.md) / [types](../modules/types.md) / EmailRole
+[@okta/okta-auth-js/myaccount](../README.md) / [Exports](../modules.md) / EmailRole
 
 # Enumeration: EmailRole
-
-[types](../modules/types.md).EmailRole
 
 ## Table of contents
 
 ### Enumeration Members
 
-- [PRIMARY](types.EmailRole.md#primary)
-- [SECONDARY](types.EmailRole.md#secondary)
+- [PRIMARY](EmailRole.md#primary)
+- [SECONDARY](EmailRole.md#secondary)
 
 ## Enumeration Members
 
