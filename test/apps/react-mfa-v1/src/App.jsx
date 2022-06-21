@@ -30,17 +30,20 @@ function App() {
 
     const { status, sessionToken } = transaction;
     switch (status) {
-      case 'SUCCESS':
+      case 'SUCCESS': {
         const { tokens } = await oktaAuth.token.getWithoutPrompt({ sessionToken });
         oktaAuth.tokenManager.setTokens(tokens);
         history.push('/');
         break;
-      case 'MFA_REQUIRED':
+      }
+      case 'MFA_REQUIRED': {
         history.push('/select-authenticator');
         break;
-      case 'MFA_CHALLENGE':
+      }
+      case 'MFA_CHALLENGE': {
         history.push('/challenge-authenticator');
         break;
+      }
       default:
         throw new Error(`Status is not supported, status: ${status}`);
     }
@@ -57,7 +60,7 @@ function App() {
       {error && (
         <div>
           <div>Error: {error.errorSummary}</div>
-          {error.errorCauses.map(cause => <div>{cause.errorSummary}</div>)}
+          {error.errorCauses.map(cause => <div key={cause.errorSummary}>{cause.errorSummary}</div>)}
         </div>
       )}
       <Switch>

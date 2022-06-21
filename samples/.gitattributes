@@ -11,3 +11,6 @@ generated/express-embedded-sign-in-widget/env linguist-generated=true
 generated/express-embedded-auth-with-sdk/env/index.js linguist-generated=true
 generated/express-embedded-sign-in-widget/package.json linguist-generated=true
 generated/express-embedded-sign-in-widget/env/index.js linguist-generated=true
+generated/react-embedded-auth-with-sdk/env linguist-generated=true
+generated/react-embedded-auth-with-sdk/env/okta-env.js linguist-generated=true
+generated/react-embedded-auth-with-sdk/env/index.js linguist-generated=true

@@ -121,7 +121,8 @@ module.exports = {
           // features that are not supported before v12 are transformed in babel.cjs.js for commonjs output
           version: '>=12.0.0'
         }],
-        'import/no-commonjs': 'error'
+        'import/no-commonjs': 'error',
+        "jsdoc/check-tag-names": 0
       },
       settings: {
         // https://github.com/import-js/eslint-plugin-import#typescript
@@ -129,6 +130,17 @@ module.exports = {
           '@typescript-eslint/parser': ['.ts']
         }
       },
+    },
+    {
+      files: ["samples/generated/**/*.js"],
+      rules: {
+        'node/no-missing-import': ['error', {
+          allowModules: ['@okta/okta-auth-js']
+        }],
+        'node/no-missing-require': ['error', {
+          allowModules: ['@okta/okta-auth-js']
+        }]
+      }
     },
     {
       files: [

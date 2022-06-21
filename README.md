@@ -539,6 +539,11 @@ Enables interaction code flow for direct auth clients.
 
 Used in authorization and interaction code flows by server-side web applications to obtain OAuth tokens. In a production application, this value should **never** be visible on the client side.
 
+#### `setLocation`
+
+Used in authorization and interaction code flows by server-side web applications to customize the redirect process.
+
+
 #### `httpRequestClient`
 
 The http request implementation. By default, this is implemented using [cross-fetch](https://github.com/lquixada/cross-fetch). To provide your own request library, implement the following interface:
@@ -869,6 +874,7 @@ This is accomplished by selecting a single tab to handle the network requests to
   * [session.get](#sessionget)
   * [session.refresh](#sessionrefresh)
 * [idx](#idx)
+* [myaccount](#myaccount)
 * [token](#token)
   * [token.getWithoutPrompt](#tokengetwithoutpromptoptions)
   * [token.getWithPopup](#tokengetwithpopupoptions)
@@ -1259,6 +1265,11 @@ authClient.session.refresh()
 ### `idx`
 
 See detail in [IDX README](docs/idx.md)
+
+### `myaccount`
+
+See detail in [MyAccount API README](docs/myaccount/README.md)
+
 
 ### `token`
 

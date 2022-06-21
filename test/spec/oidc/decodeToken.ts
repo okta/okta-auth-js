@@ -11,7 +11,7 @@
  */
 
 
-import { OktaAuth } from '@okta/okta-auth-js';
+import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 
 function setupSync(options?) {
@@ -35,8 +35,8 @@ describe('token.decode', function() {
       // Should never hit this
       expect(true).toBe(false);
     } catch (e) {
-      expect(e.name).toEqual('AuthSdkError');
-      expect(e.errorSummary).toBeDefined();
+      expect((e as AuthSdkError).name).toEqual('AuthSdkError');
+      expect((e as AuthSdkError).errorSummary).toBeDefined();
     }
   });
 });

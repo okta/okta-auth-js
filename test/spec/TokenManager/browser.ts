@@ -27,7 +27,7 @@ jest.mock('../../../lib/features', () => {
   return mocked.features;
 });
 
-import { OktaAuth } from '@okta/okta-auth-js';
+import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
@@ -474,7 +474,7 @@ describe('TokenManager (browser)', function() {
         try {
           util.expectErrorToEqual(err, error);
         } catch (e) {
-          done.fail(e);
+          done.fail(e as any);
         }
       });
       client.tokenManager.on('error', errorEventCallback);
@@ -522,7 +522,7 @@ describe('TokenManager (browser)', function() {
             tokenKey: 'test-idToken'
           });
         } catch (e) {
-          done.fail(e);
+          done.fail(e as AuthSdkError);
         }
       });
       client.tokenManager.on('error', errorEventCallback);

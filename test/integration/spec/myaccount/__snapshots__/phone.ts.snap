@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MyAccount Phone API Manage with Transaction functions can manage phone with transaction functions 1`] = `
+Object {
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "phoneNumber": Any<String>,
+  },
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Phone API Manage with Transaction functions can manage phone with transaction functions 2`] = `
+Object {
+  "challenge": [Function],
+  "delete": [Function],
+  "get": [Function],
+  "headers": Any<Object>,
+  "id": Any<String>,
+  "profile": Object {
+    "phoneNumber": Any<String>,
+  },
+  "status": "UNVERIFIED",
+}
+`;
+
+exports[`MyAccount Phone API Manage with Transaction functions can manage phone with transaction functions 3`] = `"Api validation failed: factorId and/or verificationCode"`;
+
+exports[`MyAccount Phone API Manage with Transaction functions can manage phone with transaction functions 4`] = `BaseTransaction {}`;

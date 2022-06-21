@@ -15,6 +15,9 @@
 const OktaAuth = process.env.BUNDLE_ENV === 'browser' ? 
   `<rootDir>/build/esm/browser/index.js` : 
   `<rootDir>/build/esm/node/index.js`;
+const MyAccountEntry = process.env.BUNDLE_ENV === 'browser' ? 
+  `<rootDir>/build/bundles-for-validation/esm/browser/myaccount.mjs` : 
+  `<rootDir>/build/esm/node/myaccount.mjs`;
 const testEnvironment = process.env.BUNDLE_ENV === 'browser' ? 'jsdom' : 'node';
 
 export default {
@@ -28,7 +31,8 @@ export default {
   transform: {},
   restoreMocks: true,
   moduleNameMapper: {
-    '^@okta/okta-auth-js$': OktaAuth
+    '^@okta/okta-auth-js$': OktaAuth,
+    '^@okta/okta-auth-js/myaccount$': MyAccountEntry,
   },
   extensionsToTreatAsEsm: ['.ts'],
   testPathIgnorePatterns: [],

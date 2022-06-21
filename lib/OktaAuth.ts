@@ -201,7 +201,7 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     };
 
     // Add shims for compatibility, these will be removed in next major version. OKTA-362589
-    Object.assign(this.options.storageUtil, {
+    Object.assign(this.options.storageUtil || {}, {
       getPKCEStorage: this.storageManager.getLegacyPKCEStorage.bind(this.storageManager),
       getHttpCache: this.storageManager.getHttpCache.bind(this.storageManager),
     });
@@ -250,7 +250,11 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     const getWithRedirectApi: GetWithRedirectAPI = Object.assign(getWithRedirectFn, {
       // This is exposed so we can set window.location in our tests
       _setLocation: function(url) {
-        window.location = url;
+        if (options.setLocation) {
+          options.setLocation(url);
+        } else {
+          window.location = url;
+        }
       }
     });
     // eslint-disable-next-line max-len

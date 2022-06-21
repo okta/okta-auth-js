@@ -10,14 +10,32 @@
   "browser": "build/dist/okta-auth-js.umd.js",
   "types": "build/lib/index.d.ts",
   "exports": {
-    "node": {
-      "import": "./build/esm/node/index.js",
-      "require": "./build/cjs/index.js"
+    ".": {
+      "node": {
+        "types": "./build/lib/index.d.ts",
+        "import": "./build/esm/node/index.js",
+        "require": "./build/cjs/index.js"
+      },
+      "browser": {
+        "types": "./build/lib/index.d.ts",
+        "import": "./build/esm/browser/index.js"
+      },
+      "types": "./build/lib/index.d.ts",
+      "default": "./build/dist/okta-auth-js.umd.js"
     },
-    "browser": {
-      "import": "./build/esm/browser/index.js"
-    },
-    "default": "./build/dist/okta-auth-js.umd.js"
+    "./myaccount": {
+      "node": {
+        "types": "./build/lib/myaccount/index.d.ts",
+        "import": "./build/esm/node/myaccount/myaccount/index.js",
+        "require": "./build/cjs/myaccount/index.js"
+      },
+      "browser": {
+        "types": "./build/lib/myaccount/index.d.ts",
+        "import": "./build/esm/browser/myaccount/myaccount/index.js"
+      },
+      "types": "./build/lib/myaccount/index.d.ts",
+      "default": "./build/dist/myaccount.umd.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -46,7 +64,7 @@
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
     "test:samples": "yarn workspace @okta/test.e2e.samples start",
-    "test:integration": "jest --config ./jest.integration.js",
+    "test:integration": "jest --runInBand --config ./jest.integration.js",
     "test:bundle:esm:browser": "cross-env BUNDLE_ENV=browser NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:esm:node": "cross-env BUNDLE_ENV=node NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:cjs": "cross-env BUNDLE_ENV=node jest --config ./jest.cjs.js",
@@ -58,6 +76,7 @@
     "build:esm": "rollup -c",
     "build:polyfill": "cross-env NODE_ENV=production webpack --config webpack.polyfill.config.js",
     "build:types": "tsc --emitDeclarationOnly",
+    "docs:myaccount": "node typedoc.js",
     "generate:samples": "yarn workspace @okta/samples build && yarn install --ignore-scripts",
     "dev:samples": "yarn workspace @okta/samples dev",
     "prepare": "yarn build",
@@ -87,7 +106,7 @@
   "dependencies": {
     "@babel/runtime": "^7.12.5",
     "@babel/runtime-corejs3": "^7.17.0",
-    "@peculiar/webcrypto": "1.1.6",
+    "@peculiar/webcrypto": "^1.4.0",
     "Base64": "1.1.0",
     "atob": "^2.1.2",
     "broadcast-channel": "^4.13.0",
@@ -136,6 +155,7 @@
     "eslint-plugin-jsdoc": "^25.4.2",
     "eslint-plugin-node": "^11.1.0",
     "globby": "^6.1.0",
+    "husky": ">=6",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-ajax": "^4.0.0",
     "jest": "^28.1.0",
@@ -148,11 +168,14 @@
     "rollup": "^2.70.2",
     "rollup-plugin-cleanup": "^3.2.1",
     "rollup-plugin-license": "^2.6.0",
+    "rollup-plugin-multi-input": "^1.3.1",
     "rollup-plugin-typescript2": "^0.30.0",
     "shelljs": "0.8.4",
     "ts-jest": "^28.0.2",
     "tsd": "^0.17.0",
-    "typescript": "^4.2.3",
+    "typedoc": "^0.22.13",
+    "typedoc-plugin-markdown": "^3.11.14",
+    "typescript": "^4.7.3",
     "webpack": "^5.60.0",
     "webpack-cli": "^4.9.1"
   },

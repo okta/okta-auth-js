@@ -2,8 +2,8 @@ Feature: Managing Phone Numbers
 
   Background:
     Given an App that assigned to a test group
-      And the app is granted "okta.myAccount.read" scope
-      And the app is granted "okta.myAccount.manage" scope
+      And the app is granted "okta.myAccount.profile.read" scope
+      And the app is granted "okta.myAccount.profile.manage" scope
       And the app is granted "okta.myAccount.email.manage" scope
       And the app is granted "okta.myAccount.phone.manage" scope
       And a Policy that defines "Authentication"
@@ -20,7 +20,7 @@ Feature: Managing Phone Numbers
       And she sees a tip message for "identifiers" that "User identifiers are separated because changes require verification."
     When she clicks the "add phone number" button
     Then she sees a modal popup to "add phone number"
-    When she fills in her phone number
+    When she fills in her "phone number"
       And she submits the form
     Then the form changes to receive an input for the verification code
     When she inputs the correct code from her "SMS"
@@ -39,7 +39,7 @@ Feature: Managing Phone Numbers
       And she sees a tip message for "identifiers" that "User identifiers are separated because changes require verification."
     When she clicks the "add phone number" button
     Then she sees a modal popup to "add phone number"
-    When she fills in her phone number
+    When she fills in her "phone number"
       And she submits the form
     Then the form changes to receive an input for the verification code
     When she inputs an incorrect code

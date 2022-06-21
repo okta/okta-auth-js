@@ -36,7 +36,7 @@ const SelectAuthenticator = () => {
       </select><br/>
       <button type="submit">Select</button>
     </form>
-  )
+  );
 };
 
 export default SelectAuthenticator;

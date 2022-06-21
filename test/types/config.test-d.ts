@@ -14,7 +14,7 @@ import {
   OktaAuth,
   OktaAuthOptions,
   toRelativeUrl
-} from '../../build/lib/index.d';
+} from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
 // Custom storage provider

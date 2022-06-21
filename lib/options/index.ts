@@ -63,6 +63,7 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
 
     // Internal options
     httpRequestClient: args.httpRequestClient,
+    httpRequestInterceptors: args.httpRequestInterceptors,
     transformErrorXHR: args.transformErrorXHR,
     transformAuthState: args.transformAuthState,
     restoreOriginalUri: args.restoreOriginalUri,
@@ -87,6 +88,7 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     ignoreSignature: !!args.ignoreSignature,
 
     // Server-side web applications
-    clientSecret: args.clientSecret
+    clientSecret: args.clientSecret,
+    setLocation: args.setLocation
   });
 }

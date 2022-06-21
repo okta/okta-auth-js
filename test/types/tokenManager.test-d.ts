@@ -20,7 +20,7 @@ import {
   RefreshToken,
   OktaAuth,
   TokenManagerError
-} from '../../build/lib/index.d';
+} from '@okta/okta-auth-js';
 import { expectType, expectAssignable } from 'tsd';
 
 const authClient = new OktaAuth({});

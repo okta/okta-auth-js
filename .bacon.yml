@@ -83,11 +83,11 @@ test_suites:
       script_name: e2e-express-embedded-sign-in-widget
       criteria: MERGE
       queue_name: small
-    - name: e2e-react-oie
+    - name: e2e-react-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts
       sort_order: '12'
       timeout: '20'
-      script_name: e2e-react-oie
+      script_name: e2e-react-embedded-auth-with-sdk
       criteria: MERGE
       queue_name: small
     # Sauce labs tests are flaky due to the free account we are currently using

@@ -11,9 +11,7 @@
  *
  */
 
-import {
-  OktaAuth, TokenResponse
-} from '../../build/lib/index.d';
+import { OktaAuth, TokenResponse } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
 const authClient = new OktaAuth({});

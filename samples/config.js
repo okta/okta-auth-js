@@ -128,8 +128,10 @@ const samples = [
     useEnv: true
   },
   {
-    name: '@okta/test.app.react-oie',
+    name: '@okta/samples.react-embedded-auth-with-sdk',
     appType: 'browser',
+    template: 'react-embedded-auth-with-sdk',
+    generateType: GENERATE_TYPE_OVERWRITE,
     features: [
       // group sms related specs together, so they do not run in parallel
       // this spec takes time to finish, run it first

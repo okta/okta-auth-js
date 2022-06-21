@@ -46,9 +46,9 @@ async function getTokens(client, tokenParams) {
 }
 
 // Performs basic login and implicit token flow
-export async function signinAndGetTokens(client, tokenParams?) {
-  const username = process.env.USERNAME;
-  const password = process.env.PASSWORD;
+export async function signinAndGetTokens(client, tokenParams?, credentials?) {
+  const username = credentials?.username || process.env.USERNAME;
+  const password = credentials?.password || process.env.PASSWORD;
   const tx: AuthTransaction = await client.signInWithCredentials({
     username,
     password

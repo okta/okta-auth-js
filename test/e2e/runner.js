@@ -15,7 +15,7 @@
 const env = require('@okta/env');
 const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
-const { config, configPredicate } = require('./config');
+const { config } = require('./config');
 
 env.setEnvironmentVarsFromTestEnv(__dirname);
 
@@ -24,7 +24,7 @@ const getTask = (config) => () => {
     // start the dev server
     const server = spawn('yarn', [
       'workspace',
-      config.app,
+      config.name,
       'start'
     ], { stdio: 'inherit' });
 
@@ -51,8 +51,8 @@ const getTask = (config) => () => {
       });
 
       const runner = spawn(
-        'yarn', 
-        runnerArgs.concat(opts), 
+        'yarn',
+        runnerArgs.concat(opts),
         { stdio: 'inherit' }
       );
 
@@ -66,30 +66,25 @@ const getTask = (config) => () => {
         server.kill();
         throw err;
       });
-      server.on('exit', function(code) {
+      server.on('exit', function (code) {
         console.log('Server exited with code: ' + code);
         resolve(returnCode);
       });
     });
-  }); 
+  });
 };
 
 // Run all tests
 const tasks = config
   .filter(
-    process.env.E2E_CONFIG_INDEX 
-      ? (_, index) => index === +process.env.E2E_CONFIG_INDEX 
-      : configPredicate
+    process.env.TEST_NAME
+      ? ({ name }) => name === process.env.TEST_NAME
+      : () => true
   )
-  .reduce((tasks, config) => {
-    const task = getTask(config);
-    tasks.push(task);
-    return tasks;
-  }, []);
+  .map(config => getTask(config));
 
 // track process returnCode for each task
 const codes = [];
-
 function runNextTask() {
   if (tasks.length === 0) {
     console.log('all runs are complete');
@@ -106,5 +101,5 @@ function runNextTask() {
     runNextTask();
   });
 }
-  
+
 runNextTask();

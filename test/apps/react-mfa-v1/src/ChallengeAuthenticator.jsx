@@ -37,7 +37,7 @@ const ChallengeAuthenticator = () => {
       <input type="text" name="answer" value={answer} onChange={handleAnwserChange} /><br/>
       <button type="submit">Verify</button>
     </form>
-  )
-}
+  );
+};
 
 export default ChallengeAuthenticator;

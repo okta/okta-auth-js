@@ -117,7 +117,7 @@ describe('emailVerify', () => {
         await handleEmailVerifyCallback(authClient, `state=${state}&otp=${otp}`);
       } catch (error) {
         didThrow = true;
-        expect(isEmailVerifyCallbackError(error)).toBe(true);
+        expect(isEmailVerifyCallbackError(error as EmailVerifyCallbackError)).toBe(true);
       }
       expect(didThrow).toBe(true);
       expect(canProceed).toHaveBeenCalled();

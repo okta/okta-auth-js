@@ -85,7 +85,8 @@ describe('E2E login', () => {
         await TestApp.logoutRedirect();
       });
 
-      it('can login to social idp using signin widget (with redirect)', async () => {
+      // eslint-disable-next-line jasmine/no-disabled-tests
+      xit('can login to social idp using signin widget (with redirect)', async () => {
         // Federated social auth with pinned social login buttons only works with OIE
         if (!process.env.ORG_OIE_ENABLED) {
           return;
@@ -99,7 +100,8 @@ describe('E2E login', () => {
         await TestApp.logoutRedirect();
       });
 
-      it('can login to social idp using signin widget (no redirect)', async () => {
+      // eslint-disable-next-line jasmine/no-disabled-tests
+      xit('can login to social idp using signin widget (no redirect)', async () => {
         // Federated social auth with pinned social login buttons only works with OIE
         if (!process.env.ORG_OIE_ENABLED) {
           return;

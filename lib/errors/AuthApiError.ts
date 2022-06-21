@@ -20,8 +20,9 @@ export default class AuthApiError extends CustomError implements APIError {
   errorId?: string;
   errorCauses?: Array<FieldError>;
   xhr?: HttpResponse;
+  meta?: Record<string, string | number>;
 
-  constructor(err: APIError, xhr?: HttpResponse) {
+  constructor(err: APIError, xhr?: HttpResponse, meta?: Record<string, string | number>) {
     const message = err.errorSummary;
     super(message);
 
@@ -34,6 +35,10 @@ export default class AuthApiError extends CustomError implements APIError {
 
     if (xhr) {
       this.xhr = xhr;
+    }
+
+    if (meta) {
+      this.meta = meta;
     }
   }
 }

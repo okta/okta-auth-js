@@ -15,9 +15,7 @@
     "@okta/okta-auth-js": "*",
     "@babel/register": "^7.8.2",
     "cross-spawn-with-kill": "^1.0.0",
-    "regenerator-runtime": "^0.13.3"
-  },
-  "devDependencies": {
+    "regenerator-runtime": "^0.13.3",
     "@babel/plugin-transform-async-to-generator": "^7.5.0",
     "@wdio/cli": "^7.20.0",
     "@wdio/junit-reporter": "^7.20.0",

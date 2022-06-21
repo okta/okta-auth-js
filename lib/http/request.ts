@@ -25,6 +25,13 @@ import { AuthApiError, OAuthError } from '../errors';
 
 export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions): Promise<any> {
   options = options || {};
+
+  if (sdk.options.httpRequestInterceptors) {
+    for (const interceptor of sdk.options.httpRequestInterceptors) {
+      interceptor(options);
+    }
+  }
+
   var url = options.url,
       method = options.method,
       args = options.args,
@@ -69,7 +76,13 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       if (res && isString(res)) {
         res = JSON.parse(res);
         if (res && typeof res === 'object' && !res.headers) {
-          res.headers = resp.headers;
+          if (Array.isArray(res)) {
+            res.forEach(item => {
+              item.headers = resp.headers;
+            });
+          } else {
+            res.headers = resp.headers;
+          }
         }
       }
 
@@ -89,7 +102,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
           response: res
         });
       }
-
+      
       return res;
     })
     .catch(function(resp) {

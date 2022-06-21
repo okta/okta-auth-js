@@ -17,7 +17,7 @@ import {
   RefreshToken,
   AuthState,
   OktaAuth
-} from '../../build/lib/index.d';
+} from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
 const authClient = new OktaAuth({});

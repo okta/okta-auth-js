@@ -39,7 +39,7 @@ const Home = () => {
         </table>
       </div>
       <br/>
-      {!!(authState?.isAuthenticated) ? (
+      {authState?.isAuthenticated ? (
         <>
           <button id="logout" onClick={handleLogout}>Logout</button>
           <Profile />
@@ -49,6 +49,6 @@ const Home = () => {
       )}
     </div>
   );
-}
+};
 
 export default Home;

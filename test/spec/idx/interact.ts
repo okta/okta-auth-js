@@ -724,7 +724,55 @@ describe('idx/interact', () => {
       });
     });
 
-
+    describe('maxAge', () => {
+      beforeEach(() => {
+        const { authParams } = testContext;
+        const authClient = new OktaAuth(authParams);
+        testContext.authClient = authClient;
+      });
+      
+      it('uses maxAge from function options', async () => {
+        const { authClient } = testContext;
+        const res = await interact(authClient, { maxAge: 900 });
+        expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+          url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          withCredentials: true,
+          args: ({
+            client_id: 'authClient-clientId',
+            scope: 'authClient',
+            redirect_uri: 'authClient-redirectUri',
+            code_challenge: 'tp-codeChallenge',
+            code_challenge_method: 'tp-codeChallengeMethod',
+            state: 'authClient-state',
+            max_age: 900
+          }),
+        });
+        expect(res).toEqual({
+          'interactionHandle': 'idx-interactionHandle',
+          'meta': {
+            'clientId': 'authClient-clientId',
+            'issuer': 'https://auth-js-test.okta.com',
+            'redirectUri': 'authClient-redirectUri',
+            'codeChallenge': 'tp-codeChallenge',
+            'codeChallengeMethod': 'tp-codeChallengeMethod',
+            'codeVerifier': 'tp-codeVerifier',
+            'interactionHandle': 'idx-interactionHandle',
+            'responseType': 'tp-responseType',
+            'scopes': [
+              'authClient',
+            ],
+            'state': 'authClient-state',
+            'withCredentials': true,
+            'maxAge': 900
+          },
+          'state': 'authClient-state',
+        });
+      });
+    });
 
   });
 

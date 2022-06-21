@@ -21,8 +21,12 @@ export interface JWTHeader {
   x5t?: string;
 }
 
+export type JWTPayload = UserClaims & {
+  scp?: string[];
+}
+
 export interface JWTObject {
   header: JWTHeader;
-  payload: UserClaims;
+  payload: JWTPayload;
   signature: string;
 }
