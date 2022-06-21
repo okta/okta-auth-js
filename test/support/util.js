@@ -296,10 +296,6 @@ util.itMakesCorrectRequestResponse = function (options) {
             resp = {
               ...resp, 
               headers: test.headers,
-              _http: expect.objectContaining({
-                status: expect.any(Number),
-                headers: test.headers
-              })
             };
           }
         }

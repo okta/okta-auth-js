@@ -26,7 +26,6 @@
 
 ### Properties
 
-- [\_http](BaseTransaction.md#_http)
 - [headers](BaseTransaction.md#headers)
 
 ## Constructors
@@ -44,19 +43,9 @@
 
 #### Defined in
 
-[transactions/Base.ts:19](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L19)
-
-## Properties
-
-### \_http
-
-• **\_http**: `Record`<`string`, `string` \| `object`\>
-
-#### Defined in
-
 [transactions/Base.ts:17](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L17)
 
-___
+## Properties
 
 ### headers
 
@@ -64,4 +53,4 @@ ___
 
 #### Defined in
 
-[transactions/Base.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L16)
+[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)

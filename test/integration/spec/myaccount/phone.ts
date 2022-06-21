@@ -60,9 +60,6 @@ describe('MyAccount Phone API', () => {
       });
       expect(phone).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         id: expect.any(String),
         profile: {
           phoneNumber: expect.any(String)
@@ -73,9 +70,6 @@ describe('MyAccount Phone API', () => {
       const transaction = await phone.get();
       expect(transaction).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         id: expect.any(String),
         profile: {
           phoneNumber: expect.any(String)
@@ -87,11 +81,7 @@ describe('MyAccount Phone API', () => {
       // TODO: use a18n for testing when it's scalable
       // disable challenge test for now
       // const challenge = await phone.challenge({ method: 'SMS' });
-      // expect(challenge).toMatchSnapshot({
-      //   _http: {
-      //     headers: expect.any(Object),
-      //   }
-      // });
+      // expect(challenge).toMatchSnapshot();
 
       // verify challenge code
       // no verify link when auto send is false
@@ -109,7 +99,7 @@ describe('MyAccount Phone API', () => {
 
       // delete
       const deleteTransaction = await phone.delete();
-      expect(deleteTransaction._http.status).toEqual(204);
+      expect(deleteTransaction).toMatchSnapshot();
     });
 
   });
@@ -142,9 +132,6 @@ describe('MyAccount Phone API', () => {
       });
       expect(phone).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         id: expect.any(String),
         profile: {
           phoneNumber: expect.any(String)
@@ -159,9 +146,6 @@ describe('MyAccount Phone API', () => {
           accessToken: token,
         });
         expect(challenge).toMatchSnapshot({
-          _http: {
-            headers: expect.any(Object),
-          },
           headers: expect.any(Object),
         });
       } catch (err) {
@@ -181,12 +165,11 @@ describe('MyAccount Phone API', () => {
         .toThrowErrorMatchingSnapshot();
 
       // delete
-      const transaction = await deletePhone(client, {
+      const deleteTransaction = await deletePhone(client, {
         accessToken: token,
         id: phone.id
       });
-      expect(transaction._http.status).toEqual(204);
-
+      expect(deleteTransaction).toMatchSnapshot();
     });
 
   });

@@ -21,9 +21,6 @@ describe('MyAccount Profile API', () => {
         createdAt: expect.any(String),
         modifiedAt: expect.any(String),
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         profile: expect.any(Object)
       });
     });
@@ -77,9 +74,6 @@ describe('MyAccount Profile API', () => {
       const transaction = await getProfileSchema(client, { accessToken });
       expect(transaction).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         properties: expect.any(Object)
       });
     });

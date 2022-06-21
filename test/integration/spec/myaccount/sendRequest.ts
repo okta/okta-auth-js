@@ -27,9 +27,6 @@ describe('lower level sendRequest function against "/idp/myaccount/emails" endpo
     for (const transaction of transactions) {
       expect(transaction).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         id: expect.any(String),
         profile: {
           email: expect.any(String)

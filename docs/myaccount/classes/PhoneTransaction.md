@@ -16,7 +16,6 @@
 
 ### Properties
 
-- [\_http](PhoneTransaction.md#_http)
 - [challenge](PhoneTransaction.md#challenge)
 - [delete](PhoneTransaction.md#delete)
 - [get](PhoneTransaction.md#get)
@@ -48,20 +47,6 @@
 [transactions/PhoneTransaction.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L16)
 
 ## Properties
-
-### \_http
-
-• **\_http**: `Record`<`string`, `string` \| `object`\>
-
-#### Inherited from
-
-[BaseTransaction](BaseTransaction.md).[_http](BaseTransaction.md#_http)
-
-#### Defined in
-
-[transactions/Base.ts:17](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L17)
-
-___
 
 ### challenge
 
@@ -133,7 +118,7 @@ ___
 
 #### Defined in
 
-[transactions/Base.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L16)
+[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
 
 ___
 

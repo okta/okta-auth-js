@@ -75,8 +75,6 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       res = resp.responseText;
       if (res && isString(res)) {
         res = JSON.parse(res);
-        // Deprecated: this logic may cause confliction, use "_http" field instead 
-        // Remove in the next major version - OKTA-485317
         if (res && typeof res === 'object' && !res.headers) {
           if (Array.isArray(res)) {
             res.forEach(item => {
@@ -104,24 +102,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
           response: res
         });
       }
-
-      // Attach http related info to response
-      // Only apply to empty or object response
-      if (Array.isArray(res)) {
-        res.forEach(item => {
-          item._http = {
-            headers: resp.headers,
-            status: resp.status
-          };
-        });
-      } else if (!res || typeof res === 'object') {
-        res = res || {};
-        res._http = {
-          headers: resp.headers,
-          status: resp.status
-        };
-      }
-
+      
       return res;
     })
     .catch(function(resp) {

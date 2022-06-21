@@ -2,10 +2,6 @@
 
 exports[`MyAccount Email API Email Management can manage email with SDK methods 1`] = `
 Object {
-  "_http": Object {
-    "headers": Any<Object>,
-    "status": 201,
-  },
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
@@ -23,10 +19,6 @@ Object {
 
 exports[`MyAccount Email API Email Management can manage email with SDK methods 2`] = `
 Object {
-  "_http": Object {
-    "headers": Any<Object>,
-    "status": 201,
-  },
   "expiresAt": Any<String>,
   "headers": Any<Object>,
   "id": Any<String>,
@@ -39,12 +31,10 @@ Object {
 }
 `;
 
+exports[`MyAccount Email API Email Management can manage email with SDK methods 3`] = `BaseTransaction {}`;
+
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 1`] = `
 Object {
-  "_http": Object {
-    "headers": Any<Object>,
-    "status": 201,
-  },
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
@@ -62,10 +52,6 @@ Object {
 
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 2`] = `
 Object {
-  "_http": Object {
-    "headers": Any<Object>,
-    "status": 200,
-  },
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
@@ -83,10 +69,6 @@ Object {
 
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 3`] = `
 Object {
-  "_http": Object {
-    "headers": Any<Object>,
-    "status": 201,
-  },
   "expiresAt": Any<String>,
   "headers": Any<Object>,
   "id": Any<String>,
@@ -101,10 +83,6 @@ Object {
 
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 4`] = `
 Object {
-  "_http": Object {
-    "headers": Any<Object>,
-    "status": 200,
-  },
   "expiresAt": Any<String>,
   "headers": Any<Object>,
   "id": Any<String>,
@@ -115,12 +93,10 @@ Object {
 }
 `;
 
+exports[`MyAccount Email API Email Management can manage email with Transaction functions 5`] = `BaseTransaction {}`;
+
 exports[`MyAccount Email API getEmail/s can get email/s 1`] = `
 Object {
-  "_http": Object {
-    "headers": Any<Object>,
-    "status": 200,
-  },
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
@@ -136,10 +112,6 @@ Object {
 
 exports[`MyAccount Email API getEmail/s can get email/s 2`] = `
 Object {
-  "_http": Object {
-    "headers": Any<Object>,
-    "status": 200,
-  },
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],

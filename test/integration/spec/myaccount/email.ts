@@ -44,9 +44,6 @@ describe('MyAccount Email API', () => {
       for (const transaction of transactions) {
         expect(transaction).toMatchSnapshot({
           headers: expect.any(Object),
-          _http: {
-            headers: expect.any(Object),
-          },
           id: expect.any(String),
           profile: {
             email: expect.any(String)
@@ -66,9 +63,6 @@ describe('MyAccount Email API', () => {
       });
       expect(transaction).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         id: expect.any(String),
         profile: {
           email: expect.any(String)
@@ -108,9 +102,6 @@ describe('MyAccount Email API', () => {
 
       expect(email).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         id: expect.any(String),
         profile: {
           email: expect.any(String)
@@ -121,9 +112,6 @@ describe('MyAccount Email API', () => {
       const getTransaction = await email.get();
       expect(getTransaction).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         id: expect.any(String),
         profile: {
           email: expect.any(String)
@@ -133,9 +121,6 @@ describe('MyAccount Email API', () => {
       const challenge = await email.challenge();
       expect(challenge).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         expiresAt: expect.any(String),
         id: expect.any(String),
         profile: {
@@ -146,9 +131,6 @@ describe('MyAccount Email API', () => {
       const emailStatus = await challenge.poll();
       expect(emailStatus).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         expiresAt: expect.any(String),
         id: expect.any(String),
         profile: {
@@ -166,7 +148,7 @@ describe('MyAccount Email API', () => {
 
       // delete created email
       const deleteTransaction = await email.delete();
-      expect(deleteTransaction._http.status).toEqual(204);
+      expect(deleteTransaction).toMatchSnapshot();
     });
 
     it('can manage email with SDK methods', async () => {
@@ -183,9 +165,6 @@ describe('MyAccount Email API', () => {
       });
       expect(email).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         id: expect.any(String),
         profile: {
           email: expect.any(String)
@@ -199,9 +178,6 @@ describe('MyAccount Email API', () => {
       });
       expect(challenge).toMatchSnapshot({
         headers: expect.any(Object),
-        _http: {
-          headers: expect.any(Object),
-        },
         expiresAt: expect.any(String),
         id: expect.any(String),
         profile: {
@@ -224,11 +200,11 @@ describe('MyAccount Email API', () => {
       }
 
       // delete created email
-      const transaction = await deleteEmail(client, {
+      const deleteTransaction = await deleteEmail(client, {
         id: email.id,
         accessToken: token
       });
-      expect(transaction._http.status).toEqual(204);
+      expect(deleteTransaction).toMatchSnapshot();
     });
 
   });

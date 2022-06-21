@@ -16,7 +16,6 @@
 
 ### Properties
 
-- [\_http](EmailStatusTransaction.md#_http)
 - [expiresAt](EmailStatusTransaction.md#expiresat)
 - [headers](EmailStatusTransaction.md#headers)
 - [id](EmailStatusTransaction.md#id)
@@ -46,20 +45,6 @@
 
 ## Properties
 
-### \_http
-
-• **\_http**: `Record`<`string`, `string` \| `object`\>
-
-#### Inherited from
-
-[BaseTransaction](BaseTransaction.md).[_http](BaseTransaction.md#_http)
-
-#### Defined in
-
-[transactions/Base.ts:17](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L17)
-
-___
-
 ### expiresAt
 
 • **expiresAt**: `string`
@@ -80,7 +65,7 @@ ___
 
 #### Defined in
 
-[transactions/Base.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L16)
+[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
 
 ___
 
