@@ -91,6 +91,7 @@ Feature: TOTP Support (Okta Verify) Sign Up
     Then she is redirected to the "Enroll Okta Verify" page
       And she sees a QR Code on the screen
       And she selects "Enroll with another method"
+      Then she is redirected to the "Select Enrollment Channel" page
     When she selects the "Email" enrollment method
       And she submits the form
     When she inputs a valid email for Okta Verify
