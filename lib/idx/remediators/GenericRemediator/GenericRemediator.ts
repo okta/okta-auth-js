@@ -1,6 +1,6 @@
 import { IdxContext, NextStep, Input } from '../../types';
 import { Remediator } from '../Base/Remediator';
-import { unwrapFormValue, hasValidInputValue } from './util';
+import { unwrapFormValue } from './util';
 import { OktaAuthIdxInterface } from '../../../types';
 
 export class GenericRemediator extends Remediator {
@@ -10,11 +10,15 @@ export class GenericRemediator extends Remediator {
       return false;
     }
 
-    const inputs = this.getInputs();
-    const res = inputs.reduce((acc, input) => {
-      return acc && hasValidInputValue(input, this.values);
-    }, true);
-    return res;
+    // DO NOT REMOVE - bring it back when enable client side validation for GenericRemediator
+    // const inputs = this.getInputs();
+    // const res = inputs.reduce((acc, input) => {
+    //   return acc && hasValidInputValue(input, this.values);
+    // }, true);
+    // return res;
+    
+    // GenericRemediator should does not auto proceed - turn off client side validation for now
+    return true;
   }
 
   getData() {
