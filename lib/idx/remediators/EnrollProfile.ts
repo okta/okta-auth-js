@@ -12,19 +12,46 @@
  */
 
 
-import { IdxRemediationValue } from '../types/idx-js';
+import { IdxRemediation, IdxRemediationValue } from '../types/idx-js';
+import { RemediateOptions } from '../../types';
 import { Remediator, RemediationValues } from './Base/Remediator';
+import { Authenticator, Credentials, getAuthenticator } from '../authenticator';
 
 export interface EnrollProfileValues extends RemediationValues {
   firstName?: string;
   lastName?: string;
   email?: string;
+  credentials?: Credentials;
+  password?: string;
 }
 
 export class EnrollProfile extends Remediator<EnrollProfileValues> {
   static remediationName = 'enroll-profile';
 
+  authenticator: Authenticator<any> | null = null;
+
+  constructor(
+    remediation: IdxRemediation,
+    values: EnrollProfileValues,
+    options: RemediateOptions = {}
+  ) {
+    super(remediation, values, options);
+
+    // credentials are only required when Profile Enrollment policy requires them
+    // if credentials are included in the remediation, they are considered required
+    // otherwise it will be omitted
+    const credentials = this.getCredentialsFromRemediation();
+    if (credentials) {
+      this.authenticator = getAuthenticator(credentials);
+    }
+  }
+
   canRemediate() {
+    // ensure credentials can be verified, if required
+    if (this.authenticator && !this.authenticator.canVerify(this.values)) {
+      return false;
+    }
+
     const userProfileFromValues = this.getData().userProfile;
     if (!userProfileFromValues) {
       return false;
@@ -37,6 +64,10 @@ export class EnrollProfile extends Remediator<EnrollProfileValues> {
       }
       return canRemediate;
     }, true);
+  }
+
+  getCredentialsFromRemediation () {
+    return this.remediation.value!.find(({ name }) => name === 'credentials');
   }
 
   mapUserProfile({form: { value: profileAttributes }}) {
@@ -52,7 +83,19 @@ export class EnrollProfile extends Remediator<EnrollProfileValues> {
     return data;
   }
 
+  mapCredentials() {
+    const val = this.authenticator && this.authenticator.mapCredentials(this.values);
+    if (!val) {
+      return;
+    }
+    return val;
+  }
+
   getInputUserProfile(input) {
+    return [...input.form.value];
+  }
+
+  getInputCredentials(input) {
     return [...input.form.value];
   }
 
