@@ -84,6 +84,7 @@ export interface IdxAuthenticator {
   };
   credentialId?: string;
   enrollmentId?: string;
+  profile?: Record<string, unknown>;
 }
 
 export interface IdxForm {
