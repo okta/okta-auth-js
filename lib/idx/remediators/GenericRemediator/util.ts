@@ -3,15 +3,23 @@ import { AuthSdkError } from '../../../errors';
 import { Input } from '../../types';
 
 export function unwrapFormValue(remediation): Input { 
+  if (Array.isArray(remediation)) {
+    return remediation
+      .map(item => {
+        if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+          return item;
+        }
+        return unwrapFormValue(item);
+      }) as any;
+  }
+
   const res = {};
   for (const [key, value] of Object.entries(remediation)) {
     if (value === null || typeof value === 'undefined') {
       continue;
     }
 
-    if (Array.isArray(value)) {
-      res[key] = value.map(unwrapFormValue);
-    } else if (typeof value === 'object') {
+    if (typeof value === 'object') {
       const formKeys = Object.keys(value as object);
       // detect patterns like:
       // value -> form -> value | form -> value
