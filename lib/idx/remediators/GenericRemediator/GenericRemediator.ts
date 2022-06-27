@@ -17,8 +17,10 @@ export class GenericRemediator extends Remediator {
     // }, true);
     // return res;
     
-    // GenericRemediator should does not auto proceed - turn off client side validation for now
-    return true;
+    const inputKeys = this.getInputs().map(({ name }) => name);
+    return Object.keys(this.values).reduce((acc: boolean, curr) => {
+      return acc || inputKeys.includes(curr);
+    }, false);
   }
 
   getData() {
