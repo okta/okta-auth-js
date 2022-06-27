@@ -160,6 +160,7 @@
     "jasmine-ajax": "^4.0.0",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
+    "jest-jasmine2": "^28.1.0",
     "jest-junit": "^13.0.0",
     "jest-runner": "^28.1.0",
     "jest-runner-tsd": "^3.0.0",
