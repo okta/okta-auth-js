@@ -179,4 +179,66 @@ describe('unwrapFormValue - this function only unwrap forms that have one "value
     });
   });
 
+  describe('field level message', () => {
+    it('handles general field level message', () => {
+      const data = {
+        'type':'array',
+        'value':[
+          {
+            'message':'The security question answer must be at least 4 characters in length',
+            'i18n':{
+              'key':'securityQuestion.answer.tooShort.arg',
+            },
+            'class':'ERROR'
+          }
+        ]
+      };
+      const res = unwrapFormValue(data);
+      expect(res).toEqual({
+        'type':'array',
+        'value':[
+          {
+            'message':'The security question answer must be at least 4 characters in length',
+            'i18n':{
+              'key':'securityQuestion.answer.tooShort.arg',
+            },
+            'class':'ERROR'
+          }
+        ]
+      });
+    });
+
+    it('handles field level message with number params', () => {
+      const data = {
+        'type':'array',
+        'value':[
+          {
+            'message':'The security question answer must be at least 4 characters in length',
+            'i18n':{
+              'key':'securityQuestion.answer.tooShort.arg',
+              'params':[ 4, 'fakeParam' ]
+            },
+            'class':'ERROR'
+          }
+        ]
+      };
+      const res = unwrapFormValue(data);
+      expect(res).toEqual({
+        'type':'array',
+        'value':[
+          {
+            'message':'The security question answer must be at least 4 characters in length',
+            'i18n':{
+              'key':'securityQuestion.answer.tooShort.arg',
+              'params':[ 4, 'fakeParam' ]
+            },
+            'class':'ERROR'
+          }
+        ]
+      });
+    });
+
+  });
+  
+
 });

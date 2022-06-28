@@ -84,6 +84,10 @@ export interface IdxAuthenticator {
   };
   credentialId?: string;
   enrollmentId?: string;
+  profile?: Record<string, unknown>;
+  resend?: Record<string, unknown>;
+  poll?: Record<string, unknown>;
+  recover?: Record<string, unknown>;
 }
 
 export interface IdxForm {
@@ -201,6 +205,14 @@ export interface RawIdxResponse {
   messages?: IdxMessages;
   success?: boolean;
   successWithInteractionCode?: IdxRemediation;
+  currentAuthenticator?: {
+    type: string;
+    value: IdxAuthenticator;
+  };
+  currentAuthenticatorEnrollment?: {
+    type: string;
+    value: IdxAuthenticator;
+  };
 }
 
 export function isRawIdxResponse(obj: any): obj is RawIdxResponse {
