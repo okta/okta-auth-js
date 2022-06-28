@@ -72,7 +72,8 @@ shell.cp('-Rf', [
 shell.echo('Modifying final package.json');
 let packageJSON = JSON.parse(fs.readFileSync(`${BUILD_DIR}/package.json`));
 packageJSON.private = false;
-packageJSON.scripts.prepare = '';
+delete packageJSON.scripts.prepare;
+delete packageJSON.workspaces;          // fixes workspace warning
 
 function removeBuildDir(val) {
   if (typeof val === 'string') {

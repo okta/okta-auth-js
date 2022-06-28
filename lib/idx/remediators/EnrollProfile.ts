@@ -32,7 +32,7 @@ export class EnrollProfile extends Remediator<EnrollProfileValues> {
 
   constructor(
     remediation: IdxRemediation,
-    values: EnrollProfileValues,
+    values: EnrollProfileValues = {},
     options: RemediateOptions = {}
   ) {
     super(remediation, values, options);
