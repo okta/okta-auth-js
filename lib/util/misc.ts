@@ -32,3 +32,11 @@ export function delay(ms) {
     setTimeout(resolve, ms);
   });
 }
+
+export function split2(str, delim) {
+  const parts = str.split(delim);
+  return [
+    parts[0], 
+    parts.splice(1, parts.length).join(delim),
+  ];
+}

@@ -1,4 +1,4 @@
-import { warn } from '../util';
+import { warn, split2 } from '../util';
 import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
@@ -133,14 +133,35 @@ export function getAvailableSteps(
   }
 
   for (const [name] of Object.entries((idxResponse.actions || {}))) {
-    res.push({ 
+    let stepObj = {
       name, 
       action: async (params?) => {
         return authClient.idx.proceed({ 
           actions: [{ name, params }] 
         });
       }
-    });
+    };
+    if (name.startsWith('currentAuthenticator')) {
+      const [part1, part2] = split2(name, '-');
+      const actionObj = idxResponse.rawIdxState[part1].value[part2];
+      /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+      const {
+        href, 
+        method, 
+        rel, 
+        accepts, 
+        produces, 
+        ...rest
+      } = actionObj;
+      /* eslint-enable no-unused-vars, @typescript-eslint/no-unused-vars */
+      const value = actionObj.value?.filter(item => item.name !== 'stateHandle');
+      stepObj = { 
+        ...rest,  
+        ...(value && { value }),
+        ...stepObj,
+      };
+    }
+    res.push(stepObj);
   }
 
   return res;

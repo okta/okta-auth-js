@@ -18,7 +18,9 @@ import {
   IdxResponseFactory,
   SelectEnrollProfileRemediationFactory,
   RedirectIdpRemediationFactory,
-  IdentifyRemediationFactory
+  IdentifyRemediationFactory,
+  RawIdxResponseFactory,
+  IdxAuthenticatorFactory,
 } from '@okta/test.support/idx';
 
 const mocked = {
@@ -176,7 +178,15 @@ describe('idx/startTransaction', () => {
     const idxResponse = IdxResponseFactory.build({
       actions: { 
         'currentAuthenticator-recover': (() => {})
-      }
+      },
+      rawIdxState: RawIdxResponseFactory.build({
+        currentAuthenticator: {
+          type: 'object',
+          value: IdxAuthenticatorFactory.build({
+            recover: {}
+          }),
+        },
+      }),
     });
     jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(idxResponse);
     jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue({ idxResponse });

@@ -64,6 +64,7 @@ import {
   WebauthnAuthenticatorOptionFactory,
   VerifyWebauthnAuthenticatorRemediationFactory,
   WebauthnEnrolledAuthenticatorFactory,
+  IdxAuthenticatorFactory,
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -646,7 +647,15 @@ describe('idx/authenticate', () => {
             } as IdxActions,
             neededToProceed: [
               EnrollPhoneAuthenticatorRemediationFactory.build()
-            ]
+            ],
+            rawIdxState: RawIdxResponseFactory.build({
+              currentAuthenticatorEnrollment: {
+                type: 'object',
+                value: IdxAuthenticatorFactory.build({
+                  resend: {}
+                }),
+              },
+            }),
           });
 
           const challengeAuthenticatorRemediation = EnrollAuthenticatorRemediationFactory.build({
@@ -1653,7 +1662,15 @@ describe('idx/authenticate', () => {
             } as IdxActions,
             neededToProceed: [
               ChallengePollRemediationFactory.build()
-            ]
+            ],
+            rawIdxState: RawIdxResponseFactory.build({
+              currentAuthenticator: {
+                type: 'object',
+                value: IdxAuthenticatorFactory.build({
+                  resend: {}
+                }),
+              },
+            }),
           });
 
           Object.assign(testContext, {
