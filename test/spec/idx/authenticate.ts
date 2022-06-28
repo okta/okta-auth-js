@@ -65,6 +65,8 @@ import {
   VerifyWebauthnAuthenticatorRemediationFactory,
   WebauthnEnrolledAuthenticatorFactory,
   IdxAuthenticatorFactory,
+  SelectEnrollmentChannelRemediationFactory,
+  EnrollmentChannelDataSmsRemediationFactory,
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -1879,7 +1881,32 @@ describe('idx/authenticate', () => {
             }),
           });
 
+          const enrollPollResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              EnrollPollRemediationFactory.build(),
+              SelectEnrollmentChannelRemediationFactory.build(),
+            ],
+            context: IdxContextFactory.build({
+              currentAuthenticator: {
+                value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
+              }
+            }),
+          });
+
+          const enrollmentChannelDataSmsResponse = IdxResponseFactory.build({
+            neededToProceed: [
+              EnrollmentChannelDataSmsRemediationFactory.build()
+            ],
+            context: IdxContextFactory.build({
+              currentAuthenticator: {
+                value: OktaVerifyAuthenticatorWithContextualDataFactory.build()
+              }
+            }),
+          });
+
           Object.assign(testContext, {
+            enrollPollResponse,
+            enrollmentChannelDataSmsResponse,
             selectAuthenticatorResponse,
             enrollOktaVerifyResponse,
           });
@@ -1939,8 +1966,68 @@ describe('idx/authenticate', () => {
           });
 
         });
-      });
 
+        it('can get Okta Verify link via SMS', async () => {
+          const {
+            authClient,
+            selectAuthenticatorResponse,
+            enrollPollResponse,
+            enrollmentChannelDataSmsResponse,
+            successResponse
+          } = testContext;
+
+          chainResponses([
+            selectAuthenticatorResponse,
+            enrollPollResponse,
+            enrollmentChannelDataSmsResponse,
+            successResponse
+          ]);
+
+          jest.spyOn(mocked.introspect, 'introspect')
+            .mockResolvedValueOnce(selectAuthenticatorResponse)
+            .mockResolvedValueOnce(enrollPollResponse)
+            .mockResolvedValueOnce(enrollPollResponse) // submit enrollment channel
+            .mockResolvedValueOnce(enrollmentChannelDataSmsResponse);
+
+          jest.spyOn(enrollPollResponse, 'proceed');
+          jest.spyOn(enrollmentChannelDataSmsResponse, 'proceed');
+
+          await authenticate(authClient, {
+            authenticator: AuthenticatorKey.OKTA_VERIFY
+          });
+          let res = await proceed(authClient, {
+            step: 'select-enrollment-channel'
+          });
+          const { options } = res.nextStep!;
+          expect(options).toContainEqual({
+            label: 'SMS',
+            value: 'sms'
+          });
+
+          res = await proceed(authClient, {
+            channel: 'phoneNumber'
+          });
+          const { inputs } = res.nextStep!;
+
+          expect(enrollPollResponse.proceed).toHaveBeenCalledWith(
+            'select-enrollment-channel',
+            expect.objectContaining({ authenticator: expect.objectContaining({ channel: 'phoneNumber' }) })
+          );
+
+          expect(inputs).toContainEqual({
+            name: 'phoneNumber',
+            label: 'Phone Number',
+            required: true,
+            type: 'string',
+          });
+
+          await proceed(authClient, {
+            phoneNumber: '+1234'
+          });
+
+          expect(enrollmentChannelDataSmsResponse.proceed).toHaveBeenCalled();
+        });
+      });
     });
 
     describe('security question', () => {

@@ -10,6 +10,8 @@
   - adds missing types to `IdxAuthenticator`
   - adds missing action meta to `IdxTransaction.availableSteps`
 
+- [#1247](https://github.com/okta/okta-auth-js/pull/1247) - Fixes OV enrollment flow issue in authentication flow.
+
 ## 6.7.0
 
 ### Features
