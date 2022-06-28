@@ -1,8 +1,18 @@
 # Changelog
 
+## 6.7.1
+
+### Fixes
+
+- [#1245](https://github.com/okta/okta-auth-js/pull/1245) IDX GenericRemediator patches (beta):
+  - disables client side validation
+  - fixes ion response primitive types transformation issue
+  - adds missing types to `IdxAuthenticator`
+  - adds missing action meta to `IdxTransaction.availableSteps`
+
 ## 6.7.0
 
-## Features
+### Features
 
 - [#1197](https://github.com/okta/okta-auth-js/pull/1197)
   - Changes implementation of `SyncStorageService` using `broadcast-channel` instead of using `StorageEvent`. Supports `localStorage` and `cookie` storage.
@@ -25,7 +35,7 @@
 
 ## 6.6.0
 
-## Features
+### Features
 
 - [#1225](https://github.com/okta/okta-auth-js/pull/1225) `oktaAuth.start`/`oktaAuth.stop` now return a `Promise`, ensures services have started/stopped before resolving
 ### Fixes
