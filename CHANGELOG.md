@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.8.0
+
+### Other
+
+- [#1243](https://github.com/okta/okta-auth-js/pull/1243) Adds export of `./polyfill` in package.json
+
 ## 6.7.1
 
 ### Fixes
