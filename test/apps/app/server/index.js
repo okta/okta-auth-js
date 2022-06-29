@@ -47,7 +47,7 @@ app.use(express.static('./public'));
 app.use(express.static(AUTH_JS_DIST));
 app.use('/siw', express.static(SIW_DIST));
 
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 app.post('/login', loginMiddleware);
 app.get('/login', renderWidget);

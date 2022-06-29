@@ -18,7 +18,7 @@
     "gulp-rename": "^2.0.0",
     "handlebars": "^4.7.6",
     "merge-stream": "^2.0.0",
-    "shelljs": "0.8.3",
+    "shelljs": "0.8.5",
     "through2": "^4.0.2",
     "yargs": "^16.0.3"
   },

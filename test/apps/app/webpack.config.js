@@ -45,7 +45,11 @@ module.exports = {
     }
   },
   plugins: [
-    new webpack.EnvironmentPlugin(['CLIENT_ID', 'ISSUER']),
+    new webpack.EnvironmentPlugin({
+      CLIENT_ID: '',
+      ISSUER: '',
+      CLIENT_SECRET: ''
+    }),
   ],
   devServer: {
     contentBase: path.join(__dirname, 'public'),
