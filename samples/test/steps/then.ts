@@ -354,7 +354,10 @@ Then(
     } else if (type === 'Email') {
       enrollLink = await this.a18nClient.getOktaVerifyEnrollLinkFromEmail(this.credentials.profileId);
     }
-    expect(enrollLink).toContain('/auth/push/link');
+    const currentUrl = await browser.getUrl();
+    await browser.url(enrollLink);
+    expect(await browser.getUrl()).toContain('/auth/push/link');
+    await browser.url(currentUrl);
   }
 );
 
