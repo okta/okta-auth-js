@@ -10,14 +10,23 @@ export class GenericRemediator extends Remediator {
       return false;
     }
 
-    // DO NOT REMOVE - bring it back when enable client side validation for GenericRemediator
+    // DO NOT REMOVE - bring it back when enable client side validation for GenericRemediator - OKTA-512003
     // const inputs = this.getInputs();
     // const res = inputs.reduce((acc, input) => {
     //   return acc && hasValidInputValue(input, this.values);
     // }, true);
     // return res;
+
+    if (this.remediation.name === 'poll' || this.remediation.name.endsWith('-poll')) {
+      return true;
+    }
     
     const inputKeys = this.getInputs().map(({ name }) => name);
+
+    if (!inputKeys.length) {
+      return true;
+    }
+
     return Object.keys(this.values).reduce((acc: boolean, curr) => {
       return acc || inputKeys.includes(curr);
     }, false);

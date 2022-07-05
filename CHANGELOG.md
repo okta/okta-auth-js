@@ -1,5 +1,12 @@
 # Changelog
 
+# 6.7.2
+
+### Fixes
+
+- [#1251](https://github.com/okta/okta-auth-js/pull/1251) IDX GenericRemediator patches (beta):
+  - allows flow entry point requests
+
 ## 6.7.1
 
 ### Fixes
