@@ -4,9 +4,37 @@ import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
 import license from 'rollup-plugin-license';
 import multiInput from 'rollup-plugin-multi-input';
+import { visualizer } from 'rollup-plugin-visualizer';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import pkg from './package.json';
 
 const path = require('path');
+
+let platforms = ['browser', 'node'];
+let entries = {
+  'okta-auth-js': 'lib/index.ts',
+  'core': 'lib/core/index.ts',
+  'authn': 'lib/authn/index.ts',
+  'myaccount': 'lib/myaccount/index.ts'
+};
+let preserveModules = true;
+
+// if ENTRY env var is passed, filter the entries to include only the named ENTRY
+if (process.env.ENTRY) {
+  entries = {
+    [process.env.ENTRY]: entries[process.env.ENTRY]
+  };
+}
+
+// if PLATFORM env var is passed, filter the platforms to include only the named PLATFORM
+if (process.env.PLATFORM) {
+  platforms = platforms.filter(platform => platform === process.env.PLATFORM);
+}
+
+// if ANALZYE env var is passed, output analyzer html (must output single bundle)
+if (process.env.ANALYZE) {
+  preserveModules = false;
+}
 
 const makeExternalPredicate = (env) => {
   const externalArr = [
@@ -28,13 +56,29 @@ const output = {
   format: 'es',
   exports: 'named',
   sourcemap: true,
-  preserveModules: true,
+  preserveModules,
   // not using .mjs extension because it causes issues with Vite
   // entryFileNames: '[name].mjs'
 };
 
-const getPlugins = (env) => {
-  return [
+function createPackageJson(dirName) {
+  return {
+    name: 'create-package-json',
+    generateBundle() {
+      // Add an extra package.json underneath ESM to indicate module type
+      // This helps tools like Jest identify this code as ESM
+      if (!existsSync(dirName)){
+        mkdirSync(dirName, { recursive: true });
+      }
+      writeFileSync(`${dirName}/package.json`, JSON.stringify({
+        type: 'module'
+      }, null, 4));
+    }
+  };
+}
+
+const getPlugins = (env, entryName) => {
+  let plugins = [
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
       'global.': 'window.',
@@ -71,22 +115,36 @@ const getPlugins = (env) => {
     multiInput({ 
       relative: 'lib/',
     }),
+    createPackageJson(`./build/esm/${entryName}/${env}`)
   ];
+
+  // if ANALZYE env var is passed, output analyzer html
+  if (process.env.ANALYZE) {
+    plugins = plugins.concat([
+      visualizer({
+        sourcemap: true,
+        projectRoot: path.join(__dirname, './lib'),
+        filename: `./build/esm/${entryName}.${env}.analzyer.html`,
+        template: 'treemap' // sunburst | treemap | network
+      }),
+    ]);
+  }
+  return plugins;
 };
 
-export default ['browser', 'node'].map((type) => {
-  return {
-    input: [
-      'lib/index.ts', 
-      'lib/myaccount/index.ts'
-    ],
-    external: makeExternalPredicate(type),
-    plugins: getPlugins(type),
-    output: [
-      {
-        ...output,
-        dir: `build/esm/${type}`,
-      }
-    ]
-  };
-});
+export default Object.keys(entries).reduce((res, entryName) => {
+  const entryValue = entries[entryName];
+  return res.concat(platforms.map((type) => {
+    return {
+      input: [entryValue],
+      external: makeExternalPredicate(type),
+      plugins: getPlugins(type, entryName),
+      output: [
+        {
+          ...output,
+          dir: `build/esm/${entryName}/${type}`,
+        }
+      ]
+    };
+  }));
+}, []);
