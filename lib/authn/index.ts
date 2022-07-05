@@ -49,7 +49,8 @@ export function createAuthnTransactionAPI(sdk: OktaAuthHttpInterface): AuthnTran
 // Mixin
 export function useAuthnTransactionAPI(sdk: OktaAuthHttpInterface): OktaAuthTxInterface {
   const tx: AuthnTransactionAPI = createAuthnTransactionAPI(sdk);
-  (sdk as OktaAuthTxInterface).tx = tx;
+  (sdk as OktaAuthTxInterface).tx = tx; // use legacy name: "tx"
+  (sdk as OktaAuthTxInterface).authn = tx; // use new name: "authn"
   return sdk as OktaAuthTxInterface;
 }
 

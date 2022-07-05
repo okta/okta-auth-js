@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { AuthnTransaction, AuthnTransactionAPI } from '../tx/types';
+import { AuthnTransaction, AuthnTransactionAPI } from '../authn/types';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { CustomUserClaims, UserClaims } from './UserClaims';
@@ -93,7 +93,8 @@ export interface OktaAuthIdxInterface extends
 export interface OktaAuthTxInterface extends
   OktaAuthHttpInterface
 {
-  tx: AuthnTransactionAPI;
+  tx: AuthnTransactionAPI; // legacy name
+  authn: AuthnTransactionAPI; // new name
 }
 
 export interface OktaAuthInterface extends

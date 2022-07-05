@@ -23,6 +23,19 @@
       "types": "./build/lib/index.d.ts",
       "default": "./build/dist/okta-auth-js.umd.js"
     },
+    "./authn": {
+      "node": {
+        "types": "./build/lib/authn/index.d.ts",
+        "import": "./build/esm/node/authn/authn/index.js",
+        "require": "./build/cjs/authn/index.js"
+      },
+      "browser": {
+        "types": "./build/lib/authn/index.d.ts",
+        "import": "./build/esm/browser/authn/authn/index.js"
+      },
+      "types": "./build/lib/authn/index.d.ts",
+      "default": "./build/dist/authn.umd.js"
+    },
     "./myaccount": {
       "node": {
         "types": "./build/lib/myaccount/index.d.ts",

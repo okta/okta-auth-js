@@ -15,18 +15,18 @@ import {
   OktaAuthOptions, 
   HttpAPI,
   OktaAuthHttpInterface,
-} from './types';
-import { setRequestHeader } from './http';
-import { StorageManager } from './StorageManager';
-import { buildOptions } from './options';
-import { OktaUserAgent } from './OktaUserAgent';
+} from '../types';
+import { setRequestHeader } from '../http';
+import { StorageManager } from '../StorageManager';
+import { buildOptions } from '../options';
+import { OktaUserAgent } from '../OktaUserAgent';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore 
 // Do not use this type in code, so it won't be emitted in the declaration output
 import Emitter from 'tiny-emitter';
 
-class OktaAuthHttp implements OktaAuthHttpInterface {
+export default class OktaAuthCore implements OktaAuthHttpInterface {
   options: OktaAuthOptions;
   storageManager: StorageManager;
   http: HttpAPI;
@@ -38,12 +38,6 @@ class OktaAuthHttp implements OktaAuthHttpInterface {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.storageManager = new StorageManager(options.storageManager!, options.cookies!, options.storageUtil!);
     this._oktaUserAgent = new OktaUserAgent();
-
-    // Add shims for compatibility, these will be removed in next major version. OKTA-362589
-    Object.assign(this.options.storageUtil, {
-      getPKCEStorage: this.storageManager.getLegacyPKCEStorage.bind(this.storageManager),
-      getHttpCache: this.storageManager.getHttpCache.bind(this.storageManager),
-    });
 
     // HTTP
     this.http = {
@@ -63,5 +57,3 @@ class OktaAuthHttp implements OktaAuthHttpInterface {
     return this.options.issuer!.split('/oauth2/')[0];
   }
 }
-
-export default OktaAuthHttp;

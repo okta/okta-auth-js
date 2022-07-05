@@ -11,18 +11,7 @@
  *
  */
 
-import * as crypto from './crypto';
 
-export { default as OktaAuth } from './OktaAuth';
-export * from './constants';
-export * from './idx';
-export * from './types';
-export * from './authn';
-export * from './errors';
-export * from './oidc';
-export * from './StorageManager';
-export * from './TransactionManager';
-export * from './TokenManager';
-export * from './AuthStateManager';
-export * from './util';
-export { crypto };
+export { default as OktaAuth } from './OktaAuthCore';
+
+// TODO: what else needs to be exported?

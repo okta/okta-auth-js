@@ -56,7 +56,7 @@ import {
   createAuthnTransactionAPI,
   AuthnTransaction,
   AuthnTransactionAPI
-} from './tx';
+} from './authn';
 import PKCE from './oidc/util/pkce';
 import {
   closeSession,
@@ -129,11 +129,12 @@ import {
   isTransactionMetaValid
 } from './idx/transactionMeta';
 import { makeIdxState } from './idx/idxState';
-import OktaAuthHttp from './OktaAuthHttp';
+import OktaAuthCore from './core/OktaAuthCore';
 
-class OktaAuth extends OktaAuthHttp implements OktaAuthInterface, SigninAPI, SignoutAPI {
+class OktaAuth extends OktaAuthCore implements OktaAuthInterface, SigninAPI, SignoutAPI {
   transactionManager: TransactionManager;
-  tx: AuthnTransactionAPI;
+  tx: AuthnTransactionAPI; // legacy, may be removed in future version
+  authn: AuthnTransactionAPI;
   idx: IdxAPI;
   session: SessionAPI;
   pkce: PkceAPI;
@@ -156,7 +157,7 @@ class OktaAuth extends OktaAuthHttp implements OktaAuthInterface, SigninAPI, Sig
       storageManager: this.storageManager,
     }, this.options.transactionManager));
 
-    this.tx = createAuthnTransactionAPI(this);
+    this.authn = this.tx = createAuthnTransactionAPI(this);
 
     this.pkce = {
       DEFAULT_CODE_CHALLENGE_METHOD: PKCE.DEFAULT_CODE_CHALLENGE_METHOD,
@@ -207,9 +208,9 @@ class OktaAuth extends OktaAuthHttp implements OktaAuthInterface, SigninAPI, Sig
     const getWithRedirectFn = useQueue(getWithRedirect.bind(null, this)) as GetWithRedirectFunction;
     const getWithRedirectApi: GetWithRedirectAPI = Object.assign(getWithRedirectFn, {
       // This is exposed so we can set window.location in our tests
-      _setLocation: function(url) {
-        if (options.setLocation) {
-          options.setLocation(url);
+      _setLocation: (url) => {
+        if (this.options.setLocation) {
+          this.options.setLocation(url);
         } else {
           window.location = url;
         }

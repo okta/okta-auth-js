@@ -15,7 +15,7 @@ jest.mock('../../../lib/http', () => {
   return { post };
 });
 
-import { postToTransaction } from '../../../lib/tx/api';
+import { postToTransaction } from '../../../lib/authn/api';
 
 describe('tx - api', () => {
   let testContext;
