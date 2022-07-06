@@ -13,5 +13,6 @@
 
 
 export { default as OktaAuth } from './OktaAuthCore';
-
-// TODO: what else needs to be exported?
+export * from '../types';
+export * from '../StorageManager';
+export * from  '../OktaUserAgent';

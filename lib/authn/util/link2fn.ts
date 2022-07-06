@@ -1,4 +1,4 @@
-import { OktaAuthHttpInterface } from '../../types/api';
+import { OktaAuthHttpInterface } from '../../types';
 import { find, omit, toQueryString } from '../../util';
 import AuthSdkError from '../../errors/AuthSdkError';
 import { get } from '../../http';

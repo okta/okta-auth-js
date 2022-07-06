@@ -1,4 +1,4 @@
-import { RequestData, RequestOptions } from '../types/http';
+import { RequestData, RequestOptions, OktaAuthHttpInterface } from '../types/http';
 
 export interface AuthnTransactionLink {
   name?: string;
@@ -72,4 +72,11 @@ export interface AuthnTransactionAPI {
   introspect: (args?: object) => Promise<AuthnTransaction>;
   createTransaction: (res?: AuthnTransactionState) => AuthnTransaction;
   postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => Promise<AuthnTransaction>;
+}
+
+export interface OktaAuthTxInterface extends
+  OktaAuthHttpInterface
+{
+  tx: AuthnTransactionAPI; // legacy name
+  authn: AuthnTransactionAPI; // new name
 }

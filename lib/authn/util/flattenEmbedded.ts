@@ -1,5 +1,5 @@
 /* eslint-disable complexity */
-import { OktaAuthHttpInterface } from '../../types/api';
+import { OktaAuthHttpInterface } from '../../types';
 import { clone, isObject, omit } from '../../util';
 import { AuthnTransactionAPI } from '../types';
 import { links2fns } from './links2fns';

@@ -11,7 +11,7 @@
  *
  */
 
-import { OktaAuthHttpInterface } from '../types/api';
+import { OktaAuthHttpInterface } from '../types';
 import {
   AuthnTransactionFunction,
   AuthnTransaction,

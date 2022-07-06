@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { StorageManager } from '../StorageManager';
 import { TransactionMeta } from './Transaction';
 import { Cookies, CookieOptions } from './Cookies';
 import { RawIdxResponse } from '../idx/types/idx-js';
@@ -97,4 +98,8 @@ export interface StorageManagerOptions {
   token?: StorageOptions;
   transaction?: StorageOptions;
   [propName: string]: StorageOptions | undefined; // custom sections are allowed
+}
+
+export interface OktaAuthStorageInterface {
+  storageManager: StorageManager;
 }

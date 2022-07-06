@@ -11,7 +11,9 @@
  */
 
 
-import { StorageUtil } from './Storage';
+import { OktaUserAgent } from '../OktaUserAgent';
+import { OktaAuthOptionsInterface } from './OktaAuthOptions';
+import { OktaAuthStorageInterface, StorageUtil } from './Storage';
 
 
 export type RequestHeaders = Record<string, string>;
@@ -54,4 +56,11 @@ export interface HttpResponse {
     [propName: string]: any;
   };
   headers: HeadersInit;
+}
+
+export interface OktaAuthHttpInterface extends 
+  OktaAuthOptionsInterface,
+  OktaAuthStorageInterface
+{
+  _oktaUserAgent: OktaUserAgent;
 }

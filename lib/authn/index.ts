@@ -11,8 +11,7 @@
  *
  */
 
-import { OktaAuthHttpInterface, OktaAuthTxInterface } from '../types/api';
-import { RequestData, RequestOptions } from '../types/http';
+import { RequestData, RequestOptions, OktaAuthHttpInterface } from '../types/http';
 import {
   introspectAuthn,
   transactionStatus,
@@ -21,7 +20,7 @@ import {
   postToTransaction
 } from './api';
 import { AuthnTransactionImpl } from './AuthnTransactionImpl';
-import { AuthnTransactionAPI, AuthnTransactionState } from './types';
+import { AuthnTransactionAPI, AuthnTransactionState, OktaAuthTxInterface } from './types';
 
 export * from './types';
 

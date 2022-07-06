@@ -123,3 +123,8 @@ export interface OktaAuthOptions extends
   clientSecret?: string;
   setLocation?: SetLocationFunction;
 }
+
+export interface OktaAuthOptionsInterface {
+  options: OktaAuthOptions;
+  getIssuerOrigin(): string;
+}

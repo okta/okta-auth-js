@@ -6,7 +6,7 @@
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "build/cjs/index.js",
-  "module": "build/esm/node/index.js",
+  "module": "build/esm/okta-auth-js/node/index.js",
   "browser": "build/dist/okta-auth-js.umd.js",
   "types": "build/lib/index.d.ts",
   "exports": {
@@ -95,7 +95,7 @@
     "test:bundle:esm:browser": "cross-env BUNDLE_ENV=browser NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:esm:node": "cross-env BUNDLE_ENV=node NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:cjs": "cross-env BUNDLE_ENV=node jest --config ./jest.cjs.js",
-    "test:types": "jest --config ./jest.tsd.js --runInBand",
+    "test:types": "yarn workspace @okta/test.types test",
     "build": "node scripts/build.js",
     "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js",
@@ -223,6 +223,7 @@
       "test/apps/*",
       "test/e2e",
       "test/support",
+      "test/types",
       "samples",
       "samples/test",
       "samples/generated/*"

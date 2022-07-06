@@ -11,16 +11,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { AuthnTransaction, AuthnTransactionAPI } from '../authn/types';
+import { AuthnTransaction, OktaAuthTxInterface } from '../authn/types';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { CustomUserClaims, UserClaims } from './UserClaims';
-import { CustomUrls, OktaAuthOptions, TokenParams } from './OktaAuthOptions';
-import { StorageManager } from '../StorageManager';
+import { CustomUrls, OktaAuthOptionsInterface, TokenParams } from './OktaAuthOptions';
 import TransactionManager from '../TransactionManager';
 import { TokenManagerInterface } from './TokenManager';
 import { ServiceManagerInterface } from './Service';
-import { OktaUserAgent } from '../OktaUserAgent';
 import { 
   AuthenticationOptions, 
   RegistrationOptions as IdxRegistrationOptions,
@@ -46,22 +44,8 @@ import {
 } from '../idx/types';
 import { TransactionMetaOptions } from './Transaction';
 import { IdxToPersist, RawIdxResponse } from '../idx/types/idx-js';
-
-export interface OktaAuthOptionsInterface {
-  options: OktaAuthOptions;
-  getIssuerOrigin(): string;
-}
-
-export interface OktaAuthStorageInterface {
-  storageManager: StorageManager;
-
-}
-export interface OktaAuthHttpInterface extends 
-  OktaAuthOptionsInterface,
-  OktaAuthStorageInterface
-{
-  _oktaUserAgent: OktaUserAgent;
-}
+import { OktaAuthHttpInterface } from './http';
+import { OktaAuthStorageInterface } from './Storage';
 
 export interface OktaAuthFeaturesInterface {
   // Functional on browser only
@@ -88,13 +72,6 @@ export interface OktaAuthIdxInterface extends
   Pick<OktaAuthOIDCInterface, 'token'>
 {
   idx: IdxAPI;
-}
-
-export interface OktaAuthTxInterface extends
-  OktaAuthHttpInterface
-{
-  tx: AuthnTransactionAPI; // legacy name
-  authn: AuthnTransactionAPI; // new name
 }
 
 export interface OktaAuthInterface extends
