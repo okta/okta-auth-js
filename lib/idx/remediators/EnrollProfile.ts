@@ -23,6 +23,7 @@ export interface EnrollProfileValues extends RemediationValues {
   email?: string;
   credentials?: Credentials;
   password?: string;
+  passcode?: string;
 }
 
 export class EnrollProfile extends Remediator<EnrollProfileValues> {
@@ -42,7 +43,7 @@ export class EnrollProfile extends Remediator<EnrollProfileValues> {
     // otherwise it will be omitted
     const credentials = this.getCredentialsFromRemediation();
     if (credentials) {
-      this.authenticator = getAuthenticator(credentials);
+      this.authenticator = getAuthenticator(remediation);
     }
   }
 

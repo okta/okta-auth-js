@@ -106,7 +106,6 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
 
   // returns an object for the entire remediation form, or just a part
   getData(key?: string) {
-
     if (!key) {
       let allValues = getAllValues(this.remediation);
       let res = allValues!.reduce((data, key) => {

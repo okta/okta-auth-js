@@ -65,6 +65,10 @@ export const IdentifyRemediationFactory = IdxRemediationFactory.params({
   ]
 });
 
+export const SelectIdentifyRemediationFactory = IdxRemediationFactory.params({
+  name: 'select-identify'
+});
+
 export const IdentifyWithPasswordRemediationFactory = IdentifyRemediationFactory.params({
   value:[
     UsernameValueFactory.build(),
@@ -349,6 +353,23 @@ export const EnrollExtendedProfileRemediationFactory = IdxRemediationFactory.par
       form: ExtendedUserProfileFormFactory.build()
     })
   ]
+});
+
+export const EnrollProfileWithPasswordRemediationFactory = IdxRemediationFactory.params({
+  name: 'enroll-profile',
+  value: [
+    IdxValueFactory.build({
+      name: 'userProfile',
+      form: UserProfileFormFactory.build()
+    }),
+    CredentialsValueFactory.build({
+      form: PasswordFormFactory.build()
+    })
+  ],
+  relatesTo: {
+    type: 'object',
+    value: PasswordAuthenticatorFactory.build()
+  },
 });
 
 export const SelectEnrollProfileRemediationFactory = IdxRemediationFactory.params({
