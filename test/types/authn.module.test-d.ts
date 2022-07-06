@@ -17,10 +17,11 @@ import {
 
 import {
   createAuthnTransactionAPI,
-  useAuthnTransactionAPI,
   AuthnTransactionAPI,
   OktaAuthTxInterface,
-  AuthnTransaction
+  AuthnTransaction,
+  mixinAuthn,
+  FingerprintAPI
 } from '@okta/okta-auth-js/authn';
 
 import { expectType, expectAssignable, expectNotAssignable } from 'tsd';
@@ -32,12 +33,6 @@ expectNotAssignable<OktaAuthTxInterface>(authClient);
 const authn = createAuthnTransactionAPI(authClient);
 expectType<AuthnTransactionAPI>(authn);
 
-// test mixin
-const authClientTx = useAuthnTransactionAPI(authClient);
-expectAssignable<OktaAuthTxInterface>(authClientTx);
-expectType<AuthnTransactionAPI>(authClientTx.tx);
-expectType<AuthnTransactionAPI>(authClientTx.authn);
-
 // test sync methods
 expectType<boolean>(authn.exists());
 expectType<AuthnTransaction>(authn.createTransaction());
@@ -48,4 +43,22 @@ expectType<AuthnTransaction>(authn.createTransaction());
   expectType<AuthnTransaction>(await authn.resume());
   expectType<AuthnTransaction>(await authn.introspect());
   expectType<AuthnTransaction>(await authn.postToTransaction('/url'));
+})();
+
+// test mixin
+const OktaAuthTx = mixinAuthn(OktaAuth);
+const authClientTx = new OktaAuthTx({});
+expectAssignable<OktaAuthTxInterface>(authClientTx);
+expectType<AuthnTransactionAPI>(authClientTx.tx);
+expectType<AuthnTransactionAPI>(authClientTx.authn);
+expectType<FingerprintAPI>(authClientTx.fingerprint);
+
+// test async methods
+(async () => {
+  expectType<string>(await authClientTx.fingerprint());
+  expectType<AuthnTransaction>(await authClientTx.signIn({}));
+  expectType<AuthnTransaction>(await authClientTx.signInWithCredentials({}));
+  expectType<AuthnTransaction>(await authClientTx.forgotPassword({}));
+  expectType<AuthnTransaction>(await authClientTx.unlockAccount({ username: 'foo', factorType: 'SMS' }));
+  expectType<AuthnTransaction>(await authClientTx.verifyRecoveryToken({ recoveryToken: 'foo' }));
 })();

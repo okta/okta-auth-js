@@ -16,10 +16,11 @@ import {
   HttpAPI,
   OktaAuthHttpInterface,
 } from '../types';
-import { setRequestHeader } from '../http';
+import { get, setRequestHeader } from '../http';
 import { StorageManager } from '../StorageManager';
 import { buildOptions } from '../options';
 import { OktaUserAgent } from '../OktaUserAgent';
+import { toQueryString } from '../util';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore 
@@ -33,8 +34,8 @@ export default class OktaAuthCore implements OktaAuthHttpInterface {
   emitter: any;
   _oktaUserAgent: OktaUserAgent;
 
-  constructor(args: OktaAuthOptions) {
-    const options = this.options = buildOptions(args);
+  constructor(...args: any[]) {
+    const options = this.options = buildOptions(args[0] as OktaAuthOptions);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.storageManager = new StorageManager(options.storageManager!, options.cookies!, options.storageUtil!);
     this._oktaUserAgent = new OktaUserAgent();
@@ -55,5 +56,15 @@ export default class OktaAuthCore implements OktaAuthHttpInterface {
     // Infer the URL from the issuer URL, omitting the /oauth2/{authServerId}
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.options.issuer!.split('/oauth2/')[0];
+  }
+
+  webfinger(opts): Promise<object> {
+    var url = '/.well-known/webfinger' + toQueryString(opts);
+    var options = {
+      headers: {
+        'Accept': 'application/jrd+json'
+      }
+    };
+    return get(this, url, options);
   }
 }

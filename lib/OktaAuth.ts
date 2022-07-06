@@ -29,18 +29,13 @@ import {
   CryptoAPI,
   WebauthnAPI,
   SignoutAPI, 
-  FingerprintAPI,
   UserClaims, 
   SigninWithRedirectOptions,
-  SigninWithCredentialsOptions,
   SignoutOptions,
   Tokens,
-  ForgotPasswordOptions,
-  VerifyRecoveryTokenOptions,
   SessionAPI,
   SigninAPI,
   PkceAPI,
-  SigninOptions,
   IdxAPI,
   SignoutRedirectUrlOptions,
   FlowIdentifier,
@@ -52,11 +47,6 @@ import {
   OAuthResponseType,
   CustomUserClaims,
 } from './types';
-import {
-  createAuthnTransactionAPI,
-  AuthnTransaction,
-  AuthnTransactionAPI
-} from './authn';
 import PKCE from './oidc/util/pkce';
 import {
   closeSession,
@@ -90,15 +80,12 @@ import * as crypto from './crypto';
 import * as webauthn from './crypto/webauthn';
 import browserStorage from './browser/browserStorage';
 import { 
-  toQueryString, 
   toAbsoluteUrl,
-  clone,
 } from './util';
 import { TokenManager } from './TokenManager';
 import { ServiceManager } from './ServiceManager';
-import { get, httpRequest } from './http';
+import { httpRequest } from './http';
 import PromiseQueue from './PromiseQueue';
-import fingerprint from './browser/fingerprint';
 import { AuthStateManager } from './AuthStateManager';
 import TransactionManager from './TransactionManager';
 import {
@@ -129,12 +116,13 @@ import {
   isTransactionMetaValid
 } from './idx/transactionMeta';
 import { makeIdxState } from './idx/idxState';
+import { mixinAuthn } from './authn';
 import OktaAuthCore from './core/OktaAuthCore';
 
-class OktaAuth extends OktaAuthCore implements OktaAuthInterface, SigninAPI, SignoutAPI {
+const BaseClass = mixinAuthn(OktaAuthCore);
+
+class OktaAuth extends BaseClass implements OktaAuthInterface, SigninAPI, SignoutAPI {
   transactionManager: TransactionManager;
-  tx: AuthnTransactionAPI; // legacy, may be removed in future version
-  authn: AuthnTransactionAPI;
   idx: IdxAPI;
   session: SessionAPI;
   pkce: PkceAPI;
@@ -148,16 +136,12 @@ class OktaAuth extends OktaAuthCore implements OktaAuthInterface, SigninAPI, Sig
   authStateManager: AuthStateManager;
   serviceManager: ServiceManager;
 
-  fingerprint: FingerprintAPI;
-
   _pending: { handleLogin: boolean };
   constructor(args: OktaAuthOptions) {
     super(args);
     this.transactionManager = new TransactionManager(Object.assign({
       storageManager: this.storageManager,
     }, this.options.transactionManager));
-
-    this.authn = this.tx = createAuthnTransactionAPI(this);
 
     this.pkce = {
       DEFAULT_CODE_CHALLENGE_METHOD: PKCE.DEFAULT_CODE_CHALLENGE_METHOD,
@@ -314,9 +298,6 @@ class OktaAuth extends OktaAuthCore implements OktaAuthInterface, SigninAPI, Sig
       unlockAccount: unlockAccount.bind(null, this),
     };
 
-    // Fingerprint API
-    this.fingerprint = fingerprint.bind(null, this);
-
     // TokenManager
     this.tokenManager = new TokenManager(this, args.tokenManager);
 
@@ -345,31 +326,6 @@ class OktaAuth extends OktaAuthCore implements OktaAuthInterface, SigninAPI, Sig
     // TODO: review tokenManager.stop
     this.tokenManager.stop();
     await this.serviceManager.stop();
-  }
-
-  // Authn  V1
-  async signIn(opts: SigninOptions): Promise<AuthnTransaction> {
-    return this.signInWithCredentials(opts as SigninWithCredentialsOptions);
-  }
-
-  // Authn  V1
-  async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthnTransaction> {
-    opts = clone(opts || {});
-    const _postToTransaction = (options?) => {
-      delete opts.sendFingerprint;
-      return this.tx.postToTransaction('/api/v1/authn', opts, options);
-    };
-    if (!opts.sendFingerprint) {
-      return _postToTransaction();
-    }
-    return this.fingerprint()
-    .then(function(fingerprint) {
-      return _postToTransaction({
-        headers: {
-          'X-Device-Fingerprint': fingerprint
-        }
-      });
-    });
   }
 
   async signInWithRedirect(opts: SigninWithRedirectOptions = {}) {
@@ -528,16 +484,6 @@ class OktaAuth extends OktaAuthCore implements OktaAuthInterface, SigninAPI, Sig
       // Flow ends with logout redirect
       window.location.assign(logoutUri);
     }
-  }
-
-  webfinger(opts): Promise<object> {
-    var url = '/.well-known/webfinger' + toQueryString(opts);
-    var options = {
-      headers: {
-        'Accept': 'application/jrd+json'
-      }
-    };
-    return get(this, url, options);
   }
 
   //
@@ -712,21 +658,6 @@ class OktaAuth extends OktaAuthCore implements OktaAuthInterface, SigninAPI, Sig
 
   isAuthorizationCodeFlow(): boolean {
     return this.hasResponseType('code');
-  }
-
-  // { username, (relayState) }
-  forgotPassword(opts): Promise<AuthnTransaction> {
-    return this.tx.postToTransaction('/api/v1/authn/recovery/password', opts);
-  }
-
-  // { username, (relayState) }
-  unlockAccount(opts: ForgotPasswordOptions): Promise<AuthnTransaction> {
-    return this.tx.postToTransaction('/api/v1/authn/recovery/unlock', opts);
-  }
-
-  // { recoveryToken }
-  verifyRecoveryToken(opts: VerifyRecoveryTokenOptions): Promise<AuthnTransaction> {
-    return this.tx.postToTransaction('/api/v1/authn/recovery/token', opts);
   }
 
   // Escape hatch method to make arbitrary OKTA API call

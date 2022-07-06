@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { AuthnTransaction, OktaAuthTxInterface } from '../authn/types';
+import { OktaAuthTxInterface } from '../authn/types';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { CustomUserClaims, UserClaims } from './UserClaims';
@@ -106,18 +106,6 @@ export interface APIError {
   errorCauses?: Array<FieldError>;
 }
 
-// HTTP API
-export interface HttpAPI {
-  setRequestHeader(name: string, value: string): void;
-}
-
-
-// Fingerprint
-export interface FingerprintOptions {
-  timeout?: number;
-}
-
-export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
 
 // Session API
 export interface SessionObject {
@@ -229,34 +217,8 @@ export interface WebauthnAPI {
   ): CredentialCreationOptions;
 }
 
-export interface SupportsCodeFlow {
-  useInteractionCodeFlow?: boolean;
-}
-
-export interface SigninOptions extends 
-  SupportsCodeFlow,
-  AuthenticationOptions {
-    // Only used in Authn V1
-    relayState?: string;
-    context?: {
-      deviceToken?: string;
-    };
-    sendFingerprint?: boolean;
-    stateToken?: string;
-}
-
-export interface SigninWithRedirectOptions extends SigninOptions, TokenParams {
+export interface SigninWithRedirectOptions extends TokenParams {
   originalUri?: string;
-}
-
-export interface SigninWithCredentialsOptions extends SigninOptions {
-  username?: string;
-  password?: string;
-}
-
-export interface SigninAPI {
-  signIn(opts: SigninOptions): Promise<AuthnTransaction>;
-  signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthnTransaction>;
 }
 
 export interface SignoutRedirectUrlOptions {
@@ -275,16 +237,6 @@ export interface SignoutOptions extends SignoutRedirectUrlOptions {
 
 export interface SignoutAPI {
   signOut(opts: SignoutOptions);
-}
-
-export interface ForgotPasswordOptions {
-  username: string;
-  factorType: 'SMS' | 'EMAIL' | 'CALL';
-  relayState?: string;
-}
-
-export interface VerifyRecoveryTokenOptions {
-  recoveryToken: string;
 }
 
 export interface PkceAPI {

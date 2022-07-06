@@ -69,7 +69,7 @@ export function transactionExists(sdk: OktaAuthOptionsInterface) {
   return !!getSavedStateToken(sdk);
 }
 
-export function postToTransaction(sdk: OktaAuthHttpInterface, tx, url, args, options?) {
+export function postToTransaction(sdk: OktaAuthHttpInterface, tx: AuthnTransactionAPI, url: string, args, options?) {
   options = Object.assign({ withCredentials: true }, options);
   return post(sdk, url, args, options)
     .then(function(res) {

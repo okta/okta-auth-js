@@ -58,9 +58,20 @@ export interface HttpResponse {
   headers: HeadersInit;
 }
 
+// HTTP API
+export interface HttpAPI {
+  setRequestHeader(name: string, value: string): void;
+}
+
 export interface OktaAuthHttpInterface extends 
   OktaAuthOptionsInterface,
   OktaAuthStorageInterface
 {
   _oktaUserAgent: OktaUserAgent;
+  http: HttpAPI;
+  
+  setHeaders(headers): void;
+  getIssuerOrigin(): string;
+  webfinger(opts): Promise<object>;
 }
+

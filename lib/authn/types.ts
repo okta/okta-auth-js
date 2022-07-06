@@ -74,9 +74,60 @@ export interface AuthnTransactionAPI {
   postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => Promise<AuthnTransaction>;
 }
 
+export interface SigninOptions {
+  // Only used in Authn V1
+  relayState?: string;
+  context?: {
+    deviceToken?: string;
+  };
+  sendFingerprint?: boolean;
+  stateToken?: string;
+}
+
+export interface SigninWithCredentialsOptions extends SigninOptions {
+  username?: string;
+  password?: string;
+}
+
+export interface SigninAPI {
+  signIn(opts: SigninOptions): Promise<AuthnTransaction>;
+  signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthnTransaction>;
+}
+
+export interface ForgotPasswordOptions {
+  username: string;
+  factorType: 'SMS' | 'EMAIL' | 'CALL';
+  relayState?: string;
+}
+
+export interface VerifyRecoveryTokenOptions {
+  recoveryToken: string;
+}
+
+export interface AuthnAPI extends SigninAPI {
+  forgotPassword(opts): Promise<AuthnTransaction>;
+
+  // { username, (relayState) }
+  unlockAccount(opts: ForgotPasswordOptions): Promise<AuthnTransaction>;
+
+  // { recoveryToken }
+  verifyRecoveryToken(opts: VerifyRecoveryTokenOptions): Promise<AuthnTransaction>;
+}
+
+// Fingerprint
+export interface FingerprintOptions {
+  timeout?: number;
+}
+
+export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
+
+
 export interface OktaAuthTxInterface extends
-  OktaAuthHttpInterface
+  OktaAuthHttpInterface,
+  AuthnAPI
 {
   tx: AuthnTransactionAPI; // legacy name
   authn: AuthnTransactionAPI; // new name
+  fingerprint: FingerprintAPI;
+
 }

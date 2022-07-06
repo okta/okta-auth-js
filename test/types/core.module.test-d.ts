@@ -33,3 +33,8 @@ expectType<OktaUserAgent>(authClient._oktaUserAgent);
 
 expectType<string>(authClient.getIssuerOrigin());
 expectType<void>(authClient.setHeaders({ foo: 'bar' }));
+
+// test async methods
+(async () => {
+  expectType<object>(await authClient.webfinger({}));
+})();
