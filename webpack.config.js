@@ -37,14 +37,14 @@ module.exports = Object.keys(entries).map(function(entryName) {
 
   // if ANALZYE env var is passed, output analyzer html
   if (process.env.ANALYZE) {
-    plugins.unshift([
+    plugins.unshift(
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
         reportFilename: `${entryName}.umd.analyzer.html`,
         analyzerMode: 'static',
         defaultSizes: 'stat'
       })
-    ]);
+    );
   }
 
   return _.extend({}, _.cloneDeep(commonConfig), {
