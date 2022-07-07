@@ -612,6 +612,7 @@ function redirectToLogin(additionalParams) {
 }
 window._loginRedirect = bindClick(redirectToLogin);
 var signIn;
+var _idpPopupWindow;
 
 function showSigninWidget(options) {
   // Create widget options
@@ -642,7 +643,8 @@ function showSigninWidget(options) {
       document.querySelectorAll('.okta-idps-container .social-auth-button').forEach(function (el) {
         el.onclick = function(event) {
           event.preventDefault();
-          openPopup(el.href, {
+          disableIDPs(); // workaround issue of not being able to select another IDP after an IDP is selected
+          _idpPopupWindow = openPopup(el.href, {
             popupTitle: el.innerText
           });
         }
@@ -670,6 +672,25 @@ function hideSigninWidget() {
   signIn && signIn.remove();
 }
 
+function disableIDPs() {
+  const idpContainer = document.querySelector('.sign-in-with-idp');
+  idpContainer.innerHTML = '<div style="text-align: left; padding-top: 20px; font-size: 13px;"><a class="link-button" href="#" onclick="restartLoginFlow(event)">Cancel / restart IDP flow</a></div>';
+}
+
+function restartLoginFlow(event) {
+  event.preventDefault();
+  // close existing popup window if any
+  if (_idpPopupWindow) {
+    _idpPopupWindow.close();
+  }
+  // clear existing transaction
+  signIn.authClient.transactionManager.clear();
+
+  // re-render widget
+  hideSigninWidget();
+  showSigninWidget();
+  
+}
 function resumeTransaction(options) {
   if (!config.useInteractionCodeFlow) {
     // Authn
