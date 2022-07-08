@@ -1,13 +1,32 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
+    "module": "esnext",
     "lib": [
-      "dom"
+      "es6", "DOM"
     ],
-    "moduleResolution": "nodenext" // consume types from submodule
-  }
+    "noEmit": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": false,
+    "moduleResolution": "node",
+    "target": "es2017",
+    "baseUrl": ".",
+    "paths": {
+      "@okta/okta-auth-js": [
+        "../../build/lib/index.d.ts"
+      ],
+      "@okta/okta-auth-js/*": [
+        "../../build/lib/*/index.d.ts"
+      ]
+    }
+  },
+  "include": [
+    "*.test-d.ts"
+  ]
 }
