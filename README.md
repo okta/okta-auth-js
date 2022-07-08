@@ -532,10 +532,6 @@ if (oktaAuth.isLoginRedirect()) {
 
 Default to `false`. It enables debugging logs when set to `true`.
 
-#### `useInteractionCodeFlow`
-
-Enables interaction code flow for direct auth clients.
-
 #### `clientSecret`
 
 Used in authorization and interaction code flows by server-side web applications to obtain OAuth tokens. In a production application, this value should **never** be visible on the client side.
