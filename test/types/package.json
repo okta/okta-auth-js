@@ -1,0 +1,8 @@
+{
+  "name": "@okta/test.types",
+  "version": "1.0.0",
+  "description": "test type declarations",
+  "scripts": {
+    "test": "jest --runInBand"
+  }
+}

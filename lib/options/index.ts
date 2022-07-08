@@ -59,7 +59,6 @@ export function buildOptions(args: OktaAuthOptions = {}): OktaAuthOptions {
     responseMode: args.responseMode,
     responseType: args.responseType,
     pkce: args.pkce === false ? false : true, // PKCE defaults to true
-    useInteractionCodeFlow: args.useInteractionCodeFlow,
 
     // Internal options
     httpRequestClient: args.httpRequestClient,

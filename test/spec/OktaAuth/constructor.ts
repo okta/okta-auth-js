@@ -53,7 +53,6 @@ describe('OktaAuth (constructor)', () => {
   .concat([
     'clientId',
     'redirectUri',
-    'useInteractionCodeFlow',
     'state',
     'scopes',
     'postLogoutRedirectUri',

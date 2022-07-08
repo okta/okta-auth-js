@@ -2,7 +2,8 @@
   "name": "@okta/tree-shaking",
   "version": "0.0.1",
   "scripts": {
-    "start": "webpack --watch"
+    "clean": "rimraf target",
+    "build": "webpack"
   },
   "main": "index.js",
   "dependencies": {

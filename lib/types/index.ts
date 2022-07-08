@@ -26,3 +26,4 @@ export * from './TokenManager';
 export * from './Service';
 export * from './UserClaims';
 export * from '../myaccount';
+export * from '../authn/types';
