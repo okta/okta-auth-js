@@ -95,7 +95,6 @@ export interface OktaAuthOptions extends
     'recoveryToken'
   >
 {
-  useInteractionCodeFlow?: boolean;
   ignoreLifetime?: boolean;
   tokenManager?: TokenManagerOptions;
   postLogoutRedirectUri?: string;
@@ -122,4 +121,9 @@ export interface OktaAuthOptions extends
   // For server-side web applications ONLY!
   clientSecret?: string;
   setLocation?: SetLocationFunction;
+}
+
+export interface OktaAuthOptionsInterface {
+  options: OktaAuthOptions;
+  getIssuerOrigin(): string;
 }

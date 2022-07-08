@@ -20,7 +20,7 @@ import {
   Tokens, 
   OktaAuthOptions, 
   AccessToken, 
-  AuthTransaction, 
+  AuthnTransaction, 
   TokenParams,
   isAuthorizationCodeError,
   IdxStatus,
@@ -627,7 +627,7 @@ class TestApp {
     let sessionToken;
     let tokens;
     if (username || password) {
-      const v1Transaction: AuthTransaction = await this.oktaAuth.signIn({ username, password });
+      const v1Transaction: AuthnTransaction = await this.oktaAuth.signIn({ username, password });
       if (v1Transaction.status === 'SUCCESS') {
         sessionToken = v1Transaction.sessionToken;
       } else {
