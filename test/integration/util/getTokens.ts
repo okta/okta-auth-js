@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
 import waitFor from '@okta/test.support/waitFor';
-import { AuthTransaction, CustomUrls, handleOAuthResponse } from '../../../lib';
+import { AuthnTransaction, CustomUrls, handleOAuthResponse } from '../../../lib';
 import { getWithRedirect } from '../../../lib/oidc';
 import { parseOAuthResponseFromUrl } from '../../../lib/oidc/parseFromUrl';
 
@@ -49,7 +49,7 @@ async function getTokens(client, tokenParams) {
 export async function signinAndGetTokens(client, tokenParams?, credentials?) {
   const username = credentials?.username || process.env.USERNAME;
   const password = credentials?.password || process.env.PASSWORD;
-  const tx: AuthTransaction = await client.signInWithCredentials({
+  const tx: AuthnTransaction = await client.signInWithCredentials({
     username,
     password
   });

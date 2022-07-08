@@ -12,20 +12,7 @@
  */
 
 
-import { TransactionState } from './TransactionState';
-
-export function addStateToken(res, options?) {
-  var builtArgs = {} as TransactionState;
-  Object.assign(builtArgs, options);
-
-  // Add the stateToken if one isn't passed and we have one
-  if (!builtArgs.stateToken && res.stateToken) {
-    builtArgs.stateToken = res.stateToken;
-  }
-
-  return builtArgs;
-}
-
-export function getStateToken(res) {
-  return addStateToken(res);
-}
+export { default as OktaAuth } from './OktaAuthCore';
+export * from '../types';
+export * from '../StorageManager';
+export * from  '../OktaUserAgent';

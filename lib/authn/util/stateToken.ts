@@ -11,8 +11,21 @@
  *
  */
 
-export * from './api';
-export * from './AuthTransaction';
-export * from './poll';
-export * from './TransactionState';
-export * from './util';
+
+import { AuthnTransactionState } from '../types';
+
+export function addStateToken(res, options?) {
+  var builtArgs = {} as AuthnTransactionState;
+  Object.assign(builtArgs, options);
+
+  // Add the stateToken if one isn't passed and we have one
+  if (!builtArgs.stateToken && res.stateToken) {
+    builtArgs.stateToken = res.stateToken;
+  }
+
+  return builtArgs;
+}
+
+export function getStateToken(res) {
+  return addStateToken(res);
+}
