@@ -14,3 +14,4 @@ node_modules
 dist
 /test/apps/app/public/oidc-app.js
 /test/apps/app/target
+/test/apps/tree-shaking/target

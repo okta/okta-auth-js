@@ -29,22 +29,15 @@ import {
   CryptoAPI,
   WebauthnAPI,
   SignoutAPI, 
-  FingerprintAPI,
   UserClaims, 
   SigninWithRedirectOptions,
-  SigninWithCredentialsOptions,
   SignoutOptions,
   Tokens,
-  ForgotPasswordOptions,
-  VerifyRecoveryTokenOptions,
-  TransactionAPI,
   SessionAPI,
   SigninAPI,
   PkceAPI,
-  SigninOptions,
   IdxAPI,
   SignoutRedirectUrlOptions,
-  HttpAPI,
   FlowIdentifier,
   GetWithRedirectAPI,
   ParseFromUrlInterface,
@@ -53,17 +46,7 @@ import {
   IsAuthenticatedOptions,
   OAuthResponseType,
   CustomUserClaims,
-  RequestData,
 } from './types';
-import {
-  transactionStatus,
-  resumeTransaction,
-  transactionExists,
-  introspectAuthn,
-  postToTransaction,
-  AuthTransaction,
-  TransactionState
-} from './tx';
 import PKCE from './oidc/util/pkce';
 import {
   closeSession,
@@ -97,19 +80,14 @@ import * as crypto from './crypto';
 import * as webauthn from './crypto/webauthn';
 import browserStorage from './browser/browserStorage';
 import { 
-  toQueryString, 
   toAbsoluteUrl,
-  clone,
 } from './util';
 import { TokenManager } from './TokenManager';
 import { ServiceManager } from './ServiceManager';
-import { get, httpRequest, setRequestHeader } from './http';
+import { httpRequest } from './http';
 import PromiseQueue from './PromiseQueue';
-import fingerprint from './browser/fingerprint';
 import { AuthStateManager } from './AuthStateManager';
-import { StorageManager } from './StorageManager';
 import TransactionManager from './TransactionManager';
-import { buildOptions } from './options';
 import {
   interact,
   introspect,
@@ -128,7 +106,6 @@ import {
   parseEmailVerifyCallback,
   isEmailVerifyCallbackError
 } from './idx';
-import { OktaUserAgent } from './OktaUserAgent';
 import { parseOAuthResponseFromUrl } from './oidc/parseFromUrl';
 import {
   getSavedTransactionMeta,
@@ -138,17 +115,14 @@ import {
   clearTransactionMeta,
   isTransactionMetaValid
 } from './idx/transactionMeta';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore 
-// Do not use this type in code, so it won't be emitted in the declaration output
-import Emitter from 'tiny-emitter';
 import { makeIdxState } from './idx/idxState';
+import { mixinAuthn } from './authn';
+import OktaAuthCore from './core/OktaAuthCore';
 
-class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
-  options: OktaAuthOptions;
-  storageManager: StorageManager;
+const BaseClass = mixinAuthn(OktaAuthCore);
+
+class OktaAuth extends BaseClass implements OktaAuthInterface, SigninAPI, SignoutAPI {
   transactionManager: TransactionManager;
-  tx: TransactionAPI;
   idx: IdxAPI;
   session: SessionAPI;
   pkce: PkceAPI;
@@ -158,41 +132,16 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
   features: FeaturesAPI = features;
   token: TokenAPI;
   _tokenQueue: PromiseQueue;
-  emitter: any;
   tokenManager: TokenManager;
   authStateManager: AuthStateManager;
   serviceManager: ServiceManager;
-  http: HttpAPI;
-  fingerprint: FingerprintAPI;
-  _oktaUserAgent: OktaUserAgent;
+
   _pending: { handleLogin: boolean };
   constructor(args: OktaAuthOptions) {
-    const options = this.options = buildOptions(args);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.storageManager = new StorageManager(options.storageManager!, options.cookies!, options.storageUtil!);
+    super(args);
     this.transactionManager = new TransactionManager(Object.assign({
       storageManager: this.storageManager,
-    }, options.transactionManager));
-    this._oktaUserAgent = new OktaUserAgent();
-
-    this.tx = {
-      status: transactionStatus.bind(null, this),
-      resume: resumeTransaction.bind(null, this),
-      exists: Object.assign(transactionExists.bind(null, this), {
-        _get: (name) => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const storage = options.storageUtil!.storage;
-          return storage.get(name);
-        }
-      }),
-      introspect: introspectAuthn.bind(null, this),
-      createTransaction: (res?: TransactionState) => {
-        return new AuthTransaction(this, res);
-      },
-      postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => {
-        return postToTransaction(this, url, args, options);
-      }
-    };
+    }, this.options.transactionManager));
 
     this.pkce = {
       DEFAULT_CODE_CHALLENGE_METHOD: PKCE.DEFAULT_CODE_CHALLENGE_METHOD,
@@ -243,9 +192,9 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     const getWithRedirectFn = useQueue(getWithRedirect.bind(null, this)) as GetWithRedirectFunction;
     const getWithRedirectApi: GetWithRedirectAPI = Object.assign(getWithRedirectFn, {
       // This is exposed so we can set window.location in our tests
-      _setLocation: function(url) {
-        if (options.setLocation) {
-          options.setLocation(url);
+      _setLocation: (url) => {
+        if (this.options.setLocation) {
+          this.options.setLocation(url);
         } else {
           window.location = url;
         }
@@ -349,16 +298,6 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       unlockAccount: unlockAccount.bind(null, this),
     };
 
-    // HTTP
-    this.http = {
-      setRequestHeader: setRequestHeader.bind(null, this)
-    };
-
-    // Fingerprint API
-    this.fingerprint = fingerprint.bind(null, this);
-
-    this.emitter = new Emitter();
-
     // TokenManager
     this.tokenManager = new TokenManager(this, args.tokenManager);
 
@@ -387,36 +326,6 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
     // TODO: review tokenManager.stop
     this.tokenManager.stop();
     await this.serviceManager.stop();
-  }
-
-  setHeaders(headers) {
-    this.options.headers = Object.assign({}, this.options.headers, headers);
-  }
-
-
-  // Authn  V1
-  async signIn(opts: SigninOptions): Promise<AuthTransaction> {
-    return this.signInWithCredentials(opts as SigninWithCredentialsOptions);
-  }
-
-  // Authn  V1
-  async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction> {
-    opts = clone(opts || {});
-    const _postToTransaction = (options?) => {
-      delete opts.sendFingerprint;
-      return postToTransaction(this, '/api/v1/authn', opts, options);
-    };
-    if (!opts.sendFingerprint) {
-      return _postToTransaction();
-    }
-    return this.fingerprint()
-    .then(function(fingerprint) {
-      return _postToTransaction({
-        headers: {
-          'X-Device-Fingerprint': fingerprint
-        }
-      });
-    });
   }
 
   async signInWithRedirect(opts: SigninWithRedirectOptions = {}) {
@@ -575,16 +484,6 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
       // Flow ends with logout redirect
       window.location.assign(logoutUri);
     }
-  }
-
-  webfinger(opts): Promise<object> {
-    var url = '/.well-known/webfinger' + toQueryString(opts);
-    var options = {
-      headers: {
-        'Accept': 'application/jrd+json'
-      }
-    };
-    return get(this, url, options);
   }
 
   //
@@ -759,32 +658,6 @@ class OktaAuth implements OktaAuthInterface, SigninAPI, SignoutAPI {
 
   isAuthorizationCodeFlow(): boolean {
     return this.hasResponseType('code');
-  }
-
-  // { username, password, (relayState), (context) }
-  // signIn(opts: SignInWithCredentialsOptions): Promise<AuthTransaction> {
-  //   return postToTransaction(this, '/api/v1/authn', opts);
-  // }
-
-  getIssuerOrigin(): string {
-    // Infer the URL from the issuer URL, omitting the /oauth2/{authServerId}
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.options.issuer!.split('/oauth2/')[0];
-  }
-
-  // { username, (relayState) }
-  forgotPassword(opts): Promise<AuthTransaction> {
-    return postToTransaction(this, '/api/v1/authn/recovery/password', opts);
-  }
-
-  // { username, (relayState) }
-  unlockAccount(opts: ForgotPasswordOptions): Promise<AuthTransaction> {
-    return postToTransaction(this, '/api/v1/authn/recovery/unlock', opts);
-  }
-
-  // { recoveryToken }
-  verifyRecoveryToken(opts: VerifyRecoveryTokenOptions): Promise<AuthTransaction> {
-    return postToTransaction(this, '/api/v1/authn/recovery/token', opts);
   }
 
   // Escape hatch method to make arbitrary OKTA API call

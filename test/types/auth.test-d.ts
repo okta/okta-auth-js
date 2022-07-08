@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { AuthTransaction, UserClaims, OktaAuth, TokenParams } from '@okta/okta-auth-js';
+import { AuthnTransaction, UserClaims, OktaAuth, TokenParams } from '@okta/okta-auth-js';
 import { expectType, expectAssignable } from 'tsd';
 
 const authClient = new OktaAuth({});
@@ -50,7 +50,7 @@ const authorizeOptions2: TokenParams = {
 
 (async () => {
   // signIn
-  expectType<AuthTransaction>(await authClient.signInWithCredentials({
+  expectType<AuthnTransaction>(await authClient.signInWithCredentials({
     username: 'some-username',
     password: 'some-password',
     sendFingerprint: true,
@@ -70,21 +70,21 @@ const authorizeOptions2: TokenParams = {
   }));
 
   // forgotPassword
-  expectType<AuthTransaction>(await authClient.forgotPassword({
+  expectType<AuthnTransaction>(await authClient.forgotPassword({
     username: 'dade.murphy@example.com',
     factorType: 'SMS',
     relayState: 'd3de23'
   }));
 
   // unlockAccount
-  expectType<AuthTransaction>(await authClient.unlockAccount({
+  expectType<AuthnTransaction>(await authClient.unlockAccount({
     username: 'dade.murphy@example.com',
     factorType: 'SMS',
     relayState: 'd3de23'
   }));
 
   // verifyRecoveryToken
-  expectType<AuthTransaction>(await authClient.verifyRecoveryToken({
+  expectType<AuthnTransaction>(await authClient.verifyRecoveryToken({
     recoveryToken: '00xdqXOE5qDZX8-PBR1bYv8AESqIFinDy3yul01tyh'
   }));
 

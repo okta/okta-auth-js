@@ -1,14 +1,14 @@
+const REPORT_DIR = '../../build2/reports/tsd';
+
 let counts = {};
 
 module.exports = {
   runner: 'jest-runner-tsd',
-  roots: [
-    'test/types'
-  ],
   testMatch: ['**/*.test-d.ts'],
   reporters: [
     'default',
     ['jest-junit', {
+      outputDirectory: REPORT_DIR,
       suiteNameTemplate: (vars) => `${vars.filename}`,
       classNameTemplate: (vars) => {
         if (!counts[vars.filename]) {

@@ -6,33 +6,59 @@
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
   "main": "build/cjs/index.js",
-  "module": "build/esm/node/index.js",
+  "module": "build/esm/okta-auth-js/node/index.js",
   "browser": "build/dist/okta-auth-js.umd.js",
   "types": "build/lib/index.d.ts",
   "exports": {
     ".": {
       "node": {
         "types": "./build/lib/index.d.ts",
-        "import": "./build/esm/node/index.js",
+        "import": "./build/esm/okta-auth-js/node/index.js",
         "require": "./build/cjs/index.js"
       },
       "browser": {
         "types": "./build/lib/index.d.ts",
-        "import": "./build/esm/browser/index.js",
-        "default": "./build/esm/browser/index.js"
+        "import": "./build/esm/okta-auth-js/browser/index.js",
+        "default": "./build/esm/okta-auth-js/browser/index.js"
       },
       "types": "./build/lib/index.d.ts",
       "default": "./build/dist/okta-auth-js.umd.js"
     },
+    "./core": {
+      "node": {
+        "types": "./build/lib/core/index.d.ts",
+        "import": "./build/esm/core/node/core/core/index.js",
+        "require": "./build/cjs/core/index.js"
+      },
+      "browser": {
+        "types": "./build/lib/core/index.d.ts",
+        "import": "./build/esm/core/browser/core/core/index.js"
+      },
+      "types": "./build/lib/core/index.d.ts",
+      "default": "./build/dist/core.umd.js"
+    },
+    "./authn": {
+      "node": {
+        "types": "./build/lib/authn/index.d.ts",
+        "import": "./build/esm/authn/node/authn/authn/index.js",
+        "require": "./build/cjs/authn/index.js"
+      },
+      "browser": {
+        "types": "./build/lib/authn/index.d.ts",
+        "import": "./build/esm/authn/browser/authn/authn/index.js"
+      },
+      "types": "./build/lib/authn/index.d.ts",
+      "default": "./build/dist/authn.umd.js"
+    },
     "./myaccount": {
       "node": {
         "types": "./build/lib/myaccount/index.d.ts",
-        "import": "./build/esm/node/myaccount/myaccount/index.js",
+        "import": "./build/esm/myaccount/node/myaccount/myaccount/index.js",
         "require": "./build/cjs/myaccount/index.js"
       },
       "browser": {
         "types": "./build/lib/myaccount/index.d.ts",
-        "import": "./build/esm/browser/myaccount/myaccount/index.js"
+        "import": "./build/esm/myaccount/browser/myaccount/myaccount/index.js"
       },
       "types": "./build/lib/myaccount/index.d.ts",
       "default": "./build/dist/myaccount.umd.js"
@@ -70,7 +96,7 @@
     "test:bundle:esm:browser": "cross-env BUNDLE_ENV=browser NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:esm:node": "cross-env BUNDLE_ENV=node NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:cjs": "cross-env BUNDLE_ENV=node jest --config ./jest.cjs.js",
-    "test:types": "jest --config ./jest.tsd.js --runInBand",
+    "test:types": "yarn workspace @okta/test.types test",
     "build": "node scripts/build.js",
     "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js",
@@ -172,6 +198,7 @@
     "rollup-plugin-license": "^2.8.1",
     "rollup-plugin-multi-input": "^1.3.1",
     "rollup-plugin-typescript2": "^0.30.0",
+    "rollup-plugin-visualizer": "^5.5.4",
     "shelljs": "0.8.5",
     "ts-jest": "^28.0.2",
     "tsd": "^0.17.0",
@@ -179,6 +206,7 @@
     "typedoc-plugin-markdown": "^3.11.14",
     "typescript": "^4.7.3",
     "webpack": "^5.60.0",
+    "webpack-bundle-analyzer": "^4.5.0",
     "webpack-dev-server": "^4.9.2",
     "webpack-cli": "^4.10.0"
   },
@@ -196,6 +224,7 @@
       "test/apps/*",
       "test/e2e",
       "test/support",
+      "test/types",
       "samples",
       "samples/test",
       "samples/generated/*"

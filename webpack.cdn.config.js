@@ -6,6 +6,8 @@ var path    = require('path');
 var webpack = require('webpack');
 var fs      = require('fs');
 var _ = require('lodash');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
 var commonConfig = require('./webpack.common.config');
 
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
@@ -42,7 +44,14 @@ module.exports = _.extend({}, baseConfig, {
     library: 'OktaAuth',
     libraryTarget: 'var'
   },
-  plugins: commonConfig.plugins.concat([
+  plugins: [
+    new BundleAnalyzerPlugin({
+      openAnalyzer: false,
+      reportFilename: 'okta-auth-js.min.analyzer.html',
+      analyzerMode: 'static',
+      defaultSizes: 'stat'
+    })
+  ].concat(commonConfig.plugins).concat([
 
     // Add a single Okta license after removing others
     new webpack.BannerPlugin(license)

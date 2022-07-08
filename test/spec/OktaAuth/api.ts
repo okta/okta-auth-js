@@ -12,15 +12,12 @@
 
 
 /* eslint-disable no-new */
-jest.mock('../../../lib/tx');
-
 import { 
   OktaAuth, 
   AuthApiError,
   AuthSdkError
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import {postToTransaction} from '../../../lib/tx';
 import { APIError, isAccessToken, isIDToken } from '../../../lib/types';
 import util from '@okta/test.support/util';
 
@@ -31,6 +28,7 @@ describe('OktaAuth (api)', function() {
   beforeEach(function() {
     issuer =  'http://my-okta-domain';
     auth = new OktaAuth({ issuer, pkce: false });
+    jest.spyOn(auth.tx, 'postToTransaction').mockResolvedValue({});
   });
 
   it('is a valid constructor', function() {
@@ -83,21 +81,21 @@ describe('OktaAuth (api)', function() {
     });
     it('should call "/api/v1/authn" endpoint with default options', async () => {
       await auth.signInWithCredentials(options);
-      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
+      expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn', options, undefined);
     });
     it('should call fingerprint if has sendFingerprint in options', async () => {
       options.sendFingerprint = true;
       await auth.signInWithCredentials(options);
       delete options.sendFingerprint;
       expect(auth.fingerprint).toHaveBeenCalled();
-      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, {
+      expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn', options, {
         headers: { 'X-Device-Fingerprint': 'fake fingerprint' }
       });
     });
     it('can pass stateToken to /authn endpoint', async () => {
       options = { stateToken: 'fake-stateToken' };
       await auth.signInWithCredentials(options);
-      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn', options, undefined);
+      expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn', options, undefined);
     });
   });
 
@@ -473,7 +471,7 @@ describe('OktaAuth (api)', function() {
     it('calls postToTransaction with correct url and options', async () => {
       const options = { fake: 'fake' };
       await auth.forgotPassword(options);
-      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn/recovery/password', options);
+      expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn/recovery/password', options);
     });
   });
 
@@ -481,7 +479,7 @@ describe('OktaAuth (api)', function() {
     it('calls postToTransaction with correct url and options', async () => {
       const options = { fake: 'fake' };
       await auth.unlockAccount(options);
-      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn/recovery/unlock', options);
+      expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn/recovery/unlock', options);
     });
   });
 
@@ -489,7 +487,7 @@ describe('OktaAuth (api)', function() {
     it('calls postToTransaction with correct url and options', async () => {
       const options = { fake: 'fake' };
       await auth.verifyRecoveryToken(options);
-      expect(postToTransaction).toHaveBeenCalledWith(auth, '/api/v1/authn/recovery/token', options);
+      expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn/recovery/token', options);
     });
   });
 

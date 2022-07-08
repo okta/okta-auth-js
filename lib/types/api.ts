@@ -11,17 +11,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { AuthTransaction } from '../tx/AuthTransaction';
-import { TransactionState } from '../tx/TransactionState';
+import { OktaAuthTxInterface } from '../authn/types';
 import { Token, Tokens, RevocableToken, AccessToken, IDToken, RefreshToken } from './Token';
 import { JWTObject } from './JWT';
 import { CustomUserClaims, UserClaims } from './UserClaims';
-import { CustomUrls, OktaAuthOptions, TokenParams } from './OktaAuthOptions';
-import { StorageManager } from '../StorageManager';
+import { CustomUrls, OktaAuthOptionsInterface, TokenParams } from './OktaAuthOptions';
 import TransactionManager from '../TransactionManager';
 import { TokenManagerInterface } from './TokenManager';
 import { ServiceManagerInterface } from './Service';
-import { OktaUserAgent } from '../OktaUserAgent';
 import { 
   AuthenticationOptions, 
   RegistrationOptions as IdxRegistrationOptions,
@@ -46,24 +43,9 @@ import {
   StartOptions
 } from '../idx/types';
 import { TransactionMetaOptions } from './Transaction';
-import { RequestData, RequestOptions } from './http';
 import { IdxToPersist, RawIdxResponse } from '../idx/types/idx-js';
-
-export interface OktaAuthOptionsInterface {
-  options: OktaAuthOptions;
-  getIssuerOrigin(): string;
-}
-
-export interface OktaAuthStorageInterface {
-  storageManager: StorageManager;
-
-}
-export interface OktaAuthHttpInterface extends 
-  OktaAuthOptionsInterface,
-  OktaAuthStorageInterface
-{
-  _oktaUserAgent: OktaUserAgent;
-}
+import { OktaAuthHttpInterface } from './http';
+import { OktaAuthStorageInterface } from './Storage';
 
 export interface OktaAuthFeaturesInterface {
   // Functional on browser only
@@ -98,6 +80,7 @@ export interface OktaAuthInterface extends
   OktaAuthFeaturesInterface,
   OktaAuthHttpInterface,
   OktaAuthTransactionInterface,
+  OktaAuthTxInterface,
   OktaAuthIdxInterface,
   OktaAuthOIDCInterface
 {
@@ -123,34 +106,6 @@ export interface APIError {
   errorCauses?: Array<FieldError>;
 }
 
-// HTTP API
-export interface HttpAPI {
-  setRequestHeader(name: string, value: string): void;
-}
-
-// Transaction API
-
-export type TransactionExistsFunction = () => boolean;
-export interface TransactionExists extends TransactionExistsFunction {
-  _get: (key: string) => string;
-}
-
-// Authn (classic) api
-export interface TransactionAPI {
-  exists: TransactionExists;
-  status: (args?: object) => Promise<object>;
-  resume: (args?: object) => Promise<AuthTransaction>;
-  introspect: (args?: object) => Promise<AuthTransaction>;
-  createTransaction: (res?: TransactionState) => AuthTransaction;
-  postToTransaction: (url: string, args?: RequestData, options?: RequestOptions) => Promise<AuthTransaction>;
-}
-
-// Fingerprint
-export interface FingerprintOptions {
-  timeout?: number;
-}
-
-export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
 
 // Session API
 export interface SessionObject {
@@ -262,34 +217,8 @@ export interface WebauthnAPI {
   ): CredentialCreationOptions;
 }
 
-export interface SupportsCodeFlow {
-  useInteractionCodeFlow?: boolean;
-}
-
-export interface SigninOptions extends 
-  SupportsCodeFlow,
-  AuthenticationOptions {
-    // Only used in Authn V1
-    relayState?: string;
-    context?: {
-      deviceToken?: string;
-    };
-    sendFingerprint?: boolean;
-    stateToken?: string;
-}
-
-export interface SigninWithRedirectOptions extends SigninOptions, TokenParams {
+export interface SigninWithRedirectOptions extends TokenParams {
   originalUri?: string;
-}
-
-export interface SigninWithCredentialsOptions extends SigninOptions {
-  username?: string;
-  password?: string;
-}
-
-export interface SigninAPI {
-  signIn(opts: SigninOptions): Promise<AuthTransaction>;
-  signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthTransaction>;
 }
 
 export interface SignoutRedirectUrlOptions {
@@ -308,16 +237,6 @@ export interface SignoutOptions extends SignoutRedirectUrlOptions {
 
 export interface SignoutAPI {
   signOut(opts: SignoutOptions);
-}
-
-export interface ForgotPasswordOptions {
-  username: string;
-  factorType: 'SMS' | 'EMAIL' | 'CALL';
-  relayState?: string;
-}
-
-export interface VerifyRecoveryTokenOptions {
-  recoveryToken: string;
 }
 
 export interface PkceAPI {
