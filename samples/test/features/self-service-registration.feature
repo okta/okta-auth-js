@@ -69,8 +69,8 @@ Scenario: Mary signs up with an invalid Email
   And she fills out her Last Name
   And she fills out her Email with an invalid email format
   And she submits the form
-  Then she sees an error message "'Email' must be in the form of an email address"
-  And she sees an error message "Provided value for property 'Email' does not match required pattern"
+  Then she sees an error message "must be in the form of an email address"
+  And she sees an error message "does not match required pattern"
 
 Scenario: Mary signs up for an account with Password, sets up required Email factor, And sets up optional SMS with an invalid phone number
   When she clicks the 'signup' button
