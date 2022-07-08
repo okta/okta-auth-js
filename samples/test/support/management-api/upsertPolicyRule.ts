@@ -65,8 +65,15 @@ const getAccessPolicyActions = (description: string) => {
           'verificationMethod': {
             'factorMode': '1FA',
             'type': 'ASSURANCE',
-            'reauthenticateIn': 'PT1M',
-            'constraints': []
+            'reauthenticateIn': 'PT2H',
+            'constraints': [
+              {
+                'possession':{}
+             },
+             {
+                'knowledge':{}
+             }
+            ]
           }
         }
       },
