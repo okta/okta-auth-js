@@ -11,22 +11,22 @@
  *
  */
 
-import { post } from '../http';
-import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '../util';
-import { DEFAULT_POLLING_DELAY } from '../constants';
-import AuthSdkError from '../errors/AuthSdkError';
-import AuthPollStopError from '../errors/AuthPollStopError';
-import { TransactionState } from './TransactionState';
-import { getStateToken } from './util';
+import { post } from '../../http';
+import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '../../util';
+import { DEFAULT_POLLING_DELAY } from '../../constants';
+import AuthSdkError from '../../errors/AuthSdkError';
+import AuthPollStopError from '../../errors/AuthPollStopError';
+import { AuthnTransactionState } from '../types';
+import { getStateToken } from './stateToken';
 
-export interface PollOptions {
+interface PollOptions {
   delay?: number;
   rememberDevice?: boolean;
   autoPush?: boolean;
-  transactionCallBack?: (TransactionState) => void;
+  transactionCallBack?: (AuthnTransactionState) => void;
 }
 
-export function getPollFn(sdk, res: TransactionState, ref) {
+export function getPollFn(sdk, res: AuthnTransactionState, ref) {
   return function (options: PollOptions | number) {
     var delay;
     var rememberDevice;
