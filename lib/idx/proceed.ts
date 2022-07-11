@@ -22,7 +22,9 @@ import { AuthSdkError } from '../errors';
 
 export function canProceed(authClient: OktaAuthIdxInterface, options: ProceedOptions = {}): boolean {
   const meta = getSavedTransactionMeta(authClient, options);
-  return !!(meta || options.stateHandle);
+  const savedIdxResponse = authClient.transactionManager.loadIdxResponse(options);
+  const stateHandle = savedIdxResponse?.stateHandle || options.stateHandle;
+  return !!(meta || stateHandle);
 }
 
 export async function proceed(

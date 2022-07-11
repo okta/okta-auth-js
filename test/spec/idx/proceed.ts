@@ -39,6 +39,7 @@ describe('idx/proceed', () => {
       urls: { authorizeUrl: 'meta-authorizeUrl' },
       ignoreSignature: true,
     };
+    const savedIdxResponse = { stateHandle: 'fake-stateHandle' };
     const authClient = {
       options: {
         issuer,
@@ -48,6 +49,7 @@ describe('idx/proceed', () => {
       transactionManager: {
         exists: () => true,
         load: () => transactionMeta,
+        loadIdxResponse: () => {},
         clear: () => {},
         save: () => {},
       },
@@ -62,14 +64,20 @@ describe('idx/proceed', () => {
       redirectUri,
       stateHandle,
       transactionMeta,
+      savedIdxResponse,
       authClient
     };
   });
 
   describe('canProceed', () => {
-    it('returns true if there is a saved transaction', () => {
+    it('returns true if there is a saved transaction meta', () => {
       const { authClient, transactionMeta } = testContext;
       jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+      expect(canProceed(authClient)).toBe(true);
+    });
+    it('returns true if there is a saved idxTransaction', () => {
+      const { authClient, savedIdxResponse } = testContext;
+      jest.spyOn(authClient.transactionManager, 'loadIdxResponse').mockReturnValue(savedIdxResponse);
       expect(canProceed(authClient)).toBe(true);
     });
     it('returns false if there is no saved transaction', () => {

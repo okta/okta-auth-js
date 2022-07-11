@@ -1,6 +1,12 @@
 # Changelog
 
-# 6.7.2
+## 6.7.3
+
+### Fixes
+
+- [#1255](https://github.com/okta/okta-auth-js/pull/1255) IDX: allows `idx.proceed` when saved idx response is available
+
+## 6.7.2
 
 ### Fixes
 
