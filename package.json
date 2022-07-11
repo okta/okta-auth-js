@@ -71,6 +71,10 @@
   "bugs": {
     "url": "https://github.com/okta/okta-auth-js/issues"
   },
+  "sideEffects": [
+    "./lib/server/serverStorage.ts",
+    "./polyfill/index.js"
+  ],
   "scripts": {
     "banners": "node ./scripts/maintain-banners.js",
     "clean": "yarn clean:build",
