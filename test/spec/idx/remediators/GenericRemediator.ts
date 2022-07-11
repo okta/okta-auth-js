@@ -20,9 +20,60 @@ describe('remediators/GenericRemediator', () => {
     expect(remediator).toBeInstanceOf(Remediator);
   });
 
-  // Re-enable when add client side validation in GenericRemediator
-  describe.skip('Override canRemediate', () => {
-    describe('single level inputs', () => {
+  describe('Override canRemediate', () => {
+    describe('server side validation', () => {
+      it('returns true when no inputs', () => {
+        const remediation = IdxRemediationFactory.build({
+          name: 'foo',
+          value: [],
+          action: jest.fn()
+        });
+        const values = {} as RemediationValues;
+        const remediator = new GenericRemediator(remediation, values);
+        expect(remediator.canRemediate()).toBe(true);
+      });
+
+      it('returns true for polling request', () => {
+        const remediation = IdxRemediationFactory.build({
+          name: 'challenge-poll',
+          action: jest.fn()
+        });
+        const values = {} as RemediationValues;
+        const remediator = new GenericRemediator(remediation, values);
+        expect(remediator.canRemediate()).toBe(true);
+      });
+
+      it('returns true when any input key can be found in values', () => {
+        const remediation = IdxRemediationFactory.build({
+          name: 'foo',
+          value: [
+            UsernameValueFactory.build(),
+          ],
+          action: jest.fn()
+        });
+        const values = {
+          identifier: 'fake-identifier',
+        } as RemediationValues;
+        const remediator = new GenericRemediator(remediation, values);
+        expect(remediator.canRemediate()).toBe(true);
+      });
+
+      it('returns false when no input key can be found in values', () => {
+        const remediation = IdxRemediationFactory.build({
+          name: 'foo',
+          value: [
+            UsernameValueFactory.build(),
+          ],
+          action: jest.fn()
+        });
+        const values = {} as RemediationValues;
+        const remediator = new GenericRemediator(remediation, values);
+        expect(remediator.canRemediate()).toBe(false);
+      });
+    });
+
+    // Re-enable when add client side validation in GenericRemediator - OKTA-512003
+    describe.skip('single level inputs', () => {
       let remediation;
       beforeAll(() => {
         remediation = IdxRemediationFactory.build({
@@ -51,7 +102,8 @@ describe('remediators/GenericRemediator', () => {
       });
     });
 
-    describe('nested inputs', () => {
+    // Re-enable when add client side validation in GenericRemediator - OKTA-512003
+    describe.skip('nested inputs', () => {
       let remediation;
       beforeAll(() => {
         remediation = IdxRemediationFactory.build({
@@ -64,6 +116,7 @@ describe('remediators/GenericRemediator', () => {
         });
       });
 
+      // eslint-disable-next-line  jasmine/no-spec-dupes
       it('can remediate when required fields have value', () => {
         const values = {
           identifier: 'fake-identifier',
@@ -75,6 +128,7 @@ describe('remediators/GenericRemediator', () => {
         expect(remediator.canRemediate()).toBe(true);
       });
 
+      // eslint-disable-next-line  jasmine/no-spec-dupes
       it('cannot remediate when required fields are missing', () => {
         let values, remediator;
         
