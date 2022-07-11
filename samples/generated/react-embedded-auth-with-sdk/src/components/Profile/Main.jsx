@@ -21,6 +21,7 @@ const Profile = () => {
   const { oktaAuth } = useOktaAuth();
   const { setTransaction: setIdxTransaction } = useIdxTransaction();
   const [error, setError] = useState(null);
+  const [corsError, setCorsError] = useState(null);
   const [approach, setApproach] = useState('');
   const [profile, setProfile] = useState(null);
   const [transaction, setTransaction] = useState(null);
@@ -74,39 +75,12 @@ const Profile = () => {
       setTransaction,
       challenge,
       setChallenge,
-      startReAuthentication
+      startReAuthentication,
+      corsError,
+      setCorsError
     }}>
       <Box id="profile-table" padding="s" borderColor="display" borderRadius="base">
-        <ProfileSection />
-
-        <Box borderColor="display" />
-
-        <Box display="flex" className="pure-g" padding="m">
-          <Box
-            className="pure-u-1 pure-u-sm-1-2"
-            paddingRight="s"
-            display="flex"
-            flexDirection="column"
-            marginTop="s"
-          >
-            <EmailSection />
-            <PhoneSection />
-          </Box>
-
-          <Box className="pure-u-1 pure-u-sm-1-2" marginTop="s">
-            <InfoBox
-              id="identifiers-tip"
-              heading="Tip"
-              icon="information-circle-filled"
-              renderInfo={() => (
-                <Text as="p">
-                  User identifiers are separated because changes require verification.
-                </Text>
-              )}
-            />
-          </Box>
-        </Box>
-
+        <MyAccountPanel corsError={corsError}/>
         {
           !!error && <Modal open={true}>
             <Form
@@ -145,10 +119,49 @@ const Profile = () => {
             </Form>
           </Modal>
         }
-
       </Box>
     </MyAccountContext.Provider>
   );
 };
+
+const MyAccountPanel = ({corsError}) => {
+  if (corsError) {
+    return (<p>Your Okta Org does not have the MyAccount API enabled</p>)
+  }
+
+  return (
+    <>
+      <ProfileSection />
+
+      <Box borderColor="display" />
+
+      <Box display="flex" className="pure-g" padding="m">
+        <Box
+          className="pure-u-1 pure-u-sm-1-2"
+          paddingRight="s"
+          display="flex"
+          flexDirection="column"
+          marginTop="s"
+        >
+          <EmailSection />
+          <PhoneSection />
+        </Box>
+
+        <Box className="pure-u-1 pure-u-sm-1-2" marginTop="s">
+          <InfoBox
+            id="identifiers-tip"
+            heading="Tip"
+            icon="information-circle-filled"
+            renderInfo={() => (
+              <Text as="p">
+                User identifiers are separated because changes require verification.
+              </Text>
+            )}
+          />
+        </Box>
+      </Box>
+    </>
+  );
+}
 
 export default Profile;

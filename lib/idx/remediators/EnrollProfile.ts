@@ -12,10 +12,10 @@
  */
 
 
-import { IdxRemediation, IdxRemediationValue } from '../types/idx-js';
+import { IdxRemediation, IdxRemediationValue, IdxAuthenticator } from '../types/idx-js';
 import { RemediateOptions } from '../../types';
 import { Remediator, RemediationValues } from './Base/Remediator';
-import { Authenticator, Credentials, getAuthenticator } from '../authenticator';
+import { Authenticator, Credentials, OktaPassword } from '../authenticator';
 
 export interface EnrollProfileValues extends RemediationValues {
   firstName?: string;
@@ -43,7 +43,7 @@ export class EnrollProfile extends Remediator<EnrollProfileValues> {
     // otherwise it will be omitted
     const credentials = this.getCredentialsFromRemediation();
     if (credentials) {
-      this.authenticator = getAuthenticator(remediation);
+      this.authenticator = this.authenticator = new OktaPassword({} as IdxAuthenticator);
     }
   }
 
