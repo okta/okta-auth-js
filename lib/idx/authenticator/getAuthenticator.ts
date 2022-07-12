@@ -6,11 +6,11 @@ import { SecurityQuestionEnrollment } from './SecurityQuestionEnrollment';
 import { SecurityQuestionVerification } from './SecurityQuestionVerification';
 import { WebauthnEnrollment } from './WebauthnEnrollment';
 import { WebauthnVerification } from './WebauthnVerification';
-import { IdxAuthenticator, IdxRemediation, IdxRemediationValue } from '../types/idx-js';
+import { IdxAuthenticator, IdxRemediation } from '../types/idx-js';
 import { AuthenticatorKey } from '../types';
 
 /* eslint complexity:[0,8] */
-export function getAuthenticator(remediation: IdxRemediation | IdxRemediationValue): Authenticator<any> {
+export function getAuthenticator(remediation: IdxRemediation): Authenticator<any> {
   const relatesTo = remediation.relatesTo;
   const value = relatesTo?.value || {} as IdxAuthenticator;
   switch (value.key) {
