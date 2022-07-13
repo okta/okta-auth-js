@@ -11,6 +11,8 @@
  *
  */
 export * from './endpoints';
+export * from './options';
+export * from './TokenManager';
 export * from './util';
 
 export { decodeToken } from './decodeToken';

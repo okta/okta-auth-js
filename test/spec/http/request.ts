@@ -19,7 +19,7 @@ import {
   DEFAULT_CACHE_DURATION, 
   AuthApiError, 
   STATE_TOKEN_KEY_NAME 
-} from '../../../lib';
+} from '../../../lib/exports/core';
 
 describe('HTTP Requestor', () => {
   let sdk;

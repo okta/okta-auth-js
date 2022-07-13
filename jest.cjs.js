@@ -12,8 +12,8 @@
 
 //Jest doc: https://jestjs.io/docs/ecmascript-modules
 
-const OktaAuth = '<rootDir>/build/cjs/index.js';
-const MyAccountEntry = '<rootDir>/build/cjs/myaccount/index.js';
+const OktaAuth = '<rootDir>/build/cjs/exports/default.js';
+const MyAccountEntry = '<rootDir>/build/cjs/exports/myaccount.js';
 
 module.exports = {
   'roots': [

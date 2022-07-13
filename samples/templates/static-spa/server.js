@@ -18,7 +18,7 @@ const path = require('path');
 
 const app = express();
 const port = '8080';
-const authJSAssets = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js')), '..', 'dist');
+const authJSAssets = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js/package.json')), 'build', 'dist');
 
 // preserves query parameters
 function redirectToOrigin(req, res, next) {

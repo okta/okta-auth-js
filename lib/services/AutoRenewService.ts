@@ -11,18 +11,17 @@
  */
 
 
-import { TokenManager } from '../TokenManager';
 import { AuthSdkError } from '../errors';
-import { ServiceInterface, ServiceManagerOptions, EVENT_EXPIRED } from '../types';
+import { ServiceInterface, ServiceManagerOptions, EVENT_EXPIRED, TokenManagerInterface } from '../types';
 import { isBrowser } from '../features';
 
 export class AutoRenewService implements ServiceInterface {
-  private tokenManager: TokenManager;
+  private tokenManager: TokenManagerInterface;
   private options: ServiceManagerOptions;
   private renewTimeQueue: Array<number>;
   private started = false;
 
-  constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
+  constructor(tokenManager: TokenManagerInterface, options: ServiceManagerOptions = {}) {
     this.tokenManager = tokenManager;
     this.options = options;
     this.renewTimeQueue = [];

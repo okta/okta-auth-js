@@ -1,9 +1,9 @@
+import { OktaAuth } from '@okta/okta-auth-js';
 import {
   getProfile,
   updateProfile,
   getProfileSchema
 } from '../../../lib/myaccount';
-import { OktaAuth } from '../../../lib';
 import {
   ProfileTransaction,
   ProfileSchemaTransaction

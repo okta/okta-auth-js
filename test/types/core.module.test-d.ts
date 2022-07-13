@@ -16,8 +16,9 @@ import {
   OktaAuthOptions,
   OktaAuthHttpInterface,
   HttpAPI,
-  StorageManager,
-  OktaUserAgent
+  OktaUserAgent,
+  OktaAuthCoreOptions,
+  CoreStorageManagerInterface
 } from '@okta/okta-auth-js/core';
 import { expectType, expectAssignable } from 'tsd';
 
@@ -26,9 +27,10 @@ const authClient = new OktaAuth(options);
 
 expectAssignable<OktaAuthHttpInterface>(authClient);
 
-expectType<OktaAuthOptions>(authClient.options);
+expectType<OktaAuthCoreOptions>(authClient.options);
+expectType<OktaAuthOptions>(authClient.options); // test alias
 expectType<HttpAPI>(authClient.http);
-expectType<StorageManager>(authClient.storageManager);
+expectType<CoreStorageManagerInterface>(authClient.storageManager);
 expectType<OktaUserAgent>(authClient._oktaUserAgent);
 
 expectType<string>(authClient.getIssuerOrigin());

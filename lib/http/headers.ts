@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { OktaAuthHttpInterface } from '../types';
+import { OktaAuthHttpInterface } from './types';
 
 export function setRequestHeader(authClient: OktaAuthHttpInterface, headerName, headerValue) {
   authClient.options.headers = authClient.options.headers || {};

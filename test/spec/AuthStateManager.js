@@ -13,7 +13,7 @@
 /* global window */
 
 import Emitter from 'tiny-emitter';
-import { AuthStateManager, INITIAL_AUTH_STATE } from '../../lib/AuthStateManager';
+import { AuthStateManager, INITIAL_AUTH_STATE } from '../../lib/core/AuthStateManager';
 import { AuthSdkError } from '../../lib/errors';
 import { BroadcastChannel } from 'broadcast-channel';
 import { OktaAuth } from '@okta/okta-auth-js';

@@ -10,7 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { renewTokens, AuthSdkError } from '../../../lib';
+import { renewTokens } from '../../../lib/oidc';
+import { AuthSdkError } from '../../../lib/errors';
 
 jest.mock('../../../lib/oidc/getWithoutPrompt', () => {
   return {

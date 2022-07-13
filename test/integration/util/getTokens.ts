@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 import waitFor from '@okta/test.support/waitFor';
-import { AuthnTransaction, CustomUrls, handleOAuthResponse } from '../../../lib';
-import { getWithRedirect } from '../../../lib/oidc';
+import { AuthnTransaction, CustomUrls } from '../../../lib/types';
+import { getWithRedirect, handleOAuthResponse } from '../../../lib/oidc';
 import { parseOAuthResponseFromUrl } from '../../../lib/oidc/parseFromUrl';
 
 function mockGetWithRedirect(client, testContext) {

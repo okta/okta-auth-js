@@ -11,7 +11,7 @@ import {
   signinAndGetTokens
 } from '../../util';
 import { EmailRole } from '../../../../lib/myaccount/types';
-import { AuthApiError } from '../../../../lib';
+import { AuthApiError } from '../../../../lib/errors';
 import { EmailTransaction } from '../../../../lib/myaccount/transactions';
 
 // TODO: generate dynamic profile with a18n api
