@@ -6,8 +6,10 @@ The [IDX API](./idx.md) is built on the [Okta Identity Engine](https://developer
 - [Introduction to IDX](#introduction-to-idx)
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
-- [New Methods](#new-methods)
 - [Transaction Model](#transaction-model)
+- [IDX Transaction](#idx-transaction)
+- [Implementing IDK](#implementing-idk)
+- [Authn to IDX Conversion Chart](#authn-to-idx-conversion-chart)
 - [Handling Errors](#handling-errors)
 - [Basic Example](#basic-example)
 - [Helpful Information and Resources](#helpful-information-and-resources)
@@ -103,8 +105,8 @@ const { status } = await authClient.idx.start({
 The primary goal of any IDX transaction is to authenticated a user. The `nextStep` field will contain the form necessary to continue on the current "path".
 
 ```
-start();                                  // nextStep: username
-proceed({username: 'user@foo.com'});      // nextStep: password
+start();                                  // nextStep.inputs: [username]
+proceed({username: 'user@foo.com'});      // nextStep.inputs: [password]
 proceed({password: '12345});
 ```
 
