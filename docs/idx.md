@@ -34,6 +34,7 @@
     - [`idx.authenticate`](#idxauthenticate)
     - [`idx.register`](#idxregister)
     - [`idx.recoverPassword`](#idxrecoverpassword)
+    - [`idx.unlockAccount`](#idxunlockaccount)
     - [`idx.start`](#idxstart)
     - [`idx.startTransaction`](#idxstarttransaction)
     - [`idx.cancel`](#idxcancel)
