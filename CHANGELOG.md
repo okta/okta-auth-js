@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.7.4
+
+### Fixes
+
+- [#1262](https://github.com/okta/okta-auth-js/pull/1262) Freezes `broadcast-channel` version at `4.13.0`, `4.14.0` requires node 14+
+
 ## 6.7.3
 
 - [#1264](https://github.com/okta/okta-auth-js/pull/1264) IDX GenericRemediator patches (beta):
