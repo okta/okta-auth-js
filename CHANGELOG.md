@@ -1,6 +1,11 @@
 # Changelog
 
-# 6.7.2
+## 6.7.3
+
+- [#1264](https://github.com/okta/okta-auth-js/pull/1264) IDX GenericRemediator patches (beta):
+  - allows proceeding when `options.step` is available
+
+## 6.7.2
 
 ### Fixes
 
