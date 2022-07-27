@@ -2028,7 +2028,7 @@ describe('idx/authenticate', () => {
           expect(enrollmentChannelDataSmsResponse.proceed).toHaveBeenCalled();
         });
 
-        it('can get Okta Verify link via SMS (proceed via authenticator)', async () => {
+        xit('can get Okta Verify link via SMS (proceed via authenticator)', async () => {
           const {
             authClient,
             selectAuthenticatorResponse,
