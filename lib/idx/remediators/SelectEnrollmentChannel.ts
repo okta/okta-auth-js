@@ -26,18 +26,20 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
   static remediationName = 'select-enrollment-channel';
 
   canRemediate() {
-    if (this.values.channel) {
-      return true;
-    }
+    return Boolean(this.values.channel);
 
-    if (this.values.authenticator) {
-      const { id, channel } = this.values.authenticator as Authenticator;
-      if (!!id && !!channel) {
-        return true;
-      }
-    }
+    // if (this.values.channel) {
+    //   return true;
+    // }
 
-    return false;
+    // if (this.values.authenticator) {
+    //   const { id, channel } = this.values.authenticator as Authenticator;
+    //   if (!!id && !!channel) {
+    //     return true;
+    //   }
+    // }
+
+    // return false;
   }
 
   getNextStep(authClient: OktaAuthIdxInterface, context: IdxContext) {
@@ -59,10 +61,10 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
   }
 
   getData() {
-    if (this.values.authenticator) {
-      const { stateHandle, authenticator } = this.values;
-      return { stateHandle, authenticator };
-    }
+    // if (this.values.authenticator) {
+    //   const { stateHandle, authenticator } = this.values;
+    //   return { stateHandle, authenticator };
+    // }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const remediationValue = this.remediation!.value![0].value as IdxRemediationValueForm;
