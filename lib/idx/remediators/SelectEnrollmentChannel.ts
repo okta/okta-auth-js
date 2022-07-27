@@ -26,7 +26,6 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
   static remediationName = 'select-enrollment-channel';
 
   canRemediate() {
-    // return Boolean(this.values.channel);
     if (this.values.channel) {
       return true;
     }
