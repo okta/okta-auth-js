@@ -22,14 +22,14 @@ describe('remediators/GenericRemediator', () => {
 
   describe('Override canRemediate', () => {
     describe('server side validation', () => {
-      it('returns true when no inputs', () => {
+      it('returns true when step is specified in options', () => {
         const remediation = IdxRemediationFactory.build({
           name: 'foo',
           value: [],
           action: jest.fn()
         });
         const values = {} as RemediationValues;
-        const remediator = new GenericRemediator(remediation, values);
+        const remediator = new GenericRemediator(remediation, values, { step: 'foo' });
         expect(remediator.canRemediate()).toBe(true);
       });
 
@@ -43,22 +43,7 @@ describe('remediators/GenericRemediator', () => {
         expect(remediator.canRemediate()).toBe(true);
       });
 
-      it('returns true when any input key can be found in values', () => {
-        const remediation = IdxRemediationFactory.build({
-          name: 'foo',
-          value: [
-            UsernameValueFactory.build(),
-          ],
-          action: jest.fn()
-        });
-        const values = {
-          identifier: 'fake-identifier',
-        } as RemediationValues;
-        const remediator = new GenericRemediator(remediation, values);
-        expect(remediator.canRemediate()).toBe(true);
-      });
-
-      it('returns false when no input key can be found in values', () => {
+      it('returns false by default', () => {
         const remediation = IdxRemediationFactory.build({
           name: 'foo',
           value: [
