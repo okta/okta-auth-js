@@ -20,16 +20,13 @@ export class GenericRemediator extends Remediator {
     if (this.remediation.name === 'poll' || this.remediation.name.endsWith('-poll')) {
       return true;
     }
-    
-    const inputKeys = this.getInputs().map(({ name }) => name);
 
-    if (!inputKeys.length) {
+    if (this.options.step) {
       return true;
     }
-
-    return Object.keys(this.values).reduce((acc: boolean, curr) => {
-      return acc || inputKeys.includes(curr);
-    }, false);
+    
+    // disable auto proceed for unknown remediations
+    return false;
   }
 
   getData() {
