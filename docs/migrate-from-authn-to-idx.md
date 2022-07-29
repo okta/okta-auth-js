@@ -16,7 +16,7 @@ The [IDX API](./idx.md) is built on the [Okta Identity Engine](https://developer
 
 ## Introduction to IDX
 
-The IDX API is designed to enable login experiences, like the Okta [SignIn Widget](#https://github.com/okta/okta-signin-widget). IDX is a brand new protocol and behaves differently than the traditional `authn` API. IDX pairs very well with dynamic-rendered or templated UI frameworks like React, Angular or even JSPs. Each IDX response describes a form, prompting the user for the inputs needed to proceed to the next step in the authentication flow. For example:
+The IDX API is designed to enable dynamic login experiences, like the Okta [SignIn Widget](#https://github.com/okta/okta-signin-widget). IDX is a brand new protocol and enables more authentication flows than the traditional `authn` API. IDX pairs very well with dynamic-rendered or templated UI frameworks like React, Angular or even JSPs. Each IDX response describes a form, prompting the user for the inputs needed to proceed to the next step in the authentication flow. For example:
 
 ```javascript
 const { nextStep } = await idx.start();
@@ -25,7 +25,7 @@ const { status } = await idx.proceed({username: 'foo', password: 'bar'});
 // status = IdxStatus.SUCCESS
 ```
   
-> The `authn` API is still supported. IDX is _not_ a drop-in replacement for `authn`. It's a more sophisticated protocol. Both APIs can be used to build authencation flows. However if you're looking to ultitize features of [OIE](https://developer.okta.com/docs/concepts/ie-intro/), like passwordless authentication, you'll have to build on top of IDX
+> The `authn` API is still supported. IDX is _not_ a drop-in replacement for `authn`. It's a more sophisticated protocol. Either API can be used to build authencation flows. However if you're looking to ultitize features of [OIE](https://developer.okta.com/docs/concepts/ie-intro/), like passwordless authentication, you'll have to build on top of IDX
 
 ## Getting Started
 
