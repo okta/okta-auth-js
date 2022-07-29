@@ -31,7 +31,7 @@ import {
 } from '../types';
 import { IdxMessage, IdxResponse, isIdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
-import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
+import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isSessionExpiredError, isTerminalResponse } from './util';
 declare interface RunData {
   options: RunOptions;
   values: remediators.RemediationValues;
@@ -261,16 +261,25 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
     const isTerminalSuccess = !hasActions && !hasErrors && idxResponse!.requestDidSucceed === true;
     if (isTerminalSuccess) {
       shouldClearTransaction = true;
-    } else {
+    }
+    else {
       // only save response if there are actions available (ignore messages)
       shouldSaveResponse = shouldSaveResponse && hasActions;
     }
     // leave shared storage intact so the transaction can be continued in another tab
     clearSharedStorage = false;
-  } else if (canceled) {
+
+    if (isSessionExpiredError(idxResponse!)) {
+      shouldSaveResponse = false;
+      clearSharedStorage = true;
+      shouldClearTransaction = true;
+    }
+  } 
+  else if (canceled) {
     status = IdxStatus.CANCELED;
     shouldClearTransaction = true;
-  } else if (idxResponse?.interactionCode) { 
+  } 
+  else if (idxResponse?.interactionCode) { 
     interactionCode = idxResponse.interactionCode;
     if (exchangeCodeForTokens === false) {
       status = IdxStatus.SUCCESS;
@@ -281,6 +290,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
       shouldClearTransaction = true;
     }
   }
+
   return {
     ...data,
     status,

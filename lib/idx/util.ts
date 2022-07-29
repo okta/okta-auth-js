@@ -11,6 +11,11 @@ export function isTerminalResponse(idxResponse: IdxResponse) {
   return !neededToProceed.length && !interactionCode;
 }
 
+export function isSessionExpiredError(idxResponse: IdxResponse) {
+  const errorI18NKey = idxResponse?.context?.messages?.value[0]?.i18n?.key;
+  return errorI18NKey && errorI18NKey === 'idx.session.expired';
+}
+
 export function canSkipFn(idxResponse: IdxResponse) {
   return idxResponse.neededToProceed.some(({ name }) => name === 'skip');
 }
