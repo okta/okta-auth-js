@@ -72,7 +72,10 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
   }
 
   getValuesAfterProceed(): SelectEnrollmentChannelValues {
-    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'channel');
+    this.values = super.getValuesAfterProceed();
+    delete this.values.authenticators;    // required to prevent infinite loops from auto-remediating via values
+    const filterKey = this.values.channel ? 'channel' : 'authenticator';
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== filterKey);
     return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
   }
 }
