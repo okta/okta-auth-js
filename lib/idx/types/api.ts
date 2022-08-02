@@ -119,6 +119,7 @@ export type Authenticator = {
   key?: string;
   methodType?: string;
   phoneNumber?: string;
+  channel?: string;
 };
 
 export function isAuthenticator(obj: any): obj is Authenticator {
