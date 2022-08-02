@@ -2066,7 +2066,6 @@ describe('idx/authenticate', () => {
           });
 
           res = await proceed(authClient, {
-            // channel: 'phoneNumber'
             authenticator: {
               id: 'string',
               channel: 'phoneNumber'
@@ -2090,7 +2089,10 @@ describe('idx/authenticate', () => {
             phoneNumber: '+1234'
           });
 
-          expect(enrollmentChannelDataSmsResponse.proceed).toHaveBeenCalled();
+          expect(enrollmentChannelDataSmsResponse.proceed).toHaveBeenCalledWith(
+            'enrollment-channel-data',
+            expect.objectContaining({ phoneNumber: '+1234' })
+          );
         });
       });
     });
