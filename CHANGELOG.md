@@ -5,6 +5,11 @@
 ### Other
 
 - [#1243](https://github.com/okta/okta-auth-js/pull/1243) Adds export of `./polyfill` in package.json
+## 6.7.4
+
+### Fixes
+- [#1263](https://github.com/okta/okta-auth-js/pull/1263) (IDX) `select-enrollment-channel` remediation now accepts protocol defined inputs, as well as conveniences
+- [#1262](https://github.com/okta/okta-auth-js/pull/1262) Freezes `broadcast-channel` version at `4.13.0`, `4.14.0` requires node 14+
 
 ## 6.7.3
 

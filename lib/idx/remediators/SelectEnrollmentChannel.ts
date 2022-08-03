@@ -13,6 +13,7 @@
 
 import { Remediator, RemediationValues } from './Base/Remediator';
 import { IdxRemediationValueForm, IdxOption, IdxRemediationValue, IdxContext } from '../types/idx-js';
+import { Authenticator } from '../types';
 import { getAuthenticatorFromRemediation } from './util';
 import { OktaAuthIdxInterface } from '../../types';
 
@@ -25,7 +26,18 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
   static remediationName = 'select-enrollment-channel';
 
   canRemediate() {
-    return Boolean(this.values.channel);
+    if (this.values.channel) {
+      return true;
+    }
+
+    if (this.values.authenticator) {
+      const { id, channel } = this.values.authenticator as Authenticator;
+      if (!!id && !!channel) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   getNextStep(authClient: OktaAuthIdxInterface, context: IdxContext) {
@@ -52,7 +64,7 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
     return {
       authenticator: {
         id: remediationValue.form.value[0].value,
-        channel: this.values.channel,
+        channel: (this.values.authenticator as Authenticator)?.channel || this.values.channel,
       },
       stateHandle: this.values.stateHandle,
 
@@ -60,7 +72,10 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
   }
 
   getValuesAfterProceed(): SelectEnrollmentChannelValues {
-    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== 'channel');
+    this.values = super.getValuesAfterProceed();
+    delete this.values.authenticators;    // required to prevent infinite loops from auto-remediating via values
+    const filterKey = this.values.channel ? 'channel' : 'authenticator';
+    let trimmedValues = Object.keys(this.values).filter(valueKey => valueKey !== filterKey);
     return trimmedValues.reduce((values, valueKey) => ({...values, [valueKey]: this.values[valueKey]}), {});
   }
 }
