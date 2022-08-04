@@ -123,6 +123,10 @@ export interface IdxRemediationValue {
   messages?: IdxMessages;
   minLength?: number;
   maxLength?: number;
+  relatesTo?: {
+    type?: string;
+    value: IdxAuthenticator;
+  };
 }
 
 export interface IdxRemediation {

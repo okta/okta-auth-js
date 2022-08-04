@@ -16,7 +16,7 @@ import { useMyAccountContext } from '../../contexts';
 
 const ProfileSection = () => {
   const { oktaAuth } = useOktaAuth();
-  const { profile, setProfile, startReAuthentication } = useMyAccountContext();
+  const { profile, setProfile, startReAuthentication, setCorsError } = useMyAccountContext();
   const [inputs, setInputs] = useState([
     { label: 'Given name', name: 'firstName', type: 'text', value: '' },
     { label: 'Family name', name: 'lastName', type: 'text', value: '' },
@@ -31,8 +31,19 @@ const ProfileSection = () => {
       return;
     }
     const fetchProfile = async () => {
-      const profile = await getProfile(oktaAuth);
-      setProfile(profile.profile);
+      try {
+        const profile = await getProfile(oktaAuth);
+        setProfile(profile.profile);
+      }
+      catch(err) {
+        // xhr will be empty when /myaccount returns CORs error
+        if (err.xhr && Object.keys(err.xhr).length === 0) {
+          setCorsError(err);
+          return;
+        }
+
+        throw err;
+      }
     };
     if (!profile) {
       fetchProfile();

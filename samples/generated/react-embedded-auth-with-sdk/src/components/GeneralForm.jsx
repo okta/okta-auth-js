@@ -33,10 +33,17 @@ const GeneralForm = () => {
     e.preventDefault();
 
     setProcessing(true);
-    const newTransaction = await oktaAuth.idx.proceed(inputValues);
-    setTransaction(newTransaction);
-    setInputValues({});
-    setProcessing(false);
+    try {
+      const newTransaction = await oktaAuth.idx.proceed(inputValues);
+      setTransaction(newTransaction);
+      setInputValues({});
+    }
+    catch (err) {
+      console.log(err);
+    }
+    finally {
+      setProcessing(false);
+    }
   };
 
   const handleSkip = async () => {

@@ -25,7 +25,7 @@
                 <div class="ui label">
                   {{label}}
                 </div>
-                <input id={{name}} type="text" name="{{name}}" />
+                <input id={{name}} name="{{name}}" type="{{#secret}}password{{/secret}}{{^secret}}text{{/secret}}" />
               </div>
             </div>
           {{/inputs}}

@@ -56,6 +56,8 @@ import {
   OktaVerifyAuthenticatorOptionFactory, EnrollmentChannelDataEmailRemediationFactory, EnrollmentChannelDataSmsRemediationFactory,
   WebauthnAuthenticatorOptionFactory,
   EnrollWebauthnAuthenticatorRemediationFactory,
+  SelectIdentifyRemediationFactory,
+  EnrollProfileWithPasswordRemediationFactory
 } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
@@ -474,6 +476,162 @@ describe('idx/register', () => {
             value: AuthenticatorKey.OKTA_PASSWORD
           }]
         },
+      });
+    });
+
+    describe('ssr with password (single form)', () => {
+      beforeEach(() => {
+        const enrollWithPasswordResponse = IdxResponseFactory.build({
+          neededToProceed: [
+            EnrollProfileWithPasswordRemediationFactory.build(),
+            SelectIdentifyRemediationFactory.build()
+          ]
+        });
+
+        testContext.enrollWithPasswordResponse = enrollWithPasswordResponse;
+      });
+
+      it('up front (credentials)', async () => {
+        const {
+          authClient,
+          identifyResponse,
+          enrollWithPasswordResponse,
+          selectAuthenticatorResponse
+        } = testContext;
+
+        chainResponses([
+          identifyResponse,
+          enrollWithPasswordResponse,
+          selectAuthenticatorResponse
+        ]);
+        jest.spyOn(identifyResponse, 'proceed');
+        jest.spyOn(enrollWithPasswordResponse, 'proceed');
+        jest.spyOn(mocked.introspect, 'introspect')
+          .mockResolvedValueOnce(identifyResponse);
+
+        let res = await register(authClient, {
+          firstName: 'Bob',
+          lastName: 'Vance',
+          email: 'bob@vancerefrigeration.com',
+          credentials: {
+            passcode: '12345'
+          }
+        });
+
+        expect(identifyResponse.proceed).toHaveBeenCalledWith('select-enroll-profile', { });
+        expect(enrollWithPasswordResponse.proceed).toHaveBeenCalledWith('enroll-profile', {
+          userProfile: {
+            email: 'bob@vancerefrigeration.com',
+            firstName: 'Bob',
+            lastName: 'Vance'
+          },
+          credentials: {
+            passcode: '12345'
+          }
+        });
+        expect(res).toMatchObject({
+          status: IdxStatus.PENDING,
+          nextStep: {
+            name: 'select-authenticator-enroll'
+          }
+        });
+      });
+
+      it('up front (password)', async () => {
+        const {
+          authClient,
+          identifyResponse,
+          enrollWithPasswordResponse,
+          selectAuthenticatorResponse
+        } = testContext;
+
+        chainResponses([
+          identifyResponse,
+          enrollWithPasswordResponse,
+          selectAuthenticatorResponse
+        ]);
+        jest.spyOn(identifyResponse, 'proceed');
+        jest.spyOn(enrollWithPasswordResponse, 'proceed');
+        jest.spyOn(mocked.introspect, 'introspect')
+          .mockResolvedValueOnce(identifyResponse);
+
+        let res = await register(authClient, {
+          firstName: 'Bob',
+          lastName: 'Vance',
+          email: 'bob@vancerefrigeration.com',
+          password: '12345'
+        });
+
+        expect(identifyResponse.proceed).toHaveBeenCalledWith('select-enroll-profile', { });
+        expect(enrollWithPasswordResponse.proceed).toHaveBeenCalledWith('enroll-profile', {
+          userProfile: {
+            email: 'bob@vancerefrigeration.com',
+            firstName: 'Bob',
+            lastName: 'Vance'
+          },
+          credentials: {
+            passcode: '12345'
+          }
+        });
+        expect(res).toMatchObject({
+          status: IdxStatus.PENDING,
+          nextStep: {
+            name: 'select-authenticator-enroll'
+          }
+        });
+      });
+
+      it('on demand', async () => {
+        const {
+          authClient,
+          identifyResponse,
+          enrollWithPasswordResponse,
+          selectAuthenticatorResponse
+        } = testContext;
+
+        chainResponses([
+          identifyResponse,
+          enrollWithPasswordResponse,
+          selectAuthenticatorResponse
+        ]);
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(identifyResponse);
+        jest.spyOn(identifyResponse, 'proceed');
+        jest.spyOn(enrollWithPasswordResponse, 'proceed');
+
+        let res = await register(authClient, {});
+        expect(identifyResponse.proceed).toHaveBeenCalledWith('select-enroll-profile', { });
+        expect(res).toMatchObject({
+          status: IdxStatus.PENDING,
+          nextStep: {
+            name: 'enroll-profile',
+          }
+        });
+
+        const inputValues = {
+          firstName: 'Bob',
+          lastName: 'Vance',
+          email: 'bob@vancerefrigeration.com',
+          password: '12345'
+        };
+        jest.spyOn(mocked.introspect, 'introspect').mockResolvedValueOnce(enrollWithPasswordResponse);
+        res = await register(authClient, inputValues);
+
+        expect(enrollWithPasswordResponse.proceed).toHaveBeenCalledWith('enroll-profile', {
+          userProfile: {
+            email: 'bob@vancerefrigeration.com',
+            firstName: 'Bob',
+            lastName: 'Vance'
+          },
+          credentials: {
+            passcode: '12345'
+          }
+        });
+        expect(res).toMatchObject({
+          status: IdxStatus.PENDING,
+          nextStep: {
+            name: 'select-authenticator-enroll'
+          }
+        });
       });
     });
   });
