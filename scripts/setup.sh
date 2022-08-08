@@ -10,7 +10,7 @@ export PATH="${PATH}:$(yarn global bin)"
 
 # Install required node version
 export NVM_DIR="/root/.nvm"
-NODE_VERSION="${1:-v12.22.0}"
+NODE_VERSION="${1:-v14.18.0}"
 setup_service node $NODE_VERSION
 # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
 setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
@@ -34,6 +34,14 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
+
+# Prebuild of microtime requires a version of gcc with support for CXXABI_1.3.8
+# Amazon Linux 2 used in Bacon has old version of gcc, so don't use prebuild, build instead
+cd ./node_modules/microtime
+rm -rf ./prebuilds
+yum install -y python3
+yarn
+cd ../..
 
 # Build
 if ! yarn build; then

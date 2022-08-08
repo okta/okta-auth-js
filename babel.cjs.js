@@ -6,7 +6,7 @@ module.exports = {
     [
       '@babel/preset-env', {
       'targets': {
-        'node': 11
+        'node': 14
       },
       'modules': 'commonjs'
     }

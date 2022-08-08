@@ -118,8 +118,8 @@ module.exports = {
           'devDependencies': false
         }],
         'node/no-unsupported-features/es-builtins': ['error', {
-          // features that are not supported before v12 are transformed in babel.cjs.js for commonjs output
-          version: '>=12.0.0'
+          // features that are not supported before v14 are transformed in babel.cjs.js for commonjs output
+          version: '>=14.0.0'
         }],
         'import/no-commonjs': 'error',
         "jsdoc/check-tag-names": 0
