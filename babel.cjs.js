@@ -6,7 +6,7 @@ module.exports = {
     [
       '@babel/preset-env', {
       'targets': {
-        'node': 14
+        'node': true
       },
       'modules': 'commonjs'
     }
@@ -16,7 +16,7 @@ module.exports = {
     '@babel/plugin-proposal-class-properties',
     // https://babeljs.io/docs/en/babel-plugin-transform-runtime#corejs
     ['@babel/plugin-transform-runtime', {
-      corejs: 3
+      corejs: false
     }],
     ['@babel/plugin-transform-modules-commonjs', {
       'strict': true,

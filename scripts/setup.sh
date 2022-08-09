@@ -35,8 +35,9 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
   exit ${FAILED_SETUP}
 fi
 
-# Prebuild of microtime requires a version of gcc with support for CXXABI_1.3.8
-# Amazon Linux 2 used in Bacon has old version of gcc, so don't use prebuild, build instead
+# Prebuild of `microtime` requires a version of GCC with support for CXXABI_1.3.8
+# Bacon uses Amazon Linux 2 with old version of GCC which causes error
+# To fix this, don't use prebuild of `microtime`, build instead
 cd ./node_modules/microtime
 rm -rf ./prebuilds
 yum install -y python3
