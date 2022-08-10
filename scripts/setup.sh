@@ -29,17 +29,11 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
 fi
 
-# Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
-if ! yarn install --frozen-lockfile --ignore-scripts; then
+# Install dependences
+if ! yarn install --frozen-lockfile; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
-
-# microtime was not built due to `--ignore-scripts` flag, build it manually
-cd ./node_modules/microtime
-yum install -y python3
-yarn
-cd ../..
 
 # Build
 if ! yarn build; then
