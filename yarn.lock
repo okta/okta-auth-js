@@ -3859,7 +3859,7 @@ broadcast-channel@^4.10.0:
     rimraf "3.0.2"
     unload "2.3.1"
 
-broadcast-channel@^4.14.0:
+broadcast-channel@~4.14.0:
   version "4.14.0"
   resolved "https://registry.yarnpkg.com/broadcast-channel/-/broadcast-channel-4.14.0.tgz#cd2ce466128130ec3a93f7c1f1ed01d658575e35"
   integrity sha512-uNzxOgBQ+boWCRDESLNg3zZWQ3iz/X7j/uD8pAfr4/S7wQerXVvJI/SBKd9J6ckaPt2jil0gq+7l+3b+kuxJYw==

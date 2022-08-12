@@ -154,7 +154,7 @@
     "@peculiar/webcrypto": "^1.4.0",
     "Base64": "1.1.0",
     "atob": "^2.1.2",
-    "broadcast-channel": "^4.14.0",
+    "broadcast-channel": "~4.14.0",
     "btoa": "^1.2.1",
     "core-js": "^3.6.5",
     "cross-fetch": "^3.1.5",
