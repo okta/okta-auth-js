@@ -89,7 +89,6 @@ export type NextStep = {
   canSkip?: boolean;
   canResend?: boolean;
   inputs?: Input[];
-  options?: IdxOption[];
   poll?: IdxPollOptions;
   authenticatorEnrollments?: IdxAuthenticator[];
   // eslint-disable-next-line no-use-before-define

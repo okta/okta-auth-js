@@ -65,21 +65,6 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     return false;
   }
 
-  // TODO: remove this override method in the next major version - OKTA-491236
-  getNextStep(authClient: OktaAuthIdxInterface) {
-    const common = super.getNextStep(authClient);
-    const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
-    const options = authenticatorFromRemediation.options!.map(option => {
-      const { 
-        label, 
-        relatesTo
-      } = option as IdxOption;
-      const key = relatesTo!.key!;
-      return { label, value: key };
-    });
-    return { ...common, options };
-  }
-
   mapAuthenticator(remediationValue: IdxRemediationValue) {
     const { authenticators, authenticator } = this.values;
 

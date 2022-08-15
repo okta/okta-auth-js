@@ -62,16 +62,6 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
       .some(data => compareAuthenticators(this.authenticator, data));
   }
 
-  // TODO: remove this override method in the next major version - OKTA-491236
-  getNextStep(authClient: OktaAuthIdxInterface) {
-    const common = super.getNextStep(authClient);
-    const options = this.getMethodTypes();
-    return { 
-      ...common, 
-      ...(options && { options }) 
-    };
-  }
-
   protected mapAuthenticatorDataFromValues(authenticatorData?) {
     // add methodType to authenticatorData if it exists in values
     let { methodType, authenticator } = this.values;

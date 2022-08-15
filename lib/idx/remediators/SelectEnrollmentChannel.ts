@@ -46,8 +46,6 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
     const authenticator = context.currentAuthenticator.value;
     return {
       ...common,
-      // TODO: remove options field in the next major version - OKTA-491236
-      ...(options && { options }),
       authenticator,
     };
   }
