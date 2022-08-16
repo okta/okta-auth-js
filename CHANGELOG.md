@@ -5,6 +5,14 @@
 ### Other
 
 - [#1243](https://github.com/okta/okta-auth-js/pull/1243) Adds export of `./polyfill` in package.json
+
+## 6.7.5
+
+### Fixes
+- [#1269](https://github.com/okta/okta-auth-js/pull/1269) Fixes ESM exports
+  - Adds `default` export under `./browser` to support `Jest@28.1+`
+  - Adds work-around for webpack/webpack#13457 to support Module Federation (with ESM bundles)
+
 ## 6.7.4
 
 ### Fixes
