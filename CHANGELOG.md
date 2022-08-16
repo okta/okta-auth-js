@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 - [#1181](https://github.com/okta/okta-auth-js/pull/1181) - Removes legacy PKCE/OAuth storage
+- [#1272](https://github.com/okta/okta-auth-js/pull/1272) Consolidates top level idx specific options into options.idx scope
 
 
 ## 6.8.0
