@@ -26,8 +26,9 @@ const router = express.Router();
 // Handle select-authenticator
 router.get('/select-authenticator', (req, res) => {
   const { 
-    idx: { nextStep: { options, canSkip } }
+    idx: { nextStep: { inputs, canSkip } }
   } = req.getFlowStates();
+  const { options } = inputs[0];
   renderPage({ 
     req, res,
     render: () => renderTemplate(req, res, 'select-authenticator', {
@@ -172,8 +173,9 @@ router.post('/enroll-authenticator/okta_password', async (req, res, next) => {
 // Handle phone authenticator
 router.get('/verify-authenticator/phone_number', (req, res) => {
   const { 
-    idx: { nextStep: { options } } 
+    idx: { nextStep: { inputs } } 
   } = req.getFlowStates();
+  const { options } = inputs[0];
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'verify-phone', {
@@ -225,8 +227,9 @@ router.post('/challenge-authenticator/resend', async (req, res, next) => {
 
 router.get('/enroll-authenticator/phone_number/enrollment-data', (req, res) => {
   const { 
-    idx: { nextStep: { options } } 
+    idx: { nextStep: { inputs } } 
   } = req.getFlowStates();
+  const { options } = inputs[0];
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'phone-enrollment-data', {
@@ -277,8 +280,9 @@ router.post('/enroll-authenticator/phone_number', async (req, res, next) => {
 router.get('/enroll-authenticator/:authenticator/select-enrollment-channel', async (req, res) => {
   const authenticator = req.params.authenticator;
   const {
-    idx: { nextStep: { options } }
+    idx: { nextStep: { inputs } }
   } = req.getFlowStates();
+  const { options } = inputs[0];
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'select-enrollment-channel', {
@@ -413,8 +417,9 @@ router.post('/poll-authenticator/:authenticator', async (req, res) => {
 // Handle Okta Verify authenticator
 router.get('/verify-authenticator/okta_verify', (req, res) => {
   const {
-    idx: { nextStep: { options } }
+    idx: { nextStep: { inputs } }
   } = req.getFlowStates();
+  const { options } = inputs[0];
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'verify-phone', {
