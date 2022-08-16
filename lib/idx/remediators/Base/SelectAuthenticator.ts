@@ -14,10 +14,9 @@
 
 import { Remediator, RemediationValues } from './Remediator';
 import { getAuthenticatorFromRemediation } from '../util';
-import { IdxOption, IdxRemediationValue } from '../../types/idx-js';
+import { IdxRemediationValue } from '../../types/idx-js';
 import { Authenticator, isAuthenticator } from '../../types';
 import { compareAuthenticators, findMatchedOption} from '../../authenticator/util';
-import { OktaAuthIdxInterface } from '../../../types';
 
 export type SelectAuthenticatorValues = RemediationValues & {
   authenticator?: string | Authenticator;

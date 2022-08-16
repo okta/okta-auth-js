@@ -16,7 +16,6 @@ import { Remediator, RemediationValues } from './Remediator';
 import { IdxRemediationValue, IdxOption, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
 import { isAuthenticator } from '../../types';
 import { compareAuthenticators } from '../../authenticator/util';
-import { OktaAuthIdxInterface } from '../../../types';
 
 export type AuthenticatorDataValues = RemediationValues & {
   methodType?: string;
