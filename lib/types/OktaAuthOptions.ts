@@ -15,7 +15,7 @@ import { CookieOptions } from './Cookies';
 import { HttpRequestClient, RequestOptions } from './http';
 import { AuthState } from './AuthState';
 import { TransactionManagerOptions } from './Transaction';
-import { IdxTransactionMeta, RunOptions } from '../idx/types';
+import { RunOptions } from '../idx/types';
 import { ServiceManagerOptions } from './Service';
 import OktaAuth from '../OktaAuth';
 import { OAuthResponseMode, OAuthResponseType } from './OAuth';
@@ -88,11 +88,6 @@ export interface OktaAuthOptions extends
     'ignoreSignature' |
     'codeChallenge' |
     'codeChallengeMethod'
-  >,
-  Pick<IdxTransactionMeta,
-    'flow' |
-    'activationToken' |
-    'recoveryToken'
   >
 {
   ignoreLifetime?: boolean;
@@ -112,10 +107,15 @@ export interface OktaAuthOptions extends
   storageManager?: StorageManagerOptions;
   services?: ServiceManagerOptions;
   transactionManager?: TransactionManagerOptions;
-  // BETA WARNING: configs in this section are subject to change without a breaking change notice
+  /** 
+   * @beta configs in this section are subject to change without a breaking change notice 
+   */
   idx?: Pick<RunOptions,
     'useGenericRemediator' |
-    'exchangeCodeForTokens'
+    'exchangeCodeForTokens' |
+    'flow' |
+    'activationToken' |
+    'recoveryToken'
   >;
   
   // For server-side web applications ONLY!

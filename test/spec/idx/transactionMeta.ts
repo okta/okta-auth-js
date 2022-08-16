@@ -50,7 +50,8 @@ describe('idx/transactionMeta', () => {
     const authParams = {
       issuer,
       redirectUri,
-      clientId
+      clientId,
+      idx: {},
     };
     const authClient = {
       options: authParams,
@@ -91,7 +92,7 @@ describe('idx/transactionMeta', () => {
     it('saves the configured flow', async () => {
       const { authClient } = testContext;
       const flow = 'fake';
-      authClient.options.flow = flow;
+      authClient.options.idx.flow = flow;
       const res = await createTransactionMeta(authClient);
       expect(res.flow).toBe(flow);
     });

@@ -289,10 +289,10 @@ class OktaAuth extends BaseClass implements OktaAuthInterface, SigninAPI, Signou
       clearTransactionMeta: clearTransactionMeta.bind(null, this),
       isTransactionMetaValid,
       setFlow: (flow: FlowIdentifier) => {
-        this.options.flow = flow;
+        this.options.idx!.flow = flow;
       },
       getFlow: (): FlowIdentifier | undefined => {
-        return this.options.flow;
+        return this.options.idx!.flow;
       },
       canProceed: canProceed.bind(null, this),
       unlockAccount: unlockAccount.bind(null, this),

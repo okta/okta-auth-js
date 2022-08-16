@@ -28,7 +28,7 @@ export async function createTransactionMeta(
     activationToken = undefined,
     recoveryToken = undefined,
     maxAge = undefined,
-  } = { ...authClient.options, ...options }; // local options override SDK options
+  } = { ...authClient.options.idx, ...options }; // local options override SDK options
 
   const meta: IdxTransactionMeta = {
     ...pkceMeta,
@@ -55,7 +55,11 @@ export function getSavedTransactionMeta(
   options?: TransactionMetaOptions
 ): IdxTransactionMeta | undefined {
   options = removeNils(options);
-  options = { ...authClient.options, ...options }; // local options override SDK options
+  options = { 
+    ...authClient.options, 
+    ...authClient.options.idx, 
+    ...options,
+  }; // local options override SDK options
   let savedMeta;
   try {
     savedMeta = authClient.transactionManager.load(options) as IdxTransactionMeta;
@@ -84,7 +88,7 @@ export async function getTransactionMeta(
   options?: TransactionMetaOptions
 ): Promise<IdxTransactionMeta> {
   options = removeNils(options);
-  options = { ...authClient.options, ...options }; // local options override SDK options
+  options = { ...authClient.options.idx, ...options }; // local options override SDK options
   // Load existing transaction meta from storage
   const validExistingMeta = getSavedTransactionMeta(authClient, options);
   if (validExistingMeta) {
