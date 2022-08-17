@@ -5,6 +5,7 @@
 ### Other
 
 - [#1243](https://github.com/okta/okta-auth-js/pull/1243) Adds export of `./polyfill` in package.json
+- [#1276](https://github.com/okta/okta-auth-js/pull/1276) Support custom URL scheme in `isAbsoluteUrl`
 
 ## 6.7.5
 
