@@ -11,7 +11,7 @@
  */
 
 
-import PromiseQueue from '../../lib/PromiseQueue';
+import { PromiseQueue } from '../../lib/util/PromiseQueue';
 
 describe('PromiseQueue', () => {
   var promiseQueue;

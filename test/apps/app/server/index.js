@@ -22,7 +22,7 @@ const renderWidget = require('./renderWidget');
 
 const path = require('path');
 const SIW_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-signin-widget')), '..');
-const AUTH_JS_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js')), '..', 'dist');
+const AUTH_JS_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js/package.json')), 'build', 'dist');
 
 const express = require('express');
 const webpack = require('webpack');

@@ -15,11 +15,7 @@ import { OktaAuthIdxInterface } from '../types';
 
 import CustomError from '../errors/CustomError';
 import { urlParamsToObject  } from '../oidc/util/urlParams';
-
-export interface EmailVerifyCallbackResponse {
-  state: string;
-  otp: string;
-}
+import { EmailVerifyCallbackResponse } from './types/api';
 
 export class EmailVerifyCallbackError extends CustomError {
   state: string;

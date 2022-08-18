@@ -11,7 +11,7 @@
  */
 
 
-import { OktaAuth, AccessToken, IDToken } from '@okta/okta-auth-js';
+import { OktaAuth, AccessToken, IDToken, Token } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 
@@ -126,7 +126,7 @@ describe('token.getUserInfo', function() {
   it('throws an error if a string is passed instead of an accessToken object', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
-      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined));
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined as unknown as Token));
       return oa.token.getUserInfo('just a string' as unknown as AccessToken);
     })
     .then(function() {
@@ -156,7 +156,7 @@ describe('token.getUserInfo', function() {
   it('throws an error if a string is passed instead of an idTokenObject', function() {
     return Promise.resolve(setupSync())
     .then(function(oa) {
-      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined));
+      jest.spyOn(oa.tokenManager, 'get').mockReturnValue(Promise.resolve(undefined as unknown as Token));
       return oa.token.getUserInfo(tokens.standardAccessTokenParsed, 'some string' as unknown as IDToken);
     })
     .then(function() {

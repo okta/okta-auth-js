@@ -12,11 +12,11 @@
 
 
 import { AuthSdkError, OAuthError } from '../errors';
-import { OktaAuth } from '..';
-import {IdxTransactionMeta} from '../types';
+import { IdxTransactionMeta } from './types/meta';
+import { OktaAuthIdxInterface } from './types';
 
 export async function handleInteractionCodeRedirect(
-  authClient: OktaAuth, 
+  authClient: OktaAuthIdxInterface, 
   url: string
 ): Promise<void> {
   const meta = authClient.transactionManager.load() as IdxTransactionMeta;

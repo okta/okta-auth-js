@@ -1,3 +1,4 @@
+import { OktaAuth } from '@okta/okta-auth-js';
 import {
   getEmail,
   getEmails,
@@ -7,7 +8,6 @@ import {
   sendEmailChallenge,
   verifyEmailChallenge
 } from '../../../lib/myaccount';
-import { OktaAuth } from '../../../lib';
 import {
   EmailTransaction,
   EmailChallengeTransaction,

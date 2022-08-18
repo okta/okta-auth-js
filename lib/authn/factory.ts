@@ -11,7 +11,7 @@
  *
  */
 
-import { RequestData, RequestOptions, OktaAuthHttpInterface } from '../types/http';
+import { RequestData, RequestOptions, OktaAuthHttpInterface } from '../http/types';
 import {
   introspectAuthn,
   transactionStatus,

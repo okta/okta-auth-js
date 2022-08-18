@@ -18,7 +18,7 @@ import _ from 'lodash';
 import { OktaAuth } from '@okta/okta-auth-js';
 
 import browserStorage from '../../lib/browser/browserStorage';
-import { ServiceManager } from '../../lib/ServiceManager';
+import { ServiceManager } from '../../lib/core/ServiceManager';
 const cookies = browserStorage.storage;
 
 var util = {};

@@ -16,10 +16,10 @@ import {
   IDToken,
   Token,
   Tokens,
-  TokenManager,
   RefreshToken,
   OktaAuth,
-  TokenManagerError
+  TokenManagerError,
+  TokenManagerInterface
 } from '@okta/okta-auth-js';
 import { expectType, expectAssignable } from 'tsd';
 
@@ -27,7 +27,7 @@ const authClient = new OktaAuth({});
 
 (async () => {
   const tokenManager = authClient.tokenManager;
-  expectType<TokenManager>(tokenManager);
+  expectType<TokenManagerInterface>(tokenManager);
 
   // Get
   const tokens = await tokenManager.getTokens();
