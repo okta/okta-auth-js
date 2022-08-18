@@ -1,9 +1,10 @@
+import { OAuthTransactionMeta } from '../../../lib/types';
 import {
   clearTransactionFromSharedStorage,
   loadTransactionFromSharedStorage,
   pruneSharedStorage,
   saveTransactionToSharedStorage
-} from '../../../lib/util/sharedStorage';
+} from '../../../lib/oidc/util/sharedStorage';
 
 const THIRTY_MINUTES = 30 * 60 * 1000; // 30 minutes
 
@@ -102,7 +103,7 @@ describe('sharedStorage', () => {
       };
       const mockDate = 42;
       jest.spyOn(Date, 'now').mockReturnValue(mockDate);
-      saveTransactionToSharedStorage(storageManager, 'stateA', meta);
+      saveTransactionToSharedStorage(storageManager, 'stateA', meta as unknown as OAuthTransactionMeta);
       expect(sharedTransactionStorage.getStorage).toHaveBeenCalledWith();
       expect(sharedTransactionStorage.setStorage).toHaveBeenCalledWith({
         stateA: {
@@ -126,7 +127,7 @@ describe('sharedStorage', () => {
       };
       const mockDate = 42;
       jest.spyOn(Date, 'now').mockReturnValue(mockDate);
-      saveTransactionToSharedStorage(storageManager, 'stateA', meta);
+      saveTransactionToSharedStorage(storageManager, 'stateA', meta as unknown as OAuthTransactionMeta);
       expect(sharedTransactionStorage.getStorage).toHaveBeenCalledWith();
       expect(sharedTransactionStorage.setStorage).toHaveBeenCalledWith({
         stateA: {

@@ -1,4 +1,4 @@
-import { OktaAuthInterface } from '../../types';
+import { OktaAuthHttpInterface } from '../../http/types';
 import { TransactionLink } from '../request';
 
 type TransactionOptions = {
@@ -14,7 +14,7 @@ export default class BaseTransaction {
   // Deprecated
   headers?: Record<string, string>;
 
-  constructor(oktaAuth: OktaAuthInterface, options: TransactionOptions) {
+  constructor(oktaAuth: OktaAuthHttpInterface, options: TransactionOptions) {
     const { res } = options;
     const { headers, ...rest } = res;
     

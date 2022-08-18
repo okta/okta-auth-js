@@ -1,9 +1,10 @@
+import { OktaAuth } from '@okta/okta-auth-js';
 import {
   EmailTransaction,
   EmailChallengeTransaction,
   BaseTransaction
 } from '../../../lib/myaccount/transactions';
-import { AuthApiError, OktaAuth } from '../../../lib';
+import { AuthApiError } from '../../../lib/errors';
 import { sendRequest, generateRequestFnFromLinks } from '../../../lib/myaccount/request';
 
 jest.mock('../../../lib/http', () => {

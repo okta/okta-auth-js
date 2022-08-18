@@ -12,7 +12,7 @@
  */
 /* global window */
 /* eslint-disable complexity, max-statements */
-import { OktaAuthOptionsInterface, OktaAuthOptions } from '../../types';
+import { OktaAuthOAuthOptions, OktaAuthOAuthInterface } from '../types';
 
 export function hasTokensInHash(hash: string): boolean {
   return /((id|access)_token=)/i.test(hash);
@@ -32,7 +32,7 @@ export function hasErrorInUrl(hashOrSearch: string): boolean {
   return /(error=)/i.test(hashOrSearch) || /(error_description)/i.test(hashOrSearch);
 }
 
-export function isRedirectUri(uri: string, sdk: OktaAuthOptionsInterface): boolean {
+export function isRedirectUri(uri: string, sdk: OktaAuthOAuthInterface): boolean {
   var authParams = sdk.options;
   if (!uri || !authParams.redirectUri) {
     return false;
@@ -40,11 +40,11 @@ export function isRedirectUri(uri: string, sdk: OktaAuthOptionsInterface): boole
   return uri.indexOf(authParams.redirectUri) === 0;
 }
 
-export function isCodeFlow(options: OktaAuthOptions) {
+export function isCodeFlow(options: OktaAuthOAuthOptions) {
   return options.pkce || options.responseType === 'code' || options.responseMode === 'query';
 }
 
-export function getHashOrSearch(options: OktaAuthOptions) {
+export function getHashOrSearch(options: OktaAuthOAuthOptions) {
   var codeFlow = isCodeFlow(options);
   var useQuery = codeFlow && options.responseMode !== 'fragment';
   return useQuery ? window.location.search : window.location.hash;
@@ -54,7 +54,7 @@ export function getHashOrSearch(options: OktaAuthOptions) {
  * Check if tokens or a code have been passed back into the url, which happens in
  * the OIDC (including social auth IDP) redirect flow.
  */
-export function isLoginRedirect (sdk: OktaAuthOptionsInterface) {
+export function isLoginRedirect (sdk: OktaAuthOAuthInterface) {
   // First check, is this a redirect URI?
   if (!isRedirectUri(window.location.href, sdk)){
     return false;
@@ -81,7 +81,7 @@ export function isLoginRedirect (sdk: OktaAuthOptionsInterface) {
  * Check if error=interaction_required has been passed back in the url, which happens in
  * the social auth IDP redirect flow.
  */
-export function isInteractionRequired (sdk: OktaAuthOptionsInterface, hashOrSearch?: string) {
+export function isInteractionRequired (sdk: OktaAuthOAuthInterface, hashOrSearch?: string) {
   if (!hashOrSearch) { // web only
     // First check, is this a redirect URI?
     if (!isLoginRedirect(sdk)){

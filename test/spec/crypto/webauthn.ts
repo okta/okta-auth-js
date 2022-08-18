@@ -16,7 +16,7 @@ import {
   buildCredentialRequestOptions,
   getAttestation,
   getAssertion
-} from '../../../lib/crypto/webauthn';
+} from '../../../lib/idx/webauthn';
 import { ActivationData, ChallengeData, IdxAuthenticator } from '../../../lib/idx/types';
 import { base64UrlToBuffer, stringToBuffer } from '../../../lib/crypto/base64';
 import { btoa } from '../../../lib/crypto/webcrypto';

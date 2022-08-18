@@ -11,11 +11,9 @@
  */
 
 
-import TransactionManager from '../../lib/TransactionManager';
-import { StorageManager } from '../../lib/StorageManager';
-import { RawIdxResponseFactory } from '@okta/test.support/idx';
+import TransactionManager from '../../lib/oidc/TransactionManager';
 
-jest.mock('../../lib/util/sharedStorage', () => {
+jest.mock('../../lib/oidc/util/sharedStorage', () => {
   return {
     clearTransactionFromSharedStorage: () => {},
     loadTransactionFromSharedStorage: () => {},
@@ -25,7 +23,7 @@ jest.mock('../../lib/util/sharedStorage', () => {
 });
 
 const mocked = {
-  sharedStorage: require('../../lib/util/sharedStorage')
+  sharedStorage: require('../../lib/oidc/util/sharedStorage')
 };
 
 describe('TransactionManager', () => {
@@ -41,12 +39,10 @@ describe('TransactionManager', () => {
 
   beforeEach(() => {
     const transactionStorage = createMockStorage();
-    const idxResponseStorage = createMockStorage();
     const sharedTransactionStorage = createMockStorage();
     const storageManager = {
       storageUtil: {},
       getTransactionStorage: jest.fn().mockReturnValue(transactionStorage),
-      getIdxResponseStorage: jest.fn().mockReturnValue(idxResponseStorage),
       getSharedTransactionStorage: jest.fn().mockReturnValue(sharedTransactionStorage)
     } as unknown as StorageManager;
     const options = { storageManager };
@@ -66,7 +62,6 @@ describe('TransactionManager', () => {
     testContext = {
       storageManager,
       transactionStorage,
-      idxResponseStorage,
       sharedTransactionStorage,
       options,
       meta
@@ -94,17 +89,6 @@ describe('TransactionManager', () => {
       const { transactionManager, transactionStorage } = testContext;
       transactionManager.clear();
       expect(transactionStorage.clearStorage).toHaveBeenCalledWith();
-    });
-    it('clears idxResponse storage', () => {
-      const { transactionManager, idxResponseStorage } = testContext;
-      transactionManager.clear();
-      expect(idxResponseStorage.clearStorage).toHaveBeenCalledWith();
-    });
-
-    it('does not clear idxResponse storage if `clearIdxResponse` is false', () => {
-      const { transactionManager, idxResponseStorage } = testContext;
-      transactionManager.clear({ clearIdxResponse: false });
-      expect(idxResponseStorage.clearStorage).not.toHaveBeenCalled();
     });
 
     describe('shared transaction storage', () => {
@@ -260,110 +244,4 @@ describe('TransactionManager', () => {
 
   });
 
-  describe('saveIdxResponse', () => {
-    beforeEach(() => {
-      createInstance();
-      const setStorage = jest.fn();
-      const rawIdxResponse = RawIdxResponseFactory.build();
-      const savedResponse = {
-        rawIdxResponse,
-        requestDidSucceed: true
-      };
-      Object.assign(testContext, {
-        setStorage,
-        savedResponse
-      });
-    });
-    it('saves to idxResponse storage', () => {
-      const { storageManager, setStorage, savedResponse, transactionManager } = testContext;
-      jest.spyOn(storageManager, 'getIdxResponseStorage').mockReturnValue({
-        setStorage
-      });
-      transactionManager.saveIdxResponse(savedResponse);
-      expect(setStorage).toHaveBeenCalledWith(savedResponse);
-    });
-  });
-
-  describe('loadIdxResponse', () => {
-    beforeEach(() => {
-      createInstance();
-      const rawIdxResponse = RawIdxResponseFactory.build();
-      const requestDidSucceed = true;
-      const savedResponse = {
-        rawIdxResponse,
-        requestDidSucceed
-      };
-      testContext = {
-        ...testContext,
-        savedResponse
-      };
-    });
-    it('loads from idxResponse storage', () => {
-      const { transactionManager, idxResponseStorage, savedResponse } = testContext;
-      idxResponseStorage.getStorage.mockReturnValue(savedResponse);
-      const res = transactionManager.loadIdxResponse();
-      expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-      expect(res).toEqual(savedResponse);
-    });
-    it('returns null if storage is empty', () => {
-      const { transactionManager, idxResponseStorage } = testContext;
-      idxResponseStorage.getStorage.mockReturnValue(undefined);
-      const res = transactionManager.loadIdxResponse();
-      expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-      expect(res).toBeNull();
-    });
-    it('returns null if idxResponse is not valid', () => {
-      const { transactionManager, idxResponseStorage } = testContext;
-      const savedResponse = { foo: 'bar' };
-      idxResponseStorage.getStorage.mockReturnValue(savedResponse);
-      const res = transactionManager.loadIdxResponse();
-      expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-      expect(res).toBeNull();
-    });
-    describe('with options.stateHandle', () => {
-      it('returns null if options.stateHandle does not match saved stateHandle', () => {
-        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
-        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
-        const res = transactionManager.loadIdxResponse({ stateHandle: 'a' });
-        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-        expect(res).toBeNull();
-      });
-      it('returns data if options.stateHandle matches saved stateHandle', () => {
-        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
-        savedResponse.stateHandle = 'a';
-        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
-        const res = transactionManager.loadIdxResponse({ stateHandle: 'a' });
-        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-        expect(res).toBe(savedResponse);
-      });
-    });
-    describe('with options.interactionHandle', () => {
-      it('returns null if options.interactionHandle does not match saved stateHandle', () => {
-        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
-        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
-        const res = transactionManager.loadIdxResponse({ interactionHandle: 'a' });
-        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-        expect(res).toBeNull();
-      });
-      it('returns data if options.interactionHandle matches saved interactionHandle', () => {
-        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
-        savedResponse.interactionHandle = 'a';
-        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
-        const res = transactionManager.loadIdxResponse({ interactionHandle: 'a' });
-        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-        expect(res).toBe(savedResponse);
-      });
-    });
-  });
-
-  describe('clearIdxResponse', () => {
-    beforeEach(() => {
-      createInstance();
-    });
-    it('by default, clears idxResponse storage', () => {
-      const { transactionManager, idxResponseStorage } = testContext;
-      transactionManager.clearIdxResponse();
-      expect(idxResponseStorage.clearStorage).toHaveBeenCalledWith();
-    });
-  });
 });

@@ -12,7 +12,8 @@
 
 
 import { handleInteractionCodeRedirect } from '../../../lib/idx/handleInteractionCodeRedirect';
-import { Tokens, AuthSdkError, OAuthError } from '../../../lib';
+import { AuthSdkError, OAuthError } from '../../../lib/errors';
+import { Tokens } from '../../../lib/oidc/types';
 
 import tokens from '@okta/test.support/tokens';
 
