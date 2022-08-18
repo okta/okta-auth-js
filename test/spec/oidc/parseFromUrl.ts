@@ -24,7 +24,7 @@ const mocked = {
 };
 
 import { OktaAuth } from '@okta/okta-auth-js';
-import TransactionManager from '../../../lib/TransactionManager';
+import TransactionManager from '../../../lib/oidc/TransactionManager';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';

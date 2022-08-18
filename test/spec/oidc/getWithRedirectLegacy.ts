@@ -28,7 +28,7 @@ jest.mock('../../../lib/oidc/endpoints/well-known', () => {
 });
 
 import { OktaAuth } from '@okta/okta-auth-js';
-import TransactionManager from '../../../lib/TransactionManager';
+import TransactionManager from '../../../lib/oidc/TransactionManager';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import * as token from '../../../lib/oidc';

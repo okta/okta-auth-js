@@ -10,7 +10,7 @@ import {
 import { httpRequest } from '../http';
 import { AuthApiError, AuthSdkError } from '../errors';
 import { MyAccountRequestOptions as RequestOptions } from './types';
-import { OktaAuthInterface } from '../types';
+import { OktaAuthOAuthInterface } from '../oidc/types';
 
 export type TransactionLink = {
   href: string;
@@ -58,7 +58,7 @@ const parseInsufficientAuthenticationError = (
 
 /* eslint-disable complexity */
 export async function sendRequest<T extends BaseTransaction> (
-  oktaAuth: OktaAuthInterface, 
+  oktaAuth: OktaAuthOAuthInterface, 
   options: SendRequestOptions
 ): Promise<T | T[]> {
   const { 
@@ -140,7 +140,7 @@ export async function sendRequest<T extends BaseTransaction> (
 /* eslint-enable complexity */
 
 export type GenerateRequestFnFromLinksOptions = {
-  oktaAuth: OktaAuthInterface;
+  oktaAuth: OktaAuthOAuthInterface;
   accessToken: string;
   methodName: string;
   links: TransactionLinks;

@@ -12,12 +12,17 @@ const path = require('path');
 
 let platforms = ['browser', 'node'];
 let entries = {
-  'okta-auth-js': 'lib/index.ts',
-  'core': 'lib/core/index.ts',
-  'authn': 'lib/authn/index.ts',
-  'myaccount': 'lib/myaccount/index.ts'
+  'okta-auth-js': 'lib/exports/default.ts',
+  'core': 'lib/exports/core.ts',
+  'authn': 'lib/exports/authn.ts',
+  'idx': 'lib/exports/idx.ts',
+  'myaccount': 'lib/exports/myaccount.ts'
 };
 let preserveModules = true;
+const combinedOutputDir = true; // all entries share an output dir
+function getOuptutDir(entryName, env) {
+  return combinedOutputDir ? `build/esm/${env}` : `build/esm/${entryName}/${env}`;
+}
 
 // if ENTRY env var is passed, filter the entries to include only the named ENTRY
 if (process.env.ENTRY) {
@@ -80,6 +85,7 @@ function createPackageJson(dirName) {
 }
 
 const getPlugins = (env, entryName) => {
+  const outputDir = getOuptutDir(entryName, env);
   let plugins = [
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
@@ -117,7 +123,7 @@ const getPlugins = (env, entryName) => {
     multiInput({ 
       relative: 'lib/',
     }),
-    createPackageJson(`./build/esm/${entryName}/${env}`)
+    createPackageJson(outputDir)
   ];
 
   // if ANALZYE env var is passed, output analyzer html
@@ -138,13 +144,13 @@ export default Object.keys(entries).reduce((res, entryName) => {
   const entryValue = entries[entryName];
   return res.concat(platforms.map((type) => {
     return {
-      input: [entryValue],
+      input: Array.isArray(entryValue) ? entryValue : [entryValue],
       external: makeExternalPredicate(type),
       plugins: getPlugins(type, entryName),
       output: [
         {
           ...output,
-          dir: `build/esm/${entryName}/${type}`,
+          dir: getOuptutDir(entryName, type)
         }
       ]
     };

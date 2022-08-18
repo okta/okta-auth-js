@@ -1,4 +1,4 @@
-import { OktaUserAgent } from '../../lib/OktaUserAgent';
+import { OktaUserAgent } from '../../lib/http/OktaUserAgent';
 
 jest.mock('../../lib/features', () => {
   return {

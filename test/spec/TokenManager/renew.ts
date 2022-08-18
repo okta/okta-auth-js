@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import tokens from '@okta/test.support/tokens';
+import { OktaAuth } from '@okta/okta-auth-js';
 import { 
-  OktaAuth, 
   TOKEN_STORAGE_NAME,
-} from '../../../lib';
+} from '../../../lib/constants';
 import { AuthApiError, AuthSdkError, OAuthError } from '../../../lib/errors';
-import { TokenManager } from '../../../lib/TokenManager';
+import { TokenManager } from '../../../lib/oidc/TokenManager';
 
 const Emitter = require('tiny-emitter');
 
@@ -98,7 +98,7 @@ describe('TokenManager renew', () => {
       storageProvider.setItem(TOKEN_STORAGE_NAME, JSON.stringify(expiredTokens));
       // mock functions
       jest.spyOn(authClient.token, 'renewTokens').mockResolvedValue(freshTokens);
-      jest.spyOn(authClient.tokenManager, 'hasExpired').mockImplementation(token => !!token.expired);
+      jest.spyOn(authClient.tokenManager, 'hasExpired').mockImplementation(token => !!(token as any).expired);
     });
 
     it('produce consistent isAuthenticated state when renew happens in sequence', async () => {

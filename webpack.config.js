@@ -13,10 +13,11 @@ var commonConfig = require('./webpack.common.config');
 var license = fs.readFileSync('lib/license-header.txt', 'utf8'); 
 
 var entries = {
-  'okta-auth-js': './lib/index.ts',
-  'core': './lib/core/index.ts',
-  'authn': './lib/authn/index.ts',
-  'myaccount': './lib/myaccount/index.ts'
+  'okta-auth-js': './lib/exports/default.ts',
+  'core': './lib/exports/core.ts',
+  'authn': './lib/exports/authn.ts',
+  'idx': './lib/exports/idx.ts',
+  'myaccount': './lib/exports/myaccount.ts'
 };
 
 

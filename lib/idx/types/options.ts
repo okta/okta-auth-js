@@ -1,3 +1,15 @@
+/*!
+ * Copyright (c) 2021-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+
 import { RemediationFlow } from '../flow';
 import { RemediateAction } from '../remediate';
 import { FlowIdentifier } from './FlowIdentifier';
@@ -17,6 +29,10 @@ import {
   SelectAuthenticatorEnrollValues,
   EnrollAuthenticatorValues,
 } from '../remediators';
+import { IdxTransactionMeta } from './meta';
+import { OktaAuthCoreOptions } from '../../core/types';
+import { IdxStorageManagerInterface } from './storage';
+import { TransactionMetaOptions } from '../../oidc/types';
 
 export interface IdxOptions {
   flow?: FlowIdentifier;
@@ -105,3 +121,35 @@ export interface ProceedOptions extends
 export type CancelOptions = IdxOptions
 
 export type StartOptions = RunOptions
+
+export interface IdxTransactionMetaOptions
+  extends TransactionMetaOptions,
+  Pick<IdxTransactionMeta,
+    'state' |
+    'codeChallenge' |
+    'codeChallengeMethod' |
+    'codeVerifier' |
+    'flow' |
+    'activationToken' |
+    'recoveryToken'
+  >
+{}
+
+export interface OktaAuthIdxOptions
+<
+  M extends IdxTransactionMeta = IdxTransactionMeta,
+  S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>
+>
+  extends OktaAuthCoreOptions<M, S>,
+  Pick<IdxTransactionMeta,
+    'flow' |
+    'activationToken' |
+    'recoveryToken'
+  >
+{
+    // BETA WARNING: configs in this section are subject to change without a breaking change notice
+    idx?: Pick<RunOptions,
+      'useGenericRemediator' |
+      'exchangeCodeForTokens'
+    >;
+}

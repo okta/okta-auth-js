@@ -22,7 +22,7 @@ jest.mock('lib/features',() => {
   return mocked.features;
 });
 import { getDefaultTokenParams } from '../../../../lib/oidc/util/defaultTokenParams';
-import { OktaAuthOIDCInterface } from '../../../../lib/types';
+import { OktaAuthOAuthInterface } from '../../../../lib/oidc/types';
 
 describe('getDefaultTokenParams', () => {
   beforeEach(() => {
@@ -41,12 +41,12 @@ describe('getDefaultTokenParams', () => {
     }
   });
   it('`pkce`: uses value from sdk.options', () => {
-    const sdk = { options: { pkce: true } } as OktaAuthOIDCInterface;
+    const sdk = { options: { pkce: true } } as OktaAuthOAuthInterface;
     expect(getDefaultTokenParams(sdk).pkce).toBe(true);
   });
   
   it('`clientId`: uses value from sdk.options', () => {
-    const sdk = { options: { clientId: 'abc' } } as OktaAuthOIDCInterface;
+    const sdk = { options: { clientId: 'abc' } } as OktaAuthOAuthInterface;
     expect(getDefaultTokenParams(sdk).clientId).toBe('abc');
   });
   
@@ -54,40 +54,40 @@ describe('getDefaultTokenParams', () => {
     it('isBrowser: defaults to window.location.href', () => {
       jest.spyOn(mocked.features, 'isBrowser').mockReturnValue(true);
       expect(window.location.href).toBeTruthy();
-      expect(getDefaultTokenParams({ options: {} } as OktaAuthOIDCInterface).redirectUri).toBe(window.location.href);
+      expect(getDefaultTokenParams({ options: {} } as OktaAuthOAuthInterface).redirectUri).toBe(window.location.href);
     });
     it('uses values from sdk.options', () => {
-      const sdk = { options: { redirectUri: 'abc' } } as OktaAuthOIDCInterface;
+      const sdk = { options: { redirectUri: 'abc' } } as OktaAuthOAuthInterface;
       expect(getDefaultTokenParams(sdk).redirectUri).toBe('abc');
     });
   });
   
   describe('`responseType`: ', () => {
     it('defaults to ["token", "id_token"]', () => {
-      expect(getDefaultTokenParams({ options: {} } as OktaAuthOIDCInterface).responseType).toEqual(['token', 'id_token']);
+      expect(getDefaultTokenParams({ options: {} } as OktaAuthOAuthInterface).responseType).toEqual(['token', 'id_token']);
     });
     it('uses values from sdk.options', () => {
-      const sdk = { options: { responseType: 'code' } } as OktaAuthOIDCInterface;
+      const sdk = { options: { responseType: 'code' } } as OktaAuthOAuthInterface;
       expect(getDefaultTokenParams(sdk).responseType).toBe('code');
     });
   });
 
   it('`responseMode`: uses value from sdk.options', () => {
-    const sdk = { options: { responseMode: 'fragment' } } as OktaAuthOIDCInterface;
+    const sdk = { options: { responseMode: 'fragment' } } as OktaAuthOAuthInterface;
     expect(getDefaultTokenParams(sdk).responseMode).toBe('fragment');
   });
 
   describe('`state`: ', () => {
     it('generates a default value', () => {
-      expect(getDefaultTokenParams({ options: {} } as OktaAuthOIDCInterface).state).toBeTruthy();
+      expect(getDefaultTokenParams({ options: {} } as OktaAuthOAuthInterface).state).toBeTruthy();
     });
     it('uses values from sdk.options', () => {
-      const sdk = { options: { state: 'abc' } } as OktaAuthOIDCInterface;
+      const sdk = { options: { state: 'abc' } } as OktaAuthOAuthInterface;
       expect(getDefaultTokenParams(sdk).state).toBe('abc');
     });
   });
 
   it('`nonce`: generates a default value', () => {
-    expect(getDefaultTokenParams({ options: {} } as OktaAuthOIDCInterface).nonce).toBeTruthy();
+    expect(getDefaultTokenParams({ options: {} } as OktaAuthOAuthInterface).nonce).toBeTruthy();
   });
 });

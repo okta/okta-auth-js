@@ -12,14 +12,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { CustomUrls, OAuthResponse, OAuthResponseType, OktaAuthOIDCInterface, TokenParams, TokenResponse } from '../types';
+import { CustomUrls, OAuthResponse, OAuthResponseType, OktaAuthOAuthInterface, TokenParams, TokenResponse } from '../types';
 import { getOAuthUrls, getDefaultTokenParams } from './util';
 import { clone } from '../util';
 import { postToTokenEndpoint } from './endpoints/token';
 import { handleOAuthResponse } from './handleOAuthResponse';
 
 // codeVerifier is required. May pass either an authorizationCode or interactionCode
-export function exchangeCodeForTokens(sdk: OktaAuthOIDCInterface, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
+export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
   urls = urls || getOAuthUrls(sdk, tokenParams);
   // build params using defaults + options
   tokenParams = Object.assign({}, getDefaultTokenParams(sdk), clone(tokenParams));

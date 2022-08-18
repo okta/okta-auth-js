@@ -1,4 +1,4 @@
-import { OktaAuth } from '../../../lib';
+import { OktaAuth } from '../../../lib/exports/default';
 
 // Cleanup clients after test completes
 const activeClients: OktaAuth[] = [];

@@ -11,7 +11,7 @@
  */
 
 
-import { AuthSdkError } from '../../../lib';
+import { AuthSdkError } from '../../../lib/errors';
 import { canProceed, proceed } from '../../../lib/idx/proceed';
 
 const mocked = {
