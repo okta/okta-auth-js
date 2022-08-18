@@ -13,12 +13,13 @@
  */
 import { getWellKnown } from '../endpoints/well-known';
 import { AuthSdkError } from '../../errors';
-import { OktaAuthFeaturesInterface, OktaAuthOIDCInterface, TokenParams } from '../../types';
+import { OktaAuthOAuthInterface, TokenParams } from '../types';
 import { getDefaultTokenParams } from './defaultTokenParams';
 import { DEFAULT_CODE_CHALLENGE_METHOD } from '../../constants';
 import PKCE from './pkce';
+import { OktaAuthBaseInterface } from '../../base/types';
 
-export function assertPKCESupport(sdk: OktaAuthFeaturesInterface) {
+export function assertPKCESupport(sdk: OktaAuthBaseInterface) {
   if (!sdk.features.isPKCESupported()) {
     var errorMessage = 'PKCE requires a modern browser with encryption support running in a secure context.';
     if (!sdk.features.isHTTPS()) {
@@ -33,7 +34,7 @@ export function assertPKCESupport(sdk: OktaAuthFeaturesInterface) {
   }
 }
 
-export async function validateCodeChallengeMethod(sdk: OktaAuthOIDCInterface, codeChallengeMethod?: string) {
+export async function validateCodeChallengeMethod(sdk: OktaAuthOAuthInterface, codeChallengeMethod?: string) {
   // set default code challenge method, if none provided
   codeChallengeMethod = codeChallengeMethod || sdk.options.codeChallengeMethod || DEFAULT_CODE_CHALLENGE_METHOD;
 
@@ -47,7 +48,7 @@ export async function validateCodeChallengeMethod(sdk: OktaAuthOIDCInterface, co
 }
 
 export async function preparePKCE(
-  sdk: OktaAuthOIDCInterface, 
+  sdk: OktaAuthOAuthInterface, 
   tokenParams: TokenParams
 ): Promise<TokenParams> {
   let {
@@ -79,7 +80,7 @@ export async function preparePKCE(
 
 // Prepares params for a call to /authorize or /token
 export async function prepareTokenParams(
-  sdk: OktaAuthOIDCInterface,
+  sdk: OktaAuthOAuthInterface,
   tokenParams: TokenParams = {}
 ): Promise<TokenParams> {
   // build params using defaults + options

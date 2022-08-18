@@ -20,14 +20,14 @@ import {
 import { btoa } from '../crypto';
 import AuthSdkError from '../errors/AuthSdkError';
 import {
-  OktaAuthOIDCInterface,
+  OktaAuthOAuthInterface,
   RevocableToken,
   AccessToken,
   RefreshToken
 } from '../types';
 
 // refresh tokens have precedence to be revoked if no token is specified
-export async function revokeToken(sdk: OktaAuthOIDCInterface, token: RevocableToken): Promise<any> {
+export async function revokeToken(sdk: OktaAuthOAuthInterface, token: RevocableToken): Promise<any> {
   let accessToken = '';
   let refreshToken = '';
   if (token) { 

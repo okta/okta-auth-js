@@ -19,11 +19,29 @@ import {
   CookieOptions,
   SimpleStorage,
   StorageType,
-  BrowserStorageUtil,
-  CookieStorage
-} from '../types';
+  StorageUtil,
+} from '../storage/types';
 import { warn } from '../util';
 import { isIE11OrLess } from '../features';
+
+export interface CookieStorage extends SimpleStorage {
+  setItem(key: string, value: any, expiresAt?: string | null): void; // can customize expiresAt
+  getItem(key?: string): any; // if no key is passed, all cookies are returned
+  removeItem(key: string); // remove a cookie
+}
+
+export interface BrowserStorageUtil extends StorageUtil {
+  browserHasLocalStorage(): boolean;
+  browserHasSessionStorage(): boolean;
+  getStorageByType(storageType: StorageType, options: StorageOptions): SimpleStorage;
+  getLocalStorage(): Storage;
+  getSessionStorage(): Storage;
+  getInMemoryStorage(): SimpleStorage;
+  getCookieStorage(options?: StorageOptions): CookieStorage;
+  testStorage(storage: any): boolean;
+  storage: Cookies;
+  inMemoryStore: Record<string, unknown>;
+}
 
 // Building this as an object allows us to mock the functions in our tests
 var storageUtil: BrowserStorageUtil = {

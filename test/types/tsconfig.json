@@ -19,10 +19,10 @@
     "baseUrl": ".",
     "paths": {
       "@okta/okta-auth-js": [
-        "../../build/lib/index.d.ts"
+        "../../build/lib/exports/default.d.ts"
       ],
       "@okta/okta-auth-js/*": [
-        "../../build/lib/*/index.d.ts"
+        "../../build/lib/exports/*.d.ts"
       ]
     }
   },

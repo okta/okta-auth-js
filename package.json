@@ -5,64 +5,78 @@
   "version": "7.0.0",
   "homepage": "https://github.com/okta/okta-auth-js",
   "license": "Apache-2.0",
-  "main": "build/cjs/index.js",
-  "module": "build/esm/okta-auth-js/node/index.js",
+  "main": "build/cjs/exports/default.js",
+  "module": "build/esm/node/exports/exports/default.js",
   "browser": "build/dist/okta-auth-js.umd.js",
-  "types": "build/lib/index.d.ts",
+  "types": "build/lib/exports/default.d.ts",
   "exports": {
     ".": {
       "node": {
-        "types": "./build/lib/index.d.ts",
-        "import": "./build/esm/okta-auth-js/node/index.js",
-        "require": "./build/cjs/index.js"
+        "types": "./build/lib/exports/default.d.ts",
+        "import": "./build/esm/node/exports/exports/default.js",
+        "require": "./build/cjs/exports/default.js"
       },
       "browser": {
-        "types": "./build/lib/index.d.ts",
-        "import": "./build/esm/okta-auth-js/browser/index.js",
-        "default": "./build/esm/okta-auth-js/browser/index.js"
+        "types": "./build/lib/exports/default.d.ts",
+        "import": "./build/esm/browser/exports/exports/default.js",
+        "default": "./build/esm/browser/exports/exports/default.js"
       },
-      "types": "./build/lib/index.d.ts",
+      "types": "./build/lib/exports/default.d.ts",
       "default": "./build/dist/okta-auth-js.umd.js"
     },
     "./core": {
       "node": {
-        "types": "./build/lib/core/index.d.ts",
-        "import": "./build/esm/core/node/core/core/index.js",
-        "require": "./build/cjs/core/index.js"
+        "types": "./build/lib/exports/core.d.ts",
+        "import": "./build/esm/node/exports/exports/core.js",
+        "require": "./build/cjs/exports/core.js"
       },
       "browser": {
-        "types": "./build/lib/core/index.d.ts",
-        "import": "./build/esm/core/browser/core/core/index.js"
+        "types": "./build/lib/exports/core.d.ts",
+        "import": "./build/esm/browser/exports/exports/core.js"
       },
-      "types": "./build/lib/core/index.d.ts",
+      "types": "./build/lib/exports/core.d.ts",
       "default": "./build/dist/core.umd.js"
     },
     "./authn": {
       "node": {
-        "types": "./build/lib/authn/index.d.ts",
-        "import": "./build/esm/authn/node/authn/authn/index.js",
-        "require": "./build/cjs/authn/index.js"
+        "types": "./build/lib/exports/authn.d.ts",
+        "import": "./build/esm/node/exports/exports/authn.js",
+        "require": "./build/cjs/exports/authn.js"
       },
       "browser": {
-        "types": "./build/lib/authn/index.d.ts",
-        "import": "./build/esm/authn/browser/authn/authn/index.js"
+        "types": "./build/lib/exports/authn.d.ts",
+        "import": "./build/esm/browser/exports/exports/authn.js"
       },
-      "types": "./build/lib/authn/index.d.ts",
+      "types": "./build/lib/exports/authn.d.ts",
       "default": "./build/dist/authn.umd.js"
+    },
+    "./idx": {
+      "node": {
+        "types": "./build/lib/exports/idx.d.ts",
+        "import": "./build/esm/node/exports/exports/idx.js",
+        "require": "./build/cjs/exports/idx.js"
+      },
+      "browser": {
+        "types": "./build/lib/exports/idx.d.ts",
+        "import": "./build/esm/browser/exports/exports/idx.js"
+      },
+      "types": "./build/lib/exports/idx.d.ts",
+      "default": "./build/dist/idx.umd.js"
     },
     "./myaccount": {
       "node": {
-        "types": "./build/lib/myaccount/index.d.ts",
-        "import": "./build/esm/myaccount/node/myaccount/myaccount/index.js",
-        "require": "./build/cjs/myaccount/index.js"
+        "types": "./build/lib/exports/myaccount.d.ts",
+        "import": "./build/esm/node/exports/exports/myaccount.js",
+        "require": "./build/cjs/exports/myaccount.js"
       },
       "browser": {
-        "types": "./build/lib/myaccount/index.d.ts",
-        "import": "./build/esm/myaccount/browser/myaccount/myaccount/index.js"
+        "types": "./build/lib/exports/myaccount.d.ts",
+        "import": "./build/esm/browser/exports/exports/myaccount.js"
       },
-      "types": "./build/lib/myaccount/index.d.ts",
+      "types": "./build/lib/exports/myaccount.d.ts",
       "default": "./build/dist/myaccount.umd.js"
     },
+    "./package.json": "./package.json",
     "./polyfill": "./build/polyfill/index.js"
   },
   "repository": {

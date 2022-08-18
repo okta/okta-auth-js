@@ -1,4 +1,5 @@
-import { RequestData, RequestOptions, OktaAuthHttpInterface } from '../types/http';
+import { StorageManagerInterface } from '../storage/types';
+import { RequestData, RequestOptions, OktaAuthHttpInterface, OktaAuthHttpOptions } from '../http/types';
 
 export interface AuthnTransactionLink {
   name?: string;
@@ -122,9 +123,12 @@ export interface FingerprintOptions {
 export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
 
 
-export interface OktaAuthTxInterface extends
-  OktaAuthHttpInterface,
-  AuthnAPI
+export interface OktaAuthTxInterface
+<
+  S extends StorageManagerInterface = StorageManagerInterface,
+  O extends OktaAuthHttpOptions = OktaAuthHttpOptions,
+> 
+  extends OktaAuthHttpInterface<S, O>, AuthnAPI
 {
   tx: AuthnTransactionAPI; // legacy name
   authn: AuthnTransactionAPI; // new name

@@ -37,7 +37,7 @@ baseConfig.module.rules.forEach(addBabelPlugins);
 
 module.exports = _.extend({}, baseConfig, {
   mode: (process.env.NODE_ENV === 'development') ? 'development' : 'production',
-  entry: './lib/cdnEntry.ts', // only export OktaAuth constructor
+  entry: './lib/exports/cdn.ts', // only export OktaAuth constructor
   output: {
     path: path.join(__dirname, 'build', 'dist'),
     filename: 'okta-auth-js.min.js',

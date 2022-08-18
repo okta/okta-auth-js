@@ -1,11 +1,11 @@
 import {
   isEmailVerifyCallback,
   parseEmailVerifyCallback,
-  EmailVerifyCallbackResponse,
   handleEmailVerifyCallback,
   isEmailVerifyCallbackError,
   EmailVerifyCallbackError
 } from '../../../lib/idx/emailVerify';
+import { EmailVerifyCallbackResponse } from '../../../lib/idx/types';
 
 describe('emailVerify', () => {
 

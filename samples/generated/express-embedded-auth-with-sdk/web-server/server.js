@@ -27,7 +27,7 @@ const {
 
 const templateDir = path.join(__dirname, '', 'views');
 const frontendDir = path.join(__dirname, '', 'assets');
-const authJSAssets = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js')), '..', 'dist');
+const authJSAssets = path.resolve(path.dirname(require.resolve('@okta/okta-auth-js/package.json')), 'build', 'dist');
 
 const getConfig = require('../config.js');
 const { port } = getConfig().webServer;
