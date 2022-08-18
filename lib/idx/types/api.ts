@@ -1,6 +1,17 @@
-import { APIError } from '../../types/api';
-import { Tokens } from '../../types/Token';
-import { PKCETransactionMeta } from '../../types/Transaction';
+/*!
+ * Copyright (c) 2021-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+
+import { APIError } from '../../errors/types';
+import { Tokens, TransactionManagerInterface } from '../../oidc/types';
 import { FlowIdentifier } from './FlowIdentifier';
 import {
   IdxActions,
@@ -14,7 +25,24 @@ import {
   RawIdxResponse,
   IdxActionParams,
   IdpConfig,
+  IdxToPersist,
 } from './idx-js';
+import {
+  AccountUnlockOptions,
+  AuthenticationOptions,
+  CancelOptions,
+  InteractOptions,
+  IntrospectOptions,
+  OktaAuthIdxOptions,
+  PasswordRecoveryOptions,
+  ProceedOptions,
+  RegistrationOptions,
+  StartOptions,
+  IdxTransactionMetaOptions
+} from './options';
+import { IdxTransactionMeta } from './meta';
+import { IdxStorageManagerInterface, SavedIdxResponse } from './storage';
+import { OktaAuthCoreInterface } from '../../core/types';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
@@ -82,15 +110,6 @@ export enum IdxFeature {
   ACCOUNT_UNLOCK = 'unlock-account',
 }
 
-export interface IdxTransactionMeta extends PKCETransactionMeta {
-  interactionHandle?: string;
-  remediations?: string[];
-  flow?: FlowIdentifier;
-  withCredentials?: boolean;
-  activationToken?: string;
-  recoveryToken?: string;
-  maxAge?: string | number;
-}
 
 export interface IdxTransaction {
   status: IdxStatus;
@@ -138,4 +157,69 @@ export interface InteractResponse {
   state?: string;
   interactionHandle: string;
   meta: IdxTransactionMeta;
+}
+
+export interface EmailVerifyCallbackResponse {
+  state: string;
+  otp: string;
+}
+
+export interface IdxAPI {
+  // lowest level api
+  interact: (options?: InteractOptions) => Promise<InteractResponse>;
+  introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
+  makeIdxResponse: (rawIdxResponse: RawIdxResponse, toPersist: IdxToPersist, requestDidSucceed: boolean) => IdxResponse;
+
+  // flow entrypoints
+  authenticate: (options?: AuthenticationOptions) => Promise<IdxTransaction>;
+  register: (options?: RegistrationOptions) => Promise<IdxTransaction>;
+  recoverPassword: (options?: PasswordRecoveryOptions) => Promise<IdxTransaction>;
+  unlockAccount: (options?: AccountUnlockOptions) => Promise<IdxTransaction>;
+  poll: (options?: IdxPollOptions) => Promise<IdxTransaction>;
+
+  // flow control
+  start: (options?: StartOptions) => Promise<IdxTransaction>;
+  canProceed(options?: ProceedOptions): boolean;
+  proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
+  cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
+  getFlow(): FlowIdentifier | undefined;
+  setFlow(flow: FlowIdentifier): void;
+
+  // call `start` instead of `startTransaction`. `startTransaction` will be removed in next major version (7.0)
+  startTransaction: (options?: StartOptions) => Promise<IdxTransaction>;
+
+  // redirect callbacks
+  isInteractionRequired: (hashOrSearch?: string) => boolean;
+  isInteractionRequiredError: (error: Error) => boolean; 
+  handleInteractionCodeRedirect: (url: string) => Promise<void>;
+  isEmailVerifyCallback: (search: string) => boolean;
+  parseEmailVerifyCallback: (search: string) => EmailVerifyCallbackResponse;
+  handleEmailVerifyCallback: (search: string) => Promise<IdxTransaction | undefined>;
+  isEmailVerifyCallbackError: (error: Error) => boolean;
+
+  // transaction meta
+  getSavedTransactionMeta: (options?: IdxTransactionMetaOptions) => IdxTransactionMeta | undefined;
+  createTransactionMeta: (options?: IdxTransactionMetaOptions) => Promise<IdxTransactionMeta>;
+  getTransactionMeta: (options?: IdxTransactionMetaOptions) => Promise<IdxTransactionMeta>;
+  saveTransactionMeta: (meta: unknown) => void;
+  clearTransactionMeta: () => void;
+  isTransactionMetaValid: (meta: unknown) => boolean;
+}
+
+export interface IdxTransactionManagerInterface extends TransactionManagerInterface {
+  saveIdxResponse(data: SavedIdxResponse): void;
+  loadIdxResponse(options?: IntrospectOptions): SavedIdxResponse | null;
+  clearIdxResponse(): void;
+}
+
+export interface OktaAuthIdxInterface
+<
+  M extends IdxTransactionMeta = IdxTransactionMeta,
+  S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>,
+  O extends OktaAuthIdxOptions<M, S> = OktaAuthIdxOptions<M, S>,
+  TM extends IdxTransactionManagerInterface = IdxTransactionManagerInterface
+>
+  extends OktaAuthCoreInterface<M, S, O, TM>
+{
+  idx: IdxAPI;
 }

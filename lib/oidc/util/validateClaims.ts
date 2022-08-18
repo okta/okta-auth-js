@@ -14,9 +14,9 @@
 /* eslint-disable complexity, max-statements */
 
 import AuthSdkError from '../../errors/AuthSdkError';
-import { OktaAuthOptionsInterface, TokenVerifyParams, UserClaims } from '../../types';
+import { OktaAuthOAuthInterface, TokenVerifyParams, UserClaims } from '../../types';
 
-export function validateClaims(sdk: OktaAuthOptionsInterface, claims: UserClaims, validationParams: TokenVerifyParams) {
+export function validateClaims(sdk: OktaAuthOAuthInterface, claims: UserClaims, validationParams: TokenVerifyParams) {
   var aud = validationParams.clientId;
   var iss = validationParams.issuer;
   var nonce = validationParams.nonce;

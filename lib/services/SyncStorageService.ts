@@ -10,12 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { TokenManager } from '../TokenManager';
 import { BroadcastChannel } from 'broadcast-channel';
 import { isBrowser } from '../features';
 import {
   ServiceManagerOptions, ServiceInterface, Token, Tokens, 
-  EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED, EVENT_SET_STORAGE
+  EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED, EVENT_SET_STORAGE, TokenManagerInterface
 } from '../types';
 
 export type SyncMessage = {
@@ -26,13 +25,13 @@ export type SyncMessage = {
   storage?: Tokens;
 };
 export class SyncStorageService implements ServiceInterface {
-  private tokenManager: TokenManager;
+  private tokenManager: TokenManagerInterface;
   private options: ServiceManagerOptions;
   private channel?: BroadcastChannel<SyncMessage>;
   private started = false;
   private enablePostMessage = true;
 
-  constructor(tokenManager: TokenManager, options: ServiceManagerOptions = {}) {
+  constructor(tokenManager: TokenManagerInterface, options: ServiceManagerOptions = {}) {
     this.tokenManager = tokenManager;
     this.options = options;
     this.onTokenAddedHandler = this.onTokenAddedHandler.bind(this);
@@ -138,15 +137,15 @@ export class SyncStorageService implements ServiceInterface {
         this.tokenManager.getStorage().setStorage(msg.storage);
         break;
       case EVENT_ADDED:
-        this.tokenManager.emitAdded(msg.key, msg.token);
-        this.tokenManager.setExpireEventTimeout(msg.key, msg.token);
+        this.tokenManager.emitAdded(msg.key!, msg.token!);
+        this.tokenManager.setExpireEventTimeout(msg.key!, msg.token!);
         break;
       case EVENT_REMOVED:
-        this.tokenManager.clearExpireEventTimeout(msg.key);
-        this.tokenManager.emitRemoved(msg.key, msg.token);
+        this.tokenManager.clearExpireEventTimeout(msg.key!);
+        this.tokenManager.emitRemoved(msg.key!, msg.token!);
         break;
       case EVENT_RENEWED:
-        this.tokenManager.emitRenewed(msg.key, msg.token, msg.oldToken);
+        this.tokenManager.emitRenewed(msg.key!, msg.token!, msg.oldToken);
         break;
       default:
         break;
