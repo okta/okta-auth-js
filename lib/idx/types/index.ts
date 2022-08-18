@@ -25,7 +25,8 @@ export type {
   IdxAuthenticator,
   IdxActionParams,
 } from './idx-js';
+export * from './meta';
 export type { FlowIdentifier } from './FlowIdentifier';
-export type { EmailVerifyCallbackResponse } from '../emailVerify';
 export type { WebauthnEnrollValues } from '../authenticator/WebauthnEnrollment';
 export type { WebauthnVerificationValues } from '../authenticator/WebauthnVerification';
+export * from './storage';

@@ -15,9 +15,10 @@
 import { post } from '../http';
 import AuthSdkError from '../errors/AuthSdkError';
 import { STATE_TOKEN_KEY_NAME } from '../constants';
-import { OktaAuthHttpInterface, OktaAuthOptionsInterface } from '../types';
+import { OktaAuthHttpInterface, OktaAuthStorageOptions } from '../types';
 import { addStateToken } from './util/stateToken';
 import { AuthnTransactionAPI } from './types';
+import { OktaAuthBaseInterface } from '../base/types';
 
 export function transactionStatus(sdk: OktaAuthHttpInterface, args) {
   args = addStateToken(sdk, args);
@@ -64,7 +65,7 @@ export function transactionStep(sdk: OktaAuthHttpInterface, args) {
   return post(sdk, sdk.getIssuerOrigin() + '/api/v1/authn/introspect', args, { withCredentials: true });
 }
 
-export function transactionExists(sdk: OktaAuthOptionsInterface) {
+export function transactionExists(sdk: OktaAuthBaseInterface<OktaAuthStorageOptions>) {
   // We have a cookie state token
   return !!getSavedStateToken(sdk);
 }
@@ -77,7 +78,7 @@ export function postToTransaction(sdk: OktaAuthHttpInterface, tx: AuthnTransacti
     });
 }
 
-export function getSavedStateToken(sdk: OktaAuthOptionsInterface) {
+export function getSavedStateToken(sdk: OktaAuthBaseInterface<OktaAuthStorageOptions>) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const storage = sdk.options.storageUtil!.storage;
     return storage.get(STATE_TOKEN_KEY_NAME);

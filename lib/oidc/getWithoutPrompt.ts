@@ -11,11 +11,11 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuthOIDCInterface, TokenParams, TokenResponse } from '../types';
+import { OktaAuthOAuthInterface, TokenParams, TokenResponse } from '../types';
 import { clone } from '../util';
 import { getToken } from './getToken';
 
-export function getWithoutPrompt(sdk: OktaAuthOIDCInterface, options: TokenParams): Promise<TokenResponse> {
+export function getWithoutPrompt(sdk: OktaAuthOAuthInterface, options: TokenParams): Promise<TokenResponse> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithoutPrompt" takes only a single set of options'));
   }

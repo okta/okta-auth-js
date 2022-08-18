@@ -12,14 +12,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {
-  OktaAuthOptions,
-} from '../types';
 import { 
   clone,
 } from '../util';
 import fingerprint from '../browser/fingerprint';
-import OktaAuthCore from '../core/OktaAuthCore';
 import {
   FingerprintAPI,
   SigninWithCredentialsOptions,
@@ -33,15 +29,26 @@ import {
 import {
   createAuthnTransactionAPI,
 } from './factory';
+import { StorageManagerInterface } from '../storage/types';
+import { OktaAuthHttpInterface, OktaAuthHttpOptions } from '../http/types';
+import { OktaAuthConstructor } from '../base/types';
 
-export function mixinAuthn<TBase extends typeof OktaAuthCore>(Base: TBase) {
-  return class OktaAuthTx extends Base implements OktaAuthTxInterface {
+export function mixinAuthn
+<
+  S extends StorageManagerInterface = StorageManagerInterface,
+  O extends OktaAuthHttpOptions = OktaAuthHttpOptions,
+  TBase extends OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
+    = OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
+>
+(Base: TBase): TBase & OktaAuthConstructor<O, OktaAuthTxInterface<S, O>>
+{
+  return class OktaAuthTx extends Base implements OktaAuthTxInterface<S, O> {
     tx: AuthnTransactionAPI; // legacy, may be removed in future version
     authn: AuthnTransactionAPI;
     fingerprint: FingerprintAPI;
 
     constructor(...args: any[]) {
-      super(args[0] as OktaAuthOptions);
+      super(...args);
 
       this.authn = this.tx = createAuthnTransactionAPI(this);
       

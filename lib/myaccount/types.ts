@@ -1,4 +1,10 @@
-import { OktaAuthInterface } from '../types';
+import { OktaAuthCoreInterface, OktaAuthCoreOptions } from '../core/types';
+import {
+  OAuthStorageManagerInterface,
+  OAuthTransactionMeta,
+  OktaAuthOAuthInterface,
+  PKCETransactionMeta
+} from '../oidc/types';
 
 export { 
   EmailTransaction, 
@@ -77,6 +83,17 @@ export type MyAccountRequestOptions = {
 }
 
 export type IAPIFunction<T> = (
-  oktaAuth: OktaAuthInterface, 
+  oktaAuth: OktaAuthOAuthInterface, 
   options?: MyAccountRequestOptions
 ) => Promise<T>;
+
+export interface OktaAuthMyAccountInterface
+<
+  M extends OAuthTransactionMeta = PKCETransactionMeta,
+  S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
+  O extends OktaAuthCoreOptions<M, S> = OktaAuthCoreOptions<M, S>
+> 
+  extends OktaAuthCoreInterface<M, S, O>
+{
+  myaccount;
+}

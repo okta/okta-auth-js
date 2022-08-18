@@ -10,20 +10,13 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export * from './api';
-export * from './AuthState';
-export * from './EventEmitter';
-export * from './Transaction';
-export * from './Cookies';
-export * from './http';
-export * from '../idx/types';
-export * from './JWT';
-export * from './OAuth';
-export * from './OktaAuthOptions';
-export * from './Storage';
-export * from './Token';
-export * from './TokenManager';
-export * from './Service';
-export * from './UserClaims';
-export * from '../myaccount';
 export * from '../authn/types';
+export * from '../base/types';
+export * from '../core/types';
+export * from '../errors/types';
+export * from '../http/types';
+export * from '../idx/types';
+export * from '../myaccount/types';
+export * from '../oidc/types';
+export * from '../session/types';
+export * from '../storage/types';

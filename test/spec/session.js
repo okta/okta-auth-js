@@ -32,7 +32,7 @@ import {
   getSession,
   refreshSession,
   setCookieAndRedirect
-} from '../../lib/session';
+} from '../../lib/session/api';
 
 describe('session', function() {
   var sdk;

@@ -11,14 +11,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuthIdxInterface, IdxTransactionMeta, TransactionMetaOptions, PKCETransactionMeta } from '../types';
+import { OktaAuthIdxInterface, IdxTransactionMeta, PKCETransactionMeta, IdxTransactionMetaOptions } from '../types';
 import { removeNils, warn } from '../util';
 import { createOAuthMeta } from '../oidc';
 
 // Calculate new values
 export async function createTransactionMeta(
   authClient: OktaAuthIdxInterface,
-  options: TransactionMetaOptions = {}
+  options: IdxTransactionMetaOptions = {}
 ): Promise<IdxTransactionMeta> {
   const tokenParams = await authClient.token.prepareTokenParams(options);
   const pkceMeta = createOAuthMeta(authClient, tokenParams) as PKCETransactionMeta;
@@ -41,7 +41,10 @@ export async function createTransactionMeta(
   return meta;
 }
 
-export function hasSavedInteractionHandle(authClient: OktaAuthIdxInterface, options?: TransactionMetaOptions): boolean {
+export function hasSavedInteractionHandle(
+  authClient: OktaAuthIdxInterface,
+  options?: IdxTransactionMetaOptions
+): boolean {
   const savedMeta = getSavedTransactionMeta(authClient, options);
   if (savedMeta?.interactionHandle) {
     return true;
@@ -52,7 +55,7 @@ export function hasSavedInteractionHandle(authClient: OktaAuthIdxInterface, opti
 // Returns the saved transaction meta, if it exists and is valid
 export function getSavedTransactionMeta(
   authClient: OktaAuthIdxInterface,
-  options?: TransactionMetaOptions
+  options?: IdxTransactionMetaOptions
 ): IdxTransactionMeta | undefined {
   options = removeNils(options);
   options = { ...authClient.options, ...options }; // local options override SDK options
@@ -81,7 +84,7 @@ export function getSavedTransactionMeta(
 
 export async function getTransactionMeta(
   authClient: OktaAuthIdxInterface,
-  options?: TransactionMetaOptions
+  options?: IdxTransactionMetaOptions
 ): Promise<IdxTransactionMeta> {
   options = removeNils(options);
   options = { ...authClient.options, ...options }; // local options override SDK options
@@ -102,7 +105,7 @@ export function clearTransactionMeta (authClient: OktaAuthIdxInterface): void {
   authClient.transactionManager.clear();
 }
 
-export function isTransactionMetaValid (meta, options: TransactionMetaOptions  = {}): boolean {
+export function isTransactionMetaValid (meta, options: IdxTransactionMetaOptions  = {}): boolean {
   // Validate against certain options. If these exist in options, they must match in meta
   const keys = [
     'issuer',
