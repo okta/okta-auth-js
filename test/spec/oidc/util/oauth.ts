@@ -11,7 +11,7 @@
  */
 
 
-import { OktaAuth } from '../../../../lib';
+import { OktaAuth } from '@okta/okta-auth-js';
 import { getOAuthUrls } from '../../../../lib/oidc/util';
 
 describe('getOAuthUrls', function() {

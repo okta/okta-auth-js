@@ -14,7 +14,7 @@
 /* eslint-disable max-statements */
 
 import tokens from '@okta/test.support/tokens';
-import { TokenManager } from '../../../lib/TokenManager';
+import { TokenManager } from '../../../lib/oidc/TokenManager';
 import { SyncStorageService } from '../../../lib/services/SyncStorageService';
 import * as features from '../../../lib/features';
 import { BroadcastChannel } from 'broadcast-channel';

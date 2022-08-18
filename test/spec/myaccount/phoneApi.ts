@@ -1,3 +1,4 @@
+import { OktaAuth } from '@okta/okta-auth-js';
 import {
   getPhones,
   getPhone,
@@ -6,7 +7,6 @@ import {
   sendPhoneChallenge,
   verifyPhoneChallenge
 } from '../../../lib/myaccount';
-import { OktaAuth } from '../../../lib';
 import {
   PhoneTransaction,
   BaseTransaction

@@ -11,7 +11,7 @@
  */
 
 
-var OktaAuth = '<rootDir>/lib';
+var OktaAuth = '<rootDir>/lib/exports/default';
 var SDK_VERSION = require('../../../package.json').version;
 
 module.exports = {

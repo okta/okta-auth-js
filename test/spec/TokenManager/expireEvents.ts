@@ -5,7 +5,7 @@ jest.mock('../../../lib/features', () => {
   };
 });
 
-import { TokenManager } from '../../../lib/TokenManager';
+import { TokenManager } from '../../../lib/oidc/TokenManager';
 
 const Emitter = require('tiny-emitter');
 

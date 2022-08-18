@@ -14,7 +14,7 @@
 
 import { isString, removeNils, toQueryString } from '../../util';
 import { AuthSdkError } from '../../errors';
-import { OAuthParams, TokenParams } from '../../types';
+import { OAuthParams, TokenParams } from '../types';
 
 export function convertTokenParamsToOAuthParams(tokenParams: TokenParams) {
   // Quick validation
