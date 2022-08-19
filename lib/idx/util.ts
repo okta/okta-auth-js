@@ -287,11 +287,17 @@ export function handleIdxError(authClient: OktaAuthIdxInterface, e, options = {}
     requestDidSucceed: false
   };
   const terminal = isTerminalResponse(idxResponse);
-  const remediator = getRemediator(idxResponse.neededToProceed, {}, options);
-  const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
-  return {
-    idxResponse,
-    ...(terminal && { terminal }),
-    ...(!terminal && nextStep && { nextStep }) 
-  };
+  const messages = getMessagesFromResponse(idxResponse, options);
+  if (terminal) {
+    return { idxResponse, terminal, messages };
+  } else {
+    const remediator = getRemediator(idxResponse.neededToProceed, {}, options);
+    const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
+    return {
+      idxResponse,
+      messages,
+      ...(nextStep && { nextStep }),
+    };
+  }
+  
 }
