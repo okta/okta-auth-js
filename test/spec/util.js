@@ -202,9 +202,42 @@ describe('util', function() {
     });
   });
 
+  describe('isAbsoluteUrl', () => {
+    it('returns true if url has a scheme', () => {
+      expect(util.isAbsoluteUrl('https://acme.com/redirect')).toBe(true);
+    });
+
+    it('returns true if url has a custom scheme (RFC2396)', () => {
+      expect(util.isAbsoluteUrl('com.acme.app://redirect')).toBe(true);
+      expect(util.isAbsoluteUrl('com.acme.APP://redirect')).toBe(true);
+      expect(util.isAbsoluteUrl('com.acme.my-mobile-app+12://redirect')).toBe(true);
+      expect(util.isAbsoluteUrl('bad^scheme://redirect')).toBe(false);
+    });
+
+    it('returns true if url has a custom scheme without double slash', () => {
+      expect(util.isAbsoluteUrl('com.acme.app:redirect')).toBe(true);
+      expect(util.isAbsoluteUrl('com.acme.app:/redirect')).toBe(true);
+    });
+
+    it('returns false if url has no scheme', () => {
+      expect(util.isAbsoluteUrl('acme.com/redirect')).toBe(false);
+      expect(util.isAbsoluteUrl('/redirect')).toBe(false);
+      expect(util.isAbsoluteUrl('redirect')).toBe(false);
+    });
+
+    it('returns false if url is a network-path', () => {
+      expect(util.isAbsoluteUrl('//redirect')).toBe(false);
+    });
+  });
+  
   describe('toAbsoluteUrl', () => {
     it('should return same url if url is an absolute url', () => {
       const url = 'http://fake.com';
+      expect(util.toAbsoluteUrl(url)).toEqual(url);
+    });
+
+    it('should return same url if url is an absolute url with custom scheme', () => {
+      const url = 'com.acme.app://redirect';
       expect(util.toAbsoluteUrl(url)).toEqual(url);
     });
 

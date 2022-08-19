@@ -11,7 +11,7 @@
  */
 
 export function isAbsoluteUrl(url) {
-  return /^(?:[a-z]+:)?\/\//i.test(url);
+  return /^[a-z][a-z0-9+.-]*:/i.test(url);
 }
 
 export function toAbsoluteUrl(url = '', baseUrl) {
