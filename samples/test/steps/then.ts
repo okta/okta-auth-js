@@ -200,7 +200,7 @@ Then(
 Then(
   /^she sees a page to challenge her email authenticator$/,
   async function(this: ActionContext) {
-    console.log('+++', this.config);
+    console.log('+++111+++', this.config, this.credentials);
     checkIsOnPage('Challenge email authenticator')
   },
 );
