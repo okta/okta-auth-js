@@ -11,7 +11,7 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { TokenParams, Tokens } from '../types';
+import { TokenParams, Tokens } from './types';
 import { getWithoutPrompt } from './getWithoutPrompt';
 import { renewTokensWithRefresh } from './renewTokensWithRefresh';
 import { getDefaultTokenParams } from './util';

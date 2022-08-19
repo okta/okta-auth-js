@@ -11,8 +11,7 @@
  */
 
 
-import { SavedObject } from '../../lib/storage/SavedObject';
-import { SimpleStorage } from '../../lib/types';
+import { SavedObject, SimpleStorage } from '../../lib/storage';
 
 describe('SavedObject', () => {
 

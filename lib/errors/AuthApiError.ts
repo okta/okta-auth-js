@@ -11,7 +11,8 @@
  */
 
 import CustomError from './CustomError';
-import { APIError, FieldError, HttpResponse } from '../types';
+import { HttpResponse } from '../http/types';
+import { APIError, FieldError } from './types';
 
 export default class AuthApiError extends CustomError implements APIError {
   errorSummary: string;

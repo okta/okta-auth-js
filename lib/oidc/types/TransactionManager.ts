@@ -1,5 +1,4 @@
 import { OAuthTransactionMeta, TransactionMetaOptions } from './meta';
-import { OAuthStorageManagerInterface } from './storage';
 import { TransactionManagerOptions, TransactionMeta } from './Transaction';
 
 export interface ClearTransactionMetaOptions extends TransactionMetaOptions {
@@ -17,10 +16,8 @@ export interface TransactionManagerInterface {
 
 export interface TransactionManagerConstructor
 <
-  M extends OAuthTransactionMeta,
-  S extends OAuthStorageManagerInterface<M>,
   TM extends TransactionManagerInterface = TransactionManagerInterface
 >
 {
-  new (options: TransactionManagerOptions<M, S>): TM;
+  new (options: TransactionManagerOptions): TM;
 }

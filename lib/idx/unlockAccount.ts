@@ -20,7 +20,7 @@ import {
   AccountUnlockOptions, 
   IdxTransaction,
   IdxFeature,
-} from '../types';
+} from './types';
 
 export async function unlockAccount(
   authClient: OktaAuthIdxInterface, options: AccountUnlockOptions = {}

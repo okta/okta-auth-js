@@ -1,5 +1,5 @@
 import { GenericRemediator, RemediationValues, Remediator } from '../../../../lib/idx/remediators';
-import { OktaAuthIdxInterface } from '../../../../lib/types';
+import { OktaAuthIdxInterface } from '../../../../lib/idx/types';
 import { IdxRemediation } from '../../../../lib/idx/types/idx-js';
 import { 
   IdxRemediationFactory,

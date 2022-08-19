@@ -11,7 +11,7 @@
  */
 
 import { IdxResponse, IdxToPersist } from '../../types/idx-js';
-import { OktaAuthIdxInterface, RawIdxResponse } from '../../../types';    // auth-js/types
+import { OktaAuthIdxInterface, RawIdxResponse } from '../../types';    // auth-js/types
 import { parseIdxResponse } from './idxResponseParser';
 
 export function makeIdxState( 

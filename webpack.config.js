@@ -13,7 +13,7 @@ var commonConfig = require('./webpack.common.config');
 var license = fs.readFileSync('lib/license-header.txt', 'utf8'); 
 
 var entries = {
-  'okta-auth-js': './lib/exports/default.ts',
+  'default': './lib/exports/default.ts',
   'core': './lib/exports/core.ts',
   'authn': './lib/exports/authn.ts',
   'idx': './lib/exports/idx.ts',
@@ -54,8 +54,8 @@ module.exports = Object.keys(entries).map(function(entryName) {
       [entryName]: entries[entryName]
     },
     output: {
-      path: path.join(__dirname, 'build', 'dist'),
-      filename: '[name].umd.js',
+      path: path.join(__dirname, 'build', 'umd'),
+      filename: '[name].js',
       library: 'OktaAuth',
       libraryTarget: 'umd'
     },

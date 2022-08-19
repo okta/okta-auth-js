@@ -1,4 +1,4 @@
-import { OAuthTransactionMeta } from '../../../lib/types';
+import { OAuthTransactionMeta } from '../../../lib/oidc/types';
 import {
   clearTransactionFromSharedStorage,
   loadTransactionFromSharedStorage,

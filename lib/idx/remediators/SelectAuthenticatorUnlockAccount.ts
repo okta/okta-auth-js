@@ -12,7 +12,7 @@
 
 
 import { SelectAuthenticator, SelectAuthenticatorValues } from './Base/SelectAuthenticator';
-import { Authenticator } from '../../types';
+import { Authenticator } from '../types';
 import { IdxRemediationValue } from '../types/idx-js';
 
 

@@ -13,9 +13,12 @@
 import { BroadcastChannel } from 'broadcast-channel';
 import { isBrowser } from '../features';
 import {
-  ServiceManagerOptions, ServiceInterface, Token, Tokens, 
+  ServiceManagerOptions, ServiceInterface
+} from '../core/types';
+import {
+  Token, Tokens, 
   EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED, EVENT_SET_STORAGE, TokenManagerInterface
-} from '../types';
+} from '../oidc/types';
 
 export type SyncMessage = {
   type: string;

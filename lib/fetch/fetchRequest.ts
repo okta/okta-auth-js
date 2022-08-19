@@ -11,7 +11,7 @@
  */
 
 import crossFetch from 'cross-fetch';
-import { FetchOptions, HttpResponse } from '../types';
+import { FetchOptions, HttpResponse } from '../http/types';
 
 // content-type = application/json OR application/ion+json
 const appJsonContentTypeRegex = /application\/\w*\+?json/;

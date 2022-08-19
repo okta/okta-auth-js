@@ -37,10 +37,10 @@ export function mixinAuthn
 <
   S extends StorageManagerInterface = StorageManagerInterface,
   O extends OktaAuthHttpOptions = OktaAuthHttpOptions,
-  TBase extends OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
-    = OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
+  TBase extends OktaAuthConstructor<OktaAuthHttpInterface<S, O>>
+    = OktaAuthConstructor<OktaAuthHttpInterface<S, O>>
 >
-(Base: TBase): TBase & OktaAuthConstructor<O, OktaAuthTxInterface<S, O>>
+(Base: TBase): TBase & OktaAuthConstructor<OktaAuthTxInterface<S, O>>
 {
   return class OktaAuthTx extends Base implements OktaAuthTxInterface<S, O> {
     tx: AuthnTransactionAPI; // legacy, may be removed in future version

@@ -21,9 +21,8 @@ import {
   PasscodeValueFactory,
   IdxErrorPasscodeInvalidFactory
 } from '@okta/test.support/idx';
-import { IdxFeature, IdxResponse, } from '../../../lib/idx/types';
+import { IdxFeature, IdxResponse, OktaAuthIdxInterface } from '../../../lib/idx/types';
 import { Remediator, GenericRemediator } from '../../../lib/idx/remediators';
-import { OktaAuthIdxInterface } from '../../../lib/types';
 
 jest.mock('../../../lib/idx/remediators/GenericRemediator');
 

@@ -7,74 +7,73 @@
   "license": "Apache-2.0",
   "main": "build/cjs/exports/default.js",
   "module": "build/esm/node/exports/exports/default.js",
-  "browser": "build/dist/okta-auth-js.umd.js",
-  "types": "build/lib/exports/default.d.ts",
+  "browser": "build/umd/default.js",
+  "types": "build/types/lib/exports/default.d.ts",
   "exports": {
     ".": {
       "node": {
-        "types": "./build/lib/exports/default.d.ts",
+        "types": "./build/types/lib/exports/default.d.ts",
         "import": "./build/esm/node/exports/exports/default.js",
         "require": "./build/cjs/exports/default.js"
       },
-      "browser": {
-        "types": "./build/lib/exports/default.d.ts",
+      "default": {
+        "types": "./build/types/lib/exports/default.d.ts",
         "import": "./build/esm/browser/exports/exports/default.js",
-        "default": "./build/esm/browser/exports/exports/default.js"
-      },
-      "types": "./build/lib/exports/default.d.ts",
-      "default": "./build/dist/okta-auth-js.umd.js"
+        "require": "./build/umd/default.js",
+        "default": "./build/umd/default.js"
+      }
     },
     "./core": {
       "node": {
-        "types": "./build/lib/exports/core.d.ts",
+        "types": "./build/types/lib/exports/core.d.ts",
         "import": "./build/esm/node/exports/exports/core.js",
         "require": "./build/cjs/exports/core.js"
       },
-      "browser": {
-        "types": "./build/lib/exports/core.d.ts",
-        "import": "./build/esm/browser/exports/exports/core.js"
-      },
-      "types": "./build/lib/exports/core.d.ts",
-      "default": "./build/dist/core.umd.js"
+      "default": {
+        "types": "./build/types/lib/exports/core.d.ts",
+        "import": "./build/esm/browser/exports/exports/core.js",
+        "require": "./build/umd/core.js",
+        "default": "./build/umd/core.js"
+      }
     },
     "./authn": {
       "node": {
-        "types": "./build/lib/exports/authn.d.ts",
+        "types": "./build/types/lib/exports/authn.d.ts",
         "import": "./build/esm/node/exports/exports/authn.js",
         "require": "./build/cjs/exports/authn.js"
       },
-      "browser": {
-        "types": "./build/lib/exports/authn.d.ts",
-        "import": "./build/esm/browser/exports/exports/authn.js"
-      },
-      "types": "./build/lib/exports/authn.d.ts",
-      "default": "./build/dist/authn.umd.js"
+      "default": {
+        "types": "./build/types/lib/exports/authn.d.ts",
+        "import": "./build/esm/browser/exports/exports/authn.js",
+        "require": "./build/umd/authn.js",
+        "default": "./build/umd/authn.js"
+      }
     },
     "./idx": {
       "node": {
-        "types": "./build/lib/exports/idx.d.ts",
+        "types": "./build/types/lib/exports/idx.d.ts",
         "import": "./build/esm/node/exports/exports/idx.js",
         "require": "./build/cjs/exports/idx.js"
       },
-      "browser": {
-        "types": "./build/lib/exports/idx.d.ts",
-        "import": "./build/esm/browser/exports/exports/idx.js"
-      },
-      "types": "./build/lib/exports/idx.d.ts",
-      "default": "./build/dist/idx.umd.js"
+      "default": {
+        "types": "./build/types/lib/exports/idx.d.ts",
+        "import": "./build/esm/browser/exports/exports/idx.js",
+        "require": "./build/umd/idx.js",
+        "default": "./build/esm/browser/exports/exports/idx.js"
+      }
     },
     "./myaccount": {
       "node": {
-        "types": "./build/lib/exports/myaccount.d.ts",
+        "types": "./build/types/lib/exports/myaccount.d.ts",
         "import": "./build/esm/node/exports/exports/myaccount.js",
         "require": "./build/cjs/exports/myaccount.js"
       },
-      "browser": {
-        "types": "./build/lib/exports/myaccount.d.ts",
-        "import": "./build/esm/browser/exports/exports/myaccount.js"
-      },
-      "types": "./build/lib/exports/myaccount.d.ts",
-      "default": "./build/dist/myaccount.umd.js"
+      "default": {
+        "types": "./build/types/lib/exports/myaccount.d.ts",
+        "import": "./build/esm/browser/exports/exports/myaccount.js",
+        "require": "./build/umd/myaccount.js",
+        "default": "./build/umd/myaccount.js"
+      }
     },
     "./package.json": "./package.json",
     "./polyfill": "./build/polyfill/index.js"

@@ -26,7 +26,7 @@ import {
   TokenParams,
   PopupParams,
   OAuthResponse,
-} from '../types';
+} from './types';
 
 import { prepareTokenParams } from './util/prepareTokenParams';
 import { buildAuthorizeParams } from './endpoints/authorize';

@@ -15,10 +15,12 @@
 import { 
   OktaAuth, 
   AuthApiError,
-  AuthSdkError
+  AuthSdkError,
+  APIError,
+  isAccessToken,
+  isIDToken
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import { APIError, isAccessToken, isIDToken } from '../../../lib/types';
 import util from '@okta/test.support/util';
 
 describe('OktaAuth (api)', function() {

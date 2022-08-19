@@ -1,18 +1,23 @@
-import { IdxTransactionManager } from '../idx/IdxTransactionManager';
-import { createOktaAuthIdx } from '../idx/factory';
-import { createIdxStorageManager } from '../idx/storage';
 import {
-  IdxStorageManagerInterface,
-  OktaAuthIdxOptions,
   OktaAuthOptionsConstructor,
-  StorageManagerConstructor } from '../types';
-import { createIdxOptionsConstructor } from '../idx/options';
+} from '../base';
+
+import {
+  IdxStorageManagerConstructor,
+  IdxTransactionManagerConstructor,
+  OktaAuthIdxOptions,
+  createIdxTransactionManager,
+  createOktaAuthIdx,
+  createIdxStorageManager,
+  createIdxOptionsConstructor
+} from '../idx';
 
 const OptionsConstructor: OktaAuthOptionsConstructor<OktaAuthIdxOptions> = createIdxOptionsConstructor();
-const StorageManager: StorageManagerConstructor<IdxStorageManagerInterface>
-  = createIdxStorageManager();
+const StorageManager: IdxStorageManagerConstructor = createIdxStorageManager();
+const TransactionManager: IdxTransactionManagerConstructor = createIdxTransactionManager();
 
-const OktaAuthIdx = createOktaAuthIdx(StorageManager, OptionsConstructor, IdxTransactionManager);
+
+const OktaAuthIdx = createOktaAuthIdx(StorageManager, OptionsConstructor, TransactionManager);
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface OktaAuthOptions extends OktaAuthIdxOptions {}

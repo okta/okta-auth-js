@@ -11,7 +11,7 @@
  */
 
 import { OAuthStorageManagerInterface } from '../../oidc/types/storage';
-import { StorageOptions, StorageProvider } from '../../storage/types';
+import { StorageManagerConstructor, StorageOptions, StorageProvider } from '../../storage/types';
 import { RawIdxResponse } from './idx-js';
 import { IdxTransactionMeta } from './meta';
 import { IntrospectOptions } from './options';
@@ -35,3 +35,6 @@ export interface IdxStorageManagerInterface<M extends IdxTransactionMeta = IdxTr
 {
   getIdxResponseStorage(options?: StorageOptions): IdxResponseStorage | null 
 }
+
+export type IdxStorageManagerConstructor<M extends IdxTransactionMeta = IdxTransactionMeta>
+  = StorageManagerConstructor<IdxStorageManagerInterface<M>>

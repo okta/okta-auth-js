@@ -11,7 +11,12 @@
  */
 
 import { APIError } from '../../errors/types';
-import { Tokens, TransactionManagerInterface } from '../../oidc/types';
+import {
+  OktaAuthOAuthInterface,
+  Tokens,
+  TransactionManagerConstructor,
+  TransactionManagerInterface
+} from '../../oidc/types';
 import { FlowIdentifier } from './FlowIdentifier';
 import {
   IdxActions,
@@ -42,7 +47,6 @@ import {
 } from './options';
 import { IdxTransactionMeta } from './meta';
 import { IdxStorageManagerInterface, SavedIdxResponse } from './storage';
-import { OktaAuthCoreInterface } from '../../core/types';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
@@ -211,14 +215,16 @@ export interface IdxTransactionManagerInterface extends TransactionManagerInterf
   clearIdxResponse(): void;
 }
 
+export type IdxTransactionManagerConstructor = TransactionManagerConstructor<IdxTransactionManagerInterface>;
+
 export interface OktaAuthIdxInterface
 <
   M extends IdxTransactionMeta = IdxTransactionMeta,
   S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>,
-  O extends OktaAuthIdxOptions<M, S> = OktaAuthIdxOptions<M, S>,
+  O extends OktaAuthIdxOptions = OktaAuthIdxOptions,
   TM extends IdxTransactionManagerInterface = IdxTransactionManagerInterface
 >
-  extends OktaAuthCoreInterface<M, S, O, TM>
+  extends OktaAuthOAuthInterface<M, S, O, TM>
 {
   idx: IdxAPI;
 }

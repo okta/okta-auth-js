@@ -11,23 +11,44 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import {
-  OktaAuth
-} from '@okta/okta-auth-js/core';
 
 import {
+  OktaAuth,
   createAuthnTransactionAPI,
   AuthnTransactionAPI,
   OktaAuthTxInterface,
   AuthnTransaction,
-  mixinAuthn,
+  OktaAuthCoreInterface,
+  OktaAuthHttpInterface,
   FingerprintAPI
 } from '@okta/okta-auth-js/authn';
 
-import { expectType, expectAssignable, expectNotAssignable } from 'tsd';
+import { expectType, expectAssignable, expectError } from 'tsd';
 
 const authClient = new OktaAuth({});
-expectNotAssignable<OktaAuthTxInterface>(authClient);
+expectAssignable<OktaAuthTxInterface>(authClient);
+expectAssignable<OktaAuthHttpInterface>(authClient);
+expectAssignable<OktaAuthCoreInterface>(authClient);
+
+expectType<AuthnTransactionAPI>(authClient.tx);
+expectType<AuthnTransactionAPI>(authClient.authn);
+expectType<FingerprintAPI>(authClient.fingerprint);
+
+// does not include OAuth
+expectError<undefined>(authClient.token);
+
+// does not include Core
+expectError<undefined>(authClient.authStateManager);
+
+// test async methods
+(async () => {
+  expectType<string>(await authClient.fingerprint());
+  expectType<AuthnTransaction>(await authClient.signIn({}));
+  expectType<AuthnTransaction>(await authClient.signInWithCredentials({}));
+  expectType<AuthnTransaction>(await authClient.forgotPassword({}));
+  expectType<AuthnTransaction>(await authClient.unlockAccount({ username: 'foo', factorType: 'SMS' }));
+  expectType<AuthnTransaction>(await authClient.verifyRecoveryToken({ recoveryToken: 'foo' }));
+})();
 
 // test factory
 const authn = createAuthnTransactionAPI(authClient);
@@ -43,22 +64,4 @@ expectType<AuthnTransaction>(authn.createTransaction());
   expectType<AuthnTransaction>(await authn.resume());
   expectType<AuthnTransaction>(await authn.introspect());
   expectType<AuthnTransaction>(await authn.postToTransaction('/url'));
-})();
-
-// test mixin
-const OktaAuthTx = mixinAuthn(OktaAuth);
-const authClientTx = new OktaAuthTx({});
-expectAssignable<OktaAuthTxInterface>(authClientTx);
-expectType<AuthnTransactionAPI>(authClientTx.tx);
-expectType<AuthnTransactionAPI>(authClientTx.authn);
-expectType<FingerprintAPI>(authClientTx.fingerprint);
-
-// test async methods
-(async () => {
-  expectType<string>(await authClientTx.fingerprint());
-  expectType<AuthnTransaction>(await authClientTx.signIn({}));
-  expectType<AuthnTransaction>(await authClientTx.signInWithCredentials({}));
-  expectType<AuthnTransaction>(await authClientTx.forgotPassword({}));
-  expectType<AuthnTransaction>(await authClientTx.unlockAccount({ username: 'foo', factorType: 'SMS' }));
-  expectType<AuthnTransaction>(await authClientTx.verifyRecoveryToken({ recoveryToken: 'foo' }));
 })();

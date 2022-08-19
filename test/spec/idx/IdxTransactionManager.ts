@@ -11,7 +11,7 @@
  */
 
 
-import { IdxTransactionManager } from '../../../lib/idx/IdxTransactionManager';
+import { createIdxTransactionManager } from '../../../lib/idx/IdxTransactionManager';
 import { RawIdxResponseFactory } from '@okta/test.support/idx';
 
 jest.mock('../../../lib/oidc/util/sharedStorage', () => {
@@ -71,6 +71,7 @@ describe('IdxTransactionManager', () => {
 
   function createInstance(additionalOptions = {}) {
     const { options } = testContext;
+    const IdxTransactionManager = createIdxTransactionManager();
     const transactionManager = new IdxTransactionManager(Object.assign(options, additionalOptions));
     Object.assign(testContext, {
       transactionManager

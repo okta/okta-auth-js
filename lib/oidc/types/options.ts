@@ -10,12 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { OktaAuthOptionsConstructor } from '../../base/types';
 import { OktaAuthHttpOptions } from '../../http/types';
 import { SimpleStorage } from '../../storage/types';
 import { OktaAuthOAuthInterface, SetLocationFunction } from './api';
-import { OAuthTransactionMeta } from './meta';
 import { OAuthResponseMode, OAuthResponseType } from './proto';
-import { OAuthStorageManagerInterface } from './storage';
 import { TransactionManagerOptions } from './Transaction';
 
 export interface CustomUrls {
@@ -70,12 +69,7 @@ export interface SigninWithRedirectOptions extends TokenParams {
   originalUri?: string;
 }
 
-export interface OktaAuthOAuthOptions
-<
-  M extends OAuthTransactionMeta = OAuthTransactionMeta,
-  S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>
->
-extends
+export interface OktaAuthOAuthOptions extends
   OktaAuthHttpOptions,
   CustomUrls,
   Pick<TokenParams,
@@ -98,9 +92,11 @@ extends
   maxClockSkew?: number;
   restoreOriginalUri?: (oktaAuth: OktaAuthOAuthInterface, originalUri?: string) => Promise<void>;
 
-  transactionManager?: TransactionManagerOptions<M, S>;
+  transactionManager?: TransactionManagerOptions;
 
   // For server-side web applications ONLY!
   clientSecret?: string;
   setLocation?: SetLocationFunction;
 }
+
+export type OktaAuthOauthOptionsConstructor = OktaAuthOptionsConstructor<OktaAuthOAuthOptions>;
