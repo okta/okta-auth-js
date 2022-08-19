@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.7.6
+
+### Fixes
+
+- [#1277](https://github.com/okta/okta-auth-js/pull/1277) IDX GenericRemediator patches (beta):
+  - fixes error handling issue
+
 ## 6.7.5
 
 ### Fixes
