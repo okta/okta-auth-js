@@ -188,6 +188,11 @@ Then(
 );
 
 Then(
+  /^she should see (?:a message on the Login form|the message|a message|an error message) containing "(?<message>.+?)"$/,
+  checkFormContainsMessage
+);
+
+Then(
   /^the sample shows an error message "(?<message>.+?)" on the Sample App$/,
   checkFormMessage
 );
