@@ -12,7 +12,7 @@
  */
 
 import { Remediator, RemediationValues } from './Remediator';
-import { IdxRemediationValue, IdxOption, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
+import { IdxRemediationValue, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
 import { isAuthenticator } from '../../types';
 import { compareAuthenticators } from '../../authenticator/util';
 

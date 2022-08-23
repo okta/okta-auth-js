@@ -14,7 +14,7 @@
 module.exports = function flowStates(req, res, next) {
   const getKey = (req) => {
     return `flow-${req.transactionId}`;
-  }
+  };
 
   req.getFlowStates = () => {
     const key = getKey(req);
