@@ -60,7 +60,7 @@ describe('idx/run', () => {
 
     const remediateResponse = {
       idxResponse,
-      nextStep: 'remediate-nextStep'
+      // nextStep: 'remediate-nextStep'
     };
     jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue(remediateResponse);
 
@@ -100,103 +100,12 @@ describe('idx/run', () => {
     };
   });
 
-  describe('with stateHandle', () => {
-    it('will call introspect', async () => {
-      const { authClient } = testContext;
-      const stateHandle = 'abc';
-      await run(authClient, { stateHandle });
-      expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, {
-        withCredentials: true,
-        stateHandle
-      });
-    });
-
-    it('does not call interact', async () => {
-      const { authClient } = testContext;
-      const stateHandle = 'abc';
-      await run(authClient, { stateHandle });
-      expect(mocked.interact.interact).not.toHaveBeenCalled();
-    });
-
-    it('will preserve transaction meta, if it exists', async () => {
-      const { authClient, transactionMeta } = testContext;
-      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
-      jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
-      const stateHandle = 'abc';
-      await run(authClient, { stateHandle });
-      expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, transactionMeta);
-    });
-  });
-
-  describe('flow', () => {
-    it('if not specified or already set, sets the flow to "default"', async () => {
-      const { authClient } = testContext;
-      jest.spyOn(authClient.idx, 'setFlow');
-      await run(authClient);
-      expect(authClient.idx.setFlow).toHaveBeenCalledWith('default');
-    });
-  
-    it('if flow is set in run options, it sets the flow on the authClient', async () => {
-      const { authClient } = testContext;
-      const flow = 'signup';
-      jest.spyOn(authClient.idx, 'setFlow');
-      await run(authClient, { flow });
-      expect(authClient.idx.setFlow).toHaveBeenCalledWith(flow);
-    });
-
-    it('if flow is not set in run options, it respects the flow already set on auth client', async () => {
-      const { authClient } = testContext;
-      jest.spyOn(authClient.idx, 'getFlow').mockReturnValue('existing');
-      jest.spyOn(authClient.idx, 'setFlow');
-      await run(authClient);
-      expect(authClient.idx.setFlow).toHaveBeenCalledWith('existing');
-    });
-
-    it('retrieves flow specification based on flow option', async () => {
-      const { authClient } = testContext;
-      jest.spyOn(mocked.FlowSpecification, 'getFlowSpecification');
-      await run(authClient, { flow: 'signup' });
-      expect(mocked.FlowSpecification.getFlowSpecification).toHaveBeenCalledWith(authClient, 'signup');
-    });
-  });
-
-  describe('with saved transaction', () => {
-    beforeEach(() => {
-      const { transactionMeta } = testContext;
-      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
-    });
-    it('if saved meta has no interactionHandle, will call interact', async () => {
-      const { authClient } = testContext;
-      await run(authClient);
-      expect(mocked.interact.interact).toHaveBeenCalled();
-    });
-    it('if saved meta has interactionHandle, does not call interact', async () => {
-      const { authClient, transactionMeta } = testContext;
-      transactionMeta.interactionHandle = 'fake';
-      await run(authClient);
-      expect(mocked.interact.interact).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('no saved transaction', () => {
-    beforeEach(() => {
-      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(undefined);
-    });
-    it('clears saved transaction data and calls interact', async () => {
-      const { authClient } = testContext;
-      jest.spyOn(authClient.transactionManager, 'clear');
-      await run(authClient);
-      expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
-      expect(mocked.interact.interact).toHaveBeenCalled();
-    });
-  });
-
   it('returns transaction', async () => {
     const { authClient } = testContext;
     const res = await run(authClient);
     expect(res).toMatchObject({
       status: IdxStatus.PENDING,
-      nextStep: 'remediate-nextStep',
+      rawIdxState: expect.any(Object),
       requestDidSucceed: true
     });
   });
@@ -319,8 +228,119 @@ describe('idx/run', () => {
     const res = await run(authClient);
     expect(res).toMatchObject({
       messages: ['remediate-message-1'],
-      nextStep: 'remediate-nextStep',
       status: IdxStatus.PENDING,
+    });
+  });
+
+  describe('with stateHandle', () => {
+    it('will call introspect', async () => {
+      const { authClient } = testContext;
+      const stateHandle = 'abc';
+      await run(authClient, { stateHandle });
+      expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, {
+        withCredentials: true,
+        stateHandle
+      });
+    });
+
+    it('does not call interact', async () => {
+      const { authClient } = testContext;
+      const stateHandle = 'abc';
+      await run(authClient, { stateHandle });
+      expect(mocked.interact.interact).not.toHaveBeenCalled();
+    });
+
+    it('will preserve transaction meta, if it exists', async () => {
+      const { authClient, transactionMeta } = testContext;
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+      jest.spyOn(mocked.transactionMeta, 'saveTransactionMeta');
+      const stateHandle = 'abc';
+      await run(authClient, { stateHandle });
+      expect(mocked.transactionMeta.saveTransactionMeta).toHaveBeenCalledWith(authClient, transactionMeta);
+    });
+  });
+
+  describe('flow', () => {
+    it('if not specified or already set, sets the flow to "default"', async () => {
+      const { authClient } = testContext;
+      jest.spyOn(authClient.idx, 'setFlow');
+      await run(authClient);
+      expect(authClient.idx.setFlow).toHaveBeenCalledWith('default');
+    });
+  
+    it('if flow is set in run options, it sets the flow on the authClient', async () => {
+      const { authClient } = testContext;
+      const flow = 'signup';
+      jest.spyOn(authClient.idx, 'setFlow');
+      await run(authClient, { flow });
+      expect(authClient.idx.setFlow).toHaveBeenCalledWith(flow);
+    });
+
+    it('if flow is not set in run options, it respects the flow already set on auth client', async () => {
+      const { authClient } = testContext;
+      jest.spyOn(authClient.idx, 'getFlow').mockReturnValue('existing');
+      jest.spyOn(authClient.idx, 'setFlow');
+      await run(authClient);
+      expect(authClient.idx.setFlow).toHaveBeenCalledWith('existing');
+    });
+
+    it('retrieves flow specification based on flow option', async () => {
+      const { authClient } = testContext;
+      jest.spyOn(mocked.FlowSpecification, 'getFlowSpecification');
+      await run(authClient, { flow: 'signup' });
+      expect(mocked.FlowSpecification.getFlowSpecification).toHaveBeenCalledWith(authClient, 'signup');
+    });
+  });
+
+  describe('with saved transaction', () => {
+    beforeEach(() => {
+      const { transactionMeta } = testContext;
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+    });
+    it('if saved meta has no interactionHandle, will call interact', async () => {
+      const { authClient } = testContext;
+      await run(authClient);
+      expect(mocked.interact.interact).toHaveBeenCalled();
+    });
+    it('if saved meta has interactionHandle, does not call interact', async () => {
+      const { authClient, transactionMeta } = testContext;
+      transactionMeta.interactionHandle = 'fake';
+      await run(authClient);
+      expect(mocked.interact.interact).not.toHaveBeenCalled();
+    });
+
+    it('if saved meta has interactionHandle and introspect fails, clears transaction', async () => {
+      const { authClient, transactionMeta } = testContext;
+      transactionMeta.interactionHandle = 'fake';
+      const expiredInteractionHandleResponse = IdxResponseFactory.build({
+        neededToProceed: [],
+        requestDidSucceed: false,
+        rawIdxState: {
+          messages: {
+            value: [{class: 'ERROR', i18n: { key: 'idx.session.expired' }, message: 'foo'}]
+          }
+        }
+      });
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(expiredInteractionHandleResponse);
+      jest.spyOn(mocked.remediate, 'remediate').mockResolvedValue({idxResponse: expiredInteractionHandleResponse});
+      jest.spyOn(authClient.transactionManager, 'clear');
+      const res = await run(authClient);
+      expect(mocked.interact.interact).not.toHaveBeenCalled();
+      expect(authClient.transactionManager.clear).toHaveBeenCalled();
+      expect(res.status).toBe(IdxStatus.FAILURE);
+    });
+  });
+
+  describe('no saved transaction', () => {
+    beforeEach(() => {
+      jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(undefined);
+    });
+    it('clears saved transaction data and calls interact', async () => {
+      const { authClient } = testContext;
+      jest.spyOn(authClient.transactionManager, 'clear');
+      await run(authClient);
+      expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
+      expect(mocked.interact.interact).toHaveBeenCalled();
     });
   });
 
@@ -339,7 +359,7 @@ describe('idx/run', () => {
         const res = await run(authClient);
         expect(authClient.transactionManager.clear).not.toHaveBeenCalledWith();
         expect(res).toMatchObject({
-          nextStep: 'remediate-nextStep',
+          rawIdxState: expect.any(Object),
           status: IdxStatus.PENDING,
         });
       });
@@ -385,7 +405,7 @@ describe('idx/run', () => {
         jest.spyOn(authClient.transactionManager, 'clear');
         const res = await run(authClient);
         expect(res).toMatchObject({
-          nextStep: 'remediate-nextStep',
+          rawIdxState: expect.any(Object),
           status: IdxStatus.PENDING,
         });
         expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
@@ -446,7 +466,7 @@ describe('idx/run', () => {
           jest.spyOn(authClient.transactionManager, 'clear');
           const res = await run(authClient);
           expect(res).toMatchObject({
-            nextStep: 'remediate-nextStep',
+            rawIdxState: expect.any(Object),
             status: IdxStatus.TERMINAL,
           });
           expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
@@ -477,7 +497,7 @@ describe('idx/run', () => {
           jest.spyOn(authClient.transactionManager, 'clear');
           const res = await run(authClient);
           expect(res).toMatchObject({
-            nextStep: 'remediate-nextStep',
+            rawIdxState: expect.any(Object),
             status: IdxStatus.TERMINAL,
           });
           expect(authClient.transactionManager.clear).toHaveBeenCalledTimes(1);
@@ -511,7 +531,7 @@ describe('idx/run', () => {
           jest.spyOn(authClient.transactionManager, 'clear');
           const res = await run(authClient);
           expect(res).toMatchObject({
-            nextStep: 'remediate-nextStep',
+            rawIdxState: expect.any(Object),
             status: IdxStatus.TERMINAL,
           });
           expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
@@ -540,7 +560,7 @@ describe('idx/run', () => {
           jest.spyOn(authClient.transactionManager, 'clear');
           const res = await run(authClient);
           expect(res).toMatchObject({
-            nextStep: 'remediate-nextStep',
+            rawIdxState: expect.any(Object),
             status: IdxStatus.TERMINAL,
           });
           expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
@@ -580,7 +600,7 @@ describe('idx/run', () => {
           jest.spyOn(authClient.transactionManager, 'clear');
           const res = await run(authClient);
           expect(res).toMatchObject({
-            nextStep: 'remediate-nextStep',
+            rawIdxState: expect.any(Object),
             status: IdxStatus.TERMINAL,
           });
           expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
@@ -612,7 +632,7 @@ describe('idx/run', () => {
         jest.spyOn(authClient.transactionManager, 'clear');
         const res = await run(authClient);
         expect(res).toMatchObject({
-          nextStep: 'remediate-nextStep',
+          rawIdxState: expect.any(Object),
           status: IdxStatus.TERMINAL,
         });
         expect(authClient.transactionManager.clear).not.toHaveBeenCalled();
@@ -656,7 +676,7 @@ describe('idx/run', () => {
       });
 
       expect(res).toMatchObject({
-        nextStep: 'remediate-nextStep',
+        rawIdxState: expect.any(Object),
         status: IdxStatus.SUCCESS,
         tokens: tokenResponse.tokens,
       });
