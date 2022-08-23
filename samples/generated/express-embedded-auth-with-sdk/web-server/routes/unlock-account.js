@@ -48,7 +48,7 @@ router.get('/select-authenticator-unlock-account', (req, res) => {
   const { 
     idx: { nextStep: { inputs } }
   } = req.getFlowStates();
-  const { options } = inputs[0];
+  const { options } = inputs.find(({ name }) => name === 'authenticator');
 
   renderPage({
     req, res,

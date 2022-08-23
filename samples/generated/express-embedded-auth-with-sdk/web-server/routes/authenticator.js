@@ -282,7 +282,7 @@ router.get('/enroll-authenticator/:authenticator/select-enrollment-channel', asy
   const {
     idx: { nextStep: { inputs } }
   } = req.getFlowStates();
-  const { options } = inputs[0];
+  const options = inputs[0].value.form.value.find(({ name }) => name === 'channel').options;
   renderPage({
     req, res,
     render: () => renderTemplate(req, res, 'select-enrollment-channel', {

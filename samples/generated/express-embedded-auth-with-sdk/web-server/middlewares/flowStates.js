@@ -12,21 +12,25 @@
 
 
 module.exports = function flowStates(req, res, next) {
-
-  const key = `flow-${req.transactionId}`;
+  const getKey = (req) => {
+    return `flow-${req.transactionId}`;
+  }
 
   req.getFlowStates = () => {
+    const key = getKey(req);
     return req.session[key] 
         ? req.session[key].flowStates : {};
   };
   
   req.setFlowStates = (states) => {
+    const key = getKey(req);
     const existingStates = req.getFlowStates();
     req.session[key] = req.session[key] || {};
     req.session[key].flowStates = { ...existingStates, ...states };
   };
   
   req.clearFlowStates = () => {
+    const key = getKey(req);
     if (req.session[key]) {
       delete req.session[key];
     }

@@ -85,11 +85,6 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
     return authenticator;
   }
 
-  private getMethodTypes(): IdxOption[] {
-    const authenticator: IdxRemediationValue = this.getAuthenticatorFromRemediation();
-    return authenticator.form!.value.find(({ name }) => name === 'methodType')?.options as IdxOption[];
-  }
-
   getValuesAfterProceed(): T {
     this.values = super.getValuesAfterProceed();
     // remove used authenticatorData
