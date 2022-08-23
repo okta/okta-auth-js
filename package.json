@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@okta/okta-auth-js",
+  "name": "@medblocks/okta-auth-js",
   "description": "The Okta Auth SDK",
   "version": "6.8.0",
   "homepage": "https://github.com/okta/okta-auth-js",

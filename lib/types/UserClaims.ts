@@ -24,7 +24,7 @@ export type CustomUserClaims = Record<string, CustomUserClaim | CustomUserClaim[
 
 export type UserClaims<T extends CustomUserClaims = CustomUserClaims> = T & {
   auth_time?: number;
-  aud?: string;
+  aud?: string | string[];
   email?: string;
   email_verified?: boolean;
   exp?: number;
