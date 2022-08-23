@@ -23,7 +23,7 @@ Feature: Account Unlock with Single factor (Email, Phone, Okta Verify Push)
     Then she sees a page to challenge her email authenticator
     When she inputs the correct code from her "Email"
      And she submits the form
-    Then she should see a message "Your account is now unlocked!"
+    Then she should see a message containing "unlocked!"
 
   Scenario: Mary recovers from a locked account with Phone SMS OTP
     Given she has enrolled in the "SMS" factor
@@ -38,4 +38,4 @@ Feature: Account Unlock with Single factor (Email, Phone, Okta Verify Push)
     Then the screen changes to receive an input for a code to verify
     When she inputs the correct code from her "SMS"
      And she submits the form
-    Then she should see a message "Your account is now unlocked!"
+    Then she should see a message containing "unlocked!"
