@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
 import { Remediator, RemediationValues } from './Remediator';
 import { IdxRemediationValue, IdxOption, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
 import { isAuthenticator } from '../../types';
