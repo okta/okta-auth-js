@@ -262,11 +262,6 @@ describe('idx/recoverPassword', () => {
               ] 
             }
           ],
-          options: [
-            { label: 'Okta Verify', value: 'okta_verify' },
-            { label: 'Phone', value: 'phone_number' },
-            { label: 'Email', value: 'okta_email' }
-          ]
         }
       });
 
@@ -549,11 +544,6 @@ describe('idx/recoverPassword', () => {
               ]    
             }
           ],
-          options: [
-            { label: 'Okta Verify', value: 'okta_verify' },
-            { label: 'Phone', value: 'phone_number' },
-            { label: 'Email', value: 'okta_email' }
-          ]
         }
       });
 

@@ -46,8 +46,9 @@ router.post('/unlock-account', async (req, res, next) => {
 // Handle reset password
 router.get('/select-authenticator-unlock-account', (req, res) => {
   const { 
-    idx: { nextStep: { options, inputs } }
+    idx: { nextStep: { inputs } }
   } = req.getFlowStates();
+  const { options } = inputs.find(({ name }) => name === 'authenticator');
 
   renderPage({
     req, res,

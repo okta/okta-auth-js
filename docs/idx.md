@@ -196,10 +196,6 @@ This field contains information to proceed with the next step. It's available wh
   const transaction = await authClient.idx.authenticate({ username: 'from user input' });
   ```
 
-- `options?` (**deprecated**): 
-**warning: This field has been deprecated and will be removed in the next major version (v7). Current options can still be found within related input's scope.**
-This field is available in response when the input is a selection. It can also provide information for how to build UI for the next step.
-
 ###### `tokens?`
 
 It's available with `IdxStatus.SUCCESS` status. Provides tokens set based on [scopes](../README.md#scopes) configuration.
@@ -269,7 +265,6 @@ const {
   status, // IdxStatus.PENDING
   nextStep: { 
     inputs, // [{ name: 'authenticator', ... }]
-    options // [{ name: 'email', ... }, ...]
   }
 } = await authClient.idx.proceed({ username: 'xxx',  password: 'xxx' });
 // a list of authenticators is shown and the user selects "email"
@@ -327,7 +322,6 @@ const {
   status, // IdxStatus.PENDING
   nextStep: { 
     inputs, // [{ name: 'authenticator', ... }]
-    options // [{ name: 'password', ... }, ...]
   } 
 } = await authClient.idx.proceed({
   firstName: 'xxx',
@@ -408,7 +402,6 @@ const {
   status, // IdxStatus.PENDING
   nextStep: { 
     inputs, // [{ name: 'authenticator', ... }] 
-    options // [{ name: 'email', ... }, ...]
   } 
 } = await authClient.idx.proceed({ username });
 // user sees a list of authenticators and selects "email"
@@ -472,7 +465,6 @@ const {
   status, // IdxStatus.PENDING
   nextStep: { 
     inputs, // [{ name: 'authenticator', ... }] 
-    options // [{ name: 'email', ... }, ...]
   } 
 } = await authClient.idx.proceed({ username, authenticator: AuthenticatorKey.OKTA_EMAIL });
 // gather verification code from email (this call should happen in a separated request)
