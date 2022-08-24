@@ -12,9 +12,8 @@
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
-import { IdxRemediationValueForm, IdxOption, IdxRemediationValue, IdxContext } from '../types/idx-js';
+import { IdxRemediationValueForm, IdxContext } from '../types/idx-js';
 import { Authenticator } from '../types';
-import { getAuthenticatorFromRemediation } from './util';
 import { OktaAuthIdxInterface } from '../../types';
 
 
@@ -42,20 +41,11 @@ export class SelectEnrollmentChannel extends Remediator<SelectEnrollmentChannelV
 
   getNextStep(authClient: OktaAuthIdxInterface, context: IdxContext) {
     const common = super.getNextStep(authClient, context);
-    const options = this.getChannels();
     const authenticator = context.currentAuthenticator.value;
     return {
       ...common,
-      // TODO: remove options field in the next major version - OKTA-491236
-      ...(options && { options }),
       authenticator,
     };
-  }
-
-  private getChannels(): IdxOption[] | undefined {
-    const authenticator: IdxRemediationValue = getAuthenticatorFromRemediation(this.remediation);
-    const remediationValue = authenticator.value as IdxRemediationValueForm;
-    return remediationValue.form.value.find(({ name }) => name === 'channel')?.options;
   }
 
   getData() {

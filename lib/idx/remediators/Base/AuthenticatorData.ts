@@ -11,12 +11,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
 import { Remediator, RemediationValues } from './Remediator';
-import { IdxRemediationValue, IdxOption, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
+import { IdxRemediationValue, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
 import { isAuthenticator } from '../../types';
 import { compareAuthenticators } from '../../authenticator/util';
-import { OktaAuthIdxInterface } from '../../../types';
 
 export type AuthenticatorDataValues = RemediationValues & {
   methodType?: string;
@@ -62,16 +60,6 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
       .some(data => compareAuthenticators(this.authenticator, data));
   }
 
-  // TODO: remove this override method in the next major version - OKTA-491236
-  getNextStep(authClient: OktaAuthIdxInterface) {
-    const common = super.getNextStep(authClient);
-    const options = this.getMethodTypes();
-    return { 
-      ...common, 
-      ...(options && { options }) 
-    };
-  }
-
   protected mapAuthenticatorDataFromValues(authenticatorData?) {
     // add methodType to authenticatorData if it exists in values
     let { methodType, authenticator } = this.values;
@@ -94,11 +82,6 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
     const authenticator = this.remediation.value!
       .find(({ name }) => name === 'authenticator') as IdxRemediationValue;
     return authenticator;
-  }
-
-  private getMethodTypes(): IdxOption[] {
-    const authenticator: IdxRemediationValue = this.getAuthenticatorFromRemediation();
-    return authenticator.form!.value.find(({ name }) => name === 'methodType')?.options as IdxOption[];
   }
 
   getValuesAfterProceed(): T {
