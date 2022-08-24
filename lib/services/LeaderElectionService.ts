@@ -12,6 +12,8 @@
 
 
 import { ServiceInterface, ServiceManagerOptions } from '../types';
+// module is included in generated bundle
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   BroadcastChannel,
   createLeaderElection,

@@ -11,6 +11,8 @@
  */
 
 import { TokenManager } from '../TokenManager';
+// module is included in generated bundle
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { BroadcastChannel } from 'broadcast-channel';
 import { isBrowser } from '../features';
 import {

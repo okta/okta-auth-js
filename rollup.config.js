@@ -38,7 +38,9 @@ const output = {
 
 const getPlugins = (env) => {
   return [
-    nodeResolve(),
+    nodeResolve({
+      browser: true,
+    }),
     commonjs(),
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
