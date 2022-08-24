@@ -4,8 +4,8 @@
 
 ### Breaking Changes
 
-- [#1181](https://github.com/okta/okta-auth-js/pull/1181) - Removes legacy PKCE/OAuth storage
-
+- [#1181](https://github.com/okta/okta-auth-js/pull/1181) Removes legacy PKCE/OAuth storage
+- [#1271](https://github.com/okta/okta-auth-js/pull/1271) Removes `options` field from `NextStep` of IDX transaction
 
 ## 6.8.0
 
