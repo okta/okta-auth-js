@@ -451,10 +451,6 @@ describe('idx/authenticate', () => {
         expect(res.status).toBe(IdxStatus.PENDING);
         expect(res.nextStep).toEqual({
           name: 'select-authenticator-authenticate',
-          options: [{ 
-            label: 'Password',
-            value: 'okta_password' 
-          }],
           inputs: [{
             type: 'string',
             name: 'authenticator',
@@ -748,10 +744,6 @@ describe('idx/authenticate', () => {
                   ]
                 }
               ],
-              options: [
-                { label: 'SMS', value: 'sms' },
-                { label: 'Voice call', value: 'voice' },
-              ]
             }
           });
         });
@@ -1013,10 +1005,6 @@ describe('idx/authenticate', () => {
                 },
                 { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
               ],
-              options: [
-                { label: 'SMS', value: 'sms' },
-                { label: 'Voice call', value: 'voice' },
-              ],
             }
           });
 
@@ -1110,10 +1098,6 @@ describe('idx/authenticate', () => {
                   ], 
                 },
                 { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
-              ],
-              options: [
-                { label: 'SMS', value: 'sms' },
-                { label: 'Voice call', value: 'voice' }
               ],
             }
           });
@@ -2005,16 +1989,11 @@ describe('idx/authenticate', () => {
           await authenticate(authClient, {
             authenticator: AuthenticatorKey.OKTA_VERIFY
           });
-          let res = await proceed(authClient, {
+          await proceed(authClient, {
             step: 'select-enrollment-channel'
           });
-          const { options } = res.nextStep!;
-          expect(options).toContainEqual({
-            label: 'SMS',
-            value: 'sms'
-          });
 
-          res = await proceed(authClient, {
+          let res = await proceed(authClient, {
             channel: 'phoneNumber'
           });
           const { inputs } = res.nextStep!;
@@ -2066,16 +2045,11 @@ describe('idx/authenticate', () => {
           await authenticate(authClient, {
             authenticator: AuthenticatorKey.OKTA_VERIFY
           });
-          let res = await proceed(authClient, {
+          await proceed(authClient, {
             step: 'select-enrollment-channel'
           });
-          const { options } = res.nextStep!;
-          expect(options).toContainEqual({
-            label: 'SMS',
-            value: 'sms'
-          });
 
-          res = await proceed(authClient, {
+          let res = await proceed(authClient, {
             authenticator: {
               id: 'string',
               channel: 'phoneNumber'
@@ -2296,10 +2270,6 @@ describe('idx/authenticate', () => {
             label: 'Email',
             value: AuthenticatorKey.OKTA_EMAIL
           }],  
-        }],
-        options: [{
-          label: 'Email',
-          value: AuthenticatorKey.OKTA_EMAIL
         }],
       });
 
