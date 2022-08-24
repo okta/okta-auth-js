@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.5.4
+
+- [#1280](https://github.com/okta/okta-auth-js/pull/1280) Locks version of `broadcast-channel` at `4.13.0` to prevent node minimum version regressions
+
 ## 6.5.3
 
 - [#1224](https://github.com/okta/okta-auth-js/pull/1224) Fixes missing `relatesTo` type from `NextStep`
