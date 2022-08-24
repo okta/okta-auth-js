@@ -408,10 +408,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.OKTA_PASSWORD
             }]
           }],
-          options: [{
-            label: 'Password',
-            value: AuthenticatorKey.OKTA_PASSWORD
-          }]
         },
       });
     });
@@ -471,10 +467,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.OKTA_PASSWORD
             }]
           }],
-          options: [{
-            label: 'Password',
-            value: AuthenticatorKey.OKTA_PASSWORD
-          }]
         },
       });
     });
@@ -697,25 +689,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.WEBAUTHN
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }, {
-            label: 'Email',
-            value: AuthenticatorKey.OKTA_EMAIL
-          }, {
-            label: 'Google Authenticator',
-            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }, {
-            label: 'Security Question',
-            value: AuthenticatorKey.SECURITY_QUESTION
-          }, {
-            label: 'Okta Verify',
-            value: AuthenticatorKey.OKTA_VERIFY
-          }, {
-            label: 'Security Key or Biometric',
-            value: AuthenticatorKey.WEBAUTHN
-          }]
         },
       });
     });
@@ -752,10 +725,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.OKTA_PASSWORD
             }]
           }],
-          options: [{
-            label: 'Password',
-            value: AuthenticatorKey.OKTA_PASSWORD
-          }]
         },
       });
       res = await register(authClient, { password, authenticators: [AuthenticatorKey.OKTA_PASSWORD]});
@@ -796,25 +765,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.WEBAUTHN
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }, {
-            label: 'Email',
-            value: AuthenticatorKey.OKTA_EMAIL
-          }, {
-            label: 'Google Authenticator',
-            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }, {
-            label: 'Security Question',
-            value: AuthenticatorKey.SECURITY_QUESTION
-          }, {
-            label: 'Okta Verify',
-            value: AuthenticatorKey.OKTA_VERIFY
-          }, {
-            label: 'Security Key or Biometric',
-            value: AuthenticatorKey.WEBAUTHN
-          }]
         },
       });
     });
@@ -915,25 +865,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.WEBAUTHN
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }, {
-            label: 'Email',
-            value: AuthenticatorKey.OKTA_EMAIL
-          }, {
-            label: 'Google Authenticator',
-            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }, {
-            label: 'Security Question',
-            value: AuthenticatorKey.SECURITY_QUESTION
-          }, {
-            label: 'Okta Verify',
-            value: AuthenticatorKey.OKTA_VERIFY
-          }, {
-            label: 'Security Key or Biometric',
-            value: AuthenticatorKey.WEBAUTHN
-          }]
         },
       });
 
@@ -1035,10 +966,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.PHONE_NUMBER
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }]
         },
       });
     });
@@ -1298,10 +1225,6 @@ describe('idx/register', () => {
             },
             { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' },
           ],
-          options: [
-            { label: 'SMS', value: 'sms' },
-            { label: 'Voice call', value: 'voice' },
-          ]
         },
       });
 
@@ -1504,10 +1427,6 @@ describe('idx/register', () => {
             },
             { name: 'phoneNumber', type: 'string', required: true, label: 'Phone Number' }
           ],
-          options: [
-            { label: 'SMS', value: 'sms' },
-            { label: 'Voice call', value: 'voice' },
-          ]
         }
       });
 
@@ -1614,25 +1533,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.WEBAUTHN
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }, {
-            label: 'Email',
-            value: AuthenticatorKey.OKTA_EMAIL
-          }, {
-            label: 'Google Authenticator',
-            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }, {
-            label: 'Security Question',
-            value: AuthenticatorKey.SECURITY_QUESTION
-          }, {
-            label: 'Okta Verify',
-            value: AuthenticatorKey.OKTA_VERIFY
-          }, {
-            label: 'Security Key or Biometric',
-            value: AuthenticatorKey.WEBAUTHN
-          }]
         }
       });
 
@@ -1745,10 +1645,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.PHONE_NUMBER
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }]
         }
       });
     });
@@ -1867,25 +1763,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.WEBAUTHN
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }, {
-            label: 'Email',
-            value: AuthenticatorKey.OKTA_EMAIL
-          }, {
-            label: 'Google Authenticator',
-            value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-          }, {
-            label: 'Security Question',
-            value: AuthenticatorKey.SECURITY_QUESTION
-          }, {
-            label: 'Okta Verify',
-            value: AuthenticatorKey.OKTA_VERIFY
-          }, {
-            label: 'Security Key or Biometric',
-            value: AuthenticatorKey.WEBAUTHN
-          }]
         }
       });
 
@@ -2022,10 +1899,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.PHONE_NUMBER
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }]
         }
       });
     });
@@ -2111,10 +1984,6 @@ describe('idx/register', () => {
               value: AuthenticatorKey.PHONE_NUMBER
             }]
           }],
-          options: [{
-            label: 'Phone',
-            value: AuthenticatorKey.PHONE_NUMBER
-          }]
         }
       });
     });
@@ -2166,12 +2035,8 @@ describe('idx/register', () => {
       jest.spyOn(mocked.introspect, 'introspect')
         .mockResolvedValue(selectAuthenticatorResponse);
 
-      let response = await register(authClient, {});
+      await register(authClient, {});
       expect(selectAuthenticatorResponse.proceed).not.toHaveBeenCalled();
-      expect(response.nextStep?.options).toContainEqual({
-        label: 'Okta Verify',
-        value: AuthenticatorKey.OKTA_VERIFY
-      });
     });
 
     it('prompts to start polling when selected', async () => {
@@ -2247,16 +2112,11 @@ describe('idx/register', () => {
       await register(authClient, {
         authenticator: AuthenticatorKey.OKTA_VERIFY
       });
-      let res = await proceed(authClient, {
+      await proceed(authClient, {
         step: 'select-enrollment-channel'
       });
-      const { options } = res.nextStep!;
-      expect(options).toContainEqual({
-        label: 'SMS',
-        value: 'sms'
-      });
 
-      res = await proceed(authClient, {
+      let res = await proceed(authClient, {
         channel: 'phoneNumber'
       });
       const { inputs } = res.nextStep!;
@@ -2308,12 +2168,6 @@ describe('idx/register', () => {
       });
       let res = await proceed(authClient, {
         step: 'select-enrollment-channel'
-      });
-      const { options } = res.nextStep!;
-
-      expect(options).toContainEqual({
-        label: 'EMAIL',
-        value: 'email'
       });
 
       res = await proceed(authClient, {
@@ -2453,25 +2307,6 @@ describe('idx/register', () => {
             value: AuthenticatorKey.WEBAUTHN
           }]
         }],
-        options: [{
-          label: 'Phone',
-          value: AuthenticatorKey.PHONE_NUMBER
-        }, {
-          label: 'Email',
-          value: AuthenticatorKey.OKTA_EMAIL
-        }, {
-          label: 'Google Authenticator',
-          value: AuthenticatorKey.GOOGLE_AUTHENTICATOR
-        }, {
-          label: 'Security Question',
-          value: AuthenticatorKey.SECURITY_QUESTION
-        }, {
-          label: 'Okta Verify',
-          value: AuthenticatorKey.OKTA_VERIFY
-        }, {
-          label: 'Security Key or Biometric',
-          value: AuthenticatorKey.WEBAUTHN
-        }]
       });
 
       res = await register(authClient, {
@@ -2607,10 +2442,6 @@ describe('idx/register', () => {
             value: AuthenticatorKey.PHONE_NUMBER
           }]
         }],
-        options: [{
-          label: 'Phone',
-          value: AuthenticatorKey.PHONE_NUMBER
-        }]
       });
     });
   });
@@ -2651,12 +2482,6 @@ describe('idx/register', () => {
             },
           ],
           name: 'select-authenticator-enroll',
-          options: [
-            { 
-              label: 'Phone', 
-              value: AuthenticatorKey.PHONE_NUMBER 
-            }
-          ],
           canSkip: true,
         },
         status: IdxStatus.PENDING,

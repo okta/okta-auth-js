@@ -246,20 +246,6 @@ describe('/idx/unlockAccout', () => {
             ],
           },
         ],
-        options: [
-          {
-            label: 'Phone',
-            value: 'phone_number'
-          },
-          {
-            label: 'Email',
-            value: 'okta_email'
-          },
-          {
-            label: 'Okta Verify',
-            value: 'okta_verify'
-          }
-        ],
       }
     });
   });
