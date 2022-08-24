@@ -27,12 +27,12 @@
     "./myaccount": {
       "node": {
         "types": "./build/lib/myaccount/index.d.ts",
-        "import": "./build/esm/node/myaccount/myaccount/index.js",
+        "import": "./build/esm/node/myaccount/index.js",
         "require": "./build/cjs/myaccount/index.js"
       },
       "browser": {
         "types": "./build/lib/myaccount/index.d.ts",
-        "import": "./build/esm/browser/myaccount/myaccount/index.js"
+        "import": "./build/esm/browser/myaccount/index.js"
       },
       "types": "./build/lib/myaccount/index.d.ts",
       "default": "./build/dist/myaccount.umd.js"
