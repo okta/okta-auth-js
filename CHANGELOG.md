@@ -4,7 +4,7 @@
 
 ### Fixes
 - [#1263](https://github.com/okta/okta-auth-js/pull/1263) (IDX) `select-enrollment-channel` remediation now accepts protocol defined inputs, as well as conveniences
-- [#1262](https://github.com/okta/okta-auth-js/pull/1262) Freezes `broadcast-channel` version at `4.13.0`, `4.14.0` requires node 14+
+- [#1262](https://github.com/okta/okta-auth-js/pull/1262) Freezes `broadcast-channel` version at `4.13.0`, `4.14.0` requires node 14+ (This fix has been applied to 6.5.4 and up)
 
 ## 6.7.3
 
@@ -40,6 +40,10 @@
   - Fixes error `Channel is closed` while stopping leader election
 - [#1158](https://github.com/okta/okta-auth-js/pull/1158) Adds MyAccount API. See [MyAccount API DOC](/docs/myaccount/README.md) for detailed information.
 
+## 6.6.3
+
+- [#1282](https://github.com/okta/okta-auth-js/pull/1282) Backport 6.5.4, includes microtime fix [#1280](https://github.com/okta/okta-auth-js/pull/1280)
+
 ## 6.6.2
 
 ### Fixes
@@ -58,10 +62,15 @@
 ### Features
 
 - [#1225](https://github.com/okta/okta-auth-js/pull/1225) `oktaAuth.start`/`oktaAuth.stop` now return a `Promise`, ensures services have started/stopped before resolving
+
 ### Fixes
 
 - [#1226](https://github.com/okta/okta-auth-js/pull/1226) Fixes idx terminal status response SDK level `undefined` error when use GenericRemediator (beta)
 - [#1222](https://github.com/okta/okta-auth-js/pull/1222) Invalid (or expired) refresh tokens are now removed from storage when invalid token error occurs
+
+## 6.5.4
+
+- [#1280](https://github.com/okta/okta-auth-js/pull/1280) Locks version of `broadcast-channel` at `4.13.0` to prevent node minimum version regressions
 
 ## 6.5.3
 
