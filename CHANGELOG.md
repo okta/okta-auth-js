@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.6.3
+
+- [#1282](https://github.com/okta/okta-auth-js/pull/1282) Backport 6.5.4, includes microtime fix [#1280](https://github.com/okta/okta-auth-js/pull/1280)
+
 ## 6.6.2
 
 ### Fixes
