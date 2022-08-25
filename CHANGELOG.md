@@ -18,10 +18,15 @@
 ## Features
 
 - [#1225](https://github.com/okta/okta-auth-js/pull/1225) `oktaAuth.start`/`oktaAuth.stop` now return a `Promise`, ensures services have started/stopped before resolving
+
 ### Fixes
 
 - [#1226](https://github.com/okta/okta-auth-js/pull/1226) Fixes idx terminal status response SDK level `undefined` error when use GenericRemediator (beta)
 - [#1222](https://github.com/okta/okta-auth-js/pull/1222) Invalid (or expired) refresh tokens are now removed from storage when invalid token error occurs
+
+## 6.5.4
+
+- [#1280](https://github.com/okta/okta-auth-js/pull/1280) Locks version of `broadcast-channel` at `4.13.0` to prevent node minimum version regressions
 
 ## 6.5.3
 
