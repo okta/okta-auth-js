@@ -44,7 +44,7 @@ test_suites:
     - name: e2e-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts
       sort_order: '6'
-      timeout: '25'
+      timeout: '20'
       script_name: e2e-express-embedded-auth-with-sdk
       criteria: MERGE
       queue_name: small
