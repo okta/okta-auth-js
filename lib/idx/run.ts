@@ -62,7 +62,6 @@ function initializeValues(options: RunOptions) {
     'step',
     'useGenericRemediator',
     'exchangeCodeForTokens',
-    'shouldProceedWithEmailAuthenticator'
   ];
   const values = { ...options };
   knownOptions.forEach(option => {
@@ -166,7 +165,6 @@ async function getDataFromRemediate(authClient, data: RunData): Promise<RunData>
     actions,
     flow,
     step,
-    shouldProceedWithEmailAuthenticator, // will be removed in next major version
     useGenericRemediator,
   } = options;
   
@@ -194,7 +192,6 @@ async function getDataFromRemediate(authClient, data: RunData): Promise<RunData>
       actions,
       flow,
       step,
-      shouldProceedWithEmailAuthenticator, // will be removed in next major version
       useGenericRemediator,
     }
   );
