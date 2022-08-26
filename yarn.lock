@@ -11514,7 +11514,7 @@ rollup-plugin-typescript2@^0.30.0:
     resolve "1.20.0"
     tslib "2.1.0"
 
-rollup-plugin-visualizer@^5.8.0:
+rollup-plugin-visualizer@^5.5.4:
   version "5.8.0"
   resolved "https://registry.yarnpkg.com/rollup-plugin-visualizer/-/rollup-plugin-visualizer-5.8.0.tgz#32f2fe23d4299e977c06c59c07255590354e3445"
   integrity sha512-pY6j/7qHz5I9rB7d/bQoA5gX+2FbV3MBG055wrsFxDn550bgl0FNViRj6wDHh85PMswv+JVdZjhnMBzz/hdAHA==
