@@ -221,13 +221,11 @@ describe('idx/run', () => {
     const flow = 'register';
     const username = 'x';
     const password = 'y';
-    const shouldProceedWithEmailAuthenticator = false;
     const options: AuthenticationOptions = {
       username,
       password,
       flow,
       useGenericRemediator: true,
-      shouldProceedWithEmailAuthenticator // will be removed in next major version
     };
     const values = { 
       username,
@@ -243,7 +241,6 @@ describe('idx/run', () => {
       flow,
       flowMonitor,
       useGenericRemediator: true,
-      shouldProceedWithEmailAuthenticator, // will be removed in next major version
     });
   });
 
@@ -260,12 +257,10 @@ describe('idx/run', () => {
     const flow = 'register';
     const username = 'x';
     const password = 'y';
-    const shouldProceedWithEmailAuthenticator = false;
     const options: AuthenticationOptions = {
       username,
       password,
       flow,
-      shouldProceedWithEmailAuthenticator // will be removed in next major version
     };
     const values = { 
       username,
@@ -280,7 +275,6 @@ describe('idx/run', () => {
       actions,
       flow,
       flowMonitor,
-      shouldProceedWithEmailAuthenticator, // will be removed in next major version
       useGenericRemediator: true,
     });
   });

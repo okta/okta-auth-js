@@ -11,55 +11,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-import { AuthSdkError } from '../../errors';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
-import { IdxRemediation, RemediateOptions } from '../types';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
 
 export class AuthenticatorVerificationData extends AuthenticatorData<AuthenticatorVerificationDataValues> {
   static remediationName = 'authenticator-verification-data';
 
-  shouldProceedWithEmailAuthenticator: boolean; // will be removed in next major version
-
-  constructor(
-    remediation: IdxRemediation, 
-    values: AuthenticatorDataValues = {}, 
-    options: RemediateOptions = {}
-  ) {
-    super(remediation, values);
-
-    // will be removed in next major version
-    this.shouldProceedWithEmailAuthenticator = options.shouldProceedWithEmailAuthenticator !== false
-      && this.authenticator.methods.length === 1 
-      && this.authenticator.methods[0].type === 'email';
-  }
-
-  canRemediate() {
-    // auto proceed if there is only one method (will be removed in next major version)
-    if (this.shouldProceedWithEmailAuthenticator !== false) {
-      return true;
-    }
-    return super.canRemediate();
-  }
-
   mapAuthenticator() {
-    // auto proceed with the only methodType option
-    if (this.shouldProceedWithEmailAuthenticator !== false) {
-      const authenticatorFromRemediation = this.getAuthenticatorFromRemediation();
-      return authenticatorFromRemediation.form?.value.reduce((acc, curr) => {
-        if (curr.value) {
-          acc[curr.name] = curr.value;
-        } else if (curr.options) {
-          acc[curr.name] = curr.options![0].value;
-        } else {
-          throw new AuthSdkError(`Unsupported authenticator data type: ${curr}`);
-        }
-        return acc;
-      }, {});
-    }
-
     return this.getAuthenticatorData();
   }
 

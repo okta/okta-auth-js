@@ -22,6 +22,9 @@ Feature: Login with Identifier First
     Then she is redirected to the "Select Authenticator" page
     When she selects the "Email" factor
       And she submits the form
+    Then she is redirected to the "Verify Email" page
+    When she selects "Email" from the list of methods
+      And she submits the form
     Then the screen changes to receive an input for a Email code
     When she inputs the correct code from her "Email"
       And she submits the form
@@ -37,6 +40,9 @@ Feature: Login with Identifier First
       And she submits the form
     Then she is redirected to the "Select Authenticator" page
     When she selects the "Email" factor
+      And she submits the form
+    Then she is redirected to the "Verify Email" page
+    When she selects "Email" from the list of methods
       And she submits the form
       And she clicks the Email magic link
     Then she is redirected to the "Root" page
