@@ -15,10 +15,9 @@ Feature: Multi-Factor Authentication with Password and Email Magic Link
       And she has inserted her password
       And her password is correct
     When she submits the form
-    # ENG_REMEMBER_LAST_USED_FACTOR_OIE feature avoids these steps
-    # Then she is redirected to the "Select Authenticator" page
-    # When she selects the "Email" factor
-    #   And she submits the form
+    Then she is redirected to the "Verify Email" page
+    When she selects "Email" from the list of methods
+      And she submits the form
       And she clicks the Email magic link
     Then she is redirected to the "Root" page
       And she sees a table with her profile info
