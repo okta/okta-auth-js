@@ -27,8 +27,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         idx: fileURLToPath(new URL('./idx.html', import.meta.url)),
-        // authn: fileURLToPath(new URL('./authn.html', import.meta.url)),
-        // default: fileURLToPath(new URL('./index.html', import.meta.url)),
       },
       plugins: [visualizer({
         filename: 'dist/stats.idx.html',
