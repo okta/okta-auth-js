@@ -24,6 +24,7 @@ import SelectAuthenticator from './SelectAuthenticator';
 import PasswordReset from './PasswordReset';
 import Home from './Home';
 import { Page } from './Page';
+import VerifyEmail from './VerifyEmail';
 import VerifyPhone from './VerifyPhone';
 import EnrollGoogleAuthenticator from './EnrollGoogleAuthenticator';
 import ChallengeEmailAuthenticator from './ChallengeEmailAuthenticator';
@@ -67,6 +68,7 @@ const pages: { [key: string]: Page } = {
   'Root View': Home,
   'Set up Password': PasswordSetup,
   'Enroll email authenticator': EnrollEmailAuthenticator,
+  'Verify Email': VerifyEmail,
   'Verify Phone': VerifyPhone,
   'Challenge phone authenticator': ChallengePhoneAuthenticator,
   'Challenge Security Question': ChallengeSecurityQuestion,
