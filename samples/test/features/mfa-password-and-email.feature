@@ -13,10 +13,9 @@ Feature: Multi-Factor Authentication with Password and Email
     When she fills in her username
       And she fills in her correct password
       And she submits the form
-    # ENG_REMEMBER_LAST_USED_FACTOR_OIE feature avoids these steps
-    # Then she is redirected to the "Select Authenticator" page
-    # When she selects the "Email" factor
-    #   And she submits the form
+    Then she is redirected to the "Verify Email" page
+    When she selects "Email" from the list of methods
+      And she submits the form
     Then she is redirected to the "Challenge email authenticator" page
     When she inputs an incorrect code
       And she submits the form
@@ -29,10 +28,9 @@ Feature: Multi-Factor Authentication with Password and Email
       And she has inserted her password
       And her password is correct
     When she submits the form
-    # ENG_REMEMBER_LAST_USED_FACTOR_OIE feature avoids these steps
-    # Then she is redirected to the "Select Authenticator" page
-    # When she selects the "Email" factor
-    #   And she submits the form
+    Then she is redirected to the "Verify Email" page
+    When she selects "Email" from the list of methods
+      And she submits the form
     Then the screen changes to receive an input for a Email code
     When she inputs the correct code from her "Email"
       And she submits the form
