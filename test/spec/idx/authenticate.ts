@@ -1203,29 +1203,6 @@ describe('idx/authenticate', () => {
           });
         });
 
-        it('can auto select email methodType as authenticator verification data', async () => {
-          const {
-            authClient,
-            verificationDataResponse,
-            verifyEmailResponse
-          } = testContext;
-
-          jest.spyOn(verificationDataResponse, 'proceed').mockResolvedValue(verifyEmailResponse);
-          jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(verificationDataResponse);
-          const res = await authenticate(authClient);
-          expect(verificationDataResponse.proceed).toHaveBeenCalledWith('authenticator-verification-data', {
-            authenticator: {
-              id: 'id-email'
-            }
-          });
-          expect(res).toMatchObject({
-            status: IdxStatus.PENDING,
-            nextStep: {
-              name: 'challenge-authenticator'
-            }
-          });
-        });
-
         it('returns a PENDING error if an invalid code is provided', async () => {
           const {
             authClient,

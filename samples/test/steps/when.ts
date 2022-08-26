@@ -51,6 +51,7 @@ import setInputField from '../support/action/setInputField';
 import { camelize } from '../util';
 import getCodeFromSMS from '../support/action/getCodeFromSMS';
 import selectEnrollMethod from '../support/action/selectEnrollMethod';
+import selectOption from '../support/action/selectOption';
 
 When(
   'she clicks the {string} button', 
@@ -295,6 +296,13 @@ When(
 When(
   /^She selects SMS from the list of methods$/,
   selectVerifyBySms
+);
+
+When(
+  'she selects {string} from the list of methods',
+  async (methodType: string) => {
+    await selectOption('value', methodType, '#authenticator-method-options');
+  }
 );
 
 When(
