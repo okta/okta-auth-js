@@ -2,6 +2,9 @@
   "name": "@okta/test.apps.verify-entries",
   "private": true,
   "version": "0.0.0",
+  "engines": {
+    "node": ">=12.0"
+  },
   "scripts": {
     "build:idx": "tsc && vite build --config vite.idx.config.js",
     "dev:idx": "tsc && vite dev --config vite.idx.config.js",
