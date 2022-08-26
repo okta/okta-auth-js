@@ -2,7 +2,6 @@
   "name": "@okta/test.apps.verify-entries",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "build:idx": "tsc && vite build --config vite.idx.config.js",
     "dev:idx": "tsc && vite dev --config vite.idx.config.js",
@@ -16,7 +15,7 @@
   },
   "devDependencies": {
     "typescript": "^4.7.3",
-    "vite": "^3.0.7",
+    "vite": "^2.9.2",
     "@okta/env": "*"
   }
 }
