@@ -13,7 +13,7 @@
     "test:features": "RUN_CUCUMBER_TESTS=1 node ./runner"
   },
   "engines": {
-    "node": ">=11.0",
+    "node": ">=14.0",
     "yarn": "^1.7.0"
   },
   "dependencies": {

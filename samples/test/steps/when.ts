@@ -88,6 +88,9 @@ When(
 
 When(
   'she inputs the correct code from her {string}',
+  {
+    timeout: 30000,
+  },
   async function(this: ActionContext, type: string) {
     let code = '';
     if (type === 'SMS') {

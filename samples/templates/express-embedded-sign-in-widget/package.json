@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=14.0.0"
   },
   "scripts": {
     "start": "SIW_VERSION=${SIW_VERSION-{{ siwVersion }}{{append '}'}} node ./web-server/server.js",
