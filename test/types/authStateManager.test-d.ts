@@ -25,11 +25,12 @@ const authClient = new OktaAuth({});
 (async () => {
   const authStateManager = authClient.authStateManager;
 
-  authStateManager.subscribe((authState: AuthState) => {});
-  authStateManager.unsubscribe((authState: AuthState) => {});
+  const handler = (authState: AuthState) => {};
+  authStateManager.subscribe(handler);
+  authStateManager.unsubscribe(handler);
   authStateManager.unsubscribe();
 
-  authStateManager.updateAuthState();
+  await authStateManager.updateAuthState();
 
   const authState = authStateManager.getAuthState()!;
   expectType<AuthState>(authState);
