@@ -12,6 +12,7 @@
  */
 
 import AuthSdkError from './errors/AuthSdkError';
+import { isLocalStorageAvailable } from './util';
 import { StorageProvider, SimpleStorage } from './types';
 
 // formerly known as "storageBuilder". Represents an object saved under a key/name.
@@ -53,7 +54,7 @@ export default class SavedObject implements StorageProvider {
   //
 
   isSharedStorage() {
-    return typeof localStorage !== 'undefined' && this.storageProvider === localStorage as any 
+    return isLocalStorageAvailable() && this.storageProvider === localStorage as any 
       || !!this.storageProvider.isSharedStorage?.();
   }
 

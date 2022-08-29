@@ -51,7 +51,7 @@ export class SyncStorageService implements ServiceInterface {
   }
 
   canStart() {
-    return !!this.options.syncStorage && isBrowser();
+    return !!this.options.syncStorage && isBrowser() && this.tokenManager.hasSharedStorage();
   }
 
   async start() {
