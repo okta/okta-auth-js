@@ -10,7 +10,7 @@ export PATH="${PATH}:$(yarn global bin)"
 
 # Install required node version
 export NVM_DIR="/root/.nvm"
-NODE_VERSION="${1:-v12.22.0}"
+NODE_VERSION="${1:-v14.18.0}"
 setup_service node $NODE_VERSION
 # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
 setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
@@ -34,6 +34,12 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
+
+# microtime was not built due to `--ignore-scripts` flag, build it manually
+cd ./node_modules/microtime
+yum install -y python3
+yarn
+cd ../..
 
 # Build
 if ! yarn build; then

@@ -3846,7 +3846,7 @@ braces@^3.0.1, braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-broadcast-channel@4.13.0, broadcast-channel@^4.10.0:
+broadcast-channel@^4.10.0:
   version "4.13.0"
   resolved "https://registry.yarnpkg.com/broadcast-channel/-/broadcast-channel-4.13.0.tgz#21387b2602b9e9ec3b97b03bd8a8d2c198352ff6"
   integrity sha512-fcDr8QNJ4SOb6jyjUNZatVNmcHtSWfW4PFcs4xIEFZAtorKCIFoEYtjIjaQ4c0jrbr/Bl8NIwOWiLSyspoAnEQ==
@@ -3854,6 +3854,19 @@ broadcast-channel@4.13.0, broadcast-channel@^4.10.0:
     "@babel/runtime" "^7.16.0"
     detect-node "^2.1.0"
     microtime "3.0.0"
+    oblivious-set "1.1.1"
+    p-queue "6.6.2"
+    rimraf "3.0.2"
+    unload "2.3.1"
+
+broadcast-channel@~4.14.0:
+  version "4.14.0"
+  resolved "https://registry.yarnpkg.com/broadcast-channel/-/broadcast-channel-4.14.0.tgz#cd2ce466128130ec3a93f7c1f1ed01d658575e35"
+  integrity sha512-uNzxOgBQ+boWCRDESLNg3zZWQ3iz/X7j/uD8pAfr4/S7wQerXVvJI/SBKd9J6ckaPt2jil0gq+7l+3b+kuxJYw==
+  dependencies:
+    "@babel/runtime" "^7.16.0"
+    detect-node "^2.1.0"
+    microtime "3.1.0"
     oblivious-set "1.1.1"
     p-queue "6.6.2"
     rimraf "3.0.2"
@@ -9568,6 +9581,14 @@ microtime@3.0.0:
     node-addon-api "^1.2.0"
     node-gyp-build "^3.8.0"
 
+microtime@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/microtime/-/microtime-3.1.0.tgz#599a71250e3116c59f0fe5271dae4cc44321869c"
+  integrity sha512-GcjhfC2y/DF2znac8IRwri7+YUIy34QRHz/iZK3bHrh74qrNNOpAJQwiOMnIG+v1J0K4eiqd+RiGzN3F1eofTQ==
+  dependencies:
+    node-addon-api "^5.0.0"
+    node-gyp-build "^4.4.0"
+
 mime-db@1.52.0, "mime-db@>= 1.43.0 < 2", mime-db@^1.28.0:
   version "1.52.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.52.0.tgz#bbabcdc02859f4987301c856e3387ce5ec43bf70"
@@ -9835,6 +9856,11 @@ node-addon-api@^1.2.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-1.7.2.tgz#3df30b95720b53c24e59948b49532b662444f54d"
   integrity sha512-ibPK3iA+vaY1eEjESkQkM0BbCqFOaZMiXRTtdB0u7b4djtY6JnsjvPdUHVMg6xQt3B8fpTTWHI9A+ADjM9frzg==
 
+node-addon-api@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-5.0.0.tgz#7d7e6f9ef89043befdb20c1989c905ebde18c501"
+  integrity sha512-CvkDw2OEnme7ybCykJpVcKH+uAOLV2qLqiyla128dN9TkEWfrYmxG6C2boDe5KcNQqZF3orkqzGgOMvZ/JNekA==
+
 node-cache@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/node-cache/-/node-cache-5.1.2.tgz#f264dc2ccad0a780e76253a694e9fd0ed19c398d"
@@ -9858,6 +9884,11 @@ node-gyp-build@^3.8.0:
   version "3.9.0"
   resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-3.9.0.tgz#53a350187dd4d5276750da21605d1cb681d09e25"
   integrity sha512-zLcTg6P4AbcHPq465ZMFNXx7XpKKJh+7kkN699NiQWisR2uWYOWNWqRHAmbnmKiL4e9aLSlmy5U7rEMUXV59+A==
+
+node-gyp-build@^4.4.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.5.0.tgz#7a64eefa0b21112f89f58379da128ac177f20e40"
+  integrity sha512-2iGbaQBV+ITgCz76ZEjmhUKAKVf7xfY1sRl4UiKQspfZMH2h06SyhNsnSVy50cwkFQDGLyif6m/6uFXHkOZ6rg==
 
 node-int64@^0.4.0:
   version "0.4.0"
