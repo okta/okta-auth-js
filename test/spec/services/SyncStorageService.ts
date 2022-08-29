@@ -44,6 +44,7 @@ describe('SyncStorageService', () => {
       clearStorage: jest.fn().mockImplementation(() => {
         storage = {};
       }),
+      isSharedStorage: jest.fn().mockReturnValue(true),
     };
     sdkMock = {
       options: {},
