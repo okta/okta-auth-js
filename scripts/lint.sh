@@ -10,6 +10,11 @@ if ! yarn lint:report; then
   exit ${TEST_FAILURE}
 fi
 
+if ! yarn workspace @okta/test.app validate; then
+  echo "test.app validate failed! Exiting..."
+  exit ${TEST_FAILURE}
+fi
+
 mkdir -p ${TEST_RESULT_FILE_DIR}
 if ! yarn verify:package 2> ${TEST_RESULT_FILE_DIR}/verify-package-error.log; then
   echo "verify package failed! Exiting..."
