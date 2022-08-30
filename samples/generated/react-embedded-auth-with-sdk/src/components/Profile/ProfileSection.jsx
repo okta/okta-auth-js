@@ -48,7 +48,7 @@ const ProfileSection = () => {
     if (!profile) {
       fetchProfile();
     }
-  }, [oktaAuth, editing, profile, setProfile]);
+  }, [oktaAuth, editing, profile, setProfile, setCorsError]);
 
   const handleEditNames = () => {
     const newInputs = inputs.map(input => ({ ...input, value: profile[input.name] || '' }));
