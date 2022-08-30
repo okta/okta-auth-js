@@ -1987,10 +1987,10 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@tsd/typescript@^4.6.4":
-  version "4.6.4"
-  resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-4.6.4.tgz#2d49c111c32d15651c9ebe0e6f19a5df04d53f5f"
-  integrity sha512-+9o716aWbcjKLbV4bCrGlJKJbS0UZNogfVk9U7ffooYSf/9GOJ6wwahTSrRjW7mWQdywQ/sIg9xxbuPLnkmhwg==
+"@tsd/typescript@^4.8.2":
+  version "4.8.2"
+  resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-4.8.2.tgz#2523eb4c4e33e1b352e290b70711d4646f156de9"
+  integrity sha512-Guwrz4D/ATCZnWGxf8pejvxEnR2xLXwxFXr0wQh6xuRkyEmEtqJ/wj2y2Z+JTjN5wVilG/Lw7Lks5HZMo9kyXw==
 
 "@tsd/typescript@~4.3.2":
   version "4.3.5"
