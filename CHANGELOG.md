@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.7.7
+
+- [#1292](https://github.com/okta/okta-auth-js/pull/1292) Fixes browser default entry issue from [#1269](https://github.com/okta/okta-auth-js/pull/1269)
+
 ## 6.7.6
 
 ### Fixes
