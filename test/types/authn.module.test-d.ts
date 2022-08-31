@@ -44,7 +44,8 @@ expectError<undefined>(authClient.authStateManager);
 (async () => {
   expectType<string>(await authClient.fingerprint());
   expectType<AuthnTransaction>(await authClient.signIn({}));
-  expectType<AuthnTransaction>(await authClient.signInWithCredentials({}));
+  expectError(authClient.signInWithCredentials({})); // must provide credentials
+  expectType<AuthnTransaction>(await authClient.signInWithCredentials({ username: 'foo', password: 'blah' }));
   expectType<AuthnTransaction>(await authClient.forgotPassword({}));
   expectType<AuthnTransaction>(await authClient.unlockAccount({ username: 'foo', factorType: 'SMS' }));
   expectType<AuthnTransaction>(await authClient.verifyRecoveryToken({ recoveryToken: 'foo' }));
