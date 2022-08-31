@@ -34,5 +34,7 @@ extends OktaAuthOAuthInterface<M, S, O, TM>
 {
   serviceManager: ServiceManagerInterface;
   authStateManager: AuthStateManagerInterface;
+  start(): Promise<void>;
+  stop(): Promise<void>;
   handleLoginRedirect(tokens?: Tokens, originalUri?: string): Promise<void>;
 }

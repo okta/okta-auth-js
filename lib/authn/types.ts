@@ -83,11 +83,16 @@ export interface SigninOptions {
   };
   sendFingerprint?: boolean;
   stateToken?: string;
+  
+  // Optional credentials
+  username?: string;
+  password?: string;
 }
 
 export interface SigninWithCredentialsOptions extends SigninOptions {
-  username?: string;
-  password?: string;
+  // Required credentials
+  username: string;
+  password: string;
 }
 
 export interface SigninAPI {

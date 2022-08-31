@@ -58,11 +58,6 @@ export function mixinAuthn
 
     // Authn  V1
     async signIn(opts: SigninOptions): Promise<AuthnTransaction> {
-      return this.signInWithCredentials(opts as SigninWithCredentialsOptions);
-    }
-
-    // Authn  V1
-    async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthnTransaction> {
       opts = clone(opts || {});
       const _postToTransaction = (options?) => {
         delete opts.sendFingerprint;
@@ -79,6 +74,11 @@ export function mixinAuthn
           }
         });
       });
+    }
+
+    // Authn  V1
+    async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthnTransaction> {
+      return this.signIn(opts);
     }
 
     // { username, (relayState) }
