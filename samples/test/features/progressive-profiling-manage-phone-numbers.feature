@@ -45,7 +45,7 @@ Feature: Managing Phone Numbers
     When she inputs an incorrect code
       And she submits the form
     # TODO: update error message once ciamx fix is in prod
-    Then she sees a banner message for "add phone number" that "This operation couldn't be completed as requested due to an issue with the specified authenticator."
+    Then she sees a banner message for "add phone number" that "Invalid factor id, no phone factor found."
 
   Scenario: Mary deletes a phone number
     Given she is on the Root View in an AUTHENTICATED state

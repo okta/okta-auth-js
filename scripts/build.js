@@ -98,10 +98,7 @@ fs.writeFileSync(`${BUILD_DIR}/package.json`, JSON.stringify(packageJSON, null, 
 
 // Add an extra package.json underneath ESM to indicate module type
 // This helps tools like Jest identify this code as ESM
-// (name and version are required for MFE)
 fs.writeFileSync(`${BUILD_DIR}/esm/package.json`, JSON.stringify({
-  name: packageJSON.name,
-  version: packageJSON.version,
   type: 'module'
 }, null, 4));
 
