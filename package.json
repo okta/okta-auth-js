@@ -18,7 +18,8 @@
       },
       "browser": {
         "types": "./build/lib/index.d.ts",
-        "import": "./build/esm/browser/index.js"
+        "import": "./build/esm/browser/index.js",
+        "default": "./build/dist/okta-auth-js.umd.js"
       },
       "types": "./build/lib/index.d.ts",
       "default": "./build/dist/okta-auth-js.umd.js"
