@@ -13,11 +13,10 @@
 
 
 /* eslint-disable complexity */
-import { NextStep, IdxMessage, Authenticator, Input, RemediateOptions } from '../../types';
+import { OktaAuthIdxInterface, NextStep, IdxMessage, Authenticator, Input, RemediateOptions } from '../../types';
 import { IdxAuthenticator, IdxRemediation, IdxContext } from '../../types/idx-js';
 import { getAllValues, getRequiredValues, titleCase, getAuthenticatorFromRemediation } from '../util';
 import { formatAuthenticator, compareAuthenticators } from '../../authenticator/util';
-import { OktaAuthIdxInterface } from '../../../types';
 
 // A map from IDX data values (server spec) to RemediationValues (client spec)
 export type IdxToRemediationValueMap = Record<string, string[]>;

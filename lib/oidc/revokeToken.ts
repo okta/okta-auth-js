@@ -24,7 +24,7 @@ import {
   RevocableToken,
   AccessToken,
   RefreshToken
-} from '../types';
+} from './types';
 
 // refresh tokens have precedence to be revoked if no token is specified
 export async function revokeToken(sdk: OktaAuthOAuthInterface, token: RevocableToken): Promise<any> {

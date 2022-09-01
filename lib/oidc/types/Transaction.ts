@@ -16,12 +16,8 @@ import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
 import { OAuthStorageManagerInterface } from './storage';
 
 export interface TransactionManagerOptions
-<
-  M extends OAuthTransactionMeta,
-  S extends OAuthStorageManagerInterface<M>
->
 {
-  storageManager?: S;
+  storageManager?: OAuthStorageManagerInterface;
   enableSharedStorage?: boolean; // default true
   saveNonceCookie?: boolean; // default true
   saveStateCookie?: boolean; // default true

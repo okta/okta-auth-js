@@ -10,9 +10,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
+export * from './factory';
+export * from './mixin';
+export * from './storage';
 export * from './endpoints';
 export * from './options';
+export * from './types';
 export * from './TokenManager';
+export * from './TransactionManager';
 export * from './util';
 
 export { decodeToken } from './decodeToken';

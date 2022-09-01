@@ -11,7 +11,7 @@
  */
 
 
-import TransactionManager from '../../lib/oidc/TransactionManager';
+import { createTransactionManager } from '../../lib/oidc/TransactionManager';
 
 jest.mock('../../lib/oidc/util/sharedStorage', () => {
   return {
@@ -71,6 +71,7 @@ describe('TransactionManager', () => {
 
   function createInstance(additionalOptions = {}) {
     const { options } = testContext;
+    const TransactionManager = createTransactionManager();
     const transactionManager = new TransactionManager(Object.assign(options, additionalOptions));
     Object.assign(testContext, {
       transactionManager

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 /* eslint complexity:[0,8] */
-import { OktaAuthIdxInterface, IdxTransactionMeta, InteractOptions, InteractResponse } from '../types';
+import { OktaAuthIdxInterface, IdxTransactionMeta, InteractOptions, InteractResponse } from './types';
 import { getSavedTransactionMeta, saveTransactionMeta, createTransactionMeta } from './transactionMeta';
 import { getOAuthBaseUrl } from '../oidc';
 import { removeNils } from '../util';

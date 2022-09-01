@@ -13,6 +13,9 @@ test_suites:
       script_name: lint
       criteria: MERGE
       queue_name: small
+      log_files:
+        - build2/reports/lint/eslint-checkstyle-result.xml
+
     - name: unit
       script_path: ../okta-auth-js/scripts
       sort_order: '2'

@@ -14,8 +14,7 @@
 import { Remediator, RemediationValues } from './Remediator';
 import { getAuthenticator, Authenticator, AuthenticatorValues } from '../../authenticator';
 import { IdxRemediation, IdxContext } from '../../types/idx-js';
-import { NextStep } from '../../types';
-import { OktaAuthIdxInterface } from '../../../types';
+import { OktaAuthIdxInterface, NextStep } from '../../types';
 
 export type VerifyAuthenticatorValues = AuthenticatorValues & RemediationValues;
 

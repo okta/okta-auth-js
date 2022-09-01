@@ -12,14 +12,17 @@
 
 
 import {
+  OAuthTransactionMeta,
+  OAuthStorageManagerInterface,
+} from '../oidc';
+
+import {
   ServiceManagerInterface,
   ServiceInterface,
   ServiceManagerOptions,
   OktaAuthCoreInterface,
-  OAuthTransactionMeta,
-  OAuthStorageManagerInterface,
   OktaAuthCoreOptions
-} from '../types';
+} from './types';
 import { AutoRenewService, SyncStorageService, LeaderElectionService } from '../services';
 import { removeNils } from '../util';
 
@@ -31,7 +34,7 @@ export class ServiceManager
 <
   M extends OAuthTransactionMeta,
   S extends OAuthStorageManagerInterface<M>,
-  O extends OktaAuthCoreOptions<M, S>
+  O extends OktaAuthCoreOptions
 >
 implements ServiceManagerInterface 
 {

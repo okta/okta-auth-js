@@ -16,12 +16,12 @@ export function mixinCore
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
-  O extends OktaAuthCoreOptions<M, S> = OktaAuthCoreOptions<M, S>,
+  O extends OktaAuthCoreOptions = OktaAuthCoreOptions,
   TM extends TransactionManagerInterface = TransactionManagerInterface,
-  TBase extends OktaAuthConstructor<O, OktaAuthOAuthInterface<M, S, O, TM>>
-    = OktaAuthConstructor<O, OktaAuthOAuthInterface<M, S, O, TM>>
+  TBase extends OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O, TM>>
+    = OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O, TM>>
 >
-(Base: TBase): TBase & OktaAuthConstructor<O, OktaAuthCoreInterface<M, S, O, TM>>
+(Base: TBase): TBase & OktaAuthConstructor<OktaAuthCoreInterface<M, S, O, TM>>
 {
   return class OktaAuthCore extends Base implements OktaAuthCoreInterface<M, S, O, TM>
   {

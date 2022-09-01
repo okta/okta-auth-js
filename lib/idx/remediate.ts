@@ -12,10 +12,9 @@
 
 
 /* eslint-disable max-statements, max-depth, complexity */
-import { OktaAuthIdxInterface } from '../types';
 import { AuthSdkError } from '../errors';
 import { RemediationValues } from './remediators';
-import { RemediateOptions, RemediationResponse } from './types';
+import { OktaAuthIdxInterface, RemediateOptions, RemediationResponse } from './types';
 import { 
   IdxResponse,
   IdxActionParams, 

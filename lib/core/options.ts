@@ -10,21 +10,16 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OAuthOptionsConstructor } from '../oidc';
-import { OAuthStorageManagerInterface, PKCETransactionMeta } from '../oidc/types';
+import { createOAuthOptionsConstructor } from '../oidc';
 import { AuthState, OktaAuthCoreInterface, OktaAuthCoreOptions, ServiceManagerOptions } from './types';
 
 
-export function createCoreOptionsConstructor
-<
-  M extends PKCETransactionMeta = PKCETransactionMeta,
-  S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>
->
-()
+export function createCoreOptionsConstructor()
 {
+  const OAuthOptionsConstructor = createOAuthOptionsConstructor();
   return class CoreOptionsConstructor
-    extends OAuthOptionsConstructor<M, S>
-    implements Required<OktaAuthCoreOptions<M, S>>
+    extends OAuthOptionsConstructor
+    implements Required<OktaAuthCoreOptions>
   {
     services: ServiceManagerOptions;
     transformAuthState: (oktaAuth: OktaAuthCoreInterface, authState: AuthState) => Promise<AuthState>;

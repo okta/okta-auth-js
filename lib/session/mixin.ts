@@ -10,10 +10,10 @@ export function mixinSession
 <
   S extends StorageManagerInterface = StorageManagerInterface,
   O extends OktaAuthHttpOptions = OktaAuthHttpOptions,
-  TBase extends OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
-    = OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
+  TBase extends OktaAuthConstructor<OktaAuthHttpInterface<S, O>>
+    = OktaAuthConstructor<OktaAuthHttpInterface<S, O>>
 >
-(Base: TBase): TBase & OktaAuthConstructor<O, OktaAuthSessionInterface<S, O>>
+(Base: TBase): TBase & OktaAuthConstructor<OktaAuthSessionInterface<S, O>>
 {
   return class OktaAuthSession extends Base implements OktaAuthSessionInterface<S, O>
   {

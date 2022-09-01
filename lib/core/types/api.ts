@@ -12,12 +12,7 @@ import { AuthState, AuthStateManagerInterface } from './AuthState';
 
 
 // options passed to AuthJS constructor
-export interface OktaAuthCoreOptions
-<
-  M extends PKCETransactionMeta = PKCETransactionMeta,
-  S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>
->
-extends OktaAuthOAuthOptions<M, S>
+export interface OktaAuthCoreOptions extends OktaAuthOAuthOptions
 {
   services?: ServiceManagerOptions;
   // eslint-disable-next-line no-use-before-define
@@ -32,12 +27,14 @@ export type CoreStorageManagerInterface<
 export interface OktaAuthCoreInterface<
   M extends PKCETransactionMeta = PKCETransactionMeta,
   S extends CoreStorageManagerInterface<M> = CoreStorageManagerInterface<M>,
-  O extends OktaAuthCoreOptions<M, S> = OktaAuthCoreOptions<M, S>,
+  O extends OktaAuthCoreOptions = OktaAuthCoreOptions,
   TM extends TransactionManagerInterface = TransactionManagerInterface
 > 
 extends OktaAuthOAuthInterface<M, S, O, TM>
 {
   serviceManager: ServiceManagerInterface;
   authStateManager: AuthStateManagerInterface;
+  start(): Promise<void>;
+  stop(): Promise<void>;
   handleLoginRedirect(tokens?: Tokens, originalUri?: string): Promise<void>;
 }

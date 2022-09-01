@@ -20,7 +20,7 @@ import {
   IdxTransaction, 
   OktaAuthIdxInterface, 
   IdxFeature,
-} from '../types';
+} from './types';
 
 export async function register(
   authClient: OktaAuthIdxInterface, options: RegistrationOptions = {}

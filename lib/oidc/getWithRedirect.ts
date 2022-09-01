@@ -12,7 +12,7 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuthOAuthInterface, TokenParams } from '../types';
+import { OktaAuthOAuthInterface, TokenParams } from './types';
 import { clone } from '../util';
 import { prepareTokenParams, createOAuthMeta } from './util';
 import { buildAuthorizeParams } from './endpoints/authorize';

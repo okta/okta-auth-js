@@ -11,7 +11,7 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { JWTObject } from '../types';
+import { JWTObject } from './types';
 import { base64UrlToString } from '../crypto';
 
 export function decodeToken(token: string): JWTObject {

@@ -12,7 +12,7 @@
  */
 
 import { makeIdxState, validateVersionConfig } from './idxState';
-import { IntrospectOptions, OktaAuthIdxInterface } from '../types';
+import { IntrospectOptions, OktaAuthIdxInterface } from './types';
 import { IdxResponse, isRawIdxResponse } from './types/idx-js';
 import { getOAuthDomain } from '../oidc';
 import { IDX_API_VERSION } from '../constants';
