@@ -6,14 +6,19 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-
-export * from './console';
-export * from './misc';
-export * from './object';
-export * from './types';
-export * from './url';
-export * from './storage';
+// TODO: remove once the usage is removed from SaveObject.ts
+// JIRA: https://oktainc.atlassian.net/browse/OKTA-529631
+export function isLocalStorageAvailable(): boolean {
+  const test = 'test';
+  try {
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch {
+    return false;
+  }
+}
