@@ -3,6 +3,7 @@
 ## 6.7.7
 
 - [#1292](https://github.com/okta/okta-auth-js/pull/1292) Fixes browser default entry issue from [#1269](https://github.com/okta/okta-auth-js/pull/1269)
+- [#1286](https://github.com/okta/okta-auth-js/pull/1286) Fixes embedded browser regression issue when localStorage is disabled
 
 ## 6.7.6
 
