@@ -24,11 +24,13 @@ const mocked = {
 };
 
 import { OktaAuth } from '@okta/okta-auth-js';
-import TransactionManager from '../../../lib/oidc/TransactionManager';
+import { createTransactionManager } from '../../../lib/oidc/TransactionManager';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import { isInteractionRequiredError } from '../../../lib/oidc';
+
+const TransactionManager = createTransactionManager();
 
 describe('token.parseFromUrl', function() {
   function mockPKCE(response) {

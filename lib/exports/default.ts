@@ -1,24 +1,30 @@
-import { IdxTransactionManager } from '../idx/IdxTransactionManager';
-import { createOktaAuthIdx } from '../idx/factory';
-import { mixinMyAccount } from '../myaccount/mixin';
-import { mixinAuthn } from '../authn/mixin';
 import {
-  IdxStorageManagerInterface,
-  OktaAuthIdxOptions,
   OktaAuthOptionsConstructor,
-  StorageManagerConstructor
-} from '../types';
-import { createIdxOptionsConstructor } from '../idx/options';
-import { createIdxStorageManager } from '../idx/storage';
+} from '../base';
+
+import {
+  IdxStorageManagerConstructor,
+  IdxTransactionManagerConstructor,
+  OktaAuthIdxOptions,
+  createIdxTransactionManager,
+  createOktaAuthIdx,
+  createIdxStorageManager,
+  createIdxOptionsConstructor
+} from '../idx';
+
+import { mixinMyAccount } from '../myaccount';
+import { mixinAuthn } from '../authn';
+
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface OktaAuthOptions extends OktaAuthIdxOptions {}
 
 const OptionsConstructor: OktaAuthOptionsConstructor<OktaAuthOptions> = createIdxOptionsConstructor();
-const StorageManager: StorageManagerConstructor<IdxStorageManagerInterface> = createIdxStorageManager();
+const StorageManager: IdxStorageManagerConstructor = createIdxStorageManager();
+const TransactionManager: IdxTransactionManagerConstructor = createIdxTransactionManager();
 
 // Default bundle includes everything
-const WithIdx = createOktaAuthIdx(StorageManager, OptionsConstructor, IdxTransactionManager);
+const WithIdx = createOktaAuthIdx(StorageManager, OptionsConstructor, TransactionManager);
 const WithMyAccount = mixinMyAccount(WithIdx);
 const WithAuthn = mixinAuthn(WithMyAccount);
 

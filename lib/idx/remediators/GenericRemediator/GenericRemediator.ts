@@ -1,7 +1,6 @@
-import { IdxContext, NextStep, Input } from '../../types';
+import { OktaAuthIdxInterface, IdxContext, NextStep, Input } from '../../types';
 import { Remediator } from '../Base/Remediator';
 import { unwrapFormValue } from './util';
-import { OktaAuthIdxInterface } from '../../../types';
 
 export class GenericRemediator extends Remediator {
   canRemediate(): boolean {

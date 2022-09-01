@@ -11,7 +11,7 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuthOAuthInterface, TokenParams, TokenResponse } from '../types';
+import { OktaAuthOAuthInterface, TokenParams, TokenResponse } from './types';
 import { clone } from '../util';
 import { getToken } from './getToken';
 import { loadPopup } from './util';

@@ -113,31 +113,36 @@ export interface SignoutOptions extends SignoutRedirectUrlOptions {
   clearTokensBeforeRedirect?: boolean;
 }
 
+export interface OriginalUriApi {
+  getOriginalUri(state?: string): string | undefined;
+  setOriginalUri(originalUri: string, state?: string): void;
+  removeOriginalUri(state?: string): void;
+}
+
 export interface OktaAuthOAuthInterface
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
-  O extends OktaAuthOAuthOptions<M, S> = OktaAuthOAuthOptions<M, S>,
+  O extends OktaAuthOAuthOptions = OktaAuthOAuthOptions,
   TM extends TransactionManagerInterface = TransactionManagerInterface
 > 
-  extends OktaAuthSessionInterface<S, O>
+  extends OktaAuthSessionInterface<S, O>,
+  OriginalUriApi
 {
   token: TokenAPI;
   tokenManager: TokenManagerInterface;
   pkce: PkceAPI;
   transactionManager: TM;
   
+  isPKCE(): boolean;
   getIdToken(): string | undefined;
   getAccessToken(): string | undefined;
   getRefreshToken(): string | undefined;
 
   isAuthenticated(options?: IsAuthenticatedOptions): Promise<boolean>;
-  getOriginalUri(state?: string): string | undefined;
-  setOriginalUri(originalUri: string, state?: string): void;
   signOut(opts?: SignoutOptions): Promise<void>;
   isLoginRedirect(): boolean;
   storeTokensFromRedirect(): Promise<void>;
-  removeOriginalUri(state?: string): void;
   getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>>;
   signInWithRedirect(opts?: SigninWithRedirectOptions): Promise<void>;
   

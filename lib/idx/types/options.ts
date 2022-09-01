@@ -31,8 +31,8 @@ import {
 } from '../remediators';
 import { IdxTransactionMeta } from './meta';
 import { OktaAuthCoreOptions } from '../../core/types';
-import { IdxStorageManagerInterface } from './storage';
 import { TransactionMetaOptions } from '../../oidc/types';
+import { OktaAuthOptionsConstructor } from '../../base/types';
 
 export interface IdxOptions {
   flow?: FlowIdentifier;
@@ -134,12 +134,8 @@ export interface IdxTransactionMetaOptions
   >
 {}
 
-export interface OktaAuthIdxOptions
-<
-  M extends IdxTransactionMeta = IdxTransactionMeta,
-  S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>
->
-  extends OktaAuthCoreOptions<M, S>,
+export interface OktaAuthIdxOptions 
+  extends OktaAuthCoreOptions,
   Pick<IdxTransactionMeta,
     'flow' |
     'activationToken' |
@@ -152,3 +148,5 @@ export interface OktaAuthIdxOptions
       'exchangeCodeForTokens'
     >;
 }
+
+export type OktaAuthIdxOptionsConstructor = OktaAuthOptionsConstructor<OktaAuthIdxOptions>;

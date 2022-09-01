@@ -12,7 +12,7 @@
 
 import { buildAuthorizeParams } from '../../../../lib/oidc/endpoints';
 import { AuthSdkError } from '../../../../lib/errors';
-import { OAuthResponseType } from '../../../../lib/types';
+import { OAuthResponseType } from '../../../../lib/oidc/types';
 
 describe('authorize endpoint', () => {
 

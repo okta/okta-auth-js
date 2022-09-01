@@ -16,7 +16,7 @@ import {
   IdxTransaction,
   AuthenticatorKey,
   AuthenticationOptions
-} from '../types';
+} from './types';
 import { run } from './run';
 
 export async function authenticate(

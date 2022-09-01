@@ -14,10 +14,10 @@ export function mixinHttp
 <
   S extends StorageManagerInterface = StorageManagerInterface,
   O extends OktaAuthHttpOptions = OktaAuthHttpOptions,
-  TBase extends OktaAuthConstructor<O, OktaAuthStorageInterface<S, O>>
-    = OktaAuthConstructor<O, OktaAuthStorageInterface<S, O>>
+  TBase extends OktaAuthConstructor<OktaAuthStorageInterface<S, O>>
+    = OktaAuthConstructor<OktaAuthStorageInterface<S, O>>
 >
-(Base: TBase): TBase & OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
+(Base: TBase): TBase & OktaAuthConstructor<OktaAuthHttpInterface<S, O>>
 {
   return class OktaAuthHttp extends Base implements OktaAuthHttpInterface<S, O>
   {

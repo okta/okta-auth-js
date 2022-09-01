@@ -13,6 +13,21 @@ var commonConfig = require('./webpack.common.config');
 var license = fs.readFileSync('lib/license-header.txt', 'utf8');
 var baseConfig = _.cloneDeep(commonConfig);
 
+var entries = {
+  'okta-auth-js.min': './lib/exports/cdn/default.ts',
+  'okta-auth-js.core.min': './lib/exports/cdn/core.ts',
+  'okta-auth-js.authn.min': './lib/exports/cdn/authn.ts',
+  'okta-auth-js.idx.min': './lib/exports/cdn/idx.ts',
+  'okta-auth-js.myaccount.min': './lib/exports/cdn/myaccount.ts'
+};
+
+// if ENTRY env var is passed, filter the entries to include only the named ENTRY
+if (process.env.ENTRY) {
+  entries = {
+    [process.env.ENTRY]: entries[process.env.ENTRY]
+  };
+}
+
 var extraBabelPlugins = [
   ['@babel/plugin-transform-modules-commonjs', {
     'strict': true,
@@ -35,26 +50,30 @@ function addBabelPlugins(rule) {
 
 baseConfig.module.rules.forEach(addBabelPlugins);
 
-module.exports = _.extend({}, baseConfig, {
-  mode: (process.env.NODE_ENV === 'development') ? 'development' : 'production',
-  entry: './lib/exports/cdn.ts', // only export OktaAuth constructor
-  output: {
-    path: path.join(__dirname, 'build', 'dist'),
-    filename: 'okta-auth-js.min.js',
-    library: 'OktaAuth',
-    libraryTarget: 'var'
-  },
-  plugins: [
-    new BundleAnalyzerPlugin({
-      openAnalyzer: false,
-      reportFilename: 'okta-auth-js.min.analyzer.html',
-      analyzerMode: 'static',
-      defaultSizes: 'stat'
-    })
-  ].concat(commonConfig.plugins).concat([
+module.exports = Object.keys(entries).map(function(entryName) {
+  const entry = entries[entryName];
+  const config = _.extend({}, baseConfig, {
+    mode: (process.env.NODE_ENV === 'development') ? 'development' : 'production',
+    entry,
+    output: {
+      path: path.join(__dirname, 'build', 'dist'),
+      filename: `${entryName}.js`,
+      library: 'OktaAuth',
+      libraryTarget: 'var'
+    },
+    plugins: [
+      new BundleAnalyzerPlugin({
+        openAnalyzer: false,
+        reportFilename: `${entryName}.analyzer.html`,
+        analyzerMode: 'static',
+        defaultSizes: 'stat'
+      })
+    ].concat(commonConfig.plugins).concat([
 
-    // Add a single Okta license after removing others
-    new webpack.BannerPlugin(license)
-  ]),
-  devtool: 'source-map'
+      // Add a single Okta license after removing others
+      new webpack.BannerPlugin(license)
+    ]),
+    devtool: 'source-map'
+  });
+  return config;
 });

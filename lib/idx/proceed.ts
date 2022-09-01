@@ -15,7 +15,7 @@ import {
   OktaAuthIdxInterface,
   IdxTransaction,
   ProceedOptions,
-} from '../types';
+} from './types';
 import { run } from './run';
 import { getSavedTransactionMeta } from './transactionMeta';
 import { AuthSdkError } from '../errors';

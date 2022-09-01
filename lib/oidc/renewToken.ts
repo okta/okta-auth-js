@@ -11,7 +11,7 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuthOAuthInterface, Token, Tokens, isAccessToken, AccessToken, IDToken, isIDToken } from '../types';
+import { OktaAuthOAuthInterface, Token, Tokens, isAccessToken, AccessToken, IDToken, isIDToken } from './types';
 import { getWithoutPrompt } from './getWithoutPrompt';
 import { renewTokensWithRefresh } from './renewTokensWithRefresh';
 

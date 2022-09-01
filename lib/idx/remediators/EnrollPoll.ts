@@ -12,7 +12,7 @@
 
 
 import { Remediator, RemediationValues } from './Base/Remediator';
-import { NextStep, OktaAuthIdxInterface } from '../../types';
+import { NextStep, OktaAuthIdxInterface } from '../types';
 import { IdxContext } from '../types/idx-js';
 
 export interface EnrollPollValues extends RemediationValues {

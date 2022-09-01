@@ -11,7 +11,7 @@
  */
 
 
-import { OktaAuthOAuthInterface } from '../../types';
+import { OktaAuthOAuthInterface } from '../types';
 import { OAuthError, AuthApiError, isOAuthError } from '../../errors';
 
 export function isInteractionRequiredError(error: Error) {

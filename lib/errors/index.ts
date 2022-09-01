@@ -32,3 +32,5 @@ export {
   AuthSdkError,
   OAuthError
 };
+
+export * from './types';

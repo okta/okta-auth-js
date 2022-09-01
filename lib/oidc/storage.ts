@@ -5,12 +5,12 @@ import {
   StorageUtil
 } from '../storage/types';
 import { BaseStorageManager, logServerSideMemoryStorageWarning } from '../storage/BaseStorageManager';
-import { TransactionStorage, OAuthTransactionMeta, OAuthStorageManagerInterface } from './types';
+import { TransactionStorage, OAuthTransactionMeta, OAuthStorageManagerInterface, PKCETransactionMeta } from './types';
 import { SavedObject } from '../storage';
 import { ORIGINAL_URI_STORAGE_NAME, SHARED_TRANSACTION_STORAGE_NAME, TRANSACTION_STORAGE_NAME } from '../constants';
 
 
-export function createOAuthStorageManager<M extends OAuthTransactionMeta>()
+export function createOAuthStorageManager<M extends OAuthTransactionMeta = PKCETransactionMeta>()
 {
   return class OAuthStorageManager
     extends BaseStorageManager

@@ -13,7 +13,7 @@
 
 
 import { IdxRemediation, IdxRemediationValue, IdxAuthenticator } from '../types/idx-js';
-import { RemediateOptions } from '../../types';
+import { RemediateOptions } from '../types';
 import { Remediator, RemediationValues } from './Base/Remediator';
 import { Authenticator, Credentials, OktaPassword } from '../authenticator';
 

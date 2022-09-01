@@ -12,9 +12,9 @@
 
 
 import { AuthSdkError } from '../../errors';
-import { CustomUrls, OAuthParams, OAuthResponse, OktaAuthHttpInterface, RefreshToken, TokenParams } from '../../types';
+import { CustomUrls, OAuthParams, OAuthResponse, RefreshToken, TokenParams } from '../types';
 import { removeNils, toQueryString } from '../../util';
-import { httpRequest } from '../../http';
+import { httpRequest, OktaAuthHttpInterface } from '../../http';
 
 function validateOptions(options: TokenParams) {
   // Quick validation

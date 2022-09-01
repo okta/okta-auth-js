@@ -15,7 +15,7 @@
 import { getWellKnown, getKey } from './endpoints/well-known';
 import { validateClaims } from './util';
 import { AuthSdkError } from '../errors';
-import { IDToken, OktaAuthOAuthInterface, TokenVerifyParams } from '../types';
+import { IDToken, OktaAuthOAuthInterface, TokenVerifyParams } from '../oidc/types';
 import { decodeToken } from './decodeToken';
 import * as sdkCrypto from '../crypto';
 

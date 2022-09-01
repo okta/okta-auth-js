@@ -18,13 +18,13 @@ import { mixinSession } from '../session/mixin';
 export function createOktaAuthCore<
   M extends PKCETransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
-  O extends OktaAuthCoreOptions<M, S> = OktaAuthCoreOptions<M, S>,
+  O extends OktaAuthCoreOptions = OktaAuthCoreOptions,
   TM extends TransactionManagerInterface = TransactionManagerInterface
 >(
   StorageManagerConstructor: StorageManagerConstructor<S>,
   OptionsConstructor: OktaAuthOptionsConstructor<O>,
-  TransactionManagerConstructor: TransactionManagerConstructor<M, S, TM>
-): OktaAuthConstructor<O, OktaAuthCoreInterface<M, S, O, TM>>
+  TransactionManagerConstructor: TransactionManagerConstructor<TM>
+): OktaAuthConstructor<OktaAuthCoreInterface<M, S, O, TM>>
 {
   const Base = createOktaAuthBase(OptionsConstructor);
   const WithStorage = mixinStorage<S, O>(Base, StorageManagerConstructor);

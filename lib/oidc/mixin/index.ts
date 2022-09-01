@@ -1,12 +1,10 @@
-import { REFERRER_PATH_STORAGE_KEY } from '../constants';
-import { RequestOptions } from '../http/types';
-import { httpRequest } from '../http';
-import { OktaAuthConstructor } from '../base/types';
+import { httpRequest, RequestOptions } from '../../http';
+import { OktaAuthConstructor } from '../../base/types';
 import { 
   PromiseQueue,
-} from '../util';
-import { CryptoAPI } from '../crypto/types';
-import * as crypto from '../crypto';
+} from '../../util';
+import { CryptoAPI } from '../../crypto/types';
+import * as crypto from '../../crypto';
 import {
   AccessToken,
   CustomUserClaims,
@@ -27,29 +25,31 @@ import {
   TransactionManagerInterface,
   TransactionManagerConstructor,
   UserClaims,
-} from './types';
-import PKCE from './util/pkce';
-import { createTokenAPI } from './factory';
-import { TokenManager } from './TokenManager';
-import { getOAuthUrls, isLoginRedirect } from './util';
-import browserStorage from '../browser/browserStorage';
-import { OktaAuthSessionInterface } from '../session/types';
+} from '../types';
+import PKCE from '../util/pkce';
+import { createTokenAPI } from '../factory';
+import { TokenManager } from '../TokenManager';
+import { getOAuthUrls, isLoginRedirect } from '../util';
 
+import { OktaAuthSessionInterface } from '../../session/types';
+import { provideOriginalUri } from './node';
 export function mixinOAuth
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
-  O extends OktaAuthOAuthOptions<M, S> = OktaAuthOAuthOptions<M, S>,
+  O extends OktaAuthOAuthOptions = OktaAuthOAuthOptions,
   TM extends TransactionManagerInterface = TransactionManagerInterface,
-  TBase extends OktaAuthConstructor<O, OktaAuthSessionInterface<S, O>>
-    = OktaAuthConstructor<O, OktaAuthSessionInterface<S, O>>
+  TBase extends OktaAuthConstructor<OktaAuthSessionInterface<S, O>>
+    = OktaAuthConstructor<OktaAuthSessionInterface<S, O>>
 >
 (
   Base: TBase,
-  TransactionManagerConstructor: TransactionManagerConstructor<M, S, TM>,
-): TBase & OktaAuthConstructor<O, OktaAuthOAuthInterface<M, S, O, TM>>
+  TransactionManagerConstructor: TransactionManagerConstructor<TM>,
+): TBase & OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O, TM>>
 {
-  return class OktaAuthOAuth extends Base implements OktaAuthOAuthInterface<M, S, O, TM>
+  const WithOriginalUri = provideOriginalUri(Base);
+  return class OktaAuthOAuth extends WithOriginalUri
+  implements OktaAuthOAuthInterface<M, S, O, TM>
   {
     static crypto: CryptoAPI = crypto;
     token: TokenAPI;
@@ -182,48 +182,6 @@ export function mixinOAuth
     async storeTokensFromRedirect(): Promise<void> {
       const { tokens } = await this.token.parseFromUrl();
       this.tokenManager.setTokens(tokens);
-    }
-
-    setOriginalUri(originalUri: string, state?: string): void {
-      // always store in session storage
-      const sessionStorage = browserStorage.getSessionStorage();
-      sessionStorage.setItem(REFERRER_PATH_STORAGE_KEY, originalUri);
-  
-      // to support multi-tab flows, set a state in constructor or pass as param
-      state = state || this.options.state;
-      if (state) {
-        const sharedStorage = this.storageManager.getOriginalUriStorage();
-        sharedStorage.setItem(state, originalUri);
-      }
-    }
-  
-    getOriginalUri(state?: string): string | undefined {
-      // Prefer shared storage (if state is available)
-      state = state || this.options.state;
-      if (state) {
-        const sharedStorage = this.storageManager.getOriginalUriStorage();
-        const originalUri = sharedStorage.getItem(state);
-        if (originalUri) {
-          return originalUri;
-        }
-      }
-  
-      // Try to load from session storage
-      const storage = browserStorage.getSessionStorage();
-      return storage ? storage.getItem(REFERRER_PATH_STORAGE_KEY) || undefined : undefined;
-    }
-  
-    removeOriginalUri(state?: string): void {
-      // Remove from sessionStorage
-      const storage = browserStorage.getSessionStorage();
-      storage.removeItem(REFERRER_PATH_STORAGE_KEY);
-  
-      // Also remove from shared storage
-      state = state || this.options.state;
-      if (state) {
-        const sharedStorage = this.storageManager.getOriginalUriStorage();
-        sharedStorage.removeItem && sharedStorage.removeItem(state);
-      }
     }
   
     isLoginRedirect(): boolean {
@@ -379,4 +337,5 @@ export function mixinOAuth
     }
 
   };
+
 }

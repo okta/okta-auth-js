@@ -32,7 +32,9 @@ jest.mock('../../../../lib/oidc/endpoints/well-known', () => {
 });
 import { OktaAuth } from '@okta/okta-auth-js';
 import { prepareTokenParams, pkce }  from '../../../../lib/oidc';
-import TransactionManager from '../../../../lib/oidc/TransactionManager';
+import { createTransactionManager } from '../../../../lib/oidc/TransactionManager';
+
+const TransactionManager = createTransactionManager();
 
 describe('prepareTokenParams', function() {
 

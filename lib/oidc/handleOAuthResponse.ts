@@ -27,7 +27,7 @@ import {
   TokenResponse,
   CustomUrls,
   Tokens,
-} from '../types';
+} from './types';
 import { verifyToken } from './verifyToken';
 import { getDefaultTokenParams } from './util';
 

@@ -37,10 +37,10 @@ export function mixinAuthn
 <
   S extends StorageManagerInterface = StorageManagerInterface,
   O extends OktaAuthHttpOptions = OktaAuthHttpOptions,
-  TBase extends OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
-    = OktaAuthConstructor<O, OktaAuthHttpInterface<S, O>>
+  TBase extends OktaAuthConstructor<OktaAuthHttpInterface<S, O>>
+    = OktaAuthConstructor<OktaAuthHttpInterface<S, O>>
 >
-(Base: TBase): TBase & OktaAuthConstructor<O, OktaAuthTxInterface<S, O>>
+(Base: TBase): TBase & OktaAuthConstructor<OktaAuthTxInterface<S, O>>
 {
   return class OktaAuthTx extends Base implements OktaAuthTxInterface<S, O> {
     tx: AuthnTransactionAPI; // legacy, may be removed in future version
@@ -58,11 +58,6 @@ export function mixinAuthn
 
     // Authn  V1
     async signIn(opts: SigninOptions): Promise<AuthnTransaction> {
-      return this.signInWithCredentials(opts as SigninWithCredentialsOptions);
-    }
-
-    // Authn  V1
-    async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthnTransaction> {
       opts = clone(opts || {});
       const _postToTransaction = (options?) => {
         delete opts.sendFingerprint;
@@ -79,6 +74,11 @@ export function mixinAuthn
           }
         });
       });
+    }
+
+    // Authn  V1
+    async signInWithCredentials(opts: SigninWithCredentialsOptions): Promise<AuthnTransaction> {
+      return this.signIn(opts);
     }
 
     // { username, (relayState) }

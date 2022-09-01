@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuthBaseInterface, OktaAuthBaseOptions } from '../base/types';
+import { OktaAuthBaseInterface, OktaAuthBaseOptions, OktaAuthOptionsConstructor } from '../base/types';
 
 export interface CookieOptions {
   path?: string;
@@ -97,10 +97,7 @@ export interface OktaAuthStorageOptions extends OktaAuthBaseOptions {
 }
 
 // a class that constructs options
-export interface OktaAuthStorageOptionsConstructor<O extends OktaAuthStorageOptions = OktaAuthStorageOptions> {
-  new(args: any): O;
-}
-
+export type OktaAuthStorageOptionsConstructor = OktaAuthOptionsConstructor<OktaAuthStorageOptions>;
 
 // an instance of AuthJS with storage capabilities
 export interface OktaAuthStorageInterface

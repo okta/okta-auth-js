@@ -13,7 +13,7 @@
 import { AuthSdkError } from '../errors';
 import { getOAuthUrls } from './util/oauth';
 import { isSameRefreshToken } from './util/refreshToken';
-import { OktaAuthOAuthInterface, TokenParams, RefreshToken, Tokens } from '../types';
+import { OktaAuthOAuthInterface, TokenParams, RefreshToken, Tokens } from './types';
 import { handleOAuthResponse } from './handleOAuthResponse';
 import { postRefreshToken } from './endpoints/token';
 import { isRefreshTokenInvalidError } from './util/errors';

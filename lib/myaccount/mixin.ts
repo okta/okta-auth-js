@@ -2,9 +2,10 @@ import { OktaAuthConstructor } from '../base/types';
 import {
   OAuthStorageManagerInterface,
   OAuthTransactionMeta,
+  OktaAuthOAuthInterface,
+  OktaAuthOAuthOptions,
   PKCETransactionMeta,
 } from '../oidc/types';
-import { OktaAuthCoreInterface, OktaAuthCoreOptions } from '../core/types';
 import { OktaAuthMyAccountInterface } from './types';
 
 import * as MyAccountMethods from './api';
@@ -13,11 +14,11 @@ export function mixinMyAccount
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
-  O extends OktaAuthCoreOptions<M, S> = OktaAuthCoreOptions<M, S>,
-  TBase extends OktaAuthConstructor<O, OktaAuthCoreInterface<M, S, O>>
-    = OktaAuthConstructor<O, OktaAuthCoreInterface<M, S, O>>
+  O extends OktaAuthOAuthOptions = OktaAuthOAuthOptions,
+  TBase extends OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O>>
+    = OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O>>
 >
-(Base: TBase): TBase & OktaAuthConstructor<O, OktaAuthMyAccountInterface<M, S, O>>
+(Base: TBase): TBase & OktaAuthConstructor<OktaAuthMyAccountInterface<M, S, O>>
 {
   return class OktaAuthMyAccount extends Base implements OktaAuthMyAccountInterface<M, S, O>
   {

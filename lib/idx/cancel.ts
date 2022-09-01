@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuthIdxInterface, CancelOptions, IdxTransactionMeta } from '../types';
+import { OktaAuthIdxInterface, CancelOptions, IdxTransactionMeta } from './types';
 import { run } from './run';
 import { getFlowSpecification } from './flow';
 
