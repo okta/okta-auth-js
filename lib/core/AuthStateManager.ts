@@ -16,15 +16,17 @@
 import PCancelable from 'p-cancelable';
 import { AuthSdkError } from '../errors';
 import {
-  AuthState,
-  AuthStateLogOptions,
   EVENT_ADDED,
   EVENT_REMOVED,
   OAuthStorageManagerInterface,
   OAuthTransactionMeta,
-  OktaAuthCoreOptions,
   OktaAuthOAuthInterface
-} from '../types';
+} from '../oidc';
+import {
+  AuthState,
+  AuthStateLogOptions,
+  OktaAuthCoreOptions,
+} from './types';
 import { PromiseQueue, getConsole } from '../util';
 
 export const INITIAL_AUTH_STATE = null;
@@ -53,7 +55,7 @@ export class AuthStateManager
 <
   M extends OAuthTransactionMeta,
   S extends OAuthStorageManagerInterface<M>,
-  O extends OktaAuthCoreOptions<M, S>
+  O extends OktaAuthCoreOptions
 >
 {
   _sdk: OktaAuthOAuthInterface<M, S, O>;

@@ -16,7 +16,7 @@
     "emitDeclarationOnly": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "outDir": "./build",
+    "outDir": "./build/types",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": false,
@@ -31,7 +31,6 @@
     "package.json"
   ],
   "include": [
-    "types/**/*.ts",
     "lib/**/*.js",
     "lib/**/*.ts",
   ],

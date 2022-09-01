@@ -16,7 +16,7 @@ import {
   IdxPollOptions,
   IdxTransaction,
   OktaAuthIdxInterface,
-} from '../types';
+} from './types';
 import { getSavedTransactionMeta } from './transactionMeta';
 import { warn } from '../util';
 

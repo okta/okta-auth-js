@@ -11,7 +11,7 @@
  */
 
 
-import { ServiceInterface, ServiceManagerOptions } from '../types';
+import { ServiceInterface, ServiceManagerOptions } from '../core/types';
 import {
   BroadcastChannel,
   createLeaderElection,

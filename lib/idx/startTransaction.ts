@@ -12,7 +12,7 @@
 
 
 import { run } from './run';
-import { OktaAuthIdxInterface, IdxTransaction, StartOptions } from '../types';
+import { OktaAuthIdxInterface, IdxTransaction, StartOptions } from './types';
 
 export async function startTransaction(
   authClient: OktaAuthIdxInterface, 

@@ -17,7 +17,7 @@ import {
   OktaAuthIdxInterface, 
   PasswordRecoveryOptions, 
   IdxTransaction,
-} from '../types';
+} from './types';
 
 export async function recoverPassword(
   authClient: OktaAuthIdxInterface, options: PasswordRecoveryOptions = {}

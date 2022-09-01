@@ -15,7 +15,7 @@
 import { Remediator, RemediationValues } from './Remediator';
 import { getAuthenticatorFromRemediation } from '../util';
 import { IdxRemediationValue } from '../../types/idx-js';
-import { Authenticator, isAuthenticator } from '../../types';
+import { Authenticator, isAuthenticator } from '../../types/api';
 import { compareAuthenticators, findMatchedOption} from '../../authenticator/util';
 
 export type SelectAuthenticatorValues = RemediationValues & {

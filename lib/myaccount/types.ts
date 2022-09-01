@@ -1,8 +1,8 @@
-import { OktaAuthCoreInterface, OktaAuthCoreOptions } from '../core/types';
 import {
   OAuthStorageManagerInterface,
   OAuthTransactionMeta,
   OktaAuthOAuthInterface,
+  OktaAuthOAuthOptions,
   PKCETransactionMeta
 } from '../oidc/types';
 
@@ -91,9 +91,9 @@ export interface OktaAuthMyAccountInterface
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
-  O extends OktaAuthCoreOptions<M, S> = OktaAuthCoreOptions<M, S>
+  O extends OktaAuthOAuthOptions = OktaAuthOAuthOptions
 > 
-  extends OktaAuthCoreInterface<M, S, O>
+  extends OktaAuthOAuthInterface<M, S, O>
 {
   myaccount;
 }

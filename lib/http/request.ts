@@ -20,7 +20,7 @@ import {
   RequestOptions,
   FetchOptions,
   RequestData
-} from '../types';
+} from './types';
 import { AuthApiError, OAuthError } from '../errors';
 
 export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions): Promise<any> {

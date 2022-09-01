@@ -14,7 +14,7 @@
 import { isFunction } from '../util';
 import { AuthSdkError, OAuthError } from '../errors';
 import { httpRequest } from '../http';
-import { AccessToken, IDToken, UserClaims, isAccessToken, isIDToken, CustomUserClaims } from '../types';
+import { AccessToken, IDToken, UserClaims, isAccessToken, isIDToken, CustomUserClaims } from './types';
 
 export async function getUserInfo<T extends CustomUserClaims = CustomUserClaims>(
   sdk, accessTokenObject: AccessToken,

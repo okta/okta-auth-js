@@ -1,3 +1,5 @@
+// This file contains ambient declarations. Do not export anything from this file, neither try to import it
+
 declare const SDK_VERSION: string;
 
 declare interface PromiseConstructor {

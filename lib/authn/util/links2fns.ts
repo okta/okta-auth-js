@@ -1,4 +1,4 @@
-import { OktaAuthHttpInterface } from '../../types';
+import { OktaAuthHttpInterface } from '../../http/types';
 import { AuthnTransactionFunctions, AuthnTransactionAPI } from '../types';
 import { link2fn } from './link2fn';
 import { getPollFn } from './poll';

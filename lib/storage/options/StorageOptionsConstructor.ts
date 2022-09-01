@@ -10,20 +10,24 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { BaseOptionsConstructor } from '../../base';
+import { createBaseOptionsConstructor } from '../../base';
 import { CookieOptions, OktaAuthStorageOptions, StorageManagerOptions, StorageUtil } from '../types';
 import { getStorage, STORAGE_MANAGER_OPTIONS, getCookieSettings } from './node';
 import { isHTTPS } from '../../features';
 
-export class StorageOptionsConstructor extends BaseOptionsConstructor implements Required<OktaAuthStorageOptions> {
-  cookies: CookieOptions;
-  storageUtil: StorageUtil;
-  storageManager: StorageManagerOptions;
-  
-  constructor(args: any) {
-    super(args);
-    this.cookies = getCookieSettings(args, isHTTPS())!;
-    this.storageUtil = args.storageUtil || getStorage();
-    this.storageManager = { ...STORAGE_MANAGER_OPTIONS, ...args.storageManager };
-  }
+export function createStorageOptionsConstructor() {
+
+  const BaseOptionsConstructor = createBaseOptionsConstructor();
+  return class StorageOptionsConstructor extends BaseOptionsConstructor implements Required<OktaAuthStorageOptions> {
+    cookies: CookieOptions;
+    storageUtil: StorageUtil;
+    storageManager: StorageManagerOptions;
+    
+    constructor(args: any) {
+      super(args);
+      this.cookies = getCookieSettings(args, isHTTPS())!;
+      this.storageUtil = args.storageUtil || getStorage();
+      this.storageManager = { ...STORAGE_MANAGER_OPTIONS, ...args.storageManager };
+    }
+  };
 }

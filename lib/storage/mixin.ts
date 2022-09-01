@@ -10,11 +10,11 @@ export function mixinStorage
 <
   S extends StorageManagerInterface = StorageManagerInterface,
   O extends OktaAuthStorageOptions = OktaAuthStorageOptions,
-  TBase extends OktaAuthConstructor<O, OktaAuthBaseInterface<O>> = OktaAuthConstructor<O, OktaAuthBaseInterface<O>>
+  TBase extends OktaAuthConstructor<OktaAuthBaseInterface<O>> = OktaAuthConstructor<OktaAuthBaseInterface<O>>
 >
 (
   Base: TBase, StorageManager: StorageManagerConstructor<S>
-): TBase & OktaAuthConstructor<O, OktaAuthStorageInterface<S, O>>
+): TBase & OktaAuthConstructor<OktaAuthStorageInterface<S, O>>
 {
   return class OktaAuthStorage extends Base implements OktaAuthStorageInterface<S, O>
   {

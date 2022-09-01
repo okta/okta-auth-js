@@ -1,20 +1,29 @@
-import { createCoreOptionsConstructor } from '../core/options';
-import { createCoreStorageManager } from '../core/storage';
-import { createOktaAuthCore } from '../core/factory';
-import { mixinAuthn } from '../authn';
-import TransactionManager from '../oidc/TransactionManager';
 import {
+  OktaAuthOptionsConstructor,
+} from '../base';
+import {
+  StorageManagerConstructor,
+} from '../storage';
+import {
+  createTransactionManager,
+  TransactionManagerConstructor
+} from '../oidc';
+import {
+  createCoreOptionsConstructor,
+  createCoreStorageManager,
+  createOktaAuthCore,
   CoreStorageManagerInterface,
   OktaAuthCoreOptions,
-  OktaAuthOptionsConstructor,
-  StorageManagerConstructor
-} from '../types';
+} from '../core';
+import { mixinAuthn } from '../authn';
+
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface OktaAuthOptions extends OktaAuthCoreOptions {}
 
 const OptionsConstructor: OktaAuthOptionsConstructor<OktaAuthOptions> = createCoreOptionsConstructor();
 const StorageManager: StorageManagerConstructor<CoreStorageManagerInterface> = createCoreStorageManager();
+const TransactionManager: TransactionManagerConstructor = createTransactionManager();
 const Core = createOktaAuthCore(StorageManager, OptionsConstructor, TransactionManager);
 const WithAuthn = mixinAuthn(Core);
 

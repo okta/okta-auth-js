@@ -12,8 +12,8 @@
 
 
 import { RawIdxResponseFactory } from '@okta/test.support/idx';
-import { AuthApiError } from '../../../lib/errors';
-import { APIError, HttpResponse } from '../../../lib/types';
+import { AuthApiError, APIError } from '../../../lib/errors';
+import { HttpResponse } from '../../../lib/http';
 import { introspect } from '../../../lib/idx/introspect';
 
 jest.mock('../../../lib/http', () => {

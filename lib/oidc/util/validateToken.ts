@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 
 import { AuthSdkError } from '../../errors';
-import { isAccessToken, isIDToken, isRefreshToken, Token, TokenType } from '../../types';
+import { isAccessToken, isIDToken, isRefreshToken, Token, TokenType } from '../../oidc/types';
 
 export function validateToken(token: Token, type?: TokenType) {
   if (!isIDToken(token) && !isAccessToken(token) && !isRefreshToken(token)) {

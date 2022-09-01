@@ -12,7 +12,7 @@
 
 /* eslint-disable max-len, complexity */
 import { httpRequest } from '../../../http';
-import { OktaAuthIdxInterface } from '../../../types';    // auth-js/types
+import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
 import AuthApiError from '../../../errors/AuthApiError';

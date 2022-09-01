@@ -13,8 +13,7 @@
 const verifyToken = jest.fn();
 jest.mock('../../../../lib/oidc/verifyToken', () => { return { verifyToken }; });
 
-import { handleOAuthResponse } from '../../../../lib/oidc';
-import { CustomUrls, TokenParams } from '../../../../lib/types';
+import { handleOAuthResponse, CustomUrls, TokenParams } from '../../../../lib/oidc';
 
 describe('handleOAuthResponse', () => {
   let sdk;

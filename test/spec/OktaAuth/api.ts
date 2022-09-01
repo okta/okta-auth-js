@@ -15,10 +15,12 @@
 import { 
   OktaAuth, 
   AuthApiError,
-  AuthSdkError
+  AuthSdkError,
+  APIError,
+  isAccessToken,
+  isIDToken
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
-import { APIError, isAccessToken, isIDToken } from '../../../lib/types';
 import util from '@okta/test.support/util';
 
 describe('OktaAuth (api)', function() {
@@ -73,19 +75,19 @@ describe('OktaAuth (api)', function() {
     });
 
   });
-  describe('signInWithCredentials', () => {
+  describe('signIn', () => {
     let options;
     beforeEach(() => {
       options = { username: 'fake', password: 'fake' };
       auth.fingerprint = jest.fn().mockResolvedValue('fake fingerprint');
     });
     it('should call "/api/v1/authn" endpoint with default options', async () => {
-      await auth.signInWithCredentials(options);
+      await auth.signIn(options);
       expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn', options, undefined);
     });
     it('should call fingerprint if has sendFingerprint in options', async () => {
       options.sendFingerprint = true;
-      await auth.signInWithCredentials(options);
+      await auth.signIn(options);
       delete options.sendFingerprint;
       expect(auth.fingerprint).toHaveBeenCalled();
       expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn', options, {
@@ -94,20 +96,20 @@ describe('OktaAuth (api)', function() {
     });
     it('can pass stateToken to /authn endpoint', async () => {
       options = { stateToken: 'fake-stateToken' };
-      await auth.signInWithCredentials(options);
+      await auth.signIn(options);
       expect(auth.tx.postToTransaction).toHaveBeenCalledWith('/api/v1/authn', options, undefined);
     });
   });
 
-  describe('signIn', () => {
+  describe('signInWithCredentials', () => {
     let options;
     beforeEach(() => {
       options = { username: 'fake', password: 'fake' };
-      auth.signInWithCredentials = jest.fn();
+      auth.signIn = jest.fn();
     });
     it('should call signIn() with provided options', async () => {
-      await auth.signIn(options);
-      expect(auth.signInWithCredentials).toHaveBeenCalledWith(options);
+      await auth.signInWithCredentials(options);
+      expect(auth.signIn).toHaveBeenCalledWith(options);
     });
   });
 

@@ -19,7 +19,7 @@ import {
   CustomUrls,
   TransactionMeta,
   OAuthResponse
-} from '../types';
+} from './types';
 import { isString } from '../util';
 import { handleOAuthResponse } from './handleOAuthResponse';
 

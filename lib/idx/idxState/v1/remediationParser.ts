@@ -12,7 +12,7 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { OktaAuthIdxInterface } from '../../../types';    // auth-js/types
+import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import generateIdxAction from './generateIdxAction';
 
 export const generateRemediationFunctions = function generateRemediationFunctions(

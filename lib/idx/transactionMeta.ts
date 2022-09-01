@@ -11,9 +11,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuthIdxInterface, IdxTransactionMeta, PKCETransactionMeta, IdxTransactionMetaOptions } from '../types';
+import { OktaAuthIdxInterface, IdxTransactionMeta, IdxTransactionMetaOptions } from './types';
 import { removeNils, warn } from '../util';
-import { createOAuthMeta } from '../oidc';
+import { createOAuthMeta, PKCETransactionMeta } from '../oidc';
 
 // Calculate new values
 export async function createTransactionMeta(

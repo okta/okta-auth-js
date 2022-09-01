@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { CustomUrls, OAuthResponse, OAuthResponseType, OktaAuthOAuthInterface, TokenParams, TokenResponse } from '../types';
+import { CustomUrls, OAuthResponse, OAuthResponseType, OktaAuthOAuthInterface, TokenParams, TokenResponse } from './types';
 import { getOAuthUrls, getDefaultTokenParams } from './util';
 import { clone } from '../util';
 import { postToTokenEndpoint } from './endpoints/token';

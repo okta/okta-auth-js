@@ -12,10 +12,14 @@
 
 import { OktaAuthBaseOptions } from './types';
 
-export class BaseOptionsConstructor implements Required<OktaAuthBaseOptions> {
-  devMode: boolean;
+export function createBaseOptionsConstructor() {
 
-  constructor(args: any) {
-    this.devMode = !!args.devMode;
-  }
+  return class BaseOptionsConstructor implements Required<OktaAuthBaseOptions> {
+    devMode: boolean;
+
+    constructor(args: any) {
+      this.devMode = !!args.devMode;
+    }
+  };
+
 }

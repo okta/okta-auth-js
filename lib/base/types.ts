@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import * as constants from '../constants';
+
 export declare class EventEmitter {
   on   (event: string, callback: (...args: any[]) => any, ctx?: any): EventEmitter;
   once (event: string, callback: (...args: any[]) => any, ctx?: any): EventEmitter;
@@ -46,11 +48,12 @@ export interface OktaAuthBaseInterface<O extends OktaAuthBaseOptions = OktaAuthB
 }
 
 // a constructor that returns an instance of AuthJS
-export interface OktaAuthConstructor<
-  O extends OktaAuthBaseOptions = OktaAuthBaseOptions,
-  I extends OktaAuthBaseInterface<O> = OktaAuthBaseInterface<O>
+export interface OktaAuthConstructor
+<
+  I extends OktaAuthBaseInterface = OktaAuthBaseInterface
 > 
 {
   new(...args: any[]): I;
   features: FeaturesAPI; // static class member
+  constants: typeof constants;
 }

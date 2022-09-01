@@ -53,7 +53,8 @@ export interface TokenManagerInterface {
   renew(key: string): Promise<Token | undefined>;
   remove(key: string): void;
   hasExpired(token: Token): boolean;
-  
+  getExpireTime(token: Token): number;
+
   get(key): Promise<Token>;
   getSync(key): Token;
   getTokens(): Promise<Tokens>;

@@ -12,22 +12,14 @@
 
 import { createCoreOptionsConstructor } from '../core/options';
 import { FlowIdentifier } from './types/FlowIdentifier';
-import { IdxTransactionMeta } from './types/meta';
 import { OktaAuthIdxOptions } from './types/options';
-import { IdxStorageManagerInterface } from './types/storage';
 
 
-export function createIdxOptionsConstructor
-<
-  M extends IdxTransactionMeta,
-  S extends IdxStorageManagerInterface<M>
->
-()
-{
-  const CoreOptionsConstructor = createCoreOptionsConstructor<M, S>();
+export function createIdxOptionsConstructor() {
+  const CoreOptionsConstructor = createCoreOptionsConstructor();
   return class IdxOptionsConstructor
     extends CoreOptionsConstructor 
-    implements Required<OktaAuthIdxOptions<M, S>>
+    implements Required<OktaAuthIdxOptions>
   {
     flow: FlowIdentifier;
     activationToken: string;

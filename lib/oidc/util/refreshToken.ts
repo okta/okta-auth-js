@@ -1,4 +1,4 @@
-import { RefreshToken } from '../../types';
+import { RefreshToken } from '../types';
 import { isAuthApiError } from '../../errors';
 
 export function isSameRefreshToken(a: RefreshToken, b: RefreshToken) {
