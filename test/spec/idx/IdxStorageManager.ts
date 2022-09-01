@@ -11,15 +11,14 @@
  */
 
 
-import { SavedObject } from '../../../lib/storage/SavedObject';
-import { createIdxStorageManager } from '../../../lib/idx/storage';
 import { 
-  CookieOptions, 
+  CookieOptions,
+  SavedObject,
   StorageManagerOptions, 
   StorageProvider, 
-  StorageUtil, 
-  IdxResponseStorage,
-} from '../../../lib/types';
+  StorageUtil
+} from '../../../lib/storage';
+import { createIdxStorageManager, IdxResponseStorage } from '../../../lib/idx';
 
 jest.mock('../../../lib/util', () => {
   return {

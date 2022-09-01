@@ -22,7 +22,7 @@ var wellKnown = require('./xhr/well-known');
 var wellKnownSharedResource = require('./xhr/well-known-shared-resource');
 var keys = require('./xhr/keys');
 import storageUtil from '../../lib/browser/browserStorage';
-import { isAccessToken, isIDToken } from '../../lib/types';
+import { isAccessToken, isIDToken } from '../../lib/oidc/types';
 
 var oauthUtil = {};
 

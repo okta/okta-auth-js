@@ -1,5 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore 
+
+
 // Do not use this type in code, so it won't be emitted in the declaration output
 import { removeNils } from '../util';
 
@@ -26,7 +26,7 @@ export function createOktaAuthBase
 >
 (
   OptionsConstructor: OktaAuthOptionsConstructor<O>
-): OktaAuthConstructor<O, OktaAuthBaseInterface<O>>
+): OktaAuthConstructor<OktaAuthBaseInterface<O>>
 {
   class OktaAuthBase implements OktaAuthBaseInterface<O>
   {
@@ -34,6 +34,7 @@ export function createOktaAuthBase
     emitter: EventEmitter;
     features: FeaturesAPI;
     static features: FeaturesAPI = features;
+    static constants = constants;
     
     constructor(...args: any[]) {
       const options = new OptionsConstructor(args.length ? args[0] || {} : {});

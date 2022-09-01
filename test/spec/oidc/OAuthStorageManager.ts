@@ -11,17 +11,16 @@
  */
 
 
-import { SavedObject } from '../../../lib/storage/SavedObject';
-import { createOAuthStorageManager } from '../../../lib/oidc/storage';
-import { 
+import {
+  SavedObject,
   CookieOptions, 
   StorageManagerOptions, 
   StorageOptions, 
   StorageProvider, 
   StorageType, 
   StorageUtil, 
-  TransactionStorage,
-} from '../../../lib/types';
+} from '../../../lib/storage';
+import { TransactionStorage, createOAuthStorageManager } from '../../../lib/oidc';
 
 jest.mock('../../../lib/util', () => {
   return {

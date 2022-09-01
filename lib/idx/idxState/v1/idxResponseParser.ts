@@ -13,7 +13,7 @@
 /* eslint-disable max-len */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { OktaAuthIdxInterface } from '../../../types';    // auth-js/types
+import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { generateRemediationFunctions } from './remediationParser';
 import generateIdxAction from './generateIdxAction';
 import { JSONPath } from 'jsonpath-plus';

@@ -27,7 +27,7 @@ import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 import { postToTokenEndpoint } from '../../../../lib/oidc/endpoints/token';
 import factory from '@okta/test.support/factory';
-import { CustomUrls } from '../../../../lib/types';
+import { CustomUrls } from '../../../../lib/oidc/types';
 
 describe('token endpoint', function() {
   var ISSUER = 'http://example.okta.com';

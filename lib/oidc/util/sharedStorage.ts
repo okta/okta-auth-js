@@ -1,5 +1,4 @@
-import { isTransactionMeta } from '../../types';
-import { OAuthStorageManagerInterface, OAuthTransactionMeta } from '../types';
+import { OAuthStorageManagerInterface, OAuthTransactionMeta, isTransactionMeta } from '../types';
 
 const MAX_ENTRY_LIFETIME = 30 * 60 * 1000; // 30 minutes
 

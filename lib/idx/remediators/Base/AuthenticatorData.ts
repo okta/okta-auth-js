@@ -13,7 +13,7 @@
 
 import { Remediator, RemediationValues } from './Remediator';
 import { IdxRemediationValue, IdxRemediation, IdxAuthenticator } from '../../types/idx-js';
-import { isAuthenticator } from '../../types';
+import { isAuthenticator } from '../../types/api';
 import { compareAuthenticators } from '../../authenticator/util';
 
 export type AuthenticatorDataValues = RemediationValues & {

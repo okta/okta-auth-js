@@ -11,8 +11,8 @@
  *
  */
 
-import AuthSdkError from './errors/AuthSdkError';
-import { isLocalStorageAvailable } from './util';
+import AuthSdkError from '../errors/AuthSdkError';
+import { isLocalStorageAvailable } from '../util/storage';
 import { StorageProvider, SimpleStorage } from './types';
 
 // formerly known as "storageBuilder". Represents an object saved under a key/name.

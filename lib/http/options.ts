@@ -10,23 +10,26 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { StorageOptionsConstructor } from '../storage/options/StorageOptionsConstructor';
+import { createStorageOptionsConstructor } from '../storage';
 import { HttpRequestClient, OktaAuthHttpOptions, RequestOptions } from './types';
 import fetchRequest from '../fetch/fetchRequest';
 
-export class HttpOptionsConstructor extends StorageOptionsConstructor implements Required<OktaAuthHttpOptions> {
-  issuer: string;
-  transformErrorXHR: (xhr: object) => any;
-  headers: object;
-  httpRequestClient: HttpRequestClient;
-  httpRequestInterceptors: ((request: RequestOptions) => void)[];
-  
-  constructor(args: any) {
-    super(args);
-    this.issuer = args.issuer;
-    this.transformErrorXHR = args.transformErrorXHR;
-    this.headers = args.headers;
-    this.httpRequestClient = args.httpRequestClient || fetchRequest;
-    this.httpRequestInterceptors = args.httpRequestInterceptors;
-  }
+export function createHttpOptionsConstructor() {
+  const StorageOptionsConstructor = createStorageOptionsConstructor();
+  return class HttpOptionsConstructor extends StorageOptionsConstructor implements Required<OktaAuthHttpOptions> {
+    issuer: string;
+    transformErrorXHR: (xhr: object) => any;
+    headers: object;
+    httpRequestClient: HttpRequestClient;
+    httpRequestInterceptors: ((request: RequestOptions) => void)[];
+    
+    constructor(args: any) {
+      super(args);
+      this.issuer = args.issuer;
+      this.transformErrorXHR = args.transformErrorXHR;
+      this.headers = args.headers;
+      this.httpRequestClient = args.httpRequestClient || fetchRequest;
+      this.httpRequestInterceptors = args.httpRequestInterceptors;
+    }
+  };
 }

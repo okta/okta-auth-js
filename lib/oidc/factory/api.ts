@@ -11,18 +11,18 @@
  *
  */
 
-import { PromiseQueue } from '../util';
-import { decodeToken } from './decodeToken';
-import { exchangeCodeForTokens } from './exchangeCodeForTokens';
-import { getUserInfo } from './getUserInfo';
-import { getWithoutPrompt } from './getWithoutPrompt';
-import { getWithPopup } from './getWithPopup';
-import { getWithRedirect } from './getWithRedirect';
-import { parseFromUrl } from './parseFromUrl';
-import { renewToken } from './renewToken';
-import { renewTokens } from './renewTokens';
-import { renewTokensWithRefresh } from './renewTokensWithRefresh';
-import { revokeToken } from './revokeToken';
+import { PromiseQueue } from '../../util';
+import { decodeToken } from '../decodeToken';
+import { exchangeCodeForTokens } from '../exchangeCodeForTokens';
+import { getUserInfo } from '../getUserInfo';
+import { getWithoutPrompt } from '../getWithoutPrompt';
+import { getWithPopup } from '../getWithPopup';
+import { getWithRedirect } from '../getWithRedirect';
+import { parseFromUrl } from '../parseFromUrl';
+import { renewToken } from '../renewToken';
+import { renewTokens } from '../renewTokens';
+import { renewTokensWithRefresh } from '../renewTokensWithRefresh';
+import { revokeToken } from '../revokeToken';
 import {
   AccessToken,
   CustomUserClaims,
@@ -33,9 +33,9 @@ import {
   ParseFromUrlInterface,
   TokenAPI,
   UserClaims
-} from './types';
-import { isLoginRedirect, prepareTokenParams } from './util';
-import { verifyToken } from './verifyToken';
+} from '../types';
+import { isLoginRedirect, prepareTokenParams } from '../util';
+import { verifyToken } from '../verifyToken';
 
 // Factory
 export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue): TokenAPI {

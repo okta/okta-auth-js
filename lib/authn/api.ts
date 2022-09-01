@@ -15,7 +15,8 @@
 import { post } from '../http';
 import AuthSdkError from '../errors/AuthSdkError';
 import { STATE_TOKEN_KEY_NAME } from '../constants';
-import { OktaAuthHttpInterface, OktaAuthStorageOptions } from '../types';
+import { OktaAuthHttpInterface } from '../http/types';
+import { OktaAuthStorageOptions } from '../storage/types';
 import { addStateToken } from './util/stateToken';
 import { AuthnTransactionAPI } from './types';
 import { OktaAuthBaseInterface } from '../base/types';

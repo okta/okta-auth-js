@@ -18,7 +18,12 @@
     "baseUrl": "../",
     "lib": [
       "ES2020.Promise"
-    ]
+    ],
+    "paths": {
+      "@okta/okta-auth-js": [
+        "../lib/exports/default"
+      ]
+    }
   },
   "include": [
     "../types/global.d.ts",

@@ -2,9 +2,8 @@ import { warn, split2 } from '../util';
 import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
-import { IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
+import { OktaAuthIdxInterface, IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';
-import { OktaAuthIdxInterface } from '../types';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;

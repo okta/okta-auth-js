@@ -12,7 +12,7 @@
  */
 import { get } from '../../http';
 import { find } from '../../util';
-import { OktaAuthOAuthInterface, WellKnownResponse } from '../../types';
+import { OktaAuthOAuthInterface, WellKnownResponse } from '../types';
 import AuthSdkError from '../../errors/AuthSdkError';
 
 export function getWellKnown(sdk: OktaAuthOAuthInterface, issuer?: string): Promise<WellKnownResponse> {

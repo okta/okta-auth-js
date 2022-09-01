@@ -26,12 +26,12 @@ import {
   NextStep,
   RunOptions,
   IdxTransactionMeta,
-  Tokens,
-  APIError,
-} from '../types';
+} from './types';
 import { IdxMessage, IdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
+import { Tokens } from '../oidc/types';
+import { APIError } from '../errors/types';
 declare interface RunData {
   options: RunOptions;
   values: remediators.RemediationValues;
