@@ -53,6 +53,7 @@ export default class SavedObject implements StorageProvider {
   // StorageProvider interface
   //
 
+  // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
   isSharedStorage() {
     return isLocalStorageAvailable() && this.storageProvider === localStorage as any 
       || !!this.storageProvider.isSharedStorage?.();

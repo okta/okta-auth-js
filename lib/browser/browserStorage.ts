@@ -157,6 +157,7 @@ var storageUtil: BrowserStorageUtil = {
       removeItem: (key) => {
         this.storage.delete(key);
       },
+      // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
       isSharedStorage: () => true
     };
 
@@ -199,6 +200,7 @@ var storageUtil: BrowserStorageUtil = {
           storage.removeItem(key + '_' + k);
         });
       },
+      // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
       isSharedStorage: () => true
     };
   },
@@ -213,6 +215,7 @@ var storageUtil: BrowserStorageUtil = {
       setItem: (key, value) => {
         this.inMemoryStore[key] = value;
       },
+      // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
       isSharedStorage: () => false
     };
   },

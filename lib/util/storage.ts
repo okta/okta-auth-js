@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+// TODO: remove once the usage is removed from SaveObject.ts
+// JIRA: https://oktainc.atlassian.net/browse/OKTA-529631
 export function isLocalStorageAvailable(): boolean {
   const test = 'test';
   try {

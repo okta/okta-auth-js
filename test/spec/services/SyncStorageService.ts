@@ -44,6 +44,7 @@ describe('SyncStorageService', () => {
       clearStorage: jest.fn().mockImplementation(() => {
         storage = {};
       }),
+      // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
       isSharedStorage: jest.fn().mockReturnValue(true),
     };
     sdkMock = {
