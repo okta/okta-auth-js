@@ -135,6 +135,7 @@ export class TokenManager implements TokenManagerInterface {
     this.state = defaultState();
   }
 
+  // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
   hasSharedStorage() {
     return this.storage.isSharedStorage();
   }

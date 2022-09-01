@@ -51,7 +51,10 @@ export class SyncStorageService implements ServiceInterface {
   }
 
   canStart() {
-    return !!this.options.syncStorage && isBrowser();
+    // TODO: canStart logic should depend on canUse logic from broadcast-channel 
+    // instead of the storage that TokenManager uses
+    // JIRA: https://oktainc.atlassian.net/browse/OKTA-529631
+    return !!this.options.syncStorage && isBrowser() && this.tokenManager.hasSharedStorage();
   }
 
   async start() {
