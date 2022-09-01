@@ -51,7 +51,7 @@ Server-side web applications must also provide a [clientSecret](../README.md#cli
 
 ## Transaction Models
 
-### AuthN
+### Authn
 
 Entrypoint methods in the `authn` API, such as [signInWithCredentials](authn.md#signinwithcredentialsoptions) and [forgotPassword](authn.md#forgotpasswordoptions) return a `Transaction` object which has a [status](authn.md#transactionstatus) field and various [methods](authn.md#common-methods) to proceed or cancel the transaction.
 
